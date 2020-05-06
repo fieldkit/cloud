@@ -42,15 +42,6 @@ func stripQuotes(p *string) string {
 	return s
 }
 
-func isOutgoingFirmwareOlderThanIncoming(compiled string, fw *data.DeviceFirmware) bool {
-	unix, err := strconv.Atoi(compiled)
-	if err != nil {
-		return false
-	}
-	incoming := time.Unix(int64(unix), 0)
-	return incoming.After(fw.Time)
-}
-
 func FirmwareSummaryType(fw *data.Firmware) *app.FirmwareSummary {
 	buildNumber := 0
 	buildTime := 0
@@ -147,106 +138,6 @@ func (c *FirmwareController) Download(ctx *app.DownloadFirmwareContext) error {
 	return nil
 }
 
-func (c *FirmwareController) Check(ctx *app.CheckFirmwareContext) error {
-	log := Logger(ctx).Sugar()
-
-	incomingETag := stripQuotes(ctx.IfNoneMatch)
-	compiled := ctx.FkCompiled
-
-	log.Infow("device", "device_id", ctx.DeviceID, "module", ctx.Module, "incoming_etag", incomingETag, "compiled", compiled)
-
-	firmwares := []*data.DeviceFirmware{}
-	query := "SELECT f.* FROM fieldkit.device_firmware AS f JOIN fieldkit.device AS d ON f.device_id = d.source_id WHERE d.key = $1 AND f.module = $2 ORDER BY time DESC LIMIT 1"
-	if err := c.options.Database.SelectContext(ctx, &firmwares, query, ctx.DeviceID, ctx.Module); err != nil {
-		return err
-	}
-
-	if len(firmwares) == 0 {
-		return ctx.NotFound()
-	}
-
-	fw := firmwares[0]
-
-	log.Infow("firmware", "time", fw.Time, "url", fw.URL, "etag", fw.ETag, "incoming_etag", incomingETag)
-
-	if incomingETag == fw.ETag {
-		return ctx.NotModified()
-	}
-
-	if compiled != nil {
-		if isOutgoingFirmwareOlderThanIncoming(*compiled, fw) {
-			log.Infow("refusing to apply firmware compiled before device firmware", "incoming", compiled, "outgoing", fw.Time)
-			return ctx.NotFound()
-		}
-	}
-
-	resp, err := http.Get(fw.URL)
-	if err != nil {
-		return err
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return ctx.NotFound()
-	}
-
-	ctx.ResponseData.Header().Set("ETag", fmt.Sprintf("\"%s\"", fw.ETag))
-	ctx.ResponseData.Header().Set("Content-Length", fmt.Sprintf("%d", resp.ContentLength))
-	ctx.ResponseData.WriteHeader(http.StatusOK)
-
-	n, err := io.Copy(ctx.ResponseData, resp.Body)
-	if err != nil {
-		return err
-	}
-
-	log.Infow("Firmware sent", "bytes", n)
-
-	return nil
-}
-
-func (c *FirmwareController) Update(ctx *app.UpdateFirmwareContext) error {
-	log := Logger(ctx).Sugar()
-
-	log.Infow("device", "device_id", ctx.Payload.DeviceID, "firmware_id", ctx.Payload.FirmwareID)
-
-	device, err := c.options.Backend.GetDeviceSourceByID(ctx, int32(ctx.Payload.DeviceID))
-	if err != nil {
-		return err
-	}
-
-	firmwares := []*data.Firmware{}
-	if err := c.options.Database.SelectContext(ctx, &firmwares, "SELECT f.* FROM fieldkit.firmware AS f WHERE f.id = $1", ctx.Payload.FirmwareID); err != nil {
-		return err
-	}
-
-	if len(firmwares) != 1 {
-		return ctx.NotFound()
-	}
-
-	firmware := firmwares[0]
-
-	deviceFirmware := data.DeviceFirmware{
-		DeviceID: int64(device.ID),
-		Time:     time.Now(),
-		Module:   firmware.Module,
-		Profile:  firmware.Profile,
-		URL:      firmware.URL,
-		ETag:     firmware.ETag,
-	}
-
-	if _, err := c.options.Database.NamedExecContext(ctx, `
-		   INSERT INTO fieldkit.device_firmware (device_id, time, module, profile, url, etag)
-		   VALUES (:device_id, :time, :module, :profile, :url, :etag)
-		   `, deviceFirmware); err != nil {
-		return err
-	}
-
-	log.Infow("update firmware", "device_id", ctx.Payload.DeviceID, "firmware_id", ctx.Payload.FirmwareID, "module", firmware.Module, "profile", firmware.Profile, "url", firmware.URL)
-
-	return ctx.OK([]byte("OK"))
-}
-
 func (c *FirmwareController) Add(ctx *app.AddFirmwareContext) error {
 	log := Logger(ctx).Sugar()
 
@@ -309,20 +200,6 @@ func (c *FirmwareController) List(ctx *app.ListFirmwareContext) error {
 		for _, f := range firmwares {
 			f.URL = fmt.Sprintf("/firmware/%d/download", f.ID)
 		}
-	}
-
-	return ctx.OK(FirmwaresType(firmwares))
-}
-
-func (c *FirmwareController) ListDevice(ctx *app.ListDeviceFirmwareContext) error {
-	log := Logger(ctx).Sugar()
-
-	log.Infow("device", "device_id", ctx.DeviceID)
-
-	firmwares := []*data.Firmware{}
-	if err := c.options.Database.SelectContext(ctx, &firmwares,
-		`SELECT f.id, f.time, f.module, f.profile, f.etag, f.url FROM fieldkit.device_firmware AS f JOIN fieldkit.device AS d ON f.device_id = d.source_id WHERE d.key = $1 ORDER BY time DESC`, ctx.DeviceID); err != nil {
-		return err
 	}
 
 	return ctx.OK(FirmwaresType(firmwares))

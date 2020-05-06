@@ -40,24 +40,24 @@ func (c *Client) NewGetJSONDataRequest(ctx context.Context, path string, end *in
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if end != nil {
-		tmp140 := strconv.Itoa(*end)
-		values.Set("end", tmp140)
+		tmp137 := strconv.Itoa(*end)
+		values.Set("end", tmp137)
 	}
 	if internal != nil {
-		tmp141 := strconv.FormatBool(*internal)
-		values.Set("internal", tmp141)
+		tmp138 := strconv.FormatBool(*internal)
+		values.Set("internal", tmp138)
 	}
 	if page != nil {
-		tmp142 := strconv.Itoa(*page)
-		values.Set("page", tmp142)
+		tmp139 := strconv.Itoa(*page)
+		values.Set("page", tmp139)
 	}
 	if pageSize != nil {
-		tmp143 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp143)
+		tmp140 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp140)
 	}
 	if start != nil {
-		tmp144 := strconv.Itoa(*start)
-		values.Set("start", tmp144)
+		tmp141 := strconv.Itoa(*start)
+		values.Set("start", tmp141)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -97,32 +97,32 @@ func (c *Client) NewSummaryJSONDataRequest(ctx context.Context, path string, end
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if end != nil {
-		tmp145 := strconv.Itoa(*end)
-		values.Set("end", tmp145)
+		tmp142 := strconv.Itoa(*end)
+		values.Set("end", tmp142)
 	}
 	if internal != nil {
-		tmp146 := strconv.FormatBool(*internal)
-		values.Set("internal", tmp146)
+		tmp143 := strconv.FormatBool(*internal)
+		values.Set("internal", tmp143)
 	}
 	if interval != nil {
-		tmp147 := strconv.Itoa(*interval)
-		values.Set("interval", tmp147)
+		tmp144 := strconv.Itoa(*interval)
+		values.Set("interval", tmp144)
 	}
 	if page != nil {
-		tmp148 := strconv.Itoa(*page)
-		values.Set("page", tmp148)
+		tmp145 := strconv.Itoa(*page)
+		values.Set("page", tmp145)
 	}
 	if pageSize != nil {
-		tmp149 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp149)
+		tmp146 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp146)
 	}
 	if resolution != nil {
-		tmp150 := strconv.Itoa(*resolution)
-		values.Set("resolution", tmp150)
+		tmp147 := strconv.Itoa(*resolution)
+		values.Set("resolution", tmp147)
 	}
 	if start != nil {
-		tmp151 := strconv.Itoa(*start)
-		values.Set("start", tmp151)
+		tmp148 := strconv.Itoa(*start)
+		values.Set("start", tmp148)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

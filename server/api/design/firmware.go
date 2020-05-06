@@ -87,43 +87,6 @@ var _ = Resource("Firmware", func() {
 		})
 	})
 
-	Action("check", func() {
-		Routing(GET("devices/:deviceId/:module/firmware"))
-		Description("Return firmware for a device")
-		Headers(func() {
-			Header("If-None-Match")
-			Header("Fk-Compiled")
-		})
-		Params(func() {
-			Param("deviceId", String)
-			Required("deviceId")
-			Param("module", String)
-			Required("module")
-		})
-		Response(NotFound)
-		Response(NotModified)
-		Response(OK, func() {
-			Status(200)
-			Headers(func() {
-				Header("ETag")
-			})
-		})
-	})
-
-	Action("update", func() {
-		Security(JWT, func() {
-			Scope("api:admin")
-		})
-		Routing(PATCH("devices/firmware"))
-		Description("Update an Device firmware")
-		Params(func() {
-		})
-		Payload(UpdateDeviceFirmwarePayload)
-		Response(NotFound)
-		Response(BadRequest)
-		Response(OK)
-	})
-
 	Action("add", func() {
 		Security(JWT, func() {
 			Scope("api:admin")
@@ -135,14 +98,6 @@ var _ = Resource("Firmware", func() {
 		Payload(AddFirmwarePayload)
 		Response(BadRequest)
 		Response(OK)
-	})
-
-	Action("list device", func() {
-		Routing(GET("devices/:deviceId/firmware"))
-		Description("List device firmware")
-		Response(OK, func() {
-			Media(Firmwares)
-		})
 	})
 
 	Action("list", func() {

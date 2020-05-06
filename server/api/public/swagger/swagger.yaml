@@ -3,25 +3,25 @@ consumes:
 definitions:
   AddFieldNotePayload:
     example:
-      category_id: 8.252764702077084e+18
-      created: "1989-05-07T23:53:27Z"
-      media_id: 6.822439840585685e+18
-      note: Velit aut hic.
+      category_id: 6.936376325543937e+18
+      created: "2004-04-15T09:40:59Z"
+      media_id: 8.252764702077084e+18
+      note: Debitis qui.
     properties:
       category_id:
-        example: 8.252764702077084e+18
+        example: 6.936376325543937e+18
         format: int64
         type: integer
       created:
-        example: "1989-05-07T23:53:27Z"
+        example: "2004-04-15T09:40:59Z"
         format: date-time
         type: string
       media_id:
-        example: 6.822439840585685e+18
+        example: 8.252764702077084e+18
         format: int64
         type: integer
       note:
-        example: Velit aut hic.
+        example: Debitis qui.
         type: string
     required:
     - created
@@ -60,46 +60,46 @@ definitions:
     type: object
   AddProjectPayload:
     example:
-      description: Est rem quisquam repellat autem.
-      end_time: "2004-10-08T16:35:02Z"
-      goal: Eaque culpa unde.
-      location: Cumque ut ut consequatur ea.
-      name: Veritatis delectus sit veritatis.
-      private: true
-      slug: 6xcws9vmoh
-      start_time: "2011-08-26T11:06:46Z"
-      tags: Nam est est iure hic.
+      description: Aut hic.
+      end_time: "1994-08-15T13:51:44Z"
+      goal: Rem quisquam repellat.
+      location: Ut unde eaque culpa unde iusto cumque.
+      name: Ut consequatur ea repudiandae veritatis delectus sit.
+      private: false
+      slug: 76xcws9vmo
+      start_time: "2007-03-20T21:15:53Z"
+      tags: Adipisci nam est est iure hic deserunt.
     properties:
       description:
-        example: Est rem quisquam repellat autem.
+        example: Aut hic.
         type: string
       end_time:
-        example: "2004-10-08T16:35:02Z"
+        example: "1994-08-15T13:51:44Z"
         format: date-time
         type: string
       goal:
-        example: Eaque culpa unde.
+        example: Rem quisquam repellat.
         type: string
       location:
-        example: Cumque ut ut consequatur ea.
+        example: Ut unde eaque culpa unde iusto cumque.
         type: string
       name:
-        example: Veritatis delectus sit veritatis.
+        example: Ut consequatur ea repudiandae veritatis delectus sit.
         type: string
       private:
-        example: true
+        example: false
         type: boolean
       slug:
-        example: 6xcws9vmoh
+        example: 76xcws9vmo
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
       start_time:
-        example: "2011-08-26T11:06:46Z"
+        example: "2007-03-20T21:15:53Z"
         format: date-time
         type: string
       tags:
-        example: Nam est est iure hic.
+        example: Adipisci nam est est iure hic deserunt.
         type: string
     required:
     - name
@@ -109,25 +109,25 @@ definitions:
     type: object
   AddUserPayload:
     example:
-      email: jaleel@nolan.biz
-      invite_token: Impedit aliquam illum aut.
-      name: aow4svy8w3
-      password: jezymno95g
+      email: osborne_zieme@zemlakhamill.info
+      invite_token: Aliquam illum aut et.
+      name: ow4svy8w3l
+      password: ezymno95gd
     properties:
       email:
-        example: jaleel@nolan.biz
+        example: osborne_zieme@zemlakhamill.info
         format: email
         type: string
       invite_token:
-        example: Impedit aliquam illum aut.
+        example: Aliquam illum aut et.
         type: string
       name:
-        example: aow4svy8w3
+        example: ow4svy8w3l
         maxLength: 256
         pattern: \S
         type: string
       password:
-        example: jezymno95g
+        example: ezymno95gd
         minLength: 10
         type: string
     required:
@@ -140,7 +140,7 @@ definitions:
     description: DeviceDataRecord media type (default view)
     example:
       data:
-        Possimus labore qui possimus porro quaerat.: b1cac7d2-2dd2-4bd9-96da-3ad61c614b26
+        Possimus labore qui possimus porro quaerat.: b620c994-f41b-4b26-be94-69647a3fd9f0
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -151,7 +151,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Possimus labore qui possimus porro quaerat.: b1cac7d2-2dd2-4bd9-96da-3ad61c614b26
+          Possimus labore qui possimus porro quaerat.: b620c994-f41b-4b26-be94-69647a3fd9f0
         type: object
       id:
         example: 3.1889681637076403e+18
@@ -191,7 +191,7 @@ definitions:
       (default view)
     example:
     - data:
-        Possimus labore qui possimus porro quaerat.: b1cac7d2-2dd2-4bd9-96da-3ad61c614b26
+        Possimus labore qui possimus porro quaerat.: b620c994-f41b-4b26-be94-69647a3fd9f0
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -199,7 +199,7 @@ definitions:
       record: 7.193395211552676e+18
       time: "1980-07-29T04:01:26Z"
     - data:
-        Possimus labore qui possimus porro quaerat.: b1cac7d2-2dd2-4bd9-96da-3ad61c614b26
+        Possimus labore qui possimus porro quaerat.: b620c994-f41b-4b26-be94-69647a3fd9f0
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -216,7 +216,7 @@ definitions:
     example:
       data:
       - data:
-          Possimus labore qui possimus porro quaerat.: b1cac7d2-2dd2-4bd9-96da-3ad61c614b26
+          Possimus labore qui possimus porro quaerat.: b620c994-f41b-4b26-be94-69647a3fd9f0
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -224,7 +224,7 @@ definitions:
         record: 7.193395211552676e+18
         time: "1980-07-29T04:01:26Z"
       - data:
-          Possimus labore qui possimus porro quaerat.: b1cac7d2-2dd2-4bd9-96da-3ad61c614b26
+          Possimus labore qui possimus porro quaerat.: b620c994-f41b-4b26-be94-69647a3fd9f0
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -233,17 +233,17 @@ definitions:
         time: "1980-07-29T04:01:26Z"
       meta:
       - data:
-          Vel est.: 6f61449e-ac64-4e0b-8b60-158eb5aace58
+          Vel est.: 62b4e666-0834-4610-b1b8-488a471b6eb7
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Vel est.: 6f61449e-ac64-4e0b-8b60-158eb5aace58
+          Vel est.: 62b4e666-0834-4610-b1b8-488a471b6eb7
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Vel est.: 6f61449e-ac64-4e0b-8b60-158eb5aace58
+          Vel est.: 62b4e666-0834-4610-b1b8-488a471b6eb7
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
@@ -330,7 +330,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Vel est.: 6f61449e-ac64-4e0b-8b60-158eb5aace58
+        Vel est.: 62b4e666-0834-4610-b1b8-488a471b6eb7
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -338,7 +338,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Vel est.: 6f61449e-ac64-4e0b-8b60-158eb5aace58
+          Vel est.: 62b4e666-0834-4610-b1b8-488a471b6eb7
         type: object
       id:
         example: 2.827138534810339e+18
@@ -364,12 +364,12 @@ definitions:
       (default view)
     example:
     - data:
-        Vel est.: 6f61449e-ac64-4e0b-8b60-158eb5aace58
+        Vel est.: 62b4e666-0834-4610-b1b8-488a471b6eb7
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
     - data:
-        Vel est.: 6f61449e-ac64-4e0b-8b60-158eb5aace58
+        Vel est.: 62b4e666-0834-4610-b1b8-488a471b6eb7
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -747,10 +747,10 @@ definitions:
     type: object
   InviteUserPayload:
     example:
-      email: Soluta similique.
+      email: Similique ipsum qui.
     properties:
       email:
-        example: Soluta similique.
+        example: Similique ipsum qui.
         type: string
     required:
     - email
@@ -1950,15 +1950,15 @@ definitions:
     type: object
   LoginPayload:
     example:
-      email: kristopher_hansen@olsonkoelpin.net
-      password: hvhqxc40im
+      email: adolfo_collier@koelpinkutch.biz
+      password: hqxc40imp6
     properties:
       email:
-        example: kristopher_hansen@olsonkoelpin.net
+        example: adolfo_collier@koelpinkutch.biz
         format: email
         type: string
       password:
-        example: hvhqxc40im
+        example: hqxc40imp6
         minLength: 10
         type: string
     required:
@@ -2260,10 +2260,10 @@ definitions:
     type: object
   RecoveryLookupPayload:
     example:
-      email: Dolores facere veritatis quod voluptas non sit.
+      email: Officia dolores facere veritatis quod voluptas.
     properties:
       email:
-        example: Dolores facere veritatis quod voluptas non sit.
+        example: Officia dolores facere veritatis quod voluptas.
         type: string
     required:
     - email
@@ -2271,15 +2271,15 @@ definitions:
     type: object
   RecoveryPayload:
     example:
-      password: 6g6qg0z6y1
-      token: Omnis recusandae omnis perferendis illo beatae.
+      password: 6qg0z6y1io
+      token: Omnis perferendis illo.
     properties:
       password:
-        example: 6g6qg0z6y1
+        example: 6qg0z6y1io
         minLength: 10
         type: string
       token:
-        example: Omnis recusandae omnis perferendis illo beatae.
+        example: Omnis perferendis illo.
         type: string
     required:
     - token
@@ -2288,10 +2288,10 @@ definitions:
     type: object
   RefreshUserPayload:
     example:
-      refresh_token: Officia ipsa quam consectetur rerum.
+      refresh_token: Sit id officia ipsa quam consectetur rerum.
     properties:
       refresh_token:
-        example: Officia ipsa quam consectetur rerum.
+        example: Sit id officia ipsa quam consectetur rerum.
         type: string
     required:
     - refresh_token
@@ -2299,10 +2299,10 @@ definitions:
     type: object
   RemoveUserPayload:
     example:
-      email: Qui ut veniam cumque repudiandae.
+      email: Veniam cumque repudiandae libero sapiente eum quia.
     properties:
       email:
-        example: Qui ut veniam cumque repudiandae.
+        example: Veniam cumque repudiandae libero sapiente eum quia.
         type: string
     required:
     - email
@@ -2321,35 +2321,17 @@ definitions:
     title: 'Mediatype identifier: application/vnd.app.user.transmission.token+json;
       view=default'
     type: object
-  UpdateDeviceFirmwarePayload:
-    example:
-      deviceId: 6.936376325543937e+18
-      firmwareId: 8.282634339368904e+18
-    properties:
-      deviceId:
-        example: 6.936376325543937e+18
-        format: int64
-        type: integer
-      firmwareId:
-        example: 8.282634339368904e+18
-        format: int64
-        type: integer
-    required:
-    - deviceId
-    - firmwareId
-    title: UpdateDeviceFirmwarePayload
-    type: object
   UpdateUserPasswordPayload:
     example:
-      newPassword: vcbmmrted8
-      oldPassword: ycrrcazxi7
+      newPassword: cbmmrted8h
+      oldPassword: crrcazxi7n
     properties:
       newPassword:
-        example: vcbmmrted8
+        example: cbmmrted8h
         minLength: 10
         type: string
       oldPassword:
-        example: ycrrcazxi7
+        example: crrcazxi7n
         minLength: 10
         type: string
     required:
@@ -2725,96 +2707,6 @@ paths:
       summary: process data
       tags:
       - data
-  /devices/{deviceId}/{module}/firmware:
-    get:
-      description: Return firmware for a device
-      operationId: Firmware#check
-      parameters:
-      - in: path
-        name: deviceId
-        required: true
-        type: string
-      - in: path
-        name: module
-        required: true
-        type: string
-      - in: header
-        name: Fk-Compiled
-        required: false
-        type: string
-      - in: header
-        name: If-None-Match
-        required: false
-        type: string
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-          headers:
-            ETag:
-              type: string
-        "304":
-          description: Not Modified
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      summary: check Firmware
-      tags:
-      - Firmware
-  /devices/{deviceId}/firmware:
-    get:
-      description: List device firmware
-      operationId: Firmware#list device
-      parameters:
-      - in: path
-        name: deviceId
-        required: true
-        type: string
-      produces:
-      - application/vnd.app.firmwares+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Firmwares'
-      schemes:
-      - https
-      summary: list device Firmware
-      tags:
-      - Firmware
-  /devices/firmware:
-    patch:
-      description: |-
-        Update an Device firmware
-
-        Required security scopes:
-          * `api:admin`
-      operationId: Firmware#update
-      parameters:
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/UpdateDeviceFirmwarePayload'
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:admin
-      summary: update Firmware
-      tags:
-      - Firmware
   /firmware:
     get:
       description: List firmware
@@ -4158,8 +4050,6 @@ responses:
     description: No Content
   NotFound:
     description: Not Found
-  NotModified:
-    description: Not Modified
   OK:
     description: OK
   Unauthorized:
