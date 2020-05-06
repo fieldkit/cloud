@@ -26,7 +26,7 @@
         <div id="loading" v-if="loading">
             <img alt="" src="../assets/progress.gif" />
         </div>
-        <div v-if="failedAuth" class="no-auth-message">
+        <div v-if="noCurrentUser" class="no-user-message">
             <p>
                 Please
                 <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
@@ -59,7 +59,7 @@ export default {
             pending: [],
             resolved: [],
             isAuthenticated: false,
-            failedAuth: false,
+            noCurrentUser: false,
             loading: false,
         };
     },
@@ -91,7 +91,7 @@ export default {
             })
             .catch(() => {
                 this.loading = false;
-                this.failedAuth = true;
+                this.noCurrentUser = true;
             });
     },
     methods: {
@@ -144,7 +144,7 @@ export default {
     background-color: rgba(255, 255, 255, 0.65);
     text-align: center;
 }
-.no-auth-message {
+.no-user-message {
     float: left;
     font-size: 20px;
     margin: 40px 0 0 40px;

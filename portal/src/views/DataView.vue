@@ -39,7 +39,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="failedAuth" class="no-auth-message">
+        <div v-if="noCurrentUser" class="no-user-message">
             <p>
                 Please
                 <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
@@ -82,7 +82,7 @@ export default {
             projects: [],
             allSensors: [],
             isAuthenticated: false,
-            failedAuth: false,
+            noCurrentUser: false,
             timeRange: null,
             treeSelectOptions: [],
         };
@@ -117,7 +117,7 @@ export default {
                 });
             })
             .catch(() => {
-                this.failedAuth = true;
+                this.noCurrentUser = true;
             });
     },
     methods: {
@@ -404,7 +404,7 @@ export default {
 #lower-container {
     clear: both;
 }
-.no-auth-message {
+.no-user-message {
     float: left;
     font-size: 20px;
     margin: 40px 0 0 40px;
