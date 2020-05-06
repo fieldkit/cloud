@@ -3,6 +3,7 @@ package ingester
 import (
 	"bytes"
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -282,6 +283,13 @@ func TestIngestSuccessfully(t *testing.T) {
 		"id": "<<PRESENCE>>",
 		"upload_id": "<<PRESENCE>>"
 	}`)
+
+	body := IngestionSuccessful{}
+	assert.NoError(json.Unmarshal(rr.Body.Bytes(), &body))
+
+	found := 0
+	assert.NoError(e.DB.GetContext(e.Ctx, &found, "SELECT COUNT(*) FROM fieldkit.ingestion WHERE id = $1", body.ID))
+	assert.Equal(found, 1)
 }
 
 func AddIngestionHeaders(e *tests.TestEnv, r *http.Request, user *data.User, data []byte) error {

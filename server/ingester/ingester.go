@@ -219,16 +219,16 @@ func newIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 	return headers, nil
 }
 
+type IngestionSuccessful struct {
+	ID       int64  `json:"id"`
+	UploadID string `json:"upload_id"`
+}
+
 func writeSuccess(ctx context.Context, w http.ResponseWriter, req *http.Request, ingestion *data.Ingestion) error {
-	payload, err := json.Marshal(
-		struct {
-			ID       int64  `json:"id"`
-			UploadID string `json:"upload_id"`
-		}{
-			ID:       ingestion.ID,
-			UploadID: ingestion.UploadID,
-		},
-	)
+	payload, err := json.Marshal(IngestionSuccessful{
+		ID:       ingestion.ID,
+		UploadID: ingestion.UploadID,
+	})
 
 	if err != nil {
 		return err
