@@ -24,7 +24,7 @@ func NewTestableIngester(e *tests.TestEnv) (http.Handler, *data.User, error) {
 	}
 
 	config := &Config{
-		Archiver:    "default",
+		Archiver:    "nop",
 		SessionKey:  e.SessionKey,
 		PostgresURL: e.PostgresURL,
 	}
