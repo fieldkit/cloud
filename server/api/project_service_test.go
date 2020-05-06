@@ -13,7 +13,7 @@ import (
 	"github.com/fieldkit/cloud/server/tests"
 )
 
-func TestGetProjectsMine(t *testing.T) {
+func TestGetProjectsAll(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -29,14 +29,32 @@ func TestGetProjectsMine(t *testing.T) {
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusOK, rr.Code)
+}
+
+func TestGetProjectsMine(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(5)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", "/user/projects", nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
 
 	ja := jsonassert.New(t)
 	ja.Assertf(rr.Body.String(), `
-	{
-		"projects": [
-			"<<PRESENCE>>"
-		]
-	}`)
+		{
+			"projects": [
+				"<<PRESENCE>>"
+			]
+		}`)
 }
 
 func TestUpdateProjectWhenAdministrator(t *testing.T) {

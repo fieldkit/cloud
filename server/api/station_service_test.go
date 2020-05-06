@@ -53,7 +53,7 @@ func TestGetStationsProject(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("GET", "/projects/1/stations", nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d/stations", fd.Project.ID), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr := tests.ExecuteRequest(req, api)
 

@@ -32,12 +32,16 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 	}
 
 	station := &data.Station{}
-	if err = c.options.Database.GetContext(ctx, station, `SELECT * FROM fieldkit.station WHERE id = $1`, payload.ID); err != nil {
+	if err = c.options.Database.GetContext(ctx, station, `
+		SELECT * FROM fieldkit.station WHERE id = $1
+		`, payload.ID); err != nil {
 		return nil, err
 	}
 
 	total := int32(0)
-	if err = c.options.Database.GetContext(ctx, &total, `SELECT COUNT(a.*) FROM fieldkit.station_activity AS a WHERE a.station_id = $1`, payload.ID); err != nil {
+	if err = c.options.Database.GetContext(ctx, &total, `
+		SELECT COUNT(a.*) FROM fieldkit.station_activity AS a WHERE a.station_id = $1
+		`, payload.ID); err != nil {
 		return nil, err
 	}
 
@@ -108,12 +112,20 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 	}
 
 	project := &data.Project{}
-	if err = c.options.Database.GetContext(ctx, project, `SELECT * FROM fieldkit.project WHERE id = $1`, payload.ID); err != nil {
+	if err = c.options.Database.GetContext(ctx, project, `
+		SELECT * FROM fieldkit.project WHERE id = $1
+		`, payload.ID); err != nil {
 		return nil, err
 	}
 
 	total := int32(0)
-	if err = c.options.Database.GetContext(ctx, &total, `SELECT COUNT(a.*) FROM fieldkit.project_activity AS a WHERE a.project_id = $1`, payload.ID); err != nil {
+	if err = c.options.Database.GetContext(ctx, &total, `
+		SELECT COUNT(q.*) FROM  (
+			SELECT created_at FROM fieldkit.project_activity AS a WHERE a.project_id = $1
+			UNION
+			SELECT created_at FROM fieldkit.project_and_station_activity WHERE project_id = $1
+		) AS q
+		`, payload.ID); err != nil {
 		return nil, err
 	}
 

@@ -3,6 +3,9 @@ package tests
 import (
 	"crypto/sha1"
 	"fmt"
+	"time"
+
+	"github.com/lib/pq"
 
 	"github.com/bxcodec/faker/v3"
 
@@ -117,4 +120,88 @@ func (e *TestEnv) NewStation(owner *data.User) *data.Station {
 	}
 
 	return station
+}
+
+func (e *TestEnv) AddStationActivity(station *data.Station, user *data.User) error {
+	location := data.NewLocation([]float64{0, 0})
+
+	depoyedActivity := &data.StationDeployed{
+		StationActivity: data.StationActivity{
+			CreatedAt: time.Now(),
+			StationID: int64(station.ID),
+		},
+		DeployedAt: time.Now(),
+		Location:   location,
+	}
+
+	if _, err := e.DB.NamedExecContext(e.Ctx, `
+		INSERT INTO fieldkit.station_deployed (created_at, station_id, deployed_at, location) VALUES (:created_at, :station_id, :deployed_at, ST_SetSRID(ST_GeomFromText(:location), 4326))
+		`, depoyedActivity); err != nil {
+		return err
+	}
+
+	ingestion := &data.Ingestion{
+		URL:          "file:///dev/nul",
+		UploadID:     "",
+		UserID:       user.ID,
+		DeviceID:     station.DeviceID,
+		GenerationID: []byte{0x00, 0x01},
+		Type:         "data",
+		Size:         int64(1024),
+		Blocks:       data.Int64Range([]int64{1, 100}),
+		Flags:        pq.Int64Array([]int64{}),
+	}
+
+	if err := e.DB.NamedGetContext(e.Ctx, ingestion, `
+			INSERT INTO fieldkit.ingestion (time, upload_id, user_id, device_id, generation, type, size, url, blocks, flags)
+			VALUES (NOW(), :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
+			RETURNING *
+			`, ingestion); err != nil {
+		return err
+	}
+
+	activity := &data.StationIngestion{
+		StationActivity: data.StationActivity{
+			CreatedAt: time.Now(),
+			StationID: int64(station.ID),
+		},
+		UploaderID:      int64(user.ID),
+		DataIngestionID: ingestion.ID,
+		DataRecords:     1,
+		Errors:          false,
+	}
+
+	if err := e.DB.NamedGetContext(e.Ctx, activity, `
+		INSERT INTO fieldkit.station_ingestion (created_at, station_id, uploader_id, data_ingestion_id, data_records, errors)
+		VALUES (:created_at, :station_id, :uploader_id, :data_ingestion_id, :data_records, :errors)
+		ON CONFLICT (data_ingestion_id) DO NOTHING
+		RETURNING *
+		`, activity); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (e *TestEnv) AddProjectActivity(project *data.Project, station *data.Station, user *data.User) error {
+	if err := e.AddStationActivity(station, user); err != nil {
+		return err
+	}
+
+	projectUpdate := &data.ProjectUpdate{
+		ProjectActivity: data.ProjectActivity{
+			CreatedAt: time.Now(),
+			ProjectID: int64(project.ID),
+		},
+		AuthorID: int64(user.ID),
+		Body:     "Project update",
+	}
+
+	if _, err := e.DB.NamedExecContext(e.Ctx, `
+		INSERT INTO fieldkit.project_update (created_at, project_id, author_id, body) VALUES (:created_at, :project_id, :author_id, :body)
+		`, projectUpdate); err != nil {
+		return err
+	}
+
+	return nil
 }

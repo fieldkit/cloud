@@ -15,7 +15,7 @@ type StationActivity struct {
 type StationDeployed struct {
 	StationActivity
 	DeployedAt time.Time `db:"deployed_at"`
-	Location   Location  `db:"location"`
+	Location   *Location `db:"location"`
 }
 
 type StationIngestion struct {
