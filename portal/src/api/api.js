@@ -275,7 +275,7 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
-    getProjects() {
+    getUserProjects() {
         const token = this.token.getToken();
         return axios({
             method: "GET",

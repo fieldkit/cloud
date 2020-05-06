@@ -114,7 +114,7 @@ export default {
             this.routeTo = to;
             if (this.isAuthenticated) {
                 // refresh projects list
-                this.api.getProjects().then(projects => {
+                this.api.getUserProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
                         this.projects = projects.projects;
                     }
@@ -151,7 +151,7 @@ export default {
                 this.user = user;
                 this.isAuthenticated = true;
                 this.projectsTitle = "My Projects";
-                this.api.getProjects().then(projects => {
+                this.api.getUserProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
                         this.projects = projects.projects;
                     } else {

@@ -110,7 +110,7 @@ export default {
                         .then(this.initDataChartControl)
                         .then(this.initTreeSelect);
                 });
-                this.api.getProjects().then(projects => {
+                this.api.getUserProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
                         this.projects = projects.projects;
                     }

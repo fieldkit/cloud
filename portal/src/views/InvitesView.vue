@@ -80,7 +80,7 @@ export default {
             .then(user => {
                 this.user = user;
                 this.isAuthenticated = true;
-                this.api.getProjects().then(projects => {
+                this.api.getUserProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
                         this.projects = projects.projects;
                     }
