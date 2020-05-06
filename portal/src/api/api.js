@@ -387,6 +387,40 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    getProjectFollows(projectId) {
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/projects/" + projectId + "/followers",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(this._handleResponse.bind(this));
+    }
+
+    followProject(projectId) {
+        const token = this.token.getToken();
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/projects/" + projectId + "/follow",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
+        }).then(this._handleResponse.bind(this));
+    }
+
+    unfollowProject(projectId) {
+        const token = this.token.getToken();
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/projects/" + projectId + "/unfollow",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
+        }).then(this._handleResponse.bind(this));
+    }
+
     deleteFieldNote(data) {
         const token = this.token.getToken();
         return axios({
