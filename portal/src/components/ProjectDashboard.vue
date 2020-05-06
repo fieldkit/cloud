@@ -13,7 +13,7 @@
                             <img src="../assets/update.png" />
                             <div class="label">Update</div>
                         </div>
-                        <div class="action">
+                        <div class="action" v-on:click="viewProfile">
                             <img src="../assets/profile.png" />
                             <div class="label">View Profile</div>
                         </div>
@@ -24,7 +24,7 @@
                     </div>
                     <div class="stat follows">
                         <img alt="Follows" src="../assets/heart.png" class="follow-icon" />
-                        <span>22 Follows</span>
+                        <span>{{ numFollowers }} Follows</span>
                     </div>
                 </div>
                 <div class="project-details-container">
@@ -51,7 +51,13 @@
                     <div class="space"></div>
                     <div class="team-icons">
                         <div class="icon-section-label">Team</div>
-                        <img v-for="user in projectUsers" v-bind:key="user.id" alt="User image" :src="user.userImage" class="user-icon" />
+                        <img
+                            v-for="user in projectUsers"
+                            v-bind:key="user.user.id"
+                            alt="User image"
+                            :src="user.userImage"
+                            class="user-icon"
+                        />
                     </div>
                     <div class="module-icons">
                         <div class="icon-section-label">Modules</div>
@@ -101,7 +107,7 @@
                         <div class="cell-heading"></div>
                         <div class="cell"></div>
                     </div>
-                    <div class="user-row" v-for="user in projectUsers" v-bind:key="user.id">
+                    <div class="user-row" v-for="user in projectUsers" v-bind:key="user.user.id">
                         <div class="cell">
                             <img alt="User image" :src="user.userImage" class="user-icon" />
                             {{ user.user.name }}
@@ -159,7 +165,7 @@ import Mapbox from "mapbox-gl-vue";
 import { MAPBOX_ACCESS_TOKEN } from "../secrets";
 
 export default {
-    name: "ProjectSummary",
+    name: "ProjectDashboard",
     components: {
         Mapbox,
     },
@@ -168,9 +174,6 @@ export default {
             baseUrl: API_HOST,
             projectStations: [],
             viewingSummary: false,
-            viewingStations: false,
-            viewingActivity: false,
-            viewingTeam: false,
             displayStartDate: "",
             displayRunTime: "",
             projectUsers: [],
@@ -182,15 +185,11 @@ export default {
             modules: [],
             coordinates: [-118, 34],
             mapboxToken: MAPBOX_ACCESS_TOKEN,
+            numFollowers: 1,
         };
     },
     props: ["project", "userStations", "users"],
     watch: {
-        project() {
-            if (this.project) {
-                this.reset();
-            }
-        },
         users() {
             if (this.users) {
                 this.projectUsers = this.users.map(u => {
@@ -200,16 +199,26 @@ export default {
             }
         },
     },
+    async beforeCreate() {
+        this.api = new FKApi();
+    },
     methods: {
         viewSummary() {
+            this.reset();
             this.viewingSummary = true;
         },
         reset() {
             this.stationOption = "";
             this.projectStations = [];
             this.fetchStations();
+            this.fetchFollowers();
             this.updateDisplayDates();
             this.inviteEmail = "";
+        },
+        fetchFollowers() {
+            this.api.getProjectFollows(this.project.id).then(result => {
+                this.numFollowers = result.followers.length + 1;
+            });
         },
         mapInitialized(map) {
             this.map = map;
@@ -217,9 +226,11 @@ export default {
         editProject() {
             this.$router.push({ name: "editProject", params: { id: this.project.id } });
         },
+        viewProfile() {
+            this.$emit("viewProfile");
+        },
         fetchStations() {
-            const api = new FKApi();
-            api.getStationsByProject(this.project.id).then(result => {
+            this.api.getStationsByProject(this.project.id).then(result => {
                 this.projectStations = result.stations;
                 this.modules = [];
                 if (this.projectStations) {
@@ -246,24 +257,22 @@ export default {
             });
         },
         stationSelected() {
-            const api = new FKApi();
             const params = {
                 projectId: this.project.id,
                 stationId: this.stationOption,
             };
-            api.addStationToProject(params).then(() => {
+            this.api.addStationToProject(params).then(() => {
                 this.fetchStations();
             });
         },
         deleteStation(event) {
             const stationId = event.target.getAttribute("data-id");
             if (window.confirm("Are you sure you want to remove this station?")) {
-                const api = new FKApi();
                 const params = {
                     projectId: this.project.id,
                     stationId: stationId,
                 };
-                api.removeStationFromProject(params).then(() => {
+                this.api.removeStationFromProject(params).then(() => {
                     this.fetchStations();
                 });
             }
@@ -319,6 +328,7 @@ export default {
             return this.baseUrl + "/projects/" + project.id + "/media";
         },
         updateDisplayDates() {
+            this.displayRunTime = "";
             this.displayStartDate = "";
             if (this.project.start_time) {
                 let d = new Date(this.project.start_time);
@@ -453,6 +463,7 @@ export default {
 .action {
     display: inline-block;
     margin: 0 0 17px 0;
+    cursor: pointer;
 }
 .action.left {
     float: left;

@@ -3,7 +3,7 @@
         <SidebarNav
             :isAuthenticated="isAuthenticated"
             viewing="projects"
-            :projects="projects"
+            :projects="userProjects"
             :stations="stations"
             @showStation="showStation"
         />
@@ -12,14 +12,18 @@
             <img alt="" src="../assets/progress.gif" />
         </div>
         <div class="main-panel" v-show="!loading && isAuthenticated">
-            <router-link :to="{ name: 'projects' }" v-if="!viewingAll">
+            <router-link :to="{ name: 'projects' }" v-if="!viewingAll && !previewingProfile">
                 <div class="projects-link">
                     <span class="small-arrow">&lt;</span>
                     Back to Projects
                 </div>
             </router-link>
+            <div class="projects-link" v-if="!viewingAll && previewingProfile" v-on:click="switchToDashboard">
+                <span class="small-arrow">&lt;</span>
+                Back to Project Dashboard
+            </div>
             <div id="inner-container">
-                <!-- display all projects -->
+                <!-- display user's projects -->
                 <div id="projects-container" v-if="viewingAll">
                     <div class="container">
                         <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
@@ -27,56 +31,31 @@
                             Add Project
                         </div>
                         <h1>{{ projectsTitle }}</h1>
-                        <div v-for="project in projects" v-bind:key="project.id" class="project-container">
-                            <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
-                                <div class="project-image-container">
-                                    <img
-                                        alt="Fieldkit Project"
-                                        v-if="project.media_url"
-                                        :src="getImageUrl(project)"
-                                        class="project-image"
-                                    />
-                                    <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
-                                </div>
-                                <img v-if="project.private" alt="Private project" src="../assets/private.png" class="private-icon" />
-
-                                <div class="project-name">{{ project.name }}</div>
-                                <div class="project-description">{{ project.description }}</div>
-                                <div class="stats-icon-container">
-                                    <div class="stat follows">
-                                        <img alt="Follows" src="../assets/heart.png" class="follow-icon" />
-                                        <span>12</span>
-                                    </div>
-                                    <div class="stat notifications">
-                                        <img alt="Notifications" src="../assets/notification.png" class="notify-icon" />
-                                        <span>2</span>
-                                    </div>
-                                    <div class="stat comments">
-                                        <img alt="Comments" src="../assets/comment.png" class="comment-icon" />
-                                        <span>3</span>
-                                    </div>
-                                </div>
-                            </router-link>
-                        </div>
+                        <ProjectThumbnails :projects="userProjects" />
                     </div>
                     <div class="container">
                         <h1>Community Projects</h1>
+                        <ProjectThumbnails :projects="publicProjects" />
                     </div>
                 </div>
                 <!-- add or update a project -->
                 <div v-show="addingOrUpdating">
                     <ProjectForm :project="activeProject" @closeProjectForm="closeProjectForm" @updating="onProjectUpdate" />
                 </div>
-                <!-- display one project -->
-                <ProjectSummary
+                <!-- display project dashboard -->
+                <ProjectDashboard
+                    :user="user"
                     :project="activeProject"
                     :userStations="stations"
                     :users="users"
-                    ref="projectSummary"
+                    ref="projectDashboard"
                     @inviteUser="sendInvite"
                     @removeUser="removeUser"
+                    @viewProfile="switchToProfile"
                     @showStation="showStation"
                 />
+                <!-- display project profile -->
+                <ProjectProfile :user="user" :project="activeProject" :users="users" ref="projectProfile" @showStation="showStation" />
             </div>
         </div>
         <div v-if="failedAuth" class="no-auth-message">
@@ -96,7 +75,9 @@ import FKApi from "../api/api";
 import { API_HOST } from "../secrets";
 import HeaderBar from "../components/HeaderBar";
 import ProjectForm from "../components/ProjectForm";
-import ProjectSummary from "../components/ProjectSummary";
+import ProjectDashboard from "../components/ProjectDashboard";
+import ProjectProfile from "../components/ProjectProfile";
+import ProjectThumbnails from "../components/ProjectThumbnails";
 import SidebarNav from "../components/SidebarNav";
 
 export default {
@@ -104,7 +85,9 @@ export default {
     components: {
         HeaderBar,
         ProjectForm,
-        ProjectSummary,
+        ProjectDashboard,
+        ProjectProfile,
+        ProjectThumbnails,
         SidebarNav,
     },
     props: ["id"],
@@ -116,7 +99,7 @@ export default {
                 // refresh projects list
                 this.api.getUserProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
-                        this.projects = projects.projects;
+                        this.userProjects = projects.projects;
                     }
                 });
             }
@@ -125,19 +108,24 @@ export default {
             } else {
                 this.viewAllProjects();
             }
+            this.api.getPublicProjects().then(projects => {
+                this.publicProjects = projects;
+            });
         },
     },
     data: () => {
         return {
             baseUrl: API_HOST,
             user: {},
-            projects: [],
+            userProjects: [],
             projectsTitle: "Projects",
             activeProject: null,
+            publicProjects: [],
             stations: [],
             users: [],
             isAuthenticated: false,
             viewingAll: false,
+            previewingProfile: false,
             addingOrUpdating: false,
             failedAuth: false,
             loading: true,
@@ -145,6 +133,9 @@ export default {
     },
     async beforeCreate() {
         this.api = new FKApi();
+        this.api.getPublicProjects().then(projects => {
+            this.publicProjects = projects;
+        });
         this.api
             .getCurrentUser()
             .then(user => {
@@ -153,11 +144,11 @@ export default {
                 this.projectsTitle = "My Projects";
                 this.api.getUserProjects().then(projects => {
                     if (projects && projects.projects.length > 0) {
-                        this.projects = projects.projects;
+                        this.userProjects = projects.projects;
                     } else {
                         // create default project for user
                         this.api.addDefaultProject().then(project => {
-                            this.projects = [project];
+                            this.userProjects = [project];
                             this.loading = false;
                         });
                     }
@@ -193,13 +184,20 @@ export default {
             });
         },
         handleProject(project) {
-            if (!this.routeTo || this.routeTo.name == "viewProject") {
-                this.viewProject(project);
-            }
             if (this.routeTo && this.routeTo.name == "editProject") {
                 this.editProject(project);
+            } else {
+                const userProject = this.userProjects.find(p => {
+                    return p.id == project.id;
+                });
+                if (userProject) {
+                    this.viewProjectDashboard(project);
+                } else if (!project.private) {
+                    this.viewProjectProfile(project);
+                } else {
+                    this.$router.push({ name: "projects" });
+                }
             }
-            // this.$forceUpdate();
         },
         addProject() {
             this.resetFlags();
@@ -210,27 +208,45 @@ export default {
             this.resetFlags();
             this.addingOrUpdating = true;
             this.activeProject = project;
-            this.$refs.projectSummary.closeSummary();
+            this.$refs.projectProfile.closeSummary();
+            this.$refs.projectDashboard.closeSummary();
             this.loading = false;
         },
         onProjectUpdate() {
             this.loading = true;
         },
-        viewProject(project) {
+        viewProjectDashboard(project) {
             this.resetFlags();
             this.activeProject = project;
-            this.$refs.projectSummary.viewSummary();
+            this.$refs.projectProfile.closeSummary();
+            this.$refs.projectDashboard.viewSummary();
             this.loading = false;
+        },
+        switchToDashboard() {
+            this.previewingProfile = false;
+            this.$refs.projectProfile.closeSummary();
+            this.$refs.projectDashboard.viewSummary();
+        },
+        viewProjectProfile(project) {
+            this.resetFlags();
+            this.activeProject = project;
+            this.$refs.projectDashboard.closeSummary();
+            this.$refs.projectProfile.viewSummary();
+            this.loading = false;
+        },
+        switchToProfile() {
+            this.previewingProfile = true;
+            this.$refs.projectDashboard.closeSummary();
+            this.$refs.projectProfile.viewSummary();
         },
         viewAllProjects() {
             this.resetFlags();
             this.viewingAll = true;
-            this.$refs.projectSummary.closeSummary();
+            this.$refs.projectDashboard.closeSummary();
+            this.$refs.projectProfile.closeSummary();
             this.loading = false;
         },
-        getImageUrl(project) {
-            return this.baseUrl + "/projects/" + project.id + "/media/?t=" + Date.now();
-        },
+
         closeProjectForm() {
             this.activeProject = null;
             this.resetFlags();
@@ -267,6 +283,7 @@ export default {
 .projects-link {
     margin: 40px 0 0 90px;
     font-size: 14px;
+    cursor: pointer;
 }
 #inner-container {
     margin: 20px 60px;
@@ -301,52 +318,5 @@ export default {
 }
 #add-project img {
     vertical-align: bottom;
-}
-.project-container {
-    position: relative;
-    float: left;
-    width: 270px;
-    height: 265px;
-    margin: 0 12px 25px 12px;
-    border: 1px solid rgb(235, 235, 235);
-}
-.project-name {
-    font-weight: bold;
-    font-size: 16px;
-    margin: 10px 15px 0 15px;
-}
-.project-description {
-    font-weight: lighter;
-    font-size: 14px;
-    margin: 0 15px 10px 15px;
-}
-.project-image-container {
-    height: 138px;
-    text-align: center;
-    border-bottom: 1px solid rgb(235, 235, 235);
-}
-.project-image {
-    max-width: 270px;
-    max-height: 138px;
-}
-.private-icon {
-    float: right;
-    margin: -14px 14px 0 0;
-    position: relative;
-    z-index: 10;
-}
-.stats-icon-container {
-    position: absolute;
-    bottom: 20px;
-}
-.stat {
-    display: inline-block;
-    font-size: 14px;
-    font-weight: 600;
-    margin: 0 14px 0 15px;
-}
-.stat img {
-    float: left;
-    margin: 2px 4px 0 0;
 }
 </style>
