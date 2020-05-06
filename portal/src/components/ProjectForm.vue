@@ -278,7 +278,7 @@ export default {
             };
         },
         closeForm() {
-            this.$emit("closeProjectForm");
+            this.$router.push({ name: "projects" });
         },
     },
 };

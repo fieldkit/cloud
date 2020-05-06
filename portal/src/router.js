@@ -4,6 +4,8 @@ import DataView from "./views/DataView.vue";
 import InvitesView from "./views/InvitesView.vue";
 import LoginView from "./views/LoginView.vue";
 import ProjectsView from "./views/ProjectsView.vue";
+import ProjectEditView from "./views/ProjectEditView.vue";
+import ProjectView from "./views/ProjectView.vue";
 import ResetPasswordView from "./views/ResetPasswordView.vue";
 import StationsView from "./views/StationsView.vue";
 import UserView from "./views/UserView.vue";
@@ -44,13 +46,18 @@ export default new Router({
         {
             path: "/dashboard/projects/:id",
             name: "viewProject",
-            component: ProjectsView,
+            component: ProjectView,
             props: true,
+        },
+        {
+            path: "/dashboard/project/add",
+            name: "addProject",
+            component: ProjectEditView,
         },
         {
             path: "/dashboard/projects/:id/edit",
             name: "editProject",
-            component: ProjectsView,
+            component: ProjectEditView,
             props: true,
         },
         {

@@ -1,5 +1,5 @@
 <template>
-    <div id="project-summary-container" v-if="viewingSummary">
+    <div id="project-summary-container">
         <div class="project-container" v-if="project">
             <div class="left">
                 <div id="project-name">{{ project.name }}</div>
@@ -65,38 +65,8 @@
                     </div>
                 </div>
             </div>
-            <div class="stations-container">
-                <div class="section-heading stations-heading">FieldKit Stations</div>
-                <div class="space"></div>
-                <div class="stations-list">
-                    <div v-for="station in projectStations" v-bind:key="station.id">
-                        <div class="station-box">
-                            <div class="delete-link">
-                                <img alt="Info" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation" />
-                            </div>
-                            <span class="station-name" v-on:click="showStation(station)">
-                                {{ station.name }}
-                            </span>
-                            <div class="last-seen">Last seen {{ getUpdatedDate(station) }}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="stations-map">
-                    <mapbox
-                        :access-token="mapboxToken"
-                        :map-options="{
-                            style: 'mapbox://styles/mapbox/outdoors-v11',
-                            center: coordinates,
-                            zoom: 10,
-                        }"
-                        :nav-control="{
-                            show: true,
-                            position: 'bottom-left',
-                        }"
-                        @map-init="mapInitialized"
-                    />
-                </div>
-            </div>
+
+            <ProjectStations :project="project" :mapSize="mapSize" :listSize="listSize" @loaded="setModules" />
 
             <div class="manage-team-container">
                 <div class="section-heading">Manage Team</div>
@@ -157,60 +127,65 @@
 </template>
 
 <script>
-import _ from "lodash";
 import * as utils from "../utilities";
 import FKApi from "../api/api";
 import { API_HOST } from "../secrets";
-import Mapbox from "mapbox-gl-vue";
-import { MAPBOX_ACCESS_TOKEN } from "../secrets";
+import ProjectStations from "../components/ProjectStations";
 
 export default {
-    name: "ProjectDashboard",
+    name: "ProjectAdmin",
     components: {
-        Mapbox,
+        ProjectStations,
     },
     data: () => {
         return {
             baseUrl: API_HOST,
-            projectStations: [],
-            viewingSummary: false,
             displayStartDate: "",
             displayRunTime: "",
             projectUsers: [],
             inviteEmail: "",
+            newUserImage: "",
             noEmail: false,
             emailNotValid: false,
             stationOption: "",
-            timeUnits: ["seconds", "minutes", "hours", "days", "weeks", "months", "years"],
             modules: [],
-            coordinates: [-118, 34],
-            mapboxToken: MAPBOX_ACCESS_TOKEN,
             numFollowers: 1,
+            mapSize: {
+                width: "677px",
+                height: "332px",
+                containerWidth: "1022px",
+            },
+            listSize: {
+                width: "345px",
+                height: "332px",
+                boxWidth: "274px",
+            },
         };
     },
     props: ["project", "userStations", "users"],
     watch: {
+        project() {
+            if (this.project) {
+                this.reset();
+            }
+        },
         users() {
             if (this.users) {
-                this.projectUsers = this.users.map(u => {
-                    u.userImage = this.baseUrl + "/user/" + u.user.id + "/media";
-                    return u;
-                });
+                this.projectUsers = this.users;
             }
         },
     },
     async beforeCreate() {
         this.api = new FKApi();
     },
+    mounted() {
+        let imgPath = require.context("../assets/", false, /\.png$/);
+        let img = "new_user.png";
+        this.newUserImage = imgPath("./" + img);
+    },
     methods: {
-        viewSummary() {
-            this.reset();
-            this.viewingSummary = true;
-        },
         reset() {
             this.stationOption = "";
-            this.projectStations = [];
-            this.fetchStations();
             this.fetchFollowers();
             this.updateDisplayDates();
             this.inviteEmail = "";
@@ -220,41 +195,14 @@ export default {
                 this.numFollowers = result.followers.length + 1;
             });
         },
-        mapInitialized(map) {
-            this.map = map;
-        },
         editProject() {
             this.$router.push({ name: "editProject", params: { id: this.project.id } });
         },
         viewProfile() {
             this.$emit("viewProfile");
         },
-        fetchStations() {
-            this.api.getStationsByProject(this.project.id).then(result => {
-                this.projectStations = result.stations;
-                this.modules = [];
-                if (this.projectStations) {
-                    this.projectStations.forEach((s, i) => {
-                        if (i == 0 && s.status_json.latitude && this.map) {
-                            this.map.setCenter({
-                                lat: parseFloat(s.status_json.latitude),
-                                lng: parseFloat(s.status_json.longitude),
-                            });
-                        }
-                        if (s.status_json.moduleObjects) {
-                            s.status_json.moduleObjects.forEach(m => {
-                                this.modules.push(this.getModuleImg(m));
-                            });
-                        } else if (s.status_json.statusJson && s.status_json.statusJson.modules) {
-                            s.status_json.statusJson.modules.forEach(m => {
-                                this.modules.push(this.getModuleImg(m));
-                            });
-                        }
-                        // could also use readings, if present
-                    });
-                    this.modules = _.uniq(this.modules);
-                }
-            });
+        setModules(modules) {
+            this.modules = modules;
         },
         stationSelected() {
             const params = {
@@ -292,17 +240,20 @@ export default {
         sendInvite() {
             let valid = this.checkEmail();
             if (valid) {
-                this.$emit("inviteUser", { email: this.inviteEmail, projectId: this.project.id });
-                this.projectUsers.push({
-                    user: {
-                        id: "pending-" + Date.now(),
-                        name: this.inviteEmail,
-                        email: this.inviteEmail,
-                    },
-                    role: "Member",
-                    membership: "Pending",
+                const params = { email: this.inviteEmail, projectId: this.project.id };
+                this.api.sendInvite(params).then(() => {
+                    this.projectUsers.push({
+                        user: {
+                            id: "pending-" + Date.now(),
+                            name: this.inviteEmail,
+                            email: this.inviteEmail,
+                        },
+                        userImage: this.newUserImage,
+                        role: "Member",
+                        membership: "Pending",
+                    });
+                    this.inviteEmail = "";
                 });
-                this.inviteEmail = "";
             }
         },
         removeUser(event) {
@@ -315,11 +266,12 @@ export default {
                     projectId: this.project.id,
                     email: this.projectUsers[index].user.email,
                 };
-                this.$emit("removeUser", params);
-                // also remove from projectUsers
-                if (index > -1) {
-                    this.projectUsers.splice(index, 1);
-                }
+                this.api.removeUserFromProject(params).then(() => {
+                    // also remove from projectUsers
+                    if (index > -1) {
+                        this.projectUsers.splice(index, 1);
+                    }
+                });
             } else {
                 // canceled
             }
@@ -333,7 +285,7 @@ export default {
             if (this.project.start_time) {
                 let d = new Date(this.project.start_time);
                 this.displayStartDate = d.toLocaleDateString("en-US");
-                this.getRunTime();
+                this.displayRunTime = utils.getRunTime(this.project);
             }
         },
         getUpdatedDate(station) {
@@ -343,72 +295,6 @@ export default {
             const date = station.status_json.updated;
             const d = new Date(date);
             return d.toLocaleDateString("en-US");
-        },
-        closeSummary() {
-            this.viewingSummary = false;
-        },
-        showStation(station) {
-            this.$emit("showStation", station);
-        },
-        getRunTime() {
-            let start = new Date(this.project.start_time);
-            let end, runTense;
-            if (this.project.end_time) {
-                end = new Date(this.project.end_time);
-                runTense = "Ran for ";
-            } else {
-                // assume it's still running?
-                end = new Date();
-                runTense = "Running for ";
-            }
-            // get interval and convert to seconds
-            const interval = (end.getTime() - start.getTime()) / 1000;
-            let displayValue = interval;
-            let unit = 0;
-            // unit is an index into this.timeUnits
-            if (interval < 60) {
-                // already set to seconds
-            } else if (interval < 3600) {
-                // minutes
-                unit = 1;
-                displayValue /= 60;
-                displayValue = Math.round(displayValue);
-            } else if (interval < 86400) {
-                // hours
-                unit = 2;
-                displayValue /= 3600;
-                displayValue = Math.round(displayValue);
-            } else if (interval < 604800) {
-                // days
-                unit = 3;
-                displayValue /= 86400;
-                displayValue = Math.round(displayValue);
-            } else if (interval < 2628000) {
-                // weeks
-                unit = 4;
-                displayValue /= 604800;
-                displayValue = Math.round(displayValue);
-            } else if (interval < 31535965) {
-                // months
-                unit = 5;
-                displayValue /= 2628000;
-                displayValue = Math.round(displayValue);
-            } else {
-                // years
-                unit = 6;
-                displayValue /= 31535965;
-                displayValue = Math.round(displayValue);
-            }
-            this.displayRunTime = runTense + displayValue + " " + this.timeUnits[unit];
-        },
-        getModuleImg(module) {
-            let imgPath = require.context("../assets/modules-lg/", false, /\.png$/);
-            let img = utils.getModuleImg(module);
-            return imgPath("./" + img);
-        },
-        getModuleName(module) {
-            const newName = utils.convertOldFirmwareResponse(module);
-            return this.$t(newName + ".name");
         },
     },
 };
@@ -481,7 +367,6 @@ export default {
 .stat img {
     margin-right: 12px;
 }
-
 .project-details-container {
     width: 610px;
     height: 295px;
@@ -495,21 +380,6 @@ export default {
     font-weight: 600;
     float: left;
     margin: 0 0 35px 0;
-}
-.stations-heading {
-    margin: 25px 0 25px 25px;
-}
-.stations-container .space {
-    margin: 0;
-}
-.station-name {
-    font-size: 14px;
-    font-weight: 600;
-}
-.last-seen {
-    font-size: 12px;
-    font-weight: 600;
-    color: #6a6d71;
 }
 .edit-link {
     float: right;
@@ -560,8 +430,6 @@ export default {
     width: 35px;
     margin: 0 5px;
 }
-
-.stations-container,
 .manage-team-container {
     width: 1022px;
     float: left;
@@ -571,27 +439,6 @@ export default {
 .manage-team-container {
     width: 972px;
     padding: 25px;
-}
-.stations-list {
-    width: 345px;
-    height: 332px;
-    float: left;
-}
-.stations-map {
-    width: 677px;
-    height: 332px;
-    float: left;
-}
-#map {
-    width: 677px;
-    height: 332px;
-}
-.station-box {
-    width: 274px;
-    height: 38px;
-    margin: 20px auto;
-    padding: 10px;
-    border: 1px solid #d8dce0;
 }
 .delete-link {
     float: right;
@@ -642,11 +489,6 @@ export default {
 .remove-btn {
     margin: 12px 0 0 0;
     float: right;
-    cursor: pointer;
-}
-#close-form-btn {
-    float: right;
-    margin-top: 15px;
     cursor: pointer;
 }
 </style>
