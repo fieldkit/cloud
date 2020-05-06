@@ -287,6 +287,26 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    getPublicProjects() {
+        const token = this.token.getToken();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/projects",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
+        }).then(response => {
+            if (response.status == 200) {
+                return response.data.projects.filter(p => {
+                    return !p.private;
+                });
+            } else {
+                throw new Error("Api failed");
+            }
+        });
+    }
+
     getProject(id) {
         const token = this.token.getToken();
         return axios({
