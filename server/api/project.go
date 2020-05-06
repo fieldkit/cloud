@@ -272,7 +272,7 @@ func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
 		}
 
 		if lm != nil {
-			SendLoadedMedia(ctx.ResponseData, lm)
+			sendLoadedMedia(ctx.ResponseData, lm)
 		}
 
 		return nil

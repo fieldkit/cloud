@@ -225,7 +225,7 @@ func (c *StationService) Photo(ctx context.Context, payload *station.PhotoPayloa
 		return defaultPhoto(payload.ID)
 	}
 
-	cropped, err := SmartCrop(original, x, y)
+	cropped, err := smartCrop(original, x, y)
 	if err != nil {
 		return defaultPhoto(payload.ID)
 	}

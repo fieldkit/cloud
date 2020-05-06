@@ -572,7 +572,7 @@ func (c *UserController) GetCurrentUserImage(ctx *app.GetCurrentUserImageUserCon
 		}
 
 		if lm != nil {
-			SendLoadedMedia(ctx.ResponseData, lm)
+			sendLoadedMedia(ctx.ResponseData, lm)
 		}
 
 		return nil
@@ -596,7 +596,7 @@ func (c *UserController) GetUserImage(ctx *app.GetUserImageUserContext) error {
 		}
 
 		if lm != nil {
-			SendLoadedMedia(ctx.ResponseData, lm)
+			sendLoadedMedia(ctx.ResponseData, lm)
 		}
 
 		return nil

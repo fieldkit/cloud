@@ -116,7 +116,7 @@ func (c *FieldNoteController) GetMedia(ctx *app.GetMediaFieldNoteContext) error 
 	}
 
 	if lm != nil {
-		SendLoadedMedia(ctx.ResponseData, lm)
+		sendLoadedMedia(ctx.ResponseData, lm)
 	}
 
 	return nil

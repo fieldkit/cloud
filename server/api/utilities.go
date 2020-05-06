@@ -20,7 +20,7 @@ import (
 	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
-func SendLoadedMedia(responseData *goa.ResponseData, lm *repositories.LoadedMedia) error {
+func sendLoadedMedia(responseData *goa.ResponseData, lm *repositories.LoadedMedia) error {
 	writer := bufio.NewWriter(responseData)
 
 	responseData.Header().Set("Content-Length", fmt.Sprintf("%d", lm.Size))
@@ -35,7 +35,7 @@ func SendLoadedMedia(responseData *goa.ResponseData, lm *repositories.LoadedMedi
 	return nil
 }
 
-func SmartCrop(original image.Image, cropX, cropY uint) (i image.Image, err error) {
+func smartCrop(original image.Image, cropX, cropY uint) (i image.Image, err error) {
 	resizer := nfnt.NewDefaultResizer()
 	analyzer := smartcrop.NewAnalyzer(resizer)
 	topCrop, _ := analyzer.FindBestCrop(original, int(cropX), int(cropY))
@@ -47,7 +47,7 @@ func SmartCrop(original image.Image, cropX, cropY uint) (i image.Image, err erro
 	return thumb, nil
 }
 
-func SendImage(responseData *goa.ResponseData, image image.Image) error {
+func sendImage(responseData *goa.ResponseData, image image.Image) error {
 	options := jpeg.Options{
 		Quality: 80,
 	}
@@ -58,18 +58,18 @@ func SendImage(responseData *goa.ResponseData, image image.Image) error {
 		return err
 	}
 
-	return SendData(responseData, "image/jpeg", buf.Bytes())
+	return sendData(responseData, "image/jpeg", buf.Bytes())
 }
 
-func LogErrorAndSendData(ctx context.Context, responseData *goa.ResponseData, cause error, contentType string, data []byte) error {
+func logErrorAndSendData(ctx context.Context, responseData *goa.ResponseData, cause error, contentType string, data []byte) error {
 	log := Logger(ctx).Sugar()
 
 	log.Errorw("error", "error", cause)
 
-	return SendData(responseData, contentType, data)
+	return sendData(responseData, contentType, data)
 }
 
-func SendData(responseData *goa.ResponseData, contentType string, data []byte) error {
+func sendData(responseData *goa.ResponseData, contentType string, data []byte) error {
 	responseData.Header().Set("Content-Length", fmt.Sprintf("%d", len(data)))
 	responseData.Header().Set("Content-Type", contentType)
 	responseData.Write(data)
