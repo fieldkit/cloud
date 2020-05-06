@@ -6,7 +6,7 @@ const mock = jest.fn().mockImplementation(() => {
         getCurrentUser: () => Promise.resolve(user),
         getStation: () => Promise.resolve(station),
         getStations: () => Promise.resolve({ stations: [station] }),
-        getProjects: () => Promise.resolve({ projects: [] }),
+        getUserProjects: () => Promise.resolve({ projects: [] }),
         getModulesMeta: () => Promise.resolve([]),
     };
 });

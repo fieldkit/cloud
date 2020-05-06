@@ -3,9 +3,16 @@ import DataView from "@/views/DataView.vue";
 
 jest.mock("@/api/api.js");
 
+const $route = {
+    fullPath: {},
+};
+
 describe("DataView.vue", () => {
     it("Renders a project name", async () => {
         const dataView = shallowMount(DataView, {
+            mocks: {
+                $route,
+            },
             stubs: ["router-link"],
         });
         const name = "Default FieldKit Project";

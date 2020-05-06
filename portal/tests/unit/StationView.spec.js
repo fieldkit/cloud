@@ -1,7 +1,7 @@
 import { shallowMount } from "@vue/test-utils";
 import StationsView from "@/views/StationsView.vue";
 
-jest.mock("@/api/api");
+jest.mock("@/api/api.js");
 
 describe("StationsView.vue", () => {
     it("Renders a map", () => {
