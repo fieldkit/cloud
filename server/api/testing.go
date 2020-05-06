@@ -43,10 +43,6 @@ func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
 	}
 
 	apiConfig := &ApiConfiguration{
-		// ApiHost:      "",
-		// ApiDomain:    "",
-		// Domain:       "",
-		// PortalDomain: "",
 		SessionKey: e.SessionKey,
 		Emailer:    "default",
 	}

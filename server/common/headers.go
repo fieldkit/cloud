@@ -14,7 +14,7 @@ const (
 	FkDeviceIdHeaderName       = "Fk-DeviceId"
 	FkDeviceNameHeaderName     = "Fk-DeviceName"
 	FkGenerationHeaderName     = "Fk-Generation"
-	FkBlocksIdHeaderName       = "Fk-Blocks"
+	FkBlocksHeaderName         = "Fk-Blocks"
 	FkFlagsIdHeaderName        = "Fk-Flags"
 	FkTypeHeaderName           = "Fk-Type"
 
@@ -35,7 +35,7 @@ func SanitizeMeta(m map[string]*string) map[string]*string {
 		ci[strings.ToLower(key)] = value
 	}
 	newM := make(map[string]*string)
-	for _, key := range []string{FkDeviceIdHeaderName, FkGenerationHeaderName, FkBlocksIdHeaderName, FkFlagsIdHeaderName, FkFileIdHeaderName, FkBuildHeaderName, FkFileNameHeaderName, FkVersionHeaderName} {
+	for _, key := range []string{FkDeviceIdHeaderName, FkGenerationHeaderName, FkBlocksHeaderName, FkFlagsIdHeaderName, FkFileIdHeaderName, FkBuildHeaderName, FkFileNameHeaderName, FkVersionHeaderName} {
 		if value, ok := ci[strings.ToLower(key)]; ok {
 			newM[key] = value
 		}

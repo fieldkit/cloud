@@ -125,7 +125,7 @@ func ParseBlocks(s string) ([]int64, error) {
 	parts := strings.Split(s, ",")
 
 	if len(parts) != 2 {
-		return nil, fmt.Errorf("Malformed block range")
+		return nil, fmt.Errorf("malformed block range")
 	}
 
 	blocks := make([]int64, 2)

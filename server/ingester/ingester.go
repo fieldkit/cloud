@@ -92,7 +92,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 		metaMap := make(map[string]string)
 		metaMap[common.FkDeviceIdHeaderName] = hex.EncodeToString(headers.FkDeviceID)
 		metaMap[common.FkGenerationHeaderName] = hex.EncodeToString(headers.FkGenerationID)
-		metaMap[common.FkBlocksIdHeaderName] = fmt.Sprintf("%v", headers.FkBlocks)
+		metaMap[common.FkBlocksHeaderName] = fmt.Sprintf("%v", headers.FkBlocks)
 		metaMap[common.FkFlagsIdHeaderName] = fmt.Sprintf("%v", headers.FkFlags)
 
 		saved, err := o.Files.Archive(ctx, headers.ContentType, metaMap, req.Body)
@@ -215,9 +215,9 @@ func NewIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 		return nil, fmt.Errorf("invalid %s (%v)", common.FkGenerationHeaderName, err)
 	}
 
-	blocks, err := data.ParseBlocks(req.Header.Get(common.FkBlocksIdHeaderName))
+	blocks, err := data.ParseBlocks(req.Header.Get(common.FkBlocksHeaderName))
 	if err != nil {
-		return nil, fmt.Errorf("invalid %s (%v)", common.FkBlocksIdHeaderName, err)
+		return nil, fmt.Errorf("invalid %s (%v)", common.FkBlocksHeaderName, err)
 	}
 
 	name := req.Header.Get(common.FkDeviceNameHeaderName)
