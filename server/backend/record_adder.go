@@ -3,7 +3,6 @@ package backend
 import (
 	"context"
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/conservify/sqlxcache"
@@ -107,71 +106,6 @@ func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*d
 	return provision, nil
 }
 
-func (ra *RecordAdder) findMeta(ctx context.Context, provisionId, number int64) (*data.MetaRecord, error) {
-	records := []*data.MetaRecord{}
-	if err := ra.database.SelectContext(ctx, &records, `
-		SELECT r.* FROM fieldkit.meta_record AS r WHERE r.provision_id = $1 AND r.number = $2
-		`, provisionId, number); err != nil {
-		return nil, err
-	}
-
-	if len(records) != 1 {
-		return nil, nil
-	}
-
-	return records[0], nil
-}
-
-func (ra *RecordAdder) findLocation(dataRecord *pb.DataRecord) (l *data.Location, err error) {
-	if dataRecord.Readings == nil || dataRecord.Readings.Location == nil {
-		return nil, err
-	}
-	location := dataRecord.Readings.Location
-	lat := float64(location.Latitude)
-	lon := float64(location.Longitude)
-	altitude := float64(location.Altitude)
-
-	if lat > 90 || lat < -90 || lon > 180 || lon < -180 {
-		return nil, err
-	}
-
-	if lat == 0 && lon == 0 {
-		return nil, err
-	}
-
-	l = data.NewLocation([]float64{lon, lat, altitude})
-	return
-}
-
-func hasNaNs(dr *pb.DataRecord) bool {
-	for _, sg := range dr.Readings.SensorGroups {
-		for _, sr := range sg.Readings {
-			if math.IsNaN(float64(sr.Value)) {
-				return true
-			}
-
-		}
-	}
-	return false
-}
-
-func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
-	if !hasNaNs(dr) {
-		return dr
-	}
-	for _, sg := range dr.Readings.SensorGroups {
-		newReadings := make([]*pb.SensorAndValue, len(sg.Readings))
-		for _, sr := range sg.Readings {
-			if !math.IsNaN(float64(sr.Value)) {
-				newReadings = append(newReadings, sr)
-			}
-
-		}
-		sg.Readings = newReadings
-	}
-	return dr
-}
-
 func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) (warning error, fatal error) {
 	log := Logger(ctx).Sugar()
 	verboseLog := logging.OnlyLogIf(log, ra.verbose)
@@ -181,83 +115,39 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		return nil, err
 	}
 
+	recordRepository, err := repositories.NewRecordRepository(ra.database)
+	if err != nil {
+		return nil, err
+	}
+
 	if pr.SignedRecord != nil {
-		metaTime := i.Time
-		if pr.SignedRecord.Time > 0 {
-			metaTime = time.Unix(int64(pr.SignedRecord.Time), 0)
-		}
-
-		metaRecord := data.MetaRecord{
-			ProvisionID: provision.ID,
-			Time:        metaTime,
-			Number:      int64(pr.SignedRecord.Record),
-		}
-
-		if err := metaRecord.SetData(pr.DataRecord); err != nil {
-			return nil, fmt.Errorf("error setting meta json: %v", err)
-		}
-
-		if err := ra.database.NamedGetContext(ctx, &metaRecord, `
-		    INSERT INTO fieldkit.meta_record (provision_id, time, number, raw) VALUES (:provision_id, :time, :number, :raw)
-		    ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw
-			RETURNING *
-			`, metaRecord); err != nil {
+		metaRecord, err := recordRepository.AddMetaRecord(ctx, provision, i, pr.SignedRecord, pr.DataRecord)
+		if err != nil {
 			return nil, err
 		}
 
-		if err := ra.handler.OnMeta(ctx, pr.DataRecord, &metaRecord, provision); err != nil {
+		if err := ra.handler.OnMeta(ctx, pr.DataRecord, metaRecord, provision); err != nil {
 			return nil, err
 		}
 	} else if pr.DataRecord != nil {
-		if pr.DataRecord.Readings == nil {
-			verboseLog.Infow("data reading missing readings", "record", pr.DataRecord)
-			ra.metrics.DataErrorsUnknown()
-			return fmt.Errorf("weird record"), nil
-		}
-
-		location, err := ra.findLocation(pr.DataRecord)
+		dataRecord, err := recordRepository.AddDataRecord(ctx, provision, i, pr.DataRecord)
 		if err != nil {
+			if err == repositories.ErrMalformedRecord {
+				verboseLog.Infow("data reading missing readings", "record", pr.DataRecord)
+				ra.metrics.DataErrorsUnknown()
+				return err, nil
+			}
+			if err == repositories.ErrMetaMissing {
+				verboseLog.Errorw("error finding meta record", "provision_id", provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta)
+				ra.metrics.DataErrorsMissingMeta()
+				return err, nil
+			}
 			return nil, err
 		}
 
-		meta, err := ra.findMeta(ctx, provision.ID, int64(pr.DataRecord.Readings.Meta))
-		if err != nil {
-			return nil, err
-		}
-		if meta == nil {
-			verboseLog.Errorw("error finding meta record", "provision_id", provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta)
-			ra.metrics.DataErrorsMissingMeta()
-			return fmt.Errorf("error finding meta record"), nil
-		}
+		ra.statistics.addTime(dataRecord.Time)
 
-		dataTime := i.Time
-		if pr.DataRecord.Readings.Time > 0 {
-			dataTime = time.Unix(int64(pr.DataRecord.Readings.Time), 0)
-			ra.statistics.addTime(dataTime)
-		}
-
-		dataRecord := data.DataRecord{
-			ProvisionID: provision.ID,
-			Time:        dataTime,
-			Number:      int64(pr.DataRecord.Readings.Reading),
-			MetaID:      meta.ID,
-			Location:    location,
-		}
-
-		if err := dataRecord.SetData(prepareForMarshalToJson(pr.DataRecord)); err != nil {
-			return nil, fmt.Errorf("error setting data json: %v", err)
-		}
-
-		if err := ra.database.NamedGetContext(ctx, &dataRecord, `
-			INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location)
-			VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
-			ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location
-			RETURNING id
-			`, dataRecord); err != nil {
-			return nil, err
-		}
-
-		if err := ra.handler.OnData(ctx, pr.DataRecord, &dataRecord, provision); err != nil {
+		if err := ra.handler.OnData(ctx, pr.DataRecord, dataRecord, provision); err != nil {
 			return nil, err
 		}
 	}
