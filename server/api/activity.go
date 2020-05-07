@@ -157,9 +157,9 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 		return nil, err
 	}
 
-	stationsByID := make(map[int64]*activity.StationSummary)
+	stationsByID := make(map[int32]*activity.StationSummary)
 	for _, station := range stations {
-		stationsByID[int64(station.ID)] = &activity.StationSummary{
+		stationsByID[station.ID] = &activity.StationSummary{
 			ID:   int64(station.ID),
 			Name: station.Name,
 		}

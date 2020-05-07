@@ -34,9 +34,9 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 	update := data.ProjectUpdate{
 		ProjectActivity: data.ProjectActivity{
 			CreatedAt: time.Now(),
-			ProjectID: payload.ID,
+			ProjectID: int32(payload.ID),
 		},
-		AuthorID: int64(p.UserID()),
+		AuthorID: p.UserID(),
 		Body:     payload.Body,
 	}
 

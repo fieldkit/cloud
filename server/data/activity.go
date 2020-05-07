@@ -61,12 +61,12 @@ func ScanStationIngestionWM(rows *sqlx.Rows) (interface{}, error) {
 type ProjectActivity struct {
 	ID        int64     `db:"id" json:"-"`
 	CreatedAt time.Time `db:"created_at" json:"-"`
-	ProjectID int64     `db:"project_id" json:"-"`
+	ProjectID int32     `db:"project_id" json:"-"`
 }
 
 type ProjectUpdate struct {
 	ProjectActivity
-	AuthorID int64  `db:"author_id" json:"-"`
+	AuthorID int32  `db:"author_id" json:"-"`
 	Body     string `db:"body" json:"body"`
 }
 

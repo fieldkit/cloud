@@ -206,9 +206,9 @@ func (e *TestEnv) AddProjectActivity(project *data.Project, station *data.Statio
 	projectUpdate := &data.ProjectUpdate{
 		ProjectActivity: data.ProjectActivity{
 			CreatedAt: time.Now(),
-			ProjectID: int64(project.ID),
+			ProjectID: project.ID,
 		},
-		AuthorID: int64(user.ID),
+		AuthorID: user.ID,
 		Body:     "Project update",
 	}
 

@@ -58,7 +58,7 @@ func (c *DataController) Process(ctx *app.ProcessDataContext) error {
 			Time:   i.Time,
 			ID:     i.ID,
 			URL:    i.URL,
-			UserID: int64(p.UserID()),
+			UserID: p.UserID(),
 		})
 	}
 
@@ -96,7 +96,7 @@ func (c *DataController) ProcessIngestion(ctx *app.ProcessIngestionDataContext) 
 		Time:    i.Time,
 		ID:      i.ID,
 		URL:     i.URL,
-		UserID:  int64(p.UserID()),
+		UserID:  p.UserID(),
 		Verbose: true,
 	})
 

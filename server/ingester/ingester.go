@@ -120,7 +120,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			Time:   ingestion.Time,
 			ID:     ingestion.ID,
 			URL:    saved.URL,
-			UserID: int64(userID),
+			UserID: userID,
 		}); err != nil {
 			log.Warnw("publishing", "err", err)
 		}
