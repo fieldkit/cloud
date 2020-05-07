@@ -16,7 +16,6 @@ func TestGetModuleMeta(t *testing.T) {
 
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
-	assert.NotNil(api)
 
 	req, _ := http.NewRequest("GET", "/modules/meta", nil)
 	rr := tests.ExecuteRequest(req, api)

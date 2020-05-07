@@ -16,6 +16,7 @@ import (
 
 	pb "github.com/fieldkit/data-protocol"
 
+	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -129,6 +130,25 @@ func (e *TestEnv) NewStation(owner *data.User) *data.Station {
 	return station
 }
 
+func (e *TestEnv) AddProvision(deviceID, generationID []byte) (*data.Provision, error) {
+	provision := &data.Provision{
+		Created:      time.Now(),
+		Updated:      time.Now(),
+		DeviceID:     deviceID,
+		GenerationID: generationID,
+	}
+
+	if err := e.DB.NamedGetContext(e.Ctx, provision, `
+			INSERT INTO fieldkit.provision (device_id, generation, created, updated)
+			VALUES (:device_id, :generation, :created, :updated) ON CONFLICT (device_id, generation)
+			DO UPDATE SET updated = NOW() RETURNING id
+			`, provision); err != nil {
+		return nil, err
+	}
+
+	return provision, nil
+}
+
 func (e *TestEnv) AddIngestion(user *data.User, url string, deviceID []byte, length int) (*data.Ingestion, error) {
 	ingestion := &data.Ingestion{
 		URL:          url,
@@ -144,7 +164,7 @@ func (e *TestEnv) AddIngestion(user *data.User, url string, deviceID []byte, len
 	if err := e.DB.NamedGetContext(e.Ctx, ingestion, `
 			INSERT INTO fieldkit.ingestion (time, upload_id, user_id, device_id, generation, type, size, url, blocks, flags)
 			VALUES (NOW(), :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
-			RETURNING *
+			RETURNING id
 			`, ingestion); err != nil {
 		return nil, err
 	}
@@ -190,7 +210,7 @@ func (e *TestEnv) AddStationActivity(station *data.Station, user *data.User) err
 		INSERT INTO fieldkit.station_ingestion (created_at, station_id, uploader_id, data_ingestion_id, data_records, errors)
 		VALUES (:created_at, :station_id, :uploader_id, :data_ingestion_id, :data_records, :errors)
 		ON CONFLICT (data_ingestion_id) DO NOTHING
-		RETURNING *
+		RETURNING id
 		`, activity); err != nil {
 		return err
 	}
@@ -230,7 +250,12 @@ func (e *TestEnv) NewRandomData(n int) ([]byte, error) {
 	return data, err
 }
 
-func (e *TestEnv) NewMetaLayout(record uint64) *pb.SignedRecord {
+type SignedRecordAndData struct {
+	Signed *pb.SignedRecord
+	Data   *pb.DataRecord
+}
+
+func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {
 	cfg := &pb.DataRecord{
 		Modules: []*pb.ModuleInfo{
 			&pb.ModuleInfo{
@@ -315,12 +340,15 @@ func (e *TestEnv) NewMetaLayout(record uint64) *pb.SignedRecord {
 
 	hash := blake2b.Sum256(body.Bytes())
 
-	return &pb.SignedRecord{
-		Kind:   1, /* Modules */
-		Time:   0,
-		Data:   body.Bytes(),
-		Hash:   hash[:],
-		Record: record,
+	return &SignedRecordAndData{
+		Signed: &pb.SignedRecord{
+			Kind:   1, /* Modules */
+			Time:   0,
+			Data:   body.Bytes(),
+			Hash:   hash[:],
+			Record: record,
+		},
+		Data: cfg,
 	}
 }
 
@@ -417,6 +445,68 @@ func (e *TestEnv) NewDataReading(meta, reading uint64) *pb.DataRecord {
 	}
 }
 
+type AddedRecords struct {
+	Provision   *data.Provision
+	Ingestion   *data.Ingestion
+	MetaRecords []*data.MetaRecord
+	DataRecords []*data.DataRecord
+}
+
+func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*AddedRecords, error) {
+	recordRepository, err := repositories.NewRecordRepository(e.DB)
+	if err != nil {
+		return nil, err
+	}
+
+	i, err := e.AddIngestion(user, "url", station.DeviceID, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	p, err := e.AddProvision(station.DeviceID, station.DeviceID)
+	if err != nil {
+		return nil, err
+	}
+
+	metaRecords := make([]*data.MetaRecord, 0)
+	dataRecords := make([]*data.DataRecord, 0)
+
+	metaNumber := uint64(1)
+	dataNumber := uint64(1)
+
+	for m := 0; m < 1; m += 1 {
+		meta := e.NewMetaLayout(metaNumber)
+
+		metaRecord, err := recordRepository.AddMetaRecord(e.Ctx, p, i, meta.Signed, meta.Data)
+		if err != nil {
+			return nil, err
+		}
+
+		metaRecords = append(metaRecords, metaRecord)
+
+		for d := 0; d < 4; d += 1 {
+			data := e.NewDataReading(meta.Signed.Record, dataNumber)
+
+			dataRecord, err := recordRepository.AddDataRecord(e.Ctx, p, i, data)
+			if err != nil {
+				return nil, err
+			}
+
+			dataRecords = append(dataRecords, dataRecord)
+
+			dataNumber += 1
+		}
+		metaNumber += 1
+	}
+
+	return &AddedRecords{
+		Provision:   p,
+		Ingestion:   i,
+		MetaRecords: metaRecords,
+		DataRecords: dataRecords,
+	}, nil
+}
+
 type FilePair struct {
 	Meta       []byte
 	Data       []byte
@@ -433,14 +523,14 @@ func (e *TestEnv) NewFilePair(nmeta, ndata int) (*FilePair, error) {
 
 	for m := 0; m < nmeta; m += 1 {
 		meta := e.NewMetaLayout(metaNumber)
-		if err := metaFile.EncodeMessage(meta); err != nil {
+		if err := metaFile.EncodeMessage(meta.Signed); err != nil {
 			return nil, err
 		}
 
 		metaNumber += 1
 
 		for i := 0; i < ndata; i += 1 {
-			dataRecord := e.NewDataReading(meta.Record, dataNumber)
+			dataRecord := e.NewDataReading(meta.Signed.Record, dataNumber)
 			if err := dataFile.EncodeMessage(dataRecord); err != nil {
 				return nil, err
 			}

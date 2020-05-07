@@ -1,11 +1,12 @@
-package repositories
+package backend
 
 import (
 	"testing"
 
-	"github.com/fieldkit/cloud/server/tests"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/tests"
 )
 
 func TestQueryStationByID(t *testing.T) {
@@ -16,7 +17,7 @@ func TestQueryStationByID(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	r, err := NewStationRepository(e.DB)
+	r, err := repositories.NewStationRepository(e.DB)
 	assert.NoError(err)
 
 	sf, err := r.QueryStationFull(e.Ctx, fd.Stations[0].ID)
@@ -37,7 +38,7 @@ func TestQueryStationsByOwnerID(t *testing.T) {
 	fd, err := e.AddStations(5)
 	assert.NoError(err)
 
-	r, err := NewStationRepository(e.DB)
+	r, err := repositories.NewStationRepository(e.DB)
 	assert.NoError(err)
 
 	sfs, err := r.QueryStationFullByOwnerID(e.Ctx, fd.Owner.ID)
@@ -58,7 +59,7 @@ func TestQueryStationsByProjectID(t *testing.T) {
 	fd, err := e.AddStations(5)
 	assert.NoError(err)
 
-	r, err := NewStationRepository(e.DB)
+	r, err := repositories.NewStationRepository(e.DB)
 	assert.NoError(err)
 
 	sfs, err := r.QueryStationFullByProjectID(e.Ctx, fd.Project.ID)
