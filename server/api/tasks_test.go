@@ -9,7 +9,7 @@ import (
 	"github.com/fieldkit/cloud/server/tests"
 )
 
-func TestGetModuleMeta(t *testing.T) {
+func TestGetTasksFive(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -18,8 +18,8 @@ func TestGetModuleMeta(t *testing.T) {
 	assert.NoError(err)
 	assert.NotNil(api)
 
-	req, _ := http.NewRequest("GET", "/modules/meta", nil)
+	req, _ := http.NewRequest("GET", "/tasks/five", nil)
 	rr := tests.ExecuteRequest(req, api)
 
-	assert.Equal(http.StatusOK, rr.Code)
+	assert.Equal(http.StatusNoContent, rr.Code)
 }

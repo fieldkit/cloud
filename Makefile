@@ -28,7 +28,7 @@ ci-db-tests:
 	docker run --name fktests-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password --network=docker_default -d mdillon/postgis
 	sleep 5 # TODO Add a loop here to check
 	IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' fktests-pg`; \
-	cd server && FIELDKIT_POSTGRES_URL="postgres://fieldkit:password@$$IP/fieldkit?sslmode=disable" go test -p 1 -v ./...
+	cd server && FIELDKIT_POSTGRES_URL="postgres://fieldkit:password@$$IP/fieldkit?sslmode=disable" go test -p 1 -v -coverprofile=coverage.data ./...
 	docker stop fktests-pg || true
 
 setup: legacy/src/js/secrets.js portal/src/secrets.js ocr-portal/src/js/secrets.js
@@ -52,7 +52,10 @@ tests: portal/node_modules
 	cd portal && vue-cli-service test:unit
 
 gotests:
-	cd server && go test -p 1 ./...
+	cd server && go test -p 1 -coverprofile=coverage.data ./...
+
+view-coverage:
+	cd server && go tool cover -html=coverage.data
 
 dev-portal: portal/node_modules
 	cd portal && npm run serve

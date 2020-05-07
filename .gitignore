@@ -14,3 +14,4 @@ node_modules
 secrets.js
 *.fkpb
 *.di.bz2
+coverage.data
