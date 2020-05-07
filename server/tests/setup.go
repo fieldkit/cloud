@@ -40,6 +40,32 @@ var (
 	globalEnv *TestEnv
 )
 
+func tryMigrate(url string) error {
+	migrationsDir, err := findMigrationsDirectory()
+	if err != nil {
+		return err
+	}
+
+	log.Printf("trying to migrate...")
+	log.Printf("postgres = %s", url)
+	log.Printf("migrations = %s", migrationsDir)
+
+	migrater, err := migrate.New("file://"+migrationsDir, url)
+	if err != nil {
+		return err
+	}
+
+	migrater.Log = &MigratorLog{}
+
+	if err := migrater.Up(); err != nil {
+		if err != migrate.ErrNoChange {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func NewTestEnv() (e *TestEnv, err error) {
 	if globalEnv != nil {
 		log.Printf("using existing test env")
@@ -67,33 +93,20 @@ func NewTestEnv() (e *TestEnv, err error) {
 		return nil, err
 	}
 
-	log.Printf("postgres-url = %s", config.PostgresURL)
-	log.Printf("creating test database")
+	if err := tryMigrate(testUrl); err != nil {
+		log.Printf("creating test database")
 
-	if _, err := originalDb.ExecContext(ctx, fmt.Sprintf("DROP DATABASE IF EXISTS %s", databaseName)); err != nil {
-		return nil, err
-	}
+		if _, err := originalDb.ExecContext(ctx, fmt.Sprintf("DROP DATABASE IF EXISTS %s", databaseName)); err != nil {
+			return nil, err
+		}
 
-	if _, err := originalDb.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", databaseName)); err != nil {
-		return nil, err
-	}
+		if _, err := originalDb.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", databaseName)); err != nil {
+			return nil, err
+		}
 
-	migrationsDir, err := findMigrationsDirectory()
-	if err != nil {
-		return nil, err
-	}
-
-	migrater, err := migrate.New("file://"+migrationsDir, testUrl)
-	if err != nil {
-		return nil, err
-	}
-
-	migrater.Log = &MigratorLog{}
-
-	log.Printf("migrating test database")
-
-	if err := migrater.Up(); err != nil {
-		return nil, err
+		if err := tryMigrate(testUrl); err != nil {
+			return nil, err
+		}
 	}
 
 	testDb, err := sqlxcache.Open("postgres", testUrl)
