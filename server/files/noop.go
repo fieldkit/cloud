@@ -36,7 +36,6 @@ func (a *NopFilesArchive) Archive(ctx context.Context, contentType string, meta 
 	}
 
 	return ss, nil
-
 }
 
 func (a *NopFilesArchive) OpenByKey(ctx context.Context, key string) (io.ReadCloser, error) {

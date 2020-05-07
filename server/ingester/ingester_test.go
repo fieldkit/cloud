@@ -2,7 +2,6 @@ package ingester
 
 import (
 	"bytes"
-	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -90,7 +89,7 @@ func TestIngestWithoutContentType(t *testing.T) {
 	handler, user, err := NewTestableIngester(e)
 	assert.NoError(err)
 
-	data, err := NewRandomData(1024)
+	data, err := e.NewRandomData(1024)
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("POST", "/", nil)
@@ -116,7 +115,7 @@ func TestIngestWithoutContentLength(t *testing.T) {
 	handler, user, err := NewTestableIngester(e)
 	assert.NoError(err)
 
-	data, err := NewRandomData(1024)
+	data, err := e.NewRandomData(1024)
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("POST", "/", nil)
@@ -164,7 +163,7 @@ func TestIngestWithoutDeviceID(t *testing.T) {
 	handler, user, err := NewTestableIngester(e)
 	assert.NoError(err)
 
-	data, err := NewRandomData(1024)
+	data, err := e.NewRandomData(1024)
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("POST", "/", nil)
@@ -190,7 +189,7 @@ func TestIngestWithoutGeneration(t *testing.T) {
 	handler, user, err := NewTestableIngester(e)
 	assert.NoError(err)
 
-	data, err := NewRandomData(1024)
+	data, err := e.NewRandomData(1024)
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("POST", "/", nil)
@@ -216,7 +215,7 @@ func TestIngestWithoutBlocks(t *testing.T) {
 	handler, user, err := NewTestableIngester(e)
 	assert.NoError(err)
 
-	data, err := NewRandomData(1024)
+	data, err := e.NewRandomData(1024)
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("POST", "/", nil)
@@ -242,7 +241,7 @@ func TestIngestWithoutType(t *testing.T) {
 	handler, user, err := NewTestableIngester(e)
 	assert.NoError(err)
 
-	data, err := NewRandomData(1024)
+	data, err := e.NewRandomData(1024)
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("POST", "/", nil)
@@ -268,7 +267,7 @@ func TestIngestSuccessfully(t *testing.T) {
 	handler, user, err := NewTestableIngester(e)
 	assert.NoError(err)
 
-	data, err := NewRandomData(1024)
+	data, err := e.NewRandomData(1024)
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("POST", "/", nil)
@@ -306,13 +305,4 @@ func AddIngestionHeaders(e *tests.TestEnv, r *http.Request, user *data.User, dat
 	}
 
 	return nil
-}
-
-func NewRandomData(n int) ([]byte, error) {
-	data := make([]byte, n)
-	actual, err := rand.Read(data)
-	if actual != n {
-		return nil, fmt.Errorf("unexpected random byte read")
-	}
-	return data, err
 }

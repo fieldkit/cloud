@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.uber.org/zap"
@@ -34,6 +35,10 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 	i, err := ir.QueryByID(ctx, m.ID)
 	if err != nil {
 		return err
+	}
+
+	if i == nil {
+		return fmt.Errorf("ingestion missing: %v", m.ID)
 	}
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID)
