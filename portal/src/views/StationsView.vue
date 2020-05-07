@@ -47,7 +47,7 @@
                     <img alt="Google Play" src="../assets/googleplay.png" class="app-btn" />
                 </a>
             </div>
-            <div v-if="failedAuth" id="no-auth">
+            <div v-if="noCurrentUser" id="no-user">
                 <p>
                     Please
                     <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
@@ -88,7 +88,7 @@ export default {
             placeName: "",
             nativeLand: [],
             isAuthenticated: false,
-            failedAuth: false,
+            noCurrentUser: false,
             coordinates: [-96, 37.8],
             mapboxToken: MAPBOX_ACCESS_TOKEN,
         };
@@ -137,14 +137,8 @@ export default {
                 }
             })
             .catch(e => {
-                // NOTE: This isn't necessarily true, we should be
-                // checking for actual authentication error status codes
-                // in the Api code and then raising some kind of event to
-                // indicate they aren't authenticated. Added this message
-                // because I saw this happen even though I was logged in
-                // and was curious why but couldn't see.
                 console.log("error", e);
-                this.failedAuth = true;
+                this.noCurrentUser = true;
                 // handle non-logged in state
                 if (this.map) {
                     this.initStations();
@@ -348,7 +342,7 @@ export default {
     width: 100%;
     height: 100vh;
 }
-#no-auth {
+#no-user {
     font-size: 20px;
     background-color: #ffffff;
     width: 400px;

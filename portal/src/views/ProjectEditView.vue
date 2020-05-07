@@ -12,23 +12,15 @@
             <img alt="" src="../assets/progress.gif" />
         </div>
         <div class="main-panel" v-show="!loading && isAuthenticated">
-            <div id="inner-container">
-                <div id="projects-container">
-                    <div class="container">
-                        <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
-                            <img alt="Add project" src="../assets/add.png" />
-                            Add Project
-                        </div>
-                        <h1>{{ projectsTitle }}</h1>
-                        <!-- display user's projects -->
-                        <ProjectThumbnails :projects="userProjects" />
-                    </div>
-                    <div class="container">
-                        <h1>Community Projects</h1>
-                        <!-- display community projects -->
-                        <ProjectThumbnails :projects="publicProjects" />
-                    </div>
+            <router-link :to="{ name: 'projects' }">
+                <div class="projects-link">
+                    <span class="small-arrow">&lt;</span>
+                    Back to Projects
                 </div>
+            </router-link>
+            <div id="inner-container">
+                <!-- add or update a project -->
+                <ProjectForm :project="activeProject" @updating="onProjectUpdate" />
             </div>
         </div>
         <div v-if="noCurrentUser" class="no-user-message">
@@ -47,14 +39,14 @@
 import FKApi from "../api/api";
 import { API_HOST } from "../secrets";
 import HeaderBar from "../components/HeaderBar";
-import ProjectThumbnails from "../components/ProjectThumbnails";
+import ProjectForm from "../components/ProjectForm";
 import SidebarNav from "../components/SidebarNav";
 
 export default {
-    name: "ProjectsView",
+    name: "ProjectEditView",
     components: {
         HeaderBar,
-        ProjectThumbnails,
+        ProjectForm,
         SidebarNav,
     },
     props: ["id"],
@@ -63,8 +55,7 @@ export default {
             baseUrl: API_HOST,
             user: {},
             userProjects: [],
-            projectsTitle: "Projects",
-            publicProjects: [],
+            activeProject: null,
             stations: [],
             isAuthenticated: false,
             noCurrentUser: false,
@@ -78,10 +69,14 @@ export default {
             .then(user => {
                 this.user = user;
                 this.isAuthenticated = true;
-                this.projectsTitle = "My Projects";
-                this.getPublicProjects();
                 this.getUserProjects();
                 this.getStations();
+                if (this.id) {
+                    this.getProject(this.id);
+                } else {
+                    // adding project
+                    this.loading = false;
+                }
             })
             .catch(() => {
                 this.loading = false;
@@ -97,32 +92,26 @@ export default {
                 this.stations = s.stations;
             });
         },
-        getPublicProjects() {
-            this.api
-                .getPublicProjects()
-                .then(projects => {
-                    this.publicProjects = projects;
-                    this.loading = false;
-                })
-                .catch(() => {
-                    this.loading = false;
-                });
-        },
         getUserProjects() {
             this.api.getUserProjects().then(projects => {
                 if (projects && projects.projects.length > 0) {
                     this.userProjects = projects.projects;
-                } else {
-                    // create default project for user
-                    this.api.addDefaultProject().then(project => {
-                        this.userProjects = [project];
-                        this.loading = false;
-                    });
                 }
             });
         },
-        addProject() {
-            this.$router.push({ name: "addProject" });
+        getProject(projectId) {
+            this.api
+                .getProject(projectId)
+                .then(project => {
+                    this.activeProject = project;
+                    this.loading = false;
+                })
+                .catch(() => {
+                    this.$router.push({ name: "projects" });
+                });
+        },
+        onProjectUpdate() {
+            this.loading = true;
         },
         showStation(station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
@@ -132,6 +121,16 @@ export default {
 </script>
 
 <style scoped>
+.small-arrow {
+    font-size: 11px;
+    float: left;
+    margin: 2px 5px 0 0;
+}
+.projects-link {
+    margin: 40px 0 0 90px;
+    font-size: 14px;
+    cursor: pointer;
+}
 #inner-container {
     margin: 20px 60px;
     overflow: scroll;

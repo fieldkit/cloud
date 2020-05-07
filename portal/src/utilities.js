@@ -102,3 +102,56 @@ export function getModuleImg(module) {
     }
     return img;
 }
+
+export function getRunTime(project) {
+    const timeUnits = ["seconds", "minutes", "hours", "days", "weeks", "months", "years"];
+    let start = new Date(project.start_time);
+    let end, runTense;
+    if (project.end_time) {
+        end = new Date(project.end_time);
+        runTense = "Ran for ";
+    } else {
+        // assume it's still running?
+        end = new Date();
+        runTense = "Running for ";
+    }
+    // get interval and convert to seconds
+    const interval = (end.getTime() - start.getTime()) / 1000;
+    let displayValue = interval;
+    let unit = 0;
+    // unit is an index into timeUnits
+    if (interval < 60) {
+        // already set to seconds
+    } else if (interval < 3600) {
+        // minutes
+        unit = 1;
+        displayValue /= 60;
+        displayValue = Math.round(displayValue);
+    } else if (interval < 86400) {
+        // hours
+        unit = 2;
+        displayValue /= 3600;
+        displayValue = Math.round(displayValue);
+    } else if (interval < 604800) {
+        // days
+        unit = 3;
+        displayValue /= 86400;
+        displayValue = Math.round(displayValue);
+    } else if (interval < 2628000) {
+        // weeks
+        unit = 4;
+        displayValue /= 604800;
+        displayValue = Math.round(displayValue);
+    } else if (interval < 31535965) {
+        // months
+        unit = 5;
+        displayValue /= 2628000;
+        displayValue = Math.round(displayValue);
+    } else {
+        // years
+        unit = 6;
+        displayValue /= 31535965;
+        displayValue = Math.round(displayValue);
+    }
+    return runTense + displayValue + " " + timeUnits[unit];
+}
