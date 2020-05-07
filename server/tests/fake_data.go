@@ -257,77 +257,92 @@ type SignedRecordAndData struct {
 
 func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {
 	cfg := &pb.DataRecord{
+		Metadata: &pb.Metadata{
+			DeviceId: []byte{},
+			Firmware: &pb.Firmware{},
+		},
+		Identity: &pb.Identity{
+			Name: "",
+		},
 		Modules: []*pb.ModuleInfo{
 			&pb.ModuleInfo{
-				Name:     "random-module-1",
-				Header:   &pb.ModuleHeader{},
+				Name: "random-module-1",
+				Header: &pb.ModuleHeader{
+					Manufacturer: repositories.ManufacturerConservify,
+					Kind:         repositories.ConservifyRandom,
+					Version:      0x1,
+				},
 				Firmware: &pb.Firmware{},
 				Sensors: []*pb.SensorInfo{
 					&pb.SensorInfo{
-						Name:          "sensor-0",
+						Name:          "random_0",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-1",
+						Name:          "random_1",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-2",
+						Name:          "random_2",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-3",
+						Name:          "random_3",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-4",
+						Name:          "random_4",
 						UnitOfMeasure: "C",
 					},
 				},
 			},
 			&pb.ModuleInfo{
-				Name:     "random-module-2",
-				Header:   &pb.ModuleHeader{},
+				Name: "random-module-2",
+				Header: &pb.ModuleHeader{
+					Manufacturer: repositories.ManufacturerConservify,
+					Kind:         repositories.ConservifyRandom,
+					Version:      0x1,
+				},
 				Firmware: &pb.Firmware{},
 				Sensors: []*pb.SensorInfo{
 					&pb.SensorInfo{
-						Name:          "sensor-0",
+						Name:          "random_0",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-1",
+						Name:          "random_1",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-2",
+						Name:          "random_2",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-3",
+						Name:          "random_3",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-4",
+						Name:          "random_4",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-5",
+						Name:          "random_5",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-6",
+						Name:          "random_6",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-7",
+						Name:          "random_7",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-8",
+						Name:          "random_8",
 						UnitOfMeasure: "C",
 					},
 					&pb.SensorInfo{
-						Name:          "sensor-9",
+						Name:          "random_9",
 						UnitOfMeasure: "C",
 					},
 				},

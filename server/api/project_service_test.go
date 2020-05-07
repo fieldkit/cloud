@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/kinbiko/jsonassert"
 	"github.com/stretchr/testify/assert"
 
@@ -68,14 +69,16 @@ func TestUpdateProjectWhenAdministrator(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
+	newName := faker.UUIDDigit()
+	newSlug := faker.UUIDDigit()
 	payload, err := json.Marshal(
 		struct {
 			Name        string `json:"name"`
 			Slug        string `json:"slug"`
 			Description string `json:"description"`
 		}{
-			Name:        "New Name",
-			Slug:        "new-slug",
+			Name:        newName,
+			Slug:        newSlug,
 			Description: "New Description",
 		},
 	)
@@ -91,15 +94,15 @@ func TestUpdateProjectWhenAdministrator(t *testing.T) {
 	ja.Assertf(rr.Body.String(), `
 	{
 		"id": "<<PRESENCE>>",
-		"name": "New Name",
-		"slug": "new-slug",
+		"name": "%s",
+		"slug": "%s",
 		"description": "New Description",
 		"private": true,
 		"read_only": false,
 		"location": "",
 		"goal": "",
 		"tags": ""
-	}`)
+	}`, newName, newSlug)
 }
 
 func TestUpdateProjectWhenNotMember(t *testing.T) {

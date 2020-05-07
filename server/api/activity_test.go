@@ -55,7 +55,7 @@ func TestGetProjectActivity(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d/activity", fd.Stations[0].ID), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d/activity", fd.Project.ID), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr := tests.ExecuteRequest(req, api)
 
