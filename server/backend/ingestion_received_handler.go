@@ -77,7 +77,7 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		return nil
 	}
 
-	if info.DataRecords > 0 {
+	if info.DataRecords == 0 {
 		return nil
 	}
 
