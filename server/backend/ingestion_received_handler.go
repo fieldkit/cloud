@@ -49,23 +49,28 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	log.Infow("pending", "file_id", i.UploadID, "ingestion_url", i.URL, "blocks", i.Blocks)
 
+	hasOtherErrors := false
 	info, err := recordAdder.WriteRecords(ctx, i)
 	if err != nil {
-		log.Errorw("error", "error", err)
-		err := ir.MarkProcessedHasOtherErrors(ctx, i.ID)
-		if err != nil {
-			return err
-		}
-	} else {
-		err := ir.MarkProcessedDone(ctx, i.ID, info.TotalRecords, info.MetaErrors, info.DataErrors)
-		if err != nil {
-			return err
-		}
+		log.Errorw("ingestion", "error", err)
+		hasOtherErrors = true
 	}
 
 	if info != nil {
 		if err := recordIngestionActivity(ctx, log, h.Database, m, info); err != nil {
 			log.Errorw("ingestion", "error", err)
+			hasOtherErrors = true
+		}
+	}
+
+	if hasOtherErrors {
+		err := ir.MarkProcessedHasOtherErrors(ctx, i.ID)
+		if err != nil {
+			return err
+		}
+	} else {
+		if err := ir.MarkProcessedDone(ctx, i.ID, info.TotalRecords, info.MetaErrors, info.DataErrors); err != nil {
+			return err
 		}
 	}
 
@@ -92,11 +97,12 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		Errors:          info.DataErrors > 0 || info.MetaErrors > 0,
 	}
 
-	if _, err := database.NamedExecContext(ctx, `
+	if err := database.NamedGetContext(ctx, activity, `
 		INSERT INTO fieldkit.station_ingestion (created_at, station_id, uploader_id, data_ingestion_id, data_records, errors)
 		VALUES (:created_at, :station_id, :uploader_id, :data_ingestion_id, :data_records, :errors)
 		ON CONFLICT (data_ingestion_id) DO NOTHING
-		`, &activity); err != nil {
+		RETURNING *
+		`, activity); err != nil {
 		return err
 	}
 

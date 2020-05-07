@@ -270,6 +270,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	assert.Equal(int64(4), *miAfter.TotalRecords)
 	assert.Equal(int64(0), *miAfter.DataErrors)
 	assert.Equal(int64(0), *miAfter.MetaErrors)
+	assert.Equal(int64(0), *miAfter.OtherErrors)
 	assert.NotNil(miAfter.Completed)
 
 	diAfter, err := ir.QueryByID(e.Ctx, dataIngestion.ID)
@@ -277,6 +278,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	assert.Equal(int64(4*16), *diAfter.TotalRecords)
 	assert.Equal(int64(0), *diAfter.DataErrors)
 	assert.Equal(int64(0), *diAfter.MetaErrors)
+	assert.Equal(int64(0), *diAfter.OtherErrors)
 	assert.NotNil(diAfter.Completed)
 
 	found := 0
