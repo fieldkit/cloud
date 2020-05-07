@@ -9,7 +9,7 @@ import (
 type StationActivity struct {
 	ID        int64     `db:"id" json:"-"`
 	CreatedAt time.Time `db:"created_at" json:"-"`
-	StationID int64     `db:"station_id" json:"-"`
+	StationID int32     `db:"station_id" json:"-"`
 }
 
 type StationDeployed struct {
@@ -20,7 +20,7 @@ type StationDeployed struct {
 
 type StationIngestion struct {
 	StationActivity
-	UploaderID      int64 `db:"uploader_id"`
+	UploaderID      int32 `db:"uploader_id"`
 	DataIngestionID int64 `db:"data_ingestion_id"`
 	DataRecords     int64 `db:"data_records"`
 	Errors          bool  `db:"errors"`

@@ -84,7 +84,7 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 	activity := &data.StationIngestion{
 		StationActivity: data.StationActivity{
 			CreatedAt: time.Now(),
-			StationID: int64(*info.StationID),
+			StationID: *info.StationID,
 		},
 		UploaderID:      m.UserID,
 		DataIngestionID: m.ID,

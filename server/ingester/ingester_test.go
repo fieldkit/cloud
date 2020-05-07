@@ -288,7 +288,7 @@ func TestIngestSuccessfully(t *testing.T) {
 
 	found := 0
 	assert.NoError(e.DB.GetContext(e.Ctx, &found, "SELECT COUNT(*) FROM fieldkit.ingestion WHERE id = $1", body.ID))
-	assert.Equal(found, 1)
+	assert.Equal(1, found)
 }
 
 func AddIngestionHeaders(e *tests.TestEnv, r *http.Request, user *data.User, data []byte) error {

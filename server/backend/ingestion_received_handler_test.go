@@ -30,7 +30,7 @@ func TestIngestionReceivedNoSuchIngestion(t *testing.T) {
 		Time:    time.Now(),
 		ID:      int64(30342),
 		Verbose: true,
-		UserID:  int64(user.ID),
+		UserID:  user.ID,
 	})
 
 	assert.Errorf(err, "ingestion missing: %d", 30342)
@@ -61,7 +61,7 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
 		Time:    time.Now(),
 		ID:      ingestion.ID,
-		UserID:  int64(user.ID),
+		UserID:  user.ID,
 		Verbose: true,
 	}))
 }
@@ -91,7 +91,7 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
 		Time:    time.Now(),
 		ID:      ingestion.ID,
-		UserID:  int64(user.ID),
+		UserID:  user.ID,
 		Verbose: true,
 	}))
 }
@@ -127,14 +127,14 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
 		Time:    time.Now(),
 		ID:      metaIngestion.ID,
-		UserID:  int64(user.ID),
+		UserID:  user.ID,
 		Verbose: true,
 	}))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
 		Time:    time.Now(),
 		ID:      dataIngestion.ID,
-		UserID:  int64(user.ID),
+		UserID:  user.ID,
 		Verbose: true,
 	}))
 
@@ -187,14 +187,14 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
 		Time:    time.Now(),
 		ID:      metaIngestion.ID,
-		UserID:  int64(user.ID),
+		UserID:  user.ID,
 		Verbose: true,
 	}))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
 		Time:    time.Now(),
 		ID:      dataIngestion.ID,
-		UserID:  int64(user.ID),
+		UserID:  user.ID,
 		Verbose: true,
 	}))
 

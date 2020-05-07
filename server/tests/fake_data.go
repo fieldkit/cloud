@@ -158,7 +158,7 @@ func (e *TestEnv) AddStationActivity(station *data.Station, user *data.User) err
 	depoyedActivity := &data.StationDeployed{
 		StationActivity: data.StationActivity{
 			CreatedAt: time.Now(),
-			StationID: int64(station.ID),
+			StationID: station.ID,
 		},
 		DeployedAt: time.Now(),
 		Location:   location,
@@ -178,9 +178,9 @@ func (e *TestEnv) AddStationActivity(station *data.Station, user *data.User) err
 	activity := &data.StationIngestion{
 		StationActivity: data.StationActivity{
 			CreatedAt: time.Now(),
-			StationID: int64(station.ID),
+			StationID: station.ID,
 		},
-		UploaderID:      int64(user.ID),
+		UploaderID:      user.ID,
 		DataIngestionID: ingestion.ID,
 		DataRecords:     1,
 		Errors:          false,
