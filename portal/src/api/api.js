@@ -8,8 +8,7 @@ import { API_HOST, MAPBOX_ACCESS_TOKEN } from "../secrets";
 export function makeAuthenticatedApiUrl(url) {
     const tokens = new TokenStorage();
     const token = tokens.getToken();
-    const parts = token.split(" ");
-    return API_HOST + url + "?token=" + parts[1];
+    return API_HOST + url + "?token=" + token;
 }
 
 class FKApi {
@@ -68,7 +67,7 @@ class FKApi {
     }
 
     updatePassword(data) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "PATCH",
             url: this.baseUrl + "/users/" + data.userId + "/password",
@@ -81,7 +80,7 @@ class FKApi {
     }
 
     sendResetPasswordEmail(email) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "POST",
             url: this.baseUrl + "/user/recovery/lookup",
@@ -102,7 +101,7 @@ class FKApi {
     }
 
     getStation(id) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/stations/@/" + id,
@@ -114,7 +113,7 @@ class FKApi {
     }
 
     getStations() {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/stations",
@@ -126,7 +125,7 @@ class FKApi {
     }
 
     getCurrentUser() {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/user",
@@ -138,7 +137,7 @@ class FKApi {
     }
 
     getUsersByProject(projectId) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/users/project/" + projectId,
@@ -150,7 +149,7 @@ class FKApi {
     }
 
     sendInvite(data) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "POST",
             url: this.baseUrl + "/projects/" + data.projectId + "/invite",
@@ -163,7 +162,7 @@ class FKApi {
     }
 
     getInvitesByToken(inviteToken) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/projects/invites/" + inviteToken,
@@ -175,7 +174,7 @@ class FKApi {
     }
 
     getInvitesByUser() {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/projects/invites/pending",
@@ -187,7 +186,7 @@ class FKApi {
     }
 
     acceptInvite(inviteId) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "POST",
             url: this.baseUrl + "/projects/invites/" + inviteId + "/accept",
@@ -199,7 +198,7 @@ class FKApi {
     }
 
     declineInvite(inviteId) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "POST",
             url: this.baseUrl + "/projects/invites/" + inviteId + "/reject",
@@ -211,7 +210,7 @@ class FKApi {
     }
 
     getStationsByProject(projectId) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/projects/" + projectId + "/stations",
@@ -223,7 +222,7 @@ class FKApi {
     }
 
     addStationToProject(data) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "POST",
             url: this.baseUrl + "/projects/" + data.projectId + "/stations/" + data.stationId,
@@ -235,7 +234,7 @@ class FKApi {
     }
 
     removeStationFromProject(data) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "DELETE",
             url: this.baseUrl + "/projects/" + data.projectId + "/stations/" + data.stationId,
@@ -247,7 +246,7 @@ class FKApi {
     }
 
     removeUserFromProject(data) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "DELETE",
             url: this.baseUrl + "/projects/" + data.projectId + "/members",
@@ -260,7 +259,7 @@ class FKApi {
     }
 
     uploadUserImage(data) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "POST",
             url: this.baseUrl + "/user/media",
@@ -273,7 +272,7 @@ class FKApi {
     }
 
     updateUser(data) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "PATCH",
             url: this.baseUrl + "/users/" + data.id,
@@ -286,7 +285,7 @@ class FKApi {
     }
 
     getUserProjects() {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/user/projects",
@@ -298,7 +297,7 @@ class FKApi {
     }
 
     getPublicProjects() {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/projects",
@@ -318,7 +317,7 @@ class FKApi {
     }
 
     getProject(id) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/projects/" + id,
@@ -330,7 +329,7 @@ class FKApi {
     }
 
     addDefaultProject() {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "POST",
             url: this.baseUrl + "/projects",
@@ -347,7 +346,7 @@ class FKApi {
     }
 
     addProject(data) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "POST",
             url: this.baseUrl + "/projects",
@@ -360,7 +359,7 @@ class FKApi {
     }
 
     updateProject(data) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "PATCH",
             url: this.baseUrl + "/projects/" + data.id,
@@ -373,7 +372,7 @@ class FKApi {
     }
 
     uploadProjectImage(data) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "POST",
             url: this.baseUrl + "/projects/" + data.id + "/media",
@@ -386,7 +385,7 @@ class FKApi {
     }
 
     deleteProject(data) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "DELETE",
             url: this.baseUrl + "/projects/" + data.projectId,
@@ -408,7 +407,7 @@ class FKApi {
     }
 
     followProject(projectId) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "POST",
             url: this.baseUrl + "/projects/" + projectId + "/follow",
@@ -420,7 +419,7 @@ class FKApi {
     }
 
     unfollowProject(projectId) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "POST",
             url: this.baseUrl + "/projects/" + projectId + "/unfollow",
@@ -432,7 +431,7 @@ class FKApi {
     }
 
     deleteFieldNote(data) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "DELETE",
             url: this.baseUrl + "/stations/" + data.stationId + "/field-notes/" + data.fieldNoteId,
@@ -444,7 +443,7 @@ class FKApi {
     }
 
     getModulesMeta() {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/modules/meta",
@@ -463,7 +462,7 @@ class FKApi {
             end = new Date().getTime();
         }
 
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/data/devices/" + deviceId + "/summary/json?start=" + start + "&end=" + end,
@@ -475,7 +474,7 @@ class FKApi {
     }
 
     getStationDataByDeviceId(deviceId) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/data/devices/" + deviceId + "/data",
@@ -487,7 +486,7 @@ class FKApi {
     }
 
     getJSONDataByDeviceId(deviceId, page, pageSize) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/data/devices/" + deviceId + "/data/json?page=" + page + "&pageSize=" + pageSize,
@@ -499,7 +498,7 @@ class FKApi {
     }
 
     getFieldNotes(stationId) {
-        const token = this.token.getToken();
+        const token = this.token.getHeader();
         return axios({
             method: "GET",
             url: this.baseUrl + "/stations/" + stationId + "/field-notes",

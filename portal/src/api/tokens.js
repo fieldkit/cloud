@@ -4,7 +4,12 @@ export default class TokenStorage {
     }
 
     getToken() {
-        return (this.token = JSON.parse(window.localStorage["fktoken"] || "null"));
+        this.token = this._sanitize(JSON.parse(window.localStorage["fktoken"] || "null"));
+        return this.token;
+    }
+
+    getHeader() {
+        return "Bearer " + this.getToken();
     }
 
     authenticated() {
@@ -12,12 +17,20 @@ export default class TokenStorage {
     }
 
     setToken(token) {
-        window.localStorage["fktoken"] = JSON.stringify(token);
-        this.token = token;
+        const sanitized = this._sanitize(token);
+        window.localStorage["fktoken"] = JSON.stringify(sanitized);
+        this.token = sanitized;
     }
 
     clear() {
         this.token = null;
         delete window.localStorage["fktoken"];
+    }
+
+    _sanitize(token) {
+        if (token) {
+            return token.replace("Bearer ", "");
+        }
+        return null;
     }
 }
