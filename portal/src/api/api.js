@@ -2,6 +2,16 @@ import axios from "axios";
 import TokenStorage from "./tokens";
 import { API_HOST, MAPBOX_ACCESS_TOKEN } from "../secrets";
 
+// Intentionally keeping this synchronous since it'll get used in
+// VueJS stuff quite often to make URLs that don't require custom
+// headers for authentication.
+export function makeAuthenticatedApiUrl(url) {
+    const tokens = new TokenStorage();
+    const token = tokens.getToken();
+    const parts = token.split(" ");
+    return API_HOST + url + "?token=" + parts[1];
+}
+
 class FKApi {
     constructor() {
         this.baseUrl = API_HOST;

@@ -83,6 +83,7 @@
 <script>
 import * as utils from "../utilities";
 import { API_HOST } from "../secrets";
+import { makeAuthenticatedApiUrl } from "@/api/api";
 
 export default {
     name: "StationSummary",
@@ -96,7 +97,7 @@ export default {
     props: ["station", "isAuthenticated", "placeName", "nativeLand"],
     computed: {
         stationSmallPhoto: function() {
-            return API_HOST + this.station.photos.small;
+            return makeAuthenticatedApiUrl(this.station.photos.small);
         },
     },
     methods: {
