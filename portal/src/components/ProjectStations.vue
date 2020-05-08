@@ -119,7 +119,15 @@ export default {
                 stationsMap.style["margin-left"] = "0";
                 this.map.resize();
                 document.getElementById("stations-map").style.transition = "width 0.5s";
+                let boxes = document.getElementsByClassName("station-box");
+                Array.from(boxes).forEach(b => {
+                    b.style.opacity = 1;
+                });
             } else {
+                let boxes = document.getElementsByClassName("station-box");
+                Array.from(boxes).forEach(b => {
+                    b.style.opacity = 0;
+                });
                 document.getElementById("stations-list").style.width = "1px";
                 stationsMap.addEventListener("transitionend", this.postExpandMap, true);
                 stationsMap.style.width = this.mapSize.containerWidth;
@@ -196,5 +204,6 @@ export default {
     margin: 20px auto;
     padding: 10px;
     border: 1px solid #d8dce0;
+    transition: opacity 0.25s;
 }
 </style>
