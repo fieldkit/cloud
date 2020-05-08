@@ -76,7 +76,7 @@ export function getModuleImg(module) {
             img = "Icon_Distance_Module.png";
             break;
         case "modules.weather":
-            img = "Icon_Weather_Module.png ";
+            img = "Icon_Weather_Module.png";
             break;
         case "modules.water.ec":
             img = "Icon_WaterConductivity_Module.png";
