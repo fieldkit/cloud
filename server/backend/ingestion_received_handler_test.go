@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/tests"
@@ -44,7 +45,7 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	user, err := e.AddUser("")
 	assert.NoError(err)
 
-	data, err := e.NewRandomData(1024)
+	randomData, err := e.NewRandomData(1024)
 	assert.NoError(err)
 
 	handler := &IngestionReceivedHandler{
@@ -55,7 +56,7 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 		}),
 	}
 
-	ingestion, err := e.AddIngestion(user, "/file", e.MustDeviceID(), len(data))
+	ingestion, err := e.AddIngestion(user, "/file", data.MetaTypeName, e.MustDeviceID(), len(randomData))
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
@@ -85,7 +86,7 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 		}),
 	}
 
-	ingestion, err := e.AddIngestion(user, "/meta", e.MustDeviceID(), len(files.Meta))
+	ingestion, err := e.AddIngestion(user, "/meta", data.MetaTypeName, e.MustDeviceID(), len(files.Meta))
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
@@ -118,10 +119,10 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 		}),
 	}
 
-	metaIngestion, err := e.AddIngestion(user, "/meta", deviceID, len(files.Meta))
+	metaIngestion, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
 
-	dataIngestion, err := e.AddIngestion(user, "/data", deviceID, len(files.Data))
+	dataIngestion, err := e.AddIngestion(user, "/data", data.DataTypeName, deviceID, len(files.Data))
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
@@ -178,10 +179,10 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 		}),
 	}
 
-	metaIngestion, err := e.AddIngestion(user, "/meta", deviceID, len(files.Meta))
+	metaIngestion, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
 
-	dataIngestion, err := e.AddIngestion(user, "/data", deviceID, len(files.Data))
+	dataIngestion, err := e.AddIngestion(user, "/data", data.DataTypeName, deviceID, len(files.Data))
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
@@ -242,10 +243,10 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 		}),
 	}
 
-	metaIngestion, err := e.AddIngestion(fd.Owner, "/meta", deviceID, len(files.Meta))
+	metaIngestion, err := e.AddIngestion(fd.Owner, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
 
-	dataIngestion, err := e.AddIngestion(fd.Owner, "/data", deviceID, len(files.Data))
+	dataIngestion, err := e.AddIngestion(fd.Owner, "/data", data.DataTypeName, deviceID, len(files.Data))
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{

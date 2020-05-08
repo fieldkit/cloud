@@ -17,11 +17,6 @@ import (
 	"github.com/fieldkit/cloud/server/messages"
 )
 
-const (
-	MetaTypeName = "meta"
-	DataTypeName = "data"
-)
-
 type DataController struct {
 	*goa.Controller
 	options *ControllerOptions
@@ -160,9 +155,9 @@ func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
 }
 
 type ProvisionSummaryRow struct {
-	GenerationID []byte
-	Type         string
-	Blocks       data.Int64Range
+	GenerationID []byte          `db:"generation"`
+	Type         string          `db:"type"`
+	Blocks       data.Int64Range `db:"blocks"`
 }
 
 type BlocksSummaryRow struct {
@@ -221,13 +216,13 @@ func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error 
 			Updated:    p.Updated,
 			Meta: &app.DeviceMetaSummary{
 				Size:  int(0),
-				First: int(byType[MetaTypeName].Blocks[0]),
-				Last:  int(byType[MetaTypeName].Blocks[1]),
+				First: int(byType[data.MetaTypeName].Blocks[0]),
+				Last:  int(byType[data.MetaTypeName].Blocks[1]),
 			},
 			Data: &app.DeviceDataSummary{
 				Size:  int(0),
-				First: int(byType[DataTypeName].Blocks[0]),
-				Last:  int(byType[DataTypeName].Blocks[1]),
+				First: int(byType[data.DataTypeName].Blocks[0]),
+				Last:  int(byType[data.DataTypeName].Blocks[1]),
 			},
 		}
 	}
@@ -299,18 +294,18 @@ func (c *DataController) DeviceData(ctx *app.DeviceDataDataContext) error {
 	}
 
 	metaVms := make([]*app.DeviceMetaRecord, len(page.Meta))
-	for i, r := range page.Meta {
+	for _, r := range page.Meta {
 		data, err := r.GetData()
 		if err != nil {
 			return err
 		}
 
-		metaVms[i] = &app.DeviceMetaRecord{
+		metaVms = append(metaVms, &app.DeviceMetaRecord{
 			ID:     int(r.ID),
 			Time:   r.Time,
 			Record: int(r.Number),
 			Data:   data,
-		}
+		})
 	}
 
 	return ctx.OK(&app.DeviceDataRecordsResponse{

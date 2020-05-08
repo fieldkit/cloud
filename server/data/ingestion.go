@@ -17,6 +17,11 @@ import (
 	pb "github.com/fieldkit/data-protocol"
 )
 
+const (
+	MetaTypeName = "meta"
+	DataTypeName = "data"
+)
+
 type Ingestion struct {
 	ID           int64         `db:"id"`
 	Time         time.Time     `db:"time"`

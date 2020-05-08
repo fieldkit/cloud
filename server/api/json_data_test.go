@@ -10,7 +10,7 @@ import (
 	"github.com/fieldkit/cloud/server/tests"
 )
 
-func TestGetDeviceSummary(t *testing.T) {
+func TestGetJsonSummary(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -24,14 +24,14 @@ func TestGetDeviceSummary(t *testing.T) {
 	_, err = e.AddMetaAndData(fd.Stations[0], fd.Owner)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/data/devices/%s/summary", fd.Stations[0].DeviceIDHex()), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/data/devices/%s/summary/json", fd.Stations[0].DeviceIDHex()), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusOK, rr.Code)
 }
 
-func TestGetDeviceData(t *testing.T) {
+func TestGetJsonData(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -45,7 +45,7 @@ func TestGetDeviceData(t *testing.T) {
 	_, err = e.AddMetaAndData(fd.Stations[0], fd.Owner)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/data/devices/%s/data", fd.Stations[0].DeviceIDHex()), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/data/devices/%s/data/json", fd.Stations[0].DeviceIDHex()), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr := tests.ExecuteRequest(req, api)
 

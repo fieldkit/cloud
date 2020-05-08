@@ -149,13 +149,13 @@ func (e *TestEnv) AddProvision(deviceID, generationID []byte) (*data.Provision, 
 	return provision, nil
 }
 
-func (e *TestEnv) AddIngestion(user *data.User, url string, deviceID []byte, length int) (*data.Ingestion, error) {
+func (e *TestEnv) AddIngestion(user *data.User, url, typeName string, deviceID []byte, length int) (*data.Ingestion, error) {
 	ingestion := &data.Ingestion{
 		URL:          url,
 		UserID:       user.ID,
 		DeviceID:     deviceID,
 		GenerationID: deviceID,
-		Type:         "data",
+		Type:         typeName,
 		Size:         int64(length),
 		Blocks:       data.Int64Range([]int64{1, 100}),
 		Flags:        pq.Int64Array([]int64{}),
@@ -190,7 +190,7 @@ func (e *TestEnv) AddStationActivity(station *data.Station, user *data.User) err
 		return err
 	}
 
-	ingestion, err := e.AddIngestion(user, "file:///dev/null", station.DeviceID, 0)
+	ingestion, err := e.AddIngestion(user, "file:///dev/null", data.DataTypeName, station.DeviceID, 0)
 	if err != nil {
 		return err
 	}
@@ -460,20 +460,35 @@ func (e *TestEnv) NewDataReading(meta, reading uint64) *pb.DataRecord {
 	}
 }
 
-type AddedRecords struct {
-	Provision   *data.Provision
-	Ingestion   *data.Ingestion
-	MetaRecords []*data.MetaRecord
-	DataRecords []*data.DataRecord
+type AddedDataRecords struct {
+	Provision *data.Provision
+	Ingestion *data.Ingestion
+	Records   []*data.DataRecord
 }
 
-func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*AddedRecords, error) {
+type AddedMetaRecords struct {
+	Provision *data.Provision
+	Ingestion *data.Ingestion
+	Records   []*data.MetaRecord
+}
+
+type MetaAndData struct {
+	Meta *AddedMetaRecords
+	Data *AddedDataRecords
+}
+
+func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*MetaAndData, error) {
 	recordRepository, err := repositories.NewRecordRepository(e.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	i, err := e.AddIngestion(user, "url", station.DeviceID, 0)
+	di, err := e.AddIngestion(user, "url", data.DataTypeName, station.DeviceID, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	mi, err := e.AddIngestion(user, "url", data.MetaTypeName, station.DeviceID, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -492,7 +507,7 @@ func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*Added
 	for m := 0; m < 1; m += 1 {
 		meta := e.NewMetaLayout(metaNumber)
 
-		metaRecord, err := recordRepository.AddMetaRecord(e.Ctx, p, i, meta.Signed, meta.Data)
+		metaRecord, err := recordRepository.AddMetaRecord(e.Ctx, p, mi, meta.Signed, meta.Data)
 		if err != nil {
 			return nil, err
 		}
@@ -502,7 +517,7 @@ func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*Added
 		for d := 0; d < 4; d += 1 {
 			data := e.NewDataReading(meta.Signed.Record, dataNumber)
 
-			dataRecord, err := recordRepository.AddDataRecord(e.Ctx, p, i, data)
+			dataRecord, err := recordRepository.AddDataRecord(e.Ctx, p, di, data)
 			if err != nil {
 				return nil, err
 			}
@@ -514,11 +529,17 @@ func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*Added
 		metaNumber += 1
 	}
 
-	return &AddedRecords{
-		Provision:   p,
-		Ingestion:   i,
-		MetaRecords: metaRecords,
-		DataRecords: dataRecords,
+	return &MetaAndData{
+		Meta: &AddedMetaRecords{
+			Provision: p,
+			Ingestion: mi,
+			Records:   metaRecords,
+		},
+		Data: &AddedDataRecords{
+			Provision: p,
+			Ingestion: di,
+			Records:   dataRecords,
+		},
 	}, nil
 }
 

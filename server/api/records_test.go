@@ -40,7 +40,7 @@ func TestGetMetaRecord(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/meta/%d", ar.MetaRecords[0].ID), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/meta/%d", ar.Meta.Records[0].ID), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeader())
 	rr := tests.ExecuteRequest(req, api)
 
@@ -73,7 +73,7 @@ func TestGetDataRecord(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/data/%d", ar.DataRecords[0].ID), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/data/%d", ar.Data.Records[0].ID), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeader())
 	rr := tests.ExecuteRequest(req, api)
 
@@ -115,7 +115,7 @@ func TestGetDataRecordResolved(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/data/%d/resolved", ar.DataRecords[0].ID), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/data/%d/resolved", ar.Data.Records[0].ID), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeader())
 	rr := tests.ExecuteRequest(req, api)
 
@@ -161,7 +161,7 @@ func TestGetDataRecordFiltered(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/data/%d/filtered", ar.DataRecords[0].ID), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/data/%d/filtered", ar.Data.Records[0].ID), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeader())
 	rr := tests.ExecuteRequest(req, api)
 
