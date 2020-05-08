@@ -2,7 +2,11 @@
     <div class="stations-container" v-bind:style="{ width: mapSize.containerWidth }">
         <div class="section-heading stations-heading">FieldKit Stations</div>
         <div class="space"></div>
-        <div class="stations-list" v-bind:style="{ width: listSize.width, height: listSize.height }">
+        <div id="stations-list" v-bind:style="{ width: listSize.width, height: listSize.height }">
+            <div class="toggle-icon-container" v-on:click="toggleStations">
+                <img v-if="showStationsList" alt="Collapse List" src="../assets/tab-collapse.png" class="toggle-icon" />
+                <img v-if="!showStationsList" alt="Expand List" src="../assets/tab-expand.png" class="toggle-icon" />
+            </div>
             <div v-for="station in projectStations" v-bind:key="station.id">
                 <div class="station-box" v-bind:style="{ width: listSize.boxWidth }">
                     <span class="station-name" v-on:click="showStation(station)">
@@ -12,7 +16,7 @@
                 </div>
             </div>
         </div>
-        <div class="stations-map" v-bind:style="{ width: mapSize.width, height: mapSize.height }">
+        <div id="stations-map" v-bind:style="{ width: mapSize.width, height: mapSize.height }">
             <mapbox
                 :access-token="mapboxToken"
                 :map-options="{
@@ -48,6 +52,7 @@ export default {
             coordinates: [-118, 34],
             mapboxToken: MAPBOX_ACCESS_TOKEN,
             following: false,
+            showStationsList: true,
         };
     },
     props: ["project", "mapSize", "listSize"],
@@ -105,11 +110,47 @@ export default {
             let img = utils.getModuleImg(module);
             return imgPath("./" + img);
         },
+        toggleStations() {
+            let stationsMap = document.getElementById("stations-map");
+            this.showStationsList = !this.showStationsList;
+            if (this.showStationsList) {
+                document.getElementById("stations-list").style.width = this.listSize.width;
+                stationsMap.style.width = this.mapSize.width;
+                stationsMap.style["margin-left"] = "0";
+                this.map.resize();
+                document.getElementById("stations-map").style.transition = "width 0.5s";
+                let boxes = document.getElementsByClassName("station-box");
+                Array.from(boxes).forEach(b => {
+                    b.style.opacity = 1;
+                });
+            } else {
+                let boxes = document.getElementsByClassName("station-box");
+                Array.from(boxes).forEach(b => {
+                    b.style.opacity = 0;
+                });
+                document.getElementById("stations-list").style.width = "1px";
+                stationsMap.addEventListener("transitionend", this.postExpandMap, true);
+                stationsMap.style.width = this.mapSize.containerWidth;
+                stationsMap.style["margin-left"] = "-1px";
+            }
+        },
+        postExpandMap() {
+            this.map.resize();
+            document.getElementById("stations-map").style.transition = "width 0s";
+            document.getElementById("stations-map").removeEventListener("transitionend", this.postExpandMap, true);
+        },
     },
 };
 </script>
 
 <style scoped>
+.toggle-icon-container {
+    float: right;
+    margin: 16px -34px 0 0;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+}
 .section {
     float: left;
 }
@@ -146,11 +187,13 @@ export default {
     margin: 22px 0 0 0;
     border: 1px solid #d8dce0;
 }
-.stations-list {
+#stations-list {
     float: left;
+    transition: width 0.5s;
 }
-.stations-map {
+#stations-map {
     float: left;
+    transition: width 0.5s;
 }
 #map {
     width: inherit;
@@ -161,5 +204,6 @@ export default {
     margin: 20px auto;
     padding: 10px;
     border: 1px solid #d8dce0;
+    transition: opacity 0.25s;
 }
 </style>
