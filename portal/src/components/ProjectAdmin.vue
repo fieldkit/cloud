@@ -205,26 +205,26 @@ export default {
             this.modules = modules;
         },
         stationSelected() {
-            const params = {
-                projectId: this.project.id,
-                stationId: this.stationOption,
-            };
+            // const params = {
+            //     projectId: this.project.id,
+            //     stationId: this.stationOption,
+            // };
             // this.api.addStationToProject(params).then(() => {
             //     this.fetchStations();
             // });
         },
-        deleteStation(event) {
-            const stationId = event.target.getAttribute("data-id");
-            if (window.confirm("Are you sure you want to remove this station?")) {
-                const params = {
-                    projectId: this.project.id,
-                    stationId: stationId,
-                };
-                // this.api.removeStationFromProject(params).then(() => {
-                //     this.fetchStations();
-                // });
-            }
-        },
+        // deleteStation(event) {
+        //     const stationId = event.target.getAttribute("data-id");
+        //     if (window.confirm("Are you sure you want to remove this station?")) {
+        //         const params = {
+        //             projectId: this.project.id,
+        //             stationId: stationId,
+        //         };
+        //         this.api.removeStationFromProject(params).then(() => {
+        //             this.fetchStations();
+        //         });
+        //     }
+        // },
         checkEmail() {
             this.noEmail = false;
             this.emailNotValid = false;
