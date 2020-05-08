@@ -70,37 +70,26 @@ export function convertOldFirmwareResponse(module) {
 }
 
 export function getModuleImg(module) {
-    let img = "";
     switch (module.name) {
         case "modules.distance":
-            img = "Icon_Distance_Module.png";
-            break;
+            return "Icon_Distance_Module.png";
         case "modules.weather":
-            img = "Icon_Weather_Module.png";
-            break;
+            return "Icon_Weather_Module.png";
         case "modules.water.ec":
-            img = "Icon_WaterConductivity_Module.png";
-            break;
+            return "Icon_WaterConductivity_Module.png";
         case "modules.water.ph":
-            img = "Icon_WaterpH_Module.png";
-            break;
+            return "Icon_WaterpH_Module.png";
         case "modules.water.do":
-            img = "Icon_DissolvedOxygen_Module.png";
-            break;
+            return "Icon_DissolvedOxygen_Module.png";
         case "modules.water.temp":
-            img = "Icon_WaterTemp_Module.png";
-            break;
+            return "Icon_WaterTemp_Module.png";
         case "modules.water.orp":
-            img = "Icon_Water_Module.png";
-            break;
+            return "Icon_Water_Module.png";
         case "modules.water.unknown":
-            img = "Icon_Water_Module.png";
-            break;
+            return "Icon_Water_Module.png";
         default:
-            img = "Icon_Generic_Module.png";
-            break;
+            return "Icon_Generic_Module.png";
     }
-    return img;
 }
 
 export function getRunTime(project) {
