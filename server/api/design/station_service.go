@@ -242,7 +242,7 @@ var _ = Service("station", func() {
 				Header("content_type:Content-Type")
 			})
 
-			httpAuthentication()
+			httpAuthenticationQueryString()
 		})
 	})
 

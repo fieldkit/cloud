@@ -36,6 +36,10 @@ func httpAuthentication() {
 	})
 }
 
+func httpAuthenticationQueryString() {
+	Param("auth:token", String, "authentication token")
+}
+
 func DateTimeFormatting() {
 	Format(FormatDateTime)
 }
