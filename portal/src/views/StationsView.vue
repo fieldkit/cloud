@@ -161,6 +161,14 @@ export default {
             if (this.waitingForMap) {
                 this.initStations();
             }
+
+            const stationsView = this;
+            let imgData = require.context("../assets/", false, /\.png$/);
+            imgData = imgData("./" + "Icon_Map_Dot.png");
+            this.map.loadImage(imgData, function(error, image) {
+                if (error) throw error;
+                if (!stationsView.map.hasImage("dot")) stationsView.map.addImage("dot", image);
+            });
         },
 
         initStations() {
@@ -253,8 +261,7 @@ export default {
                     },
                 },
                 layout: {
-                    "icon-image": "{icon}-15",
-                    "icon-size": 2,
+                    "icon-image": "dot",
                     "text-field": "{title}",
                     "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
                     "text-offset": [0, 0.75],
