@@ -100,8 +100,6 @@ export default {
             });
         },
         reset() {
-            this.projectStations = [];
-            this.fetchStations();
             this.fetchFollowers();
             this.updateDisplayDates();
         },

@@ -209,9 +209,9 @@ export default {
                 projectId: this.project.id,
                 stationId: this.stationOption,
             };
-            this.api.addStationToProject(params).then(() => {
-                this.fetchStations();
-            });
+            // this.api.addStationToProject(params).then(() => {
+            //     this.fetchStations();
+            // });
         },
         deleteStation(event) {
             const stationId = event.target.getAttribute("data-id");
@@ -220,9 +220,9 @@ export default {
                     projectId: this.project.id,
                     stationId: stationId,
                 };
-                this.api.removeStationFromProject(params).then(() => {
-                    this.fetchStations();
-                });
+                // this.api.removeStationFromProject(params).then(() => {
+                //     this.fetchStations();
+                // });
             }
         },
         checkEmail() {
