@@ -175,7 +175,6 @@ export default {
                 const station = view.stations.find(s => {
                     return s.name == name;
                 });
-                // view.showSummary(station);
                 view.$emit("showSummary", station);
             });
         },
