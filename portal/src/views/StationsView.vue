@@ -1,6 +1,7 @@
 <template>
-    <div>
+    <div class="full-height">
         <SidebarNav
+            class="full-height left"
             viewing="stations"
             :isAuthenticated="isAuthenticated"
             :stations="stations"
@@ -8,17 +9,17 @@
             @showStation="showSummary"
         />
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" @sidebarToggled="onSidebarToggle" />
-            <StationSummary
-                v-if="activeStation"
-                :isAuthenticated="isAuthenticated"
-                :station="activeStation"
-                :placeName="placeName"
-                :nativeLand="nativeLand"
-                ref="stationSummary"
-            />
         <div id="stations-view-panel" class="main-panel full-height">
             <div id="summary-and-map">
                 <StationsMap :mapSize="mapSize" :stations="stations" @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" />
+                <StationSummary
+                    v-show="activeStation"
+                    class="summary-container"
+                    :station="activeStation"
+                    :summarySize="summarySize"
+                    ref="stationSummary"
+                />
+            </div>
             <div v-if="isAuthenticated && showNotice" id="no-stations">
                 <div id="close-notice-btn" v-on:click="closeNotice">
                     <img alt="Close" src="../assets/close.png" />
@@ -49,7 +50,6 @@
 </template>
 
 <script>
-import _ from "lodash";
 import FKApi from "@/api/api";
 import HeaderBar from "../components/HeaderBar";
 import SidebarNav from "../components/SidebarNav";
@@ -72,10 +72,13 @@ export default {
             stations: [],
             activeStation: null,
             showNotice: false,
-            placeName: "",
-            nativeLand: [],
             isAuthenticated: false,
             noCurrentUser: false,
+            summarySize: {
+                width: "415px",
+                top: "120px",
+                left: "120px",
+            },
             mapSize: {
                 width: "100%",
                 height: "100vh",
@@ -135,31 +138,16 @@ export default {
             this.map = map;
         },
 
-        getPlaceName() {
-            const longLatMapbox = this.activeStation.status_json.longitude + "," + this.activeStation.status_json.latitude;
-            return this.api.getPlaceName(longLatMapbox).then(result => {
-                this.placeName = result.features[0] ? result.features[0].place_name : "Unknown area";
-            });
-        },
-
-        getNativeLand() {
-            const latLongNative = this.activeStation.status_json.latitude + "," + this.activeStation.status_json.longitude;
-            return this.api.getNativeLand(latLongNative);
+        onSidebarToggle() {
+            this.map.resize();
         },
 
         showSummary(station, preserveRoute) {
             this.activeStation = station;
-            this.getPlaceName()
-                .then(this.getNativeLand)
-                .then(result => {
-                    this.nativeLand = _.map(_.flatten(_.map(result, "properties")), r => {
-                        return { name: r.Name, url: r.description };
-                    });
-                    this.$refs.stationSummary.viewSummary();
-                    if (!preserveRoute) {
-                        this.updateStationRoute(station);
-                    }
-                });
+            this.$refs.stationSummary.viewSummary();
+            if (!preserveRoute) {
+                this.updateStationRoute(station);
+            }
         },
 
         updateStationRoute(station) {
@@ -176,12 +164,15 @@ export default {
 </script>
 
 <style scoped>
+.full-height {
+    height: 100%;
+}
+.left {
+    float: left;
+}
 #stations-view-panel {
     margin: 0;
-}
-#map {
-    width: 100%;
-    height: 100vh;
+    overflow: scroll;
 }
 #no-user {
     font-size: 20px;

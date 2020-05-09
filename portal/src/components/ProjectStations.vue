@@ -24,6 +24,12 @@
                 @showSummary="showSummary"
                 ref="stationsMap"
             />
+            <StationSummary
+                v-show="activeStation"
+                :station="activeStation"
+                :compact="true"
+                :summarySize="summarySize"
+                ref="stationSummary"
             />
         </div>
     </div>
@@ -33,18 +39,26 @@
 import _ from "lodash";
 import * as utils from "../utilities";
 import FKApi from "../api/api";
+import StationSummary from "../components/StationSummary";
 import StationsMap from "../components/StationsMap";
 
 export default {
     name: "ProjectStations",
     components: {
+        StationSummary,
         StationsMap,
     },
     data: () => {
         return {
             projectStations: [],
+            activeStation: null,
             following: false,
             showStationsList: true,
+            summarySize: {
+                width: "359px",
+                top: "-300px",
+                left: "122px",
+            },
             mapSize: {
                 width: "inherit",
                 height: "inherit",
@@ -135,6 +149,10 @@ export default {
             this.map.resize();
             document.getElementById("stations-map-container").style.transition = "width 0s";
             document.getElementById("stations-map-container").removeEventListener("transitionend", this.postExpandMap, true);
+        },
+        showSummary(station) {
+            this.activeStation = station;
+            this.$refs.stationSummary.viewSummary();
         },
     },
 };

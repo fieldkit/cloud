@@ -1,11 +1,15 @@
 <template>
-    <div id="station-summary-container" v-if="viewingSummary">
+    <div
+        id="station-summary-container"
+        :style="{ width: summarySize.width, top: summarySize.top, left: summarySize.left }"
+        v-if="viewingSummary"
+    >
         <div v-if="station" id="close-form-btn" v-on:click="closeSummary">
             <img alt="Close" src="../assets/close.png" />
         </div>
         <div class="station-container" v-if="station">
-            <div class="left">
-                <img style="width: 124px; height: 100px;" alt="Station image" :src="stationSmallPhoto" class="station-element" />
+            <div class="left image-container">
+                <img alt="Station image" :src="stationSmallPhoto" class="station-element" />
             </div>
             <div class="left">
                 <div id="station-name" class="station-element">{{ station.name }}</div>
@@ -52,37 +56,40 @@
                     Longitude
                 </div>
             </div>
-            <div class="spacer"></div>
-            <div id="readings-container" class="section">
-                <div id="readings-label">Latest Reading</div>
-                <div v-for="(module, moduleIndex) in station.status_json.moduleObjects" v-bind:key="module.id">
-                    <div
-                        v-for="(sensor, sensorIndex) in module.sensorObjects"
-                        v-bind:key="sensor.id"
-                        :class="getCounter(moduleIndex, sensorIndex) % 2 == 1 ? 'left-reading' : 'right-reading'"
-                    >
-                        <div class="left sensor-name">{{ getSensorName(module, sensor) }}</div>
-                        <div class="right sensor-unit">
-                            {{ sensor.unit }}
-                        </div>
-                        <div class="right sensor-reading">
-                            {{ sensor.currentReading || sensor.currentReading == 0 ? sensor.currentReading.toFixed(1) : "ncR" }}
+            <template v-if="!compact">
+                <div class="spacer"></div>
+                <div id="readings-container" class="section">
+                    <div id="readings-label">Latest Reading</div>
+                    <div v-for="(module, moduleIndex) in station.status_json.moduleObjects" v-bind:key="module.id">
+                        <div
+                            v-for="(sensor, sensorIndex) in module.sensorObjects"
+                            v-bind:key="sensor.id"
+                            :class="getCounter(moduleIndex, sensorIndex) % 2 == 1 ? 'left-reading' : 'right-reading'"
+                        >
+                            <div class="left sensor-name">{{ getSensorName(module, sensor) }}</div>
+                            <div class="right sensor-unit">
+                                {{ sensor.unit }}
+                            </div>
+                            <div class="right sensor-reading">
+                                {{ sensor.currentReading || sensor.currentReading == 0 ? sensor.currentReading.toFixed(1) : "ncR" }}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <router-link :to="{ name: 'viewData', query: { stationId: station.id } }">
-                <div id="view-data-btn" class="section">
-                    Explore Data
-                </div>
-            </router-link>
+                <router-link :to="{ name: 'viewData', query: { stationId: station.id } }">
+                    <div id="view-data-btn" class="section">
+                        Explore Data
+                    </div>
+                </router-link>
+            </template>
         </div>
     </div>
 </template>
 
 <script>
+import _ from "lodash";
 import * as utils from "../utilities";
-import { API_HOST } from "../secrets";
+import FKApi from "../api/api";
 import { makeAuthenticatedApiUrl } from "@/api/api";
 
 export default {
@@ -92,17 +99,47 @@ export default {
             moduleSensorCounter: 0,
             modulesSensors: {},
             viewingSummary: false,
+            nativeLand: [],
+            placeName: "",
         };
     },
-    props: ["station", "isAuthenticated", "placeName", "nativeLand"],
+    props: ["station", "summarySize", "compact"],
     computed: {
         stationSmallPhoto: function() {
             return makeAuthenticatedApiUrl(this.station.photos.small);
         },
     },
+    watch: {
+        station() {
+            if (this.station) {
+                this.getPlaceName()
+                    .then(this.getNativeLand)
+                    .then(result => {
+                        this.nativeLand = _.map(_.flatten(_.map(result, "properties")), r => {
+                            return { name: r.Name, url: r.description };
+                        });
+                    });
+            }
+        },
+    },
+    async beforeCreate() {
+        this.api = new FKApi();
+    },
     methods: {
         viewSummary() {
             this.viewingSummary = true;
+        },
+
+        getPlaceName() {
+            const longLatMapbox = this.station.status_json.longitude + "," + this.station.status_json.latitude;
+            return this.api.getPlaceName(longLatMapbox).then(result => {
+                this.placeName = result.features[0] ? result.features[0].place_name : "Unknown area";
+            });
+        },
+
+        getNativeLand() {
+            const latLongNative = this.station.status_json.latitude + "," + this.station.status_json.longitude;
+            return this.api.getNativeLand(latLongNative);
         },
 
         getCounter(moduleIndex, sensorIndex) {
@@ -172,8 +209,10 @@ export default {
 
         closeSummary() {
             this.viewingSummary = false;
-            if (this.$route.name != "stations") {
-                this.$router.push({ name: "stations" });
+            if (!this.compact) {
+                if (this.$route.name != "stations") {
+                    this.$router.push({ name: "stations" });
+                }
             }
         },
     },
@@ -182,13 +221,9 @@ export default {
 
 <style scoped>
 #station-summary-container {
+    position: relative;
     background-color: #ffffff;
-    width: 415px;
-    position: absolute;
-    top: 145px;
-    left: 300px;
     padding: 0 20px 20px 10px;
-    margin: 60px;
     border: 1px solid rgb(215, 220, 225);
     z-index: 2;
 }
@@ -197,6 +232,15 @@ export default {
     font-size: 14px;
     font-weight: lighter;
     overflow: hidden;
+}
+.image-container {
+    width: 124px;
+    height: 100px;
+    text-align: center;
+}
+.image-container img {
+    max-width: 124px;
+    max-height: 100px;
 }
 .section {
     width: 100%;
