@@ -1,14 +1,14 @@
 <template>
-    <div class="stations-container" v-bind:style="{ width: mapSize.containerWidth }">
+    <div class="stations-container" :style="{ width: mapContainerSize.outerWidth }">
         <div class="section-heading stations-heading">FieldKit Stations</div>
         <div class="space"></div>
-        <div id="stations-list" v-bind:style="{ width: listSize.width, height: listSize.height }">
+        <div id="stations-list" :style="{ width: listSize.width, height: listSize.height }">
             <div class="toggle-icon-container" v-on:click="toggleStations">
                 <img v-if="showStationsList" alt="Collapse List" src="../assets/tab-collapse.png" class="toggle-icon" />
                 <img v-if="!showStationsList" alt="Expand List" src="../assets/tab-expand.png" class="toggle-icon" />
             </div>
             <div v-for="station in projectStations" v-bind:key="station.id">
-                <div class="station-box" v-bind:style="{ width: listSize.boxWidth }">
+                <div class="station-box" :style="{ width: listSize.boxWidth }">
                     <span class="station-name" v-on:click="showStation(station)">
                         {{ station.name }}
                     </span>
@@ -16,19 +16,14 @@
                 </div>
             </div>
         </div>
-        <div id="stations-map" v-bind:style="{ width: mapSize.width, height: mapSize.height }">
-            <mapbox
-                :access-token="mapboxToken"
-                :map-options="{
-                    style: 'mapbox://styles/mapbox/outdoors-v11',
-                    center: coordinates,
-                    zoom: 10,
-                }"
-                :nav-control="{
-                    show: true,
-                    position: 'bottom-left',
-                }"
-                @map-init="mapInitialized"
+        <div id="stations-map-container" :style="{ width: mapContainerSize.width, height: mapContainerSize.height }">
+            <StationsMap
+                :mapSize="mapSize"
+                :stations="projectStations"
+                @mapReady="onMapReady"
+                @showSummary="showSummary"
+                ref="stationsMap"
+            />
             />
         </div>
     </div>
@@ -38,24 +33,26 @@
 import _ from "lodash";
 import * as utils from "../utilities";
 import FKApi from "../api/api";
-import Mapbox from "mapbox-gl-vue";
-import { MAPBOX_ACCESS_TOKEN } from "../secrets";
+import StationsMap from "../components/StationsMap";
 
 export default {
     name: "ProjectStations",
     components: {
-        Mapbox,
+        StationsMap,
     },
     data: () => {
         return {
             projectStations: [],
-            coordinates: [-118, 34],
-            mapboxToken: MAPBOX_ACCESS_TOKEN,
             following: false,
             showStationsList: true,
+            mapSize: {
+                width: "inherit",
+                height: "inherit",
+                position: "relative",
+            },
         };
     },
-    props: ["project", "mapSize", "listSize"],
+    props: ["project", "mapContainerSize", "listSize"],
     async beforeCreate() {
         this.api = new FKApi();
     },
@@ -63,7 +60,7 @@ export default {
         this.fetchStations();
     },
     methods: {
-        mapInitialized(map) {
+        onMapReady(map) {
             this.map = map;
         },
         fetchStations() {
@@ -111,14 +108,14 @@ export default {
             return imgPath("./" + img);
         },
         toggleStations() {
-            let stationsMap = document.getElementById("stations-map");
+            let stationsMap = document.getElementById("stations-map-container");
             this.showStationsList = !this.showStationsList;
             if (this.showStationsList) {
                 document.getElementById("stations-list").style.width = this.listSize.width;
-                stationsMap.style.width = this.mapSize.width;
+                stationsMap.style.width = this.mapContainerSize.width;
                 stationsMap.style["margin-left"] = "0";
                 this.map.resize();
-                document.getElementById("stations-map").style.transition = "width 0.5s";
+                document.getElementById("stations-map-container").style.transition = "width 0.5s";
                 let boxes = document.getElementsByClassName("station-box");
                 Array.from(boxes).forEach(b => {
                     b.style.opacity = 1;
@@ -130,14 +127,14 @@ export default {
                 });
                 document.getElementById("stations-list").style.width = "1px";
                 stationsMap.addEventListener("transitionend", this.postExpandMap, true);
-                stationsMap.style.width = this.mapSize.containerWidth;
+                stationsMap.style.width = this.mapContainerSize.outerWidth;
                 stationsMap.style["margin-left"] = "-1px";
             }
         },
         postExpandMap() {
             this.map.resize();
-            document.getElementById("stations-map").style.transition = "width 0s";
-            document.getElementById("stations-map").removeEventListener("transitionend", this.postExpandMap, true);
+            document.getElementById("stations-map-container").style.transition = "width 0s";
+            document.getElementById("stations-map-container").removeEventListener("transitionend", this.postExpandMap, true);
         },
     },
 };
@@ -191,13 +188,9 @@ export default {
     float: left;
     transition: width 0.5s;
 }
-#stations-map {
+#stations-map-container {
     float: left;
     transition: width 0.5s;
-}
-#map {
-    width: inherit;
-    height: inherit;
 }
 .station-box {
     height: 38px;

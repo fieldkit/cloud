@@ -66,7 +66,7 @@
                 </div>
             </div>
 
-            <ProjectStations :project="project" :mapSize="mapSize" :listSize="listSize" @loaded="setModules" />
+            <ProjectStations :project="project" :mapContainerSize="mapContainerSize" :listSize="listSize" @loaded="setModules" />
 
             <div class="manage-team-container">
                 <div class="section-heading">Manage Team</div>
@@ -150,10 +150,10 @@ export default {
             stationOption: "",
             modules: [],
             numFollowers: 1,
-            mapSize: {
+            mapContainerSize: {
                 width: "677px",
                 height: "332px",
-                containerWidth: "1022px",
+                outerWidth: "1022px",
             },
             listSize: {
                 width: "345px",

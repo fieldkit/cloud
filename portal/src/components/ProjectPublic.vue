@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-            <ProjectStations :project="project" :mapSize="mapSize" :listSize="listSize" @loaded="setModules" />
+            <ProjectStations :project="project" :mapContainerSize="mapContainerSize" :listSize="listSize" @loaded="setModules" />
 
             <div class="team-container">
                 <div class="section-heading">{{ getTeamHeading() }}</div>
@@ -65,10 +65,10 @@ export default {
             displayRunTime: "",
             modules: [],
             following: false,
-            mapSize: {
+            mapContainerSize: {
                 width: "540px",
                 height: "332px",
-                containerWidth: "860px",
+                outerWidth: "860px",
             },
             listSize: {
                 width: "320px",
