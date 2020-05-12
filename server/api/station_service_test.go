@@ -176,3 +176,22 @@ func TestUpdateAnotherPersonsStation(t *testing.T) {
 
 	assert.Equal(http.StatusUnauthorized, rr.Code)
 }
+
+func TestUpdateMissingStation(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	payload := fmt.Sprintf(`{ "name": "%s", "status_json": {} }`, "New Name")
+	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", 0), strings.NewReader(payload))
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusNotFound, rr.Code)
+}

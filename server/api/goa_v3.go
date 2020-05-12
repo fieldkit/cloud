@@ -41,20 +41,6 @@ import (
 	user "github.com/fieldkit/cloud/server/api/gen/user"
 )
 
-func LogErrors() func(goa.Endpoint) goa.Endpoint {
-	return func(e goa.Endpoint) goa.Endpoint {
-		return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			response, err = e(ctx, request)
-			if err != nil {
-				id := newErrorID()
-				log := logging.Logger(ctx).Sugar()
-				log.Errorw("error", "error", err, "error_id", id)
-			}
-			return response, err
-		}
-	}
-}
-
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
 	testSvc := NewTestSevice(ctx, options)
 	testEndpoints := test.NewEndpoints(testSvc)
@@ -80,7 +66,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	userSvc := NewUserService(ctx, options)
 	userEndpoints := user.NewEndpoints(userSvc)
 
-	logErrors := LogErrors()
+	logErrors := logErrors()
 
 	modulesEndpoints.Use(logErrors)
 	tasksEndpoints.Use(logErrors)
@@ -155,6 +141,28 @@ func errorHandler() func(context.Context, http.ResponseWriter, error) {
 		id := ctx.Value(middleware.RequestIDKey).(string)
 		w.Write([]byte("[" + id + "] encoding: " + err.Error()))
 		log.Errorw("fatal", "id", id, "message", err.Error())
+	}
+}
+
+type ErrorNamer interface {
+	ErrorName() string
+}
+
+func logErrors() func(goa.Endpoint) goa.Endpoint {
+	return func(e goa.Endpoint) goa.Endpoint {
+		return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+			response, err = e(ctx, request)
+			if err != nil {
+				id := newErrorID()
+				log := logging.Logger(ctx).Sugar()
+				if en, ok := err.(ErrorNamer); ok {
+					log.Infow("error", "error", err, "error_id", id, "error_name", en.ErrorName())
+				} else {
+					log.Errorw("error", "error", err, "error_id", id)
+				}
+			}
+			return response, err
+		}
 	}
 }
 
