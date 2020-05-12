@@ -6,7 +6,7 @@ jest.mock("@/api/api.js");
 describe("StationsView.vue", () => {
     it("Renders a map", () => {
         const stationsView = shallowMount(StationsView);
-        const map = stationsView.find(".stations-map");
+        const map = stationsView.find("#summary-and-map");
         expect(map.isVisible()).toBe(true);
         stationsView.destroy(); // prevent warnings
     });
