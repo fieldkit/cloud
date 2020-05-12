@@ -169,7 +169,24 @@ func (c *FirmwareController) Add(ctx *app.AddFirmwareContext) error {
 }
 
 func (c *FirmwareController) List(ctx *app.ListFirmwareContext) error {
-	firmwares := []*data.Firmware{}
+	log := Logger(ctx).Sugar()
+
+	firmwareTester := false
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err == nil {
+		user := &data.User{}
+		if err := c.options.Database.GetContext(ctx, user, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
+			return err
+
+		}
+
+		log.Infow("firmware", "user", user.ID, "firmware_tester", user.FirmwareTester)
+
+		firmwareTester = user.FirmwareTester
+	} else {
+		log.Infow("firmware", "user", "anonymous")
+	}
 
 	page := 0
 	if ctx.Page != nil {
@@ -181,8 +198,15 @@ func (c *FirmwareController) List(ctx *app.ListFirmwareContext) error {
 		pageSize = *ctx.PageSize
 	}
 
-	if err := c.options.Database.SelectContext(ctx, &firmwares,
-		`SELECT f.* FROM fieldkit.firmware AS f WHERE (f.module = $1 OR $1 IS NULL) AND (f.profile = $2 OR $2 IS NULL) AND f.available ORDER BY time DESC LIMIT $3 OFFSET $4`, ctx.Module, ctx.Profile, pageSize, page*pageSize); err != nil {
+	firmwares := []*data.Firmware{}
+	if err := c.options.Database.SelectContext(ctx, &firmwares, `
+		SELECT f.*
+		FROM fieldkit.firmware AS f
+		WHERE (f.module = $1 OR $1 IS NULL) AND
+			  (f.profile = $2 OR $2 IS NULL) AND
+			  (f.available OR $5)
+		ORDER BY time DESC LIMIT $3 OFFSET $4
+		`, ctx.Module, ctx.Profile, pageSize, page*pageSize, firmwareTester); err != nil {
 		return err
 	}
 

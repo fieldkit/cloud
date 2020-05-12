@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	goa "goa.design/goa/v3/pkg"
 
@@ -165,6 +166,18 @@ type AuthAttempt struct {
 	Key          []byte
 	Unauthorized GenerateError
 	NotFound     GenerateError
+}
+
+func AuthenticateAgainstToken(ctx context.Context, token string, key []byte) (jwt.MapClaims, error) {
+	cleansed := strings.ReplaceAll(token, "Bearer ", "")
+	claims := make(jwt.MapClaims)
+	_, err := jwt.ParseWithClaims(cleansed, claims, func(t *jwt.Token) (interface{}, error) {
+		return key, nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("invalid token")
+	}
+	return claims, nil
 }
 
 func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {

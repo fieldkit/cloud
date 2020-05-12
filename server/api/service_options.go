@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 
@@ -44,6 +45,8 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("%v %v\n", config.SessionKey, jwtHMACKey)
 
 	controllerOptions = &ControllerOptions{
 		Session:      awsSession,

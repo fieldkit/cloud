@@ -49,6 +49,7 @@ type User struct {
 	MediaURL         *string `db:"media_url"`
 	MediaContentType *string `db:"media_content_type"`
 	Admin            bool    `db:"admin"`
+	FirmwareTester   bool    `db:"firmware_tester"`
 }
 
 func (user *User) SetPassword(password string) error {

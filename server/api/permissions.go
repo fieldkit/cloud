@@ -93,27 +93,41 @@ func (p *defaultPermissions) notFound(m string) error {
 	return p.unwrapped.authAttempt.NotFound(m)
 }
 
+func (p *defaultPermissions) getClaims() (jwtgo.MapClaims, error) {
+	if claims, ok := getClaims(p.context); ok {
+		return claims, nil
+	}
+
+	if token := jwt.ContextJWT(p.context); token != nil {
+		if claims, ok := token.Claims.(jwtgo.MapClaims); ok {
+			return claims, nil
+		}
+	}
+
+	if token, err := getGoaV2AuthorizationHeader(p.context); err == nil && len(token) > 0 {
+		if claims, err := AuthenticateAgainstToken(p.context, token, p.options.JWTHMACKey); err == nil {
+			return claims, nil
+		}
+	}
+
+	authAttempt := getAuthAttempt(p.context)
+
+	return nil, authAttempt.Unauthorized("authentication error")
+}
+
 func (p *defaultPermissions) unwrap() error {
 	if p.unwrapped != nil {
 		return nil
 	}
 
-	authAttempt := getAuthAttempt(p.context)
-	claims, ok := getClaims(p.context)
-	if !ok {
-		token := jwt.ContextJWT(p.context)
-		if token == nil {
-			return authAttempt.Unauthorized("JWT token is missing from context")
-		}
-
-		claims, ok = token.Claims.(jwtgo.MapClaims)
-		if !ok {
-			return authAttempt.Unauthorized("JWT claims error")
-		}
+	claims, err := p.getClaims()
+	if err != nil {
+		return err
 	}
 
 	userID := int32(claims["sub"].(float64))
 
+	authAttempt := getAuthAttempt(p.context)
 	p.unwrapped = &unwrappedPermissions{
 		authAttempt: authAttempt,
 		userID:      userID,

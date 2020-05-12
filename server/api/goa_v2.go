@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	_ "fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -125,4 +126,17 @@ func NewGoaV2AuthAttemptForErrors() *AuthAttempt {
 			}
 		},
 	}
+}
+
+func getGoaV2AuthorizationHeader(ctx context.Context) (string, error) {
+	req := goa.ContextRequest(ctx)
+	if req != nil {
+		if req.Header != nil {
+			values := req.Header["Authorization"]
+			if len(values) == 1 {
+				return values[0], nil
+			}
+		}
+	}
+	return "", nil
 }
