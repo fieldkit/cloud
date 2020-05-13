@@ -30,10 +30,14 @@ func ProjectType(project *data.Project, role *data.Role) *app.Project {
 	}
 }
 
-func ProjectsType(projects []*data.Project, role *data.Role) *app.Projects {
+func ProjectsType(projects []*data.Project, roles map[int32]*data.Role) *app.Projects {
 	projectsCollection := make([]*app.Project, len(projects))
 	for i, project := range projects {
-		projectsCollection[i] = ProjectType(project, role)
+		if role, ok := roles[project.ID]; ok {
+			projectsCollection[i] = ProjectType(project, role)
+		} else {
+			projectsCollection[i] = ProjectType(project, data.PublicRole)
+		}
 	}
 
 	return &app.Projects{
@@ -196,12 +200,26 @@ func (c *ProjectController) Get(ctx *app.GetProjectContext) error {
 }
 
 func (c *ProjectController) List(ctx *app.ListProjectContext) error {
+	roles := make(map[int32]*data.Role)
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err == nil {
+		projectUsers := []*data.ProjectUser{}
+		if err := c.options.Database.SelectContext(ctx, &projectUsers, `SELECT * FROM fieldkit.project_user WHERE user_id = $1`, p.UserID()); err != nil {
+			return err
+		}
+
+		for _, pu := range projectUsers {
+			roles[pu.ProjectID] = pu.LookupRole()
+		}
+	}
+
 	projects := []*data.Project{}
 	if err := c.options.Database.SelectContext(ctx, &projects, `SELECT p.* FROM fieldkit.project AS p`); err != nil {
 		return err
 	}
 
-	return ctx.OK(ProjectsType(projects, data.PublicRole))
+	return ctx.OK(ProjectsType(projects, roles))
 }
 
 func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) error {
@@ -219,12 +237,26 @@ func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) erro
 }
 
 func (c *ProjectController) ListStation(ctx *app.ListStationProjectContext) error {
+	roles := make(map[int32]*data.Role)
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err == nil {
+		projectUsers := []*data.ProjectUser{}
+		if err := c.options.Database.SelectContext(ctx, &projectUsers, `SELECT * FROM fieldkit.project_user WHERE user_id = $1`, p.UserID()); err != nil {
+			return err
+		}
+
+		for _, pu := range projectUsers {
+			roles[pu.ProjectID] = pu.LookupRole()
+		}
+	}
+
 	projects := []*data.Project{}
 	if err := c.options.Database.SelectContext(ctx, &projects, `SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_station AS ps ON ps.project_id = p.id WHERE ps.station_id = $1 ORDER BY p.name`, ctx.StationID); err != nil {
 		return err
 	}
 
-	return ctx.OK(ProjectsType(projects, data.PublicRole))
+	return ctx.OK(ProjectsType(projects, roles))
 }
 
 func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
