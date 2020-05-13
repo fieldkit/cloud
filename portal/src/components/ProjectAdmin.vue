@@ -85,7 +85,7 @@
                             <span class="email">{{ user.user.email }}</span>
                         </div>
                         <div class="cell">{{ user.role }}</div>
-                        <div class="cell">{{ user.membership }}</div>
+                        <div class="cell invite-status">Invite {{ user.membership.toLowerCase() }}</div>
                         <div class="cell">
                             <img
                                 alt="Remove user"
@@ -94,6 +94,13 @@
                                 :data-user="user.user.id"
                                 v-on:click="removeUser"
                             />
+                            <!-- <img
+                                alt="Edit user"
+                                src="../assets/edit.png"
+                                class="edit-btn"
+                                :data-user="user.user.id"
+                                v-on:click="editUser"
+                            /> -->
                         </div>
                     </div>
                     <div class="user-row">
@@ -114,7 +121,13 @@
                                 Must be a valid email address.
                             </span>
                         </div>
-                        <div class="cell"></div>
+                        <div class="cell role-dropdown-container">
+                            <select v-model="selectedRole">
+                                <option v-for="role in roleOptions" v-bind:value="role.code" v-bind:key="role.code + role.name">
+                                    {{ role.name }}
+                                </option>
+                            </select>
+                        </div>
                         <div class="cell">
                             <button class="invite-btn" v-on:click="sendInvite">Invite</button>
                         </div>
@@ -160,6 +173,21 @@ export default {
                 height: "332px",
                 boxWidth: "274px",
             },
+            selectedRole: -1,
+            roleOptions: [
+                {
+                    code: -1,
+                    name: "Select Role",
+                },
+                {
+                    code: 0,
+                    name: "Member",
+                },
+                {
+                    code: 1,
+                    name: "Administrator",
+                },
+            ],
         };
     },
     props: ["project", "userStations", "users"],
@@ -240,7 +268,14 @@ export default {
         sendInvite() {
             let valid = this.checkEmail();
             if (valid) {
-                const params = { email: this.inviteEmail, projectId: this.project.id };
+                if (this.selectedRole == -1) {
+                    this.selectedRole = 0;
+                }
+                let role = this.roleOptions.find(r => {
+                    return r.code == this.selectedRole;
+                });
+                // NOTE: api is currently not sending role, will do when the backend is there
+                const params = { email: this.inviteEmail, projectId: this.project.id, role: this.selectedRole };
                 this.api.sendInvite(params).then(() => {
                     this.projectUsers.push({
                         user: {
@@ -249,7 +284,7 @@ export default {
                             email: this.inviteEmail,
                         },
                         userImage: this.newUserImage,
-                        role: "Member",
+                        role: role.name,
                         membership: "Pending",
                     });
                     this.inviteEmail = "";
@@ -275,6 +310,10 @@ export default {
             } else {
                 // canceled
             }
+        },
+        editUser(event) {
+            let id = event.target.getAttribute("data-user");
+            console.log("edit user", id);
         },
         getImageUrl(project) {
             return this.baseUrl + "/projects/" + project.id + "/media";
@@ -469,6 +508,10 @@ export default {
     border-bottom: 1px solid rgb(215, 220, 225);
     padding: 10px 0;
 }
+.invite-status {
+    color: #0a67aa;
+    font-weight: 600;
+}
 .cell-heading {
     font-size: 14px;
     font-weight: bold;
@@ -482,13 +525,24 @@ export default {
     font-size: 15px;
     padding: 4px 0 4px 8px;
 }
+.role-dropdown-container select {
+    font-size: 16px;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    padding: 2px 4px;
+}
 .validation-error {
     color: #c42c44;
     display: block;
 }
+
+.edit-btn,
 .remove-btn {
     margin: 12px 0 0 0;
     float: right;
     cursor: pointer;
+}
+.edit-btn {
+    margin-right: 12px;
 }
 </style>
