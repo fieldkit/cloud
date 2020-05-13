@@ -12,13 +12,13 @@
             <img alt="" src="../assets/progress.gif" />
         </div>
         <div class="main-panel" v-show="!loading && isAuthenticated">
-            <router-link :to="{ name: 'projects' }" v-if="adminView">
+            <router-link :to="{ name: 'projects' }" v-if="!previewing">
                 <div class="projects-link">
                     <span class="small-arrow">&lt;</span>
                     Back to Projects
                 </div>
             </router-link>
-            <div class="projects-link" v-if="!adminView" v-on:click="switchToAdmin">
+            <div class="projects-link" v-if="previewing" v-on:click="switchToAdmin">
                 <span class="small-arrow">&lt;</span>
                 Back to Project Dashboard
             </div>
@@ -78,6 +78,7 @@ export default {
             user: {},
             adminView: false,
             publicView: false,
+            previewing: false,
             userProjects: [],
             activeProject: null,
             stations: [],
@@ -124,15 +125,6 @@ export default {
             this.api.getUserProjects().then(projects => {
                 if (projects && projects.projects.length > 0) {
                     this.userProjects = projects.projects;
-                    // start with admin view if this is a user's project
-                    const userProject = this.userProjects.find(p => {
-                        return p.id == this.id;
-                    });
-                    if (userProject) {
-                        this.adminView = true;
-                    } else {
-                        this.publicView = true;
-                    }
                 }
                 this.getProject();
             });
@@ -163,18 +155,27 @@ export default {
             });
         },
         handleProject(project) {
-            if (this.adminView || !project.private) {
-                this.activeProject = project;
-                this.loading = false;
+            this.publicView = false;
+            this.adminView = false;
+            // TODO: don't show projects marked as private if user isn't member
+            // ~ if (project.private) {
+            //     this.$router.push({ name: "projects" });
+            // }
+            if (project.read_only) {
+                this.publicView = true;
             } else {
-                this.$router.push({ name: "projects" });
+                this.adminView = true;
             }
+            this.activeProject = project;
+            this.loading = false;
         },
         switchToAdmin() {
+            this.previewing = false;
             this.adminView = true;
             this.publicView = false;
         },
         switchToPublic() {
+            this.previewing = true;
             this.publicView = true;
             this.adminView = false;
         },
