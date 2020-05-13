@@ -129,13 +129,7 @@ export default {
                 this.getProject();
             });
         },
-        getProject() {
-            this.api
-                .getProject(this.id)
-                .then(this.handleProject)
-                .catch(() => {
-                    this.$router.push({ name: "projects" });
-                });
+        getProjectUsers() {
             this.api.getUsersByProject(this.id).then(result => {
                 let users = result && result.users ? result.users : [];
                 this.users = users.map(u => {
@@ -154,6 +148,14 @@ export default {
                 });
             });
         },
+        getProject() {
+            this.api
+                .getProject(this.id)
+                .then(this.handleProject)
+                .catch(() => {
+                    this.$router.push({ name: "projects" });
+                });
+        },
         handleProject(project) {
             this.publicView = false;
             this.adminView = false;
@@ -166,6 +168,7 @@ export default {
             } else {
                 this.adminView = true;
             }
+            this.getProjectUsers();
             this.activeProject = project;
             this.loading = false;
         },
