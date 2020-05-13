@@ -95,9 +95,9 @@ https://api.{{.Domain}}/validate?token={{.ValidationToken.Token}}`
 }
 
 func NewRecoveryEmailTemplate() (et *EmailTemplate, err error) {
-	subjectText := `Recovery your Fieldkit account`
+	subjectText := `Recover your Fieldkit account`
 
-	bodyTextText := `To recovery your Fieldkit account, navigate to:
+	bodyTextText := `To recover your Fieldkit account, navigate to:
 https://portal.{{.Domain}}/dashboard/user/reset?token={{.RecoveryToken.Token}}`
 
 	bodyHTMLText := bodyTextText
@@ -127,7 +127,7 @@ https://portal.{{.Domain}}/dashboard/user/reset?token={{.RecoveryToken.Token}}`
 }
 
 func NewProjectInvitationEmailTemplate() (et *EmailTemplate, err error) {
-	subjectText := `Recovery your Fieldkit account`
+	subjectText := `You're invited!`
 
 	bodyTextText := `You have been invited to new FieldKit project. To view the invitation, click here:
 https://portal.{{.Domain}}/projects/invitation?token={{.Invite.Token}}`
