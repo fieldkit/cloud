@@ -1321,7 +1321,6 @@ type ProjectController interface {
 	AddStation(*AddStationProjectContext) error
 	Delete(*DeleteProjectContext) error
 	Get(*GetProjectContext) error
-	GetID(*GetIDProjectContext) error
 	GetImage(*GetImageProjectContext) error
 	InviteUser(*InviteUserProjectContext) error
 	List(*ListProjectContext) error
@@ -1340,7 +1339,6 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	service.Mux.Handle("OPTIONS", "/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/stations/:stationId", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/projects/@/:project", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/media", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/invite", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
@@ -1416,26 +1414,10 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 		}
 		return ctrl.Get(rctx)
 	}
-	h = handleProjectOrigin(h)
-	service.Mux.Handle("GET", "/projects/@/:project", ctrl.MuxHandler("get", h, nil))
-	service.LogInfo("mount", "ctrl", "Project", "action", "Get", "route", "GET /projects/@/:project")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewGetIDProjectContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.GetID(rctx)
-	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleProjectOrigin(h)
-	service.Mux.Handle("GET", "/projects/:projectId", ctrl.MuxHandler("get id", h, nil))
-	service.LogInfo("mount", "ctrl", "Project", "action", "GetID", "route", "GET /projects/:projectId", "security", "jwt")
+	service.Mux.Handle("GET", "/projects/:projectId", ctrl.MuxHandler("get", h, nil))
+	service.LogInfo("mount", "ctrl", "Project", "action", "Get", "route", "GET /projects/:projectId", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

@@ -140,7 +140,7 @@ definitions:
     description: DeviceDataRecord media type (default view)
     example:
       data:
-        Possimus labore qui possimus porro quaerat.: 6227e15c-497c-4ad8-b7a3-866215966059
+        Possimus labore qui possimus porro quaerat.: 0437a3c6-f16e-425d-a68f-63a96ad7e741
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -151,7 +151,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Possimus labore qui possimus porro quaerat.: 6227e15c-497c-4ad8-b7a3-866215966059
+          Possimus labore qui possimus porro quaerat.: 0437a3c6-f16e-425d-a68f-63a96ad7e741
         type: object
       id:
         example: 3.1889681637076403e+18
@@ -191,7 +191,7 @@ definitions:
       (default view)
     example:
     - data:
-        Possimus labore qui possimus porro quaerat.: 6227e15c-497c-4ad8-b7a3-866215966059
+        Possimus labore qui possimus porro quaerat.: 0437a3c6-f16e-425d-a68f-63a96ad7e741
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -199,7 +199,7 @@ definitions:
       record: 7.193395211552676e+18
       time: "1980-07-29T04:01:26Z"
     - data:
-        Possimus labore qui possimus porro quaerat.: 6227e15c-497c-4ad8-b7a3-866215966059
+        Possimus labore qui possimus porro quaerat.: 0437a3c6-f16e-425d-a68f-63a96ad7e741
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -216,7 +216,7 @@ definitions:
     example:
       data:
       - data:
-          Possimus labore qui possimus porro quaerat.: 6227e15c-497c-4ad8-b7a3-866215966059
+          Possimus labore qui possimus porro quaerat.: 0437a3c6-f16e-425d-a68f-63a96ad7e741
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -224,7 +224,7 @@ definitions:
         record: 7.193395211552676e+18
         time: "1980-07-29T04:01:26Z"
       - data:
-          Possimus labore qui possimus porro quaerat.: 6227e15c-497c-4ad8-b7a3-866215966059
+          Possimus labore qui possimus porro quaerat.: 0437a3c6-f16e-425d-a68f-63a96ad7e741
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -233,17 +233,17 @@ definitions:
         time: "1980-07-29T04:01:26Z"
       meta:
       - data:
-          Vel est.: 1ccf096d-c186-4e59-b561-23ac7b3ae9f6
+          Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Vel est.: 1ccf096d-c186-4e59-b561-23ac7b3ae9f6
+          Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Vel est.: 1ccf096d-c186-4e59-b561-23ac7b3ae9f6
+          Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
@@ -330,7 +330,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Vel est.: 1ccf096d-c186-4e59-b561-23ac7b3ae9f6
+        Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -338,7 +338,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Vel est.: 1ccf096d-c186-4e59-b561-23ac7b3ae9f6
+          Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
         type: object
       id:
         example: 2.827138534810339e+18
@@ -364,12 +364,12 @@ definitions:
       (default view)
     example:
     - data:
-        Vel est.: 1ccf096d-c186-4e59-b561-23ac7b3ae9f6
+        Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
     - data:
-        Vel est.: 1ccf096d-c186-4e59-b561-23ac7b3ae9f6
+        Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -2925,32 +2925,6 @@ paths:
       summary: add project
       tags:
       - project
-  /projects/@/{project}:
-    get:
-      description: Get a project
-      operationId: project#get
-      parameters:
-      - description: Project slug
-        in: path
-        maxLength: 40
-        name: project
-        pattern: ^[\da-z]+(?:-[\da-z]+)*$
-        required: true
-        type: string
-      produces:
-      - application/vnd.app.project+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Project'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      summary: get project
-      tags:
-      - project
   /projects/{projectId}:
     delete:
       description: |-
@@ -2983,7 +2957,7 @@ paths:
 
         Required security scopes:
           * `api:access`
-      operationId: project#get id
+      operationId: project#get
       parameters:
       - in: path
         name: projectId
@@ -3003,7 +2977,7 @@ paths:
       security:
       - jwt:
         - api:access
-      summary: get id project
+      summary: get project
       tags:
       - project
     patch:

@@ -129,10 +129,10 @@ func (c *Client) NewDeleteProjectRequest(ctx context.Context, path string) (*htt
 }
 
 // GetProjectPath computes a request path to the get action of project.
-func GetProjectPath(project string) string {
-	param0 := project
+func GetProjectPath(projectID int) string {
+	param0 := strconv.Itoa(projectID)
 
-	return fmt.Sprintf("/projects/@/%s", param0)
+	return fmt.Sprintf("/projects/%s", param0)
 }
 
 // Get a project
@@ -146,36 +146,6 @@ func (c *Client) GetProject(ctx context.Context, path string) (*http.Response, e
 
 // NewGetProjectRequest create the request corresponding to the get action endpoint of the project resource.
 func (c *Client) NewGetProjectRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	return req, nil
-}
-
-// GetIDProjectPath computes a request path to the get id action of project.
-func GetIDProjectPath(projectID int) string {
-	param0 := strconv.Itoa(projectID)
-
-	return fmt.Sprintf("/projects/%s", param0)
-}
-
-// Get a project
-func (c *Client) GetIDProject(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewGetIDProjectRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewGetIDProjectRequest create the request corresponding to the get id action endpoint of the project resource.
-func (c *Client) NewGetIDProjectRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"

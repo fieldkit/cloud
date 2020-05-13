@@ -173,15 +173,6 @@ func (c *ProjectController) Update(ctx *app.UpdateProjectContext) error {
 }
 
 func (c *ProjectController) Get(ctx *app.GetProjectContext) error {
-	project := &data.Project{}
-	if err := c.options.Database.GetContext(ctx, project, "SELECT p.* FROM fieldkit.project AS p WHERE p.slug = $1", ctx.Project); err != nil {
-		return err
-	}
-
-	return ctx.OK(ProjectType(project, data.PublicRole))
-}
-
-func (c *ProjectController) GetID(ctx *app.GetIDProjectContext) error {
 	role := data.PublicRole
 
 	p, err := NewPermissions(ctx, c.options).Unwrap()

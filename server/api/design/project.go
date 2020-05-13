@@ -108,19 +108,6 @@ var _ = Resource("project", func() {
 	})
 
 	Action("get", func() {
-		NoSecurity()
-		Routing(GET("projects/@/:project"))
-		Description("Get a project")
-		Params(func() {
-			Param("project", String, ProjectSlug)
-		})
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(Project)
-		})
-	})
-
-	Action("get id", func() {
 		Routing(GET("projects/:projectId"))
 		Description("Get a project")
 		Params(func() {

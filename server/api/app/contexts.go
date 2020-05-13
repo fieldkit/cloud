@@ -12,7 +12,6 @@ import (
 	"github.com/goadesign/goa"
 	"net/http"
 	"strconv"
-	"unicode/utf8"
 )
 
 // AddFirmwareContext provides the Firmware add action context.
@@ -1223,7 +1222,7 @@ type GetProjectContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Project string
+	ProjectID int
 }
 
 // NewGetProjectContext parses the incoming request URL and body, performs validations and creates the
@@ -1235,15 +1234,13 @@ func NewGetProjectContext(ctx context.Context, r *http.Request, service *goa.Ser
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := GetProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProject := req.Params["project"]
-	if len(paramProject) > 0 {
-		rawProject := paramProject[0]
-		rctx.Project = rawProject
-		if ok := goa.ValidatePattern(`^[\da-z]+(?:-[\da-z]+)*$`, rctx.Project); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`project`, rctx.Project, `^[\da-z]+(?:-[\da-z]+)*$`))
-		}
-		if utf8.RuneCountInString(rctx.Project) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`project`, rctx.Project, utf8.RuneCountInString(rctx.Project), 40, false))
+	paramProjectID := req.Params["projectId"]
+	if len(paramProjectID) > 0 {
+		rawProjectID := paramProjectID[0]
+		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
+			rctx.ProjectID = projectID
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
 		}
 	}
 	return &rctx, err
@@ -1259,49 +1256,6 @@ func (ctx *GetProjectContext) OK(r *Project) error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *GetProjectContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// GetIDProjectContext provides the project get id action context.
-type GetIDProjectContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	ProjectID int
-}
-
-// NewGetIDProjectContext parses the incoming request URL and body, performs validations and creates the
-// context used by the project controller get id action.
-func NewGetIDProjectContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIDProjectContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := GetIDProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["projectId"]
-	if len(paramProjectID) > 0 {
-		rawProjectID := paramProjectID[0]
-		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
-			rctx.ProjectID = projectID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *GetIDProjectContext) OK(r *Project) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.project+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *GetIDProjectContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
