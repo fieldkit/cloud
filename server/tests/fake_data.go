@@ -48,12 +48,7 @@ func (e *TestEnv) AddUser(pw string) (*data.User, error) {
 	return user, nil
 }
 
-func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
-	owner, err := e.AddUser("passwordpassword")
-	if err != nil {
-		return nil, err
-	}
-
+func (e *TestEnv) AddProject() (*data.Project, error) {
 	name := faker.Name()
 
 	project := &data.Project{
@@ -69,9 +64,31 @@ func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
 		return nil, err
 	}
 
+	return project, nil
+}
+
+func (e *TestEnv) AddProjectUser(p *data.Project, u *data.User, r *data.Role) error {
 	if _, err := e.DB.ExecContext(e.Ctx, `
 		INSERT INTO fieldkit.project_user (project_id, user_id, role) VALUES ($1, $2, $3)
-		`, project.ID, owner.ID, data.AdministratorRole.ID); err != nil {
+		`, p.ID, u.ID, r.ID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
+	owner, err := e.AddUser("passwordpassword")
+	if err != nil {
+		return nil, err
+	}
+
+	project, err := e.AddProject()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := e.AddProjectUser(project, owner, data.AdministratorRole); err != nil {
 		return nil, err
 	}
 

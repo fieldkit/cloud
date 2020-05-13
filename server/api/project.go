@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	_ "fmt"
 	"time"
 
 	"github.com/goadesign/goa"
@@ -181,17 +182,31 @@ func (c *ProjectController) Get(ctx *app.GetProjectContext) error {
 }
 
 func (c *ProjectController) GetID(ctx *app.GetIDProjectContext) error {
+	role := data.PublicRole
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err == nil {
+		projectUsers := []*data.ProjectUser{}
+		if err := c.options.Database.SelectContext(ctx, &projectUsers, `SELECT * FROM fieldkit.project_user WHERE project_id = $1 AND user_id = $2`, ctx.ProjectID, p.UserID()); err != nil {
+			return err
+		}
+
+		if len(projectUsers) > 0 {
+			role = projectUsers[0].LookupRole()
+		}
+	}
+
 	project := &data.Project{}
-	if err := c.options.Database.GetContext(ctx, project, "SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1", ctx.ProjectID); err != nil {
+	if err := c.options.Database.GetContext(ctx, project, `SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1`, ctx.ProjectID); err != nil {
 		return err
 	}
 
-	return ctx.OK(ProjectType(project, data.PublicRole))
+	return ctx.OK(ProjectType(project, role))
 }
 
 func (c *ProjectController) List(ctx *app.ListProjectContext) error {
 	projects := []*data.Project{}
-	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT p.* FROM fieldkit.project AS p"); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &projects, `SELECT p.* FROM fieldkit.project AS p`); err != nil {
 		return err
 	}
 
@@ -205,7 +220,7 @@ func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) erro
 	}
 
 	projects := []*data.ProjectUserAndProject{}
-	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT pu.*, p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS pu ON pu.project_id = p.id WHERE pu.user_id = $1 ORDER BY p.name", p.UserID()); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &projects, `SELECT pu.*, p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS pu ON pu.project_id = p.id WHERE pu.user_id = $1 ORDER BY p.name`, p.UserID()); err != nil {
 		return err
 	}
 
@@ -214,7 +229,7 @@ func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) erro
 
 func (c *ProjectController) ListStation(ctx *app.ListStationProjectContext) error {
 	projects := []*data.Project{}
-	if err := c.options.Database.SelectContext(ctx, &projects, "SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_station AS ps ON ps.project_id = p.id WHERE ps.station_id = $1 ORDER BY p.name", ctx.StationID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &projects, `SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_station AS ps ON ps.project_id = p.id WHERE ps.station_id = $1 ORDER BY p.name`, ctx.StationID); err != nil {
 		return err
 	}
 

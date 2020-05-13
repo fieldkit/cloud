@@ -11,6 +11,7 @@ import (
 	"github.com/kinbiko/jsonassert"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/tests"
 )
 
@@ -137,4 +138,80 @@ func TestUpdateProjectWhenNotMember(t *testing.T) {
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusUnauthorized, rr.Code)
+}
+
+func TestGetProjectMember(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	user, err := e.AddUser("")
+	assert.NoError(err)
+
+	project, err := e.AddProject()
+	assert.NoError(err)
+
+	err = e.AddProjectUser(project, user, data.MemberRole)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d", project.ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+		{
+			"id": "<<PRESENCE>>",
+			"description": "<<PRESENCE>>",
+			"tags": "<<PRESENCE>>",
+			"location": "<<PRESENCE>>",
+			"slug": "<<PRESENCE>>",
+			"read_only": true,
+			"private": false,
+			"name": "<<PRESENCE>>",
+			"goal": "<<PRESENCE>>"
+		}`)
+}
+
+func TestGetProjectAdministrator(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	user, err := e.AddUser("")
+	assert.NoError(err)
+
+	project, err := e.AddProject()
+	assert.NoError(err)
+
+	err = e.AddProjectUser(project, user, data.AdministratorRole)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d", project.ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+		{
+			"id": "<<PRESENCE>>",
+			"description": "<<PRESENCE>>",
+			"tags": "<<PRESENCE>>",
+			"location": "<<PRESENCE>>",
+			"slug": "<<PRESENCE>>",
+			"read_only": false,
+			"private": false,
+			"name": "<<PRESENCE>>",
+			"goal": "<<PRESENCE>>"
+		}`)
 }
