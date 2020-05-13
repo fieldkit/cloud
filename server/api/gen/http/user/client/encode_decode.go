@@ -55,6 +55,7 @@ func EncodeRolesRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.
 // restored after having been read.
 // DecodeRolesResponse may return the following errors:
 //	- "bad-request" (type user.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type user.Forbidden): http.StatusForbidden
 //	- "not-found" (type user.NotFound): http.StatusNotFound
 //	- "unauthorized" (type user.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
@@ -100,6 +101,16 @@ func DecodeRolesResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 				return nil, goahttp.ErrDecodingError("user", "roles", err)
 			}
 			return nil, NewRolesBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body RolesForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "roles", err)
+			}
+			return nil, NewRolesForbidden(body)
 		case http.StatusNotFound:
 			var (
 				body RolesNotFoundResponseBody

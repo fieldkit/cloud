@@ -11,17 +11,71 @@ import (
 	test "github.com/fieldkit/cloud/server/api/gen/test"
 )
 
+// GetBadRequestResponseBody is the type of the "test" service "get" endpoint
+// HTTP response body for the "bad-request" error.
+type GetBadRequestResponseBody string
+
+// GetForbiddenResponseBody is the type of the "test" service "get" endpoint
+// HTTP response body for the "forbidden" error.
+type GetForbiddenResponseBody string
+
+// GetNotFoundResponseBody is the type of the "test" service "get" endpoint
+// HTTP response body for the "not-found" error.
+type GetNotFoundResponseBody string
+
 // GetUnauthorizedResponseBody is the type of the "test" service "get" endpoint
 // HTTP response body for the "unauthorized" error.
 type GetUnauthorizedResponseBody string
+
+// ErrorBadRequestResponseBody is the type of the "test" service "error"
+// endpoint HTTP response body for the "bad-request" error.
+type ErrorBadRequestResponseBody string
+
+// ErrorForbiddenResponseBody is the type of the "test" service "error"
+// endpoint HTTP response body for the "forbidden" error.
+type ErrorForbiddenResponseBody string
+
+// ErrorNotFoundResponseBody is the type of the "test" service "error" endpoint
+// HTTP response body for the "not-found" error.
+type ErrorNotFoundResponseBody string
 
 // ErrorUnauthorizedResponseBody is the type of the "test" service "error"
 // endpoint HTTP response body for the "unauthorized" error.
 type ErrorUnauthorizedResponseBody string
 
+// EmailBadRequestResponseBody is the type of the "test" service "email"
+// endpoint HTTP response body for the "bad-request" error.
+type EmailBadRequestResponseBody string
+
+// EmailForbiddenResponseBody is the type of the "test" service "email"
+// endpoint HTTP response body for the "forbidden" error.
+type EmailForbiddenResponseBody string
+
+// EmailNotFoundResponseBody is the type of the "test" service "email" endpoint
+// HTTP response body for the "not-found" error.
+type EmailNotFoundResponseBody string
+
 // EmailUnauthorizedResponseBody is the type of the "test" service "email"
 // endpoint HTTP response body for the "unauthorized" error.
 type EmailUnauthorizedResponseBody string
+
+// NewGetBadRequest builds a test service get endpoint bad-request error.
+func NewGetBadRequest(body GetBadRequestResponseBody) test.BadRequest {
+	v := test.BadRequest(body)
+	return v
+}
+
+// NewGetForbidden builds a test service get endpoint forbidden error.
+func NewGetForbidden(body GetForbiddenResponseBody) test.Forbidden {
+	v := test.Forbidden(body)
+	return v
+}
+
+// NewGetNotFound builds a test service get endpoint not-found error.
+func NewGetNotFound(body GetNotFoundResponseBody) test.NotFound {
+	v := test.NotFound(body)
+	return v
+}
 
 // NewGetUnauthorized builds a test service get endpoint unauthorized error.
 func NewGetUnauthorized(body GetUnauthorizedResponseBody) test.Unauthorized {
@@ -29,9 +83,45 @@ func NewGetUnauthorized(body GetUnauthorizedResponseBody) test.Unauthorized {
 	return v
 }
 
+// NewErrorBadRequest builds a test service error endpoint bad-request error.
+func NewErrorBadRequest(body ErrorBadRequestResponseBody) test.BadRequest {
+	v := test.BadRequest(body)
+	return v
+}
+
+// NewErrorForbidden builds a test service error endpoint forbidden error.
+func NewErrorForbidden(body ErrorForbiddenResponseBody) test.Forbidden {
+	v := test.Forbidden(body)
+	return v
+}
+
+// NewErrorNotFound builds a test service error endpoint not-found error.
+func NewErrorNotFound(body ErrorNotFoundResponseBody) test.NotFound {
+	v := test.NotFound(body)
+	return v
+}
+
 // NewErrorUnauthorized builds a test service error endpoint unauthorized error.
 func NewErrorUnauthorized(body ErrorUnauthorizedResponseBody) test.Unauthorized {
 	v := test.Unauthorized(body)
+	return v
+}
+
+// NewEmailBadRequest builds a test service email endpoint bad-request error.
+func NewEmailBadRequest(body EmailBadRequestResponseBody) test.BadRequest {
+	v := test.BadRequest(body)
+	return v
+}
+
+// NewEmailForbidden builds a test service email endpoint forbidden error.
+func NewEmailForbidden(body EmailForbiddenResponseBody) test.Forbidden {
+	v := test.Forbidden(body)
+	return v
+}
+
+// NewEmailNotFound builds a test service email endpoint not-found error.
+func NewEmailNotFound(body EmailNotFoundResponseBody) test.NotFound {
+	v := test.NotFound(body)
 	return v
 }
 

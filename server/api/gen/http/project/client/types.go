@@ -31,6 +31,14 @@ type LookupInviteResponseBody struct {
 	Pending []*PendingInviteResponseBody `form:"pending,omitempty" json:"pending,omitempty" xml:"pending,omitempty"`
 }
 
+// UpdateBadRequestResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "bad-request" error.
+type UpdateBadRequestResponseBody string
+
+// UpdateForbiddenResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "forbidden" error.
+type UpdateForbiddenResponseBody string
+
 // UpdateNotFoundResponseBody is the type of the "project" service "update"
 // endpoint HTTP response body for the "not-found" error.
 type UpdateNotFoundResponseBody string
@@ -38,6 +46,14 @@ type UpdateNotFoundResponseBody string
 // UpdateUnauthorizedResponseBody is the type of the "project" service "update"
 // endpoint HTTP response body for the "unauthorized" error.
 type UpdateUnauthorizedResponseBody string
+
+// InvitesBadRequestResponseBody is the type of the "project" service "invites"
+// endpoint HTTP response body for the "bad-request" error.
+type InvitesBadRequestResponseBody string
+
+// InvitesForbiddenResponseBody is the type of the "project" service "invites"
+// endpoint HTTP response body for the "forbidden" error.
+type InvitesForbiddenResponseBody string
 
 // InvitesNotFoundResponseBody is the type of the "project" service "invites"
 // endpoint HTTP response body for the "not-found" error.
@@ -47,6 +63,14 @@ type InvitesNotFoundResponseBody string
 // "invites" endpoint HTTP response body for the "unauthorized" error.
 type InvitesUnauthorizedResponseBody string
 
+// LookupInviteBadRequestResponseBody is the type of the "project" service
+// "lookup invite" endpoint HTTP response body for the "bad-request" error.
+type LookupInviteBadRequestResponseBody string
+
+// LookupInviteForbiddenResponseBody is the type of the "project" service
+// "lookup invite" endpoint HTTP response body for the "forbidden" error.
+type LookupInviteForbiddenResponseBody string
+
 // LookupInviteNotFoundResponseBody is the type of the "project" service
 // "lookup invite" endpoint HTTP response body for the "not-found" error.
 type LookupInviteNotFoundResponseBody string
@@ -55,6 +79,14 @@ type LookupInviteNotFoundResponseBody string
 // "lookup invite" endpoint HTTP response body for the "unauthorized" error.
 type LookupInviteUnauthorizedResponseBody string
 
+// AcceptInviteBadRequestResponseBody is the type of the "project" service
+// "accept invite" endpoint HTTP response body for the "bad-request" error.
+type AcceptInviteBadRequestResponseBody string
+
+// AcceptInviteForbiddenResponseBody is the type of the "project" service
+// "accept invite" endpoint HTTP response body for the "forbidden" error.
+type AcceptInviteForbiddenResponseBody string
+
 // AcceptInviteNotFoundResponseBody is the type of the "project" service
 // "accept invite" endpoint HTTP response body for the "not-found" error.
 type AcceptInviteNotFoundResponseBody string
@@ -62,6 +94,14 @@ type AcceptInviteNotFoundResponseBody string
 // AcceptInviteUnauthorizedResponseBody is the type of the "project" service
 // "accept invite" endpoint HTTP response body for the "unauthorized" error.
 type AcceptInviteUnauthorizedResponseBody string
+
+// RejectInviteBadRequestResponseBody is the type of the "project" service
+// "reject invite" endpoint HTTP response body for the "bad-request" error.
+type RejectInviteBadRequestResponseBody string
+
+// RejectInviteForbiddenResponseBody is the type of the "project" service
+// "reject invite" endpoint HTTP response body for the "forbidden" error.
+type RejectInviteForbiddenResponseBody string
 
 // RejectInviteNotFoundResponseBody is the type of the "project" service
 // "reject invite" endpoint HTTP response body for the "not-found" error.
@@ -93,6 +133,19 @@ func NewUpdateRequestBody(p *project.UpdatePayload) *UpdateRequestBody {
 	return body
 }
 
+// NewUpdateBadRequest builds a project service update endpoint bad-request
+// error.
+func NewUpdateBadRequest(body UpdateBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewUpdateForbidden builds a project service update endpoint forbidden error.
+func NewUpdateForbidden(body UpdateForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
 // NewUpdateNotFound builds a project service update endpoint not-found error.
 func NewUpdateNotFound(body UpdateNotFoundResponseBody) project.NotFound {
 	v := project.NotFound(body)
@@ -115,6 +168,20 @@ func NewInvitesPendingInvitesOK(body *InvitesResponseBody) *projectviews.Pending
 		v.Pending[i] = unmarshalPendingInviteResponseBodyToProjectviewsPendingInviteView(val)
 	}
 
+	return v
+}
+
+// NewInvitesBadRequest builds a project service invites endpoint bad-request
+// error.
+func NewInvitesBadRequest(body InvitesBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewInvitesForbidden builds a project service invites endpoint forbidden
+// error.
+func NewInvitesForbidden(body InvitesForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
 	return v
 }
 
@@ -143,6 +210,20 @@ func NewLookupInvitePendingInvitesOK(body *LookupInviteResponseBody) *projectvie
 	return v
 }
 
+// NewLookupInviteBadRequest builds a project service lookup invite endpoint
+// bad-request error.
+func NewLookupInviteBadRequest(body LookupInviteBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewLookupInviteForbidden builds a project service lookup invite endpoint
+// forbidden error.
+func NewLookupInviteForbidden(body LookupInviteForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
 // NewLookupInviteNotFound builds a project service lookup invite endpoint
 // not-found error.
 func NewLookupInviteNotFound(body LookupInviteNotFoundResponseBody) project.NotFound {
@@ -157,6 +238,20 @@ func NewLookupInviteUnauthorized(body LookupInviteUnauthorizedResponseBody) proj
 	return v
 }
 
+// NewAcceptInviteBadRequest builds a project service accept invite endpoint
+// bad-request error.
+func NewAcceptInviteBadRequest(body AcceptInviteBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewAcceptInviteForbidden builds a project service accept invite endpoint
+// forbidden error.
+func NewAcceptInviteForbidden(body AcceptInviteForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
 // NewAcceptInviteNotFound builds a project service accept invite endpoint
 // not-found error.
 func NewAcceptInviteNotFound(body AcceptInviteNotFoundResponseBody) project.NotFound {
@@ -168,6 +263,20 @@ func NewAcceptInviteNotFound(body AcceptInviteNotFoundResponseBody) project.NotF
 // unauthorized error.
 func NewAcceptInviteUnauthorized(body AcceptInviteUnauthorizedResponseBody) project.Unauthorized {
 	v := project.Unauthorized(body)
+	return v
+}
+
+// NewRejectInviteBadRequest builds a project service reject invite endpoint
+// bad-request error.
+func NewRejectInviteBadRequest(body RejectInviteBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewRejectInviteForbidden builds a project service reject invite endpoint
+// forbidden error.
+func NewRejectInviteForbidden(body RejectInviteForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
 	return v
 }
 

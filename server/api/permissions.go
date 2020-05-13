@@ -80,15 +80,22 @@ func getClaims(ctx context.Context) (jwtgo.MapClaims, bool) {
 }
 
 func (p *defaultPermissions) unauthorized(m string) error {
-	if p.unwrapped == nil || p.unwrapped.authAttempt == nil || p.unwrapped.authAttempt.NotFound == nil {
-		return fmt.Errorf("unable to make error (%v)", m)
+	if p.unwrapped == nil || p.unwrapped.authAttempt == nil || p.unwrapped.authAttempt.Unauthorized == nil {
+		return fmt.Errorf("unable to make unauthorized error (%v)", m)
 	}
 	return p.unwrapped.authAttempt.Unauthorized(m)
 }
 
+func (p *defaultPermissions) forbidden(m string) error {
+	if p.unwrapped == nil || p.unwrapped.authAttempt == nil || p.unwrapped.authAttempt.Forbidden == nil {
+		return fmt.Errorf("unable to make forbidden error (%v)", m)
+	}
+	return p.unwrapped.authAttempt.Forbidden(m)
+}
+
 func (p *defaultPermissions) notFound(m string) error {
 	if p.unwrapped == nil || p.unwrapped.authAttempt == nil || p.unwrapped.authAttempt.NotFound == nil {
-		return fmt.Errorf("unable to make error (%v)", m)
+		return fmt.Errorf("unable to make not-found error (%v)", m)
 	}
 	return p.unwrapped.authAttempt.NotFound(m)
 }
@@ -112,7 +119,7 @@ func (p *defaultPermissions) getClaims() (jwtgo.MapClaims, error) {
 
 	authAttempt := getAuthAttempt(p.context)
 
-	return nil, authAttempt.Unauthorized("authentication error")
+	return nil, authAttempt.Unauthorized("unauthorized")
 }
 
 func (p *defaultPermissions) unwrap() error {
@@ -239,7 +246,7 @@ func (p *stationPermissions) CanView() error {
 
 func (p *stationPermissions) CanModify() error {
 	if p.station.OwnerID != p.UserID() {
-		return p.unauthorized("unauthorized")
+		return p.forbidden("forbidden")
 	}
 	return nil
 }
@@ -264,12 +271,12 @@ func (p *projectPermissions) CanView() error {
 
 func (p *projectPermissions) CanModify() error {
 	if p.projectUser == nil {
-		return p.unauthorized(fmt.Sprintf("unauthorized (public)"))
+		return p.forbidden("forbidden")
 	}
 
 	role := p.projectUser.LookupRole()
 	if role.IsProjectReadOnly() {
-		return p.unauthorized(fmt.Sprintf("unauthorized (%s)", role.Name))
+		return p.forbidden("forbidden")
 	}
 
 	return nil

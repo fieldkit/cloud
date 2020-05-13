@@ -112,7 +112,7 @@ func NewStationHandler(
 	var (
 		decodeRequest  = DecodeStationRequest(mux, decoder)
 		encodeResponse = EncodeStationResponse(encoder)
-		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+		encodeError    = EncodeStationError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
@@ -163,7 +163,7 @@ func NewProjectHandler(
 	var (
 		decodeRequest  = DecodeProjectRequest(mux, decoder)
 		encodeResponse = EncodeProjectResponse(encoder)
-		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+		encodeError    = EncodeProjectError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))

@@ -78,6 +78,18 @@ func EncodeRolesError(encoder func(context.Context, http.ResponseWriter) goahttp
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRolesForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
 		case "not-found":
 			res := v.(user.NotFound)
 			enc := encoder(ctx, w)

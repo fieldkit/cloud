@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 
+	activity "github.com/fieldkit/cloud/server/api/gen/activity"
 	activityviews "github.com/fieldkit/cloud/server/api/gen/activity/views"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -80,6 +81,70 @@ func DecodeStationRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 	}
 }
 
+// EncodeStationError returns an encoder for errors returned by the station
+// activity endpoint.
+func EncodeStationError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(activity.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewStationBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(activity.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewStationForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(activity.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewStationNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(activity.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewStationUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // EncodeProjectResponse returns an encoder for responses returned by the
 // activity project endpoint.
 func EncodeProjectResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
@@ -139,6 +204,70 @@ func DecodeProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 		}
 
 		return payload, nil
+	}
+}
+
+// EncodeProjectError returns an encoder for errors returned by the project
+// activity endpoint.
+func EncodeProjectError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(activity.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewProjectBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(activity.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewProjectForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(activity.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewProjectNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(activity.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewProjectUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
 	}
 }
 

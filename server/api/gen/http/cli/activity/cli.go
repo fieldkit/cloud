@@ -32,32 +32,33 @@ import (
 func UsageCommands() string {
 	return `activity (station|project)
 following (follow|unfollow|followers)
+modules meta
 project (update|invites|lookup- invite|accept- invite|reject- invite)
 station (add|get|update|list- mine|list- project|photo)
 tasks (five|refresh- device)
 test (get|error|email)
 user roles
-modules meta
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` activity station --id 1060022461665793244 --page 9185035368170386046 --auth "Inventore sit quis."` + "\n" +
-		os.Args[0] + ` following follow --id 4308578724422581315 --auth "Error vitae aliquid et quaerat similique sit."` + "\n" +
+		os.Args[0] + ` following follow --id 4323379036019030955 --auth "Laborum laboriosam soluta qui ut quasi."` + "\n" +
+		os.Args[0] + ` modules meta` + "\n" +
 		os.Args[0] + ` project update --body '{
-      "body": "Ab aliquam in assumenda magni tenetur deleniti."
-   }' --id 7134918490231707556 --auth "Sit nisi laborum laboriosam."` + "\n" +
+      "body": "Magnam et tempora."
+   }' --id 7667024179434665793 --auth "Voluptatem possimus sint sint aut."` + "\n" +
 		os.Args[0] + ` station add --body '{
-      "device_id": "Fugiat velit sed aut.",
-      "name": "Ex natus eaque impedit est quidem deleniti.",
+      "device_id": "Dolor qui fugit impedit.",
+      "name": "Rerum et quis optio voluptatibus.",
       "status_json": {
-         "Atque perspiciatis.": "Beatae magnam et tempora exercitationem.",
-         "Voluptatem possimus sint sint aut.": "Accusantium quisquam qui ut explicabo."
+         "Autem sequi amet aliquam aut est adipisci.": "Consequatur omnis rerum et pariatur.",
+         "Hic dignissimos illum ab adipisci consequatur.": "Facilis impedit corporis quam.",
+         "Omnis neque.": "Similique sequi qui deserunt velit minima."
       },
-      "status_pb": "Dignissimos sit consequuntur."
-   }' --auth "Voluptas quo sit voluptas deleniti."` + "\n" +
-		os.Args[0] + ` tasks five` + "\n" +
+      "status_pb": "Tempore et id fuga."
+   }' --auth "Aut consequuntur et a."` + "\n" +
 		""
 }
 
@@ -96,6 +97,10 @@ func ParseEndpoint(
 		followingFollowersFlags    = flag.NewFlagSet("followers", flag.ExitOnError)
 		followingFollowersIDFlag   = followingFollowersFlags.String("id", "REQUIRED", "")
 		followingFollowersPageFlag = followingFollowersFlags.String("page", "", "")
+
+		modulesFlags = flag.NewFlagSet("modules", flag.ContinueOnError)
+
+		modulesMetaFlags = flag.NewFlagSet("meta", flag.ExitOnError)
 
 		projectFlags = flag.NewFlagSet("project", flag.ContinueOnError)
 
@@ -170,10 +175,6 @@ func ParseEndpoint(
 
 		userRolesFlags    = flag.NewFlagSet("roles", flag.ExitOnError)
 		userRolesAuthFlag = userRolesFlags.String("auth", "REQUIRED", "")
-
-		modulesFlags = flag.NewFlagSet("modules", flag.ContinueOnError)
-
-		modulesMetaFlags = flag.NewFlagSet("meta", flag.ExitOnError)
 	)
 	activityFlags.Usage = activityUsage
 	activityStationFlags.Usage = activityStationUsage
@@ -183,6 +184,9 @@ func ParseEndpoint(
 	followingFollowFlags.Usage = followingFollowUsage
 	followingUnfollowFlags.Usage = followingUnfollowUsage
 	followingFollowersFlags.Usage = followingFollowersUsage
+
+	modulesFlags.Usage = modulesUsage
+	modulesMetaFlags.Usage = modulesMetaUsage
 
 	projectFlags.Usage = projectUsage
 	projectUpdateFlags.Usage = projectUpdateUsage
@@ -211,9 +215,6 @@ func ParseEndpoint(
 	userFlags.Usage = userUsage
 	userRolesFlags.Usage = userRolesUsage
 
-	modulesFlags.Usage = modulesUsage
-	modulesMetaFlags.Usage = modulesMetaUsage
-
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
 	}
@@ -233,6 +234,8 @@ func ParseEndpoint(
 			svcf = activityFlags
 		case "following":
 			svcf = followingFlags
+		case "modules":
+			svcf = modulesFlags
 		case "project":
 			svcf = projectFlags
 		case "station":
@@ -243,8 +246,6 @@ func ParseEndpoint(
 			svcf = testFlags
 		case "user":
 			svcf = userFlags
-		case "modules":
-			svcf = modulesFlags
 		default:
 			return nil, nil, fmt.Errorf("unknown service %q", svcn)
 		}
@@ -280,6 +281,13 @@ func ParseEndpoint(
 
 			case "followers":
 				epf = followingFollowersFlags
+
+			}
+
+		case "modules":
+			switch epn {
+			case "meta":
+				epf = modulesMetaFlags
 
 			}
 
@@ -354,13 +362,6 @@ func ParseEndpoint(
 
 			}
 
-		case "modules":
-			switch epn {
-			case "meta":
-				epf = modulesMetaFlags
-
-			}
-
 		}
 	}
 	if epf == nil {
@@ -403,6 +404,13 @@ func ParseEndpoint(
 			case "followers":
 				endpoint = c.Followers()
 				data, err = followingc.BuildFollowersPayload(*followingFollowersIDFlag, *followingFollowersPageFlag)
+			}
+		case "modules":
+			c := modulesc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "meta":
+				endpoint = c.Meta()
+				data = nil
 			}
 		case "project":
 			c := projectc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -475,13 +483,6 @@ func ParseEndpoint(
 				endpoint = c.Roles()
 				data, err = userc.BuildRolesPayload(*userRolesAuthFlag)
 			}
-		case "modules":
-			c := modulesc.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "meta":
-				endpoint = c.Meta()
-				data = nil
-			}
 		}
 	}
 	if err != nil {
@@ -527,7 +528,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 8816657830348650526 --page 8977962800843297053 --auth "Quisquam molestiae alias repellendus officiis aut."
+    `+os.Args[0]+` activity project --id 2897136126741734210 --page 2272442359367634531 --auth "Velit enim odio voluptatem dolorem."
 `, os.Args[0])
 }
 
@@ -555,7 +556,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 4308578724422581315 --auth "Error vitae aliquid et quaerat similique sit."
+    `+os.Args[0]+` following follow --id 4323379036019030955 --auth "Laborum laboriosam soluta qui ut quasi."
 `, os.Args[0])
 }
 
@@ -567,7 +568,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 5452370707435534299 --auth "Aut temporibus."
+    `+os.Args[0]+` following unfollow --id 6524049285818241773 --auth "Quaerat nesciunt ut dicta laudantium eos soluta."
 `, os.Args[0])
 }
 
@@ -579,7 +580,30 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 5430013960920797921 --page 3594915953782018094
+    `+os.Args[0]+` following followers --id 6486883668694283026 --page 51912185459656111
+`, os.Args[0])
+}
+
+// modulesUsage displays the usage of the modules command and its subcommands.
+func modulesUsage() {
+	fmt.Fprintf(os.Stderr, `Service is the modules service interface.
+Usage:
+    %s [globalflags] modules COMMAND [flags]
+
+COMMAND:
+    meta: Meta implements meta.
+
+Additional help:
+    %s modules COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func modulesMetaUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] modules meta
+
+Meta implements meta.
+
+Example:
+    `+os.Args[0]+` modules meta
 `, os.Args[0])
 }
 
@@ -610,8 +634,8 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` project update --body '{
-      "body": "Ab aliquam in assumenda magni tenetur deleniti."
-   }' --id 7134918490231707556 --auth "Sit nisi laborum laboriosam."
+      "body": "Magnam et tempora."
+   }' --id 7667024179434665793 --auth "Voluptatem possimus sint sint aut."
 `, os.Args[0])
 }
 
@@ -622,7 +646,7 @@ Invites implements invites.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project invites --auth "Aut provident."
+    `+os.Args[0]+` project invites --auth "Odio quod quis."
 `, os.Args[0])
 }
 
@@ -634,7 +658,7 @@ LookupInvite implements lookup invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project lookup- invite --token "Mollitia totam id quibusdam autem reprehenderit aliquam." --auth "Id repellat iusto tenetur dolorem nam."
+    `+os.Args[0]+` project lookup- invite --token "Excepturi et." --auth "Eos sunt veniam esse."
 `, os.Args[0])
 }
 
@@ -647,7 +671,7 @@ AcceptInvite implements accept invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project accept- invite --id 307690885509477116 --token "Corporis possimus eum." --auth "Iusto porro qui."
+    `+os.Args[0]+` project accept- invite --id 6043532295722033983 --token "Aliquid incidunt neque harum blanditiis." --auth "Dolor est sequi vel velit eos earum."
 `, os.Args[0])
 }
 
@@ -660,7 +684,7 @@ RejectInvite implements reject invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project reject- invite --id 8136271461735829520 --token "Non ad." --auth "Consequuntur voluptatum tenetur."
+    `+os.Args[0]+` project reject- invite --id 8222474452558605978 --token "Saepe quos aliquid totam qui." --auth "Dignissimos labore doloribus voluptas consequuntur illum."
 `, os.Args[0])
 }
 
@@ -691,14 +715,15 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` station add --body '{
-      "device_id": "Fugiat velit sed aut.",
-      "name": "Ex natus eaque impedit est quidem deleniti.",
+      "device_id": "Dolor qui fugit impedit.",
+      "name": "Rerum et quis optio voluptatibus.",
       "status_json": {
-         "Atque perspiciatis.": "Beatae magnam et tempora exercitationem.",
-         "Voluptatem possimus sint sint aut.": "Accusantium quisquam qui ut explicabo."
+         "Autem sequi amet aliquam aut est adipisci.": "Consequatur omnis rerum et pariatur.",
+         "Hic dignissimos illum ab adipisci consequatur.": "Facilis impedit corporis quam.",
+         "Omnis neque.": "Similique sequi qui deserunt velit minima."
       },
-      "status_pb": "Dignissimos sit consequuntur."
-   }' --auth "Voluptas quo sit voluptas deleniti."
+      "status_pb": "Tempore et id fuga."
+   }' --auth "Aut consequuntur et a."
 `, os.Args[0])
 }
 
@@ -710,7 +735,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 934165679 --auth "Dolor omnis."
+    `+os.Args[0]+` station get --id 639648518 --auth "Officiis nisi numquam omnis ratione quis."
 `, os.Args[0])
 }
 
@@ -724,13 +749,13 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "name": "Ea fuga nihil adipisci.",
+      "name": "Corporis ipsam id sequi recusandae et.",
       "status_json": {
-         "Atque qui magni exercitationem.": "Totam eaque.",
-         "Esse cupiditate.": "Aut ut quam aliquid quo."
+         "Iusto accusamus.": "Nulla qui.",
+         "Veniam maiores neque molestias soluta pariatur.": "Voluptate fuga molestiae."
       },
-      "status_pb": "Illo dicta rem."
-   }' --id 848745265 --auth "Eaque veniam qui."
+      "status_pb": "Repellat velit sapiente enim."
+   }' --id 852214632 --auth "Quas perspiciatis nisi laudantium."
 `, os.Args[0])
 }
 
@@ -741,7 +766,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- mine --auth "Dolorem quo non earum culpa."
+    `+os.Args[0]+` station list- mine --auth "Ut placeat."
 `, os.Args[0])
 }
 
@@ -753,7 +778,7 @@ ListProject implements list project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project --id 48171469 --auth "Sed rem dicta accusamus pariatur."
+    `+os.Args[0]+` station list- project --id 2121330838 --auth "Magnam velit id."
 `, os.Args[0])
 }
 
@@ -765,7 +790,7 @@ Photo implements photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station photo --id 258610457 --auth "Officiis natus."
+    `+os.Args[0]+` station photo --id 874235349 --auth "Amet sint hic accusamus repudiandae temporibus."
 `, os.Args[0])
 }
 
@@ -801,7 +826,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Cumque odit omnis." --auth "Repellendus aut temporibus."
+    `+os.Args[0]+` tasks refresh- device --device-id "Aut molestias dolorem." --auth "Delectus hic quia omnis debitis beatae ut."
 `, os.Args[0])
 }
 
@@ -827,7 +852,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 4985938252868972266
+    `+os.Args[0]+` test get --id 3102965868016943750
 `, os.Args[0])
 }
 
@@ -849,7 +874,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Et iusto accusamus repellendus nulla." --auth "Velit veniam."
+    `+os.Args[0]+` test email --address "Vel quia aut fuga ut." --auth "Eos nihil commodi expedita nostrum officia."
 `, os.Args[0])
 }
 
@@ -873,29 +898,6 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Voluptate fuga molestiae."
-`, os.Args[0])
-}
-
-// modulesUsage displays the usage of the modules command and its subcommands.
-func modulesUsage() {
-	fmt.Fprintf(os.Stderr, `Service is the modules service interface.
-Usage:
-    %s [globalflags] modules COMMAND [flags]
-
-COMMAND:
-    meta: Meta implements meta.
-
-Additional help:
-    %s modules COMMAND --help
-`, os.Args[0], os.Args[0])
-}
-func modulesMetaUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] modules meta
-
-Meta implements meta.
-
-Example:
-    `+os.Args[0]+` modules meta
+    `+os.Args[0]+` user roles --auth "Quibusdam explicabo dolores consectetur non omnis ab."
 `, os.Args[0])
 }

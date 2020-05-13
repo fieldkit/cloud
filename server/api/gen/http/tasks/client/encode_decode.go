@@ -37,6 +37,9 @@ func (c *Client) BuildFiveRequest(ctx context.Context, v interface{}) (*http.Req
 // five endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeFiveResponse may return the following errors:
+//	- "bad-request" (type tasks.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type tasks.Forbidden): http.StatusForbidden
+//	- "not-found" (type tasks.NotFound): http.StatusNotFound
 //	- "unauthorized" (type tasks.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeFiveResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
@@ -56,6 +59,36 @@ func DecodeFiveResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 		switch resp.StatusCode {
 		case http.StatusNoContent:
 			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body FiveBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("tasks", "five", err)
+			}
+			return nil, NewFiveBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body FiveForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("tasks", "five", err)
+			}
+			return nil, NewFiveForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body FiveNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("tasks", "five", err)
+			}
+			return nil, NewFiveNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body FiveUnauthorizedResponseBody
@@ -118,6 +151,9 @@ func EncodeRefreshDeviceRequest(encoder func(*http.Request) goahttp.Encoder) fun
 // tasks refresh device endpoint. restoreBody controls whether the response
 // body should be restored after having been read.
 // DecodeRefreshDeviceResponse may return the following errors:
+//	- "bad-request" (type tasks.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type tasks.Forbidden): http.StatusForbidden
+//	- "not-found" (type tasks.NotFound): http.StatusNotFound
 //	- "unauthorized" (type tasks.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeRefreshDeviceResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
@@ -137,6 +173,36 @@ func DecodeRefreshDeviceResponse(decoder func(*http.Response) goahttp.Decoder, r
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body RefreshDeviceBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("tasks", "refresh device", err)
+			}
+			return nil, NewRefreshDeviceBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body RefreshDeviceForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("tasks", "refresh device", err)
+			}
+			return nil, NewRefreshDeviceForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body RefreshDeviceNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("tasks", "refresh device", err)
+			}
+			return nil, NewRefreshDeviceNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body RefreshDeviceUnauthorizedResponseBody

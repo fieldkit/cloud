@@ -28,6 +28,38 @@ type ProjectResponseBody struct {
 	Page       int32                               `form:"page" json:"page" xml:"page"`
 }
 
+// StationBadRequestResponseBody is the type of the "activity" service
+// "station" endpoint HTTP response body for the "bad-request" error.
+type StationBadRequestResponseBody string
+
+// StationForbiddenResponseBody is the type of the "activity" service "station"
+// endpoint HTTP response body for the "forbidden" error.
+type StationForbiddenResponseBody string
+
+// StationNotFoundResponseBody is the type of the "activity" service "station"
+// endpoint HTTP response body for the "not-found" error.
+type StationNotFoundResponseBody string
+
+// StationUnauthorizedResponseBody is the type of the "activity" service
+// "station" endpoint HTTP response body for the "unauthorized" error.
+type StationUnauthorizedResponseBody string
+
+// ProjectBadRequestResponseBody is the type of the "activity" service
+// "project" endpoint HTTP response body for the "bad-request" error.
+type ProjectBadRequestResponseBody string
+
+// ProjectForbiddenResponseBody is the type of the "activity" service "project"
+// endpoint HTTP response body for the "forbidden" error.
+type ProjectForbiddenResponseBody string
+
+// ProjectNotFoundResponseBody is the type of the "activity" service "project"
+// endpoint HTTP response body for the "not-found" error.
+type ProjectNotFoundResponseBody string
+
+// ProjectUnauthorizedResponseBody is the type of the "activity" service
+// "project" endpoint HTTP response body for the "unauthorized" error.
+type ProjectUnauthorizedResponseBody string
+
 // ActivityEntryResponseBodyCollection is used to define fields on response
 // body types.
 type ActivityEntryResponseBodyCollection []*ActivityEntryResponseBody
@@ -84,6 +116,62 @@ func NewProjectResponseBody(res *activityviews.ProjectActivityPageView) *Project
 			body.Activities[i] = marshalActivityviewsActivityEntryViewToActivityEntryResponseBody(val)
 		}
 	}
+	return body
+}
+
+// NewStationBadRequestResponseBody builds the HTTP response body from the
+// result of the "station" endpoint of the "activity" service.
+func NewStationBadRequestResponseBody(res activity.BadRequest) StationBadRequestResponseBody {
+	body := StationBadRequestResponseBody(res)
+	return body
+}
+
+// NewStationForbiddenResponseBody builds the HTTP response body from the
+// result of the "station" endpoint of the "activity" service.
+func NewStationForbiddenResponseBody(res activity.Forbidden) StationForbiddenResponseBody {
+	body := StationForbiddenResponseBody(res)
+	return body
+}
+
+// NewStationNotFoundResponseBody builds the HTTP response body from the result
+// of the "station" endpoint of the "activity" service.
+func NewStationNotFoundResponseBody(res activity.NotFound) StationNotFoundResponseBody {
+	body := StationNotFoundResponseBody(res)
+	return body
+}
+
+// NewStationUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "station" endpoint of the "activity" service.
+func NewStationUnauthorizedResponseBody(res activity.Unauthorized) StationUnauthorizedResponseBody {
+	body := StationUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewProjectBadRequestResponseBody builds the HTTP response body from the
+// result of the "project" endpoint of the "activity" service.
+func NewProjectBadRequestResponseBody(res activity.BadRequest) ProjectBadRequestResponseBody {
+	body := ProjectBadRequestResponseBody(res)
+	return body
+}
+
+// NewProjectForbiddenResponseBody builds the HTTP response body from the
+// result of the "project" endpoint of the "activity" service.
+func NewProjectForbiddenResponseBody(res activity.Forbidden) ProjectForbiddenResponseBody {
+	body := ProjectForbiddenResponseBody(res)
+	return body
+}
+
+// NewProjectNotFoundResponseBody builds the HTTP response body from the result
+// of the "project" endpoint of the "activity" service.
+func NewProjectNotFoundResponseBody(res activity.NotFound) ProjectNotFoundResponseBody {
+	body := ProjectNotFoundResponseBody(res)
+	return body
+}
+
+// NewProjectUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "project" endpoint of the "activity" service.
+func NewProjectUnauthorizedResponseBody(res activity.Unauthorized) ProjectUnauthorizedResponseBody {
+	body := ProjectUnauthorizedResponseBody(res)
 	return body
 }
 

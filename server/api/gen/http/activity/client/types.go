@@ -8,6 +8,7 @@
 package client
 
 import (
+	activity "github.com/fieldkit/cloud/server/api/gen/activity"
 	activityviews "github.com/fieldkit/cloud/server/api/gen/activity/views"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -27,6 +28,38 @@ type ProjectResponseBody struct {
 	Total      *int32                              `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
 	Page       *int32                              `form:"page,omitempty" json:"page,omitempty" xml:"page,omitempty"`
 }
+
+// StationBadRequestResponseBody is the type of the "activity" service
+// "station" endpoint HTTP response body for the "bad-request" error.
+type StationBadRequestResponseBody string
+
+// StationForbiddenResponseBody is the type of the "activity" service "station"
+// endpoint HTTP response body for the "forbidden" error.
+type StationForbiddenResponseBody string
+
+// StationNotFoundResponseBody is the type of the "activity" service "station"
+// endpoint HTTP response body for the "not-found" error.
+type StationNotFoundResponseBody string
+
+// StationUnauthorizedResponseBody is the type of the "activity" service
+// "station" endpoint HTTP response body for the "unauthorized" error.
+type StationUnauthorizedResponseBody string
+
+// ProjectBadRequestResponseBody is the type of the "activity" service
+// "project" endpoint HTTP response body for the "bad-request" error.
+type ProjectBadRequestResponseBody string
+
+// ProjectForbiddenResponseBody is the type of the "activity" service "project"
+// endpoint HTTP response body for the "forbidden" error.
+type ProjectForbiddenResponseBody string
+
+// ProjectNotFoundResponseBody is the type of the "activity" service "project"
+// endpoint HTTP response body for the "not-found" error.
+type ProjectNotFoundResponseBody string
+
+// ProjectUnauthorizedResponseBody is the type of the "activity" service
+// "project" endpoint HTTP response body for the "unauthorized" error.
+type ProjectUnauthorizedResponseBody string
 
 // ActivityEntryCollectionResponseBody is used to define fields on response
 // body types.
@@ -70,6 +103,34 @@ func NewStationActivityPageViewOK(body *StationResponseBody) *activityviews.Stat
 	return v
 }
 
+// NewStationBadRequest builds a activity service station endpoint bad-request
+// error.
+func NewStationBadRequest(body StationBadRequestResponseBody) activity.BadRequest {
+	v := activity.BadRequest(body)
+	return v
+}
+
+// NewStationForbidden builds a activity service station endpoint forbidden
+// error.
+func NewStationForbidden(body StationForbiddenResponseBody) activity.Forbidden {
+	v := activity.Forbidden(body)
+	return v
+}
+
+// NewStationNotFound builds a activity service station endpoint not-found
+// error.
+func NewStationNotFound(body StationNotFoundResponseBody) activity.NotFound {
+	v := activity.NotFound(body)
+	return v
+}
+
+// NewStationUnauthorized builds a activity service station endpoint
+// unauthorized error.
+func NewStationUnauthorized(body StationUnauthorizedResponseBody) activity.Unauthorized {
+	v := activity.Unauthorized(body)
+	return v
+}
+
 // NewProjectActivityPageViewOK builds a "activity" service "project" endpoint
 // result from a HTTP "OK" response.
 func NewProjectActivityPageViewOK(body *ProjectResponseBody) *activityviews.ProjectActivityPageView {
@@ -82,6 +143,34 @@ func NewProjectActivityPageViewOK(body *ProjectResponseBody) *activityviews.Proj
 		v.Activities[i] = unmarshalActivityEntryResponseBodyToActivityviewsActivityEntryView(val)
 	}
 
+	return v
+}
+
+// NewProjectBadRequest builds a activity service project endpoint bad-request
+// error.
+func NewProjectBadRequest(body ProjectBadRequestResponseBody) activity.BadRequest {
+	v := activity.BadRequest(body)
+	return v
+}
+
+// NewProjectForbidden builds a activity service project endpoint forbidden
+// error.
+func NewProjectForbidden(body ProjectForbiddenResponseBody) activity.Forbidden {
+	v := activity.Forbidden(body)
+	return v
+}
+
+// NewProjectNotFound builds a activity service project endpoint not-found
+// error.
+func NewProjectNotFound(body ProjectNotFoundResponseBody) activity.NotFound {
+	v := activity.NotFound(body)
+	return v
+}
+
+// NewProjectUnauthorized builds a activity service project endpoint
+// unauthorized error.
+func NewProjectUnauthorized(body ProjectUnauthorizedResponseBody) activity.Unauthorized {
+	v := activity.Unauthorized(body)
 	return v
 }
 

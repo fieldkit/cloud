@@ -35,6 +35,12 @@ func (c *Client) BuildMetaRequest(ctx context.Context, v interface{}) (*http.Req
 // DecodeMetaResponse returns a decoder for responses returned by the modules
 // meta endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
+// DecodeMetaResponse may return the following errors:
+//	- "bad-request" (type modules.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type modules.Forbidden): http.StatusForbidden
+//	- "not-found" (type modules.NotFound): http.StatusNotFound
+//	- "unauthorized" (type modules.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
 func DecodeMetaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -61,6 +67,46 @@ func DecodeMetaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 			}
 			res := NewMetaResultOK(body)
 			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body MetaBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("modules", "meta", err)
+			}
+			return nil, NewMetaBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body MetaForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("modules", "meta", err)
+			}
+			return nil, NewMetaForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body MetaNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("modules", "meta", err)
+			}
+			return nil, NewMetaNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body MetaUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("modules", "meta", err)
+			}
+			return nil, NewMetaUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("modules", "meta", resp.StatusCode, string(body))

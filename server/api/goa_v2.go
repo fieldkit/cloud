@@ -112,8 +112,17 @@ func NewGoaV2AuthAttemptForErrors() *AuthAttempt {
 				Code:   "unauthorized",
 				ID:     newErrorID(),
 				Meta:   map[string]interface{}{},
+				Status: http.StatusUnauthorized,
 				Detail: m,
-				Status: 401,
+			}
+		},
+		Forbidden: func(m string) error {
+			return &goa.ErrorResponse{
+				Code:   "unauthorized",
+				ID:     newErrorID(),
+				Meta:   map[string]interface{}{},
+				Status: http.StatusForbidden,
+				Detail: m,
 			}
 		},
 		NotFound: func(m string) error {
@@ -121,8 +130,8 @@ func NewGoaV2AuthAttemptForErrors() *AuthAttempt {
 				Code:   "not_found",
 				ID:     newErrorID(),
 				Meta:   map[string]interface{}{},
+				Status: http.StatusNotFound,
 				Detail: m,
-				Status: 404,
 			}
 		},
 	}

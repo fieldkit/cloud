@@ -110,8 +110,5 @@ var _ = Service("activity", func() {
 		})
 	})
 
-	HTTP(func() {
-	})
-
 	commonOptions()
 })

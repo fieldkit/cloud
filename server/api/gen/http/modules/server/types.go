@@ -6,3 +6,51 @@
 // $ goa gen github.com/fieldkit/cloud/server/api/design
 
 package server
+
+import (
+	modules "github.com/fieldkit/cloud/server/api/gen/modules"
+)
+
+// MetaBadRequestResponseBody is the type of the "modules" service "meta"
+// endpoint HTTP response body for the "bad-request" error.
+type MetaBadRequestResponseBody string
+
+// MetaForbiddenResponseBody is the type of the "modules" service "meta"
+// endpoint HTTP response body for the "forbidden" error.
+type MetaForbiddenResponseBody string
+
+// MetaNotFoundResponseBody is the type of the "modules" service "meta"
+// endpoint HTTP response body for the "not-found" error.
+type MetaNotFoundResponseBody string
+
+// MetaUnauthorizedResponseBody is the type of the "modules" service "meta"
+// endpoint HTTP response body for the "unauthorized" error.
+type MetaUnauthorizedResponseBody string
+
+// NewMetaBadRequestResponseBody builds the HTTP response body from the result
+// of the "meta" endpoint of the "modules" service.
+func NewMetaBadRequestResponseBody(res modules.BadRequest) MetaBadRequestResponseBody {
+	body := MetaBadRequestResponseBody(res)
+	return body
+}
+
+// NewMetaForbiddenResponseBody builds the HTTP response body from the result
+// of the "meta" endpoint of the "modules" service.
+func NewMetaForbiddenResponseBody(res modules.Forbidden) MetaForbiddenResponseBody {
+	body := MetaForbiddenResponseBody(res)
+	return body
+}
+
+// NewMetaNotFoundResponseBody builds the HTTP response body from the result of
+// the "meta" endpoint of the "modules" service.
+func NewMetaNotFoundResponseBody(res modules.NotFound) MetaNotFoundResponseBody {
+	body := MetaNotFoundResponseBody(res)
+	return body
+}
+
+// NewMetaUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "meta" endpoint of the "modules" service.
+func NewMetaUnauthorizedResponseBody(res modules.Unauthorized) MetaUnauthorizedResponseBody {
+	body := MetaUnauthorizedResponseBody(res)
+	return body
+}

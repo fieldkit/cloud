@@ -240,7 +240,8 @@ func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *secu
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		Unauthorized: func(m string) error { return project.Unauthorized(m) },
 		NotFound:     func(m string) error { return project.NotFound(m) },
+		Unauthorized: func(m string) error { return project.Unauthorized(m) },
+		Forbidden:    func(m string) error { return project.Forbidden(m) },
 	})
 }

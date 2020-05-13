@@ -67,6 +67,9 @@ func EncodeFollowRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // following follow endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeFollowResponse may return the following errors:
+//	- "bad-request" (type following.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type following.Forbidden): http.StatusForbidden
+//	- "not-found" (type following.NotFound): http.StatusNotFound
 //	- "unauthorized" (type following.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeFollowResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
@@ -86,6 +89,36 @@ func DecodeFollowResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body FollowBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("following", "follow", err)
+			}
+			return nil, NewFollowBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body FollowForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("following", "follow", err)
+			}
+			return nil, NewFollowForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body FollowNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("following", "follow", err)
+			}
+			return nil, NewFollowNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body FollowUnauthorizedResponseBody
@@ -150,6 +183,9 @@ func EncodeUnfollowRequest(encoder func(*http.Request) goahttp.Encoder) func(*ht
 // following unfollow endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeUnfollowResponse may return the following errors:
+//	- "bad-request" (type following.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type following.Forbidden): http.StatusForbidden
+//	- "not-found" (type following.NotFound): http.StatusNotFound
 //	- "unauthorized" (type following.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeUnfollowResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
@@ -169,6 +205,36 @@ func DecodeUnfollowResponse(decoder func(*http.Response) goahttp.Decoder, restor
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body UnfollowBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("following", "unfollow", err)
+			}
+			return nil, NewUnfollowBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body UnfollowForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("following", "unfollow", err)
+			}
+			return nil, NewUnfollowForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body UnfollowNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("following", "unfollow", err)
+			}
+			return nil, NewUnfollowNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body UnfollowUnauthorizedResponseBody
@@ -234,6 +300,9 @@ func EncodeFollowersRequest(encoder func(*http.Request) goahttp.Encoder) func(*h
 // following followers endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeFollowersResponse may return the following errors:
+//	- "bad-request" (type following.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type following.Forbidden): http.StatusForbidden
+//	- "not-found" (type following.NotFound): http.StatusNotFound
 //	- "unauthorized" (type following.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeFollowersResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
@@ -268,6 +337,36 @@ func DecodeFollowersResponse(decoder func(*http.Response) goahttp.Decoder, resto
 			}
 			res := following.NewFollowersPage(vres)
 			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body FollowersBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("following", "followers", err)
+			}
+			return nil, NewFollowersBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body FollowersForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("following", "followers", err)
+			}
+			return nil, NewFollowersForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body FollowersNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("following", "followers", err)
+			}
+			return nil, NewFollowersNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body FollowersUnauthorizedResponseBody

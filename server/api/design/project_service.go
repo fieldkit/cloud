@@ -136,13 +136,5 @@ var _ = Service("project", func() {
 		})
 	})
 
-	Error("unauthorized", String, "credentials are invalid")
-	Error("not-found", String, "not found")
-
-	HTTP(func() {
-		Response("unauthorized", StatusUnauthorized)
-		Response("not-found", StatusNotFound)
-	})
-
 	commonOptions()
 })

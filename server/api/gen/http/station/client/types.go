@@ -109,6 +109,10 @@ type ListProjectResponseBody struct {
 // endpoint HTTP response body for the "bad-request" error.
 type AddBadRequestResponseBody string
 
+// AddForbiddenResponseBody is the type of the "station" service "add" endpoint
+// HTTP response body for the "forbidden" error.
+type AddForbiddenResponseBody string
+
 // AddNotFoundResponseBody is the type of the "station" service "add" endpoint
 // HTTP response body for the "not-found" error.
 type AddNotFoundResponseBody string
@@ -120,6 +124,10 @@ type AddUnauthorizedResponseBody string
 // GetBadRequestResponseBody is the type of the "station" service "get"
 // endpoint HTTP response body for the "bad-request" error.
 type GetBadRequestResponseBody string
+
+// GetForbiddenResponseBody is the type of the "station" service "get" endpoint
+// HTTP response body for the "forbidden" error.
+type GetForbiddenResponseBody string
 
 // GetNotFoundResponseBody is the type of the "station" service "get" endpoint
 // HTTP response body for the "not-found" error.
@@ -133,6 +141,10 @@ type GetUnauthorizedResponseBody string
 // endpoint HTTP response body for the "bad-request" error.
 type UpdateBadRequestResponseBody string
 
+// UpdateForbiddenResponseBody is the type of the "station" service "update"
+// endpoint HTTP response body for the "forbidden" error.
+type UpdateForbiddenResponseBody string
+
 // UpdateNotFoundResponseBody is the type of the "station" service "update"
 // endpoint HTTP response body for the "not-found" error.
 type UpdateNotFoundResponseBody string
@@ -144,6 +156,10 @@ type UpdateUnauthorizedResponseBody string
 // ListMineBadRequestResponseBody is the type of the "station" service "list
 // mine" endpoint HTTP response body for the "bad-request" error.
 type ListMineBadRequestResponseBody string
+
+// ListMineForbiddenResponseBody is the type of the "station" service "list
+// mine" endpoint HTTP response body for the "forbidden" error.
+type ListMineForbiddenResponseBody string
 
 // ListMineNotFoundResponseBody is the type of the "station" service "list
 // mine" endpoint HTTP response body for the "not-found" error.
@@ -157,6 +173,10 @@ type ListMineUnauthorizedResponseBody string
 // project" endpoint HTTP response body for the "bad-request" error.
 type ListProjectBadRequestResponseBody string
 
+// ListProjectForbiddenResponseBody is the type of the "station" service "list
+// project" endpoint HTTP response body for the "forbidden" error.
+type ListProjectForbiddenResponseBody string
+
 // ListProjectNotFoundResponseBody is the type of the "station" service "list
 // project" endpoint HTTP response body for the "not-found" error.
 type ListProjectNotFoundResponseBody string
@@ -168,6 +188,10 @@ type ListProjectUnauthorizedResponseBody string
 // PhotoBadRequestResponseBody is the type of the "station" service "photo"
 // endpoint HTTP response body for the "bad-request" error.
 type PhotoBadRequestResponseBody string
+
+// PhotoForbiddenResponseBody is the type of the "station" service "photo"
+// endpoint HTTP response body for the "forbidden" error.
+type PhotoForbiddenResponseBody string
 
 // PhotoNotFoundResponseBody is the type of the "station" service "photo"
 // endpoint HTTP response body for the "not-found" error.
@@ -325,6 +349,12 @@ func NewAddBadRequest(body AddBadRequestResponseBody) station.BadRequest {
 	return v
 }
 
+// NewAddForbidden builds a station service add endpoint forbidden error.
+func NewAddForbidden(body AddForbiddenResponseBody) station.Forbidden {
+	v := station.Forbidden(body)
+	return v
+}
+
 // NewAddNotFound builds a station service add endpoint not-found error.
 func NewAddNotFound(body AddNotFoundResponseBody) station.NotFound {
 	v := station.NotFound(body)
@@ -379,6 +409,12 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 // NewGetBadRequest builds a station service get endpoint bad-request error.
 func NewGetBadRequest(body GetBadRequestResponseBody) station.BadRequest {
 	v := station.BadRequest(body)
+	return v
+}
+
+// NewGetForbidden builds a station service get endpoint forbidden error.
+func NewGetForbidden(body GetForbiddenResponseBody) station.Forbidden {
+	v := station.Forbidden(body)
 	return v
 }
 
@@ -440,6 +476,12 @@ func NewUpdateBadRequest(body UpdateBadRequestResponseBody) station.BadRequest {
 	return v
 }
 
+// NewUpdateForbidden builds a station service update endpoint forbidden error.
+func NewUpdateForbidden(body UpdateForbiddenResponseBody) station.Forbidden {
+	v := station.Forbidden(body)
+	return v
+}
+
 // NewUpdateNotFound builds a station service update endpoint not-found error.
 func NewUpdateNotFound(body UpdateNotFoundResponseBody) station.NotFound {
 	v := station.NotFound(body)
@@ -469,6 +511,13 @@ func NewListMineStationsFullOK(body *ListMineResponseBody) *stationviews.Station
 // bad-request error.
 func NewListMineBadRequest(body ListMineBadRequestResponseBody) station.BadRequest {
 	v := station.BadRequest(body)
+	return v
+}
+
+// NewListMineForbidden builds a station service list mine endpoint forbidden
+// error.
+func NewListMineForbidden(body ListMineForbiddenResponseBody) station.Forbidden {
+	v := station.Forbidden(body)
 	return v
 }
 
@@ -505,6 +554,13 @@ func NewListProjectBadRequest(body ListProjectBadRequestResponseBody) station.Ba
 	return v
 }
 
+// NewListProjectForbidden builds a station service list project endpoint
+// forbidden error.
+func NewListProjectForbidden(body ListProjectForbiddenResponseBody) station.Forbidden {
+	v := station.Forbidden(body)
+	return v
+}
+
 // NewListProjectNotFound builds a station service list project endpoint
 // not-found error.
 func NewListProjectNotFound(body ListProjectNotFoundResponseBody) station.NotFound {
@@ -532,6 +588,12 @@ func NewPhotoResultOK(length int64, contentType string) *station.PhotoResult {
 // NewPhotoBadRequest builds a station service photo endpoint bad-request error.
 func NewPhotoBadRequest(body PhotoBadRequestResponseBody) station.BadRequest {
 	v := station.BadRequest(body)
+	return v
+}
+
+// NewPhotoForbidden builds a station service photo endpoint forbidden error.
+func NewPhotoForbidden(body PhotoForbiddenResponseBody) station.Forbidden {
+	v := station.Forbidden(body)
 	return v
 }
 

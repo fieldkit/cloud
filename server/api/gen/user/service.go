@@ -51,18 +51,21 @@ type AvailableRole struct {
 	Name string
 }
 
-// credentials are invalid
+// unauthorized
 type Unauthorized string
 
-// not found
+// forbidden
+type Forbidden string
+
+// not-found
 type NotFound string
 
-// bad request
+// bad-request
 type BadRequest string
 
 // Error returns an error description.
 func (e Unauthorized) Error() string {
-	return "credentials are invalid"
+	return "unauthorized"
 }
 
 // ErrorName returns "unauthorized".
@@ -71,8 +74,18 @@ func (e Unauthorized) ErrorName() string {
 }
 
 // Error returns an error description.
+func (e Forbidden) Error() string {
+	return "forbidden"
+}
+
+// ErrorName returns "forbidden".
+func (e Forbidden) ErrorName() string {
+	return "forbidden"
+}
+
+// Error returns an error description.
 func (e NotFound) Error() string {
-	return "not found"
+	return "not-found"
 }
 
 // ErrorName returns "not-found".
@@ -82,7 +95,7 @@ func (e NotFound) ErrorName() string {
 
 // Error returns an error description.
 func (e BadRequest) Error() string {
-	return "bad request"
+	return "bad-request"
 }
 
 // ErrorName returns "bad-request".

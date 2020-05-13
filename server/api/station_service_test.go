@@ -174,7 +174,7 @@ func TestUpdateAnotherPersonsStation(t *testing.T) {
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(badActor))
 	rr := tests.ExecuteRequest(req, api)
 
-	assert.Equal(http.StatusUnauthorized, rr.Code)
+	assert.Equal(http.StatusForbidden, rr.Code)
 }
 
 func TestUpdateMissingStation(t *testing.T) {

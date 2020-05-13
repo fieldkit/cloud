@@ -21,13 +21,49 @@ type FollowersResponseBody struct {
 	Page      *int32                         `form:"page,omitempty" json:"page,omitempty" xml:"page,omitempty"`
 }
 
+// FollowBadRequestResponseBody is the type of the "following" service "follow"
+// endpoint HTTP response body for the "bad-request" error.
+type FollowBadRequestResponseBody string
+
+// FollowForbiddenResponseBody is the type of the "following" service "follow"
+// endpoint HTTP response body for the "forbidden" error.
+type FollowForbiddenResponseBody string
+
+// FollowNotFoundResponseBody is the type of the "following" service "follow"
+// endpoint HTTP response body for the "not-found" error.
+type FollowNotFoundResponseBody string
+
 // FollowUnauthorizedResponseBody is the type of the "following" service
 // "follow" endpoint HTTP response body for the "unauthorized" error.
 type FollowUnauthorizedResponseBody string
 
+// UnfollowBadRequestResponseBody is the type of the "following" service
+// "unfollow" endpoint HTTP response body for the "bad-request" error.
+type UnfollowBadRequestResponseBody string
+
+// UnfollowForbiddenResponseBody is the type of the "following" service
+// "unfollow" endpoint HTTP response body for the "forbidden" error.
+type UnfollowForbiddenResponseBody string
+
+// UnfollowNotFoundResponseBody is the type of the "following" service
+// "unfollow" endpoint HTTP response body for the "not-found" error.
+type UnfollowNotFoundResponseBody string
+
 // UnfollowUnauthorizedResponseBody is the type of the "following" service
 // "unfollow" endpoint HTTP response body for the "unauthorized" error.
 type UnfollowUnauthorizedResponseBody string
+
+// FollowersBadRequestResponseBody is the type of the "following" service
+// "followers" endpoint HTTP response body for the "bad-request" error.
+type FollowersBadRequestResponseBody string
+
+// FollowersForbiddenResponseBody is the type of the "following" service
+// "followers" endpoint HTTP response body for the "forbidden" error.
+type FollowersForbiddenResponseBody string
+
+// FollowersNotFoundResponseBody is the type of the "following" service
+// "followers" endpoint HTTP response body for the "not-found" error.
+type FollowersNotFoundResponseBody string
 
 // FollowersUnauthorizedResponseBody is the type of the "following" service
 // "followers" endpoint HTTP response body for the "unauthorized" error.
@@ -49,10 +85,51 @@ type AvatarResponseBody struct {
 	URL *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 }
 
+// NewFollowBadRequest builds a following service follow endpoint bad-request
+// error.
+func NewFollowBadRequest(body FollowBadRequestResponseBody) following.BadRequest {
+	v := following.BadRequest(body)
+	return v
+}
+
+// NewFollowForbidden builds a following service follow endpoint forbidden
+// error.
+func NewFollowForbidden(body FollowForbiddenResponseBody) following.Forbidden {
+	v := following.Forbidden(body)
+	return v
+}
+
+// NewFollowNotFound builds a following service follow endpoint not-found error.
+func NewFollowNotFound(body FollowNotFoundResponseBody) following.NotFound {
+	v := following.NotFound(body)
+	return v
+}
+
 // NewFollowUnauthorized builds a following service follow endpoint
 // unauthorized error.
 func NewFollowUnauthorized(body FollowUnauthorizedResponseBody) following.Unauthorized {
 	v := following.Unauthorized(body)
+	return v
+}
+
+// NewUnfollowBadRequest builds a following service unfollow endpoint
+// bad-request error.
+func NewUnfollowBadRequest(body UnfollowBadRequestResponseBody) following.BadRequest {
+	v := following.BadRequest(body)
+	return v
+}
+
+// NewUnfollowForbidden builds a following service unfollow endpoint forbidden
+// error.
+func NewUnfollowForbidden(body UnfollowForbiddenResponseBody) following.Forbidden {
+	v := following.Forbidden(body)
+	return v
+}
+
+// NewUnfollowNotFound builds a following service unfollow endpoint not-found
+// error.
+func NewUnfollowNotFound(body UnfollowNotFoundResponseBody) following.NotFound {
+	v := following.NotFound(body)
 	return v
 }
 
@@ -75,6 +152,27 @@ func NewFollowersPageViewOK(body *FollowersResponseBody) *followingviews.Followe
 		v.Followers[i] = unmarshalFollowerResponseBodyToFollowingviewsFollowerView(val)
 	}
 
+	return v
+}
+
+// NewFollowersBadRequest builds a following service followers endpoint
+// bad-request error.
+func NewFollowersBadRequest(body FollowersBadRequestResponseBody) following.BadRequest {
+	v := following.BadRequest(body)
+	return v
+}
+
+// NewFollowersForbidden builds a following service followers endpoint
+// forbidden error.
+func NewFollowersForbidden(body FollowersForbiddenResponseBody) following.Forbidden {
+	v := following.Forbidden(body)
+	return v
+}
+
+// NewFollowersNotFound builds a following service followers endpoint not-found
+// error.
+func NewFollowersNotFound(body FollowersNotFoundResponseBody) following.NotFound {
+	v := following.NotFound(body)
 	return v
 }
 

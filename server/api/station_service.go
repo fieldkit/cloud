@@ -250,8 +250,9 @@ func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *secu
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		Unauthorized: func(m string) error { return station.Unauthorized(m) },
 		NotFound:     func(m string) error { return station.NotFound(m) },
+		Unauthorized: func(m string) error { return station.Unauthorized(m) },
+		Forbidden:    func(m string) error { return station.Forbidden(m) },
 	})
 }
 

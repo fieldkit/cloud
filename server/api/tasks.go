@@ -58,7 +58,8 @@ func (s *TasksService) JWTAuth(ctx context.Context, token string, scheme *securi
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		Unauthorized: func(m string) error { return tasks.Unauthorized(m) },
 		NotFound:     nil,
+		Unauthorized: func(m string) error { return tasks.Unauthorized(m) },
+		Forbidden:    func(m string) error { return tasks.Forbidden(m) },
 	})
 }

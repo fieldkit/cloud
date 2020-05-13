@@ -95,6 +95,18 @@ func EncodeAddError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
+		case "forbidden":
+			res := v.(station.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAddForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
 		case "not-found":
 			res := v.(station.NotFound)
 			enc := encoder(ctx, w)
@@ -195,6 +207,18 @@ func EncodeGetError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(station.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
 			res := v.(station.NotFound)
@@ -312,6 +336,18 @@ func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahtt
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
+		case "forbidden":
+			res := v.(station.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUpdateForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
 		case "not-found":
 			res := v.(station.NotFound)
 			enc := encoder(ctx, w)
@@ -401,6 +437,18 @@ func EncodeListMineError(encoder func(context.Context, http.ResponseWriter) goah
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(station.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListMineForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
 			res := v.(station.NotFound)
@@ -502,6 +550,18 @@ func EncodeListProjectError(encoder func(context.Context, http.ResponseWriter) g
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(station.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListProjectForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
 			res := v.(station.NotFound)
@@ -605,6 +665,18 @@ func EncodePhotoError(encoder func(context.Context, http.ResponseWriter) goahttp
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(station.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewPhotoForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
 			res := v.(station.NotFound)

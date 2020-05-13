@@ -28,6 +28,18 @@ func commonOptions() {
 	cors.Origin("/(.+[.])?localhost:\\d+/", corsRules)       // Dev
 	cors.Origin("/(.+[.])?fieldkit.org:\\d+/", corsRules)    // Dev
 	cors.Origin("/(.+[.])?local.fkdev.org:\\d+/", corsRules) // Dev
+
+	Error("unauthorized", String, "unauthorized")
+	Error("forbidden", String, "forbidden")
+	Error("not-found", String, "not-found")
+	Error("bad-request", String, "bad-request")
+
+	HTTP(func() {
+		Response("unauthorized", StatusUnauthorized)
+		Response("forbidden", StatusForbidden)
+		Response("not-found", StatusNotFound)
+		Response("bad-request", StatusBadRequest)
+	})
 }
 
 func httpAuthentication() {

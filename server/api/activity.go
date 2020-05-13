@@ -222,8 +222,9 @@ func (s *ActivityService) JWTAuth(ctx context.Context, token string, scheme *sec
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		Unauthorized: nil,
 		NotFound:     nil,
+		Unauthorized: nil,
+		Forbidden:    nil,
 	})
 }
 

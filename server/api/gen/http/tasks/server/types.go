@@ -11,18 +11,84 @@ import (
 	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
 )
 
+// FiveBadRequestResponseBody is the type of the "tasks" service "five"
+// endpoint HTTP response body for the "bad-request" error.
+type FiveBadRequestResponseBody string
+
+// FiveForbiddenResponseBody is the type of the "tasks" service "five" endpoint
+// HTTP response body for the "forbidden" error.
+type FiveForbiddenResponseBody string
+
+// FiveNotFoundResponseBody is the type of the "tasks" service "five" endpoint
+// HTTP response body for the "not-found" error.
+type FiveNotFoundResponseBody string
+
 // FiveUnauthorizedResponseBody is the type of the "tasks" service "five"
 // endpoint HTTP response body for the "unauthorized" error.
 type FiveUnauthorizedResponseBody string
+
+// RefreshDeviceBadRequestResponseBody is the type of the "tasks" service
+// "refresh device" endpoint HTTP response body for the "bad-request" error.
+type RefreshDeviceBadRequestResponseBody string
+
+// RefreshDeviceForbiddenResponseBody is the type of the "tasks" service
+// "refresh device" endpoint HTTP response body for the "forbidden" error.
+type RefreshDeviceForbiddenResponseBody string
+
+// RefreshDeviceNotFoundResponseBody is the type of the "tasks" service
+// "refresh device" endpoint HTTP response body for the "not-found" error.
+type RefreshDeviceNotFoundResponseBody string
 
 // RefreshDeviceUnauthorizedResponseBody is the type of the "tasks" service
 // "refresh device" endpoint HTTP response body for the "unauthorized" error.
 type RefreshDeviceUnauthorizedResponseBody string
 
+// NewFiveBadRequestResponseBody builds the HTTP response body from the result
+// of the "five" endpoint of the "tasks" service.
+func NewFiveBadRequestResponseBody(res tasks.BadRequest) FiveBadRequestResponseBody {
+	body := FiveBadRequestResponseBody(res)
+	return body
+}
+
+// NewFiveForbiddenResponseBody builds the HTTP response body from the result
+// of the "five" endpoint of the "tasks" service.
+func NewFiveForbiddenResponseBody(res tasks.Forbidden) FiveForbiddenResponseBody {
+	body := FiveForbiddenResponseBody(res)
+	return body
+}
+
+// NewFiveNotFoundResponseBody builds the HTTP response body from the result of
+// the "five" endpoint of the "tasks" service.
+func NewFiveNotFoundResponseBody(res tasks.NotFound) FiveNotFoundResponseBody {
+	body := FiveNotFoundResponseBody(res)
+	return body
+}
+
 // NewFiveUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "five" endpoint of the "tasks" service.
 func NewFiveUnauthorizedResponseBody(res tasks.Unauthorized) FiveUnauthorizedResponseBody {
 	body := FiveUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewRefreshDeviceBadRequestResponseBody builds the HTTP response body from
+// the result of the "refresh device" endpoint of the "tasks" service.
+func NewRefreshDeviceBadRequestResponseBody(res tasks.BadRequest) RefreshDeviceBadRequestResponseBody {
+	body := RefreshDeviceBadRequestResponseBody(res)
+	return body
+}
+
+// NewRefreshDeviceForbiddenResponseBody builds the HTTP response body from the
+// result of the "refresh device" endpoint of the "tasks" service.
+func NewRefreshDeviceForbiddenResponseBody(res tasks.Forbidden) RefreshDeviceForbiddenResponseBody {
+	body := RefreshDeviceForbiddenResponseBody(res)
+	return body
+}
+
+// NewRefreshDeviceNotFoundResponseBody builds the HTTP response body from the
+// result of the "refresh device" endpoint of the "tasks" service.
+func NewRefreshDeviceNotFoundResponseBody(res tasks.NotFound) RefreshDeviceNotFoundResponseBody {
+	body := RefreshDeviceNotFoundResponseBody(res)
 	return body
 }
 

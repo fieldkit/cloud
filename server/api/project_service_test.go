@@ -137,7 +137,7 @@ func TestUpdateProjectWhenNotMember(t *testing.T) {
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
 	rr := tests.ExecuteRequest(req, api)
 
-	assert.Equal(http.StatusUnauthorized, rr.Code)
+	assert.Equal(http.StatusForbidden, rr.Code)
 }
 
 func TestGetProjectMember(t *testing.T) {

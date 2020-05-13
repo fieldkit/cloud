@@ -31,6 +31,14 @@ type LookupInviteResponseBody struct {
 	Pending []*PendingInviteResponseBody `form:"pending" json:"pending" xml:"pending"`
 }
 
+// UpdateBadRequestResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "bad-request" error.
+type UpdateBadRequestResponseBody string
+
+// UpdateForbiddenResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "forbidden" error.
+type UpdateForbiddenResponseBody string
+
 // UpdateNotFoundResponseBody is the type of the "project" service "update"
 // endpoint HTTP response body for the "not-found" error.
 type UpdateNotFoundResponseBody string
@@ -38,6 +46,14 @@ type UpdateNotFoundResponseBody string
 // UpdateUnauthorizedResponseBody is the type of the "project" service "update"
 // endpoint HTTP response body for the "unauthorized" error.
 type UpdateUnauthorizedResponseBody string
+
+// InvitesBadRequestResponseBody is the type of the "project" service "invites"
+// endpoint HTTP response body for the "bad-request" error.
+type InvitesBadRequestResponseBody string
+
+// InvitesForbiddenResponseBody is the type of the "project" service "invites"
+// endpoint HTTP response body for the "forbidden" error.
+type InvitesForbiddenResponseBody string
 
 // InvitesNotFoundResponseBody is the type of the "project" service "invites"
 // endpoint HTTP response body for the "not-found" error.
@@ -47,6 +63,14 @@ type InvitesNotFoundResponseBody string
 // "invites" endpoint HTTP response body for the "unauthorized" error.
 type InvitesUnauthorizedResponseBody string
 
+// LookupInviteBadRequestResponseBody is the type of the "project" service
+// "lookup invite" endpoint HTTP response body for the "bad-request" error.
+type LookupInviteBadRequestResponseBody string
+
+// LookupInviteForbiddenResponseBody is the type of the "project" service
+// "lookup invite" endpoint HTTP response body for the "forbidden" error.
+type LookupInviteForbiddenResponseBody string
+
 // LookupInviteNotFoundResponseBody is the type of the "project" service
 // "lookup invite" endpoint HTTP response body for the "not-found" error.
 type LookupInviteNotFoundResponseBody string
@@ -55,6 +79,14 @@ type LookupInviteNotFoundResponseBody string
 // "lookup invite" endpoint HTTP response body for the "unauthorized" error.
 type LookupInviteUnauthorizedResponseBody string
 
+// AcceptInviteBadRequestResponseBody is the type of the "project" service
+// "accept invite" endpoint HTTP response body for the "bad-request" error.
+type AcceptInviteBadRequestResponseBody string
+
+// AcceptInviteForbiddenResponseBody is the type of the "project" service
+// "accept invite" endpoint HTTP response body for the "forbidden" error.
+type AcceptInviteForbiddenResponseBody string
+
 // AcceptInviteNotFoundResponseBody is the type of the "project" service
 // "accept invite" endpoint HTTP response body for the "not-found" error.
 type AcceptInviteNotFoundResponseBody string
@@ -62,6 +94,14 @@ type AcceptInviteNotFoundResponseBody string
 // AcceptInviteUnauthorizedResponseBody is the type of the "project" service
 // "accept invite" endpoint HTTP response body for the "unauthorized" error.
 type AcceptInviteUnauthorizedResponseBody string
+
+// RejectInviteBadRequestResponseBody is the type of the "project" service
+// "reject invite" endpoint HTTP response body for the "bad-request" error.
+type RejectInviteBadRequestResponseBody string
+
+// RejectInviteForbiddenResponseBody is the type of the "project" service
+// "reject invite" endpoint HTTP response body for the "forbidden" error.
+type RejectInviteForbiddenResponseBody string
 
 // RejectInviteNotFoundResponseBody is the type of the "project" service
 // "reject invite" endpoint HTTP response body for the "not-found" error.
@@ -110,6 +150,20 @@ func NewLookupInviteResponseBody(res *projectviews.PendingInvitesView) *LookupIn
 	return body
 }
 
+// NewUpdateBadRequestResponseBody builds the HTTP response body from the
+// result of the "update" endpoint of the "project" service.
+func NewUpdateBadRequestResponseBody(res project.BadRequest) UpdateBadRequestResponseBody {
+	body := UpdateBadRequestResponseBody(res)
+	return body
+}
+
+// NewUpdateForbiddenResponseBody builds the HTTP response body from the result
+// of the "update" endpoint of the "project" service.
+func NewUpdateForbiddenResponseBody(res project.Forbidden) UpdateForbiddenResponseBody {
+	body := UpdateForbiddenResponseBody(res)
+	return body
+}
+
 // NewUpdateNotFoundResponseBody builds the HTTP response body from the result
 // of the "update" endpoint of the "project" service.
 func NewUpdateNotFoundResponseBody(res project.NotFound) UpdateNotFoundResponseBody {
@@ -121,6 +175,20 @@ func NewUpdateNotFoundResponseBody(res project.NotFound) UpdateNotFoundResponseB
 // result of the "update" endpoint of the "project" service.
 func NewUpdateUnauthorizedResponseBody(res project.Unauthorized) UpdateUnauthorizedResponseBody {
 	body := UpdateUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewInvitesBadRequestResponseBody builds the HTTP response body from the
+// result of the "invites" endpoint of the "project" service.
+func NewInvitesBadRequestResponseBody(res project.BadRequest) InvitesBadRequestResponseBody {
+	body := InvitesBadRequestResponseBody(res)
+	return body
+}
+
+// NewInvitesForbiddenResponseBody builds the HTTP response body from the
+// result of the "invites" endpoint of the "project" service.
+func NewInvitesForbiddenResponseBody(res project.Forbidden) InvitesForbiddenResponseBody {
+	body := InvitesForbiddenResponseBody(res)
 	return body
 }
 
@@ -138,6 +206,20 @@ func NewInvitesUnauthorizedResponseBody(res project.Unauthorized) InvitesUnautho
 	return body
 }
 
+// NewLookupInviteBadRequestResponseBody builds the HTTP response body from the
+// result of the "lookup invite" endpoint of the "project" service.
+func NewLookupInviteBadRequestResponseBody(res project.BadRequest) LookupInviteBadRequestResponseBody {
+	body := LookupInviteBadRequestResponseBody(res)
+	return body
+}
+
+// NewLookupInviteForbiddenResponseBody builds the HTTP response body from the
+// result of the "lookup invite" endpoint of the "project" service.
+func NewLookupInviteForbiddenResponseBody(res project.Forbidden) LookupInviteForbiddenResponseBody {
+	body := LookupInviteForbiddenResponseBody(res)
+	return body
+}
+
 // NewLookupInviteNotFoundResponseBody builds the HTTP response body from the
 // result of the "lookup invite" endpoint of the "project" service.
 func NewLookupInviteNotFoundResponseBody(res project.NotFound) LookupInviteNotFoundResponseBody {
@@ -152,6 +234,20 @@ func NewLookupInviteUnauthorizedResponseBody(res project.Unauthorized) LookupInv
 	return body
 }
 
+// NewAcceptInviteBadRequestResponseBody builds the HTTP response body from the
+// result of the "accept invite" endpoint of the "project" service.
+func NewAcceptInviteBadRequestResponseBody(res project.BadRequest) AcceptInviteBadRequestResponseBody {
+	body := AcceptInviteBadRequestResponseBody(res)
+	return body
+}
+
+// NewAcceptInviteForbiddenResponseBody builds the HTTP response body from the
+// result of the "accept invite" endpoint of the "project" service.
+func NewAcceptInviteForbiddenResponseBody(res project.Forbidden) AcceptInviteForbiddenResponseBody {
+	body := AcceptInviteForbiddenResponseBody(res)
+	return body
+}
+
 // NewAcceptInviteNotFoundResponseBody builds the HTTP response body from the
 // result of the "accept invite" endpoint of the "project" service.
 func NewAcceptInviteNotFoundResponseBody(res project.NotFound) AcceptInviteNotFoundResponseBody {
@@ -163,6 +259,20 @@ func NewAcceptInviteNotFoundResponseBody(res project.NotFound) AcceptInviteNotFo
 // the result of the "accept invite" endpoint of the "project" service.
 func NewAcceptInviteUnauthorizedResponseBody(res project.Unauthorized) AcceptInviteUnauthorizedResponseBody {
 	body := AcceptInviteUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewRejectInviteBadRequestResponseBody builds the HTTP response body from the
+// result of the "reject invite" endpoint of the "project" service.
+func NewRejectInviteBadRequestResponseBody(res project.BadRequest) RejectInviteBadRequestResponseBody {
+	body := RejectInviteBadRequestResponseBody(res)
+	return body
+}
+
+// NewRejectInviteForbiddenResponseBody builds the HTTP response body from the
+// result of the "reject invite" endpoint of the "project" service.
+func NewRejectInviteForbiddenResponseBody(res project.Forbidden) RejectInviteForbiddenResponseBody {
+	body := RejectInviteForbiddenResponseBody(res)
 	return body
 }
 

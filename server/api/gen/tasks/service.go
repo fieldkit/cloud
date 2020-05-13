@@ -47,6 +47,15 @@ type RefreshDevicePayload struct {
 // credentials are invalid
 type Unauthorized string
 
+// forbidden
+type Forbidden string
+
+// not-found
+type NotFound string
+
+// bad-request
+type BadRequest string
+
 // Error returns an error description.
 func (e Unauthorized) Error() string {
 	return "credentials are invalid"
@@ -55,4 +64,34 @@ func (e Unauthorized) Error() string {
 // ErrorName returns "unauthorized".
 func (e Unauthorized) ErrorName() string {
 	return "unauthorized"
+}
+
+// Error returns an error description.
+func (e Forbidden) Error() string {
+	return "forbidden"
+}
+
+// ErrorName returns "forbidden".
+func (e Forbidden) ErrorName() string {
+	return "forbidden"
+}
+
+// Error returns an error description.
+func (e NotFound) Error() string {
+	return "not-found"
+}
+
+// ErrorName returns "not-found".
+func (e NotFound) ErrorName() string {
+	return "not-found"
+}
+
+// Error returns an error description.
+func (e BadRequest) Error() string {
+	return "bad-request"
+}
+
+// ErrorName returns "bad-request".
+func (e BadRequest) ErrorName() string {
+	return "bad-request"
 }

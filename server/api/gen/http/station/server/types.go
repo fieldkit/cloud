@@ -109,6 +109,10 @@ type ListProjectResponseBody struct {
 // endpoint HTTP response body for the "bad-request" error.
 type AddBadRequestResponseBody string
 
+// AddForbiddenResponseBody is the type of the "station" service "add" endpoint
+// HTTP response body for the "forbidden" error.
+type AddForbiddenResponseBody string
+
 // AddNotFoundResponseBody is the type of the "station" service "add" endpoint
 // HTTP response body for the "not-found" error.
 type AddNotFoundResponseBody string
@@ -120,6 +124,10 @@ type AddUnauthorizedResponseBody string
 // GetBadRequestResponseBody is the type of the "station" service "get"
 // endpoint HTTP response body for the "bad-request" error.
 type GetBadRequestResponseBody string
+
+// GetForbiddenResponseBody is the type of the "station" service "get" endpoint
+// HTTP response body for the "forbidden" error.
+type GetForbiddenResponseBody string
 
 // GetNotFoundResponseBody is the type of the "station" service "get" endpoint
 // HTTP response body for the "not-found" error.
@@ -133,6 +141,10 @@ type GetUnauthorizedResponseBody string
 // endpoint HTTP response body for the "bad-request" error.
 type UpdateBadRequestResponseBody string
 
+// UpdateForbiddenResponseBody is the type of the "station" service "update"
+// endpoint HTTP response body for the "forbidden" error.
+type UpdateForbiddenResponseBody string
+
 // UpdateNotFoundResponseBody is the type of the "station" service "update"
 // endpoint HTTP response body for the "not-found" error.
 type UpdateNotFoundResponseBody string
@@ -144,6 +156,10 @@ type UpdateUnauthorizedResponseBody string
 // ListMineBadRequestResponseBody is the type of the "station" service "list
 // mine" endpoint HTTP response body for the "bad-request" error.
 type ListMineBadRequestResponseBody string
+
+// ListMineForbiddenResponseBody is the type of the "station" service "list
+// mine" endpoint HTTP response body for the "forbidden" error.
+type ListMineForbiddenResponseBody string
 
 // ListMineNotFoundResponseBody is the type of the "station" service "list
 // mine" endpoint HTTP response body for the "not-found" error.
@@ -157,6 +173,10 @@ type ListMineUnauthorizedResponseBody string
 // project" endpoint HTTP response body for the "bad-request" error.
 type ListProjectBadRequestResponseBody string
 
+// ListProjectForbiddenResponseBody is the type of the "station" service "list
+// project" endpoint HTTP response body for the "forbidden" error.
+type ListProjectForbiddenResponseBody string
+
 // ListProjectNotFoundResponseBody is the type of the "station" service "list
 // project" endpoint HTTP response body for the "not-found" error.
 type ListProjectNotFoundResponseBody string
@@ -168,6 +188,10 @@ type ListProjectUnauthorizedResponseBody string
 // PhotoBadRequestResponseBody is the type of the "station" service "photo"
 // endpoint HTTP response body for the "bad-request" error.
 type PhotoBadRequestResponseBody string
+
+// PhotoForbiddenResponseBody is the type of the "station" service "photo"
+// endpoint HTTP response body for the "forbidden" error.
+type PhotoForbiddenResponseBody string
 
 // PhotoNotFoundResponseBody is the type of the "station" service "photo"
 // endpoint HTTP response body for the "not-found" error.
@@ -426,6 +450,13 @@ func NewAddBadRequestResponseBody(res station.BadRequest) AddBadRequestResponseB
 	return body
 }
 
+// NewAddForbiddenResponseBody builds the HTTP response body from the result of
+// the "add" endpoint of the "station" service.
+func NewAddForbiddenResponseBody(res station.Forbidden) AddForbiddenResponseBody {
+	body := AddForbiddenResponseBody(res)
+	return body
+}
+
 // NewAddNotFoundResponseBody builds the HTTP response body from the result of
 // the "add" endpoint of the "station" service.
 func NewAddNotFoundResponseBody(res station.NotFound) AddNotFoundResponseBody {
@@ -444,6 +475,13 @@ func NewAddUnauthorizedResponseBody(res station.Unauthorized) AddUnauthorizedRes
 // of the "get" endpoint of the "station" service.
 func NewGetBadRequestResponseBody(res station.BadRequest) GetBadRequestResponseBody {
 	body := GetBadRequestResponseBody(res)
+	return body
+}
+
+// NewGetForbiddenResponseBody builds the HTTP response body from the result of
+// the "get" endpoint of the "station" service.
+func NewGetForbiddenResponseBody(res station.Forbidden) GetForbiddenResponseBody {
+	body := GetForbiddenResponseBody(res)
 	return body
 }
 
@@ -468,6 +506,13 @@ func NewUpdateBadRequestResponseBody(res station.BadRequest) UpdateBadRequestRes
 	return body
 }
 
+// NewUpdateForbiddenResponseBody builds the HTTP response body from the result
+// of the "update" endpoint of the "station" service.
+func NewUpdateForbiddenResponseBody(res station.Forbidden) UpdateForbiddenResponseBody {
+	body := UpdateForbiddenResponseBody(res)
+	return body
+}
+
 // NewUpdateNotFoundResponseBody builds the HTTP response body from the result
 // of the "update" endpoint of the "station" service.
 func NewUpdateNotFoundResponseBody(res station.NotFound) UpdateNotFoundResponseBody {
@@ -486,6 +531,13 @@ func NewUpdateUnauthorizedResponseBody(res station.Unauthorized) UpdateUnauthori
 // result of the "list mine" endpoint of the "station" service.
 func NewListMineBadRequestResponseBody(res station.BadRequest) ListMineBadRequestResponseBody {
 	body := ListMineBadRequestResponseBody(res)
+	return body
+}
+
+// NewListMineForbiddenResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "station" service.
+func NewListMineForbiddenResponseBody(res station.Forbidden) ListMineForbiddenResponseBody {
+	body := ListMineForbiddenResponseBody(res)
 	return body
 }
 
@@ -510,6 +562,13 @@ func NewListProjectBadRequestResponseBody(res station.BadRequest) ListProjectBad
 	return body
 }
 
+// NewListProjectForbiddenResponseBody builds the HTTP response body from the
+// result of the "list project" endpoint of the "station" service.
+func NewListProjectForbiddenResponseBody(res station.Forbidden) ListProjectForbiddenResponseBody {
+	body := ListProjectForbiddenResponseBody(res)
+	return body
+}
+
 // NewListProjectNotFoundResponseBody builds the HTTP response body from the
 // result of the "list project" endpoint of the "station" service.
 func NewListProjectNotFoundResponseBody(res station.NotFound) ListProjectNotFoundResponseBody {
@@ -528,6 +587,13 @@ func NewListProjectUnauthorizedResponseBody(res station.Unauthorized) ListProjec
 // of the "photo" endpoint of the "station" service.
 func NewPhotoBadRequestResponseBody(res station.BadRequest) PhotoBadRequestResponseBody {
 	body := PhotoBadRequestResponseBody(res)
+	return body
+}
+
+// NewPhotoForbiddenResponseBody builds the HTTP response body from the result
+// of the "photo" endpoint of the "station" service.
+func NewPhotoForbiddenResponseBody(res station.Forbidden) PhotoForbiddenResponseBody {
+	body := PhotoForbiddenResponseBody(res)
 	return body
 }
 

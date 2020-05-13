@@ -41,15 +41,5 @@ var _ = Service("user", func() {
 		})
 	})
 
-	Error("unauthorized", String, "credentials are invalid")
-	Error("not-found", String, "not found")
-	Error("bad-request", String, "bad request")
-
-	HTTP(func() {
-		Response("unauthorized", StatusUnauthorized)
-		Response("not-found", StatusNotFound)
-		Response("bad-request", StatusBadRequest)
-	})
-
 	commonOptions()
 })

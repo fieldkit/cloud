@@ -23,6 +23,10 @@ type RolesResponseBody struct {
 // endpoint HTTP response body for the "bad-request" error.
 type RolesBadRequestResponseBody string
 
+// RolesForbiddenResponseBody is the type of the "user" service "roles"
+// endpoint HTTP response body for the "forbidden" error.
+type RolesForbiddenResponseBody string
+
 // RolesNotFoundResponseBody is the type of the "user" service "roles" endpoint
 // HTTP response body for the "not-found" error.
 type RolesNotFoundResponseBody string
@@ -52,6 +56,12 @@ func NewRolesAvailableRolesOK(body *RolesResponseBody) *userviews.AvailableRoles
 // NewRolesBadRequest builds a user service roles endpoint bad-request error.
 func NewRolesBadRequest(body RolesBadRequestResponseBody) user.BadRequest {
 	v := user.BadRequest(body)
+	return v
+}
+
+// NewRolesForbidden builds a user service roles endpoint forbidden error.
+func NewRolesForbidden(body RolesForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
 	return v
 }
 

@@ -11,6 +11,22 @@ import (
 	modules "github.com/fieldkit/cloud/server/api/gen/modules"
 )
 
+// MetaBadRequestResponseBody is the type of the "modules" service "meta"
+// endpoint HTTP response body for the "bad-request" error.
+type MetaBadRequestResponseBody string
+
+// MetaForbiddenResponseBody is the type of the "modules" service "meta"
+// endpoint HTTP response body for the "forbidden" error.
+type MetaForbiddenResponseBody string
+
+// MetaNotFoundResponseBody is the type of the "modules" service "meta"
+// endpoint HTTP response body for the "not-found" error.
+type MetaNotFoundResponseBody string
+
+// MetaUnauthorizedResponseBody is the type of the "modules" service "meta"
+// endpoint HTTP response body for the "unauthorized" error.
+type MetaUnauthorizedResponseBody string
+
 // NewMetaResultOK builds a "modules" service "meta" endpoint result from a
 // HTTP "OK" response.
 func NewMetaResultOK(body interface{}) *modules.MetaResult {
@@ -20,4 +36,29 @@ func NewMetaResultOK(body interface{}) *modules.MetaResult {
 	}
 
 	return res
+}
+
+// NewMetaBadRequest builds a modules service meta endpoint bad-request error.
+func NewMetaBadRequest(body MetaBadRequestResponseBody) modules.BadRequest {
+	v := modules.BadRequest(body)
+	return v
+}
+
+// NewMetaForbidden builds a modules service meta endpoint forbidden error.
+func NewMetaForbidden(body MetaForbiddenResponseBody) modules.Forbidden {
+	v := modules.Forbidden(body)
+	return v
+}
+
+// NewMetaNotFound builds a modules service meta endpoint not-found error.
+func NewMetaNotFound(body MetaNotFoundResponseBody) modules.NotFound {
+	v := modules.NotFound(body)
+	return v
+}
+
+// NewMetaUnauthorized builds a modules service meta endpoint unauthorized
+// error.
+func NewMetaUnauthorized(body MetaUnauthorizedResponseBody) modules.Unauthorized {
+	v := modules.Unauthorized(body)
+	return v
 }

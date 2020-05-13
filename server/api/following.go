@@ -103,7 +103,8 @@ func (s *FollowingService) JWTAuth(ctx context.Context, token string, scheme *se
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		Unauthorized: func(m string) error { return following.Unauthorized(m) },
 		NotFound:     nil,
+		Unauthorized: func(m string) error { return following.Unauthorized(m) },
+		Forbidden:    func(m string) error { return following.Forbidden(m) },
 	})
 }

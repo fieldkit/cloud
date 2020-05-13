@@ -20,13 +20,49 @@ type FollowersResponseBody struct {
 	Page      int32                          `form:"page" json:"page" xml:"page"`
 }
 
+// FollowBadRequestResponseBody is the type of the "following" service "follow"
+// endpoint HTTP response body for the "bad-request" error.
+type FollowBadRequestResponseBody string
+
+// FollowForbiddenResponseBody is the type of the "following" service "follow"
+// endpoint HTTP response body for the "forbidden" error.
+type FollowForbiddenResponseBody string
+
+// FollowNotFoundResponseBody is the type of the "following" service "follow"
+// endpoint HTTP response body for the "not-found" error.
+type FollowNotFoundResponseBody string
+
 // FollowUnauthorizedResponseBody is the type of the "following" service
 // "follow" endpoint HTTP response body for the "unauthorized" error.
 type FollowUnauthorizedResponseBody string
 
+// UnfollowBadRequestResponseBody is the type of the "following" service
+// "unfollow" endpoint HTTP response body for the "bad-request" error.
+type UnfollowBadRequestResponseBody string
+
+// UnfollowForbiddenResponseBody is the type of the "following" service
+// "unfollow" endpoint HTTP response body for the "forbidden" error.
+type UnfollowForbiddenResponseBody string
+
+// UnfollowNotFoundResponseBody is the type of the "following" service
+// "unfollow" endpoint HTTP response body for the "not-found" error.
+type UnfollowNotFoundResponseBody string
+
 // UnfollowUnauthorizedResponseBody is the type of the "following" service
 // "unfollow" endpoint HTTP response body for the "unauthorized" error.
 type UnfollowUnauthorizedResponseBody string
+
+// FollowersBadRequestResponseBody is the type of the "following" service
+// "followers" endpoint HTTP response body for the "bad-request" error.
+type FollowersBadRequestResponseBody string
+
+// FollowersForbiddenResponseBody is the type of the "following" service
+// "followers" endpoint HTTP response body for the "forbidden" error.
+type FollowersForbiddenResponseBody string
+
+// FollowersNotFoundResponseBody is the type of the "following" service
+// "followers" endpoint HTTP response body for the "not-found" error.
+type FollowersNotFoundResponseBody string
 
 // FollowersUnauthorizedResponseBody is the type of the "following" service
 // "followers" endpoint HTTP response body for the "unauthorized" error.
@@ -64,6 +100,27 @@ func NewFollowersResponseBody(res *followingviews.FollowersPageView) *FollowersR
 	return body
 }
 
+// NewFollowBadRequestResponseBody builds the HTTP response body from the
+// result of the "follow" endpoint of the "following" service.
+func NewFollowBadRequestResponseBody(res following.BadRequest) FollowBadRequestResponseBody {
+	body := FollowBadRequestResponseBody(res)
+	return body
+}
+
+// NewFollowForbiddenResponseBody builds the HTTP response body from the result
+// of the "follow" endpoint of the "following" service.
+func NewFollowForbiddenResponseBody(res following.Forbidden) FollowForbiddenResponseBody {
+	body := FollowForbiddenResponseBody(res)
+	return body
+}
+
+// NewFollowNotFoundResponseBody builds the HTTP response body from the result
+// of the "follow" endpoint of the "following" service.
+func NewFollowNotFoundResponseBody(res following.NotFound) FollowNotFoundResponseBody {
+	body := FollowNotFoundResponseBody(res)
+	return body
+}
+
 // NewFollowUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "follow" endpoint of the "following" service.
 func NewFollowUnauthorizedResponseBody(res following.Unauthorized) FollowUnauthorizedResponseBody {
@@ -71,10 +128,52 @@ func NewFollowUnauthorizedResponseBody(res following.Unauthorized) FollowUnautho
 	return body
 }
 
+// NewUnfollowBadRequestResponseBody builds the HTTP response body from the
+// result of the "unfollow" endpoint of the "following" service.
+func NewUnfollowBadRequestResponseBody(res following.BadRequest) UnfollowBadRequestResponseBody {
+	body := UnfollowBadRequestResponseBody(res)
+	return body
+}
+
+// NewUnfollowForbiddenResponseBody builds the HTTP response body from the
+// result of the "unfollow" endpoint of the "following" service.
+func NewUnfollowForbiddenResponseBody(res following.Forbidden) UnfollowForbiddenResponseBody {
+	body := UnfollowForbiddenResponseBody(res)
+	return body
+}
+
+// NewUnfollowNotFoundResponseBody builds the HTTP response body from the
+// result of the "unfollow" endpoint of the "following" service.
+func NewUnfollowNotFoundResponseBody(res following.NotFound) UnfollowNotFoundResponseBody {
+	body := UnfollowNotFoundResponseBody(res)
+	return body
+}
+
 // NewUnfollowUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "unfollow" endpoint of the "following" service.
 func NewUnfollowUnauthorizedResponseBody(res following.Unauthorized) UnfollowUnauthorizedResponseBody {
 	body := UnfollowUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewFollowersBadRequestResponseBody builds the HTTP response body from the
+// result of the "followers" endpoint of the "following" service.
+func NewFollowersBadRequestResponseBody(res following.BadRequest) FollowersBadRequestResponseBody {
+	body := FollowersBadRequestResponseBody(res)
+	return body
+}
+
+// NewFollowersForbiddenResponseBody builds the HTTP response body from the
+// result of the "followers" endpoint of the "following" service.
+func NewFollowersForbiddenResponseBody(res following.Forbidden) FollowersForbiddenResponseBody {
+	body := FollowersForbiddenResponseBody(res)
+	return body
+}
+
+// NewFollowersNotFoundResponseBody builds the HTTP response body from the
+// result of the "followers" endpoint of the "following" service.
+func NewFollowersNotFoundResponseBody(res following.NotFound) FollowersNotFoundResponseBody {
+	body := FollowersNotFoundResponseBody(res)
 	return body
 }
 

@@ -173,6 +173,7 @@ type AuthAttempt struct {
 	Scheme       *security.JWTScheme
 	Key          []byte
 	Unauthorized GenerateError
+	Forbidden    GenerateError
 	NotFound     GenerateError
 }
 
