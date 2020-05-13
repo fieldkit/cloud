@@ -103,7 +103,7 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		ON CONFLICT (data_ingestion_id) DO NOTHING
 		RETURNING *
 		`, activity); err != nil {
-		return err
+		return fmt.Errorf("error upserting activity: %v", err)
 	}
 
 	log.Infow("upserted", "activity_id", activity.ID)
