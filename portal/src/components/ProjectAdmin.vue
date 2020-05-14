@@ -66,7 +66,13 @@
                 </div>
             </div>
 
-            <ProjectStations :project="project" :mapContainerSize="mapContainerSize" :listSize="listSize" @loaded="setModules" />
+            <ProjectStations
+                :project="project"
+                :mapContainerSize="mapContainerSize"
+                :listSize="listSize"
+                :userStations="userStations"
+                @loaded="setModules"
+            />
 
             <div class="manage-team-container">
                 <div class="section-heading">Manage Team</div>
@@ -160,7 +166,6 @@ export default {
             newUserImage: "",
             noEmail: false,
             emailNotValid: false,
-            stationOption: "",
             modules: [],
             numFollowers: 1,
             mapContainerSize: {
@@ -213,7 +218,6 @@ export default {
     },
     methods: {
         reset() {
-            this.stationOption = "";
             this.fetchFollowers();
             this.updateDisplayDates();
             this.inviteEmail = "";
@@ -232,27 +236,6 @@ export default {
         setModules(modules) {
             this.modules = modules;
         },
-        stationSelected() {
-            // const params = {
-            //     projectId: this.project.id,
-            //     stationId: this.stationOption,
-            // };
-            // this.api.addStationToProject(params).then(() => {
-            //     this.fetchStations();
-            // });
-        },
-        // deleteStation(event) {
-        //     const stationId = event.target.getAttribute("data-id");
-        //     if (window.confirm("Are you sure you want to remove this station?")) {
-        //         const params = {
-        //             projectId: this.project.id,
-        //             stationId: stationId,
-        //         };
-        //         this.api.removeStationFromProject(params).then(() => {
-        //             this.fetchStations();
-        //         });
-        //     }
-        // },
         checkEmail() {
             this.noEmail = false;
             this.emailNotValid = false;
@@ -326,14 +309,6 @@ export default {
                 this.displayStartDate = d.toLocaleDateString("en-US");
                 this.displayRunTime = utils.getRunTime(this.project);
             }
-        },
-        getUpdatedDate(station) {
-            if (!station.status_json) {
-                return "N/A";
-            }
-            const date = station.status_json.updated;
-            const d = new Date(date);
-            return d.toLocaleDateString("en-US");
         },
     },
 };
@@ -478,13 +453,6 @@ export default {
 .manage-team-container {
     width: 972px;
     padding: 25px;
-}
-.delete-link {
-    float: right;
-    opacity: 0;
-}
-.delete-link:hover {
-    opacity: 1;
 }
 .users-container {
     width: 100%;

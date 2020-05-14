@@ -124,14 +124,6 @@ export default {
                 this.displayRunTime = utils.getRunTime(this.project);
             }
         },
-        getUpdatedDate(station) {
-            if (!station.status_json) {
-                return "N/A";
-            }
-            const date = station.status_json.updated;
-            const d = new Date(date);
-            return d.toLocaleDateString("en-US");
-        },
         setModules(modules) {
             this.modules = modules;
         },
