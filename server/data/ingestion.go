@@ -240,10 +240,11 @@ type StationModule struct {
 }
 
 type ModuleSensor struct {
-	ID            int64    `db:"id" json:"id"`
-	ModuleID      int64    `db:"module_id" json:"module_id"`
-	Position      uint32   `db:"position" json:"position"`
-	UnitOfMeasure string   `db:"unit_of_measure" json:"unit_of_measure"`
-	Name          string   `db:"name" json:"name"`
-	Reading       *float64 `db:"reading" json:"reading"`
+	ID            int64      `db:"id" json:"id"`
+	ModuleID      int64      `db:"module_id" json:"module_id"`
+	Position      uint32     `db:"position" json:"position"`
+	UnitOfMeasure string     `db:"unit_of_measure" json:"unit_of_measure"`
+	Name          string     `db:"name" json:"name"`
+	ReadingValue  *float64   `db:"reading_last" json:"reading_last"`
+	ReadingTime   *time.Time `db:"reading_time" json:"reading_time"`
 }

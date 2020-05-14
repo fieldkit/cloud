@@ -33,8 +33,15 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, r *pb.DataRecord
 			Version:      m.Header.Version,
 		}
 		if err := h.database.NamedGetContext(ctx, module, `
-		    INSERT INTO fieldkit.station_module (provision_id, meta_record_id, hardware_id, position, name, manufacturer, kind, version) VALUES (:provision_id, :meta_record_id, :hardware_id, :position, :name, :manufacturer, :kind, :version)
-		    ON CONFLICT (hardware_id) DO UPDATE SET position = EXCLUDED.position, name = EXCLUDED.name, manufacturer = EXCLUDED.manufacturer, kind = EXCLUDED.kind, version = EXCLUDED.version
+		    INSERT INTO fieldkit.station_module
+				(provision_id, meta_record_id, hardware_id, position, name, manufacturer, kind, version) VALUES
+				(:provision_id, :meta_record_id, :hardware_id, :position, :name, :manufacturer, :kind, :version)
+		    ON CONFLICT (hardware_id)
+				DO UPDATE SET position = EXCLUDED.position,
+							  name = EXCLUDED.name,
+                              manufacturer = EXCLUDED.manufacturer,
+                              kind = EXCLUDED.kind,
+                              version = EXCLUDED.version
 			RETURNING *
 			`, module); err != nil {
 			return err
@@ -48,8 +55,14 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, r *pb.DataRecord
 				Name:          s.Name,
 			}
 			if err := h.database.NamedGetContext(ctx, sensor, `
-				INSERT INTO fieldkit.module_sensor (module_id, position, unit_of_measure, name, reading) VALUES (:module_id, :position, :unit_of_measure, :name, :reading)
-				ON CONFLICT (module_id, position) DO UPDATE SET unit_of_measure = EXCLUDED.unit_of_measure, name = EXCLUDED.name, reading = EXCLUDED.reading
+				INSERT INTO fieldkit.module_sensor
+					(module_id, position, unit_of_measure, name, reading_last, reading_time) VALUES
+					(:module_id, :position, :unit_of_measure, :name, :reading_last, :reading_time)
+				ON CONFLICT (module_id, position)
+					DO UPDATE SET unit_of_measure = EXCLUDED.unit_of_measure,
+								  name = EXCLUDED.name,
+								  reading_last = EXCLUDED.reading_last,
+								  reading_time = EXCLUDED.reading_time
 				RETURNING *
 				`, sensor); err != nil {
 				return err
