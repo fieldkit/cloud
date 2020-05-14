@@ -5,7 +5,7 @@
         <div id="notes-title">Field Notes</div>
         <div v-for="note in notes" v-bind:key="note.id" class="note-container">
             <div class="delete-link">
-                <img alt="Info" src="../assets/Delete.png" :data-id="note.id" v-on:click="deleteNote" />
+                <img alt="Delete" src="../assets/Delete.png" :data-id="note.id" v-on:click="deleteNote" />
             </div>
             <div class="top-line" v-if="!note.title">
                 <div class="creator">{{ note.creator }}</div>
