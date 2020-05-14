@@ -116,6 +116,7 @@ type PendingInviteResponseBody struct {
 	ID      *int64                      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Project *ProjectSummaryResponseBody `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
 	Time    *int64                      `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
+	Role    *int32                      `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
 }
 
 // ProjectSummaryResponseBody is used to define fields on response body types.
@@ -305,6 +306,9 @@ func ValidatePendingInviteResponseBody(body *PendingInviteResponseBody) (err err
 	}
 	if body.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "body"))
+	}
+	if body.Role == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("role", "body"))
 	}
 	if body.Project != nil {
 		if err2 := ValidateProjectSummaryResponseBody(body.Project); err2 != nil {

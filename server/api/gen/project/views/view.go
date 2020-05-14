@@ -29,6 +29,7 @@ type PendingInviteView struct {
 	ID      *int64
 	Project *ProjectSummaryView
 	Time    *int64
+	Role    *int32
 }
 
 // ProjectSummaryView is a type that runs validations on a projected type.
@@ -85,6 +86,9 @@ func ValidatePendingInviteView(result *PendingInviteView) (err error) {
 	}
 	if result.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "result"))
+	}
+	if result.Role == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("role", "result"))
 	}
 	if result.Project != nil {
 		if err2 := ValidateProjectSummaryView(result.Project); err2 != nil {

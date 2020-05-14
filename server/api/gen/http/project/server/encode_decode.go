@@ -590,6 +590,7 @@ func marshalProjectviewsPendingInviteViewToPendingInviteResponseBody(v *projectv
 	res := &PendingInviteResponseBody{
 		ID:   *v.ID,
 		Time: *v.Time,
+		Role: *v.Role,
 	}
 	if v.Project != nil {
 		res.Project = marshalProjectviewsProjectSummaryViewToProjectSummaryResponseBody(v.Project)

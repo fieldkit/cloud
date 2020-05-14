@@ -8,9 +8,11 @@ var PendingInvite = Type("PendingInvite", func() {
 	Attribute("id", Int64)
 	Attribute("project", ProjectSummary)
 	Attribute("time", Int64)
+	Attribute("role", Int32)
 	Required("id")
 	Required("project")
 	Required("time")
+	Required("role")
 })
 
 var PendingInvites = ResultType("application/vnd.app.invites.pending", func() {

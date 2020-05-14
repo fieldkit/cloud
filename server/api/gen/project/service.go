@@ -88,6 +88,7 @@ type PendingInvite struct {
 	ID      int64
 	Project *ProjectSummary
 	Time    int64
+	Role    int32
 }
 
 type ProjectSummary struct {
@@ -195,6 +196,7 @@ func transformProjectviewsPendingInviteViewToPendingInvite(v *projectviews.Pendi
 	res := &PendingInvite{
 		ID:   *v.ID,
 		Time: *v.Time,
+		Role: *v.Role,
 	}
 	if v.Project != nil {
 		res.Project = transformProjectviewsProjectSummaryViewToProjectSummary(v.Project)
@@ -220,6 +222,7 @@ func transformPendingInviteToProjectviewsPendingInviteView(v *PendingInvite) *pr
 	res := &projectviews.PendingInviteView{
 		ID:   &v.ID,
 		Time: &v.Time,
+		Role: &v.Role,
 	}
 	if v.Project != nil {
 		res.Project = transformProjectSummaryToProjectviewsProjectSummaryView(v.Project)

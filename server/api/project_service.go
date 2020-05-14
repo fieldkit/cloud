@@ -82,6 +82,7 @@ func (c *ProjectService) Invites(ctx context.Context, payload *project.InvitesPa
 		pending = append(pending, &project.PendingInvite{
 			ID:   int64(i.ID),
 			Time: i.InvitedTime.Unix() * 1000,
+			Role: i.RoleID,
 			Project: &project.ProjectSummary{
 				ID:   int64(p.ID),
 				Name: p.Name,

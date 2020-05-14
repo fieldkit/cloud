@@ -50,15 +50,15 @@ func UsageExamples() string {
       "body": "Magnam et tempora."
    }' --id 7667024179434665793 --auth "Voluptatem possimus sint sint aut."` + "\n" +
 		os.Args[0] + ` station add --body '{
-      "device_id": "Dolor qui fugit impedit.",
-      "name": "Rerum et quis optio voluptatibus.",
+      "device_id": "Omnis consequatur.",
+      "name": "Amet aliquam aut est.",
       "status_json": {
-         "Autem sequi amet aliquam aut est adipisci.": "Consequatur omnis rerum et pariatur.",
-         "Hic dignissimos illum ab adipisci consequatur.": "Facilis impedit corporis quam.",
-         "Omnis neque.": "Similique sequi qui deserunt velit minima."
+         "Et pariatur.": "Hic dignissimos illum ab adipisci consequatur.",
+         "Facilis impedit corporis quam.": "Omnis neque.",
+         "Similique sequi qui deserunt velit minima.": "Tempore et id fuga."
       },
-      "status_pb": "Tempore et id fuga."
-   }' --auth "Aut consequuntur et a."` + "\n" +
+      "status_pb": "Aut consequuntur et a."
+   }' --auth "Eveniet esse suscipit saepe qui quibusdam dolor."` + "\n" +
 		""
 }
 
@@ -658,7 +658,7 @@ LookupInvite implements lookup invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project lookup- invite --token "Excepturi et." --auth "Eos sunt veniam esse."
+    `+os.Args[0]+` project lookup- invite --token "Eos sunt veniam esse." --auth "Repellendus sit."
 `, os.Args[0])
 }
 
@@ -671,7 +671,7 @@ AcceptInvite implements accept invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project accept- invite --id 6043532295722033983 --token "Aliquid incidunt neque harum blanditiis." --auth "Dolor est sequi vel velit eos earum."
+    `+os.Args[0]+` project accept- invite --id 8145841929511294902 --token "Est sequi vel velit." --auth "Earum est aut."
 `, os.Args[0])
 }
 
@@ -684,7 +684,7 @@ RejectInvite implements reject invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project reject- invite --id 8222474452558605978 --token "Saepe quos aliquid totam qui." --auth "Dignissimos labore doloribus voluptas consequuntur illum."
+    `+os.Args[0]+` project reject- invite --id 206243884521340402 --token "Consequuntur illum dolores quo." --auth "Sequi aliquam velit eveniet."
 `, os.Args[0])
 }
 
@@ -715,15 +715,15 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` station add --body '{
-      "device_id": "Dolor qui fugit impedit.",
-      "name": "Rerum et quis optio voluptatibus.",
+      "device_id": "Omnis consequatur.",
+      "name": "Amet aliquam aut est.",
       "status_json": {
-         "Autem sequi amet aliquam aut est adipisci.": "Consequatur omnis rerum et pariatur.",
-         "Hic dignissimos illum ab adipisci consequatur.": "Facilis impedit corporis quam.",
-         "Omnis neque.": "Similique sequi qui deserunt velit minima."
+         "Et pariatur.": "Hic dignissimos illum ab adipisci consequatur.",
+         "Facilis impedit corporis quam.": "Omnis neque.",
+         "Similique sequi qui deserunt velit minima.": "Tempore et id fuga."
       },
-      "status_pb": "Tempore et id fuga."
-   }' --auth "Aut consequuntur et a."
+      "status_pb": "Aut consequuntur et a."
+   }' --auth "Eveniet esse suscipit saepe qui quibusdam dolor."
 `, os.Args[0])
 }
 
@@ -735,7 +735,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 1554103333 --auth "Doloremque quasi sint."
+    `+os.Args[0]+` station get --id 661380997 --auth "Quibusdam voluptas non sequi."
 `, os.Args[0])
 }
 
@@ -749,13 +749,13 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "name": "Aut temporibus veniam et sapiente.",
+      "name": "Sapiente non at quae incidunt.",
       "status_json": {
-         "Quae incidunt omnis excepturi corporis ipsam id.": "Recusandae et doloribus et iusto accusamus repellendus.",
-         "Qui velit veniam maiores neque.": "Soluta pariatur dolorem voluptate fuga."
+         "Corporis ipsam id sequi recusandae et.": "Et iusto accusamus repellendus nulla.",
+         "Velit veniam.": "Neque molestias soluta pariatur."
       },
-      "status_pb": "Molestiae repellat velit."
-   }' --id 1577662745 --auth "Est at quas perspiciatis nisi laudantium."
+      "status_pb": "Voluptate fuga molestiae."
+   }' --id 741636272 --auth "Velit sapiente enim est."
 `, os.Args[0])
 }
 
@@ -766,7 +766,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- mine --auth "Ut placeat."
+    `+os.Args[0]+` station list- mine --auth "Voluptate fugit autem."
 `, os.Args[0])
 }
 
@@ -778,7 +778,7 @@ ListProject implements list project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project --id 2121330838 --auth "Magnam velit id."
+    `+os.Args[0]+` station list- project --id 396358963 --auth "Labore excepturi laboriosam voluptas."
 `, os.Args[0])
 }
 
@@ -790,7 +790,7 @@ Photo implements photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station photo --id 874235349 --auth "Amet sint hic accusamus repudiandae temporibus."
+    `+os.Args[0]+` station photo --id 687160891 --auth "Quis et omnis delectus sed sunt est."
 `, os.Args[0])
 }
 
@@ -826,7 +826,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Aut molestias dolorem." --auth "Delectus hic quia omnis debitis beatae ut."
+    `+os.Args[0]+` tasks refresh- device --device-id "Non a nulla quod." --auth "Facilis quasi aut placeat."
 `, os.Args[0])
 }
 
@@ -852,7 +852,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 3102965868016943750
+    `+os.Args[0]+` test get --id 8849660070720972928
 `, os.Args[0])
 }
 
@@ -874,7 +874,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Vel quia aut fuga ut." --auth "Eos nihil commodi expedita nostrum officia."
+    `+os.Args[0]+` test email --address "Animi explicabo quis similique nisi." --auth "Voluptates mollitia."
 `, os.Args[0])
 }
 
@@ -898,6 +898,6 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Quibusdam explicabo dolores consectetur non omnis ab."
+    `+os.Args[0]+` user roles --auth "Et illo sapiente cumque aut tempora et."
 `, os.Args[0])
 }

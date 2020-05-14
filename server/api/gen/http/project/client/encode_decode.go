@@ -630,6 +630,7 @@ func unmarshalPendingInviteResponseBodyToProjectviewsPendingInviteView(v *Pendin
 	res := &projectviews.PendingInviteView{
 		ID:   v.ID,
 		Time: v.Time,
+		Role: v.Role,
 	}
 	res.Project = unmarshalProjectSummaryResponseBodyToProjectviewsProjectSummaryView(v.Project)
 

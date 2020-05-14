@@ -116,6 +116,7 @@ type PendingInviteResponseBody struct {
 	ID      int64                       `form:"id" json:"id" xml:"id"`
 	Project *ProjectSummaryResponseBody `form:"project" json:"project" xml:"project"`
 	Time    int64                       `form:"time" json:"time" xml:"time"`
+	Role    int32                       `form:"role" json:"role" xml:"role"`
 }
 
 // ProjectSummaryResponseBody is used to define fields on response body types.
