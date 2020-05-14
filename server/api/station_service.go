@@ -292,6 +292,10 @@ func transformModules(from *data.StationFull) (to []*station.StationModule) {
 				sensors = append(sensors, &station.StationSensor{
 					Name:          s.Name,
 					UnitOfMeasure: s.UnitOfMeasure,
+					Reading: &station.SensorReading{
+						Last: 0.0,
+						Time: int64(0),
+					},
 				})
 			}
 		}
