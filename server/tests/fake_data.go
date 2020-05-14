@@ -534,7 +534,7 @@ func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*MetaA
 		for d := 0; d < 4; d += 1 {
 			data := e.NewDataReading(meta.Signed.Record, dataNumber)
 
-			dataRecord, err := recordRepository.AddDataRecord(e.Ctx, p, di, data)
+			dataRecord, _, err := recordRepository.AddDataRecord(e.Ctx, p, di, data)
 			if err != nil {
 				return nil, err
 			}

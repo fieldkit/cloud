@@ -126,11 +126,11 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			return nil, err
 		}
 
-		if err := ra.handler.OnMeta(ctx, pr.DataRecord, metaRecord, provision); err != nil {
+		if err := ra.handler.OnMeta(ctx, provision, pr.DataRecord, metaRecord); err != nil {
 			return nil, err
 		}
 	} else if pr.DataRecord != nil {
-		dataRecord, err := recordRepository.AddDataRecord(ctx, provision, i, pr.DataRecord)
+		dataRecord, metaRecord, err := recordRepository.AddDataRecord(ctx, provision, i, pr.DataRecord)
 		if err != nil {
 			if err == repositories.ErrMalformedRecord {
 				verboseLog.Infow("data reading missing readings", "record", pr.DataRecord)
@@ -147,7 +147,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 
 		ra.statistics.addTime(dataRecord.Time)
 
-		if err := ra.handler.OnData(ctx, pr.DataRecord, dataRecord, provision); err != nil {
+		if err := ra.handler.OnData(ctx, provision, pr.DataRecord, dataRecord, metaRecord); err != nil {
 			return nil, err
 		}
 	}

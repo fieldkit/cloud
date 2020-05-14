@@ -9,8 +9,8 @@ import (
 )
 
 type RecordHandler interface {
-	OnMeta(ctx context.Context, r *pb.DataRecord, db *data.MetaRecord, p *data.Provision) error
-	OnData(ctx context.Context, r *pb.DataRecord, db *data.DataRecord, p *data.Provision) error
+	OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error
+	OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error
 }
 
 type noopRecordHandler struct {
@@ -20,10 +20,10 @@ func NewNoopRecordHandler() *noopRecordHandler {
 	return &noopRecordHandler{}
 }
 
-func (h *noopRecordHandler) OnMeta(ctx context.Context, r *pb.DataRecord, db *data.MetaRecord, p *data.Provision) error {
+func (h *noopRecordHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error {
 	return nil
 }
 
-func (h *noopRecordHandler) OnData(ctx context.Context, r *pb.DataRecord, db *data.DataRecord, p *data.Provision) error {
+func (h *noopRecordHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
 	return nil
 }

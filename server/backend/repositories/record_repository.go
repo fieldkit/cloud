@@ -164,17 +164,17 @@ func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
 var ErrMalformedRecord = errors.New("malformed record")
 var ErrMetaMissing = errors.New("error finding meta record")
 
-func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision, i *data.Ingestion, dr *pb.DataRecord) (*data.DataRecord, error) {
+func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision, i *data.Ingestion, dr *pb.DataRecord) (*data.DataRecord, *data.MetaRecord, error) {
 	if dr.Readings == nil {
-		return nil, ErrMalformedRecord
+		return nil, nil, ErrMalformedRecord
 	}
 
-	meta, err := r.findMeta(ctx, p.ID, int64(dr.Readings.Meta))
+	metaRecord, err := r.findMeta(ctx, p.ID, int64(dr.Readings.Meta))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	if meta == nil {
-		return nil, ErrMetaMissing
+	if metaRecord == nil {
+		return nil, nil, ErrMetaMissing
 	}
 
 	dataTime := i.Time
@@ -184,19 +184,19 @@ func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision,
 
 	location, err := r.findLocation(dr)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	dataRecord := &data.DataRecord{
 		ProvisionID: p.ID,
 		Time:        dataTime,
 		Number:      int64(dr.Readings.Reading),
-		MetaID:      meta.ID,
+		MetaID:      metaRecord.ID,
 		Location:    location,
 	}
 
 	if err := dataRecord.SetData(prepareForMarshalToJson(dr)); err != nil {
-		return nil, fmt.Errorf("error setting data json: %v", err)
+		return nil, nil, fmt.Errorf("error setting data json: %v", err)
 	}
 
 	if err := r.Database.NamedGetContext(ctx, dataRecord, `
@@ -205,8 +205,8 @@ func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision,
 			ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location
 			RETURNING id
 			`, dataRecord); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return dataRecord, nil
+	return dataRecord, metaRecord, nil
 }

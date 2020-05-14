@@ -20,7 +20,7 @@ func NewStationModelRecordHandler(database *sqlxcache.DB) *stationModelRecordHan
 	}
 }
 
-func (h *stationModelRecordHandler) OnMeta(ctx context.Context, r *pb.DataRecord, db *data.MetaRecord, p *data.Provision) error {
+func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error {
 	for _, m := range r.Modules {
 		module := &data.StationModule{
 			ProvisionID:  p.ID,
@@ -73,6 +73,6 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, r *pb.DataRecord
 	return nil
 }
 
-func (h *stationModelRecordHandler) OnData(ctx context.Context, r *pb.DataRecord, db *data.DataRecord, p *data.Provision) error {
+func (h *stationModelRecordHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
 	return nil
 }
