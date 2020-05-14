@@ -1,6 +1,20 @@
 <template>
     <div class="stations-container" :style="{ width: mapContainerSize.outerWidth }">
-        <div class="section-heading stations-heading">FieldKit Stations</div>
+        <div class="section-heading stations-heading">
+            FieldKit Stations
+            <div class="add-station" v-on:click="showStationSelect" v-if="!addingStation">
+                <img src="../assets/add.png" class="add-station-btn" />
+                Add Station
+            </div>
+            <div class="station-dropdown" v-if="addingStation">
+                Add a station:
+                <select v-model="stationOption" v-on:change="stationSelected">
+                    <option v-for="station in userStations" v-bind:value="station.id" v-bind:key="station.id">
+                        {{ station.name }}
+                    </option>
+                </select>
+            </div>
+        </div>
         <div class="space"></div>
         <div id="stations-list" :style="{ width: listSize.width, height: listSize.height }">
             <div class="toggle-icon-container" v-on:click="toggleStations">
@@ -9,6 +23,9 @@
             </div>
             <div v-for="station in projectStations" v-bind:key="station.id">
                 <div class="station-box" :style="{ width: listSize.boxWidth }">
+                    <div class="delete-link">
+                        <img alt="Delete" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation" />
+                    </div>
                     <span class="station-name" v-on:click="showStation(station)">
                         {{ station.name }}
                     </span>
@@ -54,6 +71,8 @@ export default {
             activeStation: null,
             following: false,
             showStationsList: true,
+            addingStation: false,
+            stationOption: "",
             summarySize: {
                 width: "359px",
                 top: "-300px",
@@ -66,7 +85,7 @@ export default {
             },
         };
     },
-    props: ["project", "mapContainerSize", "listSize"],
+    props: ["project", "mapContainerSize", "listSize", "userStations"],
     async beforeCreate() {
         this.api = new FKApi();
     },
@@ -106,15 +125,34 @@ export default {
             });
         },
         getUpdatedDate(station) {
-            if (!station.status_json) {
-                return "N/A";
-            }
-            const date = station.status_json.updated;
-            const d = new Date(date);
-            return d.toLocaleDateString("en-US");
+            return utils.getUpdatedDate(station);
         },
         showStation(station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
+        },
+        showStationSelect() {
+            this.addingStation = true;
+        },
+        stationSelected() {
+            const params = {
+                projectId: this.project.id,
+                stationId: this.stationOption,
+            };
+            this.api.addStationToProject(params).then(() => {
+                this.fetchStations();
+            });
+        },
+        deleteStation(event) {
+            const stationId = event.target.getAttribute("data-id");
+            if (window.confirm("Are you sure you want to remove this station?")) {
+                const params = {
+                    projectId: this.project.id,
+                    stationId: stationId,
+                };
+                this.api.removeStationFromProject(params).then(() => {
+                    this.fetchStations();
+                });
+            }
         },
         getModuleImg(module) {
             let imgPath = require.context("../assets/modules-lg/", false, /\.png$/);
@@ -176,6 +214,7 @@ export default {
     margin: 0 0 35px 0;
 }
 .stations-heading {
+    width: 100%;
     margin: 25px 0 25px 25px;
 }
 .stations-container .space {
@@ -185,6 +224,23 @@ export default {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+}
+.station-dropdown,
+.add-station {
+    float: right;
+    font-size: 14px;
+    margin-right: 50px;
+    cursor: pointer;
+}
+.add-station-btn {
+    width: 18px;
+    vertical-align: text-top;
+}
+.station-dropdown select {
+    font-size: 16px;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    padding: 2px 4px;
 }
 .last-seen {
     font-size: 12px;
@@ -216,5 +272,12 @@ export default {
     padding: 10px;
     border: 1px solid #d8dce0;
     transition: opacity 0.25s;
+}
+.delete-link {
+    float: right;
+    opacity: 0;
+}
+.delete-link:hover {
+    opacity: 1;
 }
 </style>

@@ -128,8 +128,14 @@ export default {
                 }
             });
 
+            if (this.map.getLayer("station-markers")) {
+                this.map.removeLayer("station-markers");
+            }
+            if (this.map.getSource("station-markers")) {
+                this.map.removeSource("station-markers");
+            }
             this.map.addLayer({
-                id: "station-marker",
+                id: "station-markers",
                 type: "symbol",
                 source: {
                     type: "geojson",
@@ -170,7 +176,7 @@ export default {
             }
 
             const view = this;
-            this.map.on("click", "station-marker", function(e) {
+            this.map.on("click", "station-markers", function(e) {
                 const name = e.features[0].properties.title;
                 const station = view.stations.find(s => {
                     return s.name == name;
