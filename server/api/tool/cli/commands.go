@@ -477,10 +477,10 @@ Payload example:
 Payload example:
 
 {
-   "email": "osborne_zieme@zemlakhamill.info",
-   "invite_token": "Aliquam illum aut et.",
-   "name": "ow4svy8w3l",
-   "password": "ezymno95gd"
+   "email": "grace@zieme.info",
+   "invite_token": "Impedit aliquam illum aut.",
+   "name": "aow4svy8w3",
+   "password": "jezymno95g"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp75.Run(c, args) },
 	}
@@ -515,8 +515,8 @@ Payload example:
 Payload example:
 
 {
-   "newPassword": "cbmmrted8h",
-   "oldPassword": "crrcazxi7n"
+   "newPassword": "vcbmmrted8",
+   "oldPassword": "ycrrcazxi7"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp77.Run(c, args) },
 	}
@@ -764,7 +764,8 @@ Payload example:
 Payload example:
 
 {
-   "email": "Similique ipsum qui."
+   "email": "Similique ipsum qui.",
+   "role": 3458383168235590841
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp96.Run(c, args) },
 	}
@@ -850,8 +851,8 @@ Payload example:
 Payload example:
 
 {
-   "email": "adolfo_collier@koelpinkutch.biz",
-   "password": "hqxc40imp6"
+   "email": "kristopher_hansen@olsonkoelpin.net",
+   "password": "hvhqxc40im"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp102.Run(c, args) },
 	}
@@ -956,8 +957,8 @@ Payload example:
 Payload example:
 
 {
-   "password": "6qg0z6y1io",
-   "token": "Omnis perferendis illo."
+   "password": "6g6qg0z6y1",
+   "token": "Omnis recusandae omnis perferendis illo beatae."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp109.Run(c, args) },
 	}
@@ -978,7 +979,7 @@ Payload example:
 Payload example:
 
 {
-   "email": "Officia dolores facere veritatis quod voluptas."
+   "email": "Dolores facere veritatis quod voluptas non sit."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp110.Run(c, args) },
 	}
@@ -999,7 +1000,7 @@ Payload example:
 Payload example:
 
 {
-   "refresh_token": "Sit id officia ipsa quam consectetur rerum."
+   "refresh_token": "Officia ipsa quam consectetur rerum."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp111.Run(c, args) },
 	}
@@ -1034,7 +1035,7 @@ Payload example:
 Payload example:
 
 {
-   "email": "Veniam cumque repudiandae libero sapiente eum quia."
+   "email": "Cumque repudiandae libero."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp113.Run(c, args) },
 	}

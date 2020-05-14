@@ -344,19 +344,22 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 	invite = &data.ProjectInvite{
 		ProjectID:    int32(ctx.ProjectID),
 		UserID:       p.UserID(),
-		InvitedEmail: ctx.Payload.Email,
 		InvitedTime:  time.Now(),
+		InvitedEmail: ctx.Payload.Email,
+		RoleID:       int32(ctx.Payload.Role),
 		Token:        token,
 	}
 
 	if _, err := c.options.Database.ExecContext(ctx, `
-		INSERT INTO fieldkit.project_invite (project_id, user_id, invited_email, invited_time, token) VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO fieldkit.project_invite (project_id, user_id, invited_email, invited_time, token, role_id) VALUES ($1, $2, $3, $4, $5, $6)
 		`, invite.ProjectID, invite.UserID, invite.InvitedEmail, invite.InvitedTime, invite.Token); err != nil {
 		return err
 	}
 
 	sender := &data.User{}
-	if err := c.options.Database.GetContext(ctx, sender, "SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1", p.UserID()); err != nil {
+	if err := c.options.Database.GetContext(ctx, sender, `
+		SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1
+		`, p.UserID()); err != nil {
 		return err
 	}
 

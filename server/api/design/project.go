@@ -24,6 +24,8 @@ var AddProjectPayload = Type("AddProjectPayload", func() {
 var InviteUserPayload = Type("InviteUserPayload", func() {
 	Attribute("email", String)
 	Required("email")
+	Attribute("role", Integer)
+	Required("role")
 })
 
 var RemoveUserPayload = Type("RemoveUserPayload", func() {

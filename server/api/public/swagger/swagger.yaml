@@ -109,25 +109,25 @@ definitions:
     type: object
   AddUserPayload:
     example:
-      email: osborne_zieme@zemlakhamill.info
-      invite_token: Aliquam illum aut et.
-      name: ow4svy8w3l
-      password: ezymno95gd
+      email: grace@zieme.info
+      invite_token: Impedit aliquam illum aut.
+      name: aow4svy8w3
+      password: jezymno95g
     properties:
       email:
-        example: osborne_zieme@zemlakhamill.info
+        example: grace@zieme.info
         format: email
         type: string
       invite_token:
-        example: Aliquam illum aut et.
+        example: Impedit aliquam illum aut.
         type: string
       name:
-        example: ow4svy8w3l
+        example: aow4svy8w3
         maxLength: 256
         pattern: \S
         type: string
       password:
-        example: ezymno95gd
+        example: jezymno95g
         minLength: 10
         type: string
     required:
@@ -140,7 +140,7 @@ definitions:
     description: DeviceDataRecord media type (default view)
     example:
       data:
-        Possimus labore qui possimus porro quaerat.: 0437a3c6-f16e-425d-a68f-63a96ad7e741
+        Possimus labore qui possimus porro quaerat.: 8fada414-5302-4438-8e9e-42760c384e15
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -151,7 +151,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Possimus labore qui possimus porro quaerat.: 0437a3c6-f16e-425d-a68f-63a96ad7e741
+          Possimus labore qui possimus porro quaerat.: 8fada414-5302-4438-8e9e-42760c384e15
         type: object
       id:
         example: 3.1889681637076403e+18
@@ -191,7 +191,7 @@ definitions:
       (default view)
     example:
     - data:
-        Possimus labore qui possimus porro quaerat.: 0437a3c6-f16e-425d-a68f-63a96ad7e741
+        Possimus labore qui possimus porro quaerat.: 8fada414-5302-4438-8e9e-42760c384e15
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -199,7 +199,7 @@ definitions:
       record: 7.193395211552676e+18
       time: "1980-07-29T04:01:26Z"
     - data:
-        Possimus labore qui possimus porro quaerat.: 0437a3c6-f16e-425d-a68f-63a96ad7e741
+        Possimus labore qui possimus porro quaerat.: 8fada414-5302-4438-8e9e-42760c384e15
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -216,7 +216,7 @@ definitions:
     example:
       data:
       - data:
-          Possimus labore qui possimus porro quaerat.: 0437a3c6-f16e-425d-a68f-63a96ad7e741
+          Possimus labore qui possimus porro quaerat.: 8fada414-5302-4438-8e9e-42760c384e15
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -224,7 +224,7 @@ definitions:
         record: 7.193395211552676e+18
         time: "1980-07-29T04:01:26Z"
       - data:
-          Possimus labore qui possimus porro quaerat.: 0437a3c6-f16e-425d-a68f-63a96ad7e741
+          Possimus labore qui possimus porro quaerat.: 8fada414-5302-4438-8e9e-42760c384e15
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -233,17 +233,17 @@ definitions:
         time: "1980-07-29T04:01:26Z"
       meta:
       - data:
-          Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
+          Vel est.: 65044796-e5ee-4680-9c9e-08c97e450248
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
+          Vel est.: 65044796-e5ee-4680-9c9e-08c97e450248
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
+          Vel est.: 65044796-e5ee-4680-9c9e-08c97e450248
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
@@ -330,7 +330,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
+        Vel est.: 65044796-e5ee-4680-9c9e-08c97e450248
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -338,7 +338,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
+          Vel est.: 65044796-e5ee-4680-9c9e-08c97e450248
         type: object
       id:
         example: 2.827138534810339e+18
@@ -364,12 +364,12 @@ definitions:
       (default view)
     example:
     - data:
-        Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
+        Vel est.: 65044796-e5ee-4680-9c9e-08c97e450248
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
     - data:
-        Vel est.: 74158db4-1867-4d76-b281-c657db1e3826
+        Vel est.: 65044796-e5ee-4680-9c9e-08c97e450248
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -748,12 +748,18 @@ definitions:
   InviteUserPayload:
     example:
       email: Similique ipsum qui.
+      role: 3.4583831682355907e+18
     properties:
       email:
         example: Similique ipsum qui.
         type: string
+      role:
+        example: 3.4583831682355907e+18
+        format: int64
+        type: integer
     required:
     - email
+    - role
     title: InviteUserPayload
     type: object
   JSONDataMeta:
@@ -1950,15 +1956,15 @@ definitions:
     type: object
   LoginPayload:
     example:
-      email: adolfo_collier@koelpinkutch.biz
-      password: hqxc40imp6
+      email: kristopher_hansen@olsonkoelpin.net
+      password: hvhqxc40im
     properties:
       email:
-        example: adolfo_collier@koelpinkutch.biz
+        example: kristopher_hansen@olsonkoelpin.net
         format: email
         type: string
       password:
-        example: hqxc40imp6
+        example: hvhqxc40im
         minLength: 10
         type: string
     required:
@@ -2260,10 +2266,10 @@ definitions:
     type: object
   RecoveryLookupPayload:
     example:
-      email: Officia dolores facere veritatis quod voluptas.
+      email: Dolores facere veritatis quod voluptas non sit.
     properties:
       email:
-        example: Officia dolores facere veritatis quod voluptas.
+        example: Dolores facere veritatis quod voluptas non sit.
         type: string
     required:
     - email
@@ -2271,15 +2277,15 @@ definitions:
     type: object
   RecoveryPayload:
     example:
-      password: 6qg0z6y1io
-      token: Omnis perferendis illo.
+      password: 6g6qg0z6y1
+      token: Omnis recusandae omnis perferendis illo beatae.
     properties:
       password:
-        example: 6qg0z6y1io
+        example: 6g6qg0z6y1
         minLength: 10
         type: string
       token:
-        example: Omnis perferendis illo.
+        example: Omnis recusandae omnis perferendis illo beatae.
         type: string
     required:
     - token
@@ -2288,10 +2294,10 @@ definitions:
     type: object
   RefreshUserPayload:
     example:
-      refresh_token: Sit id officia ipsa quam consectetur rerum.
+      refresh_token: Officia ipsa quam consectetur rerum.
     properties:
       refresh_token:
-        example: Sit id officia ipsa quam consectetur rerum.
+        example: Officia ipsa quam consectetur rerum.
         type: string
     required:
     - refresh_token
@@ -2299,10 +2305,10 @@ definitions:
     type: object
   RemoveUserPayload:
     example:
-      email: Veniam cumque repudiandae libero sapiente eum quia.
+      email: Cumque repudiandae libero.
     properties:
       email:
-        example: Veniam cumque repudiandae libero sapiente eum quia.
+        example: Cumque repudiandae libero.
         type: string
     required:
     - email
@@ -2323,15 +2329,15 @@ definitions:
     type: object
   UpdateUserPasswordPayload:
     example:
-      newPassword: cbmmrted8h
-      oldPassword: crrcazxi7n
+      newPassword: vcbmmrted8
+      oldPassword: ycrrcazxi7
     properties:
       newPassword:
-        example: cbmmrted8h
+        example: vcbmmrted8
         minLength: 10
         type: string
       oldPassword:
-        example: crrcazxi7n
+        example: ycrrcazxi7
         minLength: 10
         type: string
     required:

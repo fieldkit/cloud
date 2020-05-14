@@ -34,6 +34,15 @@ var (
 	}
 )
 
+func LookupRole(id int32) *Role {
+	for _, r := range Roles {
+		if r.ID == id {
+			return r
+		}
+	}
+	return nil
+}
+
 func (r *Role) IsProjectReadOnly() bool {
 	return r.readOnlyProject
 }

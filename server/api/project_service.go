@@ -185,7 +185,11 @@ func (c *ProjectService) AcceptInvite(ctx context.Context, payload *project.Acce
 		return err
 	}
 
-	role := data.MemberRole
+	role := data.LookupRole(invite.RoleID)
+	if role == nil {
+		role = data.MemberRole
+	}
+
 	if _, err := c.options.Database.ExecContext(ctx, `INSERT INTO fieldkit.project_user (project_id, user_id, role) VALUES ($1, $2, $3)`, invite.ProjectID, p.UserID(), role.ID); err != nil {
 		return err
 	}

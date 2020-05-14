@@ -56,6 +56,7 @@ type ProjectInvite struct {
 	ID           int32      `db:"id,omitempty"`
 	UserID       int32      `db:"user_id"`
 	ProjectID    int32      `db:"project_id"`
+	RoleID       int32      `db:"role_id"`
 	InvitedEmail string     `db:"invited_email"`
 	InvitedTime  time.Time  `db:"invited_time"`
 	AcceptedTime *time.Time `db:"accepted_time"`

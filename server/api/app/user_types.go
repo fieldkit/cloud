@@ -382,12 +382,16 @@ type DeviceStreamSummary struct {
 // inviteUserPayload user type.
 type inviteUserPayload struct {
 	Email *string `form:"email,omitempty" json:"email,omitempty" yaml:"email,omitempty" xml:"email,omitempty"`
+	Role  *int    `form:"role,omitempty" json:"role,omitempty" yaml:"role,omitempty" xml:"role,omitempty"`
 }
 
 // Validate validates the inviteUserPayload type instance.
 func (ut *inviteUserPayload) Validate() (err error) {
 	if ut.Email == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "email"))
+	}
+	if ut.Role == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "role"))
 	}
 	return
 }
@@ -398,12 +402,16 @@ func (ut *inviteUserPayload) Publicize() *InviteUserPayload {
 	if ut.Email != nil {
 		pub.Email = *ut.Email
 	}
+	if ut.Role != nil {
+		pub.Role = *ut.Role
+	}
 	return &pub
 }
 
 // InviteUserPayload user type.
 type InviteUserPayload struct {
 	Email string `form:"email" json:"email" yaml:"email" xml:"email"`
+	Role  int    `form:"role" json:"role" yaml:"role" xml:"role"`
 }
 
 // Validate validates the InviteUserPayload type instance.
@@ -411,6 +419,7 @@ func (ut *InviteUserPayload) Validate() (err error) {
 	if ut.Email == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "email"))
 	}
+
 	return
 }
 
