@@ -307,6 +307,8 @@ func transformModules(from *data.StationFull) (to []*station.StationModule) {
 			HardwareID: &hardwareID,
 			Name:       v.Name,
 			Position:   int32(v.Position),
+			Flags:      int32(v.Flags),
+			Internal:   v.Flags > 0,
 			Sensors:    sensors,
 		})
 

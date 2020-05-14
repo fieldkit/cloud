@@ -234,6 +234,8 @@ type StationModuleResponseBody struct {
 	HardwareID *string                      `form:"hardware_id,omitempty" json:"hardware_id,omitempty" xml:"hardware_id,omitempty"`
 	Name       *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	Position   *int32                       `form:"position,omitempty" json:"position,omitempty" xml:"position,omitempty"`
+	Flags      *int32                       `form:"flags,omitempty" json:"flags,omitempty" xml:"flags,omitempty"`
+	Internal   *bool                        `form:"internal,omitempty" json:"internal,omitempty" xml:"internal,omitempty"`
 	Sensors    []*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
 }
 
@@ -685,6 +687,12 @@ func ValidateStationModuleResponseBody(body *StationModuleResponseBody) (err err
 	}
 	if body.Position == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("position", "body"))
+	}
+	if body.Flags == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("flags", "body"))
+	}
+	if body.Internal == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("internal", "body"))
 	}
 	if body.Sensors == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("sensors", "body"))

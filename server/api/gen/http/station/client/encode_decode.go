@@ -852,6 +852,8 @@ func unmarshalStationModuleResponseBodyToStationviewsStationModuleView(v *Statio
 		HardwareID: v.HardwareID,
 		Name:       v.Name,
 		Position:   v.Position,
+		Flags:      v.Flags,
+		Internal:   v.Internal,
 	}
 	res.Sensors = make([]*stationviews.StationSensorView, len(v.Sensors))
 	for i, val := range v.Sensors {

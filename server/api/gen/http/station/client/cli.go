@@ -87,7 +87,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"name\": \"Sapiente non at quae incidunt.\",\n      \"status_json\": {\n         \"Corporis ipsam id sequi recusandae et.\": \"Et iusto accusamus repellendus nulla.\",\n         \"Velit veniam.\": \"Neque molestias soluta pariatur.\"\n      },\n      \"status_pb\": \"Voluptate fuga molestiae.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"name\": \"Provident iure non esse hic.\",\n      \"status_json\": {\n         \"Voluptatem laborum voluptatem at distinctio.\": \"Omnis quia.\"\n      },\n      \"status_pb\": \"Laborum vero odio fugit.\"\n   }'")
 		}
 		if body.StatusJSON == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))

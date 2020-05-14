@@ -49,8 +49,10 @@ var StationModule = Type("StationModule", func() {
 	Attribute("hardware_id", String)
 	Attribute("name", String)
 	Attribute("position", Int32)
+	Attribute("flags", Int32)
+	Attribute("internal", Boolean)
 	Attribute("sensors", ArrayOf(StationSensor))
-	Required("id", "name", "position", "sensors")
+	Required("id", "name", "position", "flags", "internal", "sensors")
 })
 
 var StationFull = ResultType("application/vnd.app.station.full", func() {

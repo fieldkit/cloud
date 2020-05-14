@@ -772,6 +772,8 @@ func marshalStationviewsStationModuleViewToStationModuleResponseBody(v *stationv
 		HardwareID: v.HardwareID,
 		Name:       *v.Name,
 		Position:   *v.Position,
+		Flags:      *v.Flags,
+		Internal:   *v.Internal,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*StationSensorResponseBody, len(v.Sensors))

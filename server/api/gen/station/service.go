@@ -148,6 +148,8 @@ type StationModule struct {
 	HardwareID *string
 	Name       string
 	Position   int32
+	Flags      int32
+	Internal   bool
 	Sensors    []*StationSensor
 }
 
@@ -476,6 +478,8 @@ func transformStationviewsStationModuleViewToStationModule(v *stationviews.Stati
 		HardwareID: v.HardwareID,
 		Name:       *v.Name,
 		Position:   *v.Position,
+		Flags:      *v.Flags,
+		Internal:   *v.Internal,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*StationSensor, len(v.Sensors))
@@ -575,6 +579,8 @@ func transformStationModuleToStationviewsStationModuleView(v *StationModule) *st
 		HardwareID: v.HardwareID,
 		Name:       &v.Name,
 		Position:   &v.Position,
+		Flags:      &v.Flags,
+		Internal:   &v.Internal,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*stationviews.StationSensorView, len(v.Sensors))

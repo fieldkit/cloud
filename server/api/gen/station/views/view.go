@@ -80,6 +80,8 @@ type StationModuleView struct {
 	HardwareID *string
 	Name       *string
 	Position   *int32
+	Flags      *int32
+	Internal   *bool
 	Sensors    []*StationSensorView
 }
 
@@ -331,6 +333,12 @@ func ValidateStationModuleView(result *StationModuleView) (err error) {
 	}
 	if result.Position == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("position", "result"))
+	}
+	if result.Flags == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("flags", "result"))
+	}
+	if result.Internal == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("internal", "result"))
 	}
 	if result.Sensors == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("sensors", "result"))

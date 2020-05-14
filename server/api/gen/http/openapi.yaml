@@ -1072,37 +1072,37 @@ definitions:
     properties:
       created_at:
         type: integer
-        example: 2136295146005203359
+        example: 4285750555850387289
         format: int64
       id:
         type: integer
-        example: 7428279104755472120
+        example: 1104138160434154273
         format: int64
       key:
         type: string
-        example: Facilis hic ea incidunt saepe et.
+        example: Aliquam atque fuga ea quasi suscipit laborum.
       meta:
-        example: Minima animi est rerum.
+        example: Est aperiam molestiae quia aut fugiat aspernatur.
       project:
         $ref: '#/definitions/ProjectSummaryResponseBody'
       station:
         $ref: '#/definitions/StationSummaryResponseBody'
       type:
         type: string
-        example: Similique vel sunt dolores ut.
+        example: Iure et est provident veritatis beatae molestiae.
     description: ActivityEntryResponseBody result type (default view)
     example:
-      created_at: 2634306305094265562
-      id: 7447024282136891800
-      key: Et et vero aut qui.
-      meta: Deleniti impedit ipsam enim minima.
+      created_at: 8983882859965631679
+      id: 3623567405352561472
+      key: Et quod facilis hic ea incidunt.
+      meta: Sunt qui.
       project:
         id: 5612179599996282479
         name: In vel.
       station:
         id: 9145512757716136367
         name: Eum recusandae fuga quia libero est.
-      type: Eveniet ipsum aperiam et.
+      type: Quo et deserunt sequi.
     required:
     - id
     - key
@@ -1142,43 +1142,21 @@ definitions:
         id: 9145512757716136367
         name: Eum recusandae fuga quia libero est.
       type: Reprehenderit quia et voluptas.
-    - created_at: 7752770601513082766
-      id: 3299246385662106252
-      key: Facilis aut assumenda maiores.
-      meta: Libero voluptate iusto.
-      project:
-        id: 5612179599996282479
-        name: In vel.
-      station:
-        id: 9145512757716136367
-        name: Eum recusandae fuga quia libero est.
-      type: Reprehenderit quia et voluptas.
-    - created_at: 7752770601513082766
-      id: 3299246385662106252
-      key: Facilis aut assumenda maiores.
-      meta: Libero voluptate iusto.
-      project:
-        id: 5612179599996282479
-        name: In vel.
-      station:
-        id: 9145512757716136367
-        name: Eum recusandae fuga quia libero est.
-      type: Reprehenderit quia et voluptas.
   ActivityProjectBadRequestResponseBody:
     title: ActivityProjectBadRequestResponseBody
     type: string
     description: bad-request
-    example: Ea non.
+    example: Impedit ipsam enim minima recusandae modi aliquid.
   ActivityProjectForbiddenResponseBody:
     title: ActivityProjectForbiddenResponseBody
     type: string
     description: forbidden
-    example: Rerum vel occaecati tenetur laudantium.
+    example: Et vero aut qui.
   ActivityProjectNotFoundResponseBody:
     title: ActivityProjectNotFoundResponseBody
     type: string
     description: not-found
-    example: Consequuntur enim vitae dolor nisi.
+    example: Dolor eveniet ipsum aperiam et eaque.
   ActivityProjectResponseBody:
     title: 'Mediatype identifier: application/vnd.app.project.activity.page; view=default'
     type: object
@@ -1187,11 +1165,11 @@ definitions:
         $ref: '#/definitions/ActivityEntryResponseBodyCollection'
       page:
         type: integer
-        example: 1725697062
+        example: 858855066
         format: int32
       total:
         type: integer
-        example: 366597141
+        example: 292555471
         format: int32
     description: ProjectResponseBody result type (default view)
     example:
@@ -1229,8 +1207,8 @@ definitions:
           id: 9145512757716136367
           name: Eum recusandae fuga quia libero est.
         type: Reprehenderit quia et voluptas.
-      page: 1467958246
-      total: 692666835
+      page: 80748236
+      total: 366156626
     required:
     - activities
     - total
@@ -1239,22 +1217,22 @@ definitions:
     title: ActivityProjectUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Dolorem expedita.
+    example: Animi est rerum similique architecto.
   ActivityStationBadRequestResponseBody:
     title: ActivityStationBadRequestResponseBody
     type: string
     description: bad-request
-    example: Sint tempore nesciunt error.
+    example: Similique similique vel.
   ActivityStationForbiddenResponseBody:
     title: ActivityStationForbiddenResponseBody
     type: string
     description: forbidden
-    example: Ipsa ea rerum laborum quasi.
+    example: Delectus quasi explicabo adipisci sunt.
   ActivityStationNotFoundResponseBody:
     title: ActivityStationNotFoundResponseBody
     type: string
     description: not-found
-    example: Consequuntur in voluptatem.
+    example: Ut quae sunt in officia perspiciatis maiores.
   ActivityStationResponseBody:
     title: 'Mediatype identifier: application/vnd.app.station.activity.page; view=default'
     type: object
@@ -1263,11 +1241,11 @@ definitions:
         $ref: '#/definitions/ActivityEntryResponseBodyCollection'
       page:
         type: integer
-        example: 1759531944
+        example: 138439757
         format: int32
       total:
         type: integer
-        example: 812386210
+        example: 1308880709
         format: int32
     description: StationResponseBody result type (default view)
     example:
@@ -1305,8 +1283,8 @@ definitions:
           id: 9145512757716136367
           name: Eum recusandae fuga quia libero est.
         type: Reprehenderit quia et voluptas.
-      page: 1739228850
-      total: 1131900223
+      page: 1101459706
+      total: 2121590225
     required:
     - activities
     - total
@@ -1315,21 +1293,21 @@ definitions:
     title: ActivityStationUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Sit provident quidem qui voluptatem.
+    example: Culpa aperiam incidunt quia repudiandae.
   AvailableRoleResponseBody:
     title: AvailableRoleResponseBody
     type: object
     properties:
       id:
         type: integer
-        example: 922994269
+        example: 1702140844
         format: int32
       name:
         type: string
-        example: Earum voluptate fugit.
+        example: Eveniet animi impedit laborum.
     example:
-      id: 484457886
-      name: Reiciendis aliquam impedit omnis iusto.
+      id: 2122938151
+      name: Qui sit quo cum eius reprehenderit.
     required:
     - id
     - name
@@ -1339,9 +1317,9 @@ definitions:
     properties:
       url:
         type: string
-        example: Aut maxime aut quia ad et aliquid.
+        example: Quo ea non.
     example:
-      url: Omnis odio et.
+      url: Quis voluptas est et explicabo.
     required:
     - url
   FollowerResponseBody:
@@ -1352,17 +1330,17 @@ definitions:
         $ref: '#/definitions/AvatarResponseBody'
       id:
         type: integer
-        example: 1640918549389409287
+        example: 3970374607592655096
         format: int64
       name:
         type: string
-        example: Iste eius et quisquam omnis.
+        example: Enim vitae dolor.
     description: FollowerResponseBody result type (default view)
     example:
       avatar:
         url: Voluptatem corporis possimus eum sed iusto.
-      id: 4298622658863086300
-      name: Officiis sit nemo praesentium eveniet.
+      id: 838099669881704848
+      name: Aut minima omnis.
     required:
     - id
     - name
@@ -1390,37 +1368,37 @@ definitions:
     title: FollowingFollowBadRequestResponseBody
     type: string
     description: bad-request
-    example: Ex praesentium.
+    example: Consequuntur in voluptatem.
   FollowingFollowForbiddenResponseBody:
     title: FollowingFollowForbiddenResponseBody
     type: string
     description: forbidden
-    example: Harum aut minima omnis voluptates.
+    example: Quidem qui voluptatem nulla ipsa.
   FollowingFollowNotFoundResponseBody:
     title: FollowingFollowNotFoundResponseBody
     type: string
     description: not-found
-    example: Totam sit tempore aliquam vel.
+    example: Rerum laborum quasi.
   FollowingFollowUnauthorizedResponseBody:
     title: FollowingFollowUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Quis voluptas est et explicabo.
+    example: Qui dolores sit.
   FollowingFollowersBadRequestResponseBody:
     title: FollowingFollowersBadRequestResponseBody
     type: string
     description: bad-request
-    example: Dolore consequatur tenetur aut minima.
+    example: Reiciendis ut dicta.
   FollowingFollowersForbiddenResponseBody:
     title: FollowingFollowersForbiddenResponseBody
     type: string
     description: forbidden
-    example: Quibusdam iusto animi ducimus omnis sit et.
+    example: Praesentium nisi occaecati.
   FollowingFollowersNotFoundResponseBody:
     title: FollowingFollowersNotFoundResponseBody
     type: string
     description: not-found
-    example: Eveniet illum.
+    example: Non aliquid enim.
   FollowingFollowersResponseBody:
     title: 'Mediatype identifier: application/vnd.app.followers; view=default'
     type: object
@@ -1429,11 +1407,11 @@ definitions:
         $ref: '#/definitions/FollowerResponseBodyCollection'
       page:
         type: integer
-        example: 1800690280
+        example: 946170236
         format: int32
       total:
         type: integer
-        example: 550155760
+        example: 1504204377
         format: int32
     description: FollowersResponseBody result type (default view)
     example:
@@ -1454,8 +1432,8 @@ definitions:
           url: Voluptatem corporis possimus eum sed iusto.
         id: 8503965477164152269
         name: Qui quas similique.
-      page: 585793790
-      total: 960374379
+      page: 885686942
+      total: 1107231541
     required:
     - followers
     - total
@@ -1464,83 +1442,83 @@ definitions:
     title: FollowingFollowersUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Eligendi sed sunt ab.
+    example: Vel praesentium.
   FollowingUnfollowBadRequestResponseBody:
     title: FollowingUnfollowBadRequestResponseBody
     type: string
     description: bad-request
-    example: Expedita iste ut maxime corporis.
+    example: Tenetur laudantium.
   FollowingUnfollowForbiddenResponseBody:
     title: FollowingUnfollowForbiddenResponseBody
     type: string
     description: forbidden
-    example: Enim beatae.
+    example: Nostrum occaecati facilis placeat dolorem.
   FollowingUnfollowNotFoundResponseBody:
     title: FollowingUnfollowNotFoundResponseBody
     type: string
     description: not-found
-    example: Ut dicta minima eligendi repudiandae.
+    example: Minima rerum vel.
   FollowingUnfollowUnauthorizedResponseBody:
     title: FollowingUnfollowUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Occaecati qui non.
+    example: Sint tempore nesciunt error.
   ImageRefResponseBody:
     title: ImageRefResponseBody
     type: object
     properties:
       url:
         type: string
-        example: Quam quia sit sunt voluptatum distinctio.
+        example: Et pariatur consectetur.
     example:
-      url: Harum non.
+      url: Commodi error consequatur.
     required:
     - url
   ModulesMetaBadRequestResponseBody:
     title: ModulesMetaBadRequestResponseBody
     type: string
     description: bad-request
-    example: Ea omnis incidunt molestiae rerum.
+    example: Omnis tempore aut maxime.
   ModulesMetaForbiddenResponseBody:
     title: ModulesMetaForbiddenResponseBody
     type: string
     description: forbidden
-    example: Recusandae enim numquam quae adipisci.
+    example: Maxime corporis.
   ModulesMetaNotFoundResponseBody:
     title: ModulesMetaNotFoundResponseBody
     type: string
     description: not-found
-    example: Non quis.
+    example: Nesciunt iste eius et.
   ModulesMetaUnauthorizedResponseBody:
     title: ModulesMetaUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Fugit sapiente.
+    example: Eligendi repudiandae aut expedita iste.
   PendingInviteResponseBody:
     title: PendingInviteResponseBody
     type: object
     properties:
       id:
         type: integer
-        example: 1973325417583662879
+        example: 5472113167381590248
         format: int64
       project:
         $ref: '#/definitions/ProjectSummaryResponseBody'
       role:
         type: integer
-        example: 1911842377
+        example: 327579613
         format: int32
       time:
         type: integer
-        example: 5711878484236049998
+        example: 7638490429161365045
         format: int64
     example:
-      id: 3620189960935152745
+      id: 1917229482555235353
       project:
         id: 5612179599996282479
         name: In vel.
-      role: 1410471271
-      time: 4278348345229262036
+      role: 1373965068
+      time: 255127914549502687
     required:
     - id
     - project
@@ -1550,37 +1528,37 @@ definitions:
     title: ProjectAcceptInviteBadRequestResponseBody
     type: string
     description: bad-request
-    example: Sed et animi aut possimus.
+    example: Ut quo illo quos quaerat.
   ProjectAcceptInviteForbiddenResponseBody:
     title: ProjectAcceptInviteForbiddenResponseBody
     type: string
     description: forbidden
-    example: Enim dolor adipisci ipsum necessitatibus ea placeat.
+    example: Modi nihil aut aperiam.
   ProjectAcceptInviteNotFoundResponseBody:
     title: ProjectAcceptInviteNotFoundResponseBody
     type: string
     description: not-found
-    example: Voluptates delectus aut non tenetur et et.
+    example: Laboriosam sed qui natus enim exercitationem.
   ProjectAcceptInviteUnauthorizedResponseBody:
     title: ProjectAcceptInviteUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Et fugiat.
+    example: Quo et nam atque.
   ProjectInvitesBadRequestResponseBody:
     title: ProjectInvitesBadRequestResponseBody
     type: string
     description: bad-request
-    example: Sit provident nam molestiae similique laudantium.
+    example: Non quis.
   ProjectInvitesForbiddenResponseBody:
     title: ProjectInvitesForbiddenResponseBody
     type: string
     description: forbidden
-    example: Accusamus laborum est atque blanditiis ipsa.
+    example: Fugit sapiente.
   ProjectInvitesNotFoundResponseBody:
     title: ProjectInvitesNotFoundResponseBody
     type: string
     description: not-found
-    example: In quo qui aliquid occaecati.
+    example: Recusandae enim numquam quae adipisci.
   ProjectInvitesResponseBody:
     title: 'Mediatype identifier: application/vnd.app.invites.pending; view=default'
     type: object
@@ -1590,6 +1568,12 @@ definitions:
         items:
           $ref: '#/definitions/PendingInviteResponseBody'
         example:
+        - id: 3305737635478945653
+          project:
+            id: 5612179599996282479
+            name: In vel.
+          role: 771407072
+          time: 557980417179025840
         - id: 3305737635478945653
           project:
             id: 5612179599996282479
@@ -1629,22 +1613,22 @@ definitions:
     title: ProjectInvitesUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Eum voluptatem voluptas dolorum earum.
+    example: Dolore consequatur tenetur aut minima.
   ProjectLookupInviteBadRequestResponseBody:
     title: ProjectLookupInviteBadRequestResponseBody
     type: string
     description: bad-request
-    example: Nesciunt aperiam et velit dignissimos.
+    example: Porro eius.
   ProjectLookupInviteForbiddenResponseBody:
     title: ProjectLookupInviteForbiddenResponseBody
     type: string
     description: forbidden
-    example: Unde eos quis saepe vel soluta.
+    example: Ea accusamus illo.
   ProjectLookupInviteNotFoundResponseBody:
     title: ProjectLookupInviteNotFoundResponseBody
     type: string
     description: not-found
-    example: Quia iure enim quia magni debitis voluptatem.
+    example: Aliquam iure.
   ProjectLookupInviteResponseBody:
     title: 'Mediatype identifier: application/vnd.app.invites.pending; view=default'
     type: object
@@ -1654,12 +1638,6 @@ definitions:
         items:
           $ref: '#/definitions/PendingInviteResponseBody'
         example:
-        - id: 3305737635478945653
-          project:
-            id: 5612179599996282479
-            name: In vel.
-          role: 771407072
-          time: 557980417179025840
         - id: 3305737635478945653
           project:
             id: 5612179599996282479
@@ -1693,47 +1671,59 @@ definitions:
           name: In vel.
         role: 771407072
         time: 557980417179025840
+      - id: 3305737635478945653
+        project:
+          id: 5612179599996282479
+          name: In vel.
+        role: 771407072
+        time: 557980417179025840
+      - id: 3305737635478945653
+        project:
+          id: 5612179599996282479
+          name: In vel.
+        role: 771407072
+        time: 557980417179025840
     required:
     - pending
   ProjectLookupInviteUnauthorizedResponseBody:
     title: ProjectLookupInviteUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Eum dolorum cumque quaerat fuga quia ipsum.
+    example: Incidunt molestiae rerum.
   ProjectRejectInviteBadRequestResponseBody:
     title: ProjectRejectInviteBadRequestResponseBody
     type: string
     description: bad-request
-    example: Commodi error consequatur.
+    example: Omnis in quo qui aliquid occaecati.
   ProjectRejectInviteForbiddenResponseBody:
     title: ProjectRejectInviteForbiddenResponseBody
     type: string
     description: forbidden
-    example: Ab repellat soluta eligendi nihil.
+    example: Voluptas dolorum earum soluta accusamus laborum.
   ProjectRejectInviteNotFoundResponseBody:
     title: ProjectRejectInviteNotFoundResponseBody
     type: string
     description: not-found
-    example: Et pariatur consectetur.
+    example: Atque blanditiis.
   ProjectRejectInviteUnauthorizedResponseBody:
     title: ProjectRejectInviteUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Nostrum est quidem.
+    example: Delectus accusantium eum.
   ProjectSummaryResponseBody:
     title: ProjectSummaryResponseBody
     type: object
     properties:
       id:
         type: integer
-        example: 9190339515862674002
+        example: 6051206716108862392
         format: int64
       name:
         type: string
-        example: Deserunt sequi est sunt qui occaecati.
+        example: Delectus perferendis.
     example:
-      id: 5621599841139430264
-      name: Tempore a dicta culpa aperiam incidunt quia.
+      id: 4880533105027674840
+      name: Sed et illo.
     required:
     - id
     - name
@@ -1741,48 +1731,48 @@ definitions:
     title: ProjectUpdateBadRequestResponseBody
     type: string
     description: bad-request
-    example: Quo et nam atque.
+    example: Sit nemo praesentium.
   ProjectUpdateForbiddenResponseBody:
     title: ProjectUpdateForbiddenResponseBody
     type: string
     description: forbidden
-    example: Aliquam iure.
+    example: Aliquid cupiditate.
   ProjectUpdateNotFoundResponseBody:
     title: ProjectUpdateNotFoundResponseBody
     type: string
     description: not-found
-    example: Porro eius.
+    example: Odio et magnam fugiat.
   ProjectUpdateRequestBody:
     title: ProjectUpdateRequestBody
     type: object
     properties:
       body:
         type: string
-        example: Modi nihil aut aperiam.
+        example: Odit rerum officiis eius quas at.
     example:
-      body: Laboriosam sed qui natus enim exercitationem.
+      body: Sed sunt ab voluptatem quibusdam iusto.
     required:
     - body
   ProjectUpdateUnauthorizedResponseBody:
     title: ProjectUpdateUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Ea accusamus illo.
+    example: Quia ad.
   SensorReadingResponseBody:
     title: SensorReadingResponseBody
     type: object
     properties:
       last:
         type: number
-        example: 0.033941973
+        example: 0.67513114
         format: float
       time:
         type: integer
-        example: 7816882160272538949
+        example: 2818167068163197642
         format: int64
     example:
-      last: 0.43601242
-      time: 7261222884018496782
+      last: 0.7437875
+      time: 7326774741245426086
     required:
     - last
     - time
@@ -1790,43 +1780,45 @@ definitions:
     title: StationAddBadRequestResponseBody
     type: string
     description: bad-request
-    example: Aperiam adipisci eaque non.
+    example: Beatae voluptate.
   StationAddForbiddenResponseBody:
     title: StationAddForbiddenResponseBody
     type: string
     description: forbidden
-    example: Dolor est temporibus.
+    example: Necessitatibus nesciunt.
   StationAddNotFoundResponseBody:
     title: StationAddNotFoundResponseBody
     type: string
     description: not-found
-    example: Impedit molestiae aut asperiores eos quos enim.
+    example: Sit possimus distinctio ab dolorem.
   StationAddRequestBody:
     title: StationAddRequestBody
     type: object
     properties:
       device_id:
         type: string
-        example: Quidem dignissimos enim eos doloremque possimus.
+        example: Et et facilis officia eum.
       name:
         type: string
-        example: Consequatur ut aliquid placeat.
+        example: Aut commodi laboriosam ut tempore.
       status_json:
         type: object
         example:
-          Dolorem fugit distinctio.: Earum fugiat expedita ducimus.
-          Et vel ut quis reprehenderit.: Porro illo sed culpa illo ullam.
-          Voluptatem nisi vitae non sed.: Nulla nobis aut.
+          Voluptates adipisci provident provident.: Et aut explicabo numquam et quis
+            exercitationem.
         additionalProperties: true
       status_pb:
         type: string
-        example: Aut sunt iusto quibusdam.
+        example: Quia et voluptatem quibusdam officia.
     example:
-      device_id: Ratione error.
-      name: Cupiditate consequatur est eos qui.
+      device_id: Repudiandae omnis repellendus dolor illo.
+      name: Adipisci non voluptatem eius magni.
       status_json:
-        Eveniet libero sunt.: Commodi ut labore quidem in quia ipsa.
-      status_pb: Quas alias voluptatem.
+        Consectetur magnam enim sit qui occaecati aut.: Libero rerum est consequatur.
+        Non unde sint ex earum quas accusantium.: Laborum ullam nisi dolor vitae ratione
+          ea.
+        Qui natus cum.: Quos ut rerum beatae optio quia.
+      status_pb: Est temporibus labore impedit.
     required:
     - name
     - device_id
@@ -1837,22 +1829,22 @@ definitions:
     properties:
       battery:
         type: number
-        example: 0.97385716
+        example: 0.2720115
         format: float
       device_id:
         type: string
-        example: Consectetur expedita ipsa.
+        example: Unde eos quis saepe vel soluta.
       firmware_number:
         type: integer
-        example: 1261147900
+        example: 354553642
         format: int32
       firmware_time:
         type: integer
-        example: 1217655007
+        example: 393146175
         format: int32
       id:
         type: integer
-        example: 465197329
+        example: 2134008970
         format: int32
       images:
         type: array
@@ -1861,83 +1853,76 @@ definitions:
         example:
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       memory_available:
         type: integer
-        example: 1327771664
+        example: 180301928
         format: int32
       memory_used:
         type: integer
-        example: 135835149
+        example: 1412278767
         format: int32
       modules:
         type: array
         items:
           $ref: '#/definitions/StationModuleResponseBody'
         example:
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
       name:
         type: string
-        example: Est ea.
+        example: Provident nam.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
@@ -1947,14 +1932,12 @@ definitions:
         example: false
       recording_started_at:
         type: integer
-        example: 571265563795442779
+        example: 4340107795142292861
         format: int64
       status_json:
         type: object
         example:
-          Illum est officiis at pariatur.: Saepe voluptas dicta tempora est.
-          Labore aut.: Animi nisi omnis assumenda unde.
-          Molestiae ut.: Et sit dolores aspernatur beatae molestiae.
+          Voluptatem cum.: Ducimus excepturi consectetur expedita ipsa.
         additionalProperties: true
       uploads:
         type: array
@@ -1979,111 +1962,142 @@ definitions:
           type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
           upload_id: Libero ducimus vitae soluta officia rerum sunt.
           url: Consequatur omnis molestiae aut.
+        - blocks:
+          - 4910225527445709976
+          - 4994115276965661480
+          id: 1364447698721066168
+          size: 1026518110205458593
+          time: 589749273386343835
+          type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+          upload_id: Libero ducimus vitae soluta officia rerum sunt.
+          url: Consequatur omnis molestiae aut.
     description: AddResponseBody result type (default view)
     example:
-      battery: 0.7125457
-      device_id: Cum facere quos ut rerum beatae.
-      firmware_number: 871676285
-      firmware_time: 852422270
-      id: 546550562
+      battery: 0.61829185
+      device_id: Vero laboriosam et illo.
+      firmware_number: 130304440
+      firmware_time: 1961075937
+      id: 1035517609
       images:
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-      memory_available: 229206747
-      memory_used: 1590129314
+      - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+      memory_available: 1318452342
+      memory_used: 1217655007
       modules:
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
-        id: 1084648313234692161
-        name: Consectetur assumenda quaerat sit.
-        position: 706605914
-        sensors:
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      name: Sunt quaerat qui.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      name: Quibusdam dolorem.
       owner:
         id: 82670129
         name: Placeat voluptate est expedita.
       photos:
         small: Sapiente sit.
       read_only: true
-      recording_started_at: 1445943421417854434
+      recording_started_at: 5416588989082555166
       status_json:
-        Enim sit qui occaecati aut quidem libero.: Est consequatur ut non unde sint.
+        Animi nisi omnis assumenda unde.: Molestiae ut.
+        Et sit dolores aspernatur beatae molestiae.: Consectetur est.
+        Officiis at pariatur iste saepe voluptas dicta.: Est sint labore aut.
       uploads:
+      - blocks:
+        - 4910225527445709976
+        - 4994115276965661480
+        id: 1364447698721066168
+        size: 1026518110205458593
+        time: 589749273386343835
+        type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+        upload_id: Libero ducimus vitae soluta officia rerum sunt.
+        url: Consequatur omnis molestiae aut.
+      - blocks:
+        - 4910225527445709976
+        - 4994115276965661480
+        id: 1364447698721066168
+        size: 1026518110205458593
+        time: 589749273386343835
+        type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+        upload_id: Libero ducimus vitae soluta officia rerum sunt.
+        url: Consequatur omnis molestiae aut.
       - blocks:
         - 4910225527445709976
         - 4994115276965661480
@@ -2123,29 +2137,29 @@ definitions:
     title: StationAddUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Dolor vitae ratione.
+    example: Atque non veniam aspernatur.
   StationFullResponseBody:
     title: 'Mediatype identifier: application/vnd.app.station.full; view=default'
     type: object
     properties:
       battery:
         type: number
-        example: 0.3945601
+        example: 0.29777583
         format: float
       device_id:
         type: string
-        example: Non sunt aut eos porro ipsam.
+        example: Commodi voluptatem.
       firmware_number:
         type: integer
-        example: 100106792
+        example: 703886644
         format: int32
       firmware_time:
         type: integer
-        example: 1905099279
+        example: 1814853747
         format: int32
       id:
         type: integer
-        example: 1612912804
+        example: 1025231863
         format: int32
       images:
         type: array
@@ -2155,102 +2169,131 @@ definitions:
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       memory_available:
         type: integer
-        example: 667287870
+        example: 191081333
         format: int32
       memory_used:
         type: integer
-        example: 150890260
+        example: 1124668914
         format: int32
       modules:
         type: array
         items:
           $ref: '#/definitions/StationModuleResponseBody'
         example:
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
       name:
         type: string
-        example: Nulla consequatur velit non.
+        example: Et illum.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
@@ -2260,14 +2303,12 @@ definitions:
         example: false
       recording_started_at:
         type: integer
-        example: 5287433693586795299
+        example: 5082673265969482141
         format: int64
       status_json:
         type: object
         example:
-          Dolores vero sit esse cupiditate cupiditate.: Facilis dolor rerum sed eum
-            voluptatem sequi.
-          Et sunt in tenetur beatae.: Commodi et ut dolor tenetur.
+          Id distinctio asperiores.: Dolorem modi occaecati quisquam quidem nisi.
         additionalProperties: true
       uploads:
         type: array
@@ -2294,127 +2335,109 @@ definitions:
           url: Consequatur omnis molestiae aut.
     description: StationFullResponseBody result type (default view)
     example:
-      battery: 0.80613667
-      device_id: Reiciendis qui recusandae explicabo ducimus.
-      firmware_number: 1474309260
-      firmware_time: 1145861149
-      id: 1640933457
+      battery: 0.6132252
+      device_id: Consequatur velit non dolorem non.
+      firmware_number: 976319775
+      firmware_time: 1355466958
+      id: 138375654
       images:
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-      - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-      memory_available: 571732447
-      memory_used: 1595021772
+      memory_available: 49156130
+      memory_used: 1525627972
       modules:
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
-        id: 1084648313234692161
-        name: Consectetur assumenda quaerat sit.
-        position: 706605914
-        sensors:
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      name: A sequi.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      name: Aliquid officiis laudantium voluptate.
       owner:
         id: 82670129
         name: Placeat voluptate est expedita.
       photos:
         small: Sapiente sit.
       read_only: false
-      recording_started_at: 6657821746153561721
+      recording_started_at: 2863607211077579977
       status_json:
-        Ipsam et.: Officiis a.
+        Maiores delectus omnis qui et.: Sunt in tenetur beatae id.
       uploads:
-      - blocks:
-        - 4910225527445709976
-        - 4994115276965661480
-        id: 1364447698721066168
-        size: 1026518110205458593
-        time: 589749273386343835
-        type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
-        upload_id: Libero ducimus vitae soluta officia rerum sunt.
-        url: Consequatur omnis molestiae aut.
-      - blocks:
-        - 4910225527445709976
-        - 4994115276965661480
-        id: 1364447698721066168
-        size: 1026518110205458593
-        time: 589749273386343835
-        type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
-        upload_id: Libero ducimus vitae soluta officia rerum sunt.
-        url: Consequatur omnis molestiae aut.
       - blocks:
         - 4910225527445709976
         - 4994115276965661480
@@ -2459,108 +2482,82 @@ definitions:
     description: StationFullCollectionResponseBody is the result type for an array
       of StationFullResponseBody (default view)
     example:
-    - battery: 0.23769724
-      device_id: Cupiditate ducimus aut.
-      firmware_number: 573792566
-      firmware_time: 891652138
-      id: 1731647194
+    - battery: 0.9483292
+      device_id: Aut ut quam aliquid quo.
+      firmware_number: 767778983
+      firmware_time: 793127615
+      id: 1164951449
       images:
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-      memory_available: 793127615
-      memory_used: 767778983
+      - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+      memory_available: 1834929496
+      memory_used: 510450928
       modules:
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
-        id: 1084648313234692161
-        name: Consectetur assumenda quaerat sit.
-        position: 706605914
-        sensors:
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
-        id: 1084648313234692161
-        name: Consectetur assumenda quaerat sit.
-        position: 706605914
-        sensors:
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      name: Nihil adipisci debitis eaque.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      name: Esse cupiditate.
       owner:
         id: 82670129
         name: Placeat voluptate est expedita.
       photos:
         small: Sapiente sit.
       read_only: true
-      recording_started_at: 7880962178491652885
+      recording_started_at: 4522627961363068243
       status_json:
-        Atque qui magni exercitationem.: Totam eaque.
-        Illo dicta rem.: Et eaque veniam.
+        Delectus totam eaque exercitationem illo dicta.: Cupiditate et.
       uploads:
       - blocks:
         - 4910225527445709976
@@ -2580,108 +2577,91 @@ definitions:
         type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
         upload_id: Libero ducimus vitae soluta officia rerum sunt.
         url: Consequatur omnis molestiae aut.
-    - battery: 0.23769724
-      device_id: Cupiditate ducimus aut.
-      firmware_number: 573792566
-      firmware_time: 891652138
-      id: 1731647194
+      - blocks:
+        - 4910225527445709976
+        - 4994115276965661480
+        id: 1364447698721066168
+        size: 1026518110205458593
+        time: 589749273386343835
+        type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+        upload_id: Libero ducimus vitae soluta officia rerum sunt.
+        url: Consequatur omnis molestiae aut.
+    - battery: 0.9483292
+      device_id: Aut ut quam aliquid quo.
+      firmware_number: 767778983
+      firmware_time: 793127615
+      id: 1164951449
       images:
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-      memory_available: 793127615
-      memory_used: 767778983
+      - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+      memory_available: 1834929496
+      memory_used: 510450928
       modules:
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
-        id: 1084648313234692161
-        name: Consectetur assumenda quaerat sit.
-        position: 706605914
-        sensors:
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
-        id: 1084648313234692161
-        name: Consectetur assumenda quaerat sit.
-        position: 706605914
-        sensors:
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      name: Nihil adipisci debitis eaque.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      name: Esse cupiditate.
       owner:
         id: 82670129
         name: Placeat voluptate est expedita.
       photos:
         small: Sapiente sit.
       read_only: true
-      recording_started_at: 7880962178491652885
+      recording_started_at: 4522627961363068243
       status_json:
-        Atque qui magni exercitationem.: Totam eaque.
-        Illo dicta rem.: Et eaque veniam.
+        Delectus totam eaque exercitationem illo dicta.: Cupiditate et.
       uploads:
       - blocks:
         - 4910225527445709976
@@ -2701,109 +2681,205 @@ definitions:
         type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
         upload_id: Libero ducimus vitae soluta officia rerum sunt.
         url: Consequatur omnis molestiae aut.
-    - battery: 0.23769724
-      device_id: Cupiditate ducimus aut.
-      firmware_number: 573792566
-      firmware_time: 891652138
-      id: 1731647194
+      - blocks:
+        - 4910225527445709976
+        - 4994115276965661480
+        id: 1364447698721066168
+        size: 1026518110205458593
+        time: 589749273386343835
+        type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+        upload_id: Libero ducimus vitae soluta officia rerum sunt.
+        url: Consequatur omnis molestiae aut.
+    - battery: 0.9483292
+      device_id: Aut ut quam aliquid quo.
+      firmware_number: 767778983
+      firmware_time: 793127615
+      id: 1164951449
       images:
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-      memory_available: 793127615
-      memory_used: 767778983
+      - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+      memory_available: 1834929496
+      memory_used: 510450928
       modules:
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
-        id: 1084648313234692161
-        name: Consectetur assumenda quaerat sit.
-        position: 706605914
-        sensors:
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
-        id: 1084648313234692161
-        name: Consectetur assumenda quaerat sit.
-        position: 706605914
-        sensors:
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      name: Nihil adipisci debitis eaque.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      name: Esse cupiditate.
       owner:
         id: 82670129
         name: Placeat voluptate est expedita.
       photos:
         small: Sapiente sit.
       read_only: true
-      recording_started_at: 7880962178491652885
+      recording_started_at: 4522627961363068243
       status_json:
-        Atque qui magni exercitationem.: Totam eaque.
-        Illo dicta rem.: Et eaque veniam.
+        Delectus totam eaque exercitationem illo dicta.: Cupiditate et.
       uploads:
+      - blocks:
+        - 4910225527445709976
+        - 4994115276965661480
+        id: 1364447698721066168
+        size: 1026518110205458593
+        time: 589749273386343835
+        type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+        upload_id: Libero ducimus vitae soluta officia rerum sunt.
+        url: Consequatur omnis molestiae aut.
+      - blocks:
+        - 4910225527445709976
+        - 4994115276965661480
+        id: 1364447698721066168
+        size: 1026518110205458593
+        time: 589749273386343835
+        type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+        upload_id: Libero ducimus vitae soluta officia rerum sunt.
+        url: Consequatur omnis molestiae aut.
+      - blocks:
+        - 4910225527445709976
+        - 4994115276965661480
+        id: 1364447698721066168
+        size: 1026518110205458593
+        time: 589749273386343835
+        type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+        upload_id: Libero ducimus vitae soluta officia rerum sunt.
+        url: Consequatur omnis molestiae aut.
+    - battery: 0.9483292
+      device_id: Aut ut quam aliquid quo.
+      firmware_number: 767778983
+      firmware_time: 793127615
+      id: 1164951449
+      images:
+      - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+      - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+      - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+      memory_available: 1834929496
+      memory_used: 510450928
+      modules:
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
+        id: 1084648313234692161
+        internal: true
+        name: Consectetur assumenda quaerat sit.
+        position: 706605914
+        sensors:
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
+        id: 1084648313234692161
+        internal: true
+        name: Consectetur assumenda quaerat sit.
+        position: 706605914
+        sensors:
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      name: Esse cupiditate.
+      owner:
+        id: 82670129
+        name: Placeat voluptate est expedita.
+      photos:
+        small: Sapiente sit.
+      read_only: true
+      recording_started_at: 4522627961363068243
+      status_json:
+        Delectus totam eaque exercitationem illo dicta.: Cupiditate et.
+      uploads:
+      - blocks:
+        - 4910225527445709976
+        - 4994115276965661480
+        id: 1364447698721066168
+        size: 1026518110205458593
+        time: 589749273386343835
+        type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+        upload_id: Libero ducimus vitae soluta officia rerum sunt.
+        url: Consequatur omnis molestiae aut.
       - blocks:
         - 4910225527445709976
         - 4994115276965661480
@@ -2826,39 +2902,39 @@ definitions:
     title: StationGetBadRequestResponseBody
     type: string
     description: bad-request
-    example: Qui iste nisi.
+    example: Quis est in.
   StationGetForbiddenResponseBody:
     title: StationGetForbiddenResponseBody
     type: string
     description: forbidden
-    example: Consequuntur pariatur natus tempora laboriosam ab natus.
+    example: Laudantium maiores quas eum non et eaque.
   StationGetNotFoundResponseBody:
     title: StationGetNotFoundResponseBody
     type: string
     description: not-found
-    example: Rem necessitatibus.
+    example: Ut eligendi.
   StationGetResponseBody:
     title: 'Mediatype identifier: application/vnd.app.station.full; view=default'
     type: object
     properties:
       battery:
         type: number
-        example: 0.65282935
+        example: 0.39576408
         format: float
       device_id:
         type: string
-        example: Eos non voluptas quo.
+        example: Adipisci eaque non qui.
       firmware_number:
         type: integer
-        example: 1881492947
+        example: 1369462545
         format: int32
       firmware_time:
         type: integer
-        example: 135273235
+        example: 1600554334
         format: int32
       id:
         type: integer
-        example: 141137275
+        example: 766185058
         format: int32
       images:
         type: array
@@ -2868,78 +2944,146 @@ definitions:
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       memory_available:
         type: integer
-        example: 583173599
+        example: 1590818969
         format: int32
       memory_used:
         type: integer
-        example: 1842086135
+        example: 1376855473
         format: int32
       modules:
         type: array
         items:
           $ref: '#/definitions/StationModuleResponseBody'
         example:
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
+          id: 1084648313234692161
+          internal: true
+          name: Consectetur assumenda quaerat sit.
+          position: 706605914
+          sensors:
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
+          id: 1084648313234692161
+          internal: true
+          name: Consectetur assumenda quaerat sit.
+          position: 706605914
+          sensors:
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
       name:
         type: string
-        example: Sint ipsa.
+        example: Asperiores eos quos enim quisquam.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
         $ref: '#/definitions/StationPhotosResponseBody'
       read_only:
         type: boolean
-        example: false
+        example: true
       recording_started_at:
         type: integer
-        example: 5778131360874221459
+        example: 8373689447332978354
         format: int64
       status_json:
         type: object
         example:
-          Laborum laudantium maiores quas eum non et.: Ipsum ut.
+          Distinctio nobis earum fugiat expedita ducimus.: Et vel ut quis reprehenderit.
+          Quidem dignissimos enim eos doloremque possimus.: Sed dolorem.
         additionalProperties: true
       uploads:
         type: array
@@ -2973,70 +3117,95 @@ definitions:
           type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
           upload_id: Libero ducimus vitae soluta officia rerum sunt.
           url: Consequatur omnis molestiae aut.
+        - blocks:
+          - 4910225527445709976
+          - 4994115276965661480
+          id: 1364447698721066168
+          size: 1026518110205458593
+          time: 589749273386343835
+          type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+          upload_id: Libero ducimus vitae soluta officia rerum sunt.
+          url: Consequatur omnis molestiae aut.
     description: GetResponseBody result type (default view)
     example:
-      battery: 0.61055046
-      device_id: Ut explicabo debitis.
-      firmware_number: 621279285
-      firmware_time: 84371771
-      id: 1332747627
+      battery: 0.06572217
+      device_id: Aut minus aut sunt.
+      firmware_number: 1902775940
+      firmware_time: 1497846835
+      id: 709445475
       images:
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-      memory_available: 90834778
-      memory_used: 470463137
+      - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+      - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+      memory_available: 119191828
+      memory_used: 2059010510
       modules:
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      name: Maiores eveniet dolorem est.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      name: Nisi vitae non sed facilis nulla.
       owner:
         id: 82670129
         name: Placeat voluptate est expedita.
       photos:
         small: Sapiente sit.
       read_only: true
-      recording_started_at: 133924172744184178
+      recording_started_at: 1184741014335980338
       status_json:
-        Aspernatur laudantium commodi magni vel.: Nemo dolor consequuntur autem dolorem
-          cupiditate.
+        Est eos qui aut ratione error.: Voluptas eveniet libero sunt enim.
+        Ut labore.: In quia ipsa ex quas alias voluptatem.
       uploads:
       - blocks:
         - 4910225527445709976
@@ -3095,22 +3264,22 @@ definitions:
     title: StationGetUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Suscipit voluptatem tempore.
+    example: Quo repudiandae nostrum aut assumenda necessitatibus.
   StationListMineBadRequestResponseBody:
     title: StationListMineBadRequestResponseBody
     type: string
     description: bad-request
-    example: Voluptate debitis rerum.
+    example: Quia occaecati a sequi vero reiciendis.
   StationListMineForbiddenResponseBody:
     title: StationListMineForbiddenResponseBody
     type: string
     description: forbidden
-    example: Sint accusantium ab nesciunt omnis.
+    example: Sed eum.
   StationListMineNotFoundResponseBody:
     title: StationListMineNotFoundResponseBody
     type: string
     description: not-found
-    example: Et facere.
+    example: Sequi hic eligendi voluptatibus delectus enim quia.
   StationListMineResponseBody:
     title: 'Mediatype identifier: application/vnd.app.stations.full; view=default'
     type: object
@@ -3120,108 +3289,82 @@ definitions:
     description: List MineResponseBody result type (default view)
     example:
       stations:
-      - battery: 0.23769724
-        device_id: Cupiditate ducimus aut.
-        firmware_number: 573792566
-        firmware_time: 891652138
-        id: 1731647194
+      - battery: 0.9483292
+        device_id: Aut ut quam aliquid quo.
+        firmware_number: 767778983
+        firmware_time: 793127615
+        id: 1164951449
         images:
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        memory_available: 793127615
-        memory_used: 767778983
+        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+        memory_available: 1834929496
+        memory_used: 510450928
         modules:
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        name: Nihil adipisci debitis eaque.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        name: Esse cupiditate.
         owner:
           id: 82670129
           name: Placeat voluptate est expedita.
         photos:
           small: Sapiente sit.
         read_only: true
-        recording_started_at: 7880962178491652885
+        recording_started_at: 4522627961363068243
         status_json:
-          Atque qui magni exercitationem.: Totam eaque.
-          Illo dicta rem.: Et eaque veniam.
+          Delectus totam eaque exercitationem illo dicta.: Cupiditate et.
         uploads:
         - blocks:
           - 4910225527445709976
@@ -3241,108 +3384,91 @@ definitions:
           type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
           upload_id: Libero ducimus vitae soluta officia rerum sunt.
           url: Consequatur omnis molestiae aut.
-      - battery: 0.23769724
-        device_id: Cupiditate ducimus aut.
-        firmware_number: 573792566
-        firmware_time: 891652138
-        id: 1731647194
+        - blocks:
+          - 4910225527445709976
+          - 4994115276965661480
+          id: 1364447698721066168
+          size: 1026518110205458593
+          time: 589749273386343835
+          type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+          upload_id: Libero ducimus vitae soluta officia rerum sunt.
+          url: Consequatur omnis molestiae aut.
+      - battery: 0.9483292
+        device_id: Aut ut quam aliquid quo.
+        firmware_number: 767778983
+        firmware_time: 793127615
+        id: 1164951449
         images:
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        memory_available: 793127615
-        memory_used: 767778983
+        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+        memory_available: 1834929496
+        memory_used: 510450928
         modules:
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        name: Nihil adipisci debitis eaque.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        name: Esse cupiditate.
         owner:
           id: 82670129
           name: Placeat voluptate est expedita.
         photos:
           small: Sapiente sit.
         read_only: true
-        recording_started_at: 7880962178491652885
+        recording_started_at: 4522627961363068243
         status_json:
-          Atque qui magni exercitationem.: Totam eaque.
-          Illo dicta rem.: Et eaque veniam.
+          Delectus totam eaque exercitationem illo dicta.: Cupiditate et.
         uploads:
         - blocks:
           - 4910225527445709976
@@ -3362,108 +3488,91 @@ definitions:
           type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
           upload_id: Libero ducimus vitae soluta officia rerum sunt.
           url: Consequatur omnis molestiae aut.
-      - battery: 0.23769724
-        device_id: Cupiditate ducimus aut.
-        firmware_number: 573792566
-        firmware_time: 891652138
-        id: 1731647194
+        - blocks:
+          - 4910225527445709976
+          - 4994115276965661480
+          id: 1364447698721066168
+          size: 1026518110205458593
+          time: 589749273386343835
+          type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+          upload_id: Libero ducimus vitae soluta officia rerum sunt.
+          url: Consequatur omnis molestiae aut.
+      - battery: 0.9483292
+        device_id: Aut ut quam aliquid quo.
+        firmware_number: 767778983
+        firmware_time: 793127615
+        id: 1164951449
         images:
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        memory_available: 793127615
-        memory_used: 767778983
+        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+        memory_available: 1834929496
+        memory_used: 510450928
         modules:
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        name: Nihil adipisci debitis eaque.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        name: Esse cupiditate.
         owner:
           id: 82670129
           name: Placeat voluptate est expedita.
         photos:
           small: Sapiente sit.
         read_only: true
-        recording_started_at: 7880962178491652885
+        recording_started_at: 4522627961363068243
         status_json:
-          Atque qui magni exercitationem.: Totam eaque.
-          Illo dicta rem.: Et eaque veniam.
+          Delectus totam eaque exercitationem illo dicta.: Cupiditate et.
         uploads:
         - blocks:
           - 4910225527445709976
@@ -3474,118 +3583,6 @@ definitions:
           type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
           upload_id: Libero ducimus vitae soluta officia rerum sunt.
           url: Consequatur omnis molestiae aut.
-        - blocks:
-          - 4910225527445709976
-          - 4994115276965661480
-          id: 1364447698721066168
-          size: 1026518110205458593
-          time: 589749273386343835
-          type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
-          upload_id: Libero ducimus vitae soluta officia rerum sunt.
-          url: Consequatur omnis molestiae aut.
-      - battery: 0.23769724
-        device_id: Cupiditate ducimus aut.
-        firmware_number: 573792566
-        firmware_time: 891652138
-        id: 1731647194
-        images:
-        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        memory_available: 793127615
-        memory_used: 767778983
-        modules:
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        name: Nihil adipisci debitis eaque.
-        owner:
-          id: 82670129
-          name: Placeat voluptate est expedita.
-        photos:
-          small: Sapiente sit.
-        read_only: true
-        recording_started_at: 7880962178491652885
-        status_json:
-          Atque qui magni exercitationem.: Totam eaque.
-          Illo dicta rem.: Et eaque veniam.
-        uploads:
         - blocks:
           - 4910225527445709976
           - 4994115276965661480
@@ -3610,22 +3607,22 @@ definitions:
     title: StationListMineUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Placeat exercitationem aut saepe.
+    example: Esse cupiditate cupiditate omnis facilis dolor.
   StationListProjectBadRequestResponseBody:
     title: StationListProjectBadRequestResponseBody
     type: string
     description: bad-request
-    example: Necessitatibus temporibus hic labore et.
+    example: Et non dolore est consequatur.
   StationListProjectForbiddenResponseBody:
     title: StationListProjectForbiddenResponseBody
     type: string
     description: forbidden
-    example: Modi at maiores ullam voluptatem.
+    example: Ipsam et.
   StationListProjectNotFoundResponseBody:
     title: StationListProjectNotFoundResponseBody
     type: string
     description: not-found
-    example: Odit ratione expedita numquam.
+    example: Officiis a.
   StationListProjectResponseBody:
     title: 'Mediatype identifier: application/vnd.app.stations.full; view=default'
     type: object
@@ -3635,108 +3632,82 @@ definitions:
     description: List ProjectResponseBody result type (default view)
     example:
       stations:
-      - battery: 0.23769724
-        device_id: Cupiditate ducimus aut.
-        firmware_number: 573792566
-        firmware_time: 891652138
-        id: 1731647194
+      - battery: 0.9483292
+        device_id: Aut ut quam aliquid quo.
+        firmware_number: 767778983
+        firmware_time: 793127615
+        id: 1164951449
         images:
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        memory_available: 793127615
-        memory_used: 767778983
+        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+        memory_available: 1834929496
+        memory_used: 510450928
         modules:
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        name: Nihil adipisci debitis eaque.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        name: Esse cupiditate.
         owner:
           id: 82670129
           name: Placeat voluptate est expedita.
         photos:
           small: Sapiente sit.
         read_only: true
-        recording_started_at: 7880962178491652885
+        recording_started_at: 4522627961363068243
         status_json:
-          Atque qui magni exercitationem.: Totam eaque.
-          Illo dicta rem.: Et eaque veniam.
+          Delectus totam eaque exercitationem illo dicta.: Cupiditate et.
         uploads:
         - blocks:
           - 4910225527445709976
@@ -3756,108 +3727,91 @@ definitions:
           type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
           upload_id: Libero ducimus vitae soluta officia rerum sunt.
           url: Consequatur omnis molestiae aut.
-      - battery: 0.23769724
-        device_id: Cupiditate ducimus aut.
-        firmware_number: 573792566
-        firmware_time: 891652138
-        id: 1731647194
+        - blocks:
+          - 4910225527445709976
+          - 4994115276965661480
+          id: 1364447698721066168
+          size: 1026518110205458593
+          time: 589749273386343835
+          type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+          upload_id: Libero ducimus vitae soluta officia rerum sunt.
+          url: Consequatur omnis molestiae aut.
+      - battery: 0.9483292
+        device_id: Aut ut quam aliquid quo.
+        firmware_number: 767778983
+        firmware_time: 793127615
+        id: 1164951449
         images:
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        memory_available: 793127615
-        memory_used: 767778983
+        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+        memory_available: 1834929496
+        memory_used: 510450928
         modules:
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        name: Nihil adipisci debitis eaque.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        name: Esse cupiditate.
         owner:
           id: 82670129
           name: Placeat voluptate est expedita.
         photos:
           small: Sapiente sit.
         read_only: true
-        recording_started_at: 7880962178491652885
+        recording_started_at: 4522627961363068243
         status_json:
-          Atque qui magni exercitationem.: Totam eaque.
-          Illo dicta rem.: Et eaque veniam.
+          Delectus totam eaque exercitationem illo dicta.: Cupiditate et.
         uploads:
         - blocks:
           - 4910225527445709976
@@ -3877,108 +3831,91 @@ definitions:
           type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
           upload_id: Libero ducimus vitae soluta officia rerum sunt.
           url: Consequatur omnis molestiae aut.
-      - battery: 0.23769724
-        device_id: Cupiditate ducimus aut.
-        firmware_number: 573792566
-        firmware_time: 891652138
-        id: 1731647194
+        - blocks:
+          - 4910225527445709976
+          - 4994115276965661480
+          id: 1364447698721066168
+          size: 1026518110205458593
+          time: 589749273386343835
+          type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+          upload_id: Libero ducimus vitae soluta officia rerum sunt.
+          url: Consequatur omnis molestiae aut.
+      - battery: 0.9483292
+        device_id: Aut ut quam aliquid quo.
+        firmware_number: 767778983
+        firmware_time: 793127615
+        id: 1164951449
         images:
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        memory_available: 793127615
-        memory_used: 767778983
+        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+        memory_available: 1834929496
+        memory_used: 510450928
         modules:
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        name: Nihil adipisci debitis eaque.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        name: Esse cupiditate.
         owner:
           id: 82670129
           name: Placeat voluptate est expedita.
         photos:
           small: Sapiente sit.
         read_only: true
-        recording_started_at: 7880962178491652885
+        recording_started_at: 4522627961363068243
         status_json:
-          Atque qui magni exercitationem.: Totam eaque.
-          Illo dicta rem.: Et eaque veniam.
+          Delectus totam eaque exercitationem illo dicta.: Cupiditate et.
         uploads:
         - blocks:
           - 4910225527445709976
@@ -3989,118 +3926,6 @@ definitions:
           type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
           upload_id: Libero ducimus vitae soluta officia rerum sunt.
           url: Consequatur omnis molestiae aut.
-        - blocks:
-          - 4910225527445709976
-          - 4994115276965661480
-          id: 1364447698721066168
-          size: 1026518110205458593
-          time: 589749273386343835
-          type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
-          upload_id: Libero ducimus vitae soluta officia rerum sunt.
-          url: Consequatur omnis molestiae aut.
-      - battery: 0.23769724
-        device_id: Cupiditate ducimus aut.
-        firmware_number: 573792566
-        firmware_time: 891652138
-        id: 1731647194
-        images:
-        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        memory_available: 793127615
-        memory_used: 767778983
-        modules:
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
-          id: 1084648313234692161
-          name: Consectetur assumenda quaerat sit.
-          position: 706605914
-          sensors:
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
-            reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        name: Nihil adipisci debitis eaque.
-        owner:
-          id: 82670129
-          name: Placeat voluptate est expedita.
-        photos:
-          small: Sapiente sit.
-        read_only: true
-        recording_started_at: 7880962178491652885
-        status_json:
-          Atque qui magni exercitationem.: Totam eaque.
-          Illo dicta rem.: Et eaque veniam.
-        uploads:
         - blocks:
           - 4910225527445709976
           - 4994115276965661480
@@ -4125,70 +3950,76 @@ definitions:
     title: StationListProjectUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Quis omnis.
+    example: Recusandae explicabo ducimus ut accusamus iste et.
   StationModuleResponseBody:
     title: StationModuleResponseBody
     type: object
     properties:
+      flags:
+        type: integer
+        example: 746514772
+        format: int32
       hardware_id:
         type: string
-        example: Reiciendis dolor totam atque non veniam.
+        example: Laboriosam incidunt aut.
       id:
         type: integer
-        example: 5662709692668985112
+        example: 6964107615291892829
         format: int64
+      internal:
+        type: boolean
+        example: false
       name:
         type: string
-        example: Aliquam necessitatibus nesciunt est sit.
+        example: Hic est adipisci.
       position:
         type: integer
-        example: 1649446655
+        example: 2019010844
         format: int32
       sensors:
         type: array
         items:
           $ref: '#/definitions/StationSensorResponseBody'
         example:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
-          reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
     example:
-      hardware_id: Voluptatem quibusdam.
-      id: 8792670375589471082
-      name: Accusamus adipisci non voluptatem eius magni deserunt.
-      position: 1855977503
+      flags: 577588
+      hardware_id: Neque rerum sunt consequatur nisi eum.
+      id: 5469201159900131030
+      internal: true
+      name: Amet quam quia sit sunt voluptatum distinctio.
+      position: 1012217958
       sensors:
-      - name: Natus hic.
+      - name: Quasi dolorem placeat a.
         reading:
-          last: 0.73065645
-          time: 2167226722665382387
-        unit_of_measure: Dolorem placeat a et.
-      - name: Natus hic.
+          last: 0.42952597
+          time: 1292009652346905269
+        unit_of_measure: Aut qui ea fuga.
+      - name: Quasi dolorem placeat a.
         reading:
-          last: 0.73065645
-          time: 2167226722665382387
-        unit_of_measure: Dolorem placeat a et.
-      - name: Natus hic.
+          last: 0.42952597
+          time: 1292009652346905269
+        unit_of_measure: Aut qui ea fuga.
+      - name: Quasi dolorem placeat a.
         reading:
-          last: 0.73065645
-          time: 2167226722665382387
-        unit_of_measure: Dolorem placeat a et.
+          last: 0.42952597
+          time: 1292009652346905269
+        unit_of_measure: Aut qui ea fuga.
     required:
     - id
     - name
     - position
+    - flags
+    - internal
     - sensors
   StationOwnerResponseBody:
     title: StationOwnerResponseBody
@@ -4196,14 +4027,14 @@ definitions:
     properties:
       id:
         type: integer
-        example: 1692665179
+        example: 295273145
         format: int32
       name:
         type: string
-        example: Tempora placeat fuga numquam architecto.
+        example: Laudantium eveniet.
     example:
-      id: 160831627
-      name: Et ducimus.
+      id: 570968200
+      name: Eum dolorum cumque quaerat fuga quia ipsum.
     required:
     - id
     - name
@@ -4211,31 +4042,31 @@ definitions:
     title: StationPhotoBadRequestResponseBody
     type: string
     description: bad-request
-    example: Veritatis est et ipsum magnam et.
+    example: Facere consequatur voluptate debitis rerum.
   StationPhotoForbiddenResponseBody:
     title: StationPhotoForbiddenResponseBody
     type: string
     description: forbidden
-    example: Sit quis asperiores consequatur dolorum et.
+    example: Saepe iure.
   StationPhotoNotFoundResponseBody:
     title: StationPhotoNotFoundResponseBody
     type: string
     description: not-found
-    example: Temporibus iure.
+    example: Accusantium ab nesciunt omnis et.
   StationPhotoUnauthorizedResponseBody:
     title: StationPhotoUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Labore officia ut atque quas.
+    example: Molestiae ad placeat exercitationem.
   StationPhotosResponseBody:
     title: StationPhotosResponseBody
     type: object
     properties:
       small:
         type: string
-        example: Quaerat eius quibusdam dolorem qui vero.
+        example: Est ea.
     example:
-      small: Et illo.
+      small: Nostrum tempora placeat.
     required:
     - small
   StationSensorResponseBody:
@@ -4244,18 +4075,18 @@ definitions:
     properties:
       name:
         type: string
-        example: Ab dolorem aut beatae.
+        example: Et consectetur tenetur odio minus amet.
       reading:
         $ref: '#/definitions/SensorReadingResponseBody'
       unit_of_measure:
         type: string
-        example: Eaque aut commodi laboriosam ut tempore veritatis.
+        example: Possimus magni.
     example:
-      name: Eos impedit voluptates adipisci provident provident eum.
+      name: Animi quidem voluptate.
       reading:
-        last: 0.73065645
-        time: 2167226722665382387
-      unit_of_measure: Aut explicabo numquam et quis exercitationem.
+        last: 0.42952597
+        time: 1292009652346905269
+      unit_of_measure: Recusandae aspernatur natus accusantium adipisci mollitia cupiditate.
     required:
     - name
     - unit_of_measure
@@ -4265,14 +4096,14 @@ definitions:
     properties:
       id:
         type: integer
-        example: 7504338446514076204
+        example: 1315465580019025478
         format: int64
       name:
         type: string
-        example: Delectus quasi explicabo adipisci sunt.
+        example: Aut tempora.
     example:
-      id: 7180693277590426782
-      name: Quae sunt in officia perspiciatis maiores.
+      id: 1129952867675514102
+      name: Similique in explicabo natus recusandae.
     required:
     - id
     - name
@@ -4280,40 +4111,40 @@ definitions:
     title: StationUpdateBadRequestResponseBody
     type: string
     description: bad-request
-    example: Est aperiam saepe sint saepe.
+    example: Aliquid sapiente necessitatibus hic.
   StationUpdateForbiddenResponseBody:
     title: StationUpdateForbiddenResponseBody
     type: string
     description: forbidden
-    example: Quo fuga.
+    example: Porro iste consequatur deserunt possimus.
   StationUpdateNotFoundResponseBody:
     title: StationUpdateNotFoundResponseBody
     type: string
     description: not-found
-    example: Aut ut iure reprehenderit accusamus.
+    example: Consequatur tempora tempore.
   StationUpdateRequestBody:
     title: StationUpdateRequestBody
     type: object
     properties:
       name:
         type: string
-        example: Et libero sit omnis voluptate optio et.
+        example: Sint occaecati possimus.
       status_json:
         type: object
         example:
-          Aut et eos sed.: Porro quisquam eaque exercitationem ea.
-          Quia rerum dolorem voluptates.: Aperiam aut dolores.
+          Labore occaecati voluptates voluptas.: Quae nostrum ea.
+          Quo fuga.: Aut ut iure reprehenderit accusamus.
+          Voluptatem et.: Laboriosam pariatur fugit repudiandae.
         additionalProperties: true
       status_pb:
         type: string
-        example: Veritatis voluptatem necessitatibus repudiandae aut consectetur et.
+        example: Est aperiam saepe sint saepe.
     example:
-      name: Vero et illum.
+      name: Et libero sit omnis voluptate optio et.
       status_json:
-        Dolorem modi occaecati quisquam quidem nisi.: Dolorem et repudiandae asperiores
-          ut.
-        Voluptatem voluptas ut blanditiis rerum.: Id distinctio asperiores.
-      status_pb: Occaecati totam aliquid officiis.
+        Aut et eos sed.: Porro quisquam eaque exercitationem ea.
+        Quia rerum dolorem voluptates.: Aperiam aut dolores.
+      status_pb: Veritatis voluptatem necessitatibus repudiandae aut consectetur et.
     required:
     - name
     - status_json
@@ -4323,22 +4154,22 @@ definitions:
     properties:
       battery:
         type: number
-        example: 0.65055674
+        example: 0.89503455
         format: float
       device_id:
         type: string
-        example: Quia molestiae amet accusamus sed maiores dolorem.
+        example: Eveniet dolorem est vel.
       firmware_number:
         type: integer
-        example: 83127676
+        example: 1802460674
         format: int32
       firmware_time:
         type: integer
-        example: 1862979262
+        example: 1253229211
         format: int32
       id:
         type: integer
-        example: 36599086
+        example: 135273235
         format: int32
       images:
         type: array
@@ -4348,81 +4179,149 @@ definitions:
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
         - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-        - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       memory_available:
         type: integer
-        example: 593723335
+        example: 561285459
         format: int32
       memory_used:
         type: integer
-        example: 2053267953
+        example: 1509618108
         format: int32
       modules:
         type: array
         items:
           $ref: '#/definitions/StationModuleResponseBody'
         example:
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-        - hardware_id: Impedit voluptatem facere corporis eum et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
           id: 1084648313234692161
+          internal: true
           name: Consectetur assumenda quaerat sit.
           position: 706605914
           sensors:
-          - name: Natus hic.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
-          - name: Natus hic.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
             reading:
-              last: 0.73065645
-              time: 2167226722665382387
-            unit_of_measure: Dolorem placeat a et.
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
+          id: 1084648313234692161
+          internal: true
+          name: Consectetur assumenda quaerat sit.
+          position: 706605914
+          sensors:
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+        - flags: 1819257588
+          hardware_id: Impedit voluptatem facere corporis eum et.
+          id: 1084648313234692161
+          internal: true
+          name: Consectetur assumenda quaerat sit.
+          position: 706605914
+          sensors:
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
+          - name: Quasi dolorem placeat a.
+            reading:
+              last: 0.42952597
+              time: 1292009652346905269
+            unit_of_measure: Aut qui ea fuga.
       name:
         type: string
-        example: Reprehenderit non laborum.
+        example: Aut fuga.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
         $ref: '#/definitions/StationPhotosResponseBody'
       read_only:
         type: boolean
-        example: false
+        example: true
       recording_started_at:
         type: integer
-        example: 147619659695036366
+        example: 4015706169252068403
         format: int64
       status_json:
         type: object
         example:
-          Eos tempore sint beatae.: Corrupti maxime distinctio tempore occaecati.
-          Iusto ducimus quia optio provident fuga sunt.: Aperiam ut omnis neque molestias
-            rerum non.
-          Sunt aut adipisci voluptas inventore sapiente.: Neque et.
+          Autem dolorem cupiditate.: Sint consectetur nemo provident blanditiis odio
+            temporibus.
+          Voluptatem sunt similique aspernatur laudantium commodi magni.: Quaerat
+            nemo dolor.
+          Voluptatem tempore sed consequuntur.: Natus tempora laboriosam.
         additionalProperties: true
       uploads:
         type: array
@@ -4456,81 +4355,107 @@ definitions:
           type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
           upload_id: Libero ducimus vitae soluta officia rerum sunt.
           url: Consequatur omnis molestiae aut.
-        - blocks:
-          - 4910225527445709976
-          - 4994115276965661480
-          id: 1364447698721066168
-          size: 1026518110205458593
-          time: 589749273386343835
-          type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
-          upload_id: Libero ducimus vitae soluta officia rerum sunt.
-          url: Consequatur omnis molestiae aut.
     description: UpdateResponseBody result type (default view)
     example:
-      battery: 0.3930036
-      device_id: Iste consequatur deserunt possimus modi consequatur.
-      firmware_number: 596798964
-      firmware_time: 1708960709
-      id: 13998530
+      battery: 0.65055674
+      device_id: Molestiae amet accusamus sed maiores dolorem.
+      firmware_number: 83127676
+      firmware_time: 1862979262
+      id: 1531239084
       images:
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
       - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
-      memory_available: 1072404754
-      memory_used: 646229772
+      - url: Fugiat repellendus doloremque aut eos tenetur deleniti.
+      memory_available: 593723335
+      memory_used: 2053267953
       modules:
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      - hardware_id: Impedit voluptatem facere corporis eum et.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      - flags: 1819257588
+        hardware_id: Impedit voluptatem facere corporis eum et.
         id: 1084648313234692161
+        internal: true
         name: Consectetur assumenda quaerat sit.
         position: 706605914
         sensors:
-        - name: Natus hic.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-        - name: Natus hic.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
           reading:
-            last: 0.73065645
-            time: 2167226722665382387
-          unit_of_measure: Dolorem placeat a et.
-      name: Nostrum et quibusdam sint.
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+        - name: Quasi dolorem placeat a.
+          reading:
+            last: 0.42952597
+            time: 1292009652346905269
+          unit_of_measure: Aut qui ea fuga.
+      name: Veniam esse reprehenderit non laborum nobis.
       owner:
         id: 82670129
         name: Placeat voluptate est expedita.
       photos:
         small: Sapiente sit.
-      read_only: true
-      recording_started_at: 5963367263536154100
+      read_only: false
+      recording_started_at: 147619659695036366
       status_json:
-        Necessitatibus hic qui sint occaecati possimus enim.: Labore occaecati voluptates
-          voluptas.
+        Eos tempore sint beatae.: Corrupti maxime distinctio tempore occaecati.
+        Iusto ducimus quia optio provident fuga sunt.: Aperiam ut omnis neque molestias
+          rerum non.
+        Sunt aut adipisci voluptas inventore sapiente.: Neque et.
       uploads:
+      - blocks:
+        - 4910225527445709976
+        - 4994115276965661480
+        id: 1364447698721066168
+        size: 1026518110205458593
+        time: 589749273386343835
+        type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+        upload_id: Libero ducimus vitae soluta officia rerum sunt.
+        url: Consequatur omnis molestiae aut.
+      - blocks:
+        - 4910225527445709976
+        - 4994115276965661480
+        id: 1364447698721066168
+        size: 1026518110205458593
+        time: 589749273386343835
+        type: Aperiam voluptatem perspiciatis libero minus et nesciunt.
+        upload_id: Libero ducimus vitae soluta officia rerum sunt.
+        url: Consequatur omnis molestiae aut.
       - blocks:
         - 4910225527445709976
         - 4994115276965661480
@@ -4570,7 +4495,7 @@ definitions:
     title: StationUpdateUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Laboriosam pariatur fugit repudiandae.
+    example: Maxime nostrum et quibusdam.
   StationUploadResponseBody:
     title: StationUploadResponseBody
     type: object
@@ -4579,45 +4504,46 @@ definitions:
         type: array
         items:
           type: integer
-          example: 7439193385070834834
+          example: 5862378135715237705
           format: int64
         example:
-        - 6899755032239113927
-        - 2079610781275800205
-        - 7494276313902246155
-        - 8494244396217227811
+        - 77631764253496648
+        - 5870990865418244960
+        - 7571060447725427502
+        - 4033941988944021691
       id:
         type: integer
-        example: 2508863045547202818
+        example: 1119619527626747639
         format: int64
       size:
         type: integer
-        example: 2975311670858559758
+        example: 2370001891905727447
         format: int64
       time:
         type: integer
-        example: 4340107795142292861
+        example: 2793621062077166573
         format: int64
       type:
         type: string
-        example: Exercitationem et dolorem et.
+        example: Dignissimos ut.
       upload_id:
         type: string
-        example: Magni non corporis ratione corrupti.
+        example: Enim quia magni debitis voluptatem.
       url:
         type: string
-        example: Aut sed hic est adipisci.
+        example: Aperiam et.
     example:
       blocks:
-      - 1764610163930376182
-      - 2625480634763549061
-      - 4566878574482324773
-      id: 6983959340976652868
-      size: 1456459998643362411
-      time: 2334197305608456808
-      type: Cupiditate laudantium eligendi cupiditate neque rerum.
-      upload_id: Voluptatem aut eligendi qui.
-      url: Voluptate numquam recusandae aspernatur natus accusantium adipisci.
+      - 6191622518521163796
+      - 6143648148190983326
+      - 7191874699394092757
+      - 2624019074633186203
+      id: 623657743650061764
+      size: 6741619685242607278
+      time: 5825064091698373504
+      type: Possimus dolorem nostrum est quidem.
+      upload_id: Placeat autem voluptates delectus aut non.
+      url: Et nesciunt sed et animi.
     required:
     - id
     - time
@@ -4630,117 +4556,117 @@ definitions:
     title: TasksFiveBadRequestResponseBody
     type: string
     description: bad-request
-    example: Porro aut non quidem harum.
+    example: Necessitatibus temporibus hic labore et.
   TasksFiveForbiddenResponseBody:
     title: TasksFiveForbiddenResponseBody
     type: string
     description: forbidden
-    example: Molestias magnam harum magni in expedita aliquid.
+    example: Modi at maiores ullam voluptatem.
   TasksFiveNotFoundResponseBody:
     title: TasksFiveNotFoundResponseBody
     type: string
     description: not-found
-    example: Id et sequi fugiat nemo non.
+    example: Odit ratione expedita numquam.
   TasksFiveUnauthorizedResponseBody:
     title: TasksFiveUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Sit tempora sit.
+    example: Quis omnis.
   TasksRefreshDeviceBadRequestResponseBody:
     title: TasksRefreshDeviceBadRequestResponseBody
     type: string
     description: bad-request
-    example: Aut similique voluptas culpa voluptatum.
+    example: Veritatis est et ipsum magnam et.
   TasksRefreshDeviceForbiddenResponseBody:
     title: TasksRefreshDeviceForbiddenResponseBody
     type: string
     description: forbidden
-    example: Voluptatem voluptate.
+    example: Sit quis asperiores consequatur dolorum et.
   TasksRefreshDeviceNotFoundResponseBody:
     title: TasksRefreshDeviceNotFoundResponseBody
     type: string
     description: not-found
-    example: Ratione quo dignissimos ut blanditiis temporibus in.
+    example: Temporibus iure.
   TasksRefreshDeviceUnauthorizedResponseBody:
     title: TasksRefreshDeviceUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Quas labore.
+    example: Labore officia ut atque quas.
   TestEmailBadRequestResponseBody:
     title: TestEmailBadRequestResponseBody
     type: string
     description: bad-request
-    example: Incidunt non quo.
+    example: Voluptatibus labore ut voluptates.
   TestEmailForbiddenResponseBody:
     title: TestEmailForbiddenResponseBody
     type: string
     description: forbidden
-    example: Repellat neque eum voluptatem rem.
+    example: Eaque ut.
   TestEmailNotFoundResponseBody:
     title: TestEmailNotFoundResponseBody
     type: string
     description: not-found
-    example: Laboriosam harum.
+    example: Cupiditate eos maiores consequatur et architecto.
   TestEmailUnauthorizedResponseBody:
     title: TestEmailUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Eos non vitae non a quia alias.
+    example: Quod laborum dolores ullam ipsum.
   TestErrorBadRequestResponseBody:
     title: TestErrorBadRequestResponseBody
     type: string
     description: bad-request
-    example: Quod sit voluptatem consequatur reprehenderit voluptas et.
+    example: Aut similique voluptas culpa voluptatum.
   TestErrorForbiddenResponseBody:
     title: TestErrorForbiddenResponseBody
     type: string
     description: forbidden
-    example: Qui sit quo cum eius reprehenderit.
+    example: Voluptatem voluptate.
   TestErrorNotFoundResponseBody:
     title: TestErrorNotFoundResponseBody
     type: string
     description: not-found
-    example: Eos sint officia dicta necessitatibus.
+    example: Ratione quo dignissimos ut blanditiis temporibus in.
   TestErrorUnauthorizedResponseBody:
     title: TestErrorUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Consectetur eveniet animi impedit laborum doloremque.
+    example: Quas labore.
   TestGetBadRequestResponseBody:
     title: TestGetBadRequestResponseBody
     type: string
     description: bad-request
-    example: Voluptatibus labore ut voluptates.
+    example: Porro aut non quidem harum.
   TestGetForbiddenResponseBody:
     title: TestGetForbiddenResponseBody
     type: string
     description: forbidden
-    example: Eaque ut.
+    example: Molestias magnam harum magni in expedita aliquid.
   TestGetNotFoundResponseBody:
     title: TestGetNotFoundResponseBody
     type: string
     description: not-found
-    example: Cupiditate eos maiores consequatur et architecto.
+    example: Id et sequi fugiat nemo non.
   TestGetUnauthorizedResponseBody:
     title: TestGetUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Quod laborum dolores ullam ipsum.
+    example: Sit tempora sit.
   UserRolesBadRequestResponseBody:
     title: UserRolesBadRequestResponseBody
     type: string
     description: bad-request
-    example: Inventore laborum nesciunt debitis dolores non fuga.
+    example: Vitae non a quia alias ut repellat.
   UserRolesForbiddenResponseBody:
     title: UserRolesForbiddenResponseBody
     type: string
     description: forbidden
-    example: Amet eligendi aliquid.
+    example: Reprehenderit voluptas.
   UserRolesNotFoundResponseBody:
     title: UserRolesNotFoundResponseBody
     type: string
     description: not-found
-    example: Deleniti inventore laudantium libero et est.
+    example: Quis eos.
   UserRolesResponseBody:
     title: 'Mediatype identifier: application/vnd.app.roles.available; view=default'
     type: object
@@ -4750,32 +4676,30 @@ definitions:
         items:
           $ref: '#/definitions/AvailableRoleResponseBody'
         example:
-        - id: 1416647877
-          name: In explicabo.
-        - id: 1416647877
-          name: In explicabo.
-        - id: 1416647877
-          name: In explicabo.
-        - id: 1416647877
-          name: In explicabo.
+        - id: 2000338426
+          name: Nihil commodi expedita nostrum officia modi.
+        - id: 2000338426
+          name: Nihil commodi expedita nostrum officia modi.
+        - id: 2000338426
+          name: Nihil commodi expedita nostrum officia modi.
     description: RolesResponseBody result type (default view)
     example:
       roles:
-      - id: 1416647877
-        name: In explicabo.
-      - id: 1416647877
-        name: In explicabo.
-      - id: 1416647877
-        name: In explicabo.
-      - id: 1416647877
-        name: In explicabo.
+      - id: 2000338426
+        name: Nihil commodi expedita nostrum officia modi.
+      - id: 2000338426
+        name: Nihil commodi expedita nostrum officia modi.
+      - id: 2000338426
+        name: Nihil commodi expedita nostrum officia modi.
+      - id: 2000338426
+        name: Nihil commodi expedita nostrum officia modi.
     required:
     - roles
   UserRolesUnauthorizedResponseBody:
     title: UserRolesUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Ut autem voluptate nemo.
+    example: Officia dicta necessitatibus aut quod sit voluptatem.
 securityDefinitions:
   jwt_header_Authorization:
     type: apiKey

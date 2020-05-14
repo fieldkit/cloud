@@ -735,7 +735,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 661380997 --auth "Quibusdam voluptas non sequi."
+    `+os.Args[0]+` station get --id 1945076388 --auth "Consequatur neque quod."
 `, os.Args[0])
 }
 
@@ -749,13 +749,12 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "name": "Sapiente non at quae incidunt.",
+      "name": "Provident iure non esse hic.",
       "status_json": {
-         "Corporis ipsam id sequi recusandae et.": "Et iusto accusamus repellendus nulla.",
-         "Velit veniam.": "Neque molestias soluta pariatur."
+         "Voluptatem laborum voluptatem at distinctio.": "Omnis quia."
       },
-      "status_pb": "Voluptate fuga molestiae."
-   }' --id 741636272 --auth "Velit sapiente enim est."
+      "status_pb": "Laborum vero odio fugit."
+   }' --id 845418112 --auth "Totam sapiente eligendi quo."
 `, os.Args[0])
 }
 
@@ -766,7 +765,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- mine --auth "Voluptate fugit autem."
+    `+os.Args[0]+` station list- mine --auth "Quas perspiciatis nisi laudantium."
 `, os.Args[0])
 }
 
@@ -778,7 +777,7 @@ ListProject implements list project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project --id 396358963 --auth "Labore excepturi laboriosam voluptas."
+    `+os.Args[0]+` station list- project --id 995002527 --auth "Atque maiores velit quia voluptas ut placeat."
 `, os.Args[0])
 }
 
@@ -790,7 +789,7 @@ Photo implements photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station photo --id 687160891 --auth "Quis et omnis delectus sed sunt est."
+    `+os.Args[0]+` station photo --id 267202002 --auth "Quam nulla."
 `, os.Args[0])
 }
 
@@ -826,7 +825,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Non a nulla quod." --auth "Facilis quasi aut placeat."
+    `+os.Args[0]+` tasks refresh- device --device-id "Est et natus maiores perferendis id." --auth "Id corrupti consectetur tempora nihil."
 `, os.Args[0])
 }
 
@@ -852,7 +851,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 8849660070720972928
+    `+os.Args[0]+` test get --id 3855591158811567150
 `, os.Args[0])
 }
 
@@ -874,7 +873,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Animi explicabo quis similique nisi." --auth "Voluptates mollitia."
+    `+os.Args[0]+` test email --address "Nulla quod itaque facilis quasi aut." --auth "Consequatur quaerat dolorem voluptas aperiam."
 `, os.Args[0])
 }
 
@@ -898,6 +897,6 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Et illo sapiente cumque aut tempora et."
+    `+os.Args[0]+` user roles --auth "Vel quia aut fuga ut."
 `, os.Args[0])
 }
