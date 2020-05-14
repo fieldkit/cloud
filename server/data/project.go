@@ -63,3 +63,12 @@ type ProjectInvite struct {
 	RejectedTime *time.Time `db:"rejected_time"`
 	Token        Token      `db:"token" json:"token"`
 }
+
+func (u *ProjectInvite) LookupRole() *Role {
+	for _, role := range Roles {
+		if role.ID == u.RoleID {
+			return role
+		}
+	}
+	return MemberRole
+}

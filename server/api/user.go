@@ -58,7 +58,7 @@ func ProjectUsersType(users []*data.ProjectUserAndUser, invites []*data.ProjectI
 				Name:  invite.InvitedEmail,
 				Email: invite.InvitedEmail,
 			},
-			Role:       data.MemberRole.Name,
+			Role:       invite.LookupRole().Name,
 			Membership: membership,
 		})
 	}
