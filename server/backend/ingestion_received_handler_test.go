@@ -144,6 +144,7 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 
 	miAfter, err := ir.QueryByID(e.Ctx, metaIngestion.ID)
 	assert.NoError(err)
+	assert.NotNil(miAfter)
 	assert.Equal(int64(1), *miAfter.TotalRecords)
 	assert.Equal(int64(0), *miAfter.DataErrors)
 	assert.Equal(int64(0), *miAfter.MetaErrors)
@@ -151,6 +152,7 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 
 	diAfter, err := ir.QueryByID(e.Ctx, dataIngestion.ID)
 	assert.NoError(err)
+	assert.NotNil(miAfter)
 	assert.Equal(int64(16), *diAfter.TotalRecords)
 	assert.Equal(int64(0), *diAfter.DataErrors)
 	assert.Equal(int64(0), *diAfter.MetaErrors)

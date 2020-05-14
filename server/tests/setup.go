@@ -30,6 +30,7 @@ type TestEnv struct {
 	PostgresURL string
 	SessionKey  string
 	JWTHMACKey  []byte
+	Seed        int64
 }
 
 type TestConfig struct {
@@ -120,12 +121,15 @@ func NewTestEnv() (e *TestEnv, err error) {
 		return nil, err
 	}
 
+	seed := time.Now().UnixNano()
+
 	e = &TestEnv{
 		Ctx:         ctx,
 		DB:          testDb,
 		PostgresURL: testUrl,
 		SessionKey:  testSessionKey,
 		JWTHMACKey:  jwtHMACKey,
+		Seed:        seed,
 	}
 
 	globalEnv = e

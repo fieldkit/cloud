@@ -37,7 +37,7 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 		    INSERT INTO fieldkit.station_module
 				(provision_id, meta_record_id, hardware_id, position, flags, name, manufacturer, kind, version) VALUES
 				(:provision_id, :meta_record_id, :hardware_id, :position, :flags, :name, :manufacturer, :kind, :version)
-		    ON CONFLICT (hardware_id)
+		    ON CONFLICT (meta_record_id, hardware_id)
 				DO UPDATE SET position = EXCLUDED.position,
 							  name = EXCLUDED.name,
                               manufacturer = EXCLUDED.manufacturer,

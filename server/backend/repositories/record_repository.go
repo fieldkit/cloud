@@ -200,11 +200,11 @@ func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision,
 	}
 
 	if err := r.Database.NamedGetContext(ctx, dataRecord, `
-			INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location)
-			VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
-			ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location
-			RETURNING id
-			`, dataRecord); err != nil {
+		INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location)
+		VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
+		ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location
+		RETURNING id
+		`, dataRecord); err != nil {
 		return nil, nil, err
 	}
 

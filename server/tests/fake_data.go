@@ -272,6 +272,12 @@ type SignedRecordAndData struct {
 	Data   *pb.DataRecord
 }
 
+func newModuleId(seed string) []byte {
+	hasher := sha1.New()
+	hasher.Write([]byte(seed))
+	return hasher.Sum(nil)
+}
+
 func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {
 	cfg := &pb.DataRecord{
 		Metadata: &pb.Metadata{
@@ -283,7 +289,9 @@ func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {
 		},
 		Modules: []*pb.ModuleInfo{
 			&pb.ModuleInfo{
-				Name: "random-module-1",
+				Position: 0,
+				Name:     "random-module-1",
+				Id:       newModuleId(fmt.Sprintf("random-module-1-%d", e.Seed)),
 				Header: &pb.ModuleHeader{
 					Manufacturer: repositories.ManufacturerConservify,
 					Kind:         repositories.ConservifyRandom,
@@ -314,7 +322,9 @@ func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {
 				},
 			},
 			&pb.ModuleInfo{
-				Name: "random-module-2",
+				Position: 1,
+				Name:     "random-module-2",
+				Id:       newModuleId(fmt.Sprintf("random-module-2-%d", e.Seed)),
 				Header: &pb.ModuleHeader{
 					Manufacturer: repositories.ManufacturerConservify,
 					Kind:         repositories.ConservifyRandom,
