@@ -352,7 +352,7 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 
 	if _, err := c.options.Database.ExecContext(ctx, `
 		INSERT INTO fieldkit.project_invite (project_id, user_id, invited_email, invited_time, token, role_id) VALUES ($1, $2, $3, $4, $5, $6)
-		`, invite.ProjectID, invite.UserID, invite.InvitedEmail, invite.InvitedTime, invite.Token); err != nil {
+		`, invite.ProjectID, invite.UserID, invite.InvitedEmail, invite.InvitedTime, invite.Token, invite.RoleID); err != nil {
 		return err
 	}
 
