@@ -257,7 +257,6 @@ export default {
                 let role = this.roleOptions.find(r => {
                     return r.code == this.selectedRole;
                 });
-                // NOTE: api is currently not sending role, will do when the backend is there
                 const params = { email: this.inviteEmail, projectId: this.project.id, role: this.selectedRole };
                 this.api.sendInvite(params).then(() => {
                     this.projectUsers.push({

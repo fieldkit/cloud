@@ -157,7 +157,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-            data: { email: data.email },
+            data: { email: data.email, role: data.role },
         }).then(this._handleResponse.bind(this));
     }
 
