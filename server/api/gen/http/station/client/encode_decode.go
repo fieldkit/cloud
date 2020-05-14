@@ -869,6 +869,24 @@ func unmarshalStationSensorResponseBodyToStationviewsStationSensorView(v *Statio
 		Name:          v.Name,
 		UnitOfMeasure: v.UnitOfMeasure,
 	}
+	if v.Reading != nil {
+		res.Reading = unmarshalSensorReadingResponseBodyToStationviewsSensorReadingView(v.Reading)
+	}
+
+	return res
+}
+
+// unmarshalSensorReadingResponseBodyToStationviewsSensorReadingView builds a
+// value of type *stationviews.SensorReadingView from a value of type
+// *SensorReadingResponseBody.
+func unmarshalSensorReadingResponseBodyToStationviewsSensorReadingView(v *SensorReadingResponseBody) *stationviews.SensorReadingView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.SensorReadingView{
+		Last: v.Last,
+		Time: v.Time,
+	}
 
 	return res
 }

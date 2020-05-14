@@ -239,8 +239,15 @@ type StationModuleResponseBody struct {
 
 // StationSensorResponseBody is used to define fields on response body types.
 type StationSensorResponseBody struct {
-	Name          *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	UnitOfMeasure *string `form:"unit_of_measure,omitempty" json:"unit_of_measure,omitempty" xml:"unit_of_measure,omitempty"`
+	Name          *string                    `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	UnitOfMeasure *string                    `form:"unit_of_measure,omitempty" json:"unit_of_measure,omitempty" xml:"unit_of_measure,omitempty"`
+	Reading       *SensorReadingResponseBody `form:"reading,omitempty" json:"reading,omitempty" xml:"reading,omitempty"`
+}
+
+// SensorReadingResponseBody is used to define fields on response body types.
+type SensorReadingResponseBody struct {
+	Last *float32 `form:"last,omitempty" json:"last,omitempty" xml:"last,omitempty"`
+	Time *int64   `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
 }
 
 // StationFullCollectionResponseBody is used to define fields on response body
@@ -700,6 +707,23 @@ func ValidateStationSensorResponseBody(body *StationSensorResponseBody) (err err
 	}
 	if body.UnitOfMeasure == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "body"))
+	}
+	if body.Reading != nil {
+		if err2 := ValidateSensorReadingResponseBody(body.Reading); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateSensorReadingResponseBody runs the validations defined on
+// SensorReadingResponseBody
+func ValidateSensorReadingResponseBody(body *SensorReadingResponseBody) (err error) {
+	if body.Last == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("last", "body"))
+	}
+	if body.Time == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("time", "body"))
 	}
 	return
 }

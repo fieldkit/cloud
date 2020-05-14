@@ -87,6 +87,13 @@ type StationModuleView struct {
 type StationSensorView struct {
 	Name          *string
 	UnitOfMeasure *string
+	Reading       *SensorReadingView
+}
+
+// SensorReadingView is a type that runs validations on a projected type.
+type SensorReadingView struct {
+	Last *float32
+	Time *int64
 }
 
 // StationsFullView is a type that runs validations on a projected type.
@@ -345,6 +352,22 @@ func ValidateStationSensorView(result *StationSensorView) (err error) {
 	}
 	if result.UnitOfMeasure == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "result"))
+	}
+	if result.Reading != nil {
+		if err2 := ValidateSensorReadingView(result.Reading); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateSensorReadingView runs the validations defined on SensorReadingView.
+func ValidateSensorReadingView(result *SensorReadingView) (err error) {
+	if result.Last == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("last", "result"))
+	}
+	if result.Time == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("time", "result"))
 	}
 	return
 }

@@ -31,9 +31,16 @@ var StationUpload = Type("StationUpload", func() {
 	Required("id", "time", "upload_id", "size", "url", "type", "blocks")
 })
 
+var SensorReading = Type("SensorReading", func() {
+	Attribute("last", Float32)
+	Attribute("time", Int64)
+	Required("last", "time")
+})
+
 var StationSensor = Type("StationSensor", func() {
 	Attribute("name", String)
 	Attribute("unit_of_measure", String)
+	Attribute("reading", SensorReading)
 	Required("name", "unit_of_measure")
 })
 

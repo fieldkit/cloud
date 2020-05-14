@@ -735,7 +735,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 639648518 --auth "Officiis nisi numquam omnis ratione quis."
+    `+os.Args[0]+` station get --id 1554103333 --auth "Doloremque quasi sint."
 `, os.Args[0])
 }
 
@@ -749,13 +749,13 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "name": "Corporis ipsam id sequi recusandae et.",
+      "name": "Aut temporibus veniam et sapiente.",
       "status_json": {
-         "Iusto accusamus.": "Nulla qui.",
-         "Veniam maiores neque molestias soluta pariatur.": "Voluptate fuga molestiae."
+         "Quae incidunt omnis excepturi corporis ipsam id.": "Recusandae et doloribus et iusto accusamus repellendus.",
+         "Qui velit veniam maiores neque.": "Soluta pariatur dolorem voluptate fuga."
       },
-      "status_pb": "Repellat velit sapiente enim."
-   }' --id 852214632 --auth "Quas perspiciatis nisi laudantium."
+      "status_pb": "Molestiae repellat velit."
+   }' --id 1577662745 --auth "Est at quas perspiciatis nisi laudantium."
 `, os.Args[0])
 }
 

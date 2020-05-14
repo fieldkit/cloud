@@ -154,6 +154,12 @@ type StationModule struct {
 type StationSensor struct {
 	Name          string
 	UnitOfMeasure string
+	Reading       *SensorReading
+}
+
+type SensorReading struct {
+	Last float32
+	Time int64
 }
 
 type StationFullCollection []*StationFull
@@ -488,6 +494,23 @@ func transformStationviewsStationSensorViewToStationSensor(v *stationviews.Stati
 		Name:          *v.Name,
 		UnitOfMeasure: *v.UnitOfMeasure,
 	}
+	if v.Reading != nil {
+		res.Reading = transformStationviewsSensorReadingViewToSensorReading(v.Reading)
+	}
+
+	return res
+}
+
+// transformStationviewsSensorReadingViewToSensorReading builds a value of type
+// *SensorReading from a value of type *stationviews.SensorReadingView.
+func transformStationviewsSensorReadingViewToSensorReading(v *stationviews.SensorReadingView) *SensorReading {
+	if v == nil {
+		return nil
+	}
+	res := &SensorReading{
+		Last: *v.Last,
+		Time: *v.Time,
+	}
 
 	return res
 }
@@ -569,6 +592,23 @@ func transformStationSensorToStationviewsStationSensorView(v *StationSensor) *st
 	res := &stationviews.StationSensorView{
 		Name:          &v.Name,
 		UnitOfMeasure: &v.UnitOfMeasure,
+	}
+	if v.Reading != nil {
+		res.Reading = transformSensorReadingToStationviewsSensorReadingView(v.Reading)
+	}
+
+	return res
+}
+
+// transformSensorReadingToStationviewsSensorReadingView builds a value of type
+// *stationviews.SensorReadingView from a value of type *SensorReading.
+func transformSensorReadingToStationviewsSensorReadingView(v *SensorReading) *stationviews.SensorReadingView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.SensorReadingView{
+		Last: &v.Last,
+		Time: &v.Time,
 	}
 
 	return res

@@ -1322,14 +1322,14 @@ definitions:
     properties:
       id:
         type: integer
-        example: 922994269
+        example: 1396601623
         format: int32
       name:
         type: string
-        example: Earum voluptate fugit.
+        example: Quis magnam magnam.
     example:
-      id: 484457886
-      name: Reiciendis aliquam impedit omnis iusto.
+      id: 1038624841
+      name: Temporibus aut ullam.
     required:
     - id
     - name
@@ -1742,45 +1742,67 @@ definitions:
     type: string
     description: unauthorized
     example: Dolore consequatur tenetur aut minima.
+  SensorReadingResponseBody:
+    title: SensorReadingResponseBody
+    type: object
+    properties:
+      last:
+        type: number
+        example: 0.91319716
+        format: float
+      time:
+        type: integer
+        example: 6758735997811847434
+        format: int64
+    example:
+      last: 0.94970614
+      time: 7356119066887763825
+    required:
+    - last
+    - time
   StationAddBadRequestResponseBody:
     title: StationAddBadRequestResponseBody
     type: string
     description: bad-request
-    example: Dolor vitae ratione.
+    example: Aut asperiores eos quos enim quisquam.
   StationAddForbiddenResponseBody:
     title: StationAddForbiddenResponseBody
     type: string
     description: forbidden
-    example: Est consequatur ut non unde sint.
+    example: Laborum ullam nisi dolor vitae ratione ea.
   StationAddNotFoundResponseBody:
     title: StationAddNotFoundResponseBody
     type: string
     description: not-found
-    example: Earum quas accusantium aut laborum ullam.
+    example: Est temporibus labore impedit.
   StationAddRequestBody:
     title: StationAddRequestBody
     type: object
     properties:
       device_id:
         type: string
-        example: Impedit molestiae aut asperiores eos quos enim.
+        example: Ut aliquid placeat.
       name:
         type: string
-        example: Dolor est temporibus.
+        example: Adipisci eaque non qui.
       status_json:
         type: object
         example:
-          Adipisci eaque non qui.: Ut aliquid placeat.
+          Dignissimos enim eos doloremque possimus omnis sed.: Fugit distinctio nobis
+            earum.
+          Expedita ducimus saepe et vel.: Quis reprehenderit facilis.
         additionalProperties: true
       status_pb:
         type: string
-        example: Quidem dignissimos enim eos doloremque possimus.
+        example: Illo sed culpa.
     example:
-      device_id: Distinctio nobis earum fugiat expedita ducimus.
-      name: Sed dolorem.
+      device_id: Facilis nulla nobis aut minus aut sunt.
+      name: Ullam et voluptatem nisi vitae non.
       status_json:
-        Vel ut quis reprehenderit.: Porro illo sed culpa illo ullam.
-      status_pb: Voluptatem nisi vitae non sed.
+        Ex quas alias.: Consequatur minima sint ipsa.
+        Laboriosam voluptas eveniet libero sunt enim commodi.: Labore quidem in quia.
+        Omnis cupiditate consequatur est eos.: Aut ratione.
+      status_pb: Eos non voluptas quo.
     required:
     - name
     - device_id
@@ -1835,12 +1857,24 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -1848,25 +1882,24 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
       name:
         type: string
@@ -1914,17 +1947,18 @@ definitions:
           url: Voluptatem dolorum ut libero ducimus vitae.
     description: AddResponseBody result type (default view)
     example:
-      battery: 0.14634562
-      device_id: Provident provident eum et aut.
-      firmware_number: 1594683699
-      firmware_time: 1186149557
-      id: 72889830
+      battery: 0.24389912
+      device_id: Numquam et quis exercitationem praesentium quia et.
+      firmware_number: 737736688
+      firmware_time: 1690763706
+      id: 446491040
       images:
       - url: Molestiae aut in.
       - url: Molestiae aut in.
       - url: Molestiae aut in.
-      memory_available: 402833369
-      memory_used: 890060977
+      - url: Molestiae aut in.
+      memory_available: 1557696607
+      memory_used: 444039368
       modules:
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -1932,12 +1966,24 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -1945,26 +1991,107 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
-      name: Facilis officia eum eos impedit voluptates.
+      - hardware_id: Sint ea perspiciatis magnam fugiat.
+        id: 7128358081265260880
+        name: Doloremque aut eos tenetur deleniti.
+        position: 834376722
+        sensors:
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+      - hardware_id: Sint ea perspiciatis magnam fugiat.
+        id: 7128358081265260880
+        name: Doloremque aut eos tenetur deleniti.
+        position: 834376722
+        sensors:
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+      name: Adipisci provident provident eum et aut.
       owner:
         id: 352202837
         name: Esse suscipit saepe.
       photos:
         small: Voluptatem perspiciatis libero minus.
-      read_only: true
-      recording_started_at: 3777072024114468358
+      read_only: false
+      recording_started_at: 8878077367688567723
       status_json:
-        Praesentium quia et voluptatem quibusdam officia.: Adipisci non voluptatem
-          eius magni.
-        Repudiandae omnis repellendus dolor illo.: Quaerat qui natus cum facere quos.
+        Cum facere quos ut rerum beatae.: Quia voluptas consectetur magnam enim sit
+          qui.
+        Non voluptatem eius magni deserunt.: Omnis repellendus dolor illo sunt quaerat
+          qui.
       uploads:
+      - blocks:
+        - 8865864692656824427
+        - 2317958010507024076
+        id: 4012211043050441801
+        size: 8965764026283020231
+        time: 1217921154830922021
+        type: Officia rerum sunt.
+        upload_id: Omnis distinctio placeat voluptate.
+        url: Voluptatem dolorum ut libero ducimus vitae.
+      - blocks:
+        - 8865864692656824427
+        - 2317958010507024076
+        id: 4012211043050441801
+        size: 8965764026283020231
+        time: 1217921154830922021
+        type: Officia rerum sunt.
+        upload_id: Omnis distinctio placeat voluptate.
+        url: Voluptatem dolorum ut libero ducimus vitae.
       - blocks:
         - 8865864692656824427
         - 2317958010507024076
@@ -2004,29 +2131,29 @@ definitions:
     title: StationAddUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Enim sit qui occaecati aut quidem libero.
+    example: Non unde sint ex earum quas accusantium.
   StationFullResponseBody:
     title: 'Mediatype identifier: application/vnd.app.station.full; view=default'
     type: object
     properties:
       battery:
         type: number
-        example: 0.727215
+        example: 0.49828598
         format: float
       device_id:
         type: string
-        example: Dolorem et repudiandae asperiores ut.
+        example: Dolor rerum sed eum voluptatem sequi.
       firmware_number:
         type: integer
-        example: 988944466
+        example: 94747561
         format: int32
       firmware_time:
         type: integer
-        example: 179587147
+        example: 225026748
         format: int32
       id:
         type: integer
-        example: 372076216
+        example: 1561682307
         format: int32
       images:
         type: array
@@ -2036,13 +2163,14 @@ definitions:
         - url: Molestiae aut in.
         - url: Molestiae aut in.
         - url: Molestiae aut in.
+        - url: Molestiae aut in.
       memory_available:
         type: integer
-        example: 1401773740
+        example: 1484323548
         format: int32
       memory_used:
         type: integer
-        example: 891397594
+        example: 351089072
         format: int32
       modules:
         type: array
@@ -2055,12 +2183,24 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -2068,16 +2208,28 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
       name:
         type: string
-        example: Dolorem modi occaecati quisquam quidem nisi.
+        example: Sit esse cupiditate cupiditate omnis.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
@@ -2087,14 +2239,14 @@ definitions:
         example: false
       recording_started_at:
         type: integer
-        example: 7653689849478170966
+        example: 1608706266272748622
         format: int64
       status_json:
         type: object
         example:
-          Laudantium voluptate nulla.: Velit non dolorem.
-          Sunt aut eos porro ipsam.: Delectus omnis qui et.
-          Sunt in tenetur beatae id.: Et ut dolor tenetur ea.
+          Officiis a.: Et non dolore est consequatur.
+          Quia quaerat quia occaecati.: Sequi vero reiciendis.
+          Recusandae explicabo ducimus ut accusamus iste et.: Ipsam et.
         additionalProperties: true
       uploads:
         type: array
@@ -2139,18 +2291,17 @@ definitions:
           url: Voluptatem dolorum ut libero ducimus vitae.
     description: StationFullResponseBody result type (default view)
     example:
-      battery: 0.80613667
-      device_id: Hic eligendi voluptatibus delectus enim quia quaerat.
-      firmware_number: 1474309260
-      firmware_time: 1145861149
-      id: 422661226
+      battery: 0.7487886
+      device_id: Facere consequatur voluptate debitis rerum.
+      firmware_number: 1940315993
+      firmware_time: 130653414
+      id: 318527121
       images:
       - url: Molestiae aut in.
       - url: Molestiae aut in.
       - url: Molestiae aut in.
-      - url: Molestiae aut in.
-      memory_available: 571732447
-      memory_used: 1595021772
+      memory_available: 1157090305
+      memory_used: 158969624
       modules:
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -2158,12 +2309,24 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -2171,12 +2334,24 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -2184,38 +2359,57 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
-      - hardware_id: Sint ea perspiciatis magnam fugiat.
-        id: 7128358081265260880
-        name: Doloremque aut eos tenetur deleniti.
-        position: 834376722
-        sensors:
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-      name: Rerum sed eum voluptatem.
+      name: Accusantium ab nesciunt omnis et.
       owner:
         id: 352202837
         name: Esse suscipit saepe.
       photos:
         small: Voluptatem perspiciatis libero minus.
       read_only: true
-      recording_started_at: 6657821746153561721
+      recording_started_at: 8354839875140495521
       status_json:
-        Ipsam et.: Officiis a.
-        Reiciendis qui recusandae explicabo ducimus.: Accusamus iste et.
+        Asperiores consequatur dolorum et perferendis temporibus iure.: Veritatis
+          est et ipsum magnam et.
+        At maiores ullam.: Magnam odit ratione expedita numquam consequatur necessitatibus.
+        Hic labore et tenetur labore officia.: Atque quas voluptas sit.
       uploads:
+      - blocks:
+        - 8865864692656824427
+        - 2317958010507024076
+        id: 4012211043050441801
+        size: 8965764026283020231
+        time: 1217921154830922021
+        type: Officia rerum sunt.
+        upload_id: Omnis distinctio placeat voluptate.
+        url: Voluptatem dolorum ut libero ducimus vitae.
+      - blocks:
+        - 8865864692656824427
+        - 2317958010507024076
+        id: 4012211043050441801
+        size: 8965764026283020231
+        time: 1217921154830922021
+        type: Officia rerum sunt.
+        upload_id: Omnis distinctio placeat voluptate.
+        url: Voluptatem dolorum ut libero ducimus vitae.
       - blocks:
         - 8865864692656824427
         - 2317958010507024076
@@ -2260,16 +2454,17 @@ definitions:
     description: StationFullCollectionResponseBody is the result type for an array
       of StationFullResponseBody (default view)
     example:
-    - battery: 0.85445565
-      device_id: Natus hic.
-      firmware_number: 891652138
-      firmware_time: 172566858
-      id: 503359916
+    - battery: 0.93975663
+      device_id: Dolorem placeat a et.
+      firmware_number: 209858897
+      firmware_time: 1459573157
+      id: 2093369974
       images:
       - url: Molestiae aut in.
       - url: Molestiae aut in.
-      memory_available: 573792566
-      memory_used: 793127615
+      - url: Molestiae aut in.
+      memory_available: 1915130871
+      memory_used: 276069064
       modules:
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -2277,12 +2472,24 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -2290,52 +2497,39 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
-      - hardware_id: Sint ea perspiciatis magnam fugiat.
-        id: 7128358081265260880
-        name: Doloremque aut eos tenetur deleniti.
-        position: 834376722
-        sensors:
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-      - hardware_id: Sint ea perspiciatis magnam fugiat.
-        id: 7128358081265260880
-        name: Doloremque aut eos tenetur deleniti.
-        position: 834376722
-        sensors:
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-      name: Sit possimus autem.
+      name: Autem quia natus hic.
       owner:
         id: 352202837
         name: Esse suscipit saepe.
       photos:
         small: Voluptatem perspiciatis libero minus.
-      read_only: false
-      recording_started_at: 3297585623688624374
+      read_only: true
+      recording_started_at: 8670521513360547101
       status_json:
-        Aut qui ea fuga.: Adipisci debitis eaque esse cupiditate ducimus.
-        Cupiditate et.: Veniam qui.
-        Ut quam aliquid quo voluptate atque qui.: Exercitationem delectus totam eaque
-          exercitationem illo dicta.
+        Adipisci debitis eaque esse cupiditate ducimus.: Ut quam aliquid quo voluptate
+          atque qui.
+        Exercitationem delectus totam eaque exercitationem illo dicta.: Cupiditate
+          et.
+        Veniam qui.: Minus totam illum veniam deserunt sint.
       uploads:
       - blocks:
         - 8865864692656824427
@@ -2364,16 +2558,17 @@ definitions:
         type: Officia rerum sunt.
         upload_id: Omnis distinctio placeat voluptate.
         url: Voluptatem dolorum ut libero ducimus vitae.
-    - battery: 0.85445565
-      device_id: Natus hic.
-      firmware_number: 891652138
-      firmware_time: 172566858
-      id: 503359916
+    - battery: 0.93975663
+      device_id: Dolorem placeat a et.
+      firmware_number: 209858897
+      firmware_time: 1459573157
+      id: 2093369974
       images:
       - url: Molestiae aut in.
       - url: Molestiae aut in.
-      memory_available: 573792566
-      memory_used: 793127615
+      - url: Molestiae aut in.
+      memory_available: 1915130871
+      memory_used: 276069064
       modules:
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -2381,12 +2576,24 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -2394,52 +2601,39 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
-      - hardware_id: Sint ea perspiciatis magnam fugiat.
-        id: 7128358081265260880
-        name: Doloremque aut eos tenetur deleniti.
-        position: 834376722
-        sensors:
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-      - hardware_id: Sint ea perspiciatis magnam fugiat.
-        id: 7128358081265260880
-        name: Doloremque aut eos tenetur deleniti.
-        position: 834376722
-        sensors:
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-      name: Sit possimus autem.
+      name: Autem quia natus hic.
       owner:
         id: 352202837
         name: Esse suscipit saepe.
       photos:
         small: Voluptatem perspiciatis libero minus.
-      read_only: false
-      recording_started_at: 3297585623688624374
+      read_only: true
+      recording_started_at: 8670521513360547101
       status_json:
-        Aut qui ea fuga.: Adipisci debitis eaque esse cupiditate ducimus.
-        Cupiditate et.: Veniam qui.
-        Ut quam aliquid quo voluptate atque qui.: Exercitationem delectus totam eaque
-          exercitationem illo dicta.
+        Adipisci debitis eaque esse cupiditate ducimus.: Ut quam aliquid quo voluptate
+          atque qui.
+        Exercitationem delectus totam eaque exercitationem illo dicta.: Cupiditate
+          et.
+        Veniam qui.: Minus totam illum veniam deserunt sint.
       uploads:
       - blocks:
         - 8865864692656824427
@@ -2468,16 +2662,17 @@ definitions:
         type: Officia rerum sunt.
         upload_id: Omnis distinctio placeat voluptate.
         url: Voluptatem dolorum ut libero ducimus vitae.
-    - battery: 0.85445565
-      device_id: Natus hic.
-      firmware_number: 891652138
-      firmware_time: 172566858
-      id: 503359916
+    - battery: 0.93975663
+      device_id: Dolorem placeat a et.
+      firmware_number: 209858897
+      firmware_time: 1459573157
+      id: 2093369974
       images:
       - url: Molestiae aut in.
       - url: Molestiae aut in.
-      memory_available: 573792566
-      memory_used: 793127615
+      - url: Molestiae aut in.
+      memory_available: 1915130871
+      memory_used: 276069064
       modules:
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -2485,12 +2680,24 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -2498,52 +2705,143 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
-      - hardware_id: Sint ea perspiciatis magnam fugiat.
-        id: 7128358081265260880
-        name: Doloremque aut eos tenetur deleniti.
-        position: 834376722
-        sensors:
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-      - hardware_id: Sint ea perspiciatis magnam fugiat.
-        id: 7128358081265260880
-        name: Doloremque aut eos tenetur deleniti.
-        position: 834376722
-        sensors:
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-      name: Sit possimus autem.
+      name: Autem quia natus hic.
       owner:
         id: 352202837
         name: Esse suscipit saepe.
       photos:
         small: Voluptatem perspiciatis libero minus.
-      read_only: false
-      recording_started_at: 3297585623688624374
+      read_only: true
+      recording_started_at: 8670521513360547101
       status_json:
-        Aut qui ea fuga.: Adipisci debitis eaque esse cupiditate ducimus.
-        Cupiditate et.: Veniam qui.
-        Ut quam aliquid quo voluptate atque qui.: Exercitationem delectus totam eaque
-          exercitationem illo dicta.
+        Adipisci debitis eaque esse cupiditate ducimus.: Ut quam aliquid quo voluptate
+          atque qui.
+        Exercitationem delectus totam eaque exercitationem illo dicta.: Cupiditate
+          et.
+        Veniam qui.: Minus totam illum veniam deserunt sint.
+      uploads:
+      - blocks:
+        - 8865864692656824427
+        - 2317958010507024076
+        id: 4012211043050441801
+        size: 8965764026283020231
+        time: 1217921154830922021
+        type: Officia rerum sunt.
+        upload_id: Omnis distinctio placeat voluptate.
+        url: Voluptatem dolorum ut libero ducimus vitae.
+      - blocks:
+        - 8865864692656824427
+        - 2317958010507024076
+        id: 4012211043050441801
+        size: 8965764026283020231
+        time: 1217921154830922021
+        type: Officia rerum sunt.
+        upload_id: Omnis distinctio placeat voluptate.
+        url: Voluptatem dolorum ut libero ducimus vitae.
+      - blocks:
+        - 8865864692656824427
+        - 2317958010507024076
+        id: 4012211043050441801
+        size: 8965764026283020231
+        time: 1217921154830922021
+        type: Officia rerum sunt.
+        upload_id: Omnis distinctio placeat voluptate.
+        url: Voluptatem dolorum ut libero ducimus vitae.
+    - battery: 0.93975663
+      device_id: Dolorem placeat a et.
+      firmware_number: 209858897
+      firmware_time: 1459573157
+      id: 2093369974
+      images:
+      - url: Molestiae aut in.
+      - url: Molestiae aut in.
+      - url: Molestiae aut in.
+      memory_available: 1915130871
+      memory_used: 276069064
+      modules:
+      - hardware_id: Sint ea perspiciatis magnam fugiat.
+        id: 7128358081265260880
+        name: Doloremque aut eos tenetur deleniti.
+        position: 834376722
+        sensors:
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+      - hardware_id: Sint ea perspiciatis magnam fugiat.
+        id: 7128358081265260880
+        name: Doloremque aut eos tenetur deleniti.
+        position: 834376722
+        sensors:
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+      name: Autem quia natus hic.
+      owner:
+        id: 352202837
+        name: Esse suscipit saepe.
+      photos:
+        small: Voluptatem perspiciatis libero minus.
+      read_only: true
+      recording_started_at: 8670521513360547101
+      status_json:
+        Adipisci debitis eaque esse cupiditate ducimus.: Ut quam aliquid quo voluptate
+          atque qui.
+        Exercitationem delectus totam eaque exercitationem illo dicta.: Cupiditate
+          et.
+        Veniam qui.: Minus totam illum veniam deserunt sint.
       uploads:
       - blocks:
         - 8865864692656824427
@@ -2576,39 +2874,39 @@ definitions:
     title: StationGetBadRequestResponseBody
     type: string
     description: bad-request
-    example: Natus voluptas rem necessitatibus ipsa.
+    example: Quia optio.
   StationGetForbiddenResponseBody:
     title: StationGetForbiddenResponseBody
     type: string
     description: forbidden
-    example: Temporibus suscipit voluptatem tempore sed consequuntur.
+    example: Molestiae amet accusamus sed maiores dolorem.
   StationGetNotFoundResponseBody:
     title: StationGetNotFoundResponseBody
     type: string
     description: not-found
-    example: Natus tempora laboriosam.
+    example: Sint iste voluptate sed iusto.
   StationGetResponseBody:
     title: 'Mediatype identifier: application/vnd.app.station.full; view=default'
     type: object
     properties:
       battery:
         type: number
-        example: 0.36988148
+        example: 0.6040479
         format: float
       device_id:
         type: string
-        example: Quibusdam omnis.
+        example: Quas eum non et eaque ipsum ut.
       firmware_number:
         type: integer
-        example: 657069389
+        example: 1522030258
         format: int32
       firmware_time:
         type: integer
-        example: 267511061
+        example: 1772085832
         format: int32
       id:
         type: integer
-        example: 2000619793
+        example: 794314460
         format: int32
       images:
         type: array
@@ -2618,13 +2916,14 @@ definitions:
         - url: Molestiae aut in.
         - url: Molestiae aut in.
         - url: Molestiae aut in.
+        - url: Molestiae aut in.
       memory_available:
         type: integer
-        example: 246437234
+        example: 1778766431
         format: int32
       memory_used:
         type: integer
-        example: 1878813566
+        example: 112915389
         format: int32
       modules:
         type: array
@@ -2637,12 +2936,24 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -2650,46 +2961,43 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
       name:
         type: string
-        example: Nobis aut minus aut sunt.
+        example: Aut assumenda necessitatibus laborum laudantium.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
         $ref: '#/definitions/StationPhotosResponseBody'
       read_only:
         type: boolean
-        example: true
+        example: false
       recording_started_at:
         type: integer
-        example: 2517408696824133872
+        example: 4825489532639110812
         format: int64
       status_json:
         type: object
         example:
-          Aut ratione.: Laboriosam voluptas eveniet libero sunt enim commodi.
-          Consequatur minima sint ipsa.: Eos non voluptas quo.
-          Labore quidem in quia.: Ex quas alias.
+          Consequatur occaecati aut fuga maiores eveniet dolorem.: Vel ut.
         additionalProperties: true
       uploads:
         type: array
@@ -2723,20 +3031,28 @@ definitions:
           type: Officia rerum sunt.
           upload_id: Omnis distinctio placeat voluptate.
           url: Voluptatem dolorum ut libero ducimus vitae.
+        - blocks:
+          - 8865864692656824427
+          - 2317958010507024076
+          id: 4012211043050441801
+          size: 8965764026283020231
+          time: 1217921154830922021
+          type: Officia rerum sunt.
+          upload_id: Omnis distinctio placeat voluptate.
+          url: Voluptatem dolorum ut libero ducimus vitae.
     description: GetResponseBody result type (default view)
     example:
-      battery: 0.08898804
-      device_id: Ut eligendi.
-      firmware_number: 548487271
-      firmware_time: 72384144
-      id: 538676387
+      battery: 0.43538374
+      device_id: Autem dolorem cupiditate.
+      firmware_number: 1253229211
+      firmware_time: 596524501
+      id: 1069874340
       images:
       - url: Molestiae aut in.
       - url: Molestiae aut in.
       - url: Molestiae aut in.
-      - url: Molestiae aut in.
-      memory_available: 1327238171
-      memory_used: 844891189
+      memory_available: 1802460674
+      memory_used: 561285459
       modules:
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -2744,12 +3060,24 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -2757,25 +3085,86 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
-      name: Eum non et eaque.
+      - hardware_id: Sint ea perspiciatis magnam fugiat.
+        id: 7128358081265260880
+        name: Doloremque aut eos tenetur deleniti.
+        position: 834376722
+        sensors:
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+      - hardware_id: Sint ea perspiciatis magnam fugiat.
+        id: 7128358081265260880
+        name: Doloremque aut eos tenetur deleniti.
+        position: 834376722
+        sensors:
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+      name: Commodi magni vel quaerat nemo dolor.
       owner:
         id: 352202837
         name: Esse suscipit saepe.
       photos:
         small: Voluptatem perspiciatis libero minus.
-      read_only: false
-      recording_started_at: 3003898969482316482
+      read_only: true
+      recording_started_at: 6483760406262071999
       status_json:
-        Explicabo debitis praesentium quis.: Sunt similique aspernatur laudantium
-          commodi magni.
-        Occaecati aut fuga.: Eveniet dolorem est vel.
+        Blanditiis odio temporibus suscipit voluptatem.: Sed consequuntur pariatur
+          natus tempora laboriosam ab.
       uploads:
       - blocks:
         - 8865864692656824427
@@ -2834,22 +3223,22 @@ definitions:
     title: StationGetUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Sed sint consectetur nemo provident blanditiis.
+    example: Veniam esse reprehenderit non laborum nobis.
   StationListMineBadRequestResponseBody:
     title: StationListMineBadRequestResponseBody
     type: string
     description: bad-request
-    example: Voluptate debitis rerum.
+    example: Quas labore.
   StationListMineForbiddenResponseBody:
     title: StationListMineForbiddenResponseBody
     type: string
     description: forbidden
-    example: Sint accusantium ab nesciunt omnis.
+    example: Nemo non repellendus porro aut.
   StationListMineNotFoundResponseBody:
     title: StationListMineNotFoundResponseBody
     type: string
     description: not-found
-    example: Et facere.
+    example: Quidem harum.
   StationListMineResponseBody:
     title: 'Mediatype identifier: application/vnd.app.stations.full; view=default'
     type: object
@@ -2859,16 +3248,17 @@ definitions:
     description: List MineResponseBody result type (default view)
     example:
       stations:
-      - battery: 0.85445565
-        device_id: Natus hic.
-        firmware_number: 891652138
-        firmware_time: 172566858
-        id: 503359916
+      - battery: 0.93975663
+        device_id: Dolorem placeat a et.
+        firmware_number: 209858897
+        firmware_time: 1459573157
+        id: 2093369974
         images:
         - url: Molestiae aut in.
         - url: Molestiae aut in.
-        memory_available: 573792566
-        memory_used: 793127615
+        - url: Molestiae aut in.
+        memory_available: 1915130871
+        memory_used: 276069064
         modules:
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -2876,12 +3266,24 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -2889,52 +3291,39 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        name: Sit possimus autem.
+        name: Autem quia natus hic.
         owner:
           id: 352202837
           name: Esse suscipit saepe.
         photos:
           small: Voluptatem perspiciatis libero minus.
-        read_only: false
-        recording_started_at: 3297585623688624374
+        read_only: true
+        recording_started_at: 8670521513360547101
         status_json:
-          Aut qui ea fuga.: Adipisci debitis eaque esse cupiditate ducimus.
-          Cupiditate et.: Veniam qui.
-          Ut quam aliquid quo voluptate atque qui.: Exercitationem delectus totam
-            eaque exercitationem illo dicta.
+          Adipisci debitis eaque esse cupiditate ducimus.: Ut quam aliquid quo voluptate
+            atque qui.
+          Exercitationem delectus totam eaque exercitationem illo dicta.: Cupiditate
+            et.
+          Veniam qui.: Minus totam illum veniam deserunt sint.
         uploads:
         - blocks:
           - 8865864692656824427
@@ -2963,16 +3352,17 @@ definitions:
           type: Officia rerum sunt.
           upload_id: Omnis distinctio placeat voluptate.
           url: Voluptatem dolorum ut libero ducimus vitae.
-      - battery: 0.85445565
-        device_id: Natus hic.
-        firmware_number: 891652138
-        firmware_time: 172566858
-        id: 503359916
+      - battery: 0.93975663
+        device_id: Dolorem placeat a et.
+        firmware_number: 209858897
+        firmware_time: 1459573157
+        id: 2093369974
         images:
         - url: Molestiae aut in.
         - url: Molestiae aut in.
-        memory_available: 573792566
-        memory_used: 793127615
+        - url: Molestiae aut in.
+        memory_available: 1915130871
+        memory_used: 276069064
         modules:
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -2980,12 +3370,24 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -2993,52 +3395,39 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        name: Sit possimus autem.
+        name: Autem quia natus hic.
         owner:
           id: 352202837
           name: Esse suscipit saepe.
         photos:
           small: Voluptatem perspiciatis libero minus.
-        read_only: false
-        recording_started_at: 3297585623688624374
+        read_only: true
+        recording_started_at: 8670521513360547101
         status_json:
-          Aut qui ea fuga.: Adipisci debitis eaque esse cupiditate ducimus.
-          Cupiditate et.: Veniam qui.
-          Ut quam aliquid quo voluptate atque qui.: Exercitationem delectus totam
-            eaque exercitationem illo dicta.
+          Adipisci debitis eaque esse cupiditate ducimus.: Ut quam aliquid quo voluptate
+            atque qui.
+          Exercitationem delectus totam eaque exercitationem illo dicta.: Cupiditate
+            et.
+          Veniam qui.: Minus totam illum veniam deserunt sint.
         uploads:
         - blocks:
           - 8865864692656824427
@@ -3067,16 +3456,17 @@ definitions:
           type: Officia rerum sunt.
           upload_id: Omnis distinctio placeat voluptate.
           url: Voluptatem dolorum ut libero ducimus vitae.
-      - battery: 0.85445565
-        device_id: Natus hic.
-        firmware_number: 891652138
-        firmware_time: 172566858
-        id: 503359916
+      - battery: 0.93975663
+        device_id: Dolorem placeat a et.
+        firmware_number: 209858897
+        firmware_time: 1459573157
+        id: 2093369974
         images:
         - url: Molestiae aut in.
         - url: Molestiae aut in.
-        memory_available: 573792566
-        memory_used: 793127615
+        - url: Molestiae aut in.
+        memory_available: 1915130871
+        memory_used: 276069064
         modules:
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -3084,12 +3474,24 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -3097,52 +3499,39 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        name: Sit possimus autem.
+        name: Autem quia natus hic.
         owner:
           id: 352202837
           name: Esse suscipit saepe.
         photos:
           small: Voluptatem perspiciatis libero minus.
-        read_only: false
-        recording_started_at: 3297585623688624374
+        read_only: true
+        recording_started_at: 8670521513360547101
         status_json:
-          Aut qui ea fuga.: Adipisci debitis eaque esse cupiditate ducimus.
-          Cupiditate et.: Veniam qui.
-          Ut quam aliquid quo voluptate atque qui.: Exercitationem delectus totam
-            eaque exercitationem illo dicta.
+          Adipisci debitis eaque esse cupiditate ducimus.: Ut quam aliquid quo voluptate
+            atque qui.
+          Exercitationem delectus totam eaque exercitationem illo dicta.: Cupiditate
+            et.
+          Veniam qui.: Minus totam illum veniam deserunt sint.
         uploads:
         - blocks:
           - 8865864692656824427
@@ -3177,22 +3566,22 @@ definitions:
     title: StationListMineUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Placeat exercitationem aut saepe.
+    example: In expedita aliquid illo id et sequi.
   StationListProjectBadRequestResponseBody:
     title: StationListProjectBadRequestResponseBody
     type: string
     description: bad-request
-    example: Necessitatibus temporibus hic labore et.
+    example: Quod laborum dolores ullam ipsum.
   StationListProjectForbiddenResponseBody:
     title: StationListProjectForbiddenResponseBody
     type: string
     description: forbidden
-    example: Modi at maiores ullam voluptatem.
+    example: Ratione quo dignissimos ut blanditiis temporibus in.
   StationListProjectNotFoundResponseBody:
     title: StationListProjectNotFoundResponseBody
     type: string
     description: not-found
-    example: Odit ratione expedita numquam.
+    example: Aut similique voluptas culpa voluptatum.
   StationListProjectResponseBody:
     title: 'Mediatype identifier: application/vnd.app.stations.full; view=default'
     type: object
@@ -3202,16 +3591,17 @@ definitions:
     description: List ProjectResponseBody result type (default view)
     example:
       stations:
-      - battery: 0.85445565
-        device_id: Natus hic.
-        firmware_number: 891652138
-        firmware_time: 172566858
-        id: 503359916
+      - battery: 0.93975663
+        device_id: Dolorem placeat a et.
+        firmware_number: 209858897
+        firmware_time: 1459573157
+        id: 2093369974
         images:
         - url: Molestiae aut in.
         - url: Molestiae aut in.
-        memory_available: 573792566
-        memory_used: 793127615
+        - url: Molestiae aut in.
+        memory_available: 1915130871
+        memory_used: 276069064
         modules:
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -3219,12 +3609,24 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -3232,52 +3634,39 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        name: Sit possimus autem.
+        name: Autem quia natus hic.
         owner:
           id: 352202837
           name: Esse suscipit saepe.
         photos:
           small: Voluptatem perspiciatis libero minus.
-        read_only: false
-        recording_started_at: 3297585623688624374
+        read_only: true
+        recording_started_at: 8670521513360547101
         status_json:
-          Aut qui ea fuga.: Adipisci debitis eaque esse cupiditate ducimus.
-          Cupiditate et.: Veniam qui.
-          Ut quam aliquid quo voluptate atque qui.: Exercitationem delectus totam
-            eaque exercitationem illo dicta.
+          Adipisci debitis eaque esse cupiditate ducimus.: Ut quam aliquid quo voluptate
+            atque qui.
+          Exercitationem delectus totam eaque exercitationem illo dicta.: Cupiditate
+            et.
+          Veniam qui.: Minus totam illum veniam deserunt sint.
         uploads:
         - blocks:
           - 8865864692656824427
@@ -3306,16 +3695,17 @@ definitions:
           type: Officia rerum sunt.
           upload_id: Omnis distinctio placeat voluptate.
           url: Voluptatem dolorum ut libero ducimus vitae.
-      - battery: 0.85445565
-        device_id: Natus hic.
-        firmware_number: 891652138
-        firmware_time: 172566858
-        id: 503359916
+      - battery: 0.93975663
+        device_id: Dolorem placeat a et.
+        firmware_number: 209858897
+        firmware_time: 1459573157
+        id: 2093369974
         images:
         - url: Molestiae aut in.
         - url: Molestiae aut in.
-        memory_available: 573792566
-        memory_used: 793127615
+        - url: Molestiae aut in.
+        memory_available: 1915130871
+        memory_used: 276069064
         modules:
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -3323,12 +3713,24 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -3336,52 +3738,39 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        name: Sit possimus autem.
+        name: Autem quia natus hic.
         owner:
           id: 352202837
           name: Esse suscipit saepe.
         photos:
           small: Voluptatem perspiciatis libero minus.
-        read_only: false
-        recording_started_at: 3297585623688624374
+        read_only: true
+        recording_started_at: 8670521513360547101
         status_json:
-          Aut qui ea fuga.: Adipisci debitis eaque esse cupiditate ducimus.
-          Cupiditate et.: Veniam qui.
-          Ut quam aliquid quo voluptate atque qui.: Exercitationem delectus totam
-            eaque exercitationem illo dicta.
+          Adipisci debitis eaque esse cupiditate ducimus.: Ut quam aliquid quo voluptate
+            atque qui.
+          Exercitationem delectus totam eaque exercitationem illo dicta.: Cupiditate
+            et.
+          Veniam qui.: Minus totam illum veniam deserunt sint.
         uploads:
         - blocks:
           - 8865864692656824427
@@ -3410,16 +3799,17 @@ definitions:
           type: Officia rerum sunt.
           upload_id: Omnis distinctio placeat voluptate.
           url: Voluptatem dolorum ut libero ducimus vitae.
-      - battery: 0.85445565
-        device_id: Natus hic.
-        firmware_number: 891652138
-        firmware_time: 172566858
-        id: 503359916
+      - battery: 0.93975663
+        device_id: Dolorem placeat a et.
+        firmware_number: 209858897
+        firmware_time: 1459573157
+        id: 2093369974
         images:
         - url: Molestiae aut in.
         - url: Molestiae aut in.
-        memory_available: 573792566
-        memory_used: 793127615
+        - url: Molestiae aut in.
+        memory_available: 1915130871
+        memory_used: 276069064
         modules:
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -3427,12 +3817,24 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -3440,52 +3842,39 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        name: Sit possimus autem.
+        name: Autem quia natus hic.
         owner:
           id: 352202837
           name: Esse suscipit saepe.
         photos:
           small: Voluptatem perspiciatis libero minus.
-        read_only: false
-        recording_started_at: 3297585623688624374
+        read_only: true
+        recording_started_at: 8670521513360547101
         status_json:
-          Aut qui ea fuga.: Adipisci debitis eaque esse cupiditate ducimus.
-          Cupiditate et.: Veniam qui.
-          Ut quam aliquid quo voluptate atque qui.: Exercitationem delectus totam
-            eaque exercitationem illo dicta.
+          Adipisci debitis eaque esse cupiditate ducimus.: Ut quam aliquid quo voluptate
+            atque qui.
+          Exercitationem delectus totam eaque exercitationem illo dicta.: Cupiditate
+            et.
+          Veniam qui.: Minus totam illum veniam deserunt sint.
         uploads:
         - blocks:
           - 8865864692656824427
@@ -3520,7 +3909,7 @@ definitions:
     title: StationListProjectUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Quis omnis.
+    example: Voluptatem voluptate.
   StationModuleResponseBody:
     title: StationModuleResponseBody
     type: object
@@ -3545,18 +3934,35 @@ definitions:
           $ref: '#/definitions/StationSensorResponseBody'
         example:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
+          unit_of_measure: Facere corporis eum et omnis consectetur.
+        - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
     example:
-      hardware_id: Dolorem aut beatae voluptate eaque.
-      id: 7193617878477830288
-      name: Commodi laboriosam.
-      position: 49569650
+      hardware_id: Eaque aut commodi laboriosam ut tempore veritatis.
+      id: 282105191117981441
+      name: Et facilis.
+      position: 1690635197
       sensors:
       - name: Ipsam consequatur impedit.
+        reading:
+          last: 0.23439522
+          time: 2177277508224826867
         unit_of_measure: Facere corporis eum et omnis consectetur.
       - name: Ipsam consequatur impedit.
+        reading:
+          last: 0.23439522
+          time: 2177277508224826867
         unit_of_measure: Facere corporis eum et omnis consectetur.
     required:
     - id
@@ -3584,22 +3990,22 @@ definitions:
     title: StationPhotoBadRequestResponseBody
     type: string
     description: bad-request
-    example: Veritatis est et ipsum magnam et.
+    example: Consectetur eveniet animi impedit laborum doloremque.
   StationPhotoForbiddenResponseBody:
     title: StationPhotoForbiddenResponseBody
     type: string
     description: forbidden
-    example: Sit quis asperiores consequatur dolorum et.
+    example: Cupiditate eos maiores consequatur et architecto.
   StationPhotoNotFoundResponseBody:
     title: StationPhotoNotFoundResponseBody
     type: string
     description: not-found
-    example: Temporibus iure.
+    example: Voluptatibus labore ut voluptates.
   StationPhotoUnauthorizedResponseBody:
     title: StationPhotoUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Labore officia ut atque quas.
+    example: Eaque ut.
   StationPhotosResponseBody:
     title: StationPhotosResponseBody
     type: object
@@ -3618,12 +4024,17 @@ definitions:
       name:
         type: string
         example: Consectetur est.
+      reading:
+        $ref: '#/definitions/SensorReadingResponseBody'
       unit_of_measure:
         type: string
         example: Consequatur facere voluptas consequatur.
     example:
-      name: Dolor totam atque non veniam.
-      unit_of_measure: Aliquam necessitatibus nesciunt est sit.
+      name: Veniam aspernatur aliquam necessitatibus nesciunt.
+      reading:
+        last: 0.23439522
+        time: 2177277508224826867
+      unit_of_measure: Sit possimus distinctio ab dolorem.
     required:
     - name
     - unit_of_measure
@@ -3648,40 +4059,42 @@ definitions:
     title: StationUpdateBadRequestResponseBody
     type: string
     description: bad-request
-    example: Laboriosam pariatur fugit repudiandae.
+    example: Et vero suscipit quia rerum dolorem voluptates.
   StationUpdateForbiddenResponseBody:
     title: StationUpdateForbiddenResponseBody
     type: string
     description: forbidden
-    example: Quae nostrum ea.
+    example: Ullam et.
   StationUpdateNotFoundResponseBody:
     title: StationUpdateNotFoundResponseBody
     type: string
     description: not-found
-    example: Voluptatem et.
+    example: Sit omnis voluptate.
   StationUpdateRequestBody:
     title: StationUpdateRequestBody
     type: object
     properties:
       name:
         type: string
-        example: Quo fuga.
+        example: Aperiam aut dolores.
       status_json:
         type: object
         example:
-          Et vero suscipit quia rerum dolorem voluptates.: Aperiam aut dolores.
-          Ullam et.: Sit omnis voluptate.
-          Ut iure reprehenderit accusamus architecto.: Aperiam saepe sint.
+          Aut consectetur et ipsa.: Et illum.
+          Commodi voluptatem.: Ut blanditiis rerum ea id distinctio.
+          Et eos sed occaecati porro.: Eaque exercitationem ea impedit veritatis voluptatem
+            necessitatibus.
         additionalProperties: true
       status_pb:
         type: string
-        example: Aut et eos sed.
+        example: Quaerat dolorem modi occaecati quisquam quidem.
     example:
-      name: Porro quisquam eaque exercitationem ea.
+      name: Et dolorem et repudiandae asperiores ut.
       status_json:
-        Et illum.: Commodi voluptatem.
-        Voluptatem necessitatibus.: Aut consectetur et ipsa.
-      status_pb: Ut blanditiis rerum ea id distinctio.
+        Delectus omnis qui et.: Sunt in tenetur beatae id.
+        Totam aliquid.: Laudantium voluptate nulla.
+        Velit non dolorem.: Sunt aut eos porro ipsam.
+      status_pb: Et ut dolor tenetur ea.
     required:
     - name
     - status_json
@@ -3691,22 +4104,22 @@ definitions:
     properties:
       battery:
         type: number
-        example: 0.9825955
+        example: 0.51204133
         format: float
       device_id:
         type: string
-        example: Reprehenderit non laborum.
+        example: Non aut.
       firmware_number:
         type: integer
-        example: 757354545
+        example: 2045491323
         format: int32
       firmware_time:
         type: integer
-        example: 846979690
+        example: 1528437884
         format: int32
       id:
         type: integer
-        example: 596524501
+        example: 1366480011
         format: int32
       images:
         type: array
@@ -3715,13 +4128,14 @@ definitions:
         example:
         - url: Molestiae aut in.
         - url: Molestiae aut in.
+        - url: Molestiae aut in.
       memory_available:
         type: integer
-        example: 394943300
+        example: 1543402548
         format: int32
       memory_used:
         type: integer
-        example: 236172431
+        example: 1491306954
         format: int32
       modules:
         type: array
@@ -3734,38 +4148,24 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-        - hardware_id: Sint ea perspiciatis magnam fugiat.
-          id: 7128358081265260880
-          name: Doloremque aut eos tenetur deleniti.
-          position: 834376722
-          sensors:
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
-            unit_of_measure: Facere corporis eum et omnis consectetur.
-          - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
         - hardware_id: Sint ea perspiciatis magnam fugiat.
           id: 7128358081265260880
@@ -3773,33 +4173,71 @@ definitions:
           position: 834376722
           sensors:
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
           - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
+            unit_of_measure: Facere corporis eum et omnis consectetur.
+        - hardware_id: Sint ea perspiciatis magnam fugiat.
+          id: 7128358081265260880
+          name: Doloremque aut eos tenetur deleniti.
+          position: 834376722
+          sensors:
+          - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
+            unit_of_measure: Facere corporis eum et omnis consectetur.
+          - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
+            unit_of_measure: Facere corporis eum et omnis consectetur.
+          - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
+            unit_of_measure: Facere corporis eum et omnis consectetur.
+          - name: Ipsam consequatur impedit.
+            reading:
+              last: 0.23439522
+              time: 2177277508224826867
             unit_of_measure: Facere corporis eum et omnis consectetur.
       name:
         type: string
-        example: Nisi veniam.
+        example: Sunt enim aperiam ut omnis neque molestias.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
         $ref: '#/definitions/StationPhotosResponseBody'
       read_only:
         type: boolean
-        example: false
+        example: true
       recording_started_at:
         type: integer
-        example: 6946068823905022307
+        example: 5193072144753511070
         format: int64
       status_json:
         type: object
         example:
-          Neque molestias rerum non aut eos tempore.: Beatae id.
-          Sed iusto ducimus quia optio provident fuga.: Enim aperiam ut.
-          Sed maiores.: Ducimus sint iste.
+          Corrupti maxime distinctio tempore occaecati.: Sunt aut adipisci voluptas
+            inventore sapiente.
+          Neque et.: Expedita eaque.
+          Sunt molestiae qui.: Maxime nostrum et quibusdam.
         additionalProperties: true
       uploads:
         type: array
@@ -3826,16 +4264,17 @@ definitions:
           url: Voluptatem dolorum ut libero ducimus vitae.
     description: UpdateResponseBody result type (default view)
     example:
-      battery: 0.058701903
-      device_id: Velit expedita eaque et sunt.
-      firmware_number: 712596982
-      firmware_time: 101018666
-      id: 1290291848
+      battery: 0.32000142
+      device_id: Occaecati possimus enim blanditiis labore.
+      firmware_number: 678185747
+      firmware_time: 1821145011
+      id: 1014030789
       images:
       - url: Molestiae aut in.
       - url: Molestiae aut in.
-      memory_available: 1100022428
-      memory_used: 16042452
+      - url: Molestiae aut in.
+      memory_available: 190967589
+      memory_used: 843220047
       modules:
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -3843,12 +4282,24 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
       - hardware_id: Sint ea perspiciatis magnam fugiat.
         id: 7128358081265260880
@@ -3856,60 +4307,37 @@ definitions:
         position: 834376722
         sensors:
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
         - name: Ipsam consequatur impedit.
+          reading:
+            last: 0.23439522
+            time: 2177277508224826867
           unit_of_measure: Facere corporis eum et omnis consectetur.
-      - hardware_id: Sint ea perspiciatis magnam fugiat.
-        id: 7128358081265260880
-        name: Doloremque aut eos tenetur deleniti.
-        position: 834376722
-        sensors:
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-      - hardware_id: Sint ea perspiciatis magnam fugiat.
-        id: 7128358081265260880
-        name: Doloremque aut eos tenetur deleniti.
-        position: 834376722
-        sensors:
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-        - name: Ipsam consequatur impedit.
-          unit_of_measure: Facere corporis eum et omnis consectetur.
-      name: Voluptas inventore sapiente rem neque.
+      name: Tempore tempore aliquid sapiente necessitatibus hic qui.
       owner:
         id: 352202837
         name: Esse suscipit saepe.
       photos:
         small: Voluptatem perspiciatis libero minus.
-      read_only: true
-      recording_started_at: 6064214894622009149
+      read_only: false
+      recording_started_at: 8042095585249110033
       status_json:
-        Consequatur tempora tempore.: Aliquid sapiente necessitatibus hic.
-        Et quibusdam sint porro iste.: Deserunt possimus.
+        Nostrum ea doloribus voluptatem.: Quis laboriosam pariatur fugit repudiandae
+          laboriosam.
       uploads:
-      - blocks:
-        - 8865864692656824427
-        - 2317958010507024076
-        id: 4012211043050441801
-        size: 8965764026283020231
-        time: 1217921154830922021
-        type: Officia rerum sunt.
-        upload_id: Omnis distinctio placeat voluptate.
-        url: Voluptatem dolorum ut libero ducimus vitae.
       - blocks:
         - 8865864692656824427
         - 2317958010507024076
@@ -3958,7 +4386,7 @@ definitions:
     title: StationUpdateUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Voluptates voluptas.
+    example: Architecto est aperiam saepe sint.
   StationUploadResponseBody:
     title: StationUploadResponseBody
     type: object
@@ -4019,117 +4447,117 @@ definitions:
     title: TasksFiveBadRequestResponseBody
     type: string
     description: bad-request
-    example: Porro aut non quidem harum.
+    example: Eos non vitae non a quia alias.
   TasksFiveForbiddenResponseBody:
     title: TasksFiveForbiddenResponseBody
     type: string
     description: forbidden
-    example: Molestias magnam harum magni in expedita aliquid.
+    example: Eos sint officia dicta necessitatibus.
   TasksFiveNotFoundResponseBody:
     title: TasksFiveNotFoundResponseBody
     type: string
     description: not-found
-    example: Id et sequi fugiat nemo non.
+    example: Quod sit voluptatem consequatur reprehenderit voluptas et.
   TasksFiveUnauthorizedResponseBody:
     title: TasksFiveUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Sit tempora sit.
+    example: Qui sit quo cum eius reprehenderit.
   TasksRefreshDeviceBadRequestResponseBody:
     title: TasksRefreshDeviceBadRequestResponseBody
     type: string
     description: bad-request
-    example: Aut similique voluptas culpa voluptatum.
+    example: Ipsa earum voluptate.
   TasksRefreshDeviceForbiddenResponseBody:
     title: TasksRefreshDeviceForbiddenResponseBody
     type: string
     description: forbidden
-    example: Voluptatem voluptate.
+    example: Laboriosam harum.
   TasksRefreshDeviceNotFoundResponseBody:
     title: TasksRefreshDeviceNotFoundResponseBody
     type: string
     description: not-found
-    example: Ratione quo dignissimos ut blanditiis temporibus in.
+    example: Incidunt non quo.
   TasksRefreshDeviceUnauthorizedResponseBody:
     title: TasksRefreshDeviceUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Quas labore.
+    example: Repellat neque eum voluptatem rem.
   TestEmailBadRequestResponseBody:
     title: TestEmailBadRequestResponseBody
     type: string
     description: bad-request
-    example: Incidunt non quo.
+    example: Illo reiciendis excepturi doloremque maxime.
   TestEmailForbiddenResponseBody:
     title: TestEmailForbiddenResponseBody
     type: string
     description: forbidden
-    example: Repellat neque eum voluptatem rem.
+    example: Enim qui nam rerum voluptatem ipsam ipsum.
   TestEmailNotFoundResponseBody:
     title: TestEmailNotFoundResponseBody
     type: string
     description: not-found
-    example: Laboriosam harum.
+    example: Explicabo voluptatem.
   TestEmailUnauthorizedResponseBody:
     title: TestEmailUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Eos non vitae non a quia alias.
+    example: Qui et voluptas.
   TestErrorBadRequestResponseBody:
     title: TestErrorBadRequestResponseBody
     type: string
     description: bad-request
-    example: Quod sit voluptatem consequatur reprehenderit voluptas et.
+    example: Ducimus dolor.
   TestErrorForbiddenResponseBody:
     title: TestErrorForbiddenResponseBody
     type: string
     description: forbidden
-    example: Qui sit quo cum eius reprehenderit.
+    example: Inventore laborum nesciunt debitis dolores non fuga.
   TestErrorNotFoundResponseBody:
     title: TestErrorNotFoundResponseBody
     type: string
     description: not-found
-    example: Eos sint officia dicta necessitatibus.
+    example: Similique beatae.
   TestErrorUnauthorizedResponseBody:
     title: TestErrorUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Consectetur eveniet animi impedit laborum doloremque.
+    example: Deleniti inventore laudantium libero et est.
   TestGetBadRequestResponseBody:
     title: TestGetBadRequestResponseBody
     type: string
     description: bad-request
-    example: Voluptatibus labore ut voluptates.
+    example: Amet eligendi aliquid.
   TestGetForbiddenResponseBody:
     title: TestGetForbiddenResponseBody
     type: string
     description: forbidden
-    example: Eaque ut.
+    example: Numquam error.
   TestGetNotFoundResponseBody:
     title: TestGetNotFoundResponseBody
     type: string
     description: not-found
-    example: Cupiditate eos maiores consequatur et architecto.
+    example: Ut autem voluptate nemo.
   TestGetUnauthorizedResponseBody:
     title: TestGetUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Quod laborum dolores ullam ipsum.
+    example: Alias ipsam reiciendis aliquam impedit omnis.
   UserRolesBadRequestResponseBody:
     title: UserRolesBadRequestResponseBody
     type: string
     description: bad-request
-    example: Inventore laborum nesciunt debitis dolores non fuga.
+    example: Necessitatibus velit.
   UserRolesForbiddenResponseBody:
     title: UserRolesForbiddenResponseBody
     type: string
     description: forbidden
-    example: Amet eligendi aliquid.
+    example: Et rerum rem nam et.
   UserRolesNotFoundResponseBody:
     title: UserRolesNotFoundResponseBody
     type: string
     description: not-found
-    example: Deleniti inventore laudantium libero et est.
+    example: Perferendis laborum.
   UserRolesResponseBody:
     title: 'Mediatype identifier: application/vnd.app.roles.available; view=default'
     type: object
@@ -4164,7 +4592,7 @@ definitions:
     title: UserRolesUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Ut autem voluptate nemo.
+    example: Magni incidunt ut quo pariatur possimus odio.
 securityDefinitions:
   jwt_header_Authorization:
     type: apiKey
