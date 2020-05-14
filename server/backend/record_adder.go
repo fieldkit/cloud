@@ -285,6 +285,10 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 		stationID = &station.ID
 	}
 
+	if err := ra.handler.OnDone(ctx); err != nil {
+		return nil, err
+	}
+
 	withInfo.Infow("processed")
 
 	if err != nil {

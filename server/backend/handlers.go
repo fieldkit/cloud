@@ -11,6 +11,7 @@ import (
 type RecordHandler interface {
 	OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error
 	OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error
+	OnDone(ctx context.Context) error
 }
 
 type noopRecordHandler struct {
@@ -25,5 +26,9 @@ func (h *noopRecordHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb
 }
 
 func (h *noopRecordHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+	return nil
+}
+
+func (h *noopRecordHandler) OnDone(ctx context.Context) error {
 	return nil
 }

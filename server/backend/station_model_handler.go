@@ -27,6 +27,7 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 			MetaRecordID: db.ID,
 			HardwareID:   m.Id,
 			Position:     m.Position,
+			Flags:        m.Flags,
 			Name:         m.Name,
 			Manufacturer: m.Header.Manufacturer,
 			Kind:         m.Header.Kind,
@@ -34,8 +35,8 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 		}
 		if err := h.database.NamedGetContext(ctx, module, `
 		    INSERT INTO fieldkit.station_module
-				(provision_id, meta_record_id, hardware_id, position, name, manufacturer, kind, version) VALUES
-				(:provision_id, :meta_record_id, :hardware_id, :position, :name, :manufacturer, :kind, :version)
+				(provision_id, meta_record_id, hardware_id, position, flags, name, manufacturer, kind, version) VALUES
+				(:provision_id, :meta_record_id, :hardware_id, :position, :flags, :name, :manufacturer, :kind, :version)
 		    ON CONFLICT (hardware_id)
 				DO UPDATE SET position = EXCLUDED.position,
 							  name = EXCLUDED.name,
@@ -74,5 +75,9 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 }
 
 func (h *stationModelRecordHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+	return nil
+}
+
+func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 	return nil
 }
