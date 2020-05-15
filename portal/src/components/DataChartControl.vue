@@ -906,7 +906,7 @@ export default {
     margin-top: 20px;
     background-color: #ffffff;
     border-radius: 4px;
-    border: 1px solid rgb(235, 235, 235);
+    border: 1px solid #d8dce0;
 }
 #chart-controls {
     float: left;

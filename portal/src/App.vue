@@ -44,7 +44,7 @@ button {
 .main-panel .container {
     min-width: 800px;
     padding-bottom: 40px;
-    border-bottom: 2px solid rgb(235, 235, 235);
+    border-bottom: 2px solid #d8dce0;
 }
 input:focus ~ .floating-label,
 input:not(:focus):valid ~ .floating-label {
@@ -61,7 +61,7 @@ input:invalid {
     font-size: 16px;
     width: inherit;
     border: none;
-    border-bottom: 2px solid rgb(235, 235, 235);
+    border-bottom: 2px solid #d8dce0;
     padding-bottom: 4px;
 }
 .inputText:focus {

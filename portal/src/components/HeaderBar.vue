@@ -75,7 +75,7 @@ export default {
     width: 100%;
     height: 69px;
     float: left;
-    border-bottom: 2px solid rgb(235, 235, 235);
+    border-bottom: 2px solid #d8dce0;
 }
 .user-image {
     float: right;

@@ -80,7 +80,7 @@ export default {
     width: 270px;
     height: 265px;
     margin: 0 12px 25px 12px;
-    border: 1px solid rgb(235, 235, 235);
+    border: 1px solid #d8dce0;
 }
 .project-name {
     font-weight: bold;
@@ -95,7 +95,7 @@ export default {
 .project-image-container {
     height: 138px;
     text-align: center;
-    border-bottom: 1px solid rgb(235, 235, 235);
+    border-bottom: 1px solid #d8dce0;
 }
 .project-image {
     max-width: 270px;
