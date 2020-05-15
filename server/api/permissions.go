@@ -151,8 +151,6 @@ func (p *defaultPermissions) unwrap() error {
 		}
 	}
 
-	fmt.Printf("%s\n", scopesArray)
-
 	p.unwrapped = &unwrappedPermissions{
 		authAttempt: authAttempt,
 		userID:      userID,
