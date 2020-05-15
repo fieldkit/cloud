@@ -19,7 +19,9 @@ func NewIngestionRepository(database *sqlxcache.DB) (ir *IngestionRepository, er
 
 func (r *IngestionRepository) QueryByID(ctx context.Context, id int64) (i *data.Ingestion, err error) {
 	found := []*data.Ingestion{}
-	if err := r.Database.SelectContext(ctx, &found, `SELECT i.* FROM fieldkit.ingestion AS i WHERE (i.id = $1)`, id); err != nil {
+	if err := r.Database.SelectContext(ctx, &found, `
+		SELECT i.* FROM fieldkit.ingestion AS i WHERE (i.id = $1)
+		`, id); err != nil {
 		return nil, fmt.Errorf("error querying for ingestion: %v", err)
 	}
 	if len(found) == 0 {
@@ -28,9 +30,23 @@ func (r *IngestionRepository) QueryByID(ctx context.Context, id int64) (i *data.
 	return found[0], nil
 }
 
+func (r *IngestionRepository) QueryByStationID(ctx context.Context, id int64) (all []*data.Ingestion, err error) {
+	pending := []*data.Ingestion{}
+	if err := r.Database.SelectContext(ctx, &pending, `
+		SELECT i.* FROM fieldkit.ingestion AS i
+        WHERE i.device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
+		ORDER BY i.size ASC, i.time DESC
+		`, id); err != nil {
+		return nil, fmt.Errorf("error querying for ingestions: %v", err)
+	}
+	return pending, nil
+}
+
 func (r *IngestionRepository) QueryPending(ctx context.Context) (all []*data.Ingestion, err error) {
 	pending := []*data.Ingestion{}
-	if err := r.Database.SelectContext(ctx, &pending, `SELECT i.* FROM fieldkit.ingestion AS i WHERE (i.errors IS NULL) ORDER BY i.size ASC, i.time DESC`); err != nil {
+	if err := r.Database.SelectContext(ctx, &pending, `
+		SELECT i.* FROM fieldkit.ingestion AS i WHERE (i.errors IS NULL) ORDER BY i.size ASC, i.time DESC
+		`); err != nil {
 		return nil, fmt.Errorf("error querying for ingestions: %v", err)
 	}
 	return pending, nil
@@ -38,14 +54,18 @@ func (r *IngestionRepository) QueryPending(ctx context.Context) (all []*data.Ing
 
 func (r *IngestionRepository) QueryAll(ctx context.Context) (all []*data.Ingestion, err error) {
 	pending := []*data.Ingestion{}
-	if err := r.Database.SelectContext(ctx, &pending, `SELECT i.* FROM fieldkit.ingestion AS i ORDER BY i.time DESC`); err != nil {
+	if err := r.Database.SelectContext(ctx, &pending, `
+		SELECT i.* FROM fieldkit.ingestion AS i ORDER BY i.time DESC
+		`); err != nil {
 		return nil, fmt.Errorf("error querying for ingestions: %v", err)
 	}
 	return pending, nil
 }
 
 func (r *IngestionRepository) MarkProcessedHasOtherErrors(ctx context.Context, id int64) error {
-	if _, err := r.Database.ExecContext(ctx, `UPDATE fieldkit.ingestion SET other_errors = 1, attempted = NOW() WHERE id = $1`, id); err != nil {
+	if _, err := r.Database.ExecContext(ctx, `
+		UPDATE fieldkit.ingestion SET other_errors = 1, attempted = NOW() WHERE id = $1
+		`, id); err != nil {
 		return fmt.Errorf("error updating ingestion: %v", err)
 	}
 	return nil

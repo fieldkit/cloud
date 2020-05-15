@@ -42,13 +42,14 @@ func (c *DataController) Process(ctx *app.ProcessDataContext) error {
 		return err
 	}
 
-	pending, err := ir.QueryPending(ctx)
+	ingestions, err := ir.QueryPending(ctx)
 	if err != nil {
 		return err
 	}
 
-	for _, i := range pending {
-		log.Infow("queueing", "ingestion_id", i.ID)
+	log.Infow("queueing", "ingestions", len(ingestions))
+
+	for _, i := range ingestions {
 		c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
 			Time:   i.Time,
 			ID:     i.ID,
@@ -57,7 +58,45 @@ func (c *DataController) Process(ctx *app.ProcessDataContext) error {
 		})
 	}
 
-	return nil
+	return ctx.OK([]byte("{}"))
+}
+
+func (c *DataController) ProcessStation(ctx *app.ProcessStationDataContext) error {
+	log := Logger(ctx).Sugar()
+
+	ir, err := repositories.NewIngestionRepository(c.options.Database)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("processing", "station_id", ctx.StationID)
+
+	p, err := NewPermissions(ctx, c.options).ForStationByID(ctx.StationID)
+	if err != nil {
+		return err
+	}
+
+	if err := p.CanModify(); err != nil {
+		return err
+	}
+
+	ingestions, err := ir.QueryByStationID(ctx, int64(ctx.StationID))
+	if err != nil {
+		return err
+	}
+
+	log.Infow("queueing", "ingestions", len(ingestions))
+
+	for _, i := range ingestions {
+		c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
+			Time:   i.Time,
+			ID:     i.ID,
+			URL:    i.URL,
+			UserID: p.UserID(),
+		})
+	}
+
+	return ctx.OK([]byte("{}"))
 }
 
 func (c *DataController) ProcessIngestion(ctx *app.ProcessIngestionDataContext) error {
@@ -95,7 +134,7 @@ func (c *DataController) ProcessIngestion(ctx *app.ProcessIngestionDataContext) 
 		Verbose: true,
 	})
 
-	return ctx.OK([]byte("queued"))
+	return ctx.OK([]byte("{}"))
 }
 
 func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
@@ -151,7 +190,7 @@ func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
 		return err
 	}
 
-	return ctx.OK([]byte("deleted"))
+	return ctx.OK([]byte("{}"))
 }
 
 type ProvisionSummaryRow struct {

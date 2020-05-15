@@ -75,20 +75,20 @@ func (c *Client) NewDeviceDataDataRequest(ctx context.Context, path string, firs
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if firstBlock != nil {
-		tmp131 := strconv.Itoa(*firstBlock)
-		values.Set("firstBlock", tmp131)
+		tmp133 := strconv.Itoa(*firstBlock)
+		values.Set("firstBlock", tmp133)
 	}
 	if lastBlock != nil {
-		tmp132 := strconv.Itoa(*lastBlock)
-		values.Set("lastBlock", tmp132)
+		tmp134 := strconv.Itoa(*lastBlock)
+		values.Set("lastBlock", tmp134)
 	}
 	if page != nil {
-		tmp133 := strconv.Itoa(*page)
-		values.Set("page", tmp133)
+		tmp135 := strconv.Itoa(*page)
+		values.Set("page", tmp135)
 	}
 	if pageSize != nil {
-		tmp134 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp134)
+		tmp136 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp136)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -190,6 +190,41 @@ func (c *Client) ProcessIngestionData(ctx context.Context, path string) (*http.R
 
 // NewProcessIngestionDataRequest create the request corresponding to the process ingestion action endpoint of the data resource.
 func (c *Client) NewProcessIngestionDataRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
+// ProcessStationDataPath computes a request path to the process station action of data.
+func ProcessStationDataPath(stationID int) string {
+	param0 := strconv.Itoa(stationID)
+
+	return fmt.Sprintf("/data/stations/%s/process", param0)
+}
+
+// ProcessStationData makes a request to the process station action endpoint of the data resource
+func (c *Client) ProcessStationData(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewProcessStationDataRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewProcessStationDataRequest create the request corresponding to the process station action endpoint of the data resource.
+func (c *Client) NewProcessStationDataRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "https"
