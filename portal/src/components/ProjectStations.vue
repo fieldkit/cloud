@@ -108,16 +108,9 @@ export default {
                                 lng: parseFloat(s.status_json.longitude),
                             });
                         }
-                        if (s.status_json.moduleObjects) {
-                            s.status_json.moduleObjects.forEach(m => {
-                                modules.push(this.getModuleImg(m));
-                            });
-                        } else if (s.status_json.statusJson && s.status_json.statusJson.modules) {
-                            s.status_json.statusJson.modules.forEach(m => {
-                                modules.push(this.getModuleImg(m));
-                            });
-                        }
-                        // could also use readings, if present
+                        s.modules.forEach(m => {
+                            modules.push(this.getModuleImg(m));
+                        });
                     });
                     modules = _.uniq(modules);
                     this.$emit("loaded", modules);
