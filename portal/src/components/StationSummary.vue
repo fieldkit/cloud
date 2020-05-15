@@ -23,7 +23,7 @@
                 </div>
                 <div>
                     <img
-                        v-for="module in station.status_json.moduleObjects"
+                        v-for="module in station.modules"
                         v-bind:key="module.id"
                         alt="Module icon"
                         class="small-space"
@@ -60,20 +60,22 @@
                 <div class="spacer"></div>
                 <div id="readings-container" class="section">
                     <div id="readings-label">Latest Reading</div>
-                    <div v-for="(module, moduleIndex) in station.status_json.moduleObjects" v-bind:key="module.id">
-                        <div
-                            v-for="(sensor, sensorIndex) in module.sensorObjects"
-                            v-bind:key="sensor.id"
-                            :class="getCounter(moduleIndex, sensorIndex) % 2 == 1 ? 'left-reading' : 'right-reading'"
-                        >
-                            <div class="left sensor-name">{{ getSensorName(module, sensor) }}</div>
-                            <div class="right sensor-unit">
-                                {{ sensor.unit }}
+                    <div v-for="(module, moduleIndex) in station.modules" v-bind:key="module.id">
+                        <template v-if="module.position < 5">
+                            <div
+                                v-for="(sensor, sensorIndex) in module.sensors"
+                                v-bind:key="sensor.id"
+                                :class="getCounter(moduleIndex, sensorIndex) % 2 == 1 ? 'left-reading' : 'right-reading'"
+                            >
+                                <div class="left sensor-name">{{ getSensorName(module, sensor) }}</div>
+                                <div class="right sensor-unit">
+                                    {{ sensor.unit_of_measure }}
+                                </div>
+                                <div class="right sensor-reading">
+                                    {{ sensor.reading.last || sensor.reading.last == 0 ? sensor.reading.last.toFixed(1) : "--" }}
+                                </div>
                             </div>
-                            <div class="right sensor-reading">
-                                {{ sensor.currentReading || sensor.currentReading == 0 ? sensor.currentReading.toFixed(1) : "ncR" }}
-                            </div>
-                        </div>
+                        </template>
                     </div>
                 </div>
                 <router-link :to="{ name: 'viewData', query: { stationId: station.id } }">
@@ -181,8 +183,7 @@ export default {
         },
 
         getSensorName(module, sensor) {
-            const newName = utils.convertOldFirmwareResponse(module);
-            return this.$t(newName + ".sensors." + sensor.name);
+            return this.$t(module.name + "." + sensor.name);
         },
 
         getModuleImg(module) {
