@@ -68,3 +68,57 @@ func TestQueryStationsByProjectID(t *testing.T) {
 	assert.NotNil(sfs)
 	assert.Equal(len(sfs), len(fd.Stations))
 }
+
+func TestQueryStationByDeviceID(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	r, err := repositories.NewStationRepository(e.DB)
+	assert.NoError(err)
+
+	sf, err := r.QueryStationByDeviceID(e.Ctx, fd.Stations[0].DeviceID)
+	assert.NoError(err)
+
+	assert.NotNil(sf)
+	assert.NotNil(fd)
+}
+
+func TestQueryStationsByDeviceID(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	r, err := repositories.NewStationRepository(e.DB)
+	assert.NoError(err)
+
+	sf, err := r.QueryStationsByDeviceID(e.Ctx, fd.Stations[0].DeviceID)
+	assert.NoError(err)
+
+	assert.NotNil(sf)
+	assert.NotNil(fd)
+}
+
+func TestTryQueryStationByDeviceID(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	r, err := repositories.NewStationRepository(e.DB)
+	assert.NoError(err)
+
+	sf, err := r.TryQueryStationByDeviceID(e.Ctx, fd.Stations[0].DeviceID)
+	assert.NoError(err)
+
+	assert.NotNil(sf)
+	assert.NotNil(fd)
+}
