@@ -30,6 +30,7 @@ type StationPermissions interface {
 type Permissions interface {
 	Unwrap() (permissions Permissions, err error)
 	UserID() int32
+	IsAdmin() bool
 	ForProjectByID(id int) (permissions ProjectPermissions, err error)
 	ForStationByID(id int) (permissions StationPermissions, err error)
 	ForStationByDeviceID(id []byte) (permissions StationPermissions, err error)
@@ -39,6 +40,8 @@ type Permissions interface {
 type unwrappedPermissions struct {
 	userID      int32
 	authAttempt *AuthAttempt
+	scopes      []string
+	admin       bool
 }
 
 type defaultPermissions struct {
@@ -132,12 +135,29 @@ func (p *defaultPermissions) unwrap() error {
 		return err
 	}
 
-	userID := int32(claims["sub"].(float64))
-
 	authAttempt := getAuthAttempt(p.context)
+
+	userID := int32(claims["sub"].(float64))
+	scopesRaw, ok := claims["scopes"].([]interface{})
+	if !ok {
+		return authAttempt.Unauthorized("invalid scopes")
+	}
+	scopesArray := make([]string, len(scopesRaw))
+	admin := false
+	for _, scope := range scopesRaw {
+		scopesArray = append(scopesArray, scope.(string))
+		if scope == "api:admin" {
+			admin = true
+		}
+	}
+
+	fmt.Printf("%s\n", scopesArray)
+
 	p.unwrapped = &unwrappedPermissions{
 		authAttempt: authAttempt,
 		userID:      userID,
+		scopes:      scopesArray,
+		admin:       admin,
 	}
 
 	return nil
@@ -145,6 +165,10 @@ func (p *defaultPermissions) unwrap() error {
 
 func (p *defaultPermissions) UserID() int32 {
 	return p.unwrapped.userID
+}
+
+func (p *defaultPermissions) IsAdmin() bool {
+	return p.unwrapped.admin
 }
 
 func (p *defaultPermissions) Unwrap() (Permissions, error) {
@@ -245,9 +269,14 @@ func (p *stationPermissions) CanView() error {
 }
 
 func (p *stationPermissions) CanModify() error {
+	if p.IsAdmin() {
+		return nil
+	}
+
 	if p.station.OwnerID != p.UserID() {
 		return p.forbidden("forbidden")
 	}
+
 	return nil
 }
 
@@ -270,6 +299,10 @@ func (p *projectPermissions) CanView() error {
 }
 
 func (p *projectPermissions) CanModify() error {
+	if p.IsAdmin() {
+		return nil
+	}
+
 	if p.projectUser == nil {
 		return p.forbidden("forbidden")
 	}

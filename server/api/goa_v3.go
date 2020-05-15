@@ -205,7 +205,6 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 	if !ok {
 		return ctx, a.Unauthorized("invalid scopes")
 	}
-
 	scopesInToken := make([]string, len(scopes))
 	for _, scp := range scopes {
 		scopesInToken = append(scopesInToken, scp.(string))
