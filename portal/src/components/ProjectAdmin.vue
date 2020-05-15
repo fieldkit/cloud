@@ -74,6 +74,10 @@
                 @loaded="setModules"
             />
 
+            <ProjectDataFiles />
+
+            <StationsReadings :project="project" />
+
             <div class="manage-team-container">
                 <div class="section-heading">Manage Team</div>
                 <div class="users-container">
@@ -150,11 +154,15 @@ import * as utils from "../utilities";
 import FKApi from "../api/api";
 import { API_HOST } from "../secrets";
 import ProjectStations from "../components/ProjectStations";
+import ProjectDataFiles from "../components/ProjectDataFiles";
+import StationsReadings from "../components/StationsReadings";
 
 export default {
     name: "ProjectAdmin",
     components: {
         ProjectStations,
+        ProjectDataFiles,
+        StationsReadings,
     },
     data: () => {
         return {
