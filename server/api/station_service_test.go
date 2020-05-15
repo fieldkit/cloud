@@ -1,13 +1,16 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/kinbiko/jsonassert"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/golang/protobuf/proto"
 
 	"github.com/fieldkit/cloud/server/tests"
 )
@@ -85,8 +88,20 @@ func TestAddNewStation(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	payload := fmt.Sprintf(`{ "device_id": "%s", "name": "%s", "status_json": {} }`, station.DeviceIDHex(), station.Name)
-	req, _ := http.NewRequest("POST", "/stations", strings.NewReader(payload))
+	payload, err := json.Marshal(
+		struct {
+			DeviceID   string                 `json:"device_id"`
+			Name       string                 `json:"name"`
+			StatusJSON map[string]interface{} `json:"status_json"`
+		}{
+			DeviceID:   station.DeviceIDHex(),
+			Name:       station.Name,
+			StatusJSON: make(map[string]interface{}),
+		},
+	)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("POST", "/stations", bytes.NewReader(payload))
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
 	rr := tests.ExecuteRequest(req, api)
 
@@ -104,8 +119,20 @@ func TestAddStationAlreadyMine(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	payload := fmt.Sprintf(`{ "device_id": "%s", "name": "%s", "status_json": {} }`, fd.Stations[0].DeviceIDHex(), "Already Mine")
-	req, _ := http.NewRequest("POST", "/stations", strings.NewReader(payload))
+	payload, err := json.Marshal(
+		struct {
+			DeviceID   string                 `json:"device_id"`
+			Name       string                 `json:"name"`
+			StatusJSON map[string]interface{} `json:"status_json"`
+		}{
+			DeviceID:   fd.Stations[0].DeviceIDHex(),
+			Name:       "Already Mine",
+			StatusJSON: make(map[string]interface{}),
+		},
+	)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("POST", "/stations", bytes.NewReader(payload))
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr := tests.ExecuteRequest(req, api)
 
@@ -126,8 +153,20 @@ func TestAddStationAlreadyOthers(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	payload := fmt.Sprintf(`{ "device_id": "%s", "name": "%s", "status_json": {} }`, fd.Stations[0].DeviceIDHex(), "Somebody Else's")
-	req, _ := http.NewRequest("POST", "/stations", strings.NewReader(payload))
+	payload, err := json.Marshal(
+		struct {
+			DeviceID   string                 `json:"device_id"`
+			Name       string                 `json:"name"`
+			StatusJSON map[string]interface{} `json:"status_json"`
+		}{
+			DeviceID:   fd.Stations[0].DeviceIDHex(),
+			Name:       "New Name",
+			StatusJSON: make(map[string]interface{}),
+		},
+	)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("POST", "/stations", bytes.NewReader(payload))
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
 	rr := tests.ExecuteRequest(req, api)
 
@@ -147,8 +186,18 @@ func TestUpdateMyStation(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	payload := fmt.Sprintf(`{ "name": "%s", "status_json": {} }`, "New Name")
-	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), strings.NewReader(payload))
+	payload, err := json.Marshal(
+		struct {
+			Name       string                 `json:"name"`
+			StatusJSON map[string]interface{} `json:"status_json"`
+		}{
+			Name:       "New Name",
+			StatusJSON: make(map[string]interface{}),
+		},
+	)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), bytes.NewReader(payload))
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr := tests.ExecuteRequest(req, api)
 
@@ -169,8 +218,18 @@ func TestUpdateAnotherPersonsStation(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	payload := fmt.Sprintf(`{ "name": "%s", "status_json": {} }`, "New Name")
-	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), strings.NewReader(payload))
+	payload, err := json.Marshal(
+		struct {
+			Name       string                 `json:"name"`
+			StatusJSON map[string]interface{} `json:"status_json"`
+		}{
+			Name:       "New Name",
+			StatusJSON: make(map[string]interface{}),
+		},
+	)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), bytes.NewReader(payload))
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(badActor))
 	rr := tests.ExecuteRequest(req, api)
 
@@ -188,10 +247,55 @@ func TestUpdateMissingStation(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	payload := fmt.Sprintf(`{ "name": "%s", "status_json": {} }`, "New Name")
-	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", 0), strings.NewReader(payload))
+	payload, err := json.Marshal(
+		struct {
+			Name       string                 `json:"name"`
+			StatusJSON map[string]interface{} `json:"status_json"`
+		}{
+			Name:       "New Name",
+			StatusJSON: make(map[string]interface{}),
+		},
+	)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", 0), bytes.NewReader(payload))
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusNotFound, rr.Code)
+}
+
+func TestUpdateMyStationWithProtobufStatus(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	reply := e.NewHttpStatusReply(fd.Stations[0])
+	replyBuffer := proto.NewBuffer(make([]byte, 0))
+	replyBuffer.EncodeMessage(reply)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	payload, err := json.Marshal(
+		struct {
+			Name       string                 `json:"name"`
+			StatusJSON map[string]interface{} `json:"status_json"`
+			StatusPB   []byte                 `json:"status_pb"`
+		}{
+			Name:       "New Name",
+			StatusJSON: make(map[string]interface{}),
+			StatusPB:   replyBuffer.Bytes(),
+		},
+	)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), bytes.NewReader(payload))
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
 }

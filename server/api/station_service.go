@@ -52,10 +52,13 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		return nil, err
 	}
 
-	stations := []*data.Station{}
-	if err := c.options.Database.SelectContext(ctx, &stations, `
-		SELECT * FROM fieldkit.station WHERE device_id = $1
-		`, deviceId); err != nil {
+	sr, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	stations, err := sr.QueryStationsByDeviceID(ctx, deviceId)
+	if err != nil {
 		return nil, err
 	}
 
@@ -89,12 +92,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 
 	adding.SetStatus(payload.StatusJSON)
 
-	if err := c.options.Database.NamedGetContext(ctx, adding, `
-		INSERT INTO fieldkit.station
-		(name, device_id, owner_id, status_json, created_at, updated_at, location, location_name, battery, memory_used, memory_available, firmware_number, firmware_time, recording_started_at) VALUES
-		(:name, :device_id, :owner_id, :status_json, :created_at, :updated_at, :location, :location_name, :battery, :memory_used, :memory_available, :firmware_number, :firmware_time, :recording_started_at)
-		RETURNING *
-		`, adding); err != nil {
+	if _, err := sr.Add(ctx, adding); err != nil {
 		return nil, err
 	}
 
@@ -130,10 +128,13 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
 	log := Logger(ctx).Sugar()
 
-	updating := &data.Station{}
-	if err := c.options.Database.GetContext(ctx, updating, `
-		SELECT * FROM fieldkit.station WHERE id = $1
-		`, payload.ID); err != nil {
+	r, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	updating, err := r.QueryStationByID(ctx, payload.ID)
+	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, station.NotFound("station not found")
 		}
@@ -163,21 +164,7 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 
 	updating.SetStatus(payload.StatusJSON)
 
-	if err := c.options.Database.NamedGetContext(ctx, updating, `
-		UPDATE fieldkit.station SET
-			   name = :name,
-			   status_json = :status_json,
-			   battery = :battery,
-			   location = :location,
-			   location_name = :location_name,
-			   memory_available = :memory_available,
-			   memory_used = :memory_used,
-			   firmware_number = :firmware_number,
-			   firmware_time = :firmware_time,
-			   updated_at = :updated_at
-		WHERE id = :id
-		RETURNING *
-		`, updating); err != nil {
+	if err := r.Update(ctx, updating); err != nil {
 		return nil, err
 	}
 

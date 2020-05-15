@@ -32,10 +32,13 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 		pageNumber = int32(*payload.Page)
 	}
 
-	station := &data.Station{}
-	if err = c.options.Database.GetContext(ctx, station, `
-		SELECT * FROM fieldkit.station WHERE id = $1
-		`, payload.ID); err != nil {
+	sr, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	station, err := sr.QueryStationByID(ctx, int32(payload.ID))
+	if err != nil {
 		return nil, err
 	}
 

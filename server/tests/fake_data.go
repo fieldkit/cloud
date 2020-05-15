@@ -14,6 +14,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
+	pbapp "github.com/fieldkit/app-protocol"
 	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -280,6 +281,149 @@ func newModuleId(seed string) []byte {
 	hasher := sha1.New()
 	hasher.Write([]byte(seed))
 	return hasher.Sum(nil)
+}
+
+func generateModuleId(m *pbapp.ModuleCapabilities) *pbapp.ModuleCapabilities {
+	hasher := sha1.New()
+	hasher.Write([]byte(m.Name))
+	moduleID := hasher.Sum(nil)
+	m.Id = moduleID
+	return m
+}
+
+func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
+	now := time.Now()
+	used := uint32(1024 * 10)
+	installed := uint32(512 * 1024 * 1024)
+	recording := uint64(0)
+
+	return &pbapp.HttpReply{
+		Type: pbapp.ReplyType_REPLY_STATUS,
+		Status: &pbapp.Status{
+			Version: 1,
+			Uptime:  1,
+			Identity: &pbapp.Identity{
+				Name: s.Name,
+			},
+			Recording: &pbapp.Recording{
+				Enabled:     recording > 0,
+				StartedTime: recording,
+			},
+			Memory: &pbapp.MemoryStatus{
+				SramAvailable:           128 * 1024,
+				ProgramFlashAvailable:   600 * 1024,
+				ExtendedMemoryAvailable: 0,
+				DataMemoryInstalled:     installed,
+				DataMemoryUsed:          used,
+				DataMemoryConsumption:   float32(used) / float32(installed) * 100.0,
+			},
+			Gps: &pbapp.GpsStatus{
+				Fix:        1,
+				Time:       uint64(now.Unix()),
+				Satellites: 5,
+				Longitude:  -118.2709223,
+				Latitude:   34.0318047,
+				Altitude:   65,
+			},
+			Power: &pbapp.PowerStatus{
+				Battery: &pbapp.BatteryStatus{
+					Voltage:    3420.0,
+					Percentage: 70.0,
+				},
+			},
+		},
+		NetworkSettings: &pbapp.NetworkSettings{},
+		Streams: []*pbapp.DataStream{
+			&pbapp.DataStream{
+				Id:      0,
+				Time:    0,
+				Size:    0,
+				Version: 0,
+				Block:   0,
+				Name:    "data.fkpb",
+				Path:    "/fk/v1/download/data",
+			},
+			&pbapp.DataStream{
+				Id:      1,
+				Time:    0,
+				Size:    0,
+				Version: 0,
+				Block:   0,
+				Name:    "meta.fkpb",
+				Path:    "/fk/v1/download/meta",
+			},
+		},
+		Modules: []*pbapp.ModuleCapabilities{
+			generateModuleId(&pbapp.ModuleCapabilities{
+				Position: 0,
+				Flags:    1,
+				Name:     "Diagnostics Module",
+				Sensors: []*pbapp.SensorCapabilities{
+					&pbapp.SensorCapabilities{
+						Number:        0,
+						Name:          "memory",
+						UnitOfMeasure: "bytes",
+						Frequency:     60,
+					},
+				},
+			}),
+			generateModuleId(&pbapp.ModuleCapabilities{
+				Position: 0,
+				Name:     "Water Quality Module",
+				Sensors: []*pbapp.SensorCapabilities{
+					&pbapp.SensorCapabilities{
+						Number:        0,
+						Name:          "pH",
+						UnitOfMeasure: "",
+						Frequency:     60,
+					},
+				},
+			}),
+			generateModuleId(&pbapp.ModuleCapabilities{
+				Position: 1,
+				Name:     "Water Quality Module",
+				Sensors: []*pbapp.SensorCapabilities{
+					&pbapp.SensorCapabilities{
+						Number:        0,
+						Name:          "Dissolved Oxygen",
+						UnitOfMeasure: "",
+						Frequency:     60,
+					},
+				},
+			}),
+			generateModuleId(&pbapp.ModuleCapabilities{
+				Position: 2,
+				Name:     "Ocean Module",
+				Sensors: []*pbapp.SensorCapabilities{
+					&pbapp.SensorCapabilities{
+						Number:        0,
+						Name:          "Conductivity",
+						UnitOfMeasure: "µS/cm",
+						Frequency:     60,
+					},
+					&pbapp.SensorCapabilities{
+						Number:        1,
+						Name:          "Temperature",
+						UnitOfMeasure: "C",
+						Frequency:     60,
+					},
+					&pbapp.SensorCapabilities{
+						Number:        2,
+						Name:          "Depth",
+						UnitOfMeasure: "m",
+						Frequency:     60,
+					},
+					&pbapp.SensorCapabilities{
+						Number:        2,
+						Name:          "Depth (mv)",
+						UnitOfMeasure: "mv",
+						Frequency:     60,
+						Flags:         1,
+					},
+				},
+			}),
+		},
+	}
 }
 
 func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {

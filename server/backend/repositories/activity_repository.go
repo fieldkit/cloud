@@ -77,7 +77,9 @@ func (r *ActivityRepository) QueryProjectUpdate(ctx context.Context, projectID i
 
 func (r *ActivityRepository) QueryProjectActivityStations(ctx context.Context, projectID int64, pageSize, offset int32) ([]*data.Station, error) {
 	query := `
-		SELECT s.* FROM fieldkit.station AS s WHERE s.id IN (
+		SELECT
+			id, name, device_id, owner_id, created_at, updated_at, status_json, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+		FROM fieldkit.station WHERE id IN (
 			SELECT station_id FROM fieldkit.project_and_station_activity WHERE (project_id = $1) ORDER BY created_at DESC LIMIT $2 OFFSET $3
 		)`
 

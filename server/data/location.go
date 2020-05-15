@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	invalidLocationError = errors.New("Invalid location")
+	invalidLocationError = errors.New("invalid location")
 )
 
 type Location struct {

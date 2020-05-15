@@ -9,6 +9,7 @@ import (
 
 	"github.com/goadesign/goa/middleware/security/jwt"
 
+	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -209,8 +210,13 @@ func (p *defaultPermissions) ForStationByID(id int) (permissions StationPermissi
 		return nil, err
 	}
 
-	station := &data.Station{}
-	if err := p.options.Database.GetContext(p.context, station, "SELECT s.* FROM fieldkit.station AS s WHERE s.id = $1", id); err != nil {
+	r, err := repositories.NewStationRepository(p.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	station, err := r.QueryStationByID(p.context, int32(id))
+	if err != nil {
 		return nil, p.notFound(fmt.Sprintf("station not found: %v", err))
 	}
 
@@ -227,8 +233,13 @@ func (p *defaultPermissions) ForStationByDeviceID(id []byte) (permissions Statio
 		return nil, err
 	}
 
-	station := &data.Station{}
-	if err := p.options.Database.GetContext(p.context, station, "SELECT s.* FROM fieldkit.station AS s WHERE s.device_id = $1", id); err != nil {
+	r, err := repositories.NewStationRepository(p.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	station, err := r.QueryStationByDeviceID(p.context, id)
+	if err != nil {
 		return nil, p.notFound(fmt.Sprintf("station not found: %v", err))
 	}
 
