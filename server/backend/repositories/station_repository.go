@@ -162,8 +162,6 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		FROM fieldkit.station_module AS sm
 		WHERE sm.provision_id IN (
 			SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
-			ORDER BY updated DESC
-			LIMIT 1
 		)
 		ORDER BY sm.position
 		`, id); err != nil {
@@ -178,8 +176,6 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		WHERE ms.module_id IN (
 			SELECT id FROM fieldkit.station_module WHERE provision_id IN (
 				SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
-				ORDER BY updated DESC
-				LIMIT 1
 			)
 		)
 		ORDER BY ms.position
@@ -248,12 +244,15 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		SELECT
 			sm.*
 		FROM fieldkit.station_module AS sm
-		WHERE sm.provision_id IN (
-			SELECT id FROM fieldkit.provision WHERE device_id IN (
-				SELECT device_id FROM fieldkit.station WHERE owner_id = $1
+		WHERE sm.meta_record_id IN (
+			SELECT
+				MAX(sm.meta_record_id)
+			FROM fieldkit.station_module AS sm
+			WHERE sm.provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id IN (
+					SELECT device_id FROM fieldkit.station WHERE owner_id = $1
+				)
 			)
-			ORDER BY updated DESC
-			LIMIT 1
 		)
 		ORDER BY sm.position
 		`, id); err != nil {
@@ -266,12 +265,15 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 			ms.*
 		FROM fieldkit.module_sensor AS ms
 		WHERE ms.module_id IN (
-			SELECT id FROM fieldkit.station_module WHERE provision_id IN (
-				SELECT id FROM fieldkit.provision WHERE device_id IN (
-					SELECT device_id FROM fieldkit.station WHERE owner_id = $1
+			SELECT
+				MAX(sm.meta_record_id)
+			FROM fieldkit.station_module AS sm
+			WHERE sm.provision_id IN (
+				SELECT id FROM fieldkit.station_module WHERE provision_id IN (
+					SELECT id FROM fieldkit.provision WHERE device_id IN (
+						SELECT device_id FROM fieldkit.station WHERE owner_id = $1
+					)
 				)
-				ORDER BY updated DESC
-				LIMIT 1
 			)
 		)
 		ORDER BY ms.position
@@ -344,14 +346,19 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		SELECT
 			sm.*
 		FROM fieldkit.station_module AS sm
-		WHERE sm.provision_id IN (
-			SELECT id FROM fieldkit.provision WHERE device_id IN (
-				SELECT device_id FROM fieldkit.station WHERE id IN (
-					SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+        WHERE meta_record_id IN (
+			SELECT
+				MAX(sm.meta_record_id)
+			FROM fieldkit.station_module AS sm
+			WHERE sm.provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id IN (
+					SELECT device_id FROM fieldkit.station WHERE id IN (
+						SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+					)
 				)
+				ORDER BY updated DESC
+				LIMIT 1
 			)
-            ORDER BY updated DESC
-			LIMIT 1
 		)
 		ORDER BY sm.position
 		`, id); err != nil {
@@ -364,14 +371,19 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 			ms.*
 		FROM fieldkit.module_sensor AS ms
 		WHERE ms.module_id IN (
-			SELECT id FROM fieldkit.station_module WHERE provision_id IN (
-				SELECT id FROM fieldkit.provision WHERE device_id IN (
-					SELECT device_id FROM fieldkit.station WHERE id IN (
-						SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+			SELECT id FROM fieldkit.station_module WHERE meta_record_id IN (
+				SELECT
+					MAX(sm.meta_record_id)
+				FROM fieldkit.station_module AS sm
+				WHERE sm.provision_id IN (
+					SELECT id FROM fieldkit.provision WHERE device_id IN (
+						SELECT device_id FROM fieldkit.station WHERE id IN (
+							SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+						)
 					)
+					ORDER BY updated DESC
+					LIMIT 1
 				)
-				ORDER BY updated DESC
-				LIMIT 1
 			)
 		)
 		ORDER BY ms.position
