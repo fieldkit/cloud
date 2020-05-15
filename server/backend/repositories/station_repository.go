@@ -160,8 +160,12 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		SELECT
 			sm.*
 		FROM fieldkit.station_module AS sm
-		WHERE sm.provision_id IN (
-			SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
+		WHERE sm.meta_record_id IN (
+			SELECT MAX(meta_record_id)
+			FROM fieldkit.station_module AS sm
+			WHERE sm.provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
+			)
 		)
 		ORDER BY sm.position
 		`, id); err != nil {
@@ -174,8 +178,12 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 			ms.*
 		FROM fieldkit.module_sensor AS ms
 		WHERE ms.module_id IN (
-			SELECT id FROM fieldkit.station_module WHERE provision_id IN (
-				SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
+			SELECT id FROM fieldkit.station_module WHERE meta_record_id IN (
+				SELECT MAX(meta_record_id)
+				FROM fieldkit.station_module AS sm
+				WHERE sm.provision_id IN (
+					SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
+				)
 			)
 		)
 		ORDER BY ms.position
