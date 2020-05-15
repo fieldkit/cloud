@@ -108,9 +108,6 @@ func (s *Station) UpdateFromStatus(raw string) error {
 		}
 	}
 
-	if record.Modules != nil {
-	}
-
 	return nil
 }
 
