@@ -824,12 +824,12 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 		Name:               *v.Name,
 		DeviceID:           *v.DeviceID,
 		ReadOnly:           *v.ReadOnly,
-		Battery:            *v.Battery,
-		RecordingStartedAt: *v.RecordingStartedAt,
-		MemoryUsed:         *v.MemoryUsed,
-		MemoryAvailable:    *v.MemoryAvailable,
-		FirmwareNumber:     *v.FirmwareNumber,
-		FirmwareTime:       *v.FirmwareTime,
+		Battery:            v.Battery,
+		RecordingStartedAt: v.RecordingStartedAt,
+		MemoryUsed:         v.MemoryUsed,
+		MemoryAvailable:    v.MemoryAvailable,
+		FirmwareNumber:     v.FirmwareNumber,
+		FirmwareTime:       v.FirmwareTime,
 	}
 	if v.Owner != nil {
 		res.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(v.Owner)

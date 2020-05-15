@@ -25,6 +25,7 @@ require (
 	github.com/dimfeld/httppath v0.0.0-20170720192232-ee938bf73598
 	github.com/dimfeld/httptreemux v5.0.1+incompatible
 	github.com/dropbox/godropbox v0.0.0-20190501155911-5749d3b71cbe // indirect
+	github.com/fieldkit/app-protocol v0.0.0-20200515173549-e0925480073d
 	github.com/fieldkit/data-protocol v0.0.0-20200123020042-8ddcca534acd
 	github.com/go-ini/ini v1.26.0
 	github.com/go-kit/kit v0.8.0
@@ -34,7 +35,7 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang-migrate/migrate/v4 v4.11.0
 	github.com/golang/freetype v0.0.0-20161208064710-d9be45aaf745
-	github.com/golang/protobuf v1.3.5
+	github.com/golang/protobuf v1.4.2
 	github.com/google/go-querystring v1.0.0
 	github.com/google/uuid v1.1.1
 	github.com/h2non/filetype v1.0.10

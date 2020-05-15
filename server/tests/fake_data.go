@@ -102,14 +102,16 @@ func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
 		deviceID := hasher.Sum(nil)
 
 		station := &data.Station{
-			OwnerID:  owner.ID,
-			Name:     name,
-			DeviceID: deviceID,
+			OwnerID:   owner.ID,
+			Name:      name,
+			DeviceID:  deviceID,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		}
 
 		if err := e.DB.NamedGetContext(e.Ctx, station, `
-			INSERT INTO fieldkit.station (name, device_id, owner_id, status_json)
-			VALUES (:name, :device_id, :owner_id, :status_json)
+			INSERT INTO fieldkit.station (name, device_id, owner_id, status_json, created_at, updated_at)
+			VALUES (:name, :device_id, :owner_id, :status_json, :created_at, :updated_at)
 			RETURNING *
 		`, station); err != nil {
 			return nil, err
@@ -139,9 +141,11 @@ func (e *TestEnv) NewStation(owner *data.User) *data.Station {
 	deviceID := hasher.Sum(nil)
 
 	station := &data.Station{
-		OwnerID:  owner.ID,
-		DeviceID: deviceID,
-		Name:     name,
+		OwnerID:   owner.ID,
+		DeviceID:  deviceID,
+		Name:      name,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	return station

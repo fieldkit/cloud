@@ -43,7 +43,7 @@ type StationFullView struct {
 	MemoryUsed         *int32
 	MemoryAvailable    *int32
 	FirmwareNumber     *int32
-	FirmwareTime       *int32
+	FirmwareTime       *int64
 	Modules            []*StationModuleView
 }
 
@@ -214,24 +214,6 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	}
 	if result.StatusJSON == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "result"))
-	}
-	if result.Battery == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("battery", "result"))
-	}
-	if result.RecordingStartedAt == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("recording_started_at", "result"))
-	}
-	if result.MemoryUsed == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("memory_used", "result"))
-	}
-	if result.MemoryAvailable == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("memory_available", "result"))
-	}
-	if result.FirmwareNumber == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("firmware_number", "result"))
-	}
-	if result.FirmwareTime == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("firmware_time", "result"))
 	}
 	if result.Modules == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("modules", "result"))

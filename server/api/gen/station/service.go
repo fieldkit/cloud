@@ -49,11 +49,12 @@ var MethodNames = [6]string{"add", "get", "update", "list mine", "list project",
 
 // AddPayload is the payload type of the station service add method.
 type AddPayload struct {
-	Auth       string
-	Name       string
-	DeviceID   string
-	StatusJSON map[string]interface{}
-	StatusPb   *string
+	Auth         string
+	Name         string
+	DeviceID     string
+	LocationName *string
+	StatusJSON   map[string]interface{}
+	StatusPb     *string
 }
 
 // StationFull is the result type of the station service add method.
@@ -67,12 +68,12 @@ type StationFull struct {
 	Photos             *StationPhotos
 	ReadOnly           bool
 	StatusJSON         map[string]interface{}
-	Battery            float32
-	RecordingStartedAt int64
-	MemoryUsed         int32
-	MemoryAvailable    int32
-	FirmwareNumber     int32
-	FirmwareTime       int32
+	Battery            *float32
+	RecordingStartedAt *int64
+	MemoryUsed         *int32
+	MemoryAvailable    *int32
+	FirmwareNumber     *int32
+	FirmwareTime       *int64
 	Modules            []*StationModule
 }
 
@@ -84,11 +85,12 @@ type GetPayload struct {
 
 // UpdatePayload is the payload type of the station service update method.
 type UpdatePayload struct {
-	Auth       string
-	ID         int32
-	Name       string
-	StatusJSON map[string]interface{}
-	StatusPb   *string
+	Auth         string
+	ID           int32
+	Name         string
+	LocationName *string
+	StatusJSON   map[string]interface{}
+	StatusPb     *string
 }
 
 // ListMinePayload is the payload type of the station service list mine method.
@@ -247,7 +249,14 @@ func NewViewedStationsFull(res *StationsFull, view string) *stationviews.Station
 // newStationFull converts projected type StationFull to service type
 // StationFull.
 func newStationFull(vres *stationviews.StationFullView) *StationFull {
-	res := &StationFull{}
+	res := &StationFull{
+		Battery:            vres.Battery,
+		RecordingStartedAt: vres.RecordingStartedAt,
+		MemoryUsed:         vres.MemoryUsed,
+		MemoryAvailable:    vres.MemoryAvailable,
+		FirmwareNumber:     vres.FirmwareNumber,
+		FirmwareTime:       vres.FirmwareTime,
+	}
 	if vres.ID != nil {
 		res.ID = *vres.ID
 	}
@@ -259,24 +268,6 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	}
 	if vres.ReadOnly != nil {
 		res.ReadOnly = *vres.ReadOnly
-	}
-	if vres.Battery != nil {
-		res.Battery = *vres.Battery
-	}
-	if vres.RecordingStartedAt != nil {
-		res.RecordingStartedAt = *vres.RecordingStartedAt
-	}
-	if vres.MemoryUsed != nil {
-		res.MemoryUsed = *vres.MemoryUsed
-	}
-	if vres.MemoryAvailable != nil {
-		res.MemoryAvailable = *vres.MemoryAvailable
-	}
-	if vres.FirmwareNumber != nil {
-		res.FirmwareNumber = *vres.FirmwareNumber
-	}
-	if vres.FirmwareTime != nil {
-		res.FirmwareTime = *vres.FirmwareTime
 	}
 	if vres.Owner != nil {
 		res.Owner = transformStationviewsStationOwnerViewToStationOwner(vres.Owner)
@@ -321,12 +312,12 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		Name:               &res.Name,
 		DeviceID:           &res.DeviceID,
 		ReadOnly:           &res.ReadOnly,
-		Battery:            &res.Battery,
-		RecordingStartedAt: &res.RecordingStartedAt,
-		MemoryUsed:         &res.MemoryUsed,
-		MemoryAvailable:    &res.MemoryAvailable,
-		FirmwareNumber:     &res.FirmwareNumber,
-		FirmwareTime:       &res.FirmwareTime,
+		Battery:            res.Battery,
+		RecordingStartedAt: res.RecordingStartedAt,
+		MemoryUsed:         res.MemoryUsed,
+		MemoryAvailable:    res.MemoryAvailable,
+		FirmwareNumber:     res.FirmwareNumber,
+		FirmwareTime:       res.FirmwareTime,
 	}
 	if res.Owner != nil {
 		vres.Owner = transformStationOwnerToStationviewsStationOwnerView(res.Owner)

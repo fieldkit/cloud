@@ -10,6 +10,7 @@ import (
 	"image/jpeg"
 	"io"
 	"io/ioutil"
+	"time"
 
 	"goa.design/goa/v3/security"
 
@@ -45,12 +46,16 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 	log.Infow("adding station", "device_id", payload.DeviceID)
 
 	owner := &data.User{}
-	if err := c.options.Database.GetContext(ctx, owner, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
+	if err := c.options.Database.GetContext(ctx, owner, `
+		SELECT * FROM fieldkit.user WHERE id = $1
+		`, p.UserID()); err != nil {
 		return nil, err
 	}
 
 	stations := []*data.Station{}
-	if err := c.options.Database.SelectContext(ctx, &stations, `SELECT * FROM fieldkit.station WHERE device_id = $1`, deviceId); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &stations, `
+		SELECT * FROM fieldkit.station WHERE device_id = $1
+		`, deviceId); err != nil {
 		return nil, err
 	}
 
@@ -68,16 +73,26 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 	}
 
 	adding := &data.Station{
-		OwnerID:  p.UserID(),
-		Name:     payload.Name,
-		DeviceID: deviceId,
+		OwnerID:      p.UserID(),
+		Name:         payload.Name,
+		DeviceID:     deviceId,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+		LocationName: payload.LocationName,
+	}
+
+	if payload.StatusPb != nil {
+		if err := adding.UpdateFromStatus(*payload.StatusPb); err != nil {
+			log.Infow("status error", "error", err, "status", payload.StatusPb)
+		}
 	}
 
 	adding.SetStatus(payload.StatusJSON)
 
 	if err := c.options.Database.NamedGetContext(ctx, adding, `
-		INSERT INTO fieldkit.station (name, device_id, owner_id, status_json)
-		VALUES (:name, :device_id, :owner_id, :status_json)
+		INSERT INTO fieldkit.station
+		(name, device_id, owner_id, status_json, created_at, updated_at, location, location_name, battery, memory_used, memory_available, firmware_number, firmware_time, recording_started_at) VALUES
+		(:name, :device_id, :owner_id, :status_json, :created_at, :updated_at, :location, :location_name, :battery, :memory_used, :memory_available, :firmware_number, :firmware_time, :recording_started_at)
 		RETURNING *
 		`, adding); err != nil {
 		return nil, err
@@ -113,7 +128,19 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 }
 
 func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
-	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.ID))
+	log := Logger(ctx).Sugar()
+
+	updating := &data.Station{}
+	if err := c.options.Database.GetContext(ctx, updating, `
+		SELECT * FROM fieldkit.station WHERE id = $1
+		`, payload.ID); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, station.NotFound("station not found")
+		}
+		return nil, err
+	}
+
+	p, err := NewPermissions(ctx, c.options).ForStation(updating)
 	if err != nil {
 		return nil, err
 	}
@@ -122,17 +149,35 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 		return nil, err
 	}
 
-	updated := &data.Station{
-		ID:   payload.ID,
-		Name: payload.Name,
+	updating.Name = payload.Name
+	updating.UpdatedAt = time.Now()
+	if payload.LocationName != nil {
+		updating.LocationName = payload.LocationName
 	}
 
-	updated.SetStatus(payload.StatusJSON)
-
-	if err := c.options.Database.NamedGetContext(ctx, updated, "UPDATE fieldkit.station SET name = :name, status_json = :status_json WHERE id = :id RETURNING *", updated); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, station.NotFound("station not found")
+	if payload.StatusPb != nil {
+		if err := updating.UpdateFromStatus(*payload.StatusPb); err != nil {
+			log.Infow("status error", "error", err, "status", payload.StatusPb)
 		}
+	}
+
+	updating.SetStatus(payload.StatusJSON)
+
+	if err := c.options.Database.NamedGetContext(ctx, updating, `
+		UPDATE fieldkit.station SET
+			   name = :name,
+			   status_json = :status_json,
+			   battery = :battery,
+			   location = :location,
+			   location_name = :location_name,
+			   memory_available = :memory_available,
+			   memory_used = :memory_used,
+			   firmware_number = :firmware_number,
+			   firmware_time = :firmware_time,
+			   updated_at = :updated_at
+		WHERE id = :id
+		RETURNING *
+		`, updating); err != nil {
 		return nil, err
 	}
 
@@ -335,11 +380,16 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 			ID:   sf.Owner.ID,
 			Name: sf.Owner.Name,
 		},
-		DeviceID:   hex.EncodeToString(sf.Station.DeviceID),
-		Uploads:    transformUploads(sf.Ingestions),
-		Images:     transformImages(sf.Station.ID, sf.Media),
-		Modules:    transformModules(sf),
-		StatusJSON: status,
+		DeviceID:        hex.EncodeToString(sf.Station.DeviceID),
+		Uploads:         transformUploads(sf.Ingestions),
+		Images:          transformImages(sf.Station.ID, sf.Media),
+		Modules:         transformModules(sf),
+		StatusJSON:      status,
+		Battery:         sf.Station.Battery,
+		MemoryUsed:      sf.Station.MemoryUsed,
+		MemoryAvailable: sf.Station.MemoryAvailable,
+		FirmwareNumber:  sf.Station.FirmwareNumber,
+		FirmwareTime:    sf.Station.FirmwareTime,
 		Photos: &station.StationPhotos{
 			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
 		},

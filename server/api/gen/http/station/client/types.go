@@ -16,18 +16,20 @@ import (
 // AddRequestBody is the type of the "station" service "add" endpoint HTTP
 // request body.
 type AddRequestBody struct {
-	Name       string                 `form:"name" json:"name" xml:"name"`
-	DeviceID   string                 `form:"device_id" json:"device_id" xml:"device_id"`
-	StatusJSON map[string]interface{} `form:"status_json" json:"status_json" xml:"status_json"`
-	StatusPb   *string                `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
+	Name         string                 `form:"name" json:"name" xml:"name"`
+	DeviceID     string                 `form:"device_id" json:"device_id" xml:"device_id"`
+	LocationName *string                `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	StatusJSON   map[string]interface{} `form:"status_json" json:"status_json" xml:"status_json"`
+	StatusPb     *string                `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
 }
 
 // UpdateRequestBody is the type of the "station" service "update" endpoint
 // HTTP request body.
 type UpdateRequestBody struct {
-	Name       string                 `form:"name" json:"name" xml:"name"`
-	StatusJSON map[string]interface{} `form:"status_json" json:"status_json" xml:"status_json"`
-	StatusPb   *string                `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
+	Name         string                 `form:"name" json:"name" xml:"name"`
+	LocationName *string                `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	StatusJSON   map[string]interface{} `form:"status_json" json:"status_json" xml:"status_json"`
+	StatusPb     *string                `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
 }
 
 // AddResponseBody is the type of the "station" service "add" endpoint HTTP
@@ -47,7 +49,7 @@ type AddResponseBody struct {
 	MemoryUsed         *int32                       `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
 	MemoryAvailable    *int32                       `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
 	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
-	FirmwareTime       *int32                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	FirmwareTime       *int64                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
 	Modules            []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
 }
 
@@ -68,7 +70,7 @@ type GetResponseBody struct {
 	MemoryUsed         *int32                       `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
 	MemoryAvailable    *int32                       `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
 	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
-	FirmwareTime       *int32                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	FirmwareTime       *int64                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
 	Modules            []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
 }
 
@@ -89,7 +91,7 @@ type UpdateResponseBody struct {
 	MemoryUsed         *int32                       `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
 	MemoryAvailable    *int32                       `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
 	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
-	FirmwareTime       *int32                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	FirmwareTime       *int64                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
 	Modules            []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
 }
 
@@ -272,7 +274,7 @@ type StationFullResponseBody struct {
 	MemoryUsed         *int32                       `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
 	MemoryAvailable    *int32                       `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
 	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
-	FirmwareTime       *int32                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	FirmwareTime       *int64                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
 	Modules            []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
 }
 
@@ -280,9 +282,10 @@ type StationFullResponseBody struct {
 // endpoint of the "station" service.
 func NewAddRequestBody(p *station.AddPayload) *AddRequestBody {
 	body := &AddRequestBody{
-		Name:     p.Name,
-		DeviceID: p.DeviceID,
-		StatusPb: p.StatusPb,
+		Name:         p.Name,
+		DeviceID:     p.DeviceID,
+		LocationName: p.LocationName,
+		StatusPb:     p.StatusPb,
 	}
 	if p.StatusJSON != nil {
 		body.StatusJSON = make(map[string]interface{}, len(p.StatusJSON))
@@ -299,8 +302,9 @@ func NewAddRequestBody(p *station.AddPayload) *AddRequestBody {
 // "update" endpoint of the "station" service.
 func NewUpdateRequestBody(p *station.UpdatePayload) *UpdateRequestBody {
 	body := &UpdateRequestBody{
-		Name:     p.Name,
-		StatusPb: p.StatusPb,
+		Name:         p.Name,
+		LocationName: p.LocationName,
+		StatusPb:     p.StatusPb,
 	}
 	if p.StatusJSON != nil {
 		body.StatusJSON = make(map[string]interface{}, len(p.StatusJSON))
@@ -778,24 +782,6 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 	}
 	if body.StatusJSON == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
-	}
-	if body.Battery == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("battery", "body"))
-	}
-	if body.RecordingStartedAt == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("recording_started_at", "body"))
-	}
-	if body.MemoryUsed == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("memory_used", "body"))
-	}
-	if body.MemoryAvailable == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("memory_available", "body"))
-	}
-	if body.FirmwareNumber == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("firmware_number", "body"))
-	}
-	if body.FirmwareTime == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("firmware_time", "body"))
 	}
 	if body.Modules == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("modules", "body"))
