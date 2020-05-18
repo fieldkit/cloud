@@ -195,8 +195,8 @@ func (s *IngestionService) JWTAuth(ctx context.Context, token string, scheme *se
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		NotFound:     nil,
-		Unauthorized: nil,
-		Forbidden:    nil,
+		NotFound:     func(m string) error { return ingestion.NotFound(m) },
+		Unauthorized: func(m string) error { return ingestion.Unauthorized(m) },
+		Forbidden:    func(m string) error { return ingestion.Forbidden(m) },
 	})
 }
