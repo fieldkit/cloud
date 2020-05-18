@@ -314,6 +314,22 @@ func transformUploads(from []*data.Ingestion) (to []*station.StationUpload) {
 	return to
 }
 
+func transformReading(s *data.ModuleSensor) *station.SensorReading {
+	if s.ReadingValue == nil {
+		return nil
+	}
+
+	time := int64(0)
+	if s.ReadingTime != nil {
+		time = s.ReadingTime.Unix() * 1000
+	}
+
+	return &station.SensorReading{
+		Last: float32(*s.ReadingValue),
+		Time: time,
+	}
+}
+
 func transformModules(from *data.StationFull) (to []*station.StationModule) {
 	to = make([]*station.StationModule, 0)
 	for _, v := range from.Modules {
@@ -324,10 +340,7 @@ func transformModules(from *data.StationFull) (to []*station.StationModule) {
 				sensors = append(sensors, &station.StationSensor{
 					Name:          s.Name,
 					UnitOfMeasure: s.UnitOfMeasure,
-					Reading: &station.SensorReading{
-						Last: 0.0,
-						Time: int64(0),
-					},
+					Reading:       transformReading(s),
 				})
 			}
 		}
