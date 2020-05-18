@@ -68,8 +68,8 @@ var _ = Service("activity", func() {
 		Payload(func() {
 			Token("auth")
 			Attribute("id", Int64)
-			Attribute("page", Int64)
 			Required("id")
+			Attribute("page", Int64)
 		})
 
 		Result(StationActivityPage)
@@ -93,8 +93,8 @@ var _ = Service("activity", func() {
 		Payload(func() {
 			Token("auth")
 			Attribute("id", Int64)
-			Attribute("page", Int64)
 			Required("id")
+			Attribute("page", Int64)
 		})
 
 		Result(ProjectActivityPage)

@@ -203,51 +203,6 @@ func (ctx *ListFirmwareContext) OK(r *Firmwares) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
-// DeleteDataContext provides the data delete action context.
-type DeleteDataContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	IngestionID int
-}
-
-// NewDeleteDataContext parses the incoming request URL and body, performs validations and creates the
-// context used by the data controller delete action.
-func NewDeleteDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeleteDataContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := DeleteDataContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramIngestionID := req.Params["ingestionId"]
-	if len(paramIngestionID) > 0 {
-		rawIngestionID := paramIngestionID[0]
-		if ingestionID, err2 := strconv.Atoi(rawIngestionID); err2 == nil {
-			rctx.IngestionID = ingestionID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("ingestionId", rawIngestionID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *DeleteDataContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *DeleteDataContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
 // DeviceDataDataContext provides the data device data action context.
 type DeviceDataDataContext struct {
 	context.Context
@@ -278,9 +233,9 @@ func NewDeviceDataDataContext(ctx context.Context, r *http.Request, service *goa
 	if len(paramFirstBlock) > 0 {
 		rawFirstBlock := paramFirstBlock[0]
 		if firstBlock, err2 := strconv.Atoi(rawFirstBlock); err2 == nil {
-			tmp9 := firstBlock
-			tmp8 := &tmp9
-			rctx.FirstBlock = tmp8
+			tmp8 := firstBlock
+			tmp7 := &tmp8
+			rctx.FirstBlock = tmp7
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("firstBlock", rawFirstBlock, "integer"))
 		}
@@ -289,9 +244,9 @@ func NewDeviceDataDataContext(ctx context.Context, r *http.Request, service *goa
 	if len(paramLastBlock) > 0 {
 		rawLastBlock := paramLastBlock[0]
 		if lastBlock, err2 := strconv.Atoi(rawLastBlock); err2 == nil {
-			tmp11 := lastBlock
-			tmp10 := &tmp11
-			rctx.LastBlock = tmp10
+			tmp10 := lastBlock
+			tmp9 := &tmp10
+			rctx.LastBlock = tmp9
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("lastBlock", rawLastBlock, "integer"))
 		}
@@ -300,9 +255,9 @@ func NewDeviceDataDataContext(ctx context.Context, r *http.Request, service *goa
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp13 := page
-			tmp12 := &tmp13
-			rctx.Page = tmp12
+			tmp12 := page
+			tmp11 := &tmp12
+			rctx.Page = tmp11
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -311,9 +266,9 @@ func NewDeviceDataDataContext(ctx context.Context, r *http.Request, service *goa
 	if len(paramPageSize) > 0 {
 		rawPageSize := paramPageSize[0]
 		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
-			tmp15 := pageSize
-			tmp14 := &tmp15
-			rctx.PageSize = tmp14
+			tmp14 := pageSize
+			tmp13 := &tmp14
+			rctx.PageSize = tmp13
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
 		}
@@ -370,131 +325,6 @@ func (ctx *DeviceSummaryDataContext) OK(r *DeviceDataSummaryResponse) error {
 
 // NotFound sends a HTTP response with status code 404.
 func (ctx *DeviceSummaryDataContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// ProcessDataContext provides the data process action context.
-type ProcessDataContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-}
-
-// NewProcessDataContext parses the incoming request URL and body, performs validations and creates the
-// context used by the data controller process action.
-func NewProcessDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*ProcessDataContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ProcessDataContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ProcessDataContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// Busy sends a HTTP response with status code 503.
-func (ctx *ProcessDataContext) Busy() error {
-	ctx.ResponseData.WriteHeader(503)
-	return nil
-}
-
-// ProcessIngestionDataContext provides the data process ingestion action context.
-type ProcessIngestionDataContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	IngestionID int
-}
-
-// NewProcessIngestionDataContext parses the incoming request URL and body, performs validations and creates the
-// context used by the data controller process ingestion action.
-func NewProcessIngestionDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*ProcessIngestionDataContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ProcessIngestionDataContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramIngestionID := req.Params["ingestionId"]
-	if len(paramIngestionID) > 0 {
-		rawIngestionID := paramIngestionID[0]
-		if ingestionID, err2 := strconv.Atoi(rawIngestionID); err2 == nil {
-			rctx.IngestionID = ingestionID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("ingestionId", rawIngestionID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ProcessIngestionDataContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *ProcessIngestionDataContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
-}
-
-// ProcessStationDataContext provides the data process station action context.
-type ProcessStationDataContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	StationID int
-}
-
-// NewProcessStationDataContext parses the incoming request URL and body, performs validations and creates the
-// context used by the data controller process station action.
-func NewProcessStationDataContext(ctx context.Context, r *http.Request, service *goa.Service) (*ProcessStationDataContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := ProcessStationDataContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramStationID := req.Params["stationId"]
-	if len(paramStationID) > 0 {
-		rawStationID := paramStationID[0]
-		if stationID, err2 := strconv.Atoi(rawStationID); err2 == nil {
-			rctx.StationID = stationID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("stationId", rawStationID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *ProcessStationDataContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *ProcessStationDataContext) NotFound() error {
 	ctx.ResponseData.WriteHeader(404)
 	return nil
 }
@@ -814,9 +644,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramEnd) > 0 {
 		rawEnd := paramEnd[0]
 		if end, err2 := strconv.Atoi(rawEnd); err2 == nil {
-			tmp28 := end
-			tmp27 := &tmp28
-			rctx.End = tmp27
+			tmp25 := end
+			tmp24 := &tmp25
+			rctx.End = tmp24
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("end", rawEnd, "integer"))
 		}
@@ -825,8 +655,8 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramInternal) > 0 {
 		rawInternal := paramInternal[0]
 		if internal, err2 := strconv.ParseBool(rawInternal); err2 == nil {
-			tmp29 := &internal
-			rctx.Internal = tmp29
+			tmp26 := &internal
+			rctx.Internal = tmp26
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("internal", rawInternal, "boolean"))
 		}
@@ -835,9 +665,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp31 := page
-			tmp30 := &tmp31
-			rctx.Page = tmp30
+			tmp28 := page
+			tmp27 := &tmp28
+			rctx.Page = tmp27
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -846,9 +676,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramPageSize) > 0 {
 		rawPageSize := paramPageSize[0]
 		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
-			tmp33 := pageSize
-			tmp32 := &tmp33
-			rctx.PageSize = tmp32
+			tmp30 := pageSize
+			tmp29 := &tmp30
+			rctx.PageSize = tmp29
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
 		}
@@ -857,9 +687,9 @@ func NewGetJSONDataContext(ctx context.Context, r *http.Request, service *goa.Se
 	if len(paramStart) > 0 {
 		rawStart := paramStart[0]
 		if start, err2 := strconv.Atoi(rawStart); err2 == nil {
-			tmp35 := start
-			tmp34 := &tmp35
-			rctx.Start = tmp34
+			tmp32 := start
+			tmp31 := &tmp32
+			rctx.Start = tmp31
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("start", rawStart, "integer"))
 		}
@@ -914,9 +744,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramEnd) > 0 {
 		rawEnd := paramEnd[0]
 		if end, err2 := strconv.Atoi(rawEnd); err2 == nil {
-			tmp37 := end
-			tmp36 := &tmp37
-			rctx.End = tmp36
+			tmp34 := end
+			tmp33 := &tmp34
+			rctx.End = tmp33
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("end", rawEnd, "integer"))
 		}
@@ -925,8 +755,8 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramInternal) > 0 {
 		rawInternal := paramInternal[0]
 		if internal, err2 := strconv.ParseBool(rawInternal); err2 == nil {
-			tmp38 := &internal
-			rctx.Internal = tmp38
+			tmp35 := &internal
+			rctx.Internal = tmp35
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("internal", rawInternal, "boolean"))
 		}
@@ -935,9 +765,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramInterval) > 0 {
 		rawInterval := paramInterval[0]
 		if interval, err2 := strconv.Atoi(rawInterval); err2 == nil {
-			tmp40 := interval
-			tmp39 := &tmp40
-			rctx.Interval = tmp39
+			tmp37 := interval
+			tmp36 := &tmp37
+			rctx.Interval = tmp36
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("interval", rawInterval, "integer"))
 		}
@@ -946,9 +776,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramPage) > 0 {
 		rawPage := paramPage[0]
 		if page, err2 := strconv.Atoi(rawPage); err2 == nil {
-			tmp42 := page
-			tmp41 := &tmp42
-			rctx.Page = tmp41
+			tmp39 := page
+			tmp38 := &tmp39
+			rctx.Page = tmp38
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("page", rawPage, "integer"))
 		}
@@ -957,9 +787,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramPageSize) > 0 {
 		rawPageSize := paramPageSize[0]
 		if pageSize, err2 := strconv.Atoi(rawPageSize); err2 == nil {
-			tmp44 := pageSize
-			tmp43 := &tmp44
-			rctx.PageSize = tmp43
+			tmp41 := pageSize
+			tmp40 := &tmp41
+			rctx.PageSize = tmp40
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("pageSize", rawPageSize, "integer"))
 		}
@@ -968,9 +798,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramResolution) > 0 {
 		rawResolution := paramResolution[0]
 		if resolution, err2 := strconv.Atoi(rawResolution); err2 == nil {
-			tmp46 := resolution
-			tmp45 := &tmp46
-			rctx.Resolution = tmp45
+			tmp43 := resolution
+			tmp42 := &tmp43
+			rctx.Resolution = tmp42
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("resolution", rawResolution, "integer"))
 		}
@@ -979,9 +809,9 @@ func NewSummaryJSONDataContext(ctx context.Context, r *http.Request, service *go
 	if len(paramStart) > 0 {
 		rawStart := paramStart[0]
 		if start, err2 := strconv.Atoi(rawStart); err2 == nil {
-			tmp48 := start
-			tmp47 := &tmp48
-			rctx.Start = tmp47
+			tmp45 := start
+			tmp44 := &tmp45
+			rctx.Start = tmp44
 		} else {
 			err = goa.MergeErrors(err, goa.InvalidParamTypeError("start", rawStart, "integer"))
 		}

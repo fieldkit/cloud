@@ -294,41 +294,16 @@ func unmarshalAddFirmwarePayload(ctx context.Context, service *goa.Service, req 
 // DataController is the controller interface for the Data actions.
 type DataController interface {
 	goa.Muxer
-	Delete(*DeleteDataContext) error
 	DeviceData(*DeviceDataDataContext) error
 	DeviceSummary(*DeviceSummaryDataContext) error
-	Process(*ProcessDataContext) error
-	ProcessIngestion(*ProcessIngestionDataContext) error
-	ProcessStation(*ProcessStationDataContext) error
 }
 
 // MountDataController "mounts" a Data resource controller on the given service.
 func MountDataController(service *goa.Service, ctrl DataController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/data/ingestions/:ingestionId", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/data/devices/:deviceId/data", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/data/devices/:deviceId/summary", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/data/process", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/data/ingestions/:ingestionId/process", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/data/stations/:stationId/process", ctrl.MuxHandler("preflight", handleDataOrigin(cors.HandlePreflight()), nil))
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewDeleteDataContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.Delete(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleDataOrigin(h)
-	service.Mux.Handle("DELETE", "/data/ingestions/:ingestionId", ctrl.MuxHandler("delete", h, nil))
-	service.LogInfo("mount", "ctrl", "Data", "action", "Delete", "route", "DELETE /data/ingestions/:ingestionId", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -363,57 +338,6 @@ func MountDataController(service *goa.Service, ctrl DataController) {
 	h = handleDataOrigin(h)
 	service.Mux.Handle("GET", "/data/devices/:deviceId/summary", ctrl.MuxHandler("device summary", h, nil))
 	service.LogInfo("mount", "ctrl", "Data", "action", "DeviceSummary", "route", "GET /data/devices/:deviceId/summary", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewProcessDataContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.Process(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleDataOrigin(h)
-	service.Mux.Handle("POST", "/data/process", ctrl.MuxHandler("process", h, nil))
-	service.LogInfo("mount", "ctrl", "Data", "action", "Process", "route", "POST /data/process", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewProcessIngestionDataContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.ProcessIngestion(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleDataOrigin(h)
-	service.Mux.Handle("POST", "/data/ingestions/:ingestionId/process", ctrl.MuxHandler("process ingestion", h, nil))
-	service.LogInfo("mount", "ctrl", "Data", "action", "ProcessIngestion", "route", "POST /data/ingestions/:ingestionId/process", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewProcessStationDataContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.ProcessStation(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleDataOrigin(h)
-	service.Mux.Handle("POST", "/data/stations/:stationId/process", ctrl.MuxHandler("process station", h, nil))
-	service.LogInfo("mount", "ctrl", "Data", "action", "ProcessStation", "route", "POST /data/stations/:stationId/process", "security", "jwt")
 }
 
 // handleDataOrigin applies the CORS response headers corresponding to the origin.

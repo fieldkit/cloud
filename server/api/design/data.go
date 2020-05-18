@@ -10,52 +10,6 @@ var _ = Resource("data", func() {
 		Scope("api:access")
 	})
 
-	Action("process", func() {
-		Routing(POST("data/process"))
-		Description("Process data")
-		Response("Busy", func() {
-			Status(503)
-		})
-		Response(OK, func() {
-			Status(200)
-		})
-	})
-
-	Action("process station", func() {
-		Routing(POST("data/stations/:stationId/process"))
-		Params(func() {
-			Param("stationId", Integer)
-		})
-		Response(NotFound)
-		Response(OK, func() {
-			Status(200)
-		})
-	})
-
-	Action("process ingestion", func() {
-		Routing(POST("data/ingestions/:ingestionId/process"))
-		Description("Process ingestion")
-		Params(func() {
-			Param("ingestionId", Integer)
-		})
-		Response(NotFound)
-		Response(OK, func() {
-			Status(200)
-		})
-	})
-
-	Action("delete", func() {
-		Routing(DELETE("data/ingestions/:ingestionId"))
-		Description("Delete data")
-		Params(func() {
-			Param("ingestionId", Integer)
-		})
-		Response(NotFound)
-		Response(OK, func() {
-			Status(200)
-		})
-	})
-
 	Action("device summary", func() {
 		Routing(GET("data/devices/:deviceId/summary"))
 		Description("Retrieve summary")

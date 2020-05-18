@@ -140,7 +140,7 @@ definitions:
     description: DeviceDataRecord media type (default view)
     example:
       data:
-        Possimus labore qui possimus porro quaerat.: 96ded439-493a-43df-a42b-d94bc4e72ae7
+        Possimus labore qui possimus porro quaerat.: c436fac3-e431-4a51-a350-d677d1f01795
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -151,7 +151,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Possimus labore qui possimus porro quaerat.: 96ded439-493a-43df-a42b-d94bc4e72ae7
+          Possimus labore qui possimus porro quaerat.: c436fac3-e431-4a51-a350-d677d1f01795
         type: object
       id:
         example: 3.1889681637076403e+18
@@ -191,7 +191,7 @@ definitions:
       (default view)
     example:
     - data:
-        Possimus labore qui possimus porro quaerat.: 96ded439-493a-43df-a42b-d94bc4e72ae7
+        Possimus labore qui possimus porro quaerat.: c436fac3-e431-4a51-a350-d677d1f01795
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -199,7 +199,7 @@ definitions:
       record: 7.193395211552676e+18
       time: "1980-07-29T04:01:26Z"
     - data:
-        Possimus labore qui possimus porro quaerat.: 96ded439-493a-43df-a42b-d94bc4e72ae7
+        Possimus labore qui possimus porro quaerat.: c436fac3-e431-4a51-a350-d677d1f01795
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -216,7 +216,7 @@ definitions:
     example:
       data:
       - data:
-          Possimus labore qui possimus porro quaerat.: 96ded439-493a-43df-a42b-d94bc4e72ae7
+          Possimus labore qui possimus porro quaerat.: c436fac3-e431-4a51-a350-d677d1f01795
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -224,7 +224,7 @@ definitions:
         record: 7.193395211552676e+18
         time: "1980-07-29T04:01:26Z"
       - data:
-          Possimus labore qui possimus porro quaerat.: 96ded439-493a-43df-a42b-d94bc4e72ae7
+          Possimus labore qui possimus porro quaerat.: c436fac3-e431-4a51-a350-d677d1f01795
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -233,17 +233,17 @@ definitions:
         time: "1980-07-29T04:01:26Z"
       meta:
       - data:
-          Vel est.: 00839cc3-04c8-4fab-8a59-8e77d83085b7
+          Vel est.: b981501a-47ed-44e1-b020-76416110c4c0
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Vel est.: 00839cc3-04c8-4fab-8a59-8e77d83085b7
+          Vel est.: b981501a-47ed-44e1-b020-76416110c4c0
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Vel est.: 00839cc3-04c8-4fab-8a59-8e77d83085b7
+          Vel est.: b981501a-47ed-44e1-b020-76416110c4c0
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
@@ -330,7 +330,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Vel est.: 00839cc3-04c8-4fab-8a59-8e77d83085b7
+        Vel est.: b981501a-47ed-44e1-b020-76416110c4c0
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -338,7 +338,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Vel est.: 00839cc3-04c8-4fab-8a59-8e77d83085b7
+          Vel est.: b981501a-47ed-44e1-b020-76416110c4c0
         type: object
       id:
         example: 2.827138534810339e+18
@@ -364,12 +364,12 @@ definitions:
       (default view)
     example:
     - data:
-        Vel est.: 00839cc3-04c8-4fab-8a59-8e77d83085b7
+        Vel est.: b981501a-47ed-44e1-b020-76416110c4c0
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
     - data:
-        Vel est.: 00839cc3-04c8-4fab-8a59-8e77d83085b7
+        Vel est.: b981501a-47ed-44e1-b020-76416110c4c0
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -2635,110 +2635,6 @@ paths:
       summary: summary jsonData
       tags:
       - jsonData
-  /data/ingestions/{ingestionId}:
-    delete:
-      description: |-
-        Delete data
-
-        Required security scopes:
-          * `api:access`
-      operationId: data#delete
-      parameters:
-      - in: path
-        name: ingestionId
-        required: true
-        type: integer
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: delete data
-      tags:
-      - data
-  /data/ingestions/{ingestionId}/process:
-    post:
-      description: |-
-        Process ingestion
-
-        Required security scopes:
-          * `api:access`
-      operationId: data#process ingestion
-      parameters:
-      - in: path
-        name: ingestionId
-        required: true
-        type: integer
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: process ingestion data
-      tags:
-      - data
-  /data/process:
-    post:
-      description: |-
-        Process data
-
-        Required security scopes:
-          * `api:access`
-      operationId: data#process
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "503": {}
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: process data
-      tags:
-      - data
-  /data/stations/{stationId}/process:
-    post:
-      description: |-
-        Required security scopes:
-          * `api:access`
-      operationId: data#process station
-      parameters:
-      - in: path
-        name: stationId
-        required: true
-        type: integer
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: process station data
-      tags:
-      - data
   /firmware:
     get:
       description: List firmware

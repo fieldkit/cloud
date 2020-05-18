@@ -3,18 +3,12 @@ package api
 import (
 	"context"
 	"encoding/hex"
-	"fmt"
 
 	"github.com/goadesign/goa"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
-
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/messages"
 )
 
 type DataController struct {
@@ -27,170 +21,6 @@ func NewDataController(ctx context.Context, service *goa.Service, options *Contr
 		options:    options,
 		Controller: service.NewController("DataController"),
 	}
-}
-
-func (c *DataController) Process(ctx *app.ProcessDataContext) error {
-	log := Logger(ctx).Sugar()
-
-	p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err != nil {
-		return err
-	}
-
-	ir, err := repositories.NewIngestionRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
-
-	ingestions, err := ir.QueryPending(ctx)
-	if err != nil {
-		return err
-	}
-
-	log.Infow("queueing", "ingestions", len(ingestions))
-
-	for _, i := range ingestions {
-		c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-			Time:   i.Time,
-			ID:     i.ID,
-			URL:    i.URL,
-			UserID: p.UserID(),
-		})
-	}
-
-	return ctx.OK([]byte("{}"))
-}
-
-func (c *DataController) ProcessStation(ctx *app.ProcessStationDataContext) error {
-	log := Logger(ctx).Sugar()
-
-	ir, err := repositories.NewIngestionRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
-
-	log.Infow("processing", "station_id", ctx.StationID)
-
-	p, err := NewPermissions(ctx, c.options).ForStationByID(ctx.StationID)
-	if err != nil {
-		return err
-	}
-
-	if err := p.CanModify(); err != nil {
-		return err
-	}
-
-	ingestions, err := ir.QueryByStationID(ctx, int64(ctx.StationID))
-	if err != nil {
-		return err
-	}
-
-	log.Infow("queueing", "ingestions", len(ingestions))
-
-	for _, i := range ingestions {
-		c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-			Time:   i.Time,
-			ID:     i.ID,
-			URL:    i.URL,
-			UserID: p.UserID(),
-		})
-	}
-
-	return ctx.OK([]byte("{}"))
-}
-
-func (c *DataController) ProcessIngestion(ctx *app.ProcessIngestionDataContext) error {
-	log := Logger(ctx).Sugar()
-
-	ir, err := repositories.NewIngestionRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
-
-	log.Infow("processing", "ingestion_id", ctx.IngestionID)
-
-	i, err := ir.QueryByID(ctx, int64(ctx.IngestionID))
-	if err != nil {
-		return err
-	}
-	if i == nil {
-		return ctx.NotFound()
-	}
-
-	p, err := NewPermissions(ctx, c.options).ForStationByDeviceID(i.DeviceID)
-	if err != nil {
-		return err
-	}
-
-	if err := p.CanModify(); err != nil {
-		return err
-	}
-
-	c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-		Time:    i.Time,
-		ID:      i.ID,
-		URL:     i.URL,
-		UserID:  p.UserID(),
-		Verbose: true,
-	})
-
-	return ctx.OK([]byte("{}"))
-}
-
-func (c *DataController) Delete(ctx *app.DeleteDataContext) error {
-	log := Logger(ctx).Sugar()
-
-	ir, err := repositories.NewIngestionRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
-
-	log.Infow("deleting", "ingestion_id", ctx.IngestionID)
-
-	i, err := ir.QueryByID(ctx, int64(ctx.IngestionID))
-	if err != nil {
-		return err
-	}
-	if i == nil {
-		return ctx.NotFound()
-	}
-
-	p, err := NewPermissions(ctx, c.options).ForStationByDeviceID(i.DeviceID)
-	if err != nil {
-		return err
-	}
-
-	if err := p.CanModify(); err != nil {
-		return err
-	}
-
-	svc := s3.New(c.options.Session)
-
-	object, err := common.GetBucketAndKey(i.URL)
-	if err != nil {
-		return fmt.Errorf("Error parsing URL: %v", err)
-	}
-
-	log.Infow("deleting", "url", i.URL)
-
-	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(object.Bucket), Key: aws.String(object.Key)})
-	if err != nil {
-		return fmt.Errorf("Unable to delete object %q from bucket %q, %v", object.Key, object.Bucket, err)
-	}
-
-	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
-		Bucket: aws.String(object.Bucket),
-		Key:    aws.String(object.Key),
-	})
-	if err != nil {
-		return err
-	}
-
-	if err := ir.Delete(ctx, int64(ctx.IngestionID)); err != nil {
-		return err
-	}
-
-	return ctx.OK([]byte("{}"))
 }
 
 type ProvisionSummaryRow struct {
