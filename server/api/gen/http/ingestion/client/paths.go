@@ -7,22 +7,26 @@
 
 package client
 
+import (
+	"fmt"
+)
+
 // ProcessPendingIngestionPath returns the URL path to the ingestion service process pending HTTP endpoint.
 func ProcessPendingIngestionPath() string {
 	return "/data/process"
 }
 
 // ProcessStationIngestionPath returns the URL path to the ingestion service process station HTTP endpoint.
-func ProcessStationIngestionPath() string {
-	return "/data/stations/:stationId/process"
+func ProcessStationIngestionPath(stationID int32) string {
+	return fmt.Sprintf("/data/stations/%v/process", stationID)
 }
 
 // ProcessIngestionIngestionPath returns the URL path to the ingestion service process ingestion HTTP endpoint.
-func ProcessIngestionIngestionPath() string {
-	return "/data/ingestions/:ingestionId/process"
+func ProcessIngestionIngestionPath(ingestionID int64) string {
+	return fmt.Sprintf("/data/ingestions/%v/process", ingestionID)
 }
 
 // DeleteIngestionPath returns the URL path to the ingestion service delete HTTP endpoint.
-func DeleteIngestionPath() string {
-	return "/data/ingestions/:ingestionId"
+func DeleteIngestionPath(ingestionID int64) string {
+	return fmt.Sprintf("/data/ingestions/%v", ingestionID)
 }

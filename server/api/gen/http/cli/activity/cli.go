@@ -50,8 +50,8 @@ func UsageExamples() string {
 		os.Args[0] + ` ingestion process- pending --auth "Deleniti necessitatibus fugiat velit sed aut quidem."` + "\n" +
 		os.Args[0] + ` modules meta` + "\n" +
 		os.Args[0] + ` project update --body '{
-      "body": "Dignissimos labore doloribus voluptas consequuntur illum."
-   }' --id 430927724249583174 --auth "Eum sequi."` + "\n" +
+      "body": "Voluptas consequuntur."
+   }' --id 8089941774886624674 --auth "Quo eum sequi aliquam velit."` + "\n" +
 		""
 }
 
@@ -96,17 +96,17 @@ func ParseEndpoint(
 		ingestionProcessPendingFlags    = flag.NewFlagSet("process- pending", flag.ExitOnError)
 		ingestionProcessPendingAuthFlag = ingestionProcessPendingFlags.String("auth", "REQUIRED", "")
 
-		ingestionProcessStationFlags    = flag.NewFlagSet("process- station", flag.ExitOnError)
-		ingestionProcessStationBodyFlag = ingestionProcessStationFlags.String("body", "REQUIRED", "")
-		ingestionProcessStationAuthFlag = ingestionProcessStationFlags.String("auth", "REQUIRED", "")
+		ingestionProcessStationFlags         = flag.NewFlagSet("process- station", flag.ExitOnError)
+		ingestionProcessStationStationIDFlag = ingestionProcessStationFlags.String("station-id", "REQUIRED", "")
+		ingestionProcessStationAuthFlag      = ingestionProcessStationFlags.String("auth", "REQUIRED", "")
 
-		ingestionProcessIngestionFlags    = flag.NewFlagSet("process- ingestion", flag.ExitOnError)
-		ingestionProcessIngestionBodyFlag = ingestionProcessIngestionFlags.String("body", "REQUIRED", "")
-		ingestionProcessIngestionAuthFlag = ingestionProcessIngestionFlags.String("auth", "REQUIRED", "")
+		ingestionProcessIngestionFlags           = flag.NewFlagSet("process- ingestion", flag.ExitOnError)
+		ingestionProcessIngestionIngestionIDFlag = ingestionProcessIngestionFlags.String("ingestion-id", "REQUIRED", "")
+		ingestionProcessIngestionAuthFlag        = ingestionProcessIngestionFlags.String("auth", "REQUIRED", "")
 
-		ingestionDeleteFlags    = flag.NewFlagSet("delete", flag.ExitOnError)
-		ingestionDeleteBodyFlag = ingestionDeleteFlags.String("body", "REQUIRED", "")
-		ingestionDeleteAuthFlag = ingestionDeleteFlags.String("auth", "REQUIRED", "")
+		ingestionDeleteFlags           = flag.NewFlagSet("delete", flag.ExitOnError)
+		ingestionDeleteIngestionIDFlag = ingestionDeleteFlags.String("ingestion-id", "REQUIRED", "")
+		ingestionDeleteAuthFlag        = ingestionDeleteFlags.String("auth", "REQUIRED", "")
 
 		modulesFlags = flag.NewFlagSet("modules", flag.ContinueOnError)
 
@@ -447,13 +447,13 @@ func ParseEndpoint(
 				data, err = ingestionc.BuildProcessPendingPayload(*ingestionProcessPendingAuthFlag)
 			case "process- station":
 				endpoint = c.ProcessStation()
-				data, err = ingestionc.BuildProcessStationPayload(*ingestionProcessStationBodyFlag, *ingestionProcessStationAuthFlag)
+				data, err = ingestionc.BuildProcessStationPayload(*ingestionProcessStationStationIDFlag, *ingestionProcessStationAuthFlag)
 			case "process- ingestion":
 				endpoint = c.ProcessIngestion()
-				data, err = ingestionc.BuildProcessIngestionPayload(*ingestionProcessIngestionBodyFlag, *ingestionProcessIngestionAuthFlag)
+				data, err = ingestionc.BuildProcessIngestionPayload(*ingestionProcessIngestionIngestionIDFlag, *ingestionProcessIngestionAuthFlag)
 			case "delete":
 				endpoint = c.Delete()
-				data, err = ingestionc.BuildDeletePayload(*ingestionDeleteBodyFlag, *ingestionDeleteAuthFlag)
+				data, err = ingestionc.BuildDeletePayload(*ingestionDeleteIngestionIDFlag, *ingestionDeleteAuthFlag)
 			}
 		case "modules":
 			c := modulesc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -663,44 +663,38 @@ Example:
 }
 
 func ingestionProcessStationUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] ingestion process- station -body JSON -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] ingestion process- station -station-id INT32 -auth STRING
 
 ProcessStation implements process station.
-    -body JSON: 
+    -station-id INT32: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- station --body '{
-      "stationId": 272327269
-   }' --auth "Sit consequuntur perspiciatis voluptas quo sit voluptas."
+    `+os.Args[0]+` ingestion process- station --station-id 1658597825 --auth "Consequuntur perspiciatis."
 `, os.Args[0])
 }
 
 func ingestionProcessIngestionUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] ingestion process- ingestion -body JSON -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] ingestion process- ingestion -ingestion-id INT64 -auth STRING
 
 ProcessIngestion implements process ingestion.
-    -body JSON: 
+    -ingestion-id INT64: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- ingestion --body '{
-      "ingestionId": 8646877932906693598
-   }' --auth "Et eum ut."
+    `+os.Args[0]+` ingestion process- ingestion --ingestion-id 1798173126209158554 --auth "Maxime fugit quo."
 `, os.Args[0])
 }
 
 func ingestionDeleteUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] ingestion delete -body JSON -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] ingestion delete -ingestion-id INT64 -auth STRING
 
 Delete implements delete.
-    -body JSON: 
+    -ingestion-id INT64: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion delete --body '{
-      "ingestionId": 644836512396851225
-   }' --auth "Sit unde aut sit iste."
+    `+os.Args[0]+` ingestion delete --ingestion-id 8526550986221361521 --auth "Veniam esse et repellendus sit unde."
 `, os.Args[0])
 }
 
@@ -754,8 +748,8 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` project update --body '{
-      "body": "Dignissimos labore doloribus voluptas consequuntur illum."
-   }' --id 430927724249583174 --auth "Eum sequi."
+      "body": "Voluptas consequuntur."
+   }' --id 8089941774886624674 --auth "Quo eum sequi aliquam velit."
 `, os.Args[0])
 }
 
@@ -766,7 +760,7 @@ Invites implements invites.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project invites --auth "Fugit impedit quidem labore autem."
+    `+os.Args[0]+` project invites --auth "Dolor qui fugit impedit."
 `, os.Args[0])
 }
 

@@ -9,8 +9,8 @@ package server
 
 import (
 	"context"
-	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
@@ -131,24 +131,20 @@ func EncodeProcessStationResponse(encoder func(context.Context, http.ResponseWri
 func DecodeProcessStationRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			body ProcessStationRequestBody
-			err  error
-		)
-		err = decoder(r).Decode(&body)
-		if err != nil {
-			if err == io.EOF {
-				return nil, goa.MissingPayloadError()
-			}
-			return nil, goa.DecodePayloadError(err.Error())
-		}
-		err = ValidateProcessStationRequestBody(&body)
-		if err != nil {
-			return nil, err
-		}
+			stationID int32
+			auth      string
+			err       error
 
-		var (
-			auth string
+			params = mux.Vars(r)
 		)
+		{
+			stationIDRaw := params["stationId"]
+			v, err2 := strconv.ParseInt(stationIDRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("stationID", stationIDRaw, "integer"))
+			}
+			stationID = int32(v)
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -156,7 +152,7 @@ func DecodeProcessStationRequest(mux goahttp.Muxer, decoder func(*http.Request) 
 		if err != nil {
 			return nil, err
 		}
-		payload := NewProcessStationPayload(&body, auth)
+		payload := NewProcessStationPayload(stationID, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
@@ -245,24 +241,20 @@ func EncodeProcessIngestionResponse(encoder func(context.Context, http.ResponseW
 func DecodeProcessIngestionRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			body ProcessIngestionRequestBody
-			err  error
-		)
-		err = decoder(r).Decode(&body)
-		if err != nil {
-			if err == io.EOF {
-				return nil, goa.MissingPayloadError()
-			}
-			return nil, goa.DecodePayloadError(err.Error())
-		}
-		err = ValidateProcessIngestionRequestBody(&body)
-		if err != nil {
-			return nil, err
-		}
+			ingestionID int64
+			auth        string
+			err         error
 
-		var (
-			auth string
+			params = mux.Vars(r)
 		)
+		{
+			ingestionIDRaw := params["ingestionId"]
+			v, err2 := strconv.ParseInt(ingestionIDRaw, 10, 64)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("ingestionID", ingestionIDRaw, "integer"))
+			}
+			ingestionID = v
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -270,7 +262,7 @@ func DecodeProcessIngestionRequest(mux goahttp.Muxer, decoder func(*http.Request
 		if err != nil {
 			return nil, err
 		}
-		payload := NewProcessIngestionPayload(&body, auth)
+		payload := NewProcessIngestionPayload(ingestionID, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
@@ -359,24 +351,20 @@ func EncodeDeleteResponse(encoder func(context.Context, http.ResponseWriter) goa
 func DecodeDeleteRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			body DeleteRequestBody
-			err  error
-		)
-		err = decoder(r).Decode(&body)
-		if err != nil {
-			if err == io.EOF {
-				return nil, goa.MissingPayloadError()
-			}
-			return nil, goa.DecodePayloadError(err.Error())
-		}
-		err = ValidateDeleteRequestBody(&body)
-		if err != nil {
-			return nil, err
-		}
+			ingestionID int64
+			auth        string
+			err         error
 
-		var (
-			auth string
+			params = mux.Vars(r)
 		)
+		{
+			ingestionIDRaw := params["ingestionId"]
+			v, err2 := strconv.ParseInt(ingestionIDRaw, 10, 64)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("ingestionID", ingestionIDRaw, "integer"))
+			}
+			ingestionID = v
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -384,7 +372,7 @@ func DecodeDeleteRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 		if err != nil {
 			return nil, err
 		}
-		payload := NewDeletePayload(&body, auth)
+		payload := NewDeletePayload(ingestionID, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]

@@ -11,24 +11,6 @@ import (
 	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
 )
 
-// ProcessStationRequestBody is the type of the "ingestion" service "process
-// station" endpoint HTTP request body.
-type ProcessStationRequestBody struct {
-	StationID int32 `form:"stationId" json:"stationId" xml:"stationId"`
-}
-
-// ProcessIngestionRequestBody is the type of the "ingestion" service "process
-// ingestion" endpoint HTTP request body.
-type ProcessIngestionRequestBody struct {
-	IngestionID int64 `form:"ingestionId" json:"ingestionId" xml:"ingestionId"`
-}
-
-// DeleteRequestBody is the type of the "ingestion" service "delete" endpoint
-// HTTP request body.
-type DeleteRequestBody struct {
-	IngestionID int64 `form:"ingestionId" json:"ingestionId" xml:"ingestionId"`
-}
-
 // ProcessPendingBadRequestResponseBody is the type of the "ingestion" service
 // "process pending" endpoint HTTP response body for the "bad-request" error.
 type ProcessPendingBadRequestResponseBody string
@@ -96,33 +78,6 @@ type DeleteNotFoundResponseBody string
 // DeleteUnauthorizedResponseBody is the type of the "ingestion" service
 // "delete" endpoint HTTP response body for the "unauthorized" error.
 type DeleteUnauthorizedResponseBody string
-
-// NewProcessStationRequestBody builds the HTTP request body from the payload
-// of the "process station" endpoint of the "ingestion" service.
-func NewProcessStationRequestBody(p *ingestion.ProcessStationPayload) *ProcessStationRequestBody {
-	body := &ProcessStationRequestBody{
-		StationID: p.StationID,
-	}
-	return body
-}
-
-// NewProcessIngestionRequestBody builds the HTTP request body from the payload
-// of the "process ingestion" endpoint of the "ingestion" service.
-func NewProcessIngestionRequestBody(p *ingestion.ProcessIngestionPayload) *ProcessIngestionRequestBody {
-	body := &ProcessIngestionRequestBody{
-		IngestionID: p.IngestionID,
-	}
-	return body
-}
-
-// NewDeleteRequestBody builds the HTTP request body from the payload of the
-// "delete" endpoint of the "ingestion" service.
-func NewDeleteRequestBody(p *ingestion.DeletePayload) *DeleteRequestBody {
-	body := &DeleteRequestBody{
-		IngestionID: p.IngestionID,
-	}
-	return body
-}
 
 // NewProcessPendingBadRequest builds a ingestion service process pending
 // endpoint bad-request error.

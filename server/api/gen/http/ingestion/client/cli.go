@@ -8,8 +8,8 @@
 package client
 
 import (
-	"encoding/json"
 	"fmt"
+	"strconv"
 
 	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
 )
@@ -29,22 +29,23 @@ func BuildProcessPendingPayload(ingestionProcessPendingAuth string) (*ingestion.
 
 // BuildProcessStationPayload builds the payload for the ingestion process
 // station endpoint from CLI flags.
-func BuildProcessStationPayload(ingestionProcessStationBody string, ingestionProcessStationAuth string) (*ingestion.ProcessStationPayload, error) {
+func BuildProcessStationPayload(ingestionProcessStationStationID string, ingestionProcessStationAuth string) (*ingestion.ProcessStationPayload, error) {
 	var err error
-	var body ProcessStationRequestBody
+	var stationID int32
 	{
-		err = json.Unmarshal([]byte(ingestionProcessStationBody), &body)
+		var v int64
+		v, err = strconv.ParseInt(ingestionProcessStationStationID, 10, 32)
+		stationID = int32(v)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"stationId\": 272327269\n   }'")
+			return nil, fmt.Errorf("invalid value for stationID, must be INT32")
 		}
 	}
 	var auth string
 	{
 		auth = ingestionProcessStationAuth
 	}
-	v := &ingestion.ProcessStationPayload{
-		StationID: body.StationID,
-	}
+	v := &ingestion.ProcessStationPayload{}
+	v.StationID = stationID
 	v.Auth = auth
 
 	return v, nil
@@ -52,22 +53,21 @@ func BuildProcessStationPayload(ingestionProcessStationBody string, ingestionPro
 
 // BuildProcessIngestionPayload builds the payload for the ingestion process
 // ingestion endpoint from CLI flags.
-func BuildProcessIngestionPayload(ingestionProcessIngestionBody string, ingestionProcessIngestionAuth string) (*ingestion.ProcessIngestionPayload, error) {
+func BuildProcessIngestionPayload(ingestionProcessIngestionIngestionID string, ingestionProcessIngestionAuth string) (*ingestion.ProcessIngestionPayload, error) {
 	var err error
-	var body ProcessIngestionRequestBody
+	var ingestionID int64
 	{
-		err = json.Unmarshal([]byte(ingestionProcessIngestionBody), &body)
+		ingestionID, err = strconv.ParseInt(ingestionProcessIngestionIngestionID, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"ingestionId\": 8646877932906693598\n   }'")
+			return nil, fmt.Errorf("invalid value for ingestionID, must be INT64")
 		}
 	}
 	var auth string
 	{
 		auth = ingestionProcessIngestionAuth
 	}
-	v := &ingestion.ProcessIngestionPayload{
-		IngestionID: body.IngestionID,
-	}
+	v := &ingestion.ProcessIngestionPayload{}
+	v.IngestionID = ingestionID
 	v.Auth = auth
 
 	return v, nil
@@ -75,22 +75,21 @@ func BuildProcessIngestionPayload(ingestionProcessIngestionBody string, ingestio
 
 // BuildDeletePayload builds the payload for the ingestion delete endpoint from
 // CLI flags.
-func BuildDeletePayload(ingestionDeleteBody string, ingestionDeleteAuth string) (*ingestion.DeletePayload, error) {
+func BuildDeletePayload(ingestionDeleteIngestionID string, ingestionDeleteAuth string) (*ingestion.DeletePayload, error) {
 	var err error
-	var body DeleteRequestBody
+	var ingestionID int64
 	{
-		err = json.Unmarshal([]byte(ingestionDeleteBody), &body)
+		ingestionID, err = strconv.ParseInt(ingestionDeleteIngestionID, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"ingestionId\": 644836512396851225\n   }'")
+			return nil, fmt.Errorf("invalid value for ingestionID, must be INT64")
 		}
 	}
 	var auth string
 	{
 		auth = ingestionDeleteAuth
 	}
-	v := &ingestion.DeletePayload{
-		IngestionID: body.IngestionID,
-	}
+	v := &ingestion.DeletePayload{}
+	v.IngestionID = ingestionID
 	v.Auth = auth
 
 	return v, nil

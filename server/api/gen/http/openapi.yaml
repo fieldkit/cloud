@@ -12,7 +12,7 @@ produces:
 - application/xml
 - application/gob
 paths:
-  /data/ingestions/:ingestionId:
+  /data/ingestions/{ingestionId}:
     delete:
       tags:
       - ingestion
@@ -23,19 +23,17 @@ paths:
           * `api:admin`
       operationId: ingestion#delete
       parameters:
+      - name: ingestionId
+        in: path
+        required: true
+        type: integer
+        format: int64
       - name: Authorization
         in: header
         description: authentication token
         required: true
         type: string
         pattern: ^Bearer [^ ]+$
-      - name: DeleteRequestBody
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/IngestionDeleteRequestBody'
-          required:
-          - ingestionId
       responses:
         "200":
           description: OK response.
@@ -59,7 +57,7 @@ paths:
       - http
       security:
       - jwt_header_Authorization: []
-  /data/ingestions/:ingestionId/process:
+  /data/ingestions/{ingestionId}/process:
     post:
       tags:
       - ingestion
@@ -70,19 +68,17 @@ paths:
           * `api:admin`
       operationId: ingestion#process ingestion
       parameters:
+      - name: ingestionId
+        in: path
+        required: true
+        type: integer
+        format: int64
       - name: Authorization
         in: header
         description: authentication token
         required: true
         type: string
         pattern: ^Bearer [^ ]+$
-      - name: Process IngestionRequestBody
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/IngestionProcessIngestionRequestBody'
-          required:
-          - ingestionId
       responses:
         "200":
           description: OK response.
@@ -146,7 +142,7 @@ paths:
       - http
       security:
       - jwt_header_Authorization: []
-  /data/stations/:stationId/process:
+  /data/stations/{stationId}/process:
     post:
       tags:
       - ingestion
@@ -157,19 +153,17 @@ paths:
           * `api:admin`
       operationId: ingestion#process station
       parameters:
+      - name: stationId
+        in: path
+        required: true
+        type: integer
+        format: int32
       - name: Authorization
         in: header
         description: authentication token
         required: true
         type: string
         pattern: ^Bearer [^ ]+$
-      - name: Process StationRequestBody
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/IngestionProcessStationRequestBody'
-          required:
-          - stationId
       responses:
         "200":
           description: OK response.
@@ -1665,75 +1659,51 @@ definitions:
     properties:
       url:
         type: string
-        example: Et voluptatem nisi vitae non sed facilis.
+        example: Fugiat expedita.
     example:
-      url: Nobis aut minus aut sunt.
+      url: Saepe et.
     required:
     - url
   IngestionDeleteBadRequestResponseBody:
     title: IngestionDeleteBadRequestResponseBody
     type: string
     description: bad-request
-    example: Voluptatem aut eligendi qui.
+    example: Tenetur odio minus amet.
   IngestionDeleteForbiddenResponseBody:
     title: IngestionDeleteForbiddenResponseBody
     type: string
     description: forbidden
-    example: Consectetur tenetur odio.
+    example: Aut sed hic est adipisci.
   IngestionDeleteNotFoundResponseBody:
     title: IngestionDeleteNotFoundResponseBody
     type: string
     description: not-found
-    example: Amet ipsum possimus magni.
-  IngestionDeleteRequestBody:
-    title: IngestionDeleteRequestBody
-    type: object
-    properties:
-      ingestionId:
-        type: integer
-        example: 1456459998643362411
-        format: int64
-    example:
-      ingestionId: 3746490119597819090
-    required:
-    - ingestionId
+    example: Exercitationem et dolorem et.
   IngestionDeleteUnauthorizedResponseBody:
     title: IngestionDeleteUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Adipisci quis exercitationem et dolorem.
+    example: Corrupti laboriosam.
   IngestionProcessIngestionBadRequestResponseBody:
     title: IngestionProcessIngestionBadRequestResponseBody
     type: string
     description: bad-request
-    example: Laboriosam incidunt aut.
+    example: Praesentium minima magni non corporis.
   IngestionProcessIngestionForbiddenResponseBody:
     title: IngestionProcessIngestionForbiddenResponseBody
     type: string
     description: forbidden
-    example: Excepturi consectetur expedita ipsa similique.
+    example: Numquam architecto voluptatem cum.
   IngestionProcessIngestionNotFoundResponseBody:
     title: IngestionProcessIngestionNotFoundResponseBody
     type: string
     description: not-found
-    example: Minima magni non corporis ratione.
-  IngestionProcessIngestionRequestBody:
-    title: IngestionProcessIngestionRequestBody
-    type: object
-    properties:
-      ingestionId:
-        type: integer
-        example: 1135926387567911593
-        format: int64
-    example:
-      ingestionId: 2468690748951564756
-    required:
-    - ingestionId
+    example: Ducimus excepturi consectetur expedita ipsa.
   IngestionProcessIngestionUnauthorizedResponseBody:
     title: IngestionProcessIngestionUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Placeat fuga numquam architecto voluptatem cum et.
+    example: Nostrum tempora placeat.
   IngestionProcessPendingBadRequestResponseBody:
     title: IngestionProcessPendingBadRequestResponseBody
     type: string
@@ -1769,18 +1739,6 @@ definitions:
     type: string
     description: not-found
     example: Commodi error consequatur.
-  IngestionProcessStationRequestBody:
-    title: IngestionProcessStationRequestBody
-    type: object
-    properties:
-      stationId:
-        type: integer
-        example: 1692665179
-        format: int32
-    example:
-      stationId: 535444941
-    required:
-    - stationId
   IngestionProcessStationUnauthorizedResponseBody:
     title: IngestionProcessStationUnauthorizedResponseBody
     type: string
@@ -1790,47 +1748,47 @@ definitions:
     title: ModulesMetaBadRequestResponseBody
     type: string
     description: bad-request
-    example: Amet quam quia sit sunt voluptatum distinctio.
+    example: Natus accusantium adipisci mollitia cupiditate.
   ModulesMetaForbiddenResponseBody:
     title: ModulesMetaForbiddenResponseBody
     type: string
     description: forbidden
-    example: Adipisci mollitia cupiditate laudantium eligendi.
+    example: Voluptatem aut eligendi qui.
   ModulesMetaNotFoundResponseBody:
     title: ModulesMetaNotFoundResponseBody
     type: string
     description: not-found
-    example: Neque rerum sunt consequatur nisi eum.
+    example: Quidem voluptate numquam recusandae.
   ModulesMetaUnauthorizedResponseBody:
     title: ModulesMetaUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Numquam recusandae aspernatur natus.
+    example: Possimus magni.
   PendingInviteResponseBody:
     title: PendingInviteResponseBody
     type: object
     properties:
       id:
         type: integer
-        example: 5093761530119241083
+        example: 811365094104392890
         format: int64
       project:
         $ref: '#/definitions/ProjectSummaryResponseBody'
       role:
         type: integer
-        example: 998108617
+        example: 1827519725
         format: int32
       time:
         type: integer
-        example: 1990183491797932783
+        example: 4269546073217512505
         format: int64
     example:
-      id: 1856665138344963978
+      id: 5338617613351841667
       project:
         id: 4643226408798660917
         name: Dolorem inventore.
-      role: 1803158536
-      time: 6793580702840858548
+      role: 575860021
+      time: 1179235043266106534
     required:
     - id
     - project
@@ -1840,37 +1798,37 @@ definitions:
     title: ProjectAcceptInviteBadRequestResponseBody
     type: string
     description: bad-request
-    example: Adipisci non voluptatem eius magni.
+    example: Voluptates adipisci provident provident.
   ProjectAcceptInviteForbiddenResponseBody:
     title: ProjectAcceptInviteForbiddenResponseBody
     type: string
     description: forbidden
-    example: Aut explicabo numquam et quis exercitationem.
+    example: Tempore veritatis et et.
   ProjectAcceptInviteNotFoundResponseBody:
     title: ProjectAcceptInviteNotFoundResponseBody
     type: string
     description: not-found
-    example: Quia et voluptatem quibusdam officia.
+    example: Officia eum eos.
   ProjectAcceptInviteUnauthorizedResponseBody:
     title: ProjectAcceptInviteUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Impedit voluptates adipisci provident provident eum.
+    example: Commodi laboriosam.
   ProjectInvitesBadRequestResponseBody:
     title: ProjectInvitesBadRequestResponseBody
     type: string
     description: bad-request
-    example: Dolor totam atque non veniam.
+    example: Consectetur est.
   ProjectInvitesForbiddenResponseBody:
     title: ProjectInvitesForbiddenResponseBody
     type: string
     description: forbidden
-    example: Beatae molestiae dolores consectetur est.
+    example: Nisi omnis assumenda unde similique molestiae ut.
   ProjectInvitesNotFoundResponseBody:
     title: ProjectInvitesNotFoundResponseBody
     type: string
     description: not-found
-    example: Consequatur facere voluptas consequatur.
+    example: Et sit dolores aspernatur beatae molestiae.
   ProjectInvitesResponseBody:
     title: 'Mediatype identifier: application/vnd.app.invites.pending; view=default'
     type: object
@@ -1880,61 +1838,67 @@ definitions:
         items:
           $ref: '#/definitions/PendingInviteResponseBody'
         example:
-        - id: 7484451270404657907
+        - id: 4034141375464934696
           project:
             id: 4643226408798660917
             name: Dolorem inventore.
-          role: 441194199
-          time: 640249158590803575
-        - id: 7484451270404657907
+          role: 90432660
+          time: 8914770224465321786
+        - id: 4034141375464934696
           project:
             id: 4643226408798660917
             name: Dolorem inventore.
-          role: 441194199
-          time: 640249158590803575
+          role: 90432660
+          time: 8914770224465321786
+        - id: 4034141375464934696
+          project:
+            id: 4643226408798660917
+            name: Dolorem inventore.
+          role: 90432660
+          time: 8914770224465321786
+        - id: 4034141375464934696
+          project:
+            id: 4643226408798660917
+            name: Dolorem inventore.
+          role: 90432660
+          time: 8914770224465321786
     description: InvitesResponseBody result type (default view)
     example:
       pending:
-      - id: 7484451270404657907
+      - id: 4034141375464934696
         project:
           id: 4643226408798660917
           name: Dolorem inventore.
-        role: 441194199
-        time: 640249158590803575
-      - id: 7484451270404657907
+        role: 90432660
+        time: 8914770224465321786
+      - id: 4034141375464934696
         project:
           id: 4643226408798660917
           name: Dolorem inventore.
-        role: 441194199
-        time: 640249158590803575
-      - id: 7484451270404657907
-        project:
-          id: 4643226408798660917
-          name: Dolorem inventore.
-        role: 441194199
-        time: 640249158590803575
+        role: 90432660
+        time: 8914770224465321786
     required:
     - pending
   ProjectInvitesUnauthorizedResponseBody:
     title: ProjectInvitesUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Neque et sit dolores.
+    example: Dicta tempora est sint labore aut ab.
   ProjectLookupInviteBadRequestResponseBody:
     title: ProjectLookupInviteBadRequestResponseBody
     type: string
     description: bad-request
-    example: Et et facilis officia eum.
+    example: Distinctio ab dolorem aut beatae voluptate eaque.
   ProjectLookupInviteForbiddenResponseBody:
     title: ProjectLookupInviteForbiddenResponseBody
     type: string
     description: forbidden
-    example: Beatae voluptate.
+    example: Totam atque non veniam.
   ProjectLookupInviteNotFoundResponseBody:
     title: ProjectLookupInviteNotFoundResponseBody
     type: string
     description: not-found
-    example: Aut commodi laboriosam ut tempore.
+    example: Aliquam necessitatibus nesciunt est sit.
   ProjectLookupInviteResponseBody:
     title: 'Mediatype identifier: application/vnd.app.invites.pending; view=default'
     type: object
@@ -1944,72 +1908,84 @@ definitions:
         items:
           $ref: '#/definitions/PendingInviteResponseBody'
         example:
-        - id: 7484451270404657907
+        - id: 4034141375464934696
           project:
             id: 4643226408798660917
             name: Dolorem inventore.
-          role: 441194199
-          time: 640249158590803575
-        - id: 7484451270404657907
+          role: 90432660
+          time: 8914770224465321786
+        - id: 4034141375464934696
           project:
             id: 4643226408798660917
             name: Dolorem inventore.
-          role: 441194199
-          time: 640249158590803575
-        - id: 7484451270404657907
+          role: 90432660
+          time: 8914770224465321786
+        - id: 4034141375464934696
           project:
             id: 4643226408798660917
             name: Dolorem inventore.
-          role: 441194199
-          time: 640249158590803575
-        - id: 7484451270404657907
+          role: 90432660
+          time: 8914770224465321786
+        - id: 4034141375464934696
           project:
             id: 4643226408798660917
             name: Dolorem inventore.
-          role: 441194199
-          time: 640249158590803575
+          role: 90432660
+          time: 8914770224465321786
     description: Lookup InviteResponseBody result type (default view)
     example:
       pending:
-      - id: 7484451270404657907
+      - id: 4034141375464934696
         project:
           id: 4643226408798660917
           name: Dolorem inventore.
-        role: 441194199
-        time: 640249158590803575
-      - id: 7484451270404657907
+        role: 90432660
+        time: 8914770224465321786
+      - id: 4034141375464934696
         project:
           id: 4643226408798660917
           name: Dolorem inventore.
-        role: 441194199
-        time: 640249158590803575
+        role: 90432660
+        time: 8914770224465321786
+      - id: 4034141375464934696
+        project:
+          id: 4643226408798660917
+          name: Dolorem inventore.
+        role: 90432660
+        time: 8914770224465321786
+      - id: 4034141375464934696
+        project:
+          id: 4643226408798660917
+          name: Dolorem inventore.
+        role: 90432660
+        time: 8914770224465321786
     required:
     - pending
   ProjectLookupInviteUnauthorizedResponseBody:
     title: ProjectLookupInviteUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Nesciunt est sit possimus distinctio ab dolorem.
+    example: Voluptas consequatur reiciendis.
   ProjectRejectInviteBadRequestResponseBody:
     title: ProjectRejectInviteBadRequestResponseBody
     type: string
     description: bad-request
-    example: Sit qui occaecati.
+    example: Repudiandae omnis repellendus dolor illo.
   ProjectRejectInviteForbiddenResponseBody:
     title: ProjectRejectInviteForbiddenResponseBody
     type: string
     description: forbidden
-    example: Quaerat qui natus cum facere quos.
+    example: Quia et voluptatem quibusdam officia.
   ProjectRejectInviteNotFoundResponseBody:
     title: ProjectRejectInviteNotFoundResponseBody
     type: string
     description: not-found
-    example: Rerum beatae optio quia voluptas consectetur magnam.
+    example: Adipisci non voluptatem eius magni.
   ProjectRejectInviteUnauthorizedResponseBody:
     title: ProjectRejectInviteUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Repudiandae omnis repellendus dolor illo.
+    example: Et aut explicabo numquam et quis exercitationem.
   ProjectSummaryResponseBody:
     title: ProjectSummaryResponseBody
     type: object
@@ -2031,48 +2007,48 @@ definitions:
     title: ProjectUpdateBadRequestResponseBody
     type: string
     description: bad-request
-    example: Laboriosam illum.
+    example: Commodi harum non distinctio rerum quaerat eius.
   ProjectUpdateForbiddenResponseBody:
     title: ProjectUpdateForbiddenResponseBody
     type: string
     description: forbidden
-    example: Rerum quaerat eius quibusdam.
+    example: Sunt consequatur nisi eum ad amet.
   ProjectUpdateNotFoundResponseBody:
     title: ProjectUpdateNotFoundResponseBody
     type: string
     description: not-found
-    example: Qui vero laboriosam et illo molestiae.
+    example: Quia sit sunt voluptatum.
   ProjectUpdateRequestBody:
     title: ProjectUpdateRequestBody
     type: object
     properties:
       body:
         type: string
-        example: Officiis at pariatur iste saepe voluptas dicta.
+        example: Dolorem qui.
     example:
-      body: Est sint labore aut.
+      body: Laboriosam et illo molestiae sit.
     required:
     - body
   ProjectUpdateUnauthorizedResponseBody:
     title: ProjectUpdateUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Harum non.
+    example: Eligendi cupiditate neque.
   SensorReadingResponseBody:
     title: SensorReadingResponseBody
     type: object
     properties:
       last:
         type: number
-        example: 0.620609
+        example: 0.060854577
         format: float
       time:
         type: integer
-        example: 7742257978019775177
+        example: 1315896503655947493
         format: int64
     example:
-      last: 0.33735576
-      time: 7526002212695723977
+      last: 0.65282935
+      time: 5778131360874221459
     required:
     - last
     - time
@@ -2080,30 +2056,30 @@ definitions:
     title: StationAddBadRequestResponseBody
     type: string
     description: bad-request
-    example: Maxime distinctio tempore.
+    example: Sunt aut adipisci voluptas inventore sapiente.
   StationAddForbiddenResponseBody:
     title: StationAddForbiddenResponseBody
     type: string
     description: forbidden
-    example: Neque molestias rerum non aut eos tempore.
+    example: Eos tempore sint beatae.
   StationAddNotFoundResponseBody:
     title: StationAddNotFoundResponseBody
     type: string
     description: not-found
-    example: Beatae id.
+    example: Corrupti maxime distinctio tempore occaecati.
   StationAddRequestBody:
     title: StationAddRequestBody
     type: object
     properties:
       device_id:
         type: string
-        example: Sapiente rem neque et velit expedita eaque.
+        example: Expedita eaque.
       location_name:
         type: string
         example: Sunt molestiae qui.
       name:
         type: string
-        example: Eos sunt aut adipisci voluptas.
+        example: Neque et.
       status_json:
         type: object
         example:
@@ -2132,22 +2108,22 @@ definitions:
     properties:
       battery:
         type: number
-        example: 0.9536984
+        example: 0.6955007
         format: float
       device_id:
         type: string
-        example: Est temporibus labore impedit.
+        example: Quidem libero rerum est consequatur.
       firmware_number:
         type: integer
-        example: 141137275
+        example: 1203901697
         format: int32
       firmware_time:
         type: integer
-        example: 1184741014335980338
+        example: 1008694063279089943
         format: int64
       id:
         type: integer
-        example: 2067088467
+        example: 915047134
         format: int32
       images:
         type: array
@@ -2156,15 +2132,13 @@ definitions:
         example:
         - url: Sequi modi.
         - url: Sequi modi.
-        - url: Sequi modi.
-        - url: Sequi modi.
       memory_available:
         type: integer
-        example: 962324558
+        example: 1176881477
         format: int32
       memory_used:
         type: integer
-        example: 1855993461
+        example: 908135429
         format: int32
       modules:
         type: array
@@ -2227,7 +2201,7 @@ definitions:
             unit_of_measure: Voluptate deserunt beatae maxime magni qui.
       name:
         type: string
-        example: Libero rerum est consequatur.
+        example: Qui natus cum.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
@@ -2237,12 +2211,14 @@ definitions:
         example: true
       recording_started_at:
         type: integer
-        example: 4384817138615656564
+        example: 7862165724434775747
         format: int64
       status_json:
         type: object
         example:
-          Eveniet libero sunt.: Commodi ut labore quidem in quia ipsa.
+          Aut sunt iusto quibusdam.: Cupiditate consequatur est eos qui.
+          Ratione error.: Voluptas eveniet libero sunt enim.
+          Voluptatem nisi vitae non sed.: Nulla nobis aut.
         additionalProperties: true
       uploads:
         type: array
@@ -2271,20 +2247,31 @@ definitions:
           type: Dolorem quo non earum culpa.
           upload_id: Dolorem ipsam incidunt.
           url: Omnis non consequatur neque quod qui.
+        - blocks:
+          - 2840609753723309223
+          - 8636820768544793715
+          - 4831027042067440578
+          - 7282708859327207922
+          id: 2154071342732106276
+          size: 91990863147885545
+          time: 1414056513355798896
+          type: Dolorem quo non earum culpa.
+          upload_id: Dolorem ipsam incidunt.
+          url: Omnis non consequatur neque quod qui.
     description: AddResponseBody result type (default view)
     example:
-      battery: 0.46403456
-      device_id: Rem necessitatibus.
-      firmware_number: 842300130
-      firmware_time: 4374105206217466469
-      id: 1434616517
+      battery: 0.63631684
+      device_id: Temporibus suscipit voluptatem tempore sed consequuntur.
+      firmware_number: 1103041373
+      firmware_time: 4645927362999722579
+      id: 1856792707
       images:
       - url: Sequi modi.
       - url: Sequi modi.
       - url: Sequi modi.
       - url: Sequi modi.
-      memory_available: 1155169374
-      memory_used: 260453303
+      memory_available: 1720566671
+      memory_used: 1006943941
       modules:
       - flags: 1827134368
         hardware_id: Alias sed rem.
@@ -2340,56 +2327,19 @@ definitions:
             last: 0.34539536
             time: 1110723459452126700
           unit_of_measure: Voluptate deserunt beatae maxime magni qui.
-      - flags: 1827134368
-        hardware_id: Alias sed rem.
-        id: 4927771867581124943
-        internal: false
-        name: Accusamus pariatur.
-        position: 1103502337
-        sensors:
-        - name: Occaecati sequi aut provident porro ut provident.
-          reading:
-            last: 0.34539536
-            time: 1110723459452126700
-          unit_of_measure: Voluptate deserunt beatae maxime magni qui.
-        - name: Occaecati sequi aut provident porro ut provident.
-          reading:
-            last: 0.34539536
-            time: 1110723459452126700
-          unit_of_measure: Voluptate deserunt beatae maxime magni qui.
-        - name: Occaecati sequi aut provident porro ut provident.
-          reading:
-            last: 0.34539536
-            time: 1110723459452126700
-          unit_of_measure: Voluptate deserunt beatae maxime magni qui.
-        - name: Occaecati sequi aut provident porro ut provident.
-          reading:
-            last: 0.34539536
-            time: 1110723459452126700
-          unit_of_measure: Voluptate deserunt beatae maxime magni qui.
-      name: Pariatur natus tempora laboriosam ab natus.
+      name: Sed sint consectetur nemo provident blanditiis.
       owner:
         id: 1780525555
         name: Est quo nihil ipsam quia.
       photos:
         small: Omnis eos officiis nisi numquam omnis ratione.
-      read_only: true
-      recording_started_at: 2728865201168401952
+      read_only: false
+      recording_started_at: 7307708568969316386
       status_json:
-        Esse reprehenderit non laborum nobis quia.: Amet accusamus sed maiores dolorem
-          ducimus sint.
+        Natus voluptas rem necessitatibus ipsa.: Iste nisi veniam.
+        Reprehenderit non laborum.: Quia molestiae amet accusamus sed maiores dolorem.
+        Sint iste voluptate sed iusto.: Quia optio.
       uploads:
-      - blocks:
-        - 2840609753723309223
-        - 8636820768544793715
-        - 4831027042067440578
-        - 7282708859327207922
-        id: 2154071342732106276
-        size: 91990863147885545
-        time: 1414056513355798896
-        type: Dolorem quo non earum culpa.
-        upload_id: Dolorem ipsam incidunt.
-        url: Omnis non consequatur neque quod qui.
       - blocks:
         - 2840609753723309223
         - 8636820768544793715
@@ -2427,7 +2377,7 @@ definitions:
     title: StationAddUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Fuga sunt enim aperiam ut.
+    example: Molestias rerum non.
   StationFullResponseBody:
     title: 'Mediatype identifier: application/vnd.app.station.full; view=default'
     type: object
@@ -4119,24 +4069,24 @@ definitions:
     properties:
       flags:
         type: integer
-        example: 2051535776
+        example: 1497846835
         format: int32
       hardware_id:
         type: string
-        example: Dignissimos eos non voluptas quo repudiandae.
+        example: Quas alias voluptatem.
       id:
         type: integer
-        example: 8843382805323491093
+        example: 4682315370840448217
         format: int64
       internal:
         type: boolean
         example: false
       name:
         type: string
-        example: Aut assumenda necessitatibus laborum laudantium.
+        example: Minima sint ipsa.
       position:
         type: integer
-        example: 538676387
+        example: 1902775940
         format: int32
       sensors:
         type: array
@@ -4159,13 +4109,18 @@ definitions:
             time: 1110723459452126700
           unit_of_measure: Voluptate deserunt beatae maxime magni qui.
     example:
-      flags: 1763610175
-      hardware_id: Vel quaerat nemo dolor consequuntur autem dolorem.
-      id: 1198379759276805375
+      flags: 844891189
+      hardware_id: Praesentium quis voluptatem sunt similique aspernatur laudantium.
+      id: 5571358363997835502
       internal: false
-      name: Sed sint consectetur nemo provident blanditiis.
-      position: 1289259610
+      name: Magni vel.
+      position: 699399730
       sensors:
+      - name: Occaecati sequi aut provident porro ut provident.
+        reading:
+          last: 0.34539536
+          time: 1110723459452126700
+        unit_of_measure: Voluptate deserunt beatae maxime magni qui.
       - name: Occaecati sequi aut provident porro ut provident.
         reading:
           last: 0.34539536
@@ -4194,14 +4149,14 @@ definitions:
     properties:
       id:
         type: integer
-        example: 2147126837
+        example: 344156284
         format: int32
       name:
         type: string
-        example: Unde sint ex earum quas.
+        example: Ut rerum beatae optio quia voluptas consectetur.
     example:
-      id: 229206747
-      name: Laborum ullam nisi dolor vitae ratione ea.
+      id: 2142771305
+      name: Sit qui occaecati.
     required:
     - id
     - name
@@ -4231,9 +4186,9 @@ definitions:
     properties:
       small:
         type: string
-        example: Omnis cupiditate consequatur est eos.
+        example: Quis reprehenderit facilis.
     example:
-      small: Aut ratione.
+      small: Illo sed culpa.
     required:
     - small
   StationSensorResponseBody:
@@ -4242,18 +4197,18 @@ definitions:
     properties:
       name:
         type: string
-        example: Et eaque ipsum ut.
+        example: Quo repudiandae nostrum aut assumenda necessitatibus.
       reading:
         $ref: '#/definitions/SensorReadingResponseBody'
       unit_of_measure:
         type: string
-        example: Quo quis est in consequatur occaecati.
+        example: Laudantium maiores quas eum non et eaque.
     example:
-      name: Est vel ut.
+      name: Est in consequatur occaecati aut fuga maiores.
       reading:
         last: 0.34539536
         time: 1110723459452126700
-      unit_of_measure: Debitis praesentium quis voluptatem sunt similique aspernatur.
+      unit_of_measure: Dolorem est vel.
     required:
     - name
     - unit_of_measure
@@ -4595,44 +4550,44 @@ definitions:
         type: array
         items:
           type: integer
-          example: 6080411117707950274
+          example: 3290739767463186386
           format: int64
         example:
-        - 4233829358125118129
-        - 8191119417795425763
+        - 3442458521863721644
+        - 6569763755700917047
       id:
         type: integer
-        example: 3290739767463186386
+        example: 9221839545523492786
         format: int64
       size:
         type: integer
-        example: 3641034191600893269
+        example: 6829553402963597406
         format: int64
       time:
         type: integer
-        example: 2364242080595650350
+        example: 7071534387960411865
         format: int64
       type:
         type: string
-        example: Ut aliquid placeat.
+        example: Ratione ea dolor est temporibus labore impedit.
       upload_id:
         type: string
-        example: Eos quos enim.
+        example: Sint ex earum.
       url:
         type: string
-        example: Adipisci eaque non qui.
+        example: Aut laborum ullam nisi dolor.
     example:
       blocks:
-      - 8373689447332978354
-      - 5913549231965412708
-      - 6832515448265335298
-      - 5881796848122304599
-      id: 3603379415435641646
-      size: 6854632098509093296
-      time: 6034644812004757729
-      type: Et vel ut quis reprehenderit.
-      upload_id: Omnis sed dolorem fugit.
-      url: Earum fugiat expedita ducimus.
+      - 325206528401678004
+      - 3626315870229581786
+      - 7628437274576100636
+      - 6854632098509093296
+      id: 3426852618862546180
+      size: 3754415529356402956
+      time: 143219542932141332
+      type: Quidem dignissimos enim eos doloremque possimus.
+      upload_id: Aperiam adipisci eaque non.
+      url: Ut aliquid placeat.
     required:
     - id
     - time

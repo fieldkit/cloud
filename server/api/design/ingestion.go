@@ -35,7 +35,7 @@ var _ = Service("ingestion", func() {
 		})
 
 		HTTP(func() {
-			POST("data/stations/:stationId/process")
+			POST("data/stations/{stationId}/process")
 
 			httpAuthentication()
 		})
@@ -54,7 +54,7 @@ var _ = Service("ingestion", func() {
 		})
 
 		HTTP(func() {
-			POST("data/ingestions/:ingestionId/process")
+			POST("data/ingestions/{ingestionId}/process")
 
 			httpAuthentication()
 		})
@@ -73,7 +73,7 @@ var _ = Service("ingestion", func() {
 		})
 
 		HTTP(func() {
-			DELETE("data/ingestions/:ingestionId")
+			DELETE("data/ingestions/{ingestionId}")
 
 			httpAuthentication()
 		})

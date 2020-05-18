@@ -9,26 +9,7 @@ package server
 
 import (
 	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
-	goa "goa.design/goa/v3/pkg"
 )
-
-// ProcessStationRequestBody is the type of the "ingestion" service "process
-// station" endpoint HTTP request body.
-type ProcessStationRequestBody struct {
-	StationID *int32 `form:"stationId,omitempty" json:"stationId,omitempty" xml:"stationId,omitempty"`
-}
-
-// ProcessIngestionRequestBody is the type of the "ingestion" service "process
-// ingestion" endpoint HTTP request body.
-type ProcessIngestionRequestBody struct {
-	IngestionID *int64 `form:"ingestionId,omitempty" json:"ingestionId,omitempty" xml:"ingestionId,omitempty"`
-}
-
-// DeleteRequestBody is the type of the "ingestion" service "delete" endpoint
-// HTTP request body.
-type DeleteRequestBody struct {
-	IngestionID *int64 `form:"ingestionId,omitempty" json:"ingestionId,omitempty" xml:"ingestionId,omitempty"`
-}
 
 // ProcessPendingBadRequestResponseBody is the type of the "ingestion" service
 // "process pending" endpoint HTTP response body for the "bad-request" error.
@@ -222,10 +203,9 @@ func NewProcessPendingPayload(auth string) *ingestion.ProcessPendingPayload {
 
 // NewProcessStationPayload builds a ingestion service process station endpoint
 // payload.
-func NewProcessStationPayload(body *ProcessStationRequestBody, auth string) *ingestion.ProcessStationPayload {
-	v := &ingestion.ProcessStationPayload{
-		StationID: *body.StationID,
-	}
+func NewProcessStationPayload(stationID int32, auth string) *ingestion.ProcessStationPayload {
+	v := &ingestion.ProcessStationPayload{}
+	v.StationID = stationID
 	v.Auth = auth
 
 	return v
@@ -233,47 +213,19 @@ func NewProcessStationPayload(body *ProcessStationRequestBody, auth string) *ing
 
 // NewProcessIngestionPayload builds a ingestion service process ingestion
 // endpoint payload.
-func NewProcessIngestionPayload(body *ProcessIngestionRequestBody, auth string) *ingestion.ProcessIngestionPayload {
-	v := &ingestion.ProcessIngestionPayload{
-		IngestionID: *body.IngestionID,
-	}
+func NewProcessIngestionPayload(ingestionID int64, auth string) *ingestion.ProcessIngestionPayload {
+	v := &ingestion.ProcessIngestionPayload{}
+	v.IngestionID = ingestionID
 	v.Auth = auth
 
 	return v
 }
 
 // NewDeletePayload builds a ingestion service delete endpoint payload.
-func NewDeletePayload(body *DeleteRequestBody, auth string) *ingestion.DeletePayload {
-	v := &ingestion.DeletePayload{
-		IngestionID: *body.IngestionID,
-	}
+func NewDeletePayload(ingestionID int64, auth string) *ingestion.DeletePayload {
+	v := &ingestion.DeletePayload{}
+	v.IngestionID = ingestionID
 	v.Auth = auth
 
 	return v
-}
-
-// ValidateProcessStationRequestBody runs the validations defined on Process
-// StationRequestBody
-func ValidateProcessStationRequestBody(body *ProcessStationRequestBody) (err error) {
-	if body.StationID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("stationId", "body"))
-	}
-	return
-}
-
-// ValidateProcessIngestionRequestBody runs the validations defined on Process
-// IngestionRequestBody
-func ValidateProcessIngestionRequestBody(body *ProcessIngestionRequestBody) (err error) {
-	if body.IngestionID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("ingestionId", "body"))
-	}
-	return
-}
-
-// ValidateDeleteRequestBody runs the validations defined on DeleteRequestBody
-func ValidateDeleteRequestBody(body *DeleteRequestBody) (err error) {
-	if body.IngestionID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("ingestionId", "body"))
-	}
-	return
 }

@@ -62,13 +62,13 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"ProcessPending", "POST", "/data/process"},
-			{"ProcessStation", "POST", "/data/stations/:stationId/process"},
-			{"ProcessIngestion", "POST", "/data/ingestions/:ingestionId/process"},
-			{"Delete", "DELETE", "/data/ingestions/:ingestionId"},
+			{"ProcessStation", "POST", "/data/stations/{stationId}/process"},
+			{"ProcessIngestion", "POST", "/data/ingestions/{ingestionId}/process"},
+			{"Delete", "DELETE", "/data/ingestions/{ingestionId}"},
 			{"CORS", "OPTIONS", "/data/process"},
-			{"CORS", "OPTIONS", "/data/stations/:stationId/process"},
-			{"CORS", "OPTIONS", "/data/ingestions/:ingestionId/process"},
-			{"CORS", "OPTIONS", "/data/ingestions/:ingestionId"},
+			{"CORS", "OPTIONS", "/data/stations/{stationId}/process"},
+			{"CORS", "OPTIONS", "/data/ingestions/{ingestionId}/process"},
+			{"CORS", "OPTIONS", "/data/ingestions/{ingestionId}"},
 		},
 		ProcessPending:   NewProcessPendingHandler(e.ProcessPending, mux, decoder, encoder, errhandler, formatter),
 		ProcessStation:   NewProcessStationHandler(e.ProcessStation, mux, decoder, encoder, errhandler, formatter),
@@ -159,7 +159,7 @@ func MountProcessStationHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/data/stations/:stationId/process", f)
+	mux.Handle("POST", "/data/stations/{stationId}/process", f)
 }
 
 // NewProcessStationHandler creates a HTTP handler which loads the HTTP request
@@ -210,7 +210,7 @@ func MountProcessIngestionHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/data/ingestions/:ingestionId/process", f)
+	mux.Handle("POST", "/data/ingestions/{ingestionId}/process", f)
 }
 
 // NewProcessIngestionHandler creates a HTTP handler which loads the HTTP
@@ -261,7 +261,7 @@ func MountDeleteHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("DELETE", "/data/ingestions/:ingestionId", f)
+	mux.Handle("DELETE", "/data/ingestions/{ingestionId}", f)
 }
 
 // NewDeleteHandler creates a HTTP handler which loads the HTTP request and
@@ -314,9 +314,9 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("OPTIONS", "/data/process", f)
-	mux.Handle("OPTIONS", "/data/stations/:stationId/process", f)
-	mux.Handle("OPTIONS", "/data/ingestions/:ingestionId/process", f)
-	mux.Handle("OPTIONS", "/data/ingestions/:ingestionId", f)
+	mux.Handle("OPTIONS", "/data/stations/{stationId}/process", f)
+	mux.Handle("OPTIONS", "/data/ingestions/{ingestionId}/process", f)
+	mux.Handle("OPTIONS", "/data/ingestions/{ingestionId}", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

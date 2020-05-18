@@ -125,7 +125,17 @@ func DecodeProcessPendingResponse(decoder func(*http.Response) goahttp.Decoder, 
 // BuildProcessStationRequest instantiates a HTTP request object with method
 // and path set to call the "ingestion" service "process station" endpoint
 func (c *Client) BuildProcessStationRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ProcessStationIngestionPath()}
+	var (
+		stationID int32
+	)
+	{
+		p, ok := v.(*ingestion.ProcessStationPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("ingestion", "process station", "*ingestion.ProcessStationPayload", v)
+		}
+		stationID = p.StationID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ProcessStationIngestionPath(stationID)}
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("ingestion", "process station", u.String(), err)
@@ -148,10 +158,6 @@ func EncodeProcessStationRequest(encoder func(*http.Request) goahttp.Encoder) fu
 		{
 			head := p.Auth
 			req.Header.Set("Authorization", head)
-		}
-		body := NewProcessStationRequestBody(p)
-		if err := encoder(req).Encode(&body); err != nil {
-			return goahttp.ErrEncodingError("ingestion", "process station", err)
 		}
 		return nil
 	}
@@ -233,7 +239,17 @@ func DecodeProcessStationResponse(decoder func(*http.Response) goahttp.Decoder, 
 // BuildProcessIngestionRequest instantiates a HTTP request object with method
 // and path set to call the "ingestion" service "process ingestion" endpoint
 func (c *Client) BuildProcessIngestionRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ProcessIngestionIngestionPath()}
+	var (
+		ingestionID int64
+	)
+	{
+		p, ok := v.(*ingestion.ProcessIngestionPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("ingestion", "process ingestion", "*ingestion.ProcessIngestionPayload", v)
+		}
+		ingestionID = p.IngestionID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ProcessIngestionIngestionPath(ingestionID)}
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("ingestion", "process ingestion", u.String(), err)
@@ -256,10 +272,6 @@ func EncodeProcessIngestionRequest(encoder func(*http.Request) goahttp.Encoder) 
 		{
 			head := p.Auth
 			req.Header.Set("Authorization", head)
-		}
-		body := NewProcessIngestionRequestBody(p)
-		if err := encoder(req).Encode(&body); err != nil {
-			return goahttp.ErrEncodingError("ingestion", "process ingestion", err)
 		}
 		return nil
 	}
@@ -341,7 +353,17 @@ func DecodeProcessIngestionResponse(decoder func(*http.Response) goahttp.Decoder
 // BuildDeleteRequest instantiates a HTTP request object with method and path
 // set to call the "ingestion" service "delete" endpoint
 func (c *Client) BuildDeleteRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteIngestionPath()}
+	var (
+		ingestionID int64
+	)
+	{
+		p, ok := v.(*ingestion.DeletePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("ingestion", "delete", "*ingestion.DeletePayload", v)
+		}
+		ingestionID = p.IngestionID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteIngestionPath(ingestionID)}
 	req, err := http.NewRequest("DELETE", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("ingestion", "delete", u.String(), err)
@@ -364,10 +386,6 @@ func EncodeDeleteRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 		{
 			head := p.Auth
 			req.Header.Set("Authorization", head)
-		}
-		body := NewDeleteRequestBody(p)
-		if err := encoder(req).Encode(&body); err != nil {
-			return goahttp.ErrEncodingError("ingestion", "delete", err)
 		}
 		return nil
 	}
