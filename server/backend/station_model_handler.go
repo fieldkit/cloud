@@ -2,7 +2,6 @@ package backend
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/conservify/sqlxcache"
@@ -10,6 +9,7 @@ import (
 	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/errors"
 )
 
 type stationModelRecordHandler struct {
@@ -105,6 +105,8 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 		return nil
 	}
 
+	// log := Logger(ctx).Sugar()
+
 	sensors := []*SensorAndModulePosition{}
 	if err := h.database.SelectContext(ctx, &sensors, `
 		SELECT
@@ -130,13 +132,13 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 	for sgIndex, sg := range h.dataRecord.Readings.SensorGroups {
 		for sIndex, sr := range sg.Readings {
 			if sgIndex >= len(sensorsByModule) {
-				return fmt.Errorf("sensor group cardinality mismatch")
+				return errors.Structured("sensor group cardinality mismatch", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
 			}
 
 			m := sensorsByModule[sgIndex]
 
 			if sIndex >= len(m) {
-				return fmt.Errorf("sensor reading cardinality mismatch")
+				return errors.Structured("sensor reading cardinality mismatch", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
 			}
 
 			s := m[sIndex]
