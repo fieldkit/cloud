@@ -21,6 +21,10 @@ func GetBucketAndKey(s3Url string) (*BucketAndKey, error) {
 		return nil, err
 	}
 
+	if u.Scheme == "" {
+		return nil, fmt.Errorf("malformed s3 url: %s", s3Url)
+	}
+
 	parts := strings.Split(u.Host, ".")
 
 	return &BucketAndKey{
