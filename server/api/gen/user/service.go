@@ -18,6 +18,8 @@ import (
 type Service interface {
 	// Roles implements roles.
 	Roles(context.Context, *RolesPayload) (res *AvailableRoles, err error)
+	// Delete implements delete.
+	Delete(context.Context, *DeletePayload) (err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -34,7 +36,7 @@ const ServiceName = "user"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"roles"}
+var MethodNames = [2]string{"roles", "delete"}
 
 // RolesPayload is the payload type of the user service roles method.
 type RolesPayload struct {
@@ -44,6 +46,12 @@ type RolesPayload struct {
 // AvailableRoles is the result type of the user service roles method.
 type AvailableRoles struct {
 	Roles []*AvailableRole
+}
+
+// DeletePayload is the payload type of the user service delete method.
+type DeletePayload struct {
+	Auth   string
+	UserID int32
 }
 
 type AvailableRole struct {

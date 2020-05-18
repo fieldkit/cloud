@@ -15,13 +15,15 @@ import (
 
 // Client is the "user" service client.
 type Client struct {
-	RolesEndpoint goa.Endpoint
+	RolesEndpoint  goa.Endpoint
+	DeleteEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "user" service client given the endpoints.
-func NewClient(roles goa.Endpoint) *Client {
+func NewClient(roles, delete_ goa.Endpoint) *Client {
 	return &Client{
-		RolesEndpoint: roles,
+		RolesEndpoint:  roles,
+		DeleteEndpoint: delete_,
 	}
 }
 
@@ -33,4 +35,10 @@ func (c *Client) Roles(ctx context.Context, p *RolesPayload) (res *AvailableRole
 		return
 	}
 	return ires.(*AvailableRoles), nil
+}
+
+// Delete calls the "delete" endpoint of the "user" service.
+func (c *Client) Delete(ctx context.Context, p *DeletePayload) (err error) {
+	_, err = c.DeleteEndpoint(ctx, p)
+	return
 }

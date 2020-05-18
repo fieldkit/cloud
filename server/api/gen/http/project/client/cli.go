@@ -23,7 +23,7 @@ func BuildUpdatePayload(projectUpdateBody string, projectUpdateID string, projec
 	{
 		err = json.Unmarshal([]byte(projectUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Esse occaecati voluptates a velit non.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Et quis optio voluptatibus quas dolor.\"\n   }'")
 		}
 	}
 	var id int64

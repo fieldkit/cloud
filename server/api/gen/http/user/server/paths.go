@@ -7,7 +7,16 @@
 
 package server
 
+import (
+	"fmt"
+)
+
 // RolesUserPath returns the URL path to the user service roles HTTP endpoint.
 func RolesUserPath() string {
 	return "/roles"
+}
+
+// DeleteUserPath returns the URL path to the user service delete HTTP endpoint.
+func DeleteUserPath(userID int32) string {
+	return fmt.Sprintf("/admin/users/%v", userID)
 }

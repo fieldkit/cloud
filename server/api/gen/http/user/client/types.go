@@ -35,6 +35,22 @@ type RolesNotFoundResponseBody string
 // endpoint HTTP response body for the "unauthorized" error.
 type RolesUnauthorizedResponseBody string
 
+// DeleteBadRequestResponseBody is the type of the "user" service "delete"
+// endpoint HTTP response body for the "bad-request" error.
+type DeleteBadRequestResponseBody string
+
+// DeleteForbiddenResponseBody is the type of the "user" service "delete"
+// endpoint HTTP response body for the "forbidden" error.
+type DeleteForbiddenResponseBody string
+
+// DeleteNotFoundResponseBody is the type of the "user" service "delete"
+// endpoint HTTP response body for the "not-found" error.
+type DeleteNotFoundResponseBody string
+
+// DeleteUnauthorizedResponseBody is the type of the "user" service "delete"
+// endpoint HTTP response body for the "unauthorized" error.
+type DeleteUnauthorizedResponseBody string
+
 // AvailableRoleResponseBody is used to define fields on response body types.
 type AvailableRoleResponseBody struct {
 	ID   *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -73,6 +89,31 @@ func NewRolesNotFound(body RolesNotFoundResponseBody) user.NotFound {
 
 // NewRolesUnauthorized builds a user service roles endpoint unauthorized error.
 func NewRolesUnauthorized(body RolesUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewDeleteBadRequest builds a user service delete endpoint bad-request error.
+func NewDeleteBadRequest(body DeleteBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewDeleteForbidden builds a user service delete endpoint forbidden error.
+func NewDeleteForbidden(body DeleteForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewDeleteNotFound builds a user service delete endpoint not-found error.
+func NewDeleteNotFound(body DeleteNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewDeleteUnauthorized builds a user service delete endpoint unauthorized
+// error.
+func NewDeleteUnauthorized(body DeleteUnauthorizedResponseBody) user.Unauthorized {
 	v := user.Unauthorized(body)
 	return v
 }

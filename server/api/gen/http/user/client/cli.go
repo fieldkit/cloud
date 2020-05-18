@@ -8,6 +8,9 @@
 package client
 
 import (
+	"fmt"
+	"strconv"
+
 	user "github.com/fieldkit/cloud/server/api/gen/user"
 )
 
@@ -19,6 +22,30 @@ func BuildRolesPayload(userRolesAuth string) (*user.RolesPayload, error) {
 		auth = userRolesAuth
 	}
 	v := &user.RolesPayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildDeletePayload builds the payload for the user delete endpoint from CLI
+// flags.
+func BuildDeletePayload(userDeleteUserID string, userDeleteAuth string) (*user.DeletePayload, error) {
+	var err error
+	var userID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(userDeleteUserID, 10, 32)
+		userID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for userID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = userDeleteAuth
+	}
+	v := &user.DeletePayload{}
+	v.UserID = userID
 	v.Auth = auth
 
 	return v, nil

@@ -34,6 +34,22 @@ type RolesNotFoundResponseBody string
 // endpoint HTTP response body for the "unauthorized" error.
 type RolesUnauthorizedResponseBody string
 
+// DeleteBadRequestResponseBody is the type of the "user" service "delete"
+// endpoint HTTP response body for the "bad-request" error.
+type DeleteBadRequestResponseBody string
+
+// DeleteForbiddenResponseBody is the type of the "user" service "delete"
+// endpoint HTTP response body for the "forbidden" error.
+type DeleteForbiddenResponseBody string
+
+// DeleteNotFoundResponseBody is the type of the "user" service "delete"
+// endpoint HTTP response body for the "not-found" error.
+type DeleteNotFoundResponseBody string
+
+// DeleteUnauthorizedResponseBody is the type of the "user" service "delete"
+// endpoint HTTP response body for the "unauthorized" error.
+type DeleteUnauthorizedResponseBody string
+
 // AvailableRoleResponseBody is used to define fields on response body types.
 type AvailableRoleResponseBody struct {
 	ID   int32  `form:"id" json:"id" xml:"id"`
@@ -81,9 +97,46 @@ func NewRolesUnauthorizedResponseBody(res user.Unauthorized) RolesUnauthorizedRe
 	return body
 }
 
+// NewDeleteBadRequestResponseBody builds the HTTP response body from the
+// result of the "delete" endpoint of the "user" service.
+func NewDeleteBadRequestResponseBody(res user.BadRequest) DeleteBadRequestResponseBody {
+	body := DeleteBadRequestResponseBody(res)
+	return body
+}
+
+// NewDeleteForbiddenResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "user" service.
+func NewDeleteForbiddenResponseBody(res user.Forbidden) DeleteForbiddenResponseBody {
+	body := DeleteForbiddenResponseBody(res)
+	return body
+}
+
+// NewDeleteNotFoundResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "user" service.
+func NewDeleteNotFoundResponseBody(res user.NotFound) DeleteNotFoundResponseBody {
+	body := DeleteNotFoundResponseBody(res)
+	return body
+}
+
+// NewDeleteUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "delete" endpoint of the "user" service.
+func NewDeleteUnauthorizedResponseBody(res user.Unauthorized) DeleteUnauthorizedResponseBody {
+	body := DeleteUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewRolesPayload builds a user service roles endpoint payload.
 func NewRolesPayload(auth string) *user.RolesPayload {
 	v := &user.RolesPayload{}
+	v.Auth = auth
+
+	return v
+}
+
+// NewDeletePayload builds a user service delete endpoint payload.
+func NewDeletePayload(userID int32, auth string) *user.DeletePayload {
+	v := &user.DeletePayload{}
+	v.UserID = userID
 	v.Auth = auth
 
 	return v

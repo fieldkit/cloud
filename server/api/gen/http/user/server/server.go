@@ -22,6 +22,7 @@ import (
 type Server struct {
 	Mounts []*MountPoint
 	Roles  http.Handler
+	Delete http.Handler
 	CORS   http.Handler
 }
 
@@ -59,10 +60,13 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"Roles", "GET", "/roles"},
+			{"Delete", "DELETE", "/admin/users/{userId}"},
 			{"CORS", "OPTIONS", "/roles"},
+			{"CORS", "OPTIONS", "/admin/users/{userId}"},
 		},
-		Roles: NewRolesHandler(e.Roles, mux, decoder, encoder, errhandler, formatter),
-		CORS:  NewCORSHandler(),
+		Roles:  NewRolesHandler(e.Roles, mux, decoder, encoder, errhandler, formatter),
+		Delete: NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
+		CORS:   NewCORSHandler(),
 	}
 }
 
@@ -72,12 +76,14 @@ func (s *Server) Service() string { return "user" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Roles = m(s.Roles)
+	s.Delete = m(s.Delete)
 	s.CORS = m(s.CORS)
 }
 
 // Mount configures the mux to serve the user endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountRolesHandler(mux, h.Roles)
+	MountDeleteHandler(mux, h.Delete)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -132,6 +138,57 @@ func NewRolesHandler(
 	})
 }
 
+// MountDeleteHandler configures the mux to serve the "user" service "delete"
+// endpoint.
+func MountDeleteHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleUserOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("DELETE", "/admin/users/{userId}", f)
+}
+
+// NewDeleteHandler creates a HTTP handler which loads the HTTP request and
+// calls the "user" service "delete" endpoint.
+func NewDeleteHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDeleteRequest(mux, decoder)
+		encodeResponse = EncodeDeleteResponse(encoder)
+		encodeError    = EncodeDeleteError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "delete")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service user.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -143,6 +200,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("OPTIONS", "/roles", f)
+	mux.Handle("OPTIONS", "/admin/users/{userId}", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.
