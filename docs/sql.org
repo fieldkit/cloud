@@ -1,5 +1,37 @@
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
+		SELECT
+			s.id AS sensor_id,
+			m.module_index,
+			s.sensor_index
+		FROM fieldkit.module_sensor AS s JOIN
+			 fieldkit.station_module AS m ON (s.module_id = m.id)
+		WHERE m.meta_record_id = 40868
+		ORDER BY m.module_index, s.sensor_index
+
+#+END_SRC
+
+#+RESULTS:
+| sensor_id | module_index | sensor_index |
+|-----------+--------------+--------------|
+|       148 |            0 |            0 |
+|       149 |            0 |            1 |
+|       150 |            0 |            2 |
+|       151 |            0 |            3 |
+|       152 |            0 |            4 |
+|       153 |            0 |            5 |
+|       154 |            0 |            6 |
+|       155 |            0 |            7 |
+|       156 |            0 |            8 |
+|       157 |            1 |            0 |
+|       158 |            2 |            0 |
+|       159 |            2 |            1 |
+|       160 |            2 |            2 |
+|       161 |            2 |            3 |
+|       162 |            3 |            0 |
+
+#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
+
 CREATE OR REPLACE VIEW fieldkit.project_and_station_activity AS
 	SELECT sa.created_at, ps.project_id, sa.station_id, sa.id AS station_activity_id, NULL AS project_activity_id FROM
 			fieldkit.project_station AS ps

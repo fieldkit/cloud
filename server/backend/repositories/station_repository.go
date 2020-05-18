@@ -167,7 +167,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 				SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
 			)
 		)
-		ORDER BY sm.position
+		ORDER BY sm.module_index
 		`, id); err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 				)
 			)
 		)
-		ORDER BY ms.position
+		ORDER BY ms.sensor_index
 		`, id); err != nil {
 		return nil, err
 	}
@@ -262,7 +262,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 				)
 			)
 		)
-		ORDER BY sm.position
+		ORDER BY sm.module_index
 		`, id); err != nil {
 		return nil, err
 	}
@@ -284,7 +284,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 				)
 			)
 		)
-		ORDER BY ms.position
+		ORDER BY ms.sensor_index
 		`, id); err != nil {
 		return nil, err
 	}
@@ -368,7 +368,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 				LIMIT 1
 			)
 		)
-		ORDER BY sm.position
+		ORDER BY sm.module_index
 		`, id); err != nil {
 		return nil, err
 	}
@@ -394,7 +394,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 				)
 			)
 		)
-		ORDER BY ms.position
+		ORDER BY ms.sensor_index
 		`, id); err != nil {
 		return nil, err
 	}

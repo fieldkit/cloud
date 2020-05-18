@@ -27,11 +27,12 @@ func NewStationModelRecordHandler(database *sqlxcache.DB) *stationModelRecordHan
 }
 
 func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error {
-	for _, m := range r.Modules {
+	for moduleIndex, m := range r.Modules {
 		module := &data.StationModule{
 			ProvisionID:  p.ID,
 			MetaRecordID: db.ID,
 			HardwareID:   m.Id,
+			Index:        uint32(moduleIndex),
 			Position:     m.Position,
 			Flags:        m.Flags,
 			Name:         m.Name,
@@ -41,10 +42,11 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 		}
 		if err := h.database.NamedGetContext(ctx, module, `
 		    INSERT INTO fieldkit.station_module
-				(provision_id, meta_record_id, hardware_id, position, flags, name, manufacturer, kind, version) VALUES
-				(:provision_id, :meta_record_id, :hardware_id, :position, :flags, :name, :manufacturer, :kind, :version)
+				(provision_id, meta_record_id, hardware_id, position, module_index, flags, name, manufacturer, kind, version) VALUES
+				(:provision_id, :meta_record_id, :hardware_id, :position, :module_index, :flags, :name, :manufacturer, :kind, :version)
 		    ON CONFLICT (meta_record_id, hardware_id)
 				DO UPDATE SET position = EXCLUDED.position,
+							  module_index = EXCLUDED.module_index,
 							  name = EXCLUDED.name,
                               manufacturer = EXCLUDED.manufacturer,
                               kind = EXCLUDED.kind,
@@ -54,18 +56,18 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 			return err
 		}
 
-		for position, s := range m.Sensors {
+		for sensorIndex, s := range m.Sensors {
 			sensor := &data.ModuleSensor{
 				ModuleID:      module.ID,
-				Position:      uint32(position),
+				Index:         uint32(sensorIndex),
 				UnitOfMeasure: s.UnitOfMeasure,
 				Name:          s.Name,
 			}
 			if err := h.database.NamedGetContext(ctx, sensor, `
 				INSERT INTO fieldkit.module_sensor
-					(module_id, position, unit_of_measure, name, reading_last, reading_time) VALUES
-					(:module_id, :position, :unit_of_measure, :name, :reading_last, :reading_time)
-				ON CONFLICT (module_id, position)
+					(module_id, sensor_index, unit_of_measure, name, reading_last, reading_time) VALUES
+					(:module_id, :sensor_index, :unit_of_measure, :name, :reading_last, :reading_time)
+				ON CONFLICT (module_id, sensor_index)
 					DO UPDATE SET unit_of_measure = EXCLUDED.unit_of_measure,
 								  name = EXCLUDED.name,
 								  reading_last = EXCLUDED.reading_last,
@@ -89,9 +91,9 @@ func (h *stationModelRecordHandler) OnData(ctx context.Context, p *data.Provisio
 }
 
 type SensorAndModulePosition struct {
-	SensorID       int64  `db:"sensor_id"`
-	ModulePosition uint32 `db:"module_position"`
-	SensorPosition uint32 `db:"sensor_position"`
+	SensorID    int64  `db:"sensor_id"`
+	ModuleIndex uint32 `db:"module_index"`
+	SensorIndex uint32 `db:"sensor_index"`
 }
 
 type UpdateSensorValue struct {
@@ -111,19 +113,23 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 	if err := h.database.SelectContext(ctx, &sensors, `
 		SELECT
 			s.id AS sensor_id,
-			m.position AS module_position,
-			s.position AS sensor_position
+			m.module_index AS module_index,
+			s.sensor_index AS sensor_index
 		FROM fieldkit.module_sensor AS s JOIN
 			 fieldkit.station_module AS m ON (s.module_id = m.id)
 		WHERE m.meta_record_id = $1
-		ORDER BY m.position, s.position
+		ORDER BY m.module_index, s.sensor_index
 		`, h.dbMeta.ID); err != nil {
 		return err
 	}
 
+	if len(sensors) == 0 {
+		return errors.Structured("missing station model")
+	}
+
 	sensorsByModule := [][]*SensorAndModulePosition{}
 	for _, s := range sensors {
-		if len(sensorsByModule) == 0 || sensorsByModule[len(sensorsByModule)-1][0].ModulePosition != s.ModulePosition {
+		if len(sensorsByModule) == 0 || sensorsByModule[len(sensorsByModule)-1][0].ModuleIndex != s.ModuleIndex {
 			sensorsByModule = append(sensorsByModule, []*SensorAndModulePosition{})
 		}
 		sensorsByModule[len(sensorsByModule)-1] = append(sensorsByModule[len(sensorsByModule)-1], s)

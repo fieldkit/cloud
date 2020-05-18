@@ -231,6 +231,7 @@ type StationModule struct {
 	ID           int64  `db:"id" json:"id"`
 	ProvisionID  int64  `db:"provision_id" json:"provision_id"`
 	MetaRecordID int64  `db:"meta_record_id" json:"meta_record_id"`
+	Index        uint32 `db:"module_index" json:"module_index"`
 	Position     uint32 `db:"position" json:"position"`
 	HardwareID   []byte `db:"hardware_id" json:"hardware_id"`
 	Name         string `db:"name" json:"name"`
@@ -243,7 +244,7 @@ type StationModule struct {
 type ModuleSensor struct {
 	ID            int64      `db:"id" json:"id"`
 	ModuleID      int64      `db:"module_id" json:"module_id"`
-	Position      uint32     `db:"position" json:"position"`
+	Index         uint32     `db:"sensor_index" json:"sensor_index"`
 	UnitOfMeasure string     `db:"unit_of_measure" json:"unit_of_measure"`
 	Name          string     `db:"name" json:"name"`
 	ReadingValue  *float64   `db:"reading_last" json:"reading_last"`
