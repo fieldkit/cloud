@@ -30,7 +30,7 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 	for moduleIndex, m := range r.Modules {
 		module := &data.StationModule{
 			ProvisionID:  p.ID,
-			MetaRecordID: db.ID,
+			MetaRecordID: &db.ID,
 			HardwareID:   m.Id,
 			Index:        uint32(moduleIndex),
 			Position:     m.Position,

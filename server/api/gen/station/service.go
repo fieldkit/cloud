@@ -146,13 +146,14 @@ type StationPhotos struct {
 }
 
 type StationModule struct {
-	ID         int64
-	HardwareID *string
-	Name       string
-	Position   int32
-	Flags      int32
-	Internal   bool
-	Sensors    []*StationSensor
+	ID           int64
+	HardwareID   *string
+	MetaRecordID *int64
+	Name         string
+	Position     int32
+	Flags        int32
+	Internal     bool
+	Sensors      []*StationSensor
 }
 
 type StationSensor struct {
@@ -465,12 +466,13 @@ func transformStationviewsStationModuleViewToStationModule(v *stationviews.Stati
 		return nil
 	}
 	res := &StationModule{
-		ID:         *v.ID,
-		HardwareID: v.HardwareID,
-		Name:       *v.Name,
-		Position:   *v.Position,
-		Flags:      *v.Flags,
-		Internal:   *v.Internal,
+		ID:           *v.ID,
+		HardwareID:   v.HardwareID,
+		MetaRecordID: v.MetaRecordID,
+		Name:         *v.Name,
+		Position:     *v.Position,
+		Flags:        *v.Flags,
+		Internal:     *v.Internal,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*StationSensor, len(v.Sensors))
@@ -566,12 +568,13 @@ func transformStationPhotosToStationviewsStationPhotosView(v *StationPhotos) *st
 // *stationviews.StationModuleView from a value of type *StationModule.
 func transformStationModuleToStationviewsStationModuleView(v *StationModule) *stationviews.StationModuleView {
 	res := &stationviews.StationModuleView{
-		ID:         &v.ID,
-		HardwareID: v.HardwareID,
-		Name:       &v.Name,
-		Position:   &v.Position,
-		Flags:      &v.Flags,
-		Internal:   &v.Internal,
+		ID:           &v.ID,
+		HardwareID:   v.HardwareID,
+		MetaRecordID: v.MetaRecordID,
+		Name:         &v.Name,
+		Position:     &v.Position,
+		Flags:        &v.Flags,
+		Internal:     &v.Internal,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*stationviews.StationSensorView, len(v.Sensors))

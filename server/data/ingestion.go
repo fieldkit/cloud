@@ -230,7 +230,7 @@ func DecodeBinaryString(s string) ([]byte, error) {
 type StationModule struct {
 	ID           int64  `db:"id" json:"id"`
 	ProvisionID  int64  `db:"provision_id" json:"provision_id"`
-	MetaRecordID int64  `db:"meta_record_id" json:"meta_record_id"`
+	MetaRecordID *int64 `db:"meta_record_id" json:"meta_record_id"`
 	Index        uint32 `db:"module_index" json:"module_index"`
 	Position     uint32 `db:"position" json:"position"`
 	HardwareID   []byte `db:"hardware_id" json:"hardware_id"`

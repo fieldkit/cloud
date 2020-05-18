@@ -335,13 +335,14 @@ func transformModules(from *data.StationFull) (to []*station.StationModule) {
 		hardwareID := hex.EncodeToString(v.HardwareID)
 
 		to = append(to, &station.StationModule{
-			ID:         v.ID,
-			HardwareID: &hardwareID,
-			Name:       v.Name,
-			Position:   int32(v.Position),
-			Flags:      int32(v.Flags),
-			Internal:   v.Flags > 0,
-			Sensors:    sensors,
+			ID:           v.ID,
+			HardwareID:   &hardwareID,
+			MetaRecordID: v.MetaRecordID,
+			Name:         v.Name,
+			Position:     int32(v.Position),
+			Flags:        int32(v.Flags),
+			Internal:     v.Flags > 0,
+			Sensors:      sensors,
 		})
 
 	}
