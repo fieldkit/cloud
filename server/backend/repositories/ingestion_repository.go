@@ -20,7 +20,11 @@ func NewIngestionRepository(database *sqlxcache.DB) (ir *IngestionRepository, er
 func (r *IngestionRepository) QueryByID(ctx context.Context, id int64) (i *data.Ingestion, err error) {
 	found := []*data.Ingestion{}
 	if err := r.Database.SelectContext(ctx, &found, `
-		SELECT i.* FROM fieldkit.ingestion AS i WHERE (i.id = $1)
+		SELECT
+			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags,
+			completed, attempted, errors, total_records, other_errors, meta_errors, data_errors
+		FROM fieldkit.ingestion
+		WHERE id = $1
 		`, id); err != nil {
 		return nil, fmt.Errorf("error querying for ingestion: %v", err)
 	}
@@ -33,9 +37,21 @@ func (r *IngestionRepository) QueryByID(ctx context.Context, id int64) (i *data.
 func (r *IngestionRepository) QueryByStationID(ctx context.Context, id int64) (all []*data.Ingestion, err error) {
 	pending := []*data.Ingestion{}
 	if err := r.Database.SelectContext(ctx, &pending, `
-		SELECT i.* FROM fieldkit.ingestion AS i
-        WHERE i.device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
-		ORDER BY i.size ASC, i.time DESC
+		SELECT
+			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags,
+			completed, attempted, errors, total_records, other_errors, meta_errors, data_errors
+		FROM
+		(
+			SELECT
+			*,
+			CASE
+				WHEN type = 'meta' THEN 0
+				ELSE 1
+			END AS type_ordered
+			FROM fieldkit.ingestion
+		) AS q
+        WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
+		ORDER BY q.type_ordered, q.time
 		`, id); err != nil {
 		return nil, fmt.Errorf("error querying for ingestions: %v", err)
 	}
@@ -45,17 +61,21 @@ func (r *IngestionRepository) QueryByStationID(ctx context.Context, id int64) (a
 func (r *IngestionRepository) QueryPending(ctx context.Context) (all []*data.Ingestion, err error) {
 	pending := []*data.Ingestion{}
 	if err := r.Database.SelectContext(ctx, &pending, `
-		SELECT i.* FROM fieldkit.ingestion AS i WHERE (i.errors IS NULL) ORDER BY i.size ASC, i.time DESC
-		`); err != nil {
-		return nil, fmt.Errorf("error querying for ingestions: %v", err)
-	}
-	return pending, nil
-}
-
-func (r *IngestionRepository) QueryAll(ctx context.Context) (all []*data.Ingestion, err error) {
-	pending := []*data.Ingestion{}
-	if err := r.Database.SelectContext(ctx, &pending, `
-		SELECT i.* FROM fieldkit.ingestion AS i ORDER BY i.time DESC
+		SELECT
+			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags,
+			completed, attempted, errors, total_records, other_errors, meta_errors, data_errors
+		FROM
+		(
+			SELECT
+			*,
+			CASE
+				WHEN type = 'meta' THEN 0
+				ELSE 1
+			END AS type_ordered
+			FROM fieldkit.ingestion
+		) AS q
+        WHERE errors IS NULL
+		ORDER BY q.type_ordered, q.time
 		`); err != nil {
 		return nil, fmt.Errorf("error querying for ingestions: %v", err)
 	}

@@ -122,3 +122,39 @@ func TestTryQueryStationByDeviceID(t *testing.T) {
 	assert.NotNil(sf)
 	assert.NotNil(fd)
 }
+
+func TestIngestionRepositoryQueryPending(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	r, err := repositories.NewIngestionRepository(e.DB)
+	assert.NoError(err)
+
+	sf, err := r.QueryPending(e.Ctx)
+	assert.NoError(err)
+
+	assert.NotNil(sf)
+	assert.NotNil(fd)
+}
+
+func TestIngestionRepositoryQueryByStationID(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	r, err := repositories.NewIngestionRepository(e.DB)
+	assert.NoError(err)
+
+	sf, err := r.QueryByStationID(e.Ctx, int64(fd.Stations[0].ID))
+	assert.NoError(err)
+
+	assert.NotNil(sf)
+	assert.NotNil(fd)
+}
