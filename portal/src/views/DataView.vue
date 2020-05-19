@@ -289,7 +289,7 @@ export default {
             let result = [];
             modules.forEach(m => {
                 let sensors = [];
-                let addModule = true;
+                let addModule = m.position < 5;
                 const moduleSensors = m.sensorObjects ? m.sensorObjects : m.sensors;
                 moduleSensors.forEach(sensor => {
                     let dataViewSensor = this.allSensors.find(sr => {
