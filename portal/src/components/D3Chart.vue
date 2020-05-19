@@ -9,7 +9,13 @@
         <D3HistoChart :chart="chart" :layout="layout" ref="d3HistoChart" />
         <D3RangeChart :chart="chart" :layout="layout" ref="d3RangeChart" />
         <div :id="'scrubber-container-' + chart.id">
-            <svg :view-box.camel="scrubberViewBox" preserveAspectRatio="xMidYMid meet" :width="outerWidth" :height="scrubberHeight">
+            <svg
+                :id="'scrubber-svg-' + chart.id"
+                :view-box.camel="scrubberViewBox"
+                preserveAspectRatio="xMidYMid meet"
+                :width="outerWidth"
+                :height="scrubberHeight"
+            >
                 <filter :id="'dropshadow-' + chart.id" height="150%" width="150%">
                     <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
                     <!-- stdDeviation is how much to blur -->

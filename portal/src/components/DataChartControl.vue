@@ -388,6 +388,10 @@ export default {
             const index = this.charts.findIndex(c => {
                 return c.id == id;
             });
+            // remove possibly orphaned scrubber
+            if (document.getElementById("scrubber-svg-" + id)) {
+                document.getElementById("scrubber-svg-" + id).remove();
+            }
             if (index > -1) {
                 this.$emit("removeChart", id);
                 this.charts.splice(index, 1);
@@ -408,6 +412,7 @@ export default {
                 // now re-linked, reset all to parent
                 const parentTime = this.$refs[this.charts[0].ref][0].getTimeRange();
                 const requested = this.$refs[this.charts[0].ref][0].getRequestedTime();
+                const parentElement = document.getElementById("scrubber-container-chart-1");
                 this.charts.forEach((c, i) => {
                     if (i > 0) {
                         // NOTE: linking time only for now
@@ -426,6 +431,10 @@ export default {
                         c.timeButtons.forEach((b, btnIndex) => {
                             b.active = this.charts[0].timeButtons[btnIndex].active;
                         });
+                        // move scrubbers together
+                        const scrubber = document.getElementById("scrubber-svg-" + c.id);
+                        parentElement.appendChild(scrubber);
+
                         // c.type = this.charts[0].type;
                         // c.sensor = this.charts[0].sensor;
                         // c.treeSelectValue = this.charts[0].treeSelectValue;
@@ -435,11 +444,33 @@ export default {
                         // this.urlQuery[c.id + "sensor"] = this.charts[0].sensor.key;
                     }
                 });
+                let chartContainers = document.getElementsByClassName("inner-chart-container");
+                Array.from(chartContainers).forEach(b => {
+                    b.style["margin-top"] = "0";
+                });
                 this.updateRoute();
+            } else {
+                // move scrubbers apart
+                this.separateScrubbers();
             }
         },
         unlinkCharts() {
             this.linkedCharts = false;
+            this.separateScrubbers();
+        },
+        separateScrubbers() {
+            this.charts.forEach((c, i) => {
+                if (i > 0) {
+                    // move scrubbers together
+                    const container = document.getElementById("scrubber-container-" + c.id);
+                    const svg = document.getElementById("scrubber-svg-" + c.id);
+                    container.appendChild(svg);
+                }
+            });
+            let chartContainers = document.getElementsByClassName("inner-chart-container");
+            Array.from(chartContainers).forEach(b => {
+                b.style["margin-top"] = "6px";
+            });
         },
         chartTypeChanged(event) {
             // the chart type on a single chart instance has changed
@@ -896,7 +927,7 @@ export default {
 #main-loading,
 .loading {
     width: 1115px;
-    height: 590px;
+    height: 595px;
     background-color: rgba(255, 255, 255, 0.65);
     text-align: center;
     position: absolute;
