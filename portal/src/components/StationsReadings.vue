@@ -20,7 +20,7 @@
                             {{ sensor.unit_of_measure }}
                         </div>
                         <div class="right sensor-reading">
-                            {{ sensor.reading.last || sensor.reading.last == 0 ? sensor.reading.last.toFixed(1) : "--" }}
+                            {{ getReading(sensor) }}
                         </div>
                     </div>
                 </template>
@@ -80,6 +80,7 @@ export default {
             }
             this.currentStation = this.stations[this.currentIndex - 1];
         },
+
         fetchStations() {
             this.api.getStationsByProject(this.project.id).then(result => {
                 this.stations = result.stations;
@@ -101,6 +102,14 @@ export default {
             }
             return this.modulesSensors[moduleIndex][sensorIndex];
         },
+
+        getReading(sensor) {
+            if (!sensor.reading) {
+                return "--";
+            }
+            return sensor.reading.last || sensor.reading.last == 0 ? sensor.reading.last.toFixed(1) : "--";
+        },
+
         getSensorName(module, sensor) {
             return this.$t(module.name + "." + sensor.name);
         },

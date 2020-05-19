@@ -72,7 +72,7 @@
                                     {{ sensor.unit_of_measure }}
                                 </div>
                                 <div class="right sensor-reading">
-                                    {{ sensor.reading.last || sensor.reading.last == 0 ? sensor.reading.last.toFixed(1) : "--" }}
+                                    {{ getReading(sensor) }}
                                 </div>
                             </div>
                         </template>
@@ -142,6 +142,13 @@ export default {
         getNativeLand() {
             const latLongNative = this.station.status_json.latitude + "," + this.station.status_json.longitude;
             return this.api.getNativeLand(latLongNative);
+        },
+
+        getReading(sensor) {
+            if (!sensor.reading) {
+                return "--";
+            }
+            return sensor.reading.last || sensor.reading.last == 0 ? sensor.reading.last.toFixed(1) : "--";
         },
 
         getCounter(moduleIndex, sensorIndex) {
