@@ -370,10 +370,10 @@ func transformModules(from *data.StationFull) (to []*station.StationModule) {
 
 var (
 	NameMap = map[string]string{
-		"distance":    "module.distance",
-		"weather":     "module.weather",
-		"diagnostics": "module.diagnostics",
-		"ultrasonic":  "module.distance",
+		"distance":    "modules.distance",
+		"weather":     "modules.weather",
+		"diagnostics": "modules.diagnostics",
+		"ultrasonic":  "modules.distance",
 	}
 )
 
