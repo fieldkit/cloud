@@ -75,35 +75,12 @@ func (ra *RecordAdder) tryFindStation(ctx context.Context, i *data.Ingestion) (*
 }
 
 func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*data.Provision, error) {
-	// TODO Verify we have a valid generation.
-
-	provisions := []*data.Provision{}
-	if err := ra.database.SelectContext(ctx, &provisions, `
-		SELECT p.* FROM fieldkit.provision AS p WHERE p.device_id = $1 AND p.generation = $2
-		`, i.DeviceID, i.GenerationID); err != nil {
+	r, err := repositories.NewProvisionRepository(ra.database)
+	if err != nil {
 		return nil, err
 	}
 
-	if len(provisions) == 1 {
-		return provisions[0], nil
-	}
-
-	provision := &data.Provision{
-		Created:      time.Now(),
-		Updated:      time.Now(),
-		DeviceID:     i.DeviceID,
-		GenerationID: i.GenerationID,
-	}
-
-	if err := ra.database.NamedGetContext(ctx, &provision.ID, `
-		INSERT INTO fieldkit.provision (device_id, generation, created, updated)
-		VALUES (:device_id, :generation, :created, :updated) ON CONFLICT (device_id, generation)
-		DO UPDATE SET updated = NOW() RETURNING id
-		`, provision); err != nil {
-		return nil, err
-	}
-
-	return provision, nil
+	return r.QueryOrCreateProvision(ctx, i.DeviceID, i.GenerationID)
 }
 
 func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) (warning error, fatal error) {
