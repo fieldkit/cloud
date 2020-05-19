@@ -13,6 +13,11 @@ const (
 	ConservifyWeather      = 0x01
 	ConservifyWater        = 0x02
 	ConservifyDistance     = 0x03
+	ConservifyWaterPh      = 0x04
+	ConservifyWaterEc      = 0x05
+	ConservifyWaterDo      = 0x06
+	ConservifyWaterTemp    = 0x07
+	ConservifyWaterOrp     = 0x08
 	ConservifyRandom       = 0xa0
 	ConservifyDiagnostics  = 0xa1
 

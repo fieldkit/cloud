@@ -283,14 +283,6 @@ func hashString(seed string) []byte {
 	return hasher.Sum(nil)
 }
 
-func generateModuleId(m *pbapp.ModuleCapabilities) *pbapp.ModuleCapabilities {
-	hasher := sha1.New()
-	hasher.Write([]byte(m.Name))
-	moduleID := hasher.Sum(nil)
-	m.Id = moduleID
-	return m
-}
-
 func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 	now := time.Now()
 	used := uint32(1024 * 10)
@@ -358,10 +350,16 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 			},
 		},
 		Modules: []*pbapp.ModuleCapabilities{
-			generateModuleId(&pbapp.ModuleCapabilities{
+			&pbapp.ModuleCapabilities{
 				Position: 0,
 				Flags:    1,
-				Name:     "Diagnostics Module",
+				Name:     "modules.diagnostics",
+				Id:       hashString(fmt.Sprintf("diagnostics-%s-%s", s.DeviceID, e.Seed)),
+				Header: &pbapp.ModuleHeader{
+					Manufacturer: repositories.ManufacturerConservify,
+					Kind:         repositories.ConservifyDiagnostics,
+					Version:      1,
+				},
 				Sensors: []*pbapp.SensorCapabilities{
 					&pbapp.SensorCapabilities{
 						Number:        0,
@@ -370,62 +368,80 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 						Frequency:     60,
 					},
 				},
-			}),
-			generateModuleId(&pbapp.ModuleCapabilities{
+			},
+			&pbapp.ModuleCapabilities{
 				Position: 0,
-				Name:     "Water Quality Module",
+				Name:     "modules.water.ph",
+				Id:       hashString(fmt.Sprintf("ph-%s-%s", s.DeviceID, e.Seed)),
+				Header: &pbapp.ModuleHeader{
+					Manufacturer: repositories.ManufacturerConservify,
+					Kind:         repositories.ConservifyWaterPh,
+					Version:      1,
+				},
 				Sensors: []*pbapp.SensorCapabilities{
 					&pbapp.SensorCapabilities{
 						Number:        0,
-						Name:          "pH",
+						Name:          "ph",
 						UnitOfMeasure: "",
 						Frequency:     60,
 					},
 				},
-			}),
-			generateModuleId(&pbapp.ModuleCapabilities{
+			},
+			&pbapp.ModuleCapabilities{
 				Position: 1,
-				Name:     "Water Quality Module",
+				Name:     "modules.water.do",
+				Id:       hashString(fmt.Sprintf("do-%s-%s", s.DeviceID, e.Seed)),
+				Header: &pbapp.ModuleHeader{
+					Manufacturer: repositories.ManufacturerConservify,
+					Kind:         repositories.ConservifyWaterDo,
+					Version:      1,
+				},
 				Sensors: []*pbapp.SensorCapabilities{
 					&pbapp.SensorCapabilities{
 						Number:        0,
-						Name:          "Dissolved Oxygen",
+						Name:          "do",
 						UnitOfMeasure: "",
 						Frequency:     60,
 					},
 				},
-			}),
-			generateModuleId(&pbapp.ModuleCapabilities{
+			},
+			&pbapp.ModuleCapabilities{
 				Position: 2,
-				Name:     "Ocean Module",
+				Name:     "modules.water.ec",
+				Id:       hashString(fmt.Sprintf("ec-%s-%s", s.DeviceID, e.Seed)),
+				Header: &pbapp.ModuleHeader{
+					Manufacturer: repositories.ManufacturerConservify,
+					Kind:         repositories.ConservifyWaterEc,
+					Version:      1,
+				},
 				Sensors: []*pbapp.SensorCapabilities{
 					&pbapp.SensorCapabilities{
 						Number:        0,
-						Name:          "Conductivity",
+						Name:          "ec",
 						UnitOfMeasure: "µS/cm",
 						Frequency:     60,
 					},
 					&pbapp.SensorCapabilities{
 						Number:        1,
-						Name:          "Temperature",
+						Name:          "temperature",
 						UnitOfMeasure: "C",
 						Frequency:     60,
 					},
 					&pbapp.SensorCapabilities{
 						Number:        2,
-						Name:          "Depth",
+						Name:          "depth",
 						UnitOfMeasure: "m",
 						Frequency:     60,
 					},
 					&pbapp.SensorCapabilities{
 						Number:        2,
-						Name:          "Depth (mv)",
+						Name:          "depth (mv)",
 						UnitOfMeasure: "mv",
 						Frequency:     60,
 						Flags:         1,
 					},
 				},
-			}),
+			},
 		},
 	}
 }
