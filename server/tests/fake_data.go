@@ -277,7 +277,7 @@ type SignedRecordAndData struct {
 	Data   *pb.DataRecord
 }
 
-func newModuleId(seed string) []byte {
+func hashString(seed string) []byte {
 	hasher := sha1.New()
 	hasher.Write([]byte(seed))
 	return hasher.Sum(nil)
@@ -296,6 +296,8 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 	used := uint32(1024 * 10)
 	installed := uint32(512 * 1024 * 1024)
 	recording := uint64(0)
+	deviceID := s.DeviceID
+	generation := hashString(fmt.Sprintf("%s-%d-%d", s.DeviceID, e.Seed, 0))
 
 	return &pbapp.HttpReply{
 		Type: pbapp.ReplyType_REPLY_STATUS,
@@ -303,7 +305,9 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 			Version: 1,
 			Uptime:  1,
 			Identity: &pbapp.Identity{
-				Name: s.Name,
+				Name:       s.Name,
+				DeviceId:   deviceID,
+				Generation: generation,
 			},
 			Recording: &pbapp.Recording{
 				Enabled:     recording > 0,
@@ -439,7 +443,7 @@ func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {
 			&pb.ModuleInfo{
 				Position: 0,
 				Name:     "random-module-1",
-				Id:       newModuleId(fmt.Sprintf("random-module-1-%d", e.Seed)),
+				Id:       hashString(fmt.Sprintf("random-module-1-%d", e.Seed)),
 				Header: &pb.ModuleHeader{
 					Manufacturer: repositories.ManufacturerConservify,
 					Kind:         repositories.ConservifyRandom,
@@ -472,7 +476,7 @@ func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {
 			&pb.ModuleInfo{
 				Position: 1,
 				Name:     "random-module-2",
-				Id:       newModuleId(fmt.Sprintf("random-module-2-%d", e.Seed)),
+				Id:       hashString(fmt.Sprintf("random-module-2-%d", e.Seed)),
 				Header: &pb.ModuleHeader{
 					Manufacturer: repositories.ManufacturerConservify,
 					Kind:         repositories.ConservifyRandom,
