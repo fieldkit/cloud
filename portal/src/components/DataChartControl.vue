@@ -106,11 +106,6 @@
                     />
                 </template>
             </div>
-            <!-- <div v-for="(pre, preIndex) in preloading" v-bind:key="pre.id" class="inner-chart-container">
-                <div :id="pre.id + '-loading'" class="loading">
-                    <img alt="" src="../assets/progress.gif" />
-                </div>
-            </div> -->
         </div>
     </div>
 </template>
@@ -135,7 +130,6 @@ export default {
             noStation: false,
             charts: [],
             pending: [],
-            preloading: [],
             noDataCharts: [],
             stationIds: [],
             linkedCharts: false,
@@ -190,9 +184,6 @@ export default {
                 if (p.indexOf("start") > -1 || p.indexOf("end") > -1) {
                     this.$route.query[p] = parseInt(this.$route.query[p]);
                 }
-                if (p.indexOf("station") > 0) {
-                    this.preloading.push({ id: p });
-                }
                 if (p != "stationId") {
                     this.urlQuery[p] = this.$route.query[p];
                     this.prevQuery[p] = this.$route.query[p];
@@ -220,12 +211,6 @@ export default {
             this.hideLoading();
         },
         noInitialDataFound(station, chartId) {
-            const preloadingIndex = this.preloading.findIndex(p => {
-                return p.id == chartId + "station";
-            });
-            if (preloadingIndex > -1) {
-                this.preloading.splice(preloadingIndex, 1);
-            }
             const id = chartId.split("chart-")[1];
             const newChart = {
                 id: chartId,
@@ -244,12 +229,6 @@ export default {
             chart.noData = true;
         },
         initializeChart(data, deviceId, chartId) {
-            const preloadingIndex = this.preloading.findIndex(p => {
-                return p.id == chartId + "station";
-            });
-            if (preloadingIndex > -1) {
-                this.preloading.splice(preloadingIndex, 1);
-            }
             if (data[deviceId].data) {
                 this.urlQuery[chartId + "station"] = data[deviceId].station.id.toString();
                 this.addChartFromParams(data, deviceId, chartId);
@@ -902,7 +881,6 @@ export default {
             this.noStation = false;
             this.charts = [];
             this.pending = [];
-            this.preloading = [];
             this.noDataCharts = [];
             this.stationIds = [];
             this.linkedCharts = false;
