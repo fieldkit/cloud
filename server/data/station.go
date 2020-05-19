@@ -50,20 +50,29 @@ func (s *Station) GetStatus() (map[string]interface{}, error) {
 	return parsed, nil
 }
 
-func (s *Station) UpdateFromStatus(raw string) error {
+func (s *Station) ParseHttpReply(raw string) (*pb.HttpReply, error) {
 	bytes, err := DecodeBinaryString(raw)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	buffer := proto.NewBuffer(bytes)
 	_, err = buffer.DecodeVarint()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	record := &pb.HttpReply{}
 	if err := buffer.Unmarshal(record); err != nil {
+		return nil, err
+	}
+
+	return record, nil
+}
+
+func (s *Station) UpdateFromStatus(raw string) error {
+	record, err := s.ParseHttpReply(raw)
+	if err != nil {
 		return err
 	}
 
