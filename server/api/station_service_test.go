@@ -12,6 +12,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
+	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/tests"
 )
 
@@ -298,4 +300,56 @@ func TestUpdateMyStationWithProtobufStatus(t *testing.T) {
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusOK, rr.Code)
+}
+
+func TestUpdateMyStationWithProtobufStatusTwice(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	reply := e.NewHttpStatusReply(fd.Stations[0])
+	replyBuffer := proto.NewBuffer(make([]byte, 0))
+	replyBuffer.EncodeMessage(reply)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	payload, err := json.Marshal(
+		struct {
+			Name       string                 `json:"name"`
+			StatusJSON map[string]interface{} `json:"status_json"`
+			StatusPB   []byte                 `json:"status_pb"`
+		}{
+			Name:       "New Name",
+			StatusJSON: make(map[string]interface{}),
+			StatusPB:   replyBuffer.Bytes(),
+		},
+	)
+	assert.NoError(err)
+
+	for i := 0; i < 3; i += 1 {
+		req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), bytes.NewReader(payload))
+		req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+		rr := tests.ExecuteRequest(req, api)
+
+		assert.Equal(http.StatusOK, rr.Code)
+
+		sr, err := repositories.NewStationRepository(e.DB)
+		assert.NoError(err)
+
+		m := []*data.StationModule{}
+		assert.NoError(e.DB.SelectContext(e.Ctx, &m, `
+			SELECT * FROM fieldkit.station_module WHERE provision_id IN (SELECT id FROM fieldkit.provision WHERE device_id = $1)
+		`, fd.Stations[0].DeviceID))
+
+		sf, err := sr.QueryStationFull(e.Ctx, fd.Stations[0].ID)
+		assert.NoError(err)
+		assert.NotNil(sf)
+
+		assert.Equal(4, len(m))
+		assert.Equal(4, len(sf.Modules))
+	}
 }

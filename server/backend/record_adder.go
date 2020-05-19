@@ -263,7 +263,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 	}
 
 	if err := ra.handler.OnDone(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error in done handler: %v", err)
 	}
 
 	withInfo.Infow("processed")

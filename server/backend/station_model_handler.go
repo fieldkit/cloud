@@ -27,11 +27,14 @@ func NewStationModelRecordHandler(database *sqlxcache.DB) *stationModelRecordHan
 }
 
 func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error {
+	now := time.Now()
+
 	for moduleIndex, m := range r.Modules {
 		module := &data.StationModule{
 			ProvisionID:  p.ID,
-			MetaRecordID: &db.ID,
 			HardwareID:   m.Id,
+			MetaRecordID: &db.ID,
+			UpdatedAt:    now,
 			Index:        uint32(moduleIndex),
 			Position:     m.Position,
 			Flags:        m.Flags,
@@ -42,11 +45,12 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 		}
 		if err := h.database.NamedGetContext(ctx, module, `
 		    INSERT INTO fieldkit.station_module
-				(provision_id, meta_record_id, hardware_id, position, module_index, flags, name, manufacturer, kind, version) VALUES
-				(:provision_id, :meta_record_id, :hardware_id, :position, :module_index, :flags, :name, :manufacturer, :kind, :version)
-		    ON CONFLICT (meta_record_id, hardware_id)
+				(provision_id, hardware_id, meta_record_id, updated_at, position, module_index, flags, name, manufacturer, kind, version) VALUES
+				(:provision_id, :hardware_id, :meta_record_id, :updated_at, :position, :module_index, :flags, :name, :manufacturer, :kind, :version)
+		    ON CONFLICT (hardware_id, meta_record_id)
 				DO UPDATE SET position = EXCLUDED.position,
 							  module_index = EXCLUDED.module_index,
+							  updated_at = EXCLUDED.updated_at,
 							  name = EXCLUDED.name,
                               manufacturer = EXCLUDED.manufacturer,
                               kind = EXCLUDED.kind,
@@ -78,6 +82,10 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 			}
 		}
 	}
+
+	// TODO We need to delete extra modules and sensors here. It's
+	// unlikely now but I'm betting a bug or future issue will
+	// absolutely require that.
 
 	return nil
 }

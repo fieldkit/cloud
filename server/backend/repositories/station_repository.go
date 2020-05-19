@@ -4,10 +4,15 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/data"
+)
+
+var (
+	StatusReplySourceID = int32(0)
 )
 
 type StationRepository struct {
@@ -103,6 +108,85 @@ func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, devic
 	return stations[0], nil
 }
 
+func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s *data.Station, rawStatus string) error {
+	record, err := s.ParseHttpReply(rawStatus)
+	if err != nil {
+		return err
+	}
+
+	if record.Status == nil || record.Status.Identity == nil || record.Status.Identity.Generation == nil {
+		return fmt.Errorf("incomplete status, no identity or generation")
+	}
+
+	pr, err := NewProvisionRepository(r.db)
+	if err != nil {
+		return err
+	}
+
+	p, err := pr.QueryOrCreateProvision(ctx, s.DeviceID, record.Status.Identity.Generation)
+	if err != nil {
+		return err
+	}
+
+	now := time.Now()
+
+	for moduleIndex, m := range record.Modules {
+		module := &data.StationModule{
+			ProvisionID:  p.ID,
+			HardwareID:   m.Id,
+			SourceID:     &StatusReplySourceID,
+			UpdatedAt:    now,
+			Index:        uint32(moduleIndex),
+			Position:     m.Position,
+			Flags:        m.Flags,
+			Name:         m.Name,
+			Manufacturer: m.Header.Manufacturer,
+			Kind:         m.Header.Kind,
+			Version:      m.Header.Version,
+		}
+		if err := r.db.NamedGetContext(ctx, module, `
+		    INSERT INTO fieldkit.station_module
+				(provision_id, hardware_id, source_id, updated_at, position, module_index, flags, name, manufacturer, kind, version) VALUES
+				(:provision_id, :hardware_id, :source_id, :updated_at, :position, :module_index, :flags, :name, :manufacturer, :kind, :version)
+		    ON CONFLICT (hardware_id, source_id)
+				DO UPDATE SET position = EXCLUDED.position,
+							  module_index = EXCLUDED.module_index,
+							  updated_at = EXCLUDED.updated_at,
+							  name = EXCLUDED.name,
+                              manufacturer = EXCLUDED.manufacturer,
+                              kind = EXCLUDED.kind,
+                              version = EXCLUDED.version
+			RETURNING *
+			`, module); err != nil {
+			return err
+		}
+
+		for sensorIndex, s := range m.Sensors {
+			sensor := &data.ModuleSensor{
+				ModuleID:      module.ID,
+				Index:         uint32(sensorIndex),
+				UnitOfMeasure: s.UnitOfMeasure,
+				Name:          s.Name,
+			}
+			if err := r.db.NamedGetContext(ctx, sensor, `
+				INSERT INTO fieldkit.module_sensor
+					(module_id, sensor_index, unit_of_measure, name, reading_last, reading_time) VALUES
+					(:module_id, :sensor_index, :unit_of_measure, :name, :reading_last, :reading_time)
+				ON CONFLICT (module_id, sensor_index)
+					DO UPDATE SET unit_of_measure = EXCLUDED.unit_of_measure,
+								  name = EXCLUDED.name,
+								  reading_last = EXCLUDED.reading_last,
+								  reading_time = EXCLUDED.reading_time
+				RETURNING *
+				`, sensor); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*data.StationFull, error) {
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
@@ -160,8 +244,8 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		SELECT
 			sm.*
 		FROM fieldkit.station_module AS sm
-		WHERE sm.meta_record_id IN (
-			SELECT MAX(meta_record_id)
+		WHERE sm.updated_at = (
+			SELECT MAX(updated_at)
 			FROM fieldkit.station_module AS sm
 			WHERE sm.provision_id IN (
 				SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
@@ -178,8 +262,8 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 			ms.*
 		FROM fieldkit.module_sensor AS ms
 		WHERE ms.module_id IN (
-			SELECT id FROM fieldkit.station_module WHERE meta_record_id IN (
-				SELECT MAX(meta_record_id)
+			SELECT id FROM fieldkit.station_module WHERE updated_at IN (
+				SELECT MAX(updated_at)
 				FROM fieldkit.station_module AS sm
 				WHERE sm.provision_id IN (
 					SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
@@ -252,9 +336,8 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		SELECT
 			sm.*
 		FROM fieldkit.station_module AS sm
-		WHERE sm.meta_record_id IN (
-			SELECT
-				MAX(sm.meta_record_id)
+		WHERE sm.updated_at IN (
+			SELECT MAX(sm.updated_at)
 			FROM fieldkit.station_module AS sm
 			WHERE sm.provision_id IN (
 				SELECT id FROM fieldkit.provision WHERE device_id IN (
@@ -273,9 +356,8 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 			ms.*
 		FROM fieldkit.module_sensor AS ms
 		WHERE ms.module_id IN (
-			SELECT id FROM fieldkit.station_module WHERE meta_record_id IN (
-				SELECT
-					MAX(sm.meta_record_id)
+			SELECT id FROM fieldkit.station_module WHERE updated_at IN (
+				SELECT MAX(sm.updated_at)
 				FROM fieldkit.station_module AS sm
 				WHERE sm.provision_id IN (
 					SELECT id FROM fieldkit.station_module WHERE provision_id IN (
@@ -356,9 +438,9 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		SELECT
 			sm.*
 		FROM fieldkit.station_module AS sm
-        WHERE meta_record_id IN (
+        WHERE sm.updated_at IN (
 			SELECT
-				MAX(sm.meta_record_id)
+				MAX(sm.updated_at)
 			FROM fieldkit.station_module AS sm
 			WHERE sm.provision_id IN (
 				SELECT id FROM fieldkit.provision WHERE device_id IN (
@@ -381,9 +463,9 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 			ms.*
 		FROM fieldkit.module_sensor AS ms
 		WHERE ms.module_id IN (
-			SELECT id FROM fieldkit.station_module WHERE meta_record_id IN (
+			SELECT id FROM fieldkit.station_module WHERE updated_at IN (
 				SELECT
-					MAX(sm.meta_record_id)
+					MAX(sm.updated_at)
 				FROM fieldkit.station_module AS sm
 				WHERE sm.provision_id IN (
 					SELECT id FROM fieldkit.provision WHERE device_id IN (

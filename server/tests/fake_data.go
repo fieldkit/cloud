@@ -354,7 +354,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 				Position: 0,
 				Flags:    1,
 				Name:     "modules.diagnostics",
-				Id:       hashString(fmt.Sprintf("diagnostics-%s-%s", s.DeviceID, e.Seed)),
+				Id:       hashString(fmt.Sprintf("diagnostics-%v-%v", s.DeviceID, e.Seed)),
 				Header: &pbapp.ModuleHeader{
 					Manufacturer: repositories.ManufacturerConservify,
 					Kind:         repositories.ConservifyDiagnostics,
@@ -372,7 +372,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 			&pbapp.ModuleCapabilities{
 				Position: 0,
 				Name:     "modules.water.ph",
-				Id:       hashString(fmt.Sprintf("ph-%s-%s", s.DeviceID, e.Seed)),
+				Id:       hashString(fmt.Sprintf("ph-%v-%v", s.DeviceID, e.Seed)),
 				Header: &pbapp.ModuleHeader{
 					Manufacturer: repositories.ManufacturerConservify,
 					Kind:         repositories.ConservifyWaterPh,
@@ -390,7 +390,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 			&pbapp.ModuleCapabilities{
 				Position: 1,
 				Name:     "modules.water.do",
-				Id:       hashString(fmt.Sprintf("do-%s-%s", s.DeviceID, e.Seed)),
+				Id:       hashString(fmt.Sprintf("do-%v-%v", s.DeviceID, e.Seed)),
 				Header: &pbapp.ModuleHeader{
 					Manufacturer: repositories.ManufacturerConservify,
 					Kind:         repositories.ConservifyWaterDo,
@@ -408,7 +408,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 			&pbapp.ModuleCapabilities{
 				Position: 2,
 				Name:     "modules.water.ec",
-				Id:       hashString(fmt.Sprintf("ec-%s-%s", s.DeviceID, e.Seed)),
+				Id:       hashString(fmt.Sprintf("ec-%v-%v", s.DeviceID, e.Seed)),
 				Header: &pbapp.ModuleHeader{
 					Manufacturer: repositories.ManufacturerConservify,
 					Kind:         repositories.ConservifyWaterEc,

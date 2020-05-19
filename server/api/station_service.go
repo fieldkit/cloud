@@ -85,8 +85,15 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 
 	adding.SetStatus(payload.StatusJSON)
 
-	if _, err := sr.Add(ctx, adding); err != nil {
+	added, err := sr.Add(ctx, adding)
+	if err != nil {
 		return nil, err
+	}
+
+	if payload.StatusPb != nil {
+		if err := sr.UpdateStationModelFromStatus(ctx, added, *payload.StatusPb); err != nil {
+			return nil, err
+		}
 	}
 
 	return c.Get(ctx, &station.GetPayload{
@@ -121,12 +128,12 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
 	log := Logger(ctx).Sugar()
 
-	r, err := repositories.NewStationRepository(c.options.Database)
+	sr, err := repositories.NewStationRepository(c.options.Database)
 	if err != nil {
 		return nil, err
 	}
 
-	updating, err := r.QueryStationByID(ctx, payload.ID)
+	updating, err := sr.QueryStationByID(ctx, payload.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, station.NotFound("station not found")
@@ -157,8 +164,14 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 
 	updating.SetStatus(payload.StatusJSON)
 
-	if err := r.Update(ctx, updating); err != nil {
+	if err := sr.Update(ctx, updating); err != nil {
 		return nil, err
+	}
+
+	if payload.StatusPb != nil {
+		if err := sr.UpdateStationModelFromStatus(ctx, updating, *payload.StatusPb); err != nil {
+			return nil, err
+		}
 	}
 
 	return c.Get(ctx, &station.GetPayload{
