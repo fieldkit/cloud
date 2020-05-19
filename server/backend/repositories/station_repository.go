@@ -273,13 +273,15 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 			ms.*
 		FROM fieldkit.module_sensor AS ms
 		WHERE ms.module_id IN (
-			SELECT
-				MAX(sm.meta_record_id)
-			FROM fieldkit.station_module AS sm
-			WHERE sm.provision_id IN (
-				SELECT id FROM fieldkit.station_module WHERE provision_id IN (
-					SELECT id FROM fieldkit.provision WHERE device_id IN (
-						SELECT device_id FROM fieldkit.station WHERE owner_id = $1
+			SELECT id FROM fieldkit.station_module WHERE meta_record_id IN (
+				SELECT
+					MAX(sm.meta_record_id)
+				FROM fieldkit.station_module AS sm
+				WHERE sm.provision_id IN (
+					SELECT id FROM fieldkit.station_module WHERE provision_id IN (
+						SELECT id FROM fieldkit.provision WHERE device_id IN (
+							SELECT device_id FROM fieldkit.station WHERE owner_id = $1
+						)
 					)
 				)
 			)
