@@ -41,6 +41,7 @@
 
 <script>
 import FKApi from "../api/api";
+import * as utils from "../utilities";
 import Pagination from "../components/Pagination";
 
 export default {
@@ -111,7 +112,9 @@ export default {
         },
 
         getSensorName(module, sensor) {
-            return this.$t(module.name + "." + sensor.name);
+            const newName = utils.convertOldFirmwareResponse(module);
+            return this.$t(newName + ".sensors." + sensor.name);
+            // return this.$t(module.name + "." + sensor.name);
         },
     },
 };

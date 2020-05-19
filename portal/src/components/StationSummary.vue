@@ -190,7 +190,9 @@ export default {
         },
 
         getSensorName(module, sensor) {
-            return this.$t(module.name + "." + sensor.name);
+            const newName = utils.convertOldFirmwareResponse(module);
+            return this.$t(newName + ".sensors." + sensor.name);
+            // return this.$t(module.name + "." + sensor.name);
         },
 
         getModuleImg(module) {
