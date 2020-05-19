@@ -8,65 +8,73 @@
             <img alt="" src="../assets/progress.gif" />
         </div>
 
-        <div class="white-bkgd" v-if="!noStation">
-            <!-- compare and time window buttons -->
-            <div id="chart-controls">
-                <div id="compare-btn-container">
-                    <div class="compare-btn" v-on:click="addChildChart">
-                        <img alt="" src="../assets/Compare_icon.png" />
-                        <span>Compare</span>
-                    </div>
-                </div>
-                <div id="time-control-container">
-                    <div class="time-btn-label">View By:</div>
-                    <div
-                        v-for="btn in timeButtons"
-                        v-bind:key="btn.value"
-                        :class="'time-btn' + (btn.active ? ' active' : '')"
-                        :data-time="btn.value"
-                        v-on:click="setTimeRangeByDays"
-                    >
-                        {{ btn.label }}
-                    </div>
-                    <div class="calendar-container">
-                        <v-date-picker
-                            class="vc-calendar"
-                            mode="range"
-                            v-model="overallRange"
-                            :popover="{ placement: 'bottom left' }"
-                            :masks="{ input: 'MM/DD/YY' }"
-                            @popoverWillShow="onPopoverWillShow"
-                            @popoverDidHide="onPopoverDidHide"
-                        />
-                    </div>
-                </div>
-                <div class="spacer"></div>
-            </div>
-
-            <div v-for="(chart, chartIndex) in pending" v-bind:key="chart.id" :class="chartIndex > 0 ? 'top-border' : ''">
+        <div class="charts-bkgd" v-if="!noStation">
+            <div v-for="chart in pending" v-bind:key="chart.id" class="inner-chart-container">
                 <div :id="chart.id + '-loading'" class="loading">
                     <img alt="" src="../assets/progress.gif" />
                 </div>
             </div>
 
-            <div v-for="(chart, chartIndex) in noDataCharts" v-bind:key="chart.id" :class="chartIndex > 0 ? 'top-border' : ''">
+            <div v-for="chart in noDataCharts" v-bind:key="chart.id" class="inner-chart-container">
                 <div class="no-data">
                     <p>No data from {{ chart.station.name }} has been uploaded yet.</p>
                 </div>
             </div>
 
             <!-- all data charts and their drop-down menus -->
-            <div v-for="(chart, chartIndex) in charts" v-bind:key="chart.id" :class="chartIndex > 0 ? 'top-border' : ''">
+            <div v-for="(chart, chartIndex) in charts" v-bind:key="chart.id" class="inner-chart-container">
                 <div class="no-data" v-if="chart.noData">
                     <p>No data from {{ chart.station.name }} has been uploaded yet.</p>
                 </div>
                 <template v-if="!chart.noData">
+                    <div v-if="chartIndex > 0">
+                        <div class="link-icon-container" v-on:click="toggleLinkage">
+                            <img v-if="linkedCharts" class="link-icon" src="../assets/link.png" />
+                            <img v-if="!linkedCharts" class="open-link-icon" src="../assets/open_link.png" />
+                        </div>
+                        <div class="remove-chart">
+                            <img alt="Remove" src="../assets/Icon_Close_Circle.png" :data-id="chart.id" v-on:click="removeChart" />
+                        </div>
+                    </div>
+
+                    <!-- compare and time window buttons -->
+                    <div class="chart-controls">
+                        <div class="compare-btn-container" v-if="chartIndex == 0">
+                            <div class="compare-btn" v-on:click="addChildChart">
+                                <img alt="" src="../assets/Compare_icon.png" />
+                                <span>Compare</span>
+                            </div>
+                        </div>
+                        <div class="time-control-container">
+                            <div class="time-btn-label">View By:</div>
+                            <div
+                                v-for="btn in chart.timeButtons"
+                                v-bind:key="chart.id + '-' + btn.value"
+                                :data-id="chart.id"
+                                :class="'time-btn' + (btn.active ? ' active' : '')"
+                                :data-time="btn.value"
+                                v-on:click="setTimeRangeByDays"
+                            >
+                                {{ btn.label }}
+                            </div>
+                            <div class="calendar-container">
+                                <v-date-picker
+                                    class="vc-calendar"
+                                    mode="range"
+                                    v-model="chart.overallRange"
+                                    :data-id="chart.id"
+                                    :popover="{ placement: 'bottom left' }"
+                                    :masks="{ input: 'MM/DD/YY' }"
+                                    @popoverWillShow="onPopoverWillShow"
+                                    @popoverDidHide="onPopoverDidHide"
+                                />
+                            </div>
+                        </div>
+                        <div class="spacer"></div>
+                    </div>
+
                     <div :id="chart.id + '-loading'" class="loading">
                         <img alt="" src="../assets/progress.gif" />
-                    </div>
-                    <div v-if="chartIndex > 0" v-on:click="toggleLinkage">
-                        <img v-if="linkedCharts" class="link-icon" src="../assets/link.png" />
-                        <img v-if="!linkedCharts" class="open-link-icon" src="../assets/open_link.png" />
                     </div>
                     <div class="sensor-selection-dropdown">
                         <treeselect
@@ -87,9 +95,6 @@
                                 {{ option.text }}
                             </option>
                         </select>
-                        <div class="remove-chart" v-if="chartIndex > 0">
-                            <img alt="Remove" src="../assets/close.png" :data-id="chart.id" v-on:click="removeChart" />
-                        </div>
                     </div>
                     <D3Chart
                         class="d3Chart"
@@ -101,11 +106,11 @@
                     />
                 </template>
             </div>
-            <div v-for="(pre, preIndex) in preloading" v-bind:key="pre.id" :class="preIndex > 0 ? 'top-border' : ''">
+            <!-- <div v-for="(pre, preIndex) in preloading" v-bind:key="pre.id" class="inner-chart-container">
                 <div :id="pre.id + '-loading'" class="loading">
                     <img alt="" src="../assets/progress.gif" />
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
@@ -169,10 +174,6 @@ export default {
                     value: 0,
                 },
             ],
-            overallRange: {
-                start: new Date(2020, 0, 1),
-                end: new Date(2020, 0, 1),
-            },
             prevOverallRange: {
                 start: new Date(2020, 0, 1),
                 end: new Date(2020, 0, 1),
@@ -267,6 +268,10 @@ export default {
             const filteredData = chartData.filter(d => {
                 return d[sensor.key] === 0 || d[sensor.key];
             });
+            let timeBtns = [];
+            this.timeButtons.forEach(b => {
+                timeBtns.push(Object.assign({}, b));
+            });
             const newChart = {
                 id: chartId,
                 ref: "d3Chart" + id,
@@ -284,20 +289,23 @@ export default {
                 current: chartData,
                 totalTime: totalTime,
                 noData: false,
+                timeButtons: timeBtns,
+                overallRange: { start: timeCheck.range[0], end: timeCheck.range[1] },
             };
             if (timeCheck.addChart) {
                 if (document.getElementById("main-loading")) {
                     document.getElementById("main-loading").style.display = "none";
                 }
                 this.charts.push(newChart);
+                this.charts = _.sortBy(this.charts, c => {
+                    return c.id;
+                });
             } else {
                 this.pending.push(newChart);
             }
             if (document.getElementById(chartId + "station-loading")) {
                 document.getElementById(chartId + "station-loading").style.display = "none";
             }
-            // update custom date range with each new chart?
-            this.overallRange = { start: totalTime[0], end: totalTime[1] };
             this.updateIds();
             this.updateRoute();
             this.$emit("sensorUpdate", newChart);
@@ -424,6 +432,7 @@ export default {
                 this.charts.forEach((c, i) => {
                     if (i > 0) {
                         // NOTE: linking time only for now
+                        c.overallRange = this.charts[0].overallRange;
                         this.$refs[c.ref][0].setTimeRange(parentTime);
                         if (requested) {
                             const requestedRange = { start: requested[0], end: requested[1] };
@@ -431,9 +440,13 @@ export default {
                         }
                         this.showLoading(c.id);
                         const fromParent = true;
-                        this.$emit("timeChanged", parentTime, c, fromParent);
+                        // update chart data with parent data (instead of emitting timeChanged)
+                        this.updateChartData(this.charts[0].data, c.id, fromParent);
                         this.urlQuery[c.id + "start"] = parentTime.start.getTime();
                         this.urlQuery[c.id + "end"] = parentTime.end.getTime();
+                        c.timeButtons.forEach((b, btnIndex) => {
+                            b.active = this.charts[0].timeButtons[btnIndex].active;
+                        });
                         // c.type = this.charts[0].type;
                         // c.sensor = this.charts[0].sensor;
                         // c.treeSelectValue = this.charts[0].treeSelectValue;
@@ -449,7 +462,7 @@ export default {
         unlinkCharts() {
             this.linkedCharts = false;
         },
-        chartTypeChanged() {
+        chartTypeChanged(event) {
             // the chart type on a single chart instance has changed
             const selected = this.chartOptions[event.target.selectedIndex].text;
             const id = event.target.getAttribute("data-id");
@@ -474,71 +487,95 @@ export default {
             // }
             this.updateRoute();
         },
-        onPopoverWillShow() {
+        onPopoverWillShow(event) {
+            const dataId = event.firstChild.getAttribute("data-id");
+            const chart = this.charts.find(c => {
+                return c.id == dataId;
+            });
             // store value to compare to prevent hovering from
             // triggering time chages
-            this.prevOverallRange = this.overallRange;
+            this.prevOverallRange = chart.overallRange;
         },
-        onPopoverDidHide() {
+        onPopoverDidHide(event) {
+            const dataId = event.firstChild.getAttribute("data-id");
+            const chart = this.charts.find(c => {
+                return c.id == dataId;
+            });
             // using this event to avoid triggering date changes
-            // when matching this.overallRange to displayed date range
+            // when matching chart.overallRange to displayed date range
             if (
-                this.prevOverallRange.start.getTime() != this.overallRange.start.getTime() ||
-                this.prevOverallRange.end.getTime() != this.overallRange.end.getTime()
+                this.prevOverallRange.start.getTime() != chart.overallRange.start.getTime() ||
+                this.prevOverallRange.end.getTime() != chart.overallRange.end.getTime()
             ) {
+                const updateAll = chart.parent && this.linkedCharts;
+                if (!updateAll) {
+                    this.unlinkCharts();
+                }
                 this.charts.forEach(c => {
-                    this.showLoading(c.id);
-                    if (this.$refs[c.ref]) {
-                        this.$refs[c.ref][0].setTimeRange(this.overallRange);
-                        this.$refs[c.ref][0].setRequestedTime(this.overallRange);
-                        this.urlQuery[c.id + "start"] = this.overallRange.start.getTime();
-                        this.urlQuery[c.id + "end"] = this.overallRange.end.getTime();
-                        this.$emit("timeChanged", this.overallRange, c);
+                    if (c.id == chart.id || updateAll) {
+                        this.showLoading(c.id);
+                        if (this.$refs[c.ref]) {
+                            this.$refs[c.ref][0].setTimeRange(chart.overallRange);
+                            this.$refs[c.ref][0].setRequestedTime(chart.overallRange);
+                            this.urlQuery[c.id + "start"] = chart.overallRange.start.getTime();
+                            this.urlQuery[c.id + "end"] = chart.overallRange.end.getTime();
+                            this.$emit("timeChanged", chart.overallRange, c);
+                            // display active state for appropriate button
+                            c.timeButtons.forEach(b => {
+                                b.active = false;
+                            });
+                        }
                     }
                 });
                 this.updateRoute();
-                // display active state for appropriate button
-                this.timeButtons.forEach(b => {
-                    b.active = false;
-                });
             }
         },
         setTimeRangeByDays(event) {
+            // each chart now has its own time range buttons so find out which one
+            const dataId = event.id ? event.id : event.target.getAttribute("data-id");
+            const chart = this.charts.find(c => {
+                return c.id == dataId;
+            });
             // method can be called by time buttons,
             // but also emitted by D3Chart, for zooming out
             // if emitted by D3Chart, arg will have 'id' property
             const days = event.id ? 0 : event.target.getAttribute("data-time");
-            let range;
-            this.charts.forEach((c, i) => {
-                this.showLoading(c.id);
-                const endDate = c.totalTime[1];
-                range = {
-                    start: new Date(endDate.getTime() - days * DAY),
-                    end: endDate,
-                };
-                if (days == 0) {
-                    range.start = c.totalTime[0];
-                }
-                // when to update the custom date range?
-                if (i == 0) {
-                    this.overallRange = range;
-                }
-                if (this.$refs[c.ref]) {
-                    this.$refs[c.ref][0].setTimeRange(range);
-                    this.$refs[c.ref][0].setRequestedTime(range);
-                    this.urlQuery[c.id + "start"] = range.start.getTime();
-                    this.urlQuery[c.id + "end"] = range.end.getTime();
-                    this.$emit("timeChanged", range, c);
+
+            const endDate = chart.totalTime[1];
+            let range = {
+                start: new Date(endDate.getTime() - days * DAY),
+                end: endDate,
+            };
+            if (days == 0) {
+                range.start = chart.totalTime[0];
+            }
+
+            const updateAll = chart.parent && this.linkedCharts;
+            if (!updateAll) {
+                this.unlinkCharts();
+            }
+            this.charts.forEach(c => {
+                if (c.id == chart.id || updateAll) {
+                    this.showLoading(c.id);
+                    if (this.$refs[c.ref]) {
+                        // update custom date range
+                        c.overallRange = range;
+                        this.$refs[c.ref][0].setTimeRange(range);
+                        this.$refs[c.ref][0].setRequestedTime(range);
+                        this.urlQuery[c.id + "start"] = range.start.getTime();
+                        this.urlQuery[c.id + "end"] = range.end.getTime();
+                        this.$emit("timeChanged", range, c);
+                        // display active state for appropriate button
+                        c.timeButtons.forEach(b => {
+                            b.active = false;
+                            if (b.value == days) {
+                                b.active = true;
+                            }
+                        });
+                    }
                 }
             });
             this.updateRoute();
-            // display active state for appropriate button
-            this.timeButtons.forEach(b => {
-                b.active = false;
-                if (b.value == days) {
-                    b.active = true;
-                }
-            });
         },
         onTimeZoomed(zoomed) {
             if (zoomed.parent && this.linkedCharts) {
@@ -550,6 +587,7 @@ export default {
                 const chart = this.charts.find(c => {
                     return c.id == zoomed.id;
                 });
+                chart.overallRange = zoomed.range;
                 this.$refs[chart.ref][0].setTimeRange(zoomed.range);
                 this.urlQuery[chart.id + "start"] = zoomed.range.start.getTime();
                 this.urlQuery[chart.id + "end"] = zoomed.range.end.getTime();
@@ -561,6 +599,7 @@ export default {
         propagateTimeChange(range) {
             this.charts.forEach(c => {
                 if (this.$refs[c.ref]) {
+                    c.overallRange = range;
                     this.$refs[c.ref][0].setTimeRange(range);
                     this.$refs[c.ref][0].setRequestedTime(range);
                     this.urlQuery[c.id + "start"] = range.start.getTime();
@@ -665,7 +704,7 @@ export default {
             this.updateIds();
         },
         updateChartData(data, chartId, fromParent) {
-            // only update url for the chart that emitted this zoom
+            // only update url for the chart that emitted this change
             const chart = this.charts.find(c => {
                 return c.id == chartId;
             });
@@ -696,6 +735,9 @@ export default {
                     pendingChart.extent = extent;
                     this.$emit("sensorUpdate", pendingChart);
                     this.charts.push(pendingChart);
+                    this.charts = _.sortBy(this.charts, c => {
+                        return c.id;
+                    });
                     this.updateIds();
                 }
             } else {
@@ -901,23 +943,20 @@ export default {
     margin-left: 10px;
     font-size: 14px;
 }
-.white-bkgd {
+.charts-bkgd {
     float: left;
     margin-top: 20px;
-    background-color: #ffffff;
-    border-radius: 4px;
-    border: 1px solid #d8dce0;
 }
-#chart-controls {
+.chart-controls {
     float: left;
     clear: both;
 }
-#compare-btn-container {
+.compare-btn-container {
     float: left;
 }
-#time-control-container {
+.time-control-container {
     float: right;
-    margin-right: 37px;
+    margin: 0 37px 12px 0;
 }
 .calendar-container {
     float: left;
@@ -972,7 +1011,7 @@ export default {
 }
 .chart-type {
     float: right;
-    margin-right: 15px;
+    margin-right: 37px;
 }
 .sensor-selection-dropdown select,
 .chart-type select {
@@ -981,23 +1020,44 @@ export default {
     border-radius: 4px;
     padding: 2px 4px;
 }
-.top-border {
-    border-top: 1px solid rgb(215, 220, 225);
+.inner-chart-container {
+    min-height: 600px;
+    background-color: white;
+    border-radius: 1px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.07);
+    border: solid 1px #f4f5f7;
+    margin-top: 6px;
 }
-.link-icon,
-.open-link-icon {
-    width: 50px;
-    height: 50px;
-    opacity: 0.25;
+.link-icon-container {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #d8dce0;
+    border-radius: 50%;
     margin-left: 525px;
     margin-top: -25px;
     margin-bottom: -5px;
+    background: white;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+.link-icon,
+.open-link-icon {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    opacity: 0.25;
+    margin-top: 7px;
+    margin-left: -12px;
     cursor: pointer;
 }
 .remove-chart {
     float: right;
-    margin: -20px 60px 0 20px;
+    margin: -23px 23px -6px 0;
     cursor: pointer;
-    padding: 2px;
+}
+.remove-chart img {
+    width: 22px;
+    height: 22px;
 }
 </style>

@@ -63,7 +63,7 @@ function getNumberOfCharts(params) {
 }
 
 describe("DataChartControl.vue", () => {
-    it("Renders chart controls if a station exists", async () => {
+    it("Renders chart background if a station exists", async () => {
         const dataChartControl = mount(DataChartControl, {
             mocks: {
                 $route,
@@ -72,7 +72,7 @@ describe("DataChartControl.vue", () => {
             propsData: props,
         });
         await dataChartControl.vm.$nextTick();
-        expect(dataChartControl.find("#chart-controls").isVisible()).toBe(true);
+        expect(dataChartControl.find(".charts-bkgd").isVisible()).toBe(true);
         dataChartControl.destroy();
     });
 
