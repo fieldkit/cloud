@@ -351,7 +351,7 @@ func transformModules(from *data.StationFull) (to []*station.StationModule) {
 			ID:           v.ID,
 			HardwareID:   &hardwareID,
 			MetaRecordID: v.MetaRecordID,
-			Name:         v.Name,
+			Name:         translateModuleName(v.Name, sensors),
 			Position:     int32(v.Position),
 			Flags:        int32(v.Flags),
 			Internal:     v.Flags > 0,
@@ -360,6 +360,35 @@ func transformModules(from *data.StationFull) (to []*station.StationModule) {
 
 	}
 	return
+}
+
+var (
+	NameMap = map[string]string{
+		"distance":    "module.distance",
+		"weather":     "module.weather",
+		"diagnostics": "module.diagnostics",
+		"ultrasonic":  "module.distance",
+	}
+)
+
+// This is going to go away eventually once no modules with old names
+// are coming in. Then we can do a database migration and get rid of
+// them completely. I'm deciding to leave them in so we can see them
+// disappear over time.
+func translateModuleName(old string, sensors []*station.StationSensor) string {
+	if newName, ok := NameMap[old]; ok {
+		return newName
+	}
+
+	if old == "water" {
+		if len(sensors) == 1 {
+			return "modules.water." + sensors[0].Name
+		} else {
+			return "modules.water.ec"
+		}
+	}
+
+	return old
 }
 
 func transformStationFull(p Permissions, sf *data.StationFull) (*station.StationFull, error) {
