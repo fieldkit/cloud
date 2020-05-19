@@ -16,6 +16,14 @@ func NewUserRepository(db *sqlxcache.DB) (r *UserRepository, err error) {
 	return &UserRepository{db: db}, nil
 }
 
+func (r *UserRepository) QueryByID(ctx context.Context, id int32) (*data.User, error) {
+	user := &data.User{}
+	if err := r.db.GetContext(ctx, user, `SELECT * FROM fieldkit.user WHERE id = $1`, id); err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (r *UserRepository) Delete(ctx context.Context, id int32) (err error) {
 	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.project_follower WHERE follower_id = $1`, id); err != nil {
 		return err

@@ -45,13 +45,6 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 
 	log.Infow("adding station", "device_id", payload.DeviceID)
 
-	owner := &data.User{}
-	if err := c.options.Database.GetContext(ctx, owner, `
-		SELECT * FROM fieldkit.user WHERE id = $1
-		`, p.UserID()); err != nil {
-		return nil, err
-	}
-
 	sr, err := repositories.NewStationRepository(c.options.Database)
 	if err != nil {
 		return nil, err
@@ -403,13 +396,9 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 	}
 
 	return &station.StationFull{
-		ID:       sf.Station.ID,
-		Name:     sf.Station.Name,
-		ReadOnly: sp.IsReadOnly(),
-		Owner: &station.StationOwner{
-			ID:   sf.Owner.ID,
-			Name: sf.Owner.Name,
-		},
+		ID:              sf.Station.ID,
+		Name:            sf.Station.Name,
+		ReadOnly:        sp.IsReadOnly(),
 		DeviceID:        hex.EncodeToString(sf.Station.DeviceID),
 		Uploads:         transformUploads(sf.Ingestions),
 		Images:          transformImages(sf.Station.ID, sf.Media),
@@ -420,6 +409,10 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 		MemoryAvailable: sf.Station.MemoryAvailable,
 		FirmwareNumber:  sf.Station.FirmwareNumber,
 		FirmwareTime:    sf.Station.FirmwareTime,
+		Owner: &station.StationOwner{
+			ID:   sf.Owner.ID,
+			Name: sf.Owner.Name,
+		},
 		Photos: &station.StationPhotos{
 			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
 		},
