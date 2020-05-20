@@ -15,11 +15,11 @@ import (
 )
 
 type RecordRepository struct {
-	Database *sqlxcache.DB
+	db *sqlxcache.DB
 }
 
-func NewRecordRepository(database *sqlxcache.DB) (rr *RecordRepository, err error) {
-	return &RecordRepository{Database: database}, nil
+func NewRecordRepository(db *sqlxcache.DB) (rr *RecordRepository, err error) {
+	return &RecordRepository{db: db}, nil
 }
 
 type RecordsPage struct {
@@ -38,7 +38,7 @@ func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pag
 	log.Infow("querying", "device_id", deviceIdBytes, "page_number", pageNumber, "page_size", pageSize)
 
 	drs := []*data.DataRecord{}
-	if err := r.Database.SelectContext(ctx, &drs, `
+	if err := r.db.SelectContext(ctx, &drs, `
 	    SELECT r.id, r.provision_id, r.time, r.time, r.number, r.meta, ST_AsBinary(r.location) AS location, r.raw FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
 	    WHERE (p.device_id = $1)
 	    ORDER BY r.time DESC LIMIT $2 OFFSET $3`, deviceIdBytes, pageSize, pageSize*pageNumber); err != nil {
@@ -46,7 +46,7 @@ func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pag
 	}
 
 	mrs := []*data.MetaRecord{}
-	if err := r.Database.SelectContext(ctx, &mrs, `
+	if err := r.db.SelectContext(ctx, &mrs, `
 	    SELECT m.* FROM fieldkit.meta_record AS m WHERE (m.id IN (
 	      SELECT DISTINCT q.meta FROM (
 			SELECT r.meta, r.time FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id) WHERE (p.device_id = $1) ORDER BY r.time DESC LIMIT $2 OFFSET $3
@@ -85,7 +85,7 @@ func (r *RecordRepository) AddMetaRecord(ctx context.Context, p *data.Provision,
 		return nil, fmt.Errorf("error setting meta json: %v", err)
 	}
 
-	if err := r.Database.NamedGetContext(ctx, metaRecord, `
+	if err := r.db.NamedGetContext(ctx, metaRecord, `
 		INSERT INTO fieldkit.meta_record (provision_id, time, number, raw) VALUES (:provision_id, :time, :number, :raw)
 		ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw
 		RETURNING *
@@ -119,7 +119,7 @@ func (r *RecordRepository) findLocation(dataRecord *pb.DataRecord) (l *data.Loca
 
 func (r *RecordRepository) findMeta(ctx context.Context, provisionId, number int64) (*data.MetaRecord, error) {
 	records := []*data.MetaRecord{}
-	if err := r.Database.SelectContext(ctx, &records, `
+	if err := r.db.SelectContext(ctx, &records, `
 		SELECT r.* FROM fieldkit.meta_record AS r WHERE r.provision_id = $1 AND r.number = $2
 		`, provisionId, number); err != nil {
 		return nil, err
@@ -199,7 +199,7 @@ func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision,
 		return nil, nil, fmt.Errorf("error setting data json: %v", err)
 	}
 
-	if err := r.Database.NamedGetContext(ctx, dataRecord, `
+	if err := r.db.NamedGetContext(ctx, dataRecord, `
 		INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta, location)
 		VALUES (:provision_id, :time, :number, :raw, :meta, ST_SetSRID(ST_GeomFromText(:location), 4326))
 		ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location

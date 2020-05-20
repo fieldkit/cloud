@@ -10,16 +10,16 @@ import (
 )
 
 type IngestionRepository struct {
-	Database *sqlxcache.DB
+	db *sqlxcache.DB
 }
 
-func NewIngestionRepository(database *sqlxcache.DB) (ir *IngestionRepository, err error) {
-	return &IngestionRepository{Database: database}, nil
+func NewIngestionRepository(db *sqlxcache.DB) (ir *IngestionRepository, err error) {
+	return &IngestionRepository{db: db}, nil
 }
 
 func (r *IngestionRepository) QueryByID(ctx context.Context, id int64) (i *data.Ingestion, err error) {
 	found := []*data.Ingestion{}
-	if err := r.Database.SelectContext(ctx, &found, `
+	if err := r.db.SelectContext(ctx, &found, `
 		SELECT
 			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags,
 			completed, attempted, errors, total_records, other_errors, meta_errors, data_errors
@@ -36,7 +36,7 @@ func (r *IngestionRepository) QueryByID(ctx context.Context, id int64) (i *data.
 
 func (r *IngestionRepository) QueryByStationID(ctx context.Context, id int64) (all []*data.Ingestion, err error) {
 	pending := []*data.Ingestion{}
-	if err := r.Database.SelectContext(ctx, &pending, `
+	if err := r.db.SelectContext(ctx, &pending, `
 		SELECT
 			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags,
 			completed, attempted, errors, total_records, other_errors, meta_errors, data_errors
@@ -60,7 +60,7 @@ func (r *IngestionRepository) QueryByStationID(ctx context.Context, id int64) (a
 
 func (r *IngestionRepository) QueryPending(ctx context.Context) (all []*data.Ingestion, err error) {
 	pending := []*data.Ingestion{}
-	if err := r.Database.SelectContext(ctx, &pending, `
+	if err := r.db.SelectContext(ctx, &pending, `
 		SELECT
 			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags,
 			completed, attempted, errors, total_records, other_errors, meta_errors, data_errors
@@ -83,7 +83,7 @@ func (r *IngestionRepository) QueryPending(ctx context.Context) (all []*data.Ing
 }
 
 func (r *IngestionRepository) MarkProcessedHasOtherErrors(ctx context.Context, id int64) error {
-	if _, err := r.Database.ExecContext(ctx, `
+	if _, err := r.db.ExecContext(ctx, `
 		UPDATE fieldkit.ingestion SET other_errors = 1, attempted = NOW() WHERE id = $1
 		`, id); err != nil {
 		return fmt.Errorf("error updating ingestion: %v", err)
@@ -92,7 +92,7 @@ func (r *IngestionRepository) MarkProcessedHasOtherErrors(ctx context.Context, i
 }
 
 func (r *IngestionRepository) MarkProcessedDone(ctx context.Context, id, totalRecords, metaErrors, dataErrors int64) error {
-	if _, err := r.Database.ExecContext(ctx, `
+	if _, err := r.db.ExecContext(ctx, `
 		UPDATE fieldkit.ingestion SET total_records = $1, meta_errors = $2, data_errors = $3, other_errors = 0, completed = NOW(), errors = $4 WHERE id = $5
 		`, totalRecords, metaErrors, dataErrors, (metaErrors+dataErrors) > 0, id); err != nil {
 		return fmt.Errorf("error updating ingestion: %v", err)
@@ -101,7 +101,7 @@ func (r *IngestionRepository) MarkProcessedDone(ctx context.Context, id, totalRe
 }
 
 func (r *IngestionRepository) Delete(ctx context.Context, id int64) (err error) {
-	if _, err := r.Database.ExecContext(ctx, `DELETE FROM fieldkit.ingestion WHERE id = $1`, id); err != nil {
+	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.ingestion WHERE id = $1`, id); err != nil {
 		return err
 	}
 	return nil

@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	_ "fmt"
 	"time"
 )
 

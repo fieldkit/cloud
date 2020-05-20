@@ -14,21 +14,21 @@ import (
 )
 
 type stationModelRecordHandler struct {
-	database   *sqlxcache.DB
+	db         *sqlxcache.DB
 	provision  *data.Provision
 	dataRecord *pb.DataRecord
 	dbData     *data.DataRecord
 	dbMeta     *data.MetaRecord
 }
 
-func NewStationModelRecordHandler(database *sqlxcache.DB) *stationModelRecordHandler {
+func NewStationModelRecordHandler(db *sqlxcache.DB) *stationModelRecordHandler {
 	return &stationModelRecordHandler{
-		database: database,
+		db: db,
 	}
 }
 
 func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error {
-	sr, err := repositories.NewStationRepository(h.database)
+	sr, err := repositories.NewStationRepository(h.db)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 	log := Logger(ctx).Sugar()
 
 	sensors := []*SensorAndModulePosition{}
-	if err := h.database.SelectContext(ctx, &sensors, `
+	if err := h.db.SelectContext(ctx, &sensors, `
 		SELECT
              c.id AS configuration_id,
 			 s.id AS sensor_id,
@@ -155,7 +155,7 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 				Time:  time.Unix(h.dataRecord.Readings.Time, 0),
 			}
 
-			if _, err := h.database.NamedExecContext(ctx, `
+			if _, err := h.db.NamedExecContext(ctx, `
 				UPDATE fieldkit.module_sensor SET reading_last = :reading_last, reading_time = :reading_time WHERE id = :id
 				`, update); err != nil {
 				return err
@@ -165,7 +165,7 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 
 	log.Infow("configuration", "provision_id", h.provision.ID, "meta_record_id", h.dbMeta.ID)
 
-	if _, err := h.database.ExecContext(ctx, `
+	if _, err := h.db.ExecContext(ctx, `
 		INSERT INTO fieldkit.visible_configuration (station_id, configuration_id)
         SELECT
 			id AS station_id,

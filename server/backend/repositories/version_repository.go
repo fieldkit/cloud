@@ -18,22 +18,22 @@ func isInternalModule(m *pb.ModuleInfo) bool {
 }
 
 type VersionRepository struct {
-	Database *sqlxcache.DB
+	db *sqlxcache.DB
 }
 
-func NewVersionRepository(database *sqlxcache.DB) (rr *VersionRepository, err error) {
-	return &VersionRepository{Database: database}, nil
+func NewVersionRepository(db *sqlxcache.DB) (rr *VersionRepository, err error) {
+	return &VersionRepository{db: db}, nil
 }
 
 func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, deviceIdBytes []byte, internal bool, pageNumber, pageSize int) (versions []*Version, err error) {
 	log := Logger(ctx).Sugar()
 
-	sr, err := NewStationRepository(r.Database)
+	sr, err := NewStationRepository(r.db)
 	if err != nil {
 		return nil, err
 	}
 
-	rr, err := NewRecordRepository(r.Database)
+	rr, err := NewRecordRepository(r.db)
 	if err != nil {
 		return nil, err
 	}
