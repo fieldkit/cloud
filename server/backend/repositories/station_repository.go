@@ -8,6 +8,8 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
+	pbapp "github.com/fieldkit/app-protocol"
+
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -169,6 +171,32 @@ func (r *StationRepository) UpsertModuleSensor(ctx context.Context, sensor *data
 	return sensor, nil
 }
 
+func newStationModule(m *pbapp.ModuleCapabilities, c *data.StationConfiguration, moduleIndex uint32) *data.StationModule {
+	return &data.StationModule{
+		ConfigurationID: c.ID,
+		HardwareID:      m.Id,
+		Index:           moduleIndex,
+		Position:        m.Position,
+		Flags:           m.Flags,
+		Name:            m.Name,
+		Manufacturer:    m.Header.Manufacturer,
+		Kind:            m.Header.Kind,
+		Version:         m.Header.Version,
+	}
+}
+
+func newModuleSensor(s *pbapp.SensorCapabilities, m *data.StationModule, c *data.StationConfiguration, sensorIndex uint32, time *time.Time, value *float64) *data.ModuleSensor {
+	return &data.ModuleSensor{
+		ModuleID:        m.ID,
+		ConfigurationID: c.ID,
+		Index:           sensorIndex,
+		UnitOfMeasure:   s.UnitOfMeasure,
+		Name:            s.Name,
+		ReadingTime:     time,
+		ReadingValue:    value,
+	}
+}
+
 func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s *data.Station, rawStatus string) error {
 	record, err := s.ParseHttpReply(rawStatus)
 
@@ -199,32 +227,41 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 		return err
 	}
 
-	for moduleIndex, m := range record.Modules {
-		module := &data.StationModule{
-			ConfigurationID: configuration.ID,
-			HardwareID:      m.Id,
-			Index:           uint32(moduleIndex),
-			Position:        m.Position,
-			Flags:           m.Flags,
-			Name:            m.Name,
-			Manufacturer:    m.Header.Manufacturer,
-			Kind:            m.Header.Kind,
-			Version:         m.Header.Version,
-		}
-		if _, err := r.UpsertStationModule(ctx, module); err != nil {
-			return err
-		}
+	if record.LiveReadings != nil {
+		for _, lr := range record.LiveReadings {
+			time := time.Unix(int64(lr.Time), 0)
 
-		for sensorIndex, s := range m.Sensors {
-			sensor := &data.ModuleSensor{
-				ModuleID:        module.ID,
-				ConfigurationID: configuration.ID,
-				Index:           uint32(sensorIndex),
-				UnitOfMeasure:   s.UnitOfMeasure,
-				Name:            s.Name,
+			for moduleIndex, lrm := range lr.Modules {
+				m := lrm.Module
+
+				module := newStationModule(m, configuration, uint32(moduleIndex))
+				if _, err := r.UpsertStationModule(ctx, module); err != nil {
+					return err
+				}
+
+				for sensorIndex, lrs := range lrm.Readings {
+					s := lrs.Sensor
+					value := float64(lrs.Value)
+
+					sensor := newModuleSensor(s, module, configuration, uint32(sensorIndex), &time, &value)
+					if _, err := r.UpsertModuleSensor(ctx, sensor); err != nil {
+						return err
+					}
+				}
 			}
-			if _, err := r.UpsertModuleSensor(ctx, sensor); err != nil {
+		}
+	} else {
+		for moduleIndex, m := range record.Modules {
+			module := newStationModule(m, configuration, uint32(moduleIndex))
+			if _, err := r.UpsertStationModule(ctx, module); err != nil {
 				return err
+			}
+
+			for sensorIndex, s := range m.Sensors {
+				sensor := newModuleSensor(s, module, configuration, uint32(sensorIndex), nil, nil)
+				if _, err := r.UpsertModuleSensor(ctx, sensor); err != nil {
+					return err
+				}
 			}
 		}
 	}

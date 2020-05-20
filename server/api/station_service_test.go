@@ -344,5 +344,61 @@ func TestUpdateMyStationWithProtobufStatusTwice(t *testing.T) {
 		assert.NotNil(sf)
 
 		assert.Equal(4, len(sf.Modules))
+
+		for _, s := range sf.Sensors {
+			assert.Nil(s.ReadingTime)
+			assert.Nil(s.ReadingValue)
+		}
+	}
+}
+
+func TestUpdateMyStationWithProtobufLiveReadingsTwice(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	reply := e.NewLiveReadingsReply(fd.Stations[0])
+	replyBuffer := proto.NewBuffer(make([]byte, 0))
+	replyBuffer.EncodeMessage(reply)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	payload, err := json.Marshal(
+		struct {
+			Name       string                 `json:"name"`
+			StatusJSON map[string]interface{} `json:"status_json"`
+			StatusPB   []byte                 `json:"status_pb"`
+		}{
+			Name:       "New Name",
+			StatusJSON: make(map[string]interface{}),
+			StatusPB:   replyBuffer.Bytes(),
+		},
+	)
+	assert.NoError(err)
+
+	for i := 0; i < 3; i += 1 {
+		req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), bytes.NewReader(payload))
+		req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+		rr := tests.ExecuteRequest(req, api)
+
+		assert.Equal(http.StatusOK, rr.Code)
+
+		sr, err := repositories.NewStationRepository(e.DB)
+		assert.NoError(err)
+
+		sf, err := sr.QueryStationFull(e.Ctx, fd.Stations[0].ID)
+		assert.NoError(err)
+		assert.NotNil(sf)
+
+		assert.Equal(4, len(sf.Modules))
+
+		for _, s := range sf.Sensors {
+			assert.NotNil(s.ReadingTime)
+			assert.NotNil(s.ReadingValue)
+		}
 	}
 }

@@ -296,6 +296,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 		Status: &pbapp.Status{
 			Version: 1,
 			Uptime:  1,
+			Time:    uint64(now.Unix()),
 			Identity: &pbapp.Identity{
 				Name:       s.Name,
 				DeviceId:   deviceID,
@@ -444,6 +445,37 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 			},
 		},
 	}
+}
+
+func (e *TestEnv) NewLiveReadingsReply(s *data.Station) *pbapp.HttpReply {
+	status := e.NewHttpStatusReply(s)
+
+	moduleLiveReadings := make([]*pbapp.LiveModuleReadings, 0, len(status.Modules))
+
+	for _, module := range status.Modules {
+		sensors := make([]*pbapp.LiveSensorReading, 0, len(module.Sensors))
+
+		for _, sensor := range module.Sensors {
+			sensors = append(sensors, &pbapp.LiveSensorReading{
+				Sensor: sensor,
+				Value:  mrand.Float32(),
+			})
+		}
+
+		moduleLiveReadings = append(moduleLiveReadings, &pbapp.LiveModuleReadings{
+			Module:   module,
+			Readings: sensors,
+		})
+	}
+
+	status.LiveReadings = []*pbapp.LiveReadings{
+		&pbapp.LiveReadings{
+			Time:    uint64(0),
+			Modules: moduleLiveReadings,
+		},
+	}
+
+	return status
 }
 
 func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {
