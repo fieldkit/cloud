@@ -28,7 +28,7 @@ func (r *ActivityRepository) QueryStationDeployed(ctx context.Context, projectID
 			a.id, a.created_at, a.station_id, a.deployed_at, ST_AsBinary(a.location) AS location
 		FROM fieldkit.station_deployed AS a
 		WHERE a.id IN (
-			SELECT station_activity_id FROM fieldkit.project_and_station_activity WHERE (project_id = $1 OR $1 IS NULL) AND (station_id = $2 OR $2 IS NULL) ORDER BY created_at DESC LIMIT $3 OFFSET $4
+			SELECT station_activity_id FROM fieldkit.project_and_station_activity WHERE COALESCE(project_id = $1, TRUE) AND COALESCE(station_id = $2, TRUE) ORDER BY created_at DESC LIMIT $3 OFFSET $4
 		)`
 
 	deployed := []*data.StationDeployedWM{}
@@ -46,7 +46,7 @@ func (r *ActivityRepository) QueryStationIngested(ctx context.Context, projectID
 		FROM fieldkit.station_ingestion AS a JOIN
              fieldkit.user AS u ON (u.id = a.uploader_id)
 		WHERE a.id IN (
-			SELECT station_activity_id FROM fieldkit.project_and_station_activity WHERE (project_id = $1 OR $1 IS NULL) AND (station_id = $2 OR $2 IS NULL) ORDER BY created_at DESC LIMIT $3 OFFSET $4
+			SELECT station_activity_id FROM fieldkit.project_and_station_activity WHERE COALESCE(project_id = $1, TRUE) AND COALESCE(station_id = $2, TRUE) ORDER BY created_at DESC LIMIT $3 OFFSET $4
 		)`
 
 	ingested := []*data.StationIngestionWM{}
