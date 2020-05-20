@@ -85,10 +85,11 @@ export default {
     },
     props: ["user", "project", "users"],
     watch: {
-        project() {
-            if (this.project) {
+        project: {
+            handler() {
                 this.reset();
-            }
+            },
+            immediate: true,
         },
     },
     async beforeCreate() {

@@ -80,7 +80,7 @@ export default {
             publicView: false,
             previewing: false,
             userProjects: [],
-            activeProject: null,
+            activeProject: {},
             stations: [],
             users: [],
             isAuthenticated: false,
@@ -111,7 +111,7 @@ export default {
             this.adminView = false;
             this.publicView = false;
             this.userProjects = [];
-            this.activeProject = null;
+            this.activeProject = {};
             this.users = [];
             this.loading = true;
             this.init();

@@ -206,10 +206,11 @@ export default {
     },
     props: ["project", "userStations", "users"],
     watch: {
-        project() {
-            if (this.project) {
+        project: {
+            handler() {
                 this.reset();
-            }
+            },
+            immediate: true,
         },
         users() {
             if (this.users) {
