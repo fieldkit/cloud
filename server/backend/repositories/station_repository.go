@@ -145,11 +145,11 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 			(:configuration_id, :hardware_id, :module_index, :position, :flags, :name, :manufacturer, :kind, :version)
 		ON CONFLICT (configuration_id, hardware_id)
 			DO UPDATE SET module_index = EXCLUDED.module_index,
-							position = EXCLUDED.position,
-							name = EXCLUDED.name,
-							manufacturer = EXCLUDED.manufacturer,
-							kind = EXCLUDED.kind,
-							version = EXCLUDED.version
+                          position = EXCLUDED.position,
+                          name = EXCLUDED.name,
+                          manufacturer = EXCLUDED.manufacturer,
+                          kind = EXCLUDED.kind,
+						  version = EXCLUDED.version
 		RETURNING *
 		`, module); err != nil {
 		return nil, err
@@ -159,11 +159,14 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 
 func (r *StationRepository) UpsertModuleSensor(ctx context.Context, sensor *data.ModuleSensor) (*data.ModuleSensor, error) {
 	if err := r.db.NamedGetContext(ctx, sensor, `
-		INSERT INTO fieldkit.module_sensor
+		INSERT INTO fieldkit.module_sensor AS s
 			(module_id, configuration_id, sensor_index, unit_of_measure, name, reading_last, reading_time) VALUES
 			(:module_id, :configuration_id, :sensor_index, :unit_of_measure, :name, :reading_last, :reading_time)
 		ON CONFLICT (module_id, sensor_index)
-			DO UPDATE SET name = EXCLUDED.name, unit_of_measure = EXCLUDED.unit_of_measure
+			DO UPDATE SET name = EXCLUDED.name,
+                          unit_of_measure = EXCLUDED.unit_of_measure,
+						  reading_last = COALESCE(s.reading_last, EXCLUDED.reading_last),
+						  reading_time = COALESCE(s.reading_time, EXCLUDED.reading_time)
 		RETURNING *
 		`, sensor); err != nil {
 		return nil, err
