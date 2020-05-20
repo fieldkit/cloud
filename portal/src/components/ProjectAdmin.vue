@@ -72,10 +72,10 @@
                 :mapContainerSize="mapContainerSize"
                 :listSize="listSize"
                 :userStations="userStations"
-                @loaded="setModules"
+                @loaded="saveStationsData"
             />
 
-            <ProjectDataFiles />
+            <ProjectDataFiles :projectStations="projectStations" />
 
             <StationsReadings :project="project" />
 
@@ -176,6 +176,7 @@ export default {
             noEmail: false,
             emailNotValid: false,
             modules: [],
+            projectStations: [],
             numFollowers: 1,
             mapContainerSize: {
                 width: "677px",
@@ -243,8 +244,9 @@ export default {
         viewProfile() {
             this.$emit("viewProfile");
         },
-        setModules(modules) {
-            this.modules = modules;
+        saveStationsData(data) {
+            this.modules = data.modules;
+            this.projectStations = data.projectStations;
         },
         checkEmail() {
             this.noEmail = false;

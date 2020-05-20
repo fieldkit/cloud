@@ -113,7 +113,7 @@ export default {
                         });
                     });
                     modules = _.uniq(modules);
-                    this.$emit("loaded", modules);
+                    this.$emit("loaded", { modules: modules, projectStations: this.projectStations });
                 }
             });
         },
