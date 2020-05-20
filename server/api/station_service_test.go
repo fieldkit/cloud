@@ -13,7 +13,6 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/tests"
 )
 
@@ -340,16 +339,10 @@ func TestUpdateMyStationWithProtobufStatusTwice(t *testing.T) {
 		sr, err := repositories.NewStationRepository(e.DB)
 		assert.NoError(err)
 
-		m := []*data.StationModule{}
-		assert.NoError(e.DB.SelectContext(e.Ctx, &m, `
-			SELECT * FROM fieldkit.station_module WHERE provision_id IN (SELECT id FROM fieldkit.provision WHERE device_id = $1)
-		`, fd.Stations[0].DeviceID))
-
 		sf, err := sr.QueryStationFull(e.Ctx, fd.Stations[0].ID)
 		assert.NoError(err)
 		assert.NotNil(sf)
 
-		assert.Equal(4, len(m))
 		assert.Equal(4, len(sf.Modules))
 	}
 }

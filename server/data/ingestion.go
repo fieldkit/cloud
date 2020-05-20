@@ -227,28 +227,44 @@ func DecodeBinaryString(s string) ([]byte, error) {
 	return nil, fmt.Errorf("unable to decode binary string: %s", s)
 }
 
-type StationModule struct {
+type VisibleStationConfiguration struct {
+	VisibleConfiguration
+	StationConfiguration
+}
+
+type VisibleConfiguration struct {
+	StationID       int32 `db:"station_id"`
+	ConfigurationID int64 `db:"configuration_id"`
+}
+
+type StationConfiguration struct {
 	ID           int64     `db:"id" json:"id"`
 	ProvisionID  int64     `db:"provision_id" json:"provision_id"`
 	MetaRecordID *int64    `db:"meta_record_id" json:"meta_record_id"`
 	SourceID     *int32    `db:"source_id" json:"source_id"`
 	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
-	Index        uint32    `db:"module_index" json:"module_index"`
-	Position     uint32    `db:"position" json:"position"`
-	HardwareID   []byte    `db:"hardware_id" json:"hardware_id"`
-	Name         string    `db:"name" json:"name"`
-	Manufacturer uint32    `db:"manufacturer" json:"manufacturer"`
-	Kind         uint32    `db:"kind" json:"kind"`
-	Version      uint32    `db:"version" json:"version"`
-	Flags        uint32    `db:"flags" json:"flags"`
+}
+
+type StationModule struct {
+	ID              int64  `db:"id" json:"id"`
+	ConfigurationID int64  `db:"configuration_id" json:"configuration_id"`
+	HardwareID      []byte `db:"hardware_id" json:"hardware_id"`
+	Index           uint32 `db:"module_index" json:"module_index"`
+	Position        uint32 `db:"position" json:"position"`
+	Name            string `db:"name" json:"name"`
+	Manufacturer    uint32 `db:"manufacturer" json:"manufacturer"`
+	Kind            uint32 `db:"kind" json:"kind"`
+	Version         uint32 `db:"version" json:"version"`
+	Flags           uint32 `db:"flags" json:"flags"`
 }
 
 type ModuleSensor struct {
-	ID            int64      `db:"id" json:"id"`
-	ModuleID      int64      `db:"module_id" json:"module_id"`
-	Index         uint32     `db:"sensor_index" json:"sensor_index"`
-	UnitOfMeasure string     `db:"unit_of_measure" json:"unit_of_measure"`
-	Name          string     `db:"name" json:"name"`
-	ReadingValue  *float64   `db:"reading_last" json:"reading_last"`
-	ReadingTime   *time.Time `db:"reading_time" json:"reading_time"`
+	ID              int64      `db:"id" json:"id"`
+	ModuleID        int64      `db:"module_id" json:"module_id"`
+	ConfigurationID int64      `db:"configuration_id" json:"configuration_id"`
+	Index           uint32     `db:"sensor_index" json:"sensor_index"`
+	UnitOfMeasure   string     `db:"unit_of_measure" json:"unit_of_measure"`
+	Name            string     `db:"name" json:"name"`
+	ReadingValue    *float64   `db:"reading_last" json:"reading_last"`
+	ReadingTime     *time.Time `db:"reading_time" json:"reading_time"`
 }

@@ -27,30 +27,41 @@ func NewStationModelRecordHandler(database *sqlxcache.DB) *stationModelRecordHan
 }
 
 func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error {
-	now := time.Now()
+	configuration := &data.StationConfiguration{
+		ProvisionID:  p.ID,
+		MetaRecordID: &db.ID,
+		UpdatedAt:    time.Now(),
+	}
+	if err := h.database.NamedGetContext(ctx, configuration, `
+		INSERT INTO fieldkit.station_configuration
+			(provision_id, meta_record_id, updated_at) VALUES
+			(:provision_id, :meta_record_id, :updated_at)
+		ON CONFLICT (provision_id, meta_record_id)
+			DO UPDATE SET updated_at = EXCLUDED.updated_at
+		RETURNING *
+		`, configuration); err != nil {
+		return err
+	}
 
 	for moduleIndex, m := range r.Modules {
 		module := &data.StationModule{
-			ProvisionID:  p.ID,
-			HardwareID:   m.Id,
-			MetaRecordID: &db.ID,
-			UpdatedAt:    now,
-			Index:        uint32(moduleIndex),
-			Position:     m.Position,
-			Flags:        m.Flags,
-			Name:         m.Name,
-			Manufacturer: m.Header.Manufacturer,
-			Kind:         m.Header.Kind,
-			Version:      m.Header.Version,
+			ConfigurationID: configuration.ID,
+			HardwareID:      m.Id,
+			Index:           uint32(moduleIndex),
+			Position:        m.Position,
+			Flags:           m.Flags,
+			Name:            m.Name,
+			Manufacturer:    m.Header.Manufacturer,
+			Kind:            m.Header.Kind,
+			Version:         m.Header.Version,
 		}
 		if err := h.database.NamedGetContext(ctx, module, `
 		    INSERT INTO fieldkit.station_module
-				(provision_id, hardware_id, meta_record_id, updated_at, position, module_index, flags, name, manufacturer, kind, version) VALUES
-				(:provision_id, :hardware_id, :meta_record_id, :updated_at, :position, :module_index, :flags, :name, :manufacturer, :kind, :version)
-		    ON CONFLICT (hardware_id, meta_record_id)
-				DO UPDATE SET position = EXCLUDED.position,
-							  module_index = EXCLUDED.module_index,
-							  updated_at = EXCLUDED.updated_at,
+				(configuration_id, hardware_id, module_index, position, flags, name, manufacturer, kind, version) VALUES
+				(:configuration_id, :hardware_id, :module_index, :position, :flags, :name, :manufacturer, :kind, :version)
+		    ON CONFLICT (configuration_id, hardware_id)
+				DO UPDATE SET module_index = EXCLUDED.module_index,
+							  position = EXCLUDED.position,
 							  name = EXCLUDED.name,
                               manufacturer = EXCLUDED.manufacturer,
                               kind = EXCLUDED.kind,
@@ -62,20 +73,18 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 
 		for sensorIndex, s := range m.Sensors {
 			sensor := &data.ModuleSensor{
-				ModuleID:      module.ID,
-				Index:         uint32(sensorIndex),
-				UnitOfMeasure: s.UnitOfMeasure,
-				Name:          s.Name,
+				ModuleID:        module.ID,
+				ConfigurationID: configuration.ID,
+				Index:           uint32(sensorIndex),
+				UnitOfMeasure:   s.UnitOfMeasure,
+				Name:            s.Name,
 			}
 			if err := h.database.NamedGetContext(ctx, sensor, `
 				INSERT INTO fieldkit.module_sensor
-					(module_id, sensor_index, unit_of_measure, name, reading_last, reading_time) VALUES
-					(:module_id, :sensor_index, :unit_of_measure, :name, :reading_last, :reading_time)
+					(module_id, configuration_id, sensor_index, unit_of_measure, name, reading_last, reading_time) VALUES
+					(:module_id, :configuration_id, :sensor_index, :unit_of_measure, :name, :reading_last, :reading_time)
 				ON CONFLICT (module_id, sensor_index)
-					DO UPDATE SET unit_of_measure = EXCLUDED.unit_of_measure,
-								  name = EXCLUDED.name,
-								  reading_last = EXCLUDED.reading_last,
-								  reading_time = EXCLUDED.reading_time
+					DO UPDATE SET name = EXCLUDED.name, unit_of_measure = EXCLUDED.unit_of_measure
 				RETURNING *
 				`, sensor); err != nil {
 				return err
@@ -99,9 +108,10 @@ func (h *stationModelRecordHandler) OnData(ctx context.Context, p *data.Provisio
 }
 
 type SensorAndModulePosition struct {
-	SensorID    int64  `db:"sensor_id"`
-	ModuleIndex uint32 `db:"module_index"`
-	SensorIndex uint32 `db:"sensor_index"`
+	ConfigurationID int64  `db:"configuration_id"`
+	SensorID        int64  `db:"sensor_id"`
+	ModuleIndex     uint32 `db:"module_index"`
+	SensorIndex     uint32 `db:"sensor_index"`
 }
 
 type UpdateSensorValue struct {
@@ -115,24 +125,26 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 		return nil
 	}
 
-	// log := Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
 	sensors := []*SensorAndModulePosition{}
 	if err := h.database.SelectContext(ctx, &sensors, `
 		SELECT
-			s.id AS sensor_id,
-			m.module_index AS module_index,
-			s.sensor_index AS sensor_index
+             c.id AS configuration_id,
+			 s.id AS sensor_id,
+			 m.module_index AS module_index,
+			 s.sensor_index AS sensor_index
 		FROM fieldkit.module_sensor AS s JOIN
-			 fieldkit.station_module AS m ON (s.module_id = m.id)
-		WHERE m.meta_record_id = $1
+			 fieldkit.station_module AS m ON (s.module_id = m.id) JOIN
+			 fieldkit.station_configuration AS c ON (m.configuration_id = c.id)
+		WHERE c.provision_id = $1 AND c.meta_record_id = $2
 		ORDER BY m.module_index, s.sensor_index
-		`, h.dbMeta.ID); err != nil {
+		`, h.provision.ID, h.dbMeta.ID); err != nil {
 		return err
 	}
 
 	if len(sensors) == 0 {
-		return errors.Structured("missing station model")
+		return errors.Structured("no station model")
 	}
 
 	sensorsByModule := [][]*SensorAndModulePosition{}
@@ -169,6 +181,21 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 				return err
 			}
 		}
+	}
+
+	log.Infow("configuration", "provision_id", h.provision.ID, "meta_record_id", h.dbMeta.ID)
+
+	if _, err := h.database.ExecContext(ctx, `
+		INSERT INTO fieldkit.visible_configuration (station_id, configuration_id)
+        SELECT
+			id AS station_id,
+			(SELECT id FROM fieldkit.station_configuration WHERE provision_id = $1 AND meta_record_id = $2) AS configuration_id
+		FROM fieldkit.station
+		WHERE device_id = $3
+		ON CONFLICT ON CONSTRAINT visible_configuration_pkey
+		DO UPDATE SET configuration_id = EXCLUDED.configuration_id
+		`, h.provision.ID, h.dbMeta.ID, h.provision.DeviceID); err != nil {
+		return err
 	}
 
 	return nil
