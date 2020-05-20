@@ -58,7 +58,7 @@
             </div>
             <template v-if="!compact">
                 <div class="spacer"></div>
-                <div id="readings-container" class="section">
+                <div id="readings-container" class="section" v-if="station.modules.length > 0">
                     <div id="readings-label">Latest Reading</div>
                     <div v-for="(module, moduleIndex) in station.modules" v-bind:key="module.id">
                         <template v-if="module.position < 5">

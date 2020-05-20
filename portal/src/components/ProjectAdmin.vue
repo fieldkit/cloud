@@ -24,7 +24,7 @@
                     </div>
                     <div class="stat follows">
                         <img alt="Follows" src="../assets/heart.png" class="follow-icon" />
-                        <span>{{ numFollowers }} Follows</span>
+                        <span>{{ numFollowers + (numFollowers == 1 ? " Follow" : " Follows") }}</span>
                     </div>
                 </div>
                 <div class="project-details-container">

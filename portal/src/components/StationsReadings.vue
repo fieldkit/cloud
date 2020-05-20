@@ -80,6 +80,9 @@ export default {
                     this.currentIndex = value;
             }
             this.currentStation = this.stations[this.currentIndex - 1];
+            if (!this.currentStation) {
+                this.currentStation = {};
+            }
         },
 
         fetchStations() {
@@ -87,6 +90,9 @@ export default {
                 this.stations = result.stations;
                 this.pageCount = this.stations.length;
                 this.currentStation = this.stations[this.currentIndex - 1];
+                if (!this.currentStation) {
+                    this.currentStation = {};
+                }
             });
         },
 
