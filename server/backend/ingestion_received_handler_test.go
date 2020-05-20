@@ -21,11 +21,7 @@ func TestIngestionReceivedNoSuchIngestion(t *testing.T) {
 	user, err := e.AddUser("")
 	assert.NoError(err)
 
-	handler := &IngestionReceivedHandler{
-		Database: e.DB,
-		Metrics:  logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}),
-		Files:    tests.NewInMemoryArchive(map[string][]byte{}),
-	}
+	handler := NewIngestionReceivedHandler(e.DB, tests.NewInMemoryArchive(map[string][]byte{}), logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
 	err = handler.Handle(e.Ctx, &messages.IngestionReceived{
 		Time:    time.Now(),
@@ -48,13 +44,10 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	randomData, err := e.NewRandomData(1024)
 	assert.NoError(err)
 
-	handler := &IngestionReceivedHandler{
-		Database: e.DB,
-		Metrics:  logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}),
-		Files: tests.NewInMemoryArchive(map[string][]byte{
-			"/file": []byte{},
-		}),
-	}
+	files := tests.NewInMemoryArchive(map[string][]byte{
+		"/file": []byte{},
+	})
+	handler := NewIngestionReceivedHandler(e.DB, files, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
 	ingestion, err := e.AddIngestion(user, "/file", data.MetaTypeName, e.MustDeviceID(), len(randomData))
 	assert.NoError(err)
@@ -77,14 +70,11 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 	files, err := e.NewFilePair(1, 16)
 	assert.NoError(err)
 
-	handler := &IngestionReceivedHandler{
-		Database: e.DB,
-		Metrics:  logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}),
-		Files: tests.NewInMemoryArchive(map[string][]byte{
-			"/meta": files.Meta,
-			"/data": files.Data,
-		}),
-	}
+	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
+		"/meta": files.Meta,
+		"/data": files.Data,
+	})
+	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
 	ingestion, err := e.AddIngestion(user, "/meta", data.MetaTypeName, e.MustDeviceID(), len(files.Meta))
 	assert.NoError(err)
@@ -110,14 +100,11 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 	files, err := e.NewFilePair(1, 16)
 	assert.NoError(err)
 
-	handler := &IngestionReceivedHandler{
-		Database: e.DB,
-		Metrics:  logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}),
-		Files: tests.NewInMemoryArchive(map[string][]byte{
-			"/meta": files.Meta,
-			"/data": files.Data,
-		}),
-	}
+	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
+		"/meta": files.Meta,
+		"/data": files.Data,
+	})
+	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
 	metaIngestion, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
@@ -172,14 +159,11 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 	files, err := e.NewFilePair(4, 16)
 	assert.NoError(err)
 
-	handler := &IngestionReceivedHandler{
-		Database: e.DB,
-		Metrics:  logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}),
-		Files: tests.NewInMemoryArchive(map[string][]byte{
-			"/meta": files.Meta,
-			"/data": files.Data,
-		}),
-	}
+	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
+		"/meta": files.Meta,
+		"/data": files.Data,
+	})
+	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
 	metaIngestion, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
@@ -236,14 +220,11 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	files, err := e.NewFilePair(4, 16)
 	assert.NoError(err)
 
-	handler := &IngestionReceivedHandler{
-		Database: e.DB,
-		Metrics:  logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}),
-		Files: tests.NewInMemoryArchive(map[string][]byte{
-			"/meta": files.Meta,
-			"/data": files.Data,
-		}),
-	}
+	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
+		"/meta": files.Meta,
+		"/data": files.Data,
+	})
+	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
 	metaIngestion, err := e.AddIngestion(fd.Owner, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)

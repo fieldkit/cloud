@@ -174,32 +174,6 @@ func (r *StationRepository) UpsertModuleSensor(ctx context.Context, sensor *data
 	return sensor, nil
 }
 
-func newStationModule(m *pbapp.ModuleCapabilities, c *data.StationConfiguration, moduleIndex uint32) *data.StationModule {
-	return &data.StationModule{
-		ConfigurationID: c.ID,
-		HardwareID:      m.Id,
-		Index:           moduleIndex,
-		Position:        m.Position,
-		Flags:           m.Flags,
-		Name:            m.Name,
-		Manufacturer:    m.Header.Manufacturer,
-		Kind:            m.Header.Kind,
-		Version:         m.Header.Version,
-	}
-}
-
-func newModuleSensor(s *pbapp.SensorCapabilities, m *data.StationModule, c *data.StationConfiguration, sensorIndex uint32, time *time.Time, value *float64) *data.ModuleSensor {
-	return &data.ModuleSensor{
-		ModuleID:        m.ID,
-		ConfigurationID: c.ID,
-		Index:           sensorIndex,
-		UnitOfMeasure:   s.UnitOfMeasure,
-		Name:            s.Name,
-		ReadingTime:     time,
-		ReadingValue:    value,
-	}
-}
-
 func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s *data.Station, rawStatus string) error {
 	record, err := s.ParseHttpReply(rawStatus)
 
@@ -609,4 +583,30 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 	}
 
 	return all, nil
+}
+
+func newStationModule(m *pbapp.ModuleCapabilities, c *data.StationConfiguration, moduleIndex uint32) *data.StationModule {
+	return &data.StationModule{
+		ConfigurationID: c.ID,
+		HardwareID:      m.Id,
+		Index:           moduleIndex,
+		Position:        m.Position,
+		Flags:           m.Flags,
+		Name:            m.Name,
+		Manufacturer:    m.Header.Manufacturer,
+		Kind:            m.Header.Kind,
+		Version:         m.Header.Version,
+	}
+}
+
+func newModuleSensor(s *pbapp.SensorCapabilities, m *data.StationModule, c *data.StationConfiguration, sensorIndex uint32, time *time.Time, value *float64) *data.ModuleSensor {
+	return &data.ModuleSensor{
+		ModuleID:        m.ID,
+		ConfigurationID: c.ID,
+		Index:           sensorIndex,
+		UnitOfMeasure:   s.UnitOfMeasure,
+		Name:            s.Name,
+		ReadingTime:     time,
+		ReadingValue:    value,
+	}
 }

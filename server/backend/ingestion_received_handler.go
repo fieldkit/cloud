@@ -17,9 +17,17 @@ import (
 )
 
 type IngestionReceivedHandler struct {
-	Database *sqlxcache.DB
-	Files    files.FileArchive
-	Metrics  *logging.Metrics
+	db      *sqlxcache.DB
+	files   files.FileArchive
+	metrics *logging.Metrics
+}
+
+func NewIngestionReceivedHandler(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics) *IngestionReceivedHandler {
+	return &IngestionReceivedHandler{
+		db:      db,
+		files:   files,
+		metrics: metrics,
+	}
 }
 
 func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.IngestionReceived) error {
@@ -27,7 +35,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	log.Infow("processing", "time", m.Time, "ingestion_url", m.URL)
 
-	ir, err := repositories.NewIngestionRepository(h.Database)
+	ir, err := repositories.NewIngestionRepository(h.db)
 	if err != nil {
 		return err
 	}
@@ -43,9 +51,9 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID)
 
-	handler := NewStationModelRecordHandler(h.Database)
+	handler := NewStationModelRecordHandler(h.db)
 
-	recordAdder := NewRecordAdder(h.Database, h.Files, h.Metrics, handler, m.Verbose)
+	recordAdder := NewRecordAdder(h.db, h.files, h.metrics, handler, m.Verbose)
 
 	log.Infow("pending", "file_id", i.UploadID, "ingestion_url", i.URL, "blocks", i.Blocks)
 
@@ -57,7 +65,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 	}
 
 	if info != nil {
-		if err := recordIngestionActivity(ctx, log, h.Database, m, info); err != nil {
+		if err := recordIngestionActivity(ctx, log, h.db, m, info); err != nil {
 			log.Errorw("ingestion", "error", err)
 			hasOtherErrors = true
 		}

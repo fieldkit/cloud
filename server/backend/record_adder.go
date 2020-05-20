@@ -20,7 +20,7 @@ import (
 type RecordAdder struct {
 	verbose    bool
 	handler    RecordHandler
-	database   *sqlxcache.DB
+	db         *sqlxcache.DB
 	files      files.FileArchive
 	metrics    *logging.Metrics
 	statistics *newRecordStatistics
@@ -34,7 +34,7 @@ type ParsedRecord struct {
 func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, handler RecordHandler, verbose bool) (ra *RecordAdder) {
 	return &RecordAdder{
 		verbose:    verbose,
-		database:   db,
+		db:         db,
 		files:      files,
 		metrics:    metrics,
 		handler:    handler,
@@ -67,7 +67,7 @@ func (ra *RecordAdder) tryParseSignedRecord(sr *pb.SignedRecord, dataRecord *pb.
 }
 
 func (ra *RecordAdder) tryFindStation(ctx context.Context, i *data.Ingestion) (*data.Station, error) {
-	r, err := repositories.NewStationRepository(ra.database)
+	r, err := repositories.NewStationRepository(ra.db)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (ra *RecordAdder) tryFindStation(ctx context.Context, i *data.Ingestion) (*
 }
 
 func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*data.Provision, error) {
-	r, err := repositories.NewProvisionRepository(ra.database)
+	r, err := repositories.NewProvisionRepository(ra.db)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		return nil, err
 	}
 
-	recordRepository, err := repositories.NewRecordRepository(ra.database)
+	recordRepository, err := repositories.NewRecordRepository(ra.db)
 	if err != nil {
 		return nil, err
 	}
