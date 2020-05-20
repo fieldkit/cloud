@@ -108,8 +108,70 @@ func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, devic
 	return stations[0], nil
 }
 
+func (r *StationRepository) UpsertConfiguration(ctx context.Context, configuration *data.StationConfiguration) (*data.StationConfiguration, error) {
+	if configuration.SourceID != nil && configuration.MetaRecordID == nil {
+		if err := r.db.NamedGetContext(ctx, configuration, `
+			INSERT INTO fieldkit.station_configuration
+				(provision_id, source_id, updated_at) VALUES
+				(:provision_id, :source_id, :updated_at)
+			ON CONFLICT (provision_id, source_id) DO UPDATE SET updated_at = EXCLUDED.updated_at
+			RETURNING *
+			`, configuration); err != nil {
+			return nil, err
+		}
+		return configuration, nil
+	}
+	if configuration.SourceID == nil && configuration.MetaRecordID != nil {
+		if err := r.db.NamedGetContext(ctx, configuration, `
+			INSERT INTO fieldkit.station_configuration
+				(provision_id, meta_record_id, updated_at) VALUES
+				(:provision_id, :meta_record_id, :updated_at)
+			ON CONFLICT (provision_id, meta_record_id) DO UPDATE SET updated_at = EXCLUDED.updated_at
+			RETURNING *
+			`, configuration); err != nil {
+			return nil, err
+		}
+		return configuration, nil
+	}
+	return nil, fmt.Errorf("invalid StationConfiguration")
+}
+
+func (r *StationRepository) UpsertStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
+	if err := r.db.NamedGetContext(ctx, module, `
+		INSERT INTO fieldkit.station_module
+			(configuration_id, hardware_id, module_index, position, flags, name, manufacturer, kind, version) VALUES
+			(:configuration_id, :hardware_id, :module_index, :position, :flags, :name, :manufacturer, :kind, :version)
+		ON CONFLICT (configuration_id, hardware_id)
+			DO UPDATE SET module_index = EXCLUDED.module_index,
+							position = EXCLUDED.position,
+							name = EXCLUDED.name,
+							manufacturer = EXCLUDED.manufacturer,
+							kind = EXCLUDED.kind,
+							version = EXCLUDED.version
+		RETURNING *
+		`, module); err != nil {
+		return nil, err
+	}
+	return module, nil
+}
+
+func (r *StationRepository) UpsertModuleSensor(ctx context.Context, sensor *data.ModuleSensor) (*data.ModuleSensor, error) {
+	if err := r.db.NamedGetContext(ctx, sensor, `
+		INSERT INTO fieldkit.module_sensor
+			(module_id, configuration_id, sensor_index, unit_of_measure, name, reading_last, reading_time) VALUES
+			(:module_id, :configuration_id, :sensor_index, :unit_of_measure, :name, :reading_last, :reading_time)
+		ON CONFLICT (module_id, sensor_index)
+			DO UPDATE SET name = EXCLUDED.name, unit_of_measure = EXCLUDED.unit_of_measure
+		RETURNING *
+		`, sensor); err != nil {
+		return nil, err
+	}
+	return sensor, nil
+}
+
 func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s *data.Station, rawStatus string) error {
 	record, err := s.ParseHttpReply(rawStatus)
+
 	if err != nil {
 		return err
 	}
@@ -133,14 +195,7 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 		SourceID:    &StatusReplySourceID,
 		UpdatedAt:   time.Now(),
 	}
-	if err := r.db.NamedGetContext(ctx, configuration, `
-		INSERT INTO fieldkit.station_configuration
-			(provision_id, source_id, updated_at) VALUES
-			(:provision_id, :source_id, :updated_at)
-		ON CONFLICT (provision_id, source_id)
-			DO UPDATE SET updated_at = EXCLUDED.updated_at
-		RETURNING *
-		`, configuration); err != nil {
+	if _, err := r.UpsertConfiguration(ctx, configuration); err != nil {
 		return err
 	}
 
@@ -156,19 +211,7 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 			Kind:            m.Header.Kind,
 			Version:         m.Header.Version,
 		}
-		if err := r.db.NamedGetContext(ctx, module, `
-		    INSERT INTO fieldkit.station_module
-				(configuration_id, hardware_id, module_index, position, flags, name, manufacturer, kind, version) VALUES
-				(:configuration_id, :hardware_id, :module_index, :position, :flags, :name, :manufacturer, :kind, :version)
-		    ON CONFLICT (configuration_id, hardware_id)
-				DO UPDATE SET module_index = EXCLUDED.module_index,
-							  position = EXCLUDED.position,
-							  name = EXCLUDED.name,
-                              manufacturer = EXCLUDED.manufacturer,
-                              kind = EXCLUDED.kind,
-                              version = EXCLUDED.version
-			RETURNING *
-			`, module); err != nil {
+		if _, err := r.UpsertStationModule(ctx, module); err != nil {
 			return err
 		}
 
@@ -180,14 +223,7 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 				UnitOfMeasure:   s.UnitOfMeasure,
 				Name:            s.Name,
 			}
-			if err := r.db.NamedGetContext(ctx, sensor, `
-				INSERT INTO fieldkit.module_sensor
-					(module_id, configuration_id, sensor_index, unit_of_measure, name, reading_last, reading_time) VALUES
-					(:module_id, :configuration_id, :sensor_index, :unit_of_measure, :name, :reading_last, :reading_time)
-				ON CONFLICT (module_id, sensor_index)
-					DO UPDATE SET name = EXCLUDED.name, unit_of_measure = EXCLUDED.unit_of_measure
-				RETURNING *
-				`, sensor); err != nil {
+			if _, err := r.UpsertModuleSensor(ctx, sensor); err != nil {
 				return err
 			}
 		}

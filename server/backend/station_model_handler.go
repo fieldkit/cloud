@@ -8,6 +8,7 @@ import (
 
 	pb "github.com/fieldkit/data-protocol"
 
+	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/errors"
 )
@@ -27,19 +28,17 @@ func NewStationModelRecordHandler(database *sqlxcache.DB) *stationModelRecordHan
 }
 
 func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error {
+	sr, err := repositories.NewStationRepository(h.database)
+	if err != nil {
+		return err
+	}
+
 	configuration := &data.StationConfiguration{
 		ProvisionID:  p.ID,
 		MetaRecordID: &db.ID,
 		UpdatedAt:    time.Now(),
 	}
-	if err := h.database.NamedGetContext(ctx, configuration, `
-		INSERT INTO fieldkit.station_configuration
-			(provision_id, meta_record_id, updated_at) VALUES
-			(:provision_id, :meta_record_id, :updated_at)
-		ON CONFLICT (provision_id, meta_record_id)
-			DO UPDATE SET updated_at = EXCLUDED.updated_at
-		RETURNING *
-		`, configuration); err != nil {
+	if _, err := sr.UpsertConfiguration(ctx, configuration); err != nil {
 		return err
 	}
 
@@ -55,19 +54,7 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 			Kind:            m.Header.Kind,
 			Version:         m.Header.Version,
 		}
-		if err := h.database.NamedGetContext(ctx, module, `
-		    INSERT INTO fieldkit.station_module
-				(configuration_id, hardware_id, module_index, position, flags, name, manufacturer, kind, version) VALUES
-				(:configuration_id, :hardware_id, :module_index, :position, :flags, :name, :manufacturer, :kind, :version)
-		    ON CONFLICT (configuration_id, hardware_id)
-				DO UPDATE SET module_index = EXCLUDED.module_index,
-							  position = EXCLUDED.position,
-							  name = EXCLUDED.name,
-                              manufacturer = EXCLUDED.manufacturer,
-                              kind = EXCLUDED.kind,
-                              version = EXCLUDED.version
-			RETURNING *
-			`, module); err != nil {
+		if _, err := sr.UpsertStationModule(ctx, module); err != nil {
 			return err
 		}
 
@@ -79,14 +66,7 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 				UnitOfMeasure:   s.UnitOfMeasure,
 				Name:            s.Name,
 			}
-			if err := h.database.NamedGetContext(ctx, sensor, `
-				INSERT INTO fieldkit.module_sensor
-					(module_id, configuration_id, sensor_index, unit_of_measure, name, reading_last, reading_time) VALUES
-					(:module_id, :configuration_id, :sensor_index, :unit_of_measure, :name, :reading_last, :reading_time)
-				ON CONFLICT (module_id, sensor_index)
-					DO UPDATE SET name = EXCLUDED.name, unit_of_measure = EXCLUDED.unit_of_measure
-				RETURNING *
-				`, sensor); err != nil {
+			if _, err := sr.UpsertModuleSensor(ctx, sensor); err != nil {
 				return err
 			}
 		}
@@ -144,7 +124,7 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 	}
 
 	if len(sensors) == 0 {
-		return errors.Structured("no station model")
+		return errors.Structured("no sensors", "provision_id", h.provision.ID, "meta_record_id", h.dbMeta.ID)
 	}
 
 	sensorsByModule := [][]*SensorAndModulePosition{}
