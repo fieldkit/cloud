@@ -68,6 +68,7 @@
 
             <ProjectStations
                 :project="project"
+                :admin="true"
                 :mapContainerSize="mapContainerSize"
                 :listSize="listSize"
                 :userStations="userStations"

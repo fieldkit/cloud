@@ -34,7 +34,13 @@
                 </div>
             </div>
 
-            <ProjectStations :project="project" :mapContainerSize="mapContainerSize" :listSize="listSize" @loaded="setModules" />
+            <ProjectStations
+                :project="project"
+                :admin="false"
+                :mapContainerSize="mapContainerSize"
+                :listSize="listSize"
+                @loaded="setModules"
+            />
 
             <div class="team-container">
                 <div class="section-heading">{{ getTeamHeading() }}</div>

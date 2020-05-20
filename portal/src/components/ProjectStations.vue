@@ -2,7 +2,7 @@
     <div class="stations-container" :style="{ width: mapContainerSize.outerWidth }">
         <div class="section-heading stations-heading">
             FieldKit Stations
-            <div class="add-station" v-on:click="showStationSelect" v-if="!addingStation">
+            <div class="add-station" v-on:click="showStationSelect" v-if="admin && !addingStation">
                 <img src="../assets/add.png" class="add-station-btn" />
                 Add Station
             </div>
@@ -85,7 +85,7 @@ export default {
             },
         };
     },
-    props: ["project", "mapContainerSize", "listSize", "userStations"],
+    props: ["project", "admin", "mapContainerSize", "listSize", "userStations"],
     async beforeCreate() {
         this.api = new FKApi();
     },
