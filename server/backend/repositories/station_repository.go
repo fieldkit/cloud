@@ -146,6 +146,7 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 		ON CONFLICT (configuration_id, hardware_id)
 			DO UPDATE SET module_index = EXCLUDED.module_index,
                           position = EXCLUDED.position,
+                          flags = EXCLUDED.flags,
                           name = EXCLUDED.name,
                           manufacturer = EXCLUDED.manufacturer,
                           kind = EXCLUDED.kind,
