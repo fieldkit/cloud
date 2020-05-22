@@ -359,7 +359,7 @@ func transformModules(from *data.StationFull) (to []*station.StationModule) {
 			Name:       translateModuleName(v.Name, sensors),
 			Position:   int32(v.Position),
 			Flags:      int32(v.Flags),
-			Internal:   v.Flags > 0,
+			Internal:   v.Flags > 0 || v.Position == 255,
 			Sensors:    sensors,
 		})
 
