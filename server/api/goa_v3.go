@@ -168,7 +168,10 @@ func logErrors() func(goa.Endpoint) goa.Endpoint {
 				id := newErrorID()
 				log := logging.Logger(ctx).Sugar()
 				if en, ok := err.(ErrorNamer); ok {
-					log.Infow("error", "error", err, "error_id", id, "error_name", en.ErrorName())
+					// This tends to just add noise to the logs.
+					if false {
+						log.Infow("error", "error", err, "error_id", id, "error_name", en.ErrorName())
+					}
 				} else {
 					log.Errorw("error", "error", err, "error_id", id)
 				}

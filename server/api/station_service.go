@@ -59,6 +59,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		existing := stations[0]
 
 		if existing.OwnerID != p.UserID() {
+			log.Infow("station conflict", "device_id", deviceId, "user_id", p.UserID(), "owner_id", existing.OwnerID, "station_id", existing.ID)
 			return nil, station.BadRequest("station already registered to another user")
 		}
 
@@ -79,7 +80,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 
 	if payload.StatusPb != nil {
 		if err := adding.UpdateFromStatus(*payload.StatusPb); err != nil {
-			log.Infow("status error", "error", err, "status", payload.StatusPb)
+			log.Errorw("error updating from status", "error", err, "status", payload.StatusPb)
 		}
 	}
 
@@ -158,7 +159,7 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 
 	if payload.StatusPb != nil {
 		if err := updating.UpdateFromStatus(*payload.StatusPb); err != nil {
-			log.Infow("status error", "error", err, "status", payload.StatusPb)
+			log.Errorw("error updating from status", "error", err, "status", payload.StatusPb)
 		}
 	}
 
