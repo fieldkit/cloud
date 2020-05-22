@@ -40,8 +40,8 @@ func (r *DataRepository) queryMetaRecords(ctx context.Context, deviceIdBytes []b
 	mrs := []*data.MetaRecord{}
 	if err := r.db.SelectContext(ctx, &mrs, `
 	    SELECT m.* FROM fieldkit.meta_record AS m WHERE (m.id IN (
-	      SELECT DISTINCT q.meta FROM (
-			SELECT r.meta FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id) WHERE (p.device_id = $1) AND (timezone('UTC', r.time) BETWEEN $2 AND $3)
+	      SELECT DISTINCT q.meta_record_id FROM (
+			SELECT r.meta_record_id FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id) WHERE (p.device_id = $1) AND (timezone('UTC', r.time) BETWEEN $2 AND $3)
 	      ) AS q
 	    ))`, deviceIdBytes, start, end); err != nil {
 		return nil, err
@@ -69,8 +69,8 @@ func (r *DataRepository) querySummary(ctx context.Context, opts *SummaryQueryOpt
 		    SELECT
 				MIN(r.time) AS start,
 				MAX(r.time) AS end,
-				COUNT(*              ) AS number_of_data_records,
-				COUNT(DISTINCT r.meta) AS number_of_meta_records
+				COUNT(*                        ) AS number_of_data_records,
+				COUNT(DISTINCT r.meta_record_id) AS number_of_meta_records
 			FROM
 				fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
 		    WHERE (p.device_id = $1) AND (timezone('UTC', r.time) BETWEEN $2 AND $3)`, deviceIdBytes, start, end); err != nil {
@@ -136,7 +136,7 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 
 	rows, err := r.db.QueryxContext(ctx, `
 		SELECT
-			r.id, r.provision_id, r.time, r.number, r.meta, ST_AsBinary(r.location) AS location, r.raw
+			r.id, r.provision_id, r.time, r.number, r.meta_record_id, ST_AsBinary(r.location) AS location, r.raw
 		FROM
             fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
 		WHERE (p.device_id = $1) AND (timezone('UTC', r.time) BETWEEN $2 AND $3)

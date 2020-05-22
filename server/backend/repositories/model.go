@@ -96,9 +96,9 @@ type DataRow struct {
 }
 
 type ReadingValue struct {
-	MetaID int64           `json:"meta_id"`
-	Meta   *DataMetaSensor `json:"meta"`
-	Value  float64         `json:"value"`
+	MetaRecordID int64           `json:"meta_record_id"`
+	Meta         *DataMetaSensor `json:"meta"`
+	Value        float64         `json:"value"`
 }
 
 type ResolvedRecord struct {
@@ -190,7 +190,7 @@ func (full *ResolvedRecord) ToDataRow() *DataRow {
 	metaIDs := make([]int64, 0)
 
 	for key, reading := range full.Readings {
-		metaIDs = append(metaIDs, reading.MetaID)
+		metaIDs = append(metaIDs, reading.MetaRecordID)
 		data[key] = reading.Value
 	}
 

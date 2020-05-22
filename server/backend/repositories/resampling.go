@@ -126,7 +126,7 @@ func (b *ResamplingBin) MetaIDs() []int64 {
 	idsMap := make(map[int64]bool)
 	for _, filteredRecord := range b.Records {
 		for _, reading := range filteredRecord.Record.Readings {
-			idsMap[reading.MetaID] = true
+			idsMap[reading.MetaRecordID] = true
 		}
 	}
 	ids := make([]int64, 0)

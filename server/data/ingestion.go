@@ -146,13 +146,13 @@ func ParseBlocks(s string) ([]int64, error) {
 }
 
 type DataRecord struct {
-	ID          int64          `db:"id" json:"id"`
-	ProvisionID int64          `db:"provision_id" json:"provision_id"`
-	Time        time.Time      `db:"time" json:"time"`
-	Number      int64          `db:"number" json:"number"`
-	MetaID      int64          `db:"meta" json:"meta"`
-	Location    *Location      `db:"location" json:"location"`
-	Data        types.JSONText `db:"raw" json:"raw"`
+	ID           int64          `db:"id" json:"id"`
+	ProvisionID  int64          `db:"provision_id" json:"provision_id"`
+	Time         time.Time      `db:"time" json:"time"`
+	Number       int64          `db:"number" json:"number"`
+	MetaRecordID int64          `db:"meta_record_id" json:"meta_record_id"`
+	Location     *Location      `db:"location" json:"location"`
+	Data         types.JSONText `db:"raw" json:"raw"`
 }
 
 func (d *DataRecord) SetData(data interface{}) error {

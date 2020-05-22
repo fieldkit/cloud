@@ -54,15 +54,15 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 
 	byMeta := make(map[int64][]*data.DataRecord)
 	for _, dbDataRecord := range page.Data {
-		metaID := dbDataRecord.MetaID
-		_, err := mf.Add(ctx, page.Meta[metaID])
+		metaRecordID := dbDataRecord.MetaRecordID
+		_, err := mf.Add(ctx, page.Meta[metaRecordID])
 		if err != nil {
 			return nil, err
 		}
-		if byMeta[metaID] == nil {
-			byMeta[metaID] = make([]*data.DataRecord, 0)
+		if byMeta[metaRecordID] == nil {
+			byMeta[metaRecordID] = make([]*data.DataRecord, 0)
 		}
-		byMeta[metaID] = append(byMeta[metaID], dbDataRecord)
+		byMeta[metaRecordID] = append(byMeta[metaRecordID], dbDataRecord)
 	}
 
 	log.Infow("querying", "station_id", station.ID, "station_name", station.Name, "data_records", len(page.Data), "meta_records", len(byMeta))

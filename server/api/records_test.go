@@ -93,7 +93,7 @@ func TestGetDataRecord(t *testing.T) {
 			"time": "<<PRESENCE>>",
 			"id": "<<PRESENCE>>",
 			"location": "<<PRESENCE>>",
-			"meta": "<<PRESENCE>>",
+			"meta_record_id": "<<PRESENCE>>",
 			"number": "<<PRESENCE>>",
 			"provision_id": "<<PRESENCE>>",
 			"raw": "<<PRESENCE>>"
@@ -139,7 +139,7 @@ func TestGetDataRecordResolved(t *testing.T) {
 			"time": "<<PRESENCE>>",
 			"id": "<<PRESENCE>>",
 			"location": "<<PRESENCE>>",
-			"meta": "<<PRESENCE>>",
+			"meta_record_id": "<<PRESENCE>>",
 			"number": "<<PRESENCE>>",
 			"provision_id": "<<PRESENCE>>",
 			"raw": "<<PRESENCE>>"
