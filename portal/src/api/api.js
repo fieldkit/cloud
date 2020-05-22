@@ -328,6 +328,18 @@ class FKApi {
         }).then(this._handleResponse.bind(this));
     }
 
+    getProjectActivity(id) {
+        const token = this.token.getHeader();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/projects/" + id + "/activity",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
+        }).then(this._handleResponse.bind(this));
+    }
+
     addDefaultProject() {
         const token = this.token.getHeader();
         return axios({

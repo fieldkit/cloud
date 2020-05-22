@@ -1,9 +1,19 @@
 <template>
     <div id="project-summary-container">
+        <ProjectActivity
+            :project="project"
+            :viewing="viewingActivityFeed"
+            @closeActivity="closeActivityFeed"
+            v-show="viewingActivityFeed"
+        />
         <div class="project-container" v-if="project">
             <div class="left">
                 <div id="project-name">{{ project.name }}</div>
                 <div class="dashboard-heading">Project Dashboard</div>
+                <div class="activity-btn" v-on:click="openActivityFeed">
+                    <img src="../assets/notification.png" />
+                    Activity
+                </div>
                 <div class="project-image-actions-container">
                     <img alt="Fieldkit Project" v-if="project.media_url" :src="getImageUrl(project)" class="project-image" />
                     <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
@@ -24,7 +34,7 @@
                     </div>
                     <div class="stat follows">
                         <img alt="Follows" src="../assets/heart.png" class="follow-icon" />
-                        <span>{{ numFollowers }} Follows</span>
+                        <span>{{ numFollowers + (numFollowers == 1 ? " Follow" : " Follows") }}</span>
                     </div>
                 </div>
                 <div class="project-details-container">
@@ -72,10 +82,10 @@
                 :mapContainerSize="mapContainerSize"
                 :listSize="listSize"
                 :userStations="userStations"
-                @loaded="setModules"
+                @loaded="saveStationsData"
             />
 
-            <ProjectDataFiles />
+            <ProjectDataFiles :projectStations="projectStations" />
 
             <StationsReadings :project="project" />
 
@@ -155,6 +165,7 @@ import * as utils from "../utilities";
 import FKApi from "../api/api";
 import { API_HOST } from "../secrets";
 import ProjectStations from "../components/ProjectStations";
+import ProjectActivity from "../components/ProjectActivity";
 import ProjectDataFiles from "../components/ProjectDataFiles";
 import StationsReadings from "../components/StationsReadings";
 
@@ -162,6 +173,7 @@ export default {
     name: "ProjectAdmin",
     components: {
         ProjectStations,
+        ProjectActivity,
         ProjectDataFiles,
         StationsReadings,
     },
@@ -176,7 +188,9 @@ export default {
             noEmail: false,
             emailNotValid: false,
             modules: [],
+            projectStations: [],
             numFollowers: 1,
+            viewingActivityFeed: false,
             mapContainerSize: {
                 width: "677px",
                 height: "332px",
@@ -206,10 +220,11 @@ export default {
     },
     props: ["project", "userStations", "users"],
     watch: {
-        project() {
-            if (this.project) {
+        project: {
+            handler() {
                 this.reset();
-            }
+            },
+            immediate: true,
         },
         users() {
             if (this.users) {
@@ -242,8 +257,15 @@ export default {
         viewProfile() {
             this.$emit("viewProfile");
         },
-        setModules(modules) {
-            this.modules = modules;
+        closeActivityFeed() {
+            this.viewingActivityFeed = false;
+        },
+        openActivityFeed() {
+            this.viewingActivityFeed = true;
+        },
+        saveStationsData(data) {
+            this.modules = data.modules;
+            this.projectStations = data.projectStations;
         },
         checkEmail() {
             this.noEmail = false;
@@ -340,6 +362,22 @@ export default {
 }
 .show-link {
     text-decoration: underline;
+}
+.activity-btn {
+    width: 110px;
+    height: 25px;
+    float: right;
+    padding: 10px 10px 6px 10px;
+    margin: -48px 58px 0 0;
+    border: 1px solid #d8dce0;
+    border-radius: 3px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+.activity-btn img {
+    vertical-align: sub;
 }
 .project-container {
     font-size: 16px;

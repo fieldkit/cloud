@@ -12,28 +12,30 @@
             <img alt="" src="../assets/progress.gif" />
         </div>
         <div class="main-panel" v-show="!loading && isAuthenticated">
-            <router-link :to="{ name: 'projects' }" v-if="!previewing">
-                <div class="projects-link">
+            <div class="inner-container">
+                <router-link :to="{ name: 'projects' }" v-if="!previewing">
+                    <div class="projects-link">
+                        <span class="small-arrow">&lt;</span>
+                        Back to Projects
+                    </div>
+                </router-link>
+                <div class="projects-link" v-if="previewing" v-on:click="switchToAdmin">
                     <span class="small-arrow">&lt;</span>
-                    Back to Projects
+                    Back to Project Dashboard
                 </div>
-            </router-link>
-            <div class="projects-link" v-if="previewing" v-on:click="switchToAdmin">
-                <span class="small-arrow">&lt;</span>
-                Back to Project Dashboard
-            </div>
-            <div id="inner-container">
-                <!-- display admin view -->
-                <ProjectAdmin
-                    v-if="adminView"
-                    :user="user"
-                    :project="activeProject"
-                    :userStations="stations"
-                    :users="users"
-                    @viewProfile="switchToPublic"
-                />
-                <!-- display public view -->
-                <ProjectPublic v-if="publicView" :user="user" :project="activeProject" :users="users" />
+                <div class="view-container">
+                    <!-- display admin view -->
+                    <ProjectAdmin
+                        v-if="adminView"
+                        :user="user"
+                        :project="activeProject"
+                        :userStations="stations"
+                        :users="users"
+                        @viewProfile="switchToPublic"
+                    />
+                    <!-- display public view -->
+                    <ProjectPublic v-if="publicView" :user="user" :project="activeProject" :users="users" />
+                </div>
             </div>
         </div>
         <div v-if="noCurrentUser" class="no-user-message">
@@ -80,7 +82,7 @@ export default {
             publicView: false,
             previewing: false,
             userProjects: [],
-            activeProject: null,
+            activeProject: {},
             stations: [],
             users: [],
             isAuthenticated: false,
@@ -111,7 +113,7 @@ export default {
             this.adminView = false;
             this.publicView = false;
             this.userProjects = [];
-            this.activeProject = null;
+            this.activeProject = {};
             this.users = [];
             this.loading = true;
             this.init();
@@ -200,9 +202,11 @@ export default {
     font-size: 14px;
     cursor: pointer;
 }
-#inner-container {
-    margin: 20px 60px;
+.inner-container {
     overflow: scroll;
+}
+.view-container {
+    margin: 20px 60px;
 }
 #projects-container {
     width: 890px;

@@ -308,7 +308,7 @@ export default {
     text-align: left;
 }
 .image-container {
-    width: 98%;
+    width: 100%;
     margin: 15px 0;
     float: left;
 }

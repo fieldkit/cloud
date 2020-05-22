@@ -39,7 +39,7 @@
                 :admin="false"
                 :mapContainerSize="mapContainerSize"
                 :listSize="listSize"
-                @loaded="setModules"
+                @loaded="saveStationsData"
             />
 
             <div class="team-container">
@@ -85,10 +85,11 @@ export default {
     },
     props: ["user", "project", "users"],
     watch: {
-        project() {
-            if (this.project) {
+        project: {
+            handler() {
                 this.reset();
-            }
+            },
+            immediate: true,
         },
     },
     async beforeCreate() {
@@ -130,8 +131,8 @@ export default {
                 this.displayRunTime = utils.getRunTime(this.project);
             }
         },
-        setModules(modules) {
-            this.modules = modules;
+        saveStationsData(data) {
+            this.modules = data.modules;
         },
         getTeamHeading() {
             const members = this.users.length == 1 ? "member" : "members";
