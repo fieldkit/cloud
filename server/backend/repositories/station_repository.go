@@ -587,6 +587,16 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 }
 
 func newStationModule(m *pbapp.ModuleCapabilities, c *data.StationConfiguration, moduleIndex uint32) *data.StationModule {
+	if m.Header == nil {
+		return &data.StationModule{
+			ConfigurationID: c.ID,
+			HardwareID:      m.Id,
+			Index:           moduleIndex,
+			Position:        m.Position,
+			Flags:           m.Flags,
+			Name:            m.Name,
+		}
+	}
 	return &data.StationModule{
 		ConfigurationID: c.ID,
 		HardwareID:      m.Id,
