@@ -103,7 +103,9 @@ func (s *Station) UpdateFromStatus(raw string) error {
 
 		if status.Recording != nil {
 			recordingStartedAt := int64(status.Recording.StartedTime)
-			s.RecordingStartedAt = &recordingStartedAt
+			if recordingStartedAt > 0 {
+				s.RecordingStartedAt = &recordingStartedAt
+			}
 		}
 
 		if status.Firmware != nil {
