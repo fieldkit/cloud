@@ -13,15 +13,22 @@
                 <!-- just ingestions at the moment -->
                 <div v-for="activity in activities" v-bind:key="activity.id" class="activity">
                     <div class="activity-icon">
-                        <img src="../assets/compass-icon.png" />
+                        <img :src="activity.icon" />
                     </div>
-                    <div class="activity-text-container">
+                    <div class="activity-text-container" v-if="activity.type == 'ingestion'">
                         <div class="activity-heading">Uploaded Data</div>
                         <div class="activity-date">{{ activity.time.toLocaleDateString() }}</div>
                         <div class="activity-text">
                             {{ activity.records.toLocaleString() }} readings uploaded from {{ activity.name }}, with
                             {{ activity.errors ? " an error." : "no errors." }}
                             <img src="../assets/Icon_Warning_error.png" v-if="activity.errors" class="activity-error" />
+                        </div>
+                    </div>
+                    <div class="activity-text-container" v-if="activity.type == 'update'">
+                        <div class="activity-heading">{{ activity.name }}</div>
+                        <div class="activity-date">{{ activity.time.toLocaleDateString() }}</div>
+                        <div class="activity-text">
+                            {{ activity.text }}
                         </div>
                     </div>
                 </div>
@@ -43,7 +50,7 @@ export default {
             activities: [],
         };
     },
-    props: ["project", "viewing"],
+    props: ["project", "viewing", "users"],
     watch: {
         viewing() {
             if (this.viewing) {
@@ -57,17 +64,35 @@ export default {
     },
     methods: {
         fetchActivity() {
+            let imgPath = require.context("../assets/", false, /\.png$/);
+            const img = "compass-icon.png";
+            const compassImg = imgPath("./" + img);
+
             this.api.getProjectActivity(this.project.id).then(result => {
                 this.activities = result.activities.map((a, i) => {
-                    // starting with just one type of activity
+                    // starting with just two types of activity
                     if (a.type == "StationIngestion") {
                         return {
                             id: "ingestion-" + i,
                             type: "ingestion",
+                            icon: compassImg,
                             name: a.station.name,
                             time: new Date(a.created_at),
                             records: a.meta.data.records,
                             errors: a.meta.errors,
+                        };
+                    }
+                    if (a.type == "ProjectUpdate") {
+                        const user = this.users.find(u => {
+                            return u.user.id == a.meta.author.id;
+                        });
+                        return {
+                            id: "update-" + i,
+                            type: "update",
+                            icon: user && user.userImage ? user.userImage : compassImg,
+                            name: a.meta.author.name,
+                            time: new Date(a.created_at),
+                            text: a.meta.body,
                         };
                     }
                 });
@@ -127,6 +152,9 @@ export default {
     width: 40px;
     padding: 5px 0 0 0;
 }
+.activity-icon img {
+    width: 30px;
+}
 .activity-text-container {
     float: right;
     width: 275px;
@@ -134,14 +162,14 @@ export default {
 .activity-heading {
     font-size: 16px;
     font-weight: 600;
-    margin: 0 6px 0 0;
-    display: inline-block;
+    float: left;
 }
 .activity-date {
     font-size: 12px;
     color: #6a6d71;
     font-weight: 600;
-    display: inline-block;
+    float: left;
+    margin: 4px 0 0 6px;
 }
 .activity-text {
     float: left;

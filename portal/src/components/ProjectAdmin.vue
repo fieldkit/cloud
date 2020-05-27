@@ -3,6 +3,7 @@
         <ProjectActivity
             :project="project"
             :viewing="viewingActivityFeed"
+            :users="projectUsers"
             @closeActivity="closeActivityFeed"
             v-show="viewingActivityFeed"
         />
@@ -19,7 +20,7 @@
                     <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
 
                     <div class="actions-icon-container">
-                        <div class="action left">
+                        <div class="action left" v-on:click="addUpdate">
                             <img src="../assets/update.png" />
                             <div class="label">Update</div>
                         </div>
@@ -253,6 +254,9 @@ export default {
         },
         editProject() {
             this.$router.push({ name: "editProject", params: { id: this.project.id } });
+        },
+        addUpdate() {
+            this.$router.push({ name: "addProjectUpdate", params: { project: this.project } });
         },
         viewProfile() {
             this.$emit("viewProfile");
