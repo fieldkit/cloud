@@ -114,6 +114,8 @@ export default {
     watch: {
         station() {
             if (this.station) {
+                this.modulesSensors = {};
+                this.moduleSensorCounter = 0;
                 this.getPlaceName()
                     .then(this.getNativeLand)
                     .then(result => {

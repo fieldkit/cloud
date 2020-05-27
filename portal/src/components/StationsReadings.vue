@@ -9,21 +9,19 @@
         </div>
         <div class="sensors-container">
             <div v-for="(module, moduleIndex) in currentStation.modules" v-bind:key="module.id">
-                <template v-if="module.position < 5">
-                    <div
-                        v-for="(sensor, sensorIndex) in module.sensors"
-                        v-bind:key="sensor.id"
-                        :class="getCounter(moduleIndex, sensorIndex) % 2 == 1 ? 'left-reading' : 'right-reading'"
-                    >
-                        <div class="left sensor-name">{{ getSensorName(module, sensor) }}</div>
-                        <div class="right sensor-unit">
-                            {{ sensor.unit_of_measure }}
-                        </div>
-                        <div class="right sensor-reading">
-                            {{ getReading(sensor) }}
-                        </div>
+                <div
+                    v-for="(sensor, sensorIndex) in module.sensors"
+                    v-bind:key="sensor.id"
+                    :class="getCounter(moduleIndex, sensorIndex) % 2 == 1 ? 'left-reading' : 'right-reading'"
+                >
+                    <div class="left sensor-name">{{ getSensorName(module, sensor) }}</div>
+                    <div class="right sensor-unit">
+                        {{ sensor.unit_of_measure }}
                     </div>
-                </template>
+                    <div class="right sensor-reading">
+                        {{ getReading(sensor) }}
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -79,9 +77,15 @@ export default {
                 default:
                     this.currentIndex = value;
             }
+            this.modulesSensors = {};
+            this.moduleSensorCounter = 0;
             this.currentStation = this.stations[this.currentIndex - 1];
             if (!this.currentStation) {
                 this.currentStation = {};
+            } else {
+                this.currentStation.modules = this.currentStation.modules.filter(m => {
+                    return m.position < 5;
+                });
             }
         },
 
@@ -92,6 +96,10 @@ export default {
                 this.currentStation = this.stations[this.currentIndex - 1];
                 if (!this.currentStation) {
                     this.currentStation = {};
+                } else {
+                    this.currentStation.modules = this.currentStation.modules.filter(m => {
+                        return m.position < 5;
+                    });
                 }
             });
         },
