@@ -69,7 +69,7 @@ export default {
             this.$emit("updating");
             const api = new FKApi();
             const data = this.createParams();
-            api.addProjectUpdate(data).then(u => {
+            api.addProjectUpdate(data).then(() => {
                 this.$router.push({ name: "viewProject", params: { id: this.project.id } });
             });
         },
@@ -77,7 +77,7 @@ export default {
             this.$emit("updating");
             const api = new FKApi();
             const data = this.createParams();
-            api.updateProjectUpdate(data).then(u => {
+            api.updateProjectUpdate(data).then(() => {
                 this.$router.push({ name: "viewProject", params: { id: this.project.id } });
             });
         },

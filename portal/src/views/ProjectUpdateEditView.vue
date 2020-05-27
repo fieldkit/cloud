@@ -76,7 +76,7 @@ export default {
                     this.loading = false;
                 }
             })
-            .catch(e => {
+            .catch(() => {
                 this.loading = false;
                 this.noCurrentUser = true;
             });
