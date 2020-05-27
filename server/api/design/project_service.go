@@ -26,25 +26,89 @@ var PendingInvites = ResultType("application/vnd.app.invites.pending", func() {
 	})
 })
 
+var ProjectUpdate = ResultType("application/vnd.app.project.update", func() {
+	TypeName("ProjectUpdate")
+	Attributes(func() {
+		Attribute("id", Int64)
+		Attribute("body", String)
+		Attribute("created_at", Int64)
+		Required("id")
+		Required("body")
+		Required("created_at")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("body")
+	})
+})
+
 var _ = Service("project", func() {
-	Method("update", func() {
+	Method("add update", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
 		})
 
 		Payload(func() {
 			Token("auth")
-			Attribute("id", Int64)
+			Attribute("projectId", Int32)
 			Attribute("body", String)
 			Required("auth")
-			Required("id")
+			Required("projectId")
 			Required("body")
+		})
+
+		Result(ProjectUpdate)
+
+		HTTP(func() {
+			POST("projects/{projectId}/updates")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("delete update", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Attribute("projectId", Int32)
+			Attribute("updateId", Int64)
+			Required("auth")
+			Required("projectId")
+			Required("updateId")
 		})
 
 		Result(Empty)
 
 		HTTP(func() {
-			POST("projects/{id}/update")
+			DELETE("projects/{projectId}/updates/{updateId}")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("modify update", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Attribute("projectId", Int32)
+			Attribute("updateId", Int64)
+			Attribute("body", String)
+			Required("auth")
+			Required("projectId")
+			Required("updateId")
+			Required("body")
+		})
+
+		Result(ProjectUpdate)
+
+		HTTP(func() {
+			POST("projects/{projectId}/updates/{updateId}")
 
 			httpAuthentication()
 		})

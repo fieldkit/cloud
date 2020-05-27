@@ -145,7 +145,7 @@ func TestGetProjectMember(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("")
+	user, err := e.AddUser("goodgoodgood")
 	assert.NoError(err)
 
 	project, err := e.AddProject()
@@ -183,7 +183,7 @@ func TestGetProjectAdministrator(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("")
+	user, err := e.AddUser("goodgoodgood")
 	assert.NoError(err)
 
 	project, err := e.AddProject()
@@ -214,4 +214,84 @@ func TestGetProjectAdministrator(t *testing.T) {
 			"name": "<<PRESENCE>>",
 			"goal": "<<PRESENCE>>"
 		}`)
+}
+
+func TestAddProjectUpdate(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	project, err := e.AddProject()
+	assert.NoError(err)
+
+	user, err := e.AddUser("goodgoodgood")
+	assert.NoError(err)
+
+	err = e.AddProjectUser(project, user, data.AdministratorRole)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	payload, err := json.Marshal(
+		struct {
+			Body string `json:"body"`
+		}{
+			Body: "New Body",
+		},
+	)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("POST", fmt.Sprintf("/projects/%d/updates", project.ID), bytes.NewReader(payload))
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+}
+
+func TestModifyProjectUpdate(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	project, err := e.AddProject()
+	assert.NoError(err)
+
+	user, err := e.AddUser("goodgoodgood")
+	assert.NoError(err)
+
+	err = e.AddProjectUser(project, user, data.AdministratorRole)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	payload, err := json.Marshal(
+		struct {
+			Body string `json:"body"`
+		}{
+			Body: "New Body",
+		},
+	)
+	assert.NoError(err)
+
+	addReq, _ := http.NewRequest("POST", fmt.Sprintf("/projects/%d/updates", project.ID), bytes.NewReader(payload))
+	addReq.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
+	addResponse := tests.ExecuteRequest(addReq, api)
+
+	assert.Equal(http.StatusOK, addResponse.Code)
+
+	reply := struct {
+		ID   int64  `json:"id"`
+		Body string `json:"body"`
+	}{}
+
+	err = json.Unmarshal(addResponse.Body.Bytes(), &reply)
+	assert.NoError(err)
+
+	modifyReq, _ := http.NewRequest("POST", fmt.Sprintf("/projects/%d/updates/%d", project.ID, reply.ID), bytes.NewReader(payload))
+	modifyReq.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
+	modifyResponse := tests.ExecuteRequest(modifyReq, api)
+
+	assert.Equal(http.StatusOK, modifyResponse.Code)
 }

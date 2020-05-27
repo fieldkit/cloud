@@ -13,10 +13,30 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// UpdateRequestBody is the type of the "project" service "update" endpoint
-// HTTP request body.
-type UpdateRequestBody struct {
+// AddUpdateRequestBody is the type of the "project" service "add update"
+// endpoint HTTP request body.
+type AddUpdateRequestBody struct {
 	Body *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+}
+
+// ModifyUpdateRequestBody is the type of the "project" service "modify update"
+// endpoint HTTP request body.
+type ModifyUpdateRequestBody struct {
+	Body *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+}
+
+// AddUpdateResponseBody is the type of the "project" service "add update"
+// endpoint HTTP response body.
+type AddUpdateResponseBody struct {
+	ID   int64  `form:"id" json:"id" xml:"id"`
+	Body string `form:"body" json:"body" xml:"body"`
+}
+
+// ModifyUpdateResponseBody is the type of the "project" service "modify
+// update" endpoint HTTP response body.
+type ModifyUpdateResponseBody struct {
+	ID   int64  `form:"id" json:"id" xml:"id"`
+	Body string `form:"body" json:"body" xml:"body"`
 }
 
 // InvitesResponseBody is the type of the "project" service "invites" endpoint
@@ -31,21 +51,53 @@ type LookupInviteResponseBody struct {
 	Pending []*PendingInviteResponseBody `form:"pending" json:"pending" xml:"pending"`
 }
 
-// UpdateBadRequestResponseBody is the type of the "project" service "update"
-// endpoint HTTP response body for the "bad-request" error.
-type UpdateBadRequestResponseBody string
+// AddUpdateBadRequestResponseBody is the type of the "project" service "add
+// update" endpoint HTTP response body for the "bad-request" error.
+type AddUpdateBadRequestResponseBody string
 
-// UpdateForbiddenResponseBody is the type of the "project" service "update"
-// endpoint HTTP response body for the "forbidden" error.
-type UpdateForbiddenResponseBody string
+// AddUpdateForbiddenResponseBody is the type of the "project" service "add
+// update" endpoint HTTP response body for the "forbidden" error.
+type AddUpdateForbiddenResponseBody string
 
-// UpdateNotFoundResponseBody is the type of the "project" service "update"
-// endpoint HTTP response body for the "not-found" error.
-type UpdateNotFoundResponseBody string
+// AddUpdateNotFoundResponseBody is the type of the "project" service "add
+// update" endpoint HTTP response body for the "not-found" error.
+type AddUpdateNotFoundResponseBody string
 
-// UpdateUnauthorizedResponseBody is the type of the "project" service "update"
-// endpoint HTTP response body for the "unauthorized" error.
-type UpdateUnauthorizedResponseBody string
+// AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
+// update" endpoint HTTP response body for the "unauthorized" error.
+type AddUpdateUnauthorizedResponseBody string
+
+// DeleteUpdateBadRequestResponseBody is the type of the "project" service
+// "delete update" endpoint HTTP response body for the "bad-request" error.
+type DeleteUpdateBadRequestResponseBody string
+
+// DeleteUpdateForbiddenResponseBody is the type of the "project" service
+// "delete update" endpoint HTTP response body for the "forbidden" error.
+type DeleteUpdateForbiddenResponseBody string
+
+// DeleteUpdateNotFoundResponseBody is the type of the "project" service
+// "delete update" endpoint HTTP response body for the "not-found" error.
+type DeleteUpdateNotFoundResponseBody string
+
+// DeleteUpdateUnauthorizedResponseBody is the type of the "project" service
+// "delete update" endpoint HTTP response body for the "unauthorized" error.
+type DeleteUpdateUnauthorizedResponseBody string
+
+// ModifyUpdateBadRequestResponseBody is the type of the "project" service
+// "modify update" endpoint HTTP response body for the "bad-request" error.
+type ModifyUpdateBadRequestResponseBody string
+
+// ModifyUpdateForbiddenResponseBody is the type of the "project" service
+// "modify update" endpoint HTTP response body for the "forbidden" error.
+type ModifyUpdateForbiddenResponseBody string
+
+// ModifyUpdateNotFoundResponseBody is the type of the "project" service
+// "modify update" endpoint HTTP response body for the "not-found" error.
+type ModifyUpdateNotFoundResponseBody string
+
+// ModifyUpdateUnauthorizedResponseBody is the type of the "project" service
+// "modify update" endpoint HTTP response body for the "unauthorized" error.
+type ModifyUpdateUnauthorizedResponseBody string
 
 // InvitesBadRequestResponseBody is the type of the "project" service "invites"
 // endpoint HTTP response body for the "bad-request" error.
@@ -125,6 +177,26 @@ type ProjectSummaryResponseBody struct {
 	Name string `form:"name" json:"name" xml:"name"`
 }
 
+// NewAddUpdateResponseBody builds the HTTP response body from the result of
+// the "add update" endpoint of the "project" service.
+func NewAddUpdateResponseBody(res *projectviews.ProjectUpdateView) *AddUpdateResponseBody {
+	body := &AddUpdateResponseBody{
+		ID:   *res.ID,
+		Body: *res.Body,
+	}
+	return body
+}
+
+// NewModifyUpdateResponseBody builds the HTTP response body from the result of
+// the "modify update" endpoint of the "project" service.
+func NewModifyUpdateResponseBody(res *projectviews.ProjectUpdateView) *ModifyUpdateResponseBody {
+	body := &ModifyUpdateResponseBody{
+		ID:   *res.ID,
+		Body: *res.Body,
+	}
+	return body
+}
+
 // NewInvitesResponseBody builds the HTTP response body from the result of the
 // "invites" endpoint of the "project" service.
 func NewInvitesResponseBody(res *projectviews.PendingInvitesView) *InvitesResponseBody {
@@ -151,31 +223,87 @@ func NewLookupInviteResponseBody(res *projectviews.PendingInvitesView) *LookupIn
 	return body
 }
 
-// NewUpdateBadRequestResponseBody builds the HTTP response body from the
-// result of the "update" endpoint of the "project" service.
-func NewUpdateBadRequestResponseBody(res project.BadRequest) UpdateBadRequestResponseBody {
-	body := UpdateBadRequestResponseBody(res)
+// NewAddUpdateBadRequestResponseBody builds the HTTP response body from the
+// result of the "add update" endpoint of the "project" service.
+func NewAddUpdateBadRequestResponseBody(res project.BadRequest) AddUpdateBadRequestResponseBody {
+	body := AddUpdateBadRequestResponseBody(res)
 	return body
 }
 
-// NewUpdateForbiddenResponseBody builds the HTTP response body from the result
-// of the "update" endpoint of the "project" service.
-func NewUpdateForbiddenResponseBody(res project.Forbidden) UpdateForbiddenResponseBody {
-	body := UpdateForbiddenResponseBody(res)
+// NewAddUpdateForbiddenResponseBody builds the HTTP response body from the
+// result of the "add update" endpoint of the "project" service.
+func NewAddUpdateForbiddenResponseBody(res project.Forbidden) AddUpdateForbiddenResponseBody {
+	body := AddUpdateForbiddenResponseBody(res)
 	return body
 }
 
-// NewUpdateNotFoundResponseBody builds the HTTP response body from the result
-// of the "update" endpoint of the "project" service.
-func NewUpdateNotFoundResponseBody(res project.NotFound) UpdateNotFoundResponseBody {
-	body := UpdateNotFoundResponseBody(res)
+// NewAddUpdateNotFoundResponseBody builds the HTTP response body from the
+// result of the "add update" endpoint of the "project" service.
+func NewAddUpdateNotFoundResponseBody(res project.NotFound) AddUpdateNotFoundResponseBody {
+	body := AddUpdateNotFoundResponseBody(res)
 	return body
 }
 
-// NewUpdateUnauthorizedResponseBody builds the HTTP response body from the
-// result of the "update" endpoint of the "project" service.
-func NewUpdateUnauthorizedResponseBody(res project.Unauthorized) UpdateUnauthorizedResponseBody {
-	body := UpdateUnauthorizedResponseBody(res)
+// NewAddUpdateUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "add update" endpoint of the "project" service.
+func NewAddUpdateUnauthorizedResponseBody(res project.Unauthorized) AddUpdateUnauthorizedResponseBody {
+	body := AddUpdateUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewDeleteUpdateBadRequestResponseBody builds the HTTP response body from the
+// result of the "delete update" endpoint of the "project" service.
+func NewDeleteUpdateBadRequestResponseBody(res project.BadRequest) DeleteUpdateBadRequestResponseBody {
+	body := DeleteUpdateBadRequestResponseBody(res)
+	return body
+}
+
+// NewDeleteUpdateForbiddenResponseBody builds the HTTP response body from the
+// result of the "delete update" endpoint of the "project" service.
+func NewDeleteUpdateForbiddenResponseBody(res project.Forbidden) DeleteUpdateForbiddenResponseBody {
+	body := DeleteUpdateForbiddenResponseBody(res)
+	return body
+}
+
+// NewDeleteUpdateNotFoundResponseBody builds the HTTP response body from the
+// result of the "delete update" endpoint of the "project" service.
+func NewDeleteUpdateNotFoundResponseBody(res project.NotFound) DeleteUpdateNotFoundResponseBody {
+	body := DeleteUpdateNotFoundResponseBody(res)
+	return body
+}
+
+// NewDeleteUpdateUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "delete update" endpoint of the "project" service.
+func NewDeleteUpdateUnauthorizedResponseBody(res project.Unauthorized) DeleteUpdateUnauthorizedResponseBody {
+	body := DeleteUpdateUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewModifyUpdateBadRequestResponseBody builds the HTTP response body from the
+// result of the "modify update" endpoint of the "project" service.
+func NewModifyUpdateBadRequestResponseBody(res project.BadRequest) ModifyUpdateBadRequestResponseBody {
+	body := ModifyUpdateBadRequestResponseBody(res)
+	return body
+}
+
+// NewModifyUpdateForbiddenResponseBody builds the HTTP response body from the
+// result of the "modify update" endpoint of the "project" service.
+func NewModifyUpdateForbiddenResponseBody(res project.Forbidden) ModifyUpdateForbiddenResponseBody {
+	body := ModifyUpdateForbiddenResponseBody(res)
+	return body
+}
+
+// NewModifyUpdateNotFoundResponseBody builds the HTTP response body from the
+// result of the "modify update" endpoint of the "project" service.
+func NewModifyUpdateNotFoundResponseBody(res project.NotFound) ModifyUpdateNotFoundResponseBody {
+	body := ModifyUpdateNotFoundResponseBody(res)
+	return body
+}
+
+// NewModifyUpdateUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "modify update" endpoint of the "project" service.
+func NewModifyUpdateUnauthorizedResponseBody(res project.Unauthorized) ModifyUpdateUnauthorizedResponseBody {
+	body := ModifyUpdateUnauthorizedResponseBody(res)
 	return body
 }
 
@@ -291,12 +419,36 @@ func NewRejectInviteUnauthorizedResponseBody(res project.Unauthorized) RejectInv
 	return body
 }
 
-// NewUpdatePayload builds a project service update endpoint payload.
-func NewUpdatePayload(body *UpdateRequestBody, id int64, auth string) *project.UpdatePayload {
-	v := &project.UpdatePayload{
+// NewAddUpdatePayload builds a project service add update endpoint payload.
+func NewAddUpdatePayload(body *AddUpdateRequestBody, projectID int32, auth string) *project.AddUpdatePayload {
+	v := &project.AddUpdatePayload{
 		Body: *body.Body,
 	}
-	v.ID = id
+	v.ProjectID = projectID
+	v.Auth = auth
+
+	return v
+}
+
+// NewDeleteUpdatePayload builds a project service delete update endpoint
+// payload.
+func NewDeleteUpdatePayload(projectID int32, updateID int64, auth string) *project.DeleteUpdatePayload {
+	v := &project.DeleteUpdatePayload{}
+	v.ProjectID = projectID
+	v.UpdateID = updateID
+	v.Auth = auth
+
+	return v
+}
+
+// NewModifyUpdatePayload builds a project service modify update endpoint
+// payload.
+func NewModifyUpdatePayload(body *ModifyUpdateRequestBody, projectID int32, updateID int64, auth string) *project.ModifyUpdatePayload {
+	v := &project.ModifyUpdatePayload{
+		Body: *body.Body,
+	}
+	v.ProjectID = projectID
+	v.UpdateID = updateID
 	v.Auth = auth
 
 	return v
@@ -342,8 +494,18 @@ func NewRejectInvitePayload(id int64, token *string, auth string) *project.Rejec
 	return v
 }
 
-// ValidateUpdateRequestBody runs the validations defined on UpdateRequestBody
-func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
+// ValidateAddUpdateRequestBody runs the validations defined on Add
+// UpdateRequestBody
+func ValidateAddUpdateRequestBody(body *AddUpdateRequestBody) (err error) {
+	if body.Body == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("body", "body"))
+	}
+	return
+}
+
+// ValidateModifyUpdateRequestBody runs the validations defined on Modify
+// UpdateRequestBody
+func ValidateModifyUpdateRequestBody(body *ModifyUpdateRequestBody) (err error) {
 	if body.Body == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("body", "body"))
 	}

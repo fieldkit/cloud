@@ -20,21 +20,24 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// EncodeUpdateResponse returns an encoder for responses returned by the
-// project update endpoint.
-func EncodeUpdateResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeAddUpdateResponse returns an encoder for responses returned by the
+// project add update endpoint.
+func EncodeAddUpdateResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*projectviews.ProjectUpdate)
+		enc := encoder(ctx, w)
+		body := NewAddUpdateResponseBody(res.Projected)
 		w.WriteHeader(http.StatusOK)
-		return nil
+		return enc.Encode(body)
 	}
 }
 
-// DecodeUpdateRequest returns a decoder for requests sent to the project
-// update endpoint.
-func DecodeUpdateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+// DecodeAddUpdateRequest returns a decoder for requests sent to the project
+// add update endpoint.
+func DecodeAddUpdateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			body UpdateRequestBody
+			body AddUpdateRequestBody
 			err  error
 		)
 		err = decoder(r).Decode(&body)
@@ -44,24 +47,24 @@ func DecodeUpdateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 			}
 			return nil, goa.DecodePayloadError(err.Error())
 		}
-		err = ValidateUpdateRequestBody(&body)
+		err = ValidateAddUpdateRequestBody(&body)
 		if err != nil {
 			return nil, err
 		}
 
 		var (
-			id   int64
-			auth string
+			projectID int32
+			auth      string
 
 			params = mux.Vars(r)
 		)
 		{
-			idRaw := params["id"]
-			v, err2 := strconv.ParseInt(idRaw, 10, 64)
+			projectIDRaw := params["projectId"]
+			v, err2 := strconv.ParseInt(projectIDRaw, 10, 32)
 			if err2 != nil {
-				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("id", idRaw, "integer"))
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("projectID", projectIDRaw, "integer"))
 			}
-			id = v
+			projectID = int32(v)
 		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
@@ -70,7 +73,7 @@ func DecodeUpdateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 		if err != nil {
 			return nil, err
 		}
-		payload := NewUpdatePayload(&body, id, auth)
+		payload := NewAddUpdatePayload(&body, projectID, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
@@ -81,9 +84,9 @@ func DecodeUpdateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 	}
 }
 
-// EncodeUpdateError returns an encoder for errors returned by the update
-// project endpoint.
-func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeAddUpdateError returns an encoder for errors returned by the add
+// update project endpoint.
+func EncodeAddUpdateError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		en, ok := v.(ErrorNamer)
@@ -98,7 +101,7 @@ func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUpdateBadRequestResponseBody(res)
+				body = NewAddUpdateBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
@@ -110,7 +113,7 @@ func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUpdateForbiddenResponseBody(res)
+				body = NewAddUpdateForbiddenResponseBody(res)
 			}
 			w.Header().Set("goa-error", "forbidden")
 			w.WriteHeader(http.StatusForbidden)
@@ -122,7 +125,7 @@ func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUpdateNotFoundResponseBody(res)
+				body = NewAddUpdateNotFoundResponseBody(res)
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
@@ -134,7 +137,263 @@ func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUpdateUnauthorizedResponseBody(res)
+				body = NewAddUpdateUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeDeleteUpdateResponse returns an encoder for responses returned by the
+// project delete update endpoint.
+func EncodeDeleteUpdateResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		w.WriteHeader(http.StatusOK)
+		return nil
+	}
+}
+
+// DecodeDeleteUpdateRequest returns a decoder for requests sent to the project
+// delete update endpoint.
+func DecodeDeleteUpdateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			projectID int32
+			updateID  int64
+			auth      string
+			err       error
+
+			params = mux.Vars(r)
+		)
+		{
+			projectIDRaw := params["projectId"]
+			v, err2 := strconv.ParseInt(projectIDRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("projectID", projectIDRaw, "integer"))
+			}
+			projectID = int32(v)
+		}
+		{
+			updateIDRaw := params["updateId"]
+			v, err2 := strconv.ParseInt(updateIDRaw, 10, 64)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("updateID", updateIDRaw, "integer"))
+			}
+			updateID = v
+		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewDeleteUpdatePayload(projectID, updateID, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeDeleteUpdateError returns an encoder for errors returned by the delete
+// update project endpoint.
+func EncodeDeleteUpdateError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(project.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDeleteUpdateBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(project.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDeleteUpdateForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(project.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDeleteUpdateNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(project.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDeleteUpdateUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeModifyUpdateResponse returns an encoder for responses returned by the
+// project modify update endpoint.
+func EncodeModifyUpdateResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*projectviews.ProjectUpdate)
+		enc := encoder(ctx, w)
+		body := NewModifyUpdateResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeModifyUpdateRequest returns a decoder for requests sent to the project
+// modify update endpoint.
+func DecodeModifyUpdateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body ModifyUpdateRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateModifyUpdateRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+
+		var (
+			projectID int32
+			updateID  int64
+			auth      string
+
+			params = mux.Vars(r)
+		)
+		{
+			projectIDRaw := params["projectId"]
+			v, err2 := strconv.ParseInt(projectIDRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("projectID", projectIDRaw, "integer"))
+			}
+			projectID = int32(v)
+		}
+		{
+			updateIDRaw := params["updateId"]
+			v, err2 := strconv.ParseInt(updateIDRaw, 10, 64)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("updateID", updateIDRaw, "integer"))
+			}
+			updateID = v
+		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewModifyUpdatePayload(&body, projectID, updateID, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeModifyUpdateError returns an encoder for errors returned by the modify
+// update project endpoint.
+func EncodeModifyUpdateError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(project.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewModifyUpdateBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(project.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewModifyUpdateForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(project.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewModifyUpdateNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(project.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewModifyUpdateUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", "unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)

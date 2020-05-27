@@ -15,32 +15,107 @@ import (
 	project "github.com/fieldkit/cloud/server/api/gen/project"
 )
 
-// BuildUpdatePayload builds the payload for the project update endpoint from
-// CLI flags.
-func BuildUpdatePayload(projectUpdateBody string, projectUpdateID string, projectUpdateAuth string) (*project.UpdatePayload, error) {
+// BuildAddUpdatePayload builds the payload for the project add update endpoint
+// from CLI flags.
+func BuildAddUpdatePayload(projectAddUpdateBody string, projectAddUpdateProjectID string, projectAddUpdateAuth string) (*project.AddUpdatePayload, error) {
 	var err error
-	var body UpdateRequestBody
+	var body AddUpdateRequestBody
 	{
-		err = json.Unmarshal([]byte(projectUpdateBody), &body)
+		err = json.Unmarshal([]byte(projectAddUpdateBody), &body)
 		if err != nil {
 			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Et quis optio voluptatibus quas dolor.\"\n   }'")
 		}
 	}
-	var id int64
+	var projectID int32
 	{
-		id, err = strconv.ParseInt(projectUpdateID, 10, 64)
+		var v int64
+		v, err = strconv.ParseInt(projectAddUpdateProjectID, 10, 32)
+		projectID = int32(v)
 		if err != nil {
-			return nil, fmt.Errorf("invalid value for id, must be INT64")
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
 		}
 	}
 	var auth string
 	{
-		auth = projectUpdateAuth
+		auth = projectAddUpdateAuth
 	}
-	v := &project.UpdatePayload{
+	v := &project.AddUpdatePayload{
 		Body: body.Body,
 	}
-	v.ID = id
+	v.ProjectID = projectID
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildDeleteUpdatePayload builds the payload for the project delete update
+// endpoint from CLI flags.
+func BuildDeleteUpdatePayload(projectDeleteUpdateProjectID string, projectDeleteUpdateUpdateID string, projectDeleteUpdateAuth string) (*project.DeleteUpdatePayload, error) {
+	var err error
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectDeleteUpdateProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var updateID int64
+	{
+		updateID, err = strconv.ParseInt(projectDeleteUpdateUpdateID, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for updateID, must be INT64")
+		}
+	}
+	var auth string
+	{
+		auth = projectDeleteUpdateAuth
+	}
+	v := &project.DeleteUpdatePayload{}
+	v.ProjectID = projectID
+	v.UpdateID = updateID
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildModifyUpdatePayload builds the payload for the project modify update
+// endpoint from CLI flags.
+func BuildModifyUpdatePayload(projectModifyUpdateBody string, projectModifyUpdateProjectID string, projectModifyUpdateUpdateID string, projectModifyUpdateAuth string) (*project.ModifyUpdatePayload, error) {
+	var err error
+	var body ModifyUpdateRequestBody
+	{
+		err = json.Unmarshal([]byte(projectModifyUpdateBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Voluptatem perspiciatis libero minus.\"\n   }'")
+		}
+	}
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectModifyUpdateProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var updateID int64
+	{
+		updateID, err = strconv.ParseInt(projectModifyUpdateUpdateID, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for updateID, must be INT64")
+		}
+	}
+	var auth string
+	{
+		auth = projectModifyUpdateAuth
+	}
+	v := &project.ModifyUpdatePayload{
+		Body: body.Body,
+	}
+	v.ProjectID = projectID
+	v.UpdateID = updateID
 	v.Auth = auth
 
 	return v, nil

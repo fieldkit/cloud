@@ -35,7 +35,7 @@ func UsageCommands() string {
 following (follow|unfollow|followers)
 ingestion (process- pending|process- station|process- ingestion|delete)
 modules meta
-project (update|invites|lookup- invite|accept- invite|reject- invite)
+project (add- update|delete- update|modify- update|invites|lookup- invite|accept- invite|reject- invite)
 station (add|get|update|list- mine|list- project|photo)
 tasks (five|refresh- device)
 test (get|error|email)
@@ -45,13 +45,13 @@ user (roles|delete)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 7083460172664600876 --page 4740977291606166868 --auth "Magnam facilis aut assumenda maiores sint sit."` + "\n" +
-		os.Args[0] + ` following follow --id 7247355678576483787 --auth "Eaque iusto dolores ut sapiente."` + "\n" +
+	return os.Args[0] + ` activity station --id 4850889053895604672 --page 4702121072547338975 --auth "Maiores ut qui quisquam molestiae."` + "\n" +
+		os.Args[0] + ` following follow --id 7938282212268354146 --auth "Id quibusdam autem reprehenderit."` + "\n" +
 		os.Args[0] + ` ingestion process- pending --auth "Voluptatem possimus sint sint aut."` + "\n" +
 		os.Args[0] + ` modules meta` + "\n" +
-		os.Args[0] + ` project update --body '{
+		os.Args[0] + ` project add- update --body '{
       "body": "Et quis optio voluptatibus quas dolor."
-   }' --id 2235992879006751494 --auth "Impedit quidem labore."` + "\n" +
+   }' --project-id 520607661 --auth "Impedit quidem labore."` + "\n" +
 		""
 }
 
@@ -114,10 +114,21 @@ func ParseEndpoint(
 
 		projectFlags = flag.NewFlagSet("project", flag.ContinueOnError)
 
-		projectUpdateFlags    = flag.NewFlagSet("update", flag.ExitOnError)
-		projectUpdateBodyFlag = projectUpdateFlags.String("body", "REQUIRED", "")
-		projectUpdateIDFlag   = projectUpdateFlags.String("id", "REQUIRED", "")
-		projectUpdateAuthFlag = projectUpdateFlags.String("auth", "REQUIRED", "")
+		projectAddUpdateFlags         = flag.NewFlagSet("add- update", flag.ExitOnError)
+		projectAddUpdateBodyFlag      = projectAddUpdateFlags.String("body", "REQUIRED", "")
+		projectAddUpdateProjectIDFlag = projectAddUpdateFlags.String("project-id", "REQUIRED", "")
+		projectAddUpdateAuthFlag      = projectAddUpdateFlags.String("auth", "REQUIRED", "")
+
+		projectDeleteUpdateFlags         = flag.NewFlagSet("delete- update", flag.ExitOnError)
+		projectDeleteUpdateProjectIDFlag = projectDeleteUpdateFlags.String("project-id", "REQUIRED", "")
+		projectDeleteUpdateUpdateIDFlag  = projectDeleteUpdateFlags.String("update-id", "REQUIRED", "")
+		projectDeleteUpdateAuthFlag      = projectDeleteUpdateFlags.String("auth", "REQUIRED", "")
+
+		projectModifyUpdateFlags         = flag.NewFlagSet("modify- update", flag.ExitOnError)
+		projectModifyUpdateBodyFlag      = projectModifyUpdateFlags.String("body", "REQUIRED", "")
+		projectModifyUpdateProjectIDFlag = projectModifyUpdateFlags.String("project-id", "REQUIRED", "")
+		projectModifyUpdateUpdateIDFlag  = projectModifyUpdateFlags.String("update-id", "REQUIRED", "")
+		projectModifyUpdateAuthFlag      = projectModifyUpdateFlags.String("auth", "REQUIRED", "")
 
 		projectInvitesFlags    = flag.NewFlagSet("invites", flag.ExitOnError)
 		projectInvitesAuthFlag = projectInvitesFlags.String("auth", "REQUIRED", "")
@@ -209,7 +220,9 @@ func ParseEndpoint(
 	modulesMetaFlags.Usage = modulesMetaUsage
 
 	projectFlags.Usage = projectUsage
-	projectUpdateFlags.Usage = projectUpdateUsage
+	projectAddUpdateFlags.Usage = projectAddUpdateUsage
+	projectDeleteUpdateFlags.Usage = projectDeleteUpdateUsage
+	projectModifyUpdateFlags.Usage = projectModifyUpdateUsage
 	projectInvitesFlags.Usage = projectInvitesUsage
 	projectLookupInviteFlags.Usage = projectLookupInviteUsage
 	projectAcceptInviteFlags.Usage = projectAcceptInviteUsage
@@ -332,8 +345,14 @@ func ParseEndpoint(
 
 		case "project":
 			switch epn {
-			case "update":
-				epf = projectUpdateFlags
+			case "add- update":
+				epf = projectAddUpdateFlags
+
+			case "delete- update":
+				epf = projectDeleteUpdateFlags
+
+			case "modify- update":
+				epf = projectModifyUpdateFlags
 
 			case "invites":
 				epf = projectInvitesFlags
@@ -473,9 +492,15 @@ func ParseEndpoint(
 		case "project":
 			c := projectc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
-			case "update":
-				endpoint = c.Update()
-				data, err = projectc.BuildUpdatePayload(*projectUpdateBodyFlag, *projectUpdateIDFlag, *projectUpdateAuthFlag)
+			case "add- update":
+				endpoint = c.AddUpdate()
+				data, err = projectc.BuildAddUpdatePayload(*projectAddUpdateBodyFlag, *projectAddUpdateProjectIDFlag, *projectAddUpdateAuthFlag)
+			case "delete- update":
+				endpoint = c.DeleteUpdate()
+				data, err = projectc.BuildDeleteUpdatePayload(*projectDeleteUpdateProjectIDFlag, *projectDeleteUpdateUpdateIDFlag, *projectDeleteUpdateAuthFlag)
+			case "modify- update":
+				endpoint = c.ModifyUpdate()
+				data, err = projectc.BuildModifyUpdatePayload(*projectModifyUpdateBodyFlag, *projectModifyUpdateProjectIDFlag, *projectModifyUpdateUpdateIDFlag, *projectModifyUpdateAuthFlag)
 			case "invites":
 				endpoint = c.Invites()
 				data, err = projectc.BuildInvitesPayload(*projectInvitesAuthFlag)
@@ -576,7 +601,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 7083460172664600876 --page 4740977291606166868 --auth "Magnam facilis aut assumenda maiores sint sit."
+    `+os.Args[0]+` activity station --id 4850889053895604672 --page 4702121072547338975 --auth "Maiores ut qui quisquam molestiae."
 `, os.Args[0])
 }
 
@@ -589,7 +614,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 1531924819693887405 --page 2473413355860017861 --auth "Et similique."
+    `+os.Args[0]+` activity project --id 2588221656404062978 --page 8533501338479540862 --auth "Quam voluptatem illum ea dolorem adipisci."
 `, os.Args[0])
 }
 
@@ -617,7 +642,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 7247355678576483787 --auth "Eaque iusto dolores ut sapiente."
+    `+os.Args[0]+` following follow --id 7938282212268354146 --auth "Id quibusdam autem reprehenderit."
 `, os.Args[0])
 }
 
@@ -629,7 +654,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 1488727416448394763 --auth "Quod qui est sequi ullam doloribus."
+    `+os.Args[0]+` following unfollow --id 668004131381466168 --auth "Iusto porro qui."
 `, os.Args[0])
 }
 
@@ -641,7 +666,7 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 2255084724151658447 --page 2332802505764138602
+    `+os.Args[0]+` following followers --id 6162833146368073442 --page 340396845702908308
 `, os.Args[0])
 }
 
@@ -739,7 +764,9 @@ Usage:
     %s [globalflags] project COMMAND [flags]
 
 COMMAND:
-    update: Update implements update.
+    add- update: AddUpdate implements add update.
+    delete- update: DeleteUpdate implements delete update.
+    modify- update: ModifyUpdate implements modify update.
     invites: Invites implements invites.
     lookup- invite: LookupInvite implements lookup invite.
     accept- invite: AcceptInvite implements accept invite.
@@ -749,18 +776,47 @@ Additional help:
     %s project COMMAND --help
 `, os.Args[0], os.Args[0])
 }
-func projectUpdateUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] project update -body JSON -id INT64 -auth STRING
+func projectAddUpdateUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] project add- update -body JSON -project-id INT32 -auth STRING
 
-Update implements update.
+AddUpdate implements add update.
     -body JSON: 
-    -id INT64: 
+    -project-id INT32: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project update --body '{
+    `+os.Args[0]+` project add- update --body '{
       "body": "Et quis optio voluptatibus quas dolor."
-   }' --id 2235992879006751494 --auth "Impedit quidem labore."
+   }' --project-id 520607661 --auth "Impedit quidem labore."
+`, os.Args[0])
+}
+
+func projectDeleteUpdateUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] project delete- update -project-id INT32 -update-id INT64 -auth STRING
+
+DeleteUpdate implements delete update.
+    -project-id INT32: 
+    -update-id INT64: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` project delete- update --project-id 1303777347 --update-id 265494058706900424 --auth "Aut consequuntur et a."
+`, os.Args[0])
+}
+
+func projectModifyUpdateUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] project modify- update -body JSON -project-id INT32 -update-id INT64 -auth STRING
+
+ModifyUpdate implements modify update.
+    -body JSON: 
+    -project-id INT32: 
+    -update-id INT64: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` project modify- update --body '{
+      "body": "Voluptatem perspiciatis libero minus."
+   }' --project-id 1659700200 --update-id 5923090945204615108 --auth "Ea perspiciatis magnam fugiat repellendus doloremque aut."
 `, os.Args[0])
 }
 
@@ -771,7 +827,7 @@ Invites implements invites.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project invites --auth "Facilis impedit corporis quam."
+    `+os.Args[0]+` project invites --auth "Dolorem placeat a et."
 `, os.Args[0])
 }
 
@@ -783,7 +839,7 @@ LookupInvite implements lookup invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project lookup- invite --token "Libero ducimus vitae soluta officia rerum sunt." --auth "Quos consequatur omnis molestiae."
+    `+os.Args[0]+` project lookup- invite --token "Veniam qui." --auth "Minus totam illum veniam deserunt sint."
 `, os.Args[0])
 }
 
@@ -796,7 +852,7 @@ AcceptInvite implements accept invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project accept- invite --id 1986405635909329699 --token "Consectetur assumenda quaerat sit." --auth "Autem quia natus hic."
+    `+os.Args[0]+` project accept- invite --id 5729175641368403504 --token "Aut voluptas." --auth "Nostrum possimus."
 `, os.Args[0])
 }
 
@@ -809,7 +865,7 @@ RejectInvite implements reject invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project reject- invite --id 231173018460099570 --token "Totam eaque." --auth "Illo dicta rem."
+    `+os.Args[0]+` project reject- invite --id 5438991930375446807 --token "Qui quo dolorem quo non earum." --auth "Neque qui."
 `, os.Args[0])
 }
 
@@ -840,15 +896,16 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` station add --body '{
-      "device_id": "Ratione aut voluptas saepe.",
-      "location_name": "Possimus minus.",
-      "name": "Quasi rerum veritatis dolorem provident assumenda.",
+      "device_id": "Occaecati sequi aut provident porro ut provident.",
+      "location_name": "Voluptate deserunt beatae maxime magni qui.",
+      "name": "Doloremque quasi sint.",
       "status_json": {
-         "Incidunt ut sit omnis non.": "Neque quod qui quo dolorem.",
-         "Sint ipsa provident est quo.": "Ipsam quia eaque soluta dolorem dolorem."
+         "Et voluptatem laborum voluptatem.": "Distinctio reiciendis omnis quia.",
+         "Laborum vero odio fugit.": "Maxime totam sapiente eligendi quo quam.",
+         "Qui officiis natus est corrupti eligendi consequatur.": "Placeat provident iure non esse hic."
       },
-      "status_pb": "Non earum."
-   }' --auth "Neque qui."
+      "status_pb": "Cumque odit omnis."
+   }' --auth "Repellendus aut temporibus."
 `, os.Args[0])
 }
 
@@ -860,7 +917,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 2099338079 --auth "Maiores velit."
+    `+os.Args[0]+` station get --id 2098446527 --auth "Et omnis delectus sed."
 `, os.Args[0])
 }
 
@@ -874,13 +931,14 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "location_name": "Earum ut non.",
-      "name": "Accusamus repudiandae temporibus a.",
+      "location_name": "Porro quidem adipisci dolore unde maxime vero.",
+      "name": "Quaerat dolorem voluptas aperiam sunt ipsam.",
       "status_json": {
-         "Aliquid expedita veniam voluptatem ad.": "Facere atque quam eum recusandae."
+         "Sequi distinctio unde.": "Repudiandae ab vel quia.",
+         "Similique minus consequatur consequatur harum.": "Laborum laudantium."
       },
-      "status_pb": "Exercitationem explicabo quis et omnis delectus sed."
-   }' --id 1264832992 --auth "Et natus."
+      "status_pb": "Fuga ut expedita eos nihil commodi expedita."
+   }' --id 1585951539 --auth "Modi consectetur at voluptatem."
 `, os.Args[0])
 }
 
@@ -891,7 +949,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- mine --auth "Laudantium eius deleniti quis."
+    `+os.Args[0]+` station list- mine --auth "Deserunt sequi est sunt qui occaecati."
 `, os.Args[0])
 }
 
@@ -903,7 +961,7 @@ ListProject implements list project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project --id 1932469497 --auth "Minus consequatur consequatur harum est."
+    `+os.Args[0]+` station list- project --id 858855066 --auth "Odit minima animi est."
 `, os.Args[0])
 }
 
@@ -915,7 +973,7 @@ Photo implements photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station photo --id 652657037 --auth "Quis similique nisi et."
+    `+os.Args[0]+` station photo --id 1174397453 --auth "Voluptatem nulla ipsa ea rerum laborum."
 `, os.Args[0])
 }
 
@@ -951,7 +1009,7 @@ RefreshDevice implements refresh device.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Molestiae dolor est aperiam molestiae quia." --auth "Fugiat aspernatur dolor asperiores."
+    `+os.Args[0]+` tasks refresh- device --device-id "Ex praesentium." --auth "Occaecati qui non."
 `, os.Args[0])
 }
 
@@ -977,7 +1035,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 7504338446514076204
+    `+os.Args[0]+` test get --id 3456052859101749420
 `, os.Args[0])
 }
 
@@ -999,7 +1057,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Animi est rerum similique architecto." --auth "Et vero aut qui."
+    `+os.Args[0]+` test email --address "Officiis eius quas at eligendi sed." --auth "Ab voluptatem quibusdam."
 `, os.Args[0])
 }
 
@@ -1024,7 +1082,7 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Rerum laborum quasi."
+    `+os.Args[0]+` user roles --auth "Recusandae enim numquam quae adipisci."
 `, os.Args[0])
 }
 
@@ -1036,6 +1094,6 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user delete --user-id 1536994421 --auth "Perferendis quis voluptas est."
+    `+os.Args[0]+` user delete --user-id 218502286 --auth "Aut aperiam soluta laboriosam sed qui."
 `, os.Args[0])
 }

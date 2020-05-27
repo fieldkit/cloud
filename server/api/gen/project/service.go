@@ -16,8 +16,12 @@ import (
 
 // Service is the project service interface.
 type Service interface {
-	// Update implements update.
-	Update(context.Context, *UpdatePayload) (err error)
+	// AddUpdate implements add update.
+	AddUpdate(context.Context, *AddUpdatePayload) (res *ProjectUpdate, err error)
+	// DeleteUpdate implements delete update.
+	DeleteUpdate(context.Context, *DeleteUpdatePayload) (err error)
+	// ModifyUpdate implements modify update.
+	ModifyUpdate(context.Context, *ModifyUpdatePayload) (res *ProjectUpdate, err error)
 	// Invites implements invites.
 	Invites(context.Context, *InvitesPayload) (res *PendingInvites, err error)
 	// LookupInvite implements lookup invite.
@@ -42,13 +46,38 @@ const ServiceName = "project"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [5]string{"update", "invites", "lookup invite", "accept invite", "reject invite"}
+var MethodNames = [7]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept invite", "reject invite"}
 
-// UpdatePayload is the payload type of the project service update method.
-type UpdatePayload struct {
-	Auth string
-	ID   int64
-	Body string
+// AddUpdatePayload is the payload type of the project service add update
+// method.
+type AddUpdatePayload struct {
+	Auth      string
+	ProjectID int32
+	Body      string
+}
+
+// ProjectUpdate is the result type of the project service add update method.
+type ProjectUpdate struct {
+	ID        int64
+	Body      string
+	CreatedAt int64
+}
+
+// DeleteUpdatePayload is the payload type of the project service delete update
+// method.
+type DeleteUpdatePayload struct {
+	Auth      string
+	ProjectID int32
+	UpdateID  int64
+}
+
+// ModifyUpdatePayload is the payload type of the project service modify update
+// method.
+type ModifyUpdatePayload struct {
+	Auth      string
+	ProjectID int32
+	UpdateID  int64
+	Body      string
 }
 
 // InvitesPayload is the payload type of the project service invites method.
@@ -148,6 +177,19 @@ func (e BadRequest) ErrorName() string {
 	return "bad-request"
 }
 
+// NewProjectUpdate initializes result type ProjectUpdate from viewed result
+// type ProjectUpdate.
+func NewProjectUpdate(vres *projectviews.ProjectUpdate) *ProjectUpdate {
+	return newProjectUpdate(vres.Projected)
+}
+
+// NewViewedProjectUpdate initializes viewed result type ProjectUpdate from
+// result type ProjectUpdate using the given view.
+func NewViewedProjectUpdate(res *ProjectUpdate, view string) *projectviews.ProjectUpdate {
+	p := newProjectUpdateView(res)
+	return &projectviews.ProjectUpdate{Projected: p, View: "default"}
+}
+
 // NewPendingInvites initializes result type PendingInvites from viewed result
 // type PendingInvites.
 func NewPendingInvites(vres *projectviews.PendingInvites) *PendingInvites {
@@ -159,6 +201,29 @@ func NewPendingInvites(vres *projectviews.PendingInvites) *PendingInvites {
 func NewViewedPendingInvites(res *PendingInvites, view string) *projectviews.PendingInvites {
 	p := newPendingInvitesView(res)
 	return &projectviews.PendingInvites{Projected: p, View: "default"}
+}
+
+// newProjectUpdate converts projected type ProjectUpdate to service type
+// ProjectUpdate.
+func newProjectUpdate(vres *projectviews.ProjectUpdateView) *ProjectUpdate {
+	res := &ProjectUpdate{}
+	if vres.ID != nil {
+		res.ID = *vres.ID
+	}
+	if vres.Body != nil {
+		res.Body = *vres.Body
+	}
+	return res
+}
+
+// newProjectUpdateView projects result type ProjectUpdate to projected type
+// ProjectUpdateView using the "default" view.
+func newProjectUpdateView(res *ProjectUpdate) *projectviews.ProjectUpdateView {
+	vres := &projectviews.ProjectUpdateView{
+		ID:   &res.ID,
+		Body: &res.Body,
+	}
+	return vres
 }
 
 // newPendingInvites converts projected type PendingInvites to service type

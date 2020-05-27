@@ -17,8 +17,17 @@ import (
 
 // Client lists the project service endpoint HTTP clients.
 type Client struct {
-	// Update Doer is the HTTP client used to make requests to the update endpoint.
-	UpdateDoer goahttp.Doer
+	// AddUpdate Doer is the HTTP client used to make requests to the add update
+	// endpoint.
+	AddUpdateDoer goahttp.Doer
+
+	// DeleteUpdate Doer is the HTTP client used to make requests to the delete
+	// update endpoint.
+	DeleteUpdateDoer goahttp.Doer
+
+	// ModifyUpdate Doer is the HTTP client used to make requests to the modify
+	// update endpoint.
+	ModifyUpdateDoer goahttp.Doer
 
 	// Invites Doer is the HTTP client used to make requests to the invites
 	// endpoint.
@@ -59,7 +68,9 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		UpdateDoer:          doer,
+		AddUpdateDoer:       doer,
+		DeleteUpdateDoer:    doer,
+		ModifyUpdateDoer:    doer,
 		InvitesDoer:         doer,
 		LookupInviteDoer:    doer,
 		AcceptInviteDoer:    doer,
@@ -73,15 +84,15 @@ func NewClient(
 	}
 }
 
-// Update returns an endpoint that makes HTTP requests to the project service
-// update server.
-func (c *Client) Update() goa.Endpoint {
+// AddUpdate returns an endpoint that makes HTTP requests to the project
+// service add update server.
+func (c *Client) AddUpdate() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeUpdateRequest(c.encoder)
-		decodeResponse = DecodeUpdateResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeAddUpdateRequest(c.encoder)
+		decodeResponse = DecodeAddUpdateResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildUpdateRequest(ctx, v)
+		req, err := c.BuildAddUpdateRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
@@ -89,9 +100,57 @@ func (c *Client) Update() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.UpdateDoer.Do(req)
+		resp, err := c.AddUpdateDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("project", "update", err)
+			return nil, goahttp.ErrRequestError("project", "add update", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// DeleteUpdate returns an endpoint that makes HTTP requests to the project
+// service delete update server.
+func (c *Client) DeleteUpdate() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDeleteUpdateRequest(c.encoder)
+		decodeResponse = DecodeDeleteUpdateResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDeleteUpdateRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DeleteUpdateDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "delete update", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// ModifyUpdate returns an endpoint that makes HTTP requests to the project
+// service modify update server.
+func (c *Client) ModifyUpdate() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeModifyUpdateRequest(c.encoder)
+		decodeResponse = DecodeModifyUpdateResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildModifyUpdateRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ModifyUpdateDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "modify update", err)
 		}
 		return decodeResponse(resp)
 	}

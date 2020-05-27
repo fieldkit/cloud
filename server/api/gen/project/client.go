@@ -15,7 +15,9 @@ import (
 
 // Client is the "project" service client.
 type Client struct {
-	UpdateEndpoint       goa.Endpoint
+	AddUpdateEndpoint    goa.Endpoint
+	DeleteUpdateEndpoint goa.Endpoint
+	ModifyUpdateEndpoint goa.Endpoint
 	InvitesEndpoint      goa.Endpoint
 	LookupInviteEndpoint goa.Endpoint
 	AcceptInviteEndpoint goa.Endpoint
@@ -23,9 +25,11 @@ type Client struct {
 }
 
 // NewClient initializes a "project" service client given the endpoints.
-func NewClient(update, invites, lookupInvite, acceptInvite, rejectInvite goa.Endpoint) *Client {
+func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptInvite, rejectInvite goa.Endpoint) *Client {
 	return &Client{
-		UpdateEndpoint:       update,
+		AddUpdateEndpoint:    addUpdate,
+		DeleteUpdateEndpoint: deleteUpdate,
+		ModifyUpdateEndpoint: modifyUpdate,
 		InvitesEndpoint:      invites,
 		LookupInviteEndpoint: lookupInvite,
 		AcceptInviteEndpoint: acceptInvite,
@@ -33,10 +37,30 @@ func NewClient(update, invites, lookupInvite, acceptInvite, rejectInvite goa.End
 	}
 }
 
-// Update calls the "update" endpoint of the "project" service.
-func (c *Client) Update(ctx context.Context, p *UpdatePayload) (err error) {
-	_, err = c.UpdateEndpoint(ctx, p)
+// AddUpdate calls the "add update" endpoint of the "project" service.
+func (c *Client) AddUpdate(ctx context.Context, p *AddUpdatePayload) (res *ProjectUpdate, err error) {
+	var ires interface{}
+	ires, err = c.AddUpdateEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*ProjectUpdate), nil
+}
+
+// DeleteUpdate calls the "delete update" endpoint of the "project" service.
+func (c *Client) DeleteUpdate(ctx context.Context, p *DeleteUpdatePayload) (err error) {
+	_, err = c.DeleteUpdateEndpoint(ctx, p)
 	return
+}
+
+// ModifyUpdate calls the "modify update" endpoint of the "project" service.
+func (c *Client) ModifyUpdate(ctx context.Context, p *ModifyUpdatePayload) (res *ProjectUpdate, err error) {
+	var ires interface{}
+	ires, err = c.ModifyUpdateEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*ProjectUpdate), nil
 }
 
 // Invites calls the "invites" endpoint of the "project" service.

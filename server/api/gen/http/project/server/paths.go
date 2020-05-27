@@ -11,9 +11,19 @@ import (
 	"fmt"
 )
 
-// UpdateProjectPath returns the URL path to the project service update HTTP endpoint.
-func UpdateProjectPath(id int64) string {
-	return fmt.Sprintf("/projects/%v/update", id)
+// AddUpdateProjectPath returns the URL path to the project service add update HTTP endpoint.
+func AddUpdateProjectPath(projectID int32) string {
+	return fmt.Sprintf("/projects/%v/updates", projectID)
+}
+
+// DeleteUpdateProjectPath returns the URL path to the project service delete update HTTP endpoint.
+func DeleteUpdateProjectPath(projectID int32, updateID int64) string {
+	return fmt.Sprintf("/projects/%v/updates/%v", projectID, updateID)
+}
+
+// ModifyUpdateProjectPath returns the URL path to the project service modify update HTTP endpoint.
+func ModifyUpdateProjectPath(projectID int32, updateID int64) string {
+	return fmt.Sprintf("/projects/%v/updates/%v", projectID, updateID)
 }
 
 // InvitesProjectPath returns the URL path to the project service invites HTTP endpoint.

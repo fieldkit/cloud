@@ -21,8 +21,75 @@ func NewProjectService(ctx context.Context, options *ControllerOptions) *Project
 	}
 }
 
-func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayload) (err error) {
-	p, err := NewPermissions(ctx, c.options).ForProjectByID(int(payload.ID))
+func (c *ProjectService) AddUpdate(ctx context.Context, payload *project.AddUpdatePayload) (pu *project.ProjectUpdate, err error) {
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(int(payload.ProjectID))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.CanModify(); err != nil {
+		return nil, err
+	}
+
+	update := data.ProjectUpdate{
+		ProjectActivity: data.ProjectActivity{
+			CreatedAt: time.Now(),
+			ProjectID: payload.ProjectID,
+		},
+		AuthorID: p.UserID(),
+		Body:     payload.Body,
+	}
+
+	if err = c.options.Database.NamedGetContext(ctx, &update, `
+		INSERT INTO fieldkit.project_update (created_at, project_id, author_id, body) VALUES (:created_at, :project_id, :author_id, :body) RETURNING *
+		`, &update); err != nil {
+		return nil, err
+	}
+
+	pu = &project.ProjectUpdate{
+		ID:        update.ID,
+		CreatedAt: update.CreatedAt.Unix() * 1000,
+		Body:      update.Body,
+	}
+
+	return
+}
+
+func (c *ProjectService) ModifyUpdate(ctx context.Context, payload *project.ModifyUpdatePayload) (pu *project.ProjectUpdate, err error) {
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(int(payload.ProjectID))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.CanModify(); err != nil {
+		return nil, err
+	}
+
+	update := data.ProjectUpdate{
+		ProjectActivity: data.ProjectActivity{
+			ID:        payload.UpdateID,
+			ProjectID: payload.ProjectID,
+		},
+		Body: payload.Body,
+	}
+
+	if _, err = c.options.Database.NamedExecContext(ctx, `
+		UPDATE fieldkit.project_update SET body = :body WHERE id = :id
+		`, &update); err != nil {
+		return nil, err
+	}
+
+	pu = &project.ProjectUpdate{
+		ID:        update.ID,
+		CreatedAt: update.CreatedAt.Unix() * 1000,
+		Body:      update.Body,
+	}
+
+	return
+}
+
+func (c *ProjectService) DeleteUpdate(ctx context.Context, payload *project.DeleteUpdatePayload) (err error) {
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(int(payload.ProjectID))
 	if err != nil {
 		return err
 	}
@@ -31,18 +98,9 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 		return err
 	}
 
-	update := data.ProjectUpdate{
-		ProjectActivity: data.ProjectActivity{
-			CreatedAt: time.Now(),
-			ProjectID: int32(payload.ID),
-		},
-		AuthorID: p.UserID(),
-		Body:     payload.Body,
-	}
-
-	if _, err = c.options.Database.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.project_update (created_at, project_id, author_id, body) VALUES (:created_at, :project_id, :author_id, :body)
-		`, &update); err != nil {
+	if _, err = c.options.Database.ExecContext(ctx, `
+		DELETE FROM fieldkit.project_update WHERE id = $1
+		`, payload.UpdateID); err != nil {
 		return err
 	}
 

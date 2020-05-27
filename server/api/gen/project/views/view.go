@@ -11,12 +11,27 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// ProjectUpdate is the viewed result type that is projected based on a view.
+type ProjectUpdate struct {
+	// Type to project
+	Projected *ProjectUpdateView
+	// View to render
+	View string
+}
+
 // PendingInvites is the viewed result type that is projected based on a view.
 type PendingInvites struct {
 	// Type to project
 	Projected *PendingInvitesView
 	// View to render
 	View string
+}
+
+// ProjectUpdateView is a type that runs validations on a projected type.
+type ProjectUpdateView struct {
+	ID        *int64
+	Body      *string
+	CreatedAt *int64
 }
 
 // PendingInvitesView is a type that runs validations on a projected type.
@@ -39,6 +54,14 @@ type ProjectSummaryView struct {
 }
 
 var (
+	// ProjectUpdateMap is a map of attribute names in result type ProjectUpdate
+	// indexed by view name.
+	ProjectUpdateMap = map[string][]string{
+		"default": []string{
+			"id",
+			"body",
+		},
+	}
 	// PendingInvitesMap is a map of attribute names in result type PendingInvites
 	// indexed by view name.
 	PendingInvitesMap = map[string][]string{
@@ -48,6 +71,18 @@ var (
 	}
 )
 
+// ValidateProjectUpdate runs the validations defined on the viewed result type
+// ProjectUpdate.
+func ValidateProjectUpdate(result *ProjectUpdate) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateProjectUpdateView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
 // ValidatePendingInvites runs the validations defined on the viewed result
 // type PendingInvites.
 func ValidatePendingInvites(result *PendingInvites) (err error) {
@@ -56,6 +91,18 @@ func ValidatePendingInvites(result *PendingInvites) (err error) {
 		err = ValidatePendingInvitesView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateProjectUpdateView runs the validations defined on ProjectUpdateView
+// using the "default" view.
+func ValidateProjectUpdateView(result *ProjectUpdateView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.Body == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("body", "result"))
 	}
 	return
 }

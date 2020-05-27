@@ -16,7 +16,9 @@ import (
 
 // Endpoints wraps the "project" service endpoints.
 type Endpoints struct {
-	Update       goa.Endpoint
+	AddUpdate    goa.Endpoint
+	DeleteUpdate goa.Endpoint
+	ModifyUpdate goa.Endpoint
 	Invites      goa.Endpoint
 	LookupInvite goa.Endpoint
 	AcceptInvite goa.Endpoint
@@ -28,7 +30,9 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Update:       NewUpdateEndpoint(s, a.JWTAuth),
+		AddUpdate:    NewAddUpdateEndpoint(s, a.JWTAuth),
+		DeleteUpdate: NewDeleteUpdateEndpoint(s, a.JWTAuth),
+		ModifyUpdate: NewModifyUpdateEndpoint(s, a.JWTAuth),
 		Invites:      NewInvitesEndpoint(s, a.JWTAuth),
 		LookupInvite: NewLookupInviteEndpoint(s, a.JWTAuth),
 		AcceptInvite: NewAcceptInviteEndpoint(s, a.JWTAuth),
@@ -38,18 +42,20 @@ func NewEndpoints(s Service) *Endpoints {
 
 // Use applies the given middleware to all the "project" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
-	e.Update = m(e.Update)
+	e.AddUpdate = m(e.AddUpdate)
+	e.DeleteUpdate = m(e.DeleteUpdate)
+	e.ModifyUpdate = m(e.ModifyUpdate)
 	e.Invites = m(e.Invites)
 	e.LookupInvite = m(e.LookupInvite)
 	e.AcceptInvite = m(e.AcceptInvite)
 	e.RejectInvite = m(e.RejectInvite)
 }
 
-// NewUpdateEndpoint returns an endpoint function that calls the method
-// "update" of service "project".
-func NewUpdateEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+// NewAddUpdateEndpoint returns an endpoint function that calls the method "add
+// update" of service "project".
+func NewAddUpdateEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*UpdatePayload)
+		p := req.(*AddUpdatePayload)
 		var err error
 		sc := security.JWTScheme{
 			Name:           "jwt",
@@ -60,7 +66,55 @@ func NewUpdateEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		return nil, s.Update(ctx, p)
+		res, err := s.AddUpdate(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedProjectUpdate(res, "default")
+		return vres, nil
+	}
+}
+
+// NewDeleteUpdateEndpoint returns an endpoint function that calls the method
+// "delete update" of service "project".
+func NewDeleteUpdateEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*DeleteUpdatePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.DeleteUpdate(ctx, p)
+	}
+}
+
+// NewModifyUpdateEndpoint returns an endpoint function that calls the method
+// "modify update" of service "project".
+func NewModifyUpdateEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*ModifyUpdatePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.ModifyUpdate(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedProjectUpdate(res, "default")
+		return vres, nil
 	}
 }
 
