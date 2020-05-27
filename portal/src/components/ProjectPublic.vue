@@ -34,6 +34,17 @@
                 </div>
             </div>
 
+            <div id="recent-update" v-if="mostRecentUpdate">
+                <div class="activity-icon">
+                    <img :src="mostRecentUpdate.icon" />
+                </div>
+                <div class="activity-heading">Project Update</div>
+                <div class="activity-byline">by {{ mostRecentUpdate.name }} | {{ mostRecentUpdate.time.toLocaleDateString() }}</div>
+                <div class="activity-text">
+                    {{ mostRecentUpdate.text }}
+                </div>
+            </div>
+
             <ProjectStations
                 :project="project"
                 :admin="false"
@@ -49,6 +60,10 @@
                     <span class="user-name">{{ user.user.name }}</span>
                 </div>
             </div>
+            <div id="public-activity-feed-container">
+                <div class="heading">Recent Activity</div>
+                <ProjectActivity ref="projectActivity" :project="project" :viewing="true" :users="users" @foundUpdates="onFoundUpdates" />
+            </div>
         </div>
     </div>
 </template>
@@ -58,11 +73,13 @@ import * as utils from "../utilities";
 import FKApi from "../api/api";
 import { API_HOST } from "../secrets";
 import ProjectStations from "../components/ProjectStations";
+import ProjectActivity from "../components/ProjectActivity";
 
 export default {
     name: "ProjectPublic",
     components: {
         ProjectStations,
+        ProjectActivity,
     },
     data: () => {
         return {
@@ -70,6 +87,7 @@ export default {
             displayStartDate: "",
             displayRunTime: "",
             modules: [],
+            mostRecentUpdate: null,
             following: false,
             mapContainerSize: {
                 width: "540px",
@@ -92,6 +110,11 @@ export default {
             immediate: true,
         },
     },
+    mounted() {
+        if (this.project) {
+            this.$refs.projectActivity.fetchActivity();
+        }
+    },
     async beforeCreate() {
         this.api = new FKApi();
     },
@@ -107,6 +130,7 @@ export default {
             });
         },
         reset() {
+            this.mostRecentUpdate = null;
             this.fetchFollowers();
             this.updateDisplayDates();
         },
@@ -137,6 +161,9 @@ export default {
         getTeamHeading() {
             const members = this.users.length == 1 ? "member" : "members";
             return "Project Team (" + this.users.length + " " + members + ")";
+        },
+        onFoundUpdates(updates) {
+            this.mostRecentUpdate = updates[0];
         },
     },
 };
@@ -221,6 +248,41 @@ export default {
     margin: 30px 0 0 0;
     border-bottom: solid 1px #d8dce0;
 }
+#recent-update {
+    width: 820px;
+    float: left;
+    margin: 22px 0 0 0;
+    padding: 20px;
+    border-radius: 2px;
+    border: 1px solid #d8dce0;
+}
+.activity-icon {
+    float: left;
+    margin-left: 40px;
+}
+.activity-icon img {
+    width: 35px;
+}
+.activity-heading {
+    float: left;
+    margin-left: 14px;
+    font-size: 20px;
+    font-weight: 600;
+}
+.activity-byline {
+    float: left;
+    clear: both;
+    margin: -14px 0 0 90px;
+    font-size: 16px;
+}
+.activity-text {
+    float: left;
+    clear: both;
+    margin-left: 90px;
+    font-size: 16px;
+    line-height: 24px;
+    margin-top: 9px;
+}
 .team-icons,
 .module-icons {
     width: 225px;
@@ -229,8 +291,8 @@ export default {
 }
 .user-icon,
 .module-icon {
-    width: 35px;
-    margin: 0 5px;
+    width: 32px;
+    margin: 2px 5px;
     float: left;
 }
 .team-container {
@@ -244,5 +306,20 @@ export default {
 .team-member {
     float: left;
     clear: both;
+}
+#public-activity-feed-container {
+    float: left;
+    width: 480px;
+    height: 312px;
+    margin: 22px 0 0 32px;
+    border: 1px solid #d8dce0;
+    background: white;
+    overflow: scroll;
+}
+#public-activity-feed-container .heading {
+    font-size: 20px;
+    font-weight: 600;
+    float: left;
+    margin: 20px;
 }
 </style>

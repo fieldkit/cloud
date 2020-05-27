@@ -1,12 +1,13 @@
 <template>
     <div id="project-summary-container">
-        <ProjectActivity
-            :project="project"
-            :viewing="viewingActivityFeed"
-            :users="projectUsers"
-            @closeActivity="closeActivityFeed"
-            v-show="viewingActivityFeed"
-        />
+        <div id="activity-feed-container" v-show="viewingActivityFeed">
+            <!-- bottom margin has to be minus at least (height - 80) -->
+            <div id="close-feed-btn" v-on:click="closeActivityFeed">
+                <img alt="Close" src="../assets/close.png" />
+            </div>
+            <div class="heading">Activity History</div>
+            <ProjectActivity :project="project" :viewing="viewingActivityFeed" :users="projectUsers" />
+        </div>
         <div class="project-container" v-if="project">
             <div class="left">
                 <div id="project-name">{{ project.name }}</div>
@@ -367,6 +368,28 @@ export default {
 .show-link {
     text-decoration: underline;
 }
+#activity-feed-container {
+    position: relative;
+    float: right;
+    width: 375px;
+    height: 100vh;
+    margin: -80px -1px -2000px 0;
+    border: 1px solid #d8dce0;
+    background: white;
+    overflow: scroll;
+    z-index: 3;
+}
+#activity-feed-container .heading {
+    font-size: 20px;
+    font-weight: 600;
+    float: left;
+    margin: 25px;
+}
+#close-feed-btn {
+    float: right;
+    margin: 25px 25px 0 0;
+    cursor: pointer;
+}
 .activity-btn {
     width: 110px;
     height: 25px;
@@ -491,8 +514,8 @@ export default {
 }
 .user-icon,
 .module-icon {
-    width: 35px;
-    margin: 0 5px;
+    width: 32px;
+    margin: 2px 5px;
 }
 .manage-team-container {
     width: 1022px;

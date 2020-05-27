@@ -1,10 +1,5 @@
 <template>
-    <!-- bottom margin has to be minus at least (height - 80) -->
-    <div id="activity-feed-container">
-        <div id="close-feed-btn" v-on:click="closeFeed">
-            <img alt="Close" src="../assets/close.png" />
-        </div>
-        <div class="heading">Activity History</div>
+    <div>
         <div class="loading" v-if="loading">
             <img alt="" src="../assets/progress.gif" />
         </div>
@@ -39,6 +34,7 @@
         </template>
     </div>
 </template>
+
 <script>
 import FKApi from "../api/api";
 
@@ -97,10 +93,16 @@ export default {
                     }
                 });
                 this.loading = false;
+                this.filterUpdates();
             });
         },
-        closeFeed() {
-            this.$emit("closeActivity");
+        filterUpdates() {
+            const updates = this.activities.filter(a => {
+                return a.type == "update";
+            });
+            if (updates.length > 0) {
+                this.$emit("foundUpdates", updates);
+            }
         },
     },
 };
@@ -115,28 +117,6 @@ export default {
 .loading img {
     width: 100px;
 }
-#activity-feed-container {
-    position: relative;
-    float: right;
-    width: 375px;
-    height: 100vh;
-    margin: -80px -1px -2000px 0;
-    border: 1px solid #d8dce0;
-    background: white;
-    overflow: scroll;
-    z-index: 3;
-}
-.heading {
-    font-size: 20px;
-    font-weight: 600;
-    float: left;
-    margin: 25px;
-}
-#close-feed-btn {
-    float: right;
-    margin: 25px 25px 0 0;
-    cursor: pointer;
-}
 .inner-feed-container {
     float: left;
     clear: both;
@@ -145,6 +125,7 @@ export default {
 }
 .activity {
     float: left;
+    clear: both;
     margin: 15px 0;
 }
 .activity-icon {
@@ -157,6 +138,8 @@ export default {
 }
 .activity-text-container {
     float: right;
+}
+#activity-feed-container .activity-text-container {
     width: 275px;
 }
 .activity-heading {
