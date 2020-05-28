@@ -249,31 +249,17 @@ export default {
             let counterId = 0;
             this.stations.forEach(s => {
                 let modules = [];
-                if (s.status_json.moduleObjects) {
-                    const modulesResult = this.extractModulesAndSensors(s, s.status_json.moduleObjects);
-                    modulesResult.forEach(m => {
-                        counterId += 1;
-                        modules.push({
-                            id: counterId,
-                            label: m.name,
-                            customLabel: s.name + " : " + m.name,
-                            stationId: s.id,
-                            children: m.sensors,
-                        });
+                const modulesResult = this.extractModulesAndSensors(s);
+                modulesResult.forEach(m => {
+                    counterId += 1;
+                    modules.push({
+                        id: counterId,
+                        label: m.name,
+                        customLabel: s.name + " : " + m.name,
+                        stationId: s.id,
+                        children: m.sensors,
                     });
-                } else if (s.status_json.statusJson && s.status_json.statusJson.modules) {
-                    const modulesResult = this.extractModulesAndSensors(s, s.status_json.statusJson.modules);
-                    modulesResult.forEach(m => {
-                        counterId += 1;
-                        modules.push({
-                            id: counterId,
-                            label: m.name,
-                            customLabel: s.name + " : " + m.name,
-                            stationId: s.id,
-                            children: m.sensors,
-                        });
-                    });
-                }
+                });
                 counterId += 1;
                 this.treeSelectOptions.push({
                     id: counterId,
@@ -285,13 +271,12 @@ export default {
             });
         },
 
-        extractModulesAndSensors(station, modules) {
+        extractModulesAndSensors(station) {
             let result = [];
-            modules.forEach(m => {
+            station.modules.forEach(m => {
                 let sensors = [];
                 let addModule = m.position < 5;
-                const moduleSensors = m.sensorObjects ? m.sensorObjects : m.sensors;
-                moduleSensors.forEach(sensor => {
+                m.sensors.forEach(sensor => {
                     let dataViewSensor = this.allSensors.find(sr => {
                         return sr.firmwareKey == sensor.name;
                     });
