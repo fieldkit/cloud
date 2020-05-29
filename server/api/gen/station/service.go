@@ -75,6 +75,9 @@ type StationFull struct {
 	FirmwareNumber     *int32
 	FirmwareTime       *int64
 	Modules            []*StationModule
+	Updated            int64
+	LocationName       *string
+	Location           *StationLocation
 }
 
 // GetPayload is the payload type of the station service get method.
@@ -167,6 +170,11 @@ type SensorReading struct {
 	Time int64
 }
 
+type StationLocation struct {
+	Latitude  float64
+	Longitude float64
+}
+
 type StationFullCollection []*StationFull
 
 // unauthorized
@@ -257,6 +265,7 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 		MemoryAvailable:    vres.MemoryAvailable,
 		FirmwareNumber:     vres.FirmwareNumber,
 		FirmwareTime:       vres.FirmwareTime,
+		LocationName:       vres.LocationName,
 	}
 	if vres.ID != nil {
 		res.ID = *vres.ID
@@ -269,6 +278,9 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	}
 	if vres.ReadOnly != nil {
 		res.ReadOnly = *vres.ReadOnly
+	}
+	if vres.Updated != nil {
+		res.Updated = *vres.Updated
 	}
 	if vres.Owner != nil {
 		res.Owner = transformStationviewsStationOwnerViewToStationOwner(vres.Owner)
@@ -302,6 +314,9 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 			res.Modules[i] = transformStationviewsStationModuleViewToStationModule(val)
 		}
 	}
+	if vres.Location != nil {
+		res.Location = transformStationviewsStationLocationViewToStationLocation(vres.Location)
+	}
 	return res
 }
 
@@ -319,6 +334,8 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		MemoryAvailable:    res.MemoryAvailable,
 		FirmwareNumber:     res.FirmwareNumber,
 		FirmwareTime:       res.FirmwareTime,
+		Updated:            &res.Updated,
+		LocationName:       res.LocationName,
 	}
 	if res.Owner != nil {
 		vres.Owner = transformStationOwnerToStationviewsStationOwnerView(res.Owner)
@@ -351,6 +368,9 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		for i, val := range res.Modules {
 			vres.Modules[i] = transformStationModuleToStationviewsStationModuleView(val)
 		}
+	}
+	if res.Location != nil {
+		vres.Location = transformStationLocationToStationviewsStationLocationView(res.Location)
 	}
 	return vres
 }
@@ -512,6 +532,20 @@ func transformStationviewsSensorReadingViewToSensorReading(v *stationviews.Senso
 	return res
 }
 
+// transformStationviewsStationLocationViewToStationLocation builds a value of
+// type *StationLocation from a value of type *stationviews.StationLocationView.
+func transformStationviewsStationLocationViewToStationLocation(v *stationviews.StationLocationView) *StationLocation {
+	if v == nil {
+		return nil
+	}
+	res := &StationLocation{
+		Latitude:  *v.Latitude,
+		Longitude: *v.Longitude,
+	}
+
+	return res
+}
+
 // transformStationOwnerToStationviewsStationOwnerView builds a value of type
 // *stationviews.StationOwnerView from a value of type *StationOwner.
 func transformStationOwnerToStationviewsStationOwnerView(v *StationOwner) *stationviews.StationOwnerView {
@@ -609,6 +643,20 @@ func transformSensorReadingToStationviewsSensorReadingView(v *SensorReading) *st
 	res := &stationviews.SensorReadingView{
 		Last: &v.Last,
 		Time: &v.Time,
+	}
+
+	return res
+}
+
+// transformStationLocationToStationviewsStationLocationView builds a value of
+// type *stationviews.StationLocationView from a value of type *StationLocation.
+func transformStationLocationToStationviewsStationLocationView(v *StationLocation) *stationviews.StationLocationView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.StationLocationView{
+		Latitude:  &v.Latitude,
+		Longitude: &v.Longitude,
 	}
 
 	return res

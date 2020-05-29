@@ -51,6 +51,9 @@ type AddResponseBody struct {
 	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
 	FirmwareTime       *int64                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
 	Modules            []*StationModuleResponseBody `form:"modules" json:"modules" xml:"modules"`
+	Updated            int64                        `form:"updated" json:"updated" xml:"updated"`
+	Location           *StationLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	LocationName       *string                      `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
 }
 
 // GetResponseBody is the type of the "station" service "get" endpoint HTTP
@@ -72,6 +75,9 @@ type GetResponseBody struct {
 	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
 	FirmwareTime       *int64                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
 	Modules            []*StationModuleResponseBody `form:"modules" json:"modules" xml:"modules"`
+	Updated            int64                        `form:"updated" json:"updated" xml:"updated"`
+	Location           *StationLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	LocationName       *string                      `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
 }
 
 // UpdateResponseBody is the type of the "station" service "update" endpoint
@@ -93,6 +99,9 @@ type UpdateResponseBody struct {
 	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
 	FirmwareTime       *int64                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
 	Modules            []*StationModuleResponseBody `form:"modules" json:"modules" xml:"modules"`
+	Updated            int64                        `form:"updated" json:"updated" xml:"updated"`
+	Location           *StationLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	LocationName       *string                      `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
 }
 
 // ListMineResponseBody is the type of the "station" service "list mine"
@@ -255,6 +264,12 @@ type SensorReadingResponseBody struct {
 	Time int64   `form:"time" json:"time" xml:"time"`
 }
 
+// StationLocationResponseBody is used to define fields on response body types.
+type StationLocationResponseBody struct {
+	Latitude  float64 `form:"latitude" json:"latitude" xml:"latitude"`
+	Longitude float64 `form:"longitude" json:"longitude" xml:"longitude"`
+}
+
 // StationFullResponseBodyCollection is used to define fields on response body
 // types.
 type StationFullResponseBodyCollection []*StationFullResponseBody
@@ -277,6 +292,9 @@ type StationFullResponseBody struct {
 	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
 	FirmwareTime       *int64                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
 	Modules            []*StationModuleResponseBody `form:"modules" json:"modules" xml:"modules"`
+	Updated            int64                        `form:"updated" json:"updated" xml:"updated"`
+	Location           *StationLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	LocationName       *string                      `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
 }
 
 // NewAddResponseBody builds the HTTP response body from the result of the
@@ -293,6 +311,8 @@ func NewAddResponseBody(res *stationviews.StationFullView) *AddResponseBody {
 		MemoryAvailable:    res.MemoryAvailable,
 		FirmwareNumber:     res.FirmwareNumber,
 		FirmwareTime:       res.FirmwareTime,
+		Updated:            *res.Updated,
+		LocationName:       res.LocationName,
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
@@ -325,6 +345,9 @@ func NewAddResponseBody(res *stationviews.StationFullView) *AddResponseBody {
 		for i, val := range res.Modules {
 			body.Modules[i] = marshalStationviewsStationModuleViewToStationModuleResponseBody(val)
 		}
+	}
+	if res.Location != nil {
+		body.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(res.Location)
 	}
 	return body
 }
@@ -343,6 +366,8 @@ func NewGetResponseBody(res *stationviews.StationFullView) *GetResponseBody {
 		MemoryAvailable:    res.MemoryAvailable,
 		FirmwareNumber:     res.FirmwareNumber,
 		FirmwareTime:       res.FirmwareTime,
+		Updated:            *res.Updated,
+		LocationName:       res.LocationName,
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
@@ -375,6 +400,9 @@ func NewGetResponseBody(res *stationviews.StationFullView) *GetResponseBody {
 		for i, val := range res.Modules {
 			body.Modules[i] = marshalStationviewsStationModuleViewToStationModuleResponseBody(val)
 		}
+	}
+	if res.Location != nil {
+		body.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(res.Location)
 	}
 	return body
 }
@@ -393,6 +421,8 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 		MemoryAvailable:    res.MemoryAvailable,
 		FirmwareNumber:     res.FirmwareNumber,
 		FirmwareTime:       res.FirmwareTime,
+		Updated:            *res.Updated,
+		LocationName:       res.LocationName,
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
@@ -425,6 +455,9 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 		for i, val := range res.Modules {
 			body.Modules[i] = marshalStationviewsStationModuleViewToStationModuleResponseBody(val)
 		}
+	}
+	if res.Location != nil {
+		body.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(res.Location)
 	}
 	return body
 }

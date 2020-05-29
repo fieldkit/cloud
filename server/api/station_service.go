@@ -397,6 +397,16 @@ func translateModuleName(old string, sensors []*station.StationSensor) string {
 	return old
 }
 
+func transformLocation(sf *data.StationFull) *station.StationLocation {
+	if l := sf.Station.Location; l != nil {
+		return &station.StationLocation{
+			Latitude:  l.Latitude(),
+			Longitude: l.Longitude(),
+		}
+	}
+	return nil
+}
+
 func transformStationFull(p Permissions, sf *data.StationFull) (*station.StationFull, error) {
 	sp, err := p.ForStation(sf.Station)
 	if err != nil {
@@ -422,6 +432,9 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 		MemoryAvailable: sf.Station.MemoryAvailable,
 		FirmwareNumber:  sf.Station.FirmwareNumber,
 		FirmwareTime:    sf.Station.FirmwareTime,
+		Updated:         sf.Station.UpdatedAt.Unix() * 1000,
+		LocationName:    sf.Station.LocationName,
+		Location:        transformLocation(sf),
 		Owner: &station.StationOwner{
 			ID:   sf.Owner.ID,
 			Name: sf.Owner.Name,

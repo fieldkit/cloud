@@ -45,6 +45,9 @@ type StationFullView struct {
 	FirmwareNumber     *int32
 	FirmwareTime       *int64
 	Modules            []*StationModuleView
+	Updated            *int64
+	LocationName       *string
+	Location           *StationLocationView
 }
 
 // StationOwnerView is a type that runs validations on a projected type.
@@ -99,6 +102,12 @@ type SensorReadingView struct {
 	Time *int64
 }
 
+// StationLocationView is a type that runs validations on a projected type.
+type StationLocationView struct {
+	Latitude  *float64
+	Longitude *float64
+}
+
 // StationsFullView is a type that runs validations on a projected type.
 type StationsFullView struct {
 	Stations StationFullCollectionView
@@ -129,6 +138,9 @@ var (
 			"firmware_number",
 			"firmware_time",
 			"modules",
+			"updated",
+			"location",
+			"location_name",
 		},
 	}
 	// StationsFullMap is a map of attribute names in result type StationsFull
@@ -158,6 +170,9 @@ var (
 			"firmware_number",
 			"firmware_time",
 			"modules",
+			"updated",
+			"location",
+			"location_name",
 		},
 	}
 )
@@ -219,6 +234,9 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	if result.Modules == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("modules", "result"))
 	}
+	if result.Updated == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updated", "result"))
+	}
 	if result.Owner != nil {
 		if err2 := ValidateStationOwnerView(result.Owner); err2 != nil {
 			err = goa.MergeErrors(err, err2)
@@ -248,6 +266,11 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 			if err2 := ValidateStationModuleView(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
+		}
+	}
+	if result.Location != nil {
+		if err2 := ValidateStationLocationView(result.Location); err2 != nil {
+			err = goa.MergeErrors(err, err2)
 		}
 	}
 	return
@@ -359,6 +382,18 @@ func ValidateSensorReadingView(result *SensorReadingView) (err error) {
 	}
 	if result.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "result"))
+	}
+	return
+}
+
+// ValidateStationLocationView runs the validations defined on
+// StationLocationView.
+func ValidateStationLocationView(result *StationLocationView) (err error) {
+	if result.Latitude == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("latitude", "result"))
+	}
+	if result.Longitude == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("longitude", "result"))
 	}
 	return
 }

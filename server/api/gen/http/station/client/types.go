@@ -51,6 +51,9 @@ type AddResponseBody struct {
 	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
 	FirmwareTime       *int64                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
 	Modules            []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
+	Updated            *int64                       `form:"updated,omitempty" json:"updated,omitempty" xml:"updated,omitempty"`
+	LocationName       *string                      `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	Location           *StationLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 }
 
 // GetResponseBody is the type of the "station" service "get" endpoint HTTP
@@ -72,6 +75,9 @@ type GetResponseBody struct {
 	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
 	FirmwareTime       *int64                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
 	Modules            []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
+	Updated            *int64                       `form:"updated,omitempty" json:"updated,omitempty" xml:"updated,omitempty"`
+	LocationName       *string                      `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	Location           *StationLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 }
 
 // UpdateResponseBody is the type of the "station" service "update" endpoint
@@ -93,6 +99,9 @@ type UpdateResponseBody struct {
 	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
 	FirmwareTime       *int64                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
 	Modules            []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
+	Updated            *int64                       `form:"updated,omitempty" json:"updated,omitempty" xml:"updated,omitempty"`
+	LocationName       *string                      `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	Location           *StationLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 }
 
 // ListMineResponseBody is the type of the "station" service "list mine"
@@ -255,6 +264,12 @@ type SensorReadingResponseBody struct {
 	Time *int64   `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
 }
 
+// StationLocationResponseBody is used to define fields on response body types.
+type StationLocationResponseBody struct {
+	Latitude  *float64 `form:"latitude,omitempty" json:"latitude,omitempty" xml:"latitude,omitempty"`
+	Longitude *float64 `form:"longitude,omitempty" json:"longitude,omitempty" xml:"longitude,omitempty"`
+}
+
 // StationFullCollectionResponseBody is used to define fields on response body
 // types.
 type StationFullCollectionResponseBody []*StationFullResponseBody
@@ -277,6 +292,9 @@ type StationFullResponseBody struct {
 	FirmwareNumber     *int32                       `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
 	FirmwareTime       *int64                       `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
 	Modules            []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
+	Updated            *int64                       `form:"updated,omitempty" json:"updated,omitempty" xml:"updated,omitempty"`
+	LocationName       *string                      `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	Location           *StationLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 }
 
 // NewAddRequestBody builds the HTTP request body from the payload of the "add"
@@ -332,6 +350,8 @@ func NewAddStationFullOK(body *AddResponseBody) *stationviews.StationFullView {
 		MemoryAvailable:    body.MemoryAvailable,
 		FirmwareNumber:     body.FirmwareNumber,
 		FirmwareTime:       body.FirmwareTime,
+		Updated:            body.Updated,
+		LocationName:       body.LocationName,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -352,6 +372,9 @@ func NewAddStationFullOK(body *AddResponseBody) *stationviews.StationFullView {
 	v.Modules = make([]*stationviews.StationModuleView, len(body.Modules))
 	for i, val := range body.Modules {
 		v.Modules[i] = unmarshalStationModuleResponseBodyToStationviewsStationModuleView(val)
+	}
+	if body.Location != nil {
+		v.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(body.Location)
 	}
 
 	return v
@@ -395,6 +418,8 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 		MemoryAvailable:    body.MemoryAvailable,
 		FirmwareNumber:     body.FirmwareNumber,
 		FirmwareTime:       body.FirmwareTime,
+		Updated:            body.Updated,
+		LocationName:       body.LocationName,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -415,6 +440,9 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 	v.Modules = make([]*stationviews.StationModuleView, len(body.Modules))
 	for i, val := range body.Modules {
 		v.Modules[i] = unmarshalStationModuleResponseBodyToStationviewsStationModuleView(val)
+	}
+	if body.Location != nil {
+		v.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(body.Location)
 	}
 
 	return v
@@ -458,6 +486,8 @@ func NewUpdateStationFullOK(body *UpdateResponseBody) *stationviews.StationFullV
 		MemoryAvailable:    body.MemoryAvailable,
 		FirmwareNumber:     body.FirmwareNumber,
 		FirmwareTime:       body.FirmwareTime,
+		Updated:            body.Updated,
+		LocationName:       body.LocationName,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -478,6 +508,9 @@ func NewUpdateStationFullOK(body *UpdateResponseBody) *stationviews.StationFullV
 	v.Modules = make([]*stationviews.StationModuleView, len(body.Modules))
 	for i, val := range body.Modules {
 		v.Modules[i] = unmarshalStationModuleResponseBodyToStationviewsStationModuleView(val)
+	}
+	if body.Location != nil {
+		v.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(body.Location)
 	}
 
 	return v
@@ -741,6 +774,18 @@ func ValidateSensorReadingResponseBody(body *SensorReadingResponseBody) (err err
 	return
 }
 
+// ValidateStationLocationResponseBody runs the validations defined on
+// StationLocationResponseBody
+func ValidateStationLocationResponseBody(body *StationLocationResponseBody) (err error) {
+	if body.Latitude == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("latitude", "body"))
+	}
+	if body.Longitude == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("longitude", "body"))
+	}
+	return
+}
+
 // ValidateStationFullCollectionResponseBody runs the validations defined on
 // StationFullCollectionResponseBody
 func ValidateStationFullCollectionResponseBody(body StationFullCollectionResponseBody) (err error) {
@@ -787,6 +832,9 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 	if body.Modules == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("modules", "body"))
 	}
+	if body.Updated == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updated", "body"))
+	}
 	if body.Owner != nil {
 		if err2 := ValidateStationOwnerResponseBody(body.Owner); err2 != nil {
 			err = goa.MergeErrors(err, err2)
@@ -816,6 +864,11 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 			if err2 := ValidateStationModuleResponseBody(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
+		}
+	}
+	if body.Location != nil {
+		if err2 := ValidateStationLocationResponseBody(body.Location); err2 != nil {
+			err = goa.MergeErrors(err, err2)
 		}
 	}
 	return

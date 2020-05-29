@@ -894,6 +894,21 @@ func unmarshalSensorReadingResponseBodyToStationviewsSensorReadingView(v *Sensor
 	return res
 }
 
+// unmarshalStationLocationResponseBodyToStationviewsStationLocationView builds
+// a value of type *stationviews.StationLocationView from a value of type
+// *StationLocationResponseBody.
+func unmarshalStationLocationResponseBodyToStationviewsStationLocationView(v *StationLocationResponseBody) *stationviews.StationLocationView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.StationLocationView{
+		Latitude:  v.Latitude,
+		Longitude: v.Longitude,
+	}
+
+	return res
+}
+
 // unmarshalStationFullResponseBodyToStationviewsStationFullView builds a value
 // of type *stationviews.StationFullView from a value of type
 // *StationFullResponseBody.
@@ -909,6 +924,8 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 		MemoryAvailable:    v.MemoryAvailable,
 		FirmwareNumber:     v.FirmwareNumber,
 		FirmwareTime:       v.FirmwareTime,
+		Updated:            v.Updated,
+		LocationName:       v.LocationName,
 	}
 	res.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v.Owner)
 	res.Uploads = make([]*stationviews.StationUploadView, len(v.Uploads))
@@ -929,6 +946,9 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 	res.Modules = make([]*stationviews.StationModuleView, len(v.Modules))
 	for i, val := range v.Modules {
 		res.Modules[i] = unmarshalStationModuleResponseBodyToStationviewsStationModuleView(val)
+	}
+	if v.Location != nil {
+		res.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(v.Location)
 	}
 
 	return res

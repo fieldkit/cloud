@@ -46,6 +46,40 @@ func TestGetStationsMine(t *testing.T) {
 	}`)
 }
 
+func TestGetStation(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(5)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+	{
+		"id": "<<PRESENCE>>",
+		"images": "<<PRESENCE>>",
+		"updated": "<<PRESENCE>>",
+		"owner": "<<PRESENCE>>",
+		"device_id": "<<PRESENCE>>",
+		"uploads": "<<PRESENCE>>",
+		"name": "<<PRESENCE>>",
+		"photos": "<<PRESENCE>>",
+		"read_only": "<<PRESENCE>>",
+		"modules": "<<PRESENCE>>",
+		"status_json": "<<PRESENCE>>"
+	}`)
+}
+
 func TestGetStationsProject(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
@@ -299,6 +333,67 @@ func TestUpdateMyStationWithProtobufStatus(t *testing.T) {
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusOK, rr.Code)
+}
+
+func TestGetStationUpdatedWithProtobufStatus(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	reply := e.NewHttpStatusReply(fd.Stations[0])
+	replyBuffer := proto.NewBuffer(make([]byte, 0))
+	replyBuffer.EncodeMessage(reply)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	payload, err := json.Marshal(
+		struct {
+			Name       string                 `json:"name"`
+			StatusJSON map[string]interface{} `json:"status_json"`
+			StatusPB   []byte                 `json:"status_pb"`
+		}{
+			Name:       "New Name",
+			StatusJSON: make(map[string]interface{}),
+			StatusPB:   replyBuffer.Bytes(),
+		},
+	)
+	assert.NoError(err)
+
+	update, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), bytes.NewReader(payload))
+	update.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	updateResponse := tests.ExecuteRequest(update, api)
+
+	assert.Equal(http.StatusOK, updateResponse.Code)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+	{
+		"id": "<<PRESENCE>>",
+		"images": "<<PRESENCE>>",
+		"updated": "<<PRESENCE>>",
+		"owner": "<<PRESENCE>>",
+		"device_id": "<<PRESENCE>>",
+		"uploads": "<<PRESENCE>>",
+		"name": "<<PRESENCE>>",
+		"photos": "<<PRESENCE>>",
+		"read_only": "<<PRESENCE>>",
+		"modules": "<<PRESENCE>>",
+		"battery": "<<PRESENCE>>",
+		"location": "<<PRESENCE>>",
+		"memory_used": "<<PRESENCE>>",
+		"memory_available": "<<PRESENCE>>",
+		"status_json": "<<PRESENCE>>"
+	}`)
 }
 
 func TestUpdateMyStationWithProtobufStatusTwice(t *testing.T) {
