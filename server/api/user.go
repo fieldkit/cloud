@@ -254,7 +254,7 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 
 func (c *UserController) authenticateOrSpoof(ctx context.Context, email, password string) (*data.User, error) {
 	user := &data.User{}
-	err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.email = $1", email)
+	err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1)", email)
 	if err == sql.ErrNoRows {
 		return nil, data.IncorrectPasswordError
 	}
@@ -270,7 +270,7 @@ func (c *UserController) authenticateOrSpoof(ctx context.Context, email, passwor
 		log.Infow("spoofing", "email", email)
 
 		adminUser := &data.User{}
-		err := c.options.Database.GetContext(ctx, adminUser, "SELECT u.* FROM fieldkit.user AS u WHERE u.email = $1 AND u.admin", parts[0])
+		err := c.options.Database.GetContext(ctx, adminUser, "SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1) AND u.admin", parts[0])
 		if err == nil {
 			// We can safely log the user doing the spoofing here.
 			err = adminUser.CheckPassword(parts[1])
