@@ -98,6 +98,11 @@ func (s *Station) UpdateFromStatus(raw string) error {
 					float64(gps.Longitude),
 					float64(gps.Latitude),
 				})
+			} else if gps.Time > 0 && s.Location == nil {
+				s.Location = NewLocation([]float64{
+					float64(gps.Longitude),
+					float64(gps.Latitude),
+				})
 			}
 		}
 
