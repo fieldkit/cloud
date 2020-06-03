@@ -60,7 +60,6 @@ import SidebarNav from "../components/SidebarNav";
 import DataChartControl from "../components/DataChartControl";
 import NotesList from "../components/NotesList";
 import SensorSummary from "../components/SensorSummary";
-// import * as tempStations from "../assets/ancientGoose.json";
 import * as utils from "../utilities";
 
 export default {

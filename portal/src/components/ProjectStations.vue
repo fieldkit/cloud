@@ -103,10 +103,10 @@ export default {
                 let modules = [];
                 if (this.projectStations) {
                     this.projectStations.forEach((s, i) => {
-                        if (i == 0 && s.status_json.latitude && this.map) {
+                        if (i == 0 && s.location && s.location.latitude && this.map) {
                             this.map.setCenter({
-                                lat: parseFloat(s.status_json.latitude),
-                                lng: parseFloat(s.status_json.longitude),
+                                lat: parseFloat(s.location.latitude),
+                                lng: parseFloat(s.location.longitude),
                             });
                         }
                         s.modules.forEach(m => {

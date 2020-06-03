@@ -64,29 +64,27 @@ export default {
             let latMax = -90;
             let stationFeatures = [];
             let mappable = this.stations.filter(s => {
-                return (
-                    s.status_json.latitude && s.status_json.longitude && s.status_json.latitude != 1000 && s.status_json.longitude != 1000
-                );
+                return s.location.latitude && s.location.longitude && s.location.latitude != 1000 && s.location.longitude != 1000;
             });
             mappable.forEach(s => {
-                let coordinates = [s.status_json.latitude, s.status_json.longitude];
+                let coordinates = [s.location.latitude, s.location.longitude];
                 if (mappable.length == 1) {
                     this.map.setCenter({
                         lat: coordinates[0],
                         lng: coordinates[1],
                     });
                 } else {
-                    if (s.status_json.latitude > latMax) {
-                        latMax = s.status_json.latitude;
+                    if (s.location.latitude > latMax) {
+                        latMax = s.location.latitude;
                     }
-                    if (s.status_json.latitude < latMin) {
-                        latMin = s.status_json.latitude;
+                    if (s.location.latitude < latMin) {
+                        latMin = s.location.latitude;
                     }
-                    if (s.status_json.longitude > longMax) {
-                        longMax = s.status_json.longitude;
+                    if (s.location.longitude > longMax) {
+                        longMax = s.location.longitude;
                     }
-                    if (s.status_json.longitude < longMin) {
-                        longMin = s.status_json.longitude;
+                    if (s.location.longitude < longMin) {
+                        longMin = s.location.longitude;
                     }
                 }
                 stationFeatures.push({

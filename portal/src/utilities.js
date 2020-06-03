@@ -7,10 +7,10 @@ export function getUpdatedDate(station) {
         });
         date = dataUploads[0].time;
     } else {
-        if (!station.status_json) {
+        if (!station.updated) {
             return "N/A";
         }
-        date = station.status_json.updated;
+        date = station.updated;
     }
     if (!date) {
         return "N/A";

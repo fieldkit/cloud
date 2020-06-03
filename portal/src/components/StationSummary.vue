@@ -19,7 +19,7 @@
                 </div>
                 <div class="station-element">
                     <img id="battery" alt="Battery level" :src="getBatteryImg()" />
-                    <span class="small-light">{{ station.status_json.batteryLevel }}%</span>
+                    <span class="small-light">{{ station.battery }}%</span>
                 </div>
                 <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
                     <img v-if="module.position < 5" alt="Module icon" class="small-space" :src="getModuleImg(module)" />
@@ -29,7 +29,7 @@
             <div id="location-container" class="section">
                 <div class="location-item" v-if="placeName">
                     <img alt="location-icon" src="../assets/icon-location.png" />
-                    {{ station.status_json.locationName ? station.status_json.locationName : placeName }}
+                    {{ station.locationName ? station.locationName : placeName }}
                 </div>
                 <div class="location-item" v-if="nativeLand.length > 0">
                     <img alt="location-icon" src="../assets/icon-location.png" />
@@ -129,14 +129,14 @@ export default {
         },
 
         getPlaceName() {
-            const longLatMapbox = this.station.status_json.longitude + "," + this.station.status_json.latitude;
+            const longLatMapbox = this.station.location.longitude + "," + this.station.location.latitude;
             return this.api.getPlaceName(longLatMapbox).then(result => {
                 this.placeName = result.features[0] ? result.features[0].place_name : "Unknown area";
             });
         },
 
         getNativeLand() {
-            const latLongNative = this.station.status_json.latitude + "," + this.station.status_json.longitude;
+            const latLongNative = this.station.location.latitude + "," + this.station.location.longitude;
             return this.api.getNativeLand(latLongNative);
         },
 
@@ -167,7 +167,7 @@ export default {
 
         getBatteryImg() {
             const imgPath = require.context("../assets/battery/", false, /\.png$/);
-            const battery = this.station.status_json.batteryLevel;
+            const battery = this.station.battery;
             let img = "";
             if (battery == 0) {
                 img = "0.png";
@@ -198,18 +198,18 @@ export default {
         },
 
         getLat() {
-            if (!this.station.status_json.latitude) {
+            if (!this.station.location.latitude) {
                 return false;
             }
-            let lat = parseFloat(this.station.status_json.latitude);
+            let lat = parseFloat(this.station.location.latitude);
             return lat.toFixed(5);
         },
 
         getLong() {
-            if (!this.station.status_json.longitude) {
+            if (!this.station.location.longitude) {
                 return false;
             }
-            let long = parseFloat(this.station.status_json.longitude);
+            let long = parseFloat(this.station.location.longitude);
             return long.toFixed(5);
         },
 
