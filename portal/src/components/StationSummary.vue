@@ -11,7 +11,7 @@
             <div class="left image-container">
                 <img alt="Station image" :src="stationSmallPhoto" class="station-element" />
             </div>
-            <div class="left">
+            <div class="left" :style="{ 'max-width': summarySize.constrainTop }">
                 <div id="station-name" class="station-element">{{ station.name }}</div>
                 <div class="station-element">
                     Last Synced
@@ -21,14 +21,8 @@
                     <img id="battery" alt="Battery level" :src="getBatteryImg()" />
                     <span class="small-light">{{ station.status_json.batteryLevel }}%</span>
                 </div>
-                <div>
-                    <img
-                        v-for="module in station.modules"
-                        v-bind:key="module.id"
-                        alt="Module icon"
-                        class="small-space"
-                        :src="getModuleImg(module)"
-                    />
+                <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
+                    <img v-if="module.position < 5" alt="Module icon" class="small-space" :src="getModuleImg(module)" />
                 </div>
             </div>
             <div class="spacer"></div>
@@ -298,6 +292,9 @@ export default {
     margin-right: 5px;
     width: 20px;
     height: 11px;
+}
+.module-icon-container {
+    float: left;
 }
 .small-space {
     margin: 3px;

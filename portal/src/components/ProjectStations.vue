@@ -77,6 +77,7 @@ export default {
                 width: "359px",
                 top: "-300px",
                 left: "122px",
+                constrainTop: "230px",
             },
             mapSize: {
                 width: "inherit",
