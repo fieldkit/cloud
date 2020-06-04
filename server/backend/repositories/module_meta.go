@@ -55,7 +55,17 @@ func (r *ModuleMetaRepository) FindSensor(m *pb.ModuleHeader, sensor string) (mm
 	weNeedToCleanThisUp := strings.ReplaceAll(strings.ReplaceAll(sensor, " ", "_"), "-", "_")
 
 	for _, module := range all {
-		if module.Header.Manufacturer == m.Manufacturer && module.Header.Kind == m.Kind {
+		sameKind := module.Header.Kind == m.Kind
+		if !sameKind {
+			for _, k := range module.Header.AllKinds {
+				if m.Kind == k {
+					sameKind = true
+					break
+				}
+			}
+		}
+
+		if module.Header.Manufacturer == m.Manufacturer && sameKind {
 			for _, s := range module.Sensors {
 				if s.Key == sensor || s.FirmwareKey == sensor {
 					return s, nil
@@ -66,6 +76,7 @@ func (r *ModuleMetaRepository) FindSensor(m *pb.ModuleHeader, sensor string) (mm
 			}
 		}
 	}
+
 	return nil, errors.Structured("missing sensor meta", "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
 }
 
@@ -75,7 +86,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Key: "modules.water.ph",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWater,
+				Kind:         ConservifyWaterPh,
+				AllKinds:     []uint32{ConservifyWater},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -96,7 +108,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Key: "modules.water.ec",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWater,
+				Kind:         ConservifyWaterEc,
+				AllKinds:     []uint32{ConservifyWater},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -143,7 +156,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Key: "modules.water.do",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWater,
+				Kind:         ConservifyWaterDo,
+				AllKinds:     []uint32{ConservifyWater},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -164,7 +178,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Key: "modules.water.orp",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWater,
+				Kind:         ConservifyWaterOrp,
+				AllKinds:     []uint32{ConservifyWater},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -185,7 +200,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Key: "modules.water.temp",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWater,
+				Kind:         ConservifyWaterTemp,
+				AllKinds:     []uint32{ConservifyWater},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -207,6 +223,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWeather,
+				AllKinds:     []uint32{},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -396,6 +413,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWeather,
+				AllKinds:     []uint32{},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -489,6 +507,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyDistance,
+				AllKinds:     []uint32{},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -549,6 +568,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyDiagnostics,
+				AllKinds:     []uint32{},
 				Version:      0x1,
 			},
 			Internal: true,
@@ -614,6 +634,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyRandom,
+				AllKinds:     []uint32{},
 				Version:      0x1,
 			},
 			Internal: true,

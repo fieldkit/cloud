@@ -34,9 +34,10 @@ func (mm *ModuleMeta) Sensor(key string) *SensorMeta {
 }
 
 type ModuleHeader struct {
-	Manufacturer uint32 `json:"manufacturer"`
-	Kind         uint32 `json:"kind"`
-	Version      uint32 `json:"version"`
+	Manufacturer uint32   `json:"manufacturer"`
+	Kind         uint32   `json:"kind"`
+	Version      uint32   `json:"version"`
+	AllKinds     []uint32 `json:"all_kinds"`
 }
 
 type Version struct {
