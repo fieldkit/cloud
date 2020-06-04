@@ -83,7 +83,9 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 				return nil, err
 			}
 
-			rows = append(rows, row.Record.ToDataRow())
+			if row != nil && row.Record != nil {
+				rows = append(rows, row.Record.ToDataRow())
+			}
 		}
 
 		if len(rows) > 0 {
