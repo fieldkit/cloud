@@ -274,7 +274,7 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 
 func (r *StationRepository) deleteStationModulesExcept(ctx context.Context, configurationID int64, keeping []int64) error {
 	if query, args, err := sqlx.In(`
-		DELETE FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?)
+		DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?))
 		`, configurationID, keeping); err != nil {
 		return err
 	} else {
@@ -284,7 +284,7 @@ func (r *StationRepository) deleteStationModulesExcept(ctx context.Context, conf
 	}
 
 	if query, args, err := sqlx.In(`
-		DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?))
+		DELETE FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?)
 		`, configurationID, keeping); err != nil {
 		return err
 	} else {
