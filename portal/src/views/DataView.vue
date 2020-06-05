@@ -230,6 +230,7 @@ export default {
                 // Only including ones with sensor readings
                 if (Object.keys(d.d).length > 0) {
                     d.d.date = new Date(d.time);
+                    d.d.location = d.location;
                     // filter out ones with dates before 2018
                     if (d.d.date.getFullYear() > 2018) {
                         processed.push(d.d);

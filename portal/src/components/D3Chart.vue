@@ -8,6 +8,7 @@
         <D3LineChart :chart="chart" :layout="layout" ref="d3LineChart" @timeZoomed="onTimeZoom" />
         <D3HistoChart :chart="chart" :layout="layout" ref="d3HistoChart" />
         <D3RangeChart :chart="chart" :layout="layout" ref="d3RangeChart" />
+        <D3MapChart :chart="chart" :layout="layout" ref="d3MapChart" />
         <div :id="'scrubber-container-' + chart.id">
             <svg
                 :id="'scrubber-svg-' + chart.id"
@@ -32,7 +33,7 @@
                         <!-- this contains the element that the filter is applied to -->
                     </feMerge>
                 </filter>
-                <g :style="stageStyle">
+                <g :style="scrubberStageStyle">
                     <g ref="d3ScrubberStage"></g>
                 </g>
             </svg>
@@ -45,6 +46,7 @@ import * as d3 from "d3";
 import D3LineChart from "./D3LineChart";
 import D3HistoChart from "./D3HistoChart";
 import D3RangeChart from "./D3RangeChart";
+import D3MapChart from "./D3MapChart";
 
 export default {
     name: "D3Chart",
@@ -52,6 +54,7 @@ export default {
         D3LineChart,
         D3HistoChart,
         D3RangeChart,
+        D3MapChart,
     },
     props: ["chartParam"],
     data: () => {
@@ -65,6 +68,8 @@ export default {
                 marginBottom: 0,
                 marginLeft: 50,
             },
+            scrubberMarginLeft: 5,
+            chartRefs: ["d3LineChart", "d3HistoChart", "d3RangeChart", "d3MapChart"],
         };
     },
     watch: {},
@@ -78,16 +83,20 @@ export default {
         viewBox: function() {
             return "0 0 " + this.outerWidth + " " + this.outerHeight;
         },
+        stageStyle: function() {
+            return {
+                transform: "translate(" + this.layout.marginLeft + "px," + this.layout.marginTop + "px)",
+            };
+        },
         scrubberHeight: function() {
             return 50;
         },
         scrubberViewBox: function() {
             return "0 0 " + this.outerWidth + " " + this.scrubberHeight;
         },
-
-        stageStyle: function() {
+        scrubberStageStyle: function() {
             return {
-                transform: "translate(" + this.layout.marginLeft + "px," + this.layout.marginTop + "px)",
+                transform: "translate(" + this.scrubberMarginLeft + "px," + this.layout.marginTop + "px)",
             };
         },
     },
@@ -111,10 +120,20 @@ export default {
                 case "Range":
                     this.$refs.d3RangeChart.setStatus(true);
                     break;
+                case "Map":
+                    this.$refs.d3MapChart.setStatus(true);
+                    break;
                 default:
                     this.$refs.d3LineChart.setStatus(true);
                     break;
             }
+        },
+        deactivateCharts() {
+            this.chartRefs.forEach(r => {
+                if (this.$refs[r]) {
+                    this.$refs[r].setStatus(false);
+                }
+            });
         },
         getTimeRange() {
             return { start: this.chart.start, end: this.chart.end };
@@ -139,15 +158,15 @@ export default {
             this.chart.data = data;
             this.chart.extent = extent;
             this.chart.colors = colorScale;
-            this.$refs.d3LineChart.dataChanged();
-            this.$refs.d3HistoChart.dataChanged();
-            this.$refs.d3RangeChart.dataChanged();
+            this.chartRefs.forEach(r => {
+                if (this.$refs[r]) {
+                    this.$refs[r].dataChanged();
+                }
+            });
             this.updateScrubber();
         },
         updateChartType() {
-            this.$refs.d3LineChart.setStatus(false);
-            this.$refs.d3HistoChart.setStatus(false);
-            this.$refs.d3RangeChart.setStatus(false);
+            this.deactivateCharts();
             // clear this svg and start fresh
             this.chart.svg.html(null);
             this.activateChart();
@@ -161,6 +180,9 @@ export default {
                     break;
                 case "Range":
                     this.$refs.d3RangeChart.makeRange();
+                    break;
+                case "Map":
+                    this.$refs.d3MapChart.makeMap();
                     break;
             }
         },
@@ -193,7 +215,7 @@ export default {
             this.scrubberX = d3
                 .scaleTime()
                 .domain(this.scrubberTimeRange)
-                .range([this.layout.marginLeft, this.layout.width - (this.layout.marginRight + this.layout.marginLeft)]);
+                .range([this.scrubberMarginLeft, this.layout.width - (this.layout.marginRight + this.scrubberMarginLeft)]);
 
             this.scrubberY = d3
                 .scaleLinear()
@@ -214,9 +236,9 @@ export default {
             // add background rect
             this.scrubberSVG
                 .append("rect")
-                .attr("x", this.layout.marginLeft)
+                .attr("x", this.scrubberMarginLeft)
                 .attr("y", 0)
-                .attr("width", this.layout.width - this.layout.marginLeft * 2 - this.layout.marginRight)
+                .attr("width", this.layout.width - this.scrubberMarginLeft * 2 - this.layout.marginRight)
                 .attr("height", this.scrubberHeight)
                 .attr("fill", "rgb(244, 245, 247)");
             // add gray area
@@ -284,11 +306,11 @@ export default {
             }
             const xRange = d3.event.selection;
             // set bounds for scrubber handles
-            if (xRange[0] < this.layout.marginLeft) {
-                xRange[0] = this.layout.marginLeft;
+            if (xRange[0] < this.scrubberMarginLeft) {
+                xRange[0] = this.scrubberMarginLeft;
             }
-            if (xRange[1] > this.layout.width - this.layout.marginLeft - this.layout.marginRight) {
-                xRange[1] = this.layout.width - this.layout.marginLeft - this.layout.marginRight;
+            if (xRange[1] > this.layout.width - this.scrubberMarginLeft - this.layout.marginRight) {
+                xRange[1] = this.layout.width - this.scrubberMarginLeft - this.layout.marginRight;
             }
             const start = this.scrubberX.invert(xRange[0]);
             const end = this.scrubberX.invert(xRange[1]);

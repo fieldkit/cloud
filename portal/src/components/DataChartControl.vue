@@ -135,7 +135,12 @@ export default {
             linkedCharts: false,
             urlQuery: {},
             prevQuery: {},
-            chartOptions: [{ text: "Line", value: "Line" }, { text: "Histogram", value: "Histogram" }, { text: "Range", value: "Range" }],
+            chartOptions: [
+                { text: "Line", value: "Line" },
+                { text: "Histogram", value: "Histogram" },
+                { text: "Range", value: "Range" },
+                { text: "Map", value: "Map" },
+            ],
             timeButtons: [
                 {
                     active: false,
@@ -931,6 +936,7 @@ export default {
     background-color: rgba(255, 255, 255, 0.65);
     text-align: center;
     position: absolute;
+    z-index: 2;
 }
 #main-loading {
     margin-top: 20px;

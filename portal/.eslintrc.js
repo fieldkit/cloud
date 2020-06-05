@@ -24,4 +24,7 @@ module.exports = {
     parserOptions: {
         parser: "babel-eslint",
     },
+    globals: {
+        mapboxgl: true,
+    },
 };
