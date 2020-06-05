@@ -110,7 +110,9 @@ export default {
                             });
                         }
                         s.modules.forEach(m => {
-                            modules.push(this.getModuleImg(m));
+                            if (m.position < 5) {
+                                modules.push(this.getModuleImg(m));
+                            }
                         });
                     });
                     modules = _.uniq(modules);
