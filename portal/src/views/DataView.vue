@@ -62,6 +62,16 @@ import NotesList from "../components/NotesList";
 import SensorSummary from "../components/SensorSummary";
 import * as utils from "../utilities";
 
+const expectedRanges = {
+    temp: [0, 40],
+    ph: [5, 9],
+    do: [0, 10],
+    ec: [0, 60000],
+    humidity: [0, 100],
+    wind_speed: [0, 120],
+    rain: [0, 130],
+};
+
 export default {
     name: "DataView",
     components: {
@@ -194,7 +204,13 @@ export default {
                 // m.key
                 m.sensors.forEach(s => {
                     let colors;
-                    if (s.ranges.length > 0) {
+                    const expected = expectedRanges[s.firmware_key];
+                    if (expected) {
+                        colors = d3
+                            .scaleSequential()
+                            .domain([expected[0], expected[1]])
+                            .interpolator(d3.interpolatePlasma);
+                    } else if (s.ranges.length > 0) {
                         colors = d3
                             .scaleSequential()
                             .domain([s.ranges[0].minimum, s.ranges[0].maximum])
