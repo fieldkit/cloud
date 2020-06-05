@@ -5,7 +5,6 @@
         </div>
         <template v-if="!loading">
             <div class="inner-feed-container" v-if="activities.length > 0">
-                <!-- just ingestions at the moment -->
                 <div v-for="activity in activities" v-bind:key="activity.id" class="activity">
                     <div class="activity-icon">
                         <img :src="activity.icon" />
@@ -24,6 +23,15 @@
                         <div class="activity-date">{{ activity.time.toLocaleDateString() }}</div>
                         <div class="activity-text">
                             {{ activity.text }}
+                        </div>
+                    </div>
+                    <div class="activity-text-container" v-if="activity.type == 'deploy'">
+                        <div class="activity-heading">Deployed Station</div>
+                        <div class="activity-date">{{ activity.time.toLocaleDateString() }}</div>
+                        <div class="activity-text">{{ activity.name }} was deployed.</div>
+                        <div class="activity-text">
+                            <img src="../assets/icon-location.png" />
+                            {{ activity.location[1] + ", " + activity.location[0] }}
                         </div>
                     </div>
                 </div>
@@ -65,8 +73,7 @@ export default {
             const compassImg = imgPath("./" + img);
 
             this.api.getProjectActivity(this.project.id).then(result => {
-                this.activities = result.activities.map((a, i) => {
-                    // starting with just two types of activity
+                const activities = result.activities.map((a, i) => {
                     if (a.type == "StationIngestion") {
                         return {
                             id: "ingestion-" + i,
@@ -77,8 +84,7 @@ export default {
                             records: a.meta.data.records,
                             errors: a.meta.errors,
                         };
-                    }
-                    if (a.type == "ProjectUpdate") {
+                    } else if (a.type == "ProjectUpdate") {
                         const user = this.users.find(u => {
                             return u.user.id == a.meta.author.id;
                         });
@@ -90,8 +96,20 @@ export default {
                             time: new Date(a.created_at),
                             text: a.meta.body,
                         };
+                    } else if (a.type == "StationDeployed") {
+                        return {
+                            id: "deploy-" + i,
+                            type: "deploy",
+                            icon: compassImg,
+                            name: a.station.name,
+                            time: new Date(a.meta.deployed_at),
+                            location: a.meta.location,
+                        };
+                    } else {
+                        // handle unknown activity types?
                     }
                 });
+                this.activities = activities.filter(Boolean);
                 this.loading = false;
                 this.filterUpdates();
             });
