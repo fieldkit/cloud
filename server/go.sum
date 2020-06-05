@@ -83,6 +83,8 @@ github.com/conservify/sqlxcache v0.0.0-20190613231406-3c821df9ff9e h1:3ta2a/ShSG
 github.com/conservify/sqlxcache v0.0.0-20190613231406-3c821df9ff9e/go.mod h1:AvDsSXCHyWu5U4RKziUjN4WbWZgL3asecW+jQBXn/k0=
 github.com/conservify/sqlxcache v0.0.0-20190613231538-4c025edbc64e h1:yl9wABoHJ9Gw3QwgK7Ro6MiG/f1ApH27DaFMZDBqgT8=
 github.com/conservify/sqlxcache v0.0.0-20190613231538-4c025edbc64e/go.mod h1:AvDsSXCHyWu5U4RKziUjN4WbWZgL3asecW+jQBXn/k0=
+github.com/conservify/sqlxcache v0.0.0-20200605152630-7c47a2e4c819 h1:Gci7V/bAMgxmZEaFMq1nE5CMHLq4+1xZ5QkNHQSNsUo=
+github.com/conservify/sqlxcache v0.0.0-20200605152630-7c47a2e4c819/go.mod h1:AvDsSXCHyWu5U4RKziUjN4WbWZgL3asecW+jQBXn/k0=
 github.com/conservify/tooling v0.0.0-20190530175209-bf2b6e69e188 h1:nzhuVRX151/kWhgBr+2ReM0Wyv5H2T8SfGWs8ASKb7k=
 github.com/conservify/tooling v0.0.0-20190530175209-bf2b6e69e188/go.mod h1:h5m8xHonhAIhZYhgjfJf93jnPQTki09jRguMH72D4Yw=
 github.com/containerd/containerd v1.3.3/go.mod h1:bC6axHOhabU15QhwfG7w5PipXdVtMXFTttgp+kVtyUA=

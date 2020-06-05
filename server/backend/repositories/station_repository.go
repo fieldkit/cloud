@@ -8,6 +8,8 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
+	"github.com/jmoiron/sqlx"
+
 	pbapp "github.com/fieldkit/app-protocol"
 
 	"github.com/fieldkit/cloud/server/data"
@@ -205,6 +207,8 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 		return err
 	}
 
+	keeping := make([]int64, 0)
+
 	if record.LiveReadings != nil {
 		for _, lr := range record.LiveReadings {
 			time := time.Unix(int64(lr.Time), 0)
@@ -216,6 +220,8 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 				if _, err := r.UpsertStationModule(ctx, module); err != nil {
 					return err
 				}
+
+				keeping = append(keeping, module.ID)
 
 				for sensorIndex, lrs := range lrm.Readings {
 					s := lrs.Sensor
@@ -235,6 +241,8 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 				return err
 			}
 
+			keeping = append(keeping, module.ID)
+
 			for sensorIndex, s := range m.Sensors {
 				sensor := newModuleSensor(s, module, configuration, uint32(sensorIndex), nil, nil)
 				if _, err := r.UpsertModuleSensor(ctx, sensor); err != nil {
@@ -246,6 +254,10 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 
 	log := Logger(ctx).Sugar()
 
+	if err := r.deleteStationModulesExcept(ctx, configuration.ID, keeping); err != nil {
+		return err
+	}
+
 	log.Infow("configuration", "station_id", s.ID, "configuration_id", configuration.ID)
 
 	if _, err := r.db.ExecContext(ctx, `
@@ -255,6 +267,30 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 		DO UPDATE SET configuration_id = EXCLUDED.configuration_id
 		`, s.ID, configuration.ID); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (r *StationRepository) deleteStationModulesExcept(ctx context.Context, configurationID int64, keeping []int64) error {
+	if query, args, err := sqlx.In(`
+		DELETE FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?)
+		`, configurationID, keeping); err != nil {
+		return err
+	} else {
+		if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+			return err
+		}
+	}
+
+	if query, args, err := sqlx.In(`
+		DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?))
+		`, configurationID, keeping); err != nil {
+		return err
+	} else {
+		if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+			return err
+		}
 	}
 
 	return nil
