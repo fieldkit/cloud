@@ -196,6 +196,7 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 			Key:       fmt.Sprintf("%s-%d", getActivityTypeName(a), a.ID),
 			CreatedAt: a.CreatedAt.Unix() * 1000,
 			Project:   projectSummary,
+			Station:   stationsByID[a.StationID],
 			Type:      getActivityTypeName(a),
 			Meta:      a,
 		})
