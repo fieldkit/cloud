@@ -129,6 +129,10 @@ export default {
         },
 
         getPlaceName() {
+            if (!this.station.location) {
+                this.placeName = "Unknown area";
+                return;
+            }
             const longLatMapbox = this.station.location.longitude + "," + this.station.location.latitude;
             return this.api.getPlaceName(longLatMapbox).then(result => {
                 this.placeName = result.features[0] ? result.features[0].place_name : "Unknown area";
@@ -136,6 +140,9 @@ export default {
         },
 
         getNativeLand() {
+            if (!this.station.location) {
+                return [];
+            }
             const latLongNative = this.station.location.latitude + "," + this.station.location.longitude;
             return this.api.getNativeLand(latLongNative);
         },
@@ -198,7 +205,7 @@ export default {
         },
 
         getLat() {
-            if (!this.station.location.latitude) {
+            if (!this.station.location || !this.station.location.latitude) {
                 return false;
             }
             let lat = parseFloat(this.station.location.latitude);
@@ -206,7 +213,7 @@ export default {
         },
 
         getLong() {
-            if (!this.station.location.longitude) {
+            if (!this.station.location || !this.station.location.longitude) {
                 return false;
             }
             let long = parseFloat(this.station.location.longitude);

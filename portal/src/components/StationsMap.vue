@@ -64,7 +64,9 @@ export default {
             let latMax = -90;
             let stationFeatures = [];
             let mappable = this.stations.filter(s => {
-                return s.location.latitude && s.location.longitude && s.location.latitude != 1000 && s.location.longitude != 1000;
+                return (
+                    s.location && s.location.latitude && s.location.longitude && s.location.latitude != 1000 && s.location.longitude != 1000
+                );
             });
             mappable.forEach(s => {
                 let coordinates = [s.location.latitude, s.location.longitude];
@@ -165,10 +167,7 @@ export default {
                         lng: longMax,
                     },
                 ];
-                this.map.fitBounds(bounds, { duration: 0 });
-                // fitBounds is cropped too close: zoom out
-                const z = this.map.getZoom();
-                this.map.setZoom(z - 1.5);
+                this.map.fitBounds(bounds, { padding: 20, duration: 0 });
             } else if (mappable.length == 0) {
                 this.map.setZoom(6);
             }
