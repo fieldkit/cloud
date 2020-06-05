@@ -269,6 +269,32 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 		return err
 	}
 
+	if err := r.updateDeployedActivity(ctx, s); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *StationRepository) updateDeployedActivity(ctx context.Context, station *data.Station) error {
+	if station.RecordingStartedAt == nil {
+		return nil
+	}
+
+	deployedAt := time.Unix(*station.RecordingStartedAt, 0)
+	location := station.Location
+
+	if _, err := r.db.ExecContext(ctx, `
+		INSERT INTO fieldkit.station_deployed AS sd
+			(created_at, station_id, deployed_at, location) VALUES
+			(NOW(), $1, $2, ST_SetSRID(ST_GeomFromText($3), 4326))
+		ON CONFLICT (station_id, deployed_at)
+		DO UPDATE SET location = EXCLUDED.location
+		RETURNING id
+		`, station.ID, deployedAt, location); err != nil {
+		return err
+	}
+
 	return nil
 }
 
