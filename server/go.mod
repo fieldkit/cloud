@@ -40,6 +40,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/h2non/filetype v1.0.10
 	github.com/hashicorp/go-immutable-radix v0.0.0-20180129170900-7f3cd4390caa
+	github.com/hashicorp/go-multierror v1.1.0
 	github.com/hashicorp/golang-lru v0.5.1
 	github.com/hongshibao/go-algo v0.0.0-20160521171829-b1aaa26798b6 // indirect
 	github.com/hongshibao/go-kdtree v0.0.0-20180503061502-0de4e8305acf

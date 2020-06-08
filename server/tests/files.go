@@ -20,6 +20,10 @@ func NewInMemoryArchive(files map[string][]byte) (a *InMemoryArchive) {
 	}
 }
 
+func (a *InMemoryArchive) String() string {
+	return "memory"
+}
+
 func (a *InMemoryArchive) Archive(ctx context.Context, contentType string, meta map[string]string, reader io.Reader) (*files.ArchivedFile, error) {
 	return nil, fmt.Errorf("unsupported")
 }

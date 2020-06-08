@@ -97,7 +97,7 @@ func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
 	log := logging.Logger(ctx).Sugar()
 
 	if config.AwsId == "" || config.AwsSecret == "" {
-		log.Infow("using ambient aws profile")
+		log.Infow("using aws profile")
 		return session.Options{
 			Profile: config.AWSProfile,
 			Config: aws.Config{
@@ -325,17 +325,50 @@ func main() {
 }
 
 func createFileArchive(ctx context.Context, config *Config, awsSession *session.Session, metrics *logging.Metrics) (files.FileArchive, error) {
+	log := logging.Logger(ctx).Sugar()
+
+	reading := make([]files.FileArchive, 0)
+	writing := make([]files.FileArchive, 0)
+
 	switch config.Archiver {
 	case "default":
-		return files.NewLocalFilesArchive(), nil
-	case "aws":
-		if config.StreamsBucketName == "" {
-			return nil, fmt.Errorf("streams bucket is required")
+		if config.StreamsBucketName != "" {
+			s3, err := files.NewS3FileArchive(awsSession, metrics, config.StreamsBucketName)
+			if err != nil {
+				return nil, err
+			}
+			reading = append(reading, s3)
 		}
-		return files.NewS3FileArchive(awsSession, metrics, config.StreamsBucketName)
-	default:
-		return nil, fmt.Errorf("unknown archiver: " + config.Archiver)
+
+		fs := files.NewLocalFilesArchive()
+		reading = append(reading, fs)
+		writing = append(writing, fs)
+		break
+	case "aws":
+		s3, err := files.NewS3FileArchive(awsSession, metrics, config.StreamsBucketName)
+		if err != nil {
+			return nil, err
+		}
+		reading = append(reading, s3)
+		writing = append(writing, s3)
+		break
 	}
+
+	log.Infow("files", "archiver", config.Archiver, "reading", toListOfStrings(reading), "writing", toListOfStrings(writing))
+
+	if len(reading) == 0 || len(writing) == 0 {
+		return nil, fmt.Errorf("no file archives available")
+	}
+
+	return files.NewPrioritizedFilesArchive(reading, writing), nil
+}
+
+func toListOfStrings(raw []files.FileArchive) []string {
+	s := make([]string, len(raw))
+	for i, v := range raw {
+		s[i] = v.String()
+	}
+	return s
 }
 
 func getIngesterConfig() (*ingester.Config, error) {

@@ -21,6 +21,10 @@ func NewLocalFilesArchive() (a *LocalFilesArchive) {
 	return &LocalFilesArchive{}
 }
 
+func (a *LocalFilesArchive) String() string {
+	return "fs"
+}
+
 func (a *LocalFilesArchive) Archive(ctx context.Context, contentType string, meta map[string]string, reader io.Reader) (*ArchivedFile, error) {
 	log := Logger(ctx).Sugar()
 

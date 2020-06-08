@@ -25,7 +25,7 @@ type S3FileArchive struct {
 
 func NewS3FileArchive(session *session.Session, metrics *logging.Metrics, bucketName string) (files *S3FileArchive, err error) {
 	if bucketName == "" {
-		return nil, fmt.Errorf("empty bucket name")
+		return nil, fmt.Errorf("bucket name is required")
 	}
 
 	files = &S3FileArchive{
@@ -35,6 +35,10 @@ func NewS3FileArchive(session *session.Session, metrics *logging.Metrics, bucket
 	}
 
 	return
+}
+
+func (a *S3FileArchive) String() string {
+	return "s3"
 }
 
 func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta map[string]string, reader io.Reader) (*ArchivedFile, error) {

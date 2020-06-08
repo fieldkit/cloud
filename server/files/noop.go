@@ -9,18 +9,21 @@ import (
 	"github.com/google/uuid"
 )
 
-type NopFilesArchive struct {
+type nopFilesArchive struct {
 }
 
-func NewNopFilesArchive() (a *NopFilesArchive) {
-	return &NopFilesArchive{}
+func NewNopFilesArchive() (a *nopFilesArchive) {
+	return &nopFilesArchive{}
 }
 
-func (a *NopFilesArchive) Archive(ctx context.Context, contentType string, meta map[string]string, reader io.Reader) (*ArchivedFile, error) {
+func (a *nopFilesArchive) String() string {
+	return "noop"
+}
+
+func (a *nopFilesArchive) Archive(ctx context.Context, contentType string, meta map[string]string, reader io.Reader) (*ArchivedFile, error) {
 	log := Logger(ctx).Sugar()
 
 	cr := newCountingReader(reader)
-
 	id := uuid.Must(uuid.NewRandom())
 
 	fn := makeFileName(id.String())
@@ -38,14 +41,14 @@ func (a *NopFilesArchive) Archive(ctx context.Context, contentType string, meta 
 	return ss, nil
 }
 
-func (a *NopFilesArchive) OpenByKey(ctx context.Context, key string) (io.ReadCloser, error) {
+func (a *nopFilesArchive) OpenByKey(ctx context.Context, key string) (io.ReadCloser, error) {
 	return nil, fmt.Errorf("unsupported")
 }
 
-func (a *NopFilesArchive) OpenByURL(ctx context.Context, url string) (io.ReadCloser, error) {
+func (a *nopFilesArchive) OpenByURL(ctx context.Context, url string) (io.ReadCloser, error) {
 	return nil, fmt.Errorf("unsupported")
 }
 
-func (a *NopFilesArchive) Info(ctx context.Context, key string) (meta map[string]string, err error) {
+func (a *nopFilesArchive) Info(ctx context.Context, key string) (meta map[string]string, err error) {
 	return nil, fmt.Errorf("unsupported")
 }
