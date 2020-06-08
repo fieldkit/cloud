@@ -90,7 +90,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		ingestion := &data.Ingestion{
 			URL:          saved.URL,
-			UploadID:     saved.ID,
+			UploadID:     saved.Key,
 			UserID:       userID,
 			DeviceID:     headers.FkDeviceID,
 			GenerationID: headers.FkGenerationID,
@@ -112,7 +112,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		o.Metrics.Ingested(int(b), saved.BytesRead)
 
-		log.Infow("saved", "device_id", headers.FkDeviceID, "file_id", saved.ID, "time", time.Since(startedAt).String(), "size", saved.BytesRead,
+		log.Infow("saved", "device_id", headers.FkDeviceID, "file_id", saved.Key, "time", time.Since(startedAt).String(), "size", saved.BytesRead,
 			"type", ingestion.Type, "ingestion_id", ingestion.ID, "generation_id", ingestion.GenerationID, "user_id", userID,
 			"device_name", headers.FkDeviceName, "blocks", headers.FkBlocks)
 

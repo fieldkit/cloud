@@ -184,9 +184,9 @@ func (c *PictureController) UserGetID(ctx *app.UserGetIDPictureContext) error {
 		return err
 	}
 
-	mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
+	mr := repositories.NewMediaRepository(c.options.MediaFiles)
 
-	lm, err := mr.Load(ctx, "598c0282-5c8c-4bdd-9e82-950ab796c059")
+	lm, err := mr.LoadByKey(ctx, "598c0282-5c8c-4bdd-9e82-950ab796c059")
 	if err != nil {
 		return err
 	}
@@ -205,7 +205,7 @@ func (c *PictureController) UserGetID(ctx *app.UserGetIDPictureContext) error {
 }
 
 func (c *PictureController) UserSaveID(ctx *app.UserSaveIDPictureContext) error {
-	mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
+	mr := repositories.NewMediaRepository(c.options.MediaFiles)
 
 	saved, err := mr.Save(ctx, ctx.RequestData)
 	if err != nil {

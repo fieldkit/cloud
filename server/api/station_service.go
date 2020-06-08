@@ -252,7 +252,7 @@ func (c *StationService) Photo(ctx context.Context, payload *station.PhotoPayloa
 		return defaultPhoto(payload.ID)
 	}
 
-	mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
+	mr := repositories.NewMediaRepository(c.options.MediaFiles)
 
 	lm, err := mr.LoadByURL(ctx, allMedia[0].URL)
 	if err != nil {

@@ -75,7 +75,7 @@ func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta ma
 	log.Infow("saved", "url", r.Location, "bytes_read", cr.bytesRead)
 
 	ss := &ArchivedFile{
-		ID:        id.String(),
+		Key:       id.String(),
 		URL:       r.Location,
 		BytesRead: cr.bytesRead,
 	}
@@ -83,11 +83,11 @@ func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta ma
 	return ss, err
 }
 
-func (a *S3FileArchive) OpenByKey(ctx context.Context, key string) (io.ReadCloser, error) {
+func (a *S3FileArchive) OpenByKey(ctx context.Context, key string) (of *OpenedFile, err error) {
 	return a.open(ctx, a.bucketName, key)
 }
 
-func (a *S3FileArchive) OpenByURL(ctx context.Context, url string) (io.ReadCloser, error) {
+func (a *S3FileArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFile, err error) {
 	object, err := common.GetBucketAndKey(url)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing url: %v", err)
@@ -96,7 +96,32 @@ func (a *S3FileArchive) OpenByURL(ctx context.Context, url string) (io.ReadClose
 	return a.open(ctx, object.Bucket, object.Key)
 }
 
-func (a *S3FileArchive) open(ctx context.Context, bucket, key string) (io.ReadCloser, error) {
+func (a *S3FileArchive) DeleteByKey(ctx context.Context, key string) (err error) {
+	svc := s3.New(a.session)
+
+	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(a.bucketName), Key: aws.String(key)})
+	if err != nil {
+		return fmt.Errorf("unable to delete object %q from bucket %q, %v", key, a.bucketName, err)
+	}
+
+	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+		Bucket: aws.String(a.bucketName),
+		Key:    aws.String(key),
+	})
+
+	return err
+}
+
+func (a *S3FileArchive) DeleteByURL(ctx context.Context, url string) (err error) {
+	object, err := common.GetBucketAndKey(url)
+	if err != nil {
+		return fmt.Errorf("error parsing url: %v", err)
+	}
+
+	return a.DeleteByKey(ctx, object.Key)
+}
+
+func (a *S3FileArchive) open(ctx context.Context, bucket, key string) (of *OpenedFile, err error) {
 	svc := s3.New(a.session)
 
 	goi := &s3.GetObjectInput{
@@ -109,7 +134,31 @@ func (a *S3FileArchive) open(ctx context.Context, bucket, key string) (io.ReadCl
 		return nil, fmt.Errorf("error reading object %v: %v", key, err)
 	}
 
-	return obj.Body, nil
+	log := Logger(ctx).Sugar()
+
+	contentLength := int64(0)
+	if obj.ContentLength != nil {
+		contentLength = *obj.ContentLength
+	}
+
+	contentType := ""
+	if obj.ContentType != nil {
+		contentType = *obj.ContentType
+	}
+
+	log.Infow("opened", "bucket", bucket, "key", key, "content_type", contentType, "content_length", contentLength)
+
+	of = &OpenedFile{
+		FileInfo: FileInfo{
+			Key:         key,
+			Size:        contentLength,
+			ContentType: contentType,
+			Meta:        make(map[string]string),
+		},
+		Body: obj.Body,
+	}
+
+	return
 }
 
 func (a *S3FileArchive) Info(ctx context.Context, key string) (info *FileInfo, err error) {

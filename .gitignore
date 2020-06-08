@@ -15,3 +15,4 @@ secrets.js
 *.fkpb
 *.di.bz2
 coverage.data
+.fs

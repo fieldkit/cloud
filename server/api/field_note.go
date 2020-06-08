@@ -82,7 +82,7 @@ func (c *FieldNoteController) SaveMedia(ctx *app.SaveMediaFieldNoteContext) erro
 		return err
 	}
 
-	mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
+	mr := repositories.NewMediaRepository(c.options.MediaFiles)
 	saved, err := mr.Save(ctx, ctx.RequestData)
 	if err != nil {
 		return err
@@ -108,7 +108,7 @@ func (c *FieldNoteController) GetMedia(ctx *app.GetMediaFieldNoteContext) error 
 		return err
 	}
 
-	mr := repositories.NewMediaRepository(c.options.Session, c.options.Buckets.Media)
+	mr := repositories.NewMediaRepository(c.options.MediaFiles)
 
 	lm, err := mr.LoadByURL(ctx, fieldNoteMedia.URL)
 	if err != nil {
@@ -116,6 +116,7 @@ func (c *FieldNoteController) GetMedia(ctx *app.GetMediaFieldNoteContext) error 
 	}
 
 	if lm != nil {
+		// TODO Error Logging
 		sendLoadedMedia(ctx.ResponseData, lm)
 	}
 

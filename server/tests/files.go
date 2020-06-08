@@ -10,13 +10,29 @@ import (
 	"github.com/fieldkit/cloud/server/files"
 )
 
+type memoryFile struct {
+	data        []byte
+	meta        map[string]string
+	contentType string
+}
+
 type InMemoryArchive struct {
-	files map[string][]byte
+	files map[string]*memoryFile
 }
 
 func NewInMemoryArchive(files map[string][]byte) (a *InMemoryArchive) {
+	memoryFiles := make(map[string]*memoryFile)
+
+	for key, data := range files {
+		memoryFiles[key] = &memoryFile{
+			data:        data,
+			meta:        make(map[string]string),
+			contentType: "",
+		}
+	}
+
 	return &InMemoryArchive{
-		files: files,
+		files: memoryFiles,
 	}
 }
 
@@ -28,20 +44,67 @@ func (a *InMemoryArchive) Archive(ctx context.Context, contentType string, meta 
 	return nil, fmt.Errorf("unsupported")
 }
 
-func (a *InMemoryArchive) OpenByKey(ctx context.Context, key string) (io.ReadCloser, error) {
-	if d, ok := a.files[key]; ok {
-		return ioutil.NopCloser(bytes.NewBuffer(d)), nil
+func (a *InMemoryArchive) OpenByKey(ctx context.Context, key string) (of *files.OpenedFile, err error) {
+	if file, ok := a.files[key]; ok {
+		info, err := a.Info(ctx, key)
+		if err != nil {
+			return nil, err
+		}
+
+		body := ioutil.NopCloser(bytes.NewBuffer(file.data))
+		of = &files.OpenedFile{
+			FileInfo: *info,
+			Body:     body,
+		}
+
+		return of, nil
 	}
 	return nil, fmt.Errorf("no such file: %s", key)
 }
 
-func (a *InMemoryArchive) OpenByURL(ctx context.Context, url string) (io.ReadCloser, error) {
-	if d, ok := a.files[url]; ok {
-		return ioutil.NopCloser(bytes.NewBuffer(d)), nil
+func (a *InMemoryArchive) OpenByURL(ctx context.Context, url string) (of *files.OpenedFile, err error) {
+	if file, ok := a.files[url]; ok {
+		info, err := a.Info(ctx, url) // TODO Problem?
+		if err != nil {
+			return nil, err
+		}
+
+		body := ioutil.NopCloser(bytes.NewBuffer(file.data))
+
+		of = &files.OpenedFile{
+			FileInfo: *info,
+			Body:     body,
+		}
+
+		return of, nil
 	}
 	return nil, fmt.Errorf("no such file: %s", url)
 }
 
+func (a *InMemoryArchive) DeleteByKey(ctx context.Context, key string) error {
+	if _, ok := a.files[key]; ok {
+		a.files[key] = nil
+		return nil
+	}
+	return fmt.Errorf("no such file: %s", key)
+}
+
+func (a *InMemoryArchive) DeleteByURL(ctx context.Context, url string) error {
+	if _, ok := a.files[url]; ok {
+		a.files[url] = nil
+		return nil
+	}
+	return fmt.Errorf("no such file: %s", url)
+}
+
 func (a *InMemoryArchive) Info(ctx context.Context, key string) (info *files.FileInfo, err error) {
-	return nil, fmt.Errorf("unsupported")
+	if file, ok := a.files[key]; ok {
+		info = &files.FileInfo{
+			Size:        int64(len(file.data)),
+			ContentType: file.contentType,
+			Meta:        file.meta,
+		}
+		return
+	}
+	return nil, fmt.Errorf("no such file: %s", key)
 }

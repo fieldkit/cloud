@@ -4,28 +4,31 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
 
 	"github.com/google/uuid"
+
+	"github.com/h2non/filetype"
 )
 
 const (
-	Path = "./ingestion"
+	Path = "./.fs"
 )
 
-type LocalFilesArchive struct {
+type localFilesArchive struct {
 }
 
-func NewLocalFilesArchive() (a *LocalFilesArchive) {
-	return &LocalFilesArchive{}
+func NewLocalFilesArchive() (a *localFilesArchive) {
+	return &localFilesArchive{}
 }
 
-func (a *LocalFilesArchive) String() string {
+func (a *localFilesArchive) String() string {
 	return "fs"
 }
 
-func (a *LocalFilesArchive) Archive(ctx context.Context, contentType string, meta map[string]string, reader io.Reader) (*ArchivedFile, error) {
+func (a *localFilesArchive) Archive(ctx context.Context, contentType string, meta map[string]string, reader io.Reader) (*ArchivedFile, error) {
 	log := Logger(ctx).Sugar()
 
 	cr := newCountingReader(reader)
@@ -51,7 +54,7 @@ func (a *LocalFilesArchive) Archive(ctx context.Context, contentType string, met
 	io.Copy(file, cr)
 
 	ss := &ArchivedFile{
-		ID:        id.String(),
+		Key:       id.String(),
 		URL:       fn,
 		BytesRead: cr.bytesRead,
 	}
@@ -60,20 +63,65 @@ func (a *LocalFilesArchive) Archive(ctx context.Context, contentType string, met
 
 }
 
-func (a *LocalFilesArchive) OpenByKey(ctx context.Context, key string) (io.ReadCloser, error) {
+func (a *localFilesArchive) OpenByKey(ctx context.Context, key string) (of *OpenedFile, err error) {
 	return a.OpenByURL(ctx, makeFileName(key))
 }
 
-func (a *LocalFilesArchive) OpenByURL(ctx context.Context, url string) (io.ReadCloser, error) {
+func (a *localFilesArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFile, err error) {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("opening", "url", url)
 
-	return os.Open(url)
+	file, err := os.Open(url)
+	if err != nil {
+		return nil, err
+	}
+
+	info, err := a.Info(ctx, url)
+	if err != nil {
+		return nil, err
+	}
+
+	of = &OpenedFile{
+		FileInfo: *info,
+		Body:     file,
+	}
+
+	return
 }
 
-func (a *LocalFilesArchive) Info(ctx context.Context, key string) (info *FileInfo, err error) {
-	return nil, nil
+func (a *localFilesArchive) DeleteByKey(ctx context.Context, key string) error {
+	return fmt.Errorf("unsupported")
+}
+
+func (a *localFilesArchive) DeleteByURL(ctx context.Context, url string) error {
+	return fmt.Errorf("unsupported")
+}
+
+func (a *localFilesArchive) Info(ctx context.Context, keyOrUrl string) (info *FileInfo, err error) {
+	names := []string{keyOrUrl, makeFileName(keyOrUrl)}
+	for _, fn := range names {
+		if si, err := os.Stat(fn); err == nil {
+			header, _ := ioutil.ReadFile(fn) // TODO Read less data here.
+			kind, _ := filetype.Match(header)
+			if kind == filetype.Unknown {
+				return nil, fmt.Errorf("unknown file type: %s", fn)
+			}
+
+			contentType := kind.MIME.Value
+
+			info = &FileInfo{
+				Key:         keyOrUrl,
+				Size:        si.Size(),
+				Meta:        make(map[string]string),
+				ContentType: contentType,
+			}
+
+			return info, nil
+		}
+	}
+
+	return nil, fmt.Errorf("file not found: %s", keyOrUrl)
 }
 
 func makeFileName(key string) string {

@@ -151,10 +151,12 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 		return nil, err
 	}
 
-	reader, err := ra.files.OpenByURL(ctx, i.URL)
+	opened, err := ra.files.OpenByURL(ctx, i.URL)
 	if err != nil {
 		return nil, err
 	}
+
+	reader := opened.Body
 
 	defer reader.Close()
 

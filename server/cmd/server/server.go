@@ -140,7 +140,12 @@ func createApi(ctx context.Context, config *Config) (http.Handler, *api.Controll
 		return nil, nil, err
 	}
 
-	files, err := createFileArchive(ctx, config, awsSession, metrics)
+	ingestionFiles, err := createFileArchive(ctx, config.Archiver, config.StreamsBucketName, awsSession, metrics)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	mediaFiles, err := createFileArchive(ctx, config.Archiver, config.MediaBucketName, awsSession, metrics)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -150,7 +155,7 @@ func createApi(ctx context.Context, config *Config) (http.Handler, *api.Controll
 		return nil, nil, err
 	}
 
-	ingestionReceivedHandler := backend.NewIngestionReceivedHandler(database, files, metrics)
+	ingestionReceivedHandler := backend.NewIngestionReceivedHandler(database, ingestionFiles, metrics)
 
 	jq.Register(messages.IngestionReceived{}, ingestionReceivedHandler)
 
@@ -173,7 +178,7 @@ func createApi(ctx context.Context, config *Config) (http.Handler, *api.Controll
 		return nil, nil, err
 	}
 
-	controllerOptions, err := api.CreateServiceOptions(ctx, apiConfig, database, be, jq, awsSession, metrics)
+	controllerOptions, err := api.CreateServiceOptions(ctx, apiConfig, database, be, jq, mediaFiles, awsSession, metrics)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -324,16 +329,16 @@ func main() {
 	}
 }
 
-func createFileArchive(ctx context.Context, config *Config, awsSession *session.Session, metrics *logging.Metrics) (files.FileArchive, error) {
+func createFileArchive(ctx context.Context, archiver, bucketName string, awsSession *session.Session, metrics *logging.Metrics) (files.FileArchive, error) {
 	log := logging.Logger(ctx).Sugar()
 
 	reading := make([]files.FileArchive, 0)
 	writing := make([]files.FileArchive, 0)
 
-	switch config.Archiver {
+	switch archiver {
 	case "default":
-		if config.StreamsBucketName != "" {
-			s3, err := files.NewS3FileArchive(awsSession, metrics, config.StreamsBucketName)
+		if bucketName != "" {
+			s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName)
 			if err != nil {
 				return nil, err
 			}
@@ -345,7 +350,7 @@ func createFileArchive(ctx context.Context, config *Config, awsSession *session.
 		writing = append(writing, fs)
 		break
 	case "aws":
-		s3, err := files.NewS3FileArchive(awsSession, metrics, config.StreamsBucketName)
+		s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName)
 		if err != nil {
 			return nil, err
 		}
@@ -354,7 +359,7 @@ func createFileArchive(ctx context.Context, config *Config, awsSession *session.
 		break
 	}
 
-	log.Infow("files", "archiver", config.Archiver, "reading", toListOfStrings(reading), "writing", toListOfStrings(writing))
+	log.Infow("files", "archiver", archiver, "bucket_name", bucketName, "reading", toListOfStrings(reading), "writing", toListOfStrings(writing))
 
 	if len(reading) == 0 || len(writing) == 0 {
 		return nil, fmt.Errorf("no file archives available")

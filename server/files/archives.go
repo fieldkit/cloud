@@ -6,7 +6,7 @@ import (
 )
 
 type ArchivedFile struct {
-	ID        string
+	Key       string
 	URL       string
 	BytesRead int
 }
@@ -20,15 +20,23 @@ type FileMeta struct {
 }
 
 type FileInfo struct {
+	Key         string
 	Size        int64
 	ContentType string
 	Meta        map[string]string
 }
 
+type OpenedFile struct {
+	FileInfo
+	Body io.ReadCloser
+}
+
 type FileArchive interface {
 	Archive(ctx context.Context, contentType string, meta map[string]string, read io.Reader) (*ArchivedFile, error)
-	OpenByKey(ctx context.Context, key string) (io.ReadCloser, error)
-	OpenByURL(ctx context.Context, url string) (io.ReadCloser, error)
+	OpenByKey(ctx context.Context, key string) (f *OpenedFile, err error)
+	OpenByURL(ctx context.Context, url string) (f *OpenedFile, err error)
+	DeleteByKey(ctx context.Context, key string) (err error)
+	DeleteByURL(ctx context.Context, url string) (err error)
 	Info(ctx context.Context, key string) (info *FileInfo, err error)
 	String() string
 }

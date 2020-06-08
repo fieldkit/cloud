@@ -33,7 +33,7 @@ func (a *nopFilesArchive) Archive(ctx context.Context, contentType string, meta 
 	io.Copy(ioutil.Discard, cr)
 
 	ss := &ArchivedFile{
-		ID:        id.String(),
+		Key:       id.String(),
 		URL:       fn,
 		BytesRead: cr.bytesRead,
 	}
@@ -41,12 +41,20 @@ func (a *nopFilesArchive) Archive(ctx context.Context, contentType string, meta 
 	return ss, nil
 }
 
-func (a *nopFilesArchive) OpenByKey(ctx context.Context, key string) (io.ReadCloser, error) {
+func (a *nopFilesArchive) OpenByKey(ctx context.Context, key string) (of *OpenedFile, err error) {
 	return nil, fmt.Errorf("unsupported")
 }
 
-func (a *nopFilesArchive) OpenByURL(ctx context.Context, url string) (io.ReadCloser, error) {
+func (a *nopFilesArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFile, err error) {
 	return nil, fmt.Errorf("unsupported")
+}
+
+func (a *nopFilesArchive) DeleteByKey(ctx context.Context, key string) (err error) {
+	return fmt.Errorf("unsupported")
+}
+
+func (a *nopFilesArchive) DeleteByURL(ctx context.Context, url string) (err error) {
+	return fmt.Errorf("unsupported")
 }
 
 func (a *nopFilesArchive) Info(ctx context.Context, key string) (info *FileInfo, err error) {

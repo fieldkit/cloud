@@ -142,16 +142,16 @@ func (c *CopierTool) copyIngestion(ctx context.Context, id int64, force bool) (e
 			return err
 		}
 
-		copied, err := c.Destiny.Files.Archive(ctx, common.FkDataBinaryContentType, info.Meta, reading)
+		copied, err := c.Destiny.Files.Archive(ctx, common.FkDataBinaryContentType, info.Meta, reading.Body)
 		if err != nil {
 			return err
 		}
 
-		log.Infow("copied", "copied_file_id", copied.ID)
+		log.Infow("copied", "copied_file_id", copied.Key)
 
 		newIngestion := &data.Ingestion{
 			URL:          copied.URL,
-			UploadID:     copied.ID,
+			UploadID:     copied.Key,
 			UserID:       ingestion.UserID,
 			DeviceID:     ingestion.DeviceID,
 			GenerationID: ingestion.GenerationID,

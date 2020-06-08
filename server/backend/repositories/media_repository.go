@@ -6,31 +6,24 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"net/url"
-	"strings"
-
-	"github.com/google/uuid"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
 	"github.com/goadesign/goa"
 
 	"github.com/h2non/filetype"
+
+	"github.com/fieldkit/cloud/server/files"
 )
 
 type SavedMedia struct {
-	ID       string
+	Key      string
 	URL      string
-	Size     int
+	Size     int64
 	MimeType string
 }
 
 type LoadedMedia struct {
-	ID       string
-	Size     int
+	Key      string
+	Size     int64
 	MimeType string
 	Reader   io.Reader
 }
@@ -40,14 +33,12 @@ const (
 )
 
 type MediaRepository struct {
-	bucketName string
-	session    *session.Session
+	files files.FileArchive
 }
 
-func NewMediaRepository(session *session.Session, bucketName string) (r *MediaRepository) {
+func NewMediaRepository(files files.FileArchive) (r *MediaRepository) {
 	return &MediaRepository{
-		bucketName: bucketName,
-		session:    session,
+		files: files,
 	}
 }
 
@@ -76,34 +67,19 @@ func (r *MediaRepository) Save(ctx context.Context, rd *goa.RequestData) (sm *Sa
 	}
 
 	contentType := kind.MIME.Value
-
-	metadata := make(map[string]*string)
-	id := uuid.Must(uuid.NewRandom())
-	uploader := s3manager.NewUploader(r.session)
-
-	log.Infow("saving", "content_type", contentType, "id", id, "extension", kind.Extension, "mime_type", kind.MIME.Value, "bucket", r.bucketName)
-
 	objReader := io.MultiReader(bytes.NewReader(buf.Bytes()), rd.Body)
 	cr := NewCountingReader(objReader)
-
-	o, err := uploader.Upload(&s3manager.UploadInput{
-		ACL:         nil,
-		ContentType: aws.String(contentType),
-		Bucket:      aws.String(r.bucketName),
-		Key:         aws.String(id.String()),
-		Body:        cr,
-		Metadata:    metadata,
-		Tagging:     nil,
-	})
+	metadata := make(map[string]string)
+	af, err := r.files.Archive(ctx, contentType, metadata, cr)
 	if err != nil {
-		return nil, fmt.Errorf("error uploading: %v", err)
+		return nil, err
 	}
 
-	log.Infow("saved", "content_type", contentType, "id", id, "url", o.Location, "bytes_read", cr.BytesRead, "bucket", r.bucketName)
+	log.Infow("saved", "content_type", contentType, "id", af.Key, "bytes_read", cr.BytesRead)
 
 	sm = &SavedMedia{
-		ID:       id.String(),
-		URL:      o.Location,
+		Key:      af.Key,
+		URL:      af.URL,
 		Size:     cr.BytesRead,
 		MimeType: kind.MIME.Value,
 	}
@@ -111,75 +87,49 @@ func (r *MediaRepository) Save(ctx context.Context, rd *goa.RequestData) (sm *Sa
 	return
 }
 
-func (r *MediaRepository) DeleteByURL(ctx context.Context, s3url string) (err error) {
-	u, err := url.Parse(s3url)
-	if err != nil {
-		return err
-	}
-
-	parts := strings.Split(u.Host, ".")
-	key := u.Path[1:]
-
-	if parts[0] != r.bucketName {
-		return fmt.Errorf("unexpected bucket name: %s", parts[0])
-	}
-
-	return r.DeleteByID(ctx, key)
+func (r *MediaRepository) DeleteByURL(ctx context.Context, url string) (err error) {
+	return r.files.DeleteByURL(ctx, url)
 }
 
-func (r *MediaRepository) DeleteByID(ctx context.Context, id string) (err error) {
-	svc := s3.New(r.session)
-
-	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(r.bucketName), Key: aws.String(id)})
-	if err != nil {
-		return fmt.Errorf("Unable to delete object %q from bucket %q, %v", id, r.bucketName, err)
-	}
-
-	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
-		Bucket: aws.String(r.bucketName),
-		Key:    aws.String(id),
-	})
-
-	return err
+func (r *MediaRepository) DeleteByKey(ctx context.Context, key string) (err error) {
+	return r.files.DeleteByKey(ctx, key)
 }
 
-func (r *MediaRepository) LoadByURL(ctx context.Context, s3url string) (lm *LoadedMedia, err error) {
-	u, err := url.Parse(s3url)
+func (r *MediaRepository) LoadByURL(ctx context.Context, url string) (lm *LoadedMedia, err error) {
+	opened, err := r.files.OpenByURL(ctx, url)
 	if err != nil {
 		return nil, err
 	}
 
-	return r.Load(ctx, u.Path[1:])
-}
-
-func (r *MediaRepository) Load(ctx context.Context, id string) (lm *LoadedMedia, err error) {
-	log := Logger(ctx).Sugar()
-
-	log.Infow("loading", "id", id)
-
-	goi := &s3.GetObjectInput{
-		Bucket: aws.String(r.bucketName),
-		Key:    aws.String(id),
-	}
-
-	svc := s3.New(r.session)
-
-	obj, err := svc.GetObject(goi)
-	if err != nil {
-		return nil, fmt.Errorf("error reading object %v: %v", id, err)
-	}
-
-	contentLength := 0
-
-	if obj.ContentLength != nil {
-		contentLength = int(*obj.ContentLength)
+	if opened == nil {
+		return nil, fmt.Errorf("file archive bug, nil opened file: %v", r.files)
 	}
 
 	lm = &LoadedMedia{
-		ID:       id,
-		Size:     contentLength,
-		MimeType: "",
-		Reader:   obj.Body,
+		Key:      opened.Key,
+		Size:     opened.Size,
+		MimeType: opened.ContentType,
+		Reader:   opened.Body,
+	}
+
+	return
+}
+
+func (r *MediaRepository) LoadByKey(ctx context.Context, key string) (lm *LoadedMedia, err error) {
+	opened, err := r.files.OpenByKey(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+
+	if opened == nil {
+		return nil, fmt.Errorf("file archive bug, nil opened file: %v", r.files)
+	}
+
+	lm = &LoadedMedia{
+		Key:      opened.Key,
+		Size:     opened.Size,
+		MimeType: opened.ContentType,
+		Reader:   opened.Body,
 	}
 
 	return
@@ -187,7 +137,7 @@ func (r *MediaRepository) Load(ctx context.Context, id string) (lm *LoadedMedia,
 
 type CountingReader struct {
 	target    io.Reader
-	BytesRead int
+	BytesRead int64
 }
 
 func NewCountingReader(target io.Reader) *CountingReader {
@@ -198,6 +148,6 @@ func NewCountingReader(target io.Reader) *CountingReader {
 
 func (r *CountingReader) Read(p []byte) (n int, err error) {
 	n, err = r.target.Read(p)
-	r.BytesRead += n
+	r.BytesRead += int64(n)
 	return n, err
 }
