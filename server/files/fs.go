@@ -104,10 +104,6 @@ func (a *localFilesArchive) Info(ctx context.Context, keyOrUrl string) (info *Fi
 		if si, err := os.Stat(fn); err == nil {
 			header, _ := ioutil.ReadFile(fn) // TODO Read less data here.
 			kind, _ := filetype.Match(header)
-			if kind == filetype.Unknown {
-				return nil, fmt.Errorf("unknown file type: %s", fn)
-			}
-
 			contentType := kind.MIME.Value
 
 			info = &FileInfo{
