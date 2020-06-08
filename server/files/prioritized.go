@@ -59,12 +59,12 @@ func (a *prioritizedFilesArchive) OpenByURL(ctx context.Context, url string) (io
 	return nil, errors
 }
 
-func (a *prioritizedFilesArchive) Info(ctx context.Context, key string) (meta map[string]string, err error) {
+func (a *prioritizedFilesArchive) Info(ctx context.Context, key string) (info *FileInfo, err error) {
 	var errors error
 	for _, a := range a.reading {
-		meta, err := a.Info(ctx, key)
+		info, err := a.Info(ctx, key)
 		if err == nil {
-			return meta, nil
+			return info, nil
 		}
 		errors = multierror.Append(errors)
 	}

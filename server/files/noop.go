@@ -49,6 +49,6 @@ func (a *nopFilesArchive) OpenByURL(ctx context.Context, url string) (io.ReadClo
 	return nil, fmt.Errorf("unsupported")
 }
 
-func (a *nopFilesArchive) Info(ctx context.Context, key string) (meta map[string]string, err error) {
+func (a *nopFilesArchive) Info(ctx context.Context, key string) (info *FileInfo, err error) {
 	return nil, fmt.Errorf("unsupported")
 }

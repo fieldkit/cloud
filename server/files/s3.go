@@ -112,7 +112,7 @@ func (a *S3FileArchive) open(ctx context.Context, bucket, key string) (io.ReadCl
 	return obj.Body, nil
 }
 
-func (a *S3FileArchive) Info(ctx context.Context, key string) (meta map[string]string, err error) {
+func (a *S3FileArchive) Info(ctx context.Context, key string) (info *FileInfo, err error) {
 	hoi := &s3.HeadObjectInput{
 		Bucket: aws.String(a.bucketName),
 		Key:    aws.String(key),
@@ -127,10 +127,16 @@ func (a *S3FileArchive) Info(ctx context.Context, key string) (meta map[string]s
 
 	maybeMap := common.SanitizeMeta(obj.Metadata)
 
-	meta = make(map[string]string)
+	meta := make(map[string]string)
 
 	for key, value := range maybeMap {
 		meta[key] = *value
+	}
+
+	info = &FileInfo{
+		Meta:        meta,
+		Size:        0,
+		ContentType: "",
 	}
 
 	return

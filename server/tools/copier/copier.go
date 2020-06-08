@@ -129,12 +129,12 @@ func (c *CopierTool) copyIngestion(ctx context.Context, id int64, force bool) (e
 
 	ingestion := ingestions[0]
 
-	meta, err := c.Source.Files.Info(ctx, ingestion.UploadID)
+	info, err := c.Source.Files.Info(ctx, ingestion.UploadID)
 	if err != nil {
 		return err
 	}
 
-	log.Infow("copying", "ingestion_id", ingestion.ID, "file_id", ingestion.UploadID, "meta", meta)
+	log.Infow("copying", "ingestion_id", ingestion.ID, "file_id", ingestion.UploadID, "info", info)
 
 	if force {
 		reading, err := c.Source.Files.OpenByKey(ctx, ingestion.UploadID)
@@ -142,7 +142,7 @@ func (c *CopierTool) copyIngestion(ctx context.Context, id int64, force bool) (e
 			return err
 		}
 
-		copied, err := c.Destiny.Files.Archive(ctx, common.FkDataBinaryContentType, meta, reading)
+		copied, err := c.Destiny.Files.Archive(ctx, common.FkDataBinaryContentType, info.Meta, reading)
 		if err != nil {
 			return err
 		}

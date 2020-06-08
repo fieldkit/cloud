@@ -42,6 +42,6 @@ func (a *InMemoryArchive) OpenByURL(ctx context.Context, url string) (io.ReadClo
 	return nil, fmt.Errorf("no such file: %s", url)
 }
 
-func (a *InMemoryArchive) Info(ctx context.Context, key string) (meta map[string]string, err error) {
+func (a *InMemoryArchive) Info(ctx context.Context, key string) (info *files.FileInfo, err error) {
 	return nil, fmt.Errorf("unsupported")
 }
