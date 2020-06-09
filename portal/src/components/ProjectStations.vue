@@ -110,7 +110,7 @@ export default {
                             });
                         }
                         s.modules.forEach(m => {
-                            if (m.position < 5) {
+                            if (!m.internal) {
                                 modules.push(this.getModuleImg(m));
                             }
                         });

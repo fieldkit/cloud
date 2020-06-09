@@ -84,7 +84,7 @@ export default {
                 this.currentStation = {};
             } else {
                 this.currentStation.modules = this.currentStation.modules.filter(m => {
-                    return m.position < 5;
+                    return !m.internal;
                 });
             }
         },
@@ -98,7 +98,7 @@ export default {
                     this.currentStation = {};
                 } else {
                     this.currentStation.modules = this.currentStation.modules.filter(m => {
-                        return m.position < 5;
+                        return !m.internal;
                     });
                 }
             });

@@ -202,36 +202,38 @@ export default {
 
             meta.forEach(m => {
                 // m.key
-                m.sensors.forEach(s => {
-                    let colors;
-                    const expected = expectedRanges[s.firmware_key];
-                    if (expected) {
-                        colors = d3
-                            .scaleSequential()
-                            .domain([expected[0], expected[1]])
-                            .interpolator(d3.interpolatePlasma);
-                    } else if (s.ranges.length > 0) {
-                        colors = d3
-                            .scaleSequential()
-                            .domain([s.ranges[0].minimum, s.ranges[0].maximum])
-                            .interpolator(d3.interpolatePlasma);
-                    } else {
-                        colors = d3
-                            .scaleSequential()
-                            .domain([0, 1])
-                            .interpolator(black);
-                    }
-                    m.name = m.key;
-                    s.name = s.firmware_key;
-                    this.allSensors.push({
-                        label: this.getSensorName(m, s),
-                        colorScale: colors,
-                        unit: s.unit_of_measure,
-                        key: s.key,
-                        firmwareKey: s.firmware_key,
-                        name: null,
+                if (!m.internal) {
+                    m.sensors.forEach(s => {
+                        let colors;
+                        const expected = expectedRanges[s.firmware_key];
+                        if (expected) {
+                            colors = d3
+                                .scaleSequential()
+                                .domain([expected[0], expected[1]])
+                                .interpolator(d3.interpolatePlasma);
+                        } else if (s.ranges.length > 0) {
+                            colors = d3
+                                .scaleSequential()
+                                .domain([s.ranges[0].minimum, s.ranges[0].maximum])
+                                .interpolator(d3.interpolatePlasma);
+                        } else {
+                            colors = d3
+                                .scaleSequential()
+                                .domain([0, 1])
+                                .interpolator(black);
+                        }
+                        m.name = m.key;
+                        s.name = s.firmware_key;
+                        this.allSensors.push({
+                            label: this.getSensorName(m, s),
+                            colorScale: colors,
+                            unit: s.unit_of_measure,
+                            key: s.key,
+                            firmwareKey: s.firmware_key,
+                            name: null,
+                        });
                     });
-                });
+                }
             });
             return;
         },
@@ -291,26 +293,26 @@ export default {
             let result = [];
             station.modules.forEach(m => {
                 let sensors = [];
-                let addModule = m.position < 5;
-                m.sensors.forEach(sensor => {
-                    let dataViewSensor = this.allSensors.find(sr => {
-                        return sr.firmwareKey == sensor.name;
-                    });
-                    if (dataViewSensor) {
-                        const sensorLabel = this.getSensorName(m, sensor);
-                        sensors.push({
-                            id: station.name + dataViewSensor.key,
-                            label: sensorLabel,
-                            customLabel: station.name + " : " + sensorLabel,
-                            key: dataViewSensor.key,
-                            stationId: station.id,
+                let sensorsFound = 0;
+                if (!m.internal) {
+                    m.sensors.forEach(sensor => {
+                        let dataViewSensor = this.allSensors.find(sr => {
+                            return sr.firmwareKey == sensor.name;
                         });
-                    } else {
-                        // don't add module if sensor wasn't found
-                        addModule = false;
-                    }
-                });
-                if (addModule) {
+                        if (dataViewSensor) {
+                            sensorsFound += 1;
+                            const sensorLabel = this.getSensorName(m, sensor);
+                            sensors.push({
+                                id: station.name + dataViewSensor.key,
+                                label: sensorLabel,
+                                customLabel: station.name + " : " + sensorLabel,
+                                key: dataViewSensor.key,
+                                stationId: station.id,
+                            });
+                        }
+                    });
+                }
+                if (sensorsFound > 0) {
                     result.push({ name: this.getModuleName(m), sensors: sensors });
                 }
             });

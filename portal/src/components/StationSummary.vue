@@ -22,7 +22,7 @@
                     <span class="small-light">{{ station.battery }}%</span>
                 </div>
                 <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
-                    <img v-if="module.position < 5" alt="Module icon" class="small-space" :src="getModuleImg(module)" />
+                    <img v-if="!module.internal" alt="Module icon" class="small-space" :src="getModuleImg(module)" />
                 </div>
             </div>
             <div class="spacer"></div>
@@ -55,7 +55,7 @@
                 <div id="readings-container" class="section" v-if="station.modules.length > 0">
                     <div id="readings-label">Latest Reading</div>
                     <div v-for="(module, moduleIndex) in station.modules" v-bind:key="module.id">
-                        <template v-if="module.position < 5">
+                        <template v-if="!module.internal">
                             <div
                                 v-for="(sensor, sensorIndex) in module.sensors"
                                 v-bind:key="sensor.id"
