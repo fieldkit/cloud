@@ -244,9 +244,13 @@ export default {
             const sensors = _.intersectionBy(this.allSensors, resultSensors, s => {
                 return s.key;
             });
+            const sensorKeys = _.map(sensors, s => {
+                return s.key;
+            });
             result.data.forEach(d => {
+                const keys = _.intersection(sensorKeys, Object.keys(d.d));
                 // Only including ones with sensor readings
-                if (Object.keys(d.d).length > 0) {
+                if (keys.length > 0) {
                     d.d.date = new Date(d.time);
                     d.d.location = d.location;
                     // filter out ones with dates before 2018
