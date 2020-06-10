@@ -843,6 +843,25 @@ func unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView(v *Statio
 	return res
 }
 
+// unmarshalStationConfigurationResponseBodyToStationviewsStationConfigurationView
+// builds a value of type *stationviews.StationConfigurationView from a value
+// of type *StationConfigurationResponseBody.
+func unmarshalStationConfigurationResponseBodyToStationviewsStationConfigurationView(v *StationConfigurationResponseBody) *stationviews.StationConfigurationView {
+	res := &stationviews.StationConfigurationView{
+		ID:           v.ID,
+		Time:         v.Time,
+		ProvisionID:  v.ProvisionID,
+		MetaRecordID: v.MetaRecordID,
+		SourceID:     v.SourceID,
+	}
+	res.Modules = make([]*stationviews.StationModuleView, len(v.Modules))
+	for i, val := range v.Modules {
+		res.Modules[i] = unmarshalStationModuleResponseBodyToStationviewsStationModuleView(val)
+	}
+
+	return res
+}
+
 // unmarshalStationModuleResponseBodyToStationviewsStationModuleView builds a
 // value of type *stationviews.StationModuleView from a value of type
 // *StationModuleResponseBody.
@@ -960,9 +979,9 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 		tv := val
 		res.StatusJSON[tk] = tv
 	}
-	res.Modules = make([]*stationviews.StationModuleView, len(v.Modules))
-	for i, val := range v.Modules {
-		res.Modules[i] = unmarshalStationModuleResponseBodyToStationviewsStationModuleView(val)
+	res.Configurations = make([]*stationviews.StationConfigurationView, len(v.Configurations))
+	for i, val := range v.Configurations {
+		res.Configurations[i] = unmarshalStationConfigurationResponseBodyToStationviewsStationConfigurationView(val)
 	}
 	if v.Location != nil {
 		res.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(v.Location)

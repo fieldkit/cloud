@@ -44,7 +44,7 @@ type StationFullView struct {
 	MemoryAvailable    *int32
 	FirmwareNumber     *int32
 	FirmwareTime       *int64
-	Modules            []*StationModuleView
+	Configurations     []*StationConfigurationView
 	Updated            *int64
 	LocationName       *string
 	Location           *StationLocationView
@@ -75,6 +75,16 @@ type ImageRefView struct {
 // StationPhotosView is a type that runs validations on a projected type.
 type StationPhotosView struct {
 	Small *string
+}
+
+// StationConfigurationView is a type that runs validations on a projected type.
+type StationConfigurationView struct {
+	ID           *int64
+	Time         *int64
+	ProvisionID  *int64
+	MetaRecordID *int64
+	SourceID     *int32
+	Modules      []*StationModuleView
 }
 
 // StationModuleView is a type that runs validations on a projected type.
@@ -145,7 +155,7 @@ var (
 			"memory_available",
 			"firmware_number",
 			"firmware_time",
-			"modules",
+			"configurations",
 			"updated",
 			"location",
 			"location_name",
@@ -177,7 +187,7 @@ var (
 			"memory_available",
 			"firmware_number",
 			"firmware_time",
-			"modules",
+			"configurations",
 			"updated",
 			"location",
 			"location_name",
@@ -239,8 +249,8 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	if result.StatusJSON == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "result"))
 	}
-	if result.Modules == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("modules", "result"))
+	if result.Configurations == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("configurations", "result"))
 	}
 	if result.Updated == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("updated", "result"))
@@ -269,9 +279,9 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
-	for _, e := range result.Modules {
+	for _, e := range result.Configurations {
 		if e != nil {
-			if err2 := ValidateStationModuleView(e); err2 != nil {
+			if err2 := ValidateStationConfigurationView(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
 		}
@@ -333,6 +343,31 @@ func ValidateImageRefView(result *ImageRefView) (err error) {
 func ValidateStationPhotosView(result *StationPhotosView) (err error) {
 	if result.Small == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("small", "result"))
+	}
+	return
+}
+
+// ValidateStationConfigurationView runs the validations defined on
+// StationConfigurationView.
+func ValidateStationConfigurationView(result *StationConfigurationView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.ProvisionID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("provision_id", "result"))
+	}
+	if result.Time == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("time", "result"))
+	}
+	if result.Modules == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("modules", "result"))
+	}
+	for _, e := range result.Modules {
+		if e != nil {
+			if err2 := ValidateStationModuleView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
 	}
 	return
 }

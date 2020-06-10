@@ -132,10 +132,11 @@ func (s *Station) DeviceIDHex() string {
 }
 
 type StationFull struct {
-	Station    *Station
-	Owner      *User
-	Ingestions []*Ingestion
-	Media      []*MediaForStation
-	Modules    []*StationModule
-	Sensors    []*ModuleSensor
+	Station        *Station
+	Owner          *User
+	Ingestions     []*Ingestion
+	Media          []*MediaForStation
+	Configurations []*StationConfiguration
+	Modules        []*StationModule
+	Sensors        []*ModuleSensor
 }

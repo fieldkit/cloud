@@ -258,7 +258,7 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 		return err
 	}
 
-	log.Infow("configuration", "station_id", s.ID, "configuration_id", configuration.ID)
+	log.Infow("configuration", "station_id", s.ID, "configuration_id", configuration.ID, "provision_id", p.ID)
 
 	if _, err := r.db.ExecContext(ctx, `
 		INSERT INTO fieldkit.visible_configuration (station_id, configuration_id)
@@ -363,13 +363,19 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	configurations := []*data.VisibleStationConfiguration{}
+	provisions := []*data.Provision{}
+	if err := r.db.SelectContext(ctx, &provisions, `
+		SELECT * FROM fieldkit.provision WHERE device_id = $1
+		`, stations[0].DeviceID); err != nil {
+		return nil, err
+	}
+
+	configurations := []*data.StationConfiguration{}
 	if err := r.db.SelectContext(ctx, &configurations, `
-		SELECT *
-		FROM fieldkit.station_configuration
-        JOIN fieldkit.visible_configuration ON (configuration_id = id)
-		WHERE station_id = $1
-		`, id); err != nil {
+		SELECT * FROM fieldkit.station_configuration WHERE provision_id IN (
+			SELECT id FROM fieldkit.provision WHERE device_id = $1
+		) ORDER BY updated_at DESC
+		`, stations[0].DeviceID); err != nil {
 		return nil, err
 	}
 
@@ -379,10 +385,12 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 			sm.*
 		FROM fieldkit.station_module AS sm
 		WHERE sm.configuration_id IN (
-			SELECT configuration_id FROM fieldkit.visible_configuration WHERE station_id = $1
+			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id = $1
+			)
 		)
 		ORDER BY sm.module_index
-		`, id); err != nil {
+		`, stations[0].DeviceID); err != nil {
 		return nil, err
 	}
 
@@ -392,14 +400,16 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 			ms.*
 		FROM fieldkit.module_sensor AS ms
 		WHERE ms.configuration_id IN (
-			SELECT configuration_id FROM fieldkit.visible_configuration WHERE station_id = $1
+			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id = $1
+			)
 		)
 		ORDER BY ms.sensor_index
-		`, id); err != nil {
+		`, stations[0].DeviceID); err != nil {
 		return nil, err
 	}
 
-	all, err := r.toStationFull(stations, owners, ingestions, media, configurations, modules, sensors)
+	all, err := r.toStationFull(stations, owners, ingestions, media, provisions, configurations, modules, sensors)
 	if err != nil {
 		return nil, err
 	}
@@ -444,13 +454,19 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		return nil, err
 	}
 
-	configurations := []*data.VisibleStationConfiguration{}
+	provisions := []*data.Provision{}
+	if err := r.db.SelectContext(ctx, &provisions, `
+		SELECT * FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1)
+		`, id); err != nil {
+		return nil, err
+	}
+
+	configurations := []*data.StationConfiguration{}
 	if err := r.db.SelectContext(ctx, &configurations, `
 		SELECT *
 		FROM fieldkit.station_configuration
-        JOIN fieldkit.visible_configuration ON (configuration_id = id)
-		WHERE station_id IN (
-			SELECT id FROM fieldkit.station WHERE owner_id = $1
+		WHERE provision_id IN (
+			SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1)
 		)
 		`, id); err != nil {
 		return nil, err
@@ -462,11 +478,11 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 			sm.*
 		FROM fieldkit.station_module AS sm
 		WHERE sm.configuration_id IN (
-			SELECT configuration_id FROM fieldkit.visible_configuration WHERE station_id IN (
-				SELECT id FROM fieldkit.station WHERE owner_id = $1
+			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1)
 			)
 		)
-		ORDER BY sm.module_index
+		ORDER BY sm.configuration_id, sm.module_index
 		`, id); err != nil {
 		return nil, err
 	}
@@ -477,16 +493,18 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 			ms.*
 		FROM fieldkit.module_sensor AS ms
 		WHERE ms.configuration_id IN (
-			SELECT configuration_id FROM fieldkit.visible_configuration WHERE station_id IN (
-				SELECT id FROM fieldkit.station WHERE owner_id = $1
+			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1)
 			)
 		)
-		ORDER BY ms.sensor_index
+		ORDER BY ms.configuration_id, ms.sensor_index
 		`, id); err != nil {
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, ingestions, media, configurations, modules, sensors)
+	fmt.Printf("owner_id = %v nprovs = %v ncfgs = %v nmods = %v nsensors = %v\n", id, len(provisions), len(configurations), len(modules), len(sensors))
+
+	return r.toStationFull(stations, owners, ingestions, media, provisions, configurations, modules, sensors)
 }
 
 func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id int32) ([]*data.StationFull, error) {
@@ -531,13 +549,27 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		return nil, err
 	}
 
-	configurations := []*data.VisibleStationConfiguration{}
+	provisions := []*data.Provision{}
+	if err := r.db.SelectContext(ctx, &provisions, `
+		SELECT * FROM fieldkit.provision WHERE device_id IN (
+			SELECT device_id FROM fieldkit.station WHERE id IN (
+				SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+			)
+		)
+		`, id); err != nil {
+		return nil, err
+	}
+
+	configurations := []*data.StationConfiguration{}
 	if err := r.db.SelectContext(ctx, &configurations, `
 		SELECT *
 		FROM fieldkit.station_configuration
-        JOIN fieldkit.visible_configuration ON (configuration_id = id)
-		WHERE station_id IN (
-			SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+		WHERE provision_id IN (
+			SELECT id FROM fieldkit.provision WHERE device_id IN (
+				SELECT device_id FROM fieldkit.station WHERE id IN (
+					SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+				)
+			)
 		)
 		`, id); err != nil {
 		return nil, err
@@ -549,11 +581,15 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 			sm.*
 		FROM fieldkit.station_module AS sm
         WHERE sm.configuration_id IN (
-			SELECT configuration_id FROM fieldkit.visible_configuration WHERE station_id IN (
-				SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id IN (
+					SELECT device_id FROM fieldkit.station WHERE id IN (
+						SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+					)
+				)
 			)
 		)
-		ORDER BY sm.module_index
+		ORDER BY sm.configuration_id, sm.module_index
 		`, id); err != nil {
 		return nil, err
 	}
@@ -564,19 +600,27 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 			ms.*
 		FROM fieldkit.module_sensor AS ms
 		WHERE ms.configuration_id IN (
-			SELECT configuration_id FROM fieldkit.visible_configuration WHERE station_id IN (
-				SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id IN (
+					SELECT device_id FROM fieldkit.station WHERE id IN (
+						SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+					)
+				)
 			)
 		)
-		ORDER BY ms.sensor_index
+		ORDER BY ms.configuration_id, ms.sensor_index
 		`, id); err != nil {
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, ingestions, media, configurations, modules, sensors)
+	fmt.Printf("project_id = %v nprovs = %v ncfgs = %v nmods = %v nsensors = %v\n", id, len(provisions), len(configurations), len(modules), len(sensors))
+
+	return r.toStationFull(stations, owners, ingestions, media, provisions, configurations, modules, sensors)
 }
 
-func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, ingestions []*data.Ingestion, media []*data.MediaForStation, configurations []*data.VisibleStationConfiguration, modules []*data.StationModule, sensors []*data.ModuleSensor) ([]*data.StationFull, error) {
+func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, ingestions []*data.Ingestion, media []*data.MediaForStation,
+	provisions []*data.Provision, configurations []*data.StationConfiguration,
+	modules []*data.StationModule, sensors []*data.ModuleSensor) ([]*data.StationFull, error) {
 	ownersByID := make(map[int32]*data.User)
 	ingestionsByDeviceID := make(map[string][]*data.Ingestion)
 	mediaByStationID := make(map[int32][]*data.MediaForStation)
@@ -606,11 +650,18 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 		mediaByStationID[v.ID] = append(mediaByStationID[v.ID], v)
 	}
 
-	configurationsByStationID := make(map[int32]int64)
+	stationIDsByProvisionID := make(map[int64]int32)
+	for _, p := range provisions {
+		deviceID := hex.EncodeToString(p.DeviceID)
+		stationIDsByProvisionID[p.ID] = stationIDsByDeviceID[deviceID]
+	}
+
+	configurationsByStationID := make(map[int32][]*data.StationConfiguration)
 	modulesByConfigurationID := make(map[int64][]*data.StationModule)
 	for _, v := range configurations {
+		stationID := stationIDsByProvisionID[v.ProvisionID]
+		configurationsByStationID[stationID] = append(configurationsByStationID[stationID], v)
 		modulesByConfigurationID[v.ID] = make([]*data.StationModule, 0)
-		configurationsByStationID[v.StationID] = v.ConfigurationID
 	}
 
 	for _, v := range modules {
@@ -619,29 +670,29 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 
 	stationIDByModuleID := make(map[int64]int32)
 	for _, v := range configurations {
-		if modules, ok := modulesByConfigurationID[v.ID]; ok && len(modules) > 0 {
-			modulesByStationID[v.StationID] = modules
-			for _, m := range modules {
-				stationIDByModuleID[m.ID] = v.StationID
-			}
+		modules := modulesByConfigurationID[v.ID]
+		stationID := stationIDsByProvisionID[v.ProvisionID]
+		modulesByStationID[stationID] = append(modulesByStationID[stationID], modules...)
+		for _, m := range modules {
+			stationIDByModuleID[m.ID] = stationID
 		}
 	}
 
 	for _, v := range sensors {
-		if stationID, ok := stationIDByModuleID[v.ModuleID]; ok {
-			sensorsByStationID[stationID] = append(sensorsByStationID[stationID], v)
-		}
+		stationID := stationIDByModuleID[v.ModuleID]
+		sensorsByStationID[stationID] = append(sensorsByStationID[stationID], v)
 	}
 
 	all := make([]*data.StationFull, 0, len(stations))
 	for _, station := range stations {
 		all = append(all, &data.StationFull{
-			Station:    station,
-			Owner:      ownersByID[station.OwnerID],
-			Ingestions: ingestionsByDeviceID[station.DeviceIDHex()],
-			Media:      mediaByStationID[station.ID],
-			Modules:    modulesByStationID[station.ID],
-			Sensors:    sensorsByStationID[station.ID],
+			Station:        station,
+			Owner:          ownersByID[station.OwnerID],
+			Ingestions:     ingestionsByDeviceID[station.DeviceIDHex()],
+			Media:          mediaByStationID[station.ID],
+			Configurations: configurationsByStationID[station.ID],
+			Modules:        modulesByStationID[station.ID],
+			Sensors:        sensorsByStationID[station.ID],
 		})
 	}
 

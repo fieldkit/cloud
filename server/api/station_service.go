@@ -337,9 +337,24 @@ func transformReading(s *data.ModuleSensor) *station.SensorReading {
 	}
 }
 
-func transformModules(from *data.StationFull) (to []*station.StationModule) {
+func transformConfigurations(from *data.StationFull) (to []*station.StationConfiguration) {
+	to = make([]*station.StationConfiguration, 0)
+	for _, v := range from.Configurations {
+		to = append(to, &station.StationConfiguration{
+			ID:      v.ID,
+			Time:    v.UpdatedAt.Unix() * 1000,
+			Modules: transformModules(from, v.ID),
+		})
+	}
+	return
+}
+
+func transformModules(from *data.StationFull, configurationID int64) (to []*station.StationModule) {
 	to = make([]*station.StationModule, 0)
 	for _, v := range from.Modules {
+		if v.ConfigurationID != configurationID {
+			continue
+		}
 		sensors := make([]*data.ModuleSensor, 0)
 		sensorsWm := make([]*station.StationSensor, 0)
 
@@ -420,6 +435,8 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 		return nil, err
 	}
 
+	configurations := transformConfigurations(sf)
+
 	return &station.StationFull{
 		ID:              sf.Station.ID,
 		Name:            sf.Station.Name,
@@ -427,7 +444,7 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 		DeviceID:        hex.EncodeToString(sf.Station.DeviceID),
 		Uploads:         transformUploads(sf.Ingestions),
 		Images:          transformImages(sf.Station.ID, sf.Media),
-		Modules:         transformModules(sf),
+		Configurations:  configurations,
 		StatusJSON:      status,
 		Battery:         sf.Station.Battery,
 		MemoryUsed:      sf.Station.MemoryUsed,

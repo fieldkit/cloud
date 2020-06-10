@@ -13,7 +13,7 @@ var (
 )
 
 func NewTestableIngester(e *tests.TestEnv) (http.Handler, *data.User, error) {
-	user, err := e.AddUser("password")
+	user, err := e.AddUser()
 	if err != nil {
 		return nil, nil, err
 	}

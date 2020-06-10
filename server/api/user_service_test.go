@@ -16,7 +16,7 @@ func TestLoginGood(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("goodgoodgood")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)
@@ -34,7 +34,7 @@ func TestLoginGoodWithCaseChangesInEmail(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("goodgoodgood")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)
@@ -52,7 +52,7 @@ func TestLoginBad(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("goodgoodgood")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)
@@ -85,7 +85,7 @@ func TestLoginPasswordFailsValidation(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("goodgoodgood")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)

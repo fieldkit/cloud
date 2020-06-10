@@ -37,11 +37,71 @@ func TestGetStationsMine(t *testing.T) {
 	ja.Assertf(rr.Body.String(), `
 	{
 		"stations": [
-			"<<PRESENCE>>",
-			"<<PRESENCE>>",
-			"<<PRESENCE>>",
-			"<<PRESENCE>>",
-			"<<PRESENCE>>"
+			{
+				"id": "<<PRESENCE>>",
+				"images": "<<PRESENCE>>",
+				"updated": "<<PRESENCE>>",
+				"owner": "<<PRESENCE>>",
+				"device_id": "<<PRESENCE>>",
+				"uploads": "<<PRESENCE>>",
+				"name": "<<PRESENCE>>",
+				"photos": "<<PRESENCE>>",
+				"read_only": "<<PRESENCE>>",
+				"configurations": [],
+				"status_json": "<<PRESENCE>>"
+			},
+			{
+				"id": "<<PRESENCE>>",
+				"images": "<<PRESENCE>>",
+				"updated": "<<PRESENCE>>",
+				"owner": "<<PRESENCE>>",
+				"device_id": "<<PRESENCE>>",
+				"uploads": "<<PRESENCE>>",
+				"name": "<<PRESENCE>>",
+				"photos": "<<PRESENCE>>",
+				"read_only": "<<PRESENCE>>",
+				"configurations": [],
+				"status_json": "<<PRESENCE>>"
+			},
+			{
+				"id": "<<PRESENCE>>",
+				"images": "<<PRESENCE>>",
+				"updated": "<<PRESENCE>>",
+				"owner": "<<PRESENCE>>",
+				"device_id": "<<PRESENCE>>",
+				"uploads": "<<PRESENCE>>",
+				"name": "<<PRESENCE>>",
+				"photos": "<<PRESENCE>>",
+				"read_only": "<<PRESENCE>>",
+				"configurations": [],
+				"status_json": "<<PRESENCE>>"
+			},
+			{
+				"id": "<<PRESENCE>>",
+				"images": "<<PRESENCE>>",
+				"updated": "<<PRESENCE>>",
+				"owner": "<<PRESENCE>>",
+				"device_id": "<<PRESENCE>>",
+				"uploads": "<<PRESENCE>>",
+				"name": "<<PRESENCE>>",
+				"photos": "<<PRESENCE>>",
+				"read_only": "<<PRESENCE>>",
+				"configurations": [],
+				"status_json": "<<PRESENCE>>"
+			},
+			{
+				"id": "<<PRESENCE>>",
+				"images": "<<PRESENCE>>",
+				"updated": "<<PRESENCE>>",
+				"owner": "<<PRESENCE>>",
+				"device_id": "<<PRESENCE>>",
+				"uploads": "<<PRESENCE>>",
+				"name": "<<PRESENCE>>",
+				"photos": "<<PRESENCE>>",
+				"read_only": "<<PRESENCE>>",
+				"configurations": [],
+				"status_json": "<<PRESENCE>>"
+			}
 		]
 	}`)
 }
@@ -75,7 +135,7 @@ func TestGetStation(t *testing.T) {
 		"name": "<<PRESENCE>>",
 		"photos": "<<PRESENCE>>",
 		"read_only": "<<PRESENCE>>",
-		"modules": "<<PRESENCE>>",
+		"configurations": [],
 		"status_json": "<<PRESENCE>>"
 	}`)
 }
@@ -101,11 +161,71 @@ func TestGetStationsProject(t *testing.T) {
 	ja.Assertf(rr.Body.String(), `
 	{
 		"stations": [
-			"<<PRESENCE>>",
-			"<<PRESENCE>>",
-			"<<PRESENCE>>",
-			"<<PRESENCE>>",
-			"<<PRESENCE>>"
+			{
+				"id": "<<PRESENCE>>",
+				"images": "<<PRESENCE>>",
+				"updated": "<<PRESENCE>>",
+				"owner": "<<PRESENCE>>",
+				"device_id": "<<PRESENCE>>",
+				"uploads": "<<PRESENCE>>",
+				"name": "<<PRESENCE>>",
+				"photos": "<<PRESENCE>>",
+				"read_only": "<<PRESENCE>>",
+				"configurations": [],
+				"status_json": "<<PRESENCE>>"
+			},
+			{
+				"id": "<<PRESENCE>>",
+				"images": "<<PRESENCE>>",
+				"updated": "<<PRESENCE>>",
+				"owner": "<<PRESENCE>>",
+				"device_id": "<<PRESENCE>>",
+				"uploads": "<<PRESENCE>>",
+				"name": "<<PRESENCE>>",
+				"photos": "<<PRESENCE>>",
+				"read_only": "<<PRESENCE>>",
+				"configurations": [],
+				"status_json": "<<PRESENCE>>"
+			},
+			{
+				"id": "<<PRESENCE>>",
+				"images": "<<PRESENCE>>",
+				"updated": "<<PRESENCE>>",
+				"owner": "<<PRESENCE>>",
+				"device_id": "<<PRESENCE>>",
+				"uploads": "<<PRESENCE>>",
+				"name": "<<PRESENCE>>",
+				"photos": "<<PRESENCE>>",
+				"read_only": "<<PRESENCE>>",
+				"configurations": [],
+				"status_json": "<<PRESENCE>>"
+			},
+			{
+				"id": "<<PRESENCE>>",
+				"images": "<<PRESENCE>>",
+				"updated": "<<PRESENCE>>",
+				"owner": "<<PRESENCE>>",
+				"device_id": "<<PRESENCE>>",
+				"uploads": "<<PRESENCE>>",
+				"name": "<<PRESENCE>>",
+				"photos": "<<PRESENCE>>",
+				"read_only": "<<PRESENCE>>",
+				"configurations": [],
+				"status_json": "<<PRESENCE>>"
+			},
+			{
+				"id": "<<PRESENCE>>",
+				"images": "<<PRESENCE>>",
+				"updated": "<<PRESENCE>>",
+				"owner": "<<PRESENCE>>",
+				"device_id": "<<PRESENCE>>",
+				"uploads": "<<PRESENCE>>",
+				"name": "<<PRESENCE>>",
+				"photos": "<<PRESENCE>>",
+				"read_only": "<<PRESENCE>>",
+				"configurations": [],
+				"status_json": "<<PRESENCE>>"
+			}
 		]
 	}`)
 }
@@ -115,7 +235,7 @@ func TestAddNewStation(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("goodgoodgood")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	station := e.NewStation(user)
@@ -182,7 +302,7 @@ func TestAddStationAlreadyOthers(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	user, err := e.AddUser("goodgoodgood")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)
@@ -247,7 +367,7 @@ func TestUpdateAnotherPersonsStation(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	badActor, err := e.AddUser("")
+	badActor, err := e.AddUser()
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)
@@ -387,12 +507,12 @@ func TestGetStationUpdatedWithProtobufStatus(t *testing.T) {
 		"name": "<<PRESENCE>>",
 		"photos": "<<PRESENCE>>",
 		"read_only": "<<PRESENCE>>",
-		"modules": "<<PRESENCE>>",
 		"battery": "<<PRESENCE>>",
 		"location": "<<PRESENCE>>",
 		"memory_used": "<<PRESENCE>>",
 		"memory_available": "<<PRESENCE>>",
-		"status_json": "<<PRESENCE>>"
+		"status_json": "<<PRESENCE>>",
+		"configurations": [ "<<PRESENCE>>" ]
 	}`)
 }
 

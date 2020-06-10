@@ -18,7 +18,7 @@ func TestIngestionReceivedNoSuchIngestion(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	handler := NewIngestionReceivedHandler(e.DB, tests.NewInMemoryArchive(map[string][]byte{}), logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
@@ -38,7 +38,7 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	randomData, err := e.NewRandomData(1024)
@@ -64,7 +64,7 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	files, err := e.NewFilePair(1, 16)
@@ -92,7 +92,7 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	deviceID := e.MustDeviceID()
@@ -151,7 +151,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	deviceID := e.MustDeviceID()

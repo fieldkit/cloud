@@ -114,7 +114,7 @@ func TestUpdateProjectWhenNotMember(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	user, err := e.AddUser("goodgoodgood")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)
@@ -145,7 +145,7 @@ func TestGetProjectMember(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("goodgoodgood")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	project, err := e.AddProject()
@@ -183,7 +183,7 @@ func TestGetProjectAdministrator(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	user, err := e.AddUser("goodgoodgood")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	project, err := e.AddProject()
@@ -224,7 +224,7 @@ func TestAddProjectUpdate(t *testing.T) {
 	project, err := e.AddProject()
 	assert.NoError(err)
 
-	user, err := e.AddUser("goodgoodgood")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	err = e.AddProjectUser(project, user, data.AdministratorRole)
@@ -257,7 +257,7 @@ func TestModifyProjectUpdate(t *testing.T) {
 	project, err := e.AddProject()
 	assert.NoError(err)
 
-	user, err := e.AddUser("goodgoodgood")
+	user, err := e.AddUser()
 	assert.NoError(err)
 
 	err = e.AddProjectUser(project, user, data.AdministratorRole)

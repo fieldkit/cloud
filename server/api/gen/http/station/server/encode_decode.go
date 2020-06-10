@@ -763,6 +763,27 @@ func marshalStationviewsStationPhotosViewToStationPhotosResponseBody(v *stationv
 	return res
 }
 
+// marshalStationviewsStationConfigurationViewToStationConfigurationResponseBody
+// builds a value of type *StationConfigurationResponseBody from a value of
+// type *stationviews.StationConfigurationView.
+func marshalStationviewsStationConfigurationViewToStationConfigurationResponseBody(v *stationviews.StationConfigurationView) *StationConfigurationResponseBody {
+	res := &StationConfigurationResponseBody{
+		ID:           *v.ID,
+		Time:         *v.Time,
+		ProvisionID:  *v.ProvisionID,
+		MetaRecordID: v.MetaRecordID,
+		SourceID:     v.SourceID,
+	}
+	if v.Modules != nil {
+		res.Modules = make([]*StationModuleResponseBody, len(v.Modules))
+		for i, val := range v.Modules {
+			res.Modules[i] = marshalStationviewsStationModuleViewToStationModuleResponseBody(val)
+		}
+	}
+
+	return res
+}
+
 // marshalStationviewsStationModuleViewToStationModuleResponseBody builds a
 // value of type *StationModuleResponseBody from a value of type
 // *stationviews.StationModuleView.
@@ -894,10 +915,10 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 			res.StatusJSON[tk] = tv
 		}
 	}
-	if v.Modules != nil {
-		res.Modules = make([]*StationModuleResponseBody, len(v.Modules))
-		for i, val := range v.Modules {
-			res.Modules[i] = marshalStationviewsStationModuleViewToStationModuleResponseBody(val)
+	if v.Configurations != nil {
+		res.Configurations = make([]*StationConfigurationResponseBody, len(v.Configurations))
+		for i, val := range v.Configurations {
+			res.Configurations[i] = marshalStationviewsStationConfigurationViewToStationConfigurationResponseBody(val)
 		}
 	}
 	if v.Location != nil {

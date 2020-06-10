@@ -74,7 +74,7 @@ type StationFull struct {
 	MemoryAvailable    *int32
 	FirmwareNumber     *int32
 	FirmwareTime       *int64
-	Modules            []*StationModule
+	Configurations     []*StationConfiguration
 	Updated            int64
 	LocationName       *string
 	Location           *StationLocation
@@ -146,6 +146,15 @@ type ImageRef struct {
 
 type StationPhotos struct {
 	Small string
+}
+
+type StationConfiguration struct {
+	ID           int64
+	Time         int64
+	ProvisionID  int64
+	MetaRecordID *int64
+	SourceID     *int32
+	Modules      []*StationModule
 }
 
 type StationModule struct {
@@ -315,10 +324,10 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 			res.StatusJSON[tk] = tv
 		}
 	}
-	if vres.Modules != nil {
-		res.Modules = make([]*StationModule, len(vres.Modules))
-		for i, val := range vres.Modules {
-			res.Modules[i] = transformStationviewsStationModuleViewToStationModule(val)
+	if vres.Configurations != nil {
+		res.Configurations = make([]*StationConfiguration, len(vres.Configurations))
+		for i, val := range vres.Configurations {
+			res.Configurations[i] = transformStationviewsStationConfigurationViewToStationConfiguration(val)
 		}
 	}
 	if vres.Location != nil {
@@ -370,10 +379,10 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 			vres.StatusJSON[tk] = tv
 		}
 	}
-	if res.Modules != nil {
-		vres.Modules = make([]*stationviews.StationModuleView, len(res.Modules))
-		for i, val := range res.Modules {
-			vres.Modules[i] = transformStationModuleToStationviewsStationModuleView(val)
+	if res.Configurations != nil {
+		vres.Configurations = make([]*stationviews.StationConfigurationView, len(res.Configurations))
+		for i, val := range res.Configurations {
+			vres.Configurations[i] = transformStationConfigurationToStationviewsStationConfigurationView(val)
 		}
 	}
 	if res.Location != nil {
@@ -486,12 +495,33 @@ func transformStationviewsStationPhotosViewToStationPhotos(v *stationviews.Stati
 	return res
 }
 
-// transformStationviewsStationModuleViewToStationModule builds a value of type
-// *StationModule from a value of type *stationviews.StationModuleView.
-func transformStationviewsStationModuleViewToStationModule(v *stationviews.StationModuleView) *StationModule {
+// transformStationviewsStationConfigurationViewToStationConfiguration builds a
+// value of type *StationConfiguration from a value of type
+// *stationviews.StationConfigurationView.
+func transformStationviewsStationConfigurationViewToStationConfiguration(v *stationviews.StationConfigurationView) *StationConfiguration {
 	if v == nil {
 		return nil
 	}
+	res := &StationConfiguration{
+		ID:           *v.ID,
+		Time:         *v.Time,
+		ProvisionID:  *v.ProvisionID,
+		MetaRecordID: v.MetaRecordID,
+		SourceID:     v.SourceID,
+	}
+	if v.Modules != nil {
+		res.Modules = make([]*StationModule, len(v.Modules))
+		for i, val := range v.Modules {
+			res.Modules[i] = transformStationviewsStationModuleViewToStationModule(val)
+		}
+	}
+
+	return res
+}
+
+// transformStationviewsStationModuleViewToStationModule builds a value of type
+// *StationModule from a value of type *stationviews.StationModuleView.
+func transformStationviewsStationModuleViewToStationModule(v *stationviews.StationModuleView) *StationModule {
 	res := &StationModule{
 		ID:           *v.ID,
 		HardwareID:   v.HardwareID,
@@ -618,6 +648,27 @@ func transformImageRefToStationviewsImageRefView(v *ImageRef) *stationviews.Imag
 func transformStationPhotosToStationviewsStationPhotosView(v *StationPhotos) *stationviews.StationPhotosView {
 	res := &stationviews.StationPhotosView{
 		Small: &v.Small,
+	}
+
+	return res
+}
+
+// transformStationConfigurationToStationviewsStationConfigurationView builds a
+// value of type *stationviews.StationConfigurationView from a value of type
+// *StationConfiguration.
+func transformStationConfigurationToStationviewsStationConfigurationView(v *StationConfiguration) *stationviews.StationConfigurationView {
+	res := &stationviews.StationConfigurationView{
+		ID:           &v.ID,
+		Time:         &v.Time,
+		ProvisionID:  &v.ProvisionID,
+		MetaRecordID: v.MetaRecordID,
+		SourceID:     v.SourceID,
+	}
+	if v.Modules != nil {
+		res.Modules = make([]*stationviews.StationModuleView, len(v.Modules))
+		for i, val := range v.Modules {
+			res.Modules[i] = transformStationModuleToStationviewsStationModuleView(val)
+		}
 	}
 
 	return res

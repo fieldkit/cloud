@@ -21,13 +21,17 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+const (
+	GoodPassword = "goodgoodgood"
+)
+
 type FakeStations struct {
 	Owner    *data.User
 	Project  *data.Project
 	Stations []*data.Station
 }
 
-func (e *TestEnv) AddUser(pw string) (*data.User, error) {
+func (e *TestEnv) AddUser() (*data.User, error) {
 	email := faker.Email()
 	user := &data.User{
 		Name:     faker.Name(),
@@ -36,7 +40,7 @@ func (e *TestEnv) AddUser(pw string) (*data.User, error) {
 		Bio:      faker.Sentence(),
 	}
 
-	user.SetPassword(pw)
+	user.SetPassword(GoodPassword)
 
 	if err := e.DB.NamedGetContext(e.Ctx, user, `
 		INSERT INTO fieldkit.user (name, username, email, password, bio)
@@ -79,7 +83,7 @@ func (e *TestEnv) AddProjectUser(p *data.Project, u *data.User, r *data.Role) er
 }
 
 func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
-	owner, err := e.AddUser("passwordpassword")
+	owner, err := e.AddUser()
 	if err != nil {
 		return nil, err
 	}

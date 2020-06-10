@@ -65,6 +65,19 @@ var StationModule = Type("StationModule", func() {
 	Required("id", "name", "position", "flags", "internal", "sensors")
 })
 
+var StationConfiguration = Type("StationConfiguration", func() {
+	Attribute("id", Int64)
+	Attribute("time", Int64)
+	Attribute("provision_id", Int64)
+	Attribute("meta_record_id", Int64)
+	Attribute("source_id", Int32)
+	Attribute("modules", ArrayOf(StationModule))
+	Required("id")
+	Required("provision_id")
+	Required("time")
+	Required("modules")
+})
+
 var StationLocation = Type("StationLocation", func() {
 	Attribute("latitude", Float64)
 	Attribute("longitude", Float64)
@@ -91,8 +104,8 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("memory_available", Int32)
 		Attribute("firmware_number", Int32)
 		Attribute("firmware_time", Int64)
-		Attribute("modules", ArrayOf(StationModule))
-		Required("modules")
+		Attribute("configurations", ArrayOf(StationConfiguration))
+		Required("configurations")
 
 		Attribute("updated", Int64)
 		Attribute("location_name", String)
@@ -116,7 +129,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("memory_available")
 		Attribute("firmware_number")
 		Attribute("firmware_time")
-		Attribute("modules")
+		Attribute("configurations")
 
 		Attribute("updated")
 		Attribute("location")
