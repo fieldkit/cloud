@@ -6,10 +6,9 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	"github.com/conservify/sqlxcache"
-
 	information "github.com/fieldkit/cloud/server/api/gen/information"
 
+	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -38,7 +37,7 @@ func (c *InformationService) DeviceLayout(ctx context.Context, payload *informat
 
 	log.Infow("layout", "device_id", deviceID)
 
-	r, err := NewStationLayoutRepository(c.options.Database)
+	r, err := repositories.NewStationLayoutRepository(c.options.Database)
 	if err != nil {
 		return nil, err
 	}
@@ -64,62 +63,7 @@ func (s *InformationService) JWTAuth(ctx context.Context, token string, scheme *
 	})
 }
 
-type StationLayout struct {
-	Configurations []*data.StationConfiguration
-	Modules        []*data.StationModule
-	Sensors        []*data.ModuleSensor
-}
-
-type StationLayoutRepository struct {
-	db *sqlxcache.DB
-}
-
-func NewStationLayoutRepository(db *sqlxcache.DB) (rr *StationLayoutRepository, err error) {
-	return &StationLayoutRepository{db: db}, nil
-}
-
-func (r *StationLayoutRepository) QueryStationLayoutByDeviceID(ctx context.Context, deviceID []byte) (*StationLayout, error) {
-	configurations := []*data.StationConfiguration{}
-	if err := r.db.SelectContext(ctx, &configurations, `
-		SELECT * FROM fieldkit.station_configuration WHERE provision_id IN (
-			SELECT id FROM fieldkit.provision WHERE device_id = $1
-		) ORDER BY updated_at DESC
-		`, deviceID); err != nil {
-		return nil, err
-	}
-
-	modules := []*data.StationModule{}
-	if err := r.db.SelectContext(ctx, &modules, `
-		SELECT * FROM fieldkit.station_module WHERE configuration_id IN (
-			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
-				SELECT id FROM fieldkit.provision WHERE device_id = $1
-			)
-		)
-		`, deviceID); err != nil {
-		return nil, err
-	}
-
-	sensors := []*data.ModuleSensor{}
-	if err := r.db.SelectContext(ctx, &sensors, `
-		SELECT * FROM fieldkit.module_sensor WHERE module_id IN (
-			SELECT id FROM fieldkit.station_module WHERE configuration_id IN (
-				SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
-					SELECT id FROM fieldkit.provision WHERE device_id = $1
-				)
-			)
-		)
-		`, deviceID); err != nil {
-		return nil, err
-	}
-
-	return &StationLayout{
-		Configurations: configurations,
-		Modules:        modules,
-		Sensors:        sensors,
-	}, nil
-}
-
-func transformStationLayout(sl *StationLayout) (*information.DeviceLayoutResponse, error) {
+func transformStationLayout(sl *repositories.StationLayout) (*information.DeviceLayoutResponse, error) {
 	configurations := make([]*information.StationConfiguration, 0)
 	modulesByConfiguration := make(map[int64][]*information.StationModule)
 	sensorsByModule := make(map[int64][]*data.ModuleSensor)
