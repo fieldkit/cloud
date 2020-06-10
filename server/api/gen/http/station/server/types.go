@@ -256,12 +256,20 @@ type StationSensorResponseBody struct {
 	Name          string                     `form:"name" json:"name" xml:"name"`
 	UnitOfMeasure string                     `form:"unit_of_measure" json:"unit_of_measure" xml:"unit_of_measure"`
 	Reading       *SensorReadingResponseBody `form:"reading,omitempty" json:"reading,omitempty" xml:"reading,omitempty"`
+	Key           string                     `form:"key" json:"key" xml:"key"`
+	Ranges        []*SensorRangeResponseBody `form:"ranges" json:"ranges" xml:"ranges"`
 }
 
 // SensorReadingResponseBody is used to define fields on response body types.
 type SensorReadingResponseBody struct {
 	Last float32 `form:"last" json:"last" xml:"last"`
 	Time int64   `form:"time" json:"time" xml:"time"`
+}
+
+// SensorRangeResponseBody is used to define fields on response body types.
+type SensorRangeResponseBody struct {
+	Minimum float32 `form:"minimum" json:"minimum" xml:"minimum"`
+	Maximum float32 `form:"maximum" json:"maximum" xml:"maximum"`
 }
 
 // StationLocationResponseBody is used to define fields on response body types.

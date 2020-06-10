@@ -68,10 +68,18 @@ func transformStationLayout(sl *repositories.StationLayout) (*information.Device
 	modulesByConfiguration := make(map[int64][]*information.StationModule)
 	sensorsByModule := make(map[int64][]*data.ModuleSensor)
 	sensorsWmByModule := make(map[int64][]*information.StationSensor)
+	sensorsByKey := make(map[string][]*information.StationSensor)
+	moduleHeaders := make(map[int64]*repositories.HeaderFields)
+
+	mr := repositories.NewModuleMetaRepository()
 
 	for _, sm := range sl.Modules {
 		sensorsWmByModule[sm.ID] = make([]*information.StationSensor, 0)
 		sensorsByModule[sm.ID] = make([]*data.ModuleSensor, 0)
+		moduleHeaders[sm.ID] = &repositories.HeaderFields{
+			Manufacturer: sm.Manufacturer,
+			Kind:         sm.Kind,
+		}
 	}
 
 	for _, sc := range sl.Configurations {
@@ -79,26 +87,49 @@ func transformStationLayout(sl *repositories.StationLayout) (*information.Device
 	}
 
 	for _, ms := range sl.Sensors {
-		sensorsByModule[ms.ModuleID] = append(sensorsByModule[ms.ModuleID], ms)
-		sensorsWmByModule[ms.ModuleID] = append(sensorsWmByModule[ms.ModuleID], &information.StationSensor{
-			Name:          ms.Name,
-			UnitOfMeasure: ms.UnitOfMeasure,
-		})
+		if sensorMeta, err := mr.FindSensorMeta(moduleHeaders[ms.ModuleID], ms.Name); err == nil {
+			ranges := make([]*information.SensorRange, 0)
+			for _, r := range sensorMeta.Ranges {
+				ranges = append(ranges, &information.SensorRange{
+					Minimum: float32(r.Minimum),
+					Maximum: float32(r.Maximum),
+				})
+			}
+
+			sensor := &information.StationSensor{
+				Name:          ms.Name,
+				Key:           sensorMeta.Key,
+				UnitOfMeasure: ms.UnitOfMeasure,
+				Ranges:        ranges,
+			}
+
+			if _, ok := sensorsByKey[sensor.Key]; !ok {
+				sensorsByKey[sensor.Key] = make([]*information.StationSensor, 0)
+			}
+
+			sensorsByKey[sensor.Key] = append(sensorsByKey[sensor.Key], sensor)
+			sensorsByModule[ms.ModuleID] = append(sensorsByModule[ms.ModuleID], ms)
+			sensorsWmByModule[ms.ModuleID] = append(sensorsWmByModule[ms.ModuleID], sensor)
+		}
 	}
 
 	for _, sm := range sl.Modules {
 		hardwareID := hex.EncodeToString(sm.HardwareID)
 		sensors := sensorsWmByModule[sm.ID]
 
-		modulesByConfiguration[sm.ConfigurationID] = append(modulesByConfiguration[sm.ConfigurationID], &information.StationModule{
-			ID:         sm.ID,
-			HardwareID: &hardwareID,
-			Name:       translateModuleName(sm.Name, sensorsByModule[sm.ID]),
-			Position:   int32(sm.Position),
-			Flags:      int32(sm.Flags),
-			Internal:   sm.Flags > 0 || sm.Position == 255,
-			Sensors:    sensors,
-		})
+		if moduleMeta, err := mr.FindModuleMeta(moduleHeaders[sm.ID]); err == nil {
+			modulesByConfiguration[sm.ConfigurationID] = append(modulesByConfiguration[sm.ConfigurationID], &information.StationModule{
+				ID:         sm.ID,
+				HardwareID: &hardwareID,
+				Name:       translateModuleName(sm.Name, sensorsByModule[sm.ID]),
+				Position:   int32(sm.Position),
+				Flags:      int32(sm.Flags),
+				Internal:   sm.Flags > 0 || sm.Position == 255,
+				Sensors:    sensors,
+			})
+
+			_ = moduleMeta
+		}
 	}
 
 	for _, sc := range sl.Configurations {
@@ -114,5 +145,6 @@ func transformStationLayout(sl *repositories.StationLayout) (*information.Device
 
 	return &information.DeviceLayoutResponse{
 		Configurations: configurations,
+		Sensors:        sensorsByKey,
 	}, nil
 }

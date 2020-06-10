@@ -21,10 +21,13 @@ var DeviceLayoutResponse = ResultType("application/vnd.app.data.device.layout", 
 	TypeName("DeviceLayoutResponse")
 	Attributes(func() {
 		Attribute("configurations", ArrayOf(StationConfiguration))
+		Attribute("sensors", MapOf(String, ArrayOf(StationSensor)))
 		Required("configurations")
+		Required("sensors")
 	})
 	View("default", func() {
 		Attribute("configurations")
+		Attribute("sensors")
 	})
 })
 

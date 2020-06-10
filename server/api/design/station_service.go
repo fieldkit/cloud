@@ -37,11 +37,20 @@ var SensorReading = Type("SensorReading", func() {
 	Required("last", "time")
 })
 
+var SensorRange = Type("SensorRange", func() {
+	Attribute("minimum", Float32)
+	Attribute("maximum", Float32)
+	Required("minimum", "maximum")
+})
+
 var StationSensor = Type("StationSensor", func() {
 	Attribute("name", String)
 	Attribute("unit_of_measure", String)
 	Attribute("reading", SensorReading)
-	Required("name", "unit_of_measure")
+	Attribute("key", String)
+	Attribute("ranges", ArrayOf(SensorRange))
+	Required("name", "unit_of_measure", "key", "ranges")
+
 })
 
 var StationModule = Type("StationModule", func() {

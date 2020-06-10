@@ -23,6 +23,7 @@ type DeviceLayoutResponse struct {
 // DeviceLayoutResponseView is a type that runs validations on a projected type.
 type DeviceLayoutResponseView struct {
 	Configurations []*StationConfigurationView
+	Sensors        map[string][]*StationSensorView
 }
 
 // StationConfigurationView is a type that runs validations on a projected type.
@@ -52,6 +53,8 @@ type StationSensorView struct {
 	Name          *string
 	UnitOfMeasure *string
 	Reading       *SensorReadingView
+	Key           *string
+	Ranges        []*SensorRangeView
 }
 
 // SensorReadingView is a type that runs validations on a projected type.
@@ -60,12 +63,19 @@ type SensorReadingView struct {
 	Time *int64
 }
 
+// SensorRangeView is a type that runs validations on a projected type.
+type SensorRangeView struct {
+	Minimum *float32
+	Maximum *float32
+}
+
 var (
 	// DeviceLayoutResponseMap is a map of attribute names in result type
 	// DeviceLayoutResponse indexed by view name.
 	DeviceLayoutResponseMap = map[string][]string{
 		"default": []string{
 			"configurations",
+			"sensors",
 		},
 	}
 )
@@ -87,6 +97,9 @@ func ValidateDeviceLayoutResponse(result *DeviceLayoutResponse) (err error) {
 func ValidateDeviceLayoutResponseView(result *DeviceLayoutResponseView) (err error) {
 	if result.Configurations == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("configurations", "result"))
+	}
+	if result.Sensors == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("sensors", "result"))
 	}
 	for _, e := range result.Configurations {
 		if e != nil {
@@ -161,9 +174,22 @@ func ValidateStationSensorView(result *StationSensorView) (err error) {
 	if result.UnitOfMeasure == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "result"))
 	}
+	if result.Key == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("key", "result"))
+	}
+	if result.Ranges == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("ranges", "result"))
+	}
 	if result.Reading != nil {
 		if err2 := ValidateSensorReadingView(result.Reading); err2 != nil {
 			err = goa.MergeErrors(err, err2)
+		}
+	}
+	for _, e := range result.Ranges {
+		if e != nil {
+			if err2 := ValidateSensorRangeView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
 	return
@@ -176,6 +202,17 @@ func ValidateSensorReadingView(result *SensorReadingView) (err error) {
 	}
 	if result.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "result"))
+	}
+	return
+}
+
+// ValidateSensorRangeView runs the validations defined on SensorRangeView.
+func ValidateSensorRangeView(result *SensorRangeView) (err error) {
+	if result.Minimum == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("minimum", "result"))
+	}
+	if result.Maximum == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("maximum", "result"))
 	}
 	return
 }

@@ -163,11 +163,18 @@ type StationSensor struct {
 	Name          string
 	UnitOfMeasure string
 	Reading       *SensorReading
+	Key           string
+	Ranges        []*SensorRange
 }
 
 type SensorReading struct {
 	Last float32
 	Time int64
+}
+
+type SensorRange struct {
+	Minimum float32
+	Maximum float32
 }
 
 type StationLocation struct {
@@ -510,9 +517,16 @@ func transformStationviewsStationSensorViewToStationSensor(v *stationviews.Stati
 	res := &StationSensor{
 		Name:          *v.Name,
 		UnitOfMeasure: *v.UnitOfMeasure,
+		Key:           *v.Key,
 	}
 	if v.Reading != nil {
 		res.Reading = transformStationviewsSensorReadingViewToSensorReading(v.Reading)
+	}
+	if v.Ranges != nil {
+		res.Ranges = make([]*SensorRange, len(v.Ranges))
+		for i, val := range v.Ranges {
+			res.Ranges[i] = transformStationviewsSensorRangeViewToSensorRange(val)
+		}
 	}
 
 	return res
@@ -527,6 +541,17 @@ func transformStationviewsSensorReadingViewToSensorReading(v *stationviews.Senso
 	res := &SensorReading{
 		Last: *v.Last,
 		Time: *v.Time,
+	}
+
+	return res
+}
+
+// transformStationviewsSensorRangeViewToSensorRange builds a value of type
+// *SensorRange from a value of type *stationviews.SensorRangeView.
+func transformStationviewsSensorRangeViewToSensorRange(v *stationviews.SensorRangeView) *SensorRange {
+	res := &SensorRange{
+		Minimum: *v.Minimum,
+		Maximum: *v.Maximum,
 	}
 
 	return res
@@ -626,9 +651,16 @@ func transformStationSensorToStationviewsStationSensorView(v *StationSensor) *st
 	res := &stationviews.StationSensorView{
 		Name:          &v.Name,
 		UnitOfMeasure: &v.UnitOfMeasure,
+		Key:           &v.Key,
 	}
 	if v.Reading != nil {
 		res.Reading = transformSensorReadingToStationviewsSensorReadingView(v.Reading)
+	}
+	if v.Ranges != nil {
+		res.Ranges = make([]*stationviews.SensorRangeView, len(v.Ranges))
+		for i, val := range v.Ranges {
+			res.Ranges[i] = transformSensorRangeToStationviewsSensorRangeView(val)
+		}
 	}
 
 	return res
@@ -643,6 +675,17 @@ func transformSensorReadingToStationviewsSensorReadingView(v *SensorReading) *st
 	res := &stationviews.SensorReadingView{
 		Last: &v.Last,
 		Time: &v.Time,
+	}
+
+	return res
+}
+
+// transformSensorRangeToStationviewsSensorRangeView builds a value of type
+// *stationviews.SensorRangeView from a value of type *SensorRange.
+func transformSensorRangeToStationviewsSensorRangeView(v *SensorRange) *stationviews.SensorRangeView {
+	res := &stationviews.SensorRangeView{
+		Minimum: &v.Minimum,
+		Maximum: &v.Maximum,
 	}
 
 	return res

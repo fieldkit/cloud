@@ -195,9 +195,14 @@ func unmarshalStationSensorResponseBodyToInformationviewsStationSensorView(v *St
 	res := &informationviews.StationSensorView{
 		Name:          v.Name,
 		UnitOfMeasure: v.UnitOfMeasure,
+		Key:           v.Key,
 	}
 	if v.Reading != nil {
 		res.Reading = unmarshalSensorReadingResponseBodyToInformationviewsSensorReadingView(v.Reading)
+	}
+	res.Ranges = make([]*informationviews.SensorRangeView, len(v.Ranges))
+	for i, val := range v.Ranges {
+		res.Ranges[i] = unmarshalSensorRangeResponseBodyToInformationviewsSensorRangeView(val)
 	}
 
 	return res
@@ -213,6 +218,18 @@ func unmarshalSensorReadingResponseBodyToInformationviewsSensorReadingView(v *Se
 	res := &informationviews.SensorReadingView{
 		Last: v.Last,
 		Time: v.Time,
+	}
+
+	return res
+}
+
+// unmarshalSensorRangeResponseBodyToInformationviewsSensorRangeView builds a
+// value of type *informationviews.SensorRangeView from a value of type
+// *SensorRangeResponseBody.
+func unmarshalSensorRangeResponseBodyToInformationviewsSensorRangeView(v *SensorRangeResponseBody) *informationviews.SensorRangeView {
+	res := &informationviews.SensorRangeView{
+		Minimum: v.Minimum,
+		Maximum: v.Maximum,
 	}
 
 	return res

@@ -15,7 +15,8 @@ import (
 // DeviceLayoutResponseBody is the type of the "information" service "device
 // layout" endpoint HTTP response body.
 type DeviceLayoutResponseBody struct {
-	Configurations []*StationConfigurationResponseBody `form:"configurations" json:"configurations" xml:"configurations"`
+	Configurations []*StationConfigurationResponseBody     `form:"configurations" json:"configurations" xml:"configurations"`
+	Sensors        map[string][]*StationSensorResponseBody `form:"sensors" json:"sensors" xml:"sensors"`
 }
 
 // DeviceLayoutBadRequestResponseBody is the type of the "information" service
@@ -63,12 +64,20 @@ type StationSensorResponseBody struct {
 	Name          string                     `form:"name" json:"name" xml:"name"`
 	UnitOfMeasure string                     `form:"unit_of_measure" json:"unit_of_measure" xml:"unit_of_measure"`
 	Reading       *SensorReadingResponseBody `form:"reading,omitempty" json:"reading,omitempty" xml:"reading,omitempty"`
+	Key           string                     `form:"key" json:"key" xml:"key"`
+	Ranges        []*SensorRangeResponseBody `form:"ranges" json:"ranges" xml:"ranges"`
 }
 
 // SensorReadingResponseBody is used to define fields on response body types.
 type SensorReadingResponseBody struct {
 	Last float32 `form:"last" json:"last" xml:"last"`
 	Time int64   `form:"time" json:"time" xml:"time"`
+}
+
+// SensorRangeResponseBody is used to define fields on response body types.
+type SensorRangeResponseBody struct {
+	Minimum float32 `form:"minimum" json:"minimum" xml:"minimum"`
+	Maximum float32 `form:"maximum" json:"maximum" xml:"maximum"`
 }
 
 // NewDeviceLayoutResponseBody builds the HTTP response body from the result of
@@ -79,6 +88,17 @@ func NewDeviceLayoutResponseBody(res *informationviews.DeviceLayoutResponseView)
 		body.Configurations = make([]*StationConfigurationResponseBody, len(res.Configurations))
 		for i, val := range res.Configurations {
 			body.Configurations[i] = marshalInformationviewsStationConfigurationViewToStationConfigurationResponseBody(val)
+		}
+	}
+	if res.Sensors != nil {
+		body.Sensors = make(map[string][]*StationSensorResponseBody, len(res.Sensors))
+		for key, val := range res.Sensors {
+			tk := key
+			tv := make([]*StationSensorResponseBody, len(val))
+			for i, val := range val {
+				tv[i] = marshalInformationviewsStationSensorViewToStationSensorResponseBody(val)
+			}
+			body.Sensors[tk] = tv
 		}
 	}
 	return body

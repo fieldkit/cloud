@@ -60,7 +60,12 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord)
 		for _, sensor := range module.Sensors {
 			key := strcase.ToLowerCamel(sensor.Name)
 
-			extraSensor, err := mf.modulesRepository.FindSensor(header, sensor.Name)
+			hf := HeaderFields{
+				Manufacturer: header.Manufacturer,
+				Kind:         header.Kind,
+			}
+
+			extraSensor, err := mf.modulesRepository.FindSensorMeta(&hf, sensor.Name)
 			if err != nil {
 				return nil, errors.Structured(err, "meta_record_id", databaseRecord.ID)
 			}

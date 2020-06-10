@@ -3,8 +3,6 @@ package repositories
 import (
 	"strings"
 
-	pb "github.com/fieldkit/data-protocol"
-
 	"github.com/fieldkit/cloud/server/errors"
 )
 
@@ -25,6 +23,11 @@ const (
 	MaximumRain      = 1000.0 // mm
 )
 
+type HeaderFields struct {
+	Manufacturer uint32
+	Kind         uint32
+}
+
 type ModuleMetaRepository struct {
 }
 
@@ -32,7 +35,7 @@ func NewModuleMetaRepository() *ModuleMetaRepository {
 	return &ModuleMetaRepository{}
 }
 
-func (r *ModuleMetaRepository) FindModuleMeta(m *pb.ModuleHeader) (mm *ModuleMeta, err error) {
+func (r *ModuleMetaRepository) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, err error) {
 	all, err := r.FindAllModulesMeta()
 	if err != nil {
 		return nil, err
@@ -45,7 +48,7 @@ func (r *ModuleMetaRepository) FindModuleMeta(m *pb.ModuleHeader) (mm *ModuleMet
 	return nil, errors.Structured("missing module meta", "manufacturer", m.Manufacturer, "kind", m.Kind)
 }
 
-func (r *ModuleMetaRepository) FindSensor(m *pb.ModuleHeader, sensor string) (mm *SensorMeta, err error) {
+func (r *ModuleMetaRepository) FindSensorMeta(m *HeaderFields, sensor string) (mm *SensorMeta, err error) {
 	all, err := r.FindAllModulesMeta()
 	if err != nil {
 		return nil, err

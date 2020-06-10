@@ -47,6 +47,7 @@ type DeviceLayoutPayload struct {
 // layout method.
 type DeviceLayoutResponse struct {
 	Configurations []*StationConfiguration
+	Sensors        map[string][]*StationSensor
 }
 
 type StationConfiguration struct {
@@ -73,11 +74,18 @@ type StationSensor struct {
 	Name          string
 	UnitOfMeasure string
 	Reading       *SensorReading
+	Key           string
+	Ranges        []*SensorRange
 }
 
 type SensorReading struct {
 	Last float32
 	Time int64
+}
+
+type SensorRange struct {
+	Minimum float32
+	Maximum float32
 }
 
 // unauthorized
@@ -156,6 +164,17 @@ func newDeviceLayoutResponse(vres *informationviews.DeviceLayoutResponseView) *D
 			res.Configurations[i] = transformInformationviewsStationConfigurationViewToStationConfiguration(val)
 		}
 	}
+	if vres.Sensors != nil {
+		res.Sensors = make(map[string][]*StationSensor, len(vres.Sensors))
+		for key, val := range vres.Sensors {
+			tk := key
+			tv := make([]*StationSensor, len(val))
+			for i, val := range val {
+				tv[i] = transformInformationviewsStationSensorViewToStationSensor(val)
+			}
+			res.Sensors[tk] = tv
+		}
+	}
 	return res
 }
 
@@ -167,6 +186,17 @@ func newDeviceLayoutResponseView(res *DeviceLayoutResponse) *informationviews.De
 		vres.Configurations = make([]*informationviews.StationConfigurationView, len(res.Configurations))
 		for i, val := range res.Configurations {
 			vres.Configurations[i] = transformStationConfigurationToInformationviewsStationConfigurationView(val)
+		}
+	}
+	if res.Sensors != nil {
+		vres.Sensors = make(map[string][]*informationviews.StationSensorView, len(res.Sensors))
+		for key, val := range res.Sensors {
+			tk := key
+			tv := make([]*informationviews.StationSensorView, len(val))
+			for i, val := range val {
+				tv[i] = transformStationSensorToInformationviewsStationSensorView(val)
+			}
+			vres.Sensors[tk] = tv
 		}
 	}
 	return vres
@@ -224,9 +254,16 @@ func transformInformationviewsStationSensorViewToStationSensor(v *informationvie
 	res := &StationSensor{
 		Name:          *v.Name,
 		UnitOfMeasure: *v.UnitOfMeasure,
+		Key:           *v.Key,
 	}
 	if v.Reading != nil {
 		res.Reading = transformInformationviewsSensorReadingViewToSensorReading(v.Reading)
+	}
+	if v.Ranges != nil {
+		res.Ranges = make([]*SensorRange, len(v.Ranges))
+		for i, val := range v.Ranges {
+			res.Ranges[i] = transformInformationviewsSensorRangeViewToSensorRange(val)
+		}
 	}
 
 	return res
@@ -241,6 +278,17 @@ func transformInformationviewsSensorReadingViewToSensorReading(v *informationvie
 	res := &SensorReading{
 		Last: *v.Last,
 		Time: *v.Time,
+	}
+
+	return res
+}
+
+// transformInformationviewsSensorRangeViewToSensorRange builds a value of type
+// *SensorRange from a value of type *informationviews.SensorRangeView.
+func transformInformationviewsSensorRangeViewToSensorRange(v *informationviews.SensorRangeView) *SensorRange {
+	res := &SensorRange{
+		Minimum: *v.Minimum,
+		Maximum: *v.Maximum,
 	}
 
 	return res
@@ -295,9 +343,16 @@ func transformStationSensorToInformationviewsStationSensorView(v *StationSensor)
 	res := &informationviews.StationSensorView{
 		Name:          &v.Name,
 		UnitOfMeasure: &v.UnitOfMeasure,
+		Key:           &v.Key,
 	}
 	if v.Reading != nil {
 		res.Reading = transformSensorReadingToInformationviewsSensorReadingView(v.Reading)
+	}
+	if v.Ranges != nil {
+		res.Ranges = make([]*informationviews.SensorRangeView, len(v.Ranges))
+		for i, val := range v.Ranges {
+			res.Ranges[i] = transformSensorRangeToInformationviewsSensorRangeView(val)
+		}
 	}
 
 	return res
@@ -312,6 +367,17 @@ func transformSensorReadingToInformationviewsSensorReadingView(v *SensorReading)
 	res := &informationviews.SensorReadingView{
 		Last: &v.Last,
 		Time: &v.Time,
+	}
+
+	return res
+}
+
+// transformSensorRangeToInformationviewsSensorRangeView builds a value of type
+// *informationviews.SensorRangeView from a value of type *SensorRange.
+func transformSensorRangeToInformationviewsSensorRangeView(v *SensorRange) *informationviews.SensorRangeView {
+	res := &informationviews.SensorRangeView{
+		Minimum: &v.Minimum,
+		Maximum: &v.Maximum,
 	}
 
 	return res

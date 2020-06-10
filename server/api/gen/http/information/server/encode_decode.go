@@ -175,9 +175,16 @@ func marshalInformationviewsStationSensorViewToStationSensorResponseBody(v *info
 	res := &StationSensorResponseBody{
 		Name:          *v.Name,
 		UnitOfMeasure: *v.UnitOfMeasure,
+		Key:           *v.Key,
 	}
 	if v.Reading != nil {
 		res.Reading = marshalInformationviewsSensorReadingViewToSensorReadingResponseBody(v.Reading)
+	}
+	if v.Ranges != nil {
+		res.Ranges = make([]*SensorRangeResponseBody, len(v.Ranges))
+		for i, val := range v.Ranges {
+			res.Ranges[i] = marshalInformationviewsSensorRangeViewToSensorRangeResponseBody(val)
+		}
 	}
 
 	return res
@@ -193,6 +200,18 @@ func marshalInformationviewsSensorReadingViewToSensorReadingResponseBody(v *info
 	res := &SensorReadingResponseBody{
 		Last: *v.Last,
 		Time: *v.Time,
+	}
+
+	return res
+}
+
+// marshalInformationviewsSensorRangeViewToSensorRangeResponseBody builds a
+// value of type *SensorRangeResponseBody from a value of type
+// *informationviews.SensorRangeView.
+func marshalInformationviewsSensorRangeViewToSensorRangeResponseBody(v *informationviews.SensorRangeView) *SensorRangeResponseBody {
+	res := &SensorRangeResponseBody{
+		Minimum: *v.Minimum,
+		Maximum: *v.Maximum,
 	}
 
 	return res

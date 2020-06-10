@@ -94,12 +94,20 @@ type StationSensorView struct {
 	Name          *string
 	UnitOfMeasure *string
 	Reading       *SensorReadingView
+	Key           *string
+	Ranges        []*SensorRangeView
 }
 
 // SensorReadingView is a type that runs validations on a projected type.
 type SensorReadingView struct {
 	Last *float32
 	Time *int64
+}
+
+// SensorRangeView is a type that runs validations on a projected type.
+type SensorRangeView struct {
+	Minimum *float32
+	Maximum *float32
 }
 
 // StationLocationView is a type that runs validations on a projected type.
@@ -367,9 +375,22 @@ func ValidateStationSensorView(result *StationSensorView) (err error) {
 	if result.UnitOfMeasure == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "result"))
 	}
+	if result.Key == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("key", "result"))
+	}
+	if result.Ranges == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("ranges", "result"))
+	}
 	if result.Reading != nil {
 		if err2 := ValidateSensorReadingView(result.Reading); err2 != nil {
 			err = goa.MergeErrors(err, err2)
+		}
+	}
+	for _, e := range result.Ranges {
+		if e != nil {
+			if err2 := ValidateSensorRangeView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
 	return
@@ -382,6 +403,17 @@ func ValidateSensorReadingView(result *SensorReadingView) (err error) {
 	}
 	if result.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "result"))
+	}
+	return
+}
+
+// ValidateSensorRangeView runs the validations defined on SensorRangeView.
+func ValidateSensorRangeView(result *SensorRangeView) (err error) {
+	if result.Minimum == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("minimum", "result"))
+	}
+	if result.Maximum == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("maximum", "result"))
 	}
 	return
 }

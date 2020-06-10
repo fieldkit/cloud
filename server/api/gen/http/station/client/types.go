@@ -256,12 +256,20 @@ type StationSensorResponseBody struct {
 	Name          *string                    `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	UnitOfMeasure *string                    `form:"unit_of_measure,omitempty" json:"unit_of_measure,omitempty" xml:"unit_of_measure,omitempty"`
 	Reading       *SensorReadingResponseBody `form:"reading,omitempty" json:"reading,omitempty" xml:"reading,omitempty"`
+	Key           *string                    `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	Ranges        []*SensorRangeResponseBody `form:"ranges,omitempty" json:"ranges,omitempty" xml:"ranges,omitempty"`
 }
 
 // SensorReadingResponseBody is used to define fields on response body types.
 type SensorReadingResponseBody struct {
 	Last *float32 `form:"last,omitempty" json:"last,omitempty" xml:"last,omitempty"`
 	Time *int64   `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
+}
+
+// SensorRangeResponseBody is used to define fields on response body types.
+type SensorRangeResponseBody struct {
+	Minimum *float32 `form:"minimum,omitempty" json:"minimum,omitempty" xml:"minimum,omitempty"`
+	Maximum *float32 `form:"maximum,omitempty" json:"maximum,omitempty" xml:"maximum,omitempty"`
 }
 
 // StationLocationResponseBody is used to define fields on response body types.
@@ -754,9 +762,22 @@ func ValidateStationSensorResponseBody(body *StationSensorResponseBody) (err err
 	if body.UnitOfMeasure == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "body"))
 	}
+	if body.Key == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("key", "body"))
+	}
+	if body.Ranges == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("ranges", "body"))
+	}
 	if body.Reading != nil {
 		if err2 := ValidateSensorReadingResponseBody(body.Reading); err2 != nil {
 			err = goa.MergeErrors(err, err2)
+		}
+	}
+	for _, e := range body.Ranges {
+		if e != nil {
+			if err2 := ValidateSensorRangeResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
 	return
@@ -770,6 +791,18 @@ func ValidateSensorReadingResponseBody(body *SensorReadingResponseBody) (err err
 	}
 	if body.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "body"))
+	}
+	return
+}
+
+// ValidateSensorRangeResponseBody runs the validations defined on
+// SensorRangeResponseBody
+func ValidateSensorRangeResponseBody(body *SensorRangeResponseBody) (err error) {
+	if body.Minimum == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("minimum", "body"))
+	}
+	if body.Maximum == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("maximum", "body"))
 	}
 	return
 }
