@@ -50,7 +50,33 @@ type DeviceLayoutResponse struct {
 }
 
 type StationConfiguration struct {
-	ID   int64
+	ID           int64
+	Time         int64
+	ProvisionID  int64
+	MetaRecordID *int64
+	SourceID     *int32
+	Modules      []*StationModule
+}
+
+type StationModule struct {
+	ID           int64
+	HardwareID   *string
+	MetaRecordID *int64
+	Name         string
+	Position     int32
+	Flags        int32
+	Internal     bool
+	Sensors      []*StationSensor
+}
+
+type StationSensor struct {
+	Name          string
+	UnitOfMeasure string
+	Reading       *SensorReading
+}
+
+type SensorReading struct {
+	Last float32
 	Time int64
 }
 
@@ -154,7 +180,66 @@ func transformInformationviewsStationConfigurationViewToStationConfiguration(v *
 		return nil
 	}
 	res := &StationConfiguration{
-		ID:   *v.ID,
+		ID:           *v.ID,
+		Time:         *v.Time,
+		ProvisionID:  *v.ProvisionID,
+		MetaRecordID: v.MetaRecordID,
+		SourceID:     v.SourceID,
+	}
+	if v.Modules != nil {
+		res.Modules = make([]*StationModule, len(v.Modules))
+		for i, val := range v.Modules {
+			res.Modules[i] = transformInformationviewsStationModuleViewToStationModule(val)
+		}
+	}
+
+	return res
+}
+
+// transformInformationviewsStationModuleViewToStationModule builds a value of
+// type *StationModule from a value of type *informationviews.StationModuleView.
+func transformInformationviewsStationModuleViewToStationModule(v *informationviews.StationModuleView) *StationModule {
+	res := &StationModule{
+		ID:           *v.ID,
+		HardwareID:   v.HardwareID,
+		MetaRecordID: v.MetaRecordID,
+		Name:         *v.Name,
+		Position:     *v.Position,
+		Flags:        *v.Flags,
+		Internal:     *v.Internal,
+	}
+	if v.Sensors != nil {
+		res.Sensors = make([]*StationSensor, len(v.Sensors))
+		for i, val := range v.Sensors {
+			res.Sensors[i] = transformInformationviewsStationSensorViewToStationSensor(val)
+		}
+	}
+
+	return res
+}
+
+// transformInformationviewsStationSensorViewToStationSensor builds a value of
+// type *StationSensor from a value of type *informationviews.StationSensorView.
+func transformInformationviewsStationSensorViewToStationSensor(v *informationviews.StationSensorView) *StationSensor {
+	res := &StationSensor{
+		Name:          *v.Name,
+		UnitOfMeasure: *v.UnitOfMeasure,
+	}
+	if v.Reading != nil {
+		res.Reading = transformInformationviewsSensorReadingViewToSensorReading(v.Reading)
+	}
+
+	return res
+}
+
+// transformInformationviewsSensorReadingViewToSensorReading builds a value of
+// type *SensorReading from a value of type *informationviews.SensorReadingView.
+func transformInformationviewsSensorReadingViewToSensorReading(v *informationviews.SensorReadingView) *SensorReading {
+	if v == nil {
+		return nil
+	}
+	res := &SensorReading{
+		Last: *v.Last,
 		Time: *v.Time,
 	}
 
@@ -166,7 +251,66 @@ func transformInformationviewsStationConfigurationViewToStationConfiguration(v *
 // value of type *StationConfiguration.
 func transformStationConfigurationToInformationviewsStationConfigurationView(v *StationConfiguration) *informationviews.StationConfigurationView {
 	res := &informationviews.StationConfigurationView{
-		ID:   &v.ID,
+		ID:           &v.ID,
+		Time:         &v.Time,
+		ProvisionID:  &v.ProvisionID,
+		MetaRecordID: v.MetaRecordID,
+		SourceID:     v.SourceID,
+	}
+	if v.Modules != nil {
+		res.Modules = make([]*informationviews.StationModuleView, len(v.Modules))
+		for i, val := range v.Modules {
+			res.Modules[i] = transformStationModuleToInformationviewsStationModuleView(val)
+		}
+	}
+
+	return res
+}
+
+// transformStationModuleToInformationviewsStationModuleView builds a value of
+// type *informationviews.StationModuleView from a value of type *StationModule.
+func transformStationModuleToInformationviewsStationModuleView(v *StationModule) *informationviews.StationModuleView {
+	res := &informationviews.StationModuleView{
+		ID:           &v.ID,
+		HardwareID:   v.HardwareID,
+		MetaRecordID: v.MetaRecordID,
+		Name:         &v.Name,
+		Position:     &v.Position,
+		Flags:        &v.Flags,
+		Internal:     &v.Internal,
+	}
+	if v.Sensors != nil {
+		res.Sensors = make([]*informationviews.StationSensorView, len(v.Sensors))
+		for i, val := range v.Sensors {
+			res.Sensors[i] = transformStationSensorToInformationviewsStationSensorView(val)
+		}
+	}
+
+	return res
+}
+
+// transformStationSensorToInformationviewsStationSensorView builds a value of
+// type *informationviews.StationSensorView from a value of type *StationSensor.
+func transformStationSensorToInformationviewsStationSensorView(v *StationSensor) *informationviews.StationSensorView {
+	res := &informationviews.StationSensorView{
+		Name:          &v.Name,
+		UnitOfMeasure: &v.UnitOfMeasure,
+	}
+	if v.Reading != nil {
+		res.Reading = transformSensorReadingToInformationviewsSensorReadingView(v.Reading)
+	}
+
+	return res
+}
+
+// transformSensorReadingToInformationviewsSensorReadingView builds a value of
+// type *informationviews.SensorReadingView from a value of type *SensorReading.
+func transformSensorReadingToInformationviewsSensorReadingView(v *SensorReading) *informationviews.SensorReadingView {
+	if v == nil {
+		return nil
+	}
+	res := &informationviews.SensorReadingView{
+		Last: &v.Last,
 		Time: &v.Time,
 	}
 

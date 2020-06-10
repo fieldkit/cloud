@@ -153,7 +153,65 @@ func DecodeDeviceLayoutResponse(decoder func(*http.Response) goahttp.Decoder, re
 // value of type *StationConfigurationResponseBody.
 func unmarshalStationConfigurationResponseBodyToInformationviewsStationConfigurationView(v *StationConfigurationResponseBody) *informationviews.StationConfigurationView {
 	res := &informationviews.StationConfigurationView{
-		ID:   v.ID,
+		ID:           v.ID,
+		Time:         v.Time,
+		ProvisionID:  v.ProvisionID,
+		MetaRecordID: v.MetaRecordID,
+		SourceID:     v.SourceID,
+	}
+	res.Modules = make([]*informationviews.StationModuleView, len(v.Modules))
+	for i, val := range v.Modules {
+		res.Modules[i] = unmarshalStationModuleResponseBodyToInformationviewsStationModuleView(val)
+	}
+
+	return res
+}
+
+// unmarshalStationModuleResponseBodyToInformationviewsStationModuleView builds
+// a value of type *informationviews.StationModuleView from a value of type
+// *StationModuleResponseBody.
+func unmarshalStationModuleResponseBodyToInformationviewsStationModuleView(v *StationModuleResponseBody) *informationviews.StationModuleView {
+	res := &informationviews.StationModuleView{
+		ID:           v.ID,
+		HardwareID:   v.HardwareID,
+		MetaRecordID: v.MetaRecordID,
+		Name:         v.Name,
+		Position:     v.Position,
+		Flags:        v.Flags,
+		Internal:     v.Internal,
+	}
+	res.Sensors = make([]*informationviews.StationSensorView, len(v.Sensors))
+	for i, val := range v.Sensors {
+		res.Sensors[i] = unmarshalStationSensorResponseBodyToInformationviewsStationSensorView(val)
+	}
+
+	return res
+}
+
+// unmarshalStationSensorResponseBodyToInformationviewsStationSensorView builds
+// a value of type *informationviews.StationSensorView from a value of type
+// *StationSensorResponseBody.
+func unmarshalStationSensorResponseBodyToInformationviewsStationSensorView(v *StationSensorResponseBody) *informationviews.StationSensorView {
+	res := &informationviews.StationSensorView{
+		Name:          v.Name,
+		UnitOfMeasure: v.UnitOfMeasure,
+	}
+	if v.Reading != nil {
+		res.Reading = unmarshalSensorReadingResponseBodyToInformationviewsSensorReadingView(v.Reading)
+	}
+
+	return res
+}
+
+// unmarshalSensorReadingResponseBodyToInformationviewsSensorReadingView builds
+// a value of type *informationviews.SensorReadingView from a value of type
+// *SensorReadingResponseBody.
+func unmarshalSensorReadingResponseBodyToInformationviewsSensorReadingView(v *SensorReadingResponseBody) *informationviews.SensorReadingView {
+	if v == nil {
+		return nil
+	}
+	res := &informationviews.SensorReadingView{
+		Last: v.Last,
 		Time: v.Time,
 	}
 

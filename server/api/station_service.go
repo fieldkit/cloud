@@ -340,11 +340,13 @@ func transformReading(s *data.ModuleSensor) *station.SensorReading {
 func transformModules(from *data.StationFull) (to []*station.StationModule) {
 	to = make([]*station.StationModule, 0)
 	for _, v := range from.Modules {
-		sensors := make([]*station.StationSensor, 0)
+		sensors := make([]*data.ModuleSensor, 0)
+		sensorsWm := make([]*station.StationSensor, 0)
 
 		for _, s := range from.Sensors {
 			if s.ModuleID == v.ID {
-				sensors = append(sensors, &station.StationSensor{
+				sensors = append(sensors, s)
+				sensorsWm = append(sensorsWm, &station.StationSensor{
 					Name:          s.Name,
 					UnitOfMeasure: s.UnitOfMeasure,
 					Reading:       transformReading(s),
@@ -361,7 +363,7 @@ func transformModules(from *data.StationFull) (to []*station.StationModule) {
 			Position:   int32(v.Position),
 			Flags:      int32(v.Flags),
 			Internal:   v.Flags > 0 || v.Position == 255,
-			Sensors:    sensors,
+			Sensors:    sensorsWm,
 		})
 
 	}
@@ -381,7 +383,7 @@ var (
 // are coming in. Then we can do a database migration and get rid of
 // them completely. I'm deciding to leave them in so we can see them
 // disappear over time.
-func translateModuleName(old string, sensors []*station.StationSensor) string {
+func translateModuleName(old string, sensors []*data.ModuleSensor) string {
 	if newName, ok := NameMap[old]; ok {
 		return newName
 	}

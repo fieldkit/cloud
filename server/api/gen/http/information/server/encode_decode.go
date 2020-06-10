@@ -129,7 +129,69 @@ func EncodeDeviceLayoutError(encoder func(context.Context, http.ResponseWriter) 
 // type *informationviews.StationConfigurationView.
 func marshalInformationviewsStationConfigurationViewToStationConfigurationResponseBody(v *informationviews.StationConfigurationView) *StationConfigurationResponseBody {
 	res := &StationConfigurationResponseBody{
-		ID:   *v.ID,
+		ID:           *v.ID,
+		Time:         *v.Time,
+		ProvisionID:  *v.ProvisionID,
+		MetaRecordID: v.MetaRecordID,
+		SourceID:     v.SourceID,
+	}
+	if v.Modules != nil {
+		res.Modules = make([]*StationModuleResponseBody, len(v.Modules))
+		for i, val := range v.Modules {
+			res.Modules[i] = marshalInformationviewsStationModuleViewToStationModuleResponseBody(val)
+		}
+	}
+
+	return res
+}
+
+// marshalInformationviewsStationModuleViewToStationModuleResponseBody builds a
+// value of type *StationModuleResponseBody from a value of type
+// *informationviews.StationModuleView.
+func marshalInformationviewsStationModuleViewToStationModuleResponseBody(v *informationviews.StationModuleView) *StationModuleResponseBody {
+	res := &StationModuleResponseBody{
+		ID:           *v.ID,
+		HardwareID:   v.HardwareID,
+		MetaRecordID: v.MetaRecordID,
+		Name:         *v.Name,
+		Position:     *v.Position,
+		Flags:        *v.Flags,
+		Internal:     *v.Internal,
+	}
+	if v.Sensors != nil {
+		res.Sensors = make([]*StationSensorResponseBody, len(v.Sensors))
+		for i, val := range v.Sensors {
+			res.Sensors[i] = marshalInformationviewsStationSensorViewToStationSensorResponseBody(val)
+		}
+	}
+
+	return res
+}
+
+// marshalInformationviewsStationSensorViewToStationSensorResponseBody builds a
+// value of type *StationSensorResponseBody from a value of type
+// *informationviews.StationSensorView.
+func marshalInformationviewsStationSensorViewToStationSensorResponseBody(v *informationviews.StationSensorView) *StationSensorResponseBody {
+	res := &StationSensorResponseBody{
+		Name:          *v.Name,
+		UnitOfMeasure: *v.UnitOfMeasure,
+	}
+	if v.Reading != nil {
+		res.Reading = marshalInformationviewsSensorReadingViewToSensorReadingResponseBody(v.Reading)
+	}
+
+	return res
+}
+
+// marshalInformationviewsSensorReadingViewToSensorReadingResponseBody builds a
+// value of type *SensorReadingResponseBody from a value of type
+// *informationviews.SensorReadingView.
+func marshalInformationviewsSensorReadingViewToSensorReadingResponseBody(v *informationviews.SensorReadingView) *SensorReadingResponseBody {
+	if v == nil {
+		return nil
+	}
+	res := &SensorReadingResponseBody{
+		Last: *v.Last,
 		Time: *v.Time,
 	}
 

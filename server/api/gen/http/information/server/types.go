@@ -38,8 +38,37 @@ type DeviceLayoutUnauthorizedResponseBody string
 // StationConfigurationResponseBody is used to define fields on response body
 // types.
 type StationConfigurationResponseBody struct {
-	ID   int64 `form:"id" json:"id" xml:"id"`
-	Time int64 `form:"time" json:"time" xml:"time"`
+	ID           int64                        `form:"id" json:"id" xml:"id"`
+	Time         int64                        `form:"time" json:"time" xml:"time"`
+	ProvisionID  int64                        `form:"provision_id" json:"provision_id" xml:"provision_id"`
+	MetaRecordID *int64                       `form:"meta_record_id,omitempty" json:"meta_record_id,omitempty" xml:"meta_record_id,omitempty"`
+	SourceID     *int32                       `form:"source_id,omitempty" json:"source_id,omitempty" xml:"source_id,omitempty"`
+	Modules      []*StationModuleResponseBody `form:"modules" json:"modules" xml:"modules"`
+}
+
+// StationModuleResponseBody is used to define fields on response body types.
+type StationModuleResponseBody struct {
+	ID           int64                        `form:"id" json:"id" xml:"id"`
+	HardwareID   *string                      `form:"hardware_id,omitempty" json:"hardware_id,omitempty" xml:"hardware_id,omitempty"`
+	MetaRecordID *int64                       `form:"meta_record_id,omitempty" json:"meta_record_id,omitempty" xml:"meta_record_id,omitempty"`
+	Name         string                       `form:"name" json:"name" xml:"name"`
+	Position     int32                        `form:"position" json:"position" xml:"position"`
+	Flags        int32                        `form:"flags" json:"flags" xml:"flags"`
+	Internal     bool                         `form:"internal" json:"internal" xml:"internal"`
+	Sensors      []*StationSensorResponseBody `form:"sensors" json:"sensors" xml:"sensors"`
+}
+
+// StationSensorResponseBody is used to define fields on response body types.
+type StationSensorResponseBody struct {
+	Name          string                     `form:"name" json:"name" xml:"name"`
+	UnitOfMeasure string                     `form:"unit_of_measure" json:"unit_of_measure" xml:"unit_of_measure"`
+	Reading       *SensorReadingResponseBody `form:"reading,omitempty" json:"reading,omitempty" xml:"reading,omitempty"`
+}
+
+// SensorReadingResponseBody is used to define fields on response body types.
+type SensorReadingResponseBody struct {
+	Last float32 `form:"last" json:"last" xml:"last"`
+	Time int64   `form:"time" json:"time" xml:"time"`
 }
 
 // NewDeviceLayoutResponseBody builds the HTTP response body from the result of

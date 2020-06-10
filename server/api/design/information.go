@@ -7,8 +7,14 @@ import (
 var StationConfiguration = Type("StationConfiguration", func() {
 	Attribute("id", Int64)
 	Attribute("time", Int64)
+	Attribute("provision_id", Int64)
+	Attribute("meta_record_id", Int64)
+	Attribute("source_id", Int32)
+	Attribute("modules", ArrayOf(StationModule))
 	Required("id")
+	Required("provision_id")
 	Required("time")
+	Required("modules")
 })
 
 var DeviceLayoutResponse = ResultType("application/vnd.app.data.device.layout", func() {

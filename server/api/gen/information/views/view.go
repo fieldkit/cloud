@@ -27,7 +27,36 @@ type DeviceLayoutResponseView struct {
 
 // StationConfigurationView is a type that runs validations on a projected type.
 type StationConfigurationView struct {
-	ID   *int64
+	ID           *int64
+	Time         *int64
+	ProvisionID  *int64
+	MetaRecordID *int64
+	SourceID     *int32
+	Modules      []*StationModuleView
+}
+
+// StationModuleView is a type that runs validations on a projected type.
+type StationModuleView struct {
+	ID           *int64
+	HardwareID   *string
+	MetaRecordID *int64
+	Name         *string
+	Position     *int32
+	Flags        *int32
+	Internal     *bool
+	Sensors      []*StationSensorView
+}
+
+// StationSensorView is a type that runs validations on a projected type.
+type StationSensorView struct {
+	Name          *string
+	UnitOfMeasure *string
+	Reading       *SensorReadingView
+}
+
+// SensorReadingView is a type that runs validations on a projected type.
+type SensorReadingView struct {
+	Last *float32
 	Time *int64
 }
 
@@ -74,6 +103,76 @@ func ValidateDeviceLayoutResponseView(result *DeviceLayoutResponseView) (err err
 func ValidateStationConfigurationView(result *StationConfigurationView) (err error) {
 	if result.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.ProvisionID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("provision_id", "result"))
+	}
+	if result.Time == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("time", "result"))
+	}
+	if result.Modules == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("modules", "result"))
+	}
+	for _, e := range result.Modules {
+		if e != nil {
+			if err2 := ValidateStationModuleView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateStationModuleView runs the validations defined on StationModuleView.
+func ValidateStationModuleView(result *StationModuleView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	if result.Position == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("position", "result"))
+	}
+	if result.Flags == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("flags", "result"))
+	}
+	if result.Internal == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("internal", "result"))
+	}
+	if result.Sensors == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("sensors", "result"))
+	}
+	for _, e := range result.Sensors {
+		if e != nil {
+			if err2 := ValidateStationSensorView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateStationSensorView runs the validations defined on StationSensorView.
+func ValidateStationSensorView(result *StationSensorView) (err error) {
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	if result.UnitOfMeasure == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "result"))
+	}
+	if result.Reading != nil {
+		if err2 := ValidateSensorReadingView(result.Reading); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateSensorReadingView runs the validations defined on SensorReadingView.
+func ValidateSensorReadingView(result *SensorReadingView) (err error) {
+	if result.Last == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("last", "result"))
 	}
 	if result.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "result"))

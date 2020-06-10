@@ -39,8 +39,37 @@ type DeviceLayoutUnauthorizedResponseBody string
 // StationConfigurationResponseBody is used to define fields on response body
 // types.
 type StationConfigurationResponseBody struct {
-	ID   *int64 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Time *int64 `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
+	ID           *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Time         *int64                       `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
+	ProvisionID  *int64                       `form:"provision_id,omitempty" json:"provision_id,omitempty" xml:"provision_id,omitempty"`
+	MetaRecordID *int64                       `form:"meta_record_id,omitempty" json:"meta_record_id,omitempty" xml:"meta_record_id,omitempty"`
+	SourceID     *int32                       `form:"source_id,omitempty" json:"source_id,omitempty" xml:"source_id,omitempty"`
+	Modules      []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
+}
+
+// StationModuleResponseBody is used to define fields on response body types.
+type StationModuleResponseBody struct {
+	ID           *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	HardwareID   *string                      `form:"hardware_id,omitempty" json:"hardware_id,omitempty" xml:"hardware_id,omitempty"`
+	MetaRecordID *int64                       `form:"meta_record_id,omitempty" json:"meta_record_id,omitempty" xml:"meta_record_id,omitempty"`
+	Name         *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Position     *int32                       `form:"position,omitempty" json:"position,omitempty" xml:"position,omitempty"`
+	Flags        *int32                       `form:"flags,omitempty" json:"flags,omitempty" xml:"flags,omitempty"`
+	Internal     *bool                        `form:"internal,omitempty" json:"internal,omitempty" xml:"internal,omitempty"`
+	Sensors      []*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
+}
+
+// StationSensorResponseBody is used to define fields on response body types.
+type StationSensorResponseBody struct {
+	Name          *string                    `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	UnitOfMeasure *string                    `form:"unit_of_measure,omitempty" json:"unit_of_measure,omitempty" xml:"unit_of_measure,omitempty"`
+	Reading       *SensorReadingResponseBody `form:"reading,omitempty" json:"reading,omitempty" xml:"reading,omitempty"`
+}
+
+// SensorReadingResponseBody is used to define fields on response body types.
+type SensorReadingResponseBody struct {
+	Last *float32 `form:"last,omitempty" json:"last,omitempty" xml:"last,omitempty"`
+	Time *int64   `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
 }
 
 // NewDeviceLayoutResponseViewOK builds a "information" service "device layout"
@@ -88,6 +117,79 @@ func NewDeviceLayoutUnauthorized(body DeviceLayoutUnauthorizedResponseBody) info
 func ValidateStationConfigurationResponseBody(body *StationConfigurationResponseBody) (err error) {
 	if body.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.ProvisionID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("provision_id", "body"))
+	}
+	if body.Time == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("time", "body"))
+	}
+	if body.Modules == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("modules", "body"))
+	}
+	for _, e := range body.Modules {
+		if e != nil {
+			if err2 := ValidateStationModuleResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateStationModuleResponseBody runs the validations defined on
+// StationModuleResponseBody
+func ValidateStationModuleResponseBody(body *StationModuleResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Position == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("position", "body"))
+	}
+	if body.Flags == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("flags", "body"))
+	}
+	if body.Internal == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("internal", "body"))
+	}
+	if body.Sensors == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("sensors", "body"))
+	}
+	for _, e := range body.Sensors {
+		if e != nil {
+			if err2 := ValidateStationSensorResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateStationSensorResponseBody runs the validations defined on
+// StationSensorResponseBody
+func ValidateStationSensorResponseBody(body *StationSensorResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.UnitOfMeasure == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "body"))
+	}
+	if body.Reading != nil {
+		if err2 := ValidateSensorReadingResponseBody(body.Reading); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateSensorReadingResponseBody runs the validations defined on
+// SensorReadingResponseBody
+func ValidateSensorReadingResponseBody(body *SensorReadingResponseBody) (err error) {
+	if body.Last == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("last", "body"))
 	}
 	if body.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "body"))
