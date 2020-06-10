@@ -42,6 +42,9 @@ import (
 
 	ingestionSvr "github.com/fieldkit/cloud/server/api/gen/http/ingestion/server"
 	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
+
+	informationSvr "github.com/fieldkit/cloud/server/api/gen/http/information/server"
+	information "github.com/fieldkit/cloud/server/api/gen/information"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -72,6 +75,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	ingestionSvc := NewIngestionService(ctx, options)
 	ingestionEndpoints := ingestion.NewEndpoints(ingestionSvc)
 
+	informationSvc := NewInformationService(ctx, options)
+	informationEndpoints := information.NewEndpoints(informationSvc)
+
 	logErrors := logErrors()
 
 	modulesEndpoints.Use(logErrors)
@@ -83,6 +89,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	stationEndpoints.Use(logErrors)
 	userEndpoints.Use(logErrors)
 	ingestionEndpoints.Use(logErrors)
+	informationEndpoints.Use(logErrors)
 
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
@@ -103,6 +110,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	stationServer := stationSvr.New(stationEndpoints, mux, dec, enc, eh, nil)
 	userServer := userSvr.New(userEndpoints, mux, dec, enc, eh, nil)
 	ingestionServer := ingestionSvr.New(ingestionEndpoints, mux, dec, enc, eh, nil)
+	informationServer := informationSvr.New(informationEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
@@ -113,6 +121,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	stationSvr.Mount(mux, stationServer)
 	userSvr.Mount(mux, userServer)
 	ingestionSvr.Mount(mux, ingestionServer)
+	informationSvr.Mount(mux, informationServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -141,6 +150,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range ingestionServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range informationServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 

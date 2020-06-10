@@ -15,6 +15,7 @@ import (
 
 	activityc "github.com/fieldkit/cloud/server/api/gen/http/activity/client"
 	followingc "github.com/fieldkit/cloud/server/api/gen/http/following/client"
+	informationc "github.com/fieldkit/cloud/server/api/gen/http/information/client"
 	ingestionc "github.com/fieldkit/cloud/server/api/gen/http/ingestion/client"
 	modulesc "github.com/fieldkit/cloud/server/api/gen/http/modules/client"
 	projectc "github.com/fieldkit/cloud/server/api/gen/http/project/client"
@@ -33,6 +34,7 @@ import (
 func UsageCommands() string {
 	return `activity (station|project)
 following (follow|unfollow|followers)
+information device- layout
 ingestion (process- pending|process- station|process- ingestion|delete)
 modules meta
 project (add- update|delete- update|modify- update|invites|lookup- invite|accept- invite|reject- invite)
@@ -45,13 +47,11 @@ user (roles|delete)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 1327113504597199755 --page 6518025690802732633 --auth "Autem nemo similique cupiditate."` + "\n" +
-		os.Args[0] + ` following follow --id 32189367394102167 --auth "Ad iusto molestias cumque rerum labore."` + "\n" +
-		os.Args[0] + ` ingestion process- pending --auth "Reprehenderit nulla odio."` + "\n" +
+	return os.Args[0] + ` activity station --id 3653725060896349762 --page 4329877239207155785 --auth "Aliquid quibusdam."` + "\n" +
+		os.Args[0] + ` following follow --id 482735197326932755 --auth "Iusto tenetur dolorem nam."` + "\n" +
+		os.Args[0] + ` information device- layout --device-id "Laborum modi distinctio ea et dolor iure." --auth "Odio quod quis."` + "\n" +
+		os.Args[0] + ` ingestion process- pending --auth "A provident aut quia voluptas similique."` + "\n" +
 		os.Args[0] + ` modules meta` + "\n" +
-		os.Args[0] + ` project add- update --body '{
-      "body": "Neque fugit similique."
-   }' --project-id 1070587988 --auth "Deserunt velit minima dignissimos."` + "\n" +
 		""
 }
 
@@ -90,6 +90,12 @@ func ParseEndpoint(
 		followingFollowersFlags    = flag.NewFlagSet("followers", flag.ExitOnError)
 		followingFollowersIDFlag   = followingFollowersFlags.String("id", "REQUIRED", "")
 		followingFollowersPageFlag = followingFollowersFlags.String("page", "", "")
+
+		informationFlags = flag.NewFlagSet("information", flag.ContinueOnError)
+
+		informationDeviceLayoutFlags        = flag.NewFlagSet("device- layout", flag.ExitOnError)
+		informationDeviceLayoutDeviceIDFlag = informationDeviceLayoutFlags.String("device-id", "REQUIRED", "")
+		informationDeviceLayoutAuthFlag     = informationDeviceLayoutFlags.String("auth", "REQUIRED", "")
 
 		ingestionFlags = flag.NewFlagSet("ingestion", flag.ContinueOnError)
 
@@ -210,6 +216,9 @@ func ParseEndpoint(
 	followingUnfollowFlags.Usage = followingUnfollowUsage
 	followingFollowersFlags.Usage = followingFollowersUsage
 
+	informationFlags.Usage = informationUsage
+	informationDeviceLayoutFlags.Usage = informationDeviceLayoutUsage
+
 	ingestionFlags.Usage = ingestionUsage
 	ingestionProcessPendingFlags.Usage = ingestionProcessPendingUsage
 	ingestionProcessStationFlags.Usage = ingestionProcessStationUsage
@@ -268,6 +277,8 @@ func ParseEndpoint(
 			svcf = activityFlags
 		case "following":
 			svcf = followingFlags
+		case "information":
+			svcf = informationFlags
 		case "ingestion":
 			svcf = ingestionFlags
 		case "modules":
@@ -317,6 +328,13 @@ func ParseEndpoint(
 
 			case "followers":
 				epf = followingFollowersFlags
+
+			}
+
+		case "information":
+			switch epn {
+			case "device- layout":
+				epf = informationDeviceLayoutFlags
 
 			}
 
@@ -466,6 +484,13 @@ func ParseEndpoint(
 				endpoint = c.Followers()
 				data, err = followingc.BuildFollowersPayload(*followingFollowersIDFlag, *followingFollowersPageFlag)
 			}
+		case "information":
+			c := informationc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "device- layout":
+				endpoint = c.DeviceLayout()
+				data, err = informationc.BuildDeviceLayoutPayload(*informationDeviceLayoutDeviceIDFlag, *informationDeviceLayoutAuthFlag)
+			}
 		case "ingestion":
 			c := ingestionc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -601,7 +626,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 1327113504597199755 --page 6518025690802732633 --auth "Autem nemo similique cupiditate."
+    `+os.Args[0]+` activity station --id 3653725060896349762 --page 4329877239207155785 --auth "Aliquid quibusdam."
 `, os.Args[0])
 }
 
@@ -614,7 +639,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 5939953991624838981 --page 7938282212268354146 --auth "Id quibusdam autem reprehenderit."
+    `+os.Args[0]+` activity project --id 1118095373303354860 --page 4300119959110271883 --auth "Ea dolorem adipisci ab."
 `, os.Args[0])
 }
 
@@ -642,7 +667,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 32189367394102167 --auth "Ad iusto molestias cumque rerum labore."
+    `+os.Args[0]+` following follow --id 482735197326932755 --auth "Iusto tenetur dolorem nam."
 `, os.Args[0])
 }
 
@@ -654,7 +679,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 2324590973270599946 --auth "Velit ut."
+    `+os.Args[0]+` following unfollow --id 2656240646542152529 --auth "Quaerat saepe ut facilis aut maiores reiciendis."
 `, os.Args[0])
 }
 
@@ -666,7 +691,33 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 1517587950686835149 --page 6709382594543697803
+    `+os.Args[0]+` following followers --id 7270078166221851252 --page 2540907880526789763
+`, os.Args[0])
+}
+
+// informationUsage displays the usage of the information command and its
+// subcommands.
+func informationUsage() {
+	fmt.Fprintf(os.Stderr, `Service is the information service interface.
+Usage:
+    %s [globalflags] information COMMAND [flags]
+
+COMMAND:
+    device- layout: DeviceLayout implements device layout.
+
+Additional help:
+    %s information COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func informationDeviceLayoutUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] information device- layout -device-id STRING -auth STRING
+
+DeviceLayout implements device layout.
+    -device-id STRING: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` information device- layout --device-id "Laborum modi distinctio ea et dolor iure." --auth "Odio quod quis."
 `, os.Args[0])
 }
 
@@ -694,7 +745,7 @@ ProcessPending implements process pending.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- pending --auth "Reprehenderit nulla odio."
+    `+os.Args[0]+` ingestion process- pending --auth "A provident aut quia voluptas similique."
 `, os.Args[0])
 }
 
@@ -706,7 +757,7 @@ ProcessStation implements process station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- station --station-id 1985242354 --auth "Veniam esse et repellendus sit unde."
+    `+os.Args[0]+` ingestion process- station --station-id 1467085676 --auth "Nisi amet iure odit maiores fugiat."
 `, os.Args[0])
 }
 
@@ -718,7 +769,7 @@ ProcessIngestion implements process ingestion.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- ingestion --ingestion-id 8145841929511294902 --auth "Est sequi vel velit."
+    `+os.Args[0]+` ingestion process- ingestion --ingestion-id 4134045918724087180 --auth "Voluptatem consequatur reprehenderit necessitatibus voluptas esse occaecati."
 `, os.Args[0])
 }
 
@@ -730,7 +781,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion delete --ingestion-id 8291186375213697380 --auth "Labore doloribus voluptas consequuntur illum dolores quo."
+    `+os.Args[0]+` ingestion delete --ingestion-id 4992683146127505739 --auth "Sed excepturi est."
 `, os.Args[0])
 }
 
@@ -786,8 +837,8 @@ AddUpdate implements add update.
 
 Example:
     `+os.Args[0]+` project add- update --body '{
-      "body": "Neque fugit similique."
-   }' --project-id 1070587988 --auth "Deserunt velit minima dignissimos."
+      "body": "Sequi qui."
+   }' --project-id 1371400764 --auth "Minima dignissimos."
 `, os.Args[0])
 }
 
