@@ -100,8 +100,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("images", ArrayOf(StationFullImageRef))
 		Attribute("photos", StationFullPhotos)
 		Attribute("read_only", Boolean)
-		Attribute("status_json", MapOf(String, Any))
-		Required("id", "name", "owner", "device_id", "uploads", "images", "photos", "read_only", "status_json")
+		Required("id", "name", "owner", "device_id", "uploads", "images", "photos", "read_only")
 
 		Attribute("battery", Float32)
 		Attribute("recording_started_at", Int64)
@@ -126,7 +125,6 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("images")
 		Attribute("photos")
 		Attribute("read_only")
-		Attribute("status_json")
 
 		Attribute("battery")
 		Attribute("recording_started_at")

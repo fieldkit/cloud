@@ -37,7 +37,6 @@ type StationFullView struct {
 	Images             []*ImageRefView
 	Photos             *StationPhotosView
 	ReadOnly           *bool
-	StatusJSON         map[string]interface{}
 	Battery            *float32
 	RecordingStartedAt *int64
 	MemoryUsed         *int32
@@ -154,7 +153,6 @@ var (
 			"images",
 			"photos",
 			"read_only",
-			"status_json",
 			"battery",
 			"recording_started_at",
 			"memory_used",
@@ -186,7 +184,6 @@ var (
 			"images",
 			"photos",
 			"read_only",
-			"status_json",
 			"battery",
 			"recording_started_at",
 			"memory_used",
@@ -251,9 +248,6 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	}
 	if result.ReadOnly == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("read_only", "result"))
-	}
-	if result.StatusJSON == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "result"))
 	}
 	if result.Configurations == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("configurations", "result"))

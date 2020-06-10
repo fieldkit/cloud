@@ -47,8 +47,7 @@ func TestGetStationsMine(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"read_only": "<<PRESENCE>>",
-				"configurations": { "all": [] },
-				"status_json": "<<PRESENCE>>"
+				"configurations": { "all": [] }
 			},
 			{
 				"id": "<<PRESENCE>>",
@@ -60,8 +59,7 @@ func TestGetStationsMine(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"read_only": "<<PRESENCE>>",
-				"configurations": { "all": [] },
-				"status_json": "<<PRESENCE>>"
+				"configurations": { "all": [] }
 			},
 			{
 				"id": "<<PRESENCE>>",
@@ -73,8 +71,7 @@ func TestGetStationsMine(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"read_only": "<<PRESENCE>>",
-				"configurations": { "all": [] },
-				"status_json": "<<PRESENCE>>"
+				"configurations": { "all": [] }
 			},
 			{
 				"id": "<<PRESENCE>>",
@@ -86,8 +83,7 @@ func TestGetStationsMine(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"read_only": "<<PRESENCE>>",
-				"configurations": { "all": [] },
-				"status_json": "<<PRESENCE>>"
+				"configurations": { "all": [] }
 			},
 			{
 				"id": "<<PRESENCE>>",
@@ -99,8 +95,7 @@ func TestGetStationsMine(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"read_only": "<<PRESENCE>>",
-				"configurations": { "all": [] },
-				"status_json": "<<PRESENCE>>"
+				"configurations": { "all": [] }
 			}
 		]
 	}`)
@@ -135,7 +130,6 @@ func TestGetStation(t *testing.T) {
 		"name": "<<PRESENCE>>",
 		"photos": "<<PRESENCE>>",
 		"read_only": "<<PRESENCE>>",
-		"status_json": "<<PRESENCE>>",
 		"configurations": { "all": [] }
 	}`)
 }
@@ -171,8 +165,7 @@ func TestGetStationsProject(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"read_only": "<<PRESENCE>>",
-				"configurations": { "all": [] },
-				"status_json": "<<PRESENCE>>"
+				"configurations": { "all": [] }
 			},
 			{
 				"id": "<<PRESENCE>>",
@@ -184,8 +177,7 @@ func TestGetStationsProject(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"read_only": "<<PRESENCE>>",
-				"configurations": { "all": [] },
-				"status_json": "<<PRESENCE>>"
+				"configurations": { "all": [] }
 			},
 			{
 				"id": "<<PRESENCE>>",
@@ -197,8 +189,7 @@ func TestGetStationsProject(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"read_only": "<<PRESENCE>>",
-				"configurations": { "all": [] },
-				"status_json": "<<PRESENCE>>"
+				"configurations": { "all": [] }
 			},
 			{
 				"id": "<<PRESENCE>>",
@@ -210,8 +201,7 @@ func TestGetStationsProject(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"read_only": "<<PRESENCE>>",
-				"configurations": { "all": [] },
-				"status_json": "<<PRESENCE>>"
+				"configurations": { "all": [] }
 			},
 			{
 				"id": "<<PRESENCE>>",
@@ -223,8 +213,7 @@ func TestGetStationsProject(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"read_only": "<<PRESENCE>>",
-				"configurations": { "all": [] },
-				"status_json": "<<PRESENCE>>"
+				"configurations": { "all": [] }
 			}
 		]
 	}`)
@@ -511,7 +500,6 @@ func TestGetStationUpdatedWithProtobufStatus(t *testing.T) {
 		"location": "<<PRESENCE>>",
 		"memory_used": "<<PRESENCE>>",
 		"memory_available": "<<PRESENCE>>",
-		"status_json": "<<PRESENCE>>",
 		"configurations": { "all": [ "<<PRESENCE>>" ] }
 	}`)
 }

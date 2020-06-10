@@ -160,8 +160,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 							"modules": [ "<<PRESENCE>>", "<<PRESENCE>>" ]
 						}
 					]
-				},
-				"status_json": "<<PRESENCE>>"
+				}
 			}
 		]
 	}`)

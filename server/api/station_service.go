@@ -430,11 +430,6 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 		return nil, err
 	}
 
-	status, err := sf.Station.GetStatus()
-	if err != nil {
-		return nil, err
-	}
-
 	configurations := transformConfigurations(sf)
 
 	return &station.StationFull{
@@ -447,7 +442,6 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 		Configurations: &station.StationConfigurations{
 			All: configurations,
 		},
-		StatusJSON:      status,
 		Battery:         sf.Station.Battery,
 		MemoryUsed:      sf.Station.MemoryUsed,
 		MemoryAvailable: sf.Station.MemoryAvailable,

@@ -922,14 +922,6 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 	if v.Photos != nil {
 		res.Photos = marshalStationviewsStationPhotosViewToStationPhotosResponseBody(v.Photos)
 	}
-	if v.StatusJSON != nil {
-		res.StatusJSON = make(map[string]interface{}, len(v.StatusJSON))
-		for key, val := range v.StatusJSON {
-			tk := key
-			tv := val
-			res.StatusJSON[tk] = tv
-		}
-	}
 	if v.Configurations != nil {
 		res.Configurations = marshalStationviewsStationConfigurationsViewToStationConfigurationsResponseBody(v.Configurations)
 	}
