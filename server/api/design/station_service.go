@@ -78,6 +78,11 @@ var StationConfiguration = Type("StationConfiguration", func() {
 	Required("modules")
 })
 
+var StationConfigurations = Type("StationConfigurations", func() {
+	Attribute("all", ArrayOf(StationConfiguration))
+	Required("all")
+})
+
 var StationLocation = Type("StationLocation", func() {
 	Attribute("latitude", Float64)
 	Attribute("longitude", Float64)
@@ -104,7 +109,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("memory_available", Int32)
 		Attribute("firmware_number", Int32)
 		Attribute("firmware_time", Int64)
-		Attribute("configurations", ArrayOf(StationConfiguration))
+		Attribute("configurations", StationConfigurations)
 		Required("configurations")
 
 		Attribute("updated", Int64)

@@ -35,73 +35,73 @@ type UpdateRequestBody struct {
 // AddResponseBody is the type of the "station" service "add" endpoint HTTP
 // response body.
 type AddResponseBody struct {
-	ID                 int32                               `form:"id" json:"id" xml:"id"`
-	Name               string                              `form:"name" json:"name" xml:"name"`
-	Owner              *StationOwnerResponseBody           `form:"owner" json:"owner" xml:"owner"`
-	DeviceID           string                              `form:"device_id" json:"device_id" xml:"device_id"`
-	Uploads            []*StationUploadResponseBody        `form:"uploads" json:"uploads" xml:"uploads"`
-	Images             []*ImageRefResponseBody             `form:"images" json:"images" xml:"images"`
-	Photos             *StationPhotosResponseBody          `form:"photos" json:"photos" xml:"photos"`
-	ReadOnly           bool                                `form:"read_only" json:"read_only" xml:"read_only"`
-	StatusJSON         map[string]interface{}              `form:"status_json" json:"status_json" xml:"status_json"`
-	Battery            *float32                            `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
-	RecordingStartedAt *int64                              `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
-	MemoryUsed         *int32                              `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
-	MemoryAvailable    *int32                              `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
-	FirmwareNumber     *int32                              `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
-	FirmwareTime       *int64                              `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
-	Configurations     []*StationConfigurationResponseBody `form:"configurations" json:"configurations" xml:"configurations"`
-	Updated            int64                               `form:"updated" json:"updated" xml:"updated"`
-	Location           *StationLocationResponseBody        `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-	LocationName       *string                             `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	ID                 int32                              `form:"id" json:"id" xml:"id"`
+	Name               string                             `form:"name" json:"name" xml:"name"`
+	Owner              *StationOwnerResponseBody          `form:"owner" json:"owner" xml:"owner"`
+	DeviceID           string                             `form:"device_id" json:"device_id" xml:"device_id"`
+	Uploads            []*StationUploadResponseBody       `form:"uploads" json:"uploads" xml:"uploads"`
+	Images             []*ImageRefResponseBody            `form:"images" json:"images" xml:"images"`
+	Photos             *StationPhotosResponseBody         `form:"photos" json:"photos" xml:"photos"`
+	ReadOnly           bool                               `form:"read_only" json:"read_only" xml:"read_only"`
+	StatusJSON         map[string]interface{}             `form:"status_json" json:"status_json" xml:"status_json"`
+	Battery            *float32                           `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
+	RecordingStartedAt *int64                             `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
+	MemoryUsed         *int32                             `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
+	MemoryAvailable    *int32                             `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
+	FirmwareNumber     *int32                             `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
+	FirmwareTime       *int64                             `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	Configurations     *StationConfigurationsResponseBody `form:"configurations" json:"configurations" xml:"configurations"`
+	Updated            int64                              `form:"updated" json:"updated" xml:"updated"`
+	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	LocationName       *string                            `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
 }
 
 // GetResponseBody is the type of the "station" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
-	ID                 int32                               `form:"id" json:"id" xml:"id"`
-	Name               string                              `form:"name" json:"name" xml:"name"`
-	Owner              *StationOwnerResponseBody           `form:"owner" json:"owner" xml:"owner"`
-	DeviceID           string                              `form:"device_id" json:"device_id" xml:"device_id"`
-	Uploads            []*StationUploadResponseBody        `form:"uploads" json:"uploads" xml:"uploads"`
-	Images             []*ImageRefResponseBody             `form:"images" json:"images" xml:"images"`
-	Photos             *StationPhotosResponseBody          `form:"photos" json:"photos" xml:"photos"`
-	ReadOnly           bool                                `form:"read_only" json:"read_only" xml:"read_only"`
-	StatusJSON         map[string]interface{}              `form:"status_json" json:"status_json" xml:"status_json"`
-	Battery            *float32                            `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
-	RecordingStartedAt *int64                              `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
-	MemoryUsed         *int32                              `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
-	MemoryAvailable    *int32                              `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
-	FirmwareNumber     *int32                              `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
-	FirmwareTime       *int64                              `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
-	Configurations     []*StationConfigurationResponseBody `form:"configurations" json:"configurations" xml:"configurations"`
-	Updated            int64                               `form:"updated" json:"updated" xml:"updated"`
-	Location           *StationLocationResponseBody        `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-	LocationName       *string                             `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	ID                 int32                              `form:"id" json:"id" xml:"id"`
+	Name               string                             `form:"name" json:"name" xml:"name"`
+	Owner              *StationOwnerResponseBody          `form:"owner" json:"owner" xml:"owner"`
+	DeviceID           string                             `form:"device_id" json:"device_id" xml:"device_id"`
+	Uploads            []*StationUploadResponseBody       `form:"uploads" json:"uploads" xml:"uploads"`
+	Images             []*ImageRefResponseBody            `form:"images" json:"images" xml:"images"`
+	Photos             *StationPhotosResponseBody         `form:"photos" json:"photos" xml:"photos"`
+	ReadOnly           bool                               `form:"read_only" json:"read_only" xml:"read_only"`
+	StatusJSON         map[string]interface{}             `form:"status_json" json:"status_json" xml:"status_json"`
+	Battery            *float32                           `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
+	RecordingStartedAt *int64                             `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
+	MemoryUsed         *int32                             `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
+	MemoryAvailable    *int32                             `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
+	FirmwareNumber     *int32                             `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
+	FirmwareTime       *int64                             `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	Configurations     *StationConfigurationsResponseBody `form:"configurations" json:"configurations" xml:"configurations"`
+	Updated            int64                              `form:"updated" json:"updated" xml:"updated"`
+	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	LocationName       *string                            `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
 }
 
 // UpdateResponseBody is the type of the "station" service "update" endpoint
 // HTTP response body.
 type UpdateResponseBody struct {
-	ID                 int32                               `form:"id" json:"id" xml:"id"`
-	Name               string                              `form:"name" json:"name" xml:"name"`
-	Owner              *StationOwnerResponseBody           `form:"owner" json:"owner" xml:"owner"`
-	DeviceID           string                              `form:"device_id" json:"device_id" xml:"device_id"`
-	Uploads            []*StationUploadResponseBody        `form:"uploads" json:"uploads" xml:"uploads"`
-	Images             []*ImageRefResponseBody             `form:"images" json:"images" xml:"images"`
-	Photos             *StationPhotosResponseBody          `form:"photos" json:"photos" xml:"photos"`
-	ReadOnly           bool                                `form:"read_only" json:"read_only" xml:"read_only"`
-	StatusJSON         map[string]interface{}              `form:"status_json" json:"status_json" xml:"status_json"`
-	Battery            *float32                            `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
-	RecordingStartedAt *int64                              `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
-	MemoryUsed         *int32                              `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
-	MemoryAvailable    *int32                              `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
-	FirmwareNumber     *int32                              `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
-	FirmwareTime       *int64                              `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
-	Configurations     []*StationConfigurationResponseBody `form:"configurations" json:"configurations" xml:"configurations"`
-	Updated            int64                               `form:"updated" json:"updated" xml:"updated"`
-	Location           *StationLocationResponseBody        `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-	LocationName       *string                             `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	ID                 int32                              `form:"id" json:"id" xml:"id"`
+	Name               string                             `form:"name" json:"name" xml:"name"`
+	Owner              *StationOwnerResponseBody          `form:"owner" json:"owner" xml:"owner"`
+	DeviceID           string                             `form:"device_id" json:"device_id" xml:"device_id"`
+	Uploads            []*StationUploadResponseBody       `form:"uploads" json:"uploads" xml:"uploads"`
+	Images             []*ImageRefResponseBody            `form:"images" json:"images" xml:"images"`
+	Photos             *StationPhotosResponseBody         `form:"photos" json:"photos" xml:"photos"`
+	ReadOnly           bool                               `form:"read_only" json:"read_only" xml:"read_only"`
+	StatusJSON         map[string]interface{}             `form:"status_json" json:"status_json" xml:"status_json"`
+	Battery            *float32                           `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
+	RecordingStartedAt *int64                             `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
+	MemoryUsed         *int32                             `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
+	MemoryAvailable    *int32                             `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
+	FirmwareNumber     *int32                             `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
+	FirmwareTime       *int64                             `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	Configurations     *StationConfigurationsResponseBody `form:"configurations" json:"configurations" xml:"configurations"`
+	Updated            int64                              `form:"updated" json:"updated" xml:"updated"`
+	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	LocationName       *string                            `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
 }
 
 // ListMineResponseBody is the type of the "station" service "list mine"
@@ -239,6 +239,12 @@ type StationPhotosResponseBody struct {
 	Small string `form:"small" json:"small" xml:"small"`
 }
 
+// StationConfigurationsResponseBody is used to define fields on response body
+// types.
+type StationConfigurationsResponseBody struct {
+	All []*StationConfigurationResponseBody `form:"all" json:"all" xml:"all"`
+}
+
 // StationConfigurationResponseBody is used to define fields on response body
 // types.
 type StationConfigurationResponseBody struct {
@@ -295,25 +301,25 @@ type StationFullResponseBodyCollection []*StationFullResponseBody
 
 // StationFullResponseBody is used to define fields on response body types.
 type StationFullResponseBody struct {
-	ID                 int32                               `form:"id" json:"id" xml:"id"`
-	Name               string                              `form:"name" json:"name" xml:"name"`
-	Owner              *StationOwnerResponseBody           `form:"owner" json:"owner" xml:"owner"`
-	DeviceID           string                              `form:"device_id" json:"device_id" xml:"device_id"`
-	Uploads            []*StationUploadResponseBody        `form:"uploads" json:"uploads" xml:"uploads"`
-	Images             []*ImageRefResponseBody             `form:"images" json:"images" xml:"images"`
-	Photos             *StationPhotosResponseBody          `form:"photos" json:"photos" xml:"photos"`
-	ReadOnly           bool                                `form:"read_only" json:"read_only" xml:"read_only"`
-	StatusJSON         map[string]interface{}              `form:"status_json" json:"status_json" xml:"status_json"`
-	Battery            *float32                            `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
-	RecordingStartedAt *int64                              `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
-	MemoryUsed         *int32                              `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
-	MemoryAvailable    *int32                              `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
-	FirmwareNumber     *int32                              `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
-	FirmwareTime       *int64                              `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
-	Configurations     []*StationConfigurationResponseBody `form:"configurations" json:"configurations" xml:"configurations"`
-	Updated            int64                               `form:"updated" json:"updated" xml:"updated"`
-	Location           *StationLocationResponseBody        `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-	LocationName       *string                             `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	ID                 int32                              `form:"id" json:"id" xml:"id"`
+	Name               string                             `form:"name" json:"name" xml:"name"`
+	Owner              *StationOwnerResponseBody          `form:"owner" json:"owner" xml:"owner"`
+	DeviceID           string                             `form:"device_id" json:"device_id" xml:"device_id"`
+	Uploads            []*StationUploadResponseBody       `form:"uploads" json:"uploads" xml:"uploads"`
+	Images             []*ImageRefResponseBody            `form:"images" json:"images" xml:"images"`
+	Photos             *StationPhotosResponseBody         `form:"photos" json:"photos" xml:"photos"`
+	ReadOnly           bool                               `form:"read_only" json:"read_only" xml:"read_only"`
+	StatusJSON         map[string]interface{}             `form:"status_json" json:"status_json" xml:"status_json"`
+	Battery            *float32                           `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
+	RecordingStartedAt *int64                             `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
+	MemoryUsed         *int32                             `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
+	MemoryAvailable    *int32                             `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
+	FirmwareNumber     *int32                             `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
+	FirmwareTime       *int64                             `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	Configurations     *StationConfigurationsResponseBody `form:"configurations" json:"configurations" xml:"configurations"`
+	Updated            int64                              `form:"updated" json:"updated" xml:"updated"`
+	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	LocationName       *string                            `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
 }
 
 // NewAddResponseBody builds the HTTP response body from the result of the
@@ -360,10 +366,7 @@ func NewAddResponseBody(res *stationviews.StationFullView) *AddResponseBody {
 		}
 	}
 	if res.Configurations != nil {
-		body.Configurations = make([]*StationConfigurationResponseBody, len(res.Configurations))
-		for i, val := range res.Configurations {
-			body.Configurations[i] = marshalStationviewsStationConfigurationViewToStationConfigurationResponseBody(val)
-		}
+		body.Configurations = marshalStationviewsStationConfigurationsViewToStationConfigurationsResponseBody(res.Configurations)
 	}
 	if res.Location != nil {
 		body.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(res.Location)
@@ -415,10 +418,7 @@ func NewGetResponseBody(res *stationviews.StationFullView) *GetResponseBody {
 		}
 	}
 	if res.Configurations != nil {
-		body.Configurations = make([]*StationConfigurationResponseBody, len(res.Configurations))
-		for i, val := range res.Configurations {
-			body.Configurations[i] = marshalStationviewsStationConfigurationViewToStationConfigurationResponseBody(val)
-		}
+		body.Configurations = marshalStationviewsStationConfigurationsViewToStationConfigurationsResponseBody(res.Configurations)
 	}
 	if res.Location != nil {
 		body.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(res.Location)
@@ -470,10 +470,7 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 		}
 	}
 	if res.Configurations != nil {
-		body.Configurations = make([]*StationConfigurationResponseBody, len(res.Configurations))
-		for i, val := range res.Configurations {
-			body.Configurations[i] = marshalStationviewsStationConfigurationViewToStationConfigurationResponseBody(val)
-		}
+		body.Configurations = marshalStationviewsStationConfigurationsViewToStationConfigurationsResponseBody(res.Configurations)
 	}
 	if res.Location != nil {
 		body.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(res.Location)

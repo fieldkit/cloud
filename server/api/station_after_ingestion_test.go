@@ -17,7 +17,7 @@ import (
 	"github.com/fieldkit/cloud/server/tests"
 )
 
-func TestQueryStationWithOneConfiguration(t *testing.T) {
+func TestQueryStationWithConfigurations(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -97,68 +97,70 @@ func TestQueryStationWithOneConfiguration(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"read_only": "<<PRESENCE>>",
-				"configurations": [
-					{
-						"id": "<<PRESENCE>>",
-						"provision_id": "<<PRESENCE>>",
-						"time": "<<PRESENCE>>",
-						"modules": [
-							{
-								"id": "<<PRESENCE>>",
-								"flags": "<<PRESENCE>>",
-								"hardware_id": "<<PRESENCE>>",
-								"internal": "<<PRESENCE>>",
-								"name": "<<PRESENCE>>",
-								"position": "<<PRESENCE>>",
-								"sensors": [
-									{ "key": "", "name": "random_0", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_1", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_2", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_3", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_4", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" }
-								]
-							},
-							{
-								"id": "<<PRESENCE>>",
-								"flags": "<<PRESENCE>>",
-								"hardware_id": "<<PRESENCE>>",
-								"internal": "<<PRESENCE>>",
-								"name": "<<PRESENCE>>",
-								"position": "<<PRESENCE>>",
-								"sensors": [
-									{ "key": "", "name": "random_0", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_1", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_2", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_3", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_4", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_5", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_6", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_7", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_8", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
-									{ "key": "", "name": "random_9", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" }
-								]
-							}
-						]
-					},
-					{
-						"id": "<<PRESENCE>>",
-						"provision_id": "<<PRESENCE>>",
-						"time": "<<PRESENCE>>",
-						"modules": [ "<<PRESENCE>>", "<<PRESENCE>>" ]
-					},
-					{
-						"id": "<<PRESENCE>>",
-						"provision_id": "<<PRESENCE>>",
-						"time": "<<PRESENCE>>",
-						"modules": [ "<<PRESENCE>>", "<<PRESENCE>>" ]
-					},
-					{
-						"id": "<<PRESENCE>>",
-						"provision_id": "<<PRESENCE>>",
-						"time": "<<PRESENCE>>",
-						"modules": [ "<<PRESENCE>>", "<<PRESENCE>>" ]
-					}
-				],
+				"configurations": {
+					"all": [
+						{
+							"id": "<<PRESENCE>>",
+							"provision_id": "<<PRESENCE>>",
+							"time": "<<PRESENCE>>",
+							"modules": [
+								{
+									"id": "<<PRESENCE>>",
+									"flags": "<<PRESENCE>>",
+									"hardware_id": "<<PRESENCE>>",
+									"internal": "<<PRESENCE>>",
+									"name": "<<PRESENCE>>",
+									"position": "<<PRESENCE>>",
+									"sensors": [
+										{ "key": "", "name": "random_0", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_1", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_2", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_3", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_4", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" }
+									]
+								},
+								{
+									"id": "<<PRESENCE>>",
+									"flags": "<<PRESENCE>>",
+									"hardware_id": "<<PRESENCE>>",
+									"internal": "<<PRESENCE>>",
+									"name": "<<PRESENCE>>",
+									"position": "<<PRESENCE>>",
+									"sensors": [
+										{ "key": "", "name": "random_0", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_1", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_2", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_3", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_4", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_5", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_6", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_7", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_8", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "", "name": "random_9", "ranges": null, "unit_of_measure": "C", "reading": "<<PRESENCE>>" }
+									]
+								}
+							]
+						},
+						{
+							"id": "<<PRESENCE>>",
+							"provision_id": "<<PRESENCE>>",
+							"time": "<<PRESENCE>>",
+							"modules": [ "<<PRESENCE>>", "<<PRESENCE>>" ]
+						},
+						{
+							"id": "<<PRESENCE>>",
+							"provision_id": "<<PRESENCE>>",
+							"time": "<<PRESENCE>>",
+							"modules": [ "<<PRESENCE>>", "<<PRESENCE>>" ]
+						},
+						{
+							"id": "<<PRESENCE>>",
+							"provision_id": "<<PRESENCE>>",
+							"time": "<<PRESENCE>>",
+							"modules": [ "<<PRESENCE>>", "<<PRESENCE>>" ]
+						}
+					]
+				},
 				"status_json": "<<PRESENCE>>"
 			}
 		]

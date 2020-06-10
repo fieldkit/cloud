@@ -74,7 +74,7 @@ type StationFull struct {
 	MemoryAvailable    *int32
 	FirmwareNumber     *int32
 	FirmwareTime       *int64
-	Configurations     []*StationConfiguration
+	Configurations     *StationConfigurations
 	Updated            int64
 	LocationName       *string
 	Location           *StationLocation
@@ -146,6 +146,10 @@ type ImageRef struct {
 
 type StationPhotos struct {
 	Small string
+}
+
+type StationConfigurations struct {
+	All []*StationConfiguration
 }
 
 type StationConfiguration struct {
@@ -325,10 +329,7 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 		}
 	}
 	if vres.Configurations != nil {
-		res.Configurations = make([]*StationConfiguration, len(vres.Configurations))
-		for i, val := range vres.Configurations {
-			res.Configurations[i] = transformStationviewsStationConfigurationViewToStationConfiguration(val)
-		}
+		res.Configurations = transformStationviewsStationConfigurationsViewToStationConfigurations(vres.Configurations)
 	}
 	if vres.Location != nil {
 		res.Location = transformStationviewsStationLocationViewToStationLocation(vres.Location)
@@ -380,10 +381,7 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		}
 	}
 	if res.Configurations != nil {
-		vres.Configurations = make([]*stationviews.StationConfigurationView, len(res.Configurations))
-		for i, val := range res.Configurations {
-			vres.Configurations[i] = transformStationConfigurationToStationviewsStationConfigurationView(val)
-		}
+		vres.Configurations = transformStationConfigurationsToStationviewsStationConfigurationsView(res.Configurations)
 	}
 	if res.Location != nil {
 		vres.Location = transformStationLocationToStationviewsStationLocationView(res.Location)
@@ -495,13 +493,28 @@ func transformStationviewsStationPhotosViewToStationPhotos(v *stationviews.Stati
 	return res
 }
 
+// transformStationviewsStationConfigurationsViewToStationConfigurations builds
+// a value of type *StationConfigurations from a value of type
+// *stationviews.StationConfigurationsView.
+func transformStationviewsStationConfigurationsViewToStationConfigurations(v *stationviews.StationConfigurationsView) *StationConfigurations {
+	if v == nil {
+		return nil
+	}
+	res := &StationConfigurations{}
+	if v.All != nil {
+		res.All = make([]*StationConfiguration, len(v.All))
+		for i, val := range v.All {
+			res.All[i] = transformStationviewsStationConfigurationViewToStationConfiguration(val)
+		}
+	}
+
+	return res
+}
+
 // transformStationviewsStationConfigurationViewToStationConfiguration builds a
 // value of type *StationConfiguration from a value of type
 // *stationviews.StationConfigurationView.
 func transformStationviewsStationConfigurationViewToStationConfiguration(v *stationviews.StationConfigurationView) *StationConfiguration {
-	if v == nil {
-		return nil
-	}
 	res := &StationConfiguration{
 		ID:           *v.ID,
 		Time:         *v.Time,
@@ -648,6 +661,21 @@ func transformImageRefToStationviewsImageRefView(v *ImageRef) *stationviews.Imag
 func transformStationPhotosToStationviewsStationPhotosView(v *StationPhotos) *stationviews.StationPhotosView {
 	res := &stationviews.StationPhotosView{
 		Small: &v.Small,
+	}
+
+	return res
+}
+
+// transformStationConfigurationsToStationviewsStationConfigurationsView builds
+// a value of type *stationviews.StationConfigurationsView from a value of type
+// *StationConfigurations.
+func transformStationConfigurationsToStationviewsStationConfigurationsView(v *StationConfigurations) *stationviews.StationConfigurationsView {
+	res := &stationviews.StationConfigurationsView{}
+	if v.All != nil {
+		res.All = make([]*stationviews.StationConfigurationView, len(v.All))
+		for i, val := range v.All {
+			res.All[i] = transformStationConfigurationToStationviewsStationConfigurationView(val)
+		}
 	}
 
 	return res

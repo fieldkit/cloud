@@ -843,6 +843,19 @@ func unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView(v *Statio
 	return res
 }
 
+// unmarshalStationConfigurationsResponseBodyToStationviewsStationConfigurationsView
+// builds a value of type *stationviews.StationConfigurationsView from a value
+// of type *StationConfigurationsResponseBody.
+func unmarshalStationConfigurationsResponseBodyToStationviewsStationConfigurationsView(v *StationConfigurationsResponseBody) *stationviews.StationConfigurationsView {
+	res := &stationviews.StationConfigurationsView{}
+	res.All = make([]*stationviews.StationConfigurationView, len(v.All))
+	for i, val := range v.All {
+		res.All[i] = unmarshalStationConfigurationResponseBodyToStationviewsStationConfigurationView(val)
+	}
+
+	return res
+}
+
 // unmarshalStationConfigurationResponseBodyToStationviewsStationConfigurationView
 // builds a value of type *stationviews.StationConfigurationView from a value
 // of type *StationConfigurationResponseBody.
@@ -979,10 +992,7 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 		tv := val
 		res.StatusJSON[tk] = tv
 	}
-	res.Configurations = make([]*stationviews.StationConfigurationView, len(v.Configurations))
-	for i, val := range v.Configurations {
-		res.Configurations[i] = unmarshalStationConfigurationResponseBodyToStationviewsStationConfigurationView(val)
-	}
+	res.Configurations = unmarshalStationConfigurationsResponseBodyToStationviewsStationConfigurationsView(v.Configurations)
 	if v.Location != nil {
 		res.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(v.Location)
 	}

@@ -463,11 +463,13 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 
 	configurations := []*data.StationConfiguration{}
 	if err := r.db.SelectContext(ctx, &configurations, `
-		SELECT *
-		FROM fieldkit.station_configuration
-		WHERE provision_id IN (
+		SELECT
+			sc.*
+		FROM fieldkit.station_configuration AS sc
+		WHERE sc.provision_id IN (
 			SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1)
 		)
+		ORDER BY sc.updated_at DESC
 		`, id); err != nil {
 		return nil, err
 	}
@@ -501,8 +503,6 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		`, id); err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("owner_id = %v nprovs = %v ncfgs = %v nmods = %v nsensors = %v\n", id, len(provisions), len(configurations), len(modules), len(sensors))
 
 	return r.toStationFull(stations, owners, ingestions, media, provisions, configurations, modules, sensors)
 }
@@ -551,26 +551,31 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 
 	provisions := []*data.Provision{}
 	if err := r.db.SelectContext(ctx, &provisions, `
-		SELECT * FROM fieldkit.provision WHERE device_id IN (
+		SELECT
+			p.*
+		FROM fieldkit.provision AS p WHERE device_id IN (
 			SELECT device_id FROM fieldkit.station WHERE id IN (
 				SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
 			)
 		)
+		ORDER BY p.updated DESC
 		`, id); err != nil {
 		return nil, err
 	}
 
 	configurations := []*data.StationConfiguration{}
 	if err := r.db.SelectContext(ctx, &configurations, `
-		SELECT *
-		FROM fieldkit.station_configuration
-		WHERE provision_id IN (
+		SELECT
+			sc.*
+		FROM fieldkit.station_configuration AS sc
+		WHERE sc.provision_id IN (
 			SELECT id FROM fieldkit.provision WHERE device_id IN (
 				SELECT device_id FROM fieldkit.station WHERE id IN (
 					SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
 				)
 			)
 		)
+		ORDER BY sc.updated_at DESC
 		`, id); err != nil {
 		return nil, err
 	}
@@ -612,8 +617,6 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		`, id); err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("project_id = %v nprovs = %v ncfgs = %v nmods = %v nsensors = %v\n", id, len(provisions), len(configurations), len(modules), len(sensors))
 
 	return r.toStationFull(stations, owners, ingestions, media, provisions, configurations, modules, sensors)
 }

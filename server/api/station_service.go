@@ -438,13 +438,15 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 	configurations := transformConfigurations(sf)
 
 	return &station.StationFull{
-		ID:              sf.Station.ID,
-		Name:            sf.Station.Name,
-		ReadOnly:        sp.IsReadOnly(),
-		DeviceID:        hex.EncodeToString(sf.Station.DeviceID),
-		Uploads:         transformUploads(sf.Ingestions),
-		Images:          transformImages(sf.Station.ID, sf.Media),
-		Configurations:  configurations,
+		ID:       sf.Station.ID,
+		Name:     sf.Station.Name,
+		ReadOnly: sp.IsReadOnly(),
+		DeviceID: hex.EncodeToString(sf.Station.DeviceID),
+		Uploads:  transformUploads(sf.Ingestions),
+		Images:   transformImages(sf.Station.ID, sf.Media),
+		Configurations: &station.StationConfigurations{
+			All: configurations,
+		},
 		StatusJSON:      status,
 		Battery:         sf.Station.Battery,
 		MemoryUsed:      sf.Station.MemoryUsed,

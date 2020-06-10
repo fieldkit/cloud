@@ -44,7 +44,7 @@ type StationFullView struct {
 	MemoryAvailable    *int32
 	FirmwareNumber     *int32
 	FirmwareTime       *int64
-	Configurations     []*StationConfigurationView
+	Configurations     *StationConfigurationsView
 	Updated            *int64
 	LocationName       *string
 	Location           *StationLocationView
@@ -75,6 +75,12 @@ type ImageRefView struct {
 // StationPhotosView is a type that runs validations on a projected type.
 type StationPhotosView struct {
 	Small *string
+}
+
+// StationConfigurationsView is a type that runs validations on a projected
+// type.
+type StationConfigurationsView struct {
+	All []*StationConfigurationView
 }
 
 // StationConfigurationView is a type that runs validations on a projected type.
@@ -279,11 +285,9 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
-	for _, e := range result.Configurations {
-		if e != nil {
-			if err2 := ValidateStationConfigurationView(e); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
+	if result.Configurations != nil {
+		if err2 := ValidateStationConfigurationsView(result.Configurations); err2 != nil {
+			err = goa.MergeErrors(err, err2)
 		}
 	}
 	if result.Location != nil {
@@ -343,6 +347,22 @@ func ValidateImageRefView(result *ImageRefView) (err error) {
 func ValidateStationPhotosView(result *StationPhotosView) (err error) {
 	if result.Small == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("small", "result"))
+	}
+	return
+}
+
+// ValidateStationConfigurationsView runs the validations defined on
+// StationConfigurationsView.
+func ValidateStationConfigurationsView(result *StationConfigurationsView) (err error) {
+	if result.All == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("all", "result"))
+	}
+	for _, e := range result.All {
+		if e != nil {
+			if err2 := ValidateStationConfigurationView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
 	}
 	return
 }
