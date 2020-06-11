@@ -15,7 +15,7 @@
             }"
             @map-init="mapInitialized"
         />
-        <div class="no-data-with-location" v-if="noData">No data found with location information.</div>
+        <div class="no-data-with-location" v-if="noData">No {{ chart.sensor.label }} data found with location information.</div>
     </div>
 </template>
 
@@ -82,6 +82,7 @@ export default {
             }, 500);
         },
         displayData() {
+            this.removePreviousMapped();
             this.chartData = this.chart.data.filter(d => {
                 return d.location && d.location[0] != 0 && d.location[1] != 0;
             });
@@ -89,7 +90,6 @@ export default {
                 this.noData = true;
                 return;
             }
-            this.removePreviousMapped();
             // need long, lat, and data value for color:
             const coords = this.chartData.map(d => {
                 return [d.location[0], d.location[1], d[this.chart.sensor.key]];
