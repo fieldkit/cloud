@@ -21,7 +21,7 @@
                     <img id="battery" alt="Battery level" :src="getBatteryImg()" />
                     <span class="small-light">{{ station.battery }}%</span>
                 </div>
-                <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
+                <div v-for="module in modules" v-bind:key="module.id" class="module-icon-container">
                     <img v-if="!module.internal" alt="Module icon" class="small-space" :src="getModuleImg(module)" />
                 </div>
             </div>
@@ -52,9 +52,9 @@
             </div>
             <template v-if="!compact">
                 <div class="spacer"></div>
-                <div id="readings-container" class="section" v-if="station.modules.length > 0">
+                <div id="readings-container" class="section" v-if="modules.length > 0">
                     <div id="readings-label">Latest Reading</div>
-                    <div v-for="(module, moduleIndex) in station.modules" v-bind:key="module.id">
+                    <div v-for="(module, moduleIndex) in modules" v-bind:key="module.id">
                         <template v-if="!module.internal">
                             <div
                                 v-for="(sensor, sensorIndex) in module.sensors"
@@ -92,6 +92,7 @@ export default {
     name: "StationSummary",
     data: () => {
         return {
+            modules: [],
             moduleSensorCounter: 0,
             modulesSensors: {},
             viewingSummary: false,
@@ -108,8 +109,10 @@ export default {
     watch: {
         station() {
             if (this.station) {
+                this.modules = [];
                 this.modulesSensors = {};
                 this.moduleSensorCounter = 0;
+                this.setModules();
                 this.getPlaceName()
                     .then(this.getNativeLand)
                     .then(result => {
@@ -126,6 +129,14 @@ export default {
     methods: {
         viewSummary() {
             this.viewingSummary = true;
+        },
+
+        setModules() {
+            if (this.station.configurations && this.station.configurations.all && this.station.configurations.all.length > 0) {
+                this.modules = this.station.configurations.all[0].modules.filter(m => {
+                    return !m.internal;
+                });
+            }
         },
 
         getPlaceName() {

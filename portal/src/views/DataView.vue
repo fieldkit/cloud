@@ -295,7 +295,12 @@ export default {
 
         extractModulesAndSensors(station) {
             let result = [];
-            station.modules.forEach(m => {
+            let modules =
+                station.configurations && station.configurations.all ? _.flatten(_.map(station.configurations.all, "modules")) : [];
+            modules = _.uniqBy(modules, m => {
+                return m.name;
+            });
+            modules.forEach(m => {
                 let sensors = [];
                 let sensorsFound = 0;
                 if (!m.internal) {

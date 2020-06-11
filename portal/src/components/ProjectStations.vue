@@ -109,11 +109,13 @@ export default {
                                 lng: parseFloat(s.location.longitude),
                             });
                         }
-                        s.modules.forEach(m => {
-                            if (!m.internal) {
-                                modules.push(this.getModuleImg(m));
-                            }
-                        });
+                        if (s.configurations && s.configurations.all && s.configurations.all.length > 0) {
+                            s.configurations.all[0].modules.forEach(m => {
+                                if (!m.internal) {
+                                    modules.push(this.getModuleImg(m));
+                                }
+                            });
+                        }
                     });
                     modules = _.uniq(modules);
                     this.$emit("loaded", { modules: modules, projectStations: this.projectStations });

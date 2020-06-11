@@ -4,11 +4,11 @@
         <div class="station-name">
             {{ currentStation.name }}
         </div>
-        <div v-if="!currentStation.modules || currentStation.modules.length == 0" class="no-readings">
+        <div v-if="!modules || modules.length == 0" class="no-readings">
             No readings uploaded yet
         </div>
         <div class="sensors-container">
-            <div v-for="(module, moduleIndex) in currentStation.modules" v-bind:key="module.id">
+            <div v-for="(module, moduleIndex) in modules" v-bind:key="module.id">
                 <div
                     v-for="(sensor, sensorIndex) in module.sensors"
                     v-bind:key="sensor.id"
@@ -54,6 +54,7 @@ export default {
             currentIndex: 1,
             pageCount: 0,
             stationsPerPage: 1,
+            modules: [],
             moduleSensorCounter: 0,
             modulesSensors: {},
         };
@@ -77,15 +78,14 @@ export default {
                 default:
                     this.currentIndex = value;
             }
+            this.modules = [];
             this.modulesSensors = {};
             this.moduleSensorCounter = 0;
             this.currentStation = this.stations[this.currentIndex - 1];
             if (!this.currentStation) {
                 this.currentStation = {};
             } else {
-                this.currentStation.modules = this.currentStation.modules.filter(m => {
-                    return !m.internal;
-                });
+                this.setModules();
             }
         },
 
@@ -97,11 +97,21 @@ export default {
                 if (!this.currentStation) {
                     this.currentStation = {};
                 } else {
-                    this.currentStation.modules = this.currentStation.modules.filter(m => {
-                        return !m.internal;
-                    });
+                    this.setModules();
                 }
             });
+        },
+
+        setModules() {
+            if (
+                this.currentStation.configurations &&
+                this.currentStation.configurations.all &&
+                this.currentStation.configurations.all.length > 0
+            ) {
+                this.modules = this.currentStation.configurations.all[0].modules.filter(m => {
+                    return !m.internal;
+                });
+            }
         },
 
         getCounter(moduleIndex, sensorIndex) {
