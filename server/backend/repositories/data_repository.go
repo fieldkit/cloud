@@ -172,6 +172,12 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 		}
 		if d != nil {
 			resampled = append(resampled, d)
+		} else if summary.NumberOfDataRecords <= int64(opts.Resolution) {
+			d, err = resampler.Close(ctx)
+			if err != nil {
+				return nil, err
+			}
+			resampled = append(resampled, d)
 		}
 	}
 
