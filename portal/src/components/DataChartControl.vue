@@ -301,6 +301,11 @@ export default {
             newChart.id = "chart-" + id;
             newChart.ref = "d3Chart" + id;
             newChart.parent = false;
+            let timeBtns = [];
+            this.timeButtons.forEach(b => {
+                timeBtns.push(Object.assign({}, b));
+            });
+            newChart.timeButtons = timeBtns;
             const requested = this.$refs[this.charts[0].ref][0].getRequestedTime();
             if (requested) {
                 newChart.requestedStart = requested[0];
