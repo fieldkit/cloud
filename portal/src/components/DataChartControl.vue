@@ -61,7 +61,7 @@
                                 <v-date-picker
                                     class="vc-calendar"
                                     mode="range"
-                                    v-model="chart.overallRange"
+                                    v-model="chart.datepickerRange"
                                     :data-id="chart.id"
                                     :popover="{ placement: 'bottom left' }"
                                     :masks="{ input: 'MM/DD/YY' }"
@@ -173,7 +173,7 @@ export default {
                     value: 0,
                 },
             ],
-            prevOverallRange: {
+            prevDatepickerRange: {
                 start: new Date(2020, 0, 1),
                 end: new Date(2020, 0, 1),
             },
@@ -274,7 +274,7 @@ export default {
                 totalTime: totalTime,
                 noData: false,
                 timeButtons: timeBtns,
-                overallRange: { start: timeCheck.range[0], end: timeCheck.range[1] },
+                datepickerRange: { start: timeCheck.range[0], end: timeCheck.range[1] },
             };
             if (timeCheck.addChart) {
                 if (document.getElementById("main-loading")) {
@@ -514,7 +514,7 @@ export default {
             });
             // store value to compare to prevent hovering from
             // triggering time chages
-            this.prevOverallRange = chart.overallRange;
+            this.prevDatepickerRange = chart.datepickerRange;
         },
         onPopoverDidHide(event) {
             const dataId = event.firstChild.getAttribute("data-id");
@@ -522,10 +522,10 @@ export default {
                 return c.id == dataId;
             });
             // using this event to avoid triggering date changes
-            // when matching chart.overallRange to displayed date range
+            // when matching chart.datepickerRange to displayed date range
             if (
-                this.prevOverallRange.start.getTime() != chart.overallRange.start.getTime() ||
-                this.prevOverallRange.end.getTime() != chart.overallRange.end.getTime()
+                this.prevDatepickerRange.start.getTime() != chart.datepickerRange.start.getTime() ||
+                this.prevDatepickerRange.end.getTime() != chart.datepickerRange.end.getTime()
             ) {
                 const updateAll = chart.parent && this.linkedCharts;
                 if (!updateAll) {
@@ -607,7 +607,7 @@ export default {
                 const chart = this.charts.find(c => {
                     return c.id == zoomed.id;
                 });
-                chart.overallRange = zoomed.range;
+                chart.datepickerRange = zoomed.range;
                 this.$refs[chart.ref][0].setTimeRange(zoomed.range);
                 this.urlQuery[chart.id + "start"] = zoomed.range.start.getTime();
                 this.urlQuery[chart.id + "end"] = zoomed.range.end.getTime();
