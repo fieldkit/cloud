@@ -243,7 +243,6 @@ export default {
             const id = chartId.split("chart-")[1];
             const chartData = data[deviceId].data;
             const totalTime = data[deviceId].timeRange;
-            const timeCheck = this.checkTimeWindowForChart(chartId, totalTime, deviceId);
             const sensor = this.findSensorForChart(chartId, chartData, data[deviceId].sensors);
             const type = this.getChartType(chartId);
             const extent = d3.extent(chartData, d => {
@@ -252,6 +251,12 @@ export default {
             const filteredData = chartData.filter(d => {
                 return d[sensor.key] === 0 || d[sensor.key];
             });
+            // instead of totalTime, use the time that this sensor has data for
+            const timeCheck = this.checkTimeWindowForChart(
+                chartId,
+                [filteredData[0].date, filteredData[filteredData.length - 1].date],
+                deviceId
+            );
             let timeBtns = [];
             this.timeButtons.forEach(b => {
                 timeBtns.push(Object.assign({}, b));
@@ -295,6 +300,7 @@ export default {
             this.$emit("sensorUpdate", newChart);
         },
         addChildChart() {
+            this.linkedCharts = false; // so scrubbers can be apart to start
             const id = this.makeChartId();
             let newChart = {};
             _.assign(newChart, this.charts[0]);
@@ -308,6 +314,7 @@ export default {
             newChart.timeButtons = timeBtns;
             const requested = this.$refs[this.charts[0].ref][0].getRequestedTime();
             if (requested) {
+                // just used to initialize scrubber
                 newChart.requestedStart = requested[0];
                 newChart.requestedEnd = requested[1];
             }
@@ -423,21 +430,13 @@ export default {
                 const parentTime = this.$refs[this.charts[0].ref][0].getTimeRange();
                 const requested = this.$refs[this.charts[0].ref][0].getRequestedTime();
                 const parentElement = document.getElementById("scrubber-container-chart-1");
-                this.charts.forEach((c, i) => {
-                    if (i > 0) {
-                        // NOTE: linking time only for now
-                        c.overallRange = this.charts[0].overallRange;
-                        this.$refs[c.ref][0].setTimeRange(parentTime);
-                        if (requested) {
-                            const requestedRange = { start: requested[0], end: requested[1] };
-                            this.$refs[c.ref][0].setRequestedTime(requestedRange);
-                        }
-                        this.showLoading(c.id);
-                        const fromParent = true;
-                        // update chart data with parent data (instead of emitting timeChanged)
-                        this.updateChartData(this.charts[0].data, c.id, fromParent);
-                        this.urlQuery[c.id + "start"] = parentTime.start.getTime();
-                        this.urlQuery[c.id + "end"] = parentTime.end.getTime();
+                const requestedRange = requested ? { start: requested[0], end: requested[1] } : {};
+                const ranges = { graph: parentTime, requested: requestedRange, datepicker: this.charts[0].datepickerRange };
+                const fromParent = true;
+                this.charts.forEach(c => {
+                    if (!c.parent) {
+                        this.updateChartTime(c, this.charts[0].days, ranges, fromParent);
+                        // match timeButtons to parent
                         c.timeButtons.forEach((b, btnIndex) => {
                             b.active = this.charts[0].timeButtons[btnIndex].active;
                         });
@@ -507,6 +506,21 @@ export default {
             // }
             this.updateRoute();
         },
+        updateChartTime(chart, days, ranges, fromParent, noEmit) {
+            this.showLoading(chart.id);
+            chart.days = days;
+            chart.datepickerRange = ranges.datepicker;
+            this.$refs[chart.ref][0].setTimeRange(ranges.graph);
+            this.$refs[chart.ref][0].setRequestedTime(ranges.requested);
+            this.urlQuery[chart.id + "start"] = ranges.graph.start.getTime();
+            this.urlQuery[chart.id + "end"] = ranges.graph.end.getTime();
+            chart.timeButtons.forEach(b => {
+                b.active = false;
+            });
+            if (!noEmit) {
+                this.$emit("timeChanged", ranges.graph, chart, fromParent);
+            }
+        },
         onPopoverWillShow(event) {
             const dataId = event.firstChild.getAttribute("data-id");
             const chart = this.charts.find(c => {
@@ -531,20 +545,11 @@ export default {
                 if (!updateAll) {
                     this.unlinkCharts();
                 }
+                const ranges = { graph: chart.datepickerRange, requested: chart.datepickerRange, datepicker: chart.datepickerRange };
+                const fromParent = false;
                 this.charts.forEach(c => {
                     if (c.id == chart.id || updateAll) {
-                        this.showLoading(c.id);
-                        if (this.$refs[c.ref]) {
-                            this.$refs[c.ref][0].setTimeRange(chart.overallRange);
-                            this.$refs[c.ref][0].setRequestedTime(chart.overallRange);
-                            this.urlQuery[c.id + "start"] = chart.overallRange.start.getTime();
-                            this.urlQuery[c.id + "end"] = chart.overallRange.end.getTime();
-                            this.$emit("timeChanged", chart.overallRange, c);
-                            // display active state for appropriate button
-                            c.timeButtons.forEach(b => {
-                                b.active = false;
-                            });
-                        }
+                        this.updateChartTime(c, 0, ranges, fromParent);
                     }
                 });
                 this.updateRoute();
@@ -559,72 +564,53 @@ export default {
             // method can be called by time buttons,
             // but also emitted by D3Chart, for zooming out
             // if emitted by D3Chart, arg will have 'id' property
-            const days = event.id ? 0 : event.target.getAttribute("data-time");
+            chart.days = event.id ? 0 : event.target.getAttribute("data-time");
 
             const endDate = chart.totalTime[1];
             let range = {
-                start: new Date(endDate.getTime() - days * DAY),
+                start: new Date(endDate.getTime() - chart.days * DAY),
                 end: endDate,
             };
-            if (days == 0) {
+            let requestedRange = range;
+            if (chart.days == 0) {
                 range.start = chart.totalTime[0];
+                requestedRange = {};
             }
-
             const updateAll = chart.parent && this.linkedCharts;
-            if (!updateAll) {
-                this.unlinkCharts();
-            }
+            const ranges = { graph: range, requested: requestedRange, datepicker: range };
+            const fromParent = false;
             this.charts.forEach(c => {
                 if (c.id == chart.id || updateAll) {
-                    this.showLoading(c.id);
-                    if (this.$refs[c.ref]) {
-                        // update custom date range
-                        c.overallRange = range;
-                        this.$refs[c.ref][0].setTimeRange(range);
-                        this.$refs[c.ref][0].setRequestedTime(range);
-                        this.urlQuery[c.id + "start"] = range.start.getTime();
-                        this.urlQuery[c.id + "end"] = range.end.getTime();
-                        this.$emit("timeChanged", range, c);
-                        // display active state for appropriate button
-                        c.timeButtons.forEach(b => {
-                            b.active = false;
-                            if (b.value == days) {
-                                b.active = true;
-                            }
-                        });
-                    }
+                    this.updateChartTime(c, chart.days, ranges, fromParent);
+                    // display active state for appropriate button
+                    c.timeButtons.forEach(b => {
+                        if (b.value == chart.days) {
+                            b.active = true;
+                        }
+                    });
                 }
             });
+            if (!updateAll || chart.days == 0) {
+                this.unlinkCharts();
+            }
+
             this.updateRoute();
         },
         onTimeZoomed(zoomed) {
+            const ranges = { graph: zoomed.range, requested: zoomed.range, datepicker: zoomed.range };
+            let updateAll, fromParent;
             if (zoomed.parent && this.linkedCharts) {
-                this.showLoading();
-                this.propagateTimeChange(zoomed.range);
+                updateAll = true;
+                fromParent = true;
             } else {
                 // only update url for the chart that emitted this zoom
-                this.showLoading(zoomed.id);
-                const chart = this.charts.find(c => {
-                    return c.id == zoomed.id;
-                });
-                chart.datepickerRange = zoomed.range;
-                this.$refs[chart.ref][0].setTimeRange(zoomed.range);
-                this.urlQuery[chart.id + "start"] = zoomed.range.start.getTime();
-                this.urlQuery[chart.id + "end"] = zoomed.range.end.getTime();
-                this.updateRoute();
+                updateAll = false;
+                fromParent = false;
                 this.unlinkCharts();
-                this.$emit("timeChanged", zoomed.range, chart);
             }
-        },
-        propagateTimeChange(range) {
             this.charts.forEach(c => {
-                if (this.$refs[c.ref]) {
-                    c.overallRange = range;
-                    this.$refs[c.ref][0].setTimeRange(range);
-                    this.$refs[c.ref][0].setRequestedTime(range);
-                    this.urlQuery[c.id + "start"] = range.start.getTime();
-                    this.urlQuery[c.id + "end"] = range.end.getTime();
-                    this.$emit("timeChanged", range, c);
+                if (c.id == zoomed.id || updateAll) {
+                    this.updateChartTime(c, 0, ranges, fromParent);
                 }
             });
             this.updateRoute();
@@ -659,6 +645,22 @@ export default {
             // }
             this.updateRoute();
         },
+        getNewRange(chart, filteredData) {
+            if (chart.days && chart.days != 0 && this.$refs[chart.ref]) {
+                const requested = this.$refs[chart.ref][0].getRequestedTime();
+                if (requested && requested[0]) {
+                    return { start: requested[0], end: requested[1] };
+                }
+            }
+            const range =
+                filteredData.length == 0
+                    ? { start: chart.start, end: chart.end }
+                    : {
+                          start: filteredData[0].date,
+                          end: filteredData[filteredData.length - 1].date,
+                      };
+            return range;
+        },
         chartSensorChanged(selected, chart) {
             // the sensor type on a single chart instance has changed
             const filteredData = chart.current.filter(d => {
@@ -667,8 +669,28 @@ export default {
             const extent = d3.extent(filteredData, d => {
                 return d[selected.key];
             });
+            if (!chart.parent && this.linkedCharts) {
+                // can't change time axis, just update data
+                this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
+            } else {
+                const range = this.getNewRange(chart, filteredData);
+                const updateAll = chart.parent && this.linkedCharts;
+                const ranges = { graph: range, requested: {}, datepicker: range };
+                const fromParent = true;
+                this.charts.forEach(c => {
+                    if (c.id == chart.id || updateAll) {
+                        if (c.id == chart.id) {
+                            const noEmit = true;
+                            this.updateChartTime(c, 0, ranges, fromParent, noEmit);
+                            this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
+                        } else {
+                            this.updateChartTime(c, 0, ranges, fromParent);
+                        }
+                    }
+                });
+            }
+
             // NOTE: linking time only for now
-            this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
             // // if it is the parent chart and they are linked, change all
             // if (chart.parent && this.linkedCharts) {
             //     this.propagateSensorChange(selected, filteredData, extent);
@@ -735,23 +757,17 @@ export default {
                 });
                 if (pendingIndex > -1) {
                     const pendingChart = this.pending.splice(pendingIndex, 1)[0];
-                    const range =
-                        data.length == 0
-                            ? { start: pendingChart.start, end: pendingChart.end }
-                            : {
-                                  start: data[0].date,
-                                  end: data[data.length - 1].date,
-                              };
                     const filteredData = data.filter(d => {
                         return d[pendingChart.sensor.key] === 0 || d[pendingChart.sensor.key];
                     });
+                    pendingChart.current = data;
+                    const range = this.getNewRange(pendingChart, filteredData);
                     const extent = d3.extent(filteredData, d => {
                         return d[pendingChart.sensor.key];
                     });
                     pendingChart.start = range.start;
                     pendingChart.end = range.end;
                     pendingChart.data = filteredData;
-                    pendingChart.current = data;
                     pendingChart.extent = extent;
                     this.$emit("sensorUpdate", pendingChart);
                     this.charts.push(pendingChart);
@@ -762,13 +778,6 @@ export default {
                 }
             } else {
                 chart.current = data;
-                const range =
-                    data.length == 0
-                        ? { start: chart.start, end: chart.end }
-                        : {
-                              start: data[0].date,
-                              end: data[data.length - 1].date,
-                          };
                 const filteredData = data.filter(d => {
                     return d[chart.sensor.key] === 0 || d[chart.sensor.key];
                 });
@@ -780,6 +789,7 @@ export default {
                 }
                 this.$emit("sensorUpdate", chart);
                 if (!fromParent) {
+                    const range = this.getNewRange(chart, filteredData);
                     this.$refs[chart.ref][0].setTimeRange(range);
                 }
                 this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
@@ -867,6 +877,7 @@ export default {
             }
         },
         resetTime(stationId, chart) {
+            chart.days = 0;
             if (
                 parseInt(this.$route.query[chart.id + "start"]) != chart.start.getTime() ||
                 parseInt(this.$route.query[chart.id + "end"]) != chart.end.getTime()
@@ -900,6 +911,9 @@ export default {
                         const extent = d3.extent(filteredData, d => {
                             return d[sensor.key];
                         });
+                        const range = this.getNewRange(chart, filteredData);
+                        chart.start = range.start;
+                        chart.end = range.end;
                         this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
                     } else {
                         return sensor.key;
