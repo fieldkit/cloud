@@ -443,14 +443,6 @@ export default {
                         // move scrubbers together
                         const scrubber = document.getElementById("scrubber-svg-" + c.id);
                         parentElement.appendChild(scrubber);
-
-                        // c.type = this.charts[0].type;
-                        // c.sensor = this.charts[0].sensor;
-                        // c.treeSelectValue = this.charts[0].treeSelectValue;
-                        // this.$refs[c.ref][0].updateChartType();
-                        // this.$refs[c.ref][0].updateData(this.charts[0].data, this.charts[0].extent, this.charts[0].sensor.colorScale);
-                        // this.urlQuery[c.id + "type"] = this.charts[0].type;
-                        // this.urlQuery[c.id + "sensor"] = this.charts[0].sensor.key;
                     }
                 });
                 let chartContainers = document.getElementsByClassName("inner-chart-container");
@@ -491,19 +483,6 @@ export default {
             chart.type = selected;
             this.$refs[chart.ref][0].updateChartType();
             this.urlQuery[chart.id + "type"] = selected;
-            // NOTE: linking time only for now
-            // if it is the parent chart and they are linked, change all
-            // if (chart.parent && this.linkedCharts) {
-            //     this.charts.forEach((c, i) => {
-            //         if (i > 0) {
-            //             c.type = selected;
-            //             this.$refs[c.ref][0].updateChartType();
-            //             this.urlQuery[c.id + "type"] = selected;
-            //         }
-            //     });
-            // } else {
-            //     this.unlinkCharts();
-            // }
             this.updateRoute();
         },
         updateChartTime(chart, days, ranges, fromParent, noEmit) {
@@ -593,7 +572,6 @@ export default {
             if (!updateAll || chart.days == 0) {
                 this.unlinkCharts();
             }
-
             this.updateRoute();
         },
         onTimeZoomed(zoomed) {
@@ -639,10 +617,6 @@ export default {
                 this.$emit("stationChanged", selection.stationId, chart);
                 this.urlQuery[chart.id + "station"] = selection.stationId;
             }
-            // NOTE: linking time only for now
-            // if (!chart.parent) {
-            //     this.unlinkCharts();
-            // }
             this.updateRoute();
         },
         getNewRange(chart, filteredData) {
@@ -689,27 +663,7 @@ export default {
                     }
                 });
             }
-
-            // NOTE: linking time only for now
-            // // if it is the parent chart and they are linked, change all
-            // if (chart.parent && this.linkedCharts) {
-            //     this.propagateSensorChange(selected, filteredData, extent);
-            // } else {
-            //     // otherwise, change this one
-            //     this.$refs[chart.ref][0].updateData(filteredData, extent, chart.sensor.colorScale);
-            //     this.unlinkCharts();
-            // }
             this.updateRoute();
-        },
-        propagateSensorChange(selected, filteredData, extent) {
-            this.charts.forEach(c => {
-                c.sensor = selected;
-                this.$emit("sensorUpdate", c);
-                // TODO: some stations might not have this sensor
-                c.treeSelectValue = c.station.name + selected.key;
-                this.urlQuery[c.id + "sensor"] = selected.key;
-                this.$refs[c.ref][0].updateData(filteredData, extent, c.sensor.colorScale);
-            });
         },
         showLoading(chartId) {
             if (chartId && document.getElementById(chartId + "-loading")) {
