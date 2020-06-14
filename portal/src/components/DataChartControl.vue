@@ -354,23 +354,15 @@ export default {
             return sensor;
         },
         getSensorWithData(data, sensors) {
-            // the first sensor with data
-            let summaryKeys;
+            // find the first sensor with data
+            const sensorKeys = _.map(sensors, "key");
             for (let i = 0; i < data.length; i++) {
-                summaryKeys = Object.keys(data[i]);
-                // rule out ones that only have _filters, _resampled, and date:
-                if (summaryKeys.length > 3) {
-                    i = data.length;
+                const keys = _.intersection(sensorKeys, Object.keys(data[i]));
+                if (keys.length > 0) {
+                    return keys[0];
                 }
             }
-            const actualSensors = _.intersectionBy(summaryKeys, sensors, s => {
-                return s.key ? s.key : s;
-            });
-            if (actualSensors && actualSensors.length > 0) {
-                return actualSensors[0];
-            } else {
-                return sensors[0].key;
-            }
+            return sensors[0].key;
         },
         checkTimeWindowForChart(chartId, totalTime, deviceId) {
             let addChart = true;

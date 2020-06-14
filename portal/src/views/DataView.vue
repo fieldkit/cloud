@@ -244,9 +244,7 @@ export default {
             const sensors = _.intersectionBy(this.allSensors, resultSensors, s => {
                 return s.key;
             });
-            const sensorKeys = _.map(sensors, s => {
-                return s.key;
-            });
+            const sensorKeys = _.map(sensors, "key");
             result.data.forEach(d => {
                 const keys = _.intersection(sensorKeys, Object.keys(d.d));
                 // Only including ones with sensor readings
