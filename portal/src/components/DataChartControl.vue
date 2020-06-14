@@ -612,7 +612,7 @@ export default {
             this.updateRoute();
         },
         getNewRange(chart, filteredData) {
-            if (chart.days && chart.days != 0 && this.$refs[chart.ref]) {
+            if (this.$refs[chart.ref]) {
                 const requested = this.$refs[chart.ref][0].getRequestedTime();
                 if (requested && requested[0]) {
                     return { start: requested[0], end: requested[1] };
@@ -628,8 +628,9 @@ export default {
             return range;
         },
         chartSensorChanged(selected, chart) {
+            const dataSource = chart.current.length > 0 ? chart.current : chart.overall;
             // the sensor type on a single chart instance has changed
-            const filteredData = chart.current.filter(d => {
+            const filteredData = dataSource.filter(d => {
                 return d[selected.key] === 0 || d[selected.key];
             });
             const extent = d3.extent(filteredData, d => {
