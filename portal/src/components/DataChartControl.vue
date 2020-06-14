@@ -102,7 +102,7 @@
                         :chartParam="chart"
                         @timeZoomed="onTimeZoomed"
                         @unlinkCharts="unlinkCharts"
-                        @zoomOut="setTimeRangeByDays"
+                        @allDays="setTimeRangeByDays"
                     />
                 </template>
             </div>

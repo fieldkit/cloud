@@ -187,7 +187,7 @@ export default {
             }
         },
         zoomOut() {
-            this.$emit("zoomOut", { parent: this.chart.parent, id: this.chart.id });
+            this.$emit("allDays", { parent: this.chart.parent, id: this.chart.id });
         },
         initScrubber() {
             let d3Chart = this;
