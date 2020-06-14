@@ -368,7 +368,9 @@ export default {
                 .attr("d", this.area);
 
             // update the scrubber position
-            this.scrubberUI.call(this.scrubberFn.move, [this.requestedStart, this.requestedEnd].map(this.scrubberX));
+            const start = this.requestedStart ? this.requestedStart : this.chart.start;
+            const end = this.requestedEnd ? this.requestedEnd : this.chart.end;
+            this.scrubberUI.call(this.scrubberFn.move, [start, end].map(this.scrubberX));
         },
     },
 };
