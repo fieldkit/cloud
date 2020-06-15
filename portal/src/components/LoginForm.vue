@@ -24,7 +24,6 @@
             </div>
             <div class="outer-input-container">
                 <div :class="'input-container ' + (isLoggingIn ? '' : ' middle-container')">
-                    <img v-if="isLoggingIn" alt="Email" src="../assets/Icon_Email_login.png" class="email-img" />
                     <input
                         id="email-field"
                         ref="email"
@@ -46,7 +45,6 @@
             </div>
             <div class="outer-input-container">
                 <div class="input-container middle-container">
-                    <img v-if="isLoggingIn" alt="Password" src="../assets/Icon_Password_login.png" class="password-img" />
                     <input
                         name="password"
                         class="inputText"
@@ -395,12 +393,6 @@ input {
     outline: 0;
     font-size: 18px;
     padding-bottom: 2px;
-}
-.email-img,
-.password-img {
-    width: 20px;
-    float: right;
-    margin-bottom: -18px;
 }
 ul {
     list-style-type: none;
