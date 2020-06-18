@@ -126,7 +126,7 @@ export default {
 }
 
 #inner-nav {
-    width: inherit;
+    width: 92%;
     float: left;
     text-align: left;
     padding-top: 20px;
