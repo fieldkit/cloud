@@ -21,6 +21,10 @@ type Client struct {
 	// layout endpoint.
 	DeviceLayoutDoer goahttp.Doer
 
+	// FirmwareStatistics Doer is the HTTP client used to make requests to the
+	// firmware statistics endpoint.
+	FirmwareStatisticsDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -44,13 +48,14 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		DeviceLayoutDoer:    doer,
-		CORSDoer:            doer,
-		RestoreResponseBody: restoreBody,
-		scheme:              scheme,
-		host:                host,
-		decoder:             dec,
-		encoder:             enc,
+		DeviceLayoutDoer:       doer,
+		FirmwareStatisticsDoer: doer,
+		CORSDoer:               doer,
+		RestoreResponseBody:    restoreBody,
+		scheme:                 scheme,
+		host:                   host,
+		decoder:                dec,
+		encoder:                enc,
 	}
 }
 
@@ -73,6 +78,30 @@ func (c *Client) DeviceLayout() goa.Endpoint {
 		resp, err := c.DeviceLayoutDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("information", "device layout", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// FirmwareStatistics returns an endpoint that makes HTTP requests to the
+// information service firmware statistics server.
+func (c *Client) FirmwareStatistics() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeFirmwareStatisticsRequest(c.encoder)
+		decodeResponse = DecodeFirmwareStatisticsResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildFirmwareStatisticsRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.FirmwareStatisticsDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("information", "firmware statistics", err)
 		}
 		return decodeResponse(resp)
 	}

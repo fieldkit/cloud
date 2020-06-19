@@ -148,6 +148,120 @@ func DecodeDeviceLayoutResponse(decoder func(*http.Response) goahttp.Decoder, re
 	}
 }
 
+// BuildFirmwareStatisticsRequest instantiates a HTTP request object with
+// method and path set to call the "information" service "firmware statistics"
+// endpoint
+func (c *Client) BuildFirmwareStatisticsRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: FirmwareStatisticsInformationPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("information", "firmware statistics", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeFirmwareStatisticsRequest returns an encoder for requests sent to the
+// information firmware statistics server.
+func EncodeFirmwareStatisticsRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*information.FirmwareStatisticsPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("information", "firmware statistics", "*information.FirmwareStatisticsPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeFirmwareStatisticsResponse returns a decoder for responses returned by
+// the information firmware statistics endpoint. restoreBody controls whether
+// the response body should be restored after having been read.
+// DecodeFirmwareStatisticsResponse may return the following errors:
+//	- "bad-request" (type information.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type information.Forbidden): http.StatusForbidden
+//	- "not-found" (type information.NotFound): http.StatusNotFound
+//	- "unauthorized" (type information.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeFirmwareStatisticsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body interface{}
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("information", "firmware statistics", err)
+			}
+			res := NewFirmwareStatisticsResultOK(body)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body FirmwareStatisticsBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("information", "firmware statistics", err)
+			}
+			return nil, NewFirmwareStatisticsBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body FirmwareStatisticsForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("information", "firmware statistics", err)
+			}
+			return nil, NewFirmwareStatisticsForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body FirmwareStatisticsNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("information", "firmware statistics", err)
+			}
+			return nil, NewFirmwareStatisticsNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body FirmwareStatisticsUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("information", "firmware statistics", err)
+			}
+			return nil, NewFirmwareStatisticsUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("information", "firmware statistics", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalStationConfigurationResponseBodyToInformationviewsStationConfigurationView
 // builds a value of type *informationviews.StationConfigurationView from a
 // value of type *StationConfigurationResponseBody.

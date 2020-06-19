@@ -36,6 +36,26 @@ type DeviceLayoutNotFoundResponseBody string
 // error.
 type DeviceLayoutUnauthorizedResponseBody string
 
+// FirmwareStatisticsBadRequestResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "bad-request" error.
+type FirmwareStatisticsBadRequestResponseBody string
+
+// FirmwareStatisticsForbiddenResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "forbidden" error.
+type FirmwareStatisticsForbiddenResponseBody string
+
+// FirmwareStatisticsNotFoundResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "not-found" error.
+type FirmwareStatisticsNotFoundResponseBody string
+
+// FirmwareStatisticsUnauthorizedResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "unauthorized" error.
+type FirmwareStatisticsUnauthorizedResponseBody string
+
 // StationConfigurationResponseBody is used to define fields on response body
 // types.
 type StationConfigurationResponseBody struct {
@@ -132,11 +152,52 @@ func NewDeviceLayoutUnauthorizedResponseBody(res information.Unauthorized) Devic
 	return body
 }
 
+// NewFirmwareStatisticsBadRequestResponseBody builds the HTTP response body
+// from the result of the "firmware statistics" endpoint of the "information"
+// service.
+func NewFirmwareStatisticsBadRequestResponseBody(res information.BadRequest) FirmwareStatisticsBadRequestResponseBody {
+	body := FirmwareStatisticsBadRequestResponseBody(res)
+	return body
+}
+
+// NewFirmwareStatisticsForbiddenResponseBody builds the HTTP response body
+// from the result of the "firmware statistics" endpoint of the "information"
+// service.
+func NewFirmwareStatisticsForbiddenResponseBody(res information.Forbidden) FirmwareStatisticsForbiddenResponseBody {
+	body := FirmwareStatisticsForbiddenResponseBody(res)
+	return body
+}
+
+// NewFirmwareStatisticsNotFoundResponseBody builds the HTTP response body from
+// the result of the "firmware statistics" endpoint of the "information"
+// service.
+func NewFirmwareStatisticsNotFoundResponseBody(res information.NotFound) FirmwareStatisticsNotFoundResponseBody {
+	body := FirmwareStatisticsNotFoundResponseBody(res)
+	return body
+}
+
+// NewFirmwareStatisticsUnauthorizedResponseBody builds the HTTP response body
+// from the result of the "firmware statistics" endpoint of the "information"
+// service.
+func NewFirmwareStatisticsUnauthorizedResponseBody(res information.Unauthorized) FirmwareStatisticsUnauthorizedResponseBody {
+	body := FirmwareStatisticsUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewDeviceLayoutPayload builds a information service device layout endpoint
 // payload.
 func NewDeviceLayoutPayload(deviceID string, auth string) *information.DeviceLayoutPayload {
 	v := &information.DeviceLayoutPayload{}
 	v.DeviceID = deviceID
+	v.Auth = auth
+
+	return v
+}
+
+// NewFirmwareStatisticsPayload builds a information service firmware
+// statistics endpoint payload.
+func NewFirmwareStatisticsPayload(auth string) *information.FirmwareStatisticsPayload {
+	v := &information.FirmwareStatisticsPayload{}
 	v.Auth = auth
 
 	return v

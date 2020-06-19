@@ -15,3 +15,8 @@ import (
 func DeviceLayoutInformationPath(deviceID string) string {
 	return fmt.Sprintf("/data/devices/%v/layout", deviceID)
 }
+
+// FirmwareStatisticsInformationPath returns the URL path to the information service firmware statistics HTTP endpoint.
+func FirmwareStatisticsInformationPath() string {
+	return "/devices/firmware/statistics"
+}

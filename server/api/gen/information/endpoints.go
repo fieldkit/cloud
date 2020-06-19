@@ -16,7 +16,8 @@ import (
 
 // Endpoints wraps the "information" service endpoints.
 type Endpoints struct {
-	DeviceLayout goa.Endpoint
+	DeviceLayout       goa.Endpoint
+	FirmwareStatistics goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "information" service with endpoints.
@@ -24,13 +25,15 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		DeviceLayout: NewDeviceLayoutEndpoint(s, a.JWTAuth),
+		DeviceLayout:       NewDeviceLayoutEndpoint(s, a.JWTAuth),
+		FirmwareStatistics: NewFirmwareStatisticsEndpoint(s, a.JWTAuth),
 	}
 }
 
 // Use applies the given middleware to all the "information" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.DeviceLayout = m(e.DeviceLayout)
+	e.FirmwareStatistics = m(e.FirmwareStatistics)
 }
 
 // NewDeviceLayoutEndpoint returns an endpoint function that calls the method
@@ -54,5 +57,24 @@ func NewDeviceLayoutEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endp
 		}
 		vres := NewViewedDeviceLayoutResponse(res, "default")
 		return vres, nil
+	}
+}
+
+// NewFirmwareStatisticsEndpoint returns an endpoint function that calls the
+// method "firmware statistics" of service "information".
+func NewFirmwareStatisticsEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*FirmwareStatisticsPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.FirmwareStatistics(ctx, p)
 	}
 }

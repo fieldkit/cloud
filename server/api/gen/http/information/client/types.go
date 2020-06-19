@@ -37,6 +37,26 @@ type DeviceLayoutNotFoundResponseBody string
 // error.
 type DeviceLayoutUnauthorizedResponseBody string
 
+// FirmwareStatisticsBadRequestResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "bad-request" error.
+type FirmwareStatisticsBadRequestResponseBody string
+
+// FirmwareStatisticsForbiddenResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "forbidden" error.
+type FirmwareStatisticsForbiddenResponseBody string
+
+// FirmwareStatisticsNotFoundResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "not-found" error.
+type FirmwareStatisticsNotFoundResponseBody string
+
+// FirmwareStatisticsUnauthorizedResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "unauthorized" error.
+type FirmwareStatisticsUnauthorizedResponseBody string
+
 // StationConfigurationResponseBody is used to define fields on response body
 // types.
 type StationConfigurationResponseBody struct {
@@ -126,6 +146,45 @@ func NewDeviceLayoutNotFound(body DeviceLayoutNotFoundResponseBody) information.
 // NewDeviceLayoutUnauthorized builds a information service device layout
 // endpoint unauthorized error.
 func NewDeviceLayoutUnauthorized(body DeviceLayoutUnauthorizedResponseBody) information.Unauthorized {
+	v := information.Unauthorized(body)
+	return v
+}
+
+// NewFirmwareStatisticsResultOK builds a "information" service "firmware
+// statistics" endpoint result from a HTTP "OK" response.
+func NewFirmwareStatisticsResultOK(body interface{}) *information.FirmwareStatisticsResult {
+	v := body
+	res := &information.FirmwareStatisticsResult{
+		Object: v,
+	}
+
+	return res
+}
+
+// NewFirmwareStatisticsBadRequest builds a information service firmware
+// statistics endpoint bad-request error.
+func NewFirmwareStatisticsBadRequest(body FirmwareStatisticsBadRequestResponseBody) information.BadRequest {
+	v := information.BadRequest(body)
+	return v
+}
+
+// NewFirmwareStatisticsForbidden builds a information service firmware
+// statistics endpoint forbidden error.
+func NewFirmwareStatisticsForbidden(body FirmwareStatisticsForbiddenResponseBody) information.Forbidden {
+	v := information.Forbidden(body)
+	return v
+}
+
+// NewFirmwareStatisticsNotFound builds a information service firmware
+// statistics endpoint not-found error.
+func NewFirmwareStatisticsNotFound(body FirmwareStatisticsNotFoundResponseBody) information.NotFound {
+	v := information.NotFound(body)
+	return v
+}
+
+// NewFirmwareStatisticsUnauthorized builds a information service firmware
+// statistics endpoint unauthorized error.
+func NewFirmwareStatisticsUnauthorized(body FirmwareStatisticsUnauthorizedResponseBody) information.Unauthorized {
 	v := information.Unauthorized(body)
 	return v
 }

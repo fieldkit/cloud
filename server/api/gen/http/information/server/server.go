@@ -20,9 +20,10 @@ import (
 
 // Server lists the information service endpoint HTTP handlers.
 type Server struct {
-	Mounts       []*MountPoint
-	DeviceLayout http.Handler
-	CORS         http.Handler
+	Mounts             []*MountPoint
+	DeviceLayout       http.Handler
+	FirmwareStatistics http.Handler
+	CORS               http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -59,10 +60,13 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"DeviceLayout", "GET", "/data/devices/{deviceId}/layout"},
+			{"FirmwareStatistics", "GET", "/devices/firmware/statistics"},
 			{"CORS", "OPTIONS", "/data/devices/{deviceId}/layout"},
+			{"CORS", "OPTIONS", "/devices/firmware/statistics"},
 		},
-		DeviceLayout: NewDeviceLayoutHandler(e.DeviceLayout, mux, decoder, encoder, errhandler, formatter),
-		CORS:         NewCORSHandler(),
+		DeviceLayout:       NewDeviceLayoutHandler(e.DeviceLayout, mux, decoder, encoder, errhandler, formatter),
+		FirmwareStatistics: NewFirmwareStatisticsHandler(e.FirmwareStatistics, mux, decoder, encoder, errhandler, formatter),
+		CORS:               NewCORSHandler(),
 	}
 }
 
@@ -72,12 +76,14 @@ func (s *Server) Service() string { return "information" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.DeviceLayout = m(s.DeviceLayout)
+	s.FirmwareStatistics = m(s.FirmwareStatistics)
 	s.CORS = m(s.CORS)
 }
 
 // Mount configures the mux to serve the information endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountDeviceLayoutHandler(mux, h.DeviceLayout)
+	MountFirmwareStatisticsHandler(mux, h.FirmwareStatistics)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -132,6 +138,57 @@ func NewDeviceLayoutHandler(
 	})
 }
 
+// MountFirmwareStatisticsHandler configures the mux to serve the "information"
+// service "firmware statistics" endpoint.
+func MountFirmwareStatisticsHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleInformationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/devices/firmware/statistics", f)
+}
+
+// NewFirmwareStatisticsHandler creates a HTTP handler which loads the HTTP
+// request and calls the "information" service "firmware statistics" endpoint.
+func NewFirmwareStatisticsHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeFirmwareStatisticsRequest(mux, decoder)
+		encodeResponse = EncodeFirmwareStatisticsResponse(encoder)
+		encodeError    = EncodeFirmwareStatisticsError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "firmware statistics")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "information")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service information.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -143,6 +200,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("OPTIONS", "/data/devices/{deviceId}/layout", f)
+	mux.Handle("OPTIONS", "/devices/firmware/statistics", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

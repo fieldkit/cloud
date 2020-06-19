@@ -40,5 +40,31 @@ var _ = Service("information", func() {
 		})
 	})
 
+	Method("firmware statistics", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+		})
+
+		Result(func() {
+			Attribute("object", Any)
+			Required("object")
+		})
+
+		HTTP(func() {
+			GET("devices/firmware/statistics")
+
+			Response(func() {
+				Body("object")
+			})
+
+			httpAuthentication()
+		})
+	})
+
 	commonOptions()
 })

@@ -15,13 +15,15 @@ import (
 
 // Client is the "information" service client.
 type Client struct {
-	DeviceLayoutEndpoint goa.Endpoint
+	DeviceLayoutEndpoint       goa.Endpoint
+	FirmwareStatisticsEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "information" service client given the endpoints.
-func NewClient(deviceLayout goa.Endpoint) *Client {
+func NewClient(deviceLayout, firmwareStatistics goa.Endpoint) *Client {
 	return &Client{
-		DeviceLayoutEndpoint: deviceLayout,
+		DeviceLayoutEndpoint:       deviceLayout,
+		FirmwareStatisticsEndpoint: firmwareStatistics,
 	}
 }
 
@@ -33,4 +35,15 @@ func (c *Client) DeviceLayout(ctx context.Context, p *DeviceLayoutPayload) (res 
 		return
 	}
 	return ires.(*DeviceLayoutResponse), nil
+}
+
+// FirmwareStatistics calls the "firmware statistics" endpoint of the
+// "information" service.
+func (c *Client) FirmwareStatistics(ctx context.Context, p *FirmwareStatisticsPayload) (res *FirmwareStatisticsResult, err error) {
+	var ires interface{}
+	ires, err = c.FirmwareStatisticsEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*FirmwareStatisticsResult), nil
 }

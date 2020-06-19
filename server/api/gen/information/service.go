@@ -18,6 +18,8 @@ import (
 type Service interface {
 	// DeviceLayout implements device layout.
 	DeviceLayout(context.Context, *DeviceLayoutPayload) (res *DeviceLayoutResponse, err error)
+	// FirmwareStatistics implements firmware statistics.
+	FirmwareStatistics(context.Context, *FirmwareStatisticsPayload) (res *FirmwareStatisticsResult, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -34,7 +36,7 @@ const ServiceName = "information"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"device layout"}
+var MethodNames = [2]string{"device layout", "firmware statistics"}
 
 // DeviceLayoutPayload is the payload type of the information service device
 // layout method.
@@ -48,6 +50,18 @@ type DeviceLayoutPayload struct {
 type DeviceLayoutResponse struct {
 	Configurations []*StationConfiguration
 	Sensors        map[string][]*StationSensor
+}
+
+// FirmwareStatisticsPayload is the payload type of the information service
+// firmware statistics method.
+type FirmwareStatisticsPayload struct {
+	Auth string
+}
+
+// FirmwareStatisticsResult is the result type of the information service
+// firmware statistics method.
+type FirmwareStatisticsResult struct {
+	Object interface{}
 }
 
 type StationConfiguration struct {

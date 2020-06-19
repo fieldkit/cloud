@@ -28,3 +28,16 @@ func BuildDeviceLayoutPayload(informationDeviceLayoutDeviceID string, informatio
 
 	return v, nil
 }
+
+// BuildFirmwareStatisticsPayload builds the payload for the information
+// firmware statistics endpoint from CLI flags.
+func BuildFirmwareStatisticsPayload(informationFirmwareStatisticsAuth string) (*information.FirmwareStatisticsPayload, error) {
+	var auth string
+	{
+		auth = informationFirmwareStatisticsAuth
+	}
+	v := &information.FirmwareStatisticsPayload{}
+	v.Auth = auth
+
+	return v, nil
+}

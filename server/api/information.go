@@ -52,6 +52,74 @@ func (c *InformationService) DeviceLayout(ctx context.Context, payload *informat
 	return transformStationLayout(layout)
 }
 
+func (c *InformationService) FirmwareStatistics(ctx context.Context, payload *information.FirmwareStatisticsPayload) (response *information.FirmwareStatisticsResult, err error) {
+	query := `
+	SELECT
+		MAX(time) AS previously_seen,
+		q.hash,
+		COUNT(*) AS records
+	FROM
+	(
+		SELECT
+			id,
+			provision_id,
+			time,
+			number,
+			raw::json->'identity'->>'name' AS name,
+			raw::json->'metadata'->'firmware'->>'build' AS build,
+			raw::json->'metadata'->'firmware'->>'hash' AS hash,
+			raw::json->'metadata'->'firmware'->>'number' AS number
+		FROM fieldkit.meta_record
+	)
+	AS q
+	GROUP BY q.hash
+	ORDER BY MAX(time) DESC`
+
+	rows, err := c.options.Database.QueryxContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	items := make([]interface{}, 0)
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+
+	rawValues := make([][]byte, len(columns))
+	temporary := make([]interface{}, len(columns))
+	for i, _ := range rawValues {
+		temporary[i] = &rawValues[i]
+	}
+
+	for rows.Next() {
+		err = rows.Scan(temporary...)
+		if err != nil {
+			return nil, err
+		}
+
+		values := make(map[string]string)
+		for i, raw := range rawValues {
+			if raw == nil {
+				values[columns[i]] = "\\N"
+			} else {
+				values[columns[i]] = string(raw)
+			}
+		}
+
+		items = append(items, values)
+	}
+
+	response = &information.FirmwareStatisticsResult{
+		Object: items,
+	}
+
+	return
+}
+
 func (s *InformationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
 		Token:        token,
