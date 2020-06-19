@@ -548,6 +548,7 @@ export default {
     grid-template-columns: 322px 193px 389px 40px;
     border-bottom: 1px solid rgb(215, 220, 225);
     padding: 10px 0;
+    align-items: center;
 }
 .invite-status {
     color: #0a67aa;
