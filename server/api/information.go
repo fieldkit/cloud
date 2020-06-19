@@ -75,42 +75,9 @@ func (c *InformationService) FirmwareStatistics(ctx context.Context, payload *in
 	GROUP BY q.hash
 	ORDER BY MAX(time) DESC`
 
-	rows, err := c.options.Database.QueryxContext(ctx, query)
+	items, err := data.QueryAsObject(ctx, c.options.Database, query)
 	if err != nil {
 		return nil, err
-	}
-
-	defer rows.Close()
-
-	items := make([]interface{}, 0)
-
-	columns, err := rows.Columns()
-	if err != nil {
-		return nil, err
-	}
-
-	rawValues := make([][]byte, len(columns))
-	temporary := make([]interface{}, len(columns))
-	for i, _ := range rawValues {
-		temporary[i] = &rawValues[i]
-	}
-
-	for rows.Next() {
-		err = rows.Scan(temporary...)
-		if err != nil {
-			return nil, err
-		}
-
-		values := make(map[string]string)
-		for i, raw := range rawValues {
-			if raw == nil {
-				values[columns[i]] = "\\N"
-			} else {
-				values[columns[i]] = string(raw)
-			}
-		}
-
-		items = append(items, values)
 	}
 
 	response = &information.FirmwareStatisticsResult{

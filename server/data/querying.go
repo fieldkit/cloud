@@ -57,3 +57,45 @@ func NewQuerier(db *sqlxcache.DB) *Querier {
 func (q *Querier) SelectContextCustom(ctx context.Context, destination interface{}, mapFn MapFunc, query string, args ...interface{}) error {
 	return SelectContextCustom(ctx, q.db, destination, mapFn, query, args...)
 }
+
+func QueryAsObject(ctx context.Context, db *sqlxcache.DB, query string) ([]map[string]interface{}, error) {
+	rows, err := db.QueryxContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	items := make([]map[string]interface{}, 0)
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+
+	rawValues := make([][]byte, len(columns))
+	temporary := make([]interface{}, len(columns))
+	for i, _ := range rawValues {
+		temporary[i] = &rawValues[i]
+	}
+
+	for rows.Next() {
+		err = rows.Scan(temporary...)
+		if err != nil {
+			return nil, err
+		}
+
+		values := make(map[string]interface{})
+		for i, raw := range rawValues {
+			if raw == nil {
+				values[columns[i]] = "\\N"
+			} else {
+				values[columns[i]] = string(raw)
+			}
+		}
+
+		items = append(items, values)
+	}
+
+	return items, nil
+}
