@@ -169,7 +169,7 @@ export default {
     font-size: 12px;
     color: #6a6d71;
     font-weight: 600;
-    float: left;
+    float: right;
     margin: 4px 0 0 6px;
 }
 .activity-text {
