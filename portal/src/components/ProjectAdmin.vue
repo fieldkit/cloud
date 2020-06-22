@@ -568,10 +568,19 @@ export default {
     padding: 4px 0 4px 8px;
 }
 .role-dropdown-container select {
-    font-size: 16px;
-    border: 1px solid lightgray;
-    border-radius: 4px;
-    padding: 2px 4px;
+    font-size: 13px;
+    color: #6a6d71;
+    border: none;
+    padding: 2px 10px 2px 0;
+    margin-left: -4px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17.538' height='9.865' viewBox='0 0 4.64 2.61'%3E%3Cpath d='M.493.087a.28.28 0 00-.406 0 .28.28 0 000 .406l2.03 2.03a.28.28 0 00.406 0l2.03-2.03a.28.28 0 000-.406.28.28 0 00-.406 0L2.32 1.914z' fill='%236a6d71'/%3E%3C/svg%3E%0A");
+    background-repeat: no-repeat, repeat;
+    background-position: right 0.7em top 50%, 0 0;
+    background-size: 0.75em auto, 100%;
+    box-sizing: border-box;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
 }
 .validation-error {
     color: #c42c44;
