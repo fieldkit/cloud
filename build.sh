@@ -10,7 +10,7 @@ if [ -z "$WORKING_DIRECTORY" ]; then
 fi
 
 if [ -z "$DOCKER_TAG" ]; then
-	DOCKER_TAG="master"
+	DOCKER_TAG="main"
 fi
 
 banner() {
