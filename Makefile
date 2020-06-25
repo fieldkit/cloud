@@ -31,7 +31,7 @@ ci-db-tests:
 	cd server && FIELDKIT_POSTGRES_URL="postgres://fieldkit:password@$$IP/fieldkit?sslmode=disable" go test -p 1 -v -coverprofile=coverage.data ./...
 	docker stop fktests-pg || true
 
-setup: legacy/src/js/secrets.js portal/src/secrets.js ocr-portal/src/js/secrets.js
+setup: legacy/src/js/secrets.js portal/src/secrets.ts ocr-portal/src/js/secrets.js
 	true || env GO111MODULE=on go get -u goa.design/goa/v3/...@v3
 
 legacy/src/js/secrets.js: legacy/src/js/secrets.js.template
@@ -40,7 +40,7 @@ legacy/src/js/secrets.js: legacy/src/js/secrets.js.template
 ocr-portal/src/js/secrets.js: ocr-portal/src/js/secrets.js.template
 	cp $^ $@
 
-portal/src/secrets.js: portal/src/secrets.js.template
+portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
 
 binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkstreams
@@ -133,5 +133,5 @@ migrate-down:
 aws-image:
 	cp ocr-portal/src/js/secrets.js.aws ocr-portal/src/js/secrets.js
 	cp legacy/src/js/secrets.js.aws legacy/src/js/secrets.js
-	cp portal/src/secrets.js.aws portal/src/secrets.js
+	cp portal/src/secrets.ts.aws portal/src/secrets.ts
 	WORKING_DIRECTORY=$(WORKING_DIRECTORY) DOCKER_TAG=$(DOCKER_TAG) ./build.sh

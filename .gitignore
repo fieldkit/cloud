@@ -12,6 +12,7 @@ fkstreams
 temp-go
 node_modules
 secrets.js
+secrets.ts
 *.fkpb
 *.di.bz2
 coverage.data

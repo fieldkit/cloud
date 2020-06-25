@@ -104,7 +104,7 @@ export function getModuleImg(module) {
 
 export function getRunTime(project) {
     const timeUnits = ["seconds", "minutes", "hours", "days", "weeks", "months", "years"];
-    let start = new Date(project.start_time);
+    const start = new Date(project.start_time);
     let end, runTense;
     if (project.end_time) {
         end = new Date(project.end_time);
