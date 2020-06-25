@@ -1,30 +1,31 @@
 module.exports = {
-    root: true,
-    env: {
-        node: true,
-    },
-    extends: ["plugin:vue/essential", "@vue/prettier"],
-    rules: {
-        "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
-        "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
-        "prettier/prettier": [
-            "warn",
-            {
-                "#": "prettier config in here :)",
-                printWidth: 140,
-                tabWidth: 4,
-                trailingComma: "es5",
-                semi: true,
-                singleQuote: false,
-                htmlWhitespaceSensitivity: "ignore",
-                endOfLine: "lf",
-            },
-        ],
-    },
-    parserOptions: {
-        parser: "babel-eslint",
-    },
-    globals: {
-        mapboxgl: true,
-    },
+  root: true,
+  env: {
+    node: true
+  },
+  extends: [
+    "plugin:vue/essential",
+    "eslint:recommended",
+    "@vue/typescript/recommended",
+    "@vue/prettier",
+    "@vue/prettier/@typescript-eslint"
+  ],
+  parserOptions: {
+    ecmaVersion: 2020
+  },
+  rules: {
+    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off"
+  },
+  overrides: [
+    {
+      files: [
+        "**/__tests__/*.{j,t}s?(x)",
+        "**/tests/unit/**/*.spec.{j,t}s?(x)"
+      ],
+      env: {
+        jest: true
+      }
+    }
+  ]
 };
