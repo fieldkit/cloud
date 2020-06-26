@@ -19,7 +19,7 @@ export class UserState {
 }
 
 const getters = {
-    authenticated: (state: UserState) => {
+    isAuthenticated: (state: UserState) => {
         return state.token !== null;
     },
 };

@@ -15,28 +15,23 @@
                     Log in
                 </router-link>
             </div>
-            <img alt="User image" :src="userImage" class="user-image" v-if="isAuthenticated && user.media_url" />
+            <img alt="User image" :src="userImage" class="user-image" v-if="isAuthenticated" />
         </div>
     </div>
 </template>
 
 <script>
 import FKApi from "../api/api";
+import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "../store/actions";
-import Config from "../secrets";
 
 export default {
     name: "HeaderBar",
-    props: ["isAuthenticated", "user"],
-    data: () => {
-        return {
-            baseUrl: Config.API_HOST,
-            userImage: null,
-        };
-    },
-    watch: {
-        user() {
-            this.userImage = this.baseUrl + "/user/" + this.user.id + "/media";
+    computed: {
+        ...mapGetters({ isAuthenticated: "isAuthenticated" }),
+        ...mapState({ user: s => s.user.user }),
+        userImage() {
+            return this.$config.baseUrl + "/user/" + this.user.id + "/media";
         },
     },
     methods: {
@@ -44,9 +39,6 @@ export default {
             return this.$store.dispatch(ActionTypes.LOGOUT).then(() => {
                 return this.$router.push({ name: "login" });
             });
-        },
-        refreshImage(image) {
-            this.userImage = image;
         },
         toggleSidebar() {
             const wide = document.getElementById("sidebar-nav-wide");

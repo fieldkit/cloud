@@ -15,18 +15,21 @@ Vue.use(Router);
 
 const routes = [
     {
-        path: "/",
-        alias: "/login",
+        path: "/login",
         name: "login",
         component: LoginView,
-        meta: {},
+        meta: {
+            secured: false,
+        },
     },
     {
         path: "/projects/invitation",
         name: "viewInvites",
         component: InvitesView,
         props: true,
-        meta: {},
+        meta: {
+            secured: true,
+        },
     },
     {
         path: "/dashboard/user",
@@ -40,10 +43,12 @@ const routes = [
         path: "/dashboard/user/reset",
         name: "reset",
         component: ResetPasswordView,
-        meta: {},
+        meta: {
+            secured: false,
+        },
     },
     {
-        path: "/dashboard/",
+        path: "/dashboard",
         name: "projects",
         component: ProjectsView,
         meta: {
@@ -128,8 +133,15 @@ export default function routerFactory(store) {
     });
 
     router.beforeEach((to, from, chain) => {
-        if (to.matched.some(record => record.meta.secured)) {
-            if (store.getters.authenticated) {
+        console.log("nav", from.name, "->", to.name);
+        if (from.name === null && to.name === null) {
+            if (store.getters.isAuthenticated) {
+                chain("/dashboard");
+            } else {
+                chain("/login");
+            }
+        } else if (to.matched.some(record => record.meta.secured)) {
+            if (store.getters.isAuthenticated) {
                 chain();
                 return;
             }
