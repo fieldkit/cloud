@@ -21,7 +21,7 @@
 
 <script>
 import Mapbox from "mapbox-gl-vue";
-import { MAPBOX_ACCESS_TOKEN } from "../secrets";
+import Config from "../secrets";
 
 export default {
     // keeping this name even though it doesn't currently use d3,
@@ -32,7 +32,7 @@ export default {
         return {
             activeMode: false,
             coordinates: [-118, 34],
-            mapboxToken: MAPBOX_ACCESS_TOKEN,
+            mapboxToken: Config.MAPBOX_ACCESS_TOKEN,
             noData: false,
         };
     },
@@ -47,7 +47,7 @@ export default {
         },
     },
     mounted() {
-        let mapDiv = document.getElementById(this.chart.id + "-map");
+        const mapDiv = document.getElementById(this.chart.id + "-map");
         if (mapDiv) {
             mapDiv.style.width = this.layout.width + "px";
             mapDiv.style.height = this.layout.height + "px";
@@ -65,12 +65,11 @@ export default {
         mapInitialized(map) {
             this.map = map;
             this.map.scrollZoom.disable();
-            const view = this;
             let imgData = require.context("../assets/", false, /\.png$/);
             imgData = imgData("./" + "map_arrow.png");
-            this.map.loadImage(imgData, function(error, image) {
+            this.map.loadImage(imgData, (error, image) => {
                 if (error) throw error;
-                if (!view.map.hasImage("arrow")) view.map.addImage("arrow", image);
+                if (!this.map.hasImage("arrow")) this.map.addImage("arrow", image);
             });
         },
         makeMap() {
@@ -148,7 +147,10 @@ export default {
                     // make circles larger as the user zooms from z12 to z22
                     "circle-radius": {
                         base: 1.75,
-                        stops: [[12, 3], [22, 40]],
+                        stops: [
+                            [12, 3],
+                            [22, 40],
+                        ],
                     },
                     "circle-color": ["get", "color"],
                 },
@@ -171,13 +173,13 @@ export default {
                 },
             });
 
-            let coordinates = geojson.geometry.coordinates;
+            const coordinates = geojson.geometry.coordinates;
             // Pass the first coordinates in the LineString to `lngLatBounds` &
             // wrap each coordinate pair in `extend` to include them in the bounds
             // result. A variation of this technique could be applied to zooming
             // to the bounds of multiple Points or Polygon geomteries - it just
             // requires wrapping all the coordinates with the extend method.
-            let bounds = coordinates.reduce((bounds, coord) => {
+            const bounds = coordinates.reduce((bounds, coord) => {
                 return bounds.extend(coord);
             }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
 

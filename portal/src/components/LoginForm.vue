@@ -159,7 +159,8 @@
 </template>
 
 <script>
-import FKApi from "../api/api";
+import * as ActionTypes from "../store/actions";
+import FKApi, { LoginPayload } from "../api/api";
 
 export default {
     name: "LoginForm",
@@ -194,10 +195,11 @@ export default {
     methods: {
         async login() {
             try {
-                const auth = await this.api.login(this.email.toLowerCase(), this.password);
+                const payload = new LoginPayload(this.email.toLowerCase(), this.password);
+                const auth = await this.$store.dispatch(ActionTypes.AUTHENTICATE, payload);
                 const isAuthenticated = await this.api.authenticated();
                 if (isAuthenticated) {
-                    this.userToken = auth;
+                    this.userToken = auth.token;
                     this.$router.push(this.$route.query.redirect || { name: "projects" });
                 } else {
                     alert("Unfortunately we were unable to log you in. Please check your credentials and try again.");
@@ -216,7 +218,7 @@ export default {
                     confirmPassword: this.confirmPassword,
                 };
 
-                this.api
+                await this.api
                     .register(user)
                     .then(result => {
                         this.newUser = result;

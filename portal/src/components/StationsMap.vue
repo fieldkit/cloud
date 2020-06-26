@@ -17,7 +17,7 @@
 
 <script>
 import Mapbox from "mapbox-gl-vue";
-import { MAPBOX_ACCESS_TOKEN } from "../secrets";
+import Config from "../secrets";
 
 export default {
     name: "StationsMap",
@@ -27,7 +27,7 @@ export default {
     data: () => {
         return {
             coordinates: [-118, 34],
-            mapboxToken: MAPBOX_ACCESS_TOKEN,
+            mapboxToken: Config.MAPBOX_ACCESS_TOKEN,
         };
     },
     props: ["mapSize", "stations"],
@@ -39,7 +39,7 @@ export default {
         },
     },
     mounted() {
-        let mapDiv = document.getElementById("map");
+        const mapDiv = document.getElementById("map");
         mapDiv.style.width = this.mapSize.width;
         mapDiv.style.height = this.mapSize.height;
         mapDiv.style.position = this.mapSize.position;
@@ -48,12 +48,11 @@ export default {
     methods: {
         mapInitialized(map) {
             this.map = map;
-            const view = this;
             let imgData = require.context("../assets/", false, /\.png$/);
             imgData = imgData("./" + "Icon_Map_Dot.png");
-            this.map.loadImage(imgData, function(error, image) {
+            this.map.loadImage(imgData, (error, image) => {
                 if (error) throw error;
-                if (!view.map.hasImage("dot")) view.map.addImage("dot", image);
+                if (!this.map.hasImage("dot")) this.map.addImage("dot", image);
             });
             this.$emit("mapReady", map);
         },
@@ -62,14 +61,14 @@ export default {
             let longMin = 180;
             let latMin = 90;
             let latMax = -90;
-            let stationFeatures = [];
-            let mappable = this.stations.filter(s => {
+            const stationFeatures = [];
+            const mappable = this.stations.filter(s => {
                 return (
                     s.location && s.location.latitude && s.location.longitude && s.location.latitude != 1000 && s.location.longitude != 1000
                 );
             });
             mappable.forEach(s => {
-                let coordinates = [s.location.latitude, s.location.longitude];
+                const coordinates = [s.location.latitude, s.location.longitude];
                 if (mappable.length == 1) {
                     this.map.setCenter({
                         lat: coordinates[0],
@@ -103,8 +102,8 @@ export default {
             });
             // sort by latitude
             stationFeatures.sort(function(a, b) {
-                var latA = a.geometry.coordinates[0];
-                var latB = b.geometry.coordinates[0];
+                const latA = a.geometry.coordinates[0];
+                const latB = b.geometry.coordinates[0];
                 if (latA < latB) {
                     return -1;
                 }
@@ -157,7 +156,7 @@ export default {
             });
 
             if (mappable.length > 1) {
-                let bounds = [
+                const bounds = [
                     {
                         lat: latMin,
                         lng: longMin,
@@ -172,13 +171,12 @@ export default {
                 this.map.setZoom(6);
             }
 
-            const view = this;
-            this.map.on("click", "station-markers", function(e) {
+            this.map.on("click", "station-markers", e => {
                 const name = e.features[0].properties.title;
-                const station = view.stations.find(s => {
+                const station = this.stations.find(s => {
                     return s.name == name;
                 });
-                view.$emit("showSummary", station);
+                this.$emit("showSummary", station);
             });
         },
     },
