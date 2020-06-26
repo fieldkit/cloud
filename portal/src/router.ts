@@ -13,83 +13,94 @@ import UserView from "./views/UserView.vue";
 
 Vue.use(Router);
 
-export default new Router({
-    mode: "history",
-    base: process.env.BASE_URL,
-    routes: [
-        {
-            path: "/",
-            alias: "/login",
-            name: "login",
-            component: LoginView,
-        },
-        {
-            path: "/projects/invitation",
-            name: "viewInvites",
-            component: InvitesView,
-            props: true,
-        },
-        {
-            path: "/dashboard/user",
-            name: "user",
-            component: UserView,
-        },
-        {
-            path: "/dashboard/user/reset",
-            name: "reset",
-            component: ResetPasswordView,
-        },
-        {
-            path: "/dashboard/",
-            name: "projects",
-            component: ProjectsView,
-        },
-        {
-            path: "/dashboard/projects/:id",
-            name: "viewProject",
-            component: ProjectView,
-            props: true,
-        },
-        {
-            path: "/dashboard/project/add",
-            name: "addProject",
-            component: ProjectEditView,
-        },
-        {
-            path: "/dashboard/projects/:id/edit",
-            name: "editProject",
-            component: ProjectEditView,
-            props: true,
-        },
-        {
-            path: "/dashboard/project-update/add",
-            name: "addProjectUpdate",
-            component: ProjectUpdateEditView,
-            props: true,
-        },
-        {
-            path: "/dashboard/project-updates/:id/edit",
-            name: "editProjectUpdate",
-            component: ProjectUpdateEditView,
-            props: true,
-        },
-        {
-            path: "/dashboard/stations",
-            name: "stations",
-            component: StationsView,
-            props: true,
-        },
-        {
-            path: "/dashboard/stations/:id",
-            name: "viewStation",
-            component: StationsView,
-            props: true,
-        },
-        {
-            path: "/dashboard/data",
-            name: "viewData",
-            component: DataView,
-            props: true,
-        },
-    ],
-});
+const routes = [
+    {
+        path: "/",
+        alias: "/login",
+        name: "login",
+        component: LoginView,
+    },
+    {
+        path: "/projects/invitation",
+        name: "viewInvites",
+        component: InvitesView,
+        props: true,
+    },
+    {
+        path: "/dashboard/user",
+        name: "user",
+        component: UserView,
+    },
+    {
+        path: "/dashboard/user/reset",
+        name: "reset",
+        component: ResetPasswordView,
+    },
+    {
+        path: "/dashboard/",
+        name: "projects",
+        component: ProjectsView,
+    },
+    {
+        path: "/dashboard/projects/:id",
+        name: "viewProject",
+        component: ProjectView,
+        props: true,
+    },
+    {
+        path: "/dashboard/project/add",
+        name: "addProject",
+        component: ProjectEditView,
+    },
+    {
+        path: "/dashboard/projects/:id/edit",
+        name: "editProject",
+        component: ProjectEditView,
+        props: true,
+    },
+    {
+        path: "/dashboard/project-update/add",
+        name: "addProjectUpdate",
+        component: ProjectUpdateEditView,
+        props: true,
+    },
+    {
+        path: "/dashboard/project-updates/:id/edit",
+        name: "editProjectUpdate",
+        component: ProjectUpdateEditView,
+        props: true,
+    },
+    {
+        path: "/dashboard/stations",
+        name: "stations",
+        component: StationsView,
+        props: true,
+    },
+    {
+        path: "/dashboard/stations/:id",
+        name: "viewStation",
+        component: StationsView,
+        props: true,
+    },
+    {
+        path: "/dashboard/data",
+        name: "viewData",
+        component: DataView,
+        props: true,
+    },
+];
+
+export default function routerFactory() {
+    const router = new Router({
+        mode: "history",
+        base: process.env.BASE_URL,
+        routes: routes,
+    });
+
+    router.beforeEach((to, from, chain) => {
+        console.log("before", to, from);
+        return chain();
+    });
+
+    return router;
+}
