@@ -76,7 +76,7 @@ export default {
             return this.baseUrl + "/stations/" + note.stationId + "/field-note-media/" + note.media_id;
         },
         getDate(strDate) {
-            let d = new Date(strDate);
+            const d = new Date(strDate);
             return d.toLocaleDateString("en-US");
         },
         deleteNote(event) {

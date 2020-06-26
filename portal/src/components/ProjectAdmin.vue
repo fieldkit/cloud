@@ -238,8 +238,8 @@ export default {
         this.api = new FKApi();
     },
     mounted() {
-        let imgPath = require.context("../assets/", false, /\.png$/);
-        let img = "new_user.png";
+        const imgPath = require.context("../assets/", false, /\.png$/);
+        const img = "new_user.png";
         this.newUserImage = imgPath("./" + img);
     },
     methods: {
@@ -285,12 +285,12 @@ export default {
             return !this.emailNotValid;
         },
         sendInvite() {
-            let valid = this.checkEmail();
+            const valid = this.checkEmail();
             if (valid) {
                 if (this.selectedRole == -1) {
                     this.selectedRole = 0;
                 }
-                let role = this.roleOptions.find(r => {
+                const role = this.roleOptions.find(r => {
                     return r.code == this.selectedRole;
                 });
                 const params = { email: this.inviteEmail, projectId: this.project.id, role: this.selectedRole };
@@ -310,7 +310,7 @@ export default {
             }
         },
         removeUser(event) {
-            let id = event.target.getAttribute("data-user");
+            const id = event.target.getAttribute("data-user");
             if (confirm("Are you sure you want to remove this team member?")) {
                 const index = this.projectUsers.findIndex(u => {
                     return u.user.id == id;
@@ -330,7 +330,7 @@ export default {
             }
         },
         editUser(event) {
-            let id = event.target.getAttribute("data-user");
+            const id = event.target.getAttribute("data-user");
             console.log("edit user", id);
         },
         getImageUrl(project) {
@@ -340,7 +340,7 @@ export default {
             this.displayRunTime = "";
             this.displayStartDate = "";
             if (this.project.start_time) {
-                let d = new Date(this.project.start_time);
+                const d = new Date(this.project.start_time);
                 this.displayStartDate = d.toLocaleDateString("en-US");
                 this.displayRunTime = utils.getRunTime(this.project);
             }

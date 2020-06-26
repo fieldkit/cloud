@@ -133,7 +133,7 @@ export default {
         },
         getProjectUsers() {
             this.api.getUsersByProject(this.id).then(result => {
-                let users = result && result.users ? result.users : [];
+                const users = result && result.users ? result.users : [];
                 this.users = users.map(u => {
                     // pending users come back with id = 0, which causes problems
                     if (u.user.id == 0) {
@@ -142,8 +142,8 @@ export default {
                     if (u.user.media_url) {
                         u.userImage = this.baseUrl + "/user/" + u.user.id + "/media";
                     } else {
-                        let imgPath = require.context("../assets/", false, /\.png$/);
-                        let img = "new_user.png";
+                        const imgPath = require.context("../assets/", false, /\.png$/);
+                        const img = "new_user.png";
                         u.userImage = imgPath("./" + img);
                     }
                     return u;

@@ -150,7 +150,7 @@ export default {
             this.displayRunTime = "";
             this.displayStartDate = "";
             if (this.project.start_time) {
-                let d = new Date(this.project.start_time);
+                const d = new Date(this.project.start_time);
                 this.displayStartDate = d.toLocaleDateString("en-US");
                 this.displayRunTime = utils.getRunTime(this.project);
             }

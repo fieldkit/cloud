@@ -48,9 +48,9 @@ export default {
             this.userImage = image;
         },
         toggleSidebar() {
-            let wide = document.getElementById("sidebar-nav-wide");
-            let narrow = document.getElementById("sidebar-nav-narrow");
-            let wideDisplay = getComputedStyle(wide, null).display;
+            const wide = document.getElementById("sidebar-nav-wide");
+            const narrow = document.getElementById("sidebar-nav-narrow");
+            const wideDisplay = getComputedStyle(wide, null).display;
             if (wideDisplay == "block") {
                 wide.style.display = "none";
                 narrow.style.display = "block";

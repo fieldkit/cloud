@@ -42,7 +42,6 @@ export default {
         };
     },
     props: ["projects"],
-    mounted() {},
     async beforeCreate() {
         this.api = new FKApi();
     },
