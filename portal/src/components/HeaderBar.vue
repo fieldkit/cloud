@@ -22,6 +22,7 @@
 
 <script>
 import FKApi from "../api/api";
+import * as ActionTypes from "../store/actions";
 import Config from "../secrets";
 
 export default {
@@ -40,9 +41,9 @@ export default {
     },
     methods: {
         logout() {
-            const api = new FKApi();
-            api.logout();
-            this.$router.push({ name: "login" });
+            return this.$store.dispatch(ActionTypes.LOGOUT).then(() => {
+                return this.$router.push({ name: "login" });
+            });
         },
         refreshImage(image) {
             this.userImage = image;

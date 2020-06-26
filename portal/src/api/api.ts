@@ -2,6 +2,22 @@ import axios from "axios";
 import TokenStorage from "./tokens";
 import Config from "../secrets";
 
+export class LoginPayload {
+    constructor(public readonly email: string, public readonly password: string) {}
+}
+
+export class LoginResponse {
+    constructor(public readonly token: string | null) {}
+}
+
+export class CurrentUser {
+    id: number;
+    email: string;
+    name: string;
+    bio: string;
+    mediaUrl: string;
+}
+
 // Intentionally keeping this synchronous since it'll get used in
 // VueJS stuff quite often to make URLs that don't require custom
 // headers for authentication.
@@ -28,14 +44,14 @@ class FKApi {
                 email: email,
                 password: password,
             },
-        }).then(this._handleLoginResponse.bind(this));
+        }).then(response => this.handleLogin(response));
     }
 
     logout() {
         this.token.clear();
     }
 
-    _handleLoginResponse(response) {
+    private handleLogin(response): string {
         try {
             if (response.status == 204) {
                 this.token.setToken(response.headers.authorization);
@@ -54,14 +70,14 @@ class FKApi {
             method: "POST",
             url: this.baseUrl + "/users",
             data: user,
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     resendCreateAccount(userId) {
         return axios({
             method: "POST",
             url: this.baseUrl + "/users/" + userId + "/validate-email",
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     updatePassword(data) {
@@ -74,7 +90,7 @@ class FKApi {
                 Authorization: token,
             },
             data: { newPassword: data.newPassword, oldPassword: data.oldPassword },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     sendResetPasswordEmail(email) {
@@ -87,7 +103,7 @@ class FKApi {
                 Authorization: token,
             },
             data: { email: email },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     resetPassword(data) {
@@ -95,7 +111,7 @@ class FKApi {
             method: "POST",
             url: this.baseUrl + "/user/recovery",
             data: { password: data.password, token: data.token },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getStation(id) {
@@ -107,7 +123,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getStations() {
@@ -119,7 +135,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getCurrentUser() {
@@ -131,7 +147,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getUsersByProject(projectId) {
@@ -143,7 +159,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     sendInvite(data) {
@@ -156,7 +172,7 @@ class FKApi {
                 Authorization: token,
             },
             data: { email: data.email, role: data.role },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getInvitesByToken(inviteToken) {
@@ -168,7 +184,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getInvitesByUser() {
@@ -180,7 +196,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     acceptInvite(inviteId) {
@@ -192,7 +208,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     declineInvite(inviteId) {
@@ -204,7 +220,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getStationsByProject(projectId) {
@@ -216,7 +232,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     addStationToProject(data) {
@@ -228,7 +244,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     removeStationFromProject(data) {
@@ -240,7 +256,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     removeUserFromProject(data) {
@@ -253,7 +269,7 @@ class FKApi {
                 Authorization: token,
             },
             data: { email: data.email },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     uploadUserImage(data) {
@@ -266,7 +282,7 @@ class FKApi {
                 Authorization: token,
             },
             data: data.image,
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     updateUser(data) {
@@ -279,7 +295,7 @@ class FKApi {
                 Authorization: token,
             },
             data: data,
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getUserProjects() {
@@ -291,7 +307,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getPublicProjects() {
@@ -323,7 +339,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getProjectActivity(id) {
@@ -335,7 +351,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     addDefaultProject() {
@@ -352,7 +368,7 @@ class FKApi {
                 description: "Any FieldKit stations you add, start life here.",
                 slug: "default-proj-" + Date.now(),
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     addProject(data) {
@@ -365,7 +381,7 @@ class FKApi {
                 Authorization: token,
             },
             data: data,
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     updateProject(data) {
@@ -378,7 +394,7 @@ class FKApi {
                 Authorization: token,
             },
             data: data,
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     uploadProjectImage(data) {
@@ -391,7 +407,7 @@ class FKApi {
                 Authorization: token,
             },
             data: data.image,
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     deleteProject(data) {
@@ -403,7 +419,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getProjectFollows(projectId) {
@@ -413,7 +429,7 @@ class FKApi {
             headers: {
                 "Content-Type": "application/json",
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     followProject(projectId) {
@@ -425,7 +441,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     unfollowProject(projectId) {
@@ -437,7 +453,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     deleteFieldNote(data) {
@@ -449,7 +465,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getModulesMeta() {
@@ -461,7 +477,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getStationDataSummaryByDeviceId(deviceId, start, end) {
@@ -480,7 +496,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getStationDataByDeviceId(deviceId) {
@@ -492,7 +508,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getJSONDataByDeviceId(deviceId, page, pageSize) {
@@ -504,7 +520,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getFieldNotes(stationId) {
@@ -516,7 +532,7 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getPlaceName(longLat) {
@@ -530,7 +546,7 @@ class FKApi {
             headers: {
                 "Content-Type": "application/json",
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     getNativeLand(location) {
@@ -540,7 +556,7 @@ class FKApi {
             headers: {
                 "Content-Type": "application/json",
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     addProjectUpdate(data) {
@@ -553,7 +569,7 @@ class FKApi {
                 Authorization: token,
             },
             data: data,
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     updateProjectUpdate(data) {
@@ -566,7 +582,7 @@ class FKApi {
                 Authorization: token,
             },
             data: data,
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
     deleteProjectUpdate(data) {
@@ -578,14 +594,14 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(this._handleResponse.bind(this));
+        }).then(response => this.handle(response));
     }
 
-    _handleResponse(response) {
+    private handle(response) {
         if (response.status == 200) {
             return response.data;
         } else if (response.status == 204) {
-            return "success";
+            return true;
         } else {
             throw new Error("Api failed");
         }

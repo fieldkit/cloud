@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import VCalendar from "v-calendar";
 import { sync } from "vuex-router-sync";
 import i18n from "./i18n";
+import * as ActionTypes from "./store/actions";
 import * as MutationTypes from "./store/mutations";
 import storeFactory from "./store";
 import routerFactory from "./router";
@@ -13,11 +14,13 @@ Vue.use(Vuex);
 
 Vue.config.productionTip = false;
 
-const router = routerFactory();
 const store = storeFactory();
+const router = routerFactory(store);
 const unsync = sync(store, router);
 
-store.commit(MutationTypes.INITIALIZE);
+store.dispatch(ActionTypes.INITIALIZE).catch(err => {
+    console.log("error", err, err.stack);
+});
 
 new Vue({
     i18n,

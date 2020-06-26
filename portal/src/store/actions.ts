@@ -1,1 +1,3 @@
-export const STATIONS_LOAD = "STATIONS_LOAD";
+export const INITIALIZE = "INITIALIZE";
+export const AUTHENTICATE = "AUTHENTICATE";
+export const LOGOUT = "LOGOUT";

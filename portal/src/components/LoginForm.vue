@@ -197,8 +197,7 @@ export default {
             try {
                 const payload = new LoginPayload(this.email.toLowerCase(), this.password);
                 const auth = await this.$store.dispatch(ActionTypes.AUTHENTICATE, payload);
-                const isAuthenticated = await this.api.authenticated();
-                if (isAuthenticated) {
+                if (auth.token) {
                     this.userToken = auth.token;
                     this.$router.push(this.$route.query.redirect || { name: "projects" });
                 } else {

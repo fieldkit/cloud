@@ -1,6 +1,7 @@
 import { StationsState } from "./stations";
 import { ClockState } from "./clock";
 import { MapState } from "./map";
+import { UserState } from "./user";
 
 export interface RouteState {
     name: string | null;
@@ -18,4 +19,5 @@ export interface GlobalState {
     readonly clock: ClockState;
     readonly map: MapState;
     readonly route: RouteState;
+    readonly user: UserState;
 }

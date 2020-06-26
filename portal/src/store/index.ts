@@ -1,9 +1,10 @@
 import _ from "lodash";
 import Vuex from "vuex";
 import createLogger from "./logger";
+import { clock } from "./modules/clock";
+import { user } from "./modules/user";
 import { stations } from "./modules/stations";
 import { map } from "./modules/map";
-import { clock } from "./modules/clock";
 import * as MutationTypes from "./mutations";
 import * as ActionTypes from "./actions";
 
@@ -31,9 +32,10 @@ function customizeLogger() {
 
 export default function() {
     return new Vuex.Store({
-        plugins: true ? [customizeLogger()] : [],
+        plugins: [customizeLogger()],
         modules: {
             clock,
+            user,
             stations,
             map,
         },
