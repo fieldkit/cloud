@@ -118,9 +118,10 @@ func MountFirmwareController(service *goa.Service, ctrl FirmwareController) {
 
 // handleFirmwareOrigin applies the CORS response headers corresponding to the origin.
 func handleFirmwareOrigin(h goa.Handler) goa.Handler {
-	spec0 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
-	spec1 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
-	spec2 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+	spec0 := regexp.MustCompile("(.+[.])?127.0.0.1:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec2 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
+	spec3 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -155,6 +156,19 @@ func handleFirmwareOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOriginRegexp(origin, spec2) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec3) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -342,9 +356,10 @@ func MountDataController(service *goa.Service, ctrl DataController) {
 
 // handleDataOrigin applies the CORS response headers corresponding to the origin.
 func handleDataOrigin(h goa.Handler) goa.Handler {
-	spec0 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
-	spec1 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
-	spec2 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+	spec0 := regexp.MustCompile("(.+[.])?127.0.0.1:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec2 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
+	spec3 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -379,6 +394,19 @@ func handleDataOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOriginRegexp(origin, spec2) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec3) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -636,9 +664,10 @@ func MountFieldNoteController(service *goa.Service, ctrl FieldNoteController) {
 
 // handleFieldNoteOrigin applies the CORS response headers corresponding to the origin.
 func handleFieldNoteOrigin(h goa.Handler) goa.Handler {
-	spec0 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
-	spec1 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
-	spec2 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+	spec0 := regexp.MustCompile("(.+[.])?127.0.0.1:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec2 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
+	spec3 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -673,6 +702,19 @@ func handleFieldNoteOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOriginRegexp(origin, spec2) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec3) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -875,9 +917,10 @@ func MountJSONDataController(service *goa.Service, ctrl JSONDataController) {
 
 // handleJSONDataOrigin applies the CORS response headers corresponding to the origin.
 func handleJSONDataOrigin(h goa.Handler) goa.Handler {
-	spec0 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
-	spec1 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
-	spec2 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+	spec0 := regexp.MustCompile("(.+[.])?127.0.0.1:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec2 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
+	spec3 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -912,6 +955,19 @@ func handleJSONDataOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOriginRegexp(origin, spec2) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec3) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -1099,9 +1155,10 @@ func MountPictureController(service *goa.Service, ctrl PictureController) {
 
 // handlePictureOrigin applies the CORS response headers corresponding to the origin.
 func handlePictureOrigin(h goa.Handler) goa.Handler {
-	spec0 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
-	spec1 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
-	spec2 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+	spec0 := regexp.MustCompile("(.+[.])?127.0.0.1:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec2 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
+	spec3 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -1136,6 +1193,19 @@ func handlePictureOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOriginRegexp(origin, spec2) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec3) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -1535,9 +1605,10 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 
 // handleProjectOrigin applies the CORS response headers corresponding to the origin.
 func handleProjectOrigin(h goa.Handler) goa.Handler {
-	spec0 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
-	spec1 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
-	spec2 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+	spec0 := regexp.MustCompile("(.+[.])?127.0.0.1:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec2 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
+	spec3 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -1572,6 +1643,19 @@ func handleProjectOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOriginRegexp(origin, spec2) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec3) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -1842,9 +1926,10 @@ func MountRecordsController(service *goa.Service, ctrl RecordsController) {
 
 // handleRecordsOrigin applies the CORS response headers corresponding to the origin.
 func handleRecordsOrigin(h goa.Handler) goa.Handler {
-	spec0 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
-	spec1 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
-	spec2 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+	spec0 := regexp.MustCompile("(.+[.])?127.0.0.1:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec2 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
+	spec3 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -1879,6 +1964,19 @@ func handleRecordsOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOriginRegexp(origin, spec2) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec3) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -2026,9 +2124,10 @@ func MountSwaggerController(service *goa.Service, ctrl SwaggerController) {
 
 // handleSwaggerOrigin applies the CORS response headers corresponding to the origin.
 func handleSwaggerOrigin(h goa.Handler) goa.Handler {
-	spec1 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
-	spec2 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
-	spec3 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?127.0.0.1:\\d+")
+	spec2 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec3 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
+	spec4 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -2073,6 +2172,19 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOriginRegexp(origin, spec3) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec4) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -2580,9 +2692,10 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 
 // handleUserOrigin applies the CORS response headers corresponding to the origin.
 func handleUserOrigin(h goa.Handler) goa.Handler {
-	spec0 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
-	spec1 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
-	spec2 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+	spec0 := regexp.MustCompile("(.+[.])?127.0.0.1:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec2 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
+	spec3 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -2617,6 +2730,19 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 			return h(ctx, rw, req)
 		}
 		if cors.MatchOriginRegexp(origin, spec2) {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			rw.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				rw.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOriginRegexp(origin, spec3) {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")

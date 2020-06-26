@@ -25,6 +25,7 @@ func commonOptions() {
 	cors.Origin("https://*.fieldkit.org", corsRules)
 	cors.Origin("https://fkdev.org", corsRules)
 	cors.Origin("https://*.fkdev.org", corsRules)
+	cors.Origin("/(.+[.])?127.0.0.1:\\d+/", corsRules)       // Dev
 	cors.Origin("/(.+[.])?localhost:\\d+/", corsRules)       // Dev
 	cors.Origin("/(.+[.])?fieldkit.org:\\d+/", corsRules)    // Dev
 	cors.Origin("/(.+[.])?local.fkdev.org:\\d+/", corsRules) // Dev
