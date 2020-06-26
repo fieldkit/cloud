@@ -1,0 +1,1 @@
+export const STATIONS_LOAD = "STATIONS_LOAD";
