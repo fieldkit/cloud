@@ -30,14 +30,14 @@
 </template>
 
 <script>
-import { API_HOST } from "../secrets";
+import Config from "../secrets";
 import FKApi from "../api/api";
 
 export default {
     name: "ProjectThumbnails",
     data: () => {
         return {
-            baseUrl: API_HOST,
+            baseUrl: Config.API_HOST,
             displayProjects: [],
         };
     },

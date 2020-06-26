@@ -42,7 +42,7 @@
 import FKApi from "../api/api";
 import HeaderBar from "../components/HeaderBar";
 import SidebarNav from "../components/SidebarNav";
-import { API_HOST } from "../secrets";
+import Config from "../secrets";
 
 export default {
     name: "InvitesView",
@@ -52,7 +52,7 @@ export default {
     },
     data: () => {
         return {
-            baseUrl: API_HOST,
+            baseUrl: Config.API_HOST,
             user: { name: "" },
             projects: [],
             stations: [],

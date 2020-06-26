@@ -45,7 +45,6 @@
 
 <script>
 import FKApi from "../api/api";
-import { API_HOST } from "../secrets";
 import HeaderBar from "../components/HeaderBar";
 import ProjectThumbnails from "../components/ProjectThumbnails";
 import SidebarNav from "../components/SidebarNav";
@@ -60,7 +59,6 @@ export default {
     props: ["id"],
     data: () => {
         return {
-            baseUrl: API_HOST,
             user: {},
             userProjects: [],
             projectsTitle: "Projects",

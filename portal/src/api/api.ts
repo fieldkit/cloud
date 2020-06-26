@@ -1,6 +1,6 @@
 import axios from "axios";
 import TokenStorage from "./tokens";
-import { API_HOST, MAPBOX_ACCESS_TOKEN } from "../secrets";
+import Config from "../secrets";
 
 // Intentionally keeping this synchronous since it'll get used in
 // VueJS stuff quite often to make URLs that don't require custom
@@ -8,14 +8,12 @@ import { API_HOST, MAPBOX_ACCESS_TOKEN } from "../secrets";
 export function makeAuthenticatedApiUrl(url) {
     const tokens = new TokenStorage();
     const token = tokens.getToken();
-    return API_HOST + url + "?token=" + token;
+    return Config.API_HOST + url + "?token=" + token;
 }
 
 class FKApi {
-    constructor() {
-        this.baseUrl = API_HOST;
-        this.token = new TokenStorage();
-    }
+    private readonly baseUrl: string = Config.API_HOST;
+    private readonly token: TokenStorage = new TokenStorage();
 
     authenticated() {
         return this.token.authenticated();
@@ -524,7 +522,11 @@ class FKApi {
     getPlaceName(longLat) {
         return axios({
             method: "GET",
-            url: "https://api.mapbox.com/geocoding/v5/mapbox.places/" + longLat + ".json?types=place&access_token=" + MAPBOX_ACCESS_TOKEN,
+            url:
+                "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
+                longLat +
+                ".json?types=place&access_token=" +
+                Config.MAPBOX_ACCESS_TOKEN,
             headers: {
                 "Content-Type": "application/json",
             },

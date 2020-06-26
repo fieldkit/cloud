@@ -128,7 +128,7 @@
 import FKApi from "../api/api";
 import HeaderBar from "../components/HeaderBar";
 import SidebarNav from "../components/SidebarNav";
-import { API_HOST } from "../secrets";
+import Config from "../secrets";
 
 export default {
     name: "UserView",
@@ -139,7 +139,7 @@ export default {
     props: ["id"],
     data: () => {
         return {
-            baseUrl: API_HOST,
+            baseUrl: Config.API_HOST,
             user: { username: "" },
             publicProfile: true,
             previewImage: "",

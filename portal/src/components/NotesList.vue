@@ -28,7 +28,7 @@
 <script>
 import _ from "lodash";
 import FKApi from "../api/api";
-import { API_HOST } from "../secrets";
+import Config from "../secrets";
 
 // TODO: api return names for categories rather than keys (?)
 const categoryLabels = {
@@ -44,7 +44,7 @@ export default {
     props: [],
     data: () => {
         return {
-            baseUrl: API_HOST,
+            baseUrl: Config.API_HOST,
             notes: [],
             ids: [],
         };

@@ -22,14 +22,14 @@
 
 <script>
 import FKApi from "../api/api";
-import { API_HOST } from "../secrets";
+import Config from "../secrets";
 
 export default {
     name: "HeaderBar",
     props: ["isAuthenticated", "user"],
     data: () => {
         return {
-            baseUrl: API_HOST,
+            baseUrl: Config.API_HOST,
             userImage: null,
         };
     },

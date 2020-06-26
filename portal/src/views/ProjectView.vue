@@ -52,7 +52,7 @@
 
 <script>
 import FKApi from "../api/api";
-import { API_HOST } from "../secrets";
+import Config from "../secrets";
 import HeaderBar from "../components/HeaderBar";
 import ProjectPublic from "../components/ProjectPublic";
 import SidebarNav from "../components/SidebarNav";
@@ -76,7 +76,7 @@ export default {
     },
     data: () => {
         return {
-            baseUrl: API_HOST,
+            baseUrl: Config.API_HOST,
             user: {},
             adminView: false,
             publicView: false,

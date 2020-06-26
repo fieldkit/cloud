@@ -71,7 +71,7 @@
 <script>
 import * as utils from "../utilities";
 import FKApi from "../api/api";
-import { API_HOST } from "../secrets";
+import Config from "../secrets";
 import ProjectStations from "../components/ProjectStations";
 import ProjectActivity from "../components/ProjectActivity";
 
@@ -83,7 +83,7 @@ export default {
     },
     data: () => {
         return {
-            baseUrl: API_HOST,
+            baseUrl: Config.API_HOST,
             displayStartDate: "",
             displayRunTime: "",
             modules: [],

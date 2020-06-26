@@ -1,4 +1,6 @@
 export default class TokenStorage {
+    private token: string | null;
+
     constructor() {
         this.token = this.getToken();
     }
