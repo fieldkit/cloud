@@ -55,12 +55,12 @@
 import _ from "lodash";
 import * as d3 from "d3";
 import FKApi from "@/api/api";
-import HeaderBar from "../components/HeaderBar";
-import SidebarNav from "../components/SidebarNav";
-import DataChartControl from "../components/DataChartControl";
-import NotesList from "../components/NotesList";
-import SensorSummary from "../components/SensorSummary";
-import * as utils from "../utilities";
+import HeaderBar from "@/components/HeaderBar";
+import SidebarNav from "@/components/SidebarNav";
+import DataChartControl from "@/components/DataChartControl";
+import NotesList from "@/components/NotesList";
+import SensorSummary from "@/components/SensorSummary";
+import * as utils from "@/utilities";
 
 const expectedRanges = {
     temp: [0, 40],
@@ -68,7 +68,7 @@ const expectedRanges = {
     do: [0, 10],
     ec: [0, 60000],
     humidity: [0, 100],
-    wind_speed: [0, 120],
+    wind_speed: [0, 120], // eslint-disable-line @typescript-eslint/camelcase
     rain: [0, 130],
 };
 
@@ -97,12 +97,11 @@ export default {
         };
     },
     async beforeCreate() {
-        const dataView = this;
-        window.onpopstate = function(event) {
+        window.onpopstate = event => {
             // Note: event.state.key changes
-            dataView.componentKey = event.state ? event.state.key : 0;
-            if (dataView.$refs.dataChartControl) {
-                dataView.$refs.dataChartControl.refresh(dataView.stationData);
+            this.componentKey = event.state ? event.state.key : 0;
+            if (this.$refs.dataChartControl) {
+                this.$refs.dataChartControl.refresh(this.stationData);
             }
         };
         this.api = new FKApi();
@@ -167,7 +166,7 @@ export default {
                 return;
             }
             const processedData = this.processData(result);
-            let processed = processedData.data;
+            const processed = processedData.data;
             //sort data by date
             processed.sort(function(a, b) {
                 return a.date.getTime() - b.date.getTime();
@@ -239,7 +238,7 @@ export default {
         },
 
         processData(result) {
-            let processed = [];
+            const processed = [];
             const resultSensors = _.flatten(_.map(result.modules, "sensors"));
             const sensors = _.intersectionBy(this.allSensors, resultSensors, s => {
                 return s.key;
@@ -268,7 +267,7 @@ export default {
             this.treeSelectOptions = [];
             let counterId = 0;
             this.stations.forEach(s => {
-                let modules = [];
+                const modules = [];
                 const modulesResult = this.extractModulesAndSensors(s);
                 modulesResult.forEach(m => {
                     counterId += 1;
@@ -292,18 +291,18 @@ export default {
         },
 
         extractModulesAndSensors(station) {
-            let result = [];
+            const result = [];
             let modules =
                 station.configurations && station.configurations.all ? _.flatten(_.map(station.configurations.all, "modules")) : [];
             modules = _.uniqBy(modules, m => {
                 return m.name;
             });
             modules.forEach(m => {
-                let sensors = [];
+                const sensors = [];
                 let sensorsFound = 0;
                 if (!m.internal) {
                     m.sensors.forEach(sensor => {
-                        let dataViewSensor = this.allSensors.find(sr => {
+                        const dataViewSensor = this.allSensors.find(sr => {
                             return sr.firmwareKey == sensor.name;
                         });
                         if (dataViewSensor) {

@@ -21,9 +21,9 @@
 </template>
 
 <script>
-import FKApi from "../api/api";
+import FKApi from "@/api/api";
 import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "../store/actions";
+import * as ActionTypes from "@/store/actions";
 
 export default {
     name: "HeaderBar",

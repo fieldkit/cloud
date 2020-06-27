@@ -7,7 +7,7 @@
                 marginBottom: '86px',
             }"
             alt="Fieldkit Logo"
-            src="../assets/FieldKit_Logo_White.png"
+            src="../../assets/FieldKit_Logo_White.png"
         />
         <br />
         <LoginForm />
@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import LoginForm from "../components/LoginForm.vue";
+import LoginForm from "./LoginForm.vue";
 
 @Component({
     components: {

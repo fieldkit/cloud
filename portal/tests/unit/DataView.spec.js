@@ -1,5 +1,5 @@
 import { shallowMount } from "@vue/test-utils";
-import DataView from "@/views/DataView.vue";
+import DataView from "@/views/viz/DataView.vue";
 
 jest.mock("@/api/api.js");
 

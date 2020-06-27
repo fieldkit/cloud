@@ -117,7 +117,7 @@
                 </div>
             </div>
             <div v-if="resetSent && !resendingReset">
-                <img alt="Success" src="../assets/Icon_Success.png" width="57px" />
+                <img alt="Success" src="../../assets/Icon_Success.png" width="57px" />
                 <p class="reset-heading">Password Reset Email Sent</p>
                 <div class="notification-text">Check your inbox for the email with a link to reset your password.</div>
                 <button v-on:click="resendReset" class="resubmit-btn">Resend Email</button>
@@ -126,7 +126,7 @@
                 </div>
             </div>
             <div class="resending" v-if="!resetSent && resendingReset">
-                <img alt="Resending" src="../assets/Icon_Syncing2.png" width="57px" />
+                <img alt="Resending" src="../../assets/Icon_Syncing2.png" width="57px" />
                 <p class="reset-heading">Resending</p>
             </div>
         </div>
@@ -134,7 +134,7 @@
         <div id="notification" v-if="accountCreated || accountFailed">
             <div v-if="accountCreated">
                 <div v-if="!resendingCreate">
-                    <img alt="Success" src="../assets/Icon_Success.png" width="57px" />
+                    <img alt="Success" src="../../assets/Icon_Success.png" width="57px" />
                     <p class="success">Account Created</p>
                     <div class="notification-text">We sent you an account validation email.</div>
                     <button v-on:click="resendCreate" class="resubmit-btn">Resend Email</button>
@@ -143,12 +143,12 @@
                     </div>
                 </div>
                 <div class="resending" v-if="resendingCreate">
-                    <img alt="Resending" src="../assets/Icon_Syncing2.png" width="57px" />
+                    <img alt="Resending" src="../../assets/Icon_Syncing2.png" width="57px" />
                     <p class="reset-heading">Resending</p>
                 </div>
             </div>
             <div v-if="accountFailed" class="notification-container">
-                <img alt="Unsuccessful" src="../assets/Icon_Warning_error.png" width="57px" />
+                <img alt="Unsuccessful" src="../../assets/Icon_Warning_error.png" width="57px" />
                 <p class="error">A Problem Occurred</p>
                 <p>Unfortunately we were unable to create your account at this time.</p>
                 <p class="notification-text">Contact us to get assistance.</p>
@@ -159,8 +159,8 @@
 </template>
 
 <script>
-import * as ActionTypes from "../store/actions";
-import FKApi, { LoginPayload } from "../api/api";
+import * as ActionTypes from "@/store/actions";
+import FKApi, { LoginPayload } from "@/api/api";
 
 export default {
     name: "LoginForm",
