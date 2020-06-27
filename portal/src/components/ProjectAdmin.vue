@@ -17,7 +17,7 @@
                     Activity
                 </div>
                 <div class="project-image-actions-container">
-                    <img alt="Fieldkit Project" v-if="project.media_url" :src="getImageUrl(project)" class="project-image" />
+                    <img alt="Fieldkit Project" v-if="project.mediaUrl" :src="getImageUrl(project)" class="project-image" />
                     <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
 
                     <div class="actions-icon-container">

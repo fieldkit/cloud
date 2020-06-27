@@ -183,8 +183,8 @@ export default {
     methods: {
         initialize() {
             const params = Object.keys(this.$route.query);
-            let stationParams = [];
-            let chartParams = {};
+            const stationParams = [];
+            const chartParams = {};
             params.forEach(p => {
                 if (p.indexOf("start") > -1 || p.indexOf("end") > -1) {
                     this.$route.query[p] = parseInt(this.$route.query[p]);
@@ -257,7 +257,7 @@ export default {
                 [filteredData[0].date, filteredData[filteredData.length - 1].date],
                 deviceId
             );
-            let timeBtns = [];
+            const timeBtns = [];
             this.timeButtons.forEach(b => {
                 timeBtns.push(Object.assign({}, b));
             });
@@ -302,12 +302,12 @@ export default {
         addChildChart() {
             this.linkedCharts = false; // so scrubbers can be apart to start
             const id = this.makeChartId();
-            let newChart = {};
+            const newChart = {};
             _.assign(newChart, this.charts[0]);
             newChart.id = "chart-" + id;
             newChart.ref = "d3Chart" + id;
             newChart.parent = false;
-            let timeBtns = [];
+            const timeBtns = [];
             this.timeButtons.forEach(b => {
                 timeBtns.push(Object.assign({}, b));
             });
@@ -376,7 +376,7 @@ export default {
                 if (start.getTime() != totalTime[0].getTime() || end.getTime() != totalTime[1].getTime()) {
                     // and flag this chart so it doesn't get drawn yet:
                     addChart = false;
-                    const chartParam = { id: chartId, station: { device_id: deviceId } };
+                    const chartParam = { id: chartId, station: { deviceId: deviceId } };
                     this.$emit("timeChanged", { start: start, end: end }, chartParam);
                     if (document.getElementById("main-loading")) {
                         document.getElementById("main-loading").style.display = "none";
@@ -405,7 +405,7 @@ export default {
                 this.$emit("removeChart", id);
                 this.charts.splice(index, 1);
                 // remove all the associated params
-                let keys = Object.keys(this.urlQuery);
+                const keys = Object.keys(this.urlQuery);
                 keys.forEach(k => {
                     if (k.indexOf(id) == 0) {
                         delete this.urlQuery[k];
@@ -437,7 +437,7 @@ export default {
                         parentElement.appendChild(scrubber);
                     }
                 });
-                let chartContainers = document.getElementsByClassName("inner-chart-container");
+                const chartContainers = document.getElementsByClassName("inner-chart-container");
                 Array.from(chartContainers).forEach(b => {
                     b.style["margin-top"] = "0";
                 });
@@ -460,7 +460,7 @@ export default {
                     container.appendChild(svg);
                 }
             });
-            let chartContainers = document.getElementsByClassName("inner-chart-container");
+            const chartContainers = document.getElementsByClassName("inner-chart-container");
             Array.from(chartContainers).forEach(b => {
                 b.style["margin-top"] = "6px";
             });
@@ -538,7 +538,7 @@ export default {
             chart.days = event.id ? 0 : event.target.getAttribute("data-time");
 
             const endDate = chart.totalTime[1];
-            let range = {
+            const range = {
                 start: new Date(endDate.getTime() - chart.days * DAY),
                 end: endDate,
             };
@@ -754,7 +754,7 @@ export default {
             }
         },
         updateIds() {
-            let stationIds = _.uniq(
+            const stationIds = _.uniq(
                 _.map(this.charts, c => {
                     return c.station.id;
                 })
@@ -774,11 +774,11 @@ export default {
                 if (p.indexOf("station") > -1) {
                     chartId = p.split("station")[0];
                     stationId = this.$route.query[p];
-                    let chart = this.charts.find(c => {
+                    const chart = this.charts.find(c => {
                         return c.id == chartId;
                     });
                     if (chart) {
-                        const deviceId = chart.station.device_id;
+                        const deviceId = chart.station.deviceId;
                         const chartData = data[deviceId].data;
                         if (chartData) {
                             this.refreshedSensor = this.resetSensor(stationId, chart);
@@ -796,7 +796,7 @@ export default {
                 }
             });
             if (this.charts.length > 1 && params.indexOf("stationId") != 0) {
-                let chartsToDelete = [];
+                const chartsToDelete = [];
                 this.charts.forEach(c => {
                     if (params.indexOf(c.id + "station") == -1) {
                         // flag chart for removal

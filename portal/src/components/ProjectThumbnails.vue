@@ -3,7 +3,7 @@
         <div v-for="project in displayProjects" v-bind:key="project.id" class="project-container">
             <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
                 <div class="project-image-container">
-                    <img alt="Fieldkit Project" v-if="project.media_url" :src="getImageUrl(project)" class="project-image" />
+                    <img alt="Fieldkit Project" v-if="project.mediaUrl" :src="getImageUrl(project)" class="project-image" />
                     <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
                 </div>
                 <img v-if="project.private" alt="Private project" src="../assets/private.png" class="private-icon" />

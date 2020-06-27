@@ -139,7 +139,7 @@ export default {
             this.api
                 .getStation(id)
                 .then(station => {
-                    const deviceId = station.device_id;
+                    const deviceId = station.deviceId;
                     this.stationData[deviceId] = {};
                     this.stationData[deviceId].station = station;
                     this.api
@@ -327,7 +327,7 @@ export default {
 
         onStationChange(stationId, chart) {
             this.api.getStation(stationId).then(station => {
-                const deviceId = station.device_id;
+                const deviceId = station.deviceId;
                 if (this.stationData[deviceId]) {
                     // use this station's data if we already have it
                     this.$refs.dataChartControl.resetChartData(this.stationData, deviceId, chart.id);
@@ -368,7 +368,7 @@ export default {
         onTimeChange(range, chart, fromParent) {
             const start = range.start.getTime();
             const end = range.end.getTime();
-            this.fetchSummary(chart.station.device_id, start, end).then(result => {
+            this.fetchSummary(chart.station.deviceId, start, end).then(result => {
                 const processedData = this.processData(result);
                 this.$refs.dataChartControl.updateChartData(processedData.data, chart.id, fromParent);
             });

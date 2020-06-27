@@ -3,7 +3,7 @@
         <div class="project-container" v-if="project">
             <div class="project-profile-container">
                 <div class="section left-section">
-                    <img alt="Fieldkit Project" v-if="project.media_url" :src="getImageUrl(project)" class="project-image" />
+                    <img alt="Fieldkit Project" v-if="project.mediaUrl" :src="getImageUrl(project)" class="project-image" />
                     <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
                 </div>
                 <div class="section right-section">
@@ -56,7 +56,7 @@
             <div class="team-container">
                 <div class="section-heading">{{ getTeamHeading() }}</div>
                 <div v-for="user in users" v-bind:key="user.user.id" class="team-member">
-                    <img v-if="user.user.media_url" alt="User image" :src="user.userImage" class="user-icon" />
+                    <img v-if="user.user.mediaUrl" alt="User image" :src="user.userImage" class="user-icon" />
                     <span class="user-name">{{ user.user.name }}</span>
                 </div>
             </div>

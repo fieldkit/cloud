@@ -125,12 +125,12 @@ export default {
                 this.description = _project.description;
                 this.goal = _project.goal;
                 this.location = _project.location;
-                this.startDate = _project.start_time;
-                this.endDate = _project.end_time;
+                this.startDate = _project.startTime;
+                this.endDate = _project.endTime;
                 this.tags = _project.tags;
                 this.publicProject = !_project.private;
                 this.updateDisplayDates();
-                if (_project.media_url) {
+                if (_project.mediaUrl) {
                     this.imageUrl = this.baseUrl + "/projects/" + _project.id + "/media";
                     this.hasImage = true;
                 } else {
@@ -148,13 +148,13 @@ export default {
         createParams() {
             const data = {
                 description: this.description,
-                end_time: this.endDate,
+                endTime: this.endDate,
                 goal: this.goal,
                 location: this.location,
                 name: this.name,
                 private: !this.publicProject,
                 slug: "proj-" + Date.now(),
-                start_time: this.startDate,
+                startTime: this.startDate,
                 tags: this.tags,
             };
             if (this.project) {
@@ -169,7 +169,7 @@ export default {
             const data = this.createParams();
             if (this.sendingImage) {
                 api.addProject(data).then(project => {
-                    let params = {
+                    const params = {
                         type: this.imageType,
                         image: this.sendingImage,
                         id: project.id,
@@ -195,7 +195,7 @@ export default {
             const api = new FKApi();
             const data = this.createParams();
             if (this.sendingImage) {
-                let params = {
+                const params = {
                     type: this.imageType,
                     image: this.sendingImage,
                     id: this.project.id,
@@ -230,11 +230,11 @@ export default {
         },
         updateDisplayDates() {
             if (this.startDate) {
-                let d = new Date(this.startDate);
+                const d = new Date(this.startDate);
                 this.displayStartDate = d.toLocaleDateString("en-US");
             }
             if (this.endDate) {
-                let d = new Date(this.endDate);
+                const d = new Date(this.endDate);
                 this.displayEndDate = d.toLocaleDateString("en-US");
             }
         },

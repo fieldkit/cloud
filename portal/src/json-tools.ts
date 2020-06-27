@@ -21,12 +21,7 @@ export function keysToCamel(o) {
                 if (typeof name === "string" && !/^_/.test(name)) {
                     const camelName = toCamel(name);
                     if (camelName !== name) {
-                        if (false) {
-                            const err = new Error();
-                            console.warn("style violation", name, err.stack);
-                        } else {
-                            console.warn("style violation", name);
-                        }
+                        console.warn("style violation", name);
                     }
                 }
                 return target[name];

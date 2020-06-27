@@ -139,7 +139,7 @@ export default {
                     if (u.user.id == 0) {
                         u.user.id = "pending-" + Math.random();
                     }
-                    if (u.user.media_url) {
+                    if (u.user.mediaUrl) {
                         u.userImage = this.baseUrl + "/user/" + u.user.id + "/media";
                     } else {
                         const imgPath = require.context("../assets/", false, /\.png$/);
@@ -165,7 +165,7 @@ export default {
             // ~ if (project.private) {
             //     this.$router.push({ name: "projects" });
             // }
-            if (project.read_only) {
+            if (project.readOnly) {
                 this.publicView = true;
             } else {
                 this.adminView = true;

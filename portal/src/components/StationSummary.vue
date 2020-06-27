@@ -102,7 +102,7 @@ export default {
     },
     props: ["station", "summarySize", "compact"],
     computed: {
-        stationSmallPhoto: function() {
+        stationSmallPhoto() {
             return makeAuthenticatedApiUrl(this.station.photos.small);
         },
     },
@@ -206,12 +206,11 @@ export default {
         getSensorName(module, sensor) {
             const newName = utils.convertOldFirmwareResponse(module);
             return this.$t(newName + ".sensors." + sensor.name);
-            // return this.$t(module.name + "." + sensor.name);
         },
 
         getModuleImg(module) {
-            let imgPath = require.context("../assets/", false, /\.png$/);
-            let img = utils.getModuleImg(module);
+            const imgPath = require.context("../assets/", false, /\.png$/);
+            const img = utils.getModuleImg(module);
             return imgPath("./" + img);
         },
 
@@ -219,7 +218,7 @@ export default {
             if (!this.station.location || !this.station.location.latitude) {
                 return false;
             }
-            let lat = parseFloat(this.station.location.latitude);
+            const lat = parseFloat(this.station.location.latitude);
             return lat.toFixed(5);
         },
 
@@ -227,7 +226,7 @@ export default {
             if (!this.station.location || !this.station.location.longitude) {
                 return false;
             }
-            let long = parseFloat(this.station.location.longitude);
+            const long = parseFloat(this.station.location.longitude);
             return long.toFixed(5);
         },
 

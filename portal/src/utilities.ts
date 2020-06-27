@@ -1,8 +1,8 @@
 export function getUpdatedDate(station) {
     let date = null;
-    // try more accurate first: last_uploads
-    if (station.last_uploads) {
-        const dataUploads = station.last_uploads.filter(u => {
+    // try more accurate first: lastUploads
+    if (station.lastUploads) {
+        const dataUploads = station.lastUploads.filter(u => {
             return u.type == "data";
         });
         date = dataUploads[0].time;

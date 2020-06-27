@@ -104,7 +104,7 @@ export default {
         this.chart = this.chartParam;
         this.chart.svg = d3.select(this.$refs.d3Stage);
         this.chart.colors = this.chartParam.sensor.colorScale;
-        this.chart.panelID = this.chart.station.device_id;
+        this.chart.panelID = this.chart.station.deviceId;
         this.activateChart();
         this.initScrubber();
     },
@@ -190,15 +190,14 @@ export default {
             this.$emit("allDays", { parent: this.chart.parent, id: this.chart.id });
         },
         initScrubber() {
-            let d3Chart = this;
             this.scrubberData = this.chart.overall.filter(d => {
-                return d[d3Chart.chart.sensor.key] === 0 || d[d3Chart.chart.sensor.key];
+                return d[this.chart.sensor.key] === 0 || d[this.chart.sensor.key];
             });
             this.scrubberTimeRange = [];
             this.scrubberTimeRange[0] = this.chart.totalTime[0];
             this.scrubberTimeRange[1] = this.chart.totalTime[1];
             this.scrubberExtent = d3.extent(this.scrubberData, d => {
-                return d[d3Chart.chart.sensor.key];
+                return d[this.chart.sensor.key];
             });
 
             d3.selectAll(".d3scrubber-" + this.chart.id).remove();
@@ -209,7 +208,10 @@ export default {
 
             this.scrubberFn = d3
                 .brushX()
-                .extent([[0, 0], [this.layout.width, this.scrubberHeight - this.layout.marginBottom]])
+                .extent([
+                    [0, 0],
+                    [this.layout.width, this.scrubberHeight - this.layout.marginBottom],
+                ])
                 .on("start brush end", this.scrubberMoved);
 
             this.scrubberX = d3
@@ -226,11 +228,11 @@ export default {
             this.area = d3
                 .area()
                 .x(d => {
-                    return d3Chart.scrubberX(d.date);
+                    return this.scrubberX(d.date);
                 })
                 .y0(this.scrubberHeight - (this.layout.marginBottom + this.layout.marginTop))
                 .y1(d => {
-                    return d3Chart.scrubberY(d[d3Chart.chart.sensor.key]);
+                    return this.scrubberY(d[this.chart.sensor.key]);
                 });
 
             // add background rect
@@ -336,18 +338,16 @@ export default {
             }
         },
         updateScrubber() {
-            let d3Chart = this;
-
             this.scrubberTimeRange = [];
             this.scrubberTimeRange[0] = this.chart.totalTime[0];
             this.scrubberTimeRange[1] = this.chart.totalTime[1];
             this.scrubberX.domain(this.scrubberTimeRange);
 
             this.scrubberData = this.chart.overall.filter(d => {
-                return d[d3Chart.chart.sensor.key] === 0 || d[d3Chart.chart.sensor.key];
+                return d[this.chart.sensor.key] === 0 || d[this.chart.sensor.key];
             });
             this.scrubberExtent = d3.extent(this.scrubberData, d => {
-                return d[d3Chart.chart.sensor.key];
+                return d[this.chart.sensor.key];
             });
             this.scrubberY = d3
                 .scaleLinear()

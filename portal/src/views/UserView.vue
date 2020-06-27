@@ -25,14 +25,14 @@
                 <div id="account-heading">My Account</div>
                 <div class="image-container">
                     <div id="image-heading">Profile picture</div>
-                    <img src="../assets/Profile_Image.png" v-if="!user.media_url && !previewImage" />
+                    <img src="../assets/Profile_Image.png" v-if="!user.mediaUrl && !previewImage" />
                     <img
                         alt="User image"
                         :src="baseUrl + '/user/' + user.id + '/media'"
-                        v-if="user.media_url && !previewImage"
+                        v-if="user.mediaUrl && !previewImage"
                         class="user-image"
                     />
-                    <img :src="previewImage" class="user-image" v-if="!user.media_url || previewImage" />
+                    <img :src="previewImage" class="user-image" v-if="!user.mediaUrl || previewImage" />
                     <br />
                     <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />
                 </div>
