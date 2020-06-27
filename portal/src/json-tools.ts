@@ -13,19 +13,29 @@ const toCamel = s => {
             .replace("_", "");
     });
 };
+
 export function keysToCamel(o) {
     if (isObject(o)) {
-        const n = {};
-
-        Object.keys(o).forEach(k => {
-            n[toCamel(k)] = keysToCamel(o[k]);
+        const n = new Proxy(o, {
+            get(target, name, receiver) {
+                if (typeof name === "string" && !/^_/.test(name)) {
+                    const camelName = toCamel(name);
+                    if (camelName !== name) {
+                        if (false) {
+                            const err = new Error();
+                            console.warn("style violation", name, err.stack);
+                        } else {
+                            console.warn("style violation", name);
+                        }
+                    }
+                }
+                return target[name];
+            },
         });
 
         return n;
     } else if (isArray(o)) {
-        return o.map(i => {
-            return keysToCamel(i);
-        });
+        return o.map(i => keysToCamel(i));
     }
 
     return o;

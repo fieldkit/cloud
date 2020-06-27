@@ -1,5 +1,4 @@
 import Vue from "vue";
-import { keysToCamel } from "../../json-tools";
 import * as ActionTypes from "../actions";
 import TokenStorage from "../../api/tokens";
 import FkApi, { LoginPayload, LoginResponse, CurrentUser } from "../../api/api";
@@ -41,13 +40,10 @@ const actions = {
         commit(CURRENT_USER, null);
     },
     [REFRESH_CURRENT_USER]: ({ commit, dispatch, state }: { commit: any; dispatch: any; state: UserState }) => {
-        return new FkApi()
-            .getCurrentUser()
-            .then(user => keysToCamel(user))
-            .then(user => {
-                commit(CURRENT_USER, user);
-                return user;
-            });
+        return new FkApi().getCurrentUser().then(user => {
+            commit(CURRENT_USER, user);
+            return user;
+        });
     },
 };
 

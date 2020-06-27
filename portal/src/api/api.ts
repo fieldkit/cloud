@@ -1,6 +1,7 @@
 import axios from "axios";
 import TokenStorage from "./tokens";
 import Config from "../secrets";
+import { keysToCamel } from "@/json-tools";
 
 export class LoginPayload {
     constructor(public readonly email: string, public readonly password: string) {}
@@ -599,7 +600,7 @@ class FKApi {
 
     private handle(response) {
         if (response.status == 200) {
-            return response.data;
+            return keysToCamel(response.data);
         } else if (response.status == 204) {
             return true;
         } else {
