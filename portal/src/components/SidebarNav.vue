@@ -41,15 +41,6 @@
                         No stations added
                     </div>
                 </div>
-
-                <!-- <router-link :to="{ name: 'data' }">
-                    <div class="nav-label">
-                        <img alt="Data" src="../assets/data.png" />
-                        <span :class="viewingData ? 'selected' : 'unselected'">
-                            Data
-                        </span>
-                    </div>
-                </router-link> -->
             </div>
         </div>
         <div id="sidebar-nav-narrow">
@@ -63,28 +54,13 @@
 <script>
 export default {
     name: "SidebarNav",
-    data: () => {
-        return {
-            viewingProjects: false,
-            viewingStations: false,
-            viewingData: false,
-        };
-    },
-    props: ["viewing", "isAuthenticated", "stations", "projects"],
-    mounted() {
-        switch (this.viewing) {
-            case "projects":
-                this.viewingProjects = true;
-                break;
-            case "stations":
-                this.viewingStations = true;
-                break;
-            case "data":
-                this.viewingData = true;
-                break;
-            default:
-                break;
-        }
+    props: {
+        viewingProjects: { default: false },
+        viewingStations: { default: false },
+        viewingData: { default: false },
+        isAuthenticated: { required: true },
+        stations: { required: true },
+        projects: { required: true },
     },
     methods: {
         showStation(station) {

@@ -2,7 +2,7 @@
     <div>
         <SidebarNav
             :isAuthenticated="isAuthenticated"
-            viewing="projects"
+            :viewingProjects="true"
             :projects="userProjects"
             :stations="stations"
             @showStation="showStation"
@@ -21,12 +21,10 @@
                         </div>
                         <h1 v-if="isAuthenticated">My Projects</h1>
                         <h1 v-if="!isAuthenticated">Projects</h1>
-                        <!-- display user's projects -->
                         <ProjectThumbnails :projects="userProjects" />
                     </div>
                     <div class="container">
                         <h1>Community Projects</h1>
-                        <!-- display community projects -->
                         <ProjectThumbnails :projects="publicProjects" />
                     </div>
                 </div>
