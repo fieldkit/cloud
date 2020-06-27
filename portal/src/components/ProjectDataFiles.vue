@@ -1,15 +1,15 @@
 <template>
     <div class="datafiles-container">
         <div class="heading">Data Files</div>
-        <div class="readings-stats-container" v-if="projectStations.length > 0">
+        <div class="readings-stats-container" v-if="statistics.totalReadings > 0">
             A total of
-            <span class="stat">{{ totalReadings.toLocaleString() }}</span>
+            <span class="stat">{{ statistics.totalReadings.toLocaleString() }}</span>
             readings from
             <span class="stat">{{ projectStations.length }}</span>
             stations have been uploaded between
-            <span class="stat">{{ first.toLocaleDateString() }}</span>
+            <span class="stat">{{ statistics.first.toLocaleDateString() }}</span>
             and
-            <span class="stat">{{ last.toLocaleDateString() }}.</span>
+            <span class="stat">{{ statistics.last.toLocaleDateString() }}.</span>
         </div>
         <div class="readings-stats-container" v-else>
             No readings have been uploaded yet.
@@ -29,35 +29,23 @@ export default {
             last: new Date("1/1/1970"),
         };
     },
-    props: ["projectStations"],
-    watch: {
-        projectStations() {
-            if (this.projectStations) {
-                this.init();
-            }
-        },
-    },
-    methods: {
-        init() {
-            this.totalReadings = 0;
-            this.projectStations.forEach(s => {
-                const highest = _.maxBy(s.uploads, u => {
-                    return u.blocks[1];
-                });
-                this.totalReadings += highest.blocks[1];
-                const earliest = _.minBy(s.uploads, u => {
-                    return u.time;
-                });
-                const latest = _.maxBy(s.uploads, u => {
-                    return u.time;
-                });
-                if (earliest.time < this.first.getTime()) {
-                    this.first = new Date(earliest.time);
-                }
-                if (latest.time > this.last.getTime()) {
-                    this.last = new Date(latest.time);
-                }
-            });
+    props: { projectStations: { required: true } },
+    computed: {
+        statistics() {
+            const totalReadings = _(this.projectStations)
+                .map(ps => ps.totalReadings)
+                .sum();
+            const first = _(this.projectStations)
+                .map(ps => ps.receivedAt)
+                .min();
+            const last = _(this.projectStations)
+                .map(ps => ps.receivedAt)
+                .max();
+            return {
+                totalReadings: totalReadings,
+                first: first,
+                last: last,
+            };
         },
     },
 };

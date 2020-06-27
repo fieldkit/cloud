@@ -11,7 +11,8 @@
             show: true,
             position: 'bottom-left',
         }"
-        @map-init="mapInitialized"
+        @map-init="onMapInitialized"
+        @map-load="onMapLoaded"
     />
 </template>
 
@@ -30,37 +31,37 @@ export default {
             mapboxToken: Config.MAPBOX_ACCESS_TOKEN,
         };
     },
-    props: ["mapSize", "stations"],
-    watch: {
-        stations() {
-            if (this.stations) {
-                this.updateMap();
-            }
-        },
-    },
-    mounted() {
-        const mapDiv = document.getElementById("map");
-        mapDiv.style.width = this.mapSize.width;
-        mapDiv.style.height = this.mapSize.height;
-        mapDiv.style.position = this.mapSize.position;
-        this.map.resize();
-    },
+    props: { mapSize: { required: true }, stations: { required: true } },
     methods: {
-        mapInitialized(map) {
+        onMapInitialized(map) {
             this.map = map;
+            const mapDiv = document.getElementById("map");
+            mapDiv.style.width = this.mapSize.width;
+            mapDiv.style.height = this.mapSize.height;
+            mapDiv.style.position = this.mapSize.position;
+        },
+        onMapLoaded(map) {
             let imgData = require.context("../assets/", false, /\.png$/);
             imgData = imgData("./" + "Icon_Map_Dot.png");
             this.map.loadImage(imgData, (error, image) => {
                 if (error) throw error;
                 if (!this.map.hasImage("dot")) this.map.addImage("dot", image);
             });
-            this.$emit("mapReady", map);
+            this.$emit("mapReady", this.map);
+            this.updateMap();
         },
         updateMap() {
             let longMax = -180;
             let longMin = 180;
             let latMin = 90;
             let latMax = -90;
+
+            if (!this.map) {
+                return;
+            }
+
+            this.map.resize();
+
             const stationFeatures = [];
             const mappable = this.stations.filter(s => {
                 return (
@@ -150,9 +151,6 @@ export default {
                     "text-offset": [0, 0.75],
                     "text-anchor": "top",
                 },
-                // paint: {
-                //     "text-color": "#0000ff"
-                // }
             });
 
             if (mappable.length > 1) {

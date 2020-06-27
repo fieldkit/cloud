@@ -6,7 +6,7 @@
                 <img alt="Close" src="../assets/close.png" />
             </div>
             <div class="heading">Activity History</div>
-            <ProjectActivity :project="project" :viewing="viewingActivityFeed" :users="projectUsers" />
+            <ProjectActivity :displayProject="displayProject" :viewing="viewingActivityFeed" />
         </div>
         <div class="project-container" v-if="project">
             <div class="left">
@@ -36,7 +36,7 @@
                     </div>
                     <div class="stat follows">
                         <img alt="Follows" src="../assets/heart.png" class="follow-icon" />
-                        <span>{{ numFollowers + (numFollowers == 1 ? " Follow" : " Follows") }}</span>
+                        <span>{{ project.numberOfFollowers + (project.numberOfFollowers == 1 ? " Follow" : " Follows") }}</span>
                     </div>
                 </div>
                 <div class="project-details-container">
@@ -47,13 +47,13 @@
                         <div class="project-detail">{{ project.description }}</div>
                     </div>
                     <div class="time-and-location">
-                        <div class="time" v-if="displayStartDate">
+                        <div class="time" v-if="project.startTime">
                             <img alt="Calendar" src="../assets/icon-calendar.png" class="icon" />
-                            Started {{ displayStartDate }}
+                            Started {{ project.startTime | prettyDate }}
                         </div>
-                        <div class="time" v-if="displayRunTime">
+                        <div class="time" v-if="project.duration">
                             <img alt="Time" src="../assets/icon-time.png" class="icon" />
-                            {{ displayRunTime }}
+                            {{ displayProject.duration | prettyDuration }}
                         </div>
                         <div class="location" v-if="project.location">
                             <img alt="Location" src="../assets/icon-location.png" class="icon" />
@@ -64,16 +64,22 @@
                     <div class="team-icons">
                         <div class="icon-section-label">Team</div>
                         <img
-                            v-for="user in projectUsers"
+                            v-for="user in displayProject.users"
                             v-bind:key="user.user.id"
                             alt="User image"
-                            :src="user.userImage"
+                            :src="getUserImage(user)"
                             class="user-icon"
                         />
                     </div>
                     <div class="module-icons">
                         <div class="icon-section-label">Modules</div>
-                        <img v-for="module in modules" v-bind:key="module" alt="Module icon" class="module-icon" :src="module" />
+                        <img
+                            v-for="module in projectModules"
+                            v-bind:key="module.name"
+                            alt="Module icon"
+                            class="module-icon"
+                            :src="module.url"
+                        />
                     </div>
                 </div>
             </div>
@@ -84,10 +90,9 @@
                 :mapContainerSize="mapContainerSize"
                 :listSize="listSize"
                 :userStations="userStations"
-                @loaded="saveStationsData"
             />
 
-            <ProjectDataFiles :projectStations="projectStations" />
+            <ProjectDataFiles :projectStations="displayProject.stations" />
 
             <StationsReadings :project="project" />
 
@@ -95,14 +100,14 @@
                 <div class="section-heading">Manage Team</div>
                 <div class="users-container">
                     <div class="user-row">
-                        <div class="cell-heading">Members ({{ projectUsers.length }})</div>
+                        <div class="cell-heading">Members ({{ displayProject.users.length }})</div>
                         <div class="cell-heading">Role</div>
                         <div class="cell-heading"></div>
                         <div class="cell"></div>
                     </div>
-                    <div class="user-row" v-for="user in projectUsers" v-bind:key="user.user.id">
+                    <div class="user-row" v-for="user in displayProject.users" v-bind:key="user.user.id">
                         <div class="cell">
-                            <img alt="User image" :src="user.userImage" class="user-icon" />
+                            <img alt="User image" :src="getUserImage(user)" class="user-icon" />
                             {{ user.user.name }}
                             <br />
                             <span class="email">{{ user.user.email }}</span>
@@ -117,13 +122,6 @@
                                 :data-user="user.user.id"
                                 v-on:click="removeUser"
                             />
-                            <!-- <img
-                                alt="Edit user"
-                                src="../assets/edit.png"
-                                class="edit-btn"
-                                :data-user="user.user.id"
-                                v-on:click="editUser"
-                            /> -->
                         </div>
                     </div>
                     <div class="user-row">
@@ -164,7 +162,6 @@
 
 <script>
 import FKApi from "../api/api";
-import Config from "../secrets";
 import * as utils from "../utilities";
 import ProjectStations from "../components/ProjectStations";
 import ProjectActivity from "../components/ProjectActivity";
@@ -181,17 +178,10 @@ export default {
     },
     data: () => {
         return {
-            baseUrl: Config.API_HOST,
-            displayStartDate: "",
-            displayRunTime: "",
-            projectUsers: [],
             inviteEmail: "",
             newUserImage: "",
             noEmail: false,
             emailNotValid: false,
-            modules: [],
-            projectStations: [],
-            numFollowers: 1,
             viewingActivityFeed: false,
             mapContainerSize: {
                 width: "677px",
@@ -220,22 +210,26 @@ export default {
             ],
         };
     },
-    props: ["project", "userStations", "users"],
-    watch: {
-        project: {
-            handler() {
-                this.reset();
-            },
-            immediate: true,
+    props: {
+        displayProject: {
+            required: true,
         },
-        users() {
-            if (this.users) {
-                this.projectUsers = this.users;
-            }
+        userStations: {
+            required: true,
         },
     },
-    async beforeCreate() {
-        this.api = new FKApi();
+    computed: {
+        project() {
+            return this.displayProject.project;
+        },
+        projectModules() {
+            return this.displayProject.modules.map(m => {
+                return {
+                    name: m.name,
+                    url: this.getModuleImg(m),
+                };
+            });
+        },
     },
     mounted() {
         const imgPath = require.context("../assets/", false, /\.png$/);
@@ -243,34 +237,23 @@ export default {
         this.newUserImage = imgPath("./" + img);
     },
     methods: {
-        reset() {
-            this.fetchFollowers();
-            this.updateDisplayDates();
-            this.inviteEmail = "";
-        },
-        fetchFollowers() {
-            this.api.getProjectFollows(this.project.id).then(result => {
-                this.numFollowers = result.followers.length + 1;
-            });
+        getUserImage(projectUser) {
+            return this.$config.baseUrl + "/user/" + projectUser.user.id + "/media";
         },
         editProject() {
-            this.$router.push({ name: "editProject", params: { id: this.project.id } });
+            return this.$router.push({ name: "editProject", params: { id: this.project.id } });
         },
         addUpdate() {
-            this.$router.push({ name: "addProjectUpdate", params: { project: this.project } });
+            return this.$router.push({ name: "addProjectUpdate", params: { project: this.project } });
         },
         viewProfile() {
-            this.$emit("viewProfile");
+            return this.$emit("viewProfile");
         },
         closeActivityFeed() {
             this.viewingActivityFeed = false;
         },
         openActivityFeed() {
             this.viewingActivityFeed = true;
-        },
-        saveStationsData(data) {
-            this.modules = data.modules;
-            this.projectStations = data.projectStations;
         },
         checkEmail() {
             this.noEmail = false;
@@ -294,7 +277,7 @@ export default {
                     return r.code == this.selectedRole;
                 });
                 const params = { email: this.inviteEmail, projectId: this.project.id, role: this.selectedRole };
-                this.api.sendInvite(params).then(() => {
+                new FKApi().sendInvite(params).then(() => {
                     this.projectUsers.push({
                         user: {
                             id: "pending-" + Date.now(),
@@ -319,31 +302,20 @@ export default {
                     projectId: this.project.id,
                     email: this.projectUsers[index].user.email,
                 };
-                this.api.removeUserFromProject(params).then(() => {
-                    // also remove from projectUsers
+                new FKApi().removeUserFromProject(params).then(() => {
                     if (index > -1) {
                         this.projectUsers.splice(index, 1);
                     }
                 });
-            } else {
-                // canceled
             }
-        },
-        editUser(event) {
-            const id = event.target.getAttribute("data-user");
-            console.log("edit user", id);
         },
         getImageUrl(project) {
-            return this.baseUrl + "/projects/" + project.id + "/media";
+            return this.$config.baseUrl + "/projects/" + project.id + "/media";
         },
-        updateDisplayDates() {
-            this.displayRunTime = "";
-            this.displayStartDate = "";
-            if (this.project.start_time) {
-                const d = new Date(this.project.start_time);
-                this.displayStartDate = d.toLocaleDateString("en-US");
-                this.displayRunTime = utils.getRunTime(this.project);
-            }
+        getModuleImg(module) {
+            const imgPath = require.context("../assets/modules-lg/", false, /\.png$/);
+            const img = utils.getModuleImg(module);
+            return imgPath("./" + img);
         },
     },
 };

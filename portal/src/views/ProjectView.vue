@@ -2,12 +2,12 @@
     <div>
         <SidebarNav
             :isAuthenticated="isAuthenticated"
-            viewing="projects"
+            :viewingProjects="true"
             :projects="userProjects"
             :stations="stations"
             @showStation="showStation"
         />
-        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
+        <HeaderBar />
         <div id="loading" v-if="loading">
             <img alt="" src="../assets/progress.gif" />
         </div>
@@ -24,21 +24,18 @@
                     Back to Project Dashboard
                 </div>
                 <div class="view-container">
-                    <!-- display admin view -->
                     <ProjectAdmin
-                        v-if="adminView"
+                        v-if="isAdministrator && displayProject"
                         :user="user"
-                        :project="activeProject"
+                        :displayProject="displayProject"
                         :userStations="stations"
-                        :users="users"
                         @viewProfile="switchToPublic"
                     />
-                    <!-- display public view -->
-                    <ProjectPublic v-if="publicView" :user="user" :project="activeProject" :users="users" />
+                    <ProjectPublic v-if="!isAdministrator && displayProject" :user="user" :displayProject="displayProject" />
                 </div>
             </div>
         </div>
-        <div v-if="noCurrentUser" class="no-user-message">
+        <div v-if="!isAuthenticated" class="no-user-message">
             <p>
                 Please
                 <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
@@ -51,8 +48,9 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from "vuex";
+import * as ActionTypes from "@/store/actions";
 import FKApi from "../api/api";
-import Config from "../secrets";
 import HeaderBar from "../components/HeaderBar";
 import ProjectPublic from "../components/ProjectPublic";
 import SidebarNav from "../components/SidebarNav";
@@ -66,123 +64,56 @@ export default {
         ProjectAdmin,
         SidebarNav,
     },
-    props: ["id"],
-    watch: {
-        id() {
-            if (this.id) {
-                this.reset();
-            }
+    props: {
+        id: {
+            required: true,
+            type: Number,
         },
     },
     data: () => {
         return {
-            baseUrl: Config.API_HOST,
-            user: {},
-            adminView: false,
-            publicView: false,
             previewing: false,
-            userProjects: [],
-            activeProject: {},
-            stations: [],
-            users: [],
-            isAuthenticated: false,
-            noCurrentUser: false,
-            loading: true,
         };
     },
-    async beforeCreate() {
-        this.api = new FKApi();
-        this.api
-            .getCurrentUser()
-            .then(user => {
-                this.user = user;
-                this.isAuthenticated = true;
-                this.getStations();
-                this.init();
-            })
-            .catch(() => {
-                this.loading = false;
-                this.noCurrentUser = true;
-            });
+    computed: {
+        ...mapGetters({ isAuthenticated: "isAuthenticated" }),
+        ...mapState({
+            loading: s => s.stations.loading.stations || s.stations.loading.projects,
+            user: s => s.user.user,
+            stations: s => s.stations.stations.user,
+            userProjects: s => s.stations.projects.user,
+            displayProject() {
+                return this.$store.getters.projectsById[this.id];
+            },
+            isAdministrator() {
+                const p = this.$store.getters.projectsById[this.id];
+                if (p) {
+                    return !p.readOnly;
+                }
+                return false;
+            },
+        }),
+    },
+    beforeMount() {
+        this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id });
     },
     methods: {
         goBack() {
-            window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
-        },
-        reset() {
-            this.adminView = false;
-            this.publicView = false;
-            this.userProjects = [];
-            this.activeProject = {};
-            this.users = [];
-            this.loading = true;
-            this.init();
-        },
-        getStations() {
-            this.api.getStations().then(s => {
-                this.stations = s.stations;
-            });
-        },
-        init() {
-            this.api.getUserProjects().then(projects => {
-                if (projects && projects.projects.length > 0) {
-                    this.userProjects = projects.projects;
-                }
-                this.getProject();
-            });
-        },
-        getProjectUsers() {
-            this.api.getUsersByProject(this.id).then(result => {
-                const users = result && result.users ? result.users : [];
-                this.users = users.map(u => {
-                    // pending users come back with id = 0, which causes problems
-                    if (u.user.id == 0) {
-                        u.user.id = "pending-" + Math.random();
-                    }
-                    if (u.user.mediaUrl) {
-                        u.userImage = this.baseUrl + "/user/" + u.user.id + "/media";
-                    } else {
-                        const imgPath = require.context("../assets/", false, /\.png$/);
-                        const img = "new_user.png";
-                        u.userImage = imgPath("./" + img);
-                    }
-                    return u;
-                });
-            });
-        },
-        getProject() {
-            this.api
-                .getProject(this.id)
-                .then(this.handleProject)
-                .catch(() => {
-                    this.$router.push({ name: "projects" });
-                });
-        },
-        handleProject(project) {
-            this.publicView = false;
-            this.adminView = false;
-            // TODO: don't show projects marked as private if user isn't member
-            // ~ if (project.private) {
-            //     this.$router.push({ name: "projects" });
-            // }
-            if (project.readOnly) {
-                this.publicView = true;
+            if (window.history.length > 1) {
+                this.$router.go(-1);
             } else {
-                this.adminView = true;
+                this.$router.push("/");
             }
-            this.getProjectUsers();
-            this.activeProject = project;
-            this.loading = false;
         },
         switchToAdmin() {
             this.previewing = false;
-            this.adminView = true;
-            this.publicView = false;
+            // this.adminView = true;
+            // this.publicView = false;
         },
         switchToPublic() {
             this.previewing = true;
-            this.publicView = true;
-            this.adminView = false;
+            // this.publicView = true;
+            // this.adminView = false;
         },
         showStation(station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });

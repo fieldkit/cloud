@@ -49,78 +49,47 @@ import FKApi from "../api/api";
 export default {
     name: "ProjectActivity",
     data: () => {
-        return {
-            loading: true,
-            activities: [],
-        };
+        return {};
     },
-    props: ["project", "viewing", "users"],
-    watch: {
-        viewing() {
-            if (this.viewing) {
-                this.loading = true;
-                this.fetchActivity();
-            }
+    props: { displayProject: { required: true }, viewing: { required: true } },
+    computed: {
+        loading() {
+            return false;
         },
-    },
-    async beforeCreate() {
-        this.api = new FKApi();
-    },
-    methods: {
-        fetchActivity() {
-            let imgPath = require.context("../assets/", false, /\.png$/);
-            const img = "compass-icon.png";
-            const compassImg = imgPath("./" + img);
-
-            this.api.getProjectActivity(this.project.id).then(result => {
-                const activities = result.activities.map((a, i) => {
-                    if (a.type == "StationIngestion") {
-                        return {
-                            id: "ingestion-" + i,
-                            type: "ingestion",
-                            icon: compassImg,
-                            name: a.station.name,
-                            time: new Date(a.created_at),
-                            records: a.meta.data.records,
-                            errors: a.meta.errors,
-                        };
-                    } else if (a.type == "ProjectUpdate") {
-                        const user = this.users.find(u => {
-                            return u.user.id == a.meta.author.id;
-                        });
-                        return {
-                            id: "update-" + i,
-                            type: "update",
-                            icon: user && user.userImage ? user.userImage : compassImg,
-                            name: a.meta.author.name,
-                            time: new Date(a.created_at),
-                            text: a.meta.body,
-                        };
-                    } else if (a.type == "StationDeployed") {
-                        return {
-                            id: "deploy-" + i,
-                            type: "deploy",
-                            icon: compassImg,
-                            name: a.station.name,
-                            time: new Date(a.meta.deployed_at),
-                            location: a.meta.location,
-                        };
-                    } else {
-                        // handle unknown activity types?
-                    }
-                });
-                this.activities = activities.filter(Boolean);
-                this.loading = false;
-                this.filterUpdates();
+        activities() {
+            const imgPath = require.context("../assets/", false, /\.png$/);
+            const compassImg = imgPath("./compass-icon.png");
+            return this.displayProject.activities.map((a, i) => {
+                if (a.type == "StationIngestion") {
+                    return {
+                        id: "ingestion-" + i,
+                        type: "ingestion",
+                        icon: compassImg,
+                        name: a.station.name,
+                        time: new Date(a.createdAt),
+                        records: a.meta.data.records,
+                        errors: a.meta.errors,
+                    };
+                } else if (a.type == "ProjectUpdate") {
+                    return {
+                        id: "update-" + i,
+                        type: "update",
+                        icon: compassImg,
+                        name: a.meta.author.name,
+                        time: new Date(a.createdAt),
+                        text: a.meta.body,
+                    };
+                } else if (a.type == "StationDeployed") {
+                    return {
+                        id: "deploy-" + i,
+                        type: "deploy",
+                        icon: compassImg,
+                        name: a.station.name,
+                        time: new Date(a.meta.deployedAt),
+                        location: a.meta.location,
+                    };
+                }
             });
-        },
-        filterUpdates() {
-            const updates = this.activities.filter(a => {
-                return a.type == "update";
-            });
-            if (updates.length > 0) {
-                this.$emit("foundUpdates", updates);
-            }
         },
     },
 };

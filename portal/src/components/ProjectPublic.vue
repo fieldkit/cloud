@@ -13,13 +13,19 @@
                         {{ project.location }}
                     </div>
                     <div class="time-container">
-                        <div class="time" v-if="displayStartDate">Started {{ displayStartDate }}</div>
-                        <span v-if="displayStartDate && displayRunTime">&nbsp;|&nbsp;</span>
-                        <div class="time" v-if="displayRunTime">{{ displayRunTime }}</div>
+                        <div class="time" v-if="project.startTime">Started {{ project.startTime | prettyDate }}</div>
+                        <span v-if="project.startTime && project.uptime">&nbsp;|&nbsp;</span>
+                        <div class="time" v-if="project.uptime">{{ project.uptime | prettyTime }}</div>
                     </div>
                     <div class="project-detail">{{ project.description }}</div>
                     <div class="module-icons">
-                        <img v-for="module in modules" v-bind:key="module" alt="Module icon" class="module-icon" :src="module" />
+                        <img
+                            v-for="module in projectModules"
+                            v-bind:key="module.name"
+                            alt="Module icon"
+                            class="module-icon"
+                            :src="module.url"
+                        />
                     </div>
                 </div>
 
@@ -56,13 +62,13 @@
             <div class="team-container">
                 <div class="section-heading">{{ getTeamHeading() }}</div>
                 <div v-for="user in users" v-bind:key="user.user.id" class="team-member">
-                    <img v-if="user.user.mediaUrl" alt="User image" :src="user.userImage" class="user-icon" />
+                    <img v-if="user.user.mediaUrl" alt="User image" :src="getUserImage(user)" class="user-icon" />
                     <span class="user-name">{{ user.user.name }}</span>
                 </div>
             </div>
             <div id="public-activity-feed-container">
                 <div class="heading">Recent Activity</div>
-                <ProjectActivity ref="projectActivity" :project="project" :viewing="true" :users="users" @foundUpdates="onFoundUpdates" />
+                <ProjectActivity :displayProject="displayProject" :viewing="true" />
             </div>
         </div>
     </div>
@@ -70,8 +76,8 @@
 
 <script>
 import * as utils from "../utilities";
+import * as ActionTypes from "@/store/actions";
 import FKApi from "../api/api";
-import Config from "../secrets";
 import ProjectStations from "../components/ProjectStations";
 import ProjectActivity from "../components/ProjectActivity";
 
@@ -83,10 +89,8 @@ export default {
     },
     data: () => {
         return {
-            baseUrl: Config.API_HOST,
             displayStartDate: "",
             displayRunTime: "",
-            modules: [],
             mostRecentUpdate: null,
             following: false,
             mapContainerSize: {
@@ -101,69 +105,46 @@ export default {
             },
         };
     },
-    props: ["user", "project", "users"],
-    watch: {
-        project: {
-            handler() {
-                this.reset();
-            },
-            immediate: true,
+    props: { user: {}, displayProject: {}, users: {} },
+    computed: {
+        project() {
+            return this.displayProject.project;
         },
-    },
-    mounted() {
-        if (this.project) {
-            this.$refs.projectActivity.fetchActivity();
-        }
-    },
-    async beforeCreate() {
-        this.api = new FKApi();
+        projectStations() {
+            return this.$store.getters.projectsById[this.displayProject.id].stations;
+        },
+        projectModules() {
+            return this.$store.getters.projectsById[this.displayProject.id].modules.map(m => {
+                return {
+                    name: m.name,
+                    url: this.getModuleImg(m),
+                };
+            });
+        },
     },
     methods: {
-        followProject() {
-            this.api.followProject(this.project.id).then(() => {
-                this.following = true;
-            });
+        async followProject() {
+            await this.$store.dispatch(ActionTypes.PROJECT_FOLLOW, { projectId: this.project.id });
+            this.following = true;
         },
-        unfollowProject() {
-            this.api.unfollowProject(this.project.id).then(() => {
-                this.following = false;
-            });
-        },
-        reset() {
-            this.mostRecentUpdate = null;
-            this.fetchFollowers();
-            this.updateDisplayDates();
-        },
-        fetchFollowers() {
-            this.api.getProjectFollows(this.project.id).then(result => {
-                result.followers.forEach(f => {
-                    if (f.id == this.user.id) {
-                        this.following = true;
-                    }
-                });
-            });
+        async unfollowProject() {
+            await this.$store.dispatch(ActionTypes.PROJECT_UNFOLLOW, { projectId: this.project.id });
+            this.following = false;
         },
         getImageUrl(project) {
-            return this.baseUrl + "/projects/" + project.id + "/media";
+            return this.$config.baseUrl + "/projects/" + project.id + "/media";
         },
-        updateDisplayDates() {
-            this.displayRunTime = "";
-            this.displayStartDate = "";
-            if (this.project.start_time) {
-                const d = new Date(this.project.start_time);
-                this.displayStartDate = d.toLocaleDateString("en-US");
-                this.displayRunTime = utils.getRunTime(this.project);
-            }
+        getUserImage(projectUser) {
+            return this.$config.baseUrl + "/user/" + projectUser.user.id + "/media";
         },
-        saveStationsData(data) {
-            this.modules = data.modules;
+        getModuleImg(module) {
+            const imgPath = require.context("../assets/modules-lg/", false, /\.png$/);
+            const img = utils.getModuleImg(module);
+            return imgPath("./" + img);
         },
         getTeamHeading() {
             const members = this.users.length == 1 ? "member" : "members";
             return "Project Team (" + this.users.length + " " + members + ")";
-        },
-        onFoundUpdates(updates) {
-            this.mostRecentUpdate = updates[0];
         },
     },
 };

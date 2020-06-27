@@ -7,11 +7,11 @@
             :stations="stations"
             @showStation="showStation"
         />
-        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
+        <HeaderBar />
         <div id="loading" v-if="loading">
             <img alt="" src="../assets/progress.gif" />
         </div>
-        <div class="main-panel" v-show="!loading">
+        <div class="main-panel" v-show="!loading && isAuthenticated">
             <div id="inner-container">
                 <div id="projects-container">
                     <div class="container">

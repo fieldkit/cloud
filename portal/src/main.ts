@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import VCalendar from "v-calendar";
+import moment from "moment";
 import { sync } from "vuex-router-sync";
 import i18n from "./i18n";
 import * as ActionTypes from "./store/actions";
@@ -16,6 +17,13 @@ Vue.use(VCalendar, {});
 Vue.use(Vuex);
 
 Vue.config.productionTip = false;
+
+Vue.filter("prettyDate", value => {
+    if (value) {
+        return moment(value).format("MM/DD/YYYY");
+    }
+    return "N/A";
+});
 
 const store = storeFactory();
 const router = routerFactory(store);

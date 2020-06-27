@@ -8,7 +8,7 @@
             </div>
             <div class="station-dropdown" v-if="addingStation">
                 Add a station:
-                <select v-model="stationOption" v-on:change="stationSelected">
+                <select v-model="selectedStationId" v-on:change="stationSelected">
                     <option v-for="station in userStations" v-bind:value="station.id" v-bind:key="station.id">
                         {{ station.name }}
                     </option>
@@ -24,12 +24,12 @@
             <div v-for="station in projectStations" v-bind:key="station.id">
                 <div class="station-box" :style="{ width: listSize.boxWidth }">
                     <div class="delete-link">
-                        <img alt="Delete" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation" />
+                        <img alt="Delete" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation(station)" />
                     </div>
                     <span class="station-name" v-on:click="showStation(station)">
                         {{ station.name }}
                     </span>
-                    <div class="last-seen">Last seen {{ getUpdatedDate(station) }}</div>
+                    <div class="last-seen">Last seen {{ station.updated | prettyDate }}</div>
                 </div>
             </div>
         </div>
@@ -55,9 +55,10 @@
 <script>
 import _ from "lodash";
 import * as utils from "../utilities";
-import FKApi from "../api/api";
-import StationSummary from "../components/StationSummary";
-import StationsMap from "../components/StationsMap";
+import * as ActionTypes from "@/store/actions";
+import FKApi from "@/api/api";
+import StationSummary from "@/components/StationSummary";
+import StationsMap from "@/components/StationsMap";
 
 export default {
     name: "ProjectStations",
@@ -67,12 +68,11 @@ export default {
     },
     data: () => {
         return {
-            projectStations: [],
             activeStation: null,
             following: false,
             showStationsList: true,
             addingStation: false,
-            stationOption: "",
+            selectedStationId: null,
             summarySize: {
                 width: "359px",
                 top: "-300px",
@@ -86,44 +86,21 @@ export default {
             },
         };
     },
-    props: ["project", "admin", "mapContainerSize", "listSize", "userStations"],
-    async beforeCreate() {
-        this.api = new FKApi();
+    props: {
+        project: { required: true },
+        admin: { required: true },
+        mapContainerSize: { required: true },
+        listSize: { required: true },
+        userStations: { required: true },
     },
-    mounted() {
-        this.fetchStations();
+    computed: {
+        projectStations() {
+            return this.$store.getters.projectsById[this.project.id].stations;
+        },
     },
     methods: {
         onMapReady(map) {
             this.map = map;
-        },
-        fetchStations() {
-            this.api.getStationsByProject(this.project.id).then(result => {
-                this.projectStations = result.stations;
-                let modules = [];
-                if (this.projectStations) {
-                    this.projectStations.forEach((s, i) => {
-                        if (i == 0 && s.location && s.location.latitude && this.map) {
-                            this.map.setCenter({
-                                lat: parseFloat(s.location.latitude),
-                                lng: parseFloat(s.location.longitude),
-                            });
-                        }
-                        if (s.configurations && s.configurations.all && s.configurations.all.length > 0) {
-                            s.configurations.all[0].modules.forEach(m => {
-                                if (!m.internal) {
-                                    modules.push(this.getModuleImg(m));
-                                }
-                            });
-                        }
-                    });
-                    modules = _.uniq(modules);
-                    this.$emit("loaded", { modules: modules, projectStations: this.projectStations });
-                }
-            });
-        },
-        getUpdatedDate(station) {
-            return utils.getUpdatedDate(station);
         },
         showStation(station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
@@ -131,34 +108,24 @@ export default {
         showStationSelect() {
             this.addingStation = true;
         },
-        stationSelected() {
-            const params = {
+        async stationSelected() {
+            const payload = {
                 projectId: this.project.id,
-                stationId: this.stationOption,
+                stationId: this.selectedStationId,
             };
-            this.api.addStationToProject(params).then(() => {
-                this.fetchStations();
-            });
+            await this.$store.dispatch(ActionTypes.STATION_PROJECT_ADD, payload);
         },
-        deleteStation(event) {
-            const stationId = event.target.getAttribute("data-id");
+        async deleteStation(station) {
             if (window.confirm("Are you sure you want to remove this station?")) {
-                const params = {
+                const payload = {
                     projectId: this.project.id,
-                    stationId: stationId,
+                    stationId: station.Id,
                 };
-                this.api.removeStationFromProject(params).then(() => {
-                    this.fetchStations();
-                });
+                await this.$store.dispatch(ActionTypes.STATION_PROJECT_REMOVE, payload);
             }
         },
-        getModuleImg(module) {
-            let imgPath = require.context("../assets/modules-lg/", false, /\.png$/);
-            let img = utils.getModuleImg(module);
-            return imgPath("./" + img);
-        },
         toggleStations() {
-            let stationsMap = document.getElementById("stations-map-container");
+            const stationsMap = document.getElementById("stations-map-container");
             this.showStationsList = !this.showStationsList;
             if (this.showStationsList) {
                 document.getElementById("stations-list").style.width = this.listSize.width;
@@ -166,12 +133,12 @@ export default {
                 stationsMap.style["margin-left"] = "0";
                 this.map.resize();
                 document.getElementById("stations-map-container").style.transition = "width 0.5s";
-                let boxes = document.getElementsByClassName("station-box");
+                const boxes = document.getElementsByClassName("station-box");
                 Array.from(boxes).forEach(b => {
                     b.style.opacity = 1;
                 });
             } else {
-                let boxes = document.getElementsByClassName("station-box");
+                const boxes = document.getElementsByClassName("station-box");
                 Array.from(boxes).forEach(b => {
                     b.style.opacity = 0;
                 });

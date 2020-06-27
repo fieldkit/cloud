@@ -11,6 +11,83 @@ export class LoginResponse {
     constructor(public readonly token: string | null) {}
 }
 
+export interface ProjectRef {
+    id: number;
+    name: string;
+}
+
+export interface StationRef {
+    id: number;
+    name: string;
+}
+
+export interface UploaderRef {
+    id: number;
+    name: string;
+}
+
+export interface UploadedData {
+    id: number;
+    records: number;
+}
+
+export interface UploadedMeta {
+    uploader: UploaderRef;
+    data: UploadedData;
+    errors: boolean;
+}
+
+export interface Activity {
+    id: number;
+    key: string;
+    project: ProjectRef;
+    station: StationRef;
+    createdAt: any;
+    type: string;
+    meta: UploadedMeta;
+}
+
+export interface ProjectActivityResponse {
+    activities: Activity[];
+    total: number;
+    page: number;
+}
+
+export interface Avatar {
+    url: string;
+}
+
+export interface Follower {
+    id: number;
+    name: string;
+    avatar: Avatar;
+}
+
+export interface ProjectFollowers {
+    followers: Follower[];
+    total: number;
+    page: number;
+}
+
+export interface SimpleUser {
+    id: number;
+    email: string;
+    name: string;
+    bio: string;
+    mediaUrl: string;
+    mediaContentType: string;
+}
+
+export interface ProjectUser {
+    membership: string;
+    role: string;
+    user: SimpleUser;
+}
+
+export interface ProjectUsers {
+    users: ProjectUser[];
+}
+
 export class CurrentUser {
     id: number;
     email: string;
@@ -211,7 +288,7 @@ class FKApi {
         }).then(response => this.handle(response));
     }
 
-    getUsersByProject(projectId) {
+    getUsersByProject(projectId): Promise<ProjectUsers> {
         const token = this.token.getHeader();
         return axios({
             method: "GET",
@@ -395,7 +472,7 @@ class FKApi {
         }).then(response => this.handle(response));
     }
 
-    getProjectActivity(id) {
+    getProjectActivity(id): Promise<ProjectActivityResponse> {
         const token = this.token.getHeader();
         return axios({
             method: "GET",
@@ -475,7 +552,7 @@ class FKApi {
         }).then(response => this.handle(response));
     }
 
-    getProjectFollows(projectId) {
+    getProjectFollows(projectId): Promise<ProjectFollowers> {
         return axios({
             method: "GET",
             url: this.baseUrl + "/projects/" + projectId + "/followers",
