@@ -6,8 +6,8 @@
             </div>
             <div class="text-elements">
                 <div class="user-name">
-                    <router-link :to="{ name: 'user' }" class="account-link" v-if="isAuthenticated">
-                        {{ this.user.name }}
+                    <router-link v-if="user" :to="{ name: 'user' }" class="account-link">
+                        {{ user.name }}
                     </router-link>
                 </div>
                 <div class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</div>
@@ -15,7 +15,7 @@
                     Log in
                 </router-link>
             </div>
-            <img alt="User image" :src="userImage" class="user-image" v-if="isAuthenticated" />
+            <img v-if="user" alt="User image" :src="userImage" class="user-image" />
         </div>
     </div>
 </template>
@@ -31,7 +31,7 @@ export default {
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({ user: s => s.user.user }),
         userImage() {
-            return this.$config.baseUrl + "/user/" + this.user.id + "/media";
+            return this.$config.baseUrl + "/user/" + this.$store.state.user.user.id + "/media";
         },
     },
     methods: {
