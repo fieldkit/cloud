@@ -14,7 +14,7 @@ const toCamel = s => {
     });
 };
 
-export function keysToCamel(o) {
+export function keysToCamelWithWarnings(o) {
     if (isObject(o)) {
         const n = new Proxy(o, {
             get(target, name, receiver) {
@@ -24,8 +24,24 @@ export function keysToCamel(o) {
                         console.warn("style violation", name);
                     }
                 }
-                return target[name];
+                return keysToCamelWithWarnings(target[name]);
             },
+        });
+
+        return n;
+    } else if (isArray(o)) {
+        return o.map(i => keysToCamelWithWarnings(i));
+    }
+
+    return o;
+}
+
+export function keysToCamel(o) {
+    if (isObject(o)) {
+        const n = {};
+
+        Object.keys(o).forEach(k => {
+            n[toCamel(k)] = keysToCamel(o[k]);
         });
 
         return n;
