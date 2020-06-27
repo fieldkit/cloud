@@ -19,6 +19,66 @@ export class CurrentUser {
     mediaUrl: string;
 }
 
+export interface Project {
+    description: string;
+    goal: string;
+    id: number;
+    location: string;
+    name: string;
+    private: boolean;
+    readOnly: boolean;
+    slug: string;
+    tags: string;
+    mediaContentType: string;
+    mediaUrl: string;
+    startTime?: Date;
+    numberOfFollowers: number;
+}
+
+export interface Owner {
+    id: number;
+    name: string;
+}
+
+export interface Upload {
+    id: number;
+    time: any;
+    uploadId: string;
+    size: number;
+    url: string;
+    type: string;
+    blocks: number[];
+}
+
+export interface Photos {
+    small: string;
+}
+
+export interface Configurations {
+    all: any[];
+}
+
+export interface Station {
+    id: number;
+    name: string;
+    owner: Owner;
+    deviceId: string;
+    uploads: Upload[];
+    images: any[];
+    photos: Photos;
+    readOnly: boolean;
+    configurations: Configurations;
+    updated: number;
+}
+
+export interface ProjectsResponse {
+    projects: Project[];
+}
+
+export interface StationsResponse {
+    stations: Station[];
+}
+
 // Intentionally keeping this synchronous since it'll get used in
 // VueJS stuff quite often to make URLs that don't require custom
 // headers for authentication.
@@ -115,7 +175,7 @@ class FKApi {
         }).then(response => this.handle(response));
     }
 
-    getStation(id) {
+    getStation(id): Promise<Station> {
         const token = this.token.getHeader();
         return axios({
             method: "GET",
@@ -127,7 +187,7 @@ class FKApi {
         }).then(response => this.handle(response));
     }
 
-    getStations() {
+    getStations(): Promise<StationsResponse> {
         const token = this.token.getHeader();
         return axios({
             method: "GET",
@@ -139,7 +199,7 @@ class FKApi {
         }).then(response => this.handle(response));
     }
 
-    getCurrentUser() {
+    getCurrentUser(): Promise<CurrentUser> {
         const token = this.token.getHeader();
         return axios({
             method: "GET",
@@ -299,7 +359,7 @@ class FKApi {
         }).then(response => this.handle(response));
     }
 
-    getUserProjects() {
+    getUserProjects(): Promise<ProjectsResponse> {
         const token = this.token.getHeader();
         return axios({
             method: "GET",
@@ -311,7 +371,7 @@ class FKApi {
         }).then(response => this.handle(response));
     }
 
-    getPublicProjects() {
+    getPublicProjects(): Promise<ProjectsResponse> {
         const token = this.token.getHeader();
         return axios({
             method: "GET",
@@ -320,18 +380,10 @@ class FKApi {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
-        }).then(response => {
-            if (response.status == 200) {
-                return response.data.projects.filter(p => {
-                    return !p.private;
-                });
-            } else {
-                throw new Error("Api failed");
-            }
-        });
+        }).then(response => this.handle(response));
     }
 
-    getProject(id) {
+    getProject(id): Promise<Project> {
         const token = this.token.getHeader();
         return axios({
             method: "GET",

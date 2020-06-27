@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-for="project in displayProjects" v-bind:key="project.id" class="project-container">
+        <div v-for="project in projects" v-bind:key="project.id" class="project-container">
             <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
                 <div class="project-image-container">
                     <img alt="Fieldkit Project" v-if="project.mediaUrl" :src="getImageUrl(project)" class="project-image" />
@@ -11,9 +11,9 @@
                 <div class="project-name">{{ project.name }}</div>
                 <div class="project-description">{{ project.description }}</div>
                 <div class="stats-icon-container">
-                    <div class="stat follows" v-if="project.numFollowers">
+                    <div class="stat follows" v-if="project.numberOfFollowers">
                         <img alt="Follows" src="../assets/heart.png" class="follow-icon" />
-                        <span>{{ project.numFollowers }}</span>
+                        <span>{{ project.numberOfFollowers }}</span>
                     </div>
                     <div class="stat notifications" v-if="project.notifications">
                         <img alt="Notifications" src="../assets/notification.png" class="notify-icon" />
@@ -30,43 +30,17 @@
 </template>
 
 <script>
-import Config from "../secrets";
-import FKApi from "../api/api";
+import FKApi from "@/api/api";
 
 export default {
     name: "ProjectThumbnails",
     data: () => {
-        return {
-            baseUrl: Config.API_HOST,
-            displayProjects: [],
-        };
+        return {};
     },
-    props: ["projects"],
-    async beforeCreate() {
-        this.api = new FKApi();
-    },
-    watch: {
-        projects() {
-            if (this.projects) {
-                this.projects.forEach(p => {
-                    this.api
-                        .getProjectFollows(p.id)
-                        .then(result => {
-                            // fudging this so every project has at least one follower for now
-                            // owner should be following, anyway
-                            p.numFollowers = result.followers.length + 1;
-                            this.displayProjects.push(p);
-                        })
-                        .catch(() => {
-                            this.displayProjects.push(p);
-                        });
-                });
-            }
-        },
-    },
+    props: { projects: { required: true } },
     methods: {
         getImageUrl(project) {
-            return this.baseUrl + "/projects/" + project.id + "/media/";
+            return this.$config.baseUrl + "/projects/" + project.id + "/media/";
         },
     },
 };

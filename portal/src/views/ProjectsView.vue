@@ -11,7 +11,7 @@
         <div id="loading" v-if="loading">
             <img alt="" src="../assets/progress.gif" />
         </div>
-        <div class="main-panel" v-show="!loading && isAuthenticated">
+        <div class="main-panel" v-show="!loading">
             <div id="inner-container">
                 <div id="projects-container">
                     <div class="container">
@@ -19,7 +19,8 @@
                             <img alt="Add project" src="../assets/add.png" />
                             Add Project
                         </div>
-                        <h1>{{ projectsTitle }}</h1>
+                        <h1 v-if="isAuthenticated">My Projects</h1>
+                        <h1 v-if="!isAuthenticated">Projects</h1>
                         <!-- display user's projects -->
                         <ProjectThumbnails :projects="userProjects" />
                     </div>
@@ -31,7 +32,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="noCurrentUser" class="no-user-message">
+        <div v-if="user" class="no-user-message">
             <p>
                 Please
                 <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
@@ -48,6 +49,8 @@ import FKApi from "../api/api";
 import HeaderBar from "../components/HeaderBar";
 import ProjectThumbnails from "../components/ProjectThumbnails";
 import SidebarNav from "../components/SidebarNav";
+import { mapState, mapGetters } from "vuex";
+import * as ActionTypes from "@/store/actions";
 
 export default {
     name: "ProjectsView",
@@ -56,68 +59,30 @@ export default {
         ProjectThumbnails,
         SidebarNav,
     },
-    props: ["id"],
-    data: () => {
-        return {
-            user: {},
-            userProjects: [],
-            projectsTitle: "Projects",
-            publicProjects: [],
-            stations: [],
-            isAuthenticated: false,
-            noCurrentUser: false,
-            loading: true,
-        };
+    data() {
+        return {};
     },
-    async beforeCreate() {
-        this.api = new FKApi();
-        this.api
-            .getCurrentUser()
-            .then(user => {
-                this.user = user;
-                this.isAuthenticated = true;
-                this.projectsTitle = "My Projects";
-                this.getPublicProjects();
-                this.getUserProjects();
-                this.getStations();
-            })
-            .catch(() => {
-                this.loading = false;
-                this.noCurrentUser = true;
-            });
+    computed: {
+        ...mapGetters({ isAuthenticated: "isAuthenticated" }),
+        ...mapState({
+            user: s => s.user.user,
+            stations: s => s.stations.stations.user,
+            userProjects: s => s.stations.projects.user,
+            publicProjects: s => s.stations.projects.community,
+            loading: s => s.stations.loading.stations || s.stations.loading.projects,
+        }),
+    },
+    beforeMount() {
+        this.$store.dispatch(ActionTypes.NEED_PROJECTS);
+        this.$store.dispatch(ActionTypes.NEED_STATIONS);
     },
     methods: {
         goBack() {
-            window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
-        },
-        getStations() {
-            this.api.getStations().then(s => {
-                this.stations = s.stations;
-            });
-        },
-        getPublicProjects() {
-            this.api
-                .getPublicProjects()
-                .then(projects => {
-                    this.publicProjects = projects;
-                    this.loading = false;
-                })
-                .catch(() => {
-                    this.loading = false;
-                });
-        },
-        getUserProjects() {
-            this.api.getUserProjects().then(projects => {
-                if (projects && projects.projects.length > 0) {
-                    this.userProjects = projects.projects;
-                } else {
-                    // create default project for user
-                    this.api.addDefaultProject().then(project => {
-                        this.userProjects = [project];
-                        this.loading = false;
-                    });
-                }
-            });
+            if (window.history.length > 1) {
+                this.$router.go(-1);
+            } else {
+                this.$router.push("/");
+            }
         },
         addProject() {
             this.$router.push({ name: "addProject" });
