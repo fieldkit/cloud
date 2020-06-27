@@ -436,7 +436,17 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 
 	ingestions := []*data.Ingestion{}
 	if err := r.db.SelectContext(ctx, &ingestions, `
-		SELECT * FROM fieldkit.ingestion WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1) ORDER BY time DESC
+		SELECT
+			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags, completed,
+			attempted, errors, total_records, other_errors, meta_errors, data_errors
+		FROM (
+			SELECT
+				*,
+				rank() OVER (PARTITION BY device_id ORDER BY time DESC)
+			FROM
+			fieldkit.ingestion
+			WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1) ORDER BY time DESC
+		) AS ranked WHERE rank < 10;
 		`, id); err != nil {
 		return nil, err
 	}
@@ -528,10 +538,17 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 
 	ingestions := []*data.Ingestion{}
 	if err := r.db.SelectContext(ctx, &ingestions, `
-		SELECT *
-		FROM fieldkit.ingestion
-		WHERE device_id IN (SELECT s.device_id FROM fieldkit.station AS s JOIN fieldkit.project_station AS ps ON (s.id = ps.station_id) WHERE project_id = $1)
-		ORDER BY time DESC
+		SELECT
+			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags, completed,
+			attempted, errors, total_records, other_errors, meta_errors, data_errors
+		FROM (
+			SELECT
+				*,
+				rank() OVER (PARTITION BY device_id ORDER BY time DESC)
+			FROM
+			fieldkit.ingestion
+			WHERE device_id IN (SELECT s.device_id FROM fieldkit.station AS s JOIN fieldkit.project_station AS ps ON (s.id = ps.station_id) WHERE project_id = $1)
+		) AS ranked WHERE rank < 10;
 		`, id); err != nil {
 		return nil, err
 	}
