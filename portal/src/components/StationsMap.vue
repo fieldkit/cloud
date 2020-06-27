@@ -41,9 +41,8 @@ export default {
             mapDiv.style.position = this.mapSize.position;
         },
         onMapLoaded(map) {
-            let imgData = require.context("../assets/", false, /\.png$/);
-            imgData = imgData("./" + "Icon_Map_Dot.png");
-            this.map.loadImage(imgData, (error, image) => {
+            const compass = this.$loadImage("Icon_Map_Dot.png");
+            this.map.loadImage(compass, (error, image) => {
                 if (error) throw error;
                 if (!this.map.hasImage("dot")) this.map.addImage("dot", image);
             });

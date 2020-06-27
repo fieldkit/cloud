@@ -232,9 +232,7 @@ export default {
         },
     },
     mounted() {
-        const imgPath = require.context("../assets/", false, /\.png$/);
-        const img = "new_user.png";
-        this.newUserImage = imgPath("./" + img);
+        this.newUserImage = this.$loadAsset("new_user.png");
     },
     methods: {
         getUserImage(projectUser) {
@@ -313,9 +311,7 @@ export default {
             return this.$config.baseUrl + "/projects/" + project.id + "/media";
         },
         getModuleImg(module) {
-            const imgPath = require.context("../assets/modules-lg/", false, /\.png$/);
-            const img = utils.getModuleImg(module);
-            return imgPath("./" + img);
+            return this.$loadAsset("modules-lg/" + utils.getModuleImg(module));
         },
     },
 };

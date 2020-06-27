@@ -12,7 +12,17 @@ import ConfigurationPlugin from "./config";
 import Config from "./secrets";
 import App from "./App.vue";
 
+const AssetsPlugin = {
+    install(Vue, config: any) {
+        const loader = require.context("@/assets/", true, /\.png$/);
+        Vue.prototype.$loadAsset = path => {
+            return loader("./" + path);
+        };
+    },
+};
+
 Vue.use(ConfigurationPlugin, Config);
+Vue.use(AssetsPlugin, Config);
 Vue.use(VCalendar, {});
 Vue.use(Vuex);
 

@@ -209,9 +209,7 @@ export default {
         },
 
         getModuleImg(module) {
-            const imgPath = require.context("../assets/", false, /\.png$/);
-            const img = utils.getModuleImg(module);
-            return imgPath("./" + img);
+            return this.$loadAsset(utils.getModuleImg(module));
         },
 
         getLat() {

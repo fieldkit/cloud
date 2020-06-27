@@ -57,14 +57,13 @@ export default {
             return false;
         },
         activities() {
-            const imgPath = require.context("../assets/", false, /\.png$/);
-            const compassImg = imgPath("./compass-icon.png");
+            const compass = this.$loadAsset("compass-icon.png");
             return this.displayProject.activities.map((a, i) => {
                 if (a.type == "StationIngestion") {
                     return {
                         id: "ingestion-" + i,
                         type: "ingestion",
-                        icon: compassImg,
+                        icon: compass,
                         name: a.station.name,
                         time: new Date(a.createdAt),
                         records: a.meta.data.records,
@@ -74,7 +73,7 @@ export default {
                     return {
                         id: "update-" + i,
                         type: "update",
-                        icon: compassImg,
+                        icon: compass,
                         name: a.meta.author.name,
                         time: new Date(a.createdAt),
                         text: a.meta.body,
@@ -83,7 +82,7 @@ export default {
                     return {
                         id: "deploy-" + i,
                         type: "deploy",
-                        icon: compassImg,
+                        icon: compass,
                         name: a.station.name,
                         time: new Date(a.meta.deployedAt),
                         location: a.meta.location,

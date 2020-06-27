@@ -138,9 +138,7 @@ export default {
             return this.$config.baseUrl + "/user/" + projectUser.user.id + "/media";
         },
         getModuleImg(module) {
-            const imgPath = require.context("../assets/modules-lg/", false, /\.png$/);
-            const img = utils.getModuleImg(module);
-            return imgPath("./" + img);
+            return this.$loadAsset("modules-lg/" + utils.getModuleImg(module));
         },
         getTeamHeading() {
             const members = this.users.length == 1 ? "member" : "members";
