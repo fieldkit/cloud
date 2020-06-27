@@ -609,19 +609,20 @@ func (c *Client) DecodeMediaReferenceResponse(resp *http.Response) (*MediaRefere
 //
 // Identifier: application/vnd.app.project+json; view=default
 type Project struct {
-	Description      string     `form:"description" json:"description" yaml:"description" xml:"description"`
-	EndTime          *time.Time `form:"end_time,omitempty" json:"end_time,omitempty" yaml:"end_time,omitempty" xml:"end_time,omitempty"`
-	Goal             string     `form:"goal" json:"goal" yaml:"goal" xml:"goal"`
-	ID               int        `form:"id" json:"id" yaml:"id" xml:"id"`
-	Location         string     `form:"location" json:"location" yaml:"location" xml:"location"`
-	MediaContentType *string    `form:"media_content_type,omitempty" json:"media_content_type,omitempty" yaml:"media_content_type,omitempty" xml:"media_content_type,omitempty"`
-	MediaURL         *string    `form:"media_url,omitempty" json:"media_url,omitempty" yaml:"media_url,omitempty" xml:"media_url,omitempty"`
-	Name             string     `form:"name" json:"name" yaml:"name" xml:"name"`
-	Private          bool       `form:"private" json:"private" yaml:"private" xml:"private"`
-	ReadOnly         bool       `form:"read_only" json:"read_only" yaml:"read_only" xml:"read_only"`
-	Slug             string     `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
-	StartTime        *time.Time `form:"start_time,omitempty" json:"start_time,omitempty" yaml:"start_time,omitempty" xml:"start_time,omitempty"`
-	Tags             string     `form:"tags" json:"tags" yaml:"tags" xml:"tags"`
+	Description       string     `form:"description" json:"description" yaml:"description" xml:"description"`
+	EndTime           *time.Time `form:"end_time,omitempty" json:"end_time,omitempty" yaml:"end_time,omitempty" xml:"end_time,omitempty"`
+	Goal              string     `form:"goal" json:"goal" yaml:"goal" xml:"goal"`
+	ID                int        `form:"id" json:"id" yaml:"id" xml:"id"`
+	Location          string     `form:"location" json:"location" yaml:"location" xml:"location"`
+	MediaContentType  *string    `form:"media_content_type,omitempty" json:"media_content_type,omitempty" yaml:"media_content_type,omitempty" xml:"media_content_type,omitempty"`
+	MediaURL          *string    `form:"media_url,omitempty" json:"media_url,omitempty" yaml:"media_url,omitempty" xml:"media_url,omitempty"`
+	Name              string     `form:"name" json:"name" yaml:"name" xml:"name"`
+	NumberOfFollowers int        `form:"number_of_followers" json:"number_of_followers" yaml:"number_of_followers" xml:"number_of_followers"`
+	Private           bool       `form:"private" json:"private" yaml:"private" xml:"private"`
+	ReadOnly          bool       `form:"read_only" json:"read_only" yaml:"read_only" xml:"read_only"`
+	Slug              string     `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
+	StartTime         *time.Time `form:"start_time,omitempty" json:"start_time,omitempty" yaml:"start_time,omitempty" xml:"start_time,omitempty"`
+	Tags              string     `form:"tags" json:"tags" yaml:"tags" xml:"tags"`
 }
 
 // Validate validates the Project media type instance.

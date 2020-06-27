@@ -102,6 +102,7 @@ func TestUpdateProjectWhenAdministrator(t *testing.T) {
 		"read_only": false,
 		"location": "",
 		"goal": "",
+		"number_of_followers": 0,
 		"tags": ""
 	}`, newName, newSlug)
 }
@@ -174,6 +175,7 @@ func TestGetProjectMember(t *testing.T) {
 			"read_only": true,
 			"private": false,
 			"name": "<<PRESENCE>>",
+			"number_of_followers": 0,
 			"goal": "<<PRESENCE>>"
 		}`)
 }
@@ -212,6 +214,7 @@ func TestGetProjectAdministrator(t *testing.T) {
 			"read_only": false,
 			"private": false,
 			"name": "<<PRESENCE>>",
+			"number_of_followers": 0,
 			"goal": "<<PRESENCE>>"
 		}`)
 }

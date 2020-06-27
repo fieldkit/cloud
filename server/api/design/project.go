@@ -50,7 +50,8 @@ var Project = MediaType("application/vnd.app.project+json", func() {
 		Attribute("media_url")
 		Attribute("media_content_type")
 		Attribute("read_only", Boolean)
-		Required("id", "name", "slug", "description", "goal", "location", "private", "tags", "read_only")
+		Attribute("number_of_followers", Integer)
+		Required("id", "name", "slug", "description", "goal", "location", "private", "tags", "read_only", "number_of_followers")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -66,6 +67,7 @@ var Project = MediaType("application/vnd.app.project+json", func() {
 		Attribute("media_url")
 		Attribute("media_content_type")
 		Attribute("read_only")
+		Attribute("number_of_followers")
 	})
 })
 

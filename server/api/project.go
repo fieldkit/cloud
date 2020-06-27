@@ -12,31 +12,42 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
-func ProjectType(project *data.Project, role *data.Role) *app.Project {
+func ProjectType(project *data.Project, numberOfFollowers int32, role *data.Role) *app.Project {
 	return &app.Project{
-		ID:               int(project.ID),
-		Name:             project.Name,
-		Slug:             project.Slug,
-		Description:      project.Description,
-		Goal:             project.Goal,
-		Location:         project.Location,
-		Tags:             project.Tags,
-		Private:          project.Private,
-		StartTime:        project.StartTime,
-		EndTime:          project.EndTime,
-		MediaURL:         project.MediaURL,
-		MediaContentType: project.MediaContentType,
-		ReadOnly:         role.IsProjectReadOnly(),
+		ID:                int(project.ID),
+		Name:              project.Name,
+		Slug:              project.Slug,
+		Description:       project.Description,
+		Goal:              project.Goal,
+		Location:          project.Location,
+		Tags:              project.Tags,
+		Private:           project.Private,
+		StartTime:         project.StartTime,
+		EndTime:           project.EndTime,
+		MediaURL:          project.MediaURL,
+		MediaContentType:  project.MediaContentType,
+		ReadOnly:          role.IsProjectReadOnly(),
+		NumberOfFollowers: int(numberOfFollowers),
 	}
 }
 
-func ProjectsType(projects []*data.Project, roles map[int32]*data.Role) *app.Projects {
+func findNumberOfFollowers(followers []*FollowersSummary, id int32) int32 {
+	for _, f := range followers {
+		if f.ProjectID == id {
+			return f.Followers
+		}
+	}
+	return 0
+}
+
+func ProjectsType(projects []*data.Project, followers []*FollowersSummary, roles map[int32]*data.Role) *app.Projects {
 	projectsCollection := make([]*app.Project, len(projects))
 	for i, project := range projects {
+		numberOfFollowers := findNumberOfFollowers(followers, project.ID)
 		if role, ok := roles[project.ID]; ok {
-			projectsCollection[i] = ProjectType(project, role)
+			projectsCollection[i] = ProjectType(project, numberOfFollowers, role)
 		} else {
-			projectsCollection[i] = ProjectType(project, data.PublicRole)
+			projectsCollection[i] = ProjectType(project, numberOfFollowers, data.PublicRole)
 		}
 	}
 
@@ -45,10 +56,11 @@ func ProjectsType(projects []*data.Project, roles map[int32]*data.Role) *app.Pro
 	}
 }
 
-func ProjectUserAndProjectsType(projects []*data.ProjectUserAndProject) *app.Projects {
+func ProjectUserAndProjectsType(projects []*data.ProjectUserAndProject, followers []*FollowersSummary) *app.Projects {
 	projectsCollection := make([]*app.Project, len(projects))
 	for i, project := range projects {
-		projectsCollection[i] = ProjectType(&project.Project, project.ProjectUser.LookupRole())
+		numberOfFollowers := findNumberOfFollowers(followers, project.ID)
+		projectsCollection[i] = ProjectType(&project.Project, numberOfFollowers, project.ProjectUser.LookupRole())
 	}
 
 	return &app.Projects{
@@ -115,11 +127,13 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_user (project_id, user_id, role) VALUES ($1, $2, $3)", project.ID, p.UserID(), role.ID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `
+		INSERT INTO fieldkit.project_user (project_id, user_id, role) VALUES ($1, $2, $3)
+		`, project.ID, p.UserID(), role.ID); err != nil {
 		return err
 	}
 
-	return ctx.OK(ProjectType(project, role))
+	return ctx.OK(ProjectType(project, 0, role))
 }
 
 func (c *ProjectController) Update(ctx *app.UpdateProjectContext) error {
@@ -173,7 +187,7 @@ func (c *ProjectController) Update(ctx *app.UpdateProjectContext) error {
 		return err
 	}
 
-	return ctx.OK(ProjectType(project, role))
+	return ctx.OK(ProjectType(project, 0, role))
 }
 
 func (c *ProjectController) Get(ctx *app.GetProjectContext) error {
@@ -182,7 +196,9 @@ func (c *ProjectController) Get(ctx *app.GetProjectContext) error {
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err == nil {
 		projectUsers := []*data.ProjectUser{}
-		if err := c.options.Database.SelectContext(ctx, &projectUsers, `SELECT * FROM fieldkit.project_user WHERE project_id = $1 AND user_id = $2`, ctx.ProjectID, p.UserID()); err != nil {
+		if err := c.options.Database.SelectContext(ctx, &projectUsers, `
+			SELECT * FROM fieldkit.project_user WHERE project_id = $1 AND user_id = $2
+			`, ctx.ProjectID, p.UserID()); err != nil {
 			return err
 		}
 
@@ -192,11 +208,18 @@ func (c *ProjectController) Get(ctx *app.GetProjectContext) error {
 	}
 
 	project := &data.Project{}
-	if err := c.options.Database.GetContext(ctx, project, `SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1`, ctx.ProjectID); err != nil {
+	if err := c.options.Database.GetContext(ctx, project, `
+		SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1
+		`, ctx.ProjectID); err != nil {
 		return err
 	}
 
-	return ctx.OK(ProjectType(project, role))
+	return ctx.OK(ProjectType(project, 0, role))
+}
+
+type FollowersSummary struct {
+	ProjectID int32 `db:"project_id"`
+	Followers int32 `db:"followers"`
 }
 
 func (c *ProjectController) List(ctx *app.ListProjectContext) error {
@@ -215,11 +238,22 @@ func (c *ProjectController) List(ctx *app.ListProjectContext) error {
 	}
 
 	projects := []*data.Project{}
-	if err := c.options.Database.SelectContext(ctx, &projects, `SELECT p.* FROM fieldkit.project AS p`); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &projects, `
+		SELECT p.* FROM fieldkit.project AS p ORDER BY p.name LIMIT 10
+		`); err != nil {
 		return err
 	}
 
-	return ctx.OK(ProjectsType(projects, roles))
+	followers := []*FollowersSummary{}
+	if err := c.options.Database.SelectContext(ctx, &followers, `
+		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (
+			SELECT id FROM fieldkit.project ORDER BY name LIMIT 10
+		) GROUP BY f.project_id
+		`); err != nil {
+		return err
+	}
+
+	return ctx.OK(ProjectsType(projects, followers, roles))
 }
 
 func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) error {
@@ -229,11 +263,22 @@ func (c *ProjectController) ListCurrent(ctx *app.ListCurrentProjectContext) erro
 	}
 
 	projects := []*data.ProjectUserAndProject{}
-	if err := c.options.Database.SelectContext(ctx, &projects, `SELECT pu.*, p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS pu ON pu.project_id = p.id WHERE pu.user_id = $1 ORDER BY p.name`, p.UserID()); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &projects, `
+		SELECT pu.*, p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS pu ON pu.project_id = p.id WHERE pu.user_id = $1 ORDER BY p.name
+		`, p.UserID()); err != nil {
 		return err
 	}
 
-	return ctx.OK(ProjectUserAndProjectsType(projects))
+	followers := []*FollowersSummary{}
+	if err := c.options.Database.SelectContext(ctx, &followers, `
+		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (
+			SELECT p.id FROM fieldkit.project AS p JOIN fieldkit.project_user AS pu ON pu.project_id = p.id WHERE pu.user_id = $1
+		) GROUP BY f.project_id
+		`, p.UserID()); err != nil {
+		return err
+	}
+
+	return ctx.OK(ProjectUserAndProjectsType(projects, followers))
 }
 
 func (c *ProjectController) ListStation(ctx *app.ListStationProjectContext) error {
@@ -242,7 +287,9 @@ func (c *ProjectController) ListStation(ctx *app.ListStationProjectContext) erro
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err == nil {
 		projectUsers := []*data.ProjectUser{}
-		if err := c.options.Database.SelectContext(ctx, &projectUsers, `SELECT * FROM fieldkit.project_user WHERE user_id = $1`, p.UserID()); err != nil {
+		if err := c.options.Database.SelectContext(ctx, &projectUsers, `
+			SELECT * FROM fieldkit.project_user WHERE user_id = $1
+			`, p.UserID()); err != nil {
 			return err
 		}
 
@@ -252,11 +299,22 @@ func (c *ProjectController) ListStation(ctx *app.ListStationProjectContext) erro
 	}
 
 	projects := []*data.Project{}
-	if err := c.options.Database.SelectContext(ctx, &projects, `SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_station AS ps ON ps.project_id = p.id WHERE ps.station_id = $1 ORDER BY p.name`, ctx.StationID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &projects, `
+		SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_station AS ps ON ps.project_id = p.id WHERE ps.station_id = $1 ORDER BY p.name
+		`, ctx.StationID); err != nil {
 		return err
 	}
 
-	return ctx.OK(ProjectsType(projects, roles))
+	followers := []*FollowersSummary{}
+	if err := c.options.Database.SelectContext(ctx, &followers, `
+		SELECT f.project_id, COUNT(f.*) FROM fieldkit.project_follower AS f WHERE f.project_id IN (
+			SELECT p.id FROM fieldkit.project AS p JOIN fieldkit.project_station AS ps ON ps.project_id = p.id WHERE ps.station_id = $1
+		)
+		`, ctx.StationID); err != nil {
+		return err
+	}
+
+	return ctx.OK(ProjectsType(projects, followers, roles))
 }
 
 func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
@@ -276,11 +334,13 @@ func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
 	}
 
 	project := &data.Project{}
-	if err := c.options.Database.GetContext(ctx, project, "UPDATE fieldkit.project SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *", saved.URL, saved.MimeType, ctx.ProjectID); err != nil {
+	if err := c.options.Database.GetContext(ctx, project, `
+		UPDATE fieldkit.project SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *
+		`, saved.URL, saved.MimeType, ctx.ProjectID); err != nil {
 		return err
 	}
 
-	return ctx.OK(ProjectType(project, data.AdministratorRole))
+	return ctx.OK(ProjectType(project, 0, data.AdministratorRole))
 }
 
 func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
@@ -297,7 +357,7 @@ func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
 	}
 
 	project := &data.Project{}
-	if err := c.options.Database.GetContext(ctx, project, "SELECT media_url FROM fieldkit.project WHERE id = $1", ctx.ProjectID); err != nil {
+	if err := c.options.Database.GetContext(ctx, project, `SELECT media_url FROM fieldkit.project WHERE id = $1`, ctx.ProjectID); err != nil {
 		return err
 	}
 
@@ -330,7 +390,7 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 	}
 
 	invite := &data.ProjectInvite{}
-	if err := c.options.Database.GetContext(ctx, invite, "SELECT * FROM fieldkit.project_invite WHERE project_id = $1 AND invited_email = $2", ctx.ProjectID, ctx.Payload.Email); err != nil {
+	if err := c.options.Database.GetContext(ctx, invite, `SELECT * FROM fieldkit.project_invite WHERE project_id = $1 AND invited_email = $2`, ctx.ProjectID, ctx.Payload.Email); err != nil {
 		if err != sql.ErrNoRows {
 			return err
 		}
@@ -380,11 +440,11 @@ func (c *ProjectController) RemoveUser(ctx *app.RemoveUserProjectContext) error 
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_invite WHERE project_id = $1 AND invited_email = $2", ctx.ProjectID, ctx.Payload.Email); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project_invite WHERE project_id = $1 AND invited_email = $2`, ctx.ProjectID, ctx.Payload.Email); err != nil {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_user WHERE project_id = $1 AND user_id IN (SELECT u.id FROM fieldkit.user AS u WHERE u.email = $2)", ctx.ProjectID, ctx.Payload.Email); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project_user WHERE project_id = $1 AND user_id IN (SELECT u.id FROM fieldkit.user AS u WHERE u.email = $2)`, ctx.ProjectID, ctx.Payload.Email); err != nil {
 		return err
 	}
 
@@ -401,7 +461,7 @@ func (c *ProjectController) AddStation(ctx *app.AddStationProjectContext) error 
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "INSERT INTO fieldkit.project_station (project_id, station_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", ctx.ProjectID, ctx.StationID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `INSERT INTO fieldkit.project_station (project_id, station_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`, ctx.ProjectID, ctx.StationID); err != nil {
 		return err
 	}
 
@@ -418,7 +478,7 @@ func (c *ProjectController) RemoveStation(ctx *app.RemoveStationProjectContext) 
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_station WHERE project_id = $1 AND station_id = $2", ctx.ProjectID, ctx.StationID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project_station WHERE project_id = $1 AND station_id = $2`, ctx.ProjectID, ctx.StationID); err != nil {
 		return err
 	}
 
@@ -436,7 +496,7 @@ func (c *ProjectController) Delete(ctx *app.DeleteProjectContext) error {
 	}
 
 	project := &data.Project{}
-	if err := c.options.Database.GetContext(ctx, project, "SELECT media_url FROM fieldkit.project WHERE id = $1", ctx.ProjectID); err != nil {
+	if err := c.options.Database.GetContext(ctx, project, `SELECT media_url FROM fieldkit.project WHERE id = $1`, ctx.ProjectID); err != nil {
 		return err
 	}
 	if project.MediaURL != nil {
@@ -448,15 +508,15 @@ func (c *ProjectController) Delete(ctx *app.DeleteProjectContext) error {
 		}
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_station WHERE project_id = $1", ctx.ProjectID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project_station WHERE project_id = $1`, ctx.ProjectID); err != nil {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project_user WHERE project_id = $1", ctx.ProjectID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project_user WHERE project_id = $1`, ctx.ProjectID); err != nil {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.project WHERE id = $1", ctx.ProjectID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project WHERE id = $1`, ctx.ProjectID); err != nil {
 		return err
 	}
 
