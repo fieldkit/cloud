@@ -96,8 +96,7 @@ export default {
         },
     },
     beforeMount() {
-        this.$store.dispatch(ActionTypes.NEED_PROJECTS);
-        this.$store.dispatch(ActionTypes.NEED_STATIONS);
+        this.$store.dispatch(ActionTypes.NEED_COMMON);
         if (this.id) {
             this.activeStationId = this.id;
             return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });

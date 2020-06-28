@@ -143,6 +143,10 @@ const getters = {
 };
 
 const actions = {
+    [ActionTypes.NEED_COMMON]: async ({ dispatch }: { dispatch: any }) => {
+        await dispatch(ActionTypes.NEED_PROJECTS);
+        await dispatch(ActionTypes.NEED_STATIONS);
+    },
     [ActionTypes.NEED_PROJECTS]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
         commit(MutationTypes.LOADING, { projects: true });
         const [communityProjects, userProjects] = await Promise.all([new FKApi().getPublicProjects(), new FKApi().getUserProjects()]);

@@ -93,8 +93,7 @@ export default {
         }),
     },
     beforeMount() {
-        this.$store.dispatch(ActionTypes.NEED_PROJECTS);
-        this.$store.dispatch(ActionTypes.NEED_STATIONS);
+        this.$store.dispatch(ActionTypes.NEED_COMMON);
         this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id });
     },
     methods: {
