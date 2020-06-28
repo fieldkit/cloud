@@ -2,7 +2,7 @@
     <div class="full-height">
         <SidebarNav
             class="full-height left"
-            viewing="stations"
+            viewingStations="true"
             :isAuthenticated="isAuthenticated"
             :stations="stations"
             :projects="userProjects"
@@ -11,7 +11,7 @@
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" @sidebarToggled="onSidebarToggle" />
         <div id="stations-view-panel" class="main-panel full-height">
             <div id="summary-and-map">
-                <StationsMap :mapSize="mapSize" :stations="stations" @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" />
+                <StationsMap :stations="stations" @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" />
                 <StationSummary
                     v-if="activeStationId"
                     class="summary-container"
@@ -79,11 +79,6 @@ export default {
                 left: "120px",
                 constrainTop: "285px",
             },
-            mapSize: {
-                width: "100%",
-                height: "100vh",
-                position: "absolute",
-            },
         };
     },
     watch: {
@@ -126,14 +121,6 @@ export default {
                 return this.$router.push("/");
             }
         },
-        onMapReady(map) {
-            this.map = map;
-        },
-        onSidebarToggle() {
-            if (this.map) {
-                this.map.resize();
-            }
-        },
         showSummary(station, preserveRoute) {
             this.activeStationId = station.id;
             if (!preserveRoute) {
@@ -147,6 +134,14 @@ export default {
         },
         closeNotice() {
             this.showNotice = false;
+        },
+        onMapReady(map) {
+            this.map = map;
+        },
+        onSidebarToggle() {
+            if (this.map) {
+                this.map.resize();
+            }
         },
     },
 };

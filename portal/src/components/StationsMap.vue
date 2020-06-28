@@ -32,17 +32,12 @@ export default {
         };
     },
     props: {
-        mapSize: { required: true },
         stations: { required: true },
     },
     methods: {
         onMapInitialized(map) {
             console.log("map: initialized");
             this.map = map;
-            // const mapDiv = document.getElementById("map");
-            // mapDiv.style.width = this.mapSize.width;
-            // mapDiv.style.height = this.mapSize.height;
-            // mapDiv.style.position = this.mapSize.position;
         },
         onMapLoaded() {
             console.log("map: loaded (emit ready)");
@@ -51,6 +46,7 @@ export default {
                 if (error) throw error;
                 if (!this.map.hasImage("dot")) this.map.addImage("dot", image);
             });
+            this.map.resize();
             this.$emit("mapReady", this.map);
             this.updateMap();
         },
@@ -63,8 +59,6 @@ export default {
             if (!this.map) {
                 return;
             }
-
-            this.map.resize();
 
             const stationFeatures = [];
             const mappable = this.stations.filter(s => {
@@ -186,7 +180,12 @@ export default {
 </script>
 
 <style scoped>
-#map {
+#stations-map-container #map {
+    height: inherit;
+    position: relative;
+    width: inherit;
+}
+#summary-and-map #map {
     position: absolute;
     top: 70px;
     bottom: 0;

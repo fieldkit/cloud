@@ -34,13 +34,7 @@
             </div>
         </div>
         <div id="stations-map-container" :style="{ width: mapContainerSize.width, height: mapContainerSize.height }">
-            <StationsMap
-                :mapSize="mapSize"
-                :stations="projectStations"
-                @mapReady="onMapReady"
-                @showSummary="showSummary"
-                ref="stationsMap"
-            />
+            <StationsMap :stations="projectStations" @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" />
             <StationSummary
                 v-show="activeStation"
                 :station="activeStation"
@@ -78,11 +72,6 @@ export default {
                 top: "-300px",
                 left: "122px",
                 constrainTop: "230px",
-            },
-            mapSize: {
-                width: "inherit",
-                height: "inherit",
-                position: "relative",
             },
         };
     },
