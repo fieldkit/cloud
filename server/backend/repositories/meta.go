@@ -6,6 +6,8 @@ import (
 
 	"github.com/iancoleman/strcase"
 
+	"go.uber.org/zap"
+
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/errors"
 	"github.com/fieldkit/cloud/server/logging"
@@ -16,6 +18,14 @@ import (
 const (
 	META_INTERNAL_MASK = 0x1
 )
+
+func loggerFor(ctx context.Context, databaseRecord *data.DataRecord) *zap.SugaredLogger {
+	return Logger(ctx).Sugar().With("data_record_id", databaseRecord.ID)
+}
+
+func verboseLoggerFor(ctx context.Context, databaseRecord *data.DataRecord, verbose bool) *zap.SugaredLogger {
+	return logging.OnlyLogIf(loggerFor(ctx, databaseRecord), verbose)
+}
 
 type MetaFactory struct {
 	filtering         *Filtering
@@ -38,8 +48,6 @@ func (mf *MetaFactory) InOrder() []*VersionMeta {
 }
 
 func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord) (*VersionMeta, error) {
-	log := Logger(ctx).Sugar().With("data_record_id", databaseRecord.ID)
-
 	if mf.byMetaID[databaseRecord.ID] != nil {
 		return mf.byMetaID[databaseRecord.ID], nil
 	}
@@ -106,6 +114,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord)
 	}
 
 	if numberEmptyModules > 0 {
+		log := Logger(ctx).Sugar().With("meta_record_id", databaseRecord.ID)
 		log.Warnw("empty", "number_empty_modules", numberEmptyModules)
 	}
 
@@ -133,9 +142,6 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord)
 }
 
 func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRecord, verbose bool) (*FilteredRecord, error) {
-	log := Logger(ctx).Sugar().With("data_record_id", databaseRecord.ID)
-	verboseLog := logging.OnlyLogIf(log, verbose)
-
 	meta := mf.byMetaID[databaseRecord.MetaRecordID]
 	if meta == nil {
 		return nil, errors.Structured("data record with unexpected meta", "meta_record_id", databaseRecord.MetaRecordID)
@@ -152,7 +158,10 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 	for sgIndex, sensorGroup := range dataRecord.Readings.SensorGroups {
 		moduleIndex := sgIndex
 		if moduleIndex >= len(meta.Station.AllModules) {
-			verboseLog.Infow("skip", "module_index", moduleIndex, "number_module_metas", len(meta.Station.AllModules))
+			if verbose {
+				log := verboseLoggerFor(ctx, databaseRecord, verbose)
+				log.Infow("skip", "module_index", moduleIndex, "number_module_metas", len(meta.Station.AllModules))
+			}
 			continue
 		}
 
@@ -164,7 +173,10 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 
 			for sensorIndex, reading := range sensorGroup.Readings {
 				if sensorIndex >= len(module.Sensors) {
-					verboseLog.Infow("skip", "module_index", moduleIndex, "sensor_index", sensorIndex)
+					if verbose {
+						vl := verboseLoggerFor(ctx, databaseRecord, verbose)
+						vl.Infow("skip", "module_index", moduleIndex, "sensor_index", sensorIndex)
+					}
 					continue
 				}
 
@@ -172,7 +184,10 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 
 				// This is only happening on one single record, so far.
 				if reading == nil {
-					verboseLog.Warnw("nil", "sensor_index", sensorIndex, "sensor_name", sensor.Name)
+					if verbose {
+						log := verboseLoggerFor(ctx, databaseRecord, verbose)
+						log.Warnw("nil", "sensor_index", sensorIndex, "sensor_name", sensor.Name)
+					}
 					continue
 				}
 
@@ -188,8 +203,12 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 
 	if len(readings) == 0 {
 		if numberOfNonVirtualModulesWithData == 0 {
-			verboseLog.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups), "physical_sensor_groups_with_data", numberOfNonVirtualModulesWithData)
+			if verbose {
+				log := verboseLoggerFor(ctx, databaseRecord, verbose)
+				log.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups), "physical_sensor_groups_with_data", numberOfNonVirtualModulesWithData)
+			}
 		} else {
+			log := loggerFor(ctx, databaseRecord)
 			log.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups), "physical_sensor_groups_with_data", numberOfNonVirtualModulesWithData)
 		}
 		return nil, nil

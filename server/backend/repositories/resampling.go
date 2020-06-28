@@ -37,7 +37,7 @@ func NewResampler(summary *DataSummary, metaFactory *MetaFactory, opts *SummaryQ
 		Start:   start,
 		End:     start.Add(step),
 		Step:    step,
-		Records: make([]*FilteredRecord, 0, 50),
+		Records: make([]*FilteredRecord, 0, 1000),
 	}
 
 	r = &Resampler{
@@ -85,8 +85,6 @@ func (r *Resampler) Insert(ctx context.Context, data *data.DataRecord) (d *Resam
 }
 
 func (r *Resampler) Close(ctx context.Context) (d *Resampled, err error) {
-	log := Logger(ctx).Sugar()
-
 	records := FilteredRecordCollection{
 		records: r.bin.Records,
 	}
@@ -106,6 +104,7 @@ func (r *Resampler) Close(ctx context.Context) (d *Resampled, err error) {
 	}
 
 	if false {
+		log := Logger(ctx).Sugar()
 		log.Infow("record", "bin", r.bin.Number, "records", len(r.bin.Records), "location", location, "data", data)
 	}
 
