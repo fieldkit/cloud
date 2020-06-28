@@ -189,7 +189,7 @@ const actions = {
 
         const api = new FKApi();
         const [station, _needStations, _needProjects] = await Promise.all([
-            api.getStation(payload.id),
+            api.getStationFromVuex(payload.id),
             dispatch(ActionTypes.NEED_STATIONS),
             dispatch(ActionTypes.NEED_PROJECTS),
         ]);

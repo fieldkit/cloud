@@ -288,6 +288,18 @@ class FKApi {
         }).then(response => this.handle(response));
     }
 
+    getStationFromVuex(id): Promise<Station> {
+        const token = this.token.getHeader();
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/stations/" + id,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
+        }).then(response => this.handle(response));
+    }
+
     getStation(id): Promise<Station> {
         const token = this.token.getHeader();
         return axios({
