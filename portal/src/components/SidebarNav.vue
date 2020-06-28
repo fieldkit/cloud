@@ -57,7 +57,6 @@ export default {
     props: {
         viewingProjects: { default: false },
         viewingStations: { default: false },
-        viewingData: { default: false },
         isAuthenticated: { required: true },
         stations: { required: true },
         projects: { required: true },

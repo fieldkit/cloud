@@ -1,12 +1,6 @@
 <template>
     <div>
-        <SidebarNav
-            :isAuthenticated="isAuthenticated"
-            viewing="data"
-            :stations="stations"
-            :projects="projects"
-            @showStation="showStation"
-        />
+        <SidebarNav :isAuthenticated="isAuthenticated" :stations="stations" :projects="userProjects" @showStation="showStation" />
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
         <div id="data-view-background" class="main-panel" v-show="isAuthenticated">
             <div id="data-container">
@@ -18,7 +12,7 @@
                 </router-link>
                 <div>
                     <div id="project-name">
-                        {{ projects[0] ? projects[0].name : "" }}
+                        {{ userProjects[0] ? userProjects[0].name : "" }}
                     </div>
                     <div class="block-label">Data visualization</div>
                 </div>
@@ -39,7 +33,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="noCurrentUser" class="no-user-message">
+        <div v-if="!isAuthenticated" class="no-user-message">
             <p>
                 Please
                 <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
@@ -61,6 +55,8 @@ import DataChartControl from "@/components/DataChartControl";
 import NotesList from "@/components/NotesList";
 import SensorSummary from "@/components/SensorSummary";
 import * as utils from "@/utilities";
+import { mapState, mapGetters } from "vuex";
+import * as ActionTypes from "@/store/actions";
 
 const expectedRanges = {
     temp: [0, 40],
@@ -84,17 +80,20 @@ export default {
     props: [],
     data: () => {
         return {
-            user: {},
             stationId: null,
             stationData: {},
-            stations: [],
-            projects: [],
             allSensors: [],
-            isAuthenticated: false,
-            noCurrentUser: false,
             timeRange: null,
             treeSelectOptions: [],
         };
+    },
+    computed: {
+        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
+        ...mapState({
+            user: s => s.user.user,
+            stations: s => s.stations.stations.user,
+            userProjects: s => s.stations.projects.user,
+        }),
     },
     async beforeCreate() {
         window.onpopstate = event => {
@@ -106,27 +105,14 @@ export default {
         };
         this.api = new FKApi();
         this.api
-            .getCurrentUser()
-            .then(user => {
-                this.user = user;
-                this.isAuthenticated = true;
-                this.api.getStations().then(s => {
-                    this.stations = s.stations;
-                    this.api
-                        .getModulesMeta()
-                        .then(this.processModulesMeta)
-                        .then(this.initDataChartControl)
-                        .then(this.initTreeSelect);
-                });
-                this.api.getUserProjects().then(projects => {
-                    if (projects && projects.projects.length > 0) {
-                        this.projects = projects.projects;
-                    }
-                });
-            })
-            .catch(() => {
-                this.noCurrentUser = true;
-            });
+            .getModulesMeta()
+            .then(meta => this.processModulesMeta(meta))
+            .then(data => this.initDataChartControl(data))
+            .then(data => this.initTreeSelect(data));
+    },
+    beforeMount() {
+        this.$store.dispatch(ActionTypes.NEED_PROJECTS);
+        this.$store.dispatch(ActionTypes.NEED_STATIONS);
     },
     methods: {
         initDataChartControl() {
