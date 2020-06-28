@@ -4,7 +4,7 @@
         :style="{ width: summarySize.width, top: summarySize.top, left: summarySize.left }"
         v-if="viewingSummary && station"
     >
-        <div v-if="station" id="close-form-btn" v-on:click="closeSummary">
+        <div v-if="station" id="close-form-btn" v-on:click="wantCloseSummary">
             <img alt="Close" src="../assets/close.png" />
         </div>
         <div class="station-container" v-if="station">
@@ -198,8 +198,9 @@ export default {
         getModuleImg(module) {
             return this.$loadAsset(utils.getModuleImg(module));
         },
-        closeSummary() {
-            this.viewingSummary = false;
+        wantCloseSummary() {
+            console.log("wantCloseSummary");
+            this.$emit("closeSummary");
             if (!this.compact) {
                 if (this.$route.name != "stations") {
                     this.$router.push({ name: "stations" });

@@ -31,6 +31,7 @@ export class StationsState {
     projectFollowers: { [index: number]: ProjectFollowers } = {};
     projectStations: { [index: number]: DisplayStation[] } = {};
     projectActivities: { [index: number]: Activity[] } = {};
+    hasNoStations: boolean;
 }
 
 export function whenWasStationUpdated(station: Station): Date {
@@ -162,13 +163,11 @@ const actions = {
         commit(MutationTypes.LOADING, { projects: true });
 
         const api = new FKApi();
-        const [users, followers, stations, activity, _needStations, _needProjects] = await Promise.all([
+        const [users, followers, stations, activity] = await Promise.all([
             api.getUsersByProject(payload.id),
             api.getProjectFollows(payload.id),
             api.getStationsByProject(payload.id),
             api.getProjectActivity(payload.id),
-            dispatch(ActionTypes.NEED_STATIONS),
-            dispatch(ActionTypes.NEED_PROJECTS),
         ]);
 
         commit(PROJECT_USERS, { projectId: payload.id, users: users.users });
@@ -223,6 +222,7 @@ const mutations = {
     },
     [HAVE_USER_STATIONS]: (state: StationsState, stations: Station[]) => {
         state.stations.user = stations;
+        state.hasNoStations = stations.length == 0;
         stations.forEach(station => {
             Vue.set(state.stations.all, station.id, new DisplayStation(station));
         });

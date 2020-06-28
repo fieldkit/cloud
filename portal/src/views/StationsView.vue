@@ -14,13 +14,14 @@
                 <StationsMap :stations="stations" @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" />
                 <StationSummary
                     v-if="activeStationId"
+                    @closeSummary="closeSummary"
                     class="summary-container"
                     :station="activeStation"
                     :summarySize="summarySize"
                     ref="stationSummary"
                 />
             </div>
-            <div v-if="isAuthenticated && showNotice" id="no-stations">
+            <div v-if="isAuthenticated && showNoStationsMessage && hasNoStations" id="no-stations">
                 <div id="close-notice-btn" v-on:click="closeNotice">
                     <img alt="Close" src="../assets/close.png" />
                 </div>
@@ -72,7 +73,7 @@ export default {
     data: () => {
         return {
             activeStationId: null,
-            showNotice: false,
+            showNoStationsMessage: true,
             summarySize: {
                 width: "415px",
                 top: "120px",
@@ -81,37 +82,26 @@ export default {
             },
         };
     },
-    watch: {
-        $route(to) {
-            if (to.name == "stations") {
-                console.log("closeSummary");
-                this.$refs.stationSummary.closeSummary();
-            }
-        },
-    },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
             user: s => s.user.user,
+            hasNoStations: s => s.stations.hasNoStations,
             stations: s => s.stations.stations.user,
             userProjects: s => s.stations.projects.user,
+            anyStations: s => s.stations.stations.user.length > 0,
         }),
         activeStation() {
             return this.$store.state.stations.stations.all[this.activeStationId];
         },
     },
-    beforeCreate() {
-        /*
-            .then(() => {
-                if (this.stations.length == 0 && !this.id) {
-                    this.showNotice = true;
-                }
-            })
-		*/
-    },
     beforeMount() {
-        this.activeStationId = this.id;
-        return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });
+        this.$store.dispatch(ActionTypes.NEED_PROJECTS);
+        this.$store.dispatch(ActionTypes.NEED_STATIONS);
+        if (this.id) {
+            this.activeStationId = this.id;
+            return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });
+        }
     },
     methods: {
         goBack() {
@@ -123,17 +113,15 @@ export default {
         },
         showSummary(station, preserveRoute) {
             this.activeStationId = station.id;
-            if (!preserveRoute) {
-                this.updateStationRoute(station);
-            }
+            this.updateStationRoute(station);
+        },
+        closeSummary() {
+            this.activeStationId = null;
         },
         updateStationRoute(station) {
             if (this.$route.name != "viewStation" || this.$route.params.id != station.id) {
                 this.$router.push({ name: "viewStation", params: { id: station.id } });
             }
-        },
-        closeNotice() {
-            this.showNotice = false;
         },
         onMapReady(map) {
             this.map = map;

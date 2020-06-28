@@ -143,8 +143,8 @@ export default {
             document.getElementById("stations-map-container").removeEventListener("transitionend", this.postExpandMap, true);
         },
         showSummary(station) {
-            this.activeStation = station;
-            this.$refs.stationSummary.viewSummary();
+            console.log("this.activeStationId", station.id);
+            this.activeStationId = station.id;
         },
     },
 };

@@ -169,9 +169,9 @@ export default {
 
             this.map.on("click", "station-markers", e => {
                 const name = e.features[0].properties.title;
-                const station = this.stations.find(s => {
-                    return s.name == name;
-                });
+                console.log("map: click", name);
+                const station = this.stations.find(s => s.name == name);
+                console.log("map: showSummary");
                 this.$emit("showSummary", station);
             });
         },
