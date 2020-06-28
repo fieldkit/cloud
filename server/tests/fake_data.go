@@ -292,6 +292,7 @@ func (e *TestEnv) NewRandomData(n int) ([]byte, error) {
 type SignedRecordAndData struct {
 	Signed *pb.SignedRecord
 	Data   *pb.DataRecord
+	Bytes  []byte
 }
 
 func hashString(seed string) []byte {
@@ -594,20 +595,24 @@ func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {
 		},
 	}
 
-	body := proto.NewBuffer(make([]byte, 0))
-	body.EncodeMessage(cfg)
+	plain := proto.NewBuffer(make([]byte, 0))
+	plain.Marshal(cfg)
 
-	hash := blake2b.Sum256(body.Bytes())
+	delimited := proto.NewBuffer(make([]byte, 0))
+	delimited.EncodeMessage(cfg)
+
+	hash := blake2b.Sum256(delimited.Bytes())
 
 	return &SignedRecordAndData{
 		Signed: &pb.SignedRecord{
 			Kind:   1, /* Modules */
 			Time:   0,
-			Data:   body.Bytes(),
+			Data:   delimited.Bytes(),
 			Hash:   hash[:],
 			Record: record,
 		},
-		Data: cfg,
+		Bytes: plain.Bytes(),
+		Data:  cfg,
 	}
 }
 
@@ -750,14 +755,7 @@ func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*MetaA
 
 	for m := 0; m < 1; m += 1 {
 		meta := e.NewMetaLayout(metaNumber)
-
-		buffer := proto.NewBuffer(make([]byte, 0))
-
-		if err := buffer.EncodeMessage(meta.Signed); err != nil {
-			return nil, err
-		}
-
-		metaRecord, err := recordRepository.AddMetaRecord(e.Ctx, p, mi, meta.Signed, meta.Data, buffer.Bytes())
+		metaRecord, err := recordRepository.AddMetaRecord(e.Ctx, p, mi, meta.Signed, meta.Data, meta.Bytes)
 		if err != nil {
 			return nil, err
 		}
@@ -768,8 +766,7 @@ func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*MetaA
 			data := e.NewDataReading(meta.Signed.Record, dataNumber)
 
 			buffer := proto.NewBuffer(make([]byte, 0))
-
-			if err := buffer.EncodeMessage(data); err != nil {
+			if err := buffer.Marshal(data); err != nil {
 				return nil, err
 			}
 

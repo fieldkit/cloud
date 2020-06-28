@@ -43,28 +43,30 @@ func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.
 	}
 }
 
-func (ra *RecordAdder) tryParseSignedRecord(sr *pb.SignedRecord, dataRecord *pb.DataRecord) (err error) {
-	err = proto.Unmarshal(sr.Data, dataRecord)
-	if err == nil {
-		return nil
+func (ra *RecordAdder) tryParseSignedRecord(sr *pb.SignedRecord, dataRecord *pb.DataRecord) (bytes []byte, err error) {
+	if err := proto.Unmarshal(sr.Data, dataRecord); err == nil {
+		return sr.Data, nil
 	}
 
 	buffer := proto.NewBuffer(sr.Data)
 	size, err := buffer.DecodeVarint()
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if size > uint64(len(sr.Data)) {
-		return fmt.Errorf("bad length prefix in signed record: %d", size)
+	sizeSize := uint64(proto.SizeVarint(size))
+
+	if size+sizeSize != uint64(len(sr.Data)) {
+		return nil, fmt.Errorf("bad length prefix in signed record: %d", size)
 	}
 
-	err = buffer.Unmarshal(dataRecord)
-	if err != nil {
-		return
+	if err := buffer.Unmarshal(dataRecord); err != nil {
+		return nil, err
 	}
 
-	return
+	bytes = sr.Data[sizeSize:]
+
+	return bytes, nil
 }
 
 func (ra *RecordAdder) tryFindStation(ctx context.Context, i *data.Ingestion) (*data.Station, error) {
@@ -216,7 +218,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 				unmarshalError = err
 			} else {
 				meta = true
-				err := ra.tryParseSignedRecord(&signedRecord, &dataRecord)
+				bytes, err := ra.tryParseSignedRecord(&signedRecord, &dataRecord)
 				if err != nil {
 					ra.metrics.DataErrorsParsing()
 					return nil, fmt.Errorf("error parsing signed record: %v", err)
@@ -225,7 +227,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{
 					SignedRecord: &signedRecord,
 					DataRecord:   &dataRecord,
-					Bytes:        signedRecord.Data,
+					Bytes:        bytes,
 				})
 				if fatal != nil {
 					return nil, fatal
