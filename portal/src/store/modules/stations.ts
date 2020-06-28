@@ -51,10 +51,12 @@ export class Location implements HasLocation {
 
 export class DisplaySensor {
     name: string;
+    unitOfMeasure: string;
     reading: number | null;
 
     constructor(sensor: ModuleSensor) {
         this.name = sensor.name;
+        this.unitOfMeasure = sensor.unitOfMeasure;
         this.reading = sensor.reading?.last || null;
     }
 }

@@ -76,7 +76,7 @@
                                     {{ sensor.unitOfMeasure }}
                                 </div>
                                 <div class="right sensor-reading">
-                                    {{ sensor.reading }}
+                                    {{ sensor | prettyReading }}
                                 </div>
                             </div>
                         </template>
@@ -153,12 +153,6 @@ export default {
             this.viewingSummary = true;
         },
         /*
-        getReading(sensor) {
-            if (!sensor.reading) {
-                return "--";
-            }
-            return sensor.reading.last || sensor.reading.last == 0 ? sensor.reading.last.toFixed(1) : "--";
-        },
         getCounter(moduleIndex, sensorIndex) {
             if (this.modulesSensors[moduleIndex]) {
                 if (!this.modulesSensors[moduleIndex][sensorIndex]) {
@@ -174,7 +168,7 @@ export default {
         },
 		*/
         getLeftOrRight(moduleIndex, sensorIndex) {
-            return 0;
+            return 1;
         },
         getSyncedDate() {
             return utils.getUpdatedDate(this.station);

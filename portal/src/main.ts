@@ -29,10 +29,17 @@ Vue.use(Vuex);
 Vue.config.productionTip = false;
 
 Vue.filter("prettyDate", value => {
-    if (value) {
-        return moment(value).format("MM/DD/YYYY");
+    if (!value) {
+        return "N/A";
     }
-    return "N/A";
+    return moment(value).format("MM/DD/YYYY");
+});
+
+Vue.filter("prettyReading", sensor => {
+    if (!sensor.reading) {
+        return "--";
+    }
+    return sensor.reading.toFixed(1);
 });
 
 const store = storeFactory();
