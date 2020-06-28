@@ -11,6 +11,8 @@ import (
 	_ "net/http"
 	_ "net/http/pprof"
 
+	"github.com/pkg/profile"
+
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/O-C-R/singlepage"
@@ -31,6 +33,12 @@ import (
 	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/messages"
 )
+
+type Options struct {
+	ProfileCpu    bool
+	ProfileMemory bool
+	Help          bool
+}
 
 type Config struct {
 	Addr                  string `split_words:"true" default:"127.0.0.1:8080" required:"true"`
@@ -57,25 +65,26 @@ type Config struct {
 	StatsdAddress         string `split_words:"true" default:""`
 	Production            bool   `envconfig:"production"`
 	LoggingFull           bool   `envconfig:"logging_full"`
-
-	Help bool
 }
 
-func loadConfiguration() (*Config, error) {
-	var config Config
+func loadConfiguration() (*Config, *Options, error) {
+	config := &Config{}
+	options := &Options{}
 
-	flag.BoolVar(&config.Help, "help", false, "usage")
+	flag.BoolVar(&options.ProfileMemory, "profile-memory", false, "profile memory")
+	flag.BoolVar(&options.ProfileCpu, "profile-cpu", false, "profile cpu")
+	flag.BoolVar(&options.Help, "help", false, "usage")
 
 	flag.Parse()
 
-	if config.Help {
+	if options.Help {
 		flag.Usage()
-		envconfig.Usage("server", &config)
+		envconfig.Usage("server", config)
 		os.Exit(0)
 	}
 
-	if err := envconfig.Process("FIELDKIT", &config); err != nil {
-		return nil, err
+	if err := envconfig.Process("FIELDKIT", config); err != nil {
+		return nil, nil, err
 	}
 
 	if config.ApiDomain == "" {
@@ -90,7 +99,7 @@ func loadConfiguration() (*Config, error) {
 		config.ApiHost = config.HttpScheme + "://" + config.ApiDomain
 	}
 
-	return &config, nil
+	return config, options, nil
 }
 
 func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
@@ -208,9 +217,16 @@ func createIngester(ctx context.Context) (http.Handler, error) {
 func main() {
 	ctx := context.Background()
 
-	config, err := loadConfiguration()
+	config, options, err := loadConfiguration()
 	if err != nil {
 		panic(err)
+	}
+
+	if options.ProfileCpu {
+		defer profile.Start().Stop()
+	}
+	if options.ProfileMemory {
+		defer profile.Start(profile.MemProfile).Stop()
 	}
 
 	logging.Configure(config.LoggingFull, "service")

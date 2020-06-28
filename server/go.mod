@@ -67,6 +67,7 @@ require (
 	github.com/paulmach/go.geo v0.0.0-20170321183534-b160a6efed6c
 	github.com/paulmach/go.geojson v0.0.0-20170327170536-40612a87147b
 	github.com/pkg/errors v0.9.1
+	github.com/pkg/profile v1.5.0
 	github.com/robinpowered/go-proto v0.0.0-20160614142341-85ea3e1f1d3d
 	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b
 	github.com/segmentio/ksuid v1.0.1
