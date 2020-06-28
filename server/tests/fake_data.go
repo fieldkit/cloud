@@ -44,8 +44,29 @@ func (e *TestEnv) AddUser() (*data.User, error) {
 
 	if err := e.DB.NamedGetContext(e.Ctx, user, `
 		INSERT INTO fieldkit.user (name, username, email, password, bio)
-		VALUES (:name, :email, :email, :password, :bio)
-		RETURNING *
+		VALUES (:name, :email, :email, :password, :bio) RETURNING *
+		`, user); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (e *TestEnv) AddAdminUser() (*data.User, error) {
+	email := faker.Email()
+	user := &data.User{
+		Name:     faker.Name(),
+		Username: email,
+		Email:    email,
+		Bio:      faker.Sentence(),
+		Admin:    true,
+	}
+
+	user.SetPassword(GoodPassword)
+
+	if err := e.DB.NamedGetContext(e.Ctx, user, `
+		INSERT INTO fieldkit.user (name, username, email, password, bio, admin)
+		VALUES (:name, :email, :email, :password, :bio, :admin) RETURNING *
 		`, user); err != nil {
 		return nil, err
 	}

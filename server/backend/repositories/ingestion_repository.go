@@ -72,7 +72,7 @@ func (r *IngestionRepository) QueryPending(ctx context.Context) (all []*data.Ing
 			END AS type_ordered
 			FROM fieldkit.ingestion
 		) AS q
-        WHERE errors IS NULL
+        WHERE id IN (SELECT ingestion_id FROM fieldkit.ingestion_queue WHERE completed IS NULL LIMIT 10)
 		ORDER BY q.type_ordered, q.time
 		`); err != nil {
 		return nil, fmt.Errorf("error querying for ingestions: %v", err)
