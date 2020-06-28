@@ -1,7 +1,7 @@
 import Vuex from "vuex";
 import { shallowMount, createLocalVue } from "@vue/test-utils";
-import StationsView from "@/views/StationsView.vue";
 import storeFactory from "@/store";
+import StationsView from "@/views/StationsView.vue";
 
 jest.mock("@/api/api.js");
 jest.mock("@/api/tokens.js");
