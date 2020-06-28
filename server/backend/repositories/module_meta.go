@@ -613,6 +613,30 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Ranges:        []SensorRanges{},
 				},
 				&SensorMeta{
+					Key:           "solarVbus",
+					FirmwareKey:   "solar_vbus",
+					UnitOfMeasure: "V",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "solarVs",
+					FirmwareKey:   "solar_vs",
+					UnitOfMeasure: "mv",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "solarMa",
+					FirmwareKey:   "solar_ma",
+					UnitOfMeasure: "ma",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "solarPower",
+					FirmwareKey:   "solar_power",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
 					Key:           "freeMemory",
 					FirmwareKey:   "free_memory",
 					UnitOfMeasure: "bytes",
