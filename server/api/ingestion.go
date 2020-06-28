@@ -13,7 +13,6 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/messages"
 )
 
 type IngestionService struct {
@@ -44,14 +43,11 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 		return err
 	}
 
-	log.Infow("queueing", "ingestions", len(ingestions))
+	log.Infow("queueing", "ingestions", len(ingestions), "user_id", p.UserID())
 
-	if false {
-		for _, _ = range ingestions {
-			c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-				QueuedID: 0,
-				UserID:   p.UserID(),
-			})
+	for _, i := range ingestions {
+		if _, err := ir.Enqueue(ctx, i.ID); err != nil {
+			return err
 		}
 	}
 
@@ -82,14 +78,11 @@ func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestio
 		return err
 	}
 
-	log.Infow("queueing", "ingestions", len(ingestions))
+	log.Infow("queueing", "ingestions", len(ingestions), "user_id", p.UserID())
 
-	if false {
-		for _, i := range ingestions {
-			c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-				QueuedID: i.ID,
-				UserID:   p.UserID(),
-			})
+	for _, i := range ingestions {
+		if _, err := ir.Enqueue(ctx, i.ID); err != nil {
+			return err
 		}
 	}
 
@@ -123,12 +116,8 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 		return err
 	}
 
-	if false {
-		c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-			QueuedID: 0,
-			UserID:   p.UserID(),
-			Verbose:  true,
-		})
+	if _, err := ir.Enqueue(ctx, i.ID); err != nil {
+		return err
 	}
 
 	return nil
@@ -165,14 +154,14 @@ func (c *IngestionService) Delete(ctx context.Context, payload *ingestion.Delete
 
 	object, err := common.GetBucketAndKey(i.URL)
 	if err != nil {
-		return fmt.Errorf("Error parsing URL: %v", err)
+		return fmt.Errorf("error parsing url: %v", err)
 	}
 
 	log.Infow("deleting", "url", i.URL)
 
 	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(object.Bucket), Key: aws.String(object.Key)})
 	if err != nil {
-		return fmt.Errorf("Unable to delete object %q from bucket %q, %v", object.Key, object.Bucket, err)
+		return fmt.Errorf("unable to delete object %q from bucket %q, %v", object.Key, object.Bucket, err)
 	}
 
 	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
