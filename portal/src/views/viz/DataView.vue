@@ -370,7 +370,7 @@ export default {
 
         getSensorName(module, sensor) {
             const newName = utils.convertOldFirmwareResponse(module);
-            return this.$t(newName + ".sensors." + sensor.name);
+            return this.$t(newName + ".sensors." + sensor.firmwareKey);
         },
 
         showStation(station) {
