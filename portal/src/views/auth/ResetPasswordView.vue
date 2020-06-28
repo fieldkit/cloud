@@ -7,7 +7,7 @@
                 marginBottom: '86px',
             }"
             alt="Fieldkit Logo"
-            src="../assets/FieldKit_Logo_White.png"
+            src="../../assets/FieldKit_Logo_White.png"
         />
         <br />
         <div id="user-form-container">
@@ -53,7 +53,7 @@
                 <button class="save-btn" v-on:click="submitPasswordReset">Reset password</button>
             </div>
             <div v-if="resetSuccess">
-                <img alt="Success" src="../assets/Icon_Success.png" width="57px" />
+                <img alt="Success" src="../../assets/Icon_Success.png" width="57px" />
                 <p class="success">Password Reset</p>
 
                 <router-link :to="{ name: 'login' }" class="create-link">
@@ -61,7 +61,7 @@
                 </router-link>
             </div>
             <div v-if="failedReset">
-                <img alt="Unsuccessful" src="../assets/Icon_Warning_error.png" width="57px" />
+                <img alt="Unsuccessful" src="../../assets/Icon_Warning_error.png" width="57px" />
                 <p class="error">Password Not Reset</p>
                 <div class="notification-text">Unfortunately we were unable to reset your password.</div>
                 <p>
@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import FKApi from "../api/api";
+import FKApi from "@/api/api";
 
 export default {
     name: "ResetPasswordView",

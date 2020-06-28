@@ -7,7 +7,7 @@ import ProjectsView from "./views/ProjectsView.vue";
 import ProjectEditView from "./views/ProjectEditView.vue";
 import ProjectUpdateEditView from "./views/ProjectUpdateEditView.vue";
 import ProjectView from "./views/ProjectView.vue";
-import ResetPasswordView from "./views/ResetPasswordView.vue";
+import ResetPasswordView from "./views/auth/ResetPasswordView.vue";
 import StationsView from "./views/StationsView.vue";
 import UserView from "./views/UserView.vue";
 
