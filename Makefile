@@ -74,11 +74,11 @@ $(BUILD)/server: $(SERVER_SOURCES)
 $(BUILD)/ingester: $(SERVER_SOURCES)
 	cd server/cmd/ingester && $(GO) build -o $@
 
-$(BUILD)/fktool: server/tools/fktool/*.go $(SERVER_SOURCES)
-	cd server/tools/fktool && $(GO) build -o $@ *.go
+$(BUILD)/fktool: server/cmd/fktool/*.go $(SERVER_SOURCES)
+	cd server/cmd/fktool && $(GO) build -o $@ *.go
 
-$(BUILD)/fkstreams: server/tools/fktool/*.go $(SERVER_SOURCES)
-	cd server/tools/fkstreams && $(GO) build -o $@ *.go
+$(BUILD)/fkstreams: server/cmd/fktool/*.go $(SERVER_SOURCES)
+	cd server/cmd/fkstreams && $(GO) build -o $@ *.go
 
 generate:
 	./tools/goa-generate.sh
