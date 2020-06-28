@@ -1,4 +1,4 @@
-// import _ from "lodash";
+import _ from "lodash";
 import Vuex from "vuex";
 import createLogger from "./logger";
 import { clock } from "./modules/clock";
@@ -11,15 +11,20 @@ import { progress } from "./modules/progress";
 
 function customizeLogger() {
     return createLogger({
+        transformer(state) {
+            if (state.user.token) {
+                const copy = _.cloneDeep(state);
+                copy.user.token = "YES";
+                return copy;
+            }
+            return state;
+        },
         /*
         filter(mutation, stateBefore, stateAfter) {
             return true;
         },
         actionFilter(action, state) {
             return true;
-        },
-        transformer(state) {
-            return state;
         },
         mutationTransformer(mutation) {
             return mutation;
