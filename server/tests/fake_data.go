@@ -738,7 +738,13 @@ func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*MetaA
 	for m := 0; m < 1; m += 1 {
 		meta := e.NewMetaLayout(metaNumber)
 
-		metaRecord, err := recordRepository.AddMetaRecord(e.Ctx, p, mi, meta.Signed, meta.Data)
+		buffer := proto.NewBuffer(make([]byte, 0))
+
+		if err := buffer.EncodeMessage(meta.Signed); err != nil {
+			return nil, err
+		}
+
+		metaRecord, err := recordRepository.AddMetaRecord(e.Ctx, p, mi, meta.Signed, meta.Data, buffer.Bytes())
 		if err != nil {
 			return nil, err
 		}
@@ -748,7 +754,13 @@ func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*MetaA
 		for d := 0; d < 4; d += 1 {
 			data := e.NewDataReading(meta.Signed.Record, dataNumber)
 
-			dataRecord, _, err := recordRepository.AddDataRecord(e.Ctx, p, di, data)
+			buffer := proto.NewBuffer(make([]byte, 0))
+
+			if err := buffer.EncodeMessage(data); err != nil {
+				return nil, err
+			}
+
+			dataRecord, _, err := recordRepository.AddDataRecord(e.Ctx, p, di, data, buffer.Bytes())
 			if err != nil {
 				return nil, err
 			}

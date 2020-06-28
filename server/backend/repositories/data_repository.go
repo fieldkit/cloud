@@ -39,7 +39,9 @@ type SummaryQueryOpts struct {
 func (r *DataRepository) queryMetaRecords(ctx context.Context, deviceIdBytes []byte, start, end time.Time) (map[int64]*data.MetaRecord, error) {
 	mrs := []*data.MetaRecord{}
 	if err := r.db.SelectContext(ctx, &mrs, `
-	    SELECT m.* FROM fieldkit.meta_record AS m WHERE (m.id IN (
+	    SELECT
+			m.id, m.provision_id, m.time, m.number, m.raw, m.pb
+		FROM fieldkit.meta_record AS m WHERE (m.id IN (
 	      SELECT DISTINCT q.meta_record_id FROM (
 			SELECT r.meta_record_id FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id) WHERE (p.device_id = $1) AND (timezone('UTC', r.time) BETWEEN $2 AND $3)
 	      ) AS q
@@ -136,7 +138,7 @@ func (r *DataRepository) QueryDeviceModulesAndData(ctx context.Context, opts *Su
 
 	rows, err := r.db.QueryxContext(ctx, `
 		SELECT
-			r.id, r.provision_id, r.time, r.number, r.meta_record_id, ST_AsBinary(r.location) AS location, r.raw
+			r.id, r.provision_id, r.time, r.number, r.meta_record_id, ST_AsBinary(r.location) AS location, r.raw, r.pb
 		FROM
             fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
 		WHERE (p.device_id = $1) AND (timezone('UTC', r.time) BETWEEN $2 AND $3)

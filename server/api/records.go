@@ -41,25 +41,29 @@ func (c *RecordsController) Data(ctx *app.DataRecordsContext) error {
 		return err
 	}
 
-	data_records := make([]*data.DataRecord, 0)
-	if err := c.options.Database.SelectContext(ctx, &data_records, `SELECT id, provision_id, time, number, meta_record_id, ST_AsBinary(location) AS location, raw FROM fieldkit.data_record WHERE (id = $1)`, ctx.RecordID); err != nil {
+	dataRecords := make([]*data.DataRecord, 0)
+	if err := c.options.Database.SelectContext(ctx, &dataRecords, `
+		SELECT id, provision_id, time, number, meta_record_id, ST_AsBinary(location) AS location, raw, pb FROM fieldkit.data_record WHERE (id = $1)
+		`, ctx.RecordID); err != nil {
 		return errors.Structured(err, "data_record_id", ctx.RecordID)
 	}
 
-	if len(data_records) == 0 {
+	if len(dataRecords) == 0 {
 		return ctx.NotFound()
 	}
 
-	meta_records := make([]*data.MetaRecord, 0)
-	if err := c.options.Database.SelectContext(ctx, &meta_records, `SELECT * FROM fieldkit.meta_record WHERE (id = $1)`, data_records[0].MetaRecordID); err != nil {
-		return errors.Structured(err, "meta_record_id", data_records[0].MetaRecordID)
+	metaRecords := make([]*data.MetaRecord, 0)
+	if err := c.options.Database.SelectContext(ctx, &metaRecords, `
+		SELECT * FROM fieldkit.meta_record WHERE (id = $1)
+		`, dataRecords[0].MetaRecordID); err != nil {
+		return errors.Structured(err, "meta_record_id", dataRecords[0].MetaRecordID)
 	}
 
-	if len(meta_records) == 0 {
+	if len(metaRecords) == 0 {
 		return writeJSON(ctx.ResponseData, struct {
 			Data *data.DataRecord `json:"data"`
 		}{
-			data_records[0],
+			dataRecords[0],
 		})
 	}
 
@@ -69,8 +73,8 @@ func (c *RecordsController) Data(ctx *app.DataRecordsContext) error {
 		Data *data.DataRecord `json:"data"`
 		Meta *data.MetaRecord `json:"meta"`
 	}{
-		data_records[0],
-		meta_records[0],
+		dataRecords[0],
+		metaRecords[0],
 	})
 }
 
@@ -105,7 +109,9 @@ func (c *RecordsController) Resolved(ctx *app.ResolvedRecordsContext) error {
 	}
 
 	dbDatas := make([]*data.DataRecord, 0)
-	if err := c.options.Database.SelectContext(ctx, &dbDatas, `SELECT id, provision_id, time, number, meta_record_id, ST_AsBinary(location) AS location, raw FROM fieldkit.data_record WHERE (id = $1)`, ctx.RecordID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &dbDatas, `
+		SELECT id, provision_id, time, number, meta_record_id, ST_AsBinary(location) AS location, raw, pb FROM fieldkit.data_record WHERE (id = $1)
+		`, ctx.RecordID); err != nil {
 		return err
 	}
 
@@ -114,7 +120,9 @@ func (c *RecordsController) Resolved(ctx *app.ResolvedRecordsContext) error {
 	}
 
 	dbMetas := make([]*data.MetaRecord, 0)
-	if err := c.options.Database.SelectContext(ctx, &dbMetas, `SELECT * FROM fieldkit.meta_record WHERE (id = $1)`, dbDatas[0].MetaRecordID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &dbMetas, `
+		SELECT * FROM fieldkit.meta_record WHERE (id = $1)
+		`, dbDatas[0].MetaRecordID); err != nil {
 		return err
 	}
 

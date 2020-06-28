@@ -29,6 +29,7 @@ type RecordAdder struct {
 type ParsedRecord struct {
 	SignedRecord *pb.SignedRecord
 	DataRecord   *pb.DataRecord
+	Bytes        []byte
 }
 
 func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, handler RecordHandler, verbose bool) (ra *RecordAdder) {
@@ -98,7 +99,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 	}
 
 	if pr.SignedRecord != nil {
-		metaRecord, err := recordRepository.AddMetaRecord(ctx, provision, i, pr.SignedRecord, pr.DataRecord)
+		metaRecord, err := recordRepository.AddMetaRecord(ctx, provision, i, pr.SignedRecord, pr.DataRecord, pr.Bytes)
 		if err != nil {
 			return nil, err
 		}
@@ -107,7 +108,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			return nil, err
 		}
 	} else if pr.DataRecord != nil {
-		dataRecord, metaRecord, err := recordRepository.AddDataRecord(ctx, provision, i, pr.DataRecord)
+		dataRecord, metaRecord, err := recordRepository.AddDataRecord(ctx, provision, i, pr.DataRecord, pr.Bytes)
 		if err != nil {
 			if err == repositories.ErrMalformedRecord {
 				verboseLog.Infow("data reading missing readings", "record", pr.DataRecord)
@@ -187,7 +188,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 				unmarshalError = err
 			} else {
 				data = true
-				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{DataRecord: &dataRecord})
+				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{DataRecord: &dataRecord, Bytes: b})
 				if fatal != nil {
 					return nil, fatal
 				}
@@ -223,6 +224,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{
 					SignedRecord: &signedRecord,
 					DataRecord:   &dataRecord,
+					Bytes:        signedRecord.Data,
 				})
 				if fatal != nil {
 					return nil, fatal

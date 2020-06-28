@@ -54,6 +54,7 @@ func TestGetMetaRecord(t *testing.T) {
 			"number": "<<PRESENCE>>",
 			"provision_id": "<<PRESENCE>>",
 			"raw": "<<PRESENCE>>",
+			"pb": "<<PRESENCE>>",
 			"time": "<<PRESENCE>>"
 		}
 	}`)
@@ -87,7 +88,8 @@ func TestGetDataRecord(t *testing.T) {
 			"number": "<<PRESENCE>>",
 			"provision_id": "<<PRESENCE>>",
 			"raw": "<<PRESENCE>>",
-			"time": "<<PRESENCE>>"
+			"time": "<<PRESENCE>>",
+			"pb": "<<PRESENCE>>"
 		},
 		"data": {
 			"time": "<<PRESENCE>>",
@@ -96,7 +98,8 @@ func TestGetDataRecord(t *testing.T) {
 			"meta_record_id": "<<PRESENCE>>",
 			"number": "<<PRESENCE>>",
 			"provision_id": "<<PRESENCE>>",
-			"raw": "<<PRESENCE>>"
+			"raw": "<<PRESENCE>>",
+			"pb": "<<PRESENCE>>"
 		}
 	}`)
 }
@@ -131,9 +134,10 @@ func TestGetDataRecordResolved(t *testing.T) {
 		"meta": {
 			"id": "<<PRESENCE>>",
 			"number": "<<PRESENCE>>",
+			"time": "<<PRESENCE>>",
 			"provision_id": "<<PRESENCE>>",
 			"raw": "<<PRESENCE>>",
-			"time": "<<PRESENCE>>"
+			"pb": "<<PRESENCE>>"
 		},
 		"data": {
 			"time": "<<PRESENCE>>",
@@ -142,7 +146,8 @@ func TestGetDataRecordResolved(t *testing.T) {
 			"meta_record_id": "<<PRESENCE>>",
 			"number": "<<PRESENCE>>",
 			"provision_id": "<<PRESENCE>>",
-			"raw": "<<PRESENCE>>"
+			"raw": "<<PRESENCE>>",
+			"pb": "<<PRESENCE>>"
 		}
 	}`)
 }

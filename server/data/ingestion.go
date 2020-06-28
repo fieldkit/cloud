@@ -153,6 +153,7 @@ type DataRecord struct {
 	MetaRecordID int64          `db:"meta_record_id" json:"meta_record_id"`
 	Location     *Location      `db:"location" json:"location"`
 	Data         types.JSONText `db:"raw" json:"raw"`
+	PB           []byte         `db:"pb" json:"pb"`
 }
 
 func (d *DataRecord) SetData(data interface{}) error {
@@ -186,6 +187,7 @@ type MetaRecord struct {
 	Time        time.Time      `db:"time" json:"time"`
 	Number      int64          `db:"number" json:"number"`
 	Data        types.JSONText `db:"raw" json:"raw"`
+	PB          []byte         `db:"pb" json:"pb"`
 }
 
 func (d *MetaRecord) SetData(data interface{}) error {

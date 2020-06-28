@@ -39,7 +39,9 @@ func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pag
 
 	drs := []*data.DataRecord{}
 	if err := r.db.SelectContext(ctx, &drs, `
-	    SELECT r.id, r.provision_id, r.time, r.time, r.number, r.meta_record_id, ST_AsBinary(r.location) AS location, r.raw FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
+	    SELECT
+			r.id, r.provision_id, r.time, r.time, r.number, r.meta_record_id, ST_AsBinary(r.location) AS location, r.raw, r.pb
+		FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
 	    WHERE (p.device_id = $1)
 	    ORDER BY r.time DESC LIMIT $2 OFFSET $3`, deviceIdBytes, pageSize, pageSize*pageNumber); err != nil {
 		return nil, err
@@ -47,7 +49,9 @@ func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pag
 
 	mrs := []*data.MetaRecord{}
 	if err := r.db.SelectContext(ctx, &mrs, `
-	    SELECT m.* FROM fieldkit.meta_record AS m WHERE (m.id IN (
+	    SELECT
+			m.id, m.provision_id, m.time, m.number, m.raw, m.pb
+		FROM fieldkit.meta_record AS m WHERE (m.id IN (
 	      SELECT DISTINCT q.meta_record_id FROM (
 			SELECT r.meta_record_id, r.time FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id) WHERE (p.device_id = $1) ORDER BY r.time DESC LIMIT $2 OFFSET $3
 	      ) AS q
@@ -68,7 +72,7 @@ func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pag
 	return
 }
 
-func (r *RecordRepository) AddMetaRecord(ctx context.Context, p *data.Provision, i *data.Ingestion, sr *pb.SignedRecord, dr *pb.DataRecord) (*data.MetaRecord, error) {
+func (r *RecordRepository) AddMetaRecord(ctx context.Context, p *data.Provision, i *data.Ingestion, sr *pb.SignedRecord, dr *pb.DataRecord, pb []byte) (*data.MetaRecord, error) {
 	metaTime := i.Time
 
 	if sr.Time > 0 {
@@ -79,6 +83,7 @@ func (r *RecordRepository) AddMetaRecord(ctx context.Context, p *data.Provision,
 		ProvisionID: p.ID,
 		Time:        metaTime,
 		Number:      int64(sr.Record),
+		PB:          pb,
 	}
 
 	if err := metaRecord.SetData(dr); err != nil {
@@ -86,8 +91,8 @@ func (r *RecordRepository) AddMetaRecord(ctx context.Context, p *data.Provision,
 	}
 
 	if err := r.db.NamedGetContext(ctx, metaRecord, `
-		INSERT INTO fieldkit.meta_record (provision_id, time, number, raw) VALUES (:provision_id, :time, :number, :raw)
-		ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw
+		INSERT INTO fieldkit.meta_record (provision_id, time, number, raw, pb) VALUES (:provision_id, :time, :number, :raw, :pb)
+		ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, pb = EXCLUDED.pb
 		RETURNING *
 		`, metaRecord); err != nil {
 		return nil, err
@@ -154,7 +159,6 @@ func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
 			if !math.IsNaN(float64(sr.Value)) {
 				newReadings = append(newReadings, sr)
 			}
-
 		}
 		sg.Readings = newReadings
 	}
@@ -164,7 +168,7 @@ func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
 var ErrMalformedRecord = errors.New("malformed record")
 var ErrMetaMissing = errors.New("error finding meta record")
 
-func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision, i *data.Ingestion, dr *pb.DataRecord) (*data.DataRecord, *data.MetaRecord, error) {
+func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision, i *data.Ingestion, dr *pb.DataRecord, pb []byte) (*data.DataRecord, *data.MetaRecord, error) {
 	if dr.Readings == nil {
 		return nil, nil, ErrMalformedRecord
 	}
@@ -193,6 +197,7 @@ func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision,
 		Number:       int64(dr.Readings.Reading),
 		MetaRecordID: metaRecord.ID,
 		Location:     location,
+		PB:           pb,
 	}
 
 	if err := dataRecord.SetData(prepareForMarshalToJson(dr)); err != nil {
@@ -200,9 +205,10 @@ func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision,
 	}
 
 	if err := r.db.NamedGetContext(ctx, dataRecord, `
-		INSERT INTO fieldkit.data_record (provision_id, time, number, raw, meta_record_id, location)
-		VALUES (:provision_id, :time, :number, :raw, :meta_record_id, ST_SetSRID(ST_GeomFromText(:location), 4326))
-		ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, location = EXCLUDED.location
+		INSERT INTO fieldkit.data_record (provision_id, time, number, meta_record_id, location, raw, pb)
+		VALUES (:provision_id, :time, :number, :meta_record_id, ST_SetSRID(ST_GeomFromText(:location), 4326), :raw, :pb)
+		ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, location = EXCLUDED.location,
+														 raw = EXCLUDED.raw, pb = EXCLUDED.pb
 		RETURNING id
 		`, dataRecord); err != nil {
 		return nil, nil, err
