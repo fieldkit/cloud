@@ -80,7 +80,7 @@ import FKApi from "../api/api";
 export default {
     name: "ResetPasswordView",
     components: {},
-    props: [],
+    props: {},
     data: () => {
         return {
             resetToken: "",
@@ -116,7 +116,7 @@ export default {
                     token: this.resetToken,
                     password: this.newPassword,
                 };
-                this.api
+                return this.api
                     .resetPassword(data)
                     .then(() => {
                         this.resetSuccess = true;

@@ -66,13 +66,8 @@ export default {
     async beforeCreate() {
         this.api = new FKApi();
 
-        // this.api.getInvitesByUser().then(result => {
-        //     this.pending = result.pending;
-        //     console.log("by user result?", result);
-        // });
         this.api.getInvitesByToken(this.$route.query.token).then(result => {
             this.pending = result.pending;
-            // console.log("by token result?", result);
         });
 
         this.api
@@ -108,7 +103,7 @@ export default {
                     return p.id == inviteId;
                 });
                 if (index > -1) {
-                    let invite = this.pending.splice(index, 1)[0];
+                    const invite = this.pending.splice(index, 1)[0];
                     invite.status = "Accepted";
                     this.resolved.push(invite);
                 }
@@ -121,7 +116,7 @@ export default {
                     return p.id == inviteId;
                 });
                 if (index > -1) {
-                    let invite = this.pending.splice(index, 1)[0];
+                    const invite = this.pending.splice(index, 1)[0];
                     invite.status = "Declined";
                     this.resolved.push(invite);
                 }
