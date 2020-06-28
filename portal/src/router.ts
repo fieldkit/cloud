@@ -147,7 +147,11 @@ export default function routerFactory(store) {
             if (store.getters.isAuthenticated) {
                 chain("/dashboard");
             } else {
-                chain("/login");
+                if (to.name === "login") {
+                    chain();
+                } else {
+                    chain("/login");
+                }
             }
         } else if (to.matched.some(record => record.meta.secured)) {
             if (store.getters.isAuthenticated) {
