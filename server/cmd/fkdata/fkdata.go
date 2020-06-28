@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/kelseyhightower/envconfig"
 
@@ -28,9 +29,13 @@ func main() {
 		panic(err)
 	}
 
-	visitor := &noopVisitor{}
+	visitor := NewResolvingVisitor()
 
 	rw := NewRecordWalker(db)
+
+	started := time.Now()
+
+	fmt.Printf("processing\n")
 
 	if err := rw.WalkStation(ctx, 12, visitor); err != nil {
 		panic(err)
@@ -41,5 +46,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("ok %v data (%v meta)\n", info.DataRecords, info.MetaRecords)
+	finished := time.Now()
+
+	fmt.Printf("done %v data (%v meta) %v\n", info.DataRecords, info.MetaRecords, finished.Sub(started))
 }
