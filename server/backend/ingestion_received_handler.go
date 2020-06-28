@@ -31,22 +31,28 @@ func NewIngestionReceivedHandler(db *sqlxcache.DB, files files.FileArchive, metr
 }
 
 func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.IngestionReceived) error {
-	log := Logger(ctx).Sugar().With("ingestion_id", m.ID)
+	log := Logger(ctx).Sugar().With("queued_ingestion_id", m.QueuedID)
 
-	log.Infow("processing", "time", m.Time, "ingestion_url", m.URL)
+	log.Infow("processing")
 
 	ir, err := repositories.NewIngestionRepository(h.db)
 	if err != nil {
 		return err
 	}
 
-	i, err := ir.QueryByID(ctx, m.ID)
+	queued, err := ir.QueryQueuedByID(ctx, m.QueuedID)
 	if err != nil {
 		return err
 	}
+	if queued == nil {
+		return fmt.Errorf("queued ingestion missing: %v", m.QueuedID)
+	}
 
-	if i == nil {
-		return fmt.Errorf("ingestion missing: %v", m.ID)
+	i, err := ir.QueryByID(ctx, queued.IngestionID)
+	if err != nil {
+		return err
+	} else if i == nil {
+		return fmt.Errorf("ingestion missing: %v", queued.IngestionID)
 	}
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID)
@@ -72,12 +78,12 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 	}
 
 	if hasOtherErrors {
-		err := ir.MarkProcessedHasOtherErrors(ctx, i.ID)
+		err := ir.MarkProcessedHasOtherErrors(ctx, queued.ID)
 		if err != nil {
 			return err
 		}
 	} else {
-		if err := ir.MarkProcessedDone(ctx, i.ID, info.TotalRecords, info.MetaErrors, info.DataErrors); err != nil {
+		if err := ir.MarkProcessedDone(ctx, queued.ID, info.TotalRecords, info.MetaErrors, info.DataErrors); err != nil {
 			return err
 		}
 	}
@@ -100,7 +106,7 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 			StationID: *info.StationID,
 		},
 		UploaderID:      m.UserID,
-		DataIngestionID: m.ID,
+		DataIngestionID: info.IngestionID,
 		DataRecords:     info.DataRecords,
 		Errors:          info.DataErrors > 0 || info.MetaErrors > 0,
 	}

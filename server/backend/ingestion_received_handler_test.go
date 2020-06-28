@@ -2,7 +2,6 @@ package backend
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -24,13 +23,12 @@ func TestIngestionReceivedNoSuchIngestion(t *testing.T) {
 	handler := NewIngestionReceivedHandler(e.DB, tests.NewInMemoryArchive(map[string][]byte{}), logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
 	err = handler.Handle(e.Ctx, &messages.IngestionReceived{
-		Time:    time.Now(),
-		ID:      int64(30342),
-		Verbose: true,
-		UserID:  user.ID,
+		QueuedID: int64(30342),
+		Verbose:  true,
+		UserID:   user.ID,
 	})
 
-	assert.Errorf(err, "ingestion missing: %d", 30342)
+	assert.Errorf(err, "queued ingestion missing: %d", 30342)
 }
 
 func TestIngestionReceivedCorruptedFile(t *testing.T) {
@@ -49,14 +47,13 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	})
 	handler := NewIngestionReceivedHandler(e.DB, files, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
-	ingestion, err := e.AddIngestion(user, "/file", data.MetaTypeName, e.MustDeviceID(), len(randomData))
+	queued, _, err := e.AddIngestion(user, "/file", data.MetaTypeName, e.MustDeviceID(), len(randomData))
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		Time:    time.Now(),
-		ID:      ingestion.ID,
-		UserID:  user.ID,
-		Verbose: true,
+		QueuedID: queued.ID,
+		UserID:   user.ID,
+		Verbose:  true,
 	}))
 }
 func TestIngestionReceivedMetaOnly(t *testing.T) {
@@ -76,14 +73,13 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 	})
 	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
-	ingestion, err := e.AddIngestion(user, "/meta", data.MetaTypeName, e.MustDeviceID(), len(files.Meta))
+	queued, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, e.MustDeviceID(), len(files.Meta))
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		Time:    time.Now(),
-		ID:      ingestion.ID,
-		UserID:  user.ID,
-		Verbose: true,
+		QueuedID: queued.ID,
+		UserID:   user.ID,
+		Verbose:  true,
 	}))
 }
 
@@ -106,30 +102,30 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 	})
 	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
-	metaIngestion, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
+	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
+	assert.NotNil(queuedMeta)
 	assert.NoError(err)
 
-	dataIngestion, err := e.AddIngestion(user, "/data", data.DataTypeName, deviceID, len(files.Data))
+	queuedData, _, err := e.AddIngestion(user, "/data", data.DataTypeName, deviceID, len(files.Data))
+	assert.NotNil(queuedData)
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		Time:    time.Now(),
-		ID:      metaIngestion.ID,
-		UserID:  user.ID,
-		Verbose: true,
+		QueuedID: queuedMeta.ID,
+		UserID:   user.ID,
+		Verbose:  true,
 	}))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		Time:    time.Now(),
-		ID:      dataIngestion.ID,
-		UserID:  user.ID,
-		Verbose: true,
+		QueuedID: queuedData.ID,
+		UserID:   user.ID,
+		Verbose:  true,
 	}))
 
 	ir, err := repositories.NewIngestionRepository(e.DB)
 	assert.NoError(err)
 
-	miAfter, err := ir.QueryByID(e.Ctx, metaIngestion.ID)
+	miAfter, err := ir.QueryQueuedByID(e.Ctx, queuedMeta.ID)
 	assert.NoError(err)
 	assert.NotNil(miAfter)
 	assert.Equal(int64(1), *miAfter.TotalRecords)
@@ -137,7 +133,7 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 	assert.Equal(int64(0), *miAfter.MetaErrors)
 	assert.NotNil(miAfter.Completed)
 
-	diAfter, err := ir.QueryByID(e.Ctx, dataIngestion.ID)
+	diAfter, err := ir.QueryQueuedByID(e.Ctx, queuedData.ID)
 	assert.NoError(err)
 	assert.NotNil(miAfter)
 	assert.Equal(int64(16), *diAfter.TotalRecords)
@@ -165,37 +161,35 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 	})
 	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
-	metaIngestion, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
+	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
 
-	dataIngestion, err := e.AddIngestion(user, "/data", data.DataTypeName, deviceID, len(files.Data))
+	queuedData, _, err := e.AddIngestion(user, "/data", data.DataTypeName, deviceID, len(files.Data))
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		Time:    time.Now(),
-		ID:      metaIngestion.ID,
-		UserID:  user.ID,
-		Verbose: true,
+		QueuedID: queuedMeta.ID,
+		UserID:   user.ID,
+		Verbose:  true,
 	}))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		Time:    time.Now(),
-		ID:      dataIngestion.ID,
-		UserID:  user.ID,
-		Verbose: true,
+		QueuedID: queuedData.ID,
+		UserID:   user.ID,
+		Verbose:  true,
 	}))
 
 	ir, err := repositories.NewIngestionRepository(e.DB)
 	assert.NoError(err)
 
-	miAfter, err := ir.QueryByID(e.Ctx, metaIngestion.ID)
+	miAfter, err := ir.QueryQueuedByID(e.Ctx, queuedMeta.ID)
 	assert.NoError(err)
 	assert.Equal(int64(4), *miAfter.TotalRecords)
 	assert.Equal(int64(0), *miAfter.DataErrors)
 	assert.Equal(int64(0), *miAfter.MetaErrors)
 	assert.NotNil(miAfter.Completed)
 
-	diAfter, err := ir.QueryByID(e.Ctx, dataIngestion.ID)
+	diAfter, err := ir.QueryQueuedByID(e.Ctx, queuedData.ID)
 	assert.NoError(err)
 	assert.Equal(int64(4*16), *diAfter.TotalRecords)
 	assert.Equal(int64(0), *diAfter.DataErrors)
@@ -226,30 +220,28 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	})
 	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
-	metaIngestion, err := e.AddIngestion(fd.Owner, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
+	queuedMeta, _, err := e.AddIngestion(fd.Owner, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
 
-	dataIngestion, err := e.AddIngestion(fd.Owner, "/data", data.DataTypeName, deviceID, len(files.Data))
+	queuedData, _, err := e.AddIngestion(fd.Owner, "/data", data.DataTypeName, deviceID, len(files.Data))
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		Time:    time.Now(),
-		ID:      metaIngestion.ID,
-		UserID:  fd.Owner.ID,
-		Verbose: true,
+		QueuedID: queuedMeta.ID,
+		UserID:   fd.Owner.ID,
+		Verbose:  true,
 	}))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		Time:    time.Now(),
-		ID:      dataIngestion.ID,
-		UserID:  fd.Owner.ID,
-		Verbose: true,
+		QueuedID: queuedData.ID,
+		UserID:   fd.Owner.ID,
+		Verbose:  true,
 	}))
 
 	ir, err := repositories.NewIngestionRepository(e.DB)
 	assert.NoError(err)
 
-	miAfter, err := ir.QueryByID(e.Ctx, metaIngestion.ID)
+	miAfter, err := ir.QueryQueuedByID(e.Ctx, queuedMeta.ID)
 	assert.NoError(err)
 	assert.Equal(int64(4), *miAfter.TotalRecords)
 	assert.Equal(int64(0), *miAfter.DataErrors)
@@ -257,7 +249,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	assert.Equal(int64(0), *miAfter.OtherErrors)
 	assert.NotNil(miAfter.Completed)
 
-	diAfter, err := ir.QueryByID(e.Ctx, dataIngestion.ID)
+	diAfter, err := ir.QueryQueuedByID(e.Ctx, queuedData.ID)
 	assert.NoError(err)
 	assert.Equal(int64(4*16), *diAfter.TotalRecords)
 	assert.Equal(int64(0), *diAfter.DataErrors)

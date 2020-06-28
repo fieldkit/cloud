@@ -19,6 +19,7 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
+	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/files"
@@ -100,11 +101,13 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			Flags:        pq.Int64Array([]int64{}),
 		}
 
-		if err := o.Database.NamedGetContext(ctx, ingestion, `
-			INSERT INTO fieldkit.ingestion (time, upload_id, user_id, device_id, generation, type, size, url, blocks, flags)
-			VALUES (NOW(), :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
-			RETURNING *
-			`, ingestion); err != nil {
+		ir, err := repositories.NewIngestionRepository(o.Database)
+		if err != nil {
+			return err
+		}
+
+		queuedID, err := ir.AddAndQueue(ctx, ingestion)
+		if err != nil {
 			return err
 		}
 
@@ -117,10 +120,8 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 			"device_name", headers.FkDeviceName, "blocks", headers.FkBlocks)
 
 		if err := o.Publisher.Publish(ctx, &messages.IngestionReceived{
-			Time:   ingestion.Time,
-			ID:     ingestion.ID,
-			URL:    saved.URL,
-			UserID: userID,
+			QueuedID: queuedID,
+			UserID:   userID,
 		}); err != nil {
 			log.Warnw("publishing", "err", err)
 		}

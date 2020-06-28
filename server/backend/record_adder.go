@@ -134,6 +134,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 }
 
 type WriteInfo struct {
+	IngestionID  int64
 	TotalRecords int64
 	DataRecords  int64
 	MetaRecords  int64
@@ -279,6 +280,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 	}
 
 	info = &WriteInfo{
+		IngestionID:  i.ID,
 		TotalRecords: int64(totalRecords),
 		MetaRecords:  int64(metaProcessed),
 		DataRecords:  int64(dataProcessed),

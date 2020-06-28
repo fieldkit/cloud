@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/kinbiko/jsonassert"
 	"github.com/stretchr/testify/assert"
@@ -57,24 +56,22 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 	})
 	handler := backend.NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
-	metaIngestion, err := e.AddIngestion(user, "/meta", data.MetaTypeName, station.DeviceID, len(files.Meta))
+	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, station.DeviceID, len(files.Meta))
 	assert.NoError(err)
 
-	dataIngestion, err := e.AddIngestion(user, "/data", data.DataTypeName, station.DeviceID, len(files.Data))
+	queuedData, _, err := e.AddIngestion(user, "/data", data.DataTypeName, station.DeviceID, len(files.Data))
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		Time:    time.Now(),
-		ID:      metaIngestion.ID,
-		UserID:  user.ID,
-		Verbose: true,
+		QueuedID: queuedMeta.ID,
+		UserID:   user.ID,
+		Verbose:  true,
 	}))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		Time:    time.Now(),
-		ID:      dataIngestion.ID,
-		UserID:  user.ID,
-		Verbose: true,
+		QueuedID: queuedData.ID,
+		UserID:   user.ID,
+		Verbose:  true,
 	}))
 
 	req, _ = http.NewRequest("GET", "/stations", nil)

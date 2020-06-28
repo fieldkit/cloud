@@ -46,13 +46,13 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 
 	log.Infow("queueing", "ingestions", len(ingestions))
 
-	for _, i := range ingestions {
-		c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-			Time:   i.Time,
-			ID:     i.ID,
-			URL:    i.URL,
-			UserID: p.UserID(),
-		})
+	if false {
+		for _, _ = range ingestions {
+			c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
+				QueuedID: 0,
+				UserID:   p.UserID(),
+			})
+		}
 	}
 
 	return nil
@@ -84,13 +84,13 @@ func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestio
 
 	log.Infow("queueing", "ingestions", len(ingestions))
 
-	for _, i := range ingestions {
-		c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-			Time:   i.Time,
-			ID:     i.ID,
-			URL:    i.URL,
-			UserID: p.UserID(),
-		})
+	if false {
+		for _, i := range ingestions {
+			c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
+				QueuedID: i.ID,
+				UserID:   p.UserID(),
+			})
+		}
 	}
 
 	return nil
@@ -123,13 +123,13 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 		return err
 	}
 
-	c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-		Time:    i.Time,
-		ID:      i.ID,
-		URL:     i.URL,
-		UserID:  p.UserID(),
-		Verbose: true,
-	})
+	if false {
+		c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
+			QueuedID: 0,
+			UserID:   p.UserID(),
+			Verbose:  true,
+		})
+	}
 
 	return nil
 }

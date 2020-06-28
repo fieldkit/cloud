@@ -1,11 +1,7 @@
 package messages
 
-import "time"
-
 type IngestionReceived struct {
-	Time    time.Time
-	ID      int64
-	URL     string
-	Verbose bool
-	UserID  int32
+	QueuedID int64
+	Verbose  bool
+	UserID   int32
 }

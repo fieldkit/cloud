@@ -22,6 +22,18 @@ const (
 	DataTypeName = "data"
 )
 
+type QueuedIngestion struct {
+	ID           int64      `db:"id"`
+	IngestionID  int64      `db:"ingestion_id"`
+	Queued       time.Time  `db:"queued"`
+	Attempted    *time.Time `db:"attempted"`
+	Completed    *time.Time `db:"completed"`
+	TotalRecords *int64     `db:"total_records"`
+	OtherErrors  *int64     `db:"other_errors"`
+	MetaErrors   *int64     `db:"meta_errors"`
+	DataErrors   *int64     `db:"data_errors"`
+}
+
 type Ingestion struct {
 	ID           int64         `db:"id"`
 	Time         time.Time     `db:"time"`

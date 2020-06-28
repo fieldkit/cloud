@@ -175,7 +175,7 @@ func (e *TestEnv) AddProvision(deviceID, generationID []byte) (*data.Provision, 
 	return provision, nil
 }
 
-func (e *TestEnv) AddIngestion(user *data.User, url, typeName string, deviceID []byte, length int) (*data.Ingestion, error) {
+func (e *TestEnv) AddIngestion(user *data.User, url, typeName string, deviceID []byte, length int) (*data.QueuedIngestion, *data.Ingestion, error) {
 	ingestion := &data.Ingestion{
 		URL:          url,
 		UserID:       user.ID,
@@ -192,10 +192,23 @@ func (e *TestEnv) AddIngestion(user *data.User, url, typeName string, deviceID [
 			VALUES (NOW(), :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
 			RETURNING id
 			`, ingestion); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return ingestion, nil
+	queued := &data.QueuedIngestion{
+		Queued:      time.Now(),
+		IngestionID: ingestion.ID,
+	}
+
+	if err := e.DB.NamedGetContext(e.Ctx, queued, `
+			INSERT INTO fieldkit.ingestion_queue (queued, ingestion_id)
+			VALUES (:queued, :ingestion_id)
+			RETURNING id
+			`, queued); err != nil {
+		return nil, nil, err
+	}
+
+	return queued, ingestion, nil
 }
 
 func (e *TestEnv) AddStationActivity(station *data.Station, user *data.User) error {
@@ -216,7 +229,7 @@ func (e *TestEnv) AddStationActivity(station *data.Station, user *data.User) err
 		return err
 	}
 
-	ingestion, err := e.AddIngestion(user, "file:///dev/null", data.DataTypeName, station.DeviceID, 0)
+	_, ingestion, err := e.AddIngestion(user, "file:///dev/null", data.DataTypeName, station.DeviceID, 0)
 	if err != nil {
 		return err
 	}
@@ -714,12 +727,12 @@ func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*MetaA
 		return nil, err
 	}
 
-	di, err := e.AddIngestion(user, "url", data.DataTypeName, station.DeviceID, 0)
+	_, di, err := e.AddIngestion(user, "url", data.DataTypeName, station.DeviceID, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	mi, err := e.AddIngestion(user, "url", data.MetaTypeName, station.DeviceID, 0)
+	_, mi, err := e.AddIngestion(user, "url", data.MetaTypeName, station.DeviceID, 0)
 	if err != nil {
 		return nil, err
 	}
