@@ -39,9 +39,10 @@
             <div v-if="!isAuthenticated" id="no-user">
                 <p>
                     Please
-                    <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
+                    <router-link v-if="$route" :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
                         log in
                     </router-link>
+                    <router-link v-if="!$route" :to="{ name: 'login' }" class="show-link">log in</router-link>
                     to view stations.
                 </p>
             </div>

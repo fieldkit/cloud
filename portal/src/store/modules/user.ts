@@ -1,7 +1,8 @@
 import Vue from "vue";
 import * as ActionTypes from "../actions";
-import TokenStorage from "../../api/tokens";
-import FkApi, { LoginPayload, LoginResponse, CurrentUser } from "../../api/api";
+import * as MutationTypes from "../mutations";
+import TokenStorage from "@/api/tokens";
+import FkApi, { LoginPayload, LoginResponse, CurrentUser } from "@/api/api";
 
 export const UPDATE_TOKEN = "UPDATE_TOKEN";
 export const CURRENT_USER = "CURRENT_USER";
@@ -9,12 +10,8 @@ export const CURRENT_USER = "CURRENT_USER";
 export const REFRESH_CURRENT_USER = "REFRESH_CURRENT_USER";
 
 export class UserState {
-    token: string | null;
+    token: string | null = null;
     user: CurrentUser | null = null;
-
-    constructor() {
-        this.token = new TokenStorage().getToken();
-    }
 }
 
 const getters = {
@@ -24,7 +21,7 @@ const getters = {
 };
 
 const actions = {
-    [ActionTypes.INITIALIZE]: ({ dispatch }: { dispatch: any }) => {
+    [ActionTypes.INITIALIZE]: ({ commit, dispatch }: { commit: any; dispatch: any }) => {
         return dispatch(REFRESH_CURRENT_USER);
     },
     [ActionTypes.AUTHENTICATE]: ({ commit, dispatch, state }: { commit: any; dispatch: any; state: UserState }, payload: LoginPayload) => {
@@ -48,6 +45,9 @@ const actions = {
 };
 
 const mutations = {
+    [MutationTypes.INITIALIZE]: (state: UserState, token: string) => {
+        Vue.set(state, "token", new TokenStorage().getToken());
+    },
     [UPDATE_TOKEN]: (state: UserState, token: string) => {
         Vue.set(state, "token", token);
     },

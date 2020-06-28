@@ -5,7 +5,7 @@ import moment from "moment";
 import { sync } from "vuex-router-sync";
 import i18n from "./i18n";
 // import * as ActionTypes from "./store/actions";
-// import * as MutationTypes from "./store/mutations";
+import * as MutationTypes from "./store/mutations";
 import storeFactory from "./store";
 import routerFactory from "./router";
 import ConfigurationPlugin from "./config";
@@ -36,6 +36,8 @@ Vue.filter("prettyDate", value => {
 });
 
 const store = storeFactory();
+store.commit(MutationTypes.INITIALIZE);
+
 const router = routerFactory(store);
 sync(store, router);
 

@@ -4,6 +4,7 @@ import StationsView from "@/views/StationsView.vue";
 import storeFactory from "@/store";
 
 jest.mock("@/api/api.js");
+jest.mock("@/api/tokens.js");
 
 const localVue = createLocalVue();
 

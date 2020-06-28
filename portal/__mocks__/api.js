@@ -7,7 +7,10 @@ const mock = jest.fn().mockImplementation(() => {
         getStation: () => Promise.resolve(station),
         getStations: () => Promise.resolve({ stations: [station] }),
         getUserProjects: () => Promise.resolve({ projects: [] }),
+        getPublicProjects: () => Promise.resolve({ projects: [] }),
         getModulesMeta: () => Promise.resolve([]),
+        getPlaceName: () => Promise.resolve({}),
+        getNativeLand: () => Promise.resolve({}),
     };
 });
 

@@ -142,7 +142,8 @@ export default function routerFactory(store) {
 
     router.beforeEach((to, from, chain) => {
         console.log("nav", from.name, "->", to.name);
-        if (from.name === null && to.name === null) {
+        if (from.name === null && (to.name === null || to.name == "login")) {
+            console.log("nav", "authenticated", store.getters.isAuthenticated);
             if (store.getters.isAuthenticated) {
                 chain("/dashboard");
             } else {
