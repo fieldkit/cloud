@@ -45,11 +45,14 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 
 	log.Infow("queueing", "ingestions", len(ingestions), "user_id", p.UserID())
 
-	for _, i := range ingestions {
-		if _, err := ir.Enqueue(ctx, i.ID); err != nil {
-			return err
+	c.options.Database.WithNewTransaction(ctx, func(txCtx context.Context) error {
+		for _, i := range ingestions {
+			if _, err := ir.Enqueue(txCtx, i.ID); err != nil {
+				return err
+			}
 		}
-	}
+		return nil
+	})
 
 	return nil
 }
@@ -80,11 +83,14 @@ func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestio
 
 	log.Infow("queueing", "ingestions", len(ingestions), "user_id", p.UserID())
 
-	for _, i := range ingestions {
-		if _, err := ir.Enqueue(ctx, i.ID); err != nil {
-			return err
+	c.options.Database.WithNewTransaction(ctx, func(txCtx context.Context) error {
+		for _, i := range ingestions {
+			if _, err := ir.Enqueue(txCtx, i.ID); err != nil {
+				return err
+			}
 		}
-	}
+		return nil
+	})
 
 	return nil
 }
