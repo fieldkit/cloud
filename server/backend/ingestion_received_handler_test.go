@@ -220,11 +220,13 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	})
 	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
 
-	queuedMeta, _, err := e.AddIngestion(fd.Owner, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
+	queuedMeta, metaIngestion, err := e.AddIngestion(fd.Owner, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
+	assert.NotNil(metaIngestion)
 
-	queuedData, _, err := e.AddIngestion(fd.Owner, "/data", data.DataTypeName, deviceID, len(files.Data))
+	queuedData, dataIngestion, err := e.AddIngestion(fd.Owner, "/data", data.DataTypeName, deviceID, len(files.Data))
 	assert.NoError(err)
+	assert.NotNil(dataIngestion)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
 		QueuedID: queuedMeta.ID,
@@ -258,6 +260,6 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	assert.NotNil(diAfter.Completed)
 
 	found := 0
-	assert.NoError(e.DB.GetContext(e.Ctx, &found, "SELECT COUNT(*) FROM fieldkit.station_ingestion WHERE data_ingestion_id = $1", diAfter.ID))
+	assert.NoError(e.DB.GetContext(e.Ctx, &found, "SELECT COUNT(*) FROM fieldkit.station_ingestion WHERE data_ingestion_id = $1", dataIngestion.ID))
 	assert.Equal(1, found)
 }

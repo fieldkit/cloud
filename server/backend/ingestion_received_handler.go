@@ -100,6 +100,10 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		return nil
 	}
 
+	if info.IngestionID == 0 {
+		return nil
+	}
+
 	activity := &data.StationIngestion{
 		StationActivity: data.StationActivity{
 			CreatedAt: time.Now(),
@@ -115,7 +119,7 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		INSERT INTO fieldkit.station_ingestion (created_at, station_id, uploader_id, data_ingestion_id, data_records, errors)
 		VALUES (:created_at, :station_id, :uploader_id, :data_ingestion_id, :data_records, :errors)
 		ON CONFLICT (data_ingestion_id) DO UPDATE SET data_records = EXCLUDED.data_records, errors = EXCLUDED.errors
-		RETURNING *
+		RETURNING id
 		`, activity); err != nil {
 		return fmt.Errorf("error upserting activity: %v", err)
 	}

@@ -90,6 +90,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 		}
 
 		ingestion := &data.Ingestion{
+			Time:         time.Now(),
 			URL:          saved.URL,
 			UploadID:     saved.Key,
 			UserID:       userID,

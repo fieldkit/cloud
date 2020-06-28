@@ -48,13 +48,6 @@ type Ingestion struct {
 	Type         string        `db:"type"`
 	Blocks       Int64Range    `db:"blocks"`
 	Flags        pq.Int64Array `db:"flags"`
-	Completed    *time.Time    `db:"completed"`
-	Attempted    *time.Time    `db:"attempted"`
-	Errors       *bool         `db:"errors"`
-	TotalRecords *int64        `db:"total_records"`
-	OtherErrors  *int64        `db:"other_errors"`
-	MetaErrors   *int64        `db:"meta_errors"`
-	DataErrors   *int64        `db:"data_errors"`
 }
 
 type Provision struct {

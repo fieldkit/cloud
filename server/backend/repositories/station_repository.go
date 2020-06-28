@@ -345,7 +345,8 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 
 	ingestions := []*data.Ingestion{}
 	if err := r.db.SelectContext(ctx, &ingestions, `
-		SELECT * FROM fieldkit.ingestion WHERE device_id = $1 ORDER BY time DESC LIMIT 10
+		SELECT id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags
+		FROM fieldkit.ingestion WHERE device_id = $1 ORDER BY time DESC LIMIT 10
 		`, stations[0].DeviceID); err != nil {
 		return nil, err
 	}
@@ -437,8 +438,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	ingestions := []*data.Ingestion{}
 	if err := r.db.SelectContext(ctx, &ingestions, `
 		SELECT
-			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags, completed,
-			attempted, errors, total_records, other_errors, meta_errors, data_errors
+			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags
 		FROM (
 			SELECT
 				*,
@@ -539,8 +539,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 	ingestions := []*data.Ingestion{}
 	if err := r.db.SelectContext(ctx, &ingestions, `
 		SELECT
-			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags, completed,
-			attempted, errors, total_records, other_errors, meta_errors, data_errors
+			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags
 		FROM (
 			SELECT
 				*,
