@@ -2,7 +2,7 @@
     <div
         id="station-summary-container"
         :style="{ width: summarySize.width, top: summarySize.top, left: summarySize.left }"
-        v-if="viewingSummary"
+        v-if="viewingSummary && station"
     >
         <div v-if="station" id="close-form-btn" v-on:click="closeSummary">
             <img alt="Close" src="../assets/close.png" />
@@ -21,7 +21,7 @@
                     <img id="battery" alt="Battery level" :src="getBatteryImg()" />
                     <span class="small-light">{{ station.battery }}%</span>
                 </div>
-                <div v-for="module in modules" v-bind:key="module.id" class="module-icon-container">
+                <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
                     <img v-if="!module.internal" alt="Module icon" class="small-space" :src="getModuleImg(module)" />
                 </div>
             </div>
@@ -39,34 +39,44 @@
                         <span>{{ i == nativeLand.length - 1 ? "" : ", " }}</span>
                     </span>
                 </div>
-                <div class="left">
-                    {{ getLat() || "--" }}
+                <div class="left" v-if="station.location">
+                    {{ station.location.latitude || "--" }}
                     <br />
                     Latitude
                 </div>
-                <div class="left">
-                    {{ getLong() || "--" }}
+                <div class="left" v-if="station.location">
+                    {{ station.location.latitude || "--" }}
+                    <br />
+                    Longitude
+                </div>
+                <div class="left" v-if="!station.location">
+                    --
+                    <br />
+                    Latitude
+                </div>
+                <div class="left" v-if="!station.location">
+                    --
                     <br />
                     Longitude
                 </div>
             </div>
             <template v-if="!compact">
                 <div class="spacer"></div>
-                <div id="readings-container" class="section" v-if="modules.length > 0">
+                <div id="readings-container" class="section" v-if="station.modules.length > 0">
                     <div id="readings-label">Latest Reading</div>
-                    <div v-for="(module, moduleIndex) in modules" v-bind:key="module.id">
+                    <div v-for="(module, moduleIndex) in station.modules" v-bind:key="module.id">
                         <template v-if="!module.internal">
                             <div
                                 v-for="(sensor, sensorIndex) in module.sensors"
                                 v-bind:key="sensor.id"
-                                :class="getCounter(moduleIndex, sensorIndex) % 2 == 1 ? 'left-reading' : 'right-reading'"
+                                :class="getLeftOrRight(moduleIndex, sensorIndex) % 2 == 1 ? 'left-reading' : 'right-reading'"
                             >
                                 <div class="left sensor-name">{{ getSensorName(module, sensor) }}</div>
                                 <div class="right sensor-unit">
-                                    {{ sensor.unit_of_measure }}
+                                    {{ sensor.unitOfMeasure }}
                                 </div>
                                 <div class="right sensor-reading">
-                                    {{ getReading(sensor) }}
+                                    {{ sensor.reading }}
                                 </div>
                             </div>
                         </template>
@@ -92,26 +102,25 @@ export default {
     name: "StationSummary",
     data: () => {
         return {
-            modules: [],
-            moduleSensorCounter: 0,
-            modulesSensors: {},
-            viewingSummary: false,
+            viewingSummary: true,
             nativeLand: [],
             placeName: "",
         };
     },
-    props: ["station", "summarySize", "compact"],
+    props: {
+        station: { required: true },
+        summarySize: { required: true },
+        compact: { default: false },
+    },
     computed: {
         stationSmallPhoto() {
             return makeAuthenticatedApiUrl(this.station.photos.small);
         },
     },
+    /*
     watch: {
         station() {
             if (this.station) {
-                this.modules = [];
-                this.modulesSensors = {};
-                this.moduleSensorCounter = 0;
                 this.setModules();
                 this.getPlaceName()
                     .then(this.getNativeLand)
@@ -123,48 +132,33 @@ export default {
             }
         },
     },
+	*/
     async beforeCreate() {
         this.api = new FKApi();
+    },
+    mounted() {
+        /*
+        if (!this.station.location) {
+            this.placeName = "Unknown area";
+        } else {
+            this.api.getNativeLand(this.station.location);
+            this.api.getPlaceName(this.station.location).then(result => {
+                this.placeName = result.features[0] ? result.features[0].place_name : "Unknown area";
+            });
+        }
+		*/
     },
     methods: {
         viewSummary() {
             this.viewingSummary = true;
         },
-
-        setModules() {
-            if (this.station.configurations && this.station.configurations.all && this.station.configurations.all.length > 0) {
-                this.modules = this.station.configurations.all[0].modules.filter(m => {
-                    return !m.internal;
-                });
-            }
-        },
-
-        getPlaceName() {
-            if (!this.station.location) {
-                this.placeName = "Unknown area";
-                return;
-            }
-            const longLatMapbox = this.station.location.longitude + "," + this.station.location.latitude;
-            return this.api.getPlaceName(longLatMapbox).then(result => {
-                this.placeName = result.features[0] ? result.features[0].place_name : "Unknown area";
-            });
-        },
-
-        getNativeLand() {
-            if (!this.station.location) {
-                return [];
-            }
-            const latLongNative = this.station.location.latitude + "," + this.station.location.longitude;
-            return this.api.getNativeLand(latLongNative);
-        },
-
+        /*
         getReading(sensor) {
             if (!sensor.reading) {
                 return "--";
             }
             return sensor.reading.last || sensor.reading.last == 0 ? sensor.reading.last.toFixed(1) : "--";
         },
-
         getCounter(moduleIndex, sensorIndex) {
             if (this.modulesSensors[moduleIndex]) {
                 if (!this.modulesSensors[moduleIndex][sensorIndex]) {
@@ -178,13 +172,14 @@ export default {
             }
             return this.modulesSensors[moduleIndex][sensorIndex];
         },
-
+		*/
+        getLeftOrRight(moduleIndex, sensorIndex) {
+            return 0;
+        },
         getSyncedDate() {
             return utils.getUpdatedDate(this.station);
         },
-
         getBatteryImg() {
-            const imgPath = require.context("../assets/battery/", false, /\.png$/);
             const battery = this.station.battery;
             let img = "";
             if (battery == 0) {
@@ -200,34 +195,15 @@ export default {
             } else {
                 img = "100.png";
             }
-            return imgPath("./" + img);
+            return this.$loadAsset("battery/" + img);
         },
-
         getSensorName(module, sensor) {
             const newName = utils.convertOldFirmwareResponse(module);
             return this.$t(newName + ".sensors." + sensor.name);
         },
-
         getModuleImg(module) {
             return this.$loadAsset(utils.getModuleImg(module));
         },
-
-        getLat() {
-            if (!this.station.location || !this.station.location.latitude) {
-                return false;
-            }
-            const lat = parseFloat(this.station.location.latitude);
-            return lat.toFixed(5);
-        },
-
-        getLong() {
-            if (!this.station.location || !this.station.location.longitude) {
-                return false;
-            }
-            const long = parseFloat(this.station.location.longitude);
-            return long.toFixed(5);
-        },
-
         closeSummary() {
             this.viewingSummary = false;
             if (!this.compact) {

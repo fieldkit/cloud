@@ -34,14 +34,16 @@ export default {
     props: { mapSize: { required: true }, stations: { required: true } },
     methods: {
         onMapInitialized(map) {
+            console.log("map: initialized");
             this.map = map;
             const mapDiv = document.getElementById("map");
             mapDiv.style.width = this.mapSize.width;
             mapDiv.style.height = this.mapSize.height;
             mapDiv.style.position = this.mapSize.position;
         },
-        onMapLoaded(map) {
-            const compass = this.$loadImage("Icon_Map_Dot.png");
+        onMapLoaded() {
+            console.log("map: loaded (emit ready)");
+            const compass = this.$loadAsset("Icon_Map_Dot.png");
             this.map.loadImage(compass, (error, image) => {
                 if (error) throw error;
                 if (!this.map.hasImage("dot")) this.map.addImage("dot", image);

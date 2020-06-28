@@ -42,7 +42,7 @@ export interface Activity {
     key: string;
     project: ProjectRef;
     station: StationRef;
-    createdAt: any;
+    createdAt: number;
     type: string;
     meta: UploadedMeta;
 }
@@ -119,7 +119,7 @@ export interface Owner {
 
 export interface Upload {
     id: number;
-    time: any;
+    time: number;
     uploadId: string;
     size: number;
     url: string;
@@ -131,8 +131,43 @@ export interface Photos {
     small: string;
 }
 
+export interface SensorReading {
+    last: number;
+    time: number;
+}
+
+export interface ModuleSensor {
+    name: string;
+    unitOfMeasure: string;
+    key: string;
+    ranges: null;
+    reading: SensorReading | null;
+}
+
+export interface StationModule {
+    id: number;
+    name: string;
+    hardwareId: string;
+    position: number;
+    internal: boolean;
+    flags: number;
+    sensors: ModuleSensor[];
+}
+
+export interface StationConfiguration {
+    id: number;
+    time: number;
+    provisionId: number;
+    modules: StationModule[];
+}
+
 export interface Configurations {
-    all: any[];
+    all: StationConfiguration[];
+}
+
+export interface HasLocation {
+    readonly latitude: number | null;
+    readonly longitude: number | null;
 }
 
 export interface Station {
@@ -146,6 +181,7 @@ export interface Station {
     readOnly: boolean;
     configurations: Configurations;
     updated: number;
+    location: HasLocation | null;
 }
 
 export interface ProjectsResponse {
@@ -195,11 +231,11 @@ class FKApi {
                 this.token.setToken(response.headers.authorization);
                 return response.headers.authorization;
             } else {
-                throw new Error("Log In Failed");
+                throw new Error("login failed");
             }
         } catch (err) {
-            // console.log("Error:", err);
-            throw new Error("Log In Failed");
+            console.log("error:", err, err.stack);
+            throw new Error("login failed");
         }
     }
 
@@ -665,30 +701,6 @@ class FKApi {
         }).then(response => this.handle(response));
     }
 
-    getPlaceName(longLat) {
-        return axios({
-            method: "GET",
-            url:
-                "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
-                longLat +
-                ".json?types=place&access_token=" +
-                Config.MAPBOX_ACCESS_TOKEN,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then(response => this.handle(response));
-    }
-
-    getNativeLand(location) {
-        return axios({
-            method: "GET",
-            url: "https://native-land.ca/api/index.php?maps=territories&position=" + location,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then(response => this.handle(response));
-    }
-
     addProjectUpdate(data) {
         const token = this.token.getHeader();
         return axios({
@@ -733,8 +745,34 @@ class FKApi {
         } else if (response.status == 204) {
             return true;
         } else {
-            throw new Error("Api failed");
+            throw new Error("api error: unknown");
         }
+    }
+
+    getPlaceName(location) {
+        const query = location.longitude + "," + location.latitude;
+        return axios({
+            method: "GET",
+            url:
+                "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
+                query +
+                ".json?types=place&access_token=" +
+                Config.MAPBOX_ACCESS_TOKEN,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(response => this.handle(response));
+    }
+
+    getNativeLand(location) {
+        const query = location.latitude + "," + location.longitude;
+        return axios({
+            method: "GET",
+            url: "https://native-land.ca/api/index.php?maps=territories&position=" + query,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(response => this.handle(response));
     }
 }
 

@@ -1,33 +1,72 @@
 import _ from "lodash";
 import Vue from "vue";
+import * as MutationTypes from "../mutations";
 import * as ActionTypes from "../actions";
-import FKApi, { Station, Project, ProjectUser, ProjectFollowers, Activity, Configurations } from "../../api/api";
+import FKApi, {
+    Station,
+    StationModule,
+    ModuleSensor,
+    Project,
+    ProjectUser,
+    ProjectFollowers,
+    Activity,
+    Configurations,
+    HasLocation,
+    Photos,
+} from "../../api/api";
 
 export const HAVE_USER_STATIONS = "HAVE_USER_STATIONS";
 export const HAVE_USER_PROJECTS = "HAVE_USER_PROJECTS";
 export const HAVE_COMMUNITY_PROJECTS = "HAVE_COMMUNITY_PROJECTS";
-export const LOADING = "LOADING";
 export const PROJECT_USERS = "PROJECT_USERS";
 export const PROJECT_FOLLOWS = "PROJECT_FOLLOWS";
 export const PROJECT_STATIONS = "PROJECT_STATIONS";
 export const PROJECT_ACTIVITY = "PROJECT_ACTIVITY";
+export const STATION_UPDATE = "STATION_UPDATE";
 
 export class StationsState {
-    stations: { user: Station[] } = { user: [] };
+    stations: { all: { [index: number]: Station }; user: Station[] } = { all: {}, user: [] };
     projects: { user: Project[]; community: Project[] } = { user: [], community: [] };
-    loading: { stations: boolean; projects: boolean };
     projectUsers: { [index: number]: ProjectUser[] } = {};
     projectFollowers: { [index: number]: ProjectFollowers } = {};
     projectStations: { [index: number]: DisplayStation[] } = {};
     projectActivities: { [index: number]: Activity[] } = {};
 }
 
-export function whenWasStationUpdated(station: Station) {
+export function whenWasStationUpdated(station: Station): Date {
     const uploads = station.uploads.map(u => u.time);
     if (uploads.length > 0) {
-        return uploads[0];
+        return new Date(uploads[0]);
     }
-    return station.updated;
+    return new Date(station.updated);
+}
+
+export class Location implements HasLocation {
+    constructor(public readonly latitude: number, public readonly longitude) {}
+
+    clone(): Location {
+        return new Location(this.latitude, this.longitude);
+    }
+}
+
+export class DisplaySensor {
+    name: string;
+    reading: number | null;
+
+    constructor(sensor: ModuleSensor) {
+        this.name = sensor.name;
+        this.reading = sensor.reading?.last || null;
+    }
+}
+
+export class DisplayModule {
+    name: string;
+    sensors: DisplaySensor[];
+
+    constructor(module: StationModule) {
+        this.name = module.name;
+        this.sensors = module.sensors.map(s => new DisplaySensor(s));
+    }
 }
 
 export class DisplayStation {
@@ -37,12 +76,22 @@ export class DisplayStation {
     configurations: Configurations;
     receivedAt: Date | null = null;
     totalReadings = 0;
+    location: Location | null = null;
+    photos: Photos;
+    modules: DisplayModule[] = [];
 
     constructor(station: Station) {
         this.id = station.id;
         this.name = station.name;
         this.updated = whenWasStationUpdated(station);
         this.configurations = station.configurations;
+        this.photos = station.photos;
+        this.modules = _(station.configurations.all)
+            .map(c => c.modules.filter(m => !m.internal).map(m => new DisplayModule(m)))
+            .head();
+        if (station.location) {
+            this.location = new Location(station.location.latitude, station.location.longitude);
+        }
     }
 }
 
@@ -91,23 +140,23 @@ const getters = {
 
 const actions = {
     [ActionTypes.NEED_PROJECTS]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
-        commit(LOADING, { projects: true });
+        commit(MutationTypes.LOADING, { projects: true });
         const [communityProjects, userProjects] = await Promise.all([new FKApi().getPublicProjects(), new FKApi().getUserProjects()]);
         commit(HAVE_COMMUNITY_PROJECTS, communityProjects.projects);
         commit(HAVE_USER_PROJECTS, userProjects.projects);
-        commit(LOADING, { projects: false });
+        commit(MutationTypes.LOADING, { projects: false });
     },
     [ActionTypes.NEED_STATIONS]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
-        commit(LOADING, { stations: true });
+        commit(MutationTypes.LOADING, { stations: true });
         const [stations] = await Promise.all([new FKApi().getStations()]);
         commit(HAVE_USER_STATIONS, stations.stations);
-        commit(LOADING, { stations: false });
+        commit(MutationTypes.LOADING, { stations: false });
     },
     [ActionTypes.NEED_PROJECT]: async (
         { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
         payload: { id: number }
     ) => {
-        commit(LOADING, { projects: true });
+        commit(MutationTypes.LOADING, { projects: true });
 
         const api = new FKApi();
         const [users, followers, stations, activity, _needStations, _needProjects] = await Promise.all([
@@ -124,7 +173,29 @@ const actions = {
         commit(PROJECT_STATIONS, { projectId: payload.id, stations: stations.stations });
         commit(PROJECT_ACTIVITY, { projectId: payload.id, activities: activity.activities });
 
-        commit(LOADING, { projects: false });
+        commit(MutationTypes.LOADING, { projects: false });
+    },
+    [ActionTypes.NEED_STATION]: async (
+        { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+        payload: { id: number }
+    ) => {
+        commit(MutationTypes.LOADING, { stations: true });
+
+        const api = new FKApi();
+        const [station, _needStations, _needProjects] = await Promise.all([
+            api.getStation(payload.id),
+            dispatch(ActionTypes.NEED_STATIONS),
+            dispatch(ActionTypes.NEED_PROJECTS),
+        ]);
+
+        commit(STATION_UPDATE, station);
+
+        if (station.location) {
+            const [nativeLands, placeNames] = await Promise.all([api.getNativeLand(station.location), api.getPlaceName(station.location)]);
+            console.log(nativeLands, placeNames);
+        }
+
+        commit(MutationTypes.LOADING, { stations: false });
     },
     [ActionTypes.PROJECT_FOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
         await new FKApi().followProject(payload.projectId);
@@ -149,6 +220,9 @@ const mutations = {
     },
     [HAVE_USER_STATIONS]: (state: StationsState, stations: Station[]) => {
         state.stations.user = stations;
+        stations.forEach(station => {
+            Vue.set(state.stations.all, station.id, new DisplayStation(station));
+        });
     },
     [PROJECT_USERS]: (state: StationsState, payload: { projectId: number; users: ProjectUser[] }) => {
         Vue.set(state.projectUsers, payload.projectId, payload.users);
@@ -166,8 +240,8 @@ const mutations = {
     [PROJECT_ACTIVITY]: (state: StationsState, payload: { projectId: number; activities: Activity[] }) => {
         Vue.set(state.projectActivities, payload.projectId, payload.activities);
     },
-    [LOADING]: (state: StationsState, payload: { projects: boolean; stations: boolean }) => {
-        Vue.set(state, "loading", { ...state.loading, ...payload });
+    [STATION_UPDATE]: (state: StationsState, payload: Station) => {
+        Vue.set(state.stations.all, payload.id, new DisplayStation(payload));
     },
 };
 

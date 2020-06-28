@@ -8,10 +8,10 @@
             @showStation="showStation"
         />
         <HeaderBar />
-        <div id="loading" v-if="loading">
+        <div id="loading" v-if="isBusy">
             <img alt="" src="../assets/progress.gif" />
         </div>
-        <div class="main-panel" v-show="!loading && isAuthenticated">
+        <div class="main-panel" v-show="!isBusy && isAuthenticated">
             <div id="inner-container">
                 <div id="projects-container">
                     <div class="container">
@@ -60,13 +60,12 @@ export default {
         return {};
     },
     computed: {
-        ...mapGetters({ isAuthenticated: "isAuthenticated" }),
+        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
             user: s => s.user.user,
             stations: s => s.stations.stations.user,
             userProjects: s => s.stations.projects.user,
             publicProjects: s => s.stations.projects.community,
-            loading: s => s.stations.loading.stations || s.stations.loading.projects,
         }),
     },
     beforeMount() {

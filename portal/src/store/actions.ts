@@ -5,6 +5,7 @@ export const LOGOUT = "LOGOUT";
 export const NEED_PROJECTS = "NEED_PROJECTS";
 export const NEED_STATIONS = "NEED_STATIONS";
 export const NEED_PROJECT = "NEED_PROJECT";
+export const NEED_STATION = "NEED_STATION";
 
 export const PROJECT_FOLLOW = "PROJECT_FOLLOW";
 export const PROJECT_UNFOLLOW = "PROJECT_UNFOLLOW";

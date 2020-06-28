@@ -116,7 +116,11 @@ const routes = [
         path: "/dashboard/stations/:id",
         name: "viewStation",
         component: StationsView,
-        props: true,
+        props: route => {
+            return {
+                id: Number(route.params.id),
+            };
+        },
     },
     {
         path: "/dashboard/data",

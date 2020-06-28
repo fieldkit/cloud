@@ -5,7 +5,7 @@
             viewing="stations"
             :isAuthenticated="isAuthenticated"
             :stations="stations"
-            :projects="projects"
+            :projects="userProjects"
             @showStation="showSummary"
         />
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" @sidebarToggled="onSidebarToggle" />
@@ -13,7 +13,7 @@
             <div id="summary-and-map">
                 <StationsMap :mapSize="mapSize" :stations="stations" @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" />
                 <StationSummary
-                    v-show="activeStation"
+                    v-if="activeStationId"
                     class="summary-container"
                     :station="activeStation"
                     :summarySize="summarySize"
@@ -36,7 +36,7 @@
                     <img alt="Google Play" src="../assets/googleplay.png" class="app-btn" />
                 </a>
             </div>
-            <div v-if="noCurrentUser" id="no-user">
+            <div v-if="!isAuthenticated" id="no-user">
                 <p>
                     Please
                     <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
@@ -50,11 +50,12 @@
 </template>
 
 <script>
-import FKApi from "@/api/api";
 import HeaderBar from "../components/HeaderBar";
 import SidebarNav from "../components/SidebarNav";
 import StationSummary from "../components/StationSummary";
 import StationsMap from "../components/StationsMap";
+import { mapState, mapGetters } from "vuex";
+import * as ActionTypes from "@/store/actions";
 
 export default {
     name: "StationsView",
@@ -64,16 +65,13 @@ export default {
         StationsMap,
         StationSummary,
     },
-    props: ["id"],
+    props: {
+        id: { type: Number },
+    },
     data: () => {
         return {
-            user: {},
-            projects: [],
-            stations: [],
-            activeStation: null,
+            activeStationId: null,
             showNotice: false,
-            isAuthenticated: false,
-            noCurrentUser: false,
             summarySize: {
                 width: "415px",
                 top: "120px",
@@ -90,73 +88,62 @@ export default {
     watch: {
         $route(to) {
             if (to.name == "stations") {
+                console.log("closeSummary");
                 this.$refs.stationSummary.closeSummary();
             }
         },
     },
-    async beforeCreate() {
-        this.api = new FKApi();
-        this.api
-            .getCurrentUser()
-            .then(user => {
-                this.user = user;
-                this.isAuthenticated = true;
-
-                return Promise.all([
-                    Promise.resolve().then(() => {
-                        if (this.id) {
-                            return this.api.getStation(this.id).then(station => {
-                                return this.showSummary(station, true);
-                            });
-                        }
-                    }),
-                    this.api.getStations().then(s => {
-                        this.stations = s.stations;
-                    }),
-                    this.api.getUserProjects().then(projects => {
-                        if (projects && projects.projects.length > 0) {
-                            this.projects = projects.projects;
-                        }
-                    }),
-                ]);
-            })
+    computed: {
+        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
+        ...mapState({
+            user: s => s.user.user,
+            stations: s => s.stations.stations.user,
+            userProjects: s => s.stations.projects.user,
+        }),
+        activeStation() {
+            return this.$store.state.stations.stations.all[this.activeStationId];
+        },
+    },
+    beforeCreate() {
+        /*
             .then(() => {
                 if (this.stations.length == 0 && !this.id) {
                     this.showNotice = true;
                 }
             })
-            .catch(e => {
-                console.log("error", e);
-                this.noCurrentUser = true;
-            });
+		*/
+    },
+    beforeMount() {
+        this.activeStationId = this.id;
+        return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });
     },
     methods: {
         goBack() {
-            window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
+            if (window.history.length) {
+                return this.$router.go(-1);
+            } else {
+                return this.$router.push("/");
+            }
         },
-
         onMapReady(map) {
             this.map = map;
         },
-
         onSidebarToggle() {
-            this.map.resize();
+            if (this.map) {
+                this.map.resize();
+            }
         },
-
         showSummary(station, preserveRoute) {
-            this.activeStation = station;
-            this.$refs.stationSummary.viewSummary();
+            this.activeStationId = station.id;
             if (!preserveRoute) {
                 this.updateStationRoute(station);
             }
         },
-
         updateStationRoute(station) {
             if (this.$route.name != "viewStation" || this.$route.params.id != station.id) {
                 this.$router.push({ name: "viewStation", params: { id: station.id } });
             }
         },
-
         closeNotice() {
             this.showNotice = false;
         },

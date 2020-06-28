@@ -8,10 +8,10 @@
             @showStation="showStation"
         />
         <HeaderBar />
-        <div id="loading" v-if="loading">
+        <div id="loading" v-if="isBusy">
             <img alt="" src="../assets/progress.gif" />
         </div>
-        <div class="main-panel" v-show="!loading && isAuthenticated">
+        <div class="main-panel" v-show="!isBusy && isAuthenticated">
             <div class="inner-container">
                 <router-link :to="{ name: 'projects' }" v-if="!previewing">
                     <div class="projects-link">
@@ -75,9 +75,8 @@ export default {
         };
     },
     computed: {
-        ...mapGetters({ isAuthenticated: "isAuthenticated" }),
+        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
-            loading: s => s.stations.loading.stations || s.stations.loading.projects,
             user: s => s.user.user,
             stations: s => s.stations.stations.user,
             userProjects: s => s.stations.projects.user,
