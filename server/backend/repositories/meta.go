@@ -318,6 +318,9 @@ func getLocation(l *pb.DeviceLocation) []float64 {
 	if l == nil {
 		return nil
 	}
+	if l.Latitude > 90 || l.Latitude < -90 {
+		return nil
+	}
 	if l.Longitude > 180 || l.Longitude < -180 {
 		return nil
 	}
