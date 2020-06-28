@@ -80,7 +80,6 @@ export default {
     props: [],
     data: () => {
         return {
-            stationId: null,
             stationData: {},
             allSensors: [],
             timeRange: null,
