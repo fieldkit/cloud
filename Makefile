@@ -43,7 +43,7 @@ ocr-portal/src/js/secrets.js: ocr-portal/src/js/secrets.js.template
 portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
 
-binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkstreams
+binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkstreams $(BUILD)/fkdata
 
 portal/node_modules:
 	cd portal && npm install
@@ -68,6 +68,8 @@ ingester: $(BUILD)/ingester
 
 fktool: $(BUILD)/fktool
 
+fkdata: $(BUILD)/fkdata
+
 $(BUILD)/server: $(SERVER_SOURCES)
 	cd server/cmd/server && $(GO) build -o $@
 
@@ -79,6 +81,9 @@ $(BUILD)/fktool: server/cmd/fktool/*.go $(SERVER_SOURCES)
 
 $(BUILD)/fkstreams: server/cmd/fktool/*.go $(SERVER_SOURCES)
 	cd server/cmd/fkstreams && $(GO) build -o $@ *.go
+
+$(BUILD)/fkdata: server/cmd/fkdata/*.go $(SERVER_SOURCES)
+	cd server/cmd/fkdata && $(GO) build -o $@ *.go
 
 generate:
 	./tools/goa-generate.sh
