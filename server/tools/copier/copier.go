@@ -17,9 +17,10 @@ import (
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/common"
+	"github.com/fieldkit/cloud/server/common/logging"
+
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/files"
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 type options struct {

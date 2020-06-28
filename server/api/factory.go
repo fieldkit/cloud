@@ -3,8 +3,6 @@ package api
 import (
 	"context"
 	"net/http"
-
-	_ "github.com/fieldkit/cloud/server/logging"
 )
 
 func CreateApi(ctx context.Context, controllerOptions *ControllerOptions) (http.Handler, error) {

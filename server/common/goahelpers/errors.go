@@ -10,7 +10,7 @@ import (
 
 	"github.com/goadesign/goa"
 
-	"github.com/fieldkit/cloud/server/logging"
+	"github.com/fieldkit/cloud/server/common/logging"
 )
 
 // ErrorHandler turns a Go error into an HTTP response. It should be placed in the middleware chain

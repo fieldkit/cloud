@@ -14,9 +14,10 @@ import (
 	"github.com/goadesign/goa/middleware"
 	"github.com/goadesign/goa/middleware/gzip"
 
+	"github.com/fieldkit/cloud/server/common/goahelpers"
+	"github.com/fieldkit/cloud/server/common/logging"
+
 	"github.com/fieldkit/cloud/server/api/app"
-	"github.com/fieldkit/cloud/server/goahelpers"
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 func CreateGoaV2Handler(ctx context.Context, controllerOptions *ControllerOptions, handle404 http.Handler) (http.Handler, error) {

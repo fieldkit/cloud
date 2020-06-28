@@ -8,9 +8,10 @@ import (
 
 	pb "github.com/fieldkit/data-protocol"
 
+	"github.com/fieldkit/cloud/server/common/errors"
+
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/errors"
 )
 
 type stationModelRecordHandler struct {

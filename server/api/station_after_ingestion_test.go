@@ -9,9 +9,10 @@ import (
 	"github.com/kinbiko/jsonassert"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/fieldkit/cloud/server/common/logging"
+
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/logging"
 	"github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/tests"
 )

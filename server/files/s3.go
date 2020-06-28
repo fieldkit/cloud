@@ -13,8 +13,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
 	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/errors"
-	"github.com/fieldkit/cloud/server/logging"
+	"github.com/fieldkit/cloud/server/common/errors"
+	"github.com/fieldkit/cloud/server/common/logging"
 )
 
 type S3FileArchive struct {

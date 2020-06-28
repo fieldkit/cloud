@@ -10,9 +10,10 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/fieldkit/cloud/server/health"
+	"github.com/fieldkit/cloud/server/common/health"
+	"github.com/fieldkit/cloud/server/common/logging"
+
 	"github.com/fieldkit/cloud/server/ingester"
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 func main() {

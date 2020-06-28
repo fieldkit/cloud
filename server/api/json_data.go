@@ -6,10 +6,11 @@ import (
 
 	"github.com/goadesign/goa"
 
+	"github.com/fieldkit/cloud/server/common/logging"
+
 	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/logging"
 )
 
 type JSONDataController struct {

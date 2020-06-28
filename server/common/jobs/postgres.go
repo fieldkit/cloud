@@ -14,7 +14,7 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/logging"
+	"github.com/fieldkit/cloud/server/common/logging"
 )
 
 type PgJobQueue struct {

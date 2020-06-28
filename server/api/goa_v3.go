@@ -14,7 +14,7 @@ import (
 	goahttp "goa.design/goa/v3/http"
 	"goa.design/goa/v3/middleware"
 
-	"github.com/fieldkit/cloud/server/logging"
+	"github.com/fieldkit/cloud/server/common/logging"
 
 	testSvr "github.com/fieldkit/cloud/server/api/gen/http/test/server"
 	test "github.com/fieldkit/cloud/server/api/gen/test"

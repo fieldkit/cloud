@@ -3,7 +3,7 @@ package repositories
 import (
 	"strings"
 
-	"github.com/fieldkit/cloud/server/errors"
+	"github.com/fieldkit/cloud/server/common/errors"
 )
 
 const (

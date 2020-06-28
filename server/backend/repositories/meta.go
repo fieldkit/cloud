@@ -8,9 +8,9 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/fieldkit/cloud/server/common/errors"
+	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/errors"
-	"github.com/fieldkit/cloud/server/logging"
 
 	pb "github.com/fieldkit/data-protocol"
 )

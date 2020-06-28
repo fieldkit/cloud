@@ -125,6 +125,7 @@ export default {
                 .getStation(id)
                 .then(station => {
                     const deviceId = station.deviceId;
+                    console.log("get station summary");
                     this.stationData[deviceId] = {};
                     this.stationData[deviceId].station = station;
                     this.api
@@ -175,6 +176,7 @@ export default {
         },
 
         async fetchSummary(deviceId, start, end) {
+            console.log("fetchSummary");
             return this.api.getStationDataSummaryByDeviceId(deviceId, start, end);
         },
 
