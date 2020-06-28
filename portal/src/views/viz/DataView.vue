@@ -77,7 +77,7 @@ export default {
         NotesList,
         SensorSummary,
     },
-    props: [],
+    props: {},
     data: () => {
         return {
             stationData: {},
