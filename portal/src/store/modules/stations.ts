@@ -86,9 +86,10 @@ export class DisplayStation {
         this.updated = whenWasStationUpdated(station);
         this.configurations = station.configurations;
         this.photos = station.photos;
-        this.modules = _(station.configurations.all)
-            .map(c => c.modules.filter(m => !m.internal).map(m => new DisplayModule(m)))
-            .head();
+        this.modules =
+            _(station.configurations.all)
+                .map(c => c.modules.filter(m => !m.internal).map(m => new DisplayModule(m)))
+                .head() || [];
         if (station.location) {
             this.location = new Location(station.location.latitude, station.location.longitude);
         }
