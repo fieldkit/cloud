@@ -21,8 +21,11 @@ const getters = {
 };
 
 const actions = {
-    [ActionTypes.INITIALIZE]: ({ commit, dispatch }: { commit: any; dispatch: any }) => {
-        return dispatch(REFRESH_CURRENT_USER);
+    [ActionTypes.INITIALIZE]: ({ commit, dispatch, state }: { commit: any; dispatch: any; state: UserState }) => {
+        if (state.token) {
+            return dispatch(REFRESH_CURRENT_USER);
+        }
+        return null;
     },
     [ActionTypes.AUTHENTICATE]: ({ commit, dispatch, state }: { commit: any; dispatch: any; state: UserState }, payload: LoginPayload) => {
         return new FkApi().login(payload.email, payload.password).then(token => {
@@ -49,7 +52,11 @@ const mutations = {
         Vue.set(state, "token", new TokenStorage().getToken());
     },
     [UPDATE_TOKEN]: (state: UserState, token: string) => {
+        new TokenStorage().setToken(token);
         Vue.set(state, "token", token);
+        if (token === null) {
+            Vue.set(state, "user", null);
+        }
     },
     [CURRENT_USER]: (state: UserState, user: CurrentUser) => {
         Vue.set(state, "user", user);
