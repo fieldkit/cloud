@@ -43,7 +43,6 @@
 </template>
 
 <script>
-import FKApi from "../api/api";
 import HeaderBar from "../components/HeaderBar";
 import ProjectThumbnails from "../components/ProjectThumbnails";
 import SidebarNav from "../components/SidebarNav";

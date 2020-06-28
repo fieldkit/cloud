@@ -4,8 +4,8 @@ import VCalendar from "v-calendar";
 import moment from "moment";
 import { sync } from "vuex-router-sync";
 import i18n from "./i18n";
-import * as ActionTypes from "./store/actions";
-import * as MutationTypes from "./store/mutations";
+// import * as ActionTypes from "./store/actions";
+// import * as MutationTypes from "./store/mutations";
 import storeFactory from "./store";
 import routerFactory from "./router";
 import ConfigurationPlugin from "./config";
@@ -13,7 +13,7 @@ import Config from "./secrets";
 import App from "./App.vue";
 
 const AssetsPlugin = {
-    install(Vue, config: any) {
+    install(Vue) {
         const loader = require.context("@/assets/", true, /\.png$/);
         Vue.prototype.$loadAsset = path => {
             return loader("./" + path);
@@ -37,7 +37,7 @@ Vue.filter("prettyDate", value => {
 
 const store = storeFactory();
 const router = routerFactory(store);
-const unsync = sync(store, router);
+sync(store, router);
 
 new Vue({
     i18n,

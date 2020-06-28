@@ -50,7 +50,6 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
-import FKApi from "../api/api";
 import HeaderBar from "../components/HeaderBar";
 import ProjectPublic from "../components/ProjectPublic";
 import SidebarNav from "../components/SidebarNav";

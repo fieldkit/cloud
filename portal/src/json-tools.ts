@@ -17,7 +17,7 @@ const toCamel = s => {
 export function keysToCamelWithWarnings(o) {
     if (isObject(o)) {
         const n = new Proxy(o, {
-            get(target, name, receiver) {
+            get(target, name) {
                 if (typeof name === "string" && !/^_/.test(name)) {
                     const camelName = toCamel(name);
                     if (camelName !== name) {
