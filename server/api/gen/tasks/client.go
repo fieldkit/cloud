@@ -15,26 +15,18 @@ import (
 
 // Client is the "tasks" service client.
 type Client struct {
-	FiveEndpoint          goa.Endpoint
-	RefreshDeviceEndpoint goa.Endpoint
+	FiveEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "tasks" service client given the endpoints.
-func NewClient(five, refreshDevice goa.Endpoint) *Client {
+func NewClient(five goa.Endpoint) *Client {
 	return &Client{
-		FiveEndpoint:          five,
-		RefreshDeviceEndpoint: refreshDevice,
+		FiveEndpoint: five,
 	}
 }
 
 // Five calls the "five" endpoint of the "tasks" service.
 func (c *Client) Five(ctx context.Context) (err error) {
 	_, err = c.FiveEndpoint(ctx, nil)
-	return
-}
-
-// RefreshDevice calls the "refresh device" endpoint of the "tasks" service.
-func (c *Client) RefreshDevice(ctx context.Context, p *RefreshDevicePayload) (err error) {
-	_, err = c.RefreshDeviceEndpoint(ctx, p)
 	return
 }

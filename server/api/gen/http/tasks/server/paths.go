@@ -7,16 +7,7 @@
 
 package server
 
-import (
-	"fmt"
-)
-
 // FiveTasksPath returns the URL path to the tasks service five HTTP endpoint.
 func FiveTasksPath() string {
 	return "/tasks/five"
-}
-
-// RefreshDeviceTasksPath returns the URL path to the tasks service refresh device HTTP endpoint.
-func RefreshDeviceTasksPath(deviceID string) string {
-	return fmt.Sprintf("/tasks/devices/%v/refresh", deviceID)
 }

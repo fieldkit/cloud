@@ -27,22 +27,6 @@ type FiveNotFoundResponseBody string
 // endpoint HTTP response body for the "unauthorized" error.
 type FiveUnauthorizedResponseBody string
 
-// RefreshDeviceBadRequestResponseBody is the type of the "tasks" service
-// "refresh device" endpoint HTTP response body for the "bad-request" error.
-type RefreshDeviceBadRequestResponseBody string
-
-// RefreshDeviceForbiddenResponseBody is the type of the "tasks" service
-// "refresh device" endpoint HTTP response body for the "forbidden" error.
-type RefreshDeviceForbiddenResponseBody string
-
-// RefreshDeviceNotFoundResponseBody is the type of the "tasks" service
-// "refresh device" endpoint HTTP response body for the "not-found" error.
-type RefreshDeviceNotFoundResponseBody string
-
-// RefreshDeviceUnauthorizedResponseBody is the type of the "tasks" service
-// "refresh device" endpoint HTTP response body for the "unauthorized" error.
-type RefreshDeviceUnauthorizedResponseBody string
-
 // NewFiveBadRequestResponseBody builds the HTTP response body from the result
 // of the "five" endpoint of the "tasks" service.
 func NewFiveBadRequestResponseBody(res tasks.BadRequest) FiveBadRequestResponseBody {
@@ -69,42 +53,4 @@ func NewFiveNotFoundResponseBody(res tasks.NotFound) FiveNotFoundResponseBody {
 func NewFiveUnauthorizedResponseBody(res tasks.Unauthorized) FiveUnauthorizedResponseBody {
 	body := FiveUnauthorizedResponseBody(res)
 	return body
-}
-
-// NewRefreshDeviceBadRequestResponseBody builds the HTTP response body from
-// the result of the "refresh device" endpoint of the "tasks" service.
-func NewRefreshDeviceBadRequestResponseBody(res tasks.BadRequest) RefreshDeviceBadRequestResponseBody {
-	body := RefreshDeviceBadRequestResponseBody(res)
-	return body
-}
-
-// NewRefreshDeviceForbiddenResponseBody builds the HTTP response body from the
-// result of the "refresh device" endpoint of the "tasks" service.
-func NewRefreshDeviceForbiddenResponseBody(res tasks.Forbidden) RefreshDeviceForbiddenResponseBody {
-	body := RefreshDeviceForbiddenResponseBody(res)
-	return body
-}
-
-// NewRefreshDeviceNotFoundResponseBody builds the HTTP response body from the
-// result of the "refresh device" endpoint of the "tasks" service.
-func NewRefreshDeviceNotFoundResponseBody(res tasks.NotFound) RefreshDeviceNotFoundResponseBody {
-	body := RefreshDeviceNotFoundResponseBody(res)
-	return body
-}
-
-// NewRefreshDeviceUnauthorizedResponseBody builds the HTTP response body from
-// the result of the "refresh device" endpoint of the "tasks" service.
-func NewRefreshDeviceUnauthorizedResponseBody(res tasks.Unauthorized) RefreshDeviceUnauthorizedResponseBody {
-	body := RefreshDeviceUnauthorizedResponseBody(res)
-	return body
-}
-
-// NewRefreshDevicePayload builds a tasks service refresh device endpoint
-// payload.
-func NewRefreshDevicePayload(deviceID string, auth string) *tasks.RefreshDevicePayload {
-	v := &tasks.RefreshDevicePayload{}
-	v.DeviceID = deviceID
-	v.Auth = auth
-
-	return v
 }

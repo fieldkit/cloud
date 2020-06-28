@@ -27,22 +27,6 @@ type FiveNotFoundResponseBody string
 // endpoint HTTP response body for the "unauthorized" error.
 type FiveUnauthorizedResponseBody string
 
-// RefreshDeviceBadRequestResponseBody is the type of the "tasks" service
-// "refresh device" endpoint HTTP response body for the "bad-request" error.
-type RefreshDeviceBadRequestResponseBody string
-
-// RefreshDeviceForbiddenResponseBody is the type of the "tasks" service
-// "refresh device" endpoint HTTP response body for the "forbidden" error.
-type RefreshDeviceForbiddenResponseBody string
-
-// RefreshDeviceNotFoundResponseBody is the type of the "tasks" service
-// "refresh device" endpoint HTTP response body for the "not-found" error.
-type RefreshDeviceNotFoundResponseBody string
-
-// RefreshDeviceUnauthorizedResponseBody is the type of the "tasks" service
-// "refresh device" endpoint HTTP response body for the "unauthorized" error.
-type RefreshDeviceUnauthorizedResponseBody string
-
 // NewFiveBadRequest builds a tasks service five endpoint bad-request error.
 func NewFiveBadRequest(body FiveBadRequestResponseBody) tasks.BadRequest {
 	v := tasks.BadRequest(body)
@@ -63,34 +47,6 @@ func NewFiveNotFound(body FiveNotFoundResponseBody) tasks.NotFound {
 
 // NewFiveUnauthorized builds a tasks service five endpoint unauthorized error.
 func NewFiveUnauthorized(body FiveUnauthorizedResponseBody) tasks.Unauthorized {
-	v := tasks.Unauthorized(body)
-	return v
-}
-
-// NewRefreshDeviceBadRequest builds a tasks service refresh device endpoint
-// bad-request error.
-func NewRefreshDeviceBadRequest(body RefreshDeviceBadRequestResponseBody) tasks.BadRequest {
-	v := tasks.BadRequest(body)
-	return v
-}
-
-// NewRefreshDeviceForbidden builds a tasks service refresh device endpoint
-// forbidden error.
-func NewRefreshDeviceForbidden(body RefreshDeviceForbiddenResponseBody) tasks.Forbidden {
-	v := tasks.Forbidden(body)
-	return v
-}
-
-// NewRefreshDeviceNotFound builds a tasks service refresh device endpoint
-// not-found error.
-func NewRefreshDeviceNotFound(body RefreshDeviceNotFoundResponseBody) tasks.NotFound {
-	v := tasks.NotFound(body)
-	return v
-}
-
-// NewRefreshDeviceUnauthorized builds a tasks service refresh device endpoint
-// unauthorized error.
-func NewRefreshDeviceUnauthorized(body RefreshDeviceUnauthorizedResponseBody) tasks.Unauthorized {
 	v := tasks.Unauthorized(body)
 	return v
 }

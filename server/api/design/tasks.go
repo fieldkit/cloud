@@ -11,28 +11,6 @@ var _ = Service("tasks", func() {
 		})
 	})
 
-	Method("refresh device", func() {
-		Security(JWTAuth, func() {
-			Scope("api:access")
-		})
-
-		Payload(func() {
-			Token("auth")
-			Attribute("deviceId", String)
-			Required("auth", "deviceId")
-		})
-
-		Result(Empty)
-
-		HTTP(func() {
-			POST("tasks/devices/{deviceId}/refresh")
-
-			Header("auth:Authorization", String, "authentication token", func() {
-				Pattern("^Bearer [^ ]+$")
-			})
-		})
-	})
-
 	Error("unauthorized", String, "credentials are invalid")
 
 	HTTP(func() {

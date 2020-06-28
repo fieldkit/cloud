@@ -20,10 +20,6 @@ type Client struct {
 	// Five Doer is the HTTP client used to make requests to the five endpoint.
 	FiveDoer goahttp.Doer
 
-	// RefreshDevice Doer is the HTTP client used to make requests to the refresh
-	// device endpoint.
-	RefreshDeviceDoer goahttp.Doer
-
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -48,7 +44,6 @@ func NewClient(
 ) *Client {
 	return &Client{
 		FiveDoer:            doer,
-		RefreshDeviceDoer:   doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -72,30 +67,6 @@ func (c *Client) Five() goa.Endpoint {
 		resp, err := c.FiveDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("tasks", "five", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
-// RefreshDevice returns an endpoint that makes HTTP requests to the tasks
-// service refresh device server.
-func (c *Client) RefreshDevice() goa.Endpoint {
-	var (
-		encodeRequest  = EncodeRefreshDeviceRequest(c.encoder)
-		decodeResponse = DecodeRefreshDeviceResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildRefreshDeviceRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.RefreshDeviceDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("tasks", "refresh device", err)
 		}
 		return decodeResponse(resp)
 	}

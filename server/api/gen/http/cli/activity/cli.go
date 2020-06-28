@@ -39,7 +39,7 @@ modules meta
 project (add- update|delete- update|modify- update|invites|lookup- invite|accept- invite|reject- invite)
 information (device- layout|firmware- statistics)
 station (add|get|update|list- mine|list- project|photo)
-tasks (five|refresh- device)
+tasks five
 test (get|error|email)
 user (roles|delete)
 `
@@ -47,8 +47,8 @@ user (roles|delete)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 6618835655812202335 --page 4157611018174479128 --auth "Consequatur qui consequatur."` + "\n" +
-		os.Args[0] + ` following follow --id 8519199775928822743 --auth "Sed consequatur assumenda sit id."` + "\n" +
+	return os.Args[0] + ` activity station --id 2920417339524806997 --page 8354332868448807316 --auth "Optio voluptatibus quis exercitationem autem cumque."` + "\n" +
+		os.Args[0] + ` following follow --id 8548087274381729518 --auth "Maiores reiciendis non ad."` + "\n" +
 		os.Args[0] + ` ingestion process- pending --auth "A provident aut quia voluptas similique."` + "\n" +
 		os.Args[0] + ` modules meta` + "\n" +
 		os.Args[0] + ` project add- update --body '{
@@ -188,10 +188,6 @@ func ParseEndpoint(
 
 		tasksFiveFlags = flag.NewFlagSet("five", flag.ExitOnError)
 
-		tasksRefreshDeviceFlags        = flag.NewFlagSet("refresh- device", flag.ExitOnError)
-		tasksRefreshDeviceDeviceIDFlag = tasksRefreshDeviceFlags.String("device-id", "REQUIRED", "")
-		tasksRefreshDeviceAuthFlag     = tasksRefreshDeviceFlags.String("auth", "REQUIRED", "")
-
 		testFlags = flag.NewFlagSet("test", flag.ContinueOnError)
 
 		testGetFlags  = flag.NewFlagSet("get", flag.ExitOnError)
@@ -253,7 +249,6 @@ func ParseEndpoint(
 
 	tasksFlags.Usage = tasksUsage
 	tasksFiveFlags.Usage = tasksFiveUsage
-	tasksRefreshDeviceFlags.Usage = tasksRefreshDeviceUsage
 
 	testFlags.Usage = testUsage
 	testGetFlags.Usage = testGetUsage
@@ -422,9 +417,6 @@ func ParseEndpoint(
 			case "five":
 				epf = tasksFiveFlags
 
-			case "refresh- device":
-				epf = tasksRefreshDeviceFlags
-
 			}
 
 		case "test":
@@ -579,9 +571,6 @@ func ParseEndpoint(
 			case "five":
 				endpoint = c.Five()
 				data = nil
-			case "refresh- device":
-				endpoint = c.RefreshDevice()
-				data, err = tasksc.BuildRefreshDevicePayload(*tasksRefreshDeviceDeviceIDFlag, *tasksRefreshDeviceAuthFlag)
 			}
 		case "test":
 			c := testc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -638,7 +627,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 6618835655812202335 --page 4157611018174479128 --auth "Consequatur qui consequatur."
+    `+os.Args[0]+` activity station --id 2920417339524806997 --page 8354332868448807316 --auth "Optio voluptatibus quis exercitationem autem cumque."
 `, os.Args[0])
 }
 
@@ -651,7 +640,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 4225002009770965660 --page 2800909449136207229 --auth "Eum sed iusto porro."
+    `+os.Args[0]+` activity project --id 532267701584569007 --page 7994951269711206427 --auth "Sequi ullam doloribus temporibus qui."
 `, os.Args[0])
 }
 
@@ -679,7 +668,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 8519199775928822743 --auth "Sed consequatur assumenda sit id."
+    `+os.Args[0]+` following follow --id 8548087274381729518 --auth "Maiores reiciendis non ad."
 `, os.Args[0])
 }
 
@@ -691,7 +680,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 9103309690988725867 --auth "Quo beatae."
+    `+os.Args[0]+` following unfollow --id 2094217394010648155 --auth "Sed aut."
 `, os.Args[0])
 }
 
@@ -703,7 +692,7 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 5567982530882141440 --page 1616191176580245674
+    `+os.Args[0]+` following followers --id 7691373380732457695 --page 8616248544594190336
 `, os.Args[0])
 }
 
@@ -1058,7 +1047,6 @@ Usage:
 
 COMMAND:
     five: Five implements five.
-    refresh- device: RefreshDevice implements refresh device.
 
 Additional help:
     %s tasks COMMAND --help
@@ -1071,18 +1059,6 @@ Five implements five.
 
 Example:
     `+os.Args[0]+` tasks five
-`, os.Args[0])
-}
-
-func tasksRefreshDeviceUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] tasks refresh- device -device-id STRING -auth STRING
-
-RefreshDevice implements refresh device.
-    -device-id STRING: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` tasks refresh- device --device-id "Dolore consequatur tenetur aut minima." --auth "Fugit sapiente."
 `, os.Args[0])
 }
 
@@ -1108,7 +1084,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 1833962603478720471
+    `+os.Args[0]+` test get --id 2475358697457025226
 `, os.Args[0])
 }
 
@@ -1130,7 +1106,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Ut quo illo quos quaerat." --auth "Delectus accusantium eum."
+    `+os.Args[0]+` test email --address "Accusamus illo similique aliquam iure atque porro." --auth "Eum quo et nam atque."
 `, os.Args[0])
 }
 
@@ -1155,7 +1131,7 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Voluptatibus tempora eum."
+    `+os.Args[0]+` user roles --auth "Voluptas dolorum earum soluta accusamus laborum."
 `, os.Args[0])
 }
 
@@ -1167,6 +1143,6 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user delete --user-id 1366946582 --auth "Adipisci ipsum necessitatibus ea placeat autem voluptates."
+    `+os.Args[0]+` user delete --user-id 875787324 --auth "Unde eos quis saepe vel soluta."
 `, os.Args[0])
 }
