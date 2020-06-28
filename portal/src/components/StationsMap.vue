@@ -31,15 +31,18 @@ export default {
             mapboxToken: Config.MAPBOX_ACCESS_TOKEN,
         };
     },
-    props: { mapSize: { required: true }, stations: { required: true } },
+    props: {
+        mapSize: { required: true },
+        stations: { required: true },
+    },
     methods: {
         onMapInitialized(map) {
             console.log("map: initialized");
             this.map = map;
-            const mapDiv = document.getElementById("map");
-            mapDiv.style.width = this.mapSize.width;
-            mapDiv.style.height = this.mapSize.height;
-            mapDiv.style.position = this.mapSize.position;
+            // const mapDiv = document.getElementById("map");
+            // mapDiv.style.width = this.mapSize.width;
+            // mapDiv.style.height = this.mapSize.height;
+            // mapDiv.style.position = this.mapSize.position;
         },
         onMapLoaded() {
             console.log("map: loaded (emit ready)");
@@ -182,4 +185,11 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+#map {
+    position: absolute;
+    top: 70px;
+    bottom: 0;
+    width: 100%;
+}
+</style>

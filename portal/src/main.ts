@@ -42,6 +42,13 @@ Vue.filter("prettyReading", sensor => {
     return sensor.reading.toFixed(1);
 });
 
+Vue.filter("prettyCoordinate", value => {
+    if (!value) {
+        return "--";
+    }
+    return value.toFixed(3);
+});
+
 const store = storeFactory();
 store.commit(MutationTypes.INITIALIZE);
 

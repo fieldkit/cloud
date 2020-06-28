@@ -40,12 +40,12 @@
                     </span>
                 </div>
                 <div class="left" v-if="station.location">
-                    {{ station.location.latitude || "--" }}
+                    {{ station.location.latitude | prettyCoordinate }}
                     <br />
                     Latitude
                 </div>
                 <div class="left" v-if="station.location">
-                    {{ station.location.latitude || "--" }}
+                    {{ station.location.longitude | prettyCoordinate }}
                     <br />
                     Longitude
                 </div>
