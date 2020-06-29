@@ -87,10 +87,10 @@ type AggregatingHandler struct {
 	metaFactory  *repositories.MetaFactory
 	aggregations []*aggregation
 	sensors      map[string]*Sensor
-	stationID    int32
+	stations     map[int64]int32
 }
 
-func NewAggregatingHandler(db *sqlxcache.DB, stationID int32) *AggregatingHandler {
+func NewAggregatingHandler(db *sqlxcache.DB) *AggregatingHandler {
 	minutely := &aggregation{
 		interval: time.Minute * 1,
 		table:    "fieldkit.aggregated_minutely",
@@ -108,8 +108,8 @@ func NewAggregatingHandler(db *sqlxcache.DB, stationID int32) *AggregatingHandle
 	}
 	return &AggregatingHandler{
 		db:          db,
-		stationID:   stationID,
 		metaFactory: repositories.NewMetaFactory(),
+		stations:    make(map[int64]int32),
 		aggregations: []*aggregation{
 			minutely,
 			hourly,
@@ -133,6 +133,13 @@ func (v *AggregatingHandler) refreshSensors(ctx context.Context) error {
 	return nil
 }
 
+func (v *AggregatingHandler) getStationID() int32 {
+	for _, v := range v.stations {
+		return v
+	}
+	panic("no such station id")
+}
+
 func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregation, d *Aggregated) error {
 	var location *data.Location
 
@@ -146,6 +153,8 @@ func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregatio
 		}
 	}
 
+	stationID := v.getStationID()
+
 	for key, value := range d.Values {
 		if v.sensors[key] == nil {
 			newSensor := &Sensor{
@@ -158,7 +167,7 @@ func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregatio
 		}
 
 		row := &AggregatedReading{
-			StationID: v.stationID,
+			StationID: stationID,
 			SensorID:  v.sensors[key].ID,
 			Time:      d.Time,
 			Location:  location,
@@ -181,6 +190,21 @@ func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregatio
 }
 
 func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, meta *data.MetaRecord) error {
+	if _, ok := v.stations[p.ID]; !ok {
+		sr, err := repositories.NewStationRepository(v.db)
+		if err != nil {
+			return err
+		}
+
+		station, err := sr.QueryStationByDeviceID(ctx, p.DeviceID)
+		if err != nil || station == nil {
+			// mark giving up
+			return nil
+		}
+
+		v.stations[p.ID] = station.ID
+	}
+
 	_, err := v.metaFactory.Add(ctx, meta, true)
 	if err != nil {
 		return err
@@ -190,6 +214,10 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 }
 
 func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+	if _, ok := v.stations[p.ID]; !ok {
+		return nil
+	}
+
 	filtered, err := v.metaFactory.Resolve(ctx, db, false, true)
 	if err != nil {
 		return err
@@ -222,6 +250,9 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 }
 
 func (v *AggregatingHandler) OnDone(ctx context.Context) error {
+	if len(v.stations) == 0 {
+		return nil
+	}
 	for _, aggregation := range v.aggregations {
 		if values, err := aggregation.close(); err != nil {
 			return err

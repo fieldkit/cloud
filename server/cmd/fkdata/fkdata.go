@@ -39,7 +39,7 @@ func main() {
 		log.Printf("processing\n")
 
 		stationID := int32(12)
-		visitor := handlers.NewAggregatingHandler(db, stationID)
+		visitor := handlers.NewAggregatingHandler(db)
 		if err := rw.WalkStation(txCtx, stationID, visitor); err != nil {
 			panic(err)
 		}
