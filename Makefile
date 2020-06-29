@@ -133,7 +133,5 @@ migrate-down:
 	migrate -path migrations -database "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" down
 
 aws-image:
-	cp ocr-portal/src/js/secrets.js.aws ocr-portal/src/js/secrets.js
-	cp legacy/src/js/secrets.js.aws legacy/src/js/secrets.js
 	cp portal/src/secrets.ts.aws portal/src/secrets.ts
 	WORKING_DIRECTORY=$(WORKING_DIRECTORY) DOCKER_TAG=$(DOCKER_TAG) ./build.sh
