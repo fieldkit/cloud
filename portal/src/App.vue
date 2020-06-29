@@ -10,7 +10,7 @@ import * as ActionTypes from "./store/actions";
 export default {
     mounted() {
         return this.$store.dispatch(ActionTypes.INITIALIZE).catch(err => {
-            console.log("error", err, err.stack);
+            console.log("initialize error", err, err.stack);
         });
     },
 };
