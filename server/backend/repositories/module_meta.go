@@ -740,5 +740,11 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 		},
 	}
 
+	for _, m := range mm {
+		for _, s := range m.Sensors {
+			s.FullKey = m.Key + "." + s.Key
+		}
+	}
+
 	return
 }

@@ -11,6 +11,7 @@ type SensorRanges struct {
 
 type SensorMeta struct {
 	Key           string         `json:"key"`
+	FullKey       string         `json:"full_key"`
 	FirmwareKey   string         `json:"firmware_key"`
 	UnitOfMeasure string         `json:"unit_of_measure"`
 	Ranges        []SensorRanges `json:"ranges"`
@@ -54,6 +55,7 @@ type DataMetaSensor struct {
 	Number        int            `json:"number"`
 	Name          string         `json:"name"`
 	Key           string         `json:"key"`
+	FullKey       string         `json:"full_key"`
 	UnitOfMeasure string         `json:"unit_of_measure"`
 	Internal      bool           `json:"internal"`
 	Ranges        []SensorRanges `json:"ranges"`

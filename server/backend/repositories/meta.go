@@ -72,20 +72,21 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 
 		for _, sensor := range module.Sensors {
 			key := strcase.ToLowerCamel(sensor.Name)
-
 			extraModule, extraSensor, err := mf.modulesRepository.FindSensorMeta(&hf, sensor.Name)
 			if err != nil {
 				return nil, errors.Structured(err, "meta_record_id", databaseRecord.ID)
 			}
 
+			fullKey := extraModule.Key + "." + key
 			if fq {
-				key = extraModule.Key + "." + key
+				key = fullKey
 			}
 
 			sensorMeta := &DataMetaSensor{
 				Number:        int(sensor.Number),
 				Name:          sensor.Name,
 				Key:           key,
+				FullKey:       fullKey,
 				UnitOfMeasure: sensor.UnitOfMeasure,
 				Internal:      sensor.Flags&META_INTERNAL_MASK == META_INTERNAL_MASK,
 				Ranges:        extraSensor.Ranges,
