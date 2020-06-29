@@ -128,6 +128,7 @@ export class DisplayProject {
 const getters = {
     projectsById(state: StationsState): { [index: number]: DisplayProject } {
         return _(state.projects.user)
+            .concat(state.projects.community)
             .map(p => {
                 const users = state.projectUsers[p.id] || [];
                 const stations = state.projectStations[p.id] || [];
