@@ -7,13 +7,5 @@ import (
 )
 
 func NewAllHandlers(db *sqlxcache.DB) (RecordHandler, error) {
-	stationModel := handlers.NewStationModelRecordHandler(db)
-	aggregating := handlers.NewAggregatingHandler(db)
-
-	handlers := []RecordHandler{
-		stationModel,
-		aggregating,
-	}
-
-	return NewMuxRecordHandler(handlers), nil
+	return handlers.NewStationModelRecordHandler(db), nil
 }
