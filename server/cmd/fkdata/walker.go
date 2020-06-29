@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"log"
+	"time"
 
 	"github.com/conservify/sqlxcache"
-	"github.com/jmoiron/sqlx"
 
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -13,6 +15,7 @@ import (
 type RecordWalker struct {
 	metas       map[int64]*data.MetaRecord
 	db          *sqlxcache.DB
+	started     time.Time
 	metaRecords int64
 	dataRecords int64
 }
@@ -36,26 +39,55 @@ func (rw *RecordWalker) Info(ctx context.Context) (*WalkInfo, error) {
 	}, nil
 }
 
-func (rw *RecordWalker) WalkStation(ctx context.Context, id int32, visitor RecordVisitor) error {
-	rows, err := rw.db.QueryxContext(ctx, `
-		SELECT r.id, r.provision_id, r.time, r.number, r.meta_record_id, ST_AsBinary(r.location) AS location, r.raw, r.pb
-		FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
-		WHERE (p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1))
-        ORDER BY r.time`, id)
-	if err != nil {
+func (rw *RecordWalker) WalkStation(ctx context.Context, stationID int32, visitor RecordVisitor) error {
+	pageSize := 1000
+	done := false
+
+	rw.started = time.Now()
+
+	for page := 0; !done; page += 1 {
+		_, err := rw.db.ExecContext(ctx, `
+			DECLARE records_cursor CURSOR FOR
+			SELECT r.id, r.provision_id, r.time, r.number, r.meta_record_id, ST_AsBinary(r.location) AS location, r.raw, r.pb
+			FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
+			WHERE (p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1))
+			ORDER BY r.time OFFSET $2 LIMIT $3
+		`, stationID, page*pageSize, pageSize)
+		if err != nil {
+			return err
+		}
+
+		if err := rw.walkQuery(ctx, visitor); err != nil {
+			if err == sql.ErrNoRows {
+				done = true
+				break
+			}
+			return err
+		}
+
+		if _, err := rw.db.ExecContext(ctx, "CLOSE records_cursor"); err != nil {
+			return err
+		}
+	}
+
+	if err := visitor.VisitEnd(ctx); err != nil {
 		return err
 	}
 
-	defer rows.Close()
-
-	return rw.walkQuery(ctx, rows, visitor)
+	return nil
 }
 
-func (rw *RecordWalker) walkQuery(ctx context.Context, rows *sqlx.Rows, visitor RecordVisitor) error {
+func (rw *RecordWalker) walkQuery(ctx context.Context, visitor RecordVisitor) error {
+	tx := rw.db.Transaction(ctx)
+	batchSize := 0
+
 	data := &data.DataRecord{}
 
-	for rows.Next() {
-		if err := rows.StructScan(data); err != nil {
+	for {
+		if err := tx.QueryRowxContext(ctx, `FETCH NEXT FROM records_cursor`).StructScan(data); err != nil {
+			if err == sql.ErrNoRows {
+				break
+			}
 			return err
 		}
 
@@ -77,10 +109,17 @@ func (rw *RecordWalker) walkQuery(ctx context.Context, rows *sqlx.Rows, visitor 
 		}
 
 		rw.dataRecords += 1
+
+		if rw.dataRecords%1000 == 0 {
+			elapsed := time.Now().Sub(rw.started)
+			log.Printf("%v records (%v rps)", rw.dataRecords, float64(rw.dataRecords)/elapsed.Seconds())
+		}
+
+		batchSize += 1
 	}
 
-	if err := visitor.VisitEnd(ctx); err != nil {
-		return err
+	if batchSize == 0 {
+		return sql.ErrNoRows
 	}
 
 	return nil

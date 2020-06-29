@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -39,11 +38,11 @@ func main() {
 
 		stationID := int32(12)
 		visitor := NewAggregatingVisitor(db, stationID)
-		if err := rw.WalkStation(ctx, stationID, visitor); err != nil {
+		if err := rw.WalkStation(txCtx, stationID, visitor); err != nil {
 			panic(err)
 		}
 
-		info, err := rw.Info(ctx)
+		info, err := rw.Info(txCtx)
 		if err != nil {
 			panic(err)
 		}
