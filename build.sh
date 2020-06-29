@@ -37,12 +37,6 @@ docker build -t fk-server-build server
 banner "PORTAL"
 docker build -t fk-portal-build portal
 
-banner "OCR-PORTAL"
-docker build -t fk-ocr-portal-build ocr-portal
-
-banner "LEGACY"
-docker build -t fk-legacy-build legacy
-
 banner "BUILDING"
 
 mkdir build
@@ -59,20 +53,8 @@ docker rm -f fk-portal-build > /dev/null 2>&1 || true
 docker run --rm --name fk-portal-build -v $WORKING_DIRECTORY/build/portal:/build fk-portal-build \
        sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID.$GROUP_ID /build"
 
-mkdir build/ocr-portal
-docker rm -f fk-ocr-portal-build > /dev/null 2>&1 || true
-docker run --rm --name fk-ocr-portal-build -v $WORKING_DIRECTORY/build/ocr-portal:/build fk-ocr-portal-build \
-       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID.$GROUP_ID /build"
-
-mkdir build/legacy
-docker rm -f fk-legacy-build > /dev/null 2>&1 || true
-docker run --rm --name fk-legacy-build -v $WORKING_DIRECTORY/build/legacy:/build fk-legacy-build \
-       sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID.$GROUP_ID /build"
-
 docker rm -f fk-server-build > /dev/null 2>&1 || true
 docker rm -f fk-portal-build > /dev/null 2>&1 || true
-docker rm -f fk-ocr-portal-build > /dev/null 2>&1 || true
-docker rm -f fk-legacy-build > /dev/null 2>&1 || true
 
 banner "Final Container"
 
