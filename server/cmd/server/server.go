@@ -166,8 +166,10 @@ func createApi(ctx context.Context, config *Config) (http.Handler, *api.Controll
 	}
 
 	ingestionReceivedHandler := backend.NewIngestionReceivedHandler(database, ingestionFiles, metrics)
+	refreshStationHandler := backend.NewRefreshStationHandler(database)
 
 	jq.Register(messages.IngestionReceived{}, ingestionReceivedHandler)
+	jq.Register(messages.RefreshStation{}, refreshStationHandler)
 
 	apiConfig := &api.ApiConfiguration{
 		ApiHost:       config.ApiHost,
