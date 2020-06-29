@@ -1,4 +1,4 @@
-export interface Services {
+export interface Services {}
 
 export type ServicesFactory = () => Services;
 

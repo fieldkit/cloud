@@ -33,7 +33,6 @@ export default {
             }
         },
         prepareHistogram() {
-            let d3Chart = this;
             // set x scale
             this.xHist = d3
                 .scaleLinear()
@@ -50,13 +49,13 @@ export default {
             this.histogram = d3
                 .histogram()
                 .value(d => {
-                    return d[d3Chart.chart.sensor.key];
+                    return d[this.chart.sensor.key];
                 })
                 .domain(this.xHist.domain())
                 .thresholds(thresholds);
 
             // apply histogram function
-            let bins = this.histogram(this.chart.data);
+            const bins = this.histogram(this.chart.data);
 
             // set y scale
             this.yHist = d3
@@ -76,9 +75,7 @@ export default {
             return bins;
         },
         makeHistogram() {
-            let d3Chart = this;
-
-            let bins = this.prepareHistogram();
+            const bins = this.prepareHistogram();
 
             // append the bar rectangles
             this.chart.svg.selectAll(".histobar").remove();
@@ -89,19 +86,17 @@ export default {
                 .append("rect")
                 .attr("class", "histobar")
                 .attr("transform", d => {
-                    return "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(d.length) + ")";
+                    return "translate(" + this.xHist(d.x0) + "," + this.yHist(d.length) + ")";
                 })
                 .attr("width", d => {
-                    const w = d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
+                    const w = this.xHist(d.x1) - this.xHist(d.x0) - 1;
                     return w <= 0 ? MIN_WIDTH : w;
                 })
-                .style("fill", d => d3Chart.chart.colors(d.x0))
+                .style("fill", d => this.chart.colors(d.x0))
                 .transition()
                 .duration(1000)
                 .attr("height", d => {
-                    return d.length == 0
-                        ? 0
-                        : d3Chart.layout.height - d3Chart.yHist(d.length) - d3Chart.layout.marginBottom - d3Chart.layout.marginTop;
+                    return d.length == 0 ? 0 : this.layout.height - this.yHist(d.length) - this.layout.marginBottom - this.layout.marginTop;
                 });
 
             this.chart.svg.selectAll(".x-axis").remove();
@@ -123,43 +118,37 @@ export default {
             this.hideLoading();
         },
         updateHistogram(bins) {
-            let d3Chart = this;
-
-            let bars = this.chart.svg.selectAll(".histobar").data(bins);
+            const bars = this.chart.svg.selectAll(".histobar").data(bins);
 
             // add any new bars
             bars.enter()
                 .append("rect")
                 .attr("class", "histobar")
                 .attr("transform", d => {
-                    return "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(d.length) + ")";
+                    return "translate(" + this.xHist(d.x0) + "," + this.yHist(d.length) + ")";
                 })
                 .attr("width", d => {
-                    const w = d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
+                    const w = this.xHist(d.x1) - this.xHist(d.x0) - 1;
                     return w <= 0 ? MIN_WIDTH : w;
                 })
-                .style("fill", d => d3Chart.chart.colors(d.x0))
+                .style("fill", d => this.chart.colors(d.x0))
                 .attr("height", d => {
-                    return d.length == 0
-                        ? 0
-                        : d3Chart.layout.height - d3Chart.yHist(d.length) - d3Chart.layout.marginBottom - d3Chart.layout.marginTop;
+                    return d.length == 0 ? 0 : this.layout.height - this.yHist(d.length) - this.layout.marginBottom - this.layout.marginTop;
                 });
 
             // updating any existing bars
             bars.transition()
                 .duration(1000)
-                .style("fill", d => d3Chart.chart.colors(d.x0))
+                .style("fill", d => this.chart.colors(d.x0))
                 .attr("transform", d => {
-                    return "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(d.length) + ")";
+                    return "translate(" + this.xHist(d.x0) + "," + this.yHist(d.length) + ")";
                 })
                 .attr("width", d => {
-                    const w = d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
+                    const w = this.xHist(d.x1) - this.xHist(d.x0) - 1;
                     return w <= 0 ? MIN_WIDTH : w;
                 })
                 .attr("height", d => {
-                    return d.length == 0
-                        ? 0
-                        : d3Chart.layout.height - d3Chart.yHist(d.length) - d3Chart.layout.marginBottom - d3Chart.layout.marginTop;
+                    return d.length == 0 ? 0 : this.layout.height - this.yHist(d.length) - this.layout.marginBottom - this.layout.marginTop;
                 });
 
             // remove any extra bars

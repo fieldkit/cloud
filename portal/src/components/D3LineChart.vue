@@ -32,7 +32,6 @@ export default {
     },
     methods: {
         init() {
-            let d3Chart = this;
             this.line = this.chart.svg
                 .append("g")
                 .attr("clip-path", "url(#clip" + this.chart.id + ")")
@@ -50,7 +49,10 @@ export default {
 
             this.brush = d3
                 .brushX()
-                .extent([[0, 0], [this.layout.width, this.layout.height - this.layout.marginBottom]])
+                .extent([
+                    [0, 0],
+                    [this.layout.width, this.layout.height - this.layout.marginBottom],
+                ])
                 .on("end", this.brushed);
 
             this.x = d3
@@ -66,8 +68,8 @@ export default {
             this.lineFn = d3
                 .line()
                 .defined(d => !d.blankPoint)
-                .x(d => d3Chart.x(d.date))
-                .y(d => d3Chart.y(d[d3Chart.chart.sensor.key]))
+                .x(d => this.x(d.date))
+                .y(d => this.y(d[this.chart.sensor.key]))
                 .curve(d3.curveBasis);
         },
 
@@ -81,8 +83,6 @@ export default {
             }
         },
         makeLine() {
-            let d3Chart = this;
-
             // create blank points for dotted line
             this.createBlankPoints();
 
@@ -129,13 +129,13 @@ export default {
                 .append("circle")
                 .attr("class", "dot")
                 .attr("cx", d => {
-                    return d3Chart.x(d.date);
+                    return this.x(d.date);
                 })
                 .attr("cy", d => {
-                    return d3Chart.y(d[d3Chart.chart.sensor.key]);
+                    return this.y(d[this.chart.sensor.key]);
                 })
                 .attr("r", 2)
-                .attr("fill", d => d3Chart.chart.colors(d[d3Chart.chart.sensor.key]));
+                .attr("fill", d => this.chart.colors(d[this.chart.sensor.key]));
             // tooltip will be added back
 
             this.xAxis = d3.axisBottom(this.x).ticks(10);
@@ -188,7 +188,7 @@ export default {
                 return;
             }
 
-            let xRange = d3.event.selection;
+            const xRange = d3.event.selection;
             this.chart.start = this.x.invert(xRange[0]);
             this.chart.end = this.x.invert(xRange[1]);
 
@@ -198,7 +198,6 @@ export default {
             this.$emit("timeZoomed", { start: this.chart.start, end: this.chart.end });
         },
         updateChart() {
-            let d3Chart = this;
             // update x scale
             this.x.domain([this.chart.start, this.chart.end]);
             // update y scale
@@ -223,7 +222,7 @@ export default {
                 .attr("d", this.lineFn(this.chartData));
 
             // update dots
-            let dots = this.line.selectAll(".dot").data(
+            const dots = this.line.selectAll(".dot").data(
                 this.chartData.filter(d => {
                     return !d.blankPoint;
                 })
@@ -233,22 +232,22 @@ export default {
                 .append("circle")
                 .attr("class", "dot")
                 .attr("cx", d => {
-                    return d3Chart.x(d.date);
+                    return this.x(d.date);
                 })
                 .attr("cy", d => {
-                    return d3Chart.y(d[d3Chart.chart.sensor.key]);
+                    return this.y(d[this.chart.sensor.key]);
                 })
                 .attr("r", 2)
-                .attr("fill", d => d3Chart.chart.colors(d[d3Chart.chart.sensor.key]));
+                .attr("fill", d => this.chart.colors(d[this.chart.sensor.key]));
             // updating any existing dots
             dots.transition()
                 .duration(1000)
-                .attr("fill", d => d3Chart.chart.colors(d[d3Chart.chart.sensor.key]))
+                .attr("fill", d => this.chart.colors(d[this.chart.sensor.key]))
                 .attr("cx", d => {
-                    return d3Chart.x(d.date);
+                    return this.x(d.date);
                 })
                 .attr("cy", d => {
-                    return d3Chart.y(d[d3Chart.chart.sensor.key]);
+                    return this.y(d[this.chart.sensor.key]);
                 });
             // remove any extra dots
             dots.exit().remove();
