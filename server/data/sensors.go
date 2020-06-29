@@ -3,6 +3,8 @@ package data
 import (
 	"fmt"
 	"time"
+
+	"database/sql/driver"
 )
 
 type Sensor struct {
@@ -10,17 +12,19 @@ type Sensor struct {
 	Key string `db:"key"`
 }
 
-type NumericWireTime struct {
-	time.Time
-}
+type NumericWireTime time.Time
 
 func (nw *NumericWireTime) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%v", nw.Time.Unix()*1000)), nil
+	return []byte(fmt.Sprintf("%v", time.Time(*nw).Unix()*1000)), nil
+}
+
+func (nw NumericWireTime) Value() (driver.Value, error) {
+	return time.Time(nw), nil
 }
 
 func (nw *NumericWireTime) Scan(src interface{}) error {
 	if val, ok := src.(time.Time); ok {
-		*nw = NumericWireTime{val}
+		*nw = NumericWireTime(val)
 	} else {
 		return fmt.Errorf("time Scanner passed a non-time object")
 	}

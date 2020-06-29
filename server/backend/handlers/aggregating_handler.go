@@ -205,7 +205,7 @@ func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregatio
 		row := &data.AggregatedReading{
 			StationID: stationID,
 			SensorID:  v.sensors[key].ID,
-			Time:      data.NumericWireTime{d.Time},
+			Time:      data.NumericWireTime(d.Time),
 			Location:  location,
 			Value:     value,
 		}
