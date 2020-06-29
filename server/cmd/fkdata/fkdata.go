@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
+	"os"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -15,12 +17,25 @@ import (
 	"github.com/fieldkit/cloud/server/backend/handlers"
 )
 
+type Options struct {
+	StationID int
+}
+
 type Config struct {
 	PostgresURL string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
 }
 
 func main() {
-	ctx := context.Background()
+	options := &Options{}
+
+	flag.IntVar(&options.StationID, "station-id", 0, "station id")
+
+	flag.Parse()
+
+	if options.StationID == 0 {
+		flag.Usage()
+		os.Exit(2)
+	}
 
 	config := &Config{}
 	if err := envconfig.Process("FIELDKIT", config); err != nil {
@@ -32,6 +47,8 @@ func main() {
 		panic(err)
 	}
 
+	ctx := context.Background()
+
 	err = db.WithNewTransaction(ctx, func(txCtx context.Context) error {
 		rw := backend.NewRecordWalker(db)
 
@@ -39,9 +56,8 @@ func main() {
 
 		log.Printf("processing\n")
 
-		stationID := int32(12)
 		visitor := handlers.NewAggregatingHandler(db)
-		if err := rw.WalkStation(txCtx, stationID, visitor); err != nil {
+		if err := rw.WalkStation(txCtx, int32(options.StationID), visitor); err != nil {
 			panic(err)
 		}
 
