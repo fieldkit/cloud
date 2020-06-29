@@ -139,7 +139,7 @@ func (rw *RecordWalker) loadProvision(ctx context.Context, id int64) (*data.Prov
 
 	rw.provisions[id] = records[0]
 
-	return rw.provisions[0], nil
+	return records[0], nil
 }
 
 func (rw *RecordWalker) loadMeta(ctx context.Context, provision *data.Provision, id int64, handler backend.RecordHandler) (meta *data.MetaRecord, err error) {
