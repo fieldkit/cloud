@@ -102,6 +102,14 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 
 	log.Infow("query_parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution)
 
+	if len(qp.Stations) == 0 {
+		return nil, sensor.BadRequest("at least one station required")
+	}
+
+	if len(qp.Sensors) == 0 {
+		return nil, sensor.BadRequest("at least one station required")
+	}
+
 	for _, aggregateName := range []string{
 		"fieldkit.aggregated_24h", "fieldkit.aggregated_12h", "fieldkit.aggregated_6h", "fieldkit.aggregated_1h", "fieldkit.aggregated_30m", "fieldkit.aggregated_1m",
 	} {
