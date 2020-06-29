@@ -80,8 +80,26 @@ func NewUserController(service *goa.Service, options *ControllerOptions) *UserCo
 	}
 }
 
+func (c *UserController) userExists(ctx context.Context, email string) (bool, error) {
+	existing := []*data.User{}
+	err := c.options.Database.NamedSelectContext(ctx, existing, `SELECT * FROM fieldkit.user WHERE LOWER(email) = LOWER($1)`, email)
+	if err != nil {
+		return false, err
+	}
+	if len(existing) > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
 func (c *UserController) Add(ctx *app.AddUserContext) error {
 	log := Logger(ctx).Sugar()
+
+	if yes, err := c.userExists(ctx, ctx.Payload.Email); err != nil {
+		return err
+	} else if yes {
+		return ctx.BadRequest()
+	}
 
 	user := &data.User{
 		Name:     data.Name(ctx.Payload.Name),
@@ -94,7 +112,9 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 		return err
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, user, "INSERT INTO fieldkit.user (name, username, email, password, bio) VALUES (:name, :email, :email, :password, :bio) RETURNING *", user); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, user, `
+		INSERT INTO fieldkit.user (name, username, email, password, bio) VALUES (:name, :email, :email, :password, :bio) RETURNING *
+		`, user); err != nil {
 		return err
 	}
 
@@ -103,7 +123,9 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 		return err
 	}
 
-	if _, err := c.options.Database.NamedExecContext(ctx, "INSERT INTO fieldkit.validation_token (token, user_id, expires) VALUES (:token, :user_id, :expires)", validationToken); err != nil {
+	if _, err := c.options.Database.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.validation_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
+		`, validationToken); err != nil {
 		return err
 	}
 
@@ -128,7 +150,9 @@ func (c *UserController) Update(ctx *app.UpdateUserContext) error {
 		Bio:   ctx.Payload.Bio,
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, user, "UPDATE fieldkit.user SET name = :name, username = :email, email = :email, bio = :bio WHERE id = :id RETURNING *", user); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, user, `
+		UPDATE fieldkit.user SET name = :name, username = :email, email = :email, bio = :bio WHERE id = :id RETURNING *
+		`, user); err != nil {
 		return err
 	}
 
@@ -151,7 +175,7 @@ func (c *UserController) ChangePassword(ctx *app.ChangePasswordUserContext) erro
 	log.Infow("password", "authorized_user_id", claims["sub"], "user_id", ctx.UserID)
 
 	user := &data.User{}
-	err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1", claims["sub"])
+	err := c.options.Database.GetContext(ctx, user, `SELECT * FROM fieldkit.user WHERE id = $1`, claims["sub"])
 	if err == sql.ErrNoRows {
 		return data.IncorrectPasswordError
 	}
@@ -175,7 +199,9 @@ func (c *UserController) ChangePassword(ctx *app.ChangePasswordUserContext) erro
 		return err
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, user, "UPDATE fieldkit.user SET password = :password WHERE id = :id RETURNING *", user); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, user, `
+		UPDATE fieldkit.user SET password = :password WHERE id = :id RETURNING *
+		`, user); err != nil {
 		return err
 	}
 
@@ -186,7 +212,9 @@ func (c *UserController) SendValidation(ctx *app.SendValidationUserContext) erro
 	log := Logger(ctx).Sugar()
 
 	user := &data.User{}
-	if err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1", ctx.UserID); err != nil {
+	if err := c.options.Database.GetContext(ctx, user, `
+		SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1
+		`, ctx.UserID); err != nil {
 		return err
 	}
 
@@ -197,11 +225,15 @@ func (c *UserController) SendValidation(ctx *app.SendValidationUserContext) erro
 			return err
 		}
 
-		if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.validation_token WHERE user_id = $1", user.ID); err != nil {
+		if _, err := c.options.Database.ExecContext(ctx, `
+			DELETE FROM fieldkit.validation_token WHERE user_id = $1
+			`, user.ID); err != nil {
 			return err
 		}
 
-		if _, err := c.options.Database.NamedExecContext(ctx, "INSERT INTO fieldkit.validation_token (token, user_id, expires) VALUES (:token, :user_id, :expires)", validationToken); err != nil {
+		if _, err := c.options.Database.NamedExecContext(ctx, `
+			INSERT INTO fieldkit.validation_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
+			`, validationToken); err != nil {
 			return err
 		}
 
@@ -225,7 +257,9 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 		return err
 	}
 
-	err := c.options.Database.GetContext(ctx, validationToken, "SELECT * FROM fieldkit.validation_token WHERE token = $1", validationToken.Token)
+	err := c.options.Database.GetContext(ctx, validationToken, `
+		SELECT * FROM fieldkit.validation_token WHERE token = $1
+		`, validationToken.Token)
 	if err == sql.ErrNoRows {
 		log.Infow("invalid", "token", ctx.Token)
 		ctx.ResponseData.Header().Set("Location", "https://"+c.options.PortalDomain+"?bad_token=true")
@@ -235,11 +269,11 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "UPDATE fieldkit.user SET valid = true WHERE id = $1", validationToken.UserID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `UPDATE fieldkit.user SET valid = true WHERE id = $1`, validationToken.UserID); err != nil {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.validation_token WHERE token = $1", validationToken.Token); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.validation_token WHERE token = $1`, validationToken.Token); err != nil {
 		return err
 	}
 
@@ -254,7 +288,7 @@ func (c *UserController) Validate(ctx *app.ValidateUserContext) error {
 
 func (c *UserController) authenticateOrSpoof(ctx context.Context, email, password string) (*data.User, error) {
 	user := &data.User{}
-	err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1)", email)
+	err := c.options.Database.GetContext(ctx, user, `SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1)`, email)
 	if err == sql.ErrNoRows {
 		return nil, data.IncorrectPasswordError
 	}
@@ -270,7 +304,7 @@ func (c *UserController) authenticateOrSpoof(ctx context.Context, email, passwor
 		log.Infow("spoofing", "email", email)
 
 		adminUser := &data.User{}
-		err := c.options.Database.GetContext(ctx, adminUser, "SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1) AND u.admin", parts[0])
+		err := c.options.Database.GetContext(ctx, adminUser, `SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1) AND u.admin`, parts[0])
 		if err == nil {
 			// We can safely log the user doing the spoofing here.
 			err = adminUser.CheckPassword(parts[1])
@@ -315,7 +349,9 @@ func (c *UserController) Login(ctx *app.LoginUserContext) error {
 		return err
 	}
 
-	if _, err := c.options.Database.NamedExecContext(ctx, "INSERT INTO fieldkit.refresh_token (token, user_id, expires) VALUES (:token, :user_id, :expires)", refreshToken); err != nil {
+	if _, err := c.options.Database.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.refresh_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
+		`, refreshToken); err != nil {
 		return ctx.Unauthorized(fmt.Errorf("invalid email or password"))
 	}
 
@@ -347,7 +383,7 @@ func (c *UserController) Logout(ctx *app.LogoutUserContext) error {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.refresh_token WHERE token = $1", refreshToken); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.refresh_token WHERE token = $1`, refreshToken); err != nil {
 		return err
 	}
 
@@ -358,7 +394,7 @@ func (c *UserController) RecoveryLookup(ctx *app.RecoveryLookupUserContext) erro
 	log := Logger(ctx).Sugar()
 
 	user := &data.User{}
-	err := c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE email = $1", ctx.Payload.Email)
+	err := c.options.Database.GetContext(ctx, user, `SELECT * FROM fieldkit.user WHERE email = $1`, ctx.Payload.Email)
 	if err == sql.ErrNoRows {
 		log.Infow("recovery, no user")
 		return ctx.OK([]byte("{}"))
@@ -375,11 +411,13 @@ func (c *UserController) RecoveryLookup(ctx *app.RecoveryLookupUserContext) erro
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, "DELETE FROM fieldkit.recovery_token WHERE user_id = $1", user.ID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.recovery_token WHERE user_id = $1`, user.ID); err != nil {
 		return err
 	}
 
-	if _, err := c.options.Database.NamedExecContext(ctx, "INSERT INTO fieldkit.recovery_token (token, user_id, expires) VALUES (:token, :user_id, :expires)", recoveryToken); err != nil {
+	if _, err := c.options.Database.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.recovery_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
+		`, recoveryToken); err != nil {
 		return err
 	}
 
@@ -405,7 +443,7 @@ func (c *UserController) Recovery(ctx *app.RecoveryUserContext) error {
 	log.Infow("recovery", "token_raw", ctx.Payload.Token, "token", token)
 
 	recoveryToken := &data.RecoveryToken{}
-	err := c.options.Database.GetContext(ctx, recoveryToken, "SELECT * FROM fieldkit.recovery_token WHERE token = $1", token)
+	err := c.options.Database.GetContext(ctx, recoveryToken, `SELECT * FROM fieldkit.recovery_token WHERE token = $1`, token)
 	if err == sql.ErrNoRows {
 		log.Infow("recovery, token bad")
 		return ctx.Unauthorized()
@@ -421,7 +459,9 @@ func (c *UserController) Recovery(ctx *app.RecoveryUserContext) error {
 	}
 
 	user := &data.User{}
-	err = c.options.Database.GetContext(ctx, user, "SELECT * FROM fieldkit.user WHERE id = $1", recoveryToken.UserID)
+	err = c.options.Database.GetContext(ctx, user, `
+		SELECT * FROM fieldkit.user WHERE id = $1
+		`, recoveryToken.UserID)
 	if err == sql.ErrNoRows {
 		return ctx.OK([]byte("{}"))
 	}
@@ -433,7 +473,9 @@ func (c *UserController) Recovery(ctx *app.RecoveryUserContext) error {
 		return err
 	}
 
-	if err := c.options.Database.NamedGetContext(ctx, user, "UPDATE fieldkit.user SET password = :password, valid = true WHERE id = :id RETURNING *", user); err != nil {
+	if err := c.options.Database.NamedGetContext(ctx, user, `
+		UPDATE fieldkit.user SET password = :password, valid = true WHERE id = :id RETURNING *
+		`, user); err != nil {
 		return err
 	}
 
@@ -449,7 +491,7 @@ func (c *UserController) Refresh(ctx *app.RefreshUserContext) error {
 	}
 
 	refreshToken := &data.RefreshToken{}
-	err := c.options.Database.GetContext(ctx, refreshToken, "SELECT * FROM fieldkit.refresh_token WHERE token = $1", token)
+	err := c.options.Database.GetContext(ctx, refreshToken, `SELECT * FROM fieldkit.refresh_token WHERE token = $1`, token)
 	if err == sql.ErrNoRows {
 		return ctx.Unauthorized()
 	}
@@ -463,7 +505,7 @@ func (c *UserController) Refresh(ctx *app.RefreshUserContext) error {
 	}
 
 	user := &data.User{}
-	err = c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1", refreshToken.UserID)
+	err = c.options.Database.GetContext(ctx, user, `SELECT * FROM fieldkit.user WHERE id = $1`, refreshToken.UserID)
 	if err == sql.ErrNoRows {
 		return ctx.Unauthorized()
 	}
@@ -499,7 +541,7 @@ func (c *UserController) GetCurrent(ctx *app.GetCurrentUserContext) error {
 	log := Logger(ctx).Sugar()
 
 	user := &data.User{}
-	if err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1", claims["sub"]); err != nil {
+	if err := c.options.Database.GetContext(ctx, user, `SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1`, claims["sub"]); err != nil {
 		log.Infow("user", "user_id", claims["sub"])
 		return err
 	}
@@ -511,7 +553,7 @@ func (c *UserController) GetCurrent(ctx *app.GetCurrentUserContext) error {
 
 func (c *UserController) GetID(ctx *app.GetIDUserContext) error {
 	user := &data.User{}
-	if err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1", ctx.UserID); err != nil {
+	if err := c.options.Database.GetContext(ctx, user, `SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1`, ctx.UserID); err != nil {
 		return err
 	}
 
@@ -520,12 +562,12 @@ func (c *UserController) GetID(ctx *app.GetIDUserContext) error {
 
 func (c *UserController) ListByProject(ctx *app.ListByProjectUserContext) error {
 	users := []*data.ProjectUserAndUser{}
-	if err := c.options.Database.SelectContext(ctx, &users, "SELECT pu.*, u.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1 ORDER BY u.id", ctx.ProjectID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &users, `SELECT pu.*, u.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1 ORDER BY u.id`, ctx.ProjectID); err != nil {
 		return err
 	}
 
 	invites := []*data.ProjectInvite{}
-	if err := c.options.Database.SelectContext(ctx, &invites, "SELECT * FROM fieldkit.project_invite WHERE project_id = $1 AND accepted_time IS NULL ORDER BY invited_time", ctx.ProjectID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &invites, `SELECT * FROM fieldkit.project_invite WHERE project_id = $1 AND accepted_time IS NULL ORDER BY invited_time`, ctx.ProjectID); err != nil {
 		return err
 	}
 
@@ -545,7 +587,7 @@ func (c *UserController) SaveCurrentUserImage(ctx *app.SaveCurrentUserImageUserC
 	}
 
 	user := &data.User{}
-	if err := c.options.Database.GetContext(ctx, user, "UPDATE fieldkit.user SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *", saved.URL, saved.MimeType, p.UserID()); err != nil {
+	if err := c.options.Database.GetContext(ctx, user, `UPDATE fieldkit.user SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *`, saved.URL, saved.MimeType, p.UserID()); err != nil {
 		return err
 	}
 
@@ -559,7 +601,7 @@ func (c *UserController) GetCurrentUserImage(ctx *app.GetCurrentUserImageUserCon
 	}
 
 	user := &data.User{}
-	if err := c.options.Database.GetContext(ctx, user, "SELECT media_url FROM fieldkit.user WHERE id = $1", p.UserID); err != nil {
+	if err := c.options.Database.GetContext(ctx, user, `SELECT media_url FROM fieldkit.user WHERE id = $1`, p.UserID); err != nil {
 		return err
 	}
 
@@ -583,7 +625,7 @@ func (c *UserController) GetCurrentUserImage(ctx *app.GetCurrentUserImageUserCon
 
 func (c *UserController) GetUserImage(ctx *app.GetUserImageUserContext) error {
 	user := &data.User{}
-	if err := c.options.Database.GetContext(ctx, user, "SELECT media_url FROM fieldkit.user WHERE id = $1", ctx.UserID); err != nil {
+	if err := c.options.Database.GetContext(ctx, user, `SELECT media_url FROM fieldkit.user WHERE id = $1`, ctx.UserID); err != nil {
 		return err
 	}
 
@@ -632,7 +674,7 @@ func (c *UserController) TransmissionToken(ctx *app.TransmissionTokenUserContext
 	}
 
 	user := &data.User{}
-	if err := c.options.Database.GetContext(ctx, user, "SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1", claims["sub"]); err != nil {
+	if err := c.options.Database.GetContext(ctx, user, `SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1`, claims["sub"]); err != nil {
 		return err
 	}
 
