@@ -17,6 +17,7 @@ import (
 
 	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
 
+	"github.com/fieldkit/cloud/server/backend/handlers"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -34,11 +35,12 @@ func NewSensorService(ctx context.Context, options *ControllerOptions) *SensorSe
 }
 
 type QueryParams struct {
-	Start      time.Time `db:"start"`
-	End        time.Time `db:"end"`
-	Sensors    []int64   `db:"sensors"`
-	Stations   []int64   `db:"stations"`
-	Resolution int32     `db:"resolution"`
+	Start      time.Time `json:"start"`
+	End        time.Time `json:"end"`
+	Sensors    []int64   `json:"sensors"`
+	Stations   []int64   `json:"stations"`
+	Resolution int32     `json:"resolution"`
+	Aggregate  string    `json:"aggregate"`
 }
 
 func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) {
@@ -77,12 +79,29 @@ func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) 
 		}
 	}
 
+	aggregate := handlers.AggregateNames[0]
+	if payload.Aggregate != nil {
+		found := false
+		for _, name := range handlers.AggregateNames {
+			if name == *payload.Aggregate {
+				found = true
+			}
+		}
+
+		if !found {
+			return nil, fmt.Errorf("invalid aggregate: %v", *payload.Aggregate)
+		}
+
+		aggregate = *payload.Aggregate
+	}
+
 	qp = &QueryParams{
 		Start:      start,
 		End:        end,
 		Resolution: resolution,
 		Stations:   stations,
 		Sensors:    sensors,
+		Aggregate:  aggregate,
 	}
 
 	return
@@ -100,7 +119,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return nil, err
 	}
 
-	log.Infow("query_parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution)
+	log.Infow("query_parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate)
 
 	if len(qp.Stations) == 0 {
 		return nil, sensor.BadRequest("at least one station required")
@@ -112,10 +131,9 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 
 	summaries := make(map[string]*AggregateSummary)
 
-	for _, aggregateName := range []string{"24h", "12h", "6h", "1h", "30m", "10m", "1m"} {
+	for name, table := range handlers.AggregateTableNames {
 		summary := &AggregateSummary{}
 
-		table := "fieldkit.aggregated_" + aggregateName
 		query, args, err := sqlx.In(fmt.Sprintf(`
 			SELECT COUNT(*) AS number_records FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?);
 			`, table), qp.Start, qp.End, qp.Stations, qp.Sensors)
@@ -127,7 +145,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 			return nil, err
 		}
 
-		summaries[aggregateName] = summary
+		summaries[name] = summary
 	}
 
 	data := struct {

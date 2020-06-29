@@ -159,6 +159,9 @@ func EncodeDataRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.R
 		if p.Resolution != nil {
 			values.Add("resolution", fmt.Sprintf("%v", *p.Resolution))
 		}
+		if p.Aggregate != nil {
+			values.Add("aggregate", *p.Aggregate)
+		}
 		req.URL.RawQuery = values.Encode()
 		return nil
 	}

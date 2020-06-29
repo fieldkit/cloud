@@ -15,6 +15,22 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+var (
+	AggregateNames = []string{"24h", "12h", "6h", "1h", "30m", "10m", "1m"}
+)
+
+var (
+	AggregateTableNames = map[string]string{
+		"24h": "fieldkit.aggregated_24h",
+		"12h": "fieldkit.aggregated_12h",
+		"6h":  "fieldkit.aggregated_6h",
+		"1h":  "fieldkit.aggregated_1h",
+		"30m": "fieldkit.aggregated_30m",
+		"10m": "fieldkit.aggregated_10m",
+		"1m":  "fieldkit.aggregated_1m",
+	}
+)
+
 type aggregation struct {
 	opened   time.Time
 	interval time.Duration

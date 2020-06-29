@@ -16,7 +16,7 @@ import (
 
 // BuildDataPayload builds the payload for the sensor data endpoint from CLI
 // flags.
-func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataStations string, sensorDataSensors string, sensorDataResolution string, sensorDataAuth string) (*sensor.DataPayload, error) {
+func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataStations string, sensorDataSensors string, sensorDataResolution string, sensorDataAggregate string, sensorDataAuth string) (*sensor.DataPayload, error) {
 	var err error
 	var start *int64
 	{
@@ -62,6 +62,12 @@ func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataSt
 			}
 		}
 	}
+	var aggregate *string
+	{
+		if sensorDataAggregate != "" {
+			aggregate = &sensorDataAggregate
+		}
+	}
 	var auth string
 	{
 		auth = sensorDataAuth
@@ -72,6 +78,7 @@ func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataSt
 	v.Stations = stations
 	v.Sensors = sensors
 	v.Resolution = resolution
+	v.Aggregate = aggregate
 	v.Auth = auth
 
 	return v, nil
