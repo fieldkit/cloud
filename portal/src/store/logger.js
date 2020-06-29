@@ -3,13 +3,13 @@
  * (c) 2020 Evan You
  * @license MIT
  */
-(function (global, factory) {
+(function(global, factory) {
     typeof exports === "object" && typeof module !== "undefined"
         ? (module.exports = factory())
         : typeof define === "function" && define.amd
         ? define(factory)
         : ((global = global || self), (global.Vuex = factory()));
-})(this, function () {
+})(this, function() {
     "use strict";
 
     /**
@@ -42,7 +42,7 @@
         }
 
         // if obj is hit, it is in circular structure
-        var hit = find(cache, function (c) {
+        var hit = find(cache, function(c) {
             return c.original === obj;
         });
         if (hit) {
@@ -57,7 +57,7 @@
             copy: copy,
         });
 
-        Object.keys(obj).forEach(function (key) {
+        Object.keys(obj).forEach(function(key) {
             copy[key] = deepCopy(obj[key], cache);
         });
 
@@ -72,27 +72,27 @@
         if (collapsed === void 0) collapsed = true;
         var filter = ref.filter;
         if (filter === void 0)
-            filter = function (mutation, stateBefore, stateAfter) {
+            filter = function(mutation, stateBefore, stateAfter) {
                 return true;
             };
         var transformer = ref.transformer;
         if (transformer === void 0)
-            transformer = function (state) {
+            transformer = function(state) {
                 return state;
             };
         var mutationTransformer = ref.mutationTransformer;
         if (mutationTransformer === void 0)
-            mutationTransformer = function (mut) {
+            mutationTransformer = function(mut) {
                 return mut;
             };
         var actionFilter = ref.actionFilter;
         if (actionFilter === void 0)
-            actionFilter = function (action, state) {
+            actionFilter = function(action, state) {
                 return true;
             };
         var actionTransformer = ref.actionTransformer;
         if (actionTransformer === void 0)
-            actionTransformer = function (act) {
+            actionTransformer = function(act) {
                 return act;
             };
         var logMutations = ref.logMutations;
@@ -102,7 +102,7 @@
         var logger = ref.logger;
         if (logger === void 0) logger = console;
 
-        return function (store) {
+        return function(store) {
             var prevState = deepCopy(store.state);
 
             if (typeof logger === "undefined") {
@@ -110,7 +110,7 @@
             }
 
             if (logMutations) {
-                store.subscribe(function (mutation, state) {
+                store.subscribe(function(mutation, state) {
                     var nextState = deepCopy(state);
 
                     if (filter(mutation, prevState, nextState)) {
@@ -129,7 +129,7 @@
             }
 
             if (logActions) {
-                store.subscribeAction(function (action, state) {
+                store.subscribeAction(function(action, state) {
                     if (actionFilter(action, state)) {
                         var formattedAction = actionTransformer(action);
                         var message = "store: action " + action.type;
