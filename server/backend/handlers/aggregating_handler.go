@@ -86,7 +86,7 @@ type AggregatingHandler struct {
 	db           *sqlxcache.DB
 	metaFactory  *repositories.MetaFactory
 	aggregations []*aggregation
-	sensors      map[string]*Sensor
+	sensors      map[string]*data.Sensor
 	stations     map[int64]int32
 }
 
@@ -119,12 +119,12 @@ func NewAggregatingHandler(db *sqlxcache.DB) *AggregatingHandler {
 }
 
 func (v *AggregatingHandler) refreshSensors(ctx context.Context) error {
-	sensors := []*Sensor{}
+	sensors := []*data.Sensor{}
 	if err := v.db.SelectContext(ctx, &sensors, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
 		return err
 	}
 
-	v.sensors = make(map[string]*Sensor)
+	v.sensors = make(map[string]*data.Sensor)
 
 	for _, sensor := range sensors {
 		v.sensors[sensor.Key] = sensor
@@ -157,7 +157,7 @@ func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregatio
 
 	for key, value := range d.Values {
 		if v.sensors[key] == nil {
-			newSensor := &Sensor{
+			newSensor := &data.Sensor{
 				Key: key,
 			}
 			if err := v.db.NamedGetContext(ctx, newSensor, `INSERT INTO fieldkit.aggregated_sensor (key) VALUES (:key)`, newSensor); err != nil {
@@ -166,7 +166,7 @@ func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregatio
 			v.sensors[key] = newSensor
 		}
 
-		row := &AggregatedReading{
+		row := &data.AggregatedReading{
 			StationID: stationID,
 			SensorID:  v.sensors[key].ID,
 			Time:      d.Time,
@@ -266,18 +266,4 @@ func (v *AggregatingHandler) OnDone(ctx context.Context) error {
 		}
 	}
 	return nil
-}
-
-type Sensor struct {
-	ID  int64  `db:"id"`
-	Key string `db:"key"`
-}
-
-type AggregatedReading struct {
-	ID        int64          `db:"id"`
-	StationID int32          `db:"station_id"`
-	SensorID  int64          `db:"sensor_id"`
-	Time      time.Time      `db:"time"`
-	Location  *data.Location `db:"location"`
-	Value     float64        `db:"value"`
 }
