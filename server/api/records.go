@@ -129,13 +129,13 @@ func (c *RecordsController) Resolved(ctx *app.ResolvedRecordsContext) error {
 
 	metaFactory := repositories.NewMetaFactory()
 	for _, dbMeta := range dbMetas {
-		_, err := metaFactory.Add(ctx, dbMeta)
+		_, err := metaFactory.Add(ctx, dbMeta, false)
 		if err != nil {
 			return err
 		}
 	}
 
-	filtered, err := metaFactory.Resolve(ctx, dbDatas[0], true)
+	filtered, err := metaFactory.Resolve(ctx, dbDatas[0], true, false)
 	if err != nil {
 		return err
 	}

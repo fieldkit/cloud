@@ -47,7 +47,7 @@ func (mf *MetaFactory) InOrder() []*VersionMeta {
 	return mf.ordered
 }
 
-func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord) (*VersionMeta, error) {
+func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord, fq bool) (*VersionMeta, error) {
 	if mf.byMetaID[databaseRecord.ID] != nil {
 		return mf.byMetaID[databaseRecord.ID], nil
 	}
@@ -63,19 +63,23 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord)
 	numberEmptyModules := 0
 
 	for _, module := range meta.Modules {
-		header := module.Header
 		sensors := make([]*DataMetaSensor, 0)
+
+		hf := HeaderFields{
+			Manufacturer: module.Header.Manufacturer,
+			Kind:         module.Header.Kind,
+		}
+
 		for _, sensor := range module.Sensors {
 			key := strcase.ToLowerCamel(sensor.Name)
 
-			hf := HeaderFields{
-				Manufacturer: header.Manufacturer,
-				Kind:         header.Kind,
-			}
-
-			extraSensor, err := mf.modulesRepository.FindSensorMeta(&hf, sensor.Name)
+			extraModule, extraSensor, err := mf.modulesRepository.FindSensorMeta(&hf, sensor.Name)
 			if err != nil {
 				return nil, errors.Structured(err, "meta_record_id", databaseRecord.ID)
+			}
+
+			if fq {
+				key = extraModule.Key + "." + key
 			}
 
 			sensorMeta := &DataMetaSensor{
@@ -90,10 +94,16 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord)
 			sensors = append(sensors, sensorMeta)
 		}
 
+		extraModule, err := mf.modulesRepository.FindModuleMeta(&hf)
+		if err != nil {
+			return nil, errors.Structured(err, "meta_record_id", databaseRecord.ID)
+		}
+
 		moduleMeta := &DataMetaModule{
 			Name:         module.Name,
 			Position:     int(module.Position),
 			Address:      int(module.Address),
+			Key:          extraModule.Key,
 			ID:           hex.EncodeToString(module.Id),
 			Manufacturer: int(module.Header.Manufacturer),
 			Kind:         int(module.Header.Kind),
@@ -141,7 +151,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord)
 	return versionMeta, nil
 }
 
-func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRecord, verbose bool) (*FilteredRecord, error) {
+func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRecord, verbose bool, fq bool) (*FilteredRecord, error) {
 	meta := mf.byMetaID[databaseRecord.MetaRecordID]
 	if meta == nil {
 		return nil, errors.Structured("data record with unexpected meta", "meta_record_id", databaseRecord.MetaRecordID)
@@ -191,8 +201,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 					continue
 				}
 
-				key := strcase.ToLowerCamel(sensor.Name)
-				readings[key] = &ReadingValue{
+				readings[sensor.Key] = &ReadingValue{
 					Meta:         sensor,
 					MetaRecordID: databaseRecord.MetaRecordID,
 					Value:        float64(reading.Value),

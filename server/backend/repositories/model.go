@@ -67,6 +67,7 @@ type DataMetaModule struct {
 	Version      int               `json:"version"`
 	Name         string            `json:"name"`
 	ID           string            `json:"id"`
+	Key          string            `json:"key"`
 	Sensors      []*DataMetaSensor `json:"sensors"`
 	Internal     bool              `json:"internal"`
 }

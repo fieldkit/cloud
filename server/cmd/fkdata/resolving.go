@@ -18,7 +18,7 @@ type ResolvingVisitor struct {
 }
 
 func (v *ResolvingVisitor) VisitMeta(ctx context.Context, meta *data.MetaRecord) error {
-	_, err := v.metaFactory.Add(ctx, meta)
+	_, err := v.metaFactory.Add(ctx, meta, true)
 	if err != nil {
 		return err
 	}
@@ -27,7 +27,7 @@ func (v *ResolvingVisitor) VisitMeta(ctx context.Context, meta *data.MetaRecord)
 }
 
 func (v *ResolvingVisitor) VisitData(ctx context.Context, meta *data.MetaRecord, data *data.DataRecord) error {
-	row, err := v.metaFactory.Resolve(ctx, data, false)
+	row, err := v.metaFactory.Resolve(ctx, data, false, true)
 	if err != nil {
 		return err
 	}

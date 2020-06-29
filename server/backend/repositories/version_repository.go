@@ -55,7 +55,7 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 	byMeta := make(map[int64][]*data.DataRecord)
 	for _, dbDataRecord := range page.Data {
 		metaRecordID := dbDataRecord.MetaRecordID
-		_, err := mf.Add(ctx, page.Meta[metaRecordID])
+		_, err := mf.Add(ctx, page.Meta[metaRecordID], false)
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +78,7 @@ func (r *VersionRepository) QueryDevice(ctx context.Context, deviceID string, de
 				return nil, err
 			}
 
-			row, err := mf.Resolve(ctx, d, false)
+			row, err := mf.Resolve(ctx, d, false, false)
 			if err != nil {
 				return nil, err
 			}

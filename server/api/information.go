@@ -122,7 +122,7 @@ func transformStationLayout(sl *repositories.StationLayout) (*information.Device
 	}
 
 	for _, ms := range sl.Sensors {
-		if sensorMeta, err := mr.FindSensorMeta(moduleHeaders[ms.ModuleID], ms.Name); err == nil {
+		if _, sensorMeta, err := mr.FindSensorMeta(moduleHeaders[ms.ModuleID], ms.Name); err == nil {
 			ranges := make([]*information.SensorRange, 0)
 			for _, r := range sensorMeta.Ranges {
 				ranges = append(ranges, &information.SensorRange{

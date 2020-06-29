@@ -48,10 +48,10 @@ func (r *ModuleMetaRepository) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, 
 	return nil, errors.Structured("missing module meta", "manufacturer", m.Manufacturer, "kind", m.Kind)
 }
 
-func (r *ModuleMetaRepository) FindSensorMeta(m *HeaderFields, sensor string) (mm *SensorMeta, err error) {
+func (r *ModuleMetaRepository) FindSensorMeta(m *HeaderFields, sensor string) (mm *ModuleMeta, sm *SensorMeta, err error) {
 	all, err := r.FindAllModulesMeta()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Very old firmware keys. We should sanitize these earlier in the process.
@@ -71,22 +71,22 @@ func (r *ModuleMetaRepository) FindSensorMeta(m *HeaderFields, sensor string) (m
 		if module.Header.Manufacturer == m.Manufacturer && sameKind {
 			for _, s := range module.Sensors {
 				if s.Key == sensor || s.FirmwareKey == sensor {
-					return s, nil
+					return module, s, nil
 				}
 				if s.Key == weNeedToCleanThisUp || s.FirmwareKey == weNeedToCleanThisUp {
-					return s, nil
+					return module, s, nil
 				}
 			}
 		}
 	}
 
-	return nil, errors.Structured("missing sensor meta", "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
+	return nil, nil, errors.Structured("missing sensor meta", "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
 }
 
 func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error) {
 	mm = []*ModuleMeta{
 		&ModuleMeta{
-			Key: "modules.water.ph",
+			Key: "fk.water.ph",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWaterPh,
@@ -108,7 +108,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 		},
 		&ModuleMeta{
-			Key: "modules.water.ec",
+			Key: "fk.water.ec",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWaterEc,
@@ -156,7 +156,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 		},
 		&ModuleMeta{
-			Key: "modules.water.do",
+			Key: "fk.water.do",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWaterDo,
@@ -178,7 +178,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 		},
 		&ModuleMeta{
-			Key: "modules.water.orp",
+			Key: "fk.water.orp",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWaterOrp,
@@ -200,7 +200,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 		},
 		&ModuleMeta{
-			Key: "modules.water.temp",
+			Key: "fk.water.temp",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWaterTemp,
@@ -222,7 +222,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 		},
 		&ModuleMeta{
-			Key: "modules.weather",
+			Key: "fk.weather",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWeather,
@@ -412,7 +412,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 		},
 		// This is from a very old version of the Weather firmware, we need to find a way to phase this out.
 		&ModuleMeta{
-			Key: "modules.weather",
+			Key: "fk.weather",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWeather,
@@ -727,6 +727,16 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Ranges:        []SensorRanges{},
 				},
 			},
+		},
+		&ModuleMeta{
+			Key: "fk.water",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyWater,
+				AllKinds:     []uint32{},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{},
 		},
 	}
 
