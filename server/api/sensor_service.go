@@ -89,7 +89,7 @@ func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) 
 }
 
 type AggregateSummary struct {
-	NumberOfRecords int64 `db:"number_records"`
+	NumberRecords int64 `db:"number_records" json:"number_records"`
 }
 
 func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (*sensor.DataResult, error) {
@@ -107,31 +107,34 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	}
 
 	if len(qp.Sensors) == 0 {
-		return nil, sensor.BadRequest("at least one station required")
+		return nil, sensor.BadRequest("at least one sensor required")
 	}
 
-	for _, aggregateName := range []string{
-		"fieldkit.aggregated_24h", "fieldkit.aggregated_12h", "fieldkit.aggregated_6h", "fieldkit.aggregated_1h", "fieldkit.aggregated_30m", "fieldkit.aggregated_1m",
-	} {
-		summary := AggregateSummary{}
+	summaries := make(map[string]*AggregateSummary)
 
+	for _, aggregateName := range []string{"24h", "12h", "6h", "1h", "30m", "1m"} {
+		summary := &AggregateSummary{}
+
+		table := "fieldkit.aggregated_" + aggregateName
 		query, args, err := sqlx.In(fmt.Sprintf(`
 			SELECT COUNT(*) AS number_records FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?);
-			`, aggregateName), qp.Start, qp.End, qp.Stations, qp.Sensors)
+			`, table), qp.Start, qp.End, qp.Stations, qp.Sensors)
 		if err != nil {
 			return nil, err
 		}
 
-		if err := c.db.GetContext(ctx, &summary, c.db.Rebind(query), args...); err != nil {
+		if err := c.db.GetContext(ctx, summary, c.db.Rebind(query), args...); err != nil {
 			return nil, err
 		}
 
-		log.Infow(aggregateName, "summary", summary)
+		summaries[aggregateName] = summary
 	}
 
 	data := struct {
-		Data interface{} `json:"data"`
+		Summaries map[string]*AggregateSummary `json:"sumaries"`
+		Data      interface{}                  `json:"data"`
 	}{
+		summaries,
 		nil,
 	}
 
