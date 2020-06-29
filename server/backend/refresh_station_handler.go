@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/conservify/sqlxcache"
@@ -34,12 +35,12 @@ func (h *RefreshStationHandler) Handle(ctx context.Context, m *messages.RefreshS
 	if m.Completely {
 		log.Infow("completely")
 		if err := sr.Completely(ctx, m.StationID); err != nil {
-			return err
+			return fmt.Errorf("complete refresh failed: %v", err)
 		}
 	} else {
 		log.Infow("recently")
 		if err := sr.Recently(ctx, m.StationID); err != nil {
-			return err
+			return fmt.Errorf("partial refresh failed: %v", err)
 		}
 	}
 

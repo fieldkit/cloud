@@ -105,13 +105,13 @@ func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler) er
 		}
 
 		if provision, err := rw.loadProvision(ctx, data.ProvisionID); err != nil {
-			return err
+			return fmt.Errorf("error loading provision: %v", err)
 		} else {
 			if meta, err := rw.loadMeta(ctx, provision, data.MetaRecordID, handler); err != nil {
-				return err
+				return fmt.Errorf("error loading meta: %v", err)
 			} else {
 				if err := handler.OnData(ctx, provision, nil, data, meta); err != nil {
-					return err
+					return fmt.Errorf("error handling row: %v", err)
 				}
 
 				rw.dataRecords += 1

@@ -77,15 +77,17 @@ func (a *aggregation) add(t time.Time, key string, location []float64, value flo
 func (a *aggregation) close() (*Aggregated, error) {
 	agg := make(map[string]float64)
 
-	for key, _ := range a.values {
-		mean, err := stats.Mean(a.values[key])
-		if err != nil {
-			return nil, err
+	for key, values := range a.values {
+		if len(values) > 0 {
+			mean, err := stats.Mean(values)
+			if err != nil {
+				return nil, fmt.Errorf("error taking mean: %v", err)
+			}
+
+			agg[key] = mean
+
+			a.values[key] = a.values[key][:0]
 		}
-
-		agg[key] = mean
-
-		a.values[key] = a.values[key][:0]
 	}
 
 	aggregated := &Aggregated{
@@ -216,7 +218,7 @@ func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregatio
 			ON CONFLICT (time, station_id, sensor_id) DO UPDATE SET value = EXCLUDED.value, location = EXCLUDED.location
 			RETURNING id
 			`, a.table), row); err != nil {
-			return err
+			return fmt.Errorf("error upserting sensor reading: %v", err)
 		}
 
 		_ = row
@@ -256,7 +258,10 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 
 	filtered, err := v.metaFactory.Resolve(ctx, db, false, true)
 	if err != nil {
-		return err
+		return fmt.Errorf("error resolving: %v", err)
+	}
+	if filtered == nil {
+		return nil
 	}
 
 	for _, aggregation := range v.aggregations {
@@ -264,10 +269,10 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 
 		if !aggregation.canAdd(time) {
 			if values, err := aggregation.close(); err != nil {
-				return err
+				return fmt.Errorf("error closing aggregation: %v", err)
 			} else {
 				if err := v.upsertAggregated(ctx, aggregation, values); err != nil {
-					return err
+					return fmt.Errorf("error upserting aggregated: %v", err)
 				}
 				if false {
 					fmt.Printf("%v\n", values)
@@ -277,7 +282,7 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 
 		for key, value := range filtered.Record.Readings {
 			if err := aggregation.add(time, key, filtered.Record.Location, value.Value); err != nil {
-				return err
+				return fmt.Errorf("error adding: %v", err)
 			}
 		}
 	}
@@ -291,10 +296,10 @@ func (v *AggregatingHandler) OnDone(ctx context.Context) error {
 	}
 	for _, aggregation := range v.aggregations {
 		if values, err := aggregation.close(); err != nil {
-			return err
+			return fmt.Errorf("error closing aggregation: %v", err)
 		} else {
 			if err := v.upsertAggregated(ctx, aggregation, values); err != nil {
-				return err
+				return fmt.Errorf("error upserting aggregated: %v", err)
 			}
 			if false {
 				fmt.Printf("%v\n", values)
