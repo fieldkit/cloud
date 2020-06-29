@@ -10,6 +10,8 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/conservify/sqlxcache"
+
+	"github.com/fieldkit/cloud/server/backend"
 )
 
 type Config struct {
@@ -37,7 +39,7 @@ func main() {
 		log.Printf("processing\n")
 
 		stationID := int32(12)
-		visitor := NewAggregatingVisitor(db, stationID)
+		visitor := backend.NewAggregatingHandler(db, stationID)
 		if err := rw.WalkStation(txCtx, stationID, visitor); err != nil {
 			panic(err)
 		}

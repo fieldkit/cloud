@@ -1,4 +1,4 @@
-package main
+package backend
 
 import (
 	"context"
@@ -82,7 +82,7 @@ func (a *aggregation) close() (*Aggregated, error) {
 	return aggregated, nil
 }
 
-type AggregatingVisitor struct {
+type AggregatingHandler struct {
 	db           *sqlxcache.DB
 	metaFactory  *repositories.MetaFactory
 	aggregations []*aggregation
@@ -90,7 +90,7 @@ type AggregatingVisitor struct {
 	stationID    int32
 }
 
-func NewAggregatingVisitor(db *sqlxcache.DB, stationID int32) *AggregatingVisitor {
+func NewAggregatingHandler(db *sqlxcache.DB, stationID int32) *AggregatingHandler {
 	minutely := &aggregation{
 		interval: time.Minute * 1,
 		table:    "fieldkit.aggregated_minutely",
@@ -106,7 +106,7 @@ func NewAggregatingVisitor(db *sqlxcache.DB, stationID int32) *AggregatingVisito
 		table:    "fieldkit.aggregated_daily",
 		values:   make(map[string][]float64),
 	}
-	return &AggregatingVisitor{
+	return &AggregatingHandler{
 		db:          db,
 		stationID:   stationID,
 		metaFactory: repositories.NewMetaFactory(),
@@ -118,7 +118,7 @@ func NewAggregatingVisitor(db *sqlxcache.DB, stationID int32) *AggregatingVisito
 	}
 }
 
-func (v *AggregatingVisitor) refreshSensors(ctx context.Context) error {
+func (v *AggregatingHandler) refreshSensors(ctx context.Context) error {
 	sensors := []*Sensor{}
 	if err := v.db.SelectContext(ctx, &sensors, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
 		return err
@@ -133,7 +133,7 @@ func (v *AggregatingVisitor) refreshSensors(ctx context.Context) error {
 	return nil
 }
 
-func (v *AggregatingVisitor) upsertAggregated(ctx context.Context, a *aggregation, d *Aggregated) error {
+func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregation, d *Aggregated) error {
 	var location *data.Location
 
 	if d.Location != nil {
@@ -180,7 +180,7 @@ func (v *AggregatingVisitor) upsertAggregated(ctx context.Context, a *aggregatio
 	return nil
 }
 
-func (v *AggregatingVisitor) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, meta *data.MetaRecord) error {
+func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, meta *data.MetaRecord) error {
 	_, err := v.metaFactory.Add(ctx, meta, true)
 	if err != nil {
 		return err
@@ -189,7 +189,7 @@ func (v *AggregatingVisitor) OnMeta(ctx context.Context, p *data.Provision, r *p
 	return nil
 }
 
-func (v *AggregatingVisitor) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
 	filtered, err := v.metaFactory.Resolve(ctx, db, false, true)
 	if err != nil {
 		return err
@@ -221,7 +221,7 @@ func (v *AggregatingVisitor) OnData(ctx context.Context, p *data.Provision, r *p
 	return nil
 }
 
-func (v *AggregatingVisitor) OnDone(ctx context.Context) error {
+func (v *AggregatingHandler) OnDone(ctx context.Context) error {
 	for _, aggregation := range v.aggregations {
 		if values, err := aggregation.close(); err != nil {
 			return err
