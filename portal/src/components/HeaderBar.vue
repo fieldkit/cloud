@@ -6,7 +6,7 @@
             </div>
             <div class="text-elements">
                 <div class="user-name">
-                    <router-link v-if="user" :to="{ name: 'user' }" class="account-link">
+                    <router-link v-if="user" :to="{ name: 'editUser' }" class="account-link">
                         {{ user.name }}
                     </router-link>
                 </div>

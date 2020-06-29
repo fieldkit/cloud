@@ -40,6 +40,14 @@ const routes = [
         },
     },
     {
+        path: "/dashboard/user",
+        name: "editUser",
+        component: UserView,
+        meta: {
+            secured: true,
+        },
+    },
+    {
         path: "/dashboard/user/reset",
         name: "reset",
         component: ResetPasswordView,

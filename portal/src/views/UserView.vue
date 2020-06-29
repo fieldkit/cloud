@@ -2,20 +2,20 @@
     <div>
         <SidebarNav
             :isAuthenticated="isAuthenticated"
-            viewing="projects"
-            :projects="projects"
+            :viewingProjects="true"
+            :projects="userProjects"
             :stations="stations"
             @showStation="showStation"
         />
-        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" ref="headerBar" />
-        <div class="main-panel" v-show="!loading && isAuthenticated">
+        <HeaderBar ref="headerBar" />
+        <div class="main-panel" v-show="!isBusy && isAuthenticated" v-if="user">
             <div class="view-user" v-if="!isEditing">
-                <div id="user-name">{{ this.user.name }}</div>
+                <div id="user-name">{{ user.name }}</div>
                 <div id="edit-user">
                     <img alt="Edit user" src="../assets/edit.png" v-on:click="editUser" />
                 </div>
-                <div class="user-element">{{ this.user.email }}</div>
-                <div class="user-element">{{ this.user.bio }}</div>
+                <div class="user-element">{{ user.email }}</div>
+                <div class="user-element">{{ user.bio }}</div>
             </div>
 
             <div id="user-form-container" v-if="isEditing">
@@ -28,7 +28,7 @@
                     <img src="../assets/Profile_Image.png" v-if="!user.mediaUrl && !previewImage" />
                     <img
                         alt="User image"
-                        :src="baseUrl + '/user/' + user.id + '/media'"
+                        :src="$config.baseUrl + '/user/' + user.id + '/media'"
                         v-if="user.mediaUrl && !previewImage"
                         class="user-image"
                     />
@@ -109,10 +109,10 @@
                 </div>
             </div>
         </div>
-        <div id="loading" v-if="loading">
+        <div id="loading" v-if="isBusy">
             <img alt="" src="../assets/progress.gif" />
         </div>
-        <div v-if="noCurrentUser" class="no-user-message">
+        <div v-if="!isAuthenticated" class="no-user-message">
             <p>
                 Please
                 <router-link :to="{ name: 'login', query: { redirect: { name: 'user' } } }" class="show-link">
@@ -128,7 +128,8 @@
 import FKApi from "../api/api";
 import HeaderBar from "../components/HeaderBar";
 import SidebarNav from "../components/SidebarNav";
-import Config from "../secrets";
+import { mapState, mapGetters } from "vuex";
+import * as ActionTypes from "@/store/actions";
 
 export default {
     name: "UserView",
@@ -136,20 +137,18 @@ export default {
         HeaderBar,
         SidebarNav,
     },
-    props: ["id"],
+    props: {
+        id: {
+            type: Number,
+            required: false,
+        },
+    },
     data: () => {
         return {
-            baseUrl: Config.API_HOST,
-            user: { username: "" },
             publicProfile: true,
             previewImage: "",
-            projects: [],
-            stations: [],
             acceptedImageTypes: ["jpg", "jpeg", "png", "gif"],
-            isEditing: false,
-            isAuthenticated: false,
-            noCurrentUser: false,
-            loading: false,
+            isEditing: true,
             oldPassword: "",
             newPassword: "",
             noPassword: false,
@@ -163,24 +162,17 @@ export default {
     },
     async beforeCreate() {
         this.api = new FKApi();
-        this.api
-            .getCurrentUser()
-            .then(user => {
-                this.user = user;
-                this.isAuthenticated = true;
-                this.api.getUserProjects().then(projects => {
-                    if (projects && projects.projects.length > 0) {
-                        this.projects = projects.projects;
-                    }
-                });
-                this.api.getStations().then(s => {
-                    this.stations = s.stations;
-                });
-            })
-            .catch(() => {
-                this.loading = false;
-                this.noCurrentUser = true;
-            });
+    },
+    computed: {
+        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
+        ...mapState({
+            user: s => s.user.user,
+            stations: s => s.stations.stations.user,
+            userProjects: s => s.stations.projects.user,
+        }),
+    },
+    beforeMount() {
+        this.$store.dispatch(ActionTypes.NEED_COMMON);
     },
     methods: {
         goBack() {
@@ -233,7 +225,6 @@ export default {
             this.loading = true;
             if (this.sendingImage) {
                 this.api.uploadUserImage({ type: this.imageType, image: this.sendingImage }).then(() => {
-                    this.$refs.headerBar.refreshImage(this.previewImage);
                     this.api.updateUser(this.user).then(() => {
                         this.isEditing = false;
                         this.loading = false;
