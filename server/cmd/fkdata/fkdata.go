@@ -11,7 +11,7 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/backend/handlers"
 )
 
 type Config struct {
@@ -39,7 +39,7 @@ func main() {
 		log.Printf("processing\n")
 
 		stationID := int32(12)
-		visitor := backend.NewAggregatingHandler(db, stationID)
+		visitor := handlers.NewAggregatingHandler(db, stationID)
 		if err := rw.WalkStation(txCtx, stationID, visitor); err != nil {
 			panic(err)
 		}

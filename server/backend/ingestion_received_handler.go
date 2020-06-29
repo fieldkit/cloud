@@ -11,10 +11,12 @@ import (
 
 	"github.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/messages"
+
+	"github.com/fieldkit/cloud/server/backend/handlers"
+	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
 type IngestionReceivedHandler struct {
@@ -58,7 +60,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID)
 
-	handler := NewStationModelRecordHandler(h.db)
+	handler := handlers.NewStationModelRecordHandler(h.db)
 
 	recordAdder := NewRecordAdder(h.db, h.files, h.metrics, handler, m.Verbose)
 
