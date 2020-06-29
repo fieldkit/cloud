@@ -145,11 +145,11 @@ func (v *AggregatingHandler) refreshSensors(ctx context.Context) error {
 	return nil
 }
 
-func (v *AggregatingHandler) getStationID() int32 {
+func (v *AggregatingHandler) getStationID() (int32, error) {
 	for _, v := range v.stations {
-		return v
+		return v, nil
 	}
-	panic("no such station id")
+	return 0, fmt.Errorf("no such station id")
 }
 
 func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregation, d *Aggregated) error {
@@ -165,7 +165,10 @@ func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregatio
 		}
 	}
 
-	stationID := v.getStationID()
+	stationID, err := v.getStationID()
+	if err != nil {
+		return err
+	}
 
 	for key, value := range d.Values {
 		if v.sensors[key] == nil {
