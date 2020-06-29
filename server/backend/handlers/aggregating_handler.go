@@ -172,8 +172,8 @@ func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregatio
 			newSensor := &data.Sensor{
 				Key: key,
 			}
-			if err := v.db.NamedGetContext(ctx, newSensor, `INSERT INTO fieldkit.aggregated_sensor (key) VALUES (:key)`, newSensor); err != nil {
-				return err
+			if err := v.db.NamedGetContext(ctx, newSensor, `INSERT INTO fieldkit.aggregated_sensor (key) VALUES (:key) RETURNING id`, newSensor); err != nil {
+				return fmt.Errorf("error adding aggregated sensor: %v", err)
 			}
 			v.sensors[key] = newSensor
 		}
