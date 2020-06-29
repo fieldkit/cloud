@@ -19,6 +19,7 @@ import (
 	ingestionc "github.com/fieldkit/cloud/server/api/gen/http/ingestion/client"
 	modulesc "github.com/fieldkit/cloud/server/api/gen/http/modules/client"
 	projectc "github.com/fieldkit/cloud/server/api/gen/http/project/client"
+	sensorc "github.com/fieldkit/cloud/server/api/gen/http/sensor/client"
 	stationc "github.com/fieldkit/cloud/server/api/gen/http/station/client"
 	tasksc "github.com/fieldkit/cloud/server/api/gen/http/tasks/client"
 	testc "github.com/fieldkit/cloud/server/api/gen/http/test/client"
@@ -37,6 +38,7 @@ following (follow|unfollow|followers)
 ingestion (process- pending|process- station|process- ingestion|delete)
 modules meta
 project (add- update|delete- update|modify- update|invites|lookup- invite|accept- invite|reject- invite)
+sensor (meta|data)
 information (device- layout|firmware- statistics)
 station (add|get|update|list- mine|list- project|photo)
 tasks five
@@ -47,8 +49,8 @@ user (roles|delete)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 2920417339524806997 --page 8354332868448807316 --auth "Optio voluptatibus quis exercitationem autem cumque."` + "\n" +
-		os.Args[0] + ` following follow --id 8548087274381729518 --auth "Maiores reiciendis non ad."` + "\n" +
+	return os.Args[0] + ` activity station --id 3594915953782018094 --page 2198464512681848529 --auth "Dolorem et enim ipsum."` + "\n" +
+		os.Args[0] + ` following follow --id 5223391561647918805 --auth "Consequuntur voluptatum tenetur."` + "\n" +
 		os.Args[0] + ` ingestion process- pending --auth "A provident aut quia voluptas similique."` + "\n" +
 		os.Args[0] + ` modules meta` + "\n" +
 		os.Args[0] + ` project add- update --body '{
@@ -149,6 +151,13 @@ func ParseEndpoint(
 		projectRejectInviteTokenFlag = projectRejectInviteFlags.String("token", "", "")
 		projectRejectInviteAuthFlag  = projectRejectInviteFlags.String("auth", "REQUIRED", "")
 
+		sensorFlags = flag.NewFlagSet("sensor", flag.ContinueOnError)
+
+		sensorMetaFlags = flag.NewFlagSet("meta", flag.ExitOnError)
+
+		sensorDataFlags    = flag.NewFlagSet("data", flag.ExitOnError)
+		sensorDataAuthFlag = sensorDataFlags.String("auth", "REQUIRED", "")
+
 		informationFlags = flag.NewFlagSet("information", flag.ContinueOnError)
 
 		informationDeviceLayoutFlags        = flag.NewFlagSet("device- layout", flag.ExitOnError)
@@ -235,6 +244,10 @@ func ParseEndpoint(
 	projectAcceptInviteFlags.Usage = projectAcceptInviteUsage
 	projectRejectInviteFlags.Usage = projectRejectInviteUsage
 
+	sensorFlags.Usage = sensorUsage
+	sensorMetaFlags.Usage = sensorMetaUsage
+	sensorDataFlags.Usage = sensorDataUsage
+
 	informationFlags.Usage = informationUsage
 	informationDeviceLayoutFlags.Usage = informationDeviceLayoutUsage
 	informationFirmwareStatisticsFlags.Usage = informationFirmwareStatisticsUsage
@@ -284,6 +297,8 @@ func ParseEndpoint(
 			svcf = modulesFlags
 		case "project":
 			svcf = projectFlags
+		case "sensor":
+			svcf = sensorFlags
 		case "information":
 			svcf = informationFlags
 		case "station":
@@ -377,6 +392,16 @@ func ParseEndpoint(
 
 			case "reject- invite":
 				epf = projectRejectInviteFlags
+
+			}
+
+		case "sensor":
+			switch epn {
+			case "meta":
+				epf = sensorMetaFlags
+
+			case "data":
+				epf = sensorDataFlags
 
 			}
 
@@ -533,6 +558,16 @@ func ParseEndpoint(
 				endpoint = c.RejectInvite()
 				data, err = projectc.BuildRejectInvitePayload(*projectRejectInviteIDFlag, *projectRejectInviteTokenFlag, *projectRejectInviteAuthFlag)
 			}
+		case "sensor":
+			c := sensorc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "meta":
+				endpoint = c.Meta()
+				data = nil
+			case "data":
+				endpoint = c.Data()
+				data, err = sensorc.BuildDataPayload(*sensorDataAuthFlag)
+			}
 		case "information":
 			c := informationc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -627,7 +662,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 2920417339524806997 --page 8354332868448807316 --auth "Optio voluptatibus quis exercitationem autem cumque."
+    `+os.Args[0]+` activity station --id 3594915953782018094 --page 2198464512681848529 --auth "Dolorem et enim ipsum."
 `, os.Args[0])
 }
 
@@ -640,7 +675,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 532267701584569007 --page 7994951269711206427 --auth "Sequi ullam doloribus temporibus qui."
+    `+os.Args[0]+` activity project --id 8824746852674008147 --page 5992005401719717377 --auth "Nemo voluptatem."
 `, os.Args[0])
 }
 
@@ -668,7 +703,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 8548087274381729518 --auth "Maiores reiciendis non ad."
+    `+os.Args[0]+` following follow --id 5223391561647918805 --auth "Consequuntur voluptatum tenetur."
 `, os.Args[0])
 }
 
@@ -680,7 +715,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 2094217394010648155 --auth "Sed aut."
+    `+os.Args[0]+` following unfollow --id 4816486827700341074 --auth "Perspiciatis quo."
 `, os.Args[0])
 }
 
@@ -895,6 +930,41 @@ Example:
 `, os.Args[0])
 }
 
+// sensorUsage displays the usage of the sensor command and its subcommands.
+func sensorUsage() {
+	fmt.Fprintf(os.Stderr, `Service is the sensor service interface.
+Usage:
+    %s [globalflags] sensor COMMAND [flags]
+
+COMMAND:
+    meta: Meta implements meta.
+    data: Data implements data.
+
+Additional help:
+    %s sensor COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func sensorMetaUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] sensor meta
+
+Meta implements meta.
+
+Example:
+    `+os.Args[0]+` sensor meta
+`, os.Args[0])
+}
+
+func sensorDataUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] sensor data -auth STRING
+
+Data implements data.
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` sensor data --auth "Maxime totam sapiente eligendi quo quam."
+`, os.Args[0])
+}
+
 // informationUsage displays the usage of the information command and its
 // subcommands.
 func informationUsage() {
@@ -918,7 +988,7 @@ DeviceLayout implements device layout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information device- layout --device-id "Laborum vero odio fugit." --auth "Maxime totam sapiente eligendi quo quam."
+    `+os.Args[0]+` information device- layout --device-id "Fuga molestiae molestiae repellat." --auth "Sapiente enim."
 `, os.Args[0])
 }
 
@@ -929,7 +999,7 @@ FirmwareStatistics implements firmware statistics.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information firmware- statistics --auth "Ut placeat."
+    `+os.Args[0]+` information firmware- statistics --auth "Excepturi laboriosam voluptas amet."
 `, os.Args[0])
 }
 
@@ -960,15 +1030,15 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` station add --body '{
-      "device_id": "Aliquam tempora ullam temporibus similique vel in.",
-      "location_name": "Et enim labore.",
-      "name": "Nemo corrupti et non suscipit similique aut.",
+      "device_id": "Aut non magni dignissimos.",
+      "location_name": "Omnis a quasi.",
+      "name": "Corrupti consectetur tempora nihil aspernatur.",
       "status_json": {
-         "Aliquid expedita veniam voluptatem ad.": "Facere atque quam eum recusandae.",
-         "Voluptas amet sint hic accusamus.": "Temporibus a facilis earum ut non accusantium."
+         "Hic quia omnis debitis beatae.": "Ea et odio enim quibusdam.",
+         "Perferendis aliquid eum odio animi ea aut.": "Dolorem quis."
       },
-      "status_pb": "Exercitationem explicabo quis et omnis delectus sed."
-   }' --auth "Est et natus maiores perferendis id."
+      "status_pb": "Ut mollitia quas tenetur quae aut."
+   }' --auth "Est laudantium eius deleniti quis voluptatem non."
 `, os.Args[0])
 }
 
@@ -980,7 +1050,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 628471915 --auth "Sed distinctio accusamus."
+    `+os.Args[0]+` station get --id 1729531005 --auth "Facilis hic ea incidunt saepe et."
 `, os.Args[0])
 }
 
@@ -994,13 +1064,15 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "location_name": "Et deserunt sequi est sunt qui.",
-      "name": "Facilis hic ea incidunt saepe et.",
+      "location_name": "Deleniti impedit ipsam enim minima.",
+      "name": "Eveniet ipsum aperiam et.",
       "status_json": {
-         "Sapiente tempore a dicta culpa aperiam incidunt.": "Repudiandae nam delectus quasi explicabo adipisci sunt."
+         "Aliquid doloremque qui dolores sit provident.": "Qui voluptatem nulla ipsa ea rerum laborum.",
+         "Corrupti consequuntur in voluptatem.": "Sint tempore nesciunt error.",
+         "Nostrum occaecati facilis placeat dolorem.": "Minima rerum vel."
       },
-      "status_pb": "Ut quae sunt in officia perspiciatis maiores."
-   }' --id 497394973 --auth "Similique vel sunt dolores ut."
+      "status_pb": "Tenetur laudantium."
+   }' --id 924424875 --auth "Enim vitae dolor."
 `, os.Args[0])
 }
 
@@ -1011,7 +1083,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- mine --auth "Nostrum occaecati facilis placeat dolorem."
+    `+os.Args[0]+` station list- mine --auth "Maxime corporis."
 `, os.Args[0])
 }
 
@@ -1023,7 +1095,7 @@ ListProject implements list project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project --id 11948671 --auth "Minima omnis voluptates iusto totam sit tempore."
+    `+os.Args[0]+` station list- project --id 1939265260 --auth "Rerum officiis eius quas at eligendi sed."
 `, os.Args[0])
 }
 
@@ -1035,7 +1107,7 @@ Photo implements photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station photo --id 1583854063 --auth "Aut expedita iste ut maxime corporis itaque."
+    `+os.Args[0]+` station photo --id 547984288 --auth "Adipisci recusandae enim numquam."
 `, os.Args[0])
 }
 
@@ -1084,7 +1156,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 2475358697457025226
+    `+os.Args[0]+` test get --id 1603818956727036166
 `, os.Args[0])
 }
 
@@ -1106,7 +1178,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Accusamus illo similique aliquam iure atque porro." --auth "Eum quo et nam atque."
+    `+os.Args[0]+` test email --address "Ipsum sunt unde eos quis saepe vel." --auth "Animi quia iure."
 `, os.Args[0])
 }
 
@@ -1131,7 +1203,7 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Voluptas dolorum earum soluta accusamus laborum."
+    `+os.Args[0]+` user roles --auth "Voluptates delectus aut non tenetur et et."
 `, os.Args[0])
 }
 
@@ -1143,6 +1215,6 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user delete --user-id 875787324 --auth "Unde eos quis saepe vel soluta."
+    `+os.Args[0]+` user delete --user-id 160831627 --auth "Et ducimus."
 `, os.Args[0])
 }

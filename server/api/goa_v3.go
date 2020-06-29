@@ -45,6 +45,9 @@ import (
 
 	informationSvr "github.com/fieldkit/cloud/server/api/gen/http/information/server"
 	information "github.com/fieldkit/cloud/server/api/gen/information"
+
+	sensorSvr "github.com/fieldkit/cloud/server/api/gen/http/sensor/server"
+	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -78,6 +81,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	informationSvc := NewInformationService(ctx, options)
 	informationEndpoints := information.NewEndpoints(informationSvc)
 
+	sensorSvc := NewSensorService(ctx, options)
+	sensorEndpoints := sensor.NewEndpoints(sensorSvc)
+
 	logErrors := logErrors()
 
 	modulesEndpoints.Use(logErrors)
@@ -90,6 +96,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	userEndpoints.Use(logErrors)
 	ingestionEndpoints.Use(logErrors)
 	informationEndpoints.Use(logErrors)
+	sensorEndpoints.Use(logErrors)
 
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
@@ -111,6 +118,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	userServer := userSvr.New(userEndpoints, mux, dec, enc, eh, nil)
 	ingestionServer := ingestionSvr.New(ingestionEndpoints, mux, dec, enc, eh, nil)
 	informationServer := informationSvr.New(informationEndpoints, mux, dec, enc, eh, nil)
+	sensorServer := sensorSvr.New(sensorEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
@@ -122,6 +130,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	userSvr.Mount(mux, userServer)
 	ingestionSvr.Mount(mux, ingestionServer)
 	informationSvr.Mount(mux, informationServer)
+	sensorSvr.Mount(mux, sensorServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -153,6 +162,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range informationServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range sensorServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 

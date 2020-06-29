@@ -24,7 +24,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"device_id\": \"Aliquam tempora ullam temporibus similique vel in.\",\n      \"location_name\": \"Et enim labore.\",\n      \"name\": \"Nemo corrupti et non suscipit similique aut.\",\n      \"status_json\": {\n         \"Aliquid expedita veniam voluptatem ad.\": \"Facere atque quam eum recusandae.\",\n         \"Voluptas amet sint hic accusamus.\": \"Temporibus a facilis earum ut non accusantium.\"\n      },\n      \"status_pb\": \"Exercitationem explicabo quis et omnis delectus sed.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"device_id\": \"Aut non magni dignissimos.\",\n      \"location_name\": \"Omnis a quasi.\",\n      \"name\": \"Corrupti consectetur tempora nihil aspernatur.\",\n      \"status_json\": {\n         \"Hic quia omnis debitis beatae.\": \"Ea et odio enim quibusdam.\",\n         \"Perferendis aliquid eum odio animi ea aut.\": \"Dolorem quis.\"\n      },\n      \"status_pb\": \"Ut mollitia quas tenetur quae aut.\"\n   }'")
 		}
 		if body.StatusJSON == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
@@ -88,7 +88,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"location_name\": \"Et deserunt sequi est sunt qui.\",\n      \"name\": \"Facilis hic ea incidunt saepe et.\",\n      \"status_json\": {\n         \"Sapiente tempore a dicta culpa aperiam incidunt.\": \"Repudiandae nam delectus quasi explicabo adipisci sunt.\"\n      },\n      \"status_pb\": \"Ut quae sunt in officia perspiciatis maiores.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"location_name\": \"Deleniti impedit ipsam enim minima.\",\n      \"name\": \"Eveniet ipsum aperiam et.\",\n      \"status_json\": {\n         \"Aliquid doloremque qui dolores sit provident.\": \"Qui voluptatem nulla ipsa ea rerum laborum.\",\n         \"Corrupti consequuntur in voluptatem.\": \"Sint tempore nesciunt error.\",\n         \"Nostrum occaecati facilis placeat dolorem.\": \"Minima rerum vel.\"\n      },\n      \"status_pb\": \"Tenetur laudantium.\"\n   }'")
 		}
 		if body.StatusJSON == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
