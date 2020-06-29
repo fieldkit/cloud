@@ -279,7 +279,7 @@ class FKApi {
                     return this.invoke(_.extend({ refreshed: true }, original));
                 });
             },
-            error => this.logout().then(_ => Promise.reject(new TokenError("api: refresh failed")))
+            error => this.logout().then(() => Promise.reject(error))
         );
     }
 

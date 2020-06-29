@@ -35,15 +35,6 @@
                 </div>
             </div>
         </div>
-        <div v-if="!isAuthenticated" class="no-user-message">
-            <p>
-                Please
-                <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
-                    log in
-                </router-link>
-                to view projects.
-            </p>
-        </div>
     </div>
 </template>
 
