@@ -1,3 +1,3 @@
-FROM node:11.13.0-alpine
+FROM node:12.18.1-alpine
 
 COPY UnicodeData.txt /usr/share/unicode/UnicodeData.txt
