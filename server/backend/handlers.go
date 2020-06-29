@@ -32,3 +32,40 @@ func (h *noopRecordHandler) OnData(ctx context.Context, p *data.Provision, r *pb
 func (h *noopRecordHandler) OnDone(ctx context.Context) error {
 	return nil
 }
+
+type muxRecordHandler struct {
+	handlers []RecordHandler
+}
+
+func NewMuxRecordHandler(handlers []RecordHandler) *muxRecordHandler {
+	return &muxRecordHandler{
+		handlers: handlers,
+	}
+}
+
+func (h *muxRecordHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error {
+	for _, h := range h.handlers {
+		if err := h.OnMeta(ctx, p, r, db); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (h *muxRecordHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+	for _, h := range h.handlers {
+		if err := h.OnData(ctx, p, r, db, meta); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (h *muxRecordHandler) OnDone(ctx context.Context) error {
+	for _, h := range h.handlers {
+		if err := h.OnDone(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
