@@ -2,12 +2,13 @@ package backend
 
 import (
 	"context"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/messages"
 
-	_ "github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/backend/handlers"
 )
 
 type RefreshStationHandler struct {
@@ -25,5 +26,65 @@ func (h *RefreshStationHandler) Handle(ctx context.Context, m *messages.RefreshS
 
 	log.Infow("refreshing")
 
+	sr, err := NewStationRefresher(h.db)
+	if err != nil {
+		return err
+	}
+
+	if m.Completely {
+		log.Infow("completely")
+		if err := sr.Completely(ctx, m.StationID); err != nil {
+			return err
+		}
+	} else {
+		log.Infow("recently")
+		if err := sr.Recently(ctx, m.StationID); err != nil {
+			return err
+		}
+	}
+
+	log.Infow("done")
+
 	return nil
+}
+
+type StationRefresher struct {
+	db *sqlxcache.DB
+}
+
+func NewStationRefresher(db *sqlxcache.DB) (sr *StationRefresher, err error) {
+	return &StationRefresher{
+		db: db,
+	}, nil
+}
+
+func (sr *StationRefresher) Recently(ctx context.Context, stationID int32) error {
+	walkParams := &WalkParameters{
+		StationID: stationID,
+		Start:     time.Now().Add(time.Hour * -48),
+		End:       time.Now(),
+		PageSize:  1000,
+	}
+	return sr.walk(ctx, walkParams)
+}
+
+func (sr *StationRefresher) Completely(ctx context.Context, stationID int32) error {
+	walkParams := &WalkParameters{
+		StationID: stationID,
+		Start:     time.Time{},
+		End:       time.Now(),
+		PageSize:  1000,
+	}
+	return sr.walk(ctx, walkParams)
+}
+
+func (sr *StationRefresher) walk(ctx context.Context, walkParams *WalkParameters) error {
+	return sr.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+		rw := NewRecordWalker(sr.db)
+		handler := handlers.NewAggregatingHandler(sr.db)
+		if err := rw.WalkStation(txCtx, handler, walkParams); err != nil {
+			return err
+		}
+		return nil
+	})
 }

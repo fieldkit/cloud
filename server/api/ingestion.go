@@ -13,6 +13,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 type IngestionService struct {
@@ -76,21 +77,31 @@ func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestio
 		return err
 	}
 
-	ingestions, err := ir.QueryByStationID(ctx, int64(payload.StationID))
-	if err != nil {
-		return err
-	}
-
-	log.Infow("queueing", "ingestions", len(ingestions), "user_id", p.UserID())
-
-	c.options.Database.WithNewTransaction(ctx, func(txCtx context.Context) error {
-		for _, i := range ingestions {
-			if _, err := ir.Enqueue(txCtx, i.ID); err != nil {
-				return err
-			}
+	if false {
+		ingestions, err := ir.QueryByStationID(ctx, int64(payload.StationID))
+		if err != nil {
+			return err
 		}
-		return nil
-	})
+
+		log.Infow("queueing", "ingestions", len(ingestions), "user_id", p.UserID())
+
+		c.options.Database.WithNewTransaction(ctx, func(txCtx context.Context) error {
+			for _, i := range ingestions {
+				if _, err := ir.Enqueue(txCtx, i.ID); err != nil {
+					return err
+				}
+			}
+			return nil
+		})
+	} else {
+		if err := c.options.Publisher.Publish(ctx, &messages.RefreshStation{
+			StationID:  payload.StationID,
+			Completely: true,
+			UserID:     p.UserID(),
+		}); err != nil {
+			log.Errorw("publishing", "err", err)
+		}
+	}
 
 	return nil
 }

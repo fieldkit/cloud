@@ -56,8 +56,15 @@ func main() {
 
 		log.Printf("processing\n")
 
+		walkParams := &backend.WalkParameters{
+			StationID: int32(options.StationID),
+			Start:     time.Time{},
+			End:       time.Now(),
+			PageSize:  1000,
+		}
+
 		visitor := handlers.NewAggregatingHandler(db)
-		if err := rw.WalkStation(txCtx, int32(options.StationID), visitor); err != nil {
+		if err := rw.WalkStation(txCtx, visitor, walkParams); err != nil {
 			panic(err)
 		}
 

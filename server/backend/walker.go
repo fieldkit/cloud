@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/conservify/sqlxcache"
@@ -29,6 +28,13 @@ func NewRecordWalker(db *sqlxcache.DB) (rw *RecordWalker) {
 	}
 }
 
+type WalkParameters struct {
+	PageSize  int
+	StationID int32
+	Start     time.Time
+	End       time.Time
+}
+
 type WalkInfo struct {
 	MetaRecords int64
 	DataRecords int64
@@ -41,8 +47,7 @@ func (rw *RecordWalker) Info(ctx context.Context) (*WalkInfo, error) {
 	}, nil
 }
 
-func (rw *RecordWalker) WalkStation(ctx context.Context, stationID int32, handler RecordHandler) error {
-	pageSize := 1000
+func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
 	done := false
 
 	rw.started = time.Now()
@@ -52,9 +57,9 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, stationID int32, handle
 			DECLARE records_cursor CURSOR FOR
 			SELECT r.id, r.provision_id, r.time, r.number, r.meta_record_id, ST_AsBinary(r.location) AS location, r.raw, r.pb
 			FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
-			WHERE (p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1))
-			ORDER BY r.time OFFSET $2 LIMIT $3
-		`, stationID, page*pageSize, pageSize)
+			WHERE (p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1) AND r.time >= $2 AND r.time < $3)
+			ORDER BY r.time OFFSET $4 LIMIT $5
+		`, params.StationID, params.Start, params.End, page*params.PageSize, params.PageSize)
 		if err != nil {
 			return err
 		}
@@ -80,6 +85,8 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, stationID int32, handle
 }
 
 func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler) error {
+	log := Logger(ctx).Sugar()
+
 	tx := rw.db.Transaction(ctx)
 	batchSize := 0
 
@@ -107,7 +114,7 @@ func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler) er
 
 				if rw.dataRecords%1000 == 0 {
 					elapsed := time.Now().Sub(rw.started)
-					log.Printf("%v records (%v rps)", rw.dataRecords, float64(rw.dataRecords)/elapsed.Seconds())
+					log.Infow("progress", "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
 				}
 			}
 		}
