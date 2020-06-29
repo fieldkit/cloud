@@ -11,6 +11,7 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
+	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/handlers"
 )
 
@@ -32,7 +33,7 @@ func main() {
 	}
 
 	err = db.WithNewTransaction(ctx, func(txCtx context.Context) error {
-		rw := NewRecordWalker(db)
+		rw := backend.NewRecordWalker(db)
 
 		started := time.Now()
 

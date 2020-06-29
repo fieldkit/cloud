@@ -1,4 +1,4 @@
-package main
+package backend
 
 import (
 	"context"
@@ -9,7 +9,6 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -42,7 +41,7 @@ func (rw *RecordWalker) Info(ctx context.Context) (*WalkInfo, error) {
 	}, nil
 }
 
-func (rw *RecordWalker) WalkStation(ctx context.Context, stationID int32, handler backend.RecordHandler) error {
+func (rw *RecordWalker) WalkStation(ctx context.Context, stationID int32, handler RecordHandler) error {
 	pageSize := 1000
 	done := false
 
@@ -80,7 +79,7 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, stationID int32, handle
 	return nil
 }
 
-func (rw *RecordWalker) walkQuery(ctx context.Context, handler backend.RecordHandler) error {
+func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler) error {
 	tx := rw.db.Transaction(ctx)
 	batchSize := 0
 
@@ -142,7 +141,7 @@ func (rw *RecordWalker) loadProvision(ctx context.Context, id int64) (*data.Prov
 	return records[0], nil
 }
 
-func (rw *RecordWalker) loadMeta(ctx context.Context, provision *data.Provision, id int64, handler backend.RecordHandler) (meta *data.MetaRecord, err error) {
+func (rw *RecordWalker) loadMeta(ctx context.Context, provision *data.Provision, id int64, handler RecordHandler) (meta *data.MetaRecord, err error) {
 	if rw.metas[id] != nil {
 		return rw.metas[id], nil
 	}
