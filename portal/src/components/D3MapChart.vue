@@ -181,7 +181,7 @@ export default {
             // requires wrapping all the coordinates with the extend method.
             const bounds = coordinates.reduce((bounds, coord) => {
                 return bounds.extend(coord);
-            }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+            }, new Mapbox.LngLatBounds(coordinates[0], coordinates[0]));
 
             this.map.fitBounds(bounds, {
                 padding: 20,

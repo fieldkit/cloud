@@ -62,7 +62,7 @@ export default {
                 .thresholds(thresholds);
 
             // apply histogram function
-            let bins = this.histogram(this.chart.data);
+            const bins = this.histogram(this.chart.data);
 
             // set y scale
             this.yHist = d3
@@ -78,8 +78,7 @@ export default {
             return bins;
         },
         makeRange() {
-            let d3Chart = this;
-            let bins = this.prepareRange();
+            const bins = this.prepareRange();
 
             this.chart.svg.selectAll(".range-gradient").remove();
             this.createGradient(bins);
@@ -94,13 +93,13 @@ export default {
                 .attr("class", "rangebar")
                 .attr("transform", d => {
                     const mx = d3.max(d, b => {
-                        return b[d3Chart.chart.sensor.key];
+                        return b[this.chart.sensor.key];
                     });
-                    const r = mx || mx === 0 ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")" : "translate(0,0)";
+                    const r = mx || mx === 0 ? "translate(" + this.xHist(d.x0) + "," + this.yHist(mx) + ")" : "translate(0,0)";
                     return r;
                 })
                 .attr("width", d => {
-                    return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
+                    return this.xHist(d.x1) - this.xHist(d.x0) - 1;
                 })
                 .style("fill", (d, i) => {
                     return d.length > 0 ? "url(#grad-" + i + ")" : "none";
@@ -109,9 +108,9 @@ export default {
                 .duration(1000)
                 .attr("height", d => {
                     const extent = d3.extent(d, b => {
-                        return b[d3Chart.chart.sensor.key];
+                        return b[this.chart.sensor.key];
                     });
-                    const height = d3Chart.yHist(extent[1]) - d3Chart.yHist(extent[0]);
+                    const height = this.yHist(extent[1]) - this.yHist(extent[0]);
                     const min = d.length > 0 ? -MIN_HEIGHT : 0;
                     return -(height ? height : min);
                 });
@@ -135,12 +134,10 @@ export default {
             this.hideLoading();
         },
         updateRange(bins) {
-            let d3Chart = this;
-
             this.chart.svg.selectAll(".range-gradient").remove();
             this.createGradient(bins);
 
-            let bars = this.chart.svg.selectAll(".rangebar").data(bins);
+            const bars = this.chart.svg.selectAll(".rangebar").data(bins);
 
             // add any new bars
             bars.enter()
@@ -148,22 +145,22 @@ export default {
                 .attr("class", "rangebar")
                 .attr("transform", d => {
                     const mx = d3.max(d, b => {
-                        return b[d3Chart.chart.sensor.key];
+                        return b[this.chart.sensor.key];
                     });
-                    const r = mx || mx === 0 ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")" : "translate(0,0)";
+                    const r = mx || mx === 0 ? "translate(" + this.xHist(d.x0) + "," + this.yHist(mx) + ")" : "translate(0,0)";
                     return r;
                 })
                 .attr("width", d => {
-                    return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
+                    return this.xHist(d.x1) - this.xHist(d.x0) - 1;
                 })
                 .style("fill", (d, i) => {
                     return d.length > 0 ? "url(#grad-" + i + ")" : "none";
                 })
                 .attr("height", d => {
                     const extent = d3.extent(d, b => {
-                        return b[d3Chart.chart.sensor.key];
+                        return b[this.chart.sensor.key];
                     });
-                    const height = d3Chart.yHist(extent[1]) - d3Chart.yHist(extent[0]);
+                    const height = this.yHist(extent[1]) - this.yHist(extent[0]);
                     const min = d.length > 0 ? -MIN_HEIGHT : 0;
                     return -(height ? height : min);
                 });
@@ -172,13 +169,13 @@ export default {
             bars.attr("height", 0)
                 .attr("transform", d => {
                     const mx = d3.max(d, b => {
-                        return b[d3Chart.chart.sensor.key];
+                        return b[this.chart.sensor.key];
                     });
-                    const r = mx || mx === 0 ? "translate(" + d3Chart.xHist(d.x0) + "," + d3Chart.yHist(mx) + ")" : "translate(0,0)";
+                    const r = mx || mx === 0 ? "translate(" + this.xHist(d.x0) + "," + this.yHist(mx) + ")" : "translate(0,0)";
                     return r;
                 })
                 .attr("width", d => {
-                    return d3Chart.xHist(d.x1) - d3Chart.xHist(d.x0) - 1;
+                    return this.xHist(d.x1) - this.xHist(d.x0) - 1;
                 })
                 .style("fill", (d, i) => {
                     return d.length > 0 ? "url(#grad-" + i + ")" : "none";
@@ -187,9 +184,9 @@ export default {
                 .duration(1000)
                 .attr("height", d => {
                     const extent = d3.extent(d, b => {
-                        return b[d3Chart.chart.sensor.key];
+                        return b[this.chart.sensor.key];
                     });
-                    const height = d3Chart.yHist(extent[1]) - d3Chart.yHist(extent[0]);
+                    const height = this.yHist(extent[1]) - this.yHist(extent[0]);
                     const min = d.length > 0 ? -MIN_HEIGHT : 0;
                     return -(height ? height : min);
                 });
@@ -210,10 +207,9 @@ export default {
                 .call(this.yAxis);
         },
         createGradient(bins) {
-            let d3Chart = this;
             // color gradient for each bin
             bins.forEach((bin, i) => {
-                let gradient = this.chart.svg
+                const gradient = this.chart.svg
                     .append("defs")
                     .attr("class", "range-gradient")
                     .append("linearGradient")
@@ -230,7 +226,7 @@ export default {
                         "stop-color",
                         this.chart.colors(
                             d3.max(bin, d => {
-                                return d[d3Chart.chart.sensor.key];
+                                return d[this.chart.sensor.key];
                             })
                         )
                     )
@@ -243,7 +239,7 @@ export default {
                         "stop-color",
                         this.chart.colors(
                             d3.median(bin, d => {
-                                return d[d3Chart.chart.sensor.key];
+                                return d[this.chart.sensor.key];
                             })
                         )
                     )
@@ -256,7 +252,7 @@ export default {
                         "stop-color",
                         this.chart.colors(
                             d3.min(bin, d => {
-                                return d[d3Chart.chart.sensor.key];
+                                return d[this.chart.sensor.key];
                             })
                         )
                     )

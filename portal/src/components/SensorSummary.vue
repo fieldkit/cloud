@@ -45,7 +45,7 @@ export default {
             const meta = this.allSensors.find(s => {
                 return s.key == chart.sensor.key;
             });
-            let sensor = this.sensors.find(s => {
+            const sensor = this.sensors.find(s => {
                 return s.chartId == chart.id;
             });
             if (sensor) {
@@ -86,9 +86,9 @@ export default {
         },
         week(dataSet) {
             if (dataSet.overall && dataSet.overall.length > 0) {
-                let end = dataSet.overall[dataSet.overall.length - 1].date;
-                let start = new Date(end.getTime() - WEEK);
-                let filtered = dataSet.overall.filter(d => {
+                const end = dataSet.overall[dataSet.overall.length - 1].date;
+                const start = new Date(end.getTime() - WEEK);
+                const filtered = dataSet.overall.filter(d => {
                     return d.date >= start && d.date <= end;
                 });
                 return this.computeStats(filtered, dataSet.sensor.key);
@@ -98,9 +98,9 @@ export default {
         },
         month(dataSet) {
             if (dataSet.overall && dataSet.overall.length > 0) {
-                let end = dataSet.overall[dataSet.overall.length - 1].date;
-                let start = new Date(end.getTime() - MONTH);
-                let filtered = dataSet.overall.filter(d => {
+                const end = dataSet.overall[dataSet.overall.length - 1].date;
+                const start = new Date(end.getTime() - MONTH);
+                const filtered = dataSet.overall.filter(d => {
                     return d.date >= start && d.date <= end;
                 });
                 return this.computeStats(filtered, dataSet.sensor.key);
@@ -120,13 +120,13 @@ export default {
                 return { min: "--", max: "--", median: "--" };
             }
 
-            let extent = d3.extent(data, d => {
+            const extent = d3.extent(data, d => {
                 return d[key];
             });
             if (!extent || (!extent[0] && extent[0] != 0)) {
                 return { min: "--", max: "--", median: "--" };
             }
-            let median = d3.median(data, d => {
+            const median = d3.median(data, d => {
                 return d[key];
             });
             return { min: extent[0].toFixed(2), max: extent[1].toFixed(2), median: median.toFixed(2) };

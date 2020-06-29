@@ -46,8 +46,8 @@ export default {
             return this.currentPage === this.pageCount;
         },
         pages() {
-            let pages = [];
-            for (var i = 1; i < this.pageCount + 1; i++) {
+            const pages = [];
+            for (let i = 1; i < this.pageCount + 1; i++) {
                 pages.push(i);
             }
             return pages;
