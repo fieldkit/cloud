@@ -8,17 +8,70 @@
 package client
 
 import (
+	"fmt"
+	"strconv"
+
 	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
 )
 
 // BuildDataPayload builds the payload for the sensor data endpoint from CLI
 // flags.
-func BuildDataPayload(sensorDataAuth string) (*sensor.DataPayload, error) {
+func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataStations string, sensorDataSensors string, sensorDataResolution string, sensorDataAuth string) (*sensor.DataPayload, error) {
+	var err error
+	var start *int64
+	{
+		if sensorDataStart != "" {
+			val, err := strconv.ParseInt(sensorDataStart, 10, 64)
+			start = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for start, must be INT64")
+			}
+		}
+	}
+	var end *int64
+	{
+		if sensorDataEnd != "" {
+			val, err := strconv.ParseInt(sensorDataEnd, 10, 64)
+			end = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for end, must be INT64")
+			}
+		}
+	}
+	var stations *string
+	{
+		if sensorDataStations != "" {
+			stations = &sensorDataStations
+		}
+	}
+	var sensors *string
+	{
+		if sensorDataSensors != "" {
+			sensors = &sensorDataSensors
+		}
+	}
+	var resolution *int32
+	{
+		if sensorDataResolution != "" {
+			var v int64
+			v, err = strconv.ParseInt(sensorDataResolution, 10, 32)
+			val := int32(v)
+			resolution = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for resolution, must be INT32")
+			}
+		}
+	}
 	var auth string
 	{
 		auth = sensorDataAuth
 	}
 	v := &sensor.DataPayload{}
+	v.Start = start
+	v.End = end
+	v.Stations = stations
+	v.Sensors = sensors
+	v.Resolution = resolution
 	v.Auth = auth
 
 	return v, nil

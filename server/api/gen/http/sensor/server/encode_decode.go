@@ -10,6 +10,7 @@ package server
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"strings"
 
 	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
@@ -110,9 +111,53 @@ func EncodeDataResponse(encoder func(context.Context, http.ResponseWriter) goaht
 func DecodeDataRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			auth string
-			err  error
+			start      *int64
+			end        *int64
+			stations   *string
+			sensors    *string
+			resolution *int32
+			auth       string
+			err        error
 		)
+		{
+			startRaw := r.URL.Query().Get("start")
+			if startRaw != "" {
+				v, err2 := strconv.ParseInt(startRaw, 10, 64)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("start", startRaw, "integer"))
+				}
+				start = &v
+			}
+		}
+		{
+			endRaw := r.URL.Query().Get("end")
+			if endRaw != "" {
+				v, err2 := strconv.ParseInt(endRaw, 10, 64)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("end", endRaw, "integer"))
+				}
+				end = &v
+			}
+		}
+		stationsRaw := r.URL.Query().Get("stations")
+		if stationsRaw != "" {
+			stations = &stationsRaw
+		}
+		sensorsRaw := r.URL.Query().Get("sensors")
+		if sensorsRaw != "" {
+			sensors = &sensorsRaw
+		}
+		{
+			resolutionRaw := r.URL.Query().Get("resolution")
+			if resolutionRaw != "" {
+				v, err2 := strconv.ParseInt(resolutionRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("resolution", resolutionRaw, "integer"))
+				}
+				pv := int32(v)
+				resolution = &pv
+			}
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -120,7 +165,7 @@ func DecodeDataRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.De
 		if err != nil {
 			return nil, err
 		}
-		payload := NewDataPayload(auth)
+		payload := NewDataPayload(start, end, stations, sensors, resolution, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]

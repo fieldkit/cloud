@@ -155,8 +155,13 @@ func ParseEndpoint(
 
 		sensorMetaFlags = flag.NewFlagSet("meta", flag.ExitOnError)
 
-		sensorDataFlags    = flag.NewFlagSet("data", flag.ExitOnError)
-		sensorDataAuthFlag = sensorDataFlags.String("auth", "REQUIRED", "")
+		sensorDataFlags          = flag.NewFlagSet("data", flag.ExitOnError)
+		sensorDataStartFlag      = sensorDataFlags.String("start", "", "")
+		sensorDataEndFlag        = sensorDataFlags.String("end", "", "")
+		sensorDataStationsFlag   = sensorDataFlags.String("stations", "", "")
+		sensorDataSensorsFlag    = sensorDataFlags.String("sensors", "", "")
+		sensorDataResolutionFlag = sensorDataFlags.String("resolution", "", "")
+		sensorDataAuthFlag       = sensorDataFlags.String("auth", "REQUIRED", "")
 
 		informationFlags = flag.NewFlagSet("information", flag.ContinueOnError)
 
@@ -566,7 +571,7 @@ func ParseEndpoint(
 				data = nil
 			case "data":
 				endpoint = c.Data()
-				data, err = sensorc.BuildDataPayload(*sensorDataAuthFlag)
+				data, err = sensorc.BuildDataPayload(*sensorDataStartFlag, *sensorDataEndFlag, *sensorDataStationsFlag, *sensorDataSensorsFlag, *sensorDataResolutionFlag, *sensorDataAuthFlag)
 			}
 		case "information":
 			c := informationc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -955,13 +960,18 @@ Example:
 }
 
 func sensorDataUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] sensor data -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] sensor data -start INT64 -end INT64 -stations STRING -sensors STRING -resolution INT32 -auth STRING
 
 Data implements data.
+    -start INT64: 
+    -end INT64: 
+    -stations STRING: 
+    -sensors STRING: 
+    -resolution INT32: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor data --auth "Maxime totam sapiente eligendi quo quam."
+    `+os.Args[0]+` sensor data --start 3631043144680936382 --end 6977849575841579439 --stations "Sapiente eligendi quo quam." --sensors "Cumque odit omnis." --resolution 885144781 --auth "Aut temporibus veniam et sapiente."
 `, os.Args[0])
 }
 
@@ -988,7 +998,7 @@ DeviceLayout implements device layout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information device- layout --device-id "Fuga molestiae molestiae repellat." --auth "Sapiente enim."
+    `+os.Args[0]+` information device- layout --device-id "At quas." --auth "Nisi laudantium aut et totam."
 `, os.Args[0])
 }
 

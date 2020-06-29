@@ -28,6 +28,11 @@ var _ = Service("sensor", func() {
 		Payload(func() {
 			Token("auth")
 			Required("auth")
+			Attribute("start", Int64)
+			Attribute("end", Int64)
+			Attribute("stations", String)
+			Attribute("sensors", String)
+			Attribute("resolution", Int32)
 		})
 
 		Result(func() {
@@ -37,6 +42,14 @@ var _ = Service("sensor", func() {
 
 		HTTP(func() {
 			GET("sensors/data")
+
+			Params(func() {
+				Param("start")
+				Param("end")
+				Param("stations")
+				Param("sensors")
+				Param("resolution")
+			})
 
 			Response(func() {
 				Body("object")

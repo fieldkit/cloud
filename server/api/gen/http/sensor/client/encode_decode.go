@@ -10,6 +10,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -142,6 +143,23 @@ func EncodeDataRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.R
 			head := p.Auth
 			req.Header.Set("Authorization", head)
 		}
+		values := req.URL.Query()
+		if p.Start != nil {
+			values.Add("start", fmt.Sprintf("%v", *p.Start))
+		}
+		if p.End != nil {
+			values.Add("end", fmt.Sprintf("%v", *p.End))
+		}
+		if p.Stations != nil {
+			values.Add("stations", *p.Stations)
+		}
+		if p.Sensors != nil {
+			values.Add("sensors", *p.Sensors)
+		}
+		if p.Resolution != nil {
+			values.Add("resolution", fmt.Sprintf("%v", *p.Resolution))
+		}
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }
