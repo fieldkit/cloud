@@ -29,7 +29,7 @@ func main() {
 		panic(err)
 	}
 
-	visitor := NewResolvingVisitor()
+	visitor := NewAggregatingVisitor()
 
 	rw := NewRecordWalker(db)
 

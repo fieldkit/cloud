@@ -78,6 +78,11 @@ func (rw *RecordWalker) walkQuery(ctx context.Context, rows *sqlx.Rows, visitor 
 
 		rw.dataRecords += 1
 	}
+
+	if err := visitor.VisitEnd(ctx); err != nil {
+		return err
+	}
+
 	return nil
 }
 

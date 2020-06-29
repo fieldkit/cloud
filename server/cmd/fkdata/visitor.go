@@ -9,6 +9,7 @@ import (
 type RecordVisitor interface {
 	VisitMeta(ctx context.Context, meta *data.MetaRecord) error
 	VisitData(ctx context.Context, meta *data.MetaRecord, data *data.DataRecord) error
+	VisitEnd(ctx context.Context) error
 }
 
 type noopVisitor struct {
@@ -23,5 +24,9 @@ func (v *noopVisitor) VisitMeta(ctx context.Context, meta *data.MetaRecord) erro
 }
 
 func (v *noopVisitor) VisitData(ctx context.Context, meta *data.MetaRecord, data *data.DataRecord) error {
+	return nil
+}
+
+func (v *noopVisitor) VisitEnd(ctx context.Context) error {
 	return nil
 }
