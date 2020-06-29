@@ -102,7 +102,9 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 
 	log.Infow("query_parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution)
 
-	for _, aggregateName := range []string{"fieldkit.aggregated_daily", "fieldkit.aggregated_hourly", "fieldkit.aggregated_minutely"} {
+	for _, aggregateName := range []string{
+		"fieldkit.aggregated_24h", "fieldkit.aggregated_12h", "fieldkit.aggregated_6h", "fieldkit.aggregated_1h", "fieldkit.aggregated_30m", "fieldkit.aggregated_1m",
+	} {
 		summary := AggregateSummary{}
 
 		query, args, err := sqlx.In(fmt.Sprintf(`
