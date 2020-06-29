@@ -148,12 +148,38 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		summaries[name] = summary
 	}
 
+	aggregate := handlers.AggregateTableNames[qp.Aggregate]
+	query, args, err := sqlx.In(fmt.Sprintf(`
+		SELECT * FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?) ORDER BY time;
+		`, aggregate), qp.Start, qp.End, qp.Stations, qp.Sensors)
+	if err != nil {
+		return nil, err
+	}
+
+	queried, err := c.db.QueryxContext(ctx, c.db.Rebind(query), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	defer queried.Close()
+
+	rows := make([]*data.AggregatedReading, 0)
+
+	for queried.Next() {
+		row := &data.AggregatedReading{}
+		if err = queried.StructScan(row); err != nil {
+			return nil, err
+		}
+
+		rows = append(rows, row)
+	}
+
 	data := struct {
-		Summaries map[string]*AggregateSummary `json:"sumaries"`
+		Summaries map[string]*AggregateSummary `json:"summaries"`
 		Data      interface{}                  `json:"data"`
 	}{
 		summaries,
-		nil,
+		rows,
 	}
 
 	return &sensor.DataResult{

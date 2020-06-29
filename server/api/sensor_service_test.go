@@ -65,6 +65,7 @@ func TestGetSensorsData(t *testing.T) {
 	ja := jsonassert.New(t)
 	ja.Assertf(rr.Body.String(), `
 	{
-		"data": null
+		"summaries": "<<PRESENCE>>",
+		"data": "<<PRESENCE>>"
 	}`)
 }
