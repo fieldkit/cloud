@@ -91,29 +91,41 @@ type AggregatingHandler struct {
 }
 
 func NewAggregatingHandler(db *sqlxcache.DB) *AggregatingHandler {
-	minutely := &aggregation{
-		interval: time.Minute * 1,
-		table:    "fieldkit.aggregated_minutely",
-		values:   make(map[string][]float64),
-	}
-	hourly := &aggregation{
-		interval: time.Hour * 1,
-		table:    "fieldkit.aggregated_hourly",
-		values:   make(map[string][]float64),
-	}
-	daily := &aggregation{
-		interval: time.Hour * 24,
-		table:    "fieldkit.aggregated_daily",
-		values:   make(map[string][]float64),
-	}
 	return &AggregatingHandler{
 		db:          db,
 		metaFactory: repositories.NewMetaFactory(),
 		stations:    make(map[int64]int32),
 		aggregations: []*aggregation{
-			minutely,
-			hourly,
-			daily,
+			&aggregation{
+				interval: time.Minute * 1,
+				table:    "fieldkit.aggregated_1m",
+				values:   make(map[string][]float64),
+			},
+			&aggregation{
+				interval: time.Minute * 30,
+				table:    "fieldkit.aggregated_30m",
+				values:   make(map[string][]float64),
+			},
+			&aggregation{
+				interval: time.Hour * 1,
+				table:    "fieldkit.aggregated_1h",
+				values:   make(map[string][]float64),
+			},
+			&aggregation{
+				interval: time.Hour * 6,
+				table:    "fieldkit.aggregated_6h",
+				values:   make(map[string][]float64),
+			},
+			&aggregation{
+				interval: time.Hour * 12,
+				table:    "fieldkit.aggregated_12h",
+				values:   make(map[string][]float64),
+			},
+			&aggregation{
+				interval: time.Hour * 24,
+				table:    "fieldkit.aggregated_24h",
+				values:   make(map[string][]float64),
+			},
 		},
 	}
 }
