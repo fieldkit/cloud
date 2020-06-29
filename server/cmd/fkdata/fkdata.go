@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -29,24 +30,31 @@ func main() {
 		panic(err)
 	}
 
-	visitor := NewAggregatingVisitor()
+	err = db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+		rw := NewRecordWalker(db)
 
-	rw := NewRecordWalker(db)
+		started := time.Now()
 
-	started := time.Now()
+		log.Printf("processing\n")
 
-	fmt.Printf("processing\n")
+		stationID := int32(12)
+		visitor := NewAggregatingVisitor(db, stationID)
+		if err := rw.WalkStation(ctx, stationID, visitor); err != nil {
+			panic(err)
+		}
 
-	if err := rw.WalkStation(ctx, 12, visitor); err != nil {
-		panic(err)
-	}
+		info, err := rw.Info(ctx)
+		if err != nil {
+			panic(err)
+		}
 
-	info, err := rw.Info(ctx)
+		finished := time.Now()
+
+		log.Printf("done %v data (%v meta) %v\n", info.DataRecords, info.MetaRecords, finished.Sub(started))
+
+		return nil
+	})
 	if err != nil {
 		panic(err)
 	}
-
-	finished := time.Now()
-
-	fmt.Printf("done %v data (%v meta) %v\n", info.DataRecords, info.MetaRecords, finished.Sub(started))
 }
