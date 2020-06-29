@@ -131,9 +131,10 @@ func EncodeProcessStationResponse(encoder func(context.Context, http.ResponseWri
 func DecodeProcessStationRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			stationID int32
-			auth      string
-			err       error
+			stationID  int32
+			completely *bool
+			auth       string
+			err        error
 
 			params = mux.Vars(r)
 		)
@@ -145,6 +146,16 @@ func DecodeProcessStationRequest(mux goahttp.Muxer, decoder func(*http.Request) 
 			}
 			stationID = int32(v)
 		}
+		{
+			completelyRaw := r.URL.Query().Get("completely")
+			if completelyRaw != "" {
+				v, err2 := strconv.ParseBool(completelyRaw)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("completely", completelyRaw, "boolean"))
+				}
+				completely = &v
+			}
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -152,7 +163,7 @@ func DecodeProcessStationRequest(mux goahttp.Muxer, decoder func(*http.Request) 
 		if err != nil {
 			return nil, err
 		}
-		payload := NewProcessStationPayload(stationID, auth)
+		payload := NewProcessStationPayload(stationID, completely, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]

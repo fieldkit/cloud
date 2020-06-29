@@ -244,6 +244,10 @@ paths:
           * `api:admin`
       operationId: ingestion#process station
       parameters:
+      - name: completely
+        in: query
+        required: false
+        type: boolean
       - name: stationId
         in: path
         required: true

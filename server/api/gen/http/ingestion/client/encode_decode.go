@@ -10,6 +10,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -159,6 +160,11 @@ func EncodeProcessStationRequest(encoder func(*http.Request) goahttp.Encoder) fu
 			head := p.Auth
 			req.Header.Set("Authorization", head)
 		}
+		values := req.URL.Query()
+		if p.Completely != nil {
+			values.Add("completely", fmt.Sprintf("%v", *p.Completely))
+		}
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }

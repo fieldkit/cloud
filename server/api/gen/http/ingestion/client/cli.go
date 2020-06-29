@@ -29,7 +29,7 @@ func BuildProcessPendingPayload(ingestionProcessPendingAuth string) (*ingestion.
 
 // BuildProcessStationPayload builds the payload for the ingestion process
 // station endpoint from CLI flags.
-func BuildProcessStationPayload(ingestionProcessStationStationID string, ingestionProcessStationAuth string) (*ingestion.ProcessStationPayload, error) {
+func BuildProcessStationPayload(ingestionProcessStationStationID string, ingestionProcessStationCompletely string, ingestionProcessStationAuth string) (*ingestion.ProcessStationPayload, error) {
 	var err error
 	var stationID int32
 	{
@@ -40,12 +40,24 @@ func BuildProcessStationPayload(ingestionProcessStationStationID string, ingesti
 			return nil, fmt.Errorf("invalid value for stationID, must be INT32")
 		}
 	}
+	var completely *bool
+	{
+		if ingestionProcessStationCompletely != "" {
+			var val bool
+			val, err = strconv.ParseBool(ingestionProcessStationCompletely)
+			completely = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for completely, must be BOOL")
+			}
+		}
+	}
 	var auth string
 	{
 		auth = ingestionProcessStationAuth
 	}
 	v := &ingestion.ProcessStationPayload{}
 	v.StationID = stationID
+	v.Completely = completely
 	v.Auth = auth
 
 	return v, nil

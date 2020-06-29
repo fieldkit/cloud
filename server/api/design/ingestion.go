@@ -32,10 +32,15 @@ var _ = Service("ingestion", func() {
 			Required("auth")
 			Attribute("stationId", Int32)
 			Required("stationId")
+			Attribute("completely", Boolean)
 		})
 
 		HTTP(func() {
 			POST("data/stations/{stationId}/process")
+
+			Params(func() {
+				Param("completely")
+			})
 
 			httpAuthentication()
 		})

@@ -50,8 +50,9 @@ type ProcessPendingPayload struct {
 // ProcessStationPayload is the payload type of the ingestion service process
 // station method.
 type ProcessStationPayload struct {
-	Auth      string
-	StationID int32
+	Auth       string
+	StationID  int32
+	Completely *bool
 }
 
 // ProcessIngestionPayload is the payload type of the ingestion service process

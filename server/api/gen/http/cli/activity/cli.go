@@ -100,9 +100,10 @@ func ParseEndpoint(
 		ingestionProcessPendingFlags    = flag.NewFlagSet("process- pending", flag.ExitOnError)
 		ingestionProcessPendingAuthFlag = ingestionProcessPendingFlags.String("auth", "REQUIRED", "")
 
-		ingestionProcessStationFlags         = flag.NewFlagSet("process- station", flag.ExitOnError)
-		ingestionProcessStationStationIDFlag = ingestionProcessStationFlags.String("station-id", "REQUIRED", "")
-		ingestionProcessStationAuthFlag      = ingestionProcessStationFlags.String("auth", "REQUIRED", "")
+		ingestionProcessStationFlags          = flag.NewFlagSet("process- station", flag.ExitOnError)
+		ingestionProcessStationStationIDFlag  = ingestionProcessStationFlags.String("station-id", "REQUIRED", "")
+		ingestionProcessStationCompletelyFlag = ingestionProcessStationFlags.String("completely", "", "")
+		ingestionProcessStationAuthFlag       = ingestionProcessStationFlags.String("auth", "REQUIRED", "")
 
 		ingestionProcessIngestionFlags           = flag.NewFlagSet("process- ingestion", flag.ExitOnError)
 		ingestionProcessIngestionIngestionIDFlag = ingestionProcessIngestionFlags.String("ingestion-id", "REQUIRED", "")
@@ -524,7 +525,7 @@ func ParseEndpoint(
 				data, err = ingestionc.BuildProcessPendingPayload(*ingestionProcessPendingAuthFlag)
 			case "process- station":
 				endpoint = c.ProcessStation()
-				data, err = ingestionc.BuildProcessStationPayload(*ingestionProcessStationStationIDFlag, *ingestionProcessStationAuthFlag)
+				data, err = ingestionc.BuildProcessStationPayload(*ingestionProcessStationStationIDFlag, *ingestionProcessStationCompletelyFlag, *ingestionProcessStationAuthFlag)
 			case "process- ingestion":
 				endpoint = c.ProcessIngestion()
 				data, err = ingestionc.BuildProcessIngestionPayload(*ingestionProcessIngestionIngestionIDFlag, *ingestionProcessIngestionAuthFlag)
@@ -766,14 +767,15 @@ Example:
 }
 
 func ingestionProcessStationUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] ingestion process- station -station-id INT32 -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] ingestion process- station -station-id INT32 -completely BOOL -auth STRING
 
 ProcessStation implements process station.
     -station-id INT32: 
+    -completely BOOL: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- station --station-id 48019896 --auth "Consequuntur illum dolores quo."
+    `+os.Args[0]+` ingestion process- station --station-id 48019896 --completely false --auth "Illum dolores quo."
 `, os.Args[0])
 }
 

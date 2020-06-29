@@ -94,9 +94,13 @@ func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestio
 			return nil
 		})
 	} else {
+		completely := false
+		if payload.Completely != nil {
+			completely = *payload.Completely
+		}
 		if err := c.options.Publisher.Publish(ctx, &messages.RefreshStation{
 			StationID:  payload.StationID,
-			Completely: true,
+			Completely: completely,
 			UserID:     p.UserID(),
 		}); err != nil {
 			log.Errorw("publishing", "err", err)
