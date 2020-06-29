@@ -112,7 +112,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 
 	summaries := make(map[string]*AggregateSummary)
 
-	for _, aggregateName := range []string{"24h", "12h", "6h", "1h", "30m", "1m"} {
+	for _, aggregateName := range []string{"24h", "12h", "6h", "1h", "30m", "10m", "1m"} {
 		summary := &AggregateSummary{}
 
 		table := "fieldkit.aggregated_" + aggregateName

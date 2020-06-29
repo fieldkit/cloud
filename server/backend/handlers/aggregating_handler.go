@@ -102,6 +102,11 @@ func NewAggregatingHandler(db *sqlxcache.DB) *AggregatingHandler {
 				values:   make(map[string][]float64),
 			},
 			&aggregation{
+				interval: time.Minute * 10,
+				table:    "fieldkit.aggregated_10m",
+				values:   make(map[string][]float64),
+			},
+			&aggregation{
 				interval: time.Minute * 30,
 				table:    "fieldkit.aggregated_30m",
 				values:   make(map[string][]float64),
