@@ -35,7 +35,7 @@
                 </div>
                 <div v-if="success">
                     <img alt="Success" src="../../assets/Icon_Success.png" width="57px" />
-                    <p class="success">Password Reset</p>
+                    <p class="success">Success!</p>
 
                     <router-link :to="{ name: 'login' }" class="create-link">
                         Back to Log In
@@ -87,6 +87,8 @@ export default {
                 return;
             }
 
+            this.success = false;
+            this.failed = false;
             this.busy = true;
             const payload = {
                 token: this.$route.query.token,
@@ -142,13 +144,11 @@ input {
     font-size: 18px;
     padding-bottom: 2px;
 }
-
 .password-change-heading {
     font-size: 24px;
     font-weight: 500;
     margin-bottom: 50px;
 }
-
 .save-btn {
     width: 300px;
     height: 45px;
@@ -161,13 +161,10 @@ input {
     margin: 40px 0 20px 0;
     cursor: pointer;
 }
-
-.validation-error {
-    float: left;
+.validation-errors {
     color: #c42c44;
     display: block;
     font-size: 14px;
-    margin: -20px 0 0 0;
 }
 .success,
 .error {

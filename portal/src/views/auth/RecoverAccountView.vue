@@ -85,25 +85,12 @@ export default {
             this.busy = true;
             return new FKApi()
                 .sendResetPasswordEmail(this.form.email)
-                .then(() => {
-                    this.attempted = true;
-                })
-                .finally(() => {
-                    this.busy = true;
-                });
+                .then(() => (this.attempted = true))
+                .finally(() => (this.busy = true));
         },
         resend() {
             this.resending = true;
-            this.busy = true;
-            return new FKApi()
-                .resendCreateAccount(this.created.id)
-                .then(() => {
-                    this.busy = false;
-                    this.resending = false;
-                })
-                .finally(() => {
-                    this.busy = false;
-                });
+            return this.save().finally(() => (this.resending = false));
         },
     },
 };
