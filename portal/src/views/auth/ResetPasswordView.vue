@@ -32,6 +32,11 @@
                         </div>
                     </div>
                     <button class="save-btn" v-on:click="save">Reset</button>
+                    <div>
+                        <router-link :to="{ name: 'login' }" class="create-link">
+                            Back to Log In
+                        </router-link>
+                    </div>
                 </div>
                 <div v-if="success">
                     <img alt="Success" src="../../assets/Icon_Success.png" width="57px" />
