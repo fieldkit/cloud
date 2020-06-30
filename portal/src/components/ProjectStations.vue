@@ -21,15 +21,23 @@
                 <img v-if="showStationsList" alt="Collapse List" src="../assets/tab-collapse.png" class="toggle-icon" />
                 <img v-if="!showStationsList" alt="Expand List" src="../assets/tab-expand.png" class="toggle-icon" />
             </div>
-            <div v-for="station in projectStations" v-bind:key="station.id">
-                <div class="station-box" :style="{ width: listSize.boxWidth }">
-                    <div class="delete-link">
-                        <img alt="Delete" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation(station)" />
+            <div v-if="projectStations.length == 0" class="project-stations-no-stations">
+                <h3>No Stations</h3>
+                <p>
+                    Add a station to this project to include its recent data and activities.
+                </p>
+            </div>
+            <div v-if="projectStations.length > 0">
+                <div v-for="station in projectStations" v-bind:key="station.id">
+                    <div class="station-box" :style="{ width: listSize.boxWidth }">
+                        <div class="delete-link">
+                            <img alt="Delete" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation(station)" />
+                        </div>
+                        <span class="station-name" v-on:click="showStation(station)">
+                            {{ station.name }}
+                        </span>
+                        <div class="last-seen">Last seen {{ station.updated | prettyDate }}</div>
                     </div>
-                    <span class="station-name" v-on:click="showStation(station)">
-                        {{ station.name }}
-                    </span>
-                    <div class="last-seen">Last seen {{ station.updated | prettyDate }}</div>
                 </div>
             </div>
         </div>
@@ -123,12 +131,12 @@ export default {
                 this.map.resize();
                 document.getElementById("stations-map-container").style.transition = "width 0.5s";
                 const boxes = document.getElementsByClassName("station-box");
-                Array.from(boxes).forEach(b => {
+                Array.from(boxes).forEach((b) => {
                     b.style.opacity = 1;
                 });
             } else {
                 const boxes = document.getElementsByClassName("station-box");
-                Array.from(boxes).forEach(b => {
+                Array.from(boxes).forEach((b) => {
                     b.style.opacity = 0;
                 });
                 document.getElementById("stations-list").style.width = "1px";
@@ -233,5 +241,15 @@ export default {
 }
 .delete-link:hover {
     opacity: 1;
+}
+.project-stations-no-stations {
+    width: 80%;
+    text-align: center;
+    margin: auto;
+    padding-top: 20px;
+}
+.project-stations-no-stations h1 {
+}
+.project-stations-no-stations p {
 }
 </style>
