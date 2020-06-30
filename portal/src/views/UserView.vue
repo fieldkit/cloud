@@ -51,7 +51,6 @@
                 <div id="public-checkbox-container">
                     <input type="checkbox" id="checkbox" v-model="publicProfile" />
                     <label for="checkbox">Make my profile public</label>
-                    <img alt="Info" src="../assets/info.png" />
                 </div>
                 <button class="save-btn" v-on:click="submitUpdate">Update</button>
 
