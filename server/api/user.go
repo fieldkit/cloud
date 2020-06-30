@@ -82,7 +82,7 @@ func NewUserController(service *goa.Service, options *ControllerOptions) *UserCo
 
 func (c *UserController) userExists(ctx context.Context, email string) (bool, error) {
 	existing := []*data.User{}
-	err := c.options.Database.NamedSelectContext(ctx, existing, `SELECT * FROM fieldkit.user WHERE LOWER(email) = LOWER($1)`, email)
+	err := c.options.Database.SelectContext(ctx, &existing, `SELECT * FROM fieldkit.user WHERE LOWER(email) = LOWER($1)`, email)
 	if err != nil {
 		return false, err
 	}
