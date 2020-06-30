@@ -7,6 +7,7 @@ migration
 grafana-storage
 aws.env
 .fk
+.log
 fkstreams
 .tern-port
 temp-go

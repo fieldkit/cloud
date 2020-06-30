@@ -1,10 +1,10 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import Vuelidate from "vuelidate";
 import VCalendar from "v-calendar";
 import moment from "moment";
 import { sync } from "vuex-router-sync";
 import i18n from "./i18n";
-// import * as ActionTypes from "./store/actions";
 import * as MutationTypes from "./store/mutations";
 import storeFactory from "./store";
 import routerFactory from "./router";
@@ -25,6 +25,7 @@ Vue.use(ConfigurationPlugin, Config);
 Vue.use(AssetsPlugin, Config);
 Vue.use(VCalendar, {});
 Vue.use(Vuex);
+Vue.use(Vuelidate);
 
 Vue.config.productionTip = false;
 
