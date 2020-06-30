@@ -34,6 +34,9 @@ type ControllerOptions struct {
 	// Twitter
 	ConsumerKey    string
 	ConsumerSecret string
+
+	// Services
+	locations *data.DescribeLocations
 }
 
 func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, mediaFiles files.FileArchive, awsSession *session.Session, metrics *logging.Metrics) (controllerOptions *ControllerOptions, err error) {
@@ -46,6 +49,8 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 	if err != nil {
 		return nil, err
 	}
+
+	locations := data.NewDescribeLocations(config.MapboxToken)
 
 	controllerOptions = &ControllerOptions{
 		Session:      awsSession,
@@ -60,6 +65,8 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 		Config:       config,
 		Publisher:    publisher,
 		MediaFiles:   mediaFiles,
+
+		locations: locations,
 	}
 
 	return

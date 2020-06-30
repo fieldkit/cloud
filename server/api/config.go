@@ -21,6 +21,7 @@ type ApiConfiguration struct {
 	ApiDomain     string
 	ApiHost       string
 	SessionKey    string
+	MapboxToken   string
 	Emailer       string
 	Domain        string
 	PortalDomain  string

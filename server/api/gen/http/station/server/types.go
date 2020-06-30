@@ -51,8 +51,8 @@ type AddResponseBody struct {
 	Updated            int64                              `form:"updated" json:"updated" xml:"updated"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
-	PlaceName          *string                            `form:"placeName,omitempty" json:"placeName,omitempty" xml:"placeName,omitempty"`
-	NativeLandName     *string                            `form:"nativeLandName,omitempty" json:"nativeLandName,omitempty" xml:"nativeLandName,omitempty"`
+	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
+	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 }
 
 // GetResponseBody is the type of the "station" service "get" endpoint HTTP
@@ -76,8 +76,8 @@ type GetResponseBody struct {
 	Updated            int64                              `form:"updated" json:"updated" xml:"updated"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
-	PlaceName          *string                            `form:"placeName,omitempty" json:"placeName,omitempty" xml:"placeName,omitempty"`
-	NativeLandName     *string                            `form:"nativeLandName,omitempty" json:"nativeLandName,omitempty" xml:"nativeLandName,omitempty"`
+	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
+	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 }
 
 // UpdateResponseBody is the type of the "station" service "update" endpoint
@@ -101,8 +101,8 @@ type UpdateResponseBody struct {
 	Updated            int64                              `form:"updated" json:"updated" xml:"updated"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
-	PlaceName          *string                            `form:"placeName,omitempty" json:"placeName,omitempty" xml:"placeName,omitempty"`
-	NativeLandName     *string                            `form:"nativeLandName,omitempty" json:"nativeLandName,omitempty" xml:"nativeLandName,omitempty"`
+	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
+	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 }
 
 // ListMineResponseBody is the type of the "station" service "list mine"
@@ -320,8 +320,8 @@ type StationFullResponseBody struct {
 	Updated            int64                              `form:"updated" json:"updated" xml:"updated"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
-	PlaceName          *string                            `form:"placeName,omitempty" json:"placeName,omitempty" xml:"placeName,omitempty"`
-	NativeLandName     *string                            `form:"nativeLandName,omitempty" json:"nativeLandName,omitempty" xml:"nativeLandName,omitempty"`
+	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
+	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 }
 
 // NewAddResponseBody builds the HTTP response body from the result of the
@@ -340,8 +340,8 @@ func NewAddResponseBody(res *stationviews.StationFullView) *AddResponseBody {
 		FirmwareTime:       res.FirmwareTime,
 		Updated:            *res.Updated,
 		LocationName:       res.LocationName,
-		PlaceName:          res.PlaceName,
-		NativeLandName:     res.NativeLandName,
+		PlaceNameOther:     res.PlaceNameOther,
+		PlaceNameNative:    res.PlaceNameNative,
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
@@ -386,8 +386,8 @@ func NewGetResponseBody(res *stationviews.StationFullView) *GetResponseBody {
 		FirmwareTime:       res.FirmwareTime,
 		Updated:            *res.Updated,
 		LocationName:       res.LocationName,
-		PlaceName:          res.PlaceName,
-		NativeLandName:     res.NativeLandName,
+		PlaceNameOther:     res.PlaceNameOther,
+		PlaceNameNative:    res.PlaceNameNative,
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
@@ -432,8 +432,8 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 		FirmwareTime:       res.FirmwareTime,
 		Updated:            *res.Updated,
 		LocationName:       res.LocationName,
-		PlaceName:          res.PlaceName,
-		NativeLandName:     res.NativeLandName,
+		PlaceNameOther:     res.PlaceNameOther,
+		PlaceNameNative:    res.PlaceNameNative,
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)

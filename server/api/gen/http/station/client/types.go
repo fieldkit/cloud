@@ -50,8 +50,8 @@ type AddResponseBody struct {
 	Configurations     *StationConfigurationsResponseBody `form:"configurations,omitempty" json:"configurations,omitempty" xml:"configurations,omitempty"`
 	Updated            *int64                             `form:"updated,omitempty" json:"updated,omitempty" xml:"updated,omitempty"`
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
-	PlaceName          *string                            `form:"placeName,omitempty" json:"placeName,omitempty" xml:"placeName,omitempty"`
-	NativeLandName     *string                            `form:"nativeLandName,omitempty" json:"nativeLandName,omitempty" xml:"nativeLandName,omitempty"`
+	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
+	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 }
 
@@ -75,8 +75,8 @@ type GetResponseBody struct {
 	Configurations     *StationConfigurationsResponseBody `form:"configurations,omitempty" json:"configurations,omitempty" xml:"configurations,omitempty"`
 	Updated            *int64                             `form:"updated,omitempty" json:"updated,omitempty" xml:"updated,omitempty"`
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
-	PlaceName          *string                            `form:"placeName,omitempty" json:"placeName,omitempty" xml:"placeName,omitempty"`
-	NativeLandName     *string                            `form:"nativeLandName,omitempty" json:"nativeLandName,omitempty" xml:"nativeLandName,omitempty"`
+	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
+	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 }
 
@@ -100,8 +100,8 @@ type UpdateResponseBody struct {
 	Configurations     *StationConfigurationsResponseBody `form:"configurations,omitempty" json:"configurations,omitempty" xml:"configurations,omitempty"`
 	Updated            *int64                             `form:"updated,omitempty" json:"updated,omitempty" xml:"updated,omitempty"`
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
-	PlaceName          *string                            `form:"placeName,omitempty" json:"placeName,omitempty" xml:"placeName,omitempty"`
-	NativeLandName     *string                            `form:"nativeLandName,omitempty" json:"nativeLandName,omitempty" xml:"nativeLandName,omitempty"`
+	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
+	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 }
 
@@ -319,8 +319,8 @@ type StationFullResponseBody struct {
 	Configurations     *StationConfigurationsResponseBody `form:"configurations,omitempty" json:"configurations,omitempty" xml:"configurations,omitempty"`
 	Updated            *int64                             `form:"updated,omitempty" json:"updated,omitempty" xml:"updated,omitempty"`
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
-	PlaceName          *string                            `form:"placeName,omitempty" json:"placeName,omitempty" xml:"placeName,omitempty"`
-	NativeLandName     *string                            `form:"nativeLandName,omitempty" json:"nativeLandName,omitempty" xml:"nativeLandName,omitempty"`
+	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
+	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 }
 
@@ -363,8 +363,8 @@ func NewAddStationFullOK(body *AddResponseBody) *stationviews.StationFullView {
 		FirmwareTime:       body.FirmwareTime,
 		Updated:            body.Updated,
 		LocationName:       body.LocationName,
-		PlaceName:          body.PlaceName,
-		NativeLandName:     body.NativeLandName,
+		PlaceNameOther:     body.PlaceNameOther,
+		PlaceNameNative:    body.PlaceNameNative,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -424,8 +424,8 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 		FirmwareTime:       body.FirmwareTime,
 		Updated:            body.Updated,
 		LocationName:       body.LocationName,
-		PlaceName:          body.PlaceName,
-		NativeLandName:     body.NativeLandName,
+		PlaceNameOther:     body.PlaceNameOther,
+		PlaceNameNative:    body.PlaceNameNative,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -485,8 +485,8 @@ func NewUpdateStationFullOK(body *UpdateResponseBody) *stationviews.StationFullV
 		FirmwareTime:       body.FirmwareTime,
 		Updated:            body.Updated,
 		LocationName:       body.LocationName,
-		PlaceName:          body.PlaceName,
-		NativeLandName:     body.NativeLandName,
+		PlaceNameOther:     body.PlaceNameOther,
+		PlaceNameNative:    body.PlaceNameNative,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))

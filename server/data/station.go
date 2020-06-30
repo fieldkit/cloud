@@ -26,8 +26,8 @@ type Station struct {
 	MemoryAvailable    *int32    `db:"memory_available"`
 	FirmwareNumber     *int32    `db:"firmware_number"`
 	FirmwareTime       *int64    `db:"firmware_time"`
-	PlaceName          *string   `db:"place_name"`
-	NativeLandName     *string   `db:"native_land_name"`
+	PlaceOther         *string   `db:"place_other"`
+	PlaceNative        *string   `db:"place_native"`
 }
 
 func (s *Station) ParseHttpReply(raw string) (*pb.HttpReply, error) {

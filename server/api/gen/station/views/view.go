@@ -46,8 +46,8 @@ type StationFullView struct {
 	Configurations     *StationConfigurationsView
 	Updated            *int64
 	LocationName       *string
-	PlaceName          *string
-	NativeLandName     *string
+	PlaceNameOther     *string
+	PlaceNameNative    *string
 	Location           *StationLocationView
 }
 
@@ -165,8 +165,8 @@ var (
 			"updated",
 			"location",
 			"locationName",
-			"placeName",
-			"nativeLandName",
+			"placeNameOther",
+			"placeNameNative",
 		},
 	}
 	// StationsFullMap is a map of attribute names in result type StationsFull
@@ -198,8 +198,8 @@ var (
 			"updated",
 			"location",
 			"locationName",
-			"placeName",
-			"nativeLandName",
+			"placeNameOther",
+			"placeNameNative",
 		},
 	}
 )

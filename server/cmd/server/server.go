@@ -44,6 +44,7 @@ type Config struct {
 	Addr                  string `split_words:"true" default:"127.0.0.1:8080" required:"true"`
 	PostgresURL           string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
 	SessionKey            string `split_words:"true"`
+	MapboxToken           string `split_words:"true"`
 	TwitterConsumerKey    string `split_words:"true"`
 	TwitterConsumerSecret string `split_words:"true"`
 	AWSProfile            string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
@@ -163,15 +164,16 @@ func createApi(ctx context.Context, config *Config) (http.Handler, *api.Controll
 	}
 
 	ingestionReceivedHandler := backend.NewIngestionReceivedHandler(database, ingestionFiles, metrics)
-	refreshStationHandler := backend.NewRefreshStationHandler(database)
-
 	jq.Register(messages.IngestionReceived{}, ingestionReceivedHandler)
+
+	refreshStationHandler := backend.NewRefreshStationHandler(database)
 	jq.Register(messages.RefreshStation{}, refreshStationHandler)
 
 	apiConfig := &api.ApiConfiguration{
 		ApiHost:       config.ApiHost,
 		ApiDomain:     config.ApiDomain,
 		SessionKey:    config.SessionKey,
+		MapboxToken:   config.MapboxToken,
 		Emailer:       config.Emailer,
 		Domain:        config.Domain,
 		PortalDomain:  config.PortalDomain,
@@ -237,6 +239,10 @@ func main() {
 		With("media_bucket_name", config.MediaBucketName, "streams_bucket_name", config.StreamsBucketName).
 		With("email_override", config.EmailOverride).
 		Infow("config")
+
+	if config.MapboxToken != "" {
+		log.Infow("have mapbox token")
+	}
 
 	ingesterHandler, err := createIngester(ctx)
 	if err != nil {

@@ -75,8 +75,8 @@ type StationFull struct {
 	Configurations     *StationConfigurations
 	Updated            int64
 	LocationName       *string
-	PlaceName          *string
-	NativeLandName     *string
+	PlaceNameOther     *string
+	PlaceNameNative    *string
 	Location           *StationLocation
 }
 
@@ -285,8 +285,8 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 		FirmwareNumber:     vres.FirmwareNumber,
 		FirmwareTime:       vres.FirmwareTime,
 		LocationName:       vres.LocationName,
-		PlaceName:          vres.PlaceName,
-		NativeLandName:     vres.NativeLandName,
+		PlaceNameOther:     vres.PlaceNameOther,
+		PlaceNameNative:    vres.PlaceNameNative,
 	}
 	if vres.ID != nil {
 		res.ID = *vres.ID
@@ -346,8 +346,8 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		FirmwareTime:       res.FirmwareTime,
 		Updated:            &res.Updated,
 		LocationName:       res.LocationName,
-		PlaceName:          res.PlaceName,
-		NativeLandName:     res.NativeLandName,
+		PlaceNameOther:     res.PlaceNameOther,
+		PlaceNameNative:    res.PlaceNameNative,
 	}
 	if res.Owner != nil {
 		vres.Owner = transformStationOwnerToStationviewsStationOwnerView(res.Owner)

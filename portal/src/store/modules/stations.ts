@@ -195,11 +195,6 @@ const actions = {
 
         commit(STATION_UPDATE, station);
 
-        if (station.location) {
-            const [nativeLands, placeNames] = await Promise.all([api.getNativeLand(station.location), api.getPlaceName(station.location)]);
-            console.log(nativeLands, placeNames);
-        }
-
         commit(MutationTypes.LOADING, { stations: false });
     },
     [ActionTypes.PROJECT_FOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {

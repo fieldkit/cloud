@@ -3981,14 +3981,14 @@ definitions:
       name:
         type: string
         example: Labore aut voluptatem voluptate dolorem ratione quo.
-      nativeLandName:
-        type: string
-        example: Inventore laborum nesciunt debitis dolores non fuga.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
         $ref: '#/definitions/StationPhotosResponseBody'
-      placeName:
+      placeNameNative:
+        type: string
+        example: Inventore laborum nesciunt debitis dolores non fuga.
+      placeNameOther:
         type: string
         example: Deleniti inventore laudantium libero et est.
       readOnly:
@@ -4714,13 +4714,13 @@ definitions:
       memoryAvailable: 581790764
       memoryUsed: 2133345792
       name: Beatae omnis ducimus dolor pariatur.
-      nativeLandName: Ut animi.
       owner:
         id: 1842111124
         name: Aut placeat consequatur quaerat.
       photos:
         small: Repudiandae ab vel quia.
-      placeName: Magnam magnam aut velit temporibus aut ullam.
+      placeNameNative: Ut animi.
+      placeNameOther: Magnam magnam aut velit temporibus aut ullam.
       readOnly: false
       recordingStartedAt: 2898834277194477025
       updated: 4132686005087483888
@@ -6544,14 +6544,14 @@ definitions:
       name:
         type: string
         example: Eveniet dolores est nostrum.
-      nativeLandName:
-        type: string
-        example: Iusto vel debitis sequi.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
         $ref: '#/definitions/StationPhotosResponseBody'
-      placeName:
+      placeNameNative:
+        type: string
+        example: Iusto vel debitis sequi.
+      placeNameOther:
         type: string
         example: Quam ut officiis et.
       readOnly:
@@ -7257,13 +7257,13 @@ definitions:
       memoryAvailable: 566001959
       memoryUsed: 992361619
       name: Pariatur et nemo.
-      nativeLandName: Qui facere magnam.
       owner:
         id: 1842111124
         name: Aut placeat consequatur quaerat.
       photos:
         small: Repudiandae ab vel quia.
-      placeName: Ut et eos dolor error harum sint.
+      placeNameNative: Qui facere magnam.
+      placeNameOther: Ut et eos dolor error harum sint.
       readOnly: true
       recordingStartedAt: 6189392063356336520
       updated: 4699167495102002775
@@ -7985,13 +7985,13 @@ definitions:
       memoryAvailable: 15980656
       memoryUsed: 1690748238
       name: Nihil commodi expedita nostrum officia modi.
-      nativeLandName: Sed aliquam atque fuga ea quasi.
       owner:
         id: 1842111124
         name: Aut placeat consequatur quaerat.
       photos:
         small: Repudiandae ab vel quia.
-      placeName: Quibusdam explicabo dolores consectetur non omnis ab.
+      placeNameNative: Sed aliquam atque fuga ea quasi.
+      placeNameOther: Quibusdam explicabo dolores consectetur non omnis ab.
       readOnly: false
       recordingStartedAt: 7381062728174518970
       updated: 2699266323149466829
@@ -8703,13 +8703,13 @@ definitions:
       memoryAvailable: 15980656
       memoryUsed: 1690748238
       name: Nihil commodi expedita nostrum officia modi.
-      nativeLandName: Sed aliquam atque fuga ea quasi.
       owner:
         id: 1842111124
         name: Aut placeat consequatur quaerat.
       photos:
         small: Repudiandae ab vel quia.
-      placeName: Quibusdam explicabo dolores consectetur non omnis ab.
+      placeNameNative: Sed aliquam atque fuga ea quasi.
+      placeNameOther: Quibusdam explicabo dolores consectetur non omnis ab.
       readOnly: false
       recordingStartedAt: 7381062728174518970
       updated: 2699266323149466829
@@ -9421,13 +9421,13 @@ definitions:
       memoryAvailable: 15980656
       memoryUsed: 1690748238
       name: Nihil commodi expedita nostrum officia modi.
-      nativeLandName: Sed aliquam atque fuga ea quasi.
       owner:
         id: 1842111124
         name: Aut placeat consequatur quaerat.
       photos:
         small: Repudiandae ab vel quia.
-      placeName: Quibusdam explicabo dolores consectetur non omnis ab.
+      placeNameNative: Sed aliquam atque fuga ea quasi.
+      placeNameOther: Quibusdam explicabo dolores consectetur non omnis ab.
       readOnly: false
       recordingStartedAt: 7381062728174518970
       updated: 2699266323149466829
@@ -9535,14 +9535,14 @@ definitions:
       name:
         type: string
         example: Harum quidem commodi qui sint.
-      nativeLandName:
-        type: string
-        example: Quis aut.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
         $ref: '#/definitions/StationPhotosResponseBody'
-      placeName:
+      placeNameNative:
+        type: string
+        example: Quis aut.
+      placeNameOther:
         type: string
         example: Aperiam incidunt provident quo.
       readOnly:
@@ -10270,13 +10270,13 @@ definitions:
       memoryAvailable: 900058913
       memoryUsed: 1661586950
       name: Harum dolore suscipit voluptas maxime quia.
-      nativeLandName: Quaerat omnis eos non quam neque corporis.
       owner:
         id: 1842111124
         name: Aut placeat consequatur quaerat.
       photos:
         small: Repudiandae ab vel quia.
-      placeName: Qui impedit dolor perferendis minus.
+      placeNameNative: Quaerat omnis eos non quam neque corporis.
+      placeNameOther: Qui impedit dolor perferendis minus.
       readOnly: false
       recordingStartedAt: 4255411798966175770
       updated: 53986428073263411
@@ -11018,13 +11018,13 @@ definitions:
         memoryAvailable: 15980656
         memoryUsed: 1690748238
         name: Nihil commodi expedita nostrum officia modi.
-        nativeLandName: Sed aliquam atque fuga ea quasi.
         owner:
           id: 1842111124
           name: Aut placeat consequatur quaerat.
         photos:
           small: Repudiandae ab vel quia.
-        placeName: Quibusdam explicabo dolores consectetur non omnis ab.
+        placeNameNative: Sed aliquam atque fuga ea quasi.
+        placeNameOther: Quibusdam explicabo dolores consectetur non omnis ab.
         readOnly: false
         recordingStartedAt: 7381062728174518970
         updated: 2699266323149466829
@@ -11736,13 +11736,13 @@ definitions:
         memoryAvailable: 15980656
         memoryUsed: 1690748238
         name: Nihil commodi expedita nostrum officia modi.
-        nativeLandName: Sed aliquam atque fuga ea quasi.
         owner:
           id: 1842111124
           name: Aut placeat consequatur quaerat.
         photos:
           small: Repudiandae ab vel quia.
-        placeName: Quibusdam explicabo dolores consectetur non omnis ab.
+        placeNameNative: Sed aliquam atque fuga ea quasi.
+        placeNameOther: Quibusdam explicabo dolores consectetur non omnis ab.
         readOnly: false
         recordingStartedAt: 7381062728174518970
         updated: 2699266323149466829
@@ -12454,13 +12454,13 @@ definitions:
         memoryAvailable: 15980656
         memoryUsed: 1690748238
         name: Nihil commodi expedita nostrum officia modi.
-        nativeLandName: Sed aliquam atque fuga ea quasi.
         owner:
           id: 1842111124
           name: Aut placeat consequatur quaerat.
         photos:
           small: Repudiandae ab vel quia.
-        placeName: Quibusdam explicabo dolores consectetur non omnis ab.
+        placeNameNative: Sed aliquam atque fuga ea quasi.
+        placeNameOther: Quibusdam explicabo dolores consectetur non omnis ab.
         readOnly: false
         recordingStartedAt: 7381062728174518970
         updated: 2699266323149466829
@@ -13203,13 +13203,13 @@ definitions:
         memoryAvailable: 15980656
         memoryUsed: 1690748238
         name: Nihil commodi expedita nostrum officia modi.
-        nativeLandName: Sed aliquam atque fuga ea quasi.
         owner:
           id: 1842111124
           name: Aut placeat consequatur quaerat.
         photos:
           small: Repudiandae ab vel quia.
-        placeName: Quibusdam explicabo dolores consectetur non omnis ab.
+        placeNameNative: Sed aliquam atque fuga ea quasi.
+        placeNameOther: Quibusdam explicabo dolores consectetur non omnis ab.
         readOnly: false
         recordingStartedAt: 7381062728174518970
         updated: 2699266323149466829
@@ -13921,13 +13921,13 @@ definitions:
         memoryAvailable: 15980656
         memoryUsed: 1690748238
         name: Nihil commodi expedita nostrum officia modi.
-        nativeLandName: Sed aliquam atque fuga ea quasi.
         owner:
           id: 1842111124
           name: Aut placeat consequatur quaerat.
         photos:
           small: Repudiandae ab vel quia.
-        placeName: Quibusdam explicabo dolores consectetur non omnis ab.
+        placeNameNative: Sed aliquam atque fuga ea quasi.
+        placeNameOther: Quibusdam explicabo dolores consectetur non omnis ab.
         readOnly: false
         recordingStartedAt: 7381062728174518970
         updated: 2699266323149466829
@@ -14639,13 +14639,13 @@ definitions:
         memoryAvailable: 15980656
         memoryUsed: 1690748238
         name: Nihil commodi expedita nostrum officia modi.
-        nativeLandName: Sed aliquam atque fuga ea quasi.
         owner:
           id: 1842111124
           name: Aut placeat consequatur quaerat.
         photos:
           small: Repudiandae ab vel quia.
-        placeName: Quibusdam explicabo dolores consectetur non omnis ab.
+        placeNameNative: Sed aliquam atque fuga ea quasi.
+        placeNameOther: Quibusdam explicabo dolores consectetur non omnis ab.
         readOnly: false
         recordingStartedAt: 7381062728174518970
         updated: 2699266323149466829
@@ -15036,14 +15036,14 @@ definitions:
       name:
         type: string
         example: Ab praesentium.
-      nativeLandName:
-        type: string
-        example: In eaque non saepe ratione aut ipsum.
       owner:
         $ref: '#/definitions/StationOwnerResponseBody'
       photos:
         $ref: '#/definitions/StationPhotosResponseBody'
-      placeName:
+      placeNameNative:
+        type: string
+        example: In eaque non saepe ratione aut ipsum.
+      placeNameOther:
         type: string
         example: Et eaque aliquam ea iusto corrupti.
       readOnly:
@@ -15751,13 +15751,13 @@ definitions:
       memoryAvailable: 598755962
       memoryUsed: 512143937
       name: Alias sapiente animi eos.
-      nativeLandName: Est eaque.
       owner:
         id: 1842111124
         name: Aut placeat consequatur quaerat.
       photos:
         small: Repudiandae ab vel quia.
-      placeName: Nam omnis nemo.
+      placeNameNative: Est eaque.
+      placeNameOther: Nam omnis nemo.
       readOnly: true
       recordingStartedAt: 7699739167296241763
       updated: 206918093553455287

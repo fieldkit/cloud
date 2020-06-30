@@ -30,6 +30,44 @@ func NewStationService(ctx context.Context, options *ControllerOptions) *Station
 	}
 }
 
+func (c *StationService) updateStation(ctx context.Context, station *data.Station, rawStatusPb *string) error {
+	log := Logger(ctx).Sugar()
+
+	sr, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
+		return err
+	}
+
+	if rawStatusPb != nil {
+		if err := station.UpdateFromStatus(*rawStatusPb); err != nil {
+			log.Errorw("error updating from status", "error", err, "status", *rawStatusPb)
+			// return err
+		}
+
+		if err := sr.UpdateStationModelFromStatus(ctx, station, *rawStatusPb); err != nil {
+			log.Errorw("error updating model status", "error", err, "status", *rawStatusPb)
+			// return err
+		}
+
+		if station.Location != nil && c.options.locations != nil {
+			names, err := c.options.locations.Describe(ctx, station.Location)
+			if err != nil {
+				log.Errorw("error updating from location", "error", err)
+				// return err
+			} else {
+				station.PlaceOther = names.OtherLandName
+				station.PlaceNative = names.NativeLandName
+			}
+		}
+	}
+
+	if err := sr.Update(ctx, station); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (response *station.StationFull, err error) {
 	log := Logger(ctx).Sugar()
 
@@ -63,16 +101,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 			return nil, station.BadRequest("station already registered to another user")
 		}
 
-		if payload.StatusPb != nil {
-			if err := existing.UpdateFromStatus(*payload.StatusPb); err != nil {
-				log.Errorw("error updating from status", "error", err, "status", payload.StatusPb)
-			}
-			if err := sr.UpdateStationModelFromStatus(ctx, existing, *payload.StatusPb); err != nil {
-				return nil, err
-			}
-		}
-
-		if err := sr.Update(ctx, existing); err != nil {
+		if err := c.updateStation(ctx, existing, payload.StatusPb); err != nil {
 			return nil, err
 		}
 
@@ -91,21 +120,13 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		LocationName: payload.LocationName,
 	}
 
-	if payload.StatusPb != nil {
-		if err := adding.UpdateFromStatus(*payload.StatusPb); err != nil {
-			log.Errorw("error updating from status", "error", err, "status", payload.StatusPb)
-		}
-	}
-
 	added, err := sr.Add(ctx, adding)
 	if err != nil {
 		return nil, err
 	}
 
-	if payload.StatusPb != nil {
-		if err := sr.UpdateStationModelFromStatus(ctx, added, *payload.StatusPb); err != nil {
-			return nil, err
-		}
+	if err := c.updateStation(ctx, added, payload.StatusPb); err != nil {
+		return nil, err
 	}
 
 	return c.Get(ctx, &station.GetPayload{
@@ -138,8 +159,6 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 }
 
 func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
-	log := Logger(ctx).Sugar()
-
 	sr, err := repositories.NewStationRepository(c.options.Database)
 	if err != nil {
 		return nil, err
@@ -168,20 +187,8 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 		updating.LocationName = payload.LocationName
 	}
 
-	if payload.StatusPb != nil {
-		if err := updating.UpdateFromStatus(*payload.StatusPb); err != nil {
-			log.Errorw("error updating from status", "error", err, "status", payload.StatusPb)
-		}
-	}
-
-	if err := sr.Update(ctx, updating); err != nil {
+	if err := c.updateStation(ctx, updating, payload.StatusPb); err != nil {
 		return nil, err
-	}
-
-	if payload.StatusPb != nil {
-		if err := sr.UpdateStationModelFromStatus(ctx, updating, *payload.StatusPb); err != nil {
-			return nil, err
-		}
 	}
 
 	return c.Get(ctx, &station.GetPayload{
@@ -458,8 +465,8 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 		FirmwareTime:    sf.Station.FirmwareTime,
 		Updated:         sf.Station.UpdatedAt.Unix() * 1000,
 		LocationName:    sf.Station.LocationName,
-		PlaceName:       sf.Station.PlaceName,
-		NativeLandName:  sf.Station.NativeLandName,
+		PlaceNameOther:  sf.Station.PlaceOther,
+		PlaceNameNative: sf.Station.PlaceNative,
 		Location:        transformLocation(sf),
 		Owner: &station.StationOwner{
 			ID:   sf.Owner.ID,

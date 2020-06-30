@@ -113,8 +113,8 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 
 		Attribute("updated", Int64)
 		Attribute("locationName", String)
-		Attribute("placeName", String)
-		Attribute("nativeLandName", String)
+		Attribute("placeNameOther", String)
+		Attribute("placeNameNative", String)
 		Attribute("location", StationLocation)
 		Required("updated")
 	})
@@ -139,8 +139,8 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("updated")
 		Attribute("location")
 		Attribute("locationName")
-		Attribute("placeName")
-		Attribute("nativeLandName")
+		Attribute("placeNameOther")
+		Attribute("placeNameNative")
 	})
 })
 

@@ -903,8 +903,8 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 		FirmwareTime:       v.FirmwareTime,
 		Updated:            *v.Updated,
 		LocationName:       v.LocationName,
-		PlaceName:          v.PlaceName,
-		NativeLandName:     v.NativeLandName,
+		PlaceNameOther:     v.PlaceNameOther,
+		PlaceNameNative:    v.PlaceNameNative,
 	}
 	if v.Owner != nil {
 		res.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(v.Owner)

@@ -207,6 +207,8 @@ export interface Station {
     configurations: Configurations;
     updated: number;
     location: HasLocation | null;
+    placeName: string | null;
+    nativeLandName: string | null;
 }
 
 export interface ProjectsResponse {
@@ -852,32 +854,6 @@ class FKApi {
                 Authorization: token,
             },
         });
-    }
-
-    getPlaceName(location) {
-        const query = location.longitude + "," + location.latitude;
-        return axios({
-            method: "GET",
-            url:
-                "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
-                query +
-                ".json?types=place&access_token=" +
-                Config.MAPBOX_ACCESS_TOKEN,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then((response) => this.handle(response));
-    }
-
-    getNativeLand(location) {
-        const query = location.latitude + "," + location.longitude;
-        return axios({
-            method: "GET",
-            url: "https://native-land.ca/api/index.php?maps=territories&position=" + query,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then((response) => this.handle(response));
     }
 }
 
