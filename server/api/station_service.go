@@ -63,6 +63,19 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 			return nil, station.BadRequest("station already registered to another user")
 		}
 
+		if payload.StatusPb != nil {
+			if err := existing.UpdateFromStatus(*payload.StatusPb); err != nil {
+				log.Errorw("error updating from status", "error", err, "status", payload.StatusPb)
+			}
+			if err := sr.UpdateStationModelFromStatus(ctx, existing, *payload.StatusPb); err != nil {
+				return nil, err
+			}
+		}
+
+		if err := sr.Update(ctx, existing); err != nil {
+			return nil, err
+		}
+
 		return c.Get(ctx, &station.GetPayload{
 			Auth: payload.Auth,
 			ID:   existing.ID,

@@ -66,7 +66,8 @@ func (r *StationRepository) QueryStationByID(ctx context.Context, id int32) (sta
 	station = &data.Station{}
 	if err := r.db.GetContext(ctx, station, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, place_name, native_land_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, place_name, native_land_name,
+			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE id = $1
 		`, id); err != nil {
 		return nil, err
@@ -78,7 +79,8 @@ func (r *StationRepository) QueryStationsByDeviceID(ctx context.Context, deviceI
 	stations = []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, place_name, native_land_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, place_name, native_land_name,
+			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE device_id = $1
 		`, deviceIdBytes); err != nil {
 		return nil, err
@@ -90,7 +92,8 @@ func (r *StationRepository) QueryStationByDeviceID(ctx context.Context, deviceId
 	station = &data.Station{}
 	if err := r.db.GetContext(ctx, station, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, place_name, native_land_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, place_name, native_land_name,
+			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE device_id = $1
 		`, deviceIdBytes); err != nil {
 		return nil, err
@@ -102,7 +105,8 @@ func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, devic
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, place_name, native_land_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, place_name, native_land_name,
+			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE device_id = $1
 		`, deviceIdBytes); err != nil {
 		return nil, err
@@ -179,22 +183,33 @@ func (r *StationRepository) UpsertModuleSensor(ctx context.Context, sensor *data
 }
 
 func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s *data.Station, rawStatus string) error {
-	record, err := s.ParseHttpReply(rawStatus)
-
+	statusReply, err := s.ParseHttpReply(rawStatus)
 	if err != nil {
 		return err
 	}
 
-	if record.Status == nil || record.Status.Identity == nil || record.Status.Identity.Generation == nil {
+	if statusReply.Status == nil || statusReply.Status.Identity == nil || statusReply.Status.Identity.Generation == nil {
 		return fmt.Errorf("incomplete status, no identity or generation")
 	}
 
+	if err := r.updateStationConfigurationFromStatus(ctx, s, statusReply); err != nil {
+		return err
+	}
+
+	if err := r.updateDeployedActivityFromStatus(ctx, s); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Context, station *data.Station, statusReply *pbapp.HttpReply) error {
 	pr, err := NewProvisionRepository(r.db)
 	if err != nil {
 		return err
 	}
 
-	p, err := pr.QueryOrCreateProvision(ctx, s.DeviceID, record.Status.Identity.Generation)
+	p, err := pr.QueryOrCreateProvision(ctx, station.DeviceID, statusReply.Status.Identity.Generation)
 	if err != nil {
 		return err
 	}
@@ -210,8 +225,8 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 
 	keeping := make([]int64, 0)
 
-	if record.LiveReadings != nil {
-		for _, lr := range record.LiveReadings {
+	if statusReply.LiveReadings != nil {
+		for _, lr := range statusReply.LiveReadings {
 			time := time.Unix(int64(lr.Time), 0)
 
 			for moduleIndex, lrm := range lr.Modules {
@@ -236,7 +251,7 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 			}
 		}
 	} else {
-		for moduleIndex, m := range record.Modules {
+		for moduleIndex, m := range statusReply.Modules {
 			module := newStationModule(m, configuration, uint32(moduleIndex))
 			if _, err := r.UpsertStationModule(ctx, module); err != nil {
 				return err
@@ -253,31 +268,27 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 		}
 	}
 
-	log := Logger(ctx).Sugar()
-
 	if err := r.deleteStationModulesExcept(ctx, configuration.ID, keeping); err != nil {
 		return err
 	}
 
-	log.Infow("configuration", "station_id", s.ID, "configuration_id", configuration.ID, "provision_id", p.ID)
+	log := Logger(ctx).Sugar()
+
+	log.Infow("configuration", "station_id", station.ID, "configuration_id", configuration.ID, "provision_id", p.ID)
 
 	if _, err := r.db.ExecContext(ctx, `
 		INSERT INTO fieldkit.visible_configuration (station_id, configuration_id)
         SELECT $1 AS station_id, $2 AS configuration_id
 		ON CONFLICT ON CONSTRAINT visible_configuration_pkey
 		DO UPDATE SET configuration_id = EXCLUDED.configuration_id
-		`, s.ID, configuration.ID); err != nil {
-		return err
-	}
-
-	if err := r.updateDeployedActivity(ctx, s); err != nil {
+		`, station.ID, configuration.ID); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (r *StationRepository) updateDeployedActivity(ctx context.Context, station *data.Station) error {
+func (r *StationRepository) updateDeployedActivityFromStatus(ctx context.Context, station *data.Station) error {
 	if station.RecordingStartedAt == nil {
 		return nil
 	}
