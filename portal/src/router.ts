@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import LoginView from "./views/auth/LoginView.vue";
+import CreateAccountView from "./views/auth/CreateAccountView.vue";
 import DataView from "./views/viz/DataView.vue";
 import InvitesView from "./views/InvitesView.vue";
 import ProjectsView from "./views/ProjectsView.vue";
@@ -18,6 +19,14 @@ const routes = [
         path: "/login",
         name: "login",
         component: LoginView,
+        meta: {
+            secured: false,
+        },
+    },
+    {
+        path: "/register",
+        name: "register",
+        component: CreateAccountView,
         meta: {
             secured: false,
         },
