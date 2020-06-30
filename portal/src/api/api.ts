@@ -11,6 +11,13 @@ export class ApiError extends Error {
     }
 }
 
+export class ApiUnexpectedStatus extends ApiError {
+    constructor(public readonly status: number) {
+        super("unexpected status");
+        this.name = "ApiUnexpectedStatus ";
+    }
+}
+
 export class TokenError extends ApiError {
     authenticated: boolean;
 
@@ -230,21 +237,26 @@ class FKApi {
         return axios(params).then(
             response => this.handle(response),
             error => {
-                if (params.refreshed !== true) {
-                    const response = error.response;
-                    if (response.status === 401) {
+                const response = error.response;
+
+                if (response.status === 401) {
+                    if (params.refreshed !== true) {
                         // NOTE I'd like a better way to test for this.
                         if (response.data && response.data.detail && response.data.detail.indexOf("expired") >= 0) {
                             console.log("api: token expired");
                             return this.refreshExpiredToken(params);
                         }
-
-                        // Token is super bad, so no use to us if we can't refresh.
-                        this.token.clear();
                     }
+
+                    // Token is super bad, so no use to us if we can't refresh.
+                    this.token.clear();
+
+                    console.log("api: refresh failed");
+                    return Promise.reject(new TokenError("unauthorized"));
                 }
-                console.log("api: error", error.response);
-                return Promise.reject(error);
+
+                console.log("api: error", error.response.status, error.response.data);
+                return Promise.reject(new ApiUnexpectedStatus(error.response.status));
             }
         );
     }

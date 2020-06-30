@@ -7,6 +7,9 @@ export class Configuration {
 const plugin = {
     install(Vue, config: any) {
         Vue.prototype.$config = new Configuration(config.API_HOST);
+        Vue.prototype.$seriousError = error => {
+            console.log("serious error", error);
+        };
     },
 };
 

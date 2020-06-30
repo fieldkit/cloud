@@ -1,7 +1,7 @@
 <template>
     <div id="form-container">
         <img class="form-header-logo" alt="FieldKit Logo" src="../../assets/FieldKit_Logo_White.png" />
-        <div>
+        <div v-if="!created">
             <form id="form" @submit.prevent="save">
                 <h1>Create Your Account</h1>
                 <div class="outer-input-container">
@@ -34,6 +34,12 @@
                         <div class="validation-errors" v-if="$v.form.email.$error">
                             <div v-if="!$v.form.email.required">Email is a required field.</div>
                             <div v-if="!$v.form.email.email">Must be a valid email address.</div>
+                            <div v-if="!$v.form.email.taken">
+                                This address appears to already be registered.
+                                <router-link :to="{ name: 'recover' }" class="recover-link">
+                                    Recover Account
+                                </router-link>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -79,11 +85,29 @@
                 </div>
             </form>
         </div>
+        <div v-if="created">
+            <div id="notifications">
+                <div v-if="!resending">
+                    <img alt="Success" src="../../assets/Icon_Success.png" width="57px" />
+                    <p class="success">Account Created</p>
+                    <div class="notification-text">We sent you an account validation email.</div>
+                    <button class="form-save-btn" v-on:click="resend">Resend Email</button>
+                    <router-link :to="{ name: 'login' }" class="create-link">
+                        Back to Log In
+                    </router-link>
+                </div>
+                <div v-if="resending">
+                    <img alt="Resending" src="../../assets/Icon_Syncing2.png" width="57px" />
+                    <p>Resending</p>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
+import FKApi from "@/api/api";
 
 export default {
     data() {
@@ -94,24 +118,58 @@ export default {
                 password: "",
                 passwordConfirmation: "",
             },
+            available: true,
+            creating: true,
+            created: null,
+            resending: false,
         };
     },
     validations: {
         form: {
-            name: { required },
-            email: { required, email },
+            name: {
+                required,
+            },
+            email: {
+                required,
+                email,
+                taken: function () {
+                    return this.available;
+                },
+            },
             password: { required, min: minLength(10) },
             passwordConfirmation: { required, min: minLength(10), sameAsPassword: sameAs("password") },
         },
     },
     methods: {
         save() {
-            console.log(this.$v.form.name);
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
                 return;
             }
-            console.log("save", this.$v.form);
+
+            this.creating = true;
+
+            return new FKApi()
+                .register(this.form)
+                .then((created) => {
+                    this.created = created;
+                })
+                .catch((error) => {
+                    if (error.status === 400) {
+                        this.available = false;
+                    } else {
+                        return this.$seriousError(error);
+                    }
+                })
+                .finally(() => {
+                    this.creating = false;
+                });
+        },
+        resend() {
+            this.resending = true;
+            return new FKApi().resendCreateAccount(this.created.id).then(() => {
+                this.resending = false;
+            });
         },
     },
 };
@@ -123,7 +181,8 @@ export default {
     min-height: 100%;
     background-image: linear-gradient(#52b5e4, #1b80c9);
 }
-#form {
+#form,
+#notifications {
     width: 460px;
     background-color: white;
     display: inline-block;
@@ -210,5 +269,12 @@ li {
     color: #c42c44;
     display: block;
     font-size: 14px;
+}
+.recover-link {
+    color: black;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    display: block;
 }
 </style>
