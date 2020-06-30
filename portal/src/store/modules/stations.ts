@@ -2,6 +2,7 @@ import _ from "lodash";
 import Vue from "vue";
 import * as MutationTypes from "../mutations";
 import * as ActionTypes from "../actions";
+import { Location, BoundingRectangle } from "../map-types";
 import FKApi, {
     Station,
     StationModule,
@@ -11,7 +12,6 @@ import FKApi, {
     ProjectFollowers,
     Activity,
     Configurations,
-    HasLocation,
     Photos,
 } from "../../api/api";
 
@@ -40,14 +40,6 @@ export function whenWasStationUpdated(station: Station): Date {
         return new Date(uploads[0]);
     }
     return new Date(station.updated);
-}
-
-export class Location implements HasLocation {
-    constructor(public readonly latitude: number, public readonly longitude) {}
-
-    clone(): Location {
-        return new Location(this.latitude, this.longitude);
-    }
 }
 
 export class DisplaySensor {
