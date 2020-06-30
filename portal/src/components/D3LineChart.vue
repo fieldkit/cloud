@@ -67,9 +67,9 @@ export default {
 
             this.lineFn = d3
                 .line()
-                .defined(d => !d.blankPoint)
-                .x(d => this.x(d.date))
-                .y(d => this.y(d[this.chart.sensor.key]))
+                .defined((d) => !d.blankPoint)
+                .x((d) => this.x(d.date))
+                .y((d) => this.y(d[this.chart.sensor.key]))
                 .curve(d3.curveBasis);
         },
 
@@ -121,21 +121,21 @@ export default {
             this.line
                 .selectAll(".circles")
                 .data(
-                    this.chartData.filter(d => {
+                    this.chartData.filter((d) => {
                         return !d.blankPoint;
                     })
                 )
                 .enter()
                 .append("circle")
                 .attr("class", "dot")
-                .attr("cx", d => {
+                .attr("cx", (d) => {
                     return this.x(d.date);
                 })
-                .attr("cy", d => {
+                .attr("cy", (d) => {
                     return this.y(d[this.chart.sensor.key]);
                 })
                 .attr("r", 2)
-                .attr("fill", d => this.chart.colors(d[this.chart.sensor.key]));
+                .attr("fill", (d) => this.chart.colors(d[this.chart.sensor.key]));
             // tooltip will be added back
 
             this.xAxis = d3.axisBottom(this.x).ticks(10);
@@ -167,7 +167,7 @@ export default {
                 // TODO: this interval might be too small
                 const interval = next - start;
                 for (let i = start; i < last; i += interval) {
-                    const point = this.chartData.find(d => {
+                    const point = this.chartData.find((d) => {
                         return d.date.getTime() >= i - interval && d.date.getTime() <= i;
                     });
                     if (!point) {
@@ -223,7 +223,7 @@ export default {
 
             // update dots
             const dots = this.line.selectAll(".dot").data(
-                this.chartData.filter(d => {
+                this.chartData.filter((d) => {
                     return !d.blankPoint;
                 })
             );
@@ -231,22 +231,22 @@ export default {
             dots.enter()
                 .append("circle")
                 .attr("class", "dot")
-                .attr("cx", d => {
+                .attr("cx", (d) => {
                     return this.x(d.date);
                 })
-                .attr("cy", d => {
+                .attr("cy", (d) => {
                     return this.y(d[this.chart.sensor.key]);
                 })
                 .attr("r", 2)
-                .attr("fill", d => this.chart.colors(d[this.chart.sensor.key]));
+                .attr("fill", (d) => this.chart.colors(d[this.chart.sensor.key]));
             // updating any existing dots
             dots.transition()
                 .duration(1000)
-                .attr("fill", d => this.chart.colors(d[this.chart.sensor.key]))
-                .attr("cx", d => {
+                .attr("fill", (d) => this.chart.colors(d[this.chart.sensor.key]))
+                .attr("cx", (d) => {
                     return this.x(d.date);
                 })
-                .attr("cy", d => {
+                .attr("cy", (d) => {
                     return this.y(d[this.chart.sensor.key]);
                 });
             // remove any extra dots
@@ -303,10 +303,10 @@ export default {
                 ])
                 .enter()
                 .append("stop")
-                .attr("offset", d => {
+                .attr("offset", (d) => {
                     return d.offset;
                 })
-                .attr("stop-color", d => {
+                .attr("stop-color", (d) => {
                     return d.color;
                 });
         },

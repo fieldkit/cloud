@@ -35,7 +35,7 @@ export class StationsState {
 }
 
 export function whenWasStationUpdated(station: Station): Date {
-    const uploads = station.uploads.map(u => u.time);
+    const uploads = station.uploads.map((u) => u.time);
     if (uploads.length > 0) {
         return new Date(uploads[0]);
     }
@@ -68,7 +68,7 @@ export class DisplayModule {
 
     constructor(module: StationModule) {
         this.name = module.name;
-        this.sensors = module.sensors.map(s => new DisplaySensor(s));
+        this.sensors = module.sensors.map((s) => new DisplaySensor(s));
     }
 }
 
@@ -91,7 +91,7 @@ export class DisplayStation {
         this.photos = station.photos;
         this.modules =
             _(station.configurations.all)
-                .map(c => c.modules.filter(m => !m.internal).map(m => new DisplayModule(m)))
+                .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))
                 .head() || [];
         if (station.location) {
             this.location = new Location(station.location.latitude, station.location.longitude);
@@ -116,11 +116,11 @@ export class DisplayProject {
     ) {
         this.id = project.id;
         this.modules = _(stations)
-            .filter(station => station.configurations.all.length > 0)
-            .map(station => station.configurations.all[0].modules.filter(m => !m.internal))
+            .filter((station) => station.configurations.all.length > 0)
+            .map((station) => station.configurations.all[0].modules.filter((m) => !m.internal))
             .flatten()
-            .uniqBy(m => m.name)
-            .map(m => new ProjectModule(m.name, null))
+            .uniqBy((m) => m.name)
+            .map((m) => new ProjectModule(m.name, null))
             .value();
         if (project.startTime && project.endTime) {
             const start = new Date(project.startTime);
@@ -135,17 +135,17 @@ const getters = {
     projectsById(state: StationsState): { [index: number]: DisplayProject } {
         return _(state.projects.user)
             .concat(state.projects.community)
-            .map(p => {
+            .map((p) => {
                 const users = state.projectUsers[p.id] || [];
                 const stations = state.projectStations[p.id] || [];
                 const activities = state.projectActivities[p.id] || [];
                 return new DisplayProject(p, users, stations, activities);
             })
-            .keyBy(p => p.project.id)
+            .keyBy((p) => p.project.id)
             .value();
     },
     stationsById(state: StationsState): { [index: number]: Station } {
-        return _.keyBy(state.stations, p => p.id);
+        return _.keyBy(state.stations, (p) => p.id);
     },
 };
 
@@ -234,7 +234,7 @@ const mutations = {
     [HAVE_USER_STATIONS]: (state: StationsState, stations: Station[]) => {
         state.stations.user = stations;
         state.hasNoStations = stations.length == 0;
-        stations.forEach(station => {
+        stations.forEach((station) => {
             Vue.set(state.stations.all, station.id, new DisplayStation(station));
         });
     },
@@ -248,7 +248,7 @@ const mutations = {
         Vue.set(
             state.projectStations,
             payload.projectId,
-            payload.stations.map(s => new DisplayStation(s))
+            payload.stations.map((s) => new DisplayStation(s))
         );
     },
     [PROJECT_ACTIVITY]: (state: StationsState, payload: { projectId: number; activities: Activity[] }) => {

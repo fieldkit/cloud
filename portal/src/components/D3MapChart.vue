@@ -82,7 +82,7 @@ export default {
         },
         displayData() {
             this.removePreviousMapped();
-            this.chartData = this.chart.data.filter(d => {
+            this.chartData = this.chart.data.filter((d) => {
                 return d.location && d.location[0] != 0 && d.location[1] != 0;
             });
             if (this.chartData.length == 0) {
@@ -90,7 +90,7 @@ export default {
                 return;
             }
             // need long, lat, and data value for color:
-            const coords = this.chartData.map(d => {
+            const coords = this.chartData.map((d) => {
                 return [d.location[0], d.location[1], d[this.chart.sensor.key]];
             });
             const geojson = {
@@ -120,7 +120,7 @@ export default {
                 },
             });
             // add dots
-            const geoDots = geojson.geometry.coordinates.map(c => {
+            const geoDots = geojson.geometry.coordinates.map((c) => {
                 return {
                     type: "Feature",
                     properties: {

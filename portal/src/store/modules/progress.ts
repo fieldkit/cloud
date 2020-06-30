@@ -10,7 +10,7 @@ export class ProgressState {
 
 const getters = {
     isBusy(state: ProgressState) {
-        return _.some(Object.values(state.loading).filter(l => l));
+        return _.some(Object.values(state.loading).filter((l) => l));
     },
 };
 

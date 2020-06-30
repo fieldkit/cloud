@@ -166,9 +166,9 @@ export default {
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
-            user: s => s.user.user,
-            stations: s => s.stations.stations.user,
-            userProjects: s => s.stations.projects.user,
+            user: (s) => s.user.user,
+            stations: (s) => s.stations.stations.user,
+            userProjects: (s) => s.stations.projects.user,
         }),
     },
     beforeMount() {
@@ -242,7 +242,7 @@ export default {
             this.sendingImage = null;
             let valid = false;
             if (event.target.files.length > 0) {
-                this.acceptedImageTypes.forEach(t => {
+                this.acceptedImageTypes.forEach((t) => {
                     if (event.target.files[0].type.indexOf(t) > -1) {
                         valid = true;
                     }
@@ -256,7 +256,7 @@ export default {
             this.sendingImage = image;
             const reader = new FileReader();
             reader.readAsDataURL(image);
-            reader.onload = event => {
+            reader.onload = (event) => {
                 this.previewImage = event.target.result;
             };
         },

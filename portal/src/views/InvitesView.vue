@@ -66,21 +66,21 @@ export default {
     async beforeCreate() {
         this.api = new FKApi();
 
-        this.api.getInvitesByToken(this.$route.query.token).then(result => {
+        this.api.getInvitesByToken(this.$route.query.token).then((result) => {
             this.pending = result.pending;
         });
 
         this.api
             .getCurrentUser()
-            .then(user => {
+            .then((user) => {
                 this.user = user;
                 this.isAuthenticated = true;
-                this.api.getUserProjects().then(projects => {
+                this.api.getUserProjects().then((projects) => {
                     if (projects && projects.projects.length > 0) {
                         this.projects = projects.projects;
                     }
                 });
-                this.api.getStations().then(s => {
+                this.api.getStations().then((s) => {
                     this.stations = s.stations;
                 });
             })
@@ -99,7 +99,7 @@ export default {
         accept(event) {
             const inviteId = event.target.getAttribute("data-id");
             this.api.acceptInvite(inviteId).then(() => {
-                const index = this.pending.findIndex(p => {
+                const index = this.pending.findIndex((p) => {
                     return p.id == inviteId;
                 });
                 if (index > -1) {
@@ -112,7 +112,7 @@ export default {
         decline(event) {
             const inviteId = event.target.getAttribute("data-id");
             this.api.declineInvite(inviteId).then(() => {
-                const index = this.pending.findIndex(p => {
+                const index = this.pending.findIndex((p) => {
                     return p.id == inviteId;
                 });
                 if (index > -1) {

@@ -48,7 +48,7 @@ export default {
             // set histogram function
             this.histogram = d3
                 .histogram()
-                .value(d => {
+                .value((d) => {
                     return d[this.chart.sensor.key];
                 })
                 .domain(this.xHist.domain())
@@ -62,7 +62,7 @@ export default {
                 .scaleLinear()
                 .domain([
                     0,
-                    d3.max(bins, d => {
+                    d3.max(bins, (d) => {
                         return d.length;
                     }),
                 ])
@@ -85,17 +85,17 @@ export default {
                 .enter()
                 .append("rect")
                 .attr("class", "histobar")
-                .attr("transform", d => {
+                .attr("transform", (d) => {
                     return "translate(" + this.xHist(d.x0) + "," + this.yHist(d.length) + ")";
                 })
-                .attr("width", d => {
+                .attr("width", (d) => {
                     const w = this.xHist(d.x1) - this.xHist(d.x0) - 1;
                     return w <= 0 ? MIN_WIDTH : w;
                 })
-                .style("fill", d => this.chart.colors(d.x0))
+                .style("fill", (d) => this.chart.colors(d.x0))
                 .transition()
                 .duration(1000)
-                .attr("height", d => {
+                .attr("height", (d) => {
                     return d.length == 0 ? 0 : this.layout.height - this.yHist(d.length) - this.layout.marginBottom - this.layout.marginTop;
                 });
 
@@ -124,30 +124,30 @@ export default {
             bars.enter()
                 .append("rect")
                 .attr("class", "histobar")
-                .attr("transform", d => {
+                .attr("transform", (d) => {
                     return "translate(" + this.xHist(d.x0) + "," + this.yHist(d.length) + ")";
                 })
-                .attr("width", d => {
+                .attr("width", (d) => {
                     const w = this.xHist(d.x1) - this.xHist(d.x0) - 1;
                     return w <= 0 ? MIN_WIDTH : w;
                 })
-                .style("fill", d => this.chart.colors(d.x0))
-                .attr("height", d => {
+                .style("fill", (d) => this.chart.colors(d.x0))
+                .attr("height", (d) => {
                     return d.length == 0 ? 0 : this.layout.height - this.yHist(d.length) - this.layout.marginBottom - this.layout.marginTop;
                 });
 
             // updating any existing bars
             bars.transition()
                 .duration(1000)
-                .style("fill", d => this.chart.colors(d.x0))
-                .attr("transform", d => {
+                .style("fill", (d) => this.chart.colors(d.x0))
+                .attr("transform", (d) => {
                     return "translate(" + this.xHist(d.x0) + "," + this.yHist(d.length) + ")";
                 })
-                .attr("width", d => {
+                .attr("width", (d) => {
                     const w = this.xHist(d.x1) - this.xHist(d.x0) - 1;
                     return w <= 0 ? MIN_WIDTH : w;
                 })
-                .attr("height", d => {
+                .attr("height", (d) => {
                     return d.length == 0 ? 0 : this.layout.height - this.yHist(d.length) - this.layout.marginBottom - this.layout.marginTop;
                 });
 

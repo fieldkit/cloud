@@ -89,13 +89,13 @@ export default {
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
-            user: s => s.user.user,
-            stations: s => s.stations.stations.user,
-            userProjects: s => s.stations.projects.user,
+            user: (s) => s.user.user,
+            stations: (s) => s.stations.stations.user,
+            userProjects: (s) => s.stations.projects.user,
         }),
     },
     async beforeCreate() {
-        window.onpopstate = event => {
+        window.onpopstate = (event) => {
             // Note: event.state.key changes
             this.componentKey = event.state ? event.state.key : 0;
             if (this.$refs.dataChartControl) {
@@ -105,9 +105,9 @@ export default {
         this.api = new FKApi();
         this.api
             .getModulesMeta()
-            .then(meta => this.processModulesMeta(meta))
-            .then(data => this.initDataChartControl(data))
-            .then(data => this.initTreeSelect(data));
+            .then((meta) => this.processModulesMeta(meta))
+            .then((data) => this.initDataChartControl(data))
+            .then((data) => this.initTreeSelect(data));
     },
     beforeMount() {
         this.$store.dispatch(ActionTypes.NEED_PROJECTS);
@@ -123,14 +123,14 @@ export default {
         getInitialStationData(id, chartId) {
             this.api
                 .getStation(id)
-                .then(station => {
+                .then((station) => {
                     const deviceId = station.deviceId;
                     console.log("get station summary");
                     this.stationData[deviceId] = {};
                     this.stationData[deviceId].station = station;
                     this.api
                         .getStationDataSummaryByDeviceId(deviceId)
-                        .then(result => {
+                        .then((result) => {
                             this.handleInitialDataSummary(result, deviceId, chartId);
                         })
                         .catch(() => {
@@ -186,10 +186,10 @@ export default {
                 return "#000000";
             };
 
-            meta.forEach(m => {
+            meta.forEach((m) => {
                 // m.key
                 if (!m.internal) {
-                    m.sensors.forEach(s => {
+                    m.sensors.forEach((s) => {
                         let colors;
                         const expected = expectedRanges[s.firmware_key];
                         if (expected) {
@@ -227,11 +227,11 @@ export default {
         processData(result) {
             const processed = [];
             const resultSensors = _.flatten(_.map(result.modules, "sensors"));
-            const sensors = _.intersectionBy(this.allSensors, resultSensors, s => {
+            const sensors = _.intersectionBy(this.allSensors, resultSensors, (s) => {
                 return s.key;
             });
             const sensorKeys = _.map(sensors, "key");
-            result.data.forEach(d => {
+            result.data.forEach((d) => {
                 const keys = _.intersection(sensorKeys, Object.keys(d.d));
                 // Only including ones with sensor readings
                 if (keys.length > 0) {
@@ -253,10 +253,10 @@ export default {
         initTreeSelect() {
             this.treeSelectOptions = [];
             let counterId = 0;
-            this.stations.forEach(s => {
+            this.stations.forEach((s) => {
                 const modules = [];
                 const modulesResult = this.extractModulesAndSensors(s);
-                modulesResult.forEach(m => {
+                modulesResult.forEach((m) => {
                     counterId += 1;
                     modules.push({
                         id: counterId,
@@ -281,15 +281,15 @@ export default {
             const result = [];
             let modules =
                 station.configurations && station.configurations.all ? _.flatten(_.map(station.configurations.all, "modules")) : [];
-            modules = _.uniqBy(modules, m => {
+            modules = _.uniqBy(modules, (m) => {
                 return m.name;
             });
-            modules.forEach(m => {
+            modules.forEach((m) => {
                 const sensors = [];
                 let sensorsFound = 0;
                 if (!m.internal) {
-                    m.sensors.forEach(sensor => {
-                        const dataViewSensor = this.allSensors.find(sr => {
+                    m.sensors.forEach((sensor) => {
+                        const dataViewSensor = this.allSensors.find((sr) => {
                             return sr.firmwareKey == sensor.name;
                         });
                         if (dataViewSensor) {
@@ -313,12 +313,12 @@ export default {
         },
 
         onStationChange(stationId, chart) {
-            this.api.getStation(stationId).then(station => {
+            this.api.getStation(stationId).then((station) => {
                 const deviceId = station.deviceId;
                 if (this.stationData[deviceId]) {
                     // use this station's data if we already have it
                     this.$refs.dataChartControl.resetChartData(this.stationData, deviceId, chart.id);
-                    this.fetchSummary(deviceId, chart.start.getTime(), chart.end.getTime()).then(result => {
+                    this.fetchSummary(deviceId, chart.start.getTime(), chart.end.getTime()).then((result) => {
                         const processedData = this.processData(result);
                         this.$refs.dataChartControl.updateChartData(processedData.data, chart.id);
                     });
@@ -328,11 +328,11 @@ export default {
                     // otherwise, need to fetch data for initializing ranges, etc
                     this.api
                         .getStationDataSummaryByDeviceId(deviceId)
-                        .then(result => {
+                        .then((result) => {
                             const reset = true;
                             this.handleInitialDataSummary(result, deviceId, chart.id, reset);
                             // and then get the correct time window summary
-                            this.fetchSummary(deviceId, chart.start.getTime(), chart.end.getTime()).then(result => {
+                            this.fetchSummary(deviceId, chart.start.getTime(), chart.end.getTime()).then((result) => {
                                 const processedData = this.processData(result);
                                 this.$refs.dataChartControl.updateChartData(processedData.data, chart.id);
                             });
@@ -355,7 +355,7 @@ export default {
         onTimeChange(range, chart, fromParent) {
             const start = range.start.getTime();
             const end = range.end.getTime();
-            this.fetchSummary(chart.station.deviceId, start, end).then(result => {
+            this.fetchSummary(chart.station.deviceId, start, end).then((result) => {
                 const processedData = this.processData(result);
                 this.$refs.dataChartControl.updateChartData(processedData.data, chart.id, fromParent);
             });

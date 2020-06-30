@@ -129,7 +129,7 @@ export default {
             }
         },
         deactivateCharts() {
-            this.chartRefs.forEach(r => {
+            this.chartRefs.forEach((r) => {
                 if (this.$refs[r]) {
                     this.$refs[r].setStatus(false);
                 }
@@ -158,7 +158,7 @@ export default {
             this.chart.data = data;
             this.chart.extent = extent;
             this.chart.colors = colorScale;
-            this.chartRefs.forEach(r => {
+            this.chartRefs.forEach((r) => {
                 if (this.$refs[r]) {
                     this.$refs[r].dataChanged();
                 }
@@ -190,13 +190,13 @@ export default {
             this.$emit("allDays", { parent: this.chart.parent, id: this.chart.id });
         },
         initScrubber() {
-            this.scrubberData = this.chart.overall.filter(d => {
+            this.scrubberData = this.chart.overall.filter((d) => {
                 return d[this.chart.sensor.key] === 0 || d[this.chart.sensor.key];
             });
             this.scrubberTimeRange = [];
             this.scrubberTimeRange[0] = this.chart.totalTime[0];
             this.scrubberTimeRange[1] = this.chart.totalTime[1];
-            this.scrubberExtent = d3.extent(this.scrubberData, d => {
+            this.scrubberExtent = d3.extent(this.scrubberData, (d) => {
                 return d[this.chart.sensor.key];
             });
 
@@ -227,11 +227,11 @@ export default {
             // area fn
             this.area = d3
                 .area()
-                .x(d => {
+                .x((d) => {
                     return this.scrubberX(d.date);
                 })
                 .y0(this.scrubberHeight - (this.layout.marginBottom + this.layout.marginTop))
-                .y1(d => {
+                .y1((d) => {
                     return this.scrubberY(d[this.chart.sensor.key]);
                 });
 
@@ -279,7 +279,7 @@ export default {
                 .data([{ type: "w" }, { type: "e" }])
                 .enter()
                 .append("g")
-                .attr("class", d => {
+                .attr("class", (d) => {
                     return d.type == "w" ? "left-handle" : "right-handle";
                 })
                 .attr("cursor", "ew-resize");
@@ -322,7 +322,7 @@ export default {
             this.requestedEnd = end;
             // adjust the selected area and handles to match selection
             this.scrubberClip.attr("x", xRange[0]).attr("width", xRange[1] - xRange[0]);
-            this.handles.attr("transform", d => {
+            this.handles.attr("transform", (d) => {
                 const x = d.type == "w" ? xRange[0] : xRange[1];
                 return "translate(" + x + ",0)";
             });
@@ -343,10 +343,10 @@ export default {
             this.scrubberTimeRange[1] = this.chart.totalTime[1];
             this.scrubberX.domain(this.scrubberTimeRange);
 
-            this.scrubberData = this.chart.overall.filter(d => {
+            this.scrubberData = this.chart.overall.filter((d) => {
                 return d[this.chart.sensor.key] === 0 || d[this.chart.sensor.key];
             });
-            this.scrubberExtent = d3.extent(this.scrubberData, d => {
+            this.scrubberExtent = d3.extent(this.scrubberData, (d) => {
                 return d[this.chart.sensor.key];
             });
             this.scrubberY = d3

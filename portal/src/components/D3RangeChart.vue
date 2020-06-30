@@ -55,7 +55,7 @@ export default {
             // set histogram function
             this.histogram = d3
                 .histogram()
-                .value(d => {
+                .value((d) => {
                     return d.date;
                 })
                 .domain(this.xHist.domain())
@@ -91,14 +91,14 @@ export default {
                 .enter()
                 .append("rect")
                 .attr("class", "rangebar")
-                .attr("transform", d => {
-                    const mx = d3.max(d, b => {
+                .attr("transform", (d) => {
+                    const mx = d3.max(d, (b) => {
                         return b[this.chart.sensor.key];
                     });
                     const r = mx || mx === 0 ? "translate(" + this.xHist(d.x0) + "," + this.yHist(mx) + ")" : "translate(0,0)";
                     return r;
                 })
-                .attr("width", d => {
+                .attr("width", (d) => {
                     return this.xHist(d.x1) - this.xHist(d.x0) - 1;
                 })
                 .style("fill", (d, i) => {
@@ -106,8 +106,8 @@ export default {
                 })
                 .transition()
                 .duration(1000)
-                .attr("height", d => {
-                    const extent = d3.extent(d, b => {
+                .attr("height", (d) => {
+                    const extent = d3.extent(d, (b) => {
                         return b[this.chart.sensor.key];
                     });
                     const height = this.yHist(extent[1]) - this.yHist(extent[0]);
@@ -143,21 +143,21 @@ export default {
             bars.enter()
                 .append("rect")
                 .attr("class", "rangebar")
-                .attr("transform", d => {
-                    const mx = d3.max(d, b => {
+                .attr("transform", (d) => {
+                    const mx = d3.max(d, (b) => {
                         return b[this.chart.sensor.key];
                     });
                     const r = mx || mx === 0 ? "translate(" + this.xHist(d.x0) + "," + this.yHist(mx) + ")" : "translate(0,0)";
                     return r;
                 })
-                .attr("width", d => {
+                .attr("width", (d) => {
                     return this.xHist(d.x1) - this.xHist(d.x0) - 1;
                 })
                 .style("fill", (d, i) => {
                     return d.length > 0 ? "url(#grad-" + i + ")" : "none";
                 })
-                .attr("height", d => {
-                    const extent = d3.extent(d, b => {
+                .attr("height", (d) => {
+                    const extent = d3.extent(d, (b) => {
                         return b[this.chart.sensor.key];
                     });
                     const height = this.yHist(extent[1]) - this.yHist(extent[0]);
@@ -167,14 +167,14 @@ export default {
 
             // updating any existing bars
             bars.attr("height", 0)
-                .attr("transform", d => {
-                    const mx = d3.max(d, b => {
+                .attr("transform", (d) => {
+                    const mx = d3.max(d, (b) => {
                         return b[this.chart.sensor.key];
                     });
                     const r = mx || mx === 0 ? "translate(" + this.xHist(d.x0) + "," + this.yHist(mx) + ")" : "translate(0,0)";
                     return r;
                 })
-                .attr("width", d => {
+                .attr("width", (d) => {
                     return this.xHist(d.x1) - this.xHist(d.x0) - 1;
                 })
                 .style("fill", (d, i) => {
@@ -182,8 +182,8 @@ export default {
                 })
                 .transition()
                 .duration(1000)
-                .attr("height", d => {
-                    const extent = d3.extent(d, b => {
+                .attr("height", (d) => {
+                    const extent = d3.extent(d, (b) => {
                         return b[this.chart.sensor.key];
                     });
                     const height = this.yHist(extent[1]) - this.yHist(extent[0]);
@@ -225,7 +225,7 @@ export default {
                     .style(
                         "stop-color",
                         this.chart.colors(
-                            d3.max(bin, d => {
+                            d3.max(bin, (d) => {
                                 return d[this.chart.sensor.key];
                             })
                         )
@@ -238,7 +238,7 @@ export default {
                     .style(
                         "stop-color",
                         this.chart.colors(
-                            d3.median(bin, d => {
+                            d3.median(bin, (d) => {
                                 return d[this.chart.sensor.key];
                             })
                         )
@@ -251,7 +251,7 @@ export default {
                     .style(
                         "stop-color",
                         this.chart.colors(
-                            d3.min(bin, d => {
+                            d3.min(bin, (d) => {
                                 return d[this.chart.sensor.key];
                             })
                         )

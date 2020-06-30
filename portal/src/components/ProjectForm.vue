@@ -168,7 +168,7 @@ export default {
             const api = new FKApi();
             const data = this.createParams();
             if (this.sendingImage) {
-                api.addProject(data).then(project => {
+                api.addProject(data).then((project) => {
                     const params = {
                         type: this.imageType,
                         image: this.sendingImage,
@@ -182,7 +182,7 @@ export default {
                     });
                 });
             } else {
-                api.addProject(data).then(project => {
+                api.addProject(data).then((project) => {
                     this.$router.push({
                         name: "viewProject",
                         params: { id: project.id },
@@ -201,7 +201,7 @@ export default {
                     id: this.project.id,
                 };
                 api.uploadProjectImage(params).then(() => {
-                    api.updateProject(data).then(project => {
+                    api.updateProject(data).then((project) => {
                         this.$router.push({
                             name: "viewProject",
                             params: { id: project.id },
@@ -209,7 +209,7 @@ export default {
                     });
                 });
             } else {
-                api.updateProject(data).then(project => {
+                api.updateProject(data).then((project) => {
                     this.$router.push({
                         name: "viewProject",
                         params: { id: project.id },
@@ -259,7 +259,7 @@ export default {
             this.sendingImage = null;
             let valid = false;
             if (event.target.files.length > 0) {
-                this.acceptedImageTypes.forEach(t => {
+                this.acceptedImageTypes.forEach((t) => {
                     if (event.target.files[0].type.indexOf(t) > -1) {
                         valid = true;
                     }
@@ -273,7 +273,7 @@ export default {
             this.sendingImage = image;
             const reader = new FileReader();
             reader.readAsDataURL(image);
-            reader.onload = event => {
+            reader.onload = (event) => {
                 this.previewImage = event.target.result;
             };
         },

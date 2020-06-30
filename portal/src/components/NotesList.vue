@@ -57,11 +57,11 @@ export default {
         },
         getFieldNotes() {
             const api = new FKApi();
-            this.ids.forEach(id => {
-                api.getFieldNotes(id).then(result => {
+            this.ids.forEach((id) => {
+                api.getFieldNotes(id).then((result) => {
                     this.notes = _.concat(
                         this.notes,
-                        result.notes.map(n => {
+                        result.notes.map((n) => {
                             n.stationId = id;
                             if (n.category_key != "default") {
                                 n.title = categoryLabels[n.category_key];
@@ -83,7 +83,7 @@ export default {
             const fieldNoteId = event.target.getAttribute("data-id");
             if (window.confirm("Are you sure you want to delete this note?")) {
                 const api = new FKApi();
-                const note = this.notes.find(n => {
+                const note = this.notes.find((n) => {
                     return n.id == fieldNoteId;
                 });
                 const params = {
@@ -91,7 +91,7 @@ export default {
                     fieldNoteId: fieldNoteId,
                 };
                 api.deleteFieldNote(params).then(() => {
-                    const index = this.notes.findIndex(n => {
+                    const index = this.notes.findIndex((n) => {
                         return n.id == fieldNoteId;
                     });
                     if (index > -1) {

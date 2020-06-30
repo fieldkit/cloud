@@ -133,7 +133,7 @@ export default {
             email: {
                 required,
                 email,
-                taken: function () {
+                taken: function() {
                     return this.available;
                 },
             },

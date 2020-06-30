@@ -15,7 +15,7 @@ import App from "./App.vue";
 const AssetsPlugin = {
     install(Vue) {
         const loader = require.context("@/assets/", true, /\.png$/);
-        Vue.prototype.$loadAsset = path => {
+        Vue.prototype.$loadAsset = (path) => {
             return loader("./" + path);
         };
     },
@@ -29,28 +29,28 @@ Vue.use(Vuelidate);
 
 Vue.config.productionTip = false;
 
-Vue.filter("prettyDate", value => {
+Vue.filter("prettyDate", (value) => {
     if (!value) {
         return "N/A";
     }
     return moment(value).format("MM/DD/YYYY");
 });
 
-Vue.filter("prettyReading", sensor => {
+Vue.filter("prettyReading", (sensor) => {
     if (!sensor.reading) {
         return "--";
     }
     return sensor.reading.toFixed(1);
 });
 
-Vue.filter("prettyCoordinate", value => {
+Vue.filter("prettyCoordinate", (value) => {
     if (!value) {
         return "--";
     }
     return value.toFixed(3);
 });
 
-Vue.filter("prettyDuration", value => {
+Vue.filter("prettyDuration", (value) => {
     return moment.duration(value / 1000, "seconds").humanize();
 });
 
@@ -64,5 +64,5 @@ new Vue({
     i18n,
     router,
     store,
-    render: h => h(App),
+    render: (h) => h(App),
 }).$mount("#app");

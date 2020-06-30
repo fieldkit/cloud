@@ -185,7 +185,7 @@ export default {
             const params = Object.keys(this.$route.query);
             const stationParams = [];
             const chartParams = {};
-            params.forEach(p => {
+            params.forEach((p) => {
                 if (p.indexOf("start") > -1 || p.indexOf("end") > -1) {
                     this.$route.query[p] = parseInt(this.$route.query[p]);
                 }
@@ -204,7 +204,7 @@ export default {
                 }
             });
             if (stationParams.length > 0) {
-                stationParams.forEach(p => {
+                stationParams.forEach((p) => {
                     this.$emit("stationAdded", this.$route.query[p], chartParams[p]);
                 });
             } else {
@@ -227,7 +227,7 @@ export default {
             this.hideLoading();
         },
         noDataFound(station, chartId) {
-            const chart = this.charts.find(c => {
+            const chart = this.charts.find((c) => {
                 return c.id == chartId;
             });
             chart.station = station;
@@ -245,10 +245,10 @@ export default {
             const totalTime = data[deviceId].timeRange;
             const sensor = this.findSensorForChart(chartId, chartData, data[deviceId].sensors);
             const type = this.getChartType(chartId);
-            const extent = d3.extent(chartData, d => {
+            const extent = d3.extent(chartData, (d) => {
                 return d[sensor.key];
             });
-            const filteredData = chartData.filter(d => {
+            const filteredData = chartData.filter((d) => {
                 return d[sensor.key] === 0 || d[sensor.key];
             });
             // instead of totalTime, use the time that this sensor has data for
@@ -258,7 +258,7 @@ export default {
                 deviceId
             );
             const timeBtns = [];
-            this.timeButtons.forEach(b => {
+            this.timeButtons.forEach((b) => {
                 timeBtns.push(Object.assign({}, b));
             });
             const newChart = {
@@ -286,7 +286,7 @@ export default {
                     document.getElementById("main-loading").style.display = "none";
                 }
                 this.charts.push(newChart);
-                this.charts = _.sortBy(this.charts, c => {
+                this.charts = _.sortBy(this.charts, (c) => {
                     return c.id;
                 });
             } else {
@@ -308,7 +308,7 @@ export default {
             newChart.ref = "d3Chart" + id;
             newChart.parent = false;
             const timeBtns = [];
-            this.timeButtons.forEach(b => {
+            this.timeButtons.forEach((b) => {
                 timeBtns.push(Object.assign({}, b));
             });
             newChart.timeButtons = timeBtns;
@@ -347,7 +347,7 @@ export default {
             const sensorKey = this.$route.query[chartId + "sensor"]
                 ? this.$route.query[chartId + "sensor"]
                 : this.getSensorWithData(data, sensors);
-            const sensor = sensors.find(s => {
+            const sensor = sensors.find((s) => {
                 return s.key == sensorKey;
             });
             this.urlQuery[chartId + "sensor"] = sensor.key;
@@ -394,7 +394,7 @@ export default {
         },
         removeChart(event) {
             const id = event.target.getAttribute("data-id");
-            const index = this.charts.findIndex(c => {
+            const index = this.charts.findIndex((c) => {
                 return c.id == id;
             });
             // remove possibly orphaned scrubber
@@ -406,7 +406,7 @@ export default {
                 this.charts.splice(index, 1);
                 // remove all the associated params
                 const keys = Object.keys(this.urlQuery);
-                keys.forEach(k => {
+                keys.forEach((k) => {
                     if (k.indexOf(id) == 0) {
                         delete this.urlQuery[k];
                     }
@@ -425,7 +425,7 @@ export default {
                 const requestedRange = requested ? { start: requested[0], end: requested[1] } : {};
                 const ranges = { graph: parentTime, requested: requestedRange, datepicker: this.charts[0].datepickerRange };
                 const fromParent = true;
-                this.charts.forEach(c => {
+                this.charts.forEach((c) => {
                     if (!c.parent) {
                         this.updateChartTime(c, this.charts[0].days, ranges, fromParent);
                         // match timeButtons to parent
@@ -438,7 +438,7 @@ export default {
                     }
                 });
                 const chartContainers = document.getElementsByClassName("inner-chart-container");
-                Array.from(chartContainers).forEach(b => {
+                Array.from(chartContainers).forEach((b) => {
                     b.style["margin-top"] = "0";
                 });
                 this.updateRoute();
@@ -461,7 +461,7 @@ export default {
                 }
             });
             const chartContainers = document.getElementsByClassName("inner-chart-container");
-            Array.from(chartContainers).forEach(b => {
+            Array.from(chartContainers).forEach((b) => {
                 b.style["margin-top"] = "6px";
             });
         },
@@ -469,7 +469,7 @@ export default {
             // the chart type on a single chart instance has changed
             const selected = this.chartOptions[event.target.selectedIndex].text;
             const id = event.target.getAttribute("data-id");
-            const chart = this.charts.find(c => {
+            const chart = this.charts.find((c) => {
                 return c.id == id;
             });
             chart.type = selected;
@@ -485,7 +485,7 @@ export default {
             this.$refs[chart.ref][0].setRequestedTime(ranges.requested);
             this.urlQuery[chart.id + "start"] = ranges.graph.start.getTime();
             this.urlQuery[chart.id + "end"] = ranges.graph.end.getTime();
-            chart.timeButtons.forEach(b => {
+            chart.timeButtons.forEach((b) => {
                 b.active = false;
             });
             if (!noEmit) {
@@ -494,7 +494,7 @@ export default {
         },
         onPopoverWillShow(event) {
             const dataId = event.firstChild.getAttribute("data-id");
-            const chart = this.charts.find(c => {
+            const chart = this.charts.find((c) => {
                 return c.id == dataId;
             });
             // store value to compare to prevent hovering from
@@ -503,7 +503,7 @@ export default {
         },
         onPopoverDidHide(event) {
             const dataId = event.firstChild.getAttribute("data-id");
-            const chart = this.charts.find(c => {
+            const chart = this.charts.find((c) => {
                 return c.id == dataId;
             });
             // using this event to avoid triggering date changes
@@ -518,7 +518,7 @@ export default {
                 }
                 const ranges = { graph: chart.datepickerRange, requested: chart.datepickerRange, datepicker: chart.datepickerRange };
                 const fromParent = false;
-                this.charts.forEach(c => {
+                this.charts.forEach((c) => {
                     if (c.id == chart.id || updateAll) {
                         this.updateChartTime(c, 0, ranges, fromParent);
                     }
@@ -529,7 +529,7 @@ export default {
         setTimeRangeByDays(event) {
             // each chart now has its own time range buttons so find out which one
             const dataId = event.id ? event.id : event.target.getAttribute("data-id");
-            const chart = this.charts.find(c => {
+            const chart = this.charts.find((c) => {
                 return c.id == dataId;
             });
             // method can be called by time buttons,
@@ -550,11 +550,11 @@ export default {
             const updateAll = chart.parent && this.linkedCharts;
             const ranges = { graph: range, requested: requestedRange, datepicker: range };
             const fromParent = false;
-            this.charts.forEach(c => {
+            this.charts.forEach((c) => {
                 if (c.id == chart.id || updateAll) {
                     this.updateChartTime(c, chart.days, ranges, fromParent);
                     // display active state for appropriate button
-                    c.timeButtons.forEach(b => {
+                    c.timeButtons.forEach((b) => {
                         if (b.value == chart.days) {
                             b.active = true;
                         }
@@ -578,7 +578,7 @@ export default {
                 fromParent = false;
                 this.unlinkCharts();
             }
-            this.charts.forEach(c => {
+            this.charts.forEach((c) => {
                 if (c.id == zoomed.id || updateAll) {
                     this.updateChartTime(c, 0, ranges, fromParent);
                 }
@@ -586,13 +586,13 @@ export default {
             this.updateRoute();
         },
         onTreeSelect(selection, instanceId) {
-            const chart = this.charts.find(c => {
+            const chart = this.charts.find((c) => {
                 return c.id == instanceId;
             });
             chart.noData = false;
             let sensor;
             if (selection.key) {
-                sensor = this.allSensors.find(s => {
+                sensor = this.allSensors.find((s) => {
                     return s.key == selection.key;
                 });
                 this.urlQuery[chart.id + "sensor"] = selection.key;
@@ -630,10 +630,10 @@ export default {
         chartSensorChanged(selected, chart) {
             const dataSource = chart.current.length > 0 ? chart.current : chart.overall;
             // the sensor type on a single chart instance has changed
-            const filteredData = dataSource.filter(d => {
+            const filteredData = dataSource.filter((d) => {
                 return d[selected.key] === 0 || d[selected.key];
             });
-            const extent = d3.extent(filteredData, d => {
+            const extent = d3.extent(filteredData, (d) => {
                 return d[selected.key];
             });
             if (!chart.parent && this.linkedCharts) {
@@ -644,7 +644,7 @@ export default {
                 const updateAll = chart.parent && this.linkedCharts;
                 const ranges = { graph: range, requested: {}, datepicker: range };
                 const fromParent = true;
-                this.charts.forEach(c => {
+                this.charts.forEach((c) => {
                     if (c.id == chart.id || updateAll) {
                         if (c.id == chart.id) {
                             const noEmit = true;
@@ -681,7 +681,7 @@ export default {
             }
         },
         resetChartData(data, deviceId, chartId) {
-            const chart = this.charts.find(c => {
+            const chart = this.charts.find((c) => {
                 return c.id == chartId;
             });
             // not checking pending...
@@ -694,22 +694,22 @@ export default {
         },
         updateChartData(data, chartId, fromParent) {
             // only update url for the chart that emitted this change
-            const chart = this.charts.find(c => {
+            const chart = this.charts.find((c) => {
                 return c.id == chartId;
             });
             if (!chart) {
                 // check pending
-                const pendingIndex = this.pending.findIndex(c => {
+                const pendingIndex = this.pending.findIndex((c) => {
                     return c.id == chartId;
                 });
                 if (pendingIndex > -1) {
                     const pendingChart = this.pending.splice(pendingIndex, 1)[0];
-                    const filteredData = data.filter(d => {
+                    const filteredData = data.filter((d) => {
                         return d[pendingChart.sensor.key] === 0 || d[pendingChart.sensor.key];
                     });
                     pendingChart.current = data;
                     const range = this.getNewRange(pendingChart, filteredData);
-                    const extent = d3.extent(filteredData, d => {
+                    const extent = d3.extent(filteredData, (d) => {
                         return d[pendingChart.sensor.key];
                     });
                     pendingChart.start = range.start;
@@ -718,17 +718,17 @@ export default {
                     pendingChart.extent = extent;
                     this.$emit("sensorUpdate", pendingChart);
                     this.charts.push(pendingChart);
-                    this.charts = _.sortBy(this.charts, c => {
+                    this.charts = _.sortBy(this.charts, (c) => {
                         return c.id;
                     });
                     this.updateIds();
                 }
             } else {
                 chart.current = data;
-                const filteredData = data.filter(d => {
+                const filteredData = data.filter((d) => {
                     return d[chart.sensor.key] === 0 || d[chart.sensor.key];
                 });
-                const extent = d3.extent(filteredData, d => {
+                const extent = d3.extent(filteredData, (d) => {
                     return d[chart.sensor.key];
                 });
                 if (this.refreshedSensor) {
@@ -748,14 +748,14 @@ export default {
                 this.$router.push({ name: "viewData", query: this.urlQuery });
                 this.prevQuery = {};
                 const keys = Object.keys(this.urlQuery);
-                keys.forEach(k => {
+                keys.forEach((k) => {
                     this.prevQuery[k] = this.urlQuery[k];
                 });
             }
         },
         updateIds() {
             const stationIds = _.uniq(
-                _.map(this.charts, c => {
+                _.map(this.charts, (c) => {
                     return c.station.id;
                 })
             );
@@ -768,13 +768,13 @@ export default {
             // refresh window (back or forward browser button pressed)
             this.refreshedSensor = null;
             const params = Object.keys(this.$route.query);
-            params.forEach(p => {
+            params.forEach((p) => {
                 // use station param to get chart id
                 let chartId, stationId;
                 if (p.indexOf("station") > -1) {
                     chartId = p.split("station")[0];
                     stationId = this.$route.query[p];
-                    const chart = this.charts.find(c => {
+                    const chart = this.charts.find((c) => {
                         return c.id == chartId;
                     });
                     if (chart) {
@@ -797,14 +797,14 @@ export default {
             });
             if (this.charts.length > 1 && params.indexOf("stationId") != 0) {
                 const chartsToDelete = [];
-                this.charts.forEach(c => {
+                this.charts.forEach((c) => {
                     if (params.indexOf(c.id + "station") == -1) {
                         // flag chart for removal
                         chartsToDelete.push(c.id);
                     }
                 });
-                chartsToDelete.forEach(chartId => {
-                    const index = this.charts.findIndex(c => {
+                chartsToDelete.forEach((chartId) => {
+                    const index = this.charts.findIndex((c) => {
                         return c.id == chartId;
                     });
                     if (index > -1) {
@@ -843,7 +843,7 @@ export default {
         },
         resetSensor(stationId, chart) {
             if (this.$route.query[chart.id + "sensor"]) {
-                const sensor = this.allSensors.find(s => {
+                const sensor = this.allSensors.find((s) => {
                     return s.key == this.$route.query[chart.id + "sensor"];
                 });
                 if (chart.sensor.key != sensor.key) {
@@ -852,10 +852,10 @@ export default {
                     // only update data if same station
                     if (stationId == chart.station.id) {
                         chart.treeSelectValue = chart.station.name + sensor.key;
-                        const filteredData = chart.current.filter(d => {
+                        const filteredData = chart.current.filter((d) => {
                             return d[sensor.key] === 0 || d[sensor.key];
                         });
-                        const extent = d3.extent(filteredData, d => {
+                        const extent = d3.extent(filteredData, (d) => {
                             return d[sensor.key];
                         });
                         const range = this.getNewRange(chart, filteredData);

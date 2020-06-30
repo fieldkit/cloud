@@ -236,8 +236,8 @@ class FKApi {
 
     private invoke(params): Promise<any> {
         return axios(params).then(
-            response => this.handle(response),
-            error => {
+            (response) => this.handle(response),
+            (error) => {
                 const response = error.response;
 
                 if (response.status === 401) {
@@ -285,14 +285,14 @@ class FKApi {
             url: this.baseUrl + "/refresh",
             data: requestBody,
         }).then(
-            response => {
+            (response) => {
                 return this.handleLogin(response).then(() => {
                     console.log("api: retry original");
                     original.headers.Authorization = this.token.getHeader();
                     return this.invoke(_.extend({ refreshed: true }, original));
                 });
             },
-            error => this.logout().then(() => Promise.reject(error))
+            (error) => this.logout().then(() => Promise.reject(error))
         );
     }
 
@@ -320,7 +320,7 @@ class FKApi {
                 email: email,
                 password: password,
             },
-        }).then(response => this.handleLogin(response));
+        }).then((response) => this.handleLogin(response));
     }
 
     private handleLogin(response): Promise<string> {
@@ -866,7 +866,7 @@ class FKApi {
             headers: {
                 "Content-Type": "application/json",
             },
-        }).then(response => this.handle(response));
+        }).then((response) => this.handle(response));
     }
 
     getNativeLand(location) {
@@ -877,7 +877,7 @@ class FKApi {
             headers: {
                 "Content-Type": "application/json",
             },
-        }).then(response => this.handle(response));
+        }).then((response) => this.handle(response));
     }
 }
 

@@ -33,13 +33,13 @@ export default {
     computed: {
         statistics() {
             const totalReadings = _(this.projectStations)
-                .map(ps => ps.totalReadings)
+                .map((ps) => ps.totalReadings)
                 .sum();
             const first = _(this.projectStations)
-                .map(ps => ps.receivedAt)
+                .map((ps) => ps.receivedAt)
                 .min();
             const last = _(this.projectStations)
-                .map(ps => ps.receivedAt)
+                .map((ps) => ps.receivedAt)
                 .max();
             return {
                 totalReadings: totalReadings,

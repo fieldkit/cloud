@@ -87,7 +87,7 @@ const routes = [
         path: "/dashboard/projects/:id",
         name: "viewProject",
         component: ProjectView,
-        props: route => {
+        props: (route) => {
             return {
                 id: Number(route.params.id),
             };
@@ -144,7 +144,7 @@ const routes = [
         path: "/dashboard/stations/:id",
         name: "viewStation",
         component: StationsView,
-        props: route => {
+        props: (route) => {
             return {
                 id: Number(route.params.id),
             };
@@ -181,7 +181,7 @@ export default function routerFactory(store) {
                     chain("/login");
                 }
             }
-        } else if (to.matched.some(record => record.meta.secured)) {
+        } else if (to.matched.some((record) => record.meta.secured)) {
             if (store.getters.isAuthenticated) {
                 chain();
                 return;

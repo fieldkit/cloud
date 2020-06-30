@@ -61,12 +61,12 @@ export default {
             }
 
             const stationFeatures = [];
-            const mappable = this.stations.filter(s => {
+            const mappable = this.stations.filter((s) => {
                 return (
                     s.location && s.location.latitude && s.location.longitude && s.location.latitude != 1000 && s.location.longitude != 1000
                 );
             });
-            mappable.forEach(s => {
+            mappable.forEach((s) => {
                 const coordinates = [s.location.latitude, s.location.longitude];
                 if (mappable.length == 1) {
                     this.map.setCenter({
@@ -167,10 +167,10 @@ export default {
                 this.map.setZoom(6);
             }
 
-            this.map.on("click", "station-markers", e => {
+            this.map.on("click", "station-markers", (e) => {
                 const name = e.features[0].properties.title;
                 console.log("map: click", name);
-                const station = this.stations.find(s => s.name == name);
+                const station = this.stations.find((s) => s.name == name);
                 console.log("map: showSummary");
                 this.$emit("showSummary", station);
             });

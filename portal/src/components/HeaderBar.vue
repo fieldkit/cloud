@@ -29,7 +29,7 @@ export default {
     name: "HeaderBar",
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
-        ...mapState({ user: s => s.user.user }),
+        ...mapState({ user: (s) => s.user.user }),
         userImage() {
             return this.$config.baseUrl + "/user/" + this.$store.state.user.user.id + "/media";
         },

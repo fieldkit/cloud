@@ -28,7 +28,7 @@ const actions = {
         return null;
     },
     [ActionTypes.AUTHENTICATE]: ({ commit, dispatch, state }: { commit: any; dispatch: any; state: UserState }, payload: LoginPayload) => {
-        return new FkApi().login(payload.email, payload.password).then(token => {
+        return new FkApi().login(payload.email, payload.password).then((token) => {
             commit(UPDATE_TOKEN, token);
             return dispatch(REFRESH_CURRENT_USER).then(() => {
                 return new LoginResponse(token);
@@ -40,7 +40,7 @@ const actions = {
         commit(CURRENT_USER, null);
     },
     [REFRESH_CURRENT_USER]: ({ commit, dispatch, state }: { commit: any; dispatch: any; state: UserState }) => {
-        return new FkApi().getCurrentUser().then(user => {
+        return new FkApi().getCurrentUser().then((user) => {
             commit(CURRENT_USER, user);
             return user;
         });
