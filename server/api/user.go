@@ -473,6 +473,12 @@ func (c *UserController) Recovery(ctx *app.RecoveryUserContext) error {
 		return err
 	}
 
+	if _, err := c.options.Database.ExecContext(ctx, `
+		DELETE FROM fieldkit.recovery_token WHERE user_id = $1
+		`, user.ID); err != nil {
+		return err
+	}
+
 	if err := c.options.Database.NamedGetContext(ctx, user, `
 		UPDATE fieldkit.user SET password = :password, valid = true WHERE id = :id RETURNING *
 		`, user); err != nil {
