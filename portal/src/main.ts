@@ -50,6 +50,10 @@ Vue.filter("prettyCoordinate", value => {
     return value.toFixed(3);
 });
 
+Vue.filter("prettyDuration", value => {
+    return moment.duration(value / 1000, "seconds").humanize();
+});
+
 const store = storeFactory();
 store.commit(MutationTypes.INITIALIZE);
 

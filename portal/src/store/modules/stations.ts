@@ -122,6 +122,12 @@ export class DisplayProject {
             .uniqBy(m => m.name)
             .map(m => new ProjectModule(m.name, null))
             .value();
+        if (project.startTime && project.endTime) {
+            const start = new Date(project.startTime);
+            const end = new Date(project.endTime);
+            end.setDate(end.getDate() + 1); // FK-1927
+            this.duration = end.getTime() - start.getTime();
+        }
     }
 }
 

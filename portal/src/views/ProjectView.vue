@@ -31,7 +31,12 @@
                         :userStations="stations"
                         @viewProfile="switchToPublic"
                     />
-                    <ProjectPublic v-if="!isAdministrator && displayProject" :user="user" :displayProject="displayProject" />
+                    <ProjectPublic
+                        v-if="!isAdministrator && displayProject"
+                        :user="user"
+                        :displayProject="displayProject"
+                        :userStations="stations"
+                    />
                 </div>
             </div>
         </div>
@@ -68,9 +73,9 @@ export default {
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
-            user: s => s.user.user,
-            stations: s => s.stations.stations.user,
-            userProjects: s => s.stations.projects.user,
+            user: (s) => s.user.user,
+            stations: (s) => s.stations.stations.user,
+            userProjects: (s) => s.stations.projects.user,
             displayProject() {
                 return this.$store.getters.projectsById[this.id];
             },

@@ -13,9 +13,9 @@
                         {{ project.location }}
                     </div>
                     <div class="time-container">
-                        <div class="time" v-if="project.startTime">Started {{ project.startTime | prettyDate }}</div>
-                        <span v-if="project.startTime && project.uptime">&nbsp;|&nbsp;</span>
-                        <div class="time" v-if="project.uptime">{{ project.uptime | prettyTime }}</div>
+                        <div class="time" v-if="project.startTime">Started: {{ project.startTime | prettyDate }}</div>
+                        <span v-if="project.startTime && displayProject.duration">&nbsp;|&nbsp;</span>
+                        <div class="time" v-if="displayProject.duration">{{ displayProject.duration | prettyDuration }}</div>
                     </div>
                     <div class="project-detail">{{ project.description }}</div>
                     <div class="module-icons">
@@ -56,12 +56,12 @@
                 :admin="false"
                 :mapContainerSize="mapContainerSize"
                 :listSize="listSize"
-                @loaded="saveStationsData"
+                :userStations="userStations"
             />
 
             <div class="team-container">
                 <div class="section-heading">{{ getTeamHeading() }}</div>
-                <div v-for="user in users" v-bind:key="user.user.id" class="team-member">
+                <div v-for="user in displayProject.users" v-bind:key="user.user.id" class="team-member">
                     <img v-if="user.user.mediaUrl" alt="User image" :src="getUserImage(user)" class="user-icon" />
                     <span class="user-name">{{ user.user.name }}</span>
                 </div>
@@ -105,7 +105,7 @@ export default {
             },
         };
     },
-    props: { user: {}, displayProject: {}, users: {} },
+    props: { user: {}, userStations: {}, displayProject: {} },
     computed: {
         project() {
             return this.displayProject.project;
@@ -114,7 +114,7 @@ export default {
             return this.$store.getters.projectsById[this.displayProject.id].stations;
         },
         projectModules() {
-            return this.$store.getters.projectsById[this.displayProject.id].modules.map(m => {
+            return this.$store.getters.projectsById[this.displayProject.id].modules.map((m) => {
                 return {
                     name: m.name,
                     url: this.getModuleImg(m),
@@ -141,8 +141,8 @@ export default {
             return this.$loadAsset("modules-lg/" + utils.getModuleImg(module));
         },
         getTeamHeading() {
-            const members = this.users.length == 1 ? "member" : "members";
-            return "Project Team (" + this.users.length + " " + members + ")";
+            const members = this.displayProject.users.length == 1 ? "member" : "members";
+            return "Project Team (" + this.displayProject.users.length + " " + members + ")";
         },
     },
 };

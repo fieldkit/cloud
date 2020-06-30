@@ -49,11 +49,11 @@
                     <div class="time-and-location">
                         <div class="time" v-if="project.startTime">
                             <img alt="Calendar" src="../assets/icon-calendar.png" class="icon" />
-                            Started {{ project.startTime | prettyDate }}
+                            Start date: {{ project.startTime | prettyDate }}
                         </div>
-                        <div class="time" v-if="project.duration">
+                        <div class="time" v-if="displayProject.duration">
                             <img alt="Time" src="../assets/icon-time.png" class="icon" />
-                            {{ displayProject.duration | prettyDuration }}
+                            Duration: {{ displayProject.duration | prettyDuration }}
                         </div>
                         <div class="location" v-if="project.location">
                             <img alt="Location" src="../assets/icon-location.png" class="icon" />
@@ -223,7 +223,7 @@ export default {
             return this.displayProject.project;
         },
         projectModules() {
-            return this.displayProject.modules.map(m => {
+            return this.displayProject.modules.map((m) => {
                 return {
                     name: m.name,
                     url: this.getModuleImg(m),
@@ -271,7 +271,7 @@ export default {
                 if (this.selectedRole == -1) {
                     this.selectedRole = 0;
                 }
-                const role = this.roleOptions.find(r => {
+                const role = this.roleOptions.find((r) => {
                     return r.code == this.selectedRole;
                 });
                 const params = { email: this.inviteEmail, projectId: this.project.id, role: this.selectedRole };
@@ -293,7 +293,7 @@ export default {
         removeUser(event) {
             const id = event.target.getAttribute("data-user");
             if (confirm("Are you sure you want to remove this team member?")) {
-                const index = this.projectUsers.findIndex(u => {
+                const index = this.projectUsers.findIndex((u) => {
                     return u.user.id == id;
                 });
                 const params = {
