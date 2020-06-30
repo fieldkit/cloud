@@ -42,11 +42,11 @@ func TestGetStationsMine(t *testing.T) {
 				"images": "<<PRESENCE>>",
 				"updated": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
-				"device_id": "<<PRESENCE>>",
+				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
-				"read_only": "<<PRESENCE>>",
+				"readOnly": "<<PRESENCE>>",
 				"configurations": { "all": [] }
 			},
 			{
@@ -54,11 +54,11 @@ func TestGetStationsMine(t *testing.T) {
 				"images": "<<PRESENCE>>",
 				"updated": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
-				"device_id": "<<PRESENCE>>",
+				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
-				"read_only": "<<PRESENCE>>",
+				"readOnly": "<<PRESENCE>>",
 				"configurations": { "all": [] }
 			},
 			{
@@ -66,11 +66,11 @@ func TestGetStationsMine(t *testing.T) {
 				"images": "<<PRESENCE>>",
 				"updated": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
-				"device_id": "<<PRESENCE>>",
+				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
-				"read_only": "<<PRESENCE>>",
+				"readOnly": "<<PRESENCE>>",
 				"configurations": { "all": [] }
 			},
 			{
@@ -78,11 +78,11 @@ func TestGetStationsMine(t *testing.T) {
 				"images": "<<PRESENCE>>",
 				"updated": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
-				"device_id": "<<PRESENCE>>",
+				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
-				"read_only": "<<PRESENCE>>",
+				"readOnly": "<<PRESENCE>>",
 				"configurations": { "all": [] }
 			},
 			{
@@ -90,11 +90,11 @@ func TestGetStationsMine(t *testing.T) {
 				"images": "<<PRESENCE>>",
 				"updated": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
-				"device_id": "<<PRESENCE>>",
+				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
-				"read_only": "<<PRESENCE>>",
+				"readOnly": "<<PRESENCE>>",
 				"configurations": { "all": [] }
 			}
 		]
@@ -125,11 +125,11 @@ func TestGetStation(t *testing.T) {
 		"images": "<<PRESENCE>>",
 		"updated": "<<PRESENCE>>",
 		"owner": "<<PRESENCE>>",
-		"device_id": "<<PRESENCE>>",
+		"deviceId": "<<PRESENCE>>",
 		"uploads": "<<PRESENCE>>",
 		"name": "<<PRESENCE>>",
 		"photos": "<<PRESENCE>>",
-		"read_only": "<<PRESENCE>>",
+		"readOnly": "<<PRESENCE>>",
 		"configurations": { "all": [] }
 	}`)
 }
@@ -160,11 +160,11 @@ func TestGetStationsProject(t *testing.T) {
 				"images": "<<PRESENCE>>",
 				"updated": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
-				"device_id": "<<PRESENCE>>",
+				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
-				"read_only": "<<PRESENCE>>",
+				"readOnly": "<<PRESENCE>>",
 				"configurations": { "all": [] }
 			},
 			{
@@ -172,11 +172,11 @@ func TestGetStationsProject(t *testing.T) {
 				"images": "<<PRESENCE>>",
 				"updated": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
-				"device_id": "<<PRESENCE>>",
+				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
-				"read_only": "<<PRESENCE>>",
+				"readOnly": "<<PRESENCE>>",
 				"configurations": { "all": [] }
 			},
 			{
@@ -184,11 +184,11 @@ func TestGetStationsProject(t *testing.T) {
 				"images": "<<PRESENCE>>",
 				"updated": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
-				"device_id": "<<PRESENCE>>",
+				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
-				"read_only": "<<PRESENCE>>",
+				"readOnly": "<<PRESENCE>>",
 				"configurations": { "all": [] }
 			},
 			{
@@ -196,11 +196,11 @@ func TestGetStationsProject(t *testing.T) {
 				"images": "<<PRESENCE>>",
 				"updated": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
-				"device_id": "<<PRESENCE>>",
+				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
-				"read_only": "<<PRESENCE>>",
+				"readOnly": "<<PRESENCE>>",
 				"configurations": { "all": [] }
 			},
 			{
@@ -208,11 +208,11 @@ func TestGetStationsProject(t *testing.T) {
 				"images": "<<PRESENCE>>",
 				"updated": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
-				"device_id": "<<PRESENCE>>",
+				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
-				"read_only": "<<PRESENCE>>",
+				"readOnly": "<<PRESENCE>>",
 				"configurations": { "all": [] }
 			}
 		]
@@ -234,7 +234,7 @@ func TestAddNewStation(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			DeviceID string `json:"device_id"`
+			DeviceID string `json:"deviceId"`
 			Name     string `json:"name"`
 		}{
 			DeviceID: station.DeviceIDHex(),
@@ -263,7 +263,7 @@ func TestAddStationAlreadyMine(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			DeviceID string `json:"device_id"`
+			DeviceID string `json:"deviceId"`
 			Name     string `json:"name"`
 		}{
 			DeviceID: fd.Stations[0].DeviceIDHex(),
@@ -295,7 +295,7 @@ func TestAddStationAlreadyOthers(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			DeviceID string `json:"device_id"`
+			DeviceID string `json:"deviceId"`
 			Name     string `json:"name"`
 		}{
 			DeviceID: fd.Stations[0].DeviceIDHex(),
@@ -475,15 +475,15 @@ func TestGetStationUpdatedWithProtobufStatus(t *testing.T) {
 		"images": "<<PRESENCE>>",
 		"updated": "<<PRESENCE>>",
 		"owner": "<<PRESENCE>>",
-		"device_id": "<<PRESENCE>>",
+		"deviceId": "<<PRESENCE>>",
 		"uploads": "<<PRESENCE>>",
 		"name": "<<PRESENCE>>",
 		"photos": "<<PRESENCE>>",
-		"read_only": "<<PRESENCE>>",
+		"readOnly": "<<PRESENCE>>",
 		"battery": "<<PRESENCE>>",
 		"location": "<<PRESENCE>>",
-		"memory_used": "<<PRESENCE>>",
-		"memory_available": "<<PRESENCE>>",
+		"memoryUsed": "<<PRESENCE>>",
+		"memoryAvailable": "<<PRESENCE>>",
 		"configurations": { "all": [ "<<PRESENCE>>" ] }
 	}`)
 }

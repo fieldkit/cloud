@@ -46,6 +46,8 @@ type StationFullView struct {
 	Configurations     *StationConfigurationsView
 	Updated            *int64
 	LocationName       *string
+	PlaceName          *string
+	NativeLandName     *string
 	Location           *StationLocationView
 }
 
@@ -148,21 +150,23 @@ var (
 			"id",
 			"name",
 			"owner",
-			"device_id",
+			"deviceId",
 			"uploads",
 			"images",
 			"photos",
-			"read_only",
+			"readOnly",
 			"battery",
-			"recording_started_at",
-			"memory_used",
-			"memory_available",
-			"firmware_number",
-			"firmware_time",
+			"recordingStartedAt",
+			"memoryUsed",
+			"memoryAvailable",
+			"firmwareNumber",
+			"firmwareTime",
 			"configurations",
 			"updated",
 			"location",
-			"location_name",
+			"locationName",
+			"placeName",
+			"nativeLandName",
 		},
 	}
 	// StationsFullMap is a map of attribute names in result type StationsFull
@@ -179,21 +183,23 @@ var (
 			"id",
 			"name",
 			"owner",
-			"device_id",
+			"deviceId",
 			"uploads",
 			"images",
 			"photos",
-			"read_only",
+			"readOnly",
 			"battery",
-			"recording_started_at",
-			"memory_used",
-			"memory_available",
-			"firmware_number",
-			"firmware_time",
+			"recordingStartedAt",
+			"memoryUsed",
+			"memoryAvailable",
+			"firmwareNumber",
+			"firmwareTime",
 			"configurations",
 			"updated",
 			"location",
-			"location_name",
+			"locationName",
+			"placeName",
+			"nativeLandName",
 		},
 	}
 )
@@ -235,7 +241,7 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("owner", "result"))
 	}
 	if result.DeviceID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("device_id", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("deviceId", "result"))
 	}
 	if result.Uploads == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("uploads", "result"))
@@ -247,7 +253,7 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("photos", "result"))
 	}
 	if result.ReadOnly == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("read_only", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("readOnly", "result"))
 	}
 	if result.Configurations == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("configurations", "result"))
@@ -312,7 +318,7 @@ func ValidateStationUploadView(result *StationUploadView) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "result"))
 	}
 	if result.UploadID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("upload_id", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("uploadId", "result"))
 	}
 	if result.Size == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("size", "result"))
@@ -368,7 +374,7 @@ func ValidateStationConfigurationView(result *StationConfigurationView) (err err
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
 	}
 	if result.ProvisionID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("provision_id", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("provisionId", "result"))
 	}
 	if result.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "result"))
@@ -422,7 +428,7 @@ func ValidateStationSensorView(result *StationSensorView) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
 	}
 	if result.UnitOfMeasure == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("unitOfMeasure", "result"))
 	}
 	if result.Key == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("key", "result"))

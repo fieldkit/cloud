@@ -61,17 +61,17 @@ type FirmwareStatisticsUnauthorizedResponseBody string
 type StationConfigurationResponseBody struct {
 	ID           int64                        `form:"id" json:"id" xml:"id"`
 	Time         int64                        `form:"time" json:"time" xml:"time"`
-	ProvisionID  int64                        `form:"provision_id" json:"provision_id" xml:"provision_id"`
-	MetaRecordID *int64                       `form:"meta_record_id,omitempty" json:"meta_record_id,omitempty" xml:"meta_record_id,omitempty"`
-	SourceID     *int32                       `form:"source_id,omitempty" json:"source_id,omitempty" xml:"source_id,omitempty"`
+	ProvisionID  int64                        `form:"provisionId" json:"provisionId" xml:"provisionId"`
+	MetaRecordID *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
+	SourceID     *int32                       `form:"sourceId,omitempty" json:"sourceId,omitempty" xml:"sourceId,omitempty"`
 	Modules      []*StationModuleResponseBody `form:"modules" json:"modules" xml:"modules"`
 }
 
 // StationModuleResponseBody is used to define fields on response body types.
 type StationModuleResponseBody struct {
 	ID           int64                        `form:"id" json:"id" xml:"id"`
-	HardwareID   *string                      `form:"hardware_id,omitempty" json:"hardware_id,omitempty" xml:"hardware_id,omitempty"`
-	MetaRecordID *int64                       `form:"meta_record_id,omitempty" json:"meta_record_id,omitempty" xml:"meta_record_id,omitempty"`
+	HardwareID   *string                      `form:"hardwareId,omitempty" json:"hardwareId,omitempty" xml:"hardwareId,omitempty"`
+	MetaRecordID *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
 	Name         string                       `form:"name" json:"name" xml:"name"`
 	Position     int32                        `form:"position" json:"position" xml:"position"`
 	Flags        int32                        `form:"flags" json:"flags" xml:"flags"`
@@ -82,7 +82,7 @@ type StationModuleResponseBody struct {
 // StationSensorResponseBody is used to define fields on response body types.
 type StationSensorResponseBody struct {
 	Name          string                     `form:"name" json:"name" xml:"name"`
-	UnitOfMeasure string                     `form:"unit_of_measure" json:"unit_of_measure" xml:"unit_of_measure"`
+	UnitOfMeasure string                     `form:"unitOfMeasure" json:"unitOfMeasure" xml:"unitOfMeasure"`
 	Reading       *SensorReadingResponseBody `form:"reading,omitempty" json:"reading,omitempty" xml:"reading,omitempty"`
 	Key           string                     `form:"key" json:"key" xml:"key"`
 	Ranges        []*SensorRangeResponseBody `form:"ranges" json:"ranges" xml:"ranges"`

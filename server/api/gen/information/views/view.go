@@ -118,7 +118,7 @@ func ValidateStationConfigurationView(result *StationConfigurationView) (err err
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
 	}
 	if result.ProvisionID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("provision_id", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("provisionId", "result"))
 	}
 	if result.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "result"))
@@ -172,7 +172,7 @@ func ValidateStationSensorView(result *StationSensorView) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
 	}
 	if result.UnitOfMeasure == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("unitOfMeasure", "result"))
 	}
 	if result.Key == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("key", "result"))

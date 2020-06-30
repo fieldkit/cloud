@@ -445,6 +445,8 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 		FirmwareTime:    sf.Station.FirmwareTime,
 		Updated:         sf.Station.UpdatedAt.Unix() * 1000,
 		LocationName:    sf.Station.LocationName,
+		PlaceName:       sf.Station.PlaceName,
+		NativeLandName:  sf.Station.NativeLandName,
 		Location:        transformLocation(sf),
 		Owner: &station.StationOwner{
 			ID:   sf.Owner.ID,

@@ -17,9 +17,9 @@ import (
 // request body.
 type AddRequestBody struct {
 	Name         string  `form:"name" json:"name" xml:"name"`
-	DeviceID     string  `form:"device_id" json:"device_id" xml:"device_id"`
-	LocationName *string `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
-	StatusPb     *string `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
+	DeviceID     string  `form:"deviceId" json:"deviceId" xml:"deviceId"`
+	LocationName *string `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
+	StatusPb     *string `form:"statusPb,omitempty" json:"statusPb,omitempty" xml:"statusPb,omitempty"`
 }
 
 // UpdateRequestBody is the type of the "station" service "update" endpoint
@@ -36,20 +36,22 @@ type AddResponseBody struct {
 	ID                 *int32                             `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name               *string                            `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	Owner              *StationOwnerResponseBody          `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
-	DeviceID           *string                            `form:"device_id,omitempty" json:"device_id,omitempty" xml:"device_id,omitempty"`
+	DeviceID           *string                            `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	Uploads            []*StationUploadResponseBody       `form:"uploads,omitempty" json:"uploads,omitempty" xml:"uploads,omitempty"`
 	Images             []*ImageRefResponseBody            `form:"images,omitempty" json:"images,omitempty" xml:"images,omitempty"`
 	Photos             *StationPhotosResponseBody         `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
-	ReadOnly           *bool                              `form:"read_only,omitempty" json:"read_only,omitempty" xml:"read_only,omitempty"`
+	ReadOnly           *bool                              `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
 	Battery            *float32                           `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
-	RecordingStartedAt *int64                             `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
-	MemoryUsed         *int32                             `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
-	MemoryAvailable    *int32                             `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
-	FirmwareNumber     *int32                             `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
-	FirmwareTime       *int64                             `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	RecordingStartedAt *int64                             `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
+	MemoryUsed         *int32                             `form:"memoryUsed,omitempty" json:"memoryUsed,omitempty" xml:"memoryUsed,omitempty"`
+	MemoryAvailable    *int32                             `form:"memoryAvailable,omitempty" json:"memoryAvailable,omitempty" xml:"memoryAvailable,omitempty"`
+	FirmwareNumber     *int32                             `form:"firmwareNumber,omitempty" json:"firmwareNumber,omitempty" xml:"firmwareNumber,omitempty"`
+	FirmwareTime       *int64                             `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
 	Configurations     *StationConfigurationsResponseBody `form:"configurations,omitempty" json:"configurations,omitempty" xml:"configurations,omitempty"`
 	Updated            *int64                             `form:"updated,omitempty" json:"updated,omitempty" xml:"updated,omitempty"`
-	LocationName       *string                            `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
+	PlaceName          *string                            `form:"placeName,omitempty" json:"placeName,omitempty" xml:"placeName,omitempty"`
+	NativeLandName     *string                            `form:"nativeLandName,omitempty" json:"nativeLandName,omitempty" xml:"nativeLandName,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 }
 
@@ -59,20 +61,22 @@ type GetResponseBody struct {
 	ID                 *int32                             `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name               *string                            `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	Owner              *StationOwnerResponseBody          `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
-	DeviceID           *string                            `form:"device_id,omitempty" json:"device_id,omitempty" xml:"device_id,omitempty"`
+	DeviceID           *string                            `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	Uploads            []*StationUploadResponseBody       `form:"uploads,omitempty" json:"uploads,omitempty" xml:"uploads,omitempty"`
 	Images             []*ImageRefResponseBody            `form:"images,omitempty" json:"images,omitempty" xml:"images,omitempty"`
 	Photos             *StationPhotosResponseBody         `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
-	ReadOnly           *bool                              `form:"read_only,omitempty" json:"read_only,omitempty" xml:"read_only,omitempty"`
+	ReadOnly           *bool                              `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
 	Battery            *float32                           `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
-	RecordingStartedAt *int64                             `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
-	MemoryUsed         *int32                             `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
-	MemoryAvailable    *int32                             `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
-	FirmwareNumber     *int32                             `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
-	FirmwareTime       *int64                             `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	RecordingStartedAt *int64                             `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
+	MemoryUsed         *int32                             `form:"memoryUsed,omitempty" json:"memoryUsed,omitempty" xml:"memoryUsed,omitempty"`
+	MemoryAvailable    *int32                             `form:"memoryAvailable,omitempty" json:"memoryAvailable,omitempty" xml:"memoryAvailable,omitempty"`
+	FirmwareNumber     *int32                             `form:"firmwareNumber,omitempty" json:"firmwareNumber,omitempty" xml:"firmwareNumber,omitempty"`
+	FirmwareTime       *int64                             `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
 	Configurations     *StationConfigurationsResponseBody `form:"configurations,omitempty" json:"configurations,omitempty" xml:"configurations,omitempty"`
 	Updated            *int64                             `form:"updated,omitempty" json:"updated,omitempty" xml:"updated,omitempty"`
-	LocationName       *string                            `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
+	PlaceName          *string                            `form:"placeName,omitempty" json:"placeName,omitempty" xml:"placeName,omitempty"`
+	NativeLandName     *string                            `form:"nativeLandName,omitempty" json:"nativeLandName,omitempty" xml:"nativeLandName,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 }
 
@@ -82,20 +86,22 @@ type UpdateResponseBody struct {
 	ID                 *int32                             `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name               *string                            `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	Owner              *StationOwnerResponseBody          `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
-	DeviceID           *string                            `form:"device_id,omitempty" json:"device_id,omitempty" xml:"device_id,omitempty"`
+	DeviceID           *string                            `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	Uploads            []*StationUploadResponseBody       `form:"uploads,omitempty" json:"uploads,omitempty" xml:"uploads,omitempty"`
 	Images             []*ImageRefResponseBody            `form:"images,omitempty" json:"images,omitempty" xml:"images,omitempty"`
 	Photos             *StationPhotosResponseBody         `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
-	ReadOnly           *bool                              `form:"read_only,omitempty" json:"read_only,omitempty" xml:"read_only,omitempty"`
+	ReadOnly           *bool                              `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
 	Battery            *float32                           `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
-	RecordingStartedAt *int64                             `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
-	MemoryUsed         *int32                             `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
-	MemoryAvailable    *int32                             `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
-	FirmwareNumber     *int32                             `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
-	FirmwareTime       *int64                             `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	RecordingStartedAt *int64                             `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
+	MemoryUsed         *int32                             `form:"memoryUsed,omitempty" json:"memoryUsed,omitempty" xml:"memoryUsed,omitempty"`
+	MemoryAvailable    *int32                             `form:"memoryAvailable,omitempty" json:"memoryAvailable,omitempty" xml:"memoryAvailable,omitempty"`
+	FirmwareNumber     *int32                             `form:"firmwareNumber,omitempty" json:"firmwareNumber,omitempty" xml:"firmwareNumber,omitempty"`
+	FirmwareTime       *int64                             `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
 	Configurations     *StationConfigurationsResponseBody `form:"configurations,omitempty" json:"configurations,omitempty" xml:"configurations,omitempty"`
 	Updated            *int64                             `form:"updated,omitempty" json:"updated,omitempty" xml:"updated,omitempty"`
-	LocationName       *string                            `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
+	PlaceName          *string                            `form:"placeName,omitempty" json:"placeName,omitempty" xml:"placeName,omitempty"`
+	NativeLandName     *string                            `form:"nativeLandName,omitempty" json:"nativeLandName,omitempty" xml:"nativeLandName,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 }
 
@@ -217,7 +223,7 @@ type StationOwnerResponseBody struct {
 type StationUploadResponseBody struct {
 	ID       *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Time     *int64  `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
-	UploadID *string `form:"upload_id,omitempty" json:"upload_id,omitempty" xml:"upload_id,omitempty"`
+	UploadID *string `form:"uploadId,omitempty" json:"uploadId,omitempty" xml:"uploadId,omitempty"`
 	Size     *int64  `form:"size,omitempty" json:"size,omitempty" xml:"size,omitempty"`
 	URL      *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 	Type     *string `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
@@ -245,17 +251,17 @@ type StationConfigurationsResponseBody struct {
 type StationConfigurationResponseBody struct {
 	ID           *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Time         *int64                       `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
-	ProvisionID  *int64                       `form:"provision_id,omitempty" json:"provision_id,omitempty" xml:"provision_id,omitempty"`
-	MetaRecordID *int64                       `form:"meta_record_id,omitempty" json:"meta_record_id,omitempty" xml:"meta_record_id,omitempty"`
-	SourceID     *int32                       `form:"source_id,omitempty" json:"source_id,omitempty" xml:"source_id,omitempty"`
+	ProvisionID  *int64                       `form:"provisionId,omitempty" json:"provisionId,omitempty" xml:"provisionId,omitempty"`
+	MetaRecordID *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
+	SourceID     *int32                       `form:"sourceId,omitempty" json:"sourceId,omitempty" xml:"sourceId,omitempty"`
 	Modules      []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
 }
 
 // StationModuleResponseBody is used to define fields on response body types.
 type StationModuleResponseBody struct {
 	ID           *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	HardwareID   *string                      `form:"hardware_id,omitempty" json:"hardware_id,omitempty" xml:"hardware_id,omitempty"`
-	MetaRecordID *int64                       `form:"meta_record_id,omitempty" json:"meta_record_id,omitempty" xml:"meta_record_id,omitempty"`
+	HardwareID   *string                      `form:"hardwareId,omitempty" json:"hardwareId,omitempty" xml:"hardwareId,omitempty"`
+	MetaRecordID *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
 	Name         *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	Position     *int32                       `form:"position,omitempty" json:"position,omitempty" xml:"position,omitempty"`
 	Flags        *int32                       `form:"flags,omitempty" json:"flags,omitempty" xml:"flags,omitempty"`
@@ -266,7 +272,7 @@ type StationModuleResponseBody struct {
 // StationSensorResponseBody is used to define fields on response body types.
 type StationSensorResponseBody struct {
 	Name          *string                    `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	UnitOfMeasure *string                    `form:"unit_of_measure,omitempty" json:"unit_of_measure,omitempty" xml:"unit_of_measure,omitempty"`
+	UnitOfMeasure *string                    `form:"unitOfMeasure,omitempty" json:"unitOfMeasure,omitempty" xml:"unitOfMeasure,omitempty"`
 	Reading       *SensorReadingResponseBody `form:"reading,omitempty" json:"reading,omitempty" xml:"reading,omitempty"`
 	Key           *string                    `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	Ranges        []*SensorRangeResponseBody `form:"ranges,omitempty" json:"ranges,omitempty" xml:"ranges,omitempty"`
@@ -299,20 +305,22 @@ type StationFullResponseBody struct {
 	ID                 *int32                             `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name               *string                            `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	Owner              *StationOwnerResponseBody          `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
-	DeviceID           *string                            `form:"device_id,omitempty" json:"device_id,omitempty" xml:"device_id,omitempty"`
+	DeviceID           *string                            `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	Uploads            []*StationUploadResponseBody       `form:"uploads,omitempty" json:"uploads,omitempty" xml:"uploads,omitempty"`
 	Images             []*ImageRefResponseBody            `form:"images,omitempty" json:"images,omitempty" xml:"images,omitempty"`
 	Photos             *StationPhotosResponseBody         `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
-	ReadOnly           *bool                              `form:"read_only,omitempty" json:"read_only,omitempty" xml:"read_only,omitempty"`
+	ReadOnly           *bool                              `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
 	Battery            *float32                           `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
-	RecordingStartedAt *int64                             `form:"recording_started_at,omitempty" json:"recording_started_at,omitempty" xml:"recording_started_at,omitempty"`
-	MemoryUsed         *int32                             `form:"memory_used,omitempty" json:"memory_used,omitempty" xml:"memory_used,omitempty"`
-	MemoryAvailable    *int32                             `form:"memory_available,omitempty" json:"memory_available,omitempty" xml:"memory_available,omitempty"`
-	FirmwareNumber     *int32                             `form:"firmware_number,omitempty" json:"firmware_number,omitempty" xml:"firmware_number,omitempty"`
-	FirmwareTime       *int64                             `form:"firmware_time,omitempty" json:"firmware_time,omitempty" xml:"firmware_time,omitempty"`
+	RecordingStartedAt *int64                             `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
+	MemoryUsed         *int32                             `form:"memoryUsed,omitempty" json:"memoryUsed,omitempty" xml:"memoryUsed,omitempty"`
+	MemoryAvailable    *int32                             `form:"memoryAvailable,omitempty" json:"memoryAvailable,omitempty" xml:"memoryAvailable,omitempty"`
+	FirmwareNumber     *int32                             `form:"firmwareNumber,omitempty" json:"firmwareNumber,omitempty" xml:"firmwareNumber,omitempty"`
+	FirmwareTime       *int64                             `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
 	Configurations     *StationConfigurationsResponseBody `form:"configurations,omitempty" json:"configurations,omitempty" xml:"configurations,omitempty"`
 	Updated            *int64                             `form:"updated,omitempty" json:"updated,omitempty" xml:"updated,omitempty"`
-	LocationName       *string                            `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
+	PlaceName          *string                            `form:"placeName,omitempty" json:"placeName,omitempty" xml:"placeName,omitempty"`
+	NativeLandName     *string                            `form:"nativeLandName,omitempty" json:"nativeLandName,omitempty" xml:"nativeLandName,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 }
 
@@ -355,6 +363,8 @@ func NewAddStationFullOK(body *AddResponseBody) *stationviews.StationFullView {
 		FirmwareTime:       body.FirmwareTime,
 		Updated:            body.Updated,
 		LocationName:       body.LocationName,
+		PlaceName:          body.PlaceName,
+		NativeLandName:     body.NativeLandName,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -414,6 +424,8 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 		FirmwareTime:       body.FirmwareTime,
 		Updated:            body.Updated,
 		LocationName:       body.LocationName,
+		PlaceName:          body.PlaceName,
+		NativeLandName:     body.NativeLandName,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -473,6 +485,8 @@ func NewUpdateStationFullOK(body *UpdateResponseBody) *stationviews.StationFullV
 		FirmwareTime:       body.FirmwareTime,
 		Updated:            body.Updated,
 		LocationName:       body.LocationName,
+		PlaceName:          body.PlaceName,
+		NativeLandName:     body.NativeLandName,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -655,7 +669,7 @@ func ValidateStationUploadResponseBody(body *StationUploadResponseBody) (err err
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "body"))
 	}
 	if body.UploadID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("upload_id", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("uploadId", "body"))
 	}
 	if body.Size == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("size", "body"))
@@ -713,7 +727,7 @@ func ValidateStationConfigurationResponseBody(body *StationConfigurationResponse
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
 	}
 	if body.ProvisionID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("provision_id", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("provisionId", "body"))
 	}
 	if body.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "body"))
@@ -769,7 +783,7 @@ func ValidateStationSensorResponseBody(body *StationSensorResponseBody) (err err
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
 	if body.UnitOfMeasure == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("unitOfMeasure", "body"))
 	}
 	if body.Key == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("key", "body"))
@@ -854,7 +868,7 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 		err = goa.MergeErrors(err, goa.MissingFieldError("owner", "body"))
 	}
 	if body.DeviceID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("device_id", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("deviceId", "body"))
 	}
 	if body.Uploads == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("uploads", "body"))
@@ -866,7 +880,7 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 		err = goa.MergeErrors(err, goa.MissingFieldError("photos", "body"))
 	}
 	if body.ReadOnly == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("read_only", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("readOnly", "body"))
 	}
 	if body.Configurations == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("configurations", "body"))

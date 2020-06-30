@@ -62,17 +62,17 @@ type FirmwareStatisticsUnauthorizedResponseBody string
 type StationConfigurationResponseBody struct {
 	ID           *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Time         *int64                       `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
-	ProvisionID  *int64                       `form:"provision_id,omitempty" json:"provision_id,omitempty" xml:"provision_id,omitempty"`
-	MetaRecordID *int64                       `form:"meta_record_id,omitempty" json:"meta_record_id,omitempty" xml:"meta_record_id,omitempty"`
-	SourceID     *int32                       `form:"source_id,omitempty" json:"source_id,omitempty" xml:"source_id,omitempty"`
+	ProvisionID  *int64                       `form:"provisionId,omitempty" json:"provisionId,omitempty" xml:"provisionId,omitempty"`
+	MetaRecordID *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
+	SourceID     *int32                       `form:"sourceId,omitempty" json:"sourceId,omitempty" xml:"sourceId,omitempty"`
 	Modules      []*StationModuleResponseBody `form:"modules,omitempty" json:"modules,omitempty" xml:"modules,omitempty"`
 }
 
 // StationModuleResponseBody is used to define fields on response body types.
 type StationModuleResponseBody struct {
 	ID           *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	HardwareID   *string                      `form:"hardware_id,omitempty" json:"hardware_id,omitempty" xml:"hardware_id,omitempty"`
-	MetaRecordID *int64                       `form:"meta_record_id,omitempty" json:"meta_record_id,omitempty" xml:"meta_record_id,omitempty"`
+	HardwareID   *string                      `form:"hardwareId,omitempty" json:"hardwareId,omitempty" xml:"hardwareId,omitempty"`
+	MetaRecordID *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
 	Name         *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	Position     *int32                       `form:"position,omitempty" json:"position,omitempty" xml:"position,omitempty"`
 	Flags        *int32                       `form:"flags,omitempty" json:"flags,omitempty" xml:"flags,omitempty"`
@@ -83,7 +83,7 @@ type StationModuleResponseBody struct {
 // StationSensorResponseBody is used to define fields on response body types.
 type StationSensorResponseBody struct {
 	Name          *string                    `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	UnitOfMeasure *string                    `form:"unit_of_measure,omitempty" json:"unit_of_measure,omitempty" xml:"unit_of_measure,omitempty"`
+	UnitOfMeasure *string                    `form:"unitOfMeasure,omitempty" json:"unitOfMeasure,omitempty" xml:"unitOfMeasure,omitempty"`
 	Reading       *SensorReadingResponseBody `form:"reading,omitempty" json:"reading,omitempty" xml:"reading,omitempty"`
 	Key           *string                    `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	Ranges        []*SensorRangeResponseBody `form:"ranges,omitempty" json:"ranges,omitempty" xml:"ranges,omitempty"`
@@ -196,7 +196,7 @@ func ValidateStationConfigurationResponseBody(body *StationConfigurationResponse
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
 	}
 	if body.ProvisionID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("provision_id", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("provisionId", "body"))
 	}
 	if body.Time == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("time", "body"))
@@ -252,7 +252,7 @@ func ValidateStationSensorResponseBody(body *StationSensorResponseBody) (err err
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
 	if body.UnitOfMeasure == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("unit_of_measure", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("unitOfMeasure", "body"))
 	}
 	if body.Key == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("key", "body"))
