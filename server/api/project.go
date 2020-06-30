@@ -239,7 +239,7 @@ func (c *ProjectController) List(ctx *app.ListProjectContext) error {
 
 	projects := []*data.Project{}
 	if err := c.options.Database.SelectContext(ctx, &projects, `
-		SELECT p.* FROM fieldkit.project AS p ORDER BY p.name LIMIT 10
+		SELECT p.* FROM fieldkit.project AS p WHERE NOT p.private ORDER BY p.name LIMIT 10
 		`); err != nil {
 		return err
 	}

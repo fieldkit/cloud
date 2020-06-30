@@ -112,7 +112,7 @@ export default {
         },
     },
     mounted() {
-        console.log(this.station);
+        // console.log(this.station);
     },
     methods: {
         viewSummary() {
