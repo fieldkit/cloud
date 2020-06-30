@@ -88,6 +88,10 @@ func (a *S3FileArchive) OpenByKey(ctx context.Context, key string) (of *OpenedFi
 }
 
 func (a *S3FileArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFile, err error) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("opening", "url", url)
+
 	object, err := common.GetBucketAndKey(url)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing url: %v", err)

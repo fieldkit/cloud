@@ -74,6 +74,10 @@ func (a *prioritizedFilesArchive) Info(ctx context.Context, key string) (info *F
 		if err == nil {
 			return info, nil
 		}
+
+		log := Logger(ctx).Sugar()
+		log.Warnw("error", "error", err)
+
 		errors = multierror.Append(err)
 	}
 	return nil, errors.ErrorOrNil()
