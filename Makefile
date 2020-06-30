@@ -31,14 +31,8 @@ ci-db-tests:
 	cd server && FIELDKIT_POSTGRES_URL="postgres://fieldkit:password@$$IP/fieldkit?sslmode=disable" go test -p 1 -v -coverprofile=coverage.data ./...
 	docker stop fktests-pg || true
 
-setup: legacy/src/js/secrets.js portal/src/secrets.ts ocr-portal/src/js/secrets.js
+setup: portal/src/secrets.ts
 	true || env GO111MODULE=on go get -u goa.design/goa/v3/...@v3
-
-legacy/src/js/secrets.js: legacy/src/js/secrets.js.template
-	cp $^ $@
-
-ocr-portal/src/js/secrets.js: ocr-portal/src/js/secrets.js.template
-	cp $^ $@
 
 portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
