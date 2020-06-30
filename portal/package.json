@@ -20,6 +20,7 @@
         "mapbox-gl-vue": "^2.0.3",
         "v-calendar": "^1.0.6",
         "vue": "^2.6.11",
+        "vue-body-class": "^3.0.2",
         "vue-class-component": "^7.2.3",
         "vue-i18n": "^8.17.0",
         "vue-property-decorator": "^8.4.2",

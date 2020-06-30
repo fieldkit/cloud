@@ -35,6 +35,9 @@ body {
 
     flex-shrink: 0;
 }
+body.blue-background {
+    background-color: #1b80c9;
+}
 a {
     text-decoration: none;
     color: inherit;

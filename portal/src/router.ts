@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
+import VueBodyClass from "vue-body-class";
 
 import LoginView from "./views/auth/LoginView.vue";
 import CreateAccountView from "./views/auth/CreateAccountView.vue";
@@ -23,6 +24,7 @@ const routes = [
         name: "login",
         component: LoginView,
         meta: {
+            bodyClass: "blue-background",
             secured: false,
         },
     },
@@ -31,6 +33,7 @@ const routes = [
         name: "register",
         component: CreateAccountView,
         meta: {
+            bodyClass: "blue-background",
             secured: false,
         },
     },
@@ -39,6 +42,7 @@ const routes = [
         name: "recover",
         component: RecoverAccountView,
         meta: {
+            bodyClass: "blue-background",
             secured: false,
         },
     },
@@ -47,6 +51,7 @@ const routes = [
         name: "reset",
         component: ResetPasswordView,
         meta: {
+            bodyClass: "blue-background",
             secured: false,
         },
     },
@@ -168,27 +173,32 @@ export default function routerFactory(store) {
         routes: routes,
     });
 
-    router.beforeEach((to, from, chain) => {
+    const vueBodyClass = new VueBodyClass(routes);
+    router.beforeEach((to, from, next) => {
+        vueBodyClass.guard(to, next);
+    });
+
+    router.beforeEach((to, from, next) => {
         console.log("nav", from.name, "->", to.name);
         if (from.name === null && (to.name === null || to.name == "login")) {
             console.log("nav", "authenticated", store.getters.isAuthenticated);
             if (store.getters.isAuthenticated) {
-                chain("/dashboard");
+                next("/dashboard");
             } else {
                 if (to.name === "login") {
-                    chain();
+                    next();
                 } else {
-                    chain("/login");
+                    next("/login");
                 }
             }
         } else if (to.matched.some((record) => record.meta.secured)) {
             if (store.getters.isAuthenticated) {
-                chain();
+                next();
                 return;
             }
-            chain("/login");
+            next("/login");
         } else {
-            chain();
+            next();
         }
     });
 

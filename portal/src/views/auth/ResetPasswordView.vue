@@ -1,5 +1,5 @@
 <template>
-    <div id="login-container">
+    <div id="login-form-container">
         <img class="form-header-logo" alt="FieldKit Logo" src="../../assets/FieldKit_Logo_White.png" />
         <div>
             <div id="user-form-container">
@@ -116,7 +116,7 @@ export default {
 </script>
 
 <style scoped>
-#login-container {
+#login-form-container {
     width: 100%;
     min-height: 100%;
     background-image: linear-gradient(#52b5e4, #1b80c9);
