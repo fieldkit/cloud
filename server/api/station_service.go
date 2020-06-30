@@ -54,7 +54,7 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 			if err != nil {
 				log.Errorw("error updating from location", "error", err)
 				// return err
-			} else {
+			} else if names != nil {
 				station.PlaceOther = names.OtherLandName
 				station.PlaceNative = names.NativeLandName
 			}
