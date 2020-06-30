@@ -129,7 +129,6 @@ export default {
     cursor: pointer;
 }
 .inner-container {
-    overflow: scroll;
 }
 .view-container {
     margin: 20px 60px;

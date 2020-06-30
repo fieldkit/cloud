@@ -53,10 +53,10 @@ export default {
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
-            user: s => s.user.user,
-            stations: s => s.stations.stations.user,
-            userProjects: s => s.stations.projects.user,
-            publicProjects: s => s.stations.projects.community,
+            user: (s) => s.user.user,
+            stations: (s) => s.stations.stations.user,
+            userProjects: (s) => s.stations.projects.user,
+            publicProjects: (s) => s.stations.projects.community,
         }),
     },
     beforeMount() {
@@ -83,7 +83,6 @@ export default {
 <style scoped>
 #inner-container {
     margin: 20px 60px;
-    overflow: scroll;
 }
 #projects-container {
     width: 890px;

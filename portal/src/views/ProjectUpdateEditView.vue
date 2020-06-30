@@ -64,7 +64,7 @@ export default {
         this.api = new FKApi();
         this.api
             .getCurrentUser()
-            .then(user => {
+            .then((user) => {
                 this.user = user;
                 this.isAuthenticated = true;
                 this.getUserProjects();
@@ -86,12 +86,12 @@ export default {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
         getStations() {
-            this.api.getStations().then(s => {
+            this.api.getStations().then((s) => {
                 this.stations = s.stations;
             });
         },
         getUserProjects() {
-            this.api.getUserProjects().then(projects => {
+            this.api.getUserProjects().then((projects) => {
                 if (projects && projects.projects.length > 0) {
                     this.userProjects = projects.projects;
                 }
@@ -100,7 +100,7 @@ export default {
         getProjectUpdate(updateId) {
             this.api
                 .getProjectUpdate(updateId)
-                .then(update => {
+                .then((update) => {
                     this.activeUpdate = update;
                     this.loading = false;
                 })
@@ -131,7 +131,6 @@ export default {
 }
 #inner-container {
     margin: 20px 60px;
-    overflow: scroll;
 }
 #projects-container {
     width: 890px;

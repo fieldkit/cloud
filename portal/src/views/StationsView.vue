@@ -85,11 +85,11 @@ export default {
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
-            user: s => s.user.user,
-            hasNoStations: s => s.stations.hasNoStations,
-            stations: s => s.stations.stations.user,
-            userProjects: s => s.stations.projects.user,
-            anyStations: s => s.stations.stations.user.length > 0,
+            user: (s) => s.user.user,
+            hasNoStations: (s) => s.stations.hasNoStations,
+            stations: (s) => s.stations.stations.user,
+            userProjects: (s) => s.stations.projects.user,
+            anyStations: (s) => s.stations.stations.user.length > 0,
         }),
         activeStation() {
             return this.$store.state.stations.stations.all[this.activeStationId];
@@ -143,7 +143,6 @@ export default {
 }
 #stations-view-panel {
     margin: 0;
-    overflow: scroll;
 }
 #no-user {
     font-size: 20px;

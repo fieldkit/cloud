@@ -90,7 +90,7 @@ export default {
         },
 
         fetchStations() {
-            this.api.getStationsByProject(this.project.id).then(result => {
+            this.api.getStationsByProject(this.project.id).then((result) => {
                 this.stations = result.stations;
                 this.pageCount = this.stations.length;
                 this.currentStation = this.stations[this.currentIndex - 1];
@@ -108,7 +108,7 @@ export default {
                 this.currentStation.configurations.all &&
                 this.currentStation.configurations.all.length > 0
             ) {
-                this.modules = this.currentStation.configurations.all[0].modules.filter(m => {
+                this.modules = this.currentStation.configurations.all[0].modules.filter((m) => {
                     return !m.internal;
                 });
             }
@@ -169,7 +169,6 @@ export default {
 .sensors-container {
     width: 100%;
     height: 150px;
-    overflow: scroll;
 }
 .left {
     float: left;
