@@ -1,130 +1,108 @@
 <template>
     <div id="login-container">
-        <img
-            v-bind:style="{
-                width: '210px',
-                marginTop: '150px',
-                marginBottom: '86px',
-            }"
-            alt="Fieldkit Logo"
-            src="../../assets/FieldKit_Logo_White.png"
-        />
-        <br />
-        <div id="user-form-container">
-            <div class="password-change" v-if="!resetSuccess && !failedReset">
-                <div class="inner-password-change">
-                    <div class="password-change-heading">Reset password</div>
+        <img class="form-header-logo" alt="FieldKit Logo" src="../../assets/FieldKit_Logo_White.png" />
+        <div>
+            <div id="user-form-container">
+                <div class="password-change" v-if="!success && !failed">
+                    <div class="inner-password-change">
+                        <div class="password-change-heading">Reset Password</div>
 
-                    <div class="outer-input-container">
-                        <div class="input-container">
-                            <input
-                                v-model="newPassword"
-                                secure="true"
-                                type="password"
-                                class="inputText"
-                                required=""
-                                @blur="checkPassword"
-                            />
-                            <span class="floating-label">New password</span>
-                        </div>
-                        <span class="validation-error" id="no-password" v-if="noPassword">Password is a required field.</span>
-                        <span class="validation-error" id="password-too-short" v-if="passwordTooShort">
-                            Password must be at least 10 characters.
-                        </span>
-                    </div>
+                        <div class="outer-input-container">
+                            <div class="input-container">
+                                <input secure="true" type="password" class="inputText" required="" v-model="form.password" />
+                                <span class="floating-label">New password</span>
 
-                    <div class="outer-input-container">
-                        <div class="input-container middle-container">
-                            <input
-                                v-model="confirmPassword"
-                                secure="true"
-                                type="password"
-                                class="inputText"
-                                required=""
-                                @blur="checkConfirmPassword"
-                            />
-                            <span class="floating-label">Confirm new password</span>
+                                <div class="validation-errors" v-if="$v.form.password.$error">
+                                    <div v-if="!$v.form.password.required">This is a required field.</div>
+                                    <div v-if="!$v.form.password.min">Password must be at least 10 characters.</div>
+                                </div>
+                            </div>
                         </div>
-                        <span class="validation-error" v-if="passwordsNotMatch">
-                            Passwords do not match.
-                        </span>
+
+                        <div class="outer-input-container">
+                            <div class="input-container middle-container">
+                                <input secure="true" type="password" class="inputText" required="" v-model="form.passwordConfirmation" />
+                                <span class="floating-label">Confirm new password</span>
+
+                                <div class="validation-errors" v-if="$v.form.passwordConfirmation.$error">
+                                    <div v-if="!$v.form.passwordConfirmation.required">Confirmation is a required field.</div>
+                                    <div v-if="!$v.form.passwordConfirmation.sameAsPassword">Passwords must match.</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    <button class="save-btn" v-on:click="save">Reset</button>
                 </div>
-                <button class="save-btn" v-on:click="submitPasswordReset">Reset password</button>
-            </div>
-            <div v-if="resetSuccess">
-                <img alt="Success" src="../../assets/Icon_Success.png" width="57px" />
-                <p class="success">Password Reset</p>
+                <div v-if="success">
+                    <img alt="Success" src="../../assets/Icon_Success.png" width="57px" />
+                    <p class="success">Password Reset</p>
 
-                <router-link :to="{ name: 'login' }" class="create-link">
-                    Go to Log In
-                </router-link>
-            </div>
-            <div v-if="failedReset">
-                <img alt="Unsuccessful" src="../../assets/Icon_Warning_error.png" width="57px" />
-                <p class="error">Password Not Reset</p>
-                <div class="notification-text">Unfortunately we were unable to reset your password.</div>
-                <p>
-                    Please
-                    <a href="https://www.fieldkit.org/contact/" class="contact-link">contact us</a>
-                    if you would like assistance.
-                </p>
+                    <router-link :to="{ name: 'login' }" class="create-link">
+                        Back to Log In
+                    </router-link>
+                </div>
+                <div v-if="failed">
+                    <img alt="Unsuccessful" src="../../assets/Icon_Warning_error.png" width="57px" />
+                    <p class="error">Password Not Reset</p>
+                    <div class="notification-text">Unfortunately we were unable to reset your password.</div>
+                    <p>
+                        Please
+                        <a href="https://www.fieldkit.org/contact/" class="contact-link">contact us</a>
+                        if you would like assistance.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
 import FKApi from "@/api/api";
 
 export default {
     name: "ResetPasswordView",
-    components: {},
-    props: {},
     data: () => {
         return {
-            resetToken: "",
-            newPassword: "",
-            noPassword: false,
-            passwordTooShort: false,
-            confirmPassword: "",
-            passwordsNotMatch: false,
-            resetSuccess: false,
-            failedReset: false,
+            form: {
+                password: "",
+                passwordConfirmation: "",
+            },
+            busy: false,
+            success: false,
+            failed: false,
         };
     },
-    async beforeCreate() {
-        this.api = new FKApi();
+    validations: {
+        form: {
+            password: { required, min: minLength(10) },
+            passwordConfirmation: { required, min: minLength(10), sameAsPassword: sameAs("password") },
+        },
     },
     methods: {
-        checkPassword() {
-            this.noPassword = false;
-            this.passwordTooShort = false;
-            this.noPassword = !this.newPassword || this.newPassword.length == 0;
-            if (this.noPassword) {
+        save() {
+            console.log("save");
+            this.$v.form.$touch();
+            if (this.$v.form.$pending || this.$v.form.$error) {
                 return;
             }
-            this.passwordTooShort = this.newPassword.length < 10;
-        },
-        checkConfirmPassword() {
-            this.passwordsNotMatch = this.newPassword != this.confirmPassword;
-        },
-        submitPasswordReset() {
-            this.resetToken = this.$route.query.token;
-            if (this.checkConfirmPassword) {
-                const data = {
-                    token: this.resetToken,
-                    password: this.newPassword,
-                };
-                return this.api
-                    .resetPassword(data)
-                    .then(() => {
-                        this.resetSuccess = true;
-                    })
-                    .catch(() => {
-                        this.failedReset = true;
-                    });
-            }
+
+            this.busy = true;
+            const payload = {
+                token: this.$route.query.token,
+                password: this.form.password,
+            };
+            return new FKApi()
+                .resetPassword(payload)
+                .then(() => {
+                    this.success = true;
+                })
+                .catch(() => {
+                    this.failed = true;
+                })
+                .finally(() => {
+                    this.busy = false;
+                });
         },
     },
 };
@@ -203,5 +181,10 @@ input {
 .contact-link {
     cursor: pointer;
     text-decoration: underline;
+}
+.form-header-logo {
+    width: 210px;
+    margin-top: 150px;
+    margin-bottom: 86px;
 }
 </style>

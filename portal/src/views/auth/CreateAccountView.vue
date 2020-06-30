@@ -110,6 +110,7 @@ import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
 import FKApi from "@/api/api";
 
 export default {
+    name: "CreateAccountView",
     data() {
         return {
             form: {

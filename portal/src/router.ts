@@ -1,14 +1,17 @@
 import Vue from "vue";
 import Router from "vue-router";
+
 import LoginView from "./views/auth/LoginView.vue";
 import CreateAccountView from "./views/auth/CreateAccountView.vue";
+import RecoverAccountView from "./views/auth/RecoverAccountView.vue";
+import ResetPasswordView from "./views/auth/ResetPasswordView.vue";
+
 import DataView from "./views/viz/DataView.vue";
 import InvitesView from "./views/InvitesView.vue";
 import ProjectsView from "./views/ProjectsView.vue";
 import ProjectEditView from "./views/ProjectEditView.vue";
 import ProjectUpdateEditView from "./views/ProjectUpdateEditView.vue";
 import ProjectView from "./views/ProjectView.vue";
-import ResetPasswordView from "./views/auth/ResetPasswordView.vue";
 import StationsView from "./views/StationsView.vue";
 import UserView from "./views/UserView.vue";
 
@@ -27,6 +30,22 @@ const routes = [
         path: "/register",
         name: "register",
         component: CreateAccountView,
+        meta: {
+            secured: false,
+        },
+    },
+    {
+        path: "/recover",
+        name: "recover",
+        component: RecoverAccountView,
+        meta: {
+            secured: false,
+        },
+    },
+    {
+        path: "/recover/complete",
+        name: "reset",
+        component: ResetPasswordView,
         meta: {
             secured: false,
         },
@@ -54,14 +73,6 @@ const routes = [
         component: UserView,
         meta: {
             secured: true,
-        },
-    },
-    {
-        path: "/dashboard/user/reset",
-        name: "reset",
-        component: ResetPasswordView,
-        meta: {
-            secured: false,
         },
     },
     {
