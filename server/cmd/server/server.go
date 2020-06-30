@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 
 	_ "net/http"
 	_ "net/http/pprof"
@@ -52,8 +51,6 @@ type Config struct {
 	EmailOverride         string `split_words:"true" default:""`
 	Archiver              string `split_words:"true" default:"default" required:"true"`
 	PortalRoot            string `split_words:"true"`
-	OcrPortalRoot         string `split_words:"true"`
-	LegacyRoot            string `split_words:"true"`
 	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
 	HttpScheme            string `split_words:"true" default:"https"`
 	ApiDomain             string `split_words:"true" default:""`
@@ -265,30 +262,6 @@ func main() {
 		portalServer = singlePageApplication
 	}
 
-	ocrPortalServer := notFoundHandler
-	if config.OcrPortalRoot != "" {
-		singlePageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
-			Root: config.OcrPortalRoot,
-		})
-		if err != nil {
-			panic(err)
-		}
-
-		ocrPortalServer = http.StripPrefix("/ocr-portal", singlePageApplication)
-	}
-
-	legacyServer := notFoundHandler
-	if config.LegacyRoot != "" {
-		singlePageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
-			Root: config.LegacyRoot,
-		})
-		if err != nil {
-			panic(err)
-		}
-
-		legacyServer = singlePageApplication
-	}
-
 	serveApi := func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/ingestion" {
 			ingesterHandler.ServeHTTP(w, req)
@@ -314,24 +287,6 @@ func main() {
 		if req.Host == config.PortalDomain {
 			staticLog.Infow("portal", "url", req.URL)
 			portalServer.ServeHTTP(w, req)
-			return
-		}
-
-		if req.Host == config.Domain {
-			if req.URL.Path == "/portal" || strings.HasPrefix(req.URL.Path, "/portal/") {
-				staticLog.Infow("redirecting", "url", req.URL)
-				http.Redirect(w, req, config.HttpScheme+"://"+config.PortalDomain, 301)
-				return
-			}
-
-			if req.URL.Path == "/ocr-portal" || strings.HasPrefix(req.URL.Path, "/ocr-portal/") {
-				staticLog.Infow("ocr portal", "url", req.URL)
-				ocrPortalServer.ServeHTTP(w, req)
-				return
-			}
-
-			staticLog.Infow("legacy portal", "url", req.URL)
-			legacyServer.ServeHTTP(w, req)
 			return
 		}
 
