@@ -136,8 +136,8 @@ func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
 		}
 
 		if err := e.DB.NamedGetContext(e.Ctx, station, `
-			INSERT INTO fieldkit.station (name, device_id, owner_id, status_json, created_at, updated_at)
-			VALUES (:name, :device_id, :owner_id, :status_json, :created_at, :updated_at)
+			INSERT INTO fieldkit.station (name, device_id, owner_id, created_at, updated_at)
+			VALUES (:name, :device_id, :owner_id, :created_at, :updated_at)
 			RETURNING *
 		`, station); err != nil {
 			return nil, err

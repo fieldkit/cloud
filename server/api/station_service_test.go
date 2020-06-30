@@ -234,13 +234,11 @@ func TestAddNewStation(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			DeviceID   string                 `json:"device_id"`
-			Name       string                 `json:"name"`
-			StatusJSON map[string]interface{} `json:"status_json"`
+			DeviceID string `json:"device_id"`
+			Name     string `json:"name"`
 		}{
-			DeviceID:   station.DeviceIDHex(),
-			Name:       station.Name,
-			StatusJSON: make(map[string]interface{}),
+			DeviceID: station.DeviceIDHex(),
+			Name:     station.Name,
 		},
 	)
 	assert.NoError(err)
@@ -265,13 +263,11 @@ func TestAddStationAlreadyMine(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			DeviceID   string                 `json:"device_id"`
-			Name       string                 `json:"name"`
-			StatusJSON map[string]interface{} `json:"status_json"`
+			DeviceID string `json:"device_id"`
+			Name     string `json:"name"`
 		}{
-			DeviceID:   fd.Stations[0].DeviceIDHex(),
-			Name:       "Already Mine",
-			StatusJSON: make(map[string]interface{}),
+			DeviceID: fd.Stations[0].DeviceIDHex(),
+			Name:     "Already Mine",
 		},
 	)
 	assert.NoError(err)
@@ -299,13 +295,11 @@ func TestAddStationAlreadyOthers(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			DeviceID   string                 `json:"device_id"`
-			Name       string                 `json:"name"`
-			StatusJSON map[string]interface{} `json:"status_json"`
+			DeviceID string `json:"device_id"`
+			Name     string `json:"name"`
 		}{
-			DeviceID:   fd.Stations[0].DeviceIDHex(),
-			Name:       "New Name",
-			StatusJSON: make(map[string]interface{}),
+			DeviceID: fd.Stations[0].DeviceIDHex(),
+			Name:     "New Name",
 		},
 	)
 	assert.NoError(err)
@@ -332,11 +326,9 @@ func TestUpdateMyStation(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			Name       string                 `json:"name"`
-			StatusJSON map[string]interface{} `json:"status_json"`
+			Name string `json:"name"`
 		}{
-			Name:       "New Name",
-			StatusJSON: make(map[string]interface{}),
+			Name: "New Name",
 		},
 	)
 	assert.NoError(err)
@@ -364,11 +356,9 @@ func TestUpdateAnotherPersonsStation(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			Name       string                 `json:"name"`
-			StatusJSON map[string]interface{} `json:"status_json"`
+			Name string `json:"name"`
 		}{
-			Name:       "New Name",
-			StatusJSON: make(map[string]interface{}),
+			Name: "New Name",
 		},
 	)
 	assert.NoError(err)
@@ -393,11 +383,9 @@ func TestUpdateMissingStation(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			Name       string                 `json:"name"`
-			StatusJSON map[string]interface{} `json:"status_json"`
+			Name string `json:"name"`
 		}{
-			Name:       "New Name",
-			StatusJSON: make(map[string]interface{}),
+			Name: "New Name",
 		},
 	)
 	assert.NoError(err)
@@ -426,13 +414,11 @@ func TestUpdateMyStationWithProtobufStatus(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			Name       string                 `json:"name"`
-			StatusJSON map[string]interface{} `json:"status_json"`
-			StatusPB   []byte                 `json:"status_pb"`
+			Name     string `json:"name"`
+			StatusPB []byte `json:"status_pb"`
 		}{
-			Name:       "New Name",
-			StatusJSON: make(map[string]interface{}),
-			StatusPB:   replyBuffer.Bytes(),
+			Name:     "New Name",
+			StatusPB: replyBuffer.Bytes(),
 		},
 	)
 	assert.NoError(err)
@@ -461,13 +447,11 @@ func TestGetStationUpdatedWithProtobufStatus(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			Name       string                 `json:"name"`
-			StatusJSON map[string]interface{} `json:"status_json"`
-			StatusPB   []byte                 `json:"status_pb"`
+			Name     string `json:"name"`
+			StatusPB []byte `json:"status_pb"`
 		}{
-			Name:       "New Name",
-			StatusJSON: make(map[string]interface{}),
-			StatusPB:   replyBuffer.Bytes(),
+			Name:     "New Name",
+			StatusPB: replyBuffer.Bytes(),
 		},
 	)
 	assert.NoError(err)
@@ -521,13 +505,11 @@ func TestUpdateMyStationWithProtobufStatusTwice(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			Name       string                 `json:"name"`
-			StatusJSON map[string]interface{} `json:"status_json"`
-			StatusPB   []byte                 `json:"status_pb"`
+			Name     string `json:"name"`
+			StatusPB []byte `json:"status_pb"`
 		}{
-			Name:       "New Name",
-			StatusJSON: make(map[string]interface{}),
-			StatusPB:   replyBuffer.Bytes(),
+			Name:     "New Name",
+			StatusPB: replyBuffer.Bytes(),
 		},
 	)
 	assert.NoError(err)
@@ -572,13 +554,11 @@ func TestUpdateMyStationWithProtobufLiveReadingsTwice(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			Name       string                 `json:"name"`
-			StatusJSON map[string]interface{} `json:"status_json"`
-			StatusPB   []byte                 `json:"status_pb"`
+			Name     string `json:"name"`
+			StatusPB []byte `json:"status_pb"`
 		}{
-			Name:       "New Name",
-			StatusJSON: make(map[string]interface{}),
-			StatusPB:   replyBuffer.Bytes(),
+			Name:     "New Name",
+			StatusPB: replyBuffer.Bytes(),
 		},
 	)
 	assert.NoError(err)

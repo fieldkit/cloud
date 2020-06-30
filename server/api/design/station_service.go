@@ -163,9 +163,8 @@ var _ = Service("station", func() {
 			Attribute("name", String)
 			Attribute("device_id", String)
 			Attribute("location_name", String)
-			Attribute("status_json", MapOf(String, Any))
 			Attribute("status_pb", String)
-			Required("name", "device_id", "status_json")
+			Required("name", "device_id")
 		})
 
 		Result(StationFull)
@@ -211,9 +210,8 @@ var _ = Service("station", func() {
 			Required("id")
 			Attribute("name", String)
 			Attribute("location_name", String)
-			Attribute("status_json", MapOf(String, Any))
 			Attribute("status_pb", String)
-			Required("name", "status_json")
+			Required("name")
 		})
 
 		Result(StationFull)

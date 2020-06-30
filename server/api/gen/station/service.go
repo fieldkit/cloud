@@ -53,7 +53,6 @@ type AddPayload struct {
 	Name         string
 	DeviceID     string
 	LocationName *string
-	StatusJSON   map[string]interface{}
 	StatusPb     *string
 }
 
@@ -91,7 +90,6 @@ type UpdatePayload struct {
 	ID           int32
 	Name         string
 	LocationName *string
-	StatusJSON   map[string]interface{}
 	StatusPb     *string
 }
 

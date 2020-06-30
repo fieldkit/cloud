@@ -13,7 +13,6 @@ import (
 	"strconv"
 
 	station "github.com/fieldkit/cloud/server/api/gen/station"
-	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildAddPayload builds the payload for the station add endpoint from CLI
@@ -24,13 +23,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"device_id\": \"Consectetur at voluptatem deserunt illum eos.\",\n      \"location_name\": \"Animi explicabo quis similique nisi.\",\n      \"name\": \"Eos nihil commodi expedita nostrum officia.\",\n      \"status_json\": {\n         \"Mollitia modi sed distinctio accusamus odit.\": \"Explicabo dolores consectetur non omnis.\"\n      },\n      \"status_pb\": \"Unde sed.\"\n   }'")
-		}
-		if body.StatusJSON == nil {
-			err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
-		}
-		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"device_id\": \"Delectus hic quia omnis debitis beatae ut.\",\n      \"location_name\": \"Et odio enim quibusdam et ut mollitia.\",\n      \"name\": \"Aut molestias dolorem.\",\n      \"status_pb\": \"Tenetur quae aut fuga est laudantium eius.\"\n   }'")
 		}
 	}
 	var auth string
@@ -42,14 +35,6 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 		DeviceID:     body.DeviceID,
 		LocationName: body.LocationName,
 		StatusPb:     body.StatusPb,
-	}
-	if body.StatusJSON != nil {
-		v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
-		for key, val := range body.StatusJSON {
-			tk := key
-			tv := val
-			v.StatusJSON[tk] = tv
-		}
 	}
 	v.Auth = auth
 
@@ -88,13 +73,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"location_name\": \"Dicta minima.\",\n      \"name\": \"Aliquid enim beatae reiciendis.\",\n      \"status_json\": {\n         \"Aut expedita iste ut maxime corporis itaque.\": \"Iste eius et quisquam omnis.\"\n      },\n      \"status_pb\": \"Aut maxime aut quia ad et aliquid.\"\n   }'")
-		}
-		if body.StatusJSON == nil {
-			err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
-		}
-		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"location_name\": \"Eveniet ipsum aperiam et.\",\n      \"name\": \"Vero aut qui eveniet.\",\n      \"status_pb\": \"Deleniti impedit ipsam enim minima.\"\n   }'")
 		}
 	}
 	var id int32
@@ -114,14 +93,6 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 		Name:         body.Name,
 		LocationName: body.LocationName,
 		StatusPb:     body.StatusPb,
-	}
-	if body.StatusJSON != nil {
-		v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
-		for key, val := range body.StatusJSON {
-			tk := key
-			tv := val
-			v.StatusJSON[tk] = tv
-		}
 	}
 	v.ID = id
 	v.Auth = auth

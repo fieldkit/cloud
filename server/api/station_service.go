@@ -84,8 +84,6 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		}
 	}
 
-	adding.SetStatus(payload.StatusJSON)
-
 	added, err := sr.Add(ctx, adding)
 	if err != nil {
 		return nil, err
@@ -162,8 +160,6 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 			log.Errorw("error updating from status", "error", err, "status", payload.StatusPb)
 		}
 	}
-
-	updating.SetStatus(payload.StatusJSON)
 
 	if err := sr.Update(ctx, updating); err != nil {
 		return nil, err

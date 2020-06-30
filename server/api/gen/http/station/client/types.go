@@ -16,20 +16,18 @@ import (
 // AddRequestBody is the type of the "station" service "add" endpoint HTTP
 // request body.
 type AddRequestBody struct {
-	Name         string                 `form:"name" json:"name" xml:"name"`
-	DeviceID     string                 `form:"device_id" json:"device_id" xml:"device_id"`
-	LocationName *string                `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
-	StatusJSON   map[string]interface{} `form:"status_json" json:"status_json" xml:"status_json"`
-	StatusPb     *string                `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
+	Name         string  `form:"name" json:"name" xml:"name"`
+	DeviceID     string  `form:"device_id" json:"device_id" xml:"device_id"`
+	LocationName *string `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	StatusPb     *string `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
 }
 
 // UpdateRequestBody is the type of the "station" service "update" endpoint
 // HTTP request body.
 type UpdateRequestBody struct {
-	Name         string                 `form:"name" json:"name" xml:"name"`
-	LocationName *string                `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
-	StatusJSON   map[string]interface{} `form:"status_json" json:"status_json" xml:"status_json"`
-	StatusPb     *string                `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
+	Name         string  `form:"name" json:"name" xml:"name"`
+	LocationName *string `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	StatusPb     *string `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
 }
 
 // AddResponseBody is the type of the "station" service "add" endpoint HTTP
@@ -327,14 +325,6 @@ func NewAddRequestBody(p *station.AddPayload) *AddRequestBody {
 		LocationName: p.LocationName,
 		StatusPb:     p.StatusPb,
 	}
-	if p.StatusJSON != nil {
-		body.StatusJSON = make(map[string]interface{}, len(p.StatusJSON))
-		for key, val := range p.StatusJSON {
-			tk := key
-			tv := val
-			body.StatusJSON[tk] = tv
-		}
-	}
 	return body
 }
 
@@ -345,14 +335,6 @@ func NewUpdateRequestBody(p *station.UpdatePayload) *UpdateRequestBody {
 		Name:         p.Name,
 		LocationName: p.LocationName,
 		StatusPb:     p.StatusPb,
-	}
-	if p.StatusJSON != nil {
-		body.StatusJSON = make(map[string]interface{}, len(p.StatusJSON))
-		for key, val := range p.StatusJSON {
-			tk := key
-			tv := val
-			body.StatusJSON[tk] = tv
-		}
 	}
 	return body
 }

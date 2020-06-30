@@ -80,7 +80,7 @@ func (c *CopierTool) copyStation(ctx context.Context, id int64, ownerID int32, f
 
 		if force {
 			station.OwnerID = ownerID
-			if err := c.Destiny.Database.NamedGetContext(ctx, station, `INSERT INTO fieldkit.station (owner_id, device_id, created_at, name, status_json) VALUES (:owner_id, :device_id, :created_at, :name, :status_json) RETURNING *`, station); err != nil {
+			if err := c.Destiny.Database.NamedGetContext(ctx, station, `INSERT INTO fieldkit.station (owner_id, device_id, created_at, name) VALUES (:owner_id, :device_id, :created_at, :name) RETURNING *`, station); err != nil {
 				return err
 			}
 		}

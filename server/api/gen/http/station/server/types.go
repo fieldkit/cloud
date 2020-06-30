@@ -16,20 +16,18 @@ import (
 // AddRequestBody is the type of the "station" service "add" endpoint HTTP
 // request body.
 type AddRequestBody struct {
-	Name         *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	DeviceID     *string                `form:"device_id,omitempty" json:"device_id,omitempty" xml:"device_id,omitempty"`
-	LocationName *string                `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
-	StatusJSON   map[string]interface{} `form:"status_json,omitempty" json:"status_json,omitempty" xml:"status_json,omitempty"`
-	StatusPb     *string                `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
+	Name         *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	DeviceID     *string `form:"device_id,omitempty" json:"device_id,omitempty" xml:"device_id,omitempty"`
+	LocationName *string `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	StatusPb     *string `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
 }
 
 // UpdateRequestBody is the type of the "station" service "update" endpoint
 // HTTP request body.
 type UpdateRequestBody struct {
-	Name         *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	LocationName *string                `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
-	StatusJSON   map[string]interface{} `form:"status_json,omitempty" json:"status_json,omitempty" xml:"status_json,omitempty"`
-	StatusPb     *string                `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
+	Name         *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	LocationName *string `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
+	StatusPb     *string `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
 }
 
 // AddResponseBody is the type of the "station" service "add" endpoint HTTP
@@ -652,12 +650,6 @@ func NewAddPayload(body *AddRequestBody, auth string) *station.AddPayload {
 		LocationName: body.LocationName,
 		StatusPb:     body.StatusPb,
 	}
-	v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
-	for key, val := range body.StatusJSON {
-		tk := key
-		tv := val
-		v.StatusJSON[tk] = tv
-	}
 	v.Auth = auth
 
 	return v
@@ -678,12 +670,6 @@ func NewUpdatePayload(body *UpdateRequestBody, id int32, auth string) *station.U
 		Name:         *body.Name,
 		LocationName: body.LocationName,
 		StatusPb:     body.StatusPb,
-	}
-	v.StatusJSON = make(map[string]interface{}, len(body.StatusJSON))
-	for key, val := range body.StatusJSON {
-		tk := key
-		tv := val
-		v.StatusJSON[tk] = tv
 	}
 	v.ID = id
 	v.Auth = auth
@@ -725,9 +711,6 @@ func ValidateAddRequestBody(body *AddRequestBody) (err error) {
 	if body.DeviceID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("device_id", "body"))
 	}
-	if body.StatusJSON == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
-	}
 	return
 }
 
@@ -735,9 +718,6 @@ func ValidateAddRequestBody(body *AddRequestBody) (err error) {
 func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
-	}
-	if body.StatusJSON == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("status_json", "body"))
 	}
 	return
 }

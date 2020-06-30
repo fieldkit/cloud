@@ -2,11 +2,8 @@ package data
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"strconv"
 	"time"
-
-	"github.com/jmoiron/sqlx/types"
 
 	"github.com/golang/protobuf/proto"
 
@@ -14,40 +11,21 @@ import (
 )
 
 type Station struct {
-	ID                 int32          `db:"id,omitempty"`
-	Name               string         `db:"name"`
-	DeviceID           []byte         `db:"device_id"`
-	OwnerID            int32          `db:"owner_id,omitempty"`
-	CreatedAt          time.Time      `db:"created_at,omitempty"`
-	UpdatedAt          time.Time      `db:"updated_at,omitempty"`
-	StatusJSON         types.JSONText `db:"status_json"`
-	Private            bool           `db:"private"`
-	Battery            *float32       `db:"battery"`
-	Location           *Location      `db:"location"`
-	LocationName       *string        `db:"location_name"`
-	RecordingStartedAt *int64         `db:"recording_started_at"`
-	MemoryUsed         *int32         `db:"memory_used"`
-	MemoryAvailable    *int32         `db:"memory_available"`
-	FirmwareNumber     *int32         `db:"firmware_number"`
-	FirmwareTime       *int64         `db:"firmware_time"`
-}
-
-func (s *Station) SetStatus(data interface{}) error {
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-	s.StatusJSON = jsonData
-	return nil
-}
-
-func (s *Station) GetStatus() (map[string]interface{}, error) {
-	var parsed map[string]interface{}
-	err := json.Unmarshal(s.StatusJSON, &parsed)
-	if err != nil {
-		return nil, err
-	}
-	return parsed, nil
+	ID                 int32     `db:"id,omitempty"`
+	Name               string    `db:"name"`
+	DeviceID           []byte    `db:"device_id"`
+	OwnerID            int32     `db:"owner_id,omitempty"`
+	CreatedAt          time.Time `db:"created_at,omitempty"`
+	UpdatedAt          time.Time `db:"updated_at,omitempty"`
+	Private            bool      `db:"private"`
+	Battery            *float32  `db:"battery"`
+	Location           *Location `db:"location"`
+	LocationName       *string   `db:"location_name"`
+	RecordingStartedAt *int64    `db:"recording_started_at"`
+	MemoryUsed         *int32    `db:"memory_used"`
+	MemoryAvailable    *int32    `db:"memory_available"`
+	FirmwareNumber     *int32    `db:"firmware_number"`
+	FirmwareTime       *int64    `db:"firmware_time"`
 }
 
 func (s *Station) ParseHttpReply(raw string) (*pb.HttpReply, error) {

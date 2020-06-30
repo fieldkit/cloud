@@ -33,13 +33,11 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			DeviceID   string                 `json:"device_id"`
-			Name       string                 `json:"name"`
-			StatusJSON map[string]interface{} `json:"status_json"`
+			DeviceID string `json:"device_id"`
+			Name     string `json:"name"`
 		}{
-			DeviceID:   station.DeviceIDHex(),
-			Name:       station.Name,
-			StatusJSON: make(map[string]interface{}),
+			DeviceID: station.DeviceIDHex(),
+			Name:     station.Name,
 		},
 	)
 	assert.NoError(err)

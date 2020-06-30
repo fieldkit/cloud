@@ -30,8 +30,8 @@ func NewStationRepository(db *sqlxcache.DB) (rr *StationRepository, err error) {
 func (r *StationRepository) Add(ctx context.Context, adding *data.Station) (station *data.Station, err error) {
 	if err := r.db.NamedGetContext(ctx, adding, `
 		INSERT INTO fieldkit.station
-		(name, device_id, owner_id, status_json, created_at, updated_at, location, location_name, battery, memory_used, memory_available, firmware_number, firmware_time, recording_started_at) VALUES
-		(:name, :device_id, :owner_id, :status_json, :created_at, :updated_at, ST_SetSRID(ST_GeomFromText(:location), 4326), :location_name, :battery, :memory_used, :memory_available, :firmware_number, :firmware_time, :recording_started_at)
+		(name, device_id, owner_id, created_at, updated_at, location, location_name, battery, memory_used, memory_available, firmware_number, firmware_time, recording_started_at) VALUES
+		(:name, :device_id, :owner_id, :created_at, :updated_at, ST_SetSRID(ST_GeomFromText(:location), 4326), :location_name, :battery, :memory_used, :memory_available, :firmware_number, :firmware_time, :recording_started_at)
 		RETURNING id
 		`, adding); err != nil {
 		return nil, err
@@ -44,7 +44,6 @@ func (r *StationRepository) Update(ctx context.Context, station *data.Station) (
 	if _, err := r.db.NamedExecContext(ctx, `
 		UPDATE fieldkit.station SET
 			   name = :name,
-			   status_json = :status_json,
 			   battery = :battery,
 			   location = ST_SetSRID(ST_GeomFromText(:location), 4326),
 			   location_name = :location_name,
@@ -65,7 +64,7 @@ func (r *StationRepository) QueryStationByID(ctx context.Context, id int32) (sta
 	station = &data.Station{}
 	if err := r.db.GetContext(ctx, station, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, status_json, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE id = $1
 		`, id); err != nil {
 		return nil, err
@@ -77,7 +76,7 @@ func (r *StationRepository) QueryStationsByDeviceID(ctx context.Context, deviceI
 	stations = []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, status_json, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE device_id = $1
 		`, deviceIdBytes); err != nil {
 		return nil, err
@@ -89,7 +88,7 @@ func (r *StationRepository) QueryStationByDeviceID(ctx context.Context, deviceId
 	station = &data.Station{}
 	if err := r.db.GetContext(ctx, station, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, status_json, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE device_id = $1
 		`, deviceIdBytes); err != nil {
 		return nil, err
@@ -101,7 +100,7 @@ func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, devic
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, status_json, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE device_id = $1
 		`, deviceIdBytes); err != nil {
 		return nil, err
@@ -326,7 +325,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, status_json, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE id = $1
 		`, id); err != nil {
 		return nil, err
@@ -422,7 +421,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, status_json, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE owner_id = $1
 		`, id); err != nil {
 		return nil, err
@@ -521,7 +520,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, status_json, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+			id, name, device_id, owner_id, created_at, updated_at, private, battery, location_name, recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
 		`, id); err != nil {
 		return nil, err
