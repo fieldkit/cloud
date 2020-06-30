@@ -133,6 +133,7 @@ export interface Project {
     mediaContentType: string;
     mediaUrl: string;
     startTime?: Date;
+    endTime?: Date;
     numberOfFollowers: number;
 }
 

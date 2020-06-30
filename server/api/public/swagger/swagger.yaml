@@ -61,19 +61,19 @@ definitions:
   AddProjectPayload:
     example:
       description: Aut hic.
-      end_time: "1994-08-15T13:51:44Z"
+      endTime: "1994-08-15T13:51:44Z"
       goal: Rem quisquam repellat.
       location: Ut unde eaque culpa unde iusto cumque.
       name: Ut consequatur ea repudiandae veritatis delectus sit.
       private: false
       slug: 76xcws9vmo
-      start_time: "2007-03-20T21:15:53Z"
+      startTime: "2007-03-20T21:15:53Z"
       tags: Adipisci nam est est iure hic deserunt.
     properties:
       description:
         example: Aut hic.
         type: string
-      end_time:
+      endTime:
         example: "1994-08-15T13:51:44Z"
         format: date-time
         type: string
@@ -94,7 +94,7 @@ definitions:
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
-      start_time:
+      startTime:
         example: "2007-03-20T21:15:53Z"
         format: date-time
         type: string
@@ -140,7 +140,7 @@ definitions:
     description: DeviceDataRecord media type (default view)
     example:
       data:
-        Possimus labore qui possimus porro quaerat.: 42663421-7746-4d21-836c-8bafdcc9e5be
+        Possimus labore qui possimus porro quaerat.: 4285d44d-c6ea-430e-8e72-958d25866c1e
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -151,7 +151,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Possimus labore qui possimus porro quaerat.: 42663421-7746-4d21-836c-8bafdcc9e5be
+          Possimus labore qui possimus porro quaerat.: 4285d44d-c6ea-430e-8e72-958d25866c1e
         type: object
       id:
         example: 3.1889681637076403e+18
@@ -191,7 +191,7 @@ definitions:
       (default view)
     example:
     - data:
-        Possimus labore qui possimus porro quaerat.: 42663421-7746-4d21-836c-8bafdcc9e5be
+        Possimus labore qui possimus porro quaerat.: 4285d44d-c6ea-430e-8e72-958d25866c1e
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -199,7 +199,7 @@ definitions:
       record: 7.193395211552676e+18
       time: "1980-07-29T04:01:26Z"
     - data:
-        Possimus labore qui possimus porro quaerat.: 42663421-7746-4d21-836c-8bafdcc9e5be
+        Possimus labore qui possimus porro quaerat.: 4285d44d-c6ea-430e-8e72-958d25866c1e
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -216,7 +216,7 @@ definitions:
     example:
       data:
       - data:
-          Possimus labore qui possimus porro quaerat.: 42663421-7746-4d21-836c-8bafdcc9e5be
+          Possimus labore qui possimus porro quaerat.: 4285d44d-c6ea-430e-8e72-958d25866c1e
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -224,7 +224,7 @@ definitions:
         record: 7.193395211552676e+18
         time: "1980-07-29T04:01:26Z"
       - data:
-          Possimus labore qui possimus porro quaerat.: 42663421-7746-4d21-836c-8bafdcc9e5be
+          Possimus labore qui possimus porro quaerat.: 4285d44d-c6ea-430e-8e72-958d25866c1e
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -233,17 +233,17 @@ definitions:
         time: "1980-07-29T04:01:26Z"
       meta:
       - data:
-          Vel est.: 06821fd7-5a45-4972-8e3f-d186a5559f4a
+          Vel est.: 31c0e4f8-392e-4b36-9ac9-11ed66af3625
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Vel est.: 06821fd7-5a45-4972-8e3f-d186a5559f4a
+          Vel est.: 31c0e4f8-392e-4b36-9ac9-11ed66af3625
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Vel est.: 06821fd7-5a45-4972-8e3f-d186a5559f4a
+          Vel est.: 31c0e4f8-392e-4b36-9ac9-11ed66af3625
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
@@ -330,7 +330,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Vel est.: 06821fd7-5a45-4972-8e3f-d186a5559f4a
+        Vel est.: 31c0e4f8-392e-4b36-9ac9-11ed66af3625
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -338,7 +338,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Vel est.: 06821fd7-5a45-4972-8e3f-d186a5559f4a
+          Vel est.: 31c0e4f8-392e-4b36-9ac9-11ed66af3625
         type: object
       id:
         example: 2.827138534810339e+18
@@ -364,12 +364,12 @@ definitions:
       (default view)
     example:
     - data:
-        Vel est.: 06821fd7-5a45-4972-8e3f-d186a5559f4a
+        Vel est.: 31c0e4f8-392e-4b36-9ac9-11ed66af3625
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
     - data:
-        Vel est.: 06821fd7-5a45-4972-8e3f-d186a5559f4a
+        Vel est.: 31c0e4f8-392e-4b36-9ac9-11ed66af3625
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -1994,24 +1994,24 @@ definitions:
     description: Project media type (default view)
     example:
       description: Quia id.
-      end_time: "1983-08-03T11:15:36Z"
+      endTime: "1983-08-03T11:15:36Z"
       goal: Error et.
       id: 3.1106551483003817e+18
       location: Quas voluptates ad consectetur occaecati occaecati.
-      media_content_type: Sint excepturi rerum deleniti rem sint.
-      media_url: Ad laboriosam voluptatem explicabo magnam sunt.
+      mediaContentType: Sint excepturi rerum deleniti rem sint.
+      mediaUrl: Ad laboriosam voluptatem explicabo magnam sunt.
       name: Rerum rerum et quia ut incidunt consequatur.
-      number_of_followers: 6.091445377979088e+18
+      numberOfFollowers: 6.091445377979088e+18
       private: true
-      read_only: true
+      readOnly: true
       slug: 4mrpluru5p
-      start_time: "1979-05-05T06:47:15Z"
+      startTime: "1979-05-05T06:47:15Z"
       tags: Odio vel tempore.
     properties:
       description:
         example: Quia id.
         type: string
-      end_time:
+      endTime:
         example: "1983-08-03T11:15:36Z"
         format: date-time
         type: string
@@ -2025,23 +2025,23 @@ definitions:
       location:
         example: Quas voluptates ad consectetur occaecati occaecati.
         type: string
-      media_content_type:
+      mediaContentType:
         example: Sint excepturi rerum deleniti rem sint.
         type: string
-      media_url:
+      mediaUrl:
         example: Ad laboriosam voluptatem explicabo magnam sunt.
         type: string
       name:
         example: Rerum rerum et quia ut incidunt consequatur.
         type: string
-      number_of_followers:
+      numberOfFollowers:
         example: 6.091445377979088e+18
         format: int64
         type: integer
       private:
         example: true
         type: boolean
-      read_only:
+      readOnly:
         example: true
         type: boolean
       slug:
@@ -2049,7 +2049,7 @@ definitions:
         maxLength: 40
         pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
         type: string
-      start_time:
+      startTime:
         example: "1979-05-05T06:47:15Z"
         format: date-time
         type: string
@@ -2065,8 +2065,8 @@ definitions:
     - location
     - private
     - tags
-    - read_only
-    - number_of_followers
+    - readOnly
+    - numberOfFollowers
     title: 'Mediatype identifier: application/vnd.app.project+json; view=default'
     type: object
   ProjectCollection:
@@ -2074,32 +2074,32 @@ definitions:
       view)
     example:
     - description: Quia id.
-      end_time: "1983-08-03T11:15:36Z"
+      endTime: "1983-08-03T11:15:36Z"
       goal: Error et.
       id: 3.1106551483003817e+18
       location: Quas voluptates ad consectetur occaecati occaecati.
-      media_content_type: Sint excepturi rerum deleniti rem sint.
-      media_url: Ad laboriosam voluptatem explicabo magnam sunt.
+      mediaContentType: Sint excepturi rerum deleniti rem sint.
+      mediaUrl: Ad laboriosam voluptatem explicabo magnam sunt.
       name: Rerum rerum et quia ut incidunt consequatur.
-      number_of_followers: 6.091445377979088e+18
+      numberOfFollowers: 6.091445377979088e+18
       private: true
-      read_only: true
+      readOnly: true
       slug: 4mrpluru5p
-      start_time: "1979-05-05T06:47:15Z"
+      startTime: "1979-05-05T06:47:15Z"
       tags: Odio vel tempore.
     - description: Quia id.
-      end_time: "1983-08-03T11:15:36Z"
+      endTime: "1983-08-03T11:15:36Z"
       goal: Error et.
       id: 3.1106551483003817e+18
       location: Quas voluptates ad consectetur occaecati occaecati.
-      media_content_type: Sint excepturi rerum deleniti rem sint.
-      media_url: Ad laboriosam voluptatem explicabo magnam sunt.
+      mediaContentType: Sint excepturi rerum deleniti rem sint.
+      mediaUrl: Ad laboriosam voluptatem explicabo magnam sunt.
       name: Rerum rerum et quia ut incidunt consequatur.
-      number_of_followers: 6.091445377979088e+18
+      numberOfFollowers: 6.091445377979088e+18
       private: true
-      read_only: true
+      readOnly: true
       slug: 4mrpluru5p
-      start_time: "1979-05-05T06:47:15Z"
+      startTime: "1979-05-05T06:47:15Z"
       tags: Odio vel tempore.
     items:
       $ref: '#/definitions/Project'
@@ -2227,46 +2227,46 @@ definitions:
     example:
       projects:
       - description: Quia id.
-        end_time: "1983-08-03T11:15:36Z"
+        endTime: "1983-08-03T11:15:36Z"
         goal: Error et.
         id: 3.1106551483003817e+18
         location: Quas voluptates ad consectetur occaecati occaecati.
-        media_content_type: Sint excepturi rerum deleniti rem sint.
-        media_url: Ad laboriosam voluptatem explicabo magnam sunt.
+        mediaContentType: Sint excepturi rerum deleniti rem sint.
+        mediaUrl: Ad laboriosam voluptatem explicabo magnam sunt.
         name: Rerum rerum et quia ut incidunt consequatur.
-        number_of_followers: 6.091445377979088e+18
+        numberOfFollowers: 6.091445377979088e+18
         private: true
-        read_only: true
+        readOnly: true
         slug: 4mrpluru5p
-        start_time: "1979-05-05T06:47:15Z"
+        startTime: "1979-05-05T06:47:15Z"
         tags: Odio vel tempore.
       - description: Quia id.
-        end_time: "1983-08-03T11:15:36Z"
+        endTime: "1983-08-03T11:15:36Z"
         goal: Error et.
         id: 3.1106551483003817e+18
         location: Quas voluptates ad consectetur occaecati occaecati.
-        media_content_type: Sint excepturi rerum deleniti rem sint.
-        media_url: Ad laboriosam voluptatem explicabo magnam sunt.
+        mediaContentType: Sint excepturi rerum deleniti rem sint.
+        mediaUrl: Ad laboriosam voluptatem explicabo magnam sunt.
         name: Rerum rerum et quia ut incidunt consequatur.
-        number_of_followers: 6.091445377979088e+18
+        numberOfFollowers: 6.091445377979088e+18
         private: true
-        read_only: true
+        readOnly: true
         slug: 4mrpluru5p
-        start_time: "1979-05-05T06:47:15Z"
+        startTime: "1979-05-05T06:47:15Z"
         tags: Odio vel tempore.
       - description: Quia id.
-        end_time: "1983-08-03T11:15:36Z"
+        endTime: "1983-08-03T11:15:36Z"
         goal: Error et.
         id: 3.1106551483003817e+18
         location: Quas voluptates ad consectetur occaecati occaecati.
-        media_content_type: Sint excepturi rerum deleniti rem sint.
-        media_url: Ad laboriosam voluptatem explicabo magnam sunt.
+        mediaContentType: Sint excepturi rerum deleniti rem sint.
+        mediaUrl: Ad laboriosam voluptatem explicabo magnam sunt.
         name: Rerum rerum et quia ut incidunt consequatur.
-        number_of_followers: 6.091445377979088e+18
+        numberOfFollowers: 6.091445377979088e+18
         private: true
-        read_only: true
+        readOnly: true
         slug: 4mrpluru5p
-        start_time: "1979-05-05T06:47:15Z"
+        startTime: "1979-05-05T06:47:15Z"
         tags: Odio vel tempore.
     properties:
       projects:

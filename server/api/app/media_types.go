@@ -462,18 +462,18 @@ func (mt *MediaReferenceResponse) Validate() (err error) {
 // Identifier: application/vnd.app.project+json; view=default
 type Project struct {
 	Description       string     `form:"description" json:"description" yaml:"description" xml:"description"`
-	EndTime           *time.Time `form:"end_time,omitempty" json:"end_time,omitempty" yaml:"end_time,omitempty" xml:"end_time,omitempty"`
+	EndTime           *time.Time `form:"endTime,omitempty" json:"endTime,omitempty" yaml:"endTime,omitempty" xml:"endTime,omitempty"`
 	Goal              string     `form:"goal" json:"goal" yaml:"goal" xml:"goal"`
 	ID                int        `form:"id" json:"id" yaml:"id" xml:"id"`
 	Location          string     `form:"location" json:"location" yaml:"location" xml:"location"`
-	MediaContentType  *string    `form:"media_content_type,omitempty" json:"media_content_type,omitempty" yaml:"media_content_type,omitempty" xml:"media_content_type,omitempty"`
-	MediaURL          *string    `form:"media_url,omitempty" json:"media_url,omitempty" yaml:"media_url,omitempty" xml:"media_url,omitempty"`
+	MediaContentType  *string    `form:"mediaContentType,omitempty" json:"mediaContentType,omitempty" yaml:"mediaContentType,omitempty" xml:"mediaContentType,omitempty"`
+	MediaURL          *string    `form:"mediaUrl,omitempty" json:"mediaUrl,omitempty" yaml:"mediaUrl,omitempty" xml:"mediaUrl,omitempty"`
 	Name              string     `form:"name" json:"name" yaml:"name" xml:"name"`
-	NumberOfFollowers int        `form:"number_of_followers" json:"number_of_followers" yaml:"number_of_followers" xml:"number_of_followers"`
+	NumberOfFollowers int        `form:"numberOfFollowers" json:"numberOfFollowers" yaml:"numberOfFollowers" xml:"numberOfFollowers"`
 	Private           bool       `form:"private" json:"private" yaml:"private" xml:"private"`
-	ReadOnly          bool       `form:"read_only" json:"read_only" yaml:"read_only" xml:"read_only"`
+	ReadOnly          bool       `form:"readOnly" json:"readOnly" yaml:"readOnly" xml:"readOnly"`
 	Slug              string     `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
-	StartTime         *time.Time `form:"start_time,omitempty" json:"start_time,omitempty" yaml:"start_time,omitempty" xml:"start_time,omitempty"`
+	StartTime         *time.Time `form:"startTime,omitempty" json:"startTime,omitempty" yaml:"startTime,omitempty" xml:"startTime,omitempty"`
 	Tags              string     `form:"tags" json:"tags" yaml:"tags" xml:"tags"`
 }
 

@@ -437,13 +437,13 @@ Payload example:
 
 {
    "description": "Aut hic.",
-   "end_time": "1994-08-15T13:51:44Z",
+   "endTime": "1994-08-15T13:51:44Z",
    "goal": "Rem quisquam repellat.",
    "location": "Ut unde eaque culpa unde iusto cumque.",
    "name": "Ut consequatur ea repudiandae veritatis delectus sit.",
    "private": false,
    "slug": "76xcws9vmo",
-   "start_time": "2007-03-20T21:15:53Z",
+   "startTime": "2007-03-20T21:15:53Z",
    "tags": "Adipisci nam est est iure hic deserunt."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp72.Run(c, args) },
@@ -1120,13 +1120,13 @@ Payload example:
 
 {
    "description": "Aut hic.",
-   "end_time": "1994-08-15T13:51:44Z",
+   "endTime": "1994-08-15T13:51:44Z",
    "goal": "Rem quisquam repellat.",
    "location": "Ut unde eaque culpa unde iusto cumque.",
    "name": "Ut consequatur ea repudiandae veritatis delectus sit.",
    "private": false,
    "slug": "76xcws9vmo",
-   "start_time": "2007-03-20T21:15:53Z",
+   "startTime": "2007-03-20T21:15:53Z",
    "tags": "Adipisci nam est est iure hic deserunt."
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp117.Run(c, args) },
