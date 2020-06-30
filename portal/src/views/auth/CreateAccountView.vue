@@ -2,30 +2,67 @@
     <div id="form-container">
         <img class="form-header-logo" alt="FieldKit Logo" src="../../assets/FieldKit_Logo_White.png" />
         <div>
-            <div id="form">
+            <form id="form" @submit.prevent="save">
                 <h1>Create Your Account</h1>
                 <div class="outer-input-container">
                     <div class="input-container">
-                        <input keyboardType="name" autocorrect="false" autocapitalizationType="none" required="" class="inputText" />
+                        <input
+                            keyboardType="name"
+                            autocorrect="false"
+                            autocapitalizationType="none"
+                            class="inputText"
+                            v-model="form.name"
+                        />
                         <span class="floating-label">Name</span>
+
+                        <div class="validation-errors" v-if="$v.form.name.$error">
+                            <div v-if="!$v.form.name.required">Name is a required field.</div>
+                        </div>
                     </div>
                 </div>
                 <div class="outer-input-container">
                     <div class="input-container middle-container">
-                        <input required="" keyboardType="email" autocorrect="false" autocapitalizationType="none" class="inputText" />
+                        <input
+                            keyboardType="email"
+                            autocorrect="false"
+                            autocapitalizationType="none"
+                            class="inputText"
+                            v-model="form.email"
+                        />
                         <span class="floating-label">Email</span>
+
+                        <div class="validation-errors" v-if="$v.form.email.$error">
+                            <div v-if="!$v.form.email.required">Email is a required field.</div>
+                            <div v-if="!$v.form.email.email">Must be a valid email address.</div>
+                        </div>
                     </div>
                 </div>
                 <div class="outer-input-container">
                     <div class="input-container middle-container">
-                        <input name="password" required="" secure="true" type="password" class="inputText" />
+                        <input name="password" secure="true" type="password" class="inputText" v-model="form.password" />
                         <span class="floating-label">Password</span>
+
+                        <div class="validation-errors" v-if="$v.form.password.$error">
+                            <div v-if="!$v.form.password.required">This is a required field.</div>
+                            <div v-if="!$v.form.password.min">Password must be at least 10 characters.</div>
+                        </div>
                     </div>
                 </div>
                 <div class="outer-input-container">
                     <div class="input-container middle-container">
-                        <input name="confirmPassword" required="" secure="true" ref="confirmPassword" type="password" class="inputText" />
+                        <input
+                            secure="true"
+                            name="passwordConfirmation"
+                            type="password"
+                            class="inputText"
+                            v-model="form.passwordConfirmation"
+                        />
                         <span class="floating-label">Confirm Password</span>
+
+                        <div class="validation-errors" v-if="$v.form.passwordConfirmation.$error">
+                            <div v-if="!$v.form.passwordConfirmation.required">Confirmation is a required field.</div>
+                            <div v-if="!$v.form.passwordConfirmation.sameAsPassword">Passwords must match.</div>
+                        </div>
                     </div>
                     <div class="policy-terms-container">
                         By creating an account you agree to our
@@ -34,24 +71,50 @@
                         <span class="bold">Terms of Use.</span>
                     </div>
                 </div>
-                <button class="form-save-btn">Create Account</button>
+                <button class="form-save-btn" type="submit">Create Account</button>
                 <div>
                     <router-link :to="{ name: 'login' }" class="create-link">
                         Back to Log In
                     </router-link>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+<script>
+import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
 
-@Component({
-    components: {},
-})
-export default class CreateAccountView extends Vue {}
+export default {
+    data() {
+        return {
+            form: {
+                name: "",
+                email: "",
+                password: "",
+                passwordConfirmation: "",
+            },
+        };
+    },
+    validations: {
+        form: {
+            name: { required },
+            email: { required, email },
+            password: { required, min: minLength(10) },
+            passwordConfirmation: { required, min: minLength(10), sameAsPassword: sameAs("password") },
+        },
+    },
+    methods: {
+        save() {
+            console.log(this.$v.form.name);
+            this.$v.form.$touch();
+            if (this.$v.form.$pending || this.$v.form.$error) {
+                return;
+            }
+            console.log("save", this.$v.form);
+        },
+    },
+};
 </script>
 
 <style scoped>
@@ -142,5 +205,10 @@ li {
     width: 210px;
     margin-top: 150px;
     margin-bottom: 86px;
+}
+.validation-errors {
+    color: #c42c44;
+    display: block;
+    font-size: 14px;
 }
 </style>
