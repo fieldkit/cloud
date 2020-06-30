@@ -16,7 +16,6 @@ import (
 
 	"github.com/O-C-R/singlepage"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 
 	_ "github.com/lib/pq"
@@ -58,8 +57,6 @@ type Config struct {
 	ApiHost               string `split_words:"true" default:""`
 	MediaBucketName       string `split_words:"true" default:""`
 	StreamsBucketName     string `split_words:"true" default:""`
-	AwsId                 string `split_words:"true" default:""`
-	AwsSecret             string `split_words:"true" default:""`
 	StatsdAddress         string `split_words:"true" default:""`
 	Production            bool   `envconfig:"production"`
 	LoggingFull           bool   `envconfig:"logging_full"`
@@ -102,23 +99,12 @@ func loadConfiguration() (*Config, *Options, error) {
 
 func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
 	log := logging.Logger(ctx).Sugar()
+	log.Infow("using aws profile")
 
-	if config.AwsId == "" || config.AwsSecret == "" {
-		log.Infow("using aws profile")
-		return session.Options{
-			Profile: config.AWSProfile,
-			Config: aws.Config{
-				Region:                        aws.String("us-east-1"),
-				CredentialsChainVerboseErrors: aws.Bool(true),
-			},
-		}
-	}
-	log.Infow("using aws credentials")
 	return session.Options{
 		Profile: config.AWSProfile,
 		Config: aws.Config{
 			Region:                        aws.String("us-east-1"),
-			Credentials:                   credentials.NewStaticCredentials(config.AwsId, config.AwsSecret, ""),
 			CredentialsChainVerboseErrors: aws.Bool(true),
 		},
 	}
