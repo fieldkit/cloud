@@ -207,8 +207,8 @@ export interface Station {
     configurations: Configurations;
     updated: number;
     location: HasLocation | null;
-    placeName: string | null;
-    nativeLandName: string | null;
+    placeNameOther: string | null;
+    placeNameNative: string | null;
 }
 
 export interface ProjectsResponse {

@@ -27,17 +27,13 @@
             </div>
             <div class="spacer"></div>
             <div id="location-container" class="section">
-                <div class="location-item" v-if="placeName">
+                <div class="location-item" v-if="station.placeNameOther">
                     <img alt="location-icon" src="../assets/icon-location.png" />
-                    {{ station.locationName ? station.locationName : placeName }}
+                    {{ station.locationName ? station.locationName : station.placeNameOther }}
                 </div>
-                <div class="location-item" v-if="nativeLand.length > 0">
+                <div class="location-item" v-if="station.placeNameNative">
                     <img alt="location-icon" src="../assets/icon-location.png" />
-                    Native Land:
-                    <span v-for="(n, i) in nativeLand" v-bind:key="n.url" class="note-container">
-                        <a :href="n.url" class="native-land-link" target="_blank">{{ n.name }}</a>
-                        <span>{{ i == nativeLand.length - 1 ? "" : ", " }}</span>
-                    </span>
+                    Native Land: {{ station.placeNameNative }}
                 </div>
                 <div class="left" v-if="station.location">
                     {{ station.location.latitude | prettyCoordinate }}
@@ -103,8 +99,6 @@ export default {
     data: () => {
         return {
             viewingSummary: true,
-            nativeLand: [],
-            placeName: "",
         };
     },
     props: {
@@ -117,36 +111,8 @@ export default {
             return makeAuthenticatedApiUrl(this.station.photos.small);
         },
     },
-    /*
-    watch: {
-        station() {
-            if (this.station) {
-                this.setModules();
-                this.getPlaceName()
-                    .then(this.getNativeLand)
-                    .then(result => {
-                        this.nativeLand = _.map(_.flatten(_.map(result, "properties")), r => {
-                            return { name: r.Name, url: r.description };
-                        });
-                    });
-            }
-        },
-    },
-	*/
-    async beforeCreate() {
-        this.api = new FKApi();
-    },
     mounted() {
-        /*
-        if (!this.station.location) {
-            this.placeName = "Unknown area";
-        } else {
-            this.api.getNativeLand(this.station.location);
-            this.api.getPlaceName(this.station.location).then(result => {
-                this.placeName = result.features[0] ? result.features[0].place_name : "Unknown area";
-            });
-        }
-		*/
+        console.log(this.station);
     },
     methods: {
         viewSummary() {

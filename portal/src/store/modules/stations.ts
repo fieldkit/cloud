@@ -74,6 +74,8 @@ export class DisplayStation {
     location: Location | null = null;
     photos: Photos;
     modules: DisplayModule[] = [];
+    placeNameOther: string | null;
+    placeNameNative: string | null;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -81,6 +83,8 @@ export class DisplayStation {
         this.updated = whenWasStationUpdated(station);
         this.configurations = station.configurations;
         this.photos = station.photos;
+        this.placeNameOther = station.placeNameOther;
+        this.placeNameNative = station.placeNameNative;
         this.modules =
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))

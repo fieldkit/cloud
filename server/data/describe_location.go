@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 type DescribeLocations struct {
@@ -88,8 +89,13 @@ func (ls *DescribeLocations) queryNative(ctx context.Context, l *Location) (name
 		return nil, err
 	}
 
+	names := make([]string, 0)
 	for _, feature := range parsed {
-		return &feature.Properties.Name, nil
+		names = append(names, feature.Properties.Name)
+	}
+	if len(names) > 0 {
+		all := strings.Join(names, ",")
+		return &all, nil
 	}
 
 	return nil, nil
