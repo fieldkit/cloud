@@ -223,7 +223,7 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 		return err
 	}
 
-	keeping := make([]int64, 0)
+	keepingModules := make([]int64, 0)
 
 	if statusReply.LiveReadings != nil {
 		for _, lr := range statusReply.LiveReadings {
@@ -237,7 +237,9 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 					return err
 				}
 
-				keeping = append(keeping, module.ID)
+				keepingModules = append(keepingModules, module.ID)
+
+				keepingSensors := make([]int64, 0)
 
 				for sensorIndex, lrs := range lrm.Readings {
 					s := lrs.Sensor
@@ -247,6 +249,12 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 					if _, err := r.UpsertModuleSensor(ctx, sensor); err != nil {
 						return err
 					}
+
+					keepingSensors = append(keepingSensors, sensor.ID)
+				}
+
+				if err := r.deleteModuleSensorsExcept(ctx, module.ID, keepingSensors); err != nil {
+					return err
 				}
 			}
 		}
@@ -257,18 +265,26 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 				return err
 			}
 
-			keeping = append(keeping, module.ID)
+			keepingModules = append(keepingModules, module.ID)
+
+			keepingSensors := make([]int64, 0)
 
 			for sensorIndex, s := range m.Sensors {
 				sensor := newModuleSensor(s, module, configuration, uint32(sensorIndex), nil, nil)
 				if _, err := r.UpsertModuleSensor(ctx, sensor); err != nil {
 					return err
 				}
+
+				keepingSensors = append(keepingSensors, sensor.ID)
+			}
+
+			if err := r.deleteModuleSensorsExcept(ctx, module.ID, keepingSensors); err != nil {
+				return err
 			}
 		}
 	}
 
-	if err := r.deleteStationModulesExcept(ctx, configuration.ID, keeping); err != nil {
+	if err := r.deleteStationModulesExcept(ctx, configuration.ID, keepingModules); err != nil {
 		return err
 	}
 
@@ -305,6 +321,20 @@ func (r *StationRepository) updateDeployedActivityFromStatus(ctx context.Context
 		RETURNING id
 		`, station.ID, deployedAt, location); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (r *StationRepository) deleteModuleSensorsExcept(ctx context.Context, moduleID int64, keeping []int64) error {
+	if query, args, err := sqlx.In(`
+		DELETE FROM fieldkit.module_sensor WHERE module_id = ? AND id NOT IN (?)
+		`, moduleID, keeping); err != nil {
+		return err
+	} else {
+		if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+			return err
+		}
 	}
 
 	return nil
