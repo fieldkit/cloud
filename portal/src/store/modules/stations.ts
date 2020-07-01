@@ -137,6 +137,7 @@ export class MappedStations {
     }
 
     boundsLngLat(): number[][] {
+        console.log("map: returning bounds", this.bounds, this.features);
         return [this.bounds.min.lngLat(), this.bounds.max.lngLat()];
     }
 }

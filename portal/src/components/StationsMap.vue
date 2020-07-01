@@ -1,5 +1,5 @@
 <template>
-    <div v-if="mapped && mapped.valid" style="height: 100%; width: 100%;">
+    <div v-if="mapped && mapped.valid" class="ignored" style="height: 100%; width: 100%;">
         <mapbox
             class="stations-map"
             :access-token="mapboxToken"
@@ -66,9 +66,8 @@ export default {
                 return;
             }
 
-            console.log("map: updating", this.mapped);
-
             if (!this.map.getLayer("station-markers")) {
+                console.log("map: updating", this.mapped);
                 this.map.addLayer({
                     id: "station-markers",
                     type: "symbol",
@@ -93,6 +92,8 @@ export default {
                     console.log("map: click", id);
                     this.$emit("showSummary", { id: id });
                 });
+            } else {
+                console.log("map: ignored", this.mapped);
             }
         },
     },

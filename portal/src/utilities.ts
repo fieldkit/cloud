@@ -60,13 +60,14 @@ export function unixNow() {
 export function convertOldFirmwareResponse(module) {
     // compensate for old firmware
     if (module.name.indexOf("modules") != 0) {
-        module.name = "modules." + module.name;
-        if (module.name == "modules.water") {
+        let name = "modules." + module.name;
+        if (name == "modules.water") {
             // this is dicey, but temporary...
             if (module.sensorObjects) {
-                module.name += "." + module.sensorObjects[0].name;
+                name += "." + module.sensorObjects[0].name;
             }
         }
+        return name;
     }
     return module.name;
 }
