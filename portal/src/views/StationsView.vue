@@ -11,7 +11,7 @@
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" @sidebarToggled="onSidebarToggle" />
         <div id="stations-view-panel" class="main-panel full-height">
             <div id="summary-and-map">
-                <StationsMap :stations="stations" @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" />
+                <StationsMap @mapReady="onMapReady" @showSummary="showSummary" :mapped="mapped" />
                 <StationSummary
                     v-if="activeStationId"
                     @closeSummary="closeSummary"
@@ -83,7 +83,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
+        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy", mapped: "mapped" }),
         ...mapState({
             user: (s) => s.user.user,
             hasNoStations: (s) => s.stations.hasNoStations,
@@ -110,17 +110,12 @@ export default {
                 return this.$router.push("/");
             }
         },
-        showSummary(station, preserveRoute) {
-            this.activeStationId = station.id;
-            this.updateStationRoute(station);
+        showSummary(params, preserveRoute) {
+            this.$router.push({ name: "viewStation", params: params });
+            this.activeStationId = params.id;
         },
         closeSummary() {
             this.activeStationId = null;
-        },
-        updateStationRoute(station) {
-            if (this.$route.name != "viewStation" || this.$route.params.id != station.id) {
-                this.$router.push({ name: "viewStation", params: { id: station.id } });
-            }
         },
         onMapReady(map) {
             this.map = map;

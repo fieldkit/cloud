@@ -23,6 +23,10 @@ export class Location implements HasLocation {
     clone(): Location {
         return new Location(this.latitude, this.longitude);
     }
+
+    lngLat(): number[] {
+        return [this.longitude, this.latitude];
+    }
 }
 
 export class BoundingRectangle {
@@ -32,9 +36,10 @@ export class BoundingRectangle {
         return this.min == null || this.max == null;
     }
 
-    include(l: Location): void {
+    include(l: Location): BoundingRectangle {
         this.min = this.min == null ? l.clone() : this.min.minimum(l);
         this.max = this.max == null ? l.clone() : this.max.maximum(l);
+        return this;
     }
 
     contains(l: Location): boolean {
@@ -47,6 +52,21 @@ export class BoundingRectangle {
             l.latitude <= this.max.latitude &&
             l.longitude <= this.max.longitude
         );
+    }
+
+    isEmpty() {
+        return this.min != null && this.max != null;
+    }
+
+    expandIfSingleCoordinate(margin: number): BoundingRectangle {
+        if (!this.isSingleCoordinate()) {
+            return this;
+        }
+        return BoundingRectangle.around(this.min, margin);
+    }
+
+    isSingleCoordinate(): boolean {
+        return this.min.latitude == this.max.latitude || this.max.longitude == this.max.longitude;
     }
 
     static around(center: Location, margin: number) {

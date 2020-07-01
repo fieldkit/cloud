@@ -42,7 +42,7 @@
             </div>
         </div>
         <div id="stations-map-container" :style="{ width: mapContainerSize.width, height: mapContainerSize.height }">
-            <StationsMap :stations="projectStations" @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" />
+            <StationsMap @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" :mapped="mappedProject" />
             <StationSummary
                 v-show="activeStation"
                 :station="activeStation"
@@ -93,6 +93,10 @@ export default {
     computed: {
         projectStations() {
             return this.$store.getters.projectsById[this.project.id].stations;
+        },
+        mappedProject() {
+            console.log(this.mapContainerSize);
+            return this.$store.getters.projectsById[this.project.id].mapped;
         },
     },
     methods: {

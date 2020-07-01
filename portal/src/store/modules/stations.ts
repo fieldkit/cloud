@@ -25,7 +25,7 @@ export const PROJECT_ACTIVITY = "PROJECT_ACTIVITY";
 export const STATION_UPDATE = "STATION_UPDATE";
 
 export class StationsState {
-    stations: { all: { [index: number]: Station }; user: Station[] } = { all: {}, user: [] };
+    stations: { all: { [index: number]: DisplayStation }; user: Station[] } = { all: {}, user: [] };
     projects: { user: Project[]; community: Project[] } = { user: [], community: [] };
     projectUsers: { [index: number]: ProjectUser[] } = {};
     projectFollowers: { [index: number]: ProjectFollowers } = {};
@@ -99,10 +99,56 @@ export class ProjectModule {
     constructor(public readonly name: string, public url: string | null) {}
 }
 
+export class MapFeature {
+    type = "Feature";
+    geometry: { type: string; coordinates: number[] } | null = null;
+    properties: { title: string; icon: string; id: number } | null = null;
+
+    constructor(station: DisplayStation) {
+        this.geometry = {
+            type: "Point",
+            coordinates: station.location.lngLat(),
+        };
+        this.properties = {
+            id: station.id,
+            title: station.name,
+            icon: "marker",
+        };
+    }
+}
+
+export class MappedStations {
+    bounds: BoundingRectangle | null = null;
+    features: MapFeature[] = [];
+
+    constructor(stations: DisplayStation[]) {
+        const FeetAroundPhone = 1000;
+
+        const located = stations.filter((station) => station.location != null);
+        if (located.length == 0) {
+            return;
+        }
+        const around = located.reduce((bb, station) => bb.include(station.location), new BoundingRectangle());
+
+        // Sort by latitude?
+        this.features = located.map((ds) => new MapFeature(ds));
+        this.bounds = around.expandIfSingleCoordinate(FeetAroundPhone);
+    }
+
+    get valid(): boolean {
+        return this.bounds != null;
+    }
+
+    boundsLngLat(): number[][] {
+        return [this.bounds.min.lngLat(), this.bounds.max.lngLat()];
+    }
+}
+
 export class DisplayProject {
     id: number;
     modules: ProjectModule[];
     duration: number | null = null;
+    mapped: MappedStations;
 
     constructor(
         public readonly project: Project,
@@ -118,6 +164,7 @@ export class DisplayProject {
             .uniqBy((m) => m.name)
             .map((m) => new ProjectModule(m.name, null))
             .value();
+        this.mapped = new MappedStations(stations);
         if (project.startTime && project.endTime) {
             const start = new Date(project.startTime);
             const end = new Date(project.endTime);
@@ -142,6 +189,9 @@ const getters = {
     },
     stationsById(state: StationsState): { [index: number]: Station } {
         return _.keyBy(state.stations, (p) => p.id);
+    },
+    mapped(state: StationsState): MappedStations {
+        return new MappedStations(Object.values(state.stations.all));
     },
 };
 
@@ -207,11 +257,17 @@ const actions = {
     [ActionTypes.PROJECT_UNFOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
         await new FKApi().unfollowProject(payload.projectId);
     },
-    [ActionTypes.STATION_PROJECT_ADD]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
-        // await new FKApi().unfollowProject(payload.projectId);
+    [ActionTypes.STATION_PROJECT_ADD]: async (
+        { commit, dispatch }: { commit: any; dispatch: any },
+        payload: { stationId: number; projectId: number }
+    ) => {
+        await new FKApi().addStationToProject(payload);
     },
-    [ActionTypes.STATION_PROJECT_REMOVE]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
-        // await new FKApi().unfollowProject(payload.projectId);
+    [ActionTypes.STATION_PROJECT_REMOVE]: async (
+        { commit, dispatch }: { commit: any; dispatch: any },
+        payload: { stationId: number; projectId: number }
+    ) => {
+        await new FKApi().removeStationFromProject(payload);
     },
 };
 
