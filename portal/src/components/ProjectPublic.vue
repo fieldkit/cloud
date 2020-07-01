@@ -298,7 +298,6 @@ export default {
     margin: 22px 0 0 32px;
     border: 1px solid #d8dce0;
     background: white;
-    overflow: scroll;
 }
 #public-activity-feed-container .heading {
     font-size: 20px;
