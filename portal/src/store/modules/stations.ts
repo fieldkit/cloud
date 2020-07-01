@@ -147,6 +147,7 @@ export class DisplayProject {
     modules: ProjectModule[];
     duration: number | null = null;
     mapped: MappedStations;
+    places: { native: string | null } = { native: null };
 
     constructor(
         public readonly project: Project,
@@ -169,6 +170,9 @@ export class DisplayProject {
             end.setDate(end.getDate() + 1); // FK-1927
             this.duration = end.getTime() - start.getTime();
         }
+        this.places.native = _(stations)
+            .map((s) => s.placeNameNative)
+            .join(", ");
     }
 }
 

@@ -12,6 +12,10 @@
                         <img alt="Location" src="../assets/icon-location.png" class="icon" />
                         {{ project.location }}
                     </div>
+                    <div class="location" v-if="displayProject.places.native">
+                        <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                        Native Lands: {{ displayProject.places.native }}
+                    </div>
                     <div class="time-container">
                         <div class="time" v-if="project.startTime">Started: {{ project.startTime | prettyDate }}</div>
                         <span v-if="project.startTime && displayProject.duration">&nbsp;|&nbsp;</span>

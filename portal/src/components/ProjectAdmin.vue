@@ -59,6 +59,10 @@
                             <img alt="Location" src="../assets/icon-location.png" class="icon" />
                             {{ project.location }}
                         </div>
+                        <div class="location" v-if="displayProject.places.native">
+                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            Native Lands: {{ displayProject.places.native }}
+                        </div>
                     </div>
                     <div class="space"></div>
                     <div class="team-icons">
