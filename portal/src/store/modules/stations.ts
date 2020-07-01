@@ -122,17 +122,14 @@ export class MappedStations {
     features: MapFeature[] = [];
 
     constructor(stations: DisplayStation[]) {
-        const FeetAroundPhone = 1000;
+        const DefaultLocation = new Location(34.3318104, -118.0730372); // TwinPeaks
 
         const located = stations.filter((station) => station.location != null);
-        if (located.length == 0) {
-            return;
-        }
         const around = located.reduce((bb, station) => bb.include(station.location), new BoundingRectangle());
+        const feetAround = located.length > 0 ? 1000 : 100000;
 
-        // Sort by latitude?
+        this.bounds = around.expandIfSingleCoordinate(DefaultLocation, feetAround);
         this.features = located.map((ds) => new MapFeature(ds));
-        this.bounds = around.expandIfSingleCoordinate(FeetAroundPhone);
     }
 
     get valid(): boolean {

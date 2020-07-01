@@ -54,15 +54,18 @@ export class BoundingRectangle {
         );
     }
 
-    isEmpty() {
-        return this.min != null && this.max != null;
+    isEmpty(): boolean {
+        return this.min == null || this.max == null;
     }
 
-    expandIfSingleCoordinate(margin: number): BoundingRectangle {
-        if (!this.isSingleCoordinate()) {
-            return this;
+    expandIfSingleCoordinate(defaultCenter: Location, margin: number): BoundingRectangle {
+        if (this.isEmpty()) {
+            return BoundingRectangle.around(defaultCenter, margin);
         }
-        return BoundingRectangle.around(this.min, margin);
+        if (this.isSingleCoordinate()) {
+            return BoundingRectangle.around(this.min, margin);
+        }
+        return this;
     }
 
     isSingleCoordinate(): boolean {
