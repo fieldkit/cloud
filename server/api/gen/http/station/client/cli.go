@@ -23,7 +23,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"deviceId\": \"Delectus hic quia omnis debitis beatae ut.\",\n      \"locationName\": \"Et odio enim quibusdam et ut mollitia.\",\n      \"name\": \"Aut molestias dolorem.\",\n      \"statusPb\": \"Tenetur quae aut fuga est laudantium eius.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"deviceId\": \"Expedita iste ut maxime corporis.\",\n      \"locationName\": \"Nesciunt iste eius et.\",\n      \"name\": \"Ut dicta minima eligendi repudiandae.\",\n      \"statusPb\": \"Omnis tempore aut maxime.\"\n   }'")
 		}
 	}
 	var auth string
@@ -73,7 +73,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"location_name\": \"Cum nostrum occaecati facilis.\",\n      \"name\": \"In voluptatem assumenda sint tempore nesciunt.\",\n      \"status_pb\": \"Dolorem expedita.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"location_name\": \"Ea consequuntur nostrum tempora placeat.\",\n      \"name\": \"Consequatur consequatur.\",\n      \"status_pb\": \"Numquam architecto voluptatem cum.\"\n   }'")
 		}
 	}
 	var id int32

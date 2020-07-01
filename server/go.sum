@@ -152,6 +152,7 @@ github.com/fieldkit/cloud v0.0.0-20200504164049-ff360c05c3a4 h1:kDjcPyL/I3JxsdN0
 github.com/fieldkit/cloud v0.0.0-20200518193154-9deb6ecf5fa2 h1:ZRJ2Jn7ehLFvQdc9zvOtHgevQfdrPxZJk5qT45V1ndA=
 github.com/fieldkit/cloud v0.0.0-20200609233436-ae6a89ded734 h1:Ir22Hg7H1k2UqpSaY31Fq8V3+69nBCRY97HHNUqGhJo=
 github.com/fieldkit/cloud v0.0.0-20200628205510-bd83dd7bd571 h1:QqzGyxFMesfBkFNmJsHZ0eLtBBsQN2bQ6C1NjJwEqgU=
+github.com/fieldkit/cloud v0.0.0-20200701023840-ec3219a1665a h1:O284fVTkUlcB8KTR2BfiSeztQ+wairYaSefFIwGOrRc=
 github.com/fieldkit/data-protocol v0.0.0-20180327223702-03a931c33d8e h1:rFW2B+LYyxl52yCRhUXiORgPL9HXM9h40mkkyPg2jY0=
 github.com/fieldkit/data-protocol v0.0.0-20180327223702-03a931c33d8e/go.mod h1:Atpguegf5+RPc1NjBgZ3oukS3WAqckGBcLjdRJOvY6A=
 github.com/fieldkit/data-protocol v0.0.0-20190903230951-dd4bd77f8fec h1:UZ8oj/i5PLGrAV0WqiRYzy32woAictOHHrPFWhA4w18=
