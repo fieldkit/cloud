@@ -53,7 +53,7 @@ type Note struct {
 	ID        int64     `db:"id,omitempty"`
 	StationID int32     `db:"station_id"`
 	Created   time.Time `db:"created_at"`
-	AtuhorID  int32     `db:"author_id"`
+	AuthorID  int32     `db:"author_id"`
 	MediaID   *int64    `db:"media_id"`
 	Key       *string   `db:"key"`
 	Body      *string   `db:"body"`

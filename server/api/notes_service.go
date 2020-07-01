@@ -36,7 +36,7 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 
 		note := &data.Note{
 			StationID: payload.StationID,
-			AtuhorID:  p.UserID(),
+			AuthorID:  p.UserID(),
 			MediaID:   webNote.MediaID,
 			Key:       webNote.Key,
 			Body:      webNote.Body,
@@ -61,7 +61,7 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 		note := &data.Note{
 			ID:        webNote.ID,
 			StationID: payload.StationID,
-			AtuhorID:  p.UserID(),
+			AuthorID:  p.UserID(),
 			MediaID:   webNote.MediaID,
 			Key:       webNote.Key,
 			Body:      webNote.Body,
@@ -80,6 +80,24 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 }
 
 func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*notes.FieldNotes, error) {
+	allAuthors := []*data.User{}
+	if err := s.options.Database.SelectContext(ctx, &allAuthors, `
+		SELECT * FROM fieldkit.user WHERE id IN (
+			SELECT author_id FROM fieldkit.notes WHERE station_id = $1 ORDER BY created_at DESC
+		)
+		`, payload.StationID); err != nil {
+		return nil, err
+	}
+
+	byID := make(map[int32]*notes.FieldNoteAuthor)
+	for _, user := range allAuthors {
+		byID[user.ID] = &notes.FieldNoteAuthor{
+			ID:       user.ID,
+			Name:     user.Name,
+			MediaURL: fmt.Sprintf("/user/%d/media", user.ID),
+		}
+	}
+
 	allNotes := []*data.Note{}
 	if err := s.options.Database.SelectContext(ctx, &allNotes, `
 		SELECT * FROM fieldkit.notes WHERE station_id = $1 ORDER BY created_at DESC
@@ -92,6 +110,7 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 		webNotes = append(webNotes, &notes.FieldNote{
 			ID:        n.ID,
 			CreatedAt: n.Created.Unix() * 1000,
+			Author:    byID[n.AuthorID],
 			MediaID:   n.MediaID,
 			Key:       n.Key,
 			Body:      n.Body,

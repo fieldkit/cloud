@@ -36,9 +36,17 @@ type FieldNotesView struct {
 type FieldNoteView struct {
 	ID        *int64
 	CreatedAt *int64
+	Author    *FieldNoteAuthorView
 	Key       *string
 	Body      *string
 	MediaID   *int64
+}
+
+// FieldNoteAuthorView is a type that runs validations on a projected type.
+type FieldNoteAuthorView struct {
+	ID       *int32
+	Name     *string
+	MediaURL *string
 }
 
 // NoteMediaView is a type that runs validations on a projected type.
@@ -112,6 +120,29 @@ func ValidateFieldNoteView(result *FieldNoteView) (err error) {
 	}
 	if result.CreatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("createdAt", "result"))
+	}
+	if result.Author == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("author", "result"))
+	}
+	if result.Author != nil {
+		if err2 := ValidateFieldNoteAuthorView(result.Author); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateFieldNoteAuthorView runs the validations defined on
+// FieldNoteAuthorView.
+func ValidateFieldNoteAuthorView(result *FieldNoteAuthorView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	if result.MediaURL == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("mediaUrl", "result"))
 	}
 	return
 }

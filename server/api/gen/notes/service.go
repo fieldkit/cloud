@@ -107,9 +107,16 @@ type NewFieldNote struct {
 type FieldNote struct {
 	ID        int64
 	CreatedAt int64
+	Author    *FieldNoteAuthor
 	Key       *string
 	Body      *string
 	MediaID   *int64
+}
+
+type FieldNoteAuthor struct {
+	ID       int32
+	Name     string
+	MediaURL string
 }
 
 // unauthorized
@@ -250,6 +257,21 @@ func transformNotesviewsFieldNoteViewToFieldNote(v *notesviews.FieldNoteView) *F
 		Body:      v.Body,
 		MediaID:   v.MediaID,
 	}
+	if v.Author != nil {
+		res.Author = transformNotesviewsFieldNoteAuthorViewToFieldNoteAuthor(v.Author)
+	}
+
+	return res
+}
+
+// transformNotesviewsFieldNoteAuthorViewToFieldNoteAuthor builds a value of
+// type *FieldNoteAuthor from a value of type *notesviews.FieldNoteAuthorView.
+func transformNotesviewsFieldNoteAuthorViewToFieldNoteAuthor(v *notesviews.FieldNoteAuthorView) *FieldNoteAuthor {
+	res := &FieldNoteAuthor{
+		ID:       *v.ID,
+		Name:     *v.Name,
+		MediaURL: *v.MediaURL,
+	}
 
 	return res
 }
@@ -263,6 +285,21 @@ func transformFieldNoteToNotesviewsFieldNoteView(v *FieldNote) *notesviews.Field
 		Key:       v.Key,
 		Body:      v.Body,
 		MediaID:   v.MediaID,
+	}
+	if v.Author != nil {
+		res.Author = transformFieldNoteAuthorToNotesviewsFieldNoteAuthorView(v.Author)
+	}
+
+	return res
+}
+
+// transformFieldNoteAuthorToNotesviewsFieldNoteAuthorView builds a value of
+// type *notesviews.FieldNoteAuthorView from a value of type *FieldNoteAuthor.
+func transformFieldNoteAuthorToNotesviewsFieldNoteAuthorView(v *FieldNoteAuthor) *notesviews.FieldNoteAuthorView {
+	res := &notesviews.FieldNoteAuthorView{
+		ID:       &v.ID,
+		Name:     &v.Name,
+		MediaURL: &v.MediaURL,
 	}
 
 	return res

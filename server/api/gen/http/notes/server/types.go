@@ -104,11 +104,19 @@ type UploadUnauthorizedResponseBody string
 
 // FieldNoteResponseBody is used to define fields on response body types.
 type FieldNoteResponseBody struct {
-	ID        int64   `form:"id" json:"id" xml:"id"`
-	CreatedAt int64   `form:"createdAt" json:"createdAt" xml:"createdAt"`
-	Key       *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
-	Body      *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-	MediaID   *int64  `form:"mediaId,omitempty" json:"mediaId,omitempty" xml:"mediaId,omitempty"`
+	ID        int64                        `form:"id" json:"id" xml:"id"`
+	CreatedAt int64                        `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	Author    *FieldNoteAuthorResponseBody `form:"author" json:"author" xml:"author"`
+	Key       *string                      `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	Body      *string                      `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	MediaID   *int64                       `form:"mediaId,omitempty" json:"mediaId,omitempty" xml:"mediaId,omitempty"`
+}
+
+// FieldNoteAuthorResponseBody is used to define fields on response body types.
+type FieldNoteAuthorResponseBody struct {
+	ID       int32  `form:"id" json:"id" xml:"id"`
+	Name     string `form:"name" json:"name" xml:"name"`
+	MediaURL string `form:"mediaUrl" json:"mediaUrl" xml:"mediaUrl"`
 }
 
 // FieldNoteUpdateRequestBody is used to define fields on request body types.

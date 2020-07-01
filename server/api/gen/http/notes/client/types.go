@@ -125,11 +125,19 @@ type NewFieldNoteRequestBody struct {
 
 // FieldNoteResponseBody is used to define fields on response body types.
 type FieldNoteResponseBody struct {
-	ID        *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	CreatedAt *int64  `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
-	Key       *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
-	Body      *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-	MediaID   *int64  `form:"mediaId,omitempty" json:"mediaId,omitempty" xml:"mediaId,omitempty"`
+	ID        *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	CreatedAt *int64                       `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
+	Author    *FieldNoteAuthorResponseBody `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
+	Key       *string                      `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	Body      *string                      `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	MediaID   *int64                       `form:"mediaId,omitempty" json:"mediaId,omitempty" xml:"mediaId,omitempty"`
+}
+
+// FieldNoteAuthorResponseBody is used to define fields on response body types.
+type FieldNoteAuthorResponseBody struct {
+	ID       *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name     *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	MediaURL *string `form:"mediaUrl,omitempty" json:"mediaUrl,omitempty" xml:"mediaUrl,omitempty"`
 }
 
 // NewUpdateRequestBody builds the HTTP request body from the payload of the
@@ -306,6 +314,29 @@ func ValidateFieldNoteResponseBody(body *FieldNoteResponseBody) (err error) {
 	}
 	if body.CreatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("createdAt", "body"))
+	}
+	if body.Author == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
+	}
+	if body.Author != nil {
+		if err2 := ValidateFieldNoteAuthorResponseBody(body.Author); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateFieldNoteAuthorResponseBody runs the validations defined on
+// FieldNoteAuthorResponseBody
+func ValidateFieldNoteAuthorResponseBody(body *FieldNoteAuthorResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.MediaURL == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("mediaUrl", "body"))
 	}
 	return
 }

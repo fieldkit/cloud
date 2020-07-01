@@ -672,6 +672,20 @@ func unmarshalFieldNoteResponseBodyToNotesviewsFieldNoteView(v *FieldNoteRespons
 		Body:      v.Body,
 		MediaID:   v.MediaID,
 	}
+	res.Author = unmarshalFieldNoteAuthorResponseBodyToNotesviewsFieldNoteAuthorView(v.Author)
+
+	return res
+}
+
+// unmarshalFieldNoteAuthorResponseBodyToNotesviewsFieldNoteAuthorView builds a
+// value of type *notesviews.FieldNoteAuthorView from a value of type
+// *FieldNoteAuthorResponseBody.
+func unmarshalFieldNoteAuthorResponseBodyToNotesviewsFieldNoteAuthorView(v *FieldNoteAuthorResponseBody) *notesviews.FieldNoteAuthorView {
+	res := &notesviews.FieldNoteAuthorView{
+		ID:       v.ID,
+		Name:     v.Name,
+		MediaURL: v.MediaURL,
+	}
 
 	return res
 }

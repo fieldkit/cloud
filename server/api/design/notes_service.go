@@ -17,13 +17,21 @@ var NoteMedia = ResultType("application/vnd.app.note.media", func() {
 	})
 })
 
+var FieldNoteAuthor = Type("FieldNoteAuthor", func() {
+	Attribute("id", Int32)
+	Attribute("name", String)
+	Attribute("mediaUrl", String)
+	Required("id", "name", "mediaUrl")
+})
+
 var FieldNote = Type("FieldNote", func() {
 	Attribute("id", Int64)
 	Attribute("createdAt", Int64)
+	Attribute("author", FieldNoteAuthor)
 	Attribute("key", String)
 	Attribute("body", String)
 	Attribute("mediaId", Int64)
-	Required("id", "createdAt")
+	Required("id", "createdAt", "author")
 })
 
 var ExistingFieldNote = Type("ExistingFieldNote", func() {

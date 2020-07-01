@@ -547,6 +547,22 @@ func marshalNotesviewsFieldNoteViewToFieldNoteResponseBody(v *notesviews.FieldNo
 		Body:      v.Body,
 		MediaID:   v.MediaID,
 	}
+	if v.Author != nil {
+		res.Author = marshalNotesviewsFieldNoteAuthorViewToFieldNoteAuthorResponseBody(v.Author)
+	}
+
+	return res
+}
+
+// marshalNotesviewsFieldNoteAuthorViewToFieldNoteAuthorResponseBody builds a
+// value of type *FieldNoteAuthorResponseBody from a value of type
+// *notesviews.FieldNoteAuthorView.
+func marshalNotesviewsFieldNoteAuthorViewToFieldNoteAuthorResponseBody(v *notesviews.FieldNoteAuthorView) *FieldNoteAuthorResponseBody {
+	res := &FieldNoteAuthorResponseBody{
+		ID:       *v.ID,
+		Name:     *v.Name,
+		MediaURL: *v.MediaURL,
+	}
 
 	return res
 }
