@@ -64,6 +64,10 @@ export default {
             required: true,
             type: Number,
         },
+        forcePublic: {
+            required: true,
+            type: Boolean,
+        },
     },
     data: () => {
         return {
@@ -80,9 +84,11 @@ export default {
                 return this.$store.getters.projectsById[this.id];
             },
             isAdministrator() {
-                const p = this.$store.getters.projectsById[this.id];
-                if (p) {
-                    return !p.readOnly;
+                if (!this.forcePublic) {
+                    const p = this.$store.getters.projectsById[this.id];
+                    if (p) {
+                        return !p.readOnly;
+                    }
                 }
                 return false;
             },

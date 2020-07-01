@@ -95,6 +95,21 @@ const routes = [
         props: (route) => {
             return {
                 id: Number(route.params.id),
+                forcePublic: false,
+            };
+        },
+        meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/dashboard/projects/:id/public",
+        name: "viewProject",
+        component: ProjectView,
+        props: (route) => {
+            return {
+                id: Number(route.params.id),
+                forcePublic: true,
             };
         },
         meta: {
