@@ -100,15 +100,14 @@ export default {
 </script>
 
 <style scoped>
-#stations-map-container #map {
-    height: inherit;
+.map-view #map {
+    height: 100%;
     position: relative;
     width: inherit;
 }
-#summary-and-map #map {
-    position: absolute;
-    top: 70px;
-    bottom: 0;
-    width: 100%;
+.project-container #map {
+    height: inherit;
+    position: inherit;
+    width: inherit;
 }
 </style>

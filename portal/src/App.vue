@@ -38,6 +38,13 @@ body {
 body.blue-background {
     background-color: #1b80c9;
 }
+
+html.map-view {
+    height: 100%;
+}
+body.map-view {
+    height: 100%;
+}
 a {
     text-decoration: none;
     color: inherit;

@@ -1,51 +1,48 @@
 <template>
-    <div class="full-height">
-        <SidebarNav
-            class="full-height left"
-            viewingStations="true"
-            :isAuthenticated="isAuthenticated"
-            :stations="stations"
-            :projects="userProjects"
-            @showStation="showSummary"
-        />
-        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" @sidebarToggled="onSidebarToggle" />
-        <div id="stations-view-panel" class="main-panel full-height">
-            <div id="summary-and-map">
-                <StationsMap @mapReady="onMapReady" @showSummary="showSummary" :mapped="mapped" />
-                <StationSummary
-                    v-if="activeStationId"
-                    @closeSummary="closeSummary"
-                    class="summary-container"
-                    :station="activeStation"
-                    :summarySize="summarySize"
-                    ref="stationSummary"
+    <div class="container-ignored">
+        <div class="container-top">
+            <div class="container-side">
+                <SidebarNav
+                    viewingStations="true"
+                    :isAuthenticated="isAuthenticated"
+                    :stations="stations"
+                    :projects="userProjects"
+                    @showStation="showSummary"
                 />
             </div>
-            <div v-if="isAuthenticated && showNoStationsMessage && hasNoStations" id="no-stations">
-                <div id="close-notice-btn" v-on:click="closeNotice">
-                    <img alt="Close" src="../assets/close.png" />
+
+            <div class="container-main">
+                <div class="container-header">
+                    <HeaderBar :isAuthenticated="isAuthenticated" :user="user" @sidebarToggled="onSidebarToggle" />
                 </div>
-                <p class="heading">Add a New Station</p>
-                <p class="text">
-                    You currently don't have any stations on your account. Download the FieldKit app and connect your station to add them to
-                    your account.
-                </p>
-                <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
-                    <img alt="App store" src="../assets/appstore.png" class="app-btn" />
-                </a>
-                <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
-                    <img alt="Google Play" src="../assets/googleplay.png" class="app-btn" />
-                </a>
-            </div>
-            <div v-if="!isAuthenticated" id="no-user">
-                <p>
-                    Please
-                    <router-link v-if="$route" :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
-                        log in
-                    </router-link>
-                    <router-link v-if="!$route" :to="{ name: 'login' }" class="show-link">log in</router-link>
-                    to view stations.
-                </p>
+
+                <div class="container-map">
+                    <StationsMap @mapReady="onMapReady" @showSummary="showSummary" :mapped="mapped" />
+                    <StationSummary
+                        v-if="activeStationId"
+                        @closeSummary="closeSummary"
+                        class="summary-container"
+                        :station="activeStation"
+                        :summarySize="summarySize"
+                        ref="stationSummary"
+                    />
+                    <div v-if="isAuthenticated && showNoStationsMessage && hasNoStations" id="no-stations">
+                        <div id="close-notice-btn" v-on:click="closeNotice">
+                            <img alt="Close" src="../assets/close.png" />
+                        </div>
+                        <p class="heading">Add a New Station</p>
+                        <p class="text">
+                            You currently don't have any stations on your account. Download the FieldKit app and connect your station to add
+                            them to your account.
+                        </p>
+                        <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
+                            <img alt="App store" src="../assets/appstore.png" class="app-btn" />
+                        </a>
+                        <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
+                            <img alt="Google Play" src="../assets/googleplay.png" class="app-btn" />
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -77,7 +74,7 @@ export default {
             summarySize: {
                 width: "415px",
                 top: "120px",
-                left: "120px",
+                left: "360px",
                 constrainTop: "285px",
             },
         };
@@ -130,14 +127,34 @@ export default {
 </script>
 
 <style scoped>
-.full-height {
+.container-ignored {
     height: 100%;
 }
-.left {
-    float: left;
+.container-top {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+.container-side {
+    width: 240px;
+    height: 100%;
+}
+.container-main {
+    flex-grow: 1;
+    flex-direction: column;
+    display: flex;
+}
+.container-header {
+    height: 70px;
+}
+.container-map {
+    flex-grow: 1;
 }
 #stations-view-panel {
     margin: 0;
+}
+.closeSummary {
+    position: absolute;
 }
 #no-user {
     font-size: 20px;

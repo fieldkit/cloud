@@ -179,7 +179,7 @@ export default {
 
 <style scoped>
 #station-summary-container {
-    position: relative;
+    position: absolute;
     background-color: #ffffff;
     padding: 0 20px 20px 10px;
     border: 1px solid rgb(215, 220, 225);

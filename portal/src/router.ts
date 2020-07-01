@@ -142,6 +142,7 @@ const routes = [
         component: StationsView,
         props: true,
         meta: {
+            bodyClass: "map-view",
             secured: true,
         },
     },
@@ -153,6 +154,9 @@ const routes = [
             return {
                 id: Number(route.params.id),
             };
+        },
+        meta: {
+            bodyClass: "map-view",
         },
     },
     {
