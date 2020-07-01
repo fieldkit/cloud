@@ -42,6 +42,49 @@ func NewMediaRepository(files files.FileArchive) (r *MediaRepository) {
 	}
 }
 
+func (r *MediaRepository) SaveFromService(ctx context.Context, reader io.ReadCloser, contentLength int64) (sm *SavedMedia, err error) {
+	log := Logger(ctx).Sugar()
+
+	headerLength := int64(MaximumRequiredHeaderBytes)
+	if contentLength < headerLength {
+		headerLength = contentLength
+	}
+
+	var buf bytes.Buffer
+	headerReader := bufio.NewReader(io.TeeReader(io.LimitReader(reader, headerLength), &buf))
+
+	header := make([]byte, headerLength)
+	_, err = io.ReadFull(headerReader, header)
+	if err != nil {
+		return nil, err
+	}
+
+	kind, _ := filetype.Match(header)
+	if kind == filetype.Unknown {
+		return nil, fmt.Errorf("unknown file type")
+	}
+
+	contentType := kind.MIME.Value
+	objReader := io.MultiReader(bytes.NewReader(buf.Bytes()), reader)
+	cr := NewCountingReader(objReader)
+	metadata := make(map[string]string)
+	af, err := r.files.Archive(ctx, contentType, metadata, cr)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Infow("saved", "content_type", contentType, "id", af.Key, "bytes_read", cr.BytesRead)
+
+	sm = &SavedMedia{
+		Key:      af.Key,
+		URL:      af.URL,
+		Size:     cr.BytesRead,
+		MimeType: kind.MIME.Value,
+	}
+
+	return
+}
+
 func (r *MediaRepository) Save(ctx context.Context, rd *goa.RequestData) (sm *SavedMedia, err error) {
 	log := Logger(ctx).Sugar()
 
