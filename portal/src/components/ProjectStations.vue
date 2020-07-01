@@ -231,6 +231,7 @@ export default {
 #stations-map-container {
     float: left;
     transition: width 0.5s;
+    position: relative;
 }
 .station-box {
     height: 38px;
