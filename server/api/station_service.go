@@ -10,7 +10,10 @@ import (
 	"image/jpeg"
 	"io"
 	"io/ioutil"
+	"strings"
 	"time"
+
+	"github.com/iancoleman/strcase"
 
 	"goa.design/goa/v3/security"
 
@@ -371,26 +374,37 @@ func transformModules(from *data.StationFull, configurationID int64) (to []*stat
 		if v.ConfigurationID != configurationID {
 			continue
 		}
-		sensors := make([]*data.ModuleSensor, 0)
-		sensorsWm := make([]*station.StationSensor, 0)
 
+		sensors := make([]*data.ModuleSensor, 0)
 		for _, s := range from.Sensors {
 			if s.ModuleID == v.ID {
 				sensors = append(sensors, s)
-				sensorsWm = append(sensorsWm, &station.StationSensor{
-					Name:          s.Name,
-					UnitOfMeasure: s.UnitOfMeasure,
-					Reading:       transformReading(s),
-				})
 			}
+		}
+
+		sensorsWm := make([]*station.StationSensor, 0)
+		translatedName := translateModuleName(v.Name, sensors)
+		moduleKey := translateModuleKey(translatedName)
+
+		for _, s := range sensors {
+			key := strcase.ToLowerCamel(s.Name)
+
+			sensorsWm = append(sensorsWm, &station.StationSensor{
+				Key:           key,
+				FullKey:       moduleKey + "." + key,
+				Name:          s.Name,
+				UnitOfMeasure: s.UnitOfMeasure,
+				Reading:       transformReading(s),
+			})
 		}
 
 		hardwareID := hex.EncodeToString(v.HardwareID)
 
 		to = append(to, &station.StationModule{
 			ID:         v.ID,
+			FullKey:    moduleKey,
 			HardwareID: &hardwareID,
-			Name:       translateModuleName(v.Name, sensors),
+			Name:       translatedName,
 			Position:   int32(v.Position),
 			Flags:      int32(v.Flags),
 			Internal:   v.Flags > 0 || v.Position == 255,
@@ -428,6 +442,10 @@ func translateModuleName(old string, sensors []*data.ModuleSensor) string {
 	}
 
 	return old
+}
+
+func translateModuleKey(name string) string {
+	return strings.Replace(name, "modules.", "fk.", 1)
 }
 
 func transformLocation(sf *data.StationFull) *station.StationLocation {

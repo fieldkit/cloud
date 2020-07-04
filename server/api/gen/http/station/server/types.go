@@ -266,6 +266,7 @@ type StationModuleResponseBody struct {
 	Position     int32                        `form:"position" json:"position" xml:"position"`
 	Flags        int32                        `form:"flags" json:"flags" xml:"flags"`
 	Internal     bool                         `form:"internal" json:"internal" xml:"internal"`
+	FullKey      string                       `form:"fullKey" json:"fullKey" xml:"fullKey"`
 	Sensors      []*StationSensorResponseBody `form:"sensors" json:"sensors" xml:"sensors"`
 }
 
@@ -275,6 +276,7 @@ type StationSensorResponseBody struct {
 	UnitOfMeasure string                     `form:"unitOfMeasure" json:"unitOfMeasure" xml:"unitOfMeasure"`
 	Reading       *SensorReadingResponseBody `form:"reading,omitempty" json:"reading,omitempty" xml:"reading,omitempty"`
 	Key           string                     `form:"key" json:"key" xml:"key"`
+	FullKey       string                     `form:"fullKey" json:"fullKey" xml:"fullKey"`
 	Ranges        []*SensorRangeResponseBody `form:"ranges" json:"ranges" xml:"ranges"`
 }
 

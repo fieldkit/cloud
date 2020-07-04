@@ -77,6 +77,7 @@ type StationModuleResponseBody struct {
 	Position     *int32                       `form:"position,omitempty" json:"position,omitempty" xml:"position,omitempty"`
 	Flags        *int32                       `form:"flags,omitempty" json:"flags,omitempty" xml:"flags,omitempty"`
 	Internal     *bool                        `form:"internal,omitempty" json:"internal,omitempty" xml:"internal,omitempty"`
+	FullKey      *string                      `form:"fullKey,omitempty" json:"fullKey,omitempty" xml:"fullKey,omitempty"`
 	Sensors      []*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
 }
 
@@ -86,6 +87,7 @@ type StationSensorResponseBody struct {
 	UnitOfMeasure *string                    `form:"unitOfMeasure,omitempty" json:"unitOfMeasure,omitempty" xml:"unitOfMeasure,omitempty"`
 	Reading       *SensorReadingResponseBody `form:"reading,omitempty" json:"reading,omitempty" xml:"reading,omitempty"`
 	Key           *string                    `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	FullKey       *string                    `form:"fullKey,omitempty" json:"fullKey,omitempty" xml:"fullKey,omitempty"`
 	Ranges        []*SensorRangeResponseBody `form:"ranges,omitempty" json:"ranges,omitempty" xml:"ranges,omitempty"`
 }
 
@@ -232,6 +234,9 @@ func ValidateStationModuleResponseBody(body *StationModuleResponseBody) (err err
 	if body.Internal == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("internal", "body"))
 	}
+	if body.FullKey == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fullKey", "body"))
+	}
 	if body.Sensors == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("sensors", "body"))
 	}
@@ -256,6 +261,9 @@ func ValidateStationSensorResponseBody(body *StationSensorResponseBody) (err err
 	}
 	if body.Key == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("key", "body"))
+	}
+	if body.FullKey == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fullKey", "body"))
 	}
 	if body.Ranges == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("ranges", "body"))

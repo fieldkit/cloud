@@ -259,6 +259,7 @@ func marshalInformationviewsStationModuleViewToStationModuleResponseBody(v *info
 		Position:     *v.Position,
 		Flags:        *v.Flags,
 		Internal:     *v.Internal,
+		FullKey:      *v.FullKey,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*StationSensorResponseBody, len(v.Sensors))
@@ -278,6 +279,7 @@ func marshalInformationviewsStationSensorViewToStationSensorResponseBody(v *info
 		Name:          *v.Name,
 		UnitOfMeasure: *v.UnitOfMeasure,
 		Key:           *v.Key,
+		FullKey:       *v.FullKey,
 	}
 	if v.Reading != nil {
 		res.Reading = marshalInformationviewsSensorReadingViewToSensorReadingResponseBody(v.Reading)

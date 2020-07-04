@@ -45,6 +45,7 @@ type StationModuleView struct {
 	Position     *int32
 	Flags        *int32
 	Internal     *bool
+	FullKey      *string
 	Sensors      []*StationSensorView
 }
 
@@ -54,6 +55,7 @@ type StationSensorView struct {
 	UnitOfMeasure *string
 	Reading       *SensorReadingView
 	Key           *string
+	FullKey       *string
 	Ranges        []*SensorRangeView
 }
 
@@ -153,6 +155,9 @@ func ValidateStationModuleView(result *StationModuleView) (err error) {
 	if result.Internal == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("internal", "result"))
 	}
+	if result.FullKey == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fullKey", "result"))
+	}
 	if result.Sensors == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("sensors", "result"))
 	}
@@ -176,6 +181,9 @@ func ValidateStationSensorView(result *StationSensorView) (err error) {
 	}
 	if result.Key == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("key", "result"))
+	}
+	if result.FullKey == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fullKey", "result"))
 	}
 	if result.Ranges == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("ranges", "result"))

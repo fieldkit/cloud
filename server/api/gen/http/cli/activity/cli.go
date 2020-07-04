@@ -1224,7 +1224,7 @@ FirmwareStatistics implements firmware statistics.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information firmware- statistics --auth "Ex praesentium."
+    `+os.Args[0]+` information firmware- statistics --auth "Enim beatae."
 `, os.Args[0])
 }
 
@@ -1255,11 +1255,11 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` station add --body '{
-      "deviceId": "Aliquid cupiditate.",
-      "locationName": "Odio et magnam fugiat.",
-      "name": "Quia ad.",
-      "statusPb": "Sit nemo praesentium."
-   }' --auth "Odit rerum officiis eius quas at."
+      "deviceId": "Sit nemo praesentium.",
+      "locationName": "Odit rerum officiis eius quas at.",
+      "name": "Odio et magnam fugiat.",
+      "statusPb": "Sed sunt ab voluptatem quibusdam iusto."
+   }' --auth "Ducimus omnis sit et."
 `, os.Args[0])
 }
 
@@ -1271,7 +1271,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 1878007409 --auth "Aut possimus dolorem nostrum."
+    `+os.Args[0]+` station get --id 292906630 --auth "Velit commodi error consequatur consequatur consequatur est."
 `, os.Args[0])
 }
 
@@ -1285,10 +1285,10 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "location_name": "Hic est adipisci.",
-      "name": "Laboriosam incidunt aut.",
-      "status_pb": "Exercitationem et dolorem et."
-   }' --id 1732072184 --auth "Odio minus."
+      "location_name": "Ipsum possimus magni.",
+      "name": "Odio minus.",
+      "status_pb": "Voluptatem aut eligendi qui."
+   }' --id 339108518 --auth "Voluptate numquam recusandae aspernatur natus accusantium adipisci."
 `, os.Args[0])
 }
 
@@ -1299,7 +1299,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- mine --auth "Commodi harum non distinctio rerum quaerat eius."
+    `+os.Args[0]+` station list- mine --auth "At pariatur iste."
 `, os.Args[0])
 }
 
@@ -1311,7 +1311,7 @@ ListProject implements list project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project --id 463375703 --auth "Omnis assumenda unde."
+    `+os.Args[0]+` station list- project --id 1261147900 --auth "Voluptas consequatur reiciendis."
 `, os.Args[0])
 }
 
@@ -1323,7 +1323,7 @@ Photo implements photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station photo --id 1573640852 --auth "Atque non veniam aspernatur."
+    `+os.Args[0]+` station photo --id 1475570681 --auth "Et et facilis officia eum."
 `, os.Args[0])
 }
 
@@ -1372,7 +1372,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 3493796532101343187
+    `+os.Args[0]+` test get --id 7071534387960411865
 `, os.Args[0])
 }
 
@@ -1394,7 +1394,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Rerum est consequatur." --auth "Non unde sint ex earum quas accusantium."
+    `+os.Args[0]+` test email --address "Impedit molestiae aut asperiores eos quos enim." --auth "Aperiam adipisci eaque non."
 `, os.Args[0])
 }
 
@@ -1419,7 +1419,7 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Ut aliquid placeat."
+    `+os.Args[0]+` user roles --auth "Et vel ut quis reprehenderit."
 `, os.Args[0])
 }
 
@@ -1431,6 +1431,6 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user delete --user-id 86006553 --auth "Aut minus aut sunt."
+    `+os.Args[0]+` user delete --user-id 867437850 --auth "Laboriosam voluptas eveniet libero sunt enim commodi."
 `, os.Args[0])
 }

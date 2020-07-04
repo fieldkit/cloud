@@ -48,8 +48,9 @@ var StationSensor = Type("StationSensor", func() {
 	Attribute("unitOfMeasure", String)
 	Attribute("reading", SensorReading)
 	Attribute("key", String)
+	Attribute("fullKey", String)
 	Attribute("ranges", ArrayOf(SensorRange))
-	Required("name", "unitOfMeasure", "key", "ranges")
+	Required("name", "unitOfMeasure", "key", "fullKey", "ranges")
 
 })
 
@@ -61,8 +62,9 @@ var StationModule = Type("StationModule", func() {
 	Attribute("position", Int32)
 	Attribute("flags", Int32)
 	Attribute("internal", Boolean)
+	Attribute("fullKey", String)
 	Attribute("sensors", ArrayOf(StationSensor))
-	Required("id", "name", "position", "flags", "internal", "sensors")
+	Required("id", "name", "position", "flags", "internal", "fullKey", "sensors")
 })
 
 var StationConfiguration = Type("StationConfiguration", func() {

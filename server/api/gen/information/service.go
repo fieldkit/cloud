@@ -81,6 +81,7 @@ type StationModule struct {
 	Position     int32
 	Flags        int32
 	Internal     bool
+	FullKey      string
 	Sensors      []*StationSensor
 }
 
@@ -89,6 +90,7 @@ type StationSensor struct {
 	UnitOfMeasure string
 	Reading       *SensorReading
 	Key           string
+	FullKey       string
 	Ranges        []*SensorRange
 }
 
@@ -251,6 +253,7 @@ func transformInformationviewsStationModuleViewToStationModule(v *informationvie
 		Position:     *v.Position,
 		Flags:        *v.Flags,
 		Internal:     *v.Internal,
+		FullKey:      *v.FullKey,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*StationSensor, len(v.Sensors))
@@ -269,6 +272,7 @@ func transformInformationviewsStationSensorViewToStationSensor(v *informationvie
 		Name:          *v.Name,
 		UnitOfMeasure: *v.UnitOfMeasure,
 		Key:           *v.Key,
+		FullKey:       *v.FullKey,
 	}
 	if v.Reading != nil {
 		res.Reading = transformInformationviewsSensorReadingViewToSensorReading(v.Reading)
@@ -340,6 +344,7 @@ func transformStationModuleToInformationviewsStationModuleView(v *StationModule)
 		Position:     &v.Position,
 		Flags:        &v.Flags,
 		Internal:     &v.Internal,
+		FullKey:      &v.FullKey,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*informationviews.StationSensorView, len(v.Sensors))
@@ -358,6 +363,7 @@ func transformStationSensorToInformationviewsStationSensorView(v *StationSensor)
 		Name:          &v.Name,
 		UnitOfMeasure: &v.UnitOfMeasure,
 		Key:           &v.Key,
+		FullKey:       &v.FullKey,
 	}
 	if v.Reading != nil {
 		res.Reading = transformSensorReadingToInformationviewsSensorReadingView(v.Reading)
