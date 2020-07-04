@@ -506,7 +506,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 		},
 		&ModuleMeta{
-			Key: "modules.distance",
+			Key: "fk.distance",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyDistance,
@@ -567,7 +567,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 		},
 		&ModuleMeta{
-			Key: "modules.diagnostics",
+			Key: "fk.diagnostics",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyDiagnostics,
@@ -657,7 +657,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 		},
 		&ModuleMeta{
-			Key: "modules.random",
+			Key: "fk.random",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyRandom,
