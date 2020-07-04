@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -34,7 +32,9 @@ func processStation(ctx context.Context, db *sqlxcache.DB, stationID int32) erro
 
 		started := time.Now()
 
-		log.Printf("processing\n")
+		log := logging.Logger(ctx).Sugar()
+
+		log.Infow("processing")
 
 		walkParams := &backend.WalkParameters{
 			StationID: stationID,
@@ -55,7 +55,7 @@ func processStation(ctx context.Context, db *sqlxcache.DB, stationID int32) erro
 
 		finished := time.Now()
 
-		log.Printf("done %v data (%v meta) %v\n", info.DataRecords, info.MetaRecords, finished.Sub(started))
+		log.Infow("done", "data_records", info.DataRecords, "meta_records", info.MetaRecords, "elapsed", finished.Sub(started))
 
 		return nil
 	})
@@ -87,6 +87,9 @@ func main() {
 	logging.Configure(false, "fkdata")
 
 	ctx := context.Background()
+
+	log := logging.Logger(ctx).Sugar()
+
 	if options.StationID > 0 {
 		if err := processStation(ctx, db, int32(options.StationID)); err != nil {
 			panic(err)
@@ -99,9 +102,9 @@ func main() {
 		}
 
 		for _, id := range ids {
+			log.Infow("station", "station_id", id.ID)
 			if err := processStation(ctx, db, int32(id.ID)); err != nil {
-				fmt.Println("station error", err)
-				fmt.Println("station failed", id.ID)
+				log.Errorw("error", "station_id", id.ID, "error", err)
 			}
 		}
 	}
