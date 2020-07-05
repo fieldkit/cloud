@@ -13,7 +13,7 @@ module.exports = {
     output: {
         publicPath: PUBLIC_PATH,
     },
-    module: {
+	module: {
         loaders: [
             { test: /\.css$/, loader: "css-loader" }
         ]
