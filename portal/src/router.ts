@@ -104,7 +104,7 @@ const routes = [
     },
     {
         path: "/dashboard/projects/:id/public",
-        name: "viewProject",
+        name: "viewProjectPublic",
         component: ProjectView,
         props: (route) => {
             return {
