@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
-	"time"
 
 	"github.com/kelseyhightower/envconfig"
 
@@ -13,7 +13,6 @@ import (
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/backend/handlers"
 	"github.com/fieldkit/cloud/server/common/logging"
 )
 
@@ -27,38 +26,15 @@ type Config struct {
 }
 
 func processStation(ctx context.Context, db *sqlxcache.DB, stationID int32) error {
-	return db.WithNewTransaction(ctx, func(txCtx context.Context) error {
-		rw := backend.NewRecordWalker(db)
+	sr, err := backend.NewStationRefresher(db)
+	if err != nil {
+		return err
+	}
+	if err := sr.Completely(ctx, stationID); err != nil {
+		return fmt.Errorf("complete refresh failed: %v", err)
+	}
 
-		started := time.Now()
-
-		log := logging.Logger(ctx).Sugar()
-
-		log.Infow("processing")
-
-		walkParams := &backend.WalkParameters{
-			StationID: stationID,
-			Start:     time.Time{},
-			End:       time.Now(),
-			PageSize:  1000,
-		}
-
-		visitor := handlers.NewAggregatingHandler(db)
-		if err := rw.WalkStation(txCtx, visitor, walkParams); err != nil {
-			return err
-		}
-
-		info, err := rw.Info(txCtx)
-		if err != nil {
-			return err
-		}
-
-		finished := time.Now()
-
-		log.Infow("done", "data_records", info.DataRecords, "meta_records", info.MetaRecords, "elapsed", finished.Sub(started))
-
-		return nil
-	})
+	return nil
 }
 
 func main() {
@@ -95,6 +71,7 @@ func main() {
 			panic(err)
 		}
 	}
+
 	if options.All {
 		ids := []*IDRow{}
 		if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {

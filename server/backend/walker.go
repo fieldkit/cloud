@@ -29,6 +29,7 @@ func NewRecordWalker(db *sqlxcache.DB) (rw *RecordWalker) {
 }
 
 type WalkParameters struct {
+	Page      int
 	PageSize  int
 	StationID int32
 	Start     time.Time
@@ -52,34 +53,18 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 
 	rw.started = time.Now()
 
-	for page := 0; !done; page += 1 {
-		_, err := rw.db.ExecContext(ctx, `
-			DECLARE records_cursor CURSOR FOR
-			SELECT r.id, r.provision_id, r.time, r.number, r.meta_record_id, ST_AsBinary(r.location) AS location, r.raw, r.pb
-			FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
-			WHERE (p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1) AND r.time >= $2 AND r.time < $3)
-			ORDER BY r.time OFFSET $4 LIMIT $5
-		`, params.StationID, params.Start, params.End, page*params.PageSize, params.PageSize)
-		if err != nil {
-			return err
-		}
-
-		if err := rw.walkQuery(ctx, handler); err != nil {
+	for params.Page = 0; !done; params.Page += 1 {
+		if err := rw.processBatchInTransaction(ctx, handler, params); err != nil {
 			if err == sql.ErrNoRows {
-				done = true
 				break
 			}
-			return err
-		}
-
-		if _, err := rw.db.ExecContext(ctx, "CLOSE records_cursor"); err != nil {
 			return err
 		}
 	}
 
 	elapsed := time.Now().Sub(rw.started)
 	log := Logger(ctx).Sugar()
-	log.Infow("done", "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
+	log.Infow("done", "station_id", params.StationID, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
 
 	if err := handler.OnDone(ctx); err != nil {
 		return err
@@ -88,7 +73,45 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 	return nil
 }
 
-func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler) error {
+func (rw *RecordWalker) processBatchInTransaction(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
+	return rw.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+		return rw.processBatch(txCtx, handler, params)
+	})
+}
+
+func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
+	_, err := rw.db.ExecContext(ctx, `
+			DECLARE records_cursor CURSOR FOR
+			SELECT r.id, r.provision_id, r.time, r.number, r.meta_record_id, ST_AsBinary(r.location) AS location, r.raw, r.pb
+			FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
+			WHERE (p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1) AND r.time >= $2 AND r.time < $3)
+			ORDER BY r.time OFFSET $4 LIMIT $5
+		`, params.StationID, params.Start, params.End, params.Page*params.PageSize, params.PageSize)
+	if err != nil {
+		return err
+	}
+
+	done := false
+
+	if err := rw.walkQuery(ctx, handler, params); err != nil {
+		if err != sql.ErrNoRows {
+			return err
+		}
+		done = true
+	}
+
+	if _, err := rw.db.ExecContext(ctx, "CLOSE records_cursor"); err != nil {
+		return err
+	}
+
+	if done {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
+func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
 	log := Logger(ctx).Sugar()
 
 	tx := rw.db.Transaction(ctx)
@@ -118,7 +141,7 @@ func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler) er
 
 				if rw.dataRecords%1000 == 0 {
 					elapsed := time.Now().Sub(rw.started)
-					log.Infow("progress", "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
+					log.Infow("progress", "station_id", params.StationID, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
 				}
 			}
 		}

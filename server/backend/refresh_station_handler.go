@@ -80,12 +80,10 @@ func (sr *StationRefresher) Completely(ctx context.Context, stationID int32) err
 }
 
 func (sr *StationRefresher) walk(ctx context.Context, walkParams *WalkParameters) error {
-	return sr.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
-		rw := NewRecordWalker(sr.db)
-		handler := handlers.NewAggregatingHandler(sr.db)
-		if err := rw.WalkStation(txCtx, handler, walkParams); err != nil {
-			return err
-		}
-		return nil
-	})
+	rw := NewRecordWalker(sr.db)
+	handler := handlers.NewAggregatingHandler(sr.db)
+	if err := rw.WalkStation(ctx, handler, walkParams); err != nil {
+		return err
+	}
+	return nil
 }
