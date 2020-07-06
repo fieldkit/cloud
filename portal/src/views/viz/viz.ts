@@ -100,7 +100,7 @@ export class Viz {
     }
 
     public log(...args: any[]) {
-        console.log(...["viz:", this.constructor.name, ...args]);
+        console.log(...["viz:", this.id, this.constructor.name, ...args]);
     }
 }
 
@@ -255,7 +255,7 @@ export class Workspace {
 
     public query(): Promise<any> {
         const vizToParams = _(this.allVizes)
-            .map((viz: Viz) =>
+            .map((viz: QueriesSensorData) =>
                 viz.params.map((params: DataQueryParams) => {
                     return {
                         viz: viz,
@@ -278,11 +278,9 @@ export class Workspace {
         return Promise.all(
             vizToParams.map((query) => {
                 return this.querier.query(query.params).then((data) => {
-                    query.vizes.forEach((viz: Viz) => {
+                    query.vizes.forEach((viz: QueriesSensorData) => {
                         viz.log("data", query.params.queryString(), data.data.length, data.timeRange, data.dataRange);
-                        if (viz instanceof QueriesSensorData) {
-                            viz.data = data;
-                        }
+                        viz.data = data;
                     });
                 });
             })

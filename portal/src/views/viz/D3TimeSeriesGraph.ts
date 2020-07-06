@@ -24,12 +24,38 @@ export const D3TimeSeriesGraph = Vue.extend({
             return null;
         },
     },
+    mounted() {
+        this.viz.log("mounted");
+        this.refresh();
+    },
+    updated() {
+        this.viz.log("updated");
+    },
     watch: {
+        viz(newValue, oldValue) {
+            this.viz.log("graphing (viz)");
+        },
         data(newValue, oldValue) {
-            this.viz.log("graphing");
-
+            this.viz.log("graphing (data)");
+            this.refresh();
+        },
+    },
+    methods: {
+        onDouble() {
+            return this.raiseTimeZoomed(TimeRange.eternity);
+        },
+        raiseTimeZoomed(newTimes) {
+            return this.$emit("viz-time-zoomed", newTimes);
+        },
+        onRemove() {
+            return this.$emit("viz-remove");
+        },
+        refresh() {
+            if (!this.data) {
+                return;
+            }
             const layout = new ChartLayout(1050, 340, new Margins({ top: 5, bottom: 50, left: 50, right: 0 }));
-            const data = newValue;
+            const data = this.data;
             const timeRange = data.timeRange;
             const dataRange = data.dataRange;
             const charts = [
@@ -229,17 +255,6 @@ export const D3TimeSeriesGraph = Vue.extend({
                 )
                 .attr("cx", (d) => x(d.time))
                 .attr("cy", (d) => y(d.value));
-        },
-    },
-    methods: {
-        onDouble() {
-            return this.raiseTimeZoomed(TimeRange.eternity);
-        },
-        raiseTimeZoomed(newTimes) {
-            return this.$emit("viz-time-zoomed", newTimes);
-        },
-        onRemove() {
-            return this.$emit("viz-remove");
         },
     },
     template: `

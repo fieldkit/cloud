@@ -24,12 +24,32 @@ export const D3Scrubber = Vue.extend({
             return null;
         },
     },
+    mounted() {
+        this.viz.log("mounted");
+        this.refresh();
+    },
+    updated() {
+        this.viz.log("updated");
+    },
     watch: {
+        viz(newValue, oldValue) {
+            this.viz.log("graphing (viz)");
+        },
         data(newValue, oldValue) {
-            this.viz.log("graphing");
-
+            this.viz.log("graphing (data)");
+            this.refresh();
+        },
+    },
+    methods: {
+        raiseTimeZoomed(newTimes) {
+            return this.$emit("viz-time-zoomed", newTimes);
+        },
+        refresh() {
+            if (!this.data) {
+                return;
+            }
             const layout = new ChartLayout(1050, 120, new Margins({ top: 10, bottom: 20, left: 20, right: 20 }));
-            const data = newValue;
+            const data = this.data;
             const timeRange = data.timeRange;
             const dataRange = data.dataRange;
             const charts = [
@@ -167,11 +187,6 @@ export const D3Scrubber = Vue.extend({
 
                     return svg;
                 });
-        },
-    },
-    methods: {
-        raiseTimeZoomed(newTimes) {
-            return this.$emit("viz-time-zoomed", newTimes);
         },
     },
     template: `<div class="viz scrubber"></div>`,

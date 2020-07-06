@@ -20,6 +20,11 @@ export const VizWorkspace = Vue.extend({
             required: true,
         },
     },
+    data() {
+        return {
+            selected: null,
+        };
+    },
     mounted() {
         return this.workspace.query();
     },
@@ -43,13 +48,11 @@ export const VizWorkspace = Vue.extend({
     template: `
 		<div class="workspace">
 			<div class="tree-container">
-				<treeselect :options="workspace.options" open-direction="bottom" @select="onSelected" />
+				<treeselect v-model="selected" :options="workspace.options" open-direction="bottom" @select="onSelected" />
 			</div>
 			<div class="groups-container">
 				<div v-for="group in workspace.groups" :key="group.id">
-					<div v-for="viz in group.vizes" :key="viz.id">
-						<component v-bind:is="uiNameOf(viz)" :viz="viz" @viz-time-zoomed="(range) => onVizTimeZoomed(viz, range)" @viz-remove="() => onVizRemove(viz)"></component>
-					</div>
+					<component v-for="viz in group.vizes" :key="viz.id" v-bind:is="uiNameOf(viz)" :viz="viz" @viz-time-zoomed="(range) => onVizTimeZoomed(viz, range)" @viz-remove="() => onVizRemove(viz)"></component>
 				</div>
 			</div>
 		</div>
