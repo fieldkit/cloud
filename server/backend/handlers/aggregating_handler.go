@@ -8,6 +8,7 @@ import (
 	"github.com/montanaflynn/stats"
 
 	"github.com/conservify/sqlxcache"
+	"github.com/jmoiron/sqlx"
 
 	pb "github.com/fieldkit/data-protocol"
 
@@ -193,12 +194,16 @@ func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregatio
 		return err
 	}
 
+	keeping := make([]int64, 0)
+
 	for key, value := range d.Values {
 		if v.sensors[key] == nil {
 			newSensor := &data.Sensor{
 				Key: key,
 			}
-			if err := v.db.NamedGetContext(ctx, newSensor, `INSERT INTO fieldkit.aggregated_sensor (key) VALUES (:key) RETURNING id`, newSensor); err != nil {
+			if err := v.db.NamedGetContext(ctx, newSensor, `
+				INSERT INTO fieldkit.aggregated_sensor (key) VALUES (:key) RETURNING id
+				`, newSensor); err != nil {
 				return fmt.Errorf("error adding aggregated sensor: %v", err)
 			}
 			v.sensors[key] = newSensor
@@ -221,7 +226,26 @@ func (v *AggregatingHandler) upsertAggregated(ctx context.Context, a *aggregatio
 			return fmt.Errorf("error upserting sensor reading: %v", err)
 		}
 
-		_ = row
+		keeping = append(keeping, row.ID)
+	}
+
+	// Delete any other rows for this station in this time.
+	if len(keeping) > 0 {
+		query, args, err := sqlx.In(fmt.Sprintf(`
+			DELETE FROM %s WHERE station_id = ? AND time = ? AND id NOT IN (?)
+		`, a.table), stationID, d.Time, keeping)
+		if err != nil {
+			return err
+		}
+		if _, err := v.db.ExecContext(ctx, v.db.Rebind(query), args...); err != nil {
+			return fmt.Errorf("error deleting old sensor readings: %v", err)
+		}
+	} else {
+		if _, err := v.db.ExecContext(ctx, fmt.Sprintf(`
+			DELETE FROM %s WHERE station_id = $1 AND time = $2
+		`, a.table), stationID, d.Time); err != nil {
+			return fmt.Errorf("error deleting old sensor readings: %v", err)
+		}
 	}
 
 	return nil
