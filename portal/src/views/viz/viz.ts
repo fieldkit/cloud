@@ -235,10 +235,6 @@ export class TreeOption {
     ) {}
 }
 
-export class StationSensors {
-    constructor(public readonly sensors: Sensors, public readonly stations: Stations) {}
-}
-
 export class Workspace {
     public readonly querier = new Querier();
     public readonly stations: StationMeta[] = [];

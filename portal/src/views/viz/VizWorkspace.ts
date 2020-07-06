@@ -4,7 +4,8 @@ import Vue from "vue";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
-import { Workspace, Viz, Querier } from "./viz";
+import { TimeRange } from "./common";
+import { Workspace, Viz, Querier, TreeOption } from "./viz";
 import { D3Scrubber } from "./D3Scrubber";
 import { D3TimeSeriesGraph } from "./D3TimeSeriesGraph";
 
@@ -32,17 +33,17 @@ export const VizWorkspace = Vue.extend({
         uiNameOf(viz: Viz) {
             return "D3" + viz.constructor.name;
         },
-        onVizTimeZoomed(viz, times) {
-            viz.log("zooming", times);
+        onVizTimeZoomed(viz: Viz, times: TimeRange) {
+            viz.log("zooming", times.toArray());
             return this.workspace.zoomed(viz, times);
         },
-        onVizRemove(viz) {
+        onVizRemove(viz: Viz) {
             viz.log("removing");
             return this.workspace.remove(viz);
         },
-        onSelected(options) {
-            console.log("selecting", options);
-            return this.workspace.selected(options);
+        onSelected(option: TreeOption) {
+            console.log("selecting", option);
+            return this.workspace.selected(option);
         },
     },
     template: `
