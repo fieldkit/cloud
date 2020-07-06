@@ -54,7 +54,7 @@ func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) 
 		end = time.Unix(0, *payload.End*int64(time.Millisecond))
 	}
 
-	resolution := int32(1000)
+	resolution := int32(0)
 	if payload.Resolution != nil {
 		resolution = *payload.Resolution
 	}
@@ -129,6 +129,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return nil, sensor.BadRequest("at least one sensor required")
 	}
 
+	selectedAggregateName := qp.Aggregate
 	summaries := make(map[string]*AggregateSummary)
 
 	for name, table := range handlers.AggregateTableNames {
@@ -146,9 +147,19 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		}
 
 		summaries[name] = summary
+
+		if qp.Resolution > 0 {
+			if summary.NumberRecords < int64(qp.Resolution) {
+				selectedAggregateName = name
+			}
+		}
 	}
 
-	aggregate := handlers.AggregateTableNames[qp.Aggregate]
+	if selectedAggregateName != qp.Aggregate {
+		log.Infow("selected", "aggregate", selectedAggregateName, "number_records", summaries[selectedAggregateName].NumberRecords)
+	}
+
+	aggregate := handlers.AggregateTableNames[selectedAggregateName]
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT * FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?) ORDER BY time;
 		`, aggregate), qp.Start, qp.End, qp.Stations, qp.Sensors)
