@@ -1,16 +1,8 @@
 <template>
-    <div>
+    <div class="explore-view">
         <SidebarNav :isAuthenticated="isAuthenticated" :stations="stations" :projects="userProjects" @showStation="showStation" />
         <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
-        <div id="data-view-background" class="main-panel">
-            <div id="data-container">
-                <div id="lower-container"></div>
-            </div>
-
-            <div v-if="workspace">
-                <VizWorkspace :workspace="workspace"></VizWorkspace>
-            </div>
-        </div>
+        <VizWorkspace v-if="workspace" :workspace="workspace"></VizWorkspace>
     </div>
 </template>
 
@@ -68,4 +60,22 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style>
+.explore-view {
+    height: 100%;
+    width: auto;
+    text-align: left;
+}
+.workspace {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+.tree-container {
+    flex: 0;
+}
+.groups-container {
+    flex: 1;
+}
+</style>
