@@ -106,6 +106,7 @@ export class Viz {
 
 export class QueriesSensorData extends Viz {
     public data: QueriedData | null = null;
+    public visible: TimeRange = TimeRange.eternity;
 
     constructor(
         public readonly info: VizInfo,
@@ -124,10 +125,12 @@ export class QueriesSensorData extends Viz {
 export class Scrubber extends QueriesSensorData {
     constructor(public readonly when: TimeRange, public readonly graph: Graph) {
         super(null, when, graph.stations, graph.sensors);
+        this.visible = when;
     }
 
-    public zoomed(times: TimeRange) {
-        this.graph.zoomed(times);
+    public zoomed(range: TimeRange) {
+        this.visible = range;
+        this.graph.zoomed(range);
     }
 
     public needs(viz: Viz) {
@@ -136,6 +139,8 @@ export class Scrubber extends QueriesSensorData {
 }
 
 export class Graph extends QueriesSensorData {
+    private scrubber: Scrubber | null = null;
+
     constructor(
         public readonly info: VizInfo,
         public when: TimeRange,
@@ -145,12 +150,17 @@ export class Graph extends QueriesSensorData {
         super(info, when, stations, sensors);
     }
 
-    public zoomed(times: TimeRange) {
-        this.when = times;
+    public zoomed(range: TimeRange) {
+        this.log("zoomed", range.toArray());
+        this.visible = range;
+        this.when = range;
     }
 
     public makeScrubber(): Scrubber {
-        return new Scrubber(TimeRange.eternity, this);
+        if (this.scrubber == null) {
+            this.scrubber = new Scrubber(TimeRange.eternity, this);
+        }
+        return this.scrubber;
     }
 }
 
@@ -163,6 +173,7 @@ export class DistributionGraph extends Graph {}
 export class Map extends Viz {}
 
 export class Group {
+    public visible: TimeRange = TimeRange.eternity;
     public vizes: Viz[] = [];
 
     public add(viz: Viz) {
@@ -179,6 +190,19 @@ export class Group {
 
     public get empty() {
         return this.vizes.length == 0;
+    }
+
+    public contains(viz: Viz): boolean {
+        return this.vizes.indexOf(viz) >= 0;
+    }
+
+    public zoomed(times: TimeRange) {
+        this.visible = times;
+        this.vizes.forEach((viz) => {
+            if (viz instanceof QueriesSensorData) {
+                viz.zoomed(times);
+            }
+        });
     }
 }
 
@@ -220,9 +244,7 @@ export class Workspace {
     public readonly stations: StationMeta[] = [];
     public groups: Group[] = [];
 
-    constructor(private readonly meta: SensorsResponse) {
-        // ok
-    }
+    constructor(private readonly meta: SensorsResponse) {}
 
     public addSensor(sensor: SensorMeta, stations: Stations): void {
         const info = VizInfo.fromSensor(sensor);
@@ -288,8 +310,16 @@ export class Workspace {
     }
 
     public zoomed(viz: Viz, times: TimeRange) {
-        viz.zoomed(times);
+        this.findGroup(viz).zoomed(times);
         return this.query();
+    }
+
+    private findGroup(viz: Viz): Group {
+        const groups = this.groups.filter((g) => g.contains(viz));
+        if (groups.length == 1) {
+            return groups[0];
+        }
+        throw new Error("oprhaned viz");
     }
 
     public get options(): TreeOption[] {
@@ -321,11 +351,12 @@ export class Workspace {
                         .map((station) => station.station.id)
                         .value(),
                     _(stations)
-                        .map((station) => {
-                            return new TreeOption("s-" + station.station.id + "-" + sensor.fullKey, station.station.name, sensor, [
-                                station.station.id,
-                            ]);
-                        })
+                        .map(
+                            (station) =>
+                                new TreeOption("s-" + station.station.id + "-" + sensor.fullKey, station.station.name, sensor, [
+                                    station.station.id,
+                                ])
+                        )
                         .value()
                 );
             })

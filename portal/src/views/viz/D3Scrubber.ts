@@ -23,6 +23,9 @@ export const D3Scrubber = Vue.extend({
             }
             return null;
         },
+        visible(): TimeRange {
+            return this.viz.visible;
+        },
     },
     mounted() {
         this.viz.log("mounted");
@@ -34,6 +37,10 @@ export const D3Scrubber = Vue.extend({
     watch: {
         viz(newValue, oldValue) {
             this.viz.log("graphing (viz)");
+        },
+        visible(newValue, oldValue) {
+            this.viz.log("graphing (visible)");
+            this.refresh();
         },
         data(newValue, oldValue) {
             this.viz.log("graphing (data)");
@@ -110,62 +117,6 @@ export const D3Scrubber = Vue.extend({
                     merge.append("feMergeNode");
                     merge.append("feMergeNode").attr("in", "SourceGraphic");
 
-                    const clip = svg
-                        .append("defs")
-                        .append("clipPath")
-                        .attr("id", "scrubber-clip-" + this.viz.id)
-                        .append("rect")
-                        .attr("width", layout.width)
-                        .attr("height", layout.height)
-                        .attr("x", 0)
-                        .attr("y", 0);
-
-                    const brushHandle = (g, selection) =>
-                        g
-                            .selectAll(".handle-custom")
-                            .data([{ type: "w" }, { type: "e" }])
-                            .join((enter) =>
-                                enter
-                                    .append("circle")
-                                    .attr("class", "handle-custom")
-                                    .attr("filter", "url(#dropshadow-" + this.viz.id + ")")
-                                    .attr("fill", "white")
-                                    .attr("cursor", "ew-resize")
-                                    .attr("r", 9)
-                            )
-                            .attr("display", selection === null ? "none" : null)
-                            .attr(
-                                "transform",
-                                selection === null
-                                    ? null
-                                    : (d, i) =>
-                                          `translate(${selection[i]},${(layout.height + layout.margins.top - layout.margins.bottom) / 2})`
-                            );
-
-                    const raiseZoomed = (newTimes) => this.raiseTimeZoomed(newTimes);
-
-                    const brush = d3
-                        .brushX()
-                        .extent([
-                            [layout.margins.left, layout.margins.top],
-                            [layout.width - layout.margins.left - layout.margins.right, layout.height - layout.margins.bottom],
-                        ])
-                        .on("start brush end", function(this: any) {
-                            const selection = d3.event.selection;
-                            if (selection !== null) {
-                                const sx = selection.map(x.invert);
-                                clip.attr("x", selection[0]).attr("width", selection[1] - selection[0]);
-                            }
-
-                            d3.select(this).call(brushHandle, selection);
-
-                            if (d3.event.type == "end" && d3.event.sourceEvent) {
-                                const start = x.invert(selection[0]);
-                                const end = x.invert(selection[1]);
-                                raiseZoomed(new TimeRange(new Time(start), new Time(end)));
-                            }
-                        });
-
                     const unselectedArea = svg
                         .append("path")
                         .data([this.data.data])
@@ -181,12 +132,86 @@ export const D3Scrubber = Vue.extend({
                         .attr("fill", "rgb(45, 158, 204)")
                         .attr("d", area);
 
-                    svg.append("g")
-                        .call(brush)
-                        .call(brush.move, timeRange.map(x));
-
                     return svg;
                 });
+
+            const handles = (g, selection) =>
+                g
+                    .selectAll(".handle-custom")
+                    .data([{ type: "w" }, { type: "e" }])
+                    .join((enter) =>
+                        enter
+                            .append("circle")
+                            .attr("class", "handle-custom")
+                            .attr("filter", "url(#dropshadow-" + this.viz.id + ")")
+                            .attr("fill", "white")
+                            .attr("cursor", "ew-resize")
+                            .attr("r", 9)
+                    )
+                    .attr("display", selection === null ? "none" : null)
+                    .attr(
+                        "transform",
+                        selection === null
+                            ? null
+                            : (d, i) => `translate(${selection[i]},${(layout.height + layout.margins.top - layout.margins.bottom) / 2})`
+                    );
+
+            const raiseZoomed = (newTimes) => this.raiseTimeZoomed(newTimes);
+
+            const clip = svg
+                .selectAll(".scrubber-clip")
+                .data(charts)
+                .join((enter) =>
+                    enter
+                        .append("defs")
+                        .append("clipPath")
+                        .attr("id", "scrubber-clip-" + this.viz.id)
+                        .attr("class", "scrubber-clip")
+                        .append("rect")
+                        .attr("width", layout.width)
+                        .attr("height", layout.height)
+                        .attr("x", 0)
+                        .attr("y", 0)
+                );
+
+            const brush = d3
+                .brushX()
+                .extent([
+                    [layout.margins.left, layout.margins.top],
+                    [layout.width - layout.margins.left - layout.margins.right, layout.height - layout.margins.bottom],
+                ])
+                .on("start brush end", function(this: any) {
+                    const selection = d3.event.selection;
+                    if (selection !== null) {
+                        const sx = selection.map(x.invert);
+                        clip.attr("x", selection[0]).attr("width", selection[1] - selection[0]);
+                    }
+                    d3.select(this).call(handles, selection);
+
+                    if (d3.event.type == "end" && d3.event.sourceEvent) {
+                        const start = x.invert(selection[0]);
+                        const end = x.invert(selection[1]);
+                        raiseZoomed(new TimeRange(new Time(start), new Time(end)));
+                    }
+                });
+
+            const visible = () => {
+                if (this.viz.visible.isExtreme()) {
+                    return this.data.timeRange;
+                }
+                return this.viz.visible.toArray();
+            };
+
+            const brushTop = svg
+                .selectAll(".brush-container")
+                .data(charts)
+                .join((enter) =>
+                    enter
+                        .append("g")
+                        .attr("class", "brush-container")
+                        .call(brush)
+                )
+                .call(brush.move, visible().map(x));
         },
     },
     template: `<div class="viz scrubber"></div>`,

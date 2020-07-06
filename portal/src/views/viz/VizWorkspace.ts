@@ -33,15 +33,15 @@ export const VizWorkspace = Vue.extend({
             return "D3" + viz.constructor.name;
         },
         onVizTimeZoomed(viz, times) {
-            viz.log("zoom times", times);
+            viz.log("zooming", times);
             return this.workspace.zoomed(viz, times);
         },
         onVizRemove(viz) {
-            viz.log("remove");
+            viz.log("removing");
             return this.workspace.remove(viz);
         },
         onSelected(options) {
-            console.log("selected", options);
+            console.log("selecting", options);
             return this.workspace.selected(options);
         },
     },
