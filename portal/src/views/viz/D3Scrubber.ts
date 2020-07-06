@@ -166,10 +166,6 @@ export const D3Scrubber = Vue.extend({
                             }
                         });
 
-                    svg.append("g")
-                        .call(brush)
-                        .call(brush.move, timeRange.map(x));
-
                     const unselectedArea = svg
                         .append("path")
                         .data([this.data.data])
@@ -184,6 +180,10 @@ export const D3Scrubber = Vue.extend({
                         .attr("class", "background-area")
                         .attr("fill", "rgb(45, 158, 204)")
                         .attr("d", area);
+
+                    svg.append("g")
+                        .call(brush)
+                        .call(brush.move, timeRange.map(x));
 
                     return svg;
                 });
