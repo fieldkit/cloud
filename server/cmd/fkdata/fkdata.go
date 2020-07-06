@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/kelseyhightower/envconfig"
 
@@ -33,11 +34,11 @@ func processStation(ctx context.Context, db *sqlxcache.DB, stationID int32, rece
 	}
 
 	if recently {
-		if err := sr.Recently(ctx, stationID); err != nil {
+		if err := sr.Refresh(ctx, stationID, time.Hour*48); err != nil {
 			return fmt.Errorf("recently refresh failed: %v", err)
 		}
 	} else {
-		if err := sr.Completely(ctx, stationID); err != nil {
+		if err := sr.Refresh(ctx, stationID, 0); err != nil {
 			return fmt.Errorf("complete refresh failed: %v", err)
 		}
 	}

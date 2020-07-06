@@ -32,16 +32,8 @@ func (h *RefreshStationHandler) Handle(ctx context.Context, m *messages.RefreshS
 		return err
 	}
 
-	if m.Completely {
-		log.Infow("completely")
-		if err := sr.Completely(ctx, m.StationID); err != nil {
-			return fmt.Errorf("complete refresh failed: %v", err)
-		}
-	} else {
-		log.Infow("recently")
-		if err := sr.Recently(ctx, m.StationID); err != nil {
-			return fmt.Errorf("partial refresh failed: %v", err)
-		}
+	if err := sr.Refresh(ctx, m.StationID, m.HowRecently); err != nil {
+		return fmt.Errorf("partial refresh failed: %v", err)
 	}
 
 	log.Infow("done")
@@ -59,20 +51,14 @@ func NewStationRefresher(db *sqlxcache.DB) (sr *StationRefresher, err error) {
 	}, nil
 }
 
-func (sr *StationRefresher) Recently(ctx context.Context, stationID int32) error {
-	walkParams := &WalkParameters{
-		StationID: stationID,
-		Start:     time.Now().Add(time.Hour * -48),
-		End:       time.Now(),
-		PageSize:  1000,
+func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRecently time.Duration) error {
+	start := time.Time{}
+	if howRecently > 0 {
+		start = time.Now().Add(-howRecently)
 	}
-	return sr.walk(ctx, walkParams)
-}
-
-func (sr *StationRefresher) Completely(ctx context.Context, stationID int32) error {
 	walkParams := &WalkParameters{
 		StationID: stationID,
-		Start:     time.Time{},
+		Start:     start,
 		End:       time.Now(),
 		PageSize:  1000,
 	}
