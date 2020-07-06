@@ -103,36 +103,38 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 								{
 									"id": "<<PRESENCE>>",
 									"flags": "<<PRESENCE>>",
+									"fullKey": "<<PRESENCE>>",
 									"hardwareId": "<<PRESENCE>>",
 									"internal": "<<PRESENCE>>",
 									"name": "<<PRESENCE>>",
 									"position": "<<PRESENCE>>",
 									"sensors": [
-										{ "key": "", "name": "random_0", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_1", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_2", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_3", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_4", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" }
+										{ "key": "random0", "fullKey": "random-module-1.random0", "name": "random_0", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random1", "fullKey": "random-module-1.random1", "name": "random_1", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random2", "fullKey": "random-module-1.random2", "name": "random_2", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random3", "fullKey": "random-module-1.random3", "name": "random_3", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random4", "fullKey": "random-module-1.random4", "name": "random_4", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" }
 									]
 								},
 								{
 									"id": "<<PRESENCE>>",
 									"flags": "<<PRESENCE>>",
+									"fullKey": "<<PRESENCE>>",
 									"hardwareId": "<<PRESENCE>>",
 									"internal": "<<PRESENCE>>",
 									"name": "<<PRESENCE>>",
 									"position": "<<PRESENCE>>",
 									"sensors": [
-										{ "key": "", "name": "random_0", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_1", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_2", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_3", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_4", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_5", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_6", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_7", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_8", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "", "name": "random_9", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" }
+										{ "key": "random0", "fullKey": "random-module-2.random0", "name": "random_0", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random1", "fullKey": "random-module-2.random1", "name": "random_1", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random2", "fullKey": "random-module-2.random2", "name": "random_2", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random3", "fullKey": "random-module-2.random3", "name": "random_3", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random4", "fullKey": "random-module-2.random4", "name": "random_4", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random5", "fullKey": "random-module-2.random5", "name": "random_5", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random6", "fullKey": "random-module-2.random6", "name": "random_6", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random7", "fullKey": "random-module-2.random7", "name": "random_7", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random8", "fullKey": "random-module-2.random8", "name": "random_8", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random9", "fullKey": "random-module-2.random9", "name": "random_9", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" }
 									]
 								}
 							]
