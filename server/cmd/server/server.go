@@ -163,7 +163,7 @@ func createApi(ctx context.Context, config *Config) (http.Handler, *api.Controll
 		return nil, nil, err
 	}
 
-	ingestionReceivedHandler := backend.NewIngestionReceivedHandler(database, ingestionFiles, metrics)
+	ingestionReceivedHandler := backend.NewIngestionReceivedHandler(database, ingestionFiles, metrics, jq)
 	jq.Register(messages.IngestionReceived{}, ingestionReceivedHandler)
 
 	refreshStationHandler := backend.NewRefreshStationHandler(database)

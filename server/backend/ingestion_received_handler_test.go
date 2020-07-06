@@ -8,6 +8,7 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/tests"
@@ -21,7 +22,8 @@ func TestIngestionReceivedNoSuchIngestion(t *testing.T) {
 	user, err := e.AddUser()
 	assert.NoError(err)
 
-	handler := NewIngestionReceivedHandler(e.DB, tests.NewInMemoryArchive(map[string][]byte{}), logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
+	publisher := jobs.NewDevNullMessagePublisher()
+	handler := NewIngestionReceivedHandler(e.DB, tests.NewInMemoryArchive(map[string][]byte{}), logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
 
 	err = handler.Handle(e.Ctx, &messages.IngestionReceived{
 		QueuedID: int64(30342),
@@ -43,10 +45,11 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	randomData, err := e.NewRandomData(1024)
 	assert.NoError(err)
 
+	publisher := jobs.NewDevNullMessagePublisher()
 	files := tests.NewInMemoryArchive(map[string][]byte{
 		"/file": []byte{},
 	})
-	handler := NewIngestionReceivedHandler(e.DB, files, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
+	handler := NewIngestionReceivedHandler(e.DB, files, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
 
 	queued, _, err := e.AddIngestion(user, "/file", data.MetaTypeName, e.MustDeviceID(), len(randomData))
 	assert.NoError(err)
@@ -68,11 +71,12 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 	files, err := e.NewFilePair(1, 16)
 	assert.NoError(err)
 
+	publisher := jobs.NewDevNullMessagePublisher()
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
+	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
 
 	queued, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, e.MustDeviceID(), len(files.Meta))
 	assert.NoError(err)
@@ -97,11 +101,12 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 	files, err := e.NewFilePair(1, 16)
 	assert.NoError(err)
 
+	publisher := jobs.NewDevNullMessagePublisher()
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
+	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
 
 	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NotNil(queuedMeta)
@@ -156,11 +161,12 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 	files, err := e.NewFilePair(4, 16)
 	assert.NoError(err)
 
+	publisher := jobs.NewDevNullMessagePublisher()
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
+	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
 
 	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
@@ -215,11 +221,12 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	files, err := e.NewFilePair(4, 16)
 	assert.NoError(err)
 
+	publisher := jobs.NewDevNullMessagePublisher()
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
+	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
 
 	queuedMeta, metaIngestion, err := e.AddIngestion(fd.Owner, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)

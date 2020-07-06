@@ -11,6 +11,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/common/logging"
 
+	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/messages"
@@ -19,16 +20,18 @@ import (
 )
 
 type IngestionReceivedHandler struct {
-	db      *sqlxcache.DB
-	files   files.FileArchive
-	metrics *logging.Metrics
+	db        *sqlxcache.DB
+	files     files.FileArchive
+	metrics   *logging.Metrics
+	publisher jobs.MessagePublisher
 }
 
-func NewIngestionReceivedHandler(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics) *IngestionReceivedHandler {
+func NewIngestionReceivedHandler(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, publisher jobs.MessagePublisher) *IngestionReceivedHandler {
 	return &IngestionReceivedHandler{
-		db:      db,
-		files:   files,
-		metrics: metrics,
+		db:        db,
+		files:     files,
+		metrics:   metrics,
+		publisher: publisher,
 	}
 }
 
@@ -79,6 +82,17 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		if err := recordIngestionActivity(ctx, log, h.db, m, info); err != nil {
 			log.Errorw("ingestion", "error", err)
 			hasOtherErrors = true
+		}
+
+		if info.StationID != nil {
+			if err := h.publisher.Publish(ctx, &messages.RefreshStation{
+				StationID:   *info.StationID,
+				HowRecently: time.Hour * 48,
+				Completely:  false,
+				UserID:      i.UserID,
+			}); err != nil {
+				return err
+			}
 		}
 	}
 

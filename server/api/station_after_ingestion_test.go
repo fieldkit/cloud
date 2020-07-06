@@ -9,6 +9,7 @@ import (
 	"github.com/kinbiko/jsonassert"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
 
 	"github.com/fieldkit/cloud/server/backend"
@@ -49,11 +50,12 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 	files, err := e.NewFilePair(4, 16)
 	assert.NoError(err)
 
+	publisher := jobs.NewDevNullMessagePublisher()
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := backend.NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}))
+	handler := backend.NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
 
 	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, station.DeviceID, len(files.Meta))
 	assert.NoError(err)
