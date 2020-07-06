@@ -15,6 +15,7 @@ import ProjectUpdateEditView from "./views/ProjectUpdateEditView.vue";
 import ProjectView from "./views/ProjectView.vue";
 import StationsView from "./views/StationsView.vue";
 import UserView from "./views/UserView.vue";
+import ExploreView from "./views/viz/ExploreView.vue";
 
 Vue.use(Router);
 
@@ -178,6 +179,15 @@ const routes = [
         path: "/dashboard/data",
         name: "viewData",
         component: DataView,
+        props: true,
+        meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/dashboard/explore",
+        name: "explore",
+        component: ExploreView,
         props: true,
         meta: {
             secured: true,

@@ -868,14 +868,9 @@ class FKApi {
     }
 
     sensorData(params: any): Promise<any> {
-        const queryParams = new URLSearchParams();
-        queryParams.append("start", params.when.start.getTime());
-        queryParams.append("end", params.when.end.getTime());
-        queryParams.append("stations", params.stations.join(","));
-        queryParams.append("sensors", params.sensors.join(","));
         const token = this.token.getHeader();
         return this.invoke({
-            url: this.baseUrl + "/sensors/data?" + queryParams.toString(),
+            url: this.baseUrl + "/sensors/data?" + params.queryString(),
             headers: {
                 "Content-Type": "application/json",
                 Authorization: token,
