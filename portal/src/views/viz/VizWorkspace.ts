@@ -48,7 +48,7 @@ export const VizWorkspace = Vue.extend({
 			<div class="groups-container">
 				<div v-for="group in workspace.groups" :key="group.id">
 					<div v-for="viz in group.vizes" :key="viz.id">
-						<component v-bind:is="uiNameOf(viz)" :viz="viz" @viz-time-zoomed="(range) => onVizTimeZoomed(viz, range)"  @viz-remove="() => onVizRemove(viz)"></component>
+						<component v-bind:is="uiNameOf(viz)" :viz="viz" @viz-time-zoomed="(range) => onVizTimeZoomed(viz, range)" @viz-remove="() => onVizRemove(viz)"></component>
 					</div>
 				</div>
 			</div>

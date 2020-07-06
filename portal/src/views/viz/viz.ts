@@ -230,7 +230,6 @@ export class Workspace {
         group.add(graph);
         group.add(graph.makeScrubber());
         this.groups.push(group);
-        console.log(group);
     }
 
     public addStation(station: DisplayStation): boolean {
@@ -332,8 +331,6 @@ export class Workspace {
                 );
             })
             .value();
-
-        console.log("options", options);
 
         return options;
     }

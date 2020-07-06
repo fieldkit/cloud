@@ -114,7 +114,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                     const start = x.invert(range[0]);
                     const end = x.invert(range[1]);
                     const newRange = new TimeRange(new Time(start), new Time(end));
-                    this.$emit("time-zoomed", newRange);
+                    this.raiseTimeZoomed(newRange);
                 });
 
             const colors = d3
@@ -233,10 +233,13 @@ export const D3TimeSeriesGraph = Vue.extend({
     },
     methods: {
         onDouble() {
-            this.$emit("viz-time-zoomed", TimeRange.eternity);
+            return this.raiseTimeZoomed(TimeRange.eternity);
+        },
+        raiseTimeZoomed(newTimes) {
+            return this.$emit("viz-time-zoomed", newTimes);
         },
         onRemove() {
-            this.$emit("viz-remove");
+            return this.$emit("viz-remove");
         },
     },
     template: `

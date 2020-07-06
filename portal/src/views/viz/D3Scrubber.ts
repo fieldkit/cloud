@@ -122,9 +122,7 @@ export const D3Scrubber = Vue.extend({
                                           `translate(${selection[i]},${(layout.height + layout.margins.top - layout.margins.bottom) / 2})`
                             );
 
-                    const emitZoomed = (newRange) => {
-                        return this.$emit("time-zoomed", newRange);
-                    };
+                    const raiseZoomed = (newTimes) => this.raiseTimeZoomed(newTimes);
 
                     const brush = d3
                         .brushX()
@@ -144,8 +142,7 @@ export const D3Scrubber = Vue.extend({
                             if (d3.event.type == "end" && d3.event.sourceEvent) {
                                 const start = x.invert(selection[0]);
                                 const end = x.invert(selection[1]);
-                                const newRange = new TimeRange(new Time(start), new Time(end));
-                                emitZoomed(newRange);
+                                raiseZoomed(new TimeRange(new Time(start), new Time(end)));
                             }
                         });
 
@@ -170,6 +167,11 @@ export const D3Scrubber = Vue.extend({
 
                     return svg;
                 });
+        },
+    },
+    methods: {
+        raiseTimeZoomed(newTimes) {
+            return this.$emit("viz-time-zoomed", newTimes);
         },
     },
     template: `<div class="viz scrubber"></div>`,
