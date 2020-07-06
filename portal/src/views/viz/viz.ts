@@ -32,6 +32,7 @@ export class StationMeta {
             .take(1)
             .map((cfg) => cfg.modules)
             .flatten()
+            .filter((m) => !m.internal)
             .map((m) => m.sensors)
             .flatten()
             .map((s) => new SensorMeta(sensorsByKey[s.fullKey], s))
