@@ -19,19 +19,27 @@ import (
 type Options struct {
 	StationID int
 	All       bool
+	Recently  bool
 }
 
 type Config struct {
 	PostgresURL string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
 }
 
-func processStation(ctx context.Context, db *sqlxcache.DB, stationID int32) error {
+func processStation(ctx context.Context, db *sqlxcache.DB, stationID int32, recently bool) error {
 	sr, err := backend.NewStationRefresher(db)
 	if err != nil {
 		return err
 	}
-	if err := sr.Completely(ctx, stationID); err != nil {
-		return fmt.Errorf("complete refresh failed: %v", err)
+
+	if recently {
+		if err := sr.Recently(ctx, stationID); err != nil {
+			return fmt.Errorf("recently refresh failed: %v", err)
+		}
+	} else {
+		if err := sr.Completely(ctx, stationID); err != nil {
+			return fmt.Errorf("complete refresh failed: %v", err)
+		}
 	}
 
 	return nil
@@ -42,6 +50,7 @@ func main() {
 
 	flag.IntVar(&options.StationID, "station-id", 0, "station id")
 	flag.BoolVar(&options.All, "all", false, "all stations")
+	flag.BoolVar(&options.Recently, "recently", false, "recently inserted data")
 
 	flag.Parse()
 
@@ -67,7 +76,7 @@ func main() {
 	log := logging.Logger(ctx).Sugar()
 
 	if options.StationID > 0 {
-		if err := processStation(ctx, db, int32(options.StationID)); err != nil {
+		if err := processStation(ctx, db, int32(options.StationID), options.Recently); err != nil {
 			panic(err)
 		}
 	}
@@ -80,7 +89,7 @@ func main() {
 
 		for _, id := range ids {
 			log.Infow("station", "station_id", id.ID)
-			if err := processStation(ctx, db, int32(id.ID)); err != nil {
+			if err := processStation(ctx, db, int32(id.ID), options.Recently); err != nil {
 				log.Errorw("error", "station_id", id.ID, "error", err)
 			}
 		}
