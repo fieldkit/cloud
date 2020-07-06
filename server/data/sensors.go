@@ -34,8 +34,8 @@ func (nw *NumericWireTime) Scan(src interface{}) error {
 
 type AggregatedReading struct {
 	ID        int64           `db:"id" json:"id"`
-	StationID int32           `db:"station_id" json:"station_id"`
-	SensorID  int64           `db:"sensor_id" json:"sensor_id"`
+	StationID int32           `db:"station_id" json:"stationId"`
+	SensorID  int64           `db:"sensor_id" json:"sensorId"`
 	Time      NumericWireTime `db:"time" json:"time"`
 	Location  *Location       `db:"location" json:"location"`
 	Value     float64         `db:"value" json:"value"`

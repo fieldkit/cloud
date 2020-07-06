@@ -108,7 +108,7 @@ func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) 
 }
 
 type AggregateSummary struct {
-	NumberRecords int64 `db:"number_records" json:"number_records"`
+	NumberRecords int64 `db:"number_records" json:"numberRecords"`
 }
 
 func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (*sensor.DataResult, error) {
