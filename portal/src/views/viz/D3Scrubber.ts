@@ -190,7 +190,7 @@ export const D3Scrubber = Vue.extend({
                         if (selection != null) {
                             const start = x.invert(selection[0]);
                             const end = x.invert(selection[1]);
-                            raiseZoomed(new TimeRange(new Time(start), new Time(end)));
+                            raiseZoomed(new TimeRange(start, end));
                         } else {
                             raiseZoomed(TimeRange.eternity);
                         }

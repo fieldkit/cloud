@@ -9,27 +9,35 @@ export class Ids {
 }
 
 export class Time {
-    constructor(public readonly d: Date) {}
-
-    public static Max = new Time(new Date(8640000000000000));
-    public static Min = new Time(new Date(-8640000000000000));
-
-    public getTime() {
-        return this.d.getTime();
-    }
+    public static Max = 8640000000000000;
+    public static Min = -8640000000000000;
 }
 
 export class TimeRange {
-    constructor(public readonly start: Time, public readonly end: Time) {}
-
     public static eternity = new TimeRange(Time.Min, Time.Max);
 
+    private readonly array: number[];
+
+    constructor(public readonly start: number, public readonly end: number) {
+        this.array = [start, end];
+    }
+
     public toArray(): number[] {
-        return [this.start.d.getTime(), this.end.d.getTime()];
+        return this.array;
     }
 
     public isExtreme(): boolean {
         return this.start == Time.Min || this.end == Time.Max;
+    }
+
+    public static mergeArrays(ranges: number[][]): TimeRange {
+        const min = _(ranges)
+            .map((r) => r[0])
+            .min();
+        const max = _(ranges)
+            .map((r) => r[1])
+            .max();
+        return new TimeRange(min, max);
     }
 }
 
@@ -49,8 +57,8 @@ export class DataQueryParams {
 
     public queryString(): string {
         const queryParams = new URLSearchParams();
-        queryParams.append("start", this.when.start.getTime().toString());
-        queryParams.append("end", this.when.end.getTime().toString());
+        queryParams.append("start", this.when.start.toString());
+        queryParams.append("end", this.when.end.toString());
         queryParams.append("stations", this.stations.join(","));
         queryParams.append("sensors", this.sensors.join(","));
         return queryParams.toString();
