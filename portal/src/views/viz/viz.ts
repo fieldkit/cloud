@@ -203,18 +203,6 @@ export class Group {
             return null;
         }
     }
-
-    public lock() {
-        if (this.vizes.length > 1) {
-            this.scrubbers_ = new Scrubbers(
-                this.id,
-                TimeRange.eternity,
-                this.vizes.filter((viz) => (viz as Graph).all).map((viz, i) => new Scrubber(i, (viz as Graph).all))
-            );
-        } else {
-            this.scrubbers_ = null;
-        }
-    }
 }
 
 export class Querier {
@@ -415,7 +403,6 @@ export class Workspace {
         }
         const removing = this.groups.shift();
         this.groups[0].addAll(removing);
-        this.groups[0].lock();
         return this;
     }
 
