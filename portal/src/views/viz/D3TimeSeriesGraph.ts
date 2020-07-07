@@ -143,7 +143,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                     const range = d3.event.selection;
                     const start = x.invert(range[0]);
                     const end = x.invert(range[1]);
-                    const newRange = new TimeRange(start, end);
+                    const newRange = new TimeRange(start.getTime(), end.getTime());
                     this.raiseTimeZoomed(newRange);
                 });
 

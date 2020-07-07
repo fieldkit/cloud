@@ -223,7 +223,7 @@ export const D3MultiScrubber = Vue.extend({
                     if (d3.event.type == "end" && d3.event.sourceEvent) {
                         const start = x.invert(selection[0]);
                         const end = x.invert(selection[1]);
-                        raiseZoomed(new TimeRange(start, end));
+                        raiseZoomed(new TimeRange(start.getTime(), end.getTime()));
                     }
                 });
 

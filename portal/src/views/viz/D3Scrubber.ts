@@ -30,7 +30,6 @@ export const D3Scrubber = Vue.extend({
     watch: {
         visible(newValue, oldValue) {
             this.viz.log("graphing (visible)");
-            console.log("incoming", this.viz.visible.toArray());
             this.refresh();
         },
         data(newValue, oldValue) {
@@ -198,7 +197,7 @@ export const D3Scrubber = Vue.extend({
                         if (selection != null) {
                             const start = x.invert(selection[0]);
                             const end = x.invert(selection[1]);
-                            raiseZoomed(new TimeRange(start, end));
+                            raiseZoomed(new TimeRange(start.getTime(), end.getTime()));
                         } else {
                             raiseZoomed(TimeRange.eternity);
                         }
@@ -207,10 +206,8 @@ export const D3Scrubber = Vue.extend({
 
             const visible = () => {
                 if (this.viz.visible.isExtreme()) {
-                    console.log("timeRange", this.data.timeRange);
                     return this.data.timeRange;
                 }
-                console.log("visible", this.viz.visible.toArray());
                 return this.viz.visible.toArray();
             };
 
