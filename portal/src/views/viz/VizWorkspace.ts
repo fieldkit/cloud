@@ -25,7 +25,7 @@ export const VizWorkspace = Vue.extend({
         return {};
     },
     mounted() {
-        console.log("workspace: mounted");
+        console.log("workspace: mounted", this.workspace);
         return this.workspace.query();
     },
     methods: {
@@ -34,19 +34,19 @@ export const VizWorkspace = Vue.extend({
         },
         onVizTimeZoomed(viz: Viz, times: TimeRange) {
             viz.log("zooming", times.toArray());
-            return this.workspace.zoomed(viz, times);
+            return this.workspace.zoomed(viz, times).query();
         },
         onVizRemove(viz: Viz) {
             viz.log("removing");
-            return this.workspace.remove(viz);
+            return this.workspace.remove(viz).query();
         },
         onVizChange(viz: Viz, option: TreeOption) {
             viz.log("option", option);
-            return this.workspace.selected(viz, option);
+            return this.workspace.selected(viz, option).query();
         },
         onCompare() {
             console.log("workspace: compare");
-            return this.workspace.compare();
+            return this.workspace.compare().query();
         },
     },
     template: `

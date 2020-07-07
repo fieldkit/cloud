@@ -46,7 +46,8 @@ export default {
                     this.workspace = new Workspace(sensors);
                     this.workspace.addStation(station);
                     this.workspace.compare();
-                    console.log("workspace", this.workspace);
+                    this.workspace.compare();
+                    return this.workspace;
                 });
             }
         );

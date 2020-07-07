@@ -204,18 +204,19 @@ export class Workspace {
 
     constructor(private readonly meta: SensorsResponse) {}
 
-    public addSensor(sensor: SensorMeta, stations: Stations): void {
+    public addSensor(sensor: SensorMeta, stations: Stations) {
         const info = VizInfo.fromSensor(sensor);
         const graph = new Graph(info, new DataQueryParams(TimeRange.eternity, stations, [sensor.id]));
         const group = new Group();
         group.add(graph);
         this.groups.push(group);
+        return this;
     }
 
-    public addStation(station: DisplayStation): boolean {
+    public addStation(station: DisplayStation) {
         const stationMeta = new StationMeta(this.meta, station);
         this.stations.push(stationMeta);
-        return true;
+        return this;
     }
 
     private get allVizes(): Viz[] {
@@ -263,7 +264,7 @@ export class Workspace {
 
     public zoomed(viz: Viz, times: TimeRange) {
         this.findGroup(viz).zoomed(times);
-        return this.query();
+        return this;
     }
 
     private findGroup(viz: Viz): Group {
@@ -319,6 +320,7 @@ export class Workspace {
 
     public remove(viz: Viz) {
         this.groups = this.groups.map((g) => g.remove(viz)).filter((g) => !g.empty);
+        return this;
     }
 
     public compare() {
@@ -339,7 +341,7 @@ export class Workspace {
             const stationSensors = station.sensors;
             console.log("sensors:", stationSensors);
             if (stationSensors.length == 0) {
-                return false;
+                return this;
             }
             const sensor = stationSensors[0];
             this.addSensor(sensor, [station.id]);
@@ -347,11 +349,11 @@ export class Workspace {
             console.log(this.groups[0].clone());
             this.groups.unshift(this.groups[0].clone());
         }
-        return this.query();
+        return this;
     }
 
     public selected(viz: Viz, option: TreeOption) {
         // this.addSensor(option.sensor, option.stations);
-        return this.query();
+        return this;
     }
 }
