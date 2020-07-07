@@ -25,6 +25,7 @@ export const VizWorkspace = Vue.extend({
         return {};
     },
     mounted() {
+        console.log("workspace: mounted");
         return this.workspace.query();
     },
     methods: {
@@ -44,7 +45,7 @@ export const VizWorkspace = Vue.extend({
             return this.workspace.selected(viz, option);
         },
         onCompare() {
-            console.log("compare");
+            console.log("workspace: compare");
             return this.workspace.compare();
         },
     },

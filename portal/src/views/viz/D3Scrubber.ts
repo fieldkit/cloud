@@ -3,7 +3,7 @@ import Vue from "vue";
 import * as d3 from "d3";
 
 import { Time, TimeRange, Margins, ChartLayout } from "./common";
-import { Scrubber, QueriedData } from "./viz";
+import { Graph, QueriedData } from "./viz";
 
 export const D3Scrubber = Vue.extend({
     name: "D3Scrubber",
@@ -12,14 +12,14 @@ export const D3Scrubber = Vue.extend({
     },
     props: {
         viz: {
-            type: Scrubber,
+            type: Graph,
             required: true,
         },
     },
     computed: {
         data(): QueriedData {
-            if (this.viz.data && !this.viz.data.empty) {
-                return this.viz.data;
+            if (this.viz.all && !this.viz.all.empty) {
+                return this.viz.all;
             }
             return null;
         },
@@ -30,6 +30,7 @@ export const D3Scrubber = Vue.extend({
     watch: {
         visible(newValue, oldValue) {
             this.viz.log("graphing (visible)");
+            console.log("incoming", this.viz.visible.toArray());
             this.refresh();
         },
         data(newValue, oldValue) {
@@ -186,16 +187,22 @@ export const D3Scrubber = Vue.extend({
                     d3.select(this).call(handles, selection);
 
                     if (d3.event.type == "end" && d3.event.sourceEvent) {
-                        const start = x.invert(selection[0]);
-                        const end = x.invert(selection[1]);
-                        raiseZoomed(new TimeRange(new Time(start), new Time(end)));
+                        if (selection != null) {
+                            const start = x.invert(selection[0]);
+                            const end = x.invert(selection[1]);
+                            raiseZoomed(new TimeRange(new Time(start), new Time(end)));
+                        } else {
+                            raiseZoomed(TimeRange.eternity);
+                        }
                     }
                 });
 
             const visible = () => {
                 if (this.viz.visible.isExtreme()) {
+                    console.log("timeRange", this.data.timeRange);
                     return this.data.timeRange;
                 }
+                console.log("visible", this.viz.visible.toArray());
                 return this.viz.visible.toArray();
             };
 

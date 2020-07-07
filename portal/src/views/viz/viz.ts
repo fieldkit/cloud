@@ -102,48 +102,33 @@ export abstract class Viz {
     public abstract clone(): Viz;
 }
 
-export abstract class QueriesSensorData extends Viz {
-    public data: QueriedData | null = null;
+export class Graph extends Viz {
+    private graphing: QueriedData | null = null;
+    public all: QueriedData | null = null;
     public visible: TimeRange = TimeRange.eternity;
-
-    public zoomed(range: TimeRange) {
-        this.visible = range;
-    }
 
     constructor(public info: VizInfo, public params: DataQueryParams) {
         super(info);
     }
-}
-
-export class Scrubber extends QueriesSensorData {
-    constructor(public visible: TimeRange, public params: DataQueryParams) {
-        super(null, params);
-        this.visible = visible;
-    }
-
-    public clone(): Viz {
-        return new Scrubber(this.visible, this.params);
-    }
-}
-
-export class Graph extends QueriesSensorData {
-    constructor(public info: VizInfo, public params: DataQueryParams) {
-        super(info, params);
-    }
 
     public zoomed(range: TimeRange) {
-        this.log("zoomed", range.toArray());
         this.visible = range;
         this.params = new DataQueryParams(range, this.params.stations, this.params.sensors);
     }
 
-    public makeScrubber(): Scrubber {
-        const params = new DataQueryParams(TimeRange.eternity, this.params.stations, this.params.sensors);
-        return new Scrubber(TimeRange.eternity, params);
-    }
-
     public clone(): Viz {
         return new Graph(this.info, this.params);
+    }
+
+    public set data(qd: QueriedData) {
+        if (this.all == null) {
+            this.all = qd;
+        }
+        this.graphing = qd;
+    }
+
+    public get data(): QueriedData {
+        return this.graphing;
     }
 }
 
@@ -172,7 +157,7 @@ export class Group {
 
     public zoomed(times: TimeRange) {
         this.vizes.forEach((viz) => {
-            if (viz instanceof QueriesSensorData) {
+            if (viz instanceof Graph) {
                 viz.zoomed(times);
             }
         });
@@ -224,7 +209,6 @@ export class Workspace {
         const graph = new Graph(info, new DataQueryParams(TimeRange.eternity, stations, [sensor.id]));
         const group = new Group();
         group.add(graph);
-        group.add(graph.makeScrubber());
         this.groups.push(group);
     }
 
@@ -243,7 +227,7 @@ export class Workspace {
 
     public query(): Promise<any> {
         const vizToParams = _(this.allVizes)
-            .map((viz: QueriesSensorData) =>
+            .map((viz: Graph) =>
                 [viz.params].map((params: DataQueryParams) => {
                     return {
                         viz: viz,
@@ -263,10 +247,12 @@ export class Workspace {
             })
             .value();
 
+        console.log("workspace: querying", vizToParams.length, "queries");
+
         return Promise.all(
             vizToParams.map((query) => {
                 return this.querier.query(query.params).then((data) => {
-                    query.vizes.forEach((viz: QueriesSensorData) => {
+                    query.vizes.forEach((viz: Graph) => {
                         viz.log("data", query.params.queryString(), data.data.length, data.timeRange, data.dataRange);
                         viz.data = data;
                     });

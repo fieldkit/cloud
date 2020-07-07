@@ -9,11 +9,13 @@ import { Time, TimeRange, Margins, ChartLayout } from "./common";
 import { Graph, QueriedData, Workspace } from "./viz";
 
 import { D3TimeSeriesGraph } from "./D3TimeSeriesGraph";
+import { D3Scrubber } from "./D3Scrubber";
 
 export const D3Graph = Vue.extend({
     name: "D3Graph",
     components: {
         D3TimeSeriesGraph,
+        D3Scrubber,
         Treeselect,
     },
     data() {
@@ -57,6 +59,7 @@ export const D3Graph = Vue.extend({
 				<div class="btn" @click="raiseRemove">Remove</div>
 			</div>
 			<D3TimeSeriesGraph :viz="viz" :workspace="workspace" @viz-time-zoomed="raiseTimeZoomed" />
+			<D3Scrubber :viz="viz" @viz-time-zoomed="raiseTimeZoomed" />
 		</div>
 	`,
 });
