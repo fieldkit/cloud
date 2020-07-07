@@ -133,10 +133,17 @@ export class Graph extends Viz {
 }
 
 export class Group {
+    public readonly id = Ids.make();
+
     constructor(public vizes: Viz[] = []) {}
 
     public add(viz: Viz) {
         this.vizes.push(viz);
+        return this;
+    }
+
+    public addAll(o: Group) {
+        o.vizes.forEach((v) => this.add(v));
         return this;
     }
 
@@ -334,21 +341,30 @@ export class Workspace {
             .groupBy((s) => s.fullKey)
             .value();
 
-        console.log(allSensors);
+        console.log("workspace: sensors:", allSensors);
 
         if (this.groups.length == 0) {
             const station = this.stations[0];
             const stationSensors = station.sensors;
-            console.log("sensors:", stationSensors);
+            console.log("workspace: station:", stationSensors);
             if (stationSensors.length == 0) {
                 return this;
             }
             const sensor = stationSensors[0];
             this.addSensor(sensor, [station.id]);
         } else {
-            console.log(this.groups[0].clone());
             this.groups.unshift(this.groups[0].clone());
         }
+
+        return this;
+    }
+
+    public combine() {
+        if (this.groups.length <= 1) {
+            return this;
+        }
+        const removing = this.groups.shift();
+        this.groups[0].addAll(removing);
         return this;
     }
 
