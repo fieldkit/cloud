@@ -80,6 +80,10 @@ func (rw *RecordWalker) processBatchInTransaction(ctx context.Context, handler R
 }
 
 func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("querying")
+
 	_, err := rw.db.ExecContext(ctx, `
 			DECLARE records_cursor CURSOR FOR
 			SELECT r.id, r.provision_id, r.time, r.number, r.meta_record_id, ST_AsBinary(r.location) AS location, r.raw, r.pb
@@ -92,6 +96,8 @@ func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler,
 	}
 
 	done := false
+
+	log.Infow("walking")
 
 	if err := rw.walkQuery(ctx, handler, params); err != nil {
 		if err != sql.ErrNoRows {

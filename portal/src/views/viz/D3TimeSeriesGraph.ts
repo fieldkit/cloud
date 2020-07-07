@@ -2,17 +2,27 @@ import _ from "lodash";
 import Vue from "vue";
 import * as d3 from "d3";
 
+import Treeselect from "@riophae/vue-treeselect";
+import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+
 import { Time, TimeRange, Margins, ChartLayout } from "./common";
-import { Graph, QueriedData } from "./viz";
+import { Graph, QueriedData, Workspace } from "./viz";
 
 export const D3TimeSeriesGraph = Vue.extend({
     name: "D3TimeSeriesGraph",
+    components: {
+        Treeselect,
+    },
     data() {
         return {};
     },
     props: {
         viz: {
             type: Graph,
+            required: true,
+        },
+        workspace: {
+            type: Workspace,
             required: true,
         },
     },
@@ -24,6 +34,12 @@ export const D3TimeSeriesGraph = Vue.extend({
             return null;
         },
     },
+    watch: {
+        data(newValue, oldValue) {
+            this.viz.log("graphing (data)");
+            this.refresh();
+        },
+    },
     mounted() {
         this.viz.log("mounted");
         this.refresh();
@@ -31,24 +47,12 @@ export const D3TimeSeriesGraph = Vue.extend({
     updated() {
         this.viz.log("updated");
     },
-    watch: {
-        viz(newValue, oldValue) {
-            this.viz.log("graphing (viz)");
-        },
-        data(newValue, oldValue) {
-            this.viz.log("graphing (data)");
-            this.refresh();
-        },
-    },
     methods: {
         onDouble() {
             return this.raiseTimeZoomed(TimeRange.eternity);
         },
         raiseTimeZoomed(newTimes) {
             return this.$emit("viz-time-zoomed", newTimes);
-        },
-        onRemove() {
-            return this.$emit("viz-remove");
         },
         refresh() {
             if (!this.data) {
@@ -257,11 +261,5 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .attr("cy", (d) => y(d.value));
         },
     },
-    template: `
-		<div class="viz">
-			<h3 v-if="viz.info.title">{{ viz.info.title }}</h3>
-			<div class="btn" @click="onRemove">Remove</div>
-			<div class="graph" @dblclick="onDouble"></div>
-		</div>
-	`,
+    template: `<div class="viz time-series-graph"><div class="graph" @dblclick="onDouble"></div></div>`,
 });

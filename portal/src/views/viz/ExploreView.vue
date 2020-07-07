@@ -45,6 +45,7 @@ export default {
                 return new FKApi().getAllSensors().then((sensors) => {
                     this.workspace = new Workspace(sensors);
                     this.workspace.addStation(station);
+                    this.workspace.compare();
                     console.log("workspace", this.workspace);
                 });
             }

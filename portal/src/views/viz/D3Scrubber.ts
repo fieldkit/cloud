@@ -27,17 +27,7 @@ export const D3Scrubber = Vue.extend({
             return this.viz.visible;
         },
     },
-    mounted() {
-        this.viz.log("mounted");
-        this.refresh();
-    },
-    updated() {
-        this.viz.log("updated");
-    },
     watch: {
-        viz(newValue, oldValue) {
-            this.viz.log("graphing (viz)");
-        },
         visible(newValue, oldValue) {
             this.viz.log("graphing (visible)");
             this.refresh();
@@ -46,6 +36,13 @@ export const D3Scrubber = Vue.extend({
             this.viz.log("graphing (data)");
             this.refresh();
         },
+    },
+    mounted() {
+        this.viz.log("mounted");
+        this.refresh();
+    },
+    updated() {
+        this.viz.log("updated");
     },
     methods: {
         raiseTimeZoomed(newTimes) {
