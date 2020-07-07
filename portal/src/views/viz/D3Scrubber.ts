@@ -137,15 +137,23 @@ export const D3Scrubber = Vue.extend({
                 g
                     .selectAll(".handle-custom")
                     .data([{ type: "w" }, { type: "e" }])
-                    .join((enter) =>
-                        enter
+                    .join((enter) => {
+                        const handle = enter.append("g").attr("class", "handle-custom");
+                        handle
+                            .append("line")
+                            .attr("x1", 0)
+                            .attr("x2", 0)
+                            .attr("y1", -(layout.height - layout.margins.top - layout.margins.bottom) / 2)
+                            .attr("y2", (layout.height - layout.margins.top - layout.margins.bottom) / 2)
+                            .attr("stroke", "black");
+                        handle
                             .append("circle")
-                            .attr("class", "handle-custom")
                             .attr("filter", "url(#dropshadow-" + this.viz.id + ")")
                             .attr("fill", "white")
                             .attr("cursor", "ew-resize")
-                            .attr("r", 9)
-                    )
+                            .attr("r", 9);
+                        return handle;
+                    })
                     .attr("display", selection === null ? "none" : null)
                     .attr(
                         "transform",
