@@ -3,19 +3,7 @@ import Vue from "vue";
 import * as d3 from "d3";
 
 import { Time, TimeRange, Margins, ChartLayout } from "./common";
-import { QueriedData } from "./viz";
-
-export class Scrubber {
-    constructor(public readonly data: QueriedData, public readonly index: number) {}
-}
-
-export class ScrubberSet {
-    public readonly timeRange: TimeRange;
-
-    constructor(public readonly id: string, public readonly visible: TimeRange, public readonly rows: Scrubber[]) {
-        this.timeRange = TimeRange.mergeArrays(rows.map((s) => s.data.timeRange));
-    }
-}
+import { QueriedData, Scrubbers } from "./viz";
 
 export const D3MultiScrubber = Vue.extend({
     name: "D3MultiScrubber",
@@ -24,7 +12,7 @@ export const D3MultiScrubber = Vue.extend({
     },
     props: {
         scrubbers: {
-            type: ScrubberSet,
+            type: Scrubbers,
             required: true,
         },
     },

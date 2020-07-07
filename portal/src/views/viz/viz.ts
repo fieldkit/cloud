@@ -132,10 +132,31 @@ export class Graph extends Viz {
     }
 }
 
+export class Scrubber {
+    constructor(public readonly index: number, public readonly data: QueriedData) {}
+}
+
+export class Scrubbers {
+    public readonly timeRange: TimeRange;
+
+    constructor(public readonly id: string, public readonly visible: TimeRange, public readonly rows: Scrubber[]) {
+        this.timeRange = TimeRange.mergeArrays(rows.map((s) => s.data.timeRange));
+    }
+}
+
 export class Group {
     public readonly id = Ids.make();
+    private visible_: TimeRange = TimeRange.eternity;
 
     constructor(public vizes: Viz[] = []) {}
+
+    public log(...args: any[]) {
+        console.log(...["viz:", this.id, this.constructor.name, ...args]);
+    }
+
+    public clone(): Group {
+        return new Group(this.vizes.map((v) => v.clone()));
+    }
 
     public add(viz: Viz) {
         this.vizes.push(viz);
@@ -163,6 +184,7 @@ export class Group {
     }
 
     public zoomed(times: TimeRange) {
+        this.visible_ = times;
         this.vizes.forEach((viz) => {
             if (viz instanceof Graph) {
                 viz.zoomed(times);
@@ -170,8 +192,28 @@ export class Group {
         });
     }
 
-    public clone(): Group {
-        return new Group(this.vizes.map((v) => v.clone()));
+    public get scrubbers(): Scrubbers {
+        if (this.vizes.length > 1) {
+            return new Scrubbers(
+                this.id,
+                this.visible_,
+                this.vizes.filter((viz) => (viz as Graph).all).map((viz, i) => new Scrubber(i, (viz as Graph).all))
+            );
+        } else {
+            return null;
+        }
+    }
+
+    public lock() {
+        if (this.vizes.length > 1) {
+            this.scrubbers_ = new Scrubbers(
+                this.id,
+                TimeRange.eternity,
+                this.vizes.filter((viz) => (viz as Graph).all).map((viz, i) => new Scrubber(i, (viz as Graph).all))
+            );
+        } else {
+            this.scrubbers_ = null;
+        }
     }
 }
 
@@ -269,8 +311,13 @@ export class Workspace {
         );
     }
 
-    public zoomed(viz: Viz, times: TimeRange) {
+    public graphZoomed(viz: Viz, times: TimeRange) {
         this.findGroup(viz).zoomed(times);
+        return this;
+    }
+
+    public groupZoomed(group: Group, times: TimeRange) {
+        group.zoomed(times);
         return this;
     }
 
@@ -359,17 +406,20 @@ export class Workspace {
         return this;
     }
 
+    /**
+     * Pop first Group and move all the Viz children to the new first Group
+     */
     public combine() {
         if (this.groups.length <= 1) {
             return this;
         }
         const removing = this.groups.shift();
         this.groups[0].addAll(removing);
+        this.groups[0].lock();
         return this;
     }
 
     public selected(viz: Viz, option: TreeOption) {
-        // this.addSensor(option.sensor, option.stations);
         return this;
     }
 }
