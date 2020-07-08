@@ -109,7 +109,7 @@
                         <div class="cell">
                             <UserPhoto :user="projectUser.user" />
                             <div class="invite-name">
-                                <div>{{ projectUser.user.name }}</div>
+                                <div v-if="projectUser.user.name != projectUser.user.email">{{ projectUser.user.name }}</div>
                                 <div class="email">{{ projectUser.user.email }}</div>
                             </div>
                         </div>
@@ -135,12 +135,15 @@
                                 autocapitalizationType="none"
                                 v-model="form.inviteEmail"
                             />
-                            <div class="validation-errors" v-if="$v.form.inviteEmail.$error">
-                                <span class="validation-error" id="no-email" v-if="!$v.form.inviteEmail.required">
+                            <div class="validation-errors" v-if="$v.form.inviteEmail.$error || form.inviteDuplicate">
+                                <span class="validation-error" v-if="!$v.form.inviteEmail.required">
                                     Email is a required field.
                                 </span>
-                                <span class="validation-error" id="email-not-valid" v-if="!$v.form.inviteEmail.email">
+                                <span class="validation-error" v-if="!$v.form.inviteEmail.email">
                                     Must be a valid email address.
+                                </span>
+                                <span class="validation-error" v-if="form.inviteDuplicate">
+                                    This user is already invited.
                                 </span>
                             </div>
                         </div>
@@ -194,6 +197,7 @@ export default {
         return {
             form: {
                 inviteEmail: "",
+                inviteDuplicate: false,
             },
             newUserImage: "",
             viewingActivityFeed: false,
@@ -287,10 +291,17 @@ export default {
                     email: this.form.inviteEmail,
                     role: this.selectedRole,
                 };
-                return this.$store.dispatch(ActionTypes.PROJECT_INVITE, payload).then(() => {
-                    this.$v.form.$reset();
-                    this.form.inviteEmail = "";
-                });
+                return this.$store
+                    .dispatch(ActionTypes.PROJECT_INVITE, payload)
+                    .then(() => {
+                        this.$v.form.$reset();
+                        this.form.inviteEmail = "";
+                        this.form.inviteDuplicate = false;
+                    })
+                    .catch(() => {
+                        // TODO: Move this to vuelidate.
+                        this.form.inviteDuplicate = true;
+                    });
             }
         },
         removeUser(ev, projectUser) {
@@ -561,5 +572,7 @@ export default {
 }
 .invite-name {
     display: inline-block;
+    vertical-align: top;
+    margin-top: 20px;
 }
 </style>
