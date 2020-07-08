@@ -15,7 +15,7 @@
                     Log in
                 </router-link>
             </div>
-            <img v-if="user && userImage" alt="User image" :src="userImage" class="user-image" />
+            <UserPhoto v-if="user" :user="user" />
         </div>
     </div>
 </template>
@@ -24,9 +24,13 @@
 import FKApi from "@/api/api";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
+import CommonComponents from "@/views/shared";
 
 export default {
     name: "HeaderBar",
+    components: {
+        ...CommonComponents,
+    },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({ user: (s) => s.user.user }),
@@ -44,18 +48,6 @@ export default {
             });
         },
         toggleSidebar() {
-            /*
-            const wide = document.getElementById("sidebar-nav-wide");
-            const narrow = document.getElementById("sidebar-nav-narrow");
-            const wideDisplay = getComputedStyle(wide, null).display;
-            if (wideDisplay == "block") {
-                wide.style.display = "none";
-                narrow.style.display = "block";
-            } else {
-                wide.style.display = "block";
-                narrow.style.display = "none";
-            }
-			*/
             this.$emit("toggled");
         },
     },
@@ -74,12 +66,6 @@ export default {
     height: 69px;
     float: left;
     border-bottom: 2px solid #d8dce0;
-}
-.user-image {
-    float: right;
-    margin: 10px 12px 0 0;
-    max-width: 50px;
-    max-height: 50px;
 }
 .menu-icon-container {
     float: left;

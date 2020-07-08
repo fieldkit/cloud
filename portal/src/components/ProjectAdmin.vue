@@ -68,7 +68,7 @@
                     <div class="team-icons">
                         <div class="icon-section-label">Team</div>
                         <span v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.id">
-                            <img v-if="projectUser.user.photo" alt="User image" :src="getProjectUserImage(projectUser)" class="user-icon" />
+                            <UserPhoto :user="projectUser.user" />
                         </span>
                     </div>
                     <div class="module-icons">
@@ -107,10 +107,11 @@
                     </div>
                     <div class="user-row" v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.id">
                         <div class="cell">
-                            <img alt="User image" :src="getProjectUserImage(projectUser)" class="user-icon" />
-                            {{ projectUser.user.name }}
-                            <br />
-                            <span class="email">{{ projectUser.user.email }}</span>
+                            <UserPhoto :user="projectUser.user" />
+                            <div class="invite-name">
+                                <div>{{ projectUser.user.name }}</div>
+                                <div class="email">{{ projectUser.user.email }}</div>
+                            </div>
                         </div>
                         <div class="cell">{{ projectUser.role }}</div>
                         <div class="cell invite-status">Invite {{ projectUser.membership.toLowerCase() }}</div>
@@ -170,10 +171,12 @@ import ProjectStations from "../components/ProjectStations";
 import ProjectActivity from "../components/ProjectActivity";
 import ProjectDataFiles from "../components/ProjectDataFiles";
 import StationsReadings from "../components/StationsReadings";
+import CommonComponents from "@/views/shared";
 
 export default {
     name: "ProjectAdmin",
     components: {
+        ...CommonComponents,
         ProjectStations,
         ProjectActivity,
         ProjectDataFiles,
@@ -560,14 +563,12 @@ export default {
     color: #c42c44;
     display: block;
 }
-
-.edit-btn,
 .remove-btn {
     margin: 12px 0 0 0;
     float: right;
     cursor: pointer;
 }
-.edit-btn {
-    margin-right: 12px;
+.invite-name {
+    display: inline-block;
 }
 </style>

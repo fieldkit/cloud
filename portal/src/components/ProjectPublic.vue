@@ -66,9 +66,9 @@
 
             <div class="team-container">
                 <div class="section-heading">{{ getTeamHeading() }}</div>
-                <div v-for="user in displayProject.users" v-bind:key="user.user.id" class="team-member">
-                    <img v-if="user.user.photo.url" alt="User image" :src="getUserImage(user)" class="user-icon" />
-                    <span class="user-name">{{ user.user.name }}</span>
+                <div v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.id" class="team-member">
+                    <UserPhoto :user="projectUser.user" />
+                    <span class="user-name">{{ projectUser.user.name }}</span>
                 </div>
             </div>
             <div id="public-activity-feed-container">
@@ -85,10 +85,12 @@ import * as ActionTypes from "@/store/actions";
 import FKApi from "../api/api";
 import ProjectStations from "../components/ProjectStations";
 import ProjectActivity from "../components/ProjectActivity";
+import CommonComponents from "@/views/shared";
 
 export default {
     name: "ProjectPublic",
     components: {
+        ...CommonComponents,
         ProjectStations,
         ProjectActivity,
     },
@@ -139,9 +141,6 @@ export default {
         getImageUrl(project) {
             return this.$config.baseUrl + "/" + project.photo;
         },
-        getUserImage(projectUser) {
-            return this.$config.baseUrl + "/" + projectUser.user.photo.url;
-        },
         getModuleImg(module) {
             return this.$loadAsset("modules-lg/" + utils.getModuleImg(module));
         },
@@ -185,14 +184,11 @@ export default {
     max-height: 139px;
 }
 .section {
-    float: left;
 }
 .left-section {
     width: 380px;
-    text-align: center;
 }
 .right-section {
-    margin-left: 30px;
 }
 .section-heading {
     font-size: 20px;

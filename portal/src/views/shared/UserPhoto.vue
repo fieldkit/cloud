@@ -1,0 +1,38 @@
+<template>
+    <span v-if="icon">
+        <img v-if="userImage" :src="userImage" class="default-user-icon" />
+        <img v-else src="../../assets/Profile_Image.png" class="default-user-icon" />
+    </span>
+</template>
+
+<script>
+export default {
+    name: "UserPhoto",
+    props: {
+        user: {
+            type: Object /* object with photo attribute */,
+            required: true,
+        },
+        icon: {
+            type: Boolean,
+            default: true,
+        },
+    },
+    computed: {
+        userImage() {
+            if (this.user && this.user.photo) {
+                return this.$config.baseUrl + this.user.photo;
+            }
+            return null;
+        },
+    },
+};
+</script>
+
+<style scoped>
+.default-user-icon {
+    margin: 10px 12px 0 0;
+    max-width: 50px;
+    max-height: 50px;
+}
+</style>

@@ -58,7 +58,6 @@ button {
 .main-panel {
     width: auto;
     text-align: left;
-    overflow: hidden;
     color: #2c3e50;
 }
 .main-panel h1 {
