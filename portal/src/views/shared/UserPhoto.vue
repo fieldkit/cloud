@@ -9,7 +9,7 @@
 import Vue, { PropType } from "vue";
 
 interface UserPhoto {
-    photo: string | null;
+    photo: { url: string | null };
 }
 
 export default Vue.extend({
@@ -27,7 +27,7 @@ export default Vue.extend({
     computed: {
         userImage(): string | null {
             if (this.user && this.user.photo) {
-                return this.$config.baseUrl + this.user.photo;
+                return this.$config.baseUrl + this.user.photo.url;
             }
             return null;
         },
