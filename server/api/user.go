@@ -570,12 +570,16 @@ func (c *UserController) GetID(ctx *app.GetIDUserContext) error {
 
 func (c *UserController) ListByProject(ctx *app.ListByProjectUserContext) error {
 	users := []*data.ProjectUserAndUser{}
-	if err := c.options.Database.SelectContext(ctx, &users, `SELECT pu.*, u.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1 ORDER BY u.id`, ctx.ProjectID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &users, `
+		SELECT pu.*, u.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1 ORDER BY pu.role_id DESC, u.id
+		`, ctx.ProjectID); err != nil {
 		return err
 	}
 
 	invites := []*data.ProjectInvite{}
-	if err := c.options.Database.SelectContext(ctx, &invites, `SELECT * FROM fieldkit.project_invite WHERE project_id = $1 AND accepted_time IS NULL ORDER BY invited_time`, ctx.ProjectID); err != nil {
+	if err := c.options.Database.SelectContext(ctx, &invites, `
+		SELECT * FROM fieldkit.project_invite WHERE project_id = $1 AND accepted_time IS NULL ORDER BY invited_time
+		`, ctx.ProjectID); err != nil {
 		return err
 	}
 
