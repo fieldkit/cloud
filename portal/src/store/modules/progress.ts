@@ -5,7 +5,7 @@ import * as MutationTypes from "../mutations";
 type LoadingPayload = { [index: string]: boolean };
 
 export class ProgressState {
-    loading: { [index: string]: boolean };
+    loading: { [index: string]: boolean } = {};
 }
 
 const getters = {
