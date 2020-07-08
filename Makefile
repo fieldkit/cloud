@@ -43,7 +43,11 @@ portal/node_modules:
 	cd portal && npm install
 
 tests: portal/node_modules
-	cd portal && npm install
+	if [ -f portal/node_modules/.yarn-integrity ]; then  \
+	cd portal && yarn install;                           \
+	else                                                 \
+	cd portal && npm install;                            \
+	fi
 	cd portal && vue-cli-service test:unit
 
 gotests:
