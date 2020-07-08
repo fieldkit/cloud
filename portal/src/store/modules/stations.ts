@@ -293,6 +293,9 @@ const actions = {
         payload: { id: number; token: string }
     ) => {
         await new FKApi().acceptInvite(payload);
+
+        const userProjects = new FKApi().getUserProjects();
+        commit(HAVE_USER_PROJECTS, userProjects.projects);
     },
     [ActionTypes.DECLINE_PROJECT_INVITE]: async (
         { commit, dispatch }: { commit: any; dispatch: any },
