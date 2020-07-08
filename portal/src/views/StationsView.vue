@@ -122,6 +122,9 @@ export default {
                 this.map.resize();
             }
         },
+        closeNotice() {
+            this.showNoStationsMessage = false;
+        },
     },
 };
 </script>
