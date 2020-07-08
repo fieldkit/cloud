@@ -45,6 +45,10 @@ func NewMediaRepository(files files.FileArchive) (r *MediaRepository) {
 func (r *MediaRepository) SaveFromService(ctx context.Context, reader io.ReadCloser, contentLength int64) (sm *SavedMedia, err error) {
 	log := Logger(ctx).Sugar()
 
+	if contentLength == 0 {
+		return nil, fmt.Errorf("empty")
+	}
+
 	headerLength := int64(MaximumRequiredHeaderBytes)
 	if contentLength < headerLength {
 		headerLength = contentLength
@@ -61,7 +65,7 @@ func (r *MediaRepository) SaveFromService(ctx context.Context, reader io.ReadClo
 
 	kind, _ := filetype.Match(header)
 	if kind == filetype.Unknown {
-		return nil, fmt.Errorf("unknown file type")
+		return nil, fmt.Errorf("unknown file type: %v", kind)
 	}
 
 	contentType := kind.MIME.Value
@@ -89,6 +93,9 @@ func (r *MediaRepository) Save(ctx context.Context, rd *goa.RequestData) (sm *Sa
 	log := Logger(ctx).Sugar()
 
 	contentLength := rd.ContentLength
+	if contentLength == 0 {
+		return nil, fmt.Errorf("empty")
+	}
 
 	headerLength := int64(MaximumRequiredHeaderBytes)
 	if contentLength < headerLength {
@@ -106,7 +113,7 @@ func (r *MediaRepository) Save(ctx context.Context, rd *goa.RequestData) (sm *Sa
 
 	kind, _ := filetype.Match(header)
 	if kind == filetype.Unknown {
-		return nil, fmt.Errorf("unknown file type")
+		return nil, fmt.Errorf("unknown file type: %v", kind)
 	}
 
 	contentType := kind.MIME.Value
