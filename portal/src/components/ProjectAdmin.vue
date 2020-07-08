@@ -43,8 +43,8 @@
                     <div class="section-heading">Project Details</div>
                     <div v-on:click="editProject" class="edit-link">Edit Project</div>
                     <div class="goal-and-description">
+                        <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
                         <div class="project-detail">{{ project.description }}</div>
-                        <div class="project-detail" v-if="project.goal">{{ project.goal }}</div>
                     </div>
                     <div class="time-and-location">
                         <div class="time" v-if="project.startTime">

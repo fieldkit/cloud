@@ -21,8 +21,8 @@
                         <span v-if="project.startTime && displayProject.duration">&nbsp;|&nbsp;</span>
                         <div class="time" v-if="displayProject.duration">{{ displayProject.duration | prettyDuration }}</div>
                     </div>
+                    <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
                     <div class="project-detail">{{ project.description }}</div>
-                    <div class="project-detail" v-if="project.goal">{{ project.goal }}</div>
                     <div class="module-icons">
                         <img
                             v-for="module in projectModules"
