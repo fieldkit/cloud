@@ -5,12 +5,18 @@
     </span>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue, { PropType } from "vue";
+
+interface UserPhoto {
+    photo: string | null;
+}
+
+export default Vue.extend({
     name: "UserPhoto",
     props: {
         user: {
-            type: Object /* object with photo attribute */,
+            type: Object as PropType<UserPhoto>,
             required: true,
         },
         icon: {
@@ -19,14 +25,14 @@ export default {
         },
     },
     computed: {
-        userImage() {
+        userImage(): string | null {
             if (this.user && this.user.photo) {
                 return this.$config.baseUrl + this.user.photo;
             }
             return null;
         },
     },
-};
+});
 </script>
 
 <style scoped>
