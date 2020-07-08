@@ -17,6 +17,7 @@ import { VizWorkspace } from "./VizWorkspace";
 export default {
     name: "ExploreView",
     components: {
+        StandardLayout,
         VizWorkspace,
     },
     props: {},
