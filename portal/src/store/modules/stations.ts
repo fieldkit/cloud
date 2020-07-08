@@ -294,7 +294,7 @@ const actions = {
     ) => {
         await new FKApi().acceptInvite(payload);
 
-        const userProjects = new FKApi().getUserProjects();
+        const userProjects = await new FKApi().getUserProjects();
         commit(HAVE_USER_PROJECTS, userProjects.projects);
     },
     [ActionTypes.DECLINE_PROJECT_INVITE]: async (

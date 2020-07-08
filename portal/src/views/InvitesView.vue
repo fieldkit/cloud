@@ -67,15 +67,25 @@ export default {
         },
         accept(ev, invite) {
             const token = this.$route.query.token;
-            return this.$store.dispatch(ActionTypes.ACCEPT_PROJECT_INVITE, { id: invite.id, token: token }).then(() => {
-                this.pending = [];
-            });
+            return this.$store.dispatch(ActionTypes.ACCEPT_PROJECT_INVITE, { id: invite.id, token: token }).then(
+                () => {
+                    this.pending = [];
+                },
+                () => {
+                    this.invalidToken = true;
+                }
+            );
         },
         decline(ev, invite) {
             const token = this.$route.query.token;
-            return this.$store.dispatch(ActionTypes.DECLINE_PROJECT_INVITE, { id: invite.id, token: token }).then(() => {
-                this.pending = [];
-            });
+            return this.$store.dispatch(ActionTypes.DECLINE_PROJECT_INVITE, { id: invite.id, token: token }).then(
+                () => {
+                    this.pending = [];
+                },
+                () => {
+                    this.invalidToken = true;
+                }
+            );
         },
     },
 };
