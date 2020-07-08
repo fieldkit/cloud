@@ -27,8 +27,8 @@
 
 <script>
 import StandardLayout from "./StandardLayout";
+import * as ActionTypes from "@/store/actions";
 import FKApi from "../api/api";
-import Config from "../secrets";
 
 export default {
     name: "InvitesView",
@@ -37,7 +37,6 @@ export default {
     },
     data: () => {
         return {
-            baseUrl: Config.API_HOST,
             user: { name: "" },
             projects: [],
             stations: [],
@@ -91,7 +90,7 @@ export default {
         },
         accept(event) {
             const inviteId = event.target.getAttribute("data-id");
-            this.api.acceptInvite(inviteId).then(() => {
+            return this.$store.dispatch(ActionTypes.ACCEPT_PROJECT_INVITE).then(() => {
                 const index = this.pending.findIndex((p) => {
                     return p.id == inviteId;
                 });
@@ -104,7 +103,8 @@ export default {
         },
         decline(event) {
             const inviteId = event.target.getAttribute("data-id");
-            this.api.declineInvite(inviteId).then(() => {
+
+            return this.$store.dispatch(ActionTypes.DECLINE_PROJECT_INVITE).then(() => {
                 const index = this.pending.findIndex((p) => {
                     return p.id == inviteId;
                 });

@@ -288,6 +288,12 @@ const actions = {
         const usersReply = await new FKApi().getUsersByProject(payload.projectId);
         commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
     },
+    [ActionTypes.ACCEPT_PROJECT_INVITE]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { token: string }) => {
+        await new FKApi().acceptInvite(payload.token);
+    },
+    [ActionTypes.DECLINE_PROJECT_INVITE]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { token: string }) => {
+        await new FKApi().declineInvite(payload.token);
+    },
 };
 
 const mutations = {

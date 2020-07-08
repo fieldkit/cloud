@@ -229,6 +229,7 @@ func (c *ProjectService) AcceptInvite(ctx context.Context, payload *project.Acce
 
 	if user.Email != invite.InvitedEmail {
 		if payload.Token == nil {
+			log.Infow("accept failed, no token")
 			return project.Unauthorized("permission denied")
 		}
 		given := data.Token{}
@@ -236,6 +237,7 @@ func (c *ProjectService) AcceptInvite(ctx context.Context, payload *project.Acce
 			return err
 		}
 		if given.String() != invite.Token.String() {
+			log.Infow("accept failed, email mismatch, no token")
 			return project.Unauthorized("permission denied")
 		}
 	}
@@ -278,6 +280,7 @@ func (c *ProjectService) RejectInvite(ctx context.Context, payload *project.Reje
 
 	if user.Email != invite.InvitedEmail {
 		if payload.Token == nil {
+			log.Infow("decline failed, email mismatch, no token")
 			return project.Unauthorized("permission denied")
 		}
 		given := data.Token{}
@@ -285,6 +288,7 @@ func (c *ProjectService) RejectInvite(ctx context.Context, payload *project.Reje
 			return err
 		}
 		if given.String() != invite.Token.String() {
+			log.Infow("decline failed, token mismatch")
 			return project.Unauthorized("permission denied")
 		}
 	}
