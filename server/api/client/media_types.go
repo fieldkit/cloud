@@ -824,12 +824,11 @@ func (c *Client) DecodeProjects(resp *http.Response) (*Projects, error) {
 //
 // Identifier: application/vnd.app.user+json; view=default
 type User struct {
-	Bio              string  `form:"bio" json:"bio" yaml:"bio" xml:"bio"`
-	Email            string  `form:"email" json:"email" yaml:"email" xml:"email"`
-	ID               int     `form:"id" json:"id" yaml:"id" xml:"id"`
-	MediaContentType *string `form:"media_content_type,omitempty" json:"media_content_type,omitempty" yaml:"media_content_type,omitempty" xml:"media_content_type,omitempty"`
-	MediaURL         *string `form:"media_url,omitempty" json:"media_url,omitempty" yaml:"media_url,omitempty" xml:"media_url,omitempty"`
-	Name             string  `form:"name" json:"name" yaml:"name" xml:"name"`
+	Bio   string     `form:"bio" json:"bio" yaml:"bio" xml:"bio"`
+	Email string     `form:"email" json:"email" yaml:"email" xml:"email"`
+	ID    int        `form:"id" json:"id" yaml:"id" xml:"id"`
+	Name  string     `form:"name" json:"name" yaml:"name" xml:"name"`
+	Photo *UserPhoto `form:"photo,omitempty" json:"photo,omitempty" yaml:"photo,omitempty" xml:"photo,omitempty"`
 }
 
 // Validate validates the User media type instance.

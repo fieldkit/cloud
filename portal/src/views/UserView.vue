@@ -25,14 +25,14 @@
                 <div id="account-heading">My Account</div>
                 <div class="image-container">
                     <div id="image-heading">Profile picture</div>
-                    <img src="../assets/Profile_Image.png" v-if="!user.mediaUrl && !previewImage" />
+                    <img src="../assets/Profile_Image.png" v-if="!user.photo && !previewImage" />
                     <img
                         alt="User image"
-                        :src="$config.baseUrl + '/user/' + user.id + '/media'"
-                        v-if="user.mediaUrl && !previewImage"
+                        :src="$config.baseUrl + '/' + user.photo.url"
+                        v-if="user.photo && !previewImage"
                         class="user-image"
                     />
-                    <img :src="previewImage" class="user-image" v-if="!user.mediaUrl || previewImage" />
+                    <img :src="previewImage" class="user-image" v-if="!user.photo || previewImage" />
                     <br />
                     <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />
                 </div>
@@ -204,7 +204,7 @@ export default {
                     oldPassword: this.oldPassword,
                     newPassword: this.newPassword,
                 };
-                this.api.updatePassword(data).then(() => {
+                return this.api.updatePassword(data).then(() => {
                     // TODO: indicate success
                     this.isEditing = false;
                     this.loading = false;
@@ -215,7 +215,7 @@ export default {
             this.showReset = true;
         },
         sendResetEmail() {
-            this.api.sendResetPasswordEmail(this.resetEmail).then(() => {
+            return this.api.sendResetPasswordEmail(this.resetEmail).then(() => {
                 this.showReset = false;
                 this.resetSent = true;
             });
@@ -223,14 +223,14 @@ export default {
         submitUpdate() {
             this.loading = true;
             if (this.sendingImage) {
-                this.api.uploadUserImage({ type: this.imageType, image: this.sendingImage }).then(() => {
-                    this.api.updateUser(this.user).then(() => {
+                return this.$store.dispatch(ActionTypes.UPLOAD_USER_PHOTO, { type: this.imageType, image: this.sendingImage }).then(() => {
+                    return this.$store.dispatch(ActionTypes.UPDATE_USER_PROFILE, { user: this.user }).then(() => {
                         this.isEditing = false;
                         this.loading = false;
                     });
                 });
             } else {
-                this.api.updateUser(this.user).then(() => {
+                return this.$store.dispatch(ActionTypes.UPDATE_USER_PROFILE, { user: this.user }).then(() => {
                     this.isEditing = false;
                     this.loading = false;
                 });

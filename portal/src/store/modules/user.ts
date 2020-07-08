@@ -7,8 +7,6 @@ import FkApi, { LoginPayload, LoginResponse, CurrentUser } from "@/api/api";
 export const UPDATE_TOKEN = "UPDATE_TOKEN";
 export const CURRENT_USER = "CURRENT_USER";
 
-export const REFRESH_CURRENT_USER = "REFRESH_CURRENT_USER";
-
 export class UserState {
     token: string | null = null;
     user: CurrentUser | null = null;
@@ -20,17 +18,19 @@ const getters = {
     },
 };
 
+type ActionParameters = { commit: any; dispatch: any; state: UserState };
+
 const actions = {
-    [ActionTypes.INITIALIZE]: ({ commit, dispatch, state }: { commit: any; dispatch: any; state: UserState }) => {
+    [ActionTypes.INITIALIZE]: ({ commit, dispatch, state }: ActionParameters) => {
         if (state.token) {
-            return dispatch(REFRESH_CURRENT_USER);
+            return dispatch(ActionTypes.REFRESH_CURRENT_USER);
         }
         return null;
     },
-    [ActionTypes.AUTHENTICATE]: ({ commit, dispatch, state }: { commit: any; dispatch: any; state: UserState }, payload: LoginPayload) => {
+    [ActionTypes.AUTHENTICATE]: ({ commit, dispatch, state }: ActionParameters, payload: LoginPayload) => {
         return new FkApi().login(payload.email, payload.password).then((token) => {
             commit(UPDATE_TOKEN, token);
-            return dispatch(REFRESH_CURRENT_USER).then(() => {
+            return dispatch(ActionTypes.REFRESH_CURRENT_USER).then(() => {
                 return new LoginResponse(token);
             });
         });
@@ -39,10 +39,20 @@ const actions = {
         commit(UPDATE_TOKEN, null);
         commit(CURRENT_USER, null);
     },
-    [REFRESH_CURRENT_USER]: ({ commit, dispatch, state }: { commit: any; dispatch: any; state: UserState }) => {
+    [ActionTypes.REFRESH_CURRENT_USER]: ({ commit, dispatch, state }: ActionParameters) => {
         return new FkApi().getCurrentUser().then((user) => {
             commit(CURRENT_USER, user);
             return user;
+        });
+    },
+    [ActionTypes.UPLOAD_USER_PHOTO]: ({ commit, dispatch, state }: ActionParameters, payload: any) => {
+        return new FkApi().uploadUserImage({ type: payload.type, image: payload.image }).then(() => {
+            return dispatch(ActionTypes.REFRESH_CURRENT_USER);
+        });
+    },
+    [ActionTypes.UPDATE_USER_PROFILE]: ({ commit, dispatch, state }: ActionParameters, payload: any) => {
+        return new FkApi().updateUser(payload.user).then(() => {
+            return dispatch(ActionTypes.REFRESH_CURRENT_USER);
         });
     },
 };

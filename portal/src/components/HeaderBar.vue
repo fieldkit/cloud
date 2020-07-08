@@ -31,7 +31,7 @@ export default {
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({ user: (s) => s.user.user }),
         userImage() {
-            return this.$config.baseUrl + "/user/" + this.$store.state.user.user.id + "/media";
+            return this.$config.baseUrl + this.$store.state.user.user.photo.url;
         },
     },
     methods: {

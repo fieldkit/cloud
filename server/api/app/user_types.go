@@ -1408,3 +1408,22 @@ func (ut *UpdateUserPayload) Validate() (err error) {
 	}
 	return
 }
+
+// userPhoto user type.
+type userPhoto struct {
+	URL *string `form:"url,omitempty" json:"url,omitempty" yaml:"url,omitempty" xml:"url,omitempty"`
+}
+
+// Publicize creates UserPhoto from userPhoto
+func (ut *userPhoto) Publicize() *UserPhoto {
+	var pub UserPhoto
+	if ut.URL != nil {
+		pub.URL = ut.URL
+	}
+	return &pub
+}
+
+// UserPhoto user type.
+type UserPhoto struct {
+	URL *string `form:"url,omitempty" json:"url,omitempty" yaml:"url,omitempty" xml:"url,omitempty"`
+}
