@@ -490,26 +490,32 @@ class FKApi {
         });
     }
 
-    acceptInvite(inviteId) {
+    acceptInvite(payload: { id: number; token: string }) {
         const token = this.token.getHeader();
         return this.invoke({
             method: "POST",
-            url: this.baseUrl + "/projects/invites/" + inviteId + "/accept",
+            url: this.baseUrl + "/projects/invites/" + payload.id + "/accept?token=" + payload.token,
             headers: {
                 "Content-Type": "application/json",
                 Authorization: token,
             },
+            data: {
+                token: payload.token,
+            },
         });
     }
 
-    declineInvite(inviteId) {
+    declineInvite(payload: { id: number; token: string }) {
         const token = this.token.getHeader();
         return this.invoke({
             method: "POST",
-            url: this.baseUrl + "/projects/invites/" + inviteId + "/reject",
+            url: this.baseUrl + "/projects/invites/" + payload.id + "/reject?token=" + payload.token,
             headers: {
                 "Content-Type": "application/json",
                 Authorization: token,
+            },
+            data: {
+                token: payload.token,
             },
         });
     }

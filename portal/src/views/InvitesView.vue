@@ -4,7 +4,7 @@
             <img alt="" src="../assets/progress.gif" />
         </div>
         <div class="main-panel" v-show="!loading">
-            <div class="view-user">
+            <div class="view-user" v-if="user">
                 <div id="user-name">Hi, {{ this.user.name }}</div>
                 <div class="notification" v-if="invalidToken">
                     Sorry, that invite link appears to have been already used or is invalid.
@@ -13,12 +13,8 @@
                 <div v-if="pending.length > 0" class="invite-heading">You've been invited to the following projects:</div>
                 <div v-for="invite in pending" v-bind:key="invite.id" class="project-row">
                     <div class="project-name">{{ invite.project.name }}</div>
-                    <div class="accept-link" :data-id="invite.id" v-on:click="accept">Accept</div>
-                    <div class="decline-link" :data-id="invite.id" v-on:click="decline">Decline</div>
-                </div>
-                <div v-for="invite in resolved" v-bind:key="invite.id" class="project-row">
-                    <div class="project-name">{{ invite.project.name }}</div>
-                    <div class="status">{{ invite.status }}</div>
+                    <div class="accept-link" :data-id="invite.id" v-on:click="(ev) => accept(ev, invite)">Accept</div>
+                    <div class="decline-link" :data-id="invite.id" v-on:click="(ev) => decline(ev, invite)">Decline</div>
                 </div>
             </div>
         </div>
@@ -37,16 +33,15 @@ export default {
     },
     data: () => {
         return {
-            user: { name: "" },
-            projects: [],
-            stations: [],
             pending: [],
-            resolved: [],
-            isAuthenticated: false,
-            noCurrentUser: false,
             loading: false,
             invalidToken: false,
         };
+    },
+    computed: {
+        user() {
+            return this.$store.state.user.user;
+        },
     },
     async beforeCreate() {
         this.api = new FKApi();
@@ -58,28 +53,10 @@ export default {
                 },
                 () => {
                     this.invalidToken = true;
+                    this.pending = [];
                 }
             );
         }
-
-        this.api
-            .getCurrentUser()
-            .then((user) => {
-                this.user = user;
-                this.isAuthenticated = true;
-                this.api.getUserProjects().then((projects) => {
-                    if (projects && projects.projects.length > 0) {
-                        this.projects = projects.projects;
-                    }
-                });
-                this.api.getStations().then((s) => {
-                    this.stations = s.stations;
-                });
-            })
-            .catch(() => {
-                this.loading = false;
-                this.noCurrentUser = true;
-            });
     },
     methods: {
         goBack() {
@@ -88,31 +65,16 @@ export default {
         showStation(station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
         },
-        accept(event) {
-            const inviteId = event.target.getAttribute("data-id");
-            return this.$store.dispatch(ActionTypes.ACCEPT_PROJECT_INVITE).then(() => {
-                const index = this.pending.findIndex((p) => {
-                    return p.id == inviteId;
-                });
-                if (index > -1) {
-                    const invite = this.pending.splice(index, 1)[0];
-                    invite.status = "Accepted";
-                    this.resolved.push(invite);
-                }
+        accept(ev, invite) {
+            const token = this.$route.query.token;
+            return this.$store.dispatch(ActionTypes.ACCEPT_PROJECT_INVITE, { id: invite.id, token: token }).then(() => {
+                this.pending = [];
             });
         },
-        decline(event) {
-            const inviteId = event.target.getAttribute("data-id");
-
-            return this.$store.dispatch(ActionTypes.DECLINE_PROJECT_INVITE).then(() => {
-                const index = this.pending.findIndex((p) => {
-                    return p.id == inviteId;
-                });
-                if (index > -1) {
-                    const invite = this.pending.splice(index, 1)[0];
-                    invite.status = "Declined";
-                    this.resolved.push(invite);
-                }
+        decline(ev, invite) {
+            const token = this.$route.query.token;
+            return this.$store.dispatch(ActionTypes.DECLINE_PROJECT_INVITE, { id: invite.id, token: token }).then(() => {
+                this.pending = [];
             });
         },
     },
