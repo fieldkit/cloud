@@ -325,6 +325,10 @@ func (c *UserController) authenticateOrSpoof(ctx context.Context, email, passwor
 		return nil, err
 	}
 
+	if !user.Valid {
+		return nil, data.IncorrectPasswordError
+	}
+
 	return user, nil
 }
 

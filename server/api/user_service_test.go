@@ -11,6 +11,24 @@ import (
 	"github.com/fieldkit/cloud/server/tests"
 )
 
+func TestLoginInvalidFailed(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	user, err := e.AddInvalidUser()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	rbody := strings.NewReader(fmt.Sprintf(`{ "email": "%s", "password": "goodgoodgood" }`, user.Email))
+	req, _ := http.NewRequest("POST", "/login", rbody)
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusUnauthorized, rr.Code)
+}
+
 func TestLoginGood(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
