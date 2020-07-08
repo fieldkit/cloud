@@ -91,7 +91,7 @@ export default {
             return this.$store
                 .dispatch(ActionTypes.AUTHENTICATE, payload)
                 .then(
-                    () => this.$router.push(this.$route.query.redirect || { name: "projects" }),
+                    () => this.$router.push(this.$route.query.after || { name: "projects" }),
                     () => (this.failed = true)
                 )
                 .finally(() => {

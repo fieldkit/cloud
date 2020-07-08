@@ -225,7 +225,9 @@ export default function routerFactory(store) {
                 next();
                 return;
             }
-            next("/login");
+            const queryParams = new URLSearchParams();
+            queryParams.append("after", to.fullPath);
+            next("/login?" + queryParams.toString());
         } else {
             next();
         }
