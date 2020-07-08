@@ -17,7 +17,7 @@
                     Activity
                 </div>
                 <div class="project-image-actions-container">
-                    <img alt="Fieldkit Project" v-if="project.mediaUrl" :src="getImageUrl(project)" class="project-image" />
+                    <img alt="Fieldkit Project" v-if="project.photo" :src="getImageUrl(project)" class="project-image" />
                     <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
 
                     <div class="actions-icon-container">
@@ -67,13 +67,9 @@
                     <div class="space"></div>
                     <div class="team-icons">
                         <div class="icon-section-label">Team</div>
-                        <img
-                            v-for="user in displayProject.users"
-                            v-bind:key="user.user.id"
-                            alt="User image"
-                            :src="getUserImage(user)"
-                            class="user-icon"
-                        />
+                        <span v-for="user in displayProject.users" v-bind:key="user.user.id">
+                            <img v-if="user.photo" alt="User image" :src="getUserImage(user)" class="user-icon" />
+                        </span>
                     </div>
                     <div class="module-icons">
                         <div class="icon-section-label">Modules</div>
@@ -240,7 +236,7 @@ export default {
     },
     methods: {
         getUserImage(projectUser) {
-            return this.$config.baseUrl + "/user/" + projectUser.user.id + "/media";
+            return this.$config.baseUrl + "/" + projectUser.user.photo.url;
         },
         editProject() {
             return this.$router.push({ name: "editProject", params: { id: this.project.id } });
@@ -312,7 +308,7 @@ export default {
             }
         },
         getImageUrl(project) {
-            return this.$config.baseUrl + "/projects/" + project.id + "/media";
+            return this.$config.baseUrl + "/" + project.photo;
         },
         getModuleImg(module) {
             return this.$loadAsset("modules-lg/" + utils.getModuleImg(module));

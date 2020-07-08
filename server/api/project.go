@@ -2,7 +2,7 @@ package api
 
 import (
 	"database/sql"
-	_ "fmt"
+	"fmt"
 	"time"
 
 	"github.com/goadesign/goa"
@@ -24,8 +24,7 @@ func ProjectType(project *data.Project, numberOfFollowers int32, role *data.Role
 		Private:           project.Private,
 		StartTime:         project.StartTime,
 		EndTime:           project.EndTime,
-		MediaURL:          project.MediaURL,
-		MediaContentType:  project.MediaContentType,
+		Photo:             makePhotoURL(fmt.Sprintf("/projects/%d/media", project.ID), project.MediaURL),
 		ReadOnly:          role.IsProjectReadOnly(),
 		NumberOfFollowers: int(numberOfFollowers),
 	}

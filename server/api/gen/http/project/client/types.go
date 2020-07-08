@@ -30,7 +30,7 @@ type ModifyUpdateRequestBody struct {
 type AddUpdateResponseBody struct {
 	ID        *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Body      *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-	CreatedAt *int64  `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	CreatedAt *int64  `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
 }
 
 // ModifyUpdateResponseBody is the type of the "project" service "modify
@@ -38,7 +38,7 @@ type AddUpdateResponseBody struct {
 type ModifyUpdateResponseBody struct {
 	ID        *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Body      *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-	CreatedAt *int64  `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	CreatedAt *int64  `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
 }
 
 // InvitesResponseBody is the type of the "project" service "invites" endpoint

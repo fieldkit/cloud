@@ -130,8 +130,8 @@ export default {
                 this.tags = _project.tags;
                 this.publicProject = !_project.private;
                 this.updateDisplayDates();
-                if (_project.mediaUrl) {
-                    this.imageUrl = this.baseUrl + "/projects/" + _project.id + "/media";
+                if (_project.photo) {
+                    this.imageUrl = this.baseUrl + "/" + _project.photo;
                     this.hasImage = true;
                 } else {
                     this.imageUrl = "";

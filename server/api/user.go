@@ -2,9 +2,7 @@ package api
 
 import (
 	"context"
-	"crypto/sha1"
 	"database/sql"
-	"encoding/hex"
 	"fmt"
 	"strings"
 	"time"
@@ -27,12 +25,8 @@ func UserType(user *data.User) *app.User {
 	}
 
 	if user.MediaURL != nil {
-		h := sha1.New()
-		h.Write([]byte(*user.MediaURL))
-		hash := hex.EncodeToString(h.Sum(nil))
-		url := fmt.Sprintf("/user/%d/media?%s", user.ID, hash)
 		userType.Photo = &app.UserPhoto{
-			URL: &url,
+			URL: makePhotoURL(fmt.Sprintf("/user/%d/media", user.ID), user.MediaURL),
 		}
 	}
 

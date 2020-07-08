@@ -67,7 +67,7 @@
             <div class="team-container">
                 <div class="section-heading">{{ getTeamHeading() }}</div>
                 <div v-for="user in displayProject.users" v-bind:key="user.user.id" class="team-member">
-                    <img v-if="user.user.mediaUrl" alt="User image" :src="getUserImage(user)" class="user-icon" />
+                    <img v-if="user.user.photo.url" alt="User image" :src="getUserImage(user)" class="user-icon" />
                     <span class="user-name">{{ user.user.name }}</span>
                 </div>
             </div>
@@ -137,10 +137,10 @@ export default {
             this.following = false;
         },
         getImageUrl(project) {
-            return this.$config.baseUrl + "/projects/" + project.id + "/media";
+            return this.$config.baseUrl + "/" + project.photo;
         },
         getUserImage(projectUser) {
-            return this.$config.baseUrl + "/user/" + projectUser.user.id + "/media";
+            return this.$config.baseUrl + "/" + projectUser.user.photo.url;
         },
         getModuleImg(module) {
             return this.$loadAsset("modules-lg/" + utils.getModuleImg(module));

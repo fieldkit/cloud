@@ -466,10 +466,9 @@ type Project struct {
 	Goal              string     `form:"goal" json:"goal" yaml:"goal" xml:"goal"`
 	ID                int        `form:"id" json:"id" yaml:"id" xml:"id"`
 	Location          string     `form:"location" json:"location" yaml:"location" xml:"location"`
-	MediaContentType  *string    `form:"mediaContentType,omitempty" json:"mediaContentType,omitempty" yaml:"mediaContentType,omitempty" xml:"mediaContentType,omitempty"`
-	MediaURL          *string    `form:"mediaUrl,omitempty" json:"mediaUrl,omitempty" yaml:"mediaUrl,omitempty" xml:"mediaUrl,omitempty"`
 	Name              string     `form:"name" json:"name" yaml:"name" xml:"name"`
 	NumberOfFollowers int        `form:"numberOfFollowers" json:"numberOfFollowers" yaml:"numberOfFollowers" xml:"numberOfFollowers"`
+	Photo             *string    `form:"photo,omitempty" json:"photo,omitempty" yaml:"photo,omitempty" xml:"photo,omitempty"`
 	Private           bool       `form:"private" json:"private" yaml:"private" xml:"private"`
 	ReadOnly          bool       `form:"readOnly" json:"readOnly" yaml:"readOnly" xml:"readOnly"`
 	Slug              string     `form:"slug" json:"slug" yaml:"slug" xml:"slug"`

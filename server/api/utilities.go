@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"io"
 
@@ -74,4 +76,15 @@ func sendData(responseData *goa.ResponseData, contentType string, data []byte) e
 	responseData.Header().Set("Content-Type", contentType)
 	responseData.Write(data)
 	return nil
+}
+
+func makePhotoURL(url string, actual *string) *string {
+	if actual == nil {
+		return nil
+	}
+	h := sha1.New()
+	h.Write([]byte(*actual))
+	hash := hex.EncodeToString(h.Sum(nil))
+	final := fmt.Sprintf("%s?%s", url, hash)
+	return &final
 }

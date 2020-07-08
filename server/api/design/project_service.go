@@ -31,10 +31,10 @@ var ProjectUpdate = ResultType("application/vnd.app.project.update", func() {
 	Attributes(func() {
 		Attribute("id", Int64)
 		Attribute("body", String)
-		Attribute("created_at", Int64)
+		Attribute("createdAt", Int64)
 		Required("id")
 		Required("body")
-		Required("created_at")
+		Required("createdAt")
 	})
 	View("default", func() {
 		Attribute("id")
