@@ -1,31 +1,26 @@
 <template>
     <StandardLayout>
-        <div class="main-panel" v-show="!loading && isAuthenticated">
+        <div id="loading" v-if="loading">
+            <img alt="" src="../assets/progress.gif" />
+        </div>
+        <div class="main-panel" v-show="!loading">
             <div class="view-user">
                 <div id="user-name">Hi, {{ this.user.name }}</div>
+                <div class="notification" v-if="invalidToken">
+                    Sorry, that invite link appears to have been already used or is invalid.
+                </div>
+                <div v-if="pending.length == 0" class="invite-heading">You have no pending invites.</div>
                 <div v-if="pending.length > 0" class="invite-heading">You've been invited to the following projects:</div>
                 <div v-for="invite in pending" v-bind:key="invite.id" class="project-row">
                     <div class="project-name">{{ invite.project.name }}</div>
-                    <div class="accept-link" :data-id="invite.id" v-on:click="accept">Accept invitation</div>
-                    <div class="decline-link" :data-id="invite.id" v-on:click="decline">Decline invitation</div>
+                    <div class="accept-link" :data-id="invite.id" v-on:click="accept">Accept</div>
+                    <div class="decline-link" :data-id="invite.id" v-on:click="decline">Decline</div>
                 </div>
                 <div v-for="invite in resolved" v-bind:key="invite.id" class="project-row">
                     <div class="project-name">{{ invite.project.name }}</div>
                     <div class="status">{{ invite.status }}</div>
                 </div>
             </div>
-        </div>
-        <div id="loading" v-if="loading">
-            <img alt="" src="../assets/progress.gif" />
-        </div>
-        <div v-if="noCurrentUser" class="no-user-message">
-            <p>
-                Please
-                <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
-                    log in
-                </router-link>
-                to view account.
-            </p>
         </div>
     </StandardLayout>
 </template>
@@ -51,14 +46,22 @@ export default {
             isAuthenticated: false,
             noCurrentUser: false,
             loading: false,
+            invalidToken: false,
         };
     },
     async beforeCreate() {
         this.api = new FKApi();
 
-        this.api.getInvitesByToken(this.$route.query.token).then((result) => {
-            this.pending = result.pending;
-        });
+        if (this.$route.query.token) {
+            this.api.getInvitesByToken(this.$route.query.token).then(
+                (result) => {
+                    this.pending = result.pending;
+                },
+                () => {
+                    this.invalidToken = true;
+                }
+            );
+        }
 
         this.api
             .getCurrentUser()
@@ -138,7 +141,6 @@ export default {
     text-decoration: underline;
 }
 #user-name {
-    float: left;
     font-size: 24px;
     font-weight: bold;
     margin: 30px 15px 0 20px;
@@ -195,5 +197,12 @@ export default {
     display: inline-block;
     font-size: 18px;
     font-weight: 600;
+}
+.notification {
+    margin: 20px;
+    padding: 20px;
+    background-color: #f8d7da;
+    border: 2px;
+    border-radius: 4px;
 }
 </style>
