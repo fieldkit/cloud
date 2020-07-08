@@ -1,13 +1,5 @@
 <template>
-    <div>
-        <SidebarNav
-            :isAuthenticated="isAuthenticated"
-            viewing="projects"
-            :projects="userProjects"
-            :stations="stations"
-            @showStation="showStation"
-        />
-        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
+    <StandardLayout>
         <div id="loading" v-if="loading">
             <img alt="" src="../assets/progress.gif" />
         </div>
@@ -32,21 +24,19 @@
                 to view projects.
             </p>
         </div>
-    </div>
+    </StandardLayout>
 </template>
 
 <script>
+import StandardLayout from "./StandardLayout";
 import FKApi from "../api/api";
-import HeaderBar from "../components/HeaderBar";
 import ProjectForm from "../components/ProjectForm";
-import SidebarNav from "../components/SidebarNav";
 
 export default {
     name: "ProjectEditView",
     components: {
-        HeaderBar,
+        StandardLayout,
         ProjectForm,
-        SidebarNav,
     },
     props: ["id"],
     data: () => {

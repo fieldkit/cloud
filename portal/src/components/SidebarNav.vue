@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div id="sidebar-nav-wide">
+        <div id="sidebar-nav-wide" v-if="!narrow">
             <div class="sidebar-header">
                 <router-link :to="{ name: 'projects' }" class="project-link">
                     <img alt="Fieldkit Logo" id="header-logo" src="../assets/FieldKit_Logo_Blue.png" />
@@ -43,7 +43,7 @@
                 </div>
             </div>
         </div>
-        <div id="sidebar-nav-narrow">
+        <div id="sidebar-nav-narrow" v-if="narrow">
             <div class="sidebar-header">
                 <img alt="Fieldkit Compass Logo" src="../assets/compass.png" />
             </div>
@@ -60,10 +60,14 @@ export default {
         isAuthenticated: { required: true },
         stations: { required: true },
         projects: { required: true },
+        narrow: {
+            type: Boolean,
+            default: false,
+        },
     },
     methods: {
         showStation(station) {
-            this.$emit("showStation", station);
+            this.$emit("show-station", station);
         },
     },
 };

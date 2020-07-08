@@ -1,56 +1,37 @@
 <template>
-    <div class="container-ignored">
-        <div class="container-top">
-            <div class="container-side">
-                <SidebarNav
-                    viewingStations="true"
-                    :isAuthenticated="isAuthenticated"
-                    :stations="stations"
-                    :projects="userProjects"
-                    @showStation="showSummary"
-                />
-            </div>
-
-            <div class="container-main">
-                <div class="container-header">
-                    <HeaderBar :isAuthenticated="isAuthenticated" :user="user" @sidebarToggled="onSidebarToggle" />
+    <StandardLayout>
+        <div class="container-map">
+            <StationsMap @mapReady="onMapReady" @showSummary="showSummary" :mapped="mapped" />
+            <StationSummary
+                v-if="activeStationId"
+                @closeSummary="closeSummary"
+                class="summary-container"
+                :station="activeStation"
+                :summarySize="summarySize"
+                ref="stationSummary"
+            />
+            <div v-if="isAuthenticated && showNoStationsMessage && hasNoStations" id="no-stations">
+                <div id="close-notice-btn" v-on:click="closeNotice">
+                    <img alt="Close" src="../assets/close.png" />
                 </div>
-
-                <div class="container-map">
-                    <StationsMap @mapReady="onMapReady" @showSummary="showSummary" :mapped="mapped" />
-                    <StationSummary
-                        v-if="activeStationId"
-                        @closeSummary="closeSummary"
-                        class="summary-container"
-                        :station="activeStation"
-                        :summarySize="summarySize"
-                        ref="stationSummary"
-                    />
-                    <div v-if="isAuthenticated && showNoStationsMessage && hasNoStations" id="no-stations">
-                        <div id="close-notice-btn" v-on:click="closeNotice">
-                            <img alt="Close" src="../assets/close.png" />
-                        </div>
-                        <p class="heading">Add a New Station</p>
-                        <p class="text">
-                            You currently don't have any stations on your account. Download the FieldKit app and connect your station to add
-                            them to your account.
-                        </p>
-                        <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
-                            <img alt="App store" src="../assets/appstore.png" class="app-btn" />
-                        </a>
-                        <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
-                            <img alt="Google Play" src="../assets/googleplay.png" class="app-btn" />
-                        </a>
-                    </div>
-                </div>
+                <p class="heading">Add a New Station</p>
+                <p class="text">
+                    You currently don't have any stations on your account. Download the FieldKit app and connect your station to add them to
+                    your account.
+                </p>
+                <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
+                    <img alt="App store" src="../assets/appstore.png" class="app-btn" />
+                </a>
+                <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
+                    <img alt="Google Play" src="../assets/googleplay.png" class="app-btn" />
+                </a>
             </div>
         </div>
-    </div>
+    </StandardLayout>
 </template>
 
 <script>
-import HeaderBar from "../components/HeaderBar";
-import SidebarNav from "../components/SidebarNav";
+import StandardLayout from "./StandardLayout";
 import StationSummary from "../components/StationSummary";
 import StationsMap from "../components/StationsMap";
 import { mapState, mapGetters } from "vuex";
@@ -59,8 +40,7 @@ import * as ActionTypes from "@/store/actions";
 export default {
     name: "StationsView",
     components: {
-        HeaderBar,
-        SidebarNav,
+        StandardLayout,
         StationsMap,
         StationSummary,
     },
@@ -69,6 +49,7 @@ export default {
     },
     data: () => {
         return {
+            narrowSidebar: false,
             activeStationId: null,
             showNoStationsMessage: true,
             summarySize: {
@@ -93,7 +74,6 @@ export default {
         },
     },
     beforeMount() {
-        this.$store.dispatch(ActionTypes.NEED_COMMON);
         if (this.id) {
             this.activeStationId = this.id;
             return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });

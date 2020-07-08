@@ -1,16 +1,5 @@
 <template>
-    <div>
-        <SidebarNav
-            :isAuthenticated="isAuthenticated"
-            :viewingProjects="true"
-            :projects="userProjects"
-            :stations="stations"
-            @showStation="showStation"
-        />
-        <HeaderBar />
-        <div id="loading" v-if="isBusy">
-            <img alt="" src="../assets/progress.gif" />
-        </div>
+    <StandardLayout>
         <div class="main-panel" v-show="!isBusy && isAuthenticated">
             <div id="inner-container">
                 <div id="projects-container">
@@ -30,22 +19,20 @@
                 </div>
             </div>
         </div>
-    </div>
+    </StandardLayout>
 </template>
 
 <script>
-import HeaderBar from "../components/HeaderBar";
+import StandardLayout from "./StandardLayout";
 import ProjectThumbnails from "../components/ProjectThumbnails";
-import SidebarNav from "../components/SidebarNav";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 
 export default {
     name: "ProjectsView",
     components: {
-        HeaderBar,
+        StandardLayout,
         ProjectThumbnails,
-        SidebarNav,
     },
     data() {
         return {};
@@ -59,9 +46,6 @@ export default {
             publicProjects: (s) => s.stations.projects.community,
         }),
     },
-    beforeMount() {
-        this.$store.dispatch(ActionTypes.NEED_COMMON);
-    },
     methods: {
         goBack() {
             if (window.history.length > 1) {
@@ -72,9 +56,6 @@ export default {
         },
         addProject() {
             this.$router.push({ name: "addProject" });
-        },
-        showStation(station) {
-            this.$router.push({ name: "viewStation", params: { id: station.id } });
         },
     },
 };

@@ -41,6 +41,7 @@ export default {
             });
         },
         toggleSidebar() {
+            /*
             const wide = document.getElementById("sidebar-nav-wide");
             const narrow = document.getElementById("sidebar-nav-narrow");
             const wideDisplay = getComputedStyle(wide, null).display;
@@ -51,7 +52,8 @@ export default {
                 wide.style.display = "block";
                 narrow.style.display = "none";
             }
-            this.$emit("sidebarToggled");
+			*/
+            this.$emit("toggled");
         },
     },
 };

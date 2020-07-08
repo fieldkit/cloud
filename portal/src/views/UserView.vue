@@ -1,13 +1,5 @@
 <template>
-    <div>
-        <SidebarNav
-            :isAuthenticated="isAuthenticated"
-            :viewingProjects="true"
-            :projects="userProjects"
-            :stations="stations"
-            @showStation="showStation"
-        />
-        <HeaderBar ref="headerBar" />
+    <StandardLayout>
         <div class="main-panel" v-show="!isBusy && isAuthenticated" v-if="user">
             <div class="view-user" v-if="!isEditing">
                 <div id="user-name">{{ user.name }}</div>
@@ -120,21 +112,19 @@
                 to view account.
             </p>
         </div>
-    </div>
+    </StandardLayout>
 </template>
 
 <script>
+import StandardLayout from "./StandardLayout";
 import FKApi from "../api/api";
-import HeaderBar from "../components/HeaderBar";
-import SidebarNav from "../components/SidebarNav";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 
 export default {
     name: "UserView",
     components: {
-        HeaderBar,
-        SidebarNav,
+        StandardLayout,
     },
     props: {
         id: {
@@ -169,9 +159,6 @@ export default {
             stations: (s) => s.stations.stations.user,
             userProjects: (s) => s.stations.projects.user,
         }),
-    },
-    beforeMount() {
-        this.$store.dispatch(ActionTypes.NEED_COMMON);
     },
     methods: {
         goBack() {

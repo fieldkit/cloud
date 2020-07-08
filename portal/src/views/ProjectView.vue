@@ -1,13 +1,5 @@
 <template>
-    <div>
-        <SidebarNav
-            :isAuthenticated="isAuthenticated"
-            :viewingProjects="true"
-            :projects="userProjects"
-            :stations="stations"
-            @showStation="showStation"
-        />
-        <HeaderBar />
+    <StandardLayout>
         <div id="loading" v-if="isBusy">
             <img alt="" src="../assets/progress.gif" />
         </div>
@@ -40,24 +32,22 @@
                 </div>
             </div>
         </div>
-    </div>
+    </StandardLayout>
 </template>
 
 <script>
+import StandardLayout from "./StandardLayout";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
-import HeaderBar from "../components/HeaderBar";
 import ProjectPublic from "../components/ProjectPublic";
-import SidebarNav from "../components/SidebarNav";
 import ProjectAdmin from "../components/ProjectAdmin";
 
 export default {
     name: "ProjectView",
     components: {
-        HeaderBar,
+        StandardLayout,
         ProjectPublic,
         ProjectAdmin,
-        SidebarNav,
     },
     props: {
         id: {
@@ -95,7 +85,6 @@ export default {
         }),
     },
     beforeMount() {
-        this.$store.dispatch(ActionTypes.NEED_COMMON);
         this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id });
     },
     methods: {

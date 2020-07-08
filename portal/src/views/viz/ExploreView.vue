@@ -1,16 +1,13 @@
 <template>
-    <div class="explore-view">
-        <SidebarNav :isAuthenticated="isAuthenticated" :stations="stations" :projects="userProjects" @showStation="showStation" />
-        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" />
+    <StandardLayout class="explore-view">
         <VizWorkspace v-if="workspace" :workspace="workspace"></VizWorkspace>
-    </div>
+    </StandardLayout>
 </template>
 
 <script>
+import StandardLayout from "../StandardLayout";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
-import HeaderBar from "../../components/HeaderBar";
-import SidebarNav from "../../components/SidebarNav";
 
 import FKApi from "@/api/api";
 
@@ -20,8 +17,6 @@ import { VizWorkspace } from "./VizWorkspace";
 export default {
     name: "ExploreView",
     components: {
-        HeaderBar,
-        SidebarNav,
         VizWorkspace,
     },
     props: {},

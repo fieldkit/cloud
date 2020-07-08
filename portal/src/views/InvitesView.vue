@@ -1,13 +1,5 @@
 <template>
-    <div>
-        <SidebarNav
-            :isAuthenticated="isAuthenticated"
-            viewing="projects"
-            :projects="projects"
-            :stations="stations"
-            @showStation="showStation"
-        />
-        <HeaderBar :isAuthenticated="isAuthenticated" :user="user" ref="headerBar" />
+    <StandardLayout>
         <div class="main-panel" v-show="!loading && isAuthenticated">
             <div class="view-user">
                 <div id="user-name">Hi, {{ this.user.name }}</div>
@@ -35,20 +27,18 @@
                 to view account.
             </p>
         </div>
-    </div>
+    </StandardLayout>
 </template>
 
 <script>
+import StandardLayout from "./StandardLayout";
 import FKApi from "../api/api";
-import HeaderBar from "../components/HeaderBar";
-import SidebarNav from "../components/SidebarNav";
 import Config from "../secrets";
 
 export default {
     name: "InvitesView",
     components: {
-        HeaderBar,
-        SidebarNav,
+        StandardLayout,
     },
     data: () => {
         return {
