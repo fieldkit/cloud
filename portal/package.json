@@ -14,6 +14,7 @@
         "@types/node": "^14.0.14",
         "@types/vuelidate": "^0.7.13",
         "axios": "^0.19.0",
+        "bluebird": "^3.7.2",
         "core-js": "^3.6.5",
         "d3": "^5.12.0",
         "kind-of": "6.0.3",

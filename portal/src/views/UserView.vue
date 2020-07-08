@@ -1,20 +1,11 @@
 <template>
     <StandardLayout>
         <div class="main-panel" v-show="!isBusy && isAuthenticated" v-if="user">
-            <div class="view-user" v-if="!isEditing">
-                <div id="user-name">{{ user.name }}</div>
-                <div id="edit-user">
-                    <img alt="Edit user" src="../assets/edit.png" v-on:click="editUser" />
-                </div>
-                <div class="user-element">{{ user.email }}</div>
-                <div class="user-element">{{ user.bio }}</div>
-            </div>
-
-            <div id="user-form-container" v-if="isEditing">
-                <div id="close-form-btn" v-on:click="closeForm">
-                    <img alt="Close" src="../assets/close.png" />
-                </div>
+            <div id="user-form-container">
                 <div id="account-heading">My Account</div>
+                <div class="notification" v-if="savedNotification">
+                    Profile saved.
+                </div>
                 <div class="image-container">
                     <div id="image-heading">Profile picture</div>
                     <img src="../assets/Profile_Image.png" v-if="!user.photo && !previewImage" />
@@ -116,6 +107,7 @@
 </template>
 
 <script>
+import Promise from "bluebird";
 import StandardLayout from "./StandardLayout";
 import FKApi from "../api/api";
 import { mapState, mapGetters } from "vuex";
@@ -134,10 +126,10 @@ export default {
     },
     data: () => {
         return {
+            savedNotification: false,
             publicProfile: true,
             previewImage: "",
             acceptedImageTypes: ["jpg", "jpeg", "png", "gif"],
-            isEditing: true,
             oldPassword: "",
             newPassword: "",
             noPassword: false,
@@ -167,9 +159,6 @@ export default {
         showStation(station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
         },
-        editUser() {
-            this.isEditing = true;
-        },
         checkPassword() {
             this.noPassword = false;
             this.passwordTooShort = false;
@@ -193,7 +182,6 @@ export default {
                 };
                 return this.api.updatePassword(data).then(() => {
                     // TODO: indicate success
-                    this.isEditing = false;
                     this.loading = false;
                 });
             }
@@ -212,14 +200,22 @@ export default {
             if (this.sendingImage) {
                 return this.$store.dispatch(ActionTypes.UPLOAD_USER_PHOTO, { type: this.imageType, image: this.sendingImage }).then(() => {
                     return this.$store.dispatch(ActionTypes.UPDATE_USER_PROFILE, { user: this.user }).then(() => {
-                        this.isEditing = false;
                         this.loading = false;
+                        this.savedNotification = true;
+                        // NOTE Considering a flash library for this.
+                        return Promise.delay(2000).then(() => {
+                            this.savedNotification = false;
+                        });
                     });
                 });
             } else {
                 return this.$store.dispatch(ActionTypes.UPDATE_USER_PROFILE, { user: this.user }).then(() => {
-                    this.isEditing = false;
                     this.loading = false;
+                    this.savedNotification = true;
+                    // NOTE Considering a flash library for this.
+                    return Promise.delay(2000).then(() => {
+                        this.savedNotification = false;
+                    });
                 });
             }
         },
@@ -246,9 +242,6 @@ export default {
                 this.previewImage = event.target.result;
             };
         },
-        closeForm() {
-            this.isEditing = false;
-        },
     },
 };
 </script>
@@ -257,7 +250,6 @@ export default {
 #account-heading {
     font-weight: bold;
     font-size: 24px;
-    float: left;
     margin: 15px 0 0 15px;
 }
 #close-form-btn {
@@ -309,8 +301,6 @@ export default {
     float: left;
     width: 700px;
     padding: 0 15px 15px 15px;
-    margin: 60px;
-    border: 1px solid rgb(215, 220, 225);
 }
 
 .input-container {
@@ -381,5 +371,12 @@ export default {
     margin: 15px 0 0 15px;
     font-size: 18px;
     color: #3f8530;
+}
+.notification {
+    margin: 20px;
+    padding: 20px;
+    background-color: #d4edda;
+    border: 2px;
+    border-radius: 4px;
 }
 </style>
