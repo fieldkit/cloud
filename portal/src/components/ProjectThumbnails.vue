@@ -61,6 +61,7 @@ export default {
     margin: 10px 15px 0 15px;
 }
 .project-description {
+    overflow-wrap: break-word;
     font-weight: lighter;
     font-size: 14px;
     margin: 0 15px 10px 15px;
