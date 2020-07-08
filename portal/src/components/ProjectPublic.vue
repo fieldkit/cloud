@@ -205,6 +205,7 @@ export default {
     display: inline-block;
 }
 .project-detail {
+    overflow-wrap: break-word;
     font-size: 16px;
     line-height: 24px;
 }

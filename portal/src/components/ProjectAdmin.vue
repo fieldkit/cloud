@@ -452,6 +452,7 @@ export default {
     width: 320px;
 }
 .project-detail {
+    overflow-wrap: break-word;
     font-size: 16px;
     line-height: 24px;
 }
