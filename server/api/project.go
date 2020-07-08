@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"fmt"
 	"time"
 
@@ -388,11 +387,18 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 		return err
 	}
 
-	invite := &data.ProjectInvite{}
-	if err := c.options.Database.GetContext(ctx, invite, `SELECT * FROM fieldkit.project_invite WHERE project_id = $1 AND invited_email = $2`, ctx.ProjectID, ctx.Payload.Email); err != nil {
-		if err != sql.ErrNoRows {
-			return err
-		}
+	existing := int64(0)
+	if err := c.options.Database.GetContext(ctx, &existing, `
+		SELECT COUNT(*) FROM (
+			SELECT pi.project_id, pi.invited_email AS email FROM fieldkit.project_invite AS pi
+			UNION
+			SELECT pu.project_id, u.email AS email FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON (u.id = pu.user_id)
+		) AS q WHERE q.project_id = $1 AND email = $2
+		`, ctx.ProjectID, ctx.Payload.Email); err != nil {
+		return err
+	}
+	if existing > 0 {
+		return ctx.BadRequest()
 	}
 
 	token, err := data.NewToken(20)
@@ -400,7 +406,7 @@ func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error 
 		return err
 	}
 
-	invite = &data.ProjectInvite{
+	invite := &data.ProjectInvite{
 		ProjectID:    int32(ctx.ProjectID),
 		UserID:       p.UserID(),
 		InvitedTime:  time.Now(),
