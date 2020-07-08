@@ -172,6 +172,7 @@ export class DisplayProject {
         }
         this.places.native = _(stations)
             .map((s) => s.placeNameNative)
+            .filter((n) => n && n.length > 0)
             .join(", ");
     }
 }
