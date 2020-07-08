@@ -132,15 +132,17 @@
                                 keyboardType="email"
                                 autocorrect="false"
                                 autocapitalizationType="none"
-                                v-model="inviteEmail"
+                                v-model="form.inviteEmail"
                                 @blur="checkEmail"
                             />
-                            <span class="validation-error" id="no-email" v-if="noEmail">
-                                Email is a required field.
-                            </span>
-                            <span class="validation-error" id="email-not-valid" v-if="emailNotValid">
-                                Must be a valid email address.
-                            </span>
+                            <div class="validation-errors" v-if="$v.form.inviteEmail.$error">
+                                <span class="validation-error" id="no-email" v-if="!$v.form.inviteEmail.required">
+                                    Email is a required field.
+                                </span>
+                                <span class="validation-error" id="email-not-valid" v-if="!$v.form.inviteEmail.email">
+                                    Must be a valid email address.
+                                </span>
+                            </div>
                         </div>
                         <div class="cell role-dropdown-container">
                             <select v-model="selectedRole">
@@ -161,6 +163,7 @@
 </template>
 
 <script>
+import { required, email } from "vuelidate/lib/validators";
 import FKApi from "../api/api";
 import * as utils from "../utilities";
 import ProjectStations from "../components/ProjectStations";
@@ -176,12 +179,20 @@ export default {
         ProjectDataFiles,
         StationsReadings,
     },
+    props: {
+        displayProject: {
+            required: true,
+        },
+        userStations: {
+            required: true,
+        },
+    },
     data: () => {
         return {
-            inviteEmail: "",
+            form: {
+                inviteEmail: "",
+            },
             newUserImage: "",
-            noEmail: false,
-            emailNotValid: false,
             viewingActivityFeed: false,
             mapContainerSize: {
                 width: "677px",
@@ -210,12 +221,12 @@ export default {
             ],
         };
     },
-    props: {
-        displayProject: {
-            required: true,
-        },
-        userStations: {
-            required: true,
+    validations: {
+        form: {
+            inviteEmail: {
+                required,
+                email,
+            },
         },
     },
     computed: {
@@ -254,39 +265,30 @@ export default {
             this.viewingActivityFeed = true;
         },
         checkEmail() {
-            this.noEmail = false;
-            this.emailNotValid = false;
-            this.noEmail = !this.inviteEmail || this.inviteEmail.length == 0;
-            if (this.noEmail) {
-                return false;
-            }
-            // eslint-disable-next-line
-            let emailPattern = /^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
-            this.emailNotValid = !emailPattern.test(this.inviteEmail);
-            return !this.emailNotValid;
+            this.$v.form.$touch();
+            return !(this.$v.form.$pending || this.$v.form.$error);
         },
         sendInvite() {
-            const valid = this.checkEmail();
-            if (valid) {
+            if (this.checkEmail()) {
                 if (this.selectedRole == -1) {
                     this.selectedRole = 0;
                 }
                 const role = this.roleOptions.find((r) => {
                     return r.code == this.selectedRole;
                 });
-                const params = { email: this.inviteEmail, projectId: this.project.id, role: this.selectedRole };
+                const params = { email: this.form.inviteEmail, projectId: this.project.id, role: this.selectedRole };
                 new FKApi().sendInvite(params).then(() => {
                     this.projectUsers.push({
                         user: {
                             id: "pending-" + Date.now(),
-                            name: this.inviteEmail,
-                            email: this.inviteEmail,
+                            name: this.form.inviteEmail,
+                            email: this.form.inviteEmail,
                         },
                         userImage: this.newUserImage,
                         role: role.name,
                         membership: "Pending",
                     });
-                    this.inviteEmail = "";
+                    this.form.inviteEmail = "";
                 });
             }
         },
