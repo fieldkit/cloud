@@ -67,8 +67,8 @@
                     <div class="space"></div>
                     <div class="team-icons">
                         <div class="icon-section-label">Team</div>
-                        <span v-for="user in displayProject.users" v-bind:key="user.user.id">
-                            <img v-if="user.photo" alt="User image" :src="getUserImage(user)" class="user-icon" />
+                        <span v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.id">
+                            <img v-if="projectUser.user.photo" alt="User image" :src="getProjectUserImage(projectUser)" class="user-icon" />
                         </span>
                     </div>
                     <div class="module-icons">
@@ -105,21 +105,21 @@
                         <div class="cell-heading"></div>
                         <div class="cell"></div>
                     </div>
-                    <div class="user-row" v-for="user in displayProject.users" v-bind:key="user.user.id">
+                    <div class="user-row" v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.id">
                         <div class="cell">
-                            <img alt="User image" :src="getUserImage(user)" class="user-icon" />
-                            {{ user.user.name }}
+                            <img alt="User image" :src="getProjectUserImage(projectUser)" class="user-icon" />
+                            {{ projectUser.user.name }}
                             <br />
-                            <span class="email">{{ user.user.email }}</span>
+                            <span class="email">{{ projectUser.user.email }}</span>
                         </div>
-                        <div class="cell">{{ user.role }}</div>
-                        <div class="cell invite-status">Invite {{ user.membership.toLowerCase() }}</div>
+                        <div class="cell">{{ projectUser.role }}</div>
+                        <div class="cell invite-status">Invite {{ projectUser.membership.toLowerCase() }}</div>
                         <div class="cell">
                             <img
                                 alt="Remove user"
                                 src="../assets/close-icon.png"
                                 class="remove-btn"
-                                :data-user="user.user.id"
+                                :data-user="projectUser.user.id"
                                 v-on:click="removeUser"
                             />
                         </div>
@@ -246,8 +246,11 @@ export default {
         this.newUserImage = this.$loadAsset("new_user.png");
     },
     methods: {
-        getUserImage(projectUser) {
-            return this.$config.baseUrl + "/" + projectUser.user.photo.url;
+        getProjectUserImage(projectUser) {
+            if (projectUser.user.photo) {
+                return this.$config.baseUrl + "/" + projectUser.user.photo.url;
+            }
+            return null;
         },
         editProject() {
             return this.$router.push({ name: "editProject", params: { id: this.project.id } });

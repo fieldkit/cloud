@@ -15,7 +15,7 @@
                     Log in
                 </router-link>
             </div>
-            <img v-if="user" alt="User image" :src="userImage" class="user-image" />
+            <img v-if="user && userImage" alt="User image" :src="userImage" class="user-image" />
         </div>
     </div>
 </template>
@@ -31,7 +31,10 @@ export default {
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({ user: (s) => s.user.user }),
         userImage() {
-            return this.$config.baseUrl + this.$store.state.user.user.photo.url;
+            if (this.$store.state.user.user.photo) {
+                return this.$config.baseUrl + this.$store.state.user.user.photo.url;
+            }
+            return null;
         },
     },
     methods: {
