@@ -1,6 +1,8 @@
 <template>
-    <StandardLayout class="explore-view">
-        <VizWorkspace v-if="workspace" :workspace="workspace"></VizWorkspace>
+    <StandardLayout>
+        <div class="explore-view">
+            <VizWorkspace v-if="workspace" :workspace="workspace"></VizWorkspace>
+        </div>
     </StandardLayout>
 </template>
 
@@ -45,8 +47,6 @@ export default {
                 });
             }
         );
-
-        return Promise.all([this.$store.dispatch(ActionTypes.NEED_PROJECTS), this.$store.dispatch(ActionTypes.NEED_STATIONS)]);
     },
     methods: {
         showStation(station) {
