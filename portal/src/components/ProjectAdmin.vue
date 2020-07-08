@@ -67,7 +67,7 @@
                     <div class="space"></div>
                     <div class="team-icons">
                         <div class="icon-section-label">Team</div>
-                        <span v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.id">
+                        <span v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.email">
                             <UserPhoto :user="projectUser.user" />
                         </span>
                     </div>
@@ -105,7 +105,7 @@
                         <div class="cell-heading"></div>
                         <div class="cell"></div>
                     </div>
-                    <div class="user-row" v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.id">
+                    <div class="user-row" v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.email">
                         <div class="cell">
                             <UserPhoto :user="projectUser.user" />
                             <div class="invite-name">
@@ -121,7 +121,7 @@
                                 src="../assets/close-icon.png"
                                 class="remove-btn"
                                 :data-user="projectUser.user.id"
-                                v-on:click="removeUser"
+                                v-on:click="(ev) => removeUser(ev, projectUser)"
                             />
                         </div>
                     </div>
@@ -134,7 +134,6 @@
                                 autocorrect="false"
                                 autocapitalizationType="none"
                                 v-model="form.inviteEmail"
-                                @blur="checkEmail"
                             />
                             <div class="validation-errors" v-if="$v.form.inviteEmail.$error">
                                 <span class="validation-error" id="no-email" v-if="!$v.form.inviteEmail.required">
@@ -166,6 +165,7 @@
 <script>
 import { required, email } from "vuelidate/lib/validators";
 import FKApi from "../api/api";
+import * as ActionTypes from "@/store/actions";
 import * as utils from "../utilities";
 import ProjectStations from "../components/ProjectStations";
 import ProjectActivity from "../components/ProjectActivity";
@@ -282,36 +282,27 @@ export default {
                 const role = this.roleOptions.find((r) => {
                     return r.code == this.selectedRole;
                 });
-                const params = { email: this.form.inviteEmail, projectId: this.project.id, role: this.selectedRole };
-                new FKApi().sendInvite(params).then(() => {
-                    this.projectUsers.push({
-                        user: {
-                            id: "pending-" + Date.now(),
-                            name: this.form.inviteEmail,
-                            email: this.form.inviteEmail,
-                        },
-                        userImage: this.newUserImage,
-                        role: role.name,
-                        membership: "Pending",
-                    });
+                const payload = {
+                    projectId: this.project.id,
+                    email: this.form.inviteEmail,
+                    role: this.selectedRole,
+                };
+                return this.$store.dispatch(ActionTypes.PROJECT_INVITE, payload).then(() => {
+                    this.$v.form.$reset();
                     this.form.inviteEmail = "";
                 });
             }
         },
-        removeUser(event) {
+        removeUser(ev, projectUser) {
             const id = event.target.getAttribute("data-user");
             if (confirm("Are you sure you want to remove this team member?")) {
-                const index = this.projectUsers.findIndex((u) => {
-                    return u.user.id == id;
-                });
-                const params = {
+                const payload = {
                     projectId: this.project.id,
-                    email: this.projectUsers[index].user.email,
+                    email: projectUser.user.email,
                 };
-                new FKApi().removeUserFromProject(params).then(() => {
-                    if (index > -1) {
-                        this.projectUsers.splice(index, 1);
-                    }
+                return this.$store.dispatch(ActionTypes.PROJECT_REMOVE, payload).then(() => {
+                    this.$v.form.$reset();
+                    this.form.inviteEmail = "";
                 });
             }
         },

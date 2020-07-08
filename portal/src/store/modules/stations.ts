@@ -272,6 +272,22 @@ const actions = {
     ) => {
         await new FKApi().removeStationFromProject(payload);
     },
+    [ActionTypes.PROJECT_INVITE]: async (
+        { commit, dispatch }: { commit: any; dispatch: any },
+        payload: { projectId: number; email: string; role: string }
+    ) => {
+        await new FKApi().sendInvite(payload);
+        const usersReply = await new FKApi().getUsersByProject(payload.projectId);
+        commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
+    },
+    [ActionTypes.PROJECT_REMOVE]: async (
+        { commit, dispatch }: { commit: any; dispatch: any },
+        payload: { projectId: number; email: string }
+    ) => {
+        await new FKApi().removeUserFromProject(payload);
+        const usersReply = await new FKApi().getUsersByProject(payload.projectId);
+        commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
+    },
 };
 
 const mutations = {
