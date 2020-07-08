@@ -95,7 +95,6 @@ export default {
             return this.$store.getters.projectsById[this.project.id].stations;
         },
         mappedProject() {
-            console.log(this.mapContainerSize);
             return this.$store.getters.projectsById[this.project.id].mapped;
         },
     },
