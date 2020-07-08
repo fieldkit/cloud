@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div id="sidebar-nav-wide" v-if="!narrow">
+        <div v-if="!narrow" class="container-side-wide">
             <div class="sidebar-header">
                 <router-link :to="{ name: 'projects' }" class="project-link">
                     <img alt="Fieldkit Logo" id="header-logo" src="../assets/FieldKit_Logo_Blue.png" />
@@ -43,7 +43,7 @@
                 </div>
             </div>
         </div>
-        <div id="sidebar-nav-narrow" v-if="narrow">
+        <div v-if="narrow" class="container-side-narrow">
             <div class="sidebar-header">
                 <img alt="Fieldkit Compass Logo" src="../assets/compass.png" />
             </div>
@@ -74,20 +74,15 @@ export default {
 </script>
 
 <style scoped>
-#sidebar-nav-wide {
-    display: block;
-    float: left;
+.container-side-wide {
     width: 240px;
     height: 100%;
-    min-height: 600px;
     border-right: 1px solid rgba(235, 235, 235, 1);
 }
-#sidebar-nav-narrow {
-    display: none;
-    float: left;
+
+.container-side-narrow {
     width: 65px;
     height: 100%;
-    min-height: 600px;
     border-right: 1px solid rgba(235, 235, 235, 1);
 }
 #sidebar-nav-narrow img {

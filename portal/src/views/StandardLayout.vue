@@ -1,15 +1,14 @@
 <template>
     <div class="container-ignored">
         <div class="container-top">
-            <div class="container-side">
-                <SidebarNav
-                    viewingStations="true"
-                    :isAuthenticated="isAuthenticated"
-                    :stations="stations"
-                    :projects="userProjects"
-                    @show-station="showStation"
-                />
-            </div>
+            <SidebarNav
+                viewingStations="true"
+                :isAuthenticated="isAuthenticated"
+                :stations="stations"
+                :projects="userProjects"
+                :narrow="sidebar.narrow"
+                @show-station="showStation"
+            />
 
             <div class="container-main">
                 <div class="container-header">
@@ -58,6 +57,8 @@ export default {
     methods: {
         onSidebarToggle(...args) {
             console.log("sidebar-toggle", args);
+            this.sidebar.narrow = !this.sidebar.narrow;
+            this.$emit("sidebar-toggle", this.sidebar.narrow);
         },
         showStation(station, ...args) {
             console.log("show-station", station, args);
@@ -74,10 +75,6 @@ export default {
 .container-top {
     display: flex;
     flex-direction: row;
-    height: 100%;
-}
-.container-side {
-    width: 240px;
     height: 100%;
 }
 .container-main {

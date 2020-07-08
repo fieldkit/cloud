@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout>
+    <StandardLayout @sidebar-toggle="onSidebarToggle">
         <div class="container-map">
             <StationsMap @mapReady="onMapReady" @showSummary="showSummary" :mapped="mapped" />
             <StationSummary
@@ -98,6 +98,7 @@ export default {
             this.map = map;
         },
         onSidebarToggle() {
+            console.log("stations toggle");
             if (this.map) {
                 this.map.resize();
             }
