@@ -298,3 +298,33 @@ func TestModifyProjectUpdate(t *testing.T) {
 
 	assert.Equal(http.StatusOK, modifyResponse.Code)
 }
+
+func TestGetProjectUsers(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	user, err := e.AddUser()
+	assert.NoError(err)
+
+	project, err := e.AddProject()
+	assert.NoError(err)
+
+	err = e.AddProjectUser(project, user, data.MemberRole)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/users/project/%d", project.ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+		{
+			"users": [ "<<PRESENCE>>" ]
+		}`)
+}
