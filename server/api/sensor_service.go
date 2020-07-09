@@ -111,6 +111,45 @@ type AggregateSummary struct {
 	NumberRecords int64 `db:"number_records" json:"numberRecords"`
 }
 
+type StationSensor struct {
+	SensorID  int64  `db:"sensor_id" json:"sensorId"`
+	StationID int32  `db:"station_id" json:"-"`
+	Key       string `db:"key" json:"key"`
+}
+
+func (c *SensorService) stationsMeta(ctx context.Context, stations []int64) (*sensor.DataResult, error) {
+	query, args, err := sqlx.In(fmt.Sprintf(`
+			SELECT sensor_id, station_id, s.key FROM %s JOIN fieldkit.aggregated_sensor AS s ON (s.id = sensor_id) WHERE station_id IN (?) GROUP BY sensor_id, station_id, s.key
+			`, "fieldkit.aggregated_24h"), stations)
+	if err != nil {
+		return nil, err
+	}
+
+	rows := []*StationSensor{}
+	if err := c.db.SelectContext(ctx, &rows, c.db.Rebind(query), args...); err != nil {
+		return nil, err
+	}
+
+	byStation := make(map[int32][]*StationSensor)
+	for _, id := range stations {
+		byStation[int32(id)] = make([]*StationSensor, 0)
+	}
+
+	for _, row := range rows {
+		byStation[row.StationID] = append(byStation[row.StationID], row)
+	}
+
+	data := struct {
+		Stations map[int32][]*StationSensor `json:"stations"`
+	}{
+		byStation,
+	}
+
+	return &sensor.DataResult{
+		Object: data,
+	}, nil
+}
+
 func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (*sensor.DataResult, error) {
 	log := Logger(ctx).Sugar()
 
@@ -126,7 +165,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	}
 
 	if len(qp.Sensors) == 0 {
-		return nil, sensor.BadRequest("at least one sensor required")
+		return c.stationsMeta(ctx, qp.Stations)
 	}
 
 	selectedAggregateName := qp.Aggregate
