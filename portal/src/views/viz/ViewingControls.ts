@@ -23,6 +23,14 @@ export const ViewingControls = Vue.extend({
                     label: "Histogram",
                     value: ChartType.Histogram,
                 },
+                {
+                    label: "Range",
+                    value: ChartType.Range,
+                },
+                {
+                    label: "Map",
+                    value: ChartType.Map,
+                },
             ],
             range: null,
         };

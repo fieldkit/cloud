@@ -127,6 +127,8 @@ export enum FastTime {
 export enum ChartType {
     TimeSeries,
     Histogram,
+    Range,
+    Map,
 }
 
 export class Graph extends Viz {

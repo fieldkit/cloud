@@ -3,13 +3,13 @@ import Vue from "vue";
 
 import { TimeRange } from "./common";
 import { Workspace, Viz, Group } from "./viz";
+import { VizGraph } from "./VizGraph";
 import { D3MultiScrubber } from "./D3MultiScrubber";
-import { D3Graph } from "./D3Graph";
 
 export const VizGroup = Vue.extend({
     components: {
+        VizGraph,
         D3MultiScrubber,
-        D3Graph,
     },
     props: {
         group: {
@@ -26,7 +26,7 @@ export const VizGroup = Vue.extend({
     },
     methods: {
         uiNameOf(viz: Viz) {
-            return "D3" + viz.constructor.name;
+            return "Viz" + viz.constructor.name;
         },
         raiseGroupZoomed(newTimes: TimeRange) {
             return this.$emit("group-time-zoomed", newTimes);

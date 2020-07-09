@@ -1,18 +1,24 @@
 import _ from "lodash";
 import Vue from "vue";
 
-import { TimeRange, Margins, ChartLayout } from "./common";
-import { Graph, QueriedData, Workspace } from "./viz";
+import { TimeRange } from "./common";
+import { Graph, QueriedData, Workspace, ChartType } from "./viz";
 
 import { ViewingControls } from "./ViewingControls";
 import { D3TimeSeriesGraph } from "./D3TimeSeriesGraph";
+import { D3Histogram } from "./D3Histogram";
+import { D3Range } from "./D3Range";
+import { D3Map } from "./D3Map";
 import { D3Scrubber } from "./D3Scrubber";
 
-export const D3Graph = Vue.extend({
-    name: "D3Graph",
+export const VizGraph = Vue.extend({
+    name: "VizGraph",
     components: {
         ViewingControls,
         D3TimeSeriesGraph,
+        D3Histogram,
+        D3Range,
+        D3Map,
         D3Scrubber,
     },
     data() {
@@ -57,6 +63,17 @@ export const D3Graph = Vue.extend({
             return this.$emit("viz-change-chart", ...args);
         },
         uiNameOf(graph: Graph) {
+            switch (graph.chartType) {
+                case ChartType.TimeSeries:
+                    return "D3TimeSeriesGraph";
+                case ChartType.Histogram:
+                    return "D3Histogram";
+                case ChartType.Range:
+                    return "D3Range";
+                case ChartType.Map:
+                    return "D3Map";
+            }
+            this.viz.log("unknown chart type");
             return "D3TimeSeriesGraph";
         },
     },

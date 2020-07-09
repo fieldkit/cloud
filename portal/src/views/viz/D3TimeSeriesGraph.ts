@@ -2,17 +2,12 @@ import _ from "lodash";
 import Vue from "vue";
 import * as d3 from "d3";
 
-import Treeselect from "@riophae/vue-treeselect";
-import "@riophae/vue-treeselect/dist/vue-treeselect.css";
-
 import { Time, TimeRange, Margins, ChartLayout } from "./common";
 import { Graph, QueriedData, Workspace } from "./viz";
 
 export const D3TimeSeriesGraph = Vue.extend({
     name: "D3TimeSeriesGraph",
-    components: {
-        Treeselect,
-    },
+    components: {},
     data() {
         return {};
     },
@@ -84,7 +79,7 @@ export const D3TimeSeriesGraph = Vue.extend({
 
             const svg = d3
                 .select(this.$el)
-                .select(".graph")
+                .select(".chart")
                 .selectAll("svg")
                 .data(charts)
                 .join((enter) => {
@@ -261,5 +256,5 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .attr("cy", (d) => y(d.value));
         },
     },
-    template: `<div class="viz time-series-graph"><div class="graph" @dblclick="onDouble"></div></div>`,
+    template: `<div class="viz time-series-graph"><div class="chart" @dblclick="onDouble"></div></div>`,
 });
