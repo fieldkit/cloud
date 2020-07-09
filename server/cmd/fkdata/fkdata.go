@@ -34,8 +34,8 @@ func main() {
 
 	flag.IntVar(&options.StationID, "station-id", 0, "station id")
 	flag.BoolVar(&options.All, "all", false, "all stations")
+	flag.BoolVar(&options.Fake, "fake", false, "create a fake data")
 	flag.BoolVar(&options.Recently, "recently", false, "recently inserted data")
-	flag.BoolVar(&options.Fake, "fake", false, "create a fake sine wave")
 
 	flag.Parse()
 
@@ -101,6 +101,8 @@ func processStation(ctx context.Context, db *sqlxcache.DB, stationID int32, rece
 	return nil
 }
 
+type SampleFunc func(t time.Time) float64
+
 func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error {
 	sampled := time.Now().Add(-100 * 24 * time.Hour)
 	end := time.Now()
@@ -108,30 +110,38 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 
 	aggregator := handlers.NewAggregator(db, stationID, 1000)
 
-	sensorKey := "fk.testing.sin"
-
 	SecondsPerWeek := int64(60 * 60 * 24 * 7)
 
-	getValue := func(t time.Time) float64 {
-		scaled := float64(SecondsPerWeek) / float64(t.Unix()%SecondsPerWeek)
-		radians := scaled * math.Pi
-		return math.Sin(radians)
+	sinFunc := func(period int64) SampleFunc {
+		return func(t time.Time) float64 {
+			scaled := float64(period) / float64(t.Unix()%period)
+			radians := scaled * math.Pi
+			return math.Sin(radians)
+		}
+	}
+
+	sawFunc := func(period int64, h float64) SampleFunc {
+		return func(t time.Time) float64 {
+			scaled := float64(period) / float64(t.Unix()%period)
+			return scaled * h
+		}
+	}
+
+	funcs := map[string]SampleFunc{
+		"fk.testing.sin":        sinFunc(SecondsPerWeek),
+		"fk.testing.saw.weekly": sawFunc(SecondsPerWeek, 1000),
 	}
 
 	for sampled.Before(end) {
-		value := getValue(sampled)
-
 		if err := aggregator.NextTime(ctx, sampled); err != nil {
 			return fmt.Errorf("error adding: %v", err)
 		}
 
-		if err := db.WithNewTransaction(ctx, func(txCtx context.Context) error {
-			if err := aggregator.AddSample(txCtx, sampled, []float64{}, sensorKey, value); err != nil {
+		for sensorKey, fn := range funcs {
+			value := fn(sampled)
+			if err := aggregator.AddSample(ctx, sampled, []float64{}, sensorKey, value); err != nil {
 				return err
 			}
-			return nil
-		}); err != nil {
-			return err
 		}
 
 		sampled = sampled.Add(interval)
