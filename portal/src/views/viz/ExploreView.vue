@@ -1,6 +1,15 @@
 <template>
     <StandardLayout>
         <div class="explore-view">
+            <div class="explore-header">
+                <div class="left">
+                    <h2>Default FieldKit Project</h2>
+                </div>
+                <div class="right">
+                    <div class="btn">Share</div>
+                    <div class="btn">Export</div>
+                </div>
+            </div>
             <VizWorkspace v-if="workspace" :workspace="workspace"></VizWorkspace>
         </div>
     </StandardLayout>
@@ -43,7 +52,7 @@ export default {
                 return new FKApi().getAllSensors().then((sensors) => {
                     this.workspace = new Workspace(sensors);
                     this.workspace.addStation(station);
-                    return this.workspace.compare().compare().combine();
+                    return this.workspace.compare() /*.compare().combine()*/;
                 });
             }
         );
@@ -57,21 +66,128 @@ export default {
 </script>
 
 <style>
+.graph .x-axis {
+    color: #7f7f7f;
+}
+.graph .y-axis {
+    color: #7f7f7f;
+}
+
 .explore-view {
     height: 100%;
-    width: auto;
     text-align: left;
+    background-color: #fcfcfc;
+    padding: 40px;
+    max-width: 1054px; /* HACK fixed width of svg */
 }
-.workspace {
+.explore-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.explore-header .left {
+    display: flex;
+}
+.explore-header .right {
+    display: flex;
+}
+.explore-header .btn {
+    margin-left: 20px;
+    font-size: 12px;
+    padding: 5px 10px;
+    background-color: #ffffff;
+    border: 1px solid rgb(215, 220, 225);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.workspace-container {
     height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
 }
 .tree-container {
     flex: 0;
 }
 .groups-container {
-    flex: 1;
+    border: 2px solid #efefef;
+    border-radius: 4px;
+    background-color: white;
+    padding-bottom: 20px;
+}
+
+/* HACK d3 Real talk, no idea how to do this elsewhere. -jlewallen */
+.brush-container .selection {
+    opacity: 0.3;
+}
+
+.controls-container {
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-bottom: 10px;
+}
+
+.controls-container .row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.controls-container .row-1 {
+    padding: 10px;
+    border-bottom: 1px solid #efefef;
+    margin-bottom: 5px;
+    align-items: baseline;
+}
+
+.controls-container .row-2 {
+    margin-top: 5px;
+    padding: 10px;
+    align-items: top;
+}
+
+.controls-container .tree {
+    flex-basis: 30%;
+}
+
+.controls-container .left {
+    display: flex;
+}
+
+.controls-container .right {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+}
+
+.controls-container .right {
+    font-size: 12px;
+}
+
+.controls-container .view-by {
+    margin: 35px 10px 0 10px;
+}
+
+.controls-container .fast-time {
+    margin: 35px 10px 0 10px;
+    cursor: pointer;
+}
+
+.controls-container .time-picker {
+    margin-left: 20px;
+}
+
+.controls-container .fast-time.selected {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.controls-container .left .btn {
+    margin-right: 20px;
+    font-size: 12px;
+    padding: 5px 10px;
+    background-color: #ffffff;
+    border: 1px solid rgb(215, 220, 225);
+    border-radius: 4px;
+    cursor: pointer;
 }
 </style>

@@ -52,7 +52,7 @@ export const D3Scrubber = Vue.extend({
             if (!this.data) {
                 return;
             }
-            const layout = new ChartLayout(1050, 120, new Margins({ top: 10, bottom: 20, left: 20, right: 20 }));
+            const layout = new ChartLayout(1050, 45, new Margins({ top: 0, bottom: 0, left: 0, right: 0 }));
             const data = this.data;
             const timeRange = data.timeRange;
             const dataRange = data.dataRange;
@@ -90,6 +90,13 @@ export const D3Scrubber = Vue.extend({
                         .attr("height", (c) => c.layout.height);
 
                     const defs = svg.append("defs");
+
+                    svg.append("rect")
+                        .attr("x", layout.margins.left)
+                        .attr("y", 0)
+                        .attr("width", layout.width)
+                        .attr("height", layout.height)
+                        .attr("fill", "#f4f5f7");
 
                     const blurFilter = defs
                         .append("filter")
@@ -144,7 +151,8 @@ export const D3Scrubber = Vue.extend({
                             .attr("x2", 0)
                             .attr("y1", -(layout.height - layout.margins.top - layout.margins.bottom) / 2)
                             .attr("y2", (layout.height - layout.margins.top - layout.margins.bottom) / 2)
-                            .attr("stroke", "black");
+                            .attr("stroke-width", "2")
+                            .attr("stroke", "#4f4f4f");
                         handle
                             .append("circle")
                             .attr("filter", "url(#dropshadow-" + this.viz.id + ")")
@@ -191,6 +199,7 @@ export const D3Scrubber = Vue.extend({
                         const sx = selection.map(x.invert);
                         clip.attr("x", selection[0]).attr("width", selection[1] - selection[0]);
                     }
+
                     d3.select(this).call(handles, selection);
 
                     if (d3.event.type == "end" && d3.event.sourceEvent) {

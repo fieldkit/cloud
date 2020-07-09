@@ -1,7 +1,6 @@
 import _ from "lodash";
-// import Vue, { VNode } from "vue";
 import { SensorId, SensorsResponse, SensorDataResponse, ModuleSensor } from "./api";
-import { Ids, TimeRange, Stations, Sensors, DataQueryParams } from "./common";
+import { Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
 import { DisplayStation } from "@/store/modules/stations";
 import FKApi from "@/api/api";
 
@@ -30,6 +29,10 @@ export class StationMeta {
         return this.station.id;
     }
 
+    get name(): string {
+        return this.station.name;
+    }
+
     get sensors(): SensorMeta[] {
         const sensorsByKey = _.keyBy(this.meta.sensors, (s) => s.key);
         return _(this.station.configurations.all)
@@ -49,6 +52,15 @@ export class StationMeta {
             })
             .value();
     }
+}
+
+export class TreeOption {
+    constructor(
+        public readonly id: string,
+        public readonly label: string,
+        public readonly sensorParams: SensorParams,
+        public readonly children: TreeOption[] | undefined = undefined
+    ) {}
 }
 
 export class QueriedData {
@@ -91,21 +103,38 @@ export abstract class Viz {
 
     constructor(public readonly info: VizInfo) {}
 
-    public needs(viz: Viz) {
-        return this.id === viz.id;
-    }
-
     public log(...args: any[]) {
         console.log(...["viz:", this.id, this.constructor.name, ...args]);
     }
 
     public abstract clone(): Viz;
+
+    public get canRemove(): boolean {
+        return true;
+    }
+}
+
+export enum FastTime {
+    Custom = -1,
+    Day = 1,
+    Week = 7,
+    TwoWeeks = 14,
+    Month = 30,
+    Year = 365,
+    All = 0,
+}
+
+export enum ChartType {
+    TimeSeries,
+    Histogram,
 }
 
 export class Graph extends Viz {
     private graphing: QueriedData | null = null;
     public all: QueriedData | null = null;
     public visible: TimeRange = TimeRange.eternity;
+    public chartType: ChartType = ChartType.TimeSeries;
+    public fastTime: FastTime = FastTime.All;
 
     constructor(public info: VizInfo, public params: DataQueryParams) {
         super(info);
@@ -113,7 +142,28 @@ export class Graph extends Viz {
 
     public zoomed(range: TimeRange) {
         this.visible = range;
+        this.fastTime = FastTime.Custom;
         this.params = new DataQueryParams(range, this.params.stations, this.params.sensors);
+    }
+
+    public useFastTime(fastTime: FastTime) {
+        if (!this.all) throw new Error("fast time missing all data");
+
+        const calculate = () => {
+            const sensorRange = this.all.timeRange;
+            if (fastTime == FastTime.All) {
+                return new TimeRange(sensorRange[0], sensorRange[1]);
+            } else {
+                const days = fastTime as number;
+                const start = new Date(sensorRange[1]);
+                start.setDate(start.getDate() - days);
+                return new TimeRange(start.getTime(), sensorRange[1]);
+            }
+        };
+
+        this.visible = calculate();
+        this.params = new DataQueryParams(this.visible, this.params.stations, this.params.sensors);
+        this.fastTime = fastTime;
     }
 
     public clone(): Viz {
@@ -224,16 +274,6 @@ export class Querier {
     }
 }
 
-export class TreeOption {
-    constructor(
-        public readonly id: string,
-        public readonly label: string,
-        public readonly sensor: SensorMeta,
-        public readonly stations: Stations,
-        public readonly children: TreeOption[] | undefined = undefined
-    ) {}
-}
-
 export class Workspace {
     public readonly querier = new Querier();
     public readonly stations: StationMeta[] = [];
@@ -338,22 +378,26 @@ export class Workspace {
                 const stations: StationMeta[] = _(value)
                     .map((v) => v.station)
                     .value();
-                return new TreeOption(
-                    sensor.fullKey,
-                    sensor.fullKey,
-                    sensor,
-                    _(stations)
-                        .map((station) => station.station.id)
-                        .value(),
-                    _(stations)
-                        .map(
-                            (station) =>
-                                new TreeOption("s-" + station.station.id + "-" + sensor.fullKey, station.station.name, sensor, [
-                                    station.station.id,
-                                ])
-                        )
-                        .value()
-                );
+
+                const label = sensor.fullKey;
+                const stationIds = stations.map((station) => station.id);
+                const sensorIds = [sensor.id];
+                const sensorParams = new SensorParams(sensorIds, stationIds);
+                const children = stations
+                    .map((station) => {
+                        const label = station.name;
+                        const sensorParams = new SensorParams(sensorIds, [station.id]);
+                        return new TreeOption(sensorParams.id, label, sensorParams);
+                    })
+                    .filter((child) => {
+                        return child.id != sensorParams.id;
+                    });
+
+                if (children.length == 0) {
+                    return new TreeOption(sensorParams.id, label, sensorParams);
+                }
+
+                return new TreeOption(sensorParams.id, label, sensorParams, children);
             })
             .value();
 
@@ -365,7 +409,7 @@ export class Workspace {
         return this;
     }
 
-    public compare() {
+    public compare(viz: Viz) {
         if (this.stations.length == 0) {
             throw new Error("no stations");
         }
@@ -394,6 +438,26 @@ export class Workspace {
         return this;
     }
 
+    public changeChart(viz: Viz, chartType: ChartType) {
+        return this;
+    }
+
+    public changeSensors(viz: Viz, option: TreeOption) {
+        // TODO Break groups
+        if (viz instanceof Graph) {
+            const sensorParams = option.sensorParams;
+            viz.params = new DataQueryParams(viz.params.when, sensorParams.stations, sensorParams.sensors);
+        }
+        return this;
+    }
+
+    public fastTime(viz: Viz, fastTime: FastTime) {
+        if (viz instanceof Graph) {
+            viz.useFastTime(fastTime);
+        }
+        return this;
+    }
+
     /**
      * Pop first Group and move all the Viz children to the new first Group
      */
@@ -403,10 +467,6 @@ export class Workspace {
         }
         const removing = this.groups.shift();
         this.groups[0].addAll(removing);
-        return this;
-    }
-
-    public selected(viz: Viz, option: TreeOption) {
         return this;
     }
 }

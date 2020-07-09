@@ -48,6 +48,17 @@ export class Sensor {
 export type Stations = number[];
 export type Sensors = number[];
 
+export class SensorParams {
+    constructor(public readonly sensors: Sensors, public readonly stations: Stations) {}
+
+    public get id(): string {
+        if (this.stations.length == 0) {
+            return ["Z", this.sensors.join("-"), "S", "ALL"].join("~");
+        }
+        return ["Z", this.sensors.join("-"), "S", this.stations.join("-")].join("~");
+    }
+}
+
 export class DataQueryParams {
     constructor(public readonly when: TimeRange, public readonly stations: Stations, public readonly sensors: Sensors) {}
 
@@ -62,6 +73,10 @@ export class DataQueryParams {
         queryParams.append("stations", this.stations.join(","));
         queryParams.append("sensors", this.sensors.join(","));
         return queryParams.toString();
+    }
+
+    public get sensorParams(): SensorParams {
+        return new SensorParams(this.sensors, this.stations);
     }
 }
 
