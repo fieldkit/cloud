@@ -571,7 +571,7 @@ func (c *UserController) GetID(ctx *app.GetIDUserContext) error {
 func (c *UserController) ListByProject(ctx *app.ListByProjectUserContext) error {
 	users := []*data.ProjectUserAndUser{}
 	if err := c.options.Database.SelectContext(ctx, &users, `
-		SELECT pu.*, u.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1 ORDER BY pu.role_id DESC, u.id
+		SELECT pu.*, u.* FROM fieldkit.user AS u JOIN fieldkit.project_user AS pu ON pu.user_id = u.id WHERE pu.project_id = $1 ORDER BY pu.role DESC, u.id
 		`, ctx.ProjectID); err != nil {
 		return err
 	}
