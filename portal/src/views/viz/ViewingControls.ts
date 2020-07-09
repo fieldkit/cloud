@@ -84,17 +84,19 @@ export const ViewingControls = Vue.extend({
             return this.$emit("viz-change-chart", Number(chartType));
         },
         raiseManualTime(fromPicker) {
-            // When the user picks a fast time this gets raised when
-            // the viz changes the visible time, which we're bound to
-            // so we do this to avoid raising a duplicate and querying
-            // twice. I dunno if there's a better way.
-            const rangeViz = this.viz.visible;
-            const rangePicker = new TimeRange(fromPicker.start.getTime(), fromPicker.end.getTime());
-            if (rangeViz.start != rangePicker.start || rangeViz.end != rangePicker.end) {
-                console.log("raising viz-time-zoomed");
-                return this.$emit("viz-time-zoomed", rangePicker);
-            } else {
-                console.log("swallowing viz-time-zoomed");
+            if (fromPicker) {
+                // When the user picks a fast time this gets raised when
+                // the viz changes the visible time, which we're bound to
+                // so we do this to avoid raising a duplicate and querying
+                // twice. I dunno if there's a better way.
+                const rangeViz = this.viz.visible;
+                const rangePicker = new TimeRange(fromPicker.start.getTime(), fromPicker.end.getTime());
+                if (rangeViz.start != rangePicker.start || rangeViz.end != rangePicker.end) {
+                    console.log("raising viz-time-zoomed");
+                    return this.$emit("viz-time-zoomed", rangePicker);
+                } else {
+                    console.log("swallowing viz-time-zoomed");
+                }
             }
         },
     },

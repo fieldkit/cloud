@@ -4,26 +4,28 @@ import { Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from
 import { DisplayStation } from "@/store/modules/stations";
 import FKApi from "@/api/api";
 
+export class QuickSensorStation {
+    constructor(public readonly sensorId: number, public readonly key: string) {}
+}
+
+export class QuickSensors {
+    constructor(public readonly stations: { [index: string]: QuickSensorStation[] }) {}
+}
+
 export class SensorMeta {
-    constructor(private readonly meta: SensorId, private sensor: ModuleSensor) {}
+    constructor(public readonly id: number, public readonly fullKey: string, public readonly name: string) {}
 
-    // TODO: sensor scales
-
-    public get id(): number {
-        return this.meta.id;
+    public static makePlain(meta: SensorId) {
+        return new SensorMeta(meta.id, meta.key, meta.key);
     }
 
-    public get fullKey(): string {
-        return this.sensor.fullKey;
-    }
-
-    public get name(): string {
-        return this.sensor.fullKey;
+    public static makePlainFromQuickie(quickie: QuickSensorStation) {
+        return new SensorMeta(quickie.sensorId, quickie.key, quickie.key);
     }
 }
 
 export class StationMeta {
-    constructor(private readonly meta: SensorsResponse, private station: DisplayStation) {}
+    constructor(private readonly meta: SensorsResponse, private quickSensors: QuickSensors, private station: DisplayStation) {}
 
     get id(): number {
         return this.station.id;
@@ -34,23 +36,28 @@ export class StationMeta {
     }
 
     get sensors(): SensorMeta[] {
+        // This toString is so annoying. -jlewallen
         const sensorsByKey = _.keyBy(this.meta.sensors, (s) => s.key);
-        return _(this.station.configurations.all)
+        const quickies = this.quickSensors.stations[this.id.toString()].map((q) => SensorMeta.makePlainFromQuickie(q));
+        const fromConfiguration = _(this.station.configurations.all)
             .take(1)
             .map((cfg) => cfg.modules)
             .flatten()
             .filter((m) => !m.internal)
             .map((m) => m.sensors)
             .flatten()
-            .map((s) => new SensorMeta(sensorsByKey[s.fullKey], s))
+            .map((s) => SensorMeta.makePlain(sensorsByKey[s.fullKey]))
             .filter((s) => {
-                if (!s.meta) {
-                    console.log("no meta:", s.sensor.fullKey);
-                    return false;
-                }
                 return true;
             })
             .value();
+
+        return Object.values(
+            Object.assign(
+                _.keyBy(quickies, (s) => s.id),
+                _.keyBy(fromConfiguration, (s) => s.id)
+            )
+        );
     }
 }
 
@@ -302,8 +309,8 @@ export class Workspace {
         return this;
     }
 
-    public addStation(station: DisplayStation) {
-        const stationMeta = new StationMeta(this.meta, station);
+    public addStation(quickSensors: QuickSensors, station: DisplayStation) {
+        const stationMeta = new StationMeta(this.meta, quickSensors, station);
         this.stations.push(stationMeta);
         return this;
     }
@@ -383,7 +390,7 @@ export class Workspace {
             .value();
 
         const options = _(allSensors)
-            .groupBy((s) => s.sensor.sensor.fullKey)
+            .groupBy((s) => s.sensor.fullKey)
             .values()
             .map((value: { station: DisplayStation; sensor: SensorMeta }[]) => {
                 const sensor = value[0].sensor;
@@ -413,6 +420,8 @@ export class Workspace {
             })
             .value();
 
+        console.log("workspace: options:", options);
+
         return options;
     }
 
@@ -429,7 +438,7 @@ export class Workspace {
         const allSensors = _(this.stations)
             .map((s) => s.sensors)
             .flatten()
-            .groupBy((s) => s.fullKey)
+            .keyBy((s) => s.fullKey)
             .value();
 
         console.log("workspace: sensors:", allSensors);

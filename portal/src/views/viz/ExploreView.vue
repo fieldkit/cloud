@@ -49,10 +49,12 @@ export default {
         this.$store.watch(
             (state, getters) => state.stations.stations.all[12],
             (station, _old) => {
-                return new FKApi().getAllSensors().then((sensors) => {
-                    this.workspace = new Workspace(sensors);
-                    this.workspace.addStation(station);
-                    return this.workspace.compare() /*.compare().combine()*/;
+                return new FKApi().getQuickSensors([station.id]).then((quickSensors) => {
+                    return new FKApi().getAllSensors().then((sensors) => {
+                        this.workspace = new Workspace(sensors);
+                        this.workspace.addStation(quickSensors, station);
+                        return this.workspace.compare() /*.compare().combine()*/;
+                    });
                 });
             }
         );

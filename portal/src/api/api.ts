@@ -883,6 +883,19 @@ class FKApi {
             },
         });
     }
+
+    getQuickSensors(stations) {
+        const qp = new URLSearchParams();
+        qp.append("stations", stations.join(","));
+        const token = this.token.getHeader();
+        return this.invoke({
+            url: this.baseUrl + "/sensors/data?" + qp.toString(),
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token,
+            },
+        });
+    }
 }
 
 export default FKApi;
