@@ -73,7 +73,7 @@ export const ViewingControls = Vue.extend({
         },
         raiseChangeChartType(chartType, ...args) {
             console.log("raising viz-change-chart");
-            return this.$emit("viz-change-chart", chartType);
+            return this.$emit("viz-change-chart", Number(chartType));
         },
         raiseManualTime(fromPicker) {
             // When the user picks a fast time this gets raised when
