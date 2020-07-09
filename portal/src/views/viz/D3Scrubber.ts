@@ -121,23 +121,33 @@ export const D3Scrubber = Vue.extend({
                     merge.append("feMergeNode");
                     merge.append("feMergeNode").attr("in", "SourceGraphic");
 
-                    const unselectedArea = svg
-                        .append("path")
-                        .data([this.data.data])
-                        .attr("class", "background-area")
-                        .attr("fill", "rgb(220, 222, 223)")
-                        .attr("d", area);
-
-                    const selectedArea = svg
-                        .append("path")
-                        .data([this.data.data])
-                        .attr("clip-path", "url(#scrubber-clip-" + this.viz.id + ")")
-                        .attr("class", "background-area")
-                        .attr("fill", "rgb(45, 158, 204)")
-                        .attr("d", area);
-
                     return svg;
                 });
+
+            const backgroundArea = svg
+                .selectAll(".background-area")
+                .data(charts)
+                .join((enter) =>
+                    enter
+                        .append("path")
+                        .attr("class", "background-area")
+                        .attr("fill", "rgb(220, 222, 223)")
+                )
+                .data([this.data.data])
+                .attr("d", area);
+
+            const foregroundArea = svg
+                .selectAll(".foreground-area")
+                .data(charts)
+                .join((enter) =>
+                    enter
+                        .append("path")
+                        .attr("clip-path", "url(#scrubber-clip-" + this.viz.id + ")")
+                        .attr("class", "foreground-area")
+                        .attr("fill", "rgb(45, 158, 204)")
+                )
+                .data([this.data.data])
+                .attr("d", area);
 
             const handles = (g, selection) =>
                 g

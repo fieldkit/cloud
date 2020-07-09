@@ -140,6 +140,10 @@ export class Graph extends Viz {
         super(info);
     }
 
+    public clone(): Viz {
+        return new Graph(this.info, this.params);
+    }
+
     public zoomed(range: TimeRange) {
         this.visible = range;
         this.fastTime = FastTime.Custom;
@@ -166,8 +170,14 @@ export class Graph extends Viz {
         this.fastTime = fastTime;
     }
 
-    public clone(): Viz {
-        return new Graph(this.info, this.params);
+    public changeChart(chartType: ChartType) {
+        this.chartType = chartType;
+    }
+
+    public changeSensors(option: TreeOption) {
+        const sensorParams = option.sensorParams;
+        this.params = new DataQueryParams(this.params.when, sensorParams.stations, sensorParams.sensors);
+        this.all = null;
     }
 
     public set data(qd: QueriedData) {
@@ -439,14 +449,15 @@ export class Workspace {
     }
 
     public changeChart(viz: Viz, chartType: ChartType) {
+        if (viz instanceof Graph) {
+            viz.changeChart(chartType);
+        }
         return this;
     }
 
     public changeSensors(viz: Viz, option: TreeOption) {
-        // TODO Break groups
         if (viz instanceof Graph) {
-            const sensorParams = option.sensorParams;
-            viz.params = new DataQueryParams(viz.params.when, sensorParams.stations, sensorParams.sensors);
+            viz.changeSensors(option);
         }
         return this;
     }
