@@ -303,6 +303,10 @@ export class Workspace {
     public addSensor(sensor: SensorMeta, stations: Stations) {
         const info = VizInfo.fromSensor(sensor);
         const graph = new Graph(info, new DataQueryParams(TimeRange.eternity, stations, [sensor.id]));
+        return this.addGraph(graph);
+    }
+
+    public addGraph(graph: Graph) {
         const group = new Group();
         group.add(graph);
         this.groups.push(group);
@@ -457,6 +461,29 @@ export class Workspace {
         }
 
         return this;
+    }
+
+    public addSensorAll(id: number) {
+        const allSensors = _(this.stations)
+            .map((station: StationMeta) =>
+                station.sensors.map((sensor) => {
+                    return {
+                        station: station,
+                        sensor: sensor,
+                    };
+                })
+            )
+            .flatten()
+            .groupBy((r) => r.sensor.id)
+            .mapValues((r) => r.map((s) => s.station.id))
+            .value();
+
+        console.log("workspace: adding:", allSensors);
+
+        return allSensors[id].map((stationId) => {
+            const graph = new Graph(new VizInfo("nothing"), new DataQueryParams(TimeRange.eternity, [stationId], [id]));
+            return this.addGraph(graph);
+        });
     }
 
     public changeChart(viz: Viz, chartType: ChartType) {
