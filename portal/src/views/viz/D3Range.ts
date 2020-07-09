@@ -51,11 +51,39 @@ export const D3Range = Vue.extend({
             const data = this.data;
             const timeRange = data.timeRange;
             const dataRange = data.dataRange;
+
+            const NumberOfBins = 64;
+            const thresholds = d3.range(timeRange[0], timeRange[1], (timeRange[1] - timeRange[0]) / NumberOfBins);
+
+            const x = d3
+                .scaleTime()
+                .domain(timeRange)
+                .range([layout.margins.left, layout.width - (layout.margins.right + layout.margins.left)]);
+
+            const histogram = d3
+                .histogram()
+                .value((d) => d.time)
+                .domain(x.domain())
+                .thresholds(thresholds);
+
+            const y = d3
+                .scaleLinear()
+                .domain(dataRange)
+                .range([layout.height - (layout.margins.bottom + layout.margins.top), layout.margins.top]);
+
+            const bins = histogram(this.data.data);
+
+            this.viz.log("bins", bins);
+
             const charts = [
                 {
                     layout: layout,
+                    bins: bins,
                 },
             ];
+
+            const xAxis = d3.axisBottom(x).ticks(10);
+            const yAxis = d3.axisLeft(y).ticks(6);
 
             const svg = d3
                 .select(this.$el)
@@ -69,7 +97,99 @@ export const D3Range = Vue.extend({
                         .attr("width", (c) => c.layout.width)
                         .attr("height", (c) => c.layout.height);
 
+                    adding.append("defs");
+
                     return adding;
+                });
+
+            svg.selectAll(".x-axis")
+                .data(charts)
+                .join((enter) =>
+                    enter
+                        .append("g")
+                        .attr("class", "x-axis")
+                        .attr("transform", "translate(" + 0 + "," + (layout.height - (layout.margins.bottom + layout.margins.top)) + ")")
+                )
+                .call(xAxis);
+
+            svg.selectAll(".y-axis")
+                .data(charts)
+                .join((enter) =>
+                    enter
+                        .append("g")
+                        .attr("class", "y-axis")
+                        .attr("transform", "translate(" + layout.margins.left + ",0)")
+                )
+                .call(yAxis);
+
+            const defs = svg
+                .selectAll("defs")
+                .data(charts)
+                .join((enter) => enter.append("defs"));
+
+            const colors = d3
+                .scaleSequential()
+                .domain([0, 1])
+                .interpolator(() => "#000000");
+
+            const stops = [
+                {
+                    offset: "0%",
+                    color: (bin) => colors(d3.min(bin, (d) => d.value)),
+                },
+                {
+                    offset: "50%",
+                    color: (bin) => colors(d3.median(bin, (d) => d.value)),
+                },
+                {
+                    offset: "100%",
+                    color: (bin) => colors(d3.max(bin, (d) => d.value)),
+                },
+            ];
+
+            const styles = defs
+                .selectAll(".bar-style")
+                .data(bins)
+                .join((enter, ...args) => {
+                    const style = enter
+                        .append("linearGradient")
+                        .attr("id", (d, i) => "range-bar-style-" + i)
+                        .attr("x1", "0%")
+                        .attr("x2", "0%")
+                        .attr("y1", "0%")
+                        .attr("y2", "100%");
+
+                    style
+                        .selectAll("stop")
+                        .data(stops)
+                        .join((enter) => enter.append("stop").attr("offset", (d) => d.offset))
+                        .attr("stop-color", function(this: any, stop: any) {
+                            return stop.color(d3.select(this.parentNode).datum());
+                        })
+                        .style("stop-opacity", 1);
+
+                    return style;
+                });
+
+            svg.selectAll(".range-bar")
+                .data(bins)
+                .join((enter) => enter.append("rect").attr("class", "range-bar"))
+                .attr("transform", (d) => {
+                    const mx = d3.max(d, (b) => b.value);
+                    return mx || mx === 0 ? "translate(" + x(d.x0) + "," + y(mx) + ")" : "translate(0,0)";
+                })
+                .attr("width", (d) => {
+                    return x(d.x1) - x(d.x0) - 1;
+                })
+                .style("fill", (d, i) => {
+                    return d.length > 0 ? "url(#range-bar-style-" + i + ")" : "none";
+                })
+                .attr("height", (d) => {
+                    const MinimumHeight = 2; // NOTE Why 2?
+                    const extent = d3.extent(d, (b) => b.value);
+                    const height = y(extent[1]) - y(extent[0]);
+                    const min = d.length > 0 ? -MinimumHeight : 0;
+                    return -(height ? height : min);
                 });
         },
     },

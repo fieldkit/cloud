@@ -47,6 +47,7 @@ export const D3Histogram = Vue.extend({
             if (!this.data) {
                 return;
             }
+
             const layout = new ChartLayout(1050, 340, new Margins({ top: 5, bottom: 50, left: 50, right: 0 }));
             const data = this.data;
             const timeRange = data.timeRange;
@@ -70,6 +71,71 @@ export const D3Histogram = Vue.extend({
                         .attr("height", (c) => c.layout.height);
 
                     return adding;
+                });
+
+            const NumberOfBins = 16;
+            const thresholds = d3.range(dataRange[0], dataRange[1], (dataRange[1] - dataRange[0]) / NumberOfBins);
+
+            const x = d3
+                .scaleLinear()
+                .domain(data.dataRange)
+                .range([layout.margins.left, layout.width - (layout.margins.right + layout.margins.left)]);
+
+            const histogram = d3
+                .histogram()
+                .value((d) => d.value)
+                .domain(x.domain())
+                .thresholds(thresholds);
+
+            const bins = histogram(this.data.data);
+
+            this.viz.log("bins", bins);
+
+            const y = d3
+                .scaleLinear()
+                .domain([0, d3.max(bins, (d) => d.length)])
+                .range([layout.height - (layout.margins.bottom + layout.margins.top), layout.margins.top]);
+
+            const xAxis = d3.axisBottom(x).ticks(NumberOfBins);
+            const yAxis = d3.axisLeft(y).ticks(10);
+
+            svg.selectAll(".x-axis")
+                .data(charts)
+                .join((enter) =>
+                    enter
+                        .append("g")
+                        .attr("class", "x-axis")
+                        .attr("transform", "translate(" + 0 + "," + (layout.height - (layout.margins.bottom + layout.margins.top)) + ")")
+                )
+                .call(xAxis);
+
+            svg.selectAll(".y-axis")
+                .data(charts)
+                .join((enter) =>
+                    enter
+                        .append("g")
+                        .attr("class", "y-axis")
+                        .attr("transform", "translate(" + layout.margins.left + ",0)")
+                )
+                .call(yAxis);
+
+            // NOTE Why 800?
+            const MinimumBarWidth = 800 / NumberOfBins;
+            svg.selectAll(".histogram-bar")
+                .data(bins)
+                .join((enter) => {
+                    return enter.append("rect").attr("class", "histogram-bar");
+                })
+                .attr("transform", (d) => {
+                    return "translate(" + x(d.x0) + "," + y(d.length) + ")";
+                })
+                .attr("width", (d) => {
+                    const w = x(d.x1) - x(d.x0) - 1;
+                    return w <= 0 ? MinimumBarWidth : w;
+                })
+                .style("fill", (d) => "red")
+                .attr("height", (d) => {
+                    return d.length == 0 ? 0 : layout.height - y(d.length) - layout.margins.bottom - layout.margins.top;
                 });
         },
     },

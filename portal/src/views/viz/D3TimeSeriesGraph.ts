@@ -149,6 +149,16 @@ export const D3TimeSeriesGraph = Vue.extend({
                     return "#000000";
                 });
 
+            const distance = dataRange[1] - dataRange[0];
+            const stops = [
+                { offset: "0%", color: colors(dataRange[0]) },
+                { offset: "20%", color: colors(dataRange[0] + 0.2 * distance) },
+                { offset: "40%", color: colors(dataRange[0] + 0.4 * distance) },
+                { offset: "60%", color: colors(dataRange[0] + 0.6 * distance) },
+                { offset: "80%", color: colors(dataRange[0] + 0.8 * distance) },
+                { offset: "100%", color: colors(dataRange[1]) },
+            ];
+
             const line = svg
                 .selectAll(".d3-line")
                 .data(charts)
@@ -167,29 +177,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                         .attr("x2", 0)
                         .attr("y2", y(dataRange[1]))
                         .selectAll("stop")
-                        .data([
-                            { offset: "0%", color: colors(dataRange[0]) },
-                            {
-                                offset: "20%",
-                                color: colors(dataRange[0] + 0.2 * (dataRange[1] - dataRange[0])),
-                            },
-                            {
-                                offset: "40%",
-                                color: colors(dataRange[0] + 0.4 * (dataRange[1] - dataRange[0])),
-                            },
-                            {
-                                offset: "60%",
-                                color: colors(dataRange[0] + 0.6 * (dataRange[1] - dataRange[0])),
-                            },
-                            {
-                                offset: "80%",
-                                color: colors(dataRange[0] + 0.8 * (dataRange[1] - dataRange[0])),
-                            },
-                            {
-                                offset: "100%",
-                                color: colors(dataRange[1]),
-                            },
-                        ])
+                        .data(stops)
                         .join((enter) =>
                             enter
                                 .append("stop")
