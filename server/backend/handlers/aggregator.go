@@ -98,22 +98,84 @@ func (a *aggregation) close() (*Aggregated, error) {
 	return aggregated, nil
 }
 
-func (v *Aggregator) refreshSensors(ctx context.Context) error {
-	sensors := []*data.Sensor{}
-	if err := v.db.SelectContext(ctx, &sensors, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
-		return err
-	}
-
-	v.sensors = make(map[string]*data.Sensor)
-
-	for _, sensor := range sensors {
-		v.sensors[sensor.Key] = sensor
-	}
-
-	return nil
+type Aggregator struct {
+	db           *sqlxcache.DB
+	stationID    int32
+	aggregations []*aggregation
+	sensors      map[string]*data.Sensor
+	samples      int64
+	batchSize    int
+	batches      [][]*Aggregated
 }
 
-func (v *Aggregator) upsertAggregated(ctx context.Context, a *aggregation, d *Aggregated) error {
+func NewAggregator(db *sqlxcache.DB, stationID int32, batchSize int) *Aggregator {
+	return &Aggregator{
+		db:        db,
+		stationID: stationID,
+		batchSize: batchSize,
+		batches: [][]*Aggregated{
+			make([]*Aggregated, 0, batchSize),
+			make([]*Aggregated, 0, batchSize),
+			make([]*Aggregated, 0, batchSize),
+			make([]*Aggregated, 0, batchSize),
+			make([]*Aggregated, 0, batchSize),
+			make([]*Aggregated, 0, batchSize),
+			make([]*Aggregated, 0, batchSize),
+		},
+		aggregations: []*aggregation{
+			&aggregation{
+				interval: time.Minute * 1,
+				table:    "fieldkit.aggregated_1m",
+				values:   make(map[string][]float64),
+			},
+			&aggregation{
+				interval: time.Minute * 10,
+				table:    "fieldkit.aggregated_10m",
+				values:   make(map[string][]float64),
+			},
+			&aggregation{
+				interval: time.Minute * 30,
+				table:    "fieldkit.aggregated_30m",
+				values:   make(map[string][]float64),
+			},
+			&aggregation{
+				interval: time.Hour * 1,
+				table:    "fieldkit.aggregated_1h",
+				values:   make(map[string][]float64),
+			},
+			&aggregation{
+				interval: time.Hour * 6,
+				table:    "fieldkit.aggregated_6h",
+				values:   make(map[string][]float64),
+			},
+			&aggregation{
+				interval: time.Hour * 12,
+				table:    "fieldkit.aggregated_12h",
+				values:   make(map[string][]float64),
+			},
+			&aggregation{
+				interval: time.Hour * 24,
+				table:    "fieldkit.aggregated_24h",
+				values:   make(map[string][]float64),
+			},
+		},
+	}
+}
+
+func (v *Aggregator) upsertBatch(ctx context.Context, a *aggregation, batch []*Aggregated) error {
+	return v.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+		for _, d := range batch {
+			if err := v.upsertSingle(txCtx, a, d); err != nil {
+				return err
+			}
+		}
+		log := Logger(ctx).Sugar().With("station_id", v.stationID)
+		log.Infow("batch", "aggregate", a.table, "records", len(batch))
+		return nil
+	})
+}
+
+func (v *Aggregator) upsertSingle(ctx context.Context, a *aggregation, d *Aggregated) error {
 	var location *data.Location
 
 	if d.Location != nil {
@@ -183,57 +245,6 @@ func (v *Aggregator) upsertAggregated(ctx context.Context, a *aggregation, d *Ag
 	return nil
 }
 
-type Aggregator struct {
-	db           *sqlxcache.DB
-	stationID    int32
-	aggregations []*aggregation
-	sensors      map[string]*data.Sensor
-}
-
-func NewAggregator(db *sqlxcache.DB, stationID int32) *Aggregator {
-	return &Aggregator{
-		db:        db,
-		stationID: stationID,
-		aggregations: []*aggregation{
-			&aggregation{
-				interval: time.Minute * 1,
-				table:    "fieldkit.aggregated_1m",
-				values:   make(map[string][]float64),
-			},
-			&aggregation{
-				interval: time.Minute * 10,
-				table:    "fieldkit.aggregated_10m",
-				values:   make(map[string][]float64),
-			},
-			&aggregation{
-				interval: time.Minute * 30,
-				table:    "fieldkit.aggregated_30m",
-				values:   make(map[string][]float64),
-			},
-			&aggregation{
-				interval: time.Hour * 1,
-				table:    "fieldkit.aggregated_1h",
-				values:   make(map[string][]float64),
-			},
-			&aggregation{
-				interval: time.Hour * 6,
-				table:    "fieldkit.aggregated_6h",
-				values:   make(map[string][]float64),
-			},
-			&aggregation{
-				interval: time.Hour * 12,
-				table:    "fieldkit.aggregated_12h",
-				values:   make(map[string][]float64),
-			},
-			&aggregation{
-				interval: time.Hour * 24,
-				table:    "fieldkit.aggregated_24h",
-				values:   make(map[string][]float64),
-			},
-		},
-	}
-}
-
 func (v *Aggregator) AddSample(ctx context.Context, sampled time.Time, location []float64, sensorKey string, value float64) error {
 	for _, child := range v.aggregations {
 		time := child.getTime(sampled)
@@ -246,6 +257,9 @@ func (v *Aggregator) AddSample(ctx context.Context, sampled time.Time, location 
 			return fmt.Errorf("error adding: %v", err)
 		}
 	}
+
+	v.samples += 1
+
 	return nil
 }
 
@@ -263,15 +277,18 @@ func (v *Aggregator) AddMap(ctx context.Context, sampled time.Time, location []f
 			}
 		}
 	}
+
+	v.samples += 1
+
 	return nil
 }
 
 func (v *Aggregator) NextTime(ctx context.Context, sampled time.Time) error {
-	for _, child := range v.aggregations {
+	for index, child := range v.aggregations {
 		time := child.getTime(sampled)
 
 		if !child.canAdd(time) {
-			if err := v.Close(ctx); err != nil {
+			if err := v.closeChild(ctx, index, false); err != nil {
 				return err
 			}
 		}
@@ -279,15 +296,48 @@ func (v *Aggregator) NextTime(ctx context.Context, sampled time.Time) error {
 	return nil
 }
 
-func (v *Aggregator) Close(ctx context.Context) error {
-	for _, aggregation := range v.aggregations {
-		if values, err := aggregation.close(); err != nil {
-			return fmt.Errorf("error closing aggregation: %v", err)
+func (v *Aggregator) closeChild(ctx context.Context, index int, tail bool) error {
+	aggregation := v.aggregations[index]
+	if values, err := aggregation.close(); err != nil {
+		return fmt.Errorf("error closing aggregation: %v", err)
+	} else {
+		if v.batchSize > 1 {
+			if len(v.batches[index]) == v.batchSize || tail {
+				if err := v.upsertBatch(ctx, aggregation, v.batches[index]); err != nil {
+					return err
+				}
+				v.batches[index] = v.batches[index][:0]
+			}
+			v.batches[index] = append(v.batches[index], values)
 		} else {
-			if err := v.upsertAggregated(ctx, aggregation, values); err != nil {
+			if err := v.upsertSingle(ctx, aggregation, values); err != nil {
 				return fmt.Errorf("error upserting aggregated: %v", err)
 			}
 		}
 	}
+	return nil
+}
+
+func (v *Aggregator) Close(ctx context.Context) error {
+	for index, _ := range v.aggregations {
+		if err := v.closeChild(ctx, index, true); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v *Aggregator) refreshSensors(ctx context.Context) error {
+	sensors := []*data.Sensor{}
+	if err := v.db.SelectContext(ctx, &sensors, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
+		return err
+	}
+
+	v.sensors = make(map[string]*data.Sensor)
+
+	for _, sensor := range sensors {
+		v.sensors[sensor.Key] = sensor
+	}
+
 	return nil
 }

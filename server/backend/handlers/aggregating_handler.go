@@ -40,7 +40,7 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 			return nil
 		}
 
-		v.stations[p.ID] = NewAggregator(v.db, station.ID)
+		v.stations[p.ID] = NewAggregator(v.db, station.ID, 100)
 	}
 
 	_, err := v.metaFactory.Add(ctx, meta, true)
