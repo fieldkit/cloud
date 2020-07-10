@@ -3,7 +3,7 @@
         <div class="container-map">
             <StationsMap @mapReady="onMapReady" @showSummary="showSummary" :mapped="mapped" />
             <StationSummary
-                v-if="activeStationId"
+                v-if="activeStation"
                 @closeSummary="closeSummary"
                 class="summary-container"
                 :station="activeStation"
@@ -49,8 +49,6 @@ export default {
     },
     data: () => {
         return {
-            narrowSidebar: false,
-            activeStationId: null,
             showNoStationsMessage: true,
             summarySize: {
                 width: "415px",
@@ -70,14 +68,20 @@ export default {
             anyStations: (s) => s.stations.stations.user.length > 0,
         }),
         activeStation() {
-            return this.$store.state.stations.stations.all[this.activeStationId];
+            return this.$store.state.stations.stations.all[this.id];
         },
     },
     beforeMount() {
         if (this.id) {
-            this.activeStationId = this.id;
             return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });
         }
+    },
+    watch: {
+        id() {
+            if (this.id) {
+                return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });
+            }
+        },
     },
     methods: {
         goBack() {
