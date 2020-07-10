@@ -29,6 +29,13 @@ Vue.use(Vuelidate);
 
 Vue.config.productionTip = false;
 
+Vue.filter("prettyTime", (value) => {
+    if (!value) {
+        return "N/A";
+    }
+    return moment(value).format("MM/DD/YYYY HH:mm:ss");
+});
+
 Vue.filter("prettyDate", (value) => {
     if (!value) {
         return "N/A";

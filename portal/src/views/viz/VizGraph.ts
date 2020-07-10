@@ -10,11 +10,13 @@ import { D3Histogram } from "./D3Histogram";
 import { D3Range } from "./D3Range";
 import { D3Map } from "./D3Map";
 import { D3Scrubber } from "./D3Scrubber";
+import { DebuggingPanel } from "./DebuggingPanel";
 
 export const VizGraph = Vue.extend({
     name: "VizGraph",
     components: {
         ViewingControls,
+        DebuggingPanel,
         D3TimeSeriesGraph,
         D3Histogram,
         D3Range,
@@ -92,6 +94,8 @@ export const VizGraph = Vue.extend({
 				@viz-time-zoomed="raiseTimeZoomed" />
 
 			<D3Scrubber :viz="viz" @viz-time-zoomed="raiseTimeZoomed" />
+
+            <DebuggingPanel :viz="viz" :workspace="workspace" />
 		</div>
 	`,
 });
