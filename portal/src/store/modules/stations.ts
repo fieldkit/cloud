@@ -282,12 +282,18 @@ const actions = {
         payload: { stationId: number; projectId: number }
     ) => {
         await new FKApi().addStationToProject(payload);
+
+        const stations = await new FKApi().getStationsByProject(payload.projectId);
+        commit(PROJECT_STATIONS, { projectId: payload.projectId, stations: stations.stations });
     },
     [ActionTypes.STATION_PROJECT_REMOVE]: async (
         { commit, dispatch }: { commit: any; dispatch: any },
         payload: { stationId: number; projectId: number }
     ) => {
         await new FKApi().removeStationFromProject(payload);
+
+        const stations = await new FKApi().getStationsByProject(payload.projectId);
+        commit(PROJECT_STATIONS, { projectId: payload.projectId, stations: stations.stations });
     },
     [ActionTypes.PROJECT_INVITE]: async (
         { commit, dispatch }: { commit: any; dispatch: any },
