@@ -238,6 +238,15 @@ export function makeAuthenticatedApiUrl(url) {
     return Config.API_HOST + url + "?token=" + token;
 }
 
+export interface InvokeParams {
+    authenticated: boolean;
+    method: string;
+    url: string;
+    data?: any;
+    contentType?: string;
+    refreshed?: boolean | null;
+}
+
 class FKApi {
     private readonly baseUrl: string = Config.API_HOST;
     private readonly token: TokenStorage = new TokenStorage();
@@ -246,8 +255,24 @@ class FKApi {
         return this.token.authenticated();
     }
 
-    private invoke(params): Promise<any> {
-        return axios(params).then(
+    private makeParams(params: InvokeParams): any {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        if (params.authenticated) {
+            const token = this.token.getHeader();
+            headers["Authorization"] = token;
+        }
+        return {
+            method: params.method,
+            url: params.url,
+            headers: headers,
+            data: params.data,
+        };
+    }
+
+    private invoke(params: InvokeParams): Promise<any> {
+        return axios(this.makeParams(params)).then(
             (response) => this.handle(response),
             (error) => {
                 const response = error.response;
@@ -356,6 +381,7 @@ class FKApi {
 
     register(user) {
         return this.invoke({
+            authenticated: false,
             method: "POST",
             url: this.baseUrl + "/users",
             data: user,
@@ -364,39 +390,33 @@ class FKApi {
 
     resendCreateAccount(userId) {
         return this.invoke({
+            authenticated: false,
             method: "POST",
             url: this.baseUrl + "/users/" + userId + "/validate-email",
         });
     }
 
     updatePassword(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "PATCH",
             url: this.baseUrl + "/users/" + data.userId + "/password",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
             data: { newPassword: data.newPassword, oldPassword: data.oldPassword },
         });
     }
 
     sendResetPasswordEmail(email) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: false,
             method: "POST",
             url: this.baseUrl + "/user/recovery/lookup",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
             data: { email: email },
         });
     }
 
     resetPassword(data) {
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/user/recovery",
             data: { password: data.password, token: data.token },
@@ -404,126 +424,86 @@ class FKApi {
     }
 
     getStationFromVuex(id): Promise<Station> {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/stations/" + id,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getStation(id): Promise<Station> {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/stations/@/" + id,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
-    getStations(): Promise<StationsResponse> {
-        const token = this.token.getHeader();
+    getStations(onNoAuth: OnNoAuth<StationsResponse>): Promise<StationsResponse> {
+        if (!this.token.authenticated()) {
+            return onNoAuth();
+        }
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/stations",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getCurrentUser(): Promise<CurrentUser> {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/user",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getUsersByProject(projectId): Promise<ProjectUsers> {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/users/project/" + projectId,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     sendInvite(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/projects/" + data.projectId + "/invite",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
             data: { email: data.email, role: data.role },
         });
     }
 
     getInvitesByToken(inviteToken) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/projects/invites/" + inviteToken,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getInvitesByUser() {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/projects/invites/pending",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     acceptInvite(payload: { id: number; token: string }) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/projects/invites/" + payload.id + "/accept?token=" + payload.token,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
-            data: {
-                token: payload.token,
-            },
         });
     }
 
     declineInvite(payload: { id: number; token: string }) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/projects/invites/" + payload.id + "/reject?token=" + payload.token,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
             data: {
                 token: payload.token,
             },
@@ -531,140 +511,96 @@ class FKApi {
     }
 
     getStationsByProject(projectId) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/projects/" + projectId + "/stations",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     addStationToProject(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/projects/" + data.projectId + "/stations/" + data.stationId,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     removeStationFromProject(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "DELETE",
             url: this.baseUrl + "/projects/" + data.projectId + "/stations/" + data.stationId,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     removeUserFromProject(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "DELETE",
             url: this.baseUrl + "/projects/" + data.projectId + "/members",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
             data: { email: data.email },
         });
     }
 
     uploadUserImage(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/user/media",
-            headers: {
-                "Content-Type": data.type,
-                Authorization: token,
-            },
             data: data.image,
         });
     }
 
     updateUser(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "PATCH",
             url: this.baseUrl + "/users/" + data.id,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
             data: data,
         });
     }
 
     getUserProjects(onNoAuth: OnNoAuth<ProjectsResponse>): Promise<ProjectsResponse> {
-        const token = this.token.getHeader();
-        if (!token) {
+        if (!this.token.authenticated()) {
             return onNoAuth();
         }
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/user/projects",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getPublicProjects(): Promise<ProjectsResponse> {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: false,
             method: "GET",
             url: this.baseUrl + "/projects",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getProject(id): Promise<Project> {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/projects/" + id,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getProjectActivity(id): Promise<ProjectActivityResponse> {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/projects/" + id + "/activity",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     addDefaultProject() {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/projects",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
             data: {
                 name: "Default FieldKit Project",
                 description: "Any FieldKit stations you add, start life here.",
@@ -674,111 +610,78 @@ class FKApi {
     }
 
     addProject(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/projects",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
             data: data,
         });
     }
 
     updateProject(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "PATCH",
             url: this.baseUrl + "/projects/" + data.id,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
             data: data,
         });
     }
 
     uploadProjectImage(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/projects/" + data.id + "/media",
-            headers: {
-                "Content-Type": data.type,
-                Authorization: token,
-            },
+            contentType: data.type,
             data: data.image,
         });
     }
 
     deleteProject(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "DELETE",
             url: this.baseUrl + "/projects/" + data.projectId,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getProjectFollows(projectId): Promise<ProjectFollowers> {
         return this.invoke({
+            authenticated: false,
             method: "GET",
             url: this.baseUrl + "/projects/" + projectId + "/followers",
-            headers: {
-                "Content-Type": "application/json",
-            },
         });
     }
 
     followProject(projectId) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/projects/" + projectId + "/follow",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     unfollowProject(projectId) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/projects/" + projectId + "/unfollow",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     deleteFieldNote(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "DELETE",
             url: this.baseUrl + "/stations/" + data.stationId + "/field-notes/" + data.fieldNoteId,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getModulesMeta() {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/modules/meta",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
@@ -790,123 +693,86 @@ class FKApi {
             end = new Date().getTime();
         }
 
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/data/devices/" + deviceId + "/summary/json?start=" + start + "&end=" + end,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getStationDataByDeviceId(deviceId) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/data/devices/" + deviceId + "/data",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getJSONDataByDeviceId(deviceId, page, pageSize) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/data/devices/" + deviceId + "/data/json?page=" + page + "&pageSize=" + pageSize,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getFieldNotes(stationId) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "GET",
             url: this.baseUrl + "/stations/" + stationId + "/field-notes",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     addProjectUpdate(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/projects/" + data.projectId + "/updates",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
             data: data,
         });
     }
 
     updateProjectUpdate(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "POST",
             url: this.baseUrl + "/projects/" + data.projectId + "/updates/" + data.updateId,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
             data: data,
         });
     }
 
     deleteProjectUpdate(data) {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
             method: "DELETE",
             url: this.baseUrl + "/projects/" + data.projectId + "/updates/" + data.updateId,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getAllSensors() {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
+            method: "GET",
             url: this.baseUrl + "/sensors",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     sensorData(params: any): Promise<any> {
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
+            method: "GET",
             url: this.baseUrl + "/sensors/data?" + params.queryString(),
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 
     getQuickSensors(stations) {
         const qp = new URLSearchParams();
         qp.append("stations", stations.join(","));
-        const token = this.token.getHeader();
         return this.invoke({
+            authenticated: true,
+            method: "GET",
             url: this.baseUrl + "/sensors/data?" + qp.toString(),
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: token,
-            },
         });
     }
 }

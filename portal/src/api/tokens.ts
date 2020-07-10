@@ -5,31 +5,31 @@ export default class TokenStorage {
         this.token = this.getToken();
     }
 
-    getToken() {
-        this.token = this._sanitize(JSON.parse(window.localStorage["fktoken"] || "null"));
+    public getToken() {
+        this.token = this.sanitize(JSON.parse(window.localStorage["fktoken"] || "null"));
         return this.token;
     }
 
-    getHeader() {
+    public getHeader() {
         return "Bearer " + this.getToken();
     }
 
-    authenticated() {
+    public authenticated() {
         return this.token != null;
     }
 
-    setToken(token) {
-        const sanitized = this._sanitize(token);
+    public setToken(token) {
+        const sanitized = this.sanitize(token);
         window.localStorage["fktoken"] = JSON.stringify(sanitized);
         this.token = sanitized;
     }
 
-    clear() {
+    public clear() {
         this.token = null;
         delete window.localStorage["fktoken"];
     }
 
-    _sanitize(token) {
+    private sanitize(token) {
         if (token) {
             return token.replace("Bearer ", "");
         }
