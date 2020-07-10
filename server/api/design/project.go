@@ -123,6 +123,7 @@ var _ = Resource("project", func() {
 	})
 
 	Action("list", func() {
+		NoSecurity()
 		Routing(GET("projects"))
 		Description("List projects")
 		Response(BadRequest)

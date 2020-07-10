@@ -1483,10 +1483,9 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 		}
 		return ctrl.List(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleProjectOrigin(h)
 	service.Mux.Handle("GET", "/projects", ctrl.MuxHandler("list", h, nil))
-	service.LogInfo("mount", "ctrl", "Project", "action", "List", "route", "GET /projects", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "Project", "action", "List", "route", "GET /projects")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
