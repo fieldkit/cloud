@@ -199,6 +199,9 @@ const getters = {
 };
 
 const actions = {
+    [ActionTypes.INITIALIZE]: async ({ dispatch }: { dispatch: any }) => {
+        await dispatch(ActionTypes.NEED_COMMON);
+    },
     [ActionTypes.NEED_COMMON]: async ({ dispatch }: { dispatch: any }) => {
         await dispatch(ActionTypes.NEED_PROJECTS);
         await dispatch(ActionTypes.NEED_STATIONS);

@@ -52,7 +52,7 @@ export default {
     },
     beforeMount() {
         console.log("StandardLayout: beforeMount");
-        this.$store.dispatch(ActionTypes.NEED_COMMON);
+        // this.$store.dispatch(ActionTypes.NEED_COMMON);
     },
     methods: {
         onSidebarToggle(...args) {
