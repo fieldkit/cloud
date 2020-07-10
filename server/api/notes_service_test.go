@@ -50,7 +50,8 @@ func TestCreateStationNotes(t *testing.T) {
 			"key": "key-1",
 			"body": "Hello, world!",
 			"createdAt": "<<PRESENCE>>",
-			"author": "<<PRESENCE>>"
+			"author": "<<PRESENCE>>",
+			"media": []
 		}],
 		"media": []
 	}`)
@@ -97,13 +98,14 @@ func TestUpdateStationNotes(t *testing.T) {
 	ja := jsonassert.New(t)
 	ja.Assertf(updatingRr.Body.String(), `
 	{
-		"media": []
+		"media": [],
 		"notes": [{
 			"id": %d,
 			"key": "key-2",
 			"body": "Jacob",
 			"createdAt": "<<PRESENCE>>",
-			"author": "<<PRESENCE>>"
+			"author": "<<PRESENCE>>",
+			"media": []
 		}]
 	}`, int64(id.Num))
 }
