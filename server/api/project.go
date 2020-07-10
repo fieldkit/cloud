@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -445,11 +446,26 @@ func (c *ProjectController) RemoveUser(ctx *app.RemoveUserProjectContext) error 
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project_invite WHERE project_id = $1 AND invited_email = $2`, ctx.ProjectID, ctx.Payload.Email); err != nil {
+	removing := &data.User{}
+	if err := c.options.Database.GetContext(ctx, removing, `SELECT * FROM fieldkit.user WHERE email = $1`, ctx.Payload.Email); err != nil {
+		if err != sql.ErrNoRows {
+			return err
+		}
+	} else {
+		if removing.ID == p.UserID() {
+			return ctx.BadRequest()
+		}
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, `
+		DELETE FROM fieldkit.project_invite WHERE project_id = $1 AND invited_email = $2
+		`, ctx.ProjectID, ctx.Payload.Email); err != nil {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project_user WHERE project_id = $1 AND user_id IN (SELECT u.id FROM fieldkit.user AS u WHERE u.email = $2)`, ctx.ProjectID, ctx.Payload.Email); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `
+		DELETE FROM fieldkit.project_user WHERE project_id = $1 AND user_id IN (SELECT u.id FROM fieldkit.user AS u WHERE u.email = $2)
+		`, ctx.ProjectID, ctx.Payload.Email); err != nil {
 		return err
 	}
 

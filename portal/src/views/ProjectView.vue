@@ -84,8 +84,13 @@ export default {
             },
         }),
     },
+    watch: {
+        id() {
+            return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id });
+        },
+    },
     beforeMount() {
-        this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id });
+        return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id });
     },
     methods: {
         goBack() {
