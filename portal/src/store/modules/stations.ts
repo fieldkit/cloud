@@ -4,6 +4,7 @@ import * as MutationTypes from "../mutations";
 import * as ActionTypes from "../actions";
 import { Location, BoundingRectangle } from "../map-types";
 import FKApi, {
+    OnNoReject,
     Station,
     StationModule,
     ModuleSensor,
@@ -208,7 +209,14 @@ const actions = {
     },
     [ActionTypes.NEED_PROJECTS]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
         commit(MutationTypes.LOADING, { projects: true });
-        const [communityProjects, userProjects] = await Promise.all([new FKApi().getPublicProjects(), new FKApi().getUserProjects()]);
+        const [communityProjects, userProjects] = await Promise.all([
+            new FKApi().getPublicProjects(),
+            new FKApi().getUserProjects(() => {
+                return Promise.resolve({
+                    projects: [],
+                });
+            }),
+        ]);
         commit(HAVE_COMMUNITY_PROJECTS, communityProjects.projects);
         commit(HAVE_USER_PROJECTS, userProjects.projects);
         commit(MutationTypes.LOADING, { projects: false });
@@ -297,7 +305,7 @@ const actions = {
     ) => {
         await new FKApi().acceptInvite(payload);
 
-        const userProjects = await new FKApi().getUserProjects();
+        const userProjects = await new FKApi().getUserProjects(OnNoReject);
         commit(HAVE_USER_PROJECTS, userProjects.projects);
     },
     [ActionTypes.DECLINE_PROJECT_INVITE]: async (

@@ -27,6 +27,16 @@ export class TokenError extends ApiError {
     }
 }
 
+export class MissingTokenError extends TokenError {
+    constructor() {
+        super("missing token");
+    }
+}
+
+export type OnNoAuth<T> = () => Promise<T>;
+
+export const OnNoReject = () => Promise.reject(new MissingTokenError());
+
 export class LoginPayload {
     constructor(public readonly email: string, public readonly password: string) {}
 }
@@ -595,8 +605,11 @@ class FKApi {
         });
     }
 
-    getUserProjects(): Promise<ProjectsResponse> {
+    getUserProjects(onNoAuth: OnNoAuth<ProjectsResponse>): Promise<ProjectsResponse> {
         const token = this.token.getHeader();
+        if (!token) {
+            return onNoAuth();
+        }
         return this.invoke({
             method: "GET",
             url: this.baseUrl + "/user/projects",
