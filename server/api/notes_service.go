@@ -29,6 +29,8 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 		return nil, err
 	}
 
+	media := make(map[int64][]int64)
+
 	for _, webNote := range payload.Notes.Creating {
 		if webNote.Body == nil && (webNote.MediaIds == nil || len(webNote.MediaIds) == 0) {
 			return nil, notes.BadRequest("body or media is required")
@@ -48,17 +50,12 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 			return nil, err
 		}
 
+		if media[note.ID] == nil {
+			media[note.ID] = make([]int64, 0)
+		}
+
 		for _, id := range webNote.MediaIds {
-			nml := data.NoteMediaLink{
-				NoteID:  note.ID,
-				MediaID: id,
-			}
-			if _, err := s.options.Database.NamedExecContext(ctx, `
-				INSERT INTO fieldkit.notes_media_link (note_id, media_id) VALUES (:note_id, :media_id)
-				ON CONFLICT (note_id, media_id) DO NOTHING
-			`, nml); err != nil {
-				return nil, err
-			}
+			media[note.ID] = append(media[note.ID], id)
 		}
 	}
 	for _, webNote := range payload.Notes.Notes {
@@ -85,8 +82,14 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 		}
 
 		for _, id := range webNote.MediaIds {
+			media[note.ID] = append(media[note.ID], id)
+		}
+	}
+
+	for noteID, ids := range media {
+		for _, id := range ids {
 			nml := data.NoteMediaLink{
-				NoteID:  webNote.ID,
+				NoteID:  noteID,
 				MediaID: id,
 			}
 			if _, err := s.options.Database.NamedExecContext(ctx, `
@@ -104,7 +107,7 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 }
 
 type NoteMediaWithNoteID struct {
-	NoteID int64 `db:"note_id,omitempty"`
+	NoteID *int64 `db:"note_id,omitempty"`
 	data.FieldNoteMedia
 }
 
@@ -129,11 +132,10 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 
 	allNoteMedias := []*NoteMediaWithNoteID{}
 	if err := s.options.Database.SelectContext(ctx, &allNoteMedias, `
-		SELECT m.*
+		SELECT m.*, l.note_id
 		FROM fieldkit.notes_media AS m
-		JOIN fieldkit.notes_media_link AS l ON (m.id = l.media_id)
-		JOIN fieldkit.notes AS n ON (n.id = l.note_id)
-		WHERE n.station_id = $1 ORDER BY n.created_at DESC
+		LEFT JOIN fieldkit.notes_media_link AS l ON (m.id = l.media_id)
+		WHERE m.station_id = $1 ORDER BY m.id DESC
 		`, payload.StationID); err != nil {
 		return nil, err
 	}
@@ -146,10 +148,23 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 	}
 
 	webNotes := make([]*notes.FieldNote, 0)
+
+	stationMedia := make([]*notes.NoteMedia, 0)
+	for _, nm := range allNoteMedias {
+		if nm.NoteID == nil {
+			stationMedia = append(stationMedia, &notes.NoteMedia{
+				ID:          nm.ID,
+				ContentType: nm.ContentType,
+				URL:         nm.URL,
+				Key:         nm.Key,
+			})
+		}
+	}
+
 	for _, n := range allNotes {
 		media := make([]*notes.NoteMedia, 0)
 		for _, nm := range allNoteMedias {
-			if nm.NoteID == n.ID {
+			if nm.NoteID != nil && *nm.NoteID == n.ID {
 				media = append(media, &notes.NoteMedia{
 					ID:          nm.ID,
 					ContentType: nm.ContentType,
@@ -170,6 +185,7 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 
 	return &notes.FieldNotes{
 		Notes: webNotes,
+		Media: stationMedia,
 	}, nil
 }
 

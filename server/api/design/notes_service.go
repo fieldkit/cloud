@@ -189,7 +189,7 @@ var _ = Service("notes", func() {
 
 			SkipRequestBodyEncodeDecode()
 
-			httpAuthenticationQueryString()
+			httpAuthentication()
 		})
 	})
 

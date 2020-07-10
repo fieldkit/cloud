@@ -467,9 +467,12 @@ func EncodeUploadRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 			headStr := strconv.FormatInt(head, 10)
 			req.Header.Set("Content-Length", headStr)
 		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
 		values := req.URL.Query()
 		values.Add("key", p.Key)
-		values.Add("token", p.Auth)
 		req.URL.RawQuery = values.Encode()
 		return nil
 	}

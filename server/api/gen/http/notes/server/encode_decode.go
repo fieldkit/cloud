@@ -395,9 +395,9 @@ func DecodeUploadRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 		var (
 			stationID     int32
 			key           string
-			auth          string
 			contentType   string
 			contentLength int64
+			auth          string
 			err           error
 
 			params = mux.Vars(r)
@@ -414,10 +414,6 @@ func DecodeUploadRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 		if key == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("key", "query string"))
 		}
-		auth = r.URL.Query().Get("token")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("token", "query string"))
-		}
 		contentType = r.Header.Get("Content-Type")
 		if contentType == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Content-Type", "header"))
@@ -433,10 +429,14 @@ func DecodeUploadRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 			}
 			contentLength = v
 		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
 		if err != nil {
 			return nil, err
 		}
-		payload := NewUploadPayload(stationID, key, auth, contentType, contentLength)
+		payload := NewUploadPayload(stationID, key, contentType, contentLength, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]

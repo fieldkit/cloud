@@ -1469,11 +1469,6 @@ paths:
         in: query
         required: true
         type: string
-      - name: token
-        in: query
-        description: authentication token
-        required: true
-        type: string
       - name: stationId
         in: path
         required: true
@@ -1488,6 +1483,12 @@ paths:
         required: true
         type: integer
         format: int64
+      - name: Authorization
+        in: header
+        description: authentication token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
       responses:
         "200":
           description: OK response.
@@ -1512,7 +1513,7 @@ paths:
       schemes:
       - http
       security:
-      - jwt_query_token: []
+      - jwt_header_Authorization: []
   /stations/{stationId}/notes:
     get:
       tags:

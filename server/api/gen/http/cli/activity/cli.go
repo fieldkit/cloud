@@ -190,9 +190,9 @@ func ParseEndpoint(
 		notesUploadFlags             = flag.NewFlagSet("upload", flag.ExitOnError)
 		notesUploadStationIDFlag     = notesUploadFlags.String("station-id", "REQUIRED", "")
 		notesUploadKeyFlag           = notesUploadFlags.String("key", "REQUIRED", "")
-		notesUploadAuthFlag          = notesUploadFlags.String("auth", "REQUIRED", "")
 		notesUploadContentTypeFlag   = notesUploadFlags.String("content-type", "REQUIRED", "")
 		notesUploadContentLengthFlag = notesUploadFlags.String("content-length", "REQUIRED", "")
+		notesUploadAuthFlag          = notesUploadFlags.String("auth", "REQUIRED", "")
 		notesUploadStreamFlag        = notesUploadFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
 
 		projectFlags = flag.NewFlagSet("project", flag.ContinueOnError)
@@ -656,7 +656,7 @@ func ParseEndpoint(
 				data, err = notesc.BuildMediaPayload(*notesMediaMediaIDFlag, *notesMediaAuthFlag)
 			case "upload":
 				endpoint = c.Upload()
-				data, err = notesc.BuildUploadPayload(*notesUploadStationIDFlag, *notesUploadKeyFlag, *notesUploadAuthFlag, *notesUploadContentTypeFlag, *notesUploadContentLengthFlag)
+				data, err = notesc.BuildUploadPayload(*notesUploadStationIDFlag, *notesUploadKeyFlag, *notesUploadContentTypeFlag, *notesUploadContentLengthFlag, *notesUploadAuthFlag)
 				if err == nil {
 					data, err = notesc.BuildUploadStreamPayload(data, *notesUploadStreamFlag)
 				}
@@ -1056,18 +1056,18 @@ Example:
 }
 
 func notesUploadUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] notes upload -station-id INT32 -key STRING -auth STRING -content-type STRING -content-length INT64 -stream STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] notes upload -station-id INT32 -key STRING -content-type STRING -content-length INT64 -auth STRING -stream STRING
 
 Upload implements upload.
     -station-id INT32: 
     -key STRING: 
-    -auth STRING: 
     -content-type STRING: 
     -content-length INT64: 
+    -auth STRING: 
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` notes upload --station-id 382191260 --key "Omnis quia." --auth "Laborum vero odio fugit." --content-type "Maxime totam sapiente eligendi quo quam." --content-length 56888755525650787 --stream "goa.png"
+    `+os.Args[0]+` notes upload --station-id 382191260 --key "Omnis quia." --content-type "Laborum vero odio fugit." --content-length 3631043144680936382 --auth "Totam sapiente eligendi quo." --stream "goa.png"
 `, os.Args[0])
 }
 

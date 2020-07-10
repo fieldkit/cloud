@@ -341,13 +341,13 @@ func NewMediaPayload(mediaID int32, auth string) *notes.MediaPayload {
 }
 
 // NewUploadPayload builds a notes service upload endpoint payload.
-func NewUploadPayload(stationID int32, key string, auth string, contentType string, contentLength int64) *notes.UploadPayload {
+func NewUploadPayload(stationID int32, key string, contentType string, contentLength int64, auth string) *notes.UploadPayload {
 	v := &notes.UploadPayload{}
 	v.StationID = stationID
 	v.Key = key
-	v.Auth = auth
 	v.ContentType = contentType
 	v.ContentLength = contentLength
+	v.Auth = auth
 
 	return v
 }
