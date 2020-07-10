@@ -155,7 +155,7 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 			stationMedia = append(stationMedia, &notes.NoteMedia{
 				ID:          nm.ID,
 				ContentType: nm.ContentType,
-				URL:         nm.URL,
+				URL:         fmt.Sprintf("/notes/media/%d", nm.ID),
 				Key:         nm.Key,
 			})
 		}
@@ -168,7 +168,7 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 				media = append(media, &notes.NoteMedia{
 					ID:          nm.ID,
 					ContentType: nm.ContentType,
-					URL:         nm.URL,
+					URL:         fmt.Sprintf("/notes/media/%d", nm.ID),
 					Key:         nm.Key,
 				})
 			}
