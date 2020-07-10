@@ -114,15 +114,15 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 
 	sinFunc := func(period int64) SampleFunc {
 		return func(t time.Time) float64 {
-			scaled := float64(period) / float64(t.Unix()%period)
-			radians := scaled * math.Pi
+			scaled := float64(t.Unix()%period) / float64(period)
+			radians := scaled * math.Pi * 2
 			return math.Sin(radians)
 		}
 	}
 
 	sawFunc := func(period int64, h float64) SampleFunc {
 		return func(t time.Time) float64 {
-			scaled := float64(period) / float64(t.Unix()%period)
+			scaled := float64(t.Unix()%period) / float64(period)
 			return scaled * h
 		}
 	}
