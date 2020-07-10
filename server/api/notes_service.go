@@ -30,14 +30,13 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 	}
 
 	for _, webNote := range payload.Notes.Creating {
-		if webNote.Body == nil && webNote.MediaID == nil {
+		if webNote.Body == nil && (webNote.MediaIds == nil || len(webNote.MediaIds) == 0) {
 			return nil, notes.BadRequest("body or media is required")
 		}
 
 		note := &data.Note{
 			StationID: payload.StationID,
 			AuthorID:  p.UserID(),
-			MediaID:   webNote.MediaID,
 			Key:       webNote.Key,
 			Body:      webNote.Body,
 		}
@@ -48,13 +47,26 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 		`, note); err != nil {
 			return nil, err
 		}
+
+		for _, id := range webNote.MediaIds {
+			nml := data.NoteMediaLink{
+				NoteID:  note.ID,
+				MediaID: id,
+			}
+			if _, err := s.options.Database.NamedExecContext(ctx, `
+				INSERT INTO fieldkit.notes_media_link (note_id, media_id) VALUES (:note_id, :media_id)
+				ON CONFLICT (note_id, media_id) DO NOTHING
+			`, nml); err != nil {
+				return nil, err
+			}
+		}
 	}
 	for _, webNote := range payload.Notes.Notes {
 		if webNote.ID == 0 {
 			return nil, notes.BadRequest("id is required")
 		}
 
-		if webNote.Body == nil && webNote.MediaID == nil {
+		if webNote.Body == nil && (webNote.MediaIds == nil || len(webNote.MediaIds) == 0) {
 			return nil, notes.BadRequest("body or media is required")
 		}
 
@@ -62,15 +74,27 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 			ID:        webNote.ID,
 			StationID: payload.StationID,
 			AuthorID:  p.UserID(),
-			MediaID:   webNote.MediaID,
 			Key:       webNote.Key,
 			Body:      webNote.Body,
 		}
 
 		if err := s.options.Database.NamedGetContext(ctx, note, `
-			UPDATE fieldkit.notes SET key = :key, body = :body, media_id = :media_id WHERE id = :id RETURNING *
+			UPDATE fieldkit.notes SET key = :key, body = :body WHERE id = :id RETURNING *
 		`, note); err != nil {
 			return nil, err
+		}
+
+		for _, id := range webNote.MediaIds {
+			nml := data.NoteMediaLink{
+				NoteID:  webNote.ID,
+				MediaID: id,
+			}
+			if _, err := s.options.Database.NamedExecContext(ctx, `
+				INSERT INTO fieldkit.notes_media_link (note_id, media_id) VALUES (:note_id, :media_id)
+				ON CONFLICT (note_id, media_id) DO NOTHING
+			`, nml); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -98,6 +122,13 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 		}
 	}
 
+	allNoteMedias := []*data.NoteMediaLink{}
+	if err := s.options.Database.SelectContext(ctx, &allNoteMedias, `
+		SELECT l.* FROM fieldkit.notes_media_link AS l JOIN fieldkit.notes AS n ON (n.id = l.note_id) WHERE n.station_id = $1 ORDER BY n.created_at DESC
+		`, payload.StationID); err != nil {
+		return nil, err
+	}
+
 	allNotes := []*data.Note{}
 	if err := s.options.Database.SelectContext(ctx, &allNotes, `
 		SELECT * FROM fieldkit.notes WHERE station_id = $1 ORDER BY created_at DESC
@@ -107,11 +138,15 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 
 	webNotes := make([]*notes.FieldNote, 0)
 	for _, n := range allNotes {
+		mediaIDs := make([]int64, 0)
+		for _, nml := range allNoteMedias {
+			mediaIDs = append(mediaIDs, nml.MediaID)
+		}
 		webNotes = append(webNotes, &notes.FieldNote{
 			ID:        n.ID,
 			CreatedAt: n.Created.Unix() * 1000,
 			Author:    byID[n.AuthorID],
-			MediaID:   n.MediaID,
+			MediaIds:  mediaIDs,
 			Key:       n.Key,
 			Body:      n.Body,
 		})

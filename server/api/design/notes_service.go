@@ -30,7 +30,7 @@ var FieldNote = Type("FieldNote", func() {
 	Attribute("author", FieldNoteAuthor)
 	Attribute("key", String)
 	Attribute("body", String)
-	Attribute("mediaId", Int64)
+	Attribute("mediaIds", ArrayOf(Int64))
 	Required("id", "createdAt", "author")
 })
 
@@ -38,14 +38,14 @@ var ExistingFieldNote = Type("ExistingFieldNote", func() {
 	Attribute("id", Int64)
 	Attribute("key", String)
 	Attribute("body", String)
-	Attribute("mediaId", Int64)
+	Attribute("mediaIds", ArrayOf(Int64))
 	Required("id")
 })
 
 var NewFieldNote = Type("NewFieldNote", func() {
 	Attribute("key", String)
 	Attribute("body", String)
-	Attribute("mediaId", Int64)
+	Attribute("mediaIds", ArrayOf(Int64))
 })
 
 var FieldNoteUpdate = ResultType("application/vnd.app.notes.update", func() {

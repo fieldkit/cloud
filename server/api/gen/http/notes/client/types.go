@@ -110,17 +110,17 @@ type FieldNoteUpdateRequestBody struct {
 
 // ExistingFieldNoteRequestBody is used to define fields on request body types.
 type ExistingFieldNoteRequestBody struct {
-	ID      int64   `form:"id" json:"id" xml:"id"`
-	Key     *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
-	Body    *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-	MediaID *int64  `form:"mediaId,omitempty" json:"mediaId,omitempty" xml:"mediaId,omitempty"`
+	ID       int64   `form:"id" json:"id" xml:"id"`
+	Key      *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	Body     *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	MediaIds []int64 `form:"mediaIds,omitempty" json:"mediaIds,omitempty" xml:"mediaIds,omitempty"`
 }
 
 // NewFieldNoteRequestBody is used to define fields on request body types.
 type NewFieldNoteRequestBody struct {
-	Key     *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
-	Body    *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-	MediaID *int64  `form:"mediaId,omitempty" json:"mediaId,omitempty" xml:"mediaId,omitempty"`
+	Key      *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	Body     *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	MediaIds []int64 `form:"mediaIds,omitempty" json:"mediaIds,omitempty" xml:"mediaIds,omitempty"`
 }
 
 // FieldNoteResponseBody is used to define fields on response body types.
@@ -130,7 +130,7 @@ type FieldNoteResponseBody struct {
 	Author    *FieldNoteAuthorResponseBody `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	Key       *string                      `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	Body      *string                      `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-	MediaID   *int64                       `form:"mediaId,omitempty" json:"mediaId,omitempty" xml:"mediaId,omitempty"`
+	MediaIds  []int64                      `form:"mediaIds,omitempty" json:"mediaIds,omitempty" xml:"mediaIds,omitempty"`
 }
 
 // FieldNoteAuthorResponseBody is used to define fields on response body types.

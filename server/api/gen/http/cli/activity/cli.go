@@ -59,19 +59,22 @@ func UsageExamples() string {
       "notes": {
          "creating": [
             {
-               "body": "Beatae magni aliquam perferendis facilis.",
-               "key": "Vitae ipsam corrupti ea dolorum consequatur.",
-               "mediaId": 2771950207859890457
+               "body": "Perferendis facilis mollitia vel aut.",
+               "key": "Ea dolorum consequatur alias beatae magni.",
+               "mediaIds": [
+                  4901102416227285199,
+                  8553307744897445340,
+                  3175563408179649650
+               ]
             },
             {
-               "body": "Beatae magni aliquam perferendis facilis.",
-               "key": "Vitae ipsam corrupti ea dolorum consequatur.",
-               "mediaId": 2771950207859890457
-            },
-            {
-               "body": "Beatae magni aliquam perferendis facilis.",
-               "key": "Vitae ipsam corrupti ea dolorum consequatur.",
-               "mediaId": 2771950207859890457
+               "body": "Perferendis facilis mollitia vel aut.",
+               "key": "Ea dolorum consequatur alias beatae magni.",
+               "mediaIds": [
+                  4901102416227285199,
+                  8553307744897445340,
+                  3175563408179649650
+               ]
             }
          ],
          "notes": [
@@ -79,19 +82,31 @@ func UsageExamples() string {
                "body": "Fugit quos sed enim occaecati.",
                "id": 6139879987527965591,
                "key": "Dolorum et autem tempora consequatur architecto optio.",
-               "mediaId": 6035690160929153665
+               "mediaIds": [
+                  2268756658411607113,
+                  3749521312036636972,
+                  7053919692555427872
+               ]
             },
             {
                "body": "Fugit quos sed enim occaecati.",
                "id": 6139879987527965591,
                "key": "Dolorum et autem tempora consequatur architecto optio.",
-               "mediaId": 6035690160929153665
+               "mediaIds": [
+                  2268756658411607113,
+                  3749521312036636972,
+                  7053919692555427872
+               ]
             },
             {
                "body": "Fugit quos sed enim occaecati.",
                "id": 6139879987527965591,
                "key": "Dolorum et autem tempora consequatur architecto optio.",
-               "mediaId": 6035690160929153665
+               "mediaIds": [
+                  2268756658411607113,
+                  3749521312036636972,
+                  7053919692555427872
+               ]
             }
          ]
       }
@@ -959,19 +974,22 @@ Example:
       "notes": {
          "creating": [
             {
-               "body": "Beatae magni aliquam perferendis facilis.",
-               "key": "Vitae ipsam corrupti ea dolorum consequatur.",
-               "mediaId": 2771950207859890457
+               "body": "Perferendis facilis mollitia vel aut.",
+               "key": "Ea dolorum consequatur alias beatae magni.",
+               "mediaIds": [
+                  4901102416227285199,
+                  8553307744897445340,
+                  3175563408179649650
+               ]
             },
             {
-               "body": "Beatae magni aliquam perferendis facilis.",
-               "key": "Vitae ipsam corrupti ea dolorum consequatur.",
-               "mediaId": 2771950207859890457
-            },
-            {
-               "body": "Beatae magni aliquam perferendis facilis.",
-               "key": "Vitae ipsam corrupti ea dolorum consequatur.",
-               "mediaId": 2771950207859890457
+               "body": "Perferendis facilis mollitia vel aut.",
+               "key": "Ea dolorum consequatur alias beatae magni.",
+               "mediaIds": [
+                  4901102416227285199,
+                  8553307744897445340,
+                  3175563408179649650
+               ]
             }
          ],
          "notes": [
@@ -979,19 +997,31 @@ Example:
                "body": "Fugit quos sed enim occaecati.",
                "id": 6139879987527965591,
                "key": "Dolorum et autem tempora consequatur architecto optio.",
-               "mediaId": 6035690160929153665
+               "mediaIds": [
+                  2268756658411607113,
+                  3749521312036636972,
+                  7053919692555427872
+               ]
             },
             {
                "body": "Fugit quos sed enim occaecati.",
                "id": 6139879987527965591,
                "key": "Dolorum et autem tempora consequatur architecto optio.",
-               "mediaId": 6035690160929153665
+               "mediaIds": [
+                  2268756658411607113,
+                  3749521312036636972,
+                  7053919692555427872
+               ]
             },
             {
                "body": "Fugit quos sed enim occaecati.",
                "id": 6139879987527965591,
                "key": "Dolorum et autem tempora consequatur architecto optio.",
-               "mediaId": 6035690160929153665
+               "mediaIds": [
+                  2268756658411607113,
+                  3749521312036636972,
+                  7053919692555427872
+               ]
             }
          ]
       }
@@ -1007,7 +1037,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes get --station-id 1266363991 --auth "Qui quo dolorem quo non earum."
+    `+os.Args[0]+` notes get --station-id 183867628 --auth "Culpa neque."
 `, os.Args[0])
 }
 
@@ -1019,7 +1049,7 @@ Media implements media.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes media --media-id 735207576 --auth "Exercitationem doloremque quasi."
+    `+os.Args[0]+` notes media --media-id 1827134368 --auth "Sint quis occaecati sequi aut provident porro."
 `, os.Args[0])
 }
 
@@ -1033,7 +1063,7 @@ Upload implements upload.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` notes upload --auth "Et voluptatem laborum voluptatem." --content-type "Distinctio reiciendis omnis quia." --content-length 4828704170410720828 --stream "goa.png"
+    `+os.Args[0]+` notes upload --auth "Distinctio reiciendis omnis quia." --content-type "Laborum vero odio fugit." --content-length 3631043144680936382 --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -1066,8 +1096,8 @@ AddUpdate implements add update.
 
 Example:
     `+os.Args[0]+` project add- update --body '{
-      "body": "Perspiciatis nisi laudantium aut et totam aliquam."
-   }' --project-id 891213338 --auth "Quia laboriosam qui."
+      "body": "Quia laboriosam qui."
+   }' --project-id 2103459437 --auth "Perspiciatis voluptate harum."
 `, os.Args[0])
 }
 
@@ -1080,7 +1110,7 @@ DeleteUpdate implements delete update.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project delete- update --project-id 1478536867 --update-id 7320540835494179007 --auth "Rem non nulla saepe."
+    `+os.Args[0]+` project delete- update --project-id 534940198 --update-id 34509814226429478 --auth "Sequi libero."
 `, os.Args[0])
 }
 
@@ -1095,8 +1125,8 @@ ModifyUpdate implements modify update.
 
 Example:
     `+os.Args[0]+` project modify- update --body '{
-      "body": "Ullam temporibus similique vel in et et."
-   }' --project-id 2124828878 --update-id 4856635416974905318 --auth "Laboriosam voluptas amet."
+      "body": "Aliquam tempora ullam temporibus similique vel in."
+   }' --project-id 1772008765 --update-id 1702348787103880863 --auth "Labore excepturi laboriosam voluptas."
 `, os.Args[0])
 }
 

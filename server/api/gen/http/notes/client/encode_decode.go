@@ -595,10 +595,15 @@ func marshalNotesFieldNoteUpdateToFieldNoteUpdateRequestBody(v *notes.FieldNoteU
 // *notes.ExistingFieldNote.
 func marshalNotesExistingFieldNoteToExistingFieldNoteRequestBody(v *notes.ExistingFieldNote) *ExistingFieldNoteRequestBody {
 	res := &ExistingFieldNoteRequestBody{
-		ID:      v.ID,
-		Key:     v.Key,
-		Body:    v.Body,
-		MediaID: v.MediaID,
+		ID:   v.ID,
+		Key:  v.Key,
+		Body: v.Body,
+	}
+	if v.MediaIds != nil {
+		res.MediaIds = make([]int64, len(v.MediaIds))
+		for i, val := range v.MediaIds {
+			res.MediaIds[i] = val
+		}
 	}
 
 	return res
@@ -608,9 +613,14 @@ func marshalNotesExistingFieldNoteToExistingFieldNoteRequestBody(v *notes.Existi
 // *NewFieldNoteRequestBody from a value of type *notes.NewFieldNote.
 func marshalNotesNewFieldNoteToNewFieldNoteRequestBody(v *notes.NewFieldNote) *NewFieldNoteRequestBody {
 	res := &NewFieldNoteRequestBody{
-		Key:     v.Key,
-		Body:    v.Body,
-		MediaID: v.MediaID,
+		Key:  v.Key,
+		Body: v.Body,
+	}
+	if v.MediaIds != nil {
+		res.MediaIds = make([]int64, len(v.MediaIds))
+		for i, val := range v.MediaIds {
+			res.MediaIds[i] = val
+		}
 	}
 
 	return res
@@ -641,10 +651,15 @@ func marshalFieldNoteUpdateRequestBodyToNotesFieldNoteUpdate(v *FieldNoteUpdateR
 // *ExistingFieldNoteRequestBody.
 func marshalExistingFieldNoteRequestBodyToNotesExistingFieldNote(v *ExistingFieldNoteRequestBody) *notes.ExistingFieldNote {
 	res := &notes.ExistingFieldNote{
-		ID:      v.ID,
-		Key:     v.Key,
-		Body:    v.Body,
-		MediaID: v.MediaID,
+		ID:   v.ID,
+		Key:  v.Key,
+		Body: v.Body,
+	}
+	if v.MediaIds != nil {
+		res.MediaIds = make([]int64, len(v.MediaIds))
+		for i, val := range v.MediaIds {
+			res.MediaIds[i] = val
+		}
 	}
 
 	return res
@@ -654,9 +669,14 @@ func marshalExistingFieldNoteRequestBodyToNotesExistingFieldNote(v *ExistingFiel
 // *notes.NewFieldNote from a value of type *NewFieldNoteRequestBody.
 func marshalNewFieldNoteRequestBodyToNotesNewFieldNote(v *NewFieldNoteRequestBody) *notes.NewFieldNote {
 	res := &notes.NewFieldNote{
-		Key:     v.Key,
-		Body:    v.Body,
-		MediaID: v.MediaID,
+		Key:  v.Key,
+		Body: v.Body,
+	}
+	if v.MediaIds != nil {
+		res.MediaIds = make([]int64, len(v.MediaIds))
+		for i, val := range v.MediaIds {
+			res.MediaIds[i] = val
+		}
 	}
 
 	return res
@@ -670,9 +690,14 @@ func unmarshalFieldNoteResponseBodyToNotesviewsFieldNoteView(v *FieldNoteRespons
 		CreatedAt: v.CreatedAt,
 		Key:       v.Key,
 		Body:      v.Body,
-		MediaID:   v.MediaID,
 	}
 	res.Author = unmarshalFieldNoteAuthorResponseBodyToNotesviewsFieldNoteAuthorView(v.Author)
+	if v.MediaIds != nil {
+		res.MediaIds = make([]int64, len(v.MediaIds))
+		for i, val := range v.MediaIds {
+			res.MediaIds[i] = val
+		}
+	}
 
 	return res
 }

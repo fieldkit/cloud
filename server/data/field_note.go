@@ -54,7 +54,11 @@ type Note struct {
 	StationID int32     `db:"station_id"`
 	Created   time.Time `db:"created_at"`
 	AuthorID  int32     `db:"author_id"`
-	MediaID   *int64    `db:"media_id"`
 	Key       *string   `db:"key"`
 	Body      *string   `db:"body"`
+}
+
+type NoteMediaLink struct {
+	NoteID  int64 `db:"note_id,omitempty"`
+	MediaID int64 `db:"media_id,omitempty"`
 }

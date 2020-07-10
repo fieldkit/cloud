@@ -92,16 +92,16 @@ type FieldNoteUpdate struct {
 }
 
 type ExistingFieldNote struct {
-	ID      int64
-	Key     *string
-	Body    *string
-	MediaID *int64
+	ID       int64
+	Key      *string
+	Body     *string
+	MediaIds []int64
 }
 
 type NewFieldNote struct {
-	Key     *string
-	Body    *string
-	MediaID *int64
+	Key      *string
+	Body     *string
+	MediaIds []int64
 }
 
 type FieldNote struct {
@@ -110,7 +110,7 @@ type FieldNote struct {
 	Author    *FieldNoteAuthor
 	Key       *string
 	Body      *string
-	MediaID   *int64
+	MediaIds  []int64
 }
 
 type FieldNoteAuthor struct {
@@ -255,10 +255,15 @@ func transformNotesviewsFieldNoteViewToFieldNote(v *notesviews.FieldNoteView) *F
 		CreatedAt: *v.CreatedAt,
 		Key:       v.Key,
 		Body:      v.Body,
-		MediaID:   v.MediaID,
 	}
 	if v.Author != nil {
 		res.Author = transformNotesviewsFieldNoteAuthorViewToFieldNoteAuthor(v.Author)
+	}
+	if v.MediaIds != nil {
+		res.MediaIds = make([]int64, len(v.MediaIds))
+		for i, val := range v.MediaIds {
+			res.MediaIds[i] = val
+		}
 	}
 
 	return res
@@ -284,10 +289,15 @@ func transformFieldNoteToNotesviewsFieldNoteView(v *FieldNote) *notesviews.Field
 		CreatedAt: &v.CreatedAt,
 		Key:       v.Key,
 		Body:      v.Body,
-		MediaID:   v.MediaID,
 	}
 	if v.Author != nil {
 		res.Author = transformFieldNoteAuthorToNotesviewsFieldNoteAuthorView(v.Author)
+	}
+	if v.MediaIds != nil {
+		res.MediaIds = make([]int64, len(v.MediaIds))
+		for i, val := range v.MediaIds {
+			res.MediaIds[i] = val
+		}
 	}
 
 	return res

@@ -39,7 +39,7 @@ type FieldNoteView struct {
 	Author    *FieldNoteAuthorView
 	Key       *string
 	Body      *string
-	MediaID   *int64
+	MediaIds  []int64
 }
 
 // FieldNoteAuthorView is a type that runs validations on a projected type.
