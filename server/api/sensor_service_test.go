@@ -92,6 +92,6 @@ func TestGetStationSensors(t *testing.T) {
 	ja := jsonassert.New(t)
 	ja.Assertf(rr.Body.String(), `
 	{
-		"stations": [ "<<PRESENCE>>" ],
+		"stations": "<<PRESENCE>>"
 	}`)
 }
