@@ -188,6 +188,8 @@ func ParseEndpoint(
 		notesMediaAuthFlag    = notesMediaFlags.String("auth", "REQUIRED", "")
 
 		notesUploadFlags             = flag.NewFlagSet("upload", flag.ExitOnError)
+		notesUploadStationIDFlag     = notesUploadFlags.String("station-id", "REQUIRED", "")
+		notesUploadKeyFlag           = notesUploadFlags.String("key", "REQUIRED", "")
 		notesUploadAuthFlag          = notesUploadFlags.String("auth", "REQUIRED", "")
 		notesUploadContentTypeFlag   = notesUploadFlags.String("content-type", "REQUIRED", "")
 		notesUploadContentLengthFlag = notesUploadFlags.String("content-length", "REQUIRED", "")
@@ -654,7 +656,7 @@ func ParseEndpoint(
 				data, err = notesc.BuildMediaPayload(*notesMediaMediaIDFlag, *notesMediaAuthFlag)
 			case "upload":
 				endpoint = c.Upload()
-				data, err = notesc.BuildUploadPayload(*notesUploadAuthFlag, *notesUploadContentTypeFlag, *notesUploadContentLengthFlag)
+				data, err = notesc.BuildUploadPayload(*notesUploadStationIDFlag, *notesUploadKeyFlag, *notesUploadAuthFlag, *notesUploadContentTypeFlag, *notesUploadContentLengthFlag)
 				if err == nil {
 					data, err = notesc.BuildUploadStreamPayload(data, *notesUploadStreamFlag)
 				}
@@ -1054,16 +1056,18 @@ Example:
 }
 
 func notesUploadUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] notes upload -auth STRING -content-type STRING -content-length INT64 -stream STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] notes upload -station-id INT32 -key STRING -auth STRING -content-type STRING -content-length INT64 -stream STRING
 
 Upload implements upload.
+    -station-id INT32: 
+    -key STRING: 
     -auth STRING: 
     -content-type STRING: 
     -content-length INT64: 
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` notes upload --auth "Distinctio reiciendis omnis quia." --content-type "Laborum vero odio fugit." --content-length 3631043144680936382 --stream "goa.png"
+    `+os.Args[0]+` notes upload --station-id 382191260 --key "Omnis quia." --auth "Laborum vero odio fugit." --content-type "Maxime totam sapiente eligendi quo quam." --content-length 56888755525650787 --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -1096,8 +1100,8 @@ AddUpdate implements add update.
 
 Example:
     `+os.Args[0]+` project add- update --body '{
-      "body": "Quia laboriosam qui."
-   }' --project-id 2103459437 --auth "Perspiciatis voluptate harum."
+      "body": "Eveniet dicta fuga atque maiores velit."
+   }' --project-id 1456668726 --auth "Ut placeat."
 `, os.Args[0])
 }
 
@@ -1110,7 +1114,7 @@ DeleteUpdate implements delete update.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project delete- update --project-id 534940198 --update-id 34509814226429478 --auth "Sequi libero."
+    `+os.Args[0]+` project delete- update --project-id 752568587 --update-id 2594112919068366228 --auth "Aperiam labore nemo corrupti et non suscipit."
 `, os.Args[0])
 }
 
@@ -1125,8 +1129,8 @@ ModifyUpdate implements modify update.
 
 Example:
     `+os.Args[0]+` project modify- update --body '{
-      "body": "Aliquam tempora ullam temporibus similique vel in."
-   }' --project-id 1772008765 --update-id 1702348787103880863 --auth "Labore excepturi laboriosam voluptas."
+      "body": "Repudiandae temporibus a facilis earum."
+   }' --project-id 1691611715 --update-id 8361274766535538976 --auth "Tenetur aliquid."
 `, os.Args[0])
 }
 
@@ -1137,7 +1141,7 @@ Invites implements invites.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project invites --auth "Exercitationem explicabo quis et omnis delectus sed."
+    `+os.Args[0]+` project invites --auth "Dolor aut non magni dignissimos."
 `, os.Args[0])
 }
 
@@ -1149,7 +1153,7 @@ LookupInvite implements lookup invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project lookup- invite --token "Aut molestias dolorem." --auth "Delectus hic quia omnis debitis beatae ut."
+    `+os.Args[0]+` project lookup- invite --token "Est laudantium eius deleniti quis voluptatem non." --auth "Nulla quod itaque facilis quasi aut."
 `, os.Args[0])
 }
 
@@ -1162,7 +1166,7 @@ AcceptInvite implements accept invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project accept- invite --id 3133245157041811244 --token "Placeat consequatur quaerat dolorem voluptas." --auth "Sunt ipsam ut porro."
+    `+os.Args[0]+` project accept- invite --id 8849660070720972928 --token "Unde ut repudiandae ab vel quia aut." --auth "Ut expedita eos nihil commodi expedita nostrum."
 `, os.Args[0])
 }
 
@@ -1175,7 +1179,7 @@ RejectInvite implements reject invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project reject- invite --id 7391350258137257305 --token "Commodi expedita." --auth "Officia modi consectetur at voluptatem."
+    `+os.Args[0]+` project reject- invite --id 7598215155383689861 --token "Accusamus odit quibusdam explicabo dolores consectetur non." --auth "Ab unde."
 `, os.Args[0])
 }
 
@@ -1216,7 +1220,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor data --start 2473855520066404219 --end 3911597715141922602 --stations "Aut delectus perferendis beatae pariatur sed." --sensors "Illo sapiente." --resolution 1177980330 --aggregate "Tempora et et similique in explicabo natus." --auth "Accusantium voluptatem iure et est provident."
+    `+os.Args[0]+` sensor data --start 1305916028401326816 --end 3648053334773642674 --stations "Molestiae dolor est aperiam molestiae quia." --sensors "Fugiat aspernatur dolor asperiores." --resolution 1729531005 --aggregate "Facilis hic ea incidunt saepe et." --auth "Et deserunt sequi est sunt qui."
 `, os.Args[0])
 }
 
@@ -1243,7 +1247,7 @@ DeviceLayout implements device layout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information device- layout --device-id "Ut quae sunt in officia perspiciatis maiores." --auth "Similique similique vel."
+    `+os.Args[0]+` information device- layout --device-id "Et vero aut qui." --auth "Dolor eveniet ipsum aperiam et eaque."
 `, os.Args[0])
 }
 
@@ -1254,7 +1258,7 @@ FirmwareStatistics implements firmware statistics.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information firmware- statistics --auth "Enim beatae."
+    `+os.Args[0]+` information firmware- statistics --auth "Eligendi repudiandae aut expedita iste."
 `, os.Args[0])
 }
 
@@ -1285,11 +1289,11 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` station add --body '{
-      "deviceId": "Sit nemo praesentium.",
-      "locationName": "Odit rerum officiis eius quas at.",
-      "name": "Odio et magnam fugiat.",
-      "statusPb": "Sed sunt ab voluptatem quibusdam iusto."
-   }' --auth "Ducimus omnis sit et."
+      "deviceId": "Odit rerum officiis eius quas at.",
+      "locationName": "Sed sunt ab voluptatem quibusdam iusto.",
+      "name": "Sit nemo praesentium.",
+      "statusPb": "Ducimus omnis sit et."
+   }' --auth "Eveniet illum."
 `, os.Args[0])
 }
 

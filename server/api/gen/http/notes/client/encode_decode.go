@@ -425,14 +425,19 @@ func DecodeMediaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 // set to call the "notes" service "upload" endpoint
 func (c *Client) BuildUploadRequest(ctx context.Context, v interface{}) (*http.Request, error) {
 	var (
-		body io.Reader
+		stationID int32
+		body      io.Reader
 	)
-	rd, ok := v.(*notes.UploadRequestData)
-	if !ok {
-		return nil, goahttp.ErrInvalidType("notes", "upload", "notes.UploadRequestData", v)
+	{
+		rd, ok := v.(*notes.UploadRequestData)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("notes", "upload", "notes.UploadRequestData", v)
+		}
+		p := rd.Payload
+		body = rd.Body
+		stationID = p.StationID
 	}
-	body = rd.Body
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UploadNotesPath()}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UploadNotesPath(stationID)}
 	req, err := http.NewRequest("POST", u.String(), body)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("notes", "upload", u.String(), err)
@@ -463,6 +468,7 @@ func EncodeUploadRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 			req.Header.Set("Content-Length", headStr)
 		}
 		values := req.URL.Query()
+		values.Add("key", p.Key)
 		values.Add("token", p.Auth)
 		req.URL.RawQuery = values.Encode()
 		return nil
@@ -692,11 +698,9 @@ func unmarshalFieldNoteResponseBodyToNotesviewsFieldNoteView(v *FieldNoteRespons
 		Body:      v.Body,
 	}
 	res.Author = unmarshalFieldNoteAuthorResponseBodyToNotesviewsFieldNoteAuthorView(v.Author)
-	if v.MediaIds != nil {
-		res.MediaIds = make([]int64, len(v.MediaIds))
-		for i, val := range v.MediaIds {
-			res.MediaIds[i] = val
-		}
+	res.Media = make([]*notesviews.NoteMediaView, len(v.Media))
+	for i, val := range v.Media {
+		res.Media[i] = unmarshalNoteMediaResponseBodyToNotesviewsNoteMediaView(val)
 	}
 
 	return res
@@ -710,6 +714,19 @@ func unmarshalFieldNoteAuthorResponseBodyToNotesviewsFieldNoteAuthorView(v *Fiel
 		ID:       v.ID,
 		Name:     v.Name,
 		MediaURL: v.MediaURL,
+	}
+
+	return res
+}
+
+// unmarshalNoteMediaResponseBodyToNotesviewsNoteMediaView builds a value of
+// type *notesviews.NoteMediaView from a value of type *NoteMediaResponseBody.
+func unmarshalNoteMediaResponseBodyToNotesviewsNoteMediaView(v *NoteMediaResponseBody) *notesviews.NoteMediaView {
+	res := &notesviews.NoteMediaView{
+		ID:          v.ID,
+		URL:         v.URL,
+		Key:         v.Key,
+		ContentType: v.ContentType,
 	}
 
 	return res

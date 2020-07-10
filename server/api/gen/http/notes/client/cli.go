@@ -110,8 +110,21 @@ func BuildMediaPayload(notesMediaMediaID string, notesMediaAuth string) (*notes.
 
 // BuildUploadPayload builds the payload for the notes upload endpoint from CLI
 // flags.
-func BuildUploadPayload(notesUploadAuth string, notesUploadContentType string, notesUploadContentLength string) (*notes.UploadPayload, error) {
+func BuildUploadPayload(notesUploadStationID string, notesUploadKey string, notesUploadAuth string, notesUploadContentType string, notesUploadContentLength string) (*notes.UploadPayload, error) {
 	var err error
+	var stationID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(notesUploadStationID, 10, 32)
+		stationID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for stationID, must be INT32")
+		}
+	}
+	var key string
+	{
+		key = notesUploadKey
+	}
 	var auth string
 	{
 		auth = notesUploadAuth
@@ -128,6 +141,8 @@ func BuildUploadPayload(notesUploadAuth string, notesUploadContentType string, n
 		}
 	}
 	v := &notes.UploadPayload{}
+	v.StationID = stationID
+	v.Key = key
 	v.Auth = auth
 	v.ContentType = contentType
 	v.ContentLength = contentLength

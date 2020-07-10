@@ -30,6 +30,7 @@ type NoteMedia struct {
 // FieldNotesView is a type that runs validations on a projected type.
 type FieldNotesView struct {
 	Notes []*FieldNoteView
+	Media []*NoteMediaView
 }
 
 // FieldNoteView is a type that runs validations on a projected type.
@@ -39,7 +40,7 @@ type FieldNoteView struct {
 	Author    *FieldNoteAuthorView
 	Key       *string
 	Body      *string
-	MediaIds  []int64
+	Media     []*NoteMediaView
 }
 
 // FieldNoteAuthorView is a type that runs validations on a projected type.
@@ -51,8 +52,10 @@ type FieldNoteAuthorView struct {
 
 // NoteMediaView is a type that runs validations on a projected type.
 type NoteMediaView struct {
-	ID  *int64
-	URL *string
+	ID          *int64
+	URL         *string
+	Key         *string
+	ContentType *string
 }
 
 var (
@@ -61,6 +64,7 @@ var (
 	FieldNotesMap = map[string][]string{
 		"default": []string{
 			"notes",
+			"media",
 		},
 	}
 	// NoteMediaMap is a map of attribute names in result type NoteMedia indexed by
@@ -69,6 +73,7 @@ var (
 		"default": []string{
 			"id",
 			"url",
+			"key",
 		},
 	}
 )
@@ -103,9 +108,19 @@ func ValidateFieldNotesView(result *FieldNotesView) (err error) {
 	if result.Notes == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("notes", "result"))
 	}
+	if result.Media == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("media", "result"))
+	}
 	for _, e := range result.Notes {
 		if e != nil {
 			if err2 := ValidateFieldNoteView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range result.Media {
+		if e != nil {
+			if err2 := ValidateNoteMediaView(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
 		}
@@ -124,9 +139,19 @@ func ValidateFieldNoteView(result *FieldNoteView) (err error) {
 	if result.Author == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("author", "result"))
 	}
+	if result.Media == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("media", "result"))
+	}
 	if result.Author != nil {
 		if err2 := ValidateFieldNoteAuthorView(result.Author); err2 != nil {
 			err = goa.MergeErrors(err, err2)
+		}
+	}
+	for _, e := range result.Media {
+		if e != nil {
+			if err2 := ValidateNoteMediaView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
 	return
@@ -155,6 +180,9 @@ func ValidateNoteMediaView(result *NoteMediaView) (err error) {
 	}
 	if result.URL == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("url", "result"))
+	}
+	if result.Key == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("key", "result"))
 	}
 	return
 }

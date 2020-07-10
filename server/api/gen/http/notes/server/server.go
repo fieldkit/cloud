@@ -65,10 +65,10 @@ func New(
 			{"Update", "PATCH", "/stations/{stationId}/notes"},
 			{"Get", "GET", "/stations/{stationId}/notes"},
 			{"Media", "GET", "/notes/media/{mediaId}"},
-			{"Upload", "POST", "/notes/media"},
+			{"Upload", "POST", "/stations/{stationId}/media"},
 			{"CORS", "OPTIONS", "/stations/{stationId}/notes"},
 			{"CORS", "OPTIONS", "/notes/media/{mediaId}"},
-			{"CORS", "OPTIONS", "/notes/media"},
+			{"CORS", "OPTIONS", "/stations/{stationId}/media"},
 		},
 		Update: NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
 		Get:    NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
@@ -269,7 +269,7 @@ func MountUploadHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/notes/media", f)
+	mux.Handle("POST", "/stations/{stationId}/media", f)
 }
 
 // NewUploadHandler creates a HTTP handler which loads the HTTP request and
@@ -324,7 +324,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	}
 	mux.Handle("OPTIONS", "/stations/{stationId}/notes", f)
 	mux.Handle("OPTIONS", "/notes/media/{mediaId}", f)
-	mux.Handle("OPTIONS", "/notes/media", f)
+	mux.Handle("OPTIONS", "/stations/{stationId}/media", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

@@ -27,6 +27,6 @@ func MediaNotesPath(mediaID int32) string {
 }
 
 // UploadNotesPath returns the URL path to the notes service upload HTTP endpoint.
-func UploadNotesPath() string {
-	return "/notes/media"
+func UploadNotesPath(stationID int32) string {
+	return fmt.Sprintf("/stations/%v/media", stationID)
 }

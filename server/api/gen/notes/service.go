@@ -53,6 +53,7 @@ type UpdatePayload struct {
 // FieldNotes is the result type of the notes service update method.
 type FieldNotes struct {
 	Notes []*FieldNote
+	Media []*NoteMedia
 }
 
 // GetPayload is the payload type of the notes service get method.
@@ -78,12 +79,16 @@ type UploadPayload struct {
 	Auth          string
 	ContentLength int64
 	ContentType   string
+	StationID     int32
+	Key           string
 }
 
 // NoteMedia is the result type of the notes service upload method.
 type NoteMedia struct {
-	ID  int64
-	URL string
+	ID          int64
+	URL         string
+	Key         string
+	ContentType string
 }
 
 type FieldNoteUpdate struct {
@@ -110,7 +115,7 @@ type FieldNote struct {
 	Author    *FieldNoteAuthor
 	Key       *string
 	Body      *string
-	MediaIds  []int64
+	Media     []*NoteMedia
 }
 
 type FieldNoteAuthor struct {
@@ -206,6 +211,12 @@ func newFieldNotes(vres *notesviews.FieldNotesView) *FieldNotes {
 			res.Notes[i] = transformNotesviewsFieldNoteViewToFieldNote(val)
 		}
 	}
+	if vres.Media != nil {
+		res.Media = make([]*NoteMedia, len(vres.Media))
+		for i, val := range vres.Media {
+			res.Media[i] = transformNotesviewsNoteMediaViewToNoteMedia(val)
+		}
+	}
 	return res
 }
 
@@ -217,6 +228,12 @@ func newFieldNotesView(res *FieldNotes) *notesviews.FieldNotesView {
 		vres.Notes = make([]*notesviews.FieldNoteView, len(res.Notes))
 		for i, val := range res.Notes {
 			vres.Notes[i] = transformFieldNoteToNotesviewsFieldNoteView(val)
+		}
+	}
+	if res.Media != nil {
+		vres.Media = make([]*notesviews.NoteMediaView, len(res.Media))
+		for i, val := range res.Media {
+			vres.Media[i] = transformNoteMediaToNotesviewsNoteMediaView(val)
 		}
 	}
 	return vres
@@ -231,6 +248,9 @@ func newNoteMedia(vres *notesviews.NoteMediaView) *NoteMedia {
 	if vres.URL != nil {
 		res.URL = *vres.URL
 	}
+	if vres.Key != nil {
+		res.Key = *vres.Key
+	}
 	return res
 }
 
@@ -240,6 +260,7 @@ func newNoteMediaView(res *NoteMedia) *notesviews.NoteMediaView {
 	vres := &notesviews.NoteMediaView{
 		ID:  &res.ID,
 		URL: &res.URL,
+		Key: &res.Key,
 	}
 	return vres
 }
@@ -259,10 +280,10 @@ func transformNotesviewsFieldNoteViewToFieldNote(v *notesviews.FieldNoteView) *F
 	if v.Author != nil {
 		res.Author = transformNotesviewsFieldNoteAuthorViewToFieldNoteAuthor(v.Author)
 	}
-	if v.MediaIds != nil {
-		res.MediaIds = make([]int64, len(v.MediaIds))
-		for i, val := range v.MediaIds {
-			res.MediaIds[i] = val
+	if v.Media != nil {
+		res.Media = make([]*NoteMedia, len(v.Media))
+		for i, val := range v.Media {
+			res.Media[i] = transformNotesviewsNoteMediaViewToNoteMedia(val)
 		}
 	}
 
@@ -281,6 +302,19 @@ func transformNotesviewsFieldNoteAuthorViewToFieldNoteAuthor(v *notesviews.Field
 	return res
 }
 
+// transformNotesviewsNoteMediaViewToNoteMedia builds a value of type
+// *NoteMedia from a value of type *notesviews.NoteMediaView.
+func transformNotesviewsNoteMediaViewToNoteMedia(v *notesviews.NoteMediaView) *NoteMedia {
+	res := &NoteMedia{
+		ID:          *v.ID,
+		URL:         *v.URL,
+		Key:         *v.Key,
+		ContentType: *v.ContentType,
+	}
+
+	return res
+}
+
 // transformFieldNoteToNotesviewsFieldNoteView builds a value of type
 // *notesviews.FieldNoteView from a value of type *FieldNote.
 func transformFieldNoteToNotesviewsFieldNoteView(v *FieldNote) *notesviews.FieldNoteView {
@@ -293,10 +327,10 @@ func transformFieldNoteToNotesviewsFieldNoteView(v *FieldNote) *notesviews.Field
 	if v.Author != nil {
 		res.Author = transformFieldNoteAuthorToNotesviewsFieldNoteAuthorView(v.Author)
 	}
-	if v.MediaIds != nil {
-		res.MediaIds = make([]int64, len(v.MediaIds))
-		for i, val := range v.MediaIds {
-			res.MediaIds[i] = val
+	if v.Media != nil {
+		res.Media = make([]*notesviews.NoteMediaView, len(v.Media))
+		for i, val := range v.Media {
+			res.Media[i] = transformNoteMediaToNotesviewsNoteMediaView(val)
 		}
 	}
 
@@ -310,6 +344,19 @@ func transformFieldNoteAuthorToNotesviewsFieldNoteAuthorView(v *FieldNoteAuthor)
 		ID:       &v.ID,
 		Name:     &v.Name,
 		MediaURL: &v.MediaURL,
+	}
+
+	return res
+}
+
+// transformNoteMediaToNotesviewsNoteMediaView builds a value of type
+// *notesviews.NoteMediaView from a value of type *NoteMedia.
+func transformNoteMediaToNotesviewsNoteMediaView(v *NoteMedia) *notesviews.NoteMediaView {
+	res := &notesviews.NoteMediaView{
+		ID:          &v.ID,
+		URL:         &v.URL,
+		Key:         &v.Key,
+		ContentType: &v.ContentType,
 	}
 
 	return res

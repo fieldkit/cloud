@@ -32,20 +32,22 @@ type FieldNoteCategory struct {
 	Name string `db:"name"`
 }
 
-type FieldNoteMedia struct {
-	ID          int64     `db:"id,omitempty"`
-	UserID      int32     `db:"user_id"`
-	ContentType string    `db:"content_type"`
-	Created     time.Time `db:"created"`
-	URL         string    `db:"url"`
-}
-
 type MediaForStation struct {
 	ID          int32     `db:"id,omitempty"`
 	StationID   int32     `db:"station_id"`
 	UserID      int32     `db:"user_id"`
 	ContentType string    `db:"content_type"`
 	Created     time.Time `db:"created"`
+	URL         string    `db:"url"`
+}
+
+type FieldNoteMedia struct {
+	ID          int64     `db:"id,omitempty"`
+	StationID   int32     `db:"station_id"`
+	UserID      int32     `db:"user_id"`
+	ContentType string    `db:"content_type"`
+	Created     time.Time `db:"created"`
+	Key         string    `db:"key"`
 	URL         string    `db:"url"`
 }
 

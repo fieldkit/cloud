@@ -9,11 +9,14 @@ var NoteMedia = ResultType("application/vnd.app.note.media", func() {
 	Attributes(func() {
 		Attribute("id", Int64)
 		Attribute("url", String)
-		Required("id", "url")
+		Attribute("key", String)
+		Attribute("contentType", String)
+		Required("id", "url", "key", "contentType")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("url")
+		Attribute("key")
 	})
 })
 
@@ -30,8 +33,8 @@ var FieldNote = Type("FieldNote", func() {
 	Attribute("author", FieldNoteAuthor)
 	Attribute("key", String)
 	Attribute("body", String)
-	Attribute("mediaIds", ArrayOf(Int64))
-	Required("id", "createdAt", "author")
+	Attribute("media", ArrayOf(NoteMedia))
+	Required("id", "createdAt", "author", "media")
 })
 
 var ExistingFieldNote = Type("ExistingFieldNote", func() {
@@ -67,9 +70,12 @@ var StationFieldNotes = ResultType("application/vnd.app.notes", func() {
 	Attributes(func() {
 		Attribute("notes", ArrayOf(FieldNote))
 		Required("notes")
+		Attribute("media", ArrayOf(NoteMedia))
+		Required("media")
 	})
 	View("default", func() {
 		Attribute("notes")
+		Attribute("media")
 	})
 })
 
@@ -163,15 +169,23 @@ var _ = Service("notes", func() {
 			Required("contentLength")
 			Attribute("contentType", String)
 			Required("contentType")
+			Attribute("stationId", Int32)
+			Required("stationId")
+			Attribute("key", String)
+			Required("key")
 		})
 
 		Result(NoteMedia)
 
 		HTTP(func() {
-			POST("notes/media")
+			POST("stations/{stationId}/media")
 
 			Header("contentType:Content-Type")
 			Header("contentLength:Content-Length")
+
+			Params(func() {
+				Param("key")
+			})
 
 			SkipRequestBodyEncodeDecode()
 

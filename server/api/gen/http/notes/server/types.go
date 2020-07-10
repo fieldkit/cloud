@@ -23,12 +23,14 @@ type UpdateRequestBody struct {
 // response body.
 type UpdateResponseBody struct {
 	Notes []*FieldNoteResponseBody `form:"notes" json:"notes" xml:"notes"`
+	Media []*NoteMediaResponseBody `form:"media" json:"media" xml:"media"`
 }
 
 // GetResponseBody is the type of the "notes" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
 	Notes []*FieldNoteResponseBody `form:"notes" json:"notes" xml:"notes"`
+	Media []*NoteMediaResponseBody `form:"media" json:"media" xml:"media"`
 }
 
 // UploadResponseBody is the type of the "notes" service "upload" endpoint HTTP
@@ -36,6 +38,7 @@ type GetResponseBody struct {
 type UploadResponseBody struct {
 	ID  int64  `form:"id" json:"id" xml:"id"`
 	URL string `form:"url" json:"url" xml:"url"`
+	Key string `form:"key" json:"key" xml:"key"`
 }
 
 // UpdateBadRequestResponseBody is the type of the "notes" service "update"
@@ -109,7 +112,7 @@ type FieldNoteResponseBody struct {
 	Author    *FieldNoteAuthorResponseBody `form:"author" json:"author" xml:"author"`
 	Key       *string                      `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	Body      *string                      `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-	MediaIds  []int64                      `form:"mediaIds,omitempty" json:"mediaIds,omitempty" xml:"mediaIds,omitempty"`
+	Media     []*NoteMediaResponseBody     `form:"media" json:"media" xml:"media"`
 }
 
 // FieldNoteAuthorResponseBody is used to define fields on response body types.
@@ -117,6 +120,14 @@ type FieldNoteAuthorResponseBody struct {
 	ID       int32  `form:"id" json:"id" xml:"id"`
 	Name     string `form:"name" json:"name" xml:"name"`
 	MediaURL string `form:"mediaUrl" json:"mediaUrl" xml:"mediaUrl"`
+}
+
+// NoteMediaResponseBody is used to define fields on response body types.
+type NoteMediaResponseBody struct {
+	ID          int64  `form:"id" json:"id" xml:"id"`
+	URL         string `form:"url" json:"url" xml:"url"`
+	Key         string `form:"key" json:"key" xml:"key"`
+	ContentType string `form:"contentType" json:"contentType" xml:"contentType"`
 }
 
 // FieldNoteUpdateRequestBody is used to define fields on request body types.
@@ -150,6 +161,12 @@ func NewUpdateResponseBody(res *notesviews.FieldNotesView) *UpdateResponseBody {
 			body.Notes[i] = marshalNotesviewsFieldNoteViewToFieldNoteResponseBody(val)
 		}
 	}
+	if res.Media != nil {
+		body.Media = make([]*NoteMediaResponseBody, len(res.Media))
+		for i, val := range res.Media {
+			body.Media[i] = marshalNotesviewsNoteMediaViewToNoteMediaResponseBody(val)
+		}
+	}
 	return body
 }
 
@@ -163,6 +180,12 @@ func NewGetResponseBody(res *notesviews.FieldNotesView) *GetResponseBody {
 			body.Notes[i] = marshalNotesviewsFieldNoteViewToFieldNoteResponseBody(val)
 		}
 	}
+	if res.Media != nil {
+		body.Media = make([]*NoteMediaResponseBody, len(res.Media))
+		for i, val := range res.Media {
+			body.Media[i] = marshalNotesviewsNoteMediaViewToNoteMediaResponseBody(val)
+		}
+	}
 	return body
 }
 
@@ -172,6 +195,7 @@ func NewUploadResponseBody(res *notesviews.NoteMediaView) *UploadResponseBody {
 	body := &UploadResponseBody{
 		ID:  *res.ID,
 		URL: *res.URL,
+		Key: *res.Key,
 	}
 	return body
 }
@@ -317,8 +341,10 @@ func NewMediaPayload(mediaID int32, auth string) *notes.MediaPayload {
 }
 
 // NewUploadPayload builds a notes service upload endpoint payload.
-func NewUploadPayload(auth string, contentType string, contentLength int64) *notes.UploadPayload {
+func NewUploadPayload(stationID int32, key string, auth string, contentType string, contentLength int64) *notes.UploadPayload {
 	v := &notes.UploadPayload{}
+	v.StationID = stationID
+	v.Key = key
 	v.Auth = auth
 	v.ContentType = contentType
 	v.ContentLength = contentLength

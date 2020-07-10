@@ -23,19 +23,23 @@ type UpdateRequestBody struct {
 // response body.
 type UpdateResponseBody struct {
 	Notes []*FieldNoteResponseBody `form:"notes,omitempty" json:"notes,omitempty" xml:"notes,omitempty"`
+	Media []*NoteMediaResponseBody `form:"media,omitempty" json:"media,omitempty" xml:"media,omitempty"`
 }
 
 // GetResponseBody is the type of the "notes" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
 	Notes []*FieldNoteResponseBody `form:"notes,omitempty" json:"notes,omitempty" xml:"notes,omitempty"`
+	Media []*NoteMediaResponseBody `form:"media,omitempty" json:"media,omitempty" xml:"media,omitempty"`
 }
 
 // UploadResponseBody is the type of the "notes" service "upload" endpoint HTTP
 // response body.
 type UploadResponseBody struct {
-	ID  *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	URL *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	ID          *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	URL         *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	Key         *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	ContentType *string `form:"contentType,omitempty" json:"contentType,omitempty" xml:"contentType,omitempty"`
 }
 
 // UpdateBadRequestResponseBody is the type of the "notes" service "update"
@@ -130,7 +134,7 @@ type FieldNoteResponseBody struct {
 	Author    *FieldNoteAuthorResponseBody `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	Key       *string                      `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	Body      *string                      `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-	MediaIds  []int64                      `form:"mediaIds,omitempty" json:"mediaIds,omitempty" xml:"mediaIds,omitempty"`
+	Media     []*NoteMediaResponseBody     `form:"media,omitempty" json:"media,omitempty" xml:"media,omitempty"`
 }
 
 // FieldNoteAuthorResponseBody is used to define fields on response body types.
@@ -138,6 +142,14 @@ type FieldNoteAuthorResponseBody struct {
 	ID       *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name     *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	MediaURL *string `form:"mediaUrl,omitempty" json:"mediaUrl,omitempty" xml:"mediaUrl,omitempty"`
+}
+
+// NoteMediaResponseBody is used to define fields on response body types.
+type NoteMediaResponseBody struct {
+	ID          *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	URL         *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	Key         *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	ContentType *string `form:"contentType,omitempty" json:"contentType,omitempty" xml:"contentType,omitempty"`
 }
 
 // NewUpdateRequestBody builds the HTTP request body from the payload of the
@@ -157,6 +169,10 @@ func NewUpdateFieldNotesOK(body *UpdateResponseBody) *notesviews.FieldNotesView 
 	v.Notes = make([]*notesviews.FieldNoteView, len(body.Notes))
 	for i, val := range body.Notes {
 		v.Notes[i] = unmarshalFieldNoteResponseBodyToNotesviewsFieldNoteView(val)
+	}
+	v.Media = make([]*notesviews.NoteMediaView, len(body.Media))
+	for i, val := range body.Media {
+		v.Media[i] = unmarshalNoteMediaResponseBodyToNotesviewsNoteMediaView(val)
 	}
 
 	return v
@@ -194,6 +210,10 @@ func NewGetFieldNotesOK(body *GetResponseBody) *notesviews.FieldNotesView {
 	v.Notes = make([]*notesviews.FieldNoteView, len(body.Notes))
 	for i, val := range body.Notes {
 		v.Notes[i] = unmarshalFieldNoteResponseBodyToNotesviewsFieldNoteView(val)
+	}
+	v.Media = make([]*notesviews.NoteMediaView, len(body.Media))
+	for i, val := range body.Media {
+		v.Media[i] = unmarshalNoteMediaResponseBodyToNotesviewsNoteMediaView(val)
 	}
 
 	return v
@@ -262,8 +282,10 @@ func NewMediaUnauthorized(body MediaUnauthorizedResponseBody) notes.Unauthorized
 // a HTTP "OK" response.
 func NewUploadNoteMediaOK(body *UploadResponseBody) *notesviews.NoteMediaView {
 	v := &notesviews.NoteMediaView{
-		ID:  body.ID,
-		URL: body.URL,
+		ID:          body.ID,
+		URL:         body.URL,
+		Key:         body.Key,
+		ContentType: body.ContentType,
 	}
 
 	return v
@@ -318,9 +340,19 @@ func ValidateFieldNoteResponseBody(body *FieldNoteResponseBody) (err error) {
 	if body.Author == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
 	}
+	if body.Media == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("media", "body"))
+	}
 	if body.Author != nil {
 		if err2 := ValidateFieldNoteAuthorResponseBody(body.Author); err2 != nil {
 			err = goa.MergeErrors(err, err2)
+		}
+	}
+	for _, e := range body.Media {
+		if e != nil {
+			if err2 := ValidateNoteMediaResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
 	return
@@ -337,6 +369,24 @@ func ValidateFieldNoteAuthorResponseBody(body *FieldNoteAuthorResponseBody) (err
 	}
 	if body.MediaURL == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("mediaUrl", "body"))
+	}
+	return
+}
+
+// ValidateNoteMediaResponseBody runs the validations defined on
+// NoteMediaResponseBody
+func ValidateNoteMediaResponseBody(body *NoteMediaResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.URL == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("url", "body"))
+	}
+	if body.Key == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("key", "body"))
+	}
+	if body.ContentType == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("contentType", "body"))
 	}
 	return
 }

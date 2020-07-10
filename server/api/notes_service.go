@@ -103,6 +103,11 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 	})
 }
 
+type NoteMediaWithNoteID struct {
+	NoteID int64 `db:"note_id,omitempty"`
+	data.FieldNoteMedia
+}
+
 func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*notes.FieldNotes, error) {
 	allAuthors := []*data.User{}
 	if err := s.options.Database.SelectContext(ctx, &allAuthors, `
@@ -122,9 +127,13 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 		}
 	}
 
-	allNoteMedias := []*data.NoteMediaLink{}
+	allNoteMedias := []*NoteMediaWithNoteID{}
 	if err := s.options.Database.SelectContext(ctx, &allNoteMedias, `
-		SELECT l.* FROM fieldkit.notes_media_link AS l JOIN fieldkit.notes AS n ON (n.id = l.note_id) WHERE n.station_id = $1 ORDER BY n.created_at DESC
+		SELECT m.*
+		FROM fieldkit.notes_media AS m
+		JOIN fieldkit.notes_media_link AS l ON (m.id = l.media_id)
+		JOIN fieldkit.notes AS n ON (n.id = l.note_id)
+		WHERE n.station_id = $1 ORDER BY n.created_at DESC
 		`, payload.StationID); err != nil {
 		return nil, err
 	}
@@ -138,15 +147,22 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 
 	webNotes := make([]*notes.FieldNote, 0)
 	for _, n := range allNotes {
-		mediaIDs := make([]int64, 0)
-		for _, nml := range allNoteMedias {
-			mediaIDs = append(mediaIDs, nml.MediaID)
+		media := make([]*notes.NoteMedia, 0)
+		for _, nm := range allNoteMedias {
+			if nm.NoteID == n.ID {
+				media = append(media, &notes.NoteMedia{
+					ID:          nm.ID,
+					ContentType: nm.ContentType,
+					URL:         nm.URL,
+					Key:         nm.Key,
+				})
+			}
 		}
 		webNotes = append(webNotes, &notes.FieldNote{
 			ID:        n.ID,
 			CreatedAt: n.Created.Unix() * 1000,
 			Author:    byID[n.AuthorID],
-			MediaIds:  mediaIDs,
+			Media:     media,
 			Key:       n.Key,
 			Body:      n.Body,
 		})
@@ -192,20 +208,25 @@ func (s *NotesService) Upload(ctx context.Context, payload *notes.UploadPayload,
 
 	media := &data.FieldNoteMedia{
 		Created:     time.Now(),
+		StationID:   payload.StationID,
 		UserID:      p.UserID(),
 		ContentType: saved.MimeType,
 		URL:         saved.URL,
+		Key:         payload.Key,
 	}
 
 	if err := s.options.Database.NamedGetContext(ctx, media, `
-		INSERT INTO fieldkit.notes_media (user_id, content_type, created, url) VALUES (:user_id, :content_type, :created, :url) RETURNING *
+		INSERT INTO fieldkit.notes_media (user_id, station_id, content_type, created, url, key)
+		VALUES (:user_id, :station_id, :content_type, :created, :url, :key) RETURNING *
 		`, media); err != nil {
 		return nil, err
 	}
 
 	return &notes.NoteMedia{
-		ID:  media.ID,
-		URL: fmt.Sprintf("/notes/media/%d", media.ID),
+		ID:          media.ID,
+		Key:         media.Key,
+		ContentType: media.ContentType,
+		URL:         fmt.Sprintf("/notes/media/%d", media.ID),
 	}, nil
 }
 

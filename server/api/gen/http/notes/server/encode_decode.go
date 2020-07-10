@@ -393,11 +393,27 @@ func EncodeUploadResponse(encoder func(context.Context, http.ResponseWriter) goa
 func DecodeUploadRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
+			stationID     int32
+			key           string
 			auth          string
 			contentType   string
 			contentLength int64
 			err           error
+
+			params = mux.Vars(r)
 		)
+		{
+			stationIDRaw := params["stationId"]
+			v, err2 := strconv.ParseInt(stationIDRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("stationID", stationIDRaw, "integer"))
+			}
+			stationID = int32(v)
+		}
+		key = r.URL.Query().Get("key")
+		if key == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("key", "query string"))
+		}
 		auth = r.URL.Query().Get("token")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("token", "query string"))
@@ -420,7 +436,7 @@ func DecodeUploadRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 		if err != nil {
 			return nil, err
 		}
-		payload := NewUploadPayload(auth, contentType, contentLength)
+		payload := NewUploadPayload(stationID, key, auth, contentType, contentLength)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
@@ -559,10 +575,10 @@ func marshalNotesviewsFieldNoteViewToFieldNoteResponseBody(v *notesviews.FieldNo
 	if v.Author != nil {
 		res.Author = marshalNotesviewsFieldNoteAuthorViewToFieldNoteAuthorResponseBody(v.Author)
 	}
-	if v.MediaIds != nil {
-		res.MediaIds = make([]int64, len(v.MediaIds))
-		for i, val := range v.MediaIds {
-			res.MediaIds[i] = val
+	if v.Media != nil {
+		res.Media = make([]*NoteMediaResponseBody, len(v.Media))
+		for i, val := range v.Media {
+			res.Media[i] = marshalNotesviewsNoteMediaViewToNoteMediaResponseBody(val)
 		}
 	}
 
@@ -577,6 +593,19 @@ func marshalNotesviewsFieldNoteAuthorViewToFieldNoteAuthorResponseBody(v *notesv
 		ID:       *v.ID,
 		Name:     *v.Name,
 		MediaURL: *v.MediaURL,
+	}
+
+	return res
+}
+
+// marshalNotesviewsNoteMediaViewToNoteMediaResponseBody builds a value of type
+// *NoteMediaResponseBody from a value of type *notesviews.NoteMediaView.
+func marshalNotesviewsNoteMediaViewToNoteMediaResponseBody(v *notesviews.NoteMediaView) *NoteMediaResponseBody {
+	res := &NoteMediaResponseBody{
+		ID:          *v.ID,
+		URL:         *v.URL,
+		Key:         *v.Key,
+		ContentType: *v.ContentType,
 	}
 
 	return res
