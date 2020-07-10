@@ -2,7 +2,7 @@ import _ from "lodash";
 import Vue from "vue";
 
 import { TimeRange } from "./common";
-import { Workspace, Group, Viz, TreeOption, FastTime, ChartType } from "./viz";
+import { Workspace, Group, Viz, TreeOption, FastTime, ChartType, TimeZoom } from "./viz";
 import { VizGroup } from "./VizGroup";
 
 export const VizWorkspace = Vue.extend({
@@ -23,13 +23,13 @@ export const VizWorkspace = Vue.extend({
         return this.workspace.query();
     },
     methods: {
-        onGroupTimeZoomed(group: Group, times: TimeRange) {
-            group.log("zooming", times.toArray());
-            return this.workspace.groupZoomed(group, times).query();
+        onGroupTimeZoomed(group: Group, zoom: TimeZoom) {
+            group.log("zooming", zoom);
+            return this.workspace.groupZoomed(group, zoom).query();
         },
-        onGraphTimeZoomed(group: Group, viz: Viz, times: TimeRange) {
-            viz.log("zooming", times.toArray());
-            return this.workspace.graphZoomed(viz, times).query();
+        onGraphTimeZoomed(group: Group, viz: Viz, zoom: TimeZoom) {
+            viz.log("zooming", zoom);
+            return this.workspace.graphZoomed(viz, zoom).query();
         },
         onRemove(group: Group, viz: Viz) {
             viz.log("removing");
@@ -38,10 +38,6 @@ export const VizWorkspace = Vue.extend({
         onCompare(group: Group, viz: Viz) {
             viz.log("compare");
             return this.workspace.compare(viz).query();
-        },
-        onFastTime(group: Group, viz: Viz, fastTime: FastTime) {
-            viz.log("fast-time", fastTime);
-            return this.workspace.fastTime(viz, fastTime).query();
         },
         onChangeSensors(group: Group, viz: Viz, option: TreeOption) {
             viz.log("sensors", option);
@@ -60,7 +56,6 @@ export const VizWorkspace = Vue.extend({
 					@viz-time-zoomed="(...args) => onGraphTimeZoomed(group, ...args)"
 					@viz-remove="(...args) => onRemove(group, ...args)"
 					@viz-compare="(...args) => onCompare(group, ...args)"
-					@viz-fast-time="(...args) => onFastTime(group, ...args)"
 					@viz-change-sensors="(...args) => onChangeSensors(group, ...args)"
 					@viz-change-chart="(...args) => onChangeChart(group, ...args)"
 				/>

@@ -2,8 +2,8 @@ import _ from "lodash";
 import Vue from "vue";
 import * as d3 from "d3";
 
-import { Time, TimeRange, Margins, ChartLayout } from "./common";
-import { QueriedData, Scrubbers } from "./viz";
+import { TimeRange, Margins, ChartLayout } from "./common";
+import { QueriedData, Scrubbers, TimeZoom } from "./viz";
 
 export const D3MultiScrubber = Vue.extend({
     name: "D3MultiScrubber",
@@ -43,7 +43,7 @@ export const D3MultiScrubber = Vue.extend({
     },
     methods: {
         raiseTimeZoomed(newTimes) {
-            return this.$emit("viz-time-zoomed", newTimes);
+            return this.$emit("viz-time-zoomed", new TimeZoom(null, newTimes));
         },
         refresh() {
             if (!this.data || this.data.length == 0) {

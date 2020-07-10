@@ -5,7 +5,7 @@ import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 import { TimeRange } from "./common";
-import { Graph, QueriedData, Workspace, FastTime, ChartType } from "./viz";
+import { Graph, QueriedData, Workspace, FastTime, TimeZoom, ChartType } from "./viz";
 
 export const ViewingControls = Vue.extend({
     name: "ViewingControls",
@@ -71,9 +71,9 @@ export const ViewingControls = Vue.extend({
             console.log("raising viz-remove");
             return this.$emit("viz-remove");
         },
-        raiseFastTime(ev, ...args) {
-            console.log("raising viz-fast-time");
-            return this.$emit("viz-fast-time", ...args);
+        raiseFastTime(ev, fast: FastTime, ...args) {
+            console.log("raising viz-time-zoomed");
+            return this.$emit("viz-time-zoomed", new TimeZoom(fast, null));
         },
         raiseChangeSensors(node, ...args) {
             console.log("raising viz-change-sensors");

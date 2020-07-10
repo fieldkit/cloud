@@ -2,7 +2,7 @@ import _ from "lodash";
 import Vue from "vue";
 
 import { TimeRange } from "./common";
-import { Workspace, Viz, Group } from "./viz";
+import { Workspace, Viz, Group, TimeZoom } from "./viz";
 import { VizGraph } from "./VizGraph";
 import { D3MultiScrubber } from "./D3MultiScrubber";
 
@@ -28,8 +28,8 @@ export const VizGroup = Vue.extend({
         uiNameOf(viz: Viz) {
             return "Viz" + viz.constructor.name;
         },
-        raiseGroupZoomed(newTimes: TimeRange) {
-            return this.$emit("group-time-zoomed", newTimes);
+        raiseGroupZoomed(range: TimeRange, ...args) {
+            return this.$emit("group-time-zoomed", new TimeZoom(null, range), ...args);
         },
         raiseVizTimeZoomed(...args) {
             return this.$emit("viz-time-zoomed", ...args);
@@ -39,9 +39,6 @@ export const VizGroup = Vue.extend({
         },
         raiseCompare(...args) {
             return this.$emit("viz-compare", ...args);
-        },
-        raiseFastTime(...args) {
-            return this.$emit("viz-fast-time", ...args);
         },
         raiseChangeSensors(...args) {
             return this.$emit("viz-change-sensors", ...args);
@@ -59,7 +56,6 @@ export const VizGroup = Vue.extend({
 				@viz-time-zoomed="(...args) => raiseVizTimeZoomed(viz, ...args)"
 				@viz-remove="(...args) => raiseRemove(viz, ...args)"
 				@viz-compare="(...args) => raiseCompare(viz, ...args)"
-				@viz-fast-time="(...args) => raiseFastTime(viz, ...args)"
 				@viz-change-sensors="(...args) => raiseChangeSensors(viz, ...args)"
 				@viz-change-chart="(...args) => raiseChangeChart(viz, ...args)"
 				/>

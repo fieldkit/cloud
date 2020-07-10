@@ -153,30 +153,32 @@ export class Graph extends Viz {
         return new Graph(this.info, this.params);
     }
 
-    public zoomed(range: TimeRange) {
-        this.visible = range;
-        this.fastTime = FastTime.Custom;
-        this.params = new DataQueryParams(range, this.params.stations, this.params.sensors);
+    public zoomed(zoom: TimeZoom): TimeRange {
+        if (zoom.range) {
+            this.visible = zoom.range;
+            this.fastTime = FastTime.Custom;
+        } else {
+            this.visible = this.getFastRange(zoom.fast);
+            this.fastTime = zoom.fast;
+        }
+
+        this.params = new DataQueryParams(this.visible, this.params.stations, this.params.sensors);
+
+        return this.visible;
     }
 
-    public useFastTime(fastTime: FastTime) {
+    private getFastRange(fastTime: FastTime) {
         if (!this.all) throw new Error("fast time missing all data");
 
-        const calculate = () => {
-            const sensorRange = this.all.timeRange;
-            if (fastTime == FastTime.All) {
-                return new TimeRange(sensorRange[0], sensorRange[1]);
-            } else {
-                const days = fastTime as number;
-                const start = new Date(sensorRange[1]);
-                start.setDate(start.getDate() - days);
-                return new TimeRange(start.getTime(), sensorRange[1]);
-            }
-        };
-
-        this.visible = calculate();
-        this.params = new DataQueryParams(this.visible, this.params.stations, this.params.sensors);
-        this.fastTime = fastTime;
+        const sensorRange = this.all.timeRange;
+        if (fastTime === FastTime.All) {
+            return TimeRange.eternity;
+        } else {
+            const days = fastTime as number;
+            const start = new Date(sensorRange[1]);
+            start.setDate(start.getDate() - days);
+            return new TimeRange(start.getTime(), sensorRange[1]);
+        }
     }
 
     public changeChart(chartType: ChartType) {
@@ -190,7 +192,7 @@ export class Graph extends Viz {
     }
 
     public set data(qd: QueriedData) {
-        if (this.all == null) {
+        if (this.shouldUpdateAllWith(qd)) {
             this.all = qd;
         }
         this.graphing = qd;
@@ -198,6 +200,15 @@ export class Graph extends Viz {
 
     public get data(): QueriedData {
         return this.graphing;
+    }
+
+    private shouldUpdateAllWith(qd: QueriedData): boolean {
+        if (this.all === null) {
+            return true;
+        }
+        const allArray = this.all.timeRange;
+        const allRange = new TimeRange(allArray[0], allArray[1]);
+        return !allRange.contains(qd.timeRangeQueried);
     }
 }
 
@@ -252,11 +263,12 @@ export class Group {
         return this.vizes.indexOf(viz) >= 0;
     }
 
-    public zoomed(times: TimeRange) {
-        this.visible_ = times;
+    public zoomed(zoom: TimeZoom) {
         this.vizes.forEach((viz) => {
             if (viz instanceof Graph) {
-                viz.zoomed(times);
+                // Yeah this is kind of weird... the idea though is
+                // that they'll all return the same thing.
+                this.visible_ = viz.zoomed(zoom);
             }
         });
     }
@@ -362,13 +374,13 @@ export class Workspace {
         );
     }
 
-    public graphZoomed(viz: Viz, times: TimeRange) {
-        this.findGroup(viz).zoomed(times);
+    public graphZoomed(viz: Viz, zoom: TimeZoom) {
+        this.findGroup(viz).zoomed(zoom);
         return this;
     }
 
-    public groupZoomed(group: Group, times: TimeRange) {
-        group.zoomed(times);
+    public groupZoomed(group: Group, zoom: TimeZoom) {
+        group.zoomed(zoom);
         return this;
     }
 
@@ -481,8 +493,7 @@ export class Workspace {
         console.log("workspace: adding:", allSensors);
 
         return allSensors[id].map((stationId) => {
-            const graph = new Graph(new VizInfo("nothing"), new DataQueryParams(TimeRange.eternity, [stationId], [id]));
-            return this.addGraph(graph);
+            return this.addGraph(new Graph(new VizInfo("nothing"), new DataQueryParams(TimeRange.eternity, [stationId], [id])));
         });
     }
 
@@ -500,13 +511,6 @@ export class Workspace {
         return this;
     }
 
-    public fastTime(viz: Viz, fastTime: FastTime) {
-        if (viz instanceof Graph) {
-            viz.useFastTime(fastTime);
-        }
-        return this;
-    }
-
     /**
      * Pop first Group and move all the Viz children to the new first Group
      */
@@ -518,4 +522,8 @@ export class Workspace {
         this.groups[0].addAll(removing);
         return this;
     }
+}
+
+export class TimeZoom {
+    constructor(public readonly fast: FastTime | null, public readonly range: TimeRange | null) {}
 }

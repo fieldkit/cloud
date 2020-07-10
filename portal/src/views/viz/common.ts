@@ -39,6 +39,10 @@ export class TimeRange {
             .max();
         return new TimeRange(min, max);
     }
+
+    public contains(o: TimeRange): boolean {
+        return this.start <= o.start && this.end >= o.end;
+    }
 }
 
 export class Sensor {

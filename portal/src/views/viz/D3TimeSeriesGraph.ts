@@ -2,8 +2,8 @@ import _ from "lodash";
 import Vue from "vue";
 import * as d3 from "d3";
 
-import { Time, TimeRange, Margins, ChartLayout } from "./common";
-import { Graph, QueriedData, Workspace } from "./viz";
+import { TimeRange, Margins, ChartLayout } from "./common";
+import { Graph, QueriedData, Workspace, FastTime, TimeZoom } from "./viz";
 
 export const D3TimeSeriesGraph = Vue.extend({
     name: "D3TimeSeriesGraph",
@@ -44,9 +44,9 @@ export const D3TimeSeriesGraph = Vue.extend({
     },
     methods: {
         onDouble() {
-            return this.raiseTimeZoomed(TimeRange.eternity);
+            return this.raiseTimeZoomed(new TimeZoom(FastTime.All, null));
         },
-        raiseTimeZoomed(newTimes) {
+        raiseTimeZoomed(newTimes: TimeZoom) {
             return this.$emit("viz-time-zoomed", newTimes);
         },
         refresh() {
@@ -127,7 +127,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                     const start = x.invert(range[0]);
                     const end = x.invert(range[1]);
                     const newRange = new TimeRange(start.getTime(), end.getTime());
-                    this.raiseTimeZoomed(newRange);
+                    this.raiseTimeZoomed(new TimeZoom(null, newRange));
                 });
 
             const colors = d3
