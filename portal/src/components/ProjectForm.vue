@@ -89,13 +89,15 @@
 
 <script>
 import FKApi from "../api/api";
-import Config from "../secrets";
 
 export default {
     name: "ProjectForm",
-    props: ["project"],
+    props: {
+        project: {},
+    },
     data: () => {
         return {
+            form: {},
             formType: "add",
             formHeading: "New Project",
             name: "",
@@ -111,38 +113,35 @@ export default {
             publicProject: false,
             hasImage: false,
             imageUrl: "",
-            baseUrl: Config.API_HOST,
             previewImage: null,
             acceptedImageTypes: ["jpg", "jpeg", "png", "gif"],
         };
     },
-    watch: {
-        project(_project) {
-            if (_project) {
-                this.formHeading = "Edit Project";
-                this.formType = "update";
-                this.name = _project.name;
-                this.description = _project.description;
-                this.goal = _project.goal;
-                this.location = _project.location;
-                this.startDate = _project.startTime;
-                this.endDate = _project.endTime;
-                this.tags = _project.tags;
-                this.publicProject = !_project.private;
-                this.updateDisplayDates();
-                if (_project.photo) {
-                    this.imageUrl = this.baseUrl + "/" + _project.photo;
-                    this.hasImage = true;
-                } else {
-                    this.imageUrl = "";
-                    this.hasImage = false;
-                }
+    mounted() {
+        if (this.project) {
+            this.formHeading = "Edit Project";
+            this.formType = "update";
+            this.name = this.project.name;
+            this.description = this.project.description;
+            this.goal = this.project.goal;
+            this.location = this.project.location;
+            this.startDate = this.project.startTime;
+            this.endDate = this.project.endTime;
+            this.tags = this.project.tags;
+            this.publicProject = !this.project.private;
+            this.updateDisplayDates();
+            if (this.project.photo) {
+                this.imageUrl = this.$config.baseUrl + "/" + this.project.photo;
+                this.hasImage = true;
             } else {
-                this.formType = "add";
-                this.formHeading = "New Project";
-                this.resetFields();
+                this.imageUrl = "";
+                this.hasImage = false;
             }
-        },
+        } else {
+            this.formType = "add";
+            this.formHeading = "New Project";
+            this.resetFields();
+        }
     },
     methods: {
         createParams() {
@@ -168,22 +167,22 @@ export default {
             const api = new FKApi();
             const data = this.createParams();
             if (this.sendingImage) {
-                api.addProject(data).then((project) => {
+                return api.addProject(data).then((project) => {
                     const params = {
                         type: this.imageType,
                         image: this.sendingImage,
                         id: project.id,
                     };
-                    api.uploadProjectImage(params).then(() => {
-                        this.$router.push({
+                    return api.uploadProjectImage(params).then(() => {
+                        return this.$router.push({
                             name: "viewProject",
                             params: { id: project.id },
                         });
                     });
                 });
             } else {
-                api.addProject(data).then((project) => {
-                    this.$router.push({
+                return api.addProject(data).then((project) => {
+                    return this.$router.push({
                         name: "viewProject",
                         params: { id: project.id },
                     });
@@ -200,8 +199,8 @@ export default {
                     image: this.sendingImage,
                     id: this.project.id,
                 };
-                api.uploadProjectImage(params).then(() => {
-                    api.updateProject(data).then((project) => {
+                return api.uploadProjectImage(params).then(() => {
+                    return api.updateProject(data).then((project) => {
                         this.$router.push({
                             name: "viewProject",
                             params: { id: project.id },
@@ -209,7 +208,7 @@ export default {
                     });
                 });
             } else {
-                api.updateProject(data).then((project) => {
+                return api.updateProject(data).then((project) => {
                     this.$router.push({
                         name: "viewProject",
                         params: { id: project.id },
@@ -223,7 +222,7 @@ export default {
                 const params = {
                     projectId: this.project.id,
                 };
-                api.deleteProject(params).then(() => {
+                return api.deleteProject(params).then(() => {
                     this.$router.push({ name: "projects" });
                 });
             }
@@ -278,7 +277,11 @@ export default {
             };
         },
         closeForm() {
-            this.$router.push({ name: "projects" });
+            if (this.project) {
+                return this.$router.push({ name: "viewProject", params: { id: this.project.id } });
+            } else {
+                return this.$router.push({ name: "projects" });
+            }
         },
     },
 };

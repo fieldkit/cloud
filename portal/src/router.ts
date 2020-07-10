@@ -129,7 +129,11 @@ const routes = [
         path: "/dashboard/projects/:id/edit",
         name: "editProject",
         component: ProjectEditView,
-        props: true,
+        props: (route) => {
+            return {
+                id: Number(route.params.id),
+            };
+        },
         meta: {
             secured: true,
         },
@@ -147,7 +151,11 @@ const routes = [
         path: "/dashboard/project-updates/:id/edit",
         name: "editProjectUpdate",
         component: ProjectUpdateEditView,
-        props: true,
+        props: (route) => {
+            return {
+                id: Number(route.params.id),
+            };
+        },
         meta: {
             secured: true,
         },

@@ -3,26 +3,16 @@
         <div id="loading" v-if="loading">
             <img alt="" src="../assets/progress.gif" />
         </div>
-        <div class="main-panel" v-show="!loading && isAuthenticated">
-            <router-link :to="{ name: 'projects' }">
+        <div class="main-panel" v-show="!loading">
+            <router-link :to="{ name: 'viewProject', params: { id: this.id } }">
                 <div class="projects-link">
                     <span class="small-arrow">&lt;</span>
-                    Back to Projects
+                    Back to Project
                 </div>
             </router-link>
-            <div id="inner-container">
-                <!-- add or update a project -->
+            <div id="inner-container" v-if="!loading">
                 <ProjectForm :project="activeProject" @updating="onProjectUpdate" />
             </div>
-        </div>
-        <div v-if="noCurrentUser" class="no-user-message">
-            <p>
-                Please
-                <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
-                    log in
-                </router-link>
-                to view projects.
-            </p>
         </div>
     </StandardLayout>
 </template>
@@ -38,71 +28,43 @@ export default {
         StandardLayout,
         ProjectForm,
     },
-    props: ["id"],
+    props: {
+        id: {
+            type: Number,
+        },
+    },
     data: () => {
         return {
             user: {},
-            userProjects: [],
             activeProject: null,
-            stations: [],
-            isAuthenticated: false,
-            noCurrentUser: false,
             loading: true,
         };
     },
-    async beforeCreate() {
-        this.api = new FKApi();
-        this.api
-            .getCurrentUser()
-            .then((user) => {
-                this.user = user;
-                this.isAuthenticated = true;
-                this.getUserProjects();
-                this.getStations();
-                if (this.id) {
-                    this.getProject(this.id);
-                } else {
-                    // adding project
-                    this.loading = false;
-                }
-            })
-            .catch(() => {
-                this.loading = false;
-                this.noCurrentUser = true;
-            });
+    mounted() {
+        if (this.id) {
+            return this.getProject(this.id);
+        } else {
+            this.loading = false;
+        }
     },
     methods: {
         goBack() {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
-        getStations() {
-            this.api.getStations().then((s) => {
-                this.stations = s.stations;
-            });
-        },
-        getUserProjects() {
-            this.api.getUserProjects().then((projects) => {
-                if (projects && projects.projects.length > 0) {
-                    this.userProjects = projects.projects;
-                }
-            });
-        },
         getProject(projectId) {
-            this.api
+            this.loading = true;
+            return new FKApi()
                 .getProject(projectId)
                 .then((project) => {
                     this.activeProject = project;
                     this.loading = false;
                 })
                 .catch(() => {
-                    this.$router.push({ name: "projects" });
+                    return this.$router.push({ name: "projects" });
                 });
         },
         onProjectUpdate() {
             this.loading = true;
-        },
-        showStation(station) {
-            this.$router.push({ name: "viewStation", params: { id: station.id } });
         },
     },
 };

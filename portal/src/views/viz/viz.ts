@@ -121,6 +121,18 @@ export abstract class Viz {
     }
 }
 
+export class Scrubber {
+    constructor(public readonly index: number, public readonly data: QueriedData) {}
+}
+
+export class Scrubbers {
+    public readonly timeRange: TimeRange;
+
+    constructor(public readonly id: string, public readonly visible: TimeRange, public readonly rows: Scrubber[]) {
+        this.timeRange = TimeRange.mergeArrays(rows.map((s) => s.data.timeRange));
+    }
+}
+
 export enum FastTime {
     Custom = -1,
     Day = 1,
@@ -214,18 +226,6 @@ export class Graph extends Viz {
         const allArray = this.all.timeRange;
         const allRange = new TimeRange(allArray[0], allArray[1]);
         return !allRange.contains(qd.timeRangeQueried);
-    }
-}
-
-export class Scrubber {
-    constructor(public readonly index: number, public readonly data: QueriedData) {}
-}
-
-export class Scrubbers {
-    public readonly timeRange: TimeRange;
-
-    constructor(public readonly id: string, public readonly visible: TimeRange, public readonly rows: Scrubber[]) {
-        this.timeRange = TimeRange.mergeArrays(rows.map((s) => s.data.timeRange));
     }
 }
 
