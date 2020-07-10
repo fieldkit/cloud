@@ -37,12 +37,12 @@
                 </div>
                 <button class="form-save-btn" type="submit">Log In</button>
                 <div>
-                    <router-link :to="{ name: 'recover' }" class="create-link">
+                    <router-link :to="{ name: 'recover', query: forwardAfterQuery() }" class="create-link">
                         Reset My Password
                     </router-link>
                 </div>
                 <div>
-                    <router-link :to="{ name: 'register' }" class="create-link">
+                    <router-link :to="{ name: 'register', query: forwardAfterQuery() }" class="create-link">
                         Create an Account
                     </router-link>
                 </div>
@@ -77,6 +77,14 @@ export default {
         },
     },
     methods: {
+        forwardAfterQuery() {
+            if (this.$route.query.after) {
+                return {
+                    after: this.$route.query.after,
+                };
+            }
+            return {};
+        },
         save() {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
