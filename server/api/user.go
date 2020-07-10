@@ -396,7 +396,7 @@ func (c *UserController) RecoveryLookup(ctx *app.RecoveryLookupUserContext) erro
 	log := Logger(ctx).Sugar()
 
 	user := &data.User{}
-	err := c.options.Database.GetContext(ctx, user, `SELECT * FROM fieldkit.user WHERE email = $1`, ctx.Payload.Email)
+	err := c.options.Database.GetContext(ctx, user, `SELECT * FROM fieldkit.user WHERE LOWER(email) = LOWER($1)`, ctx.Payload.Email)
 	if err == sql.ErrNoRows {
 		log.Infow("recovery, no user")
 		return ctx.OK([]byte("{}"))
