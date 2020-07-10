@@ -150,7 +150,12 @@ export class Graph extends Viz {
     }
 
     public clone(): Viz {
-        return new Graph(this.info, this.params);
+        const c = new Graph(this.info, this.params);
+        c.all = this.all;
+        c.visible = this.visible;
+        c.chartType = this.chartType;
+        c.fastTime = this.fastTime;
+        return c;
     }
 
     public zoomed(zoom: TimeZoom): TimeRange {
