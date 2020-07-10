@@ -184,18 +184,19 @@ export const D3Scrubber = Vue.extend({
             const clip = svg
                 .selectAll(".scrubber-clip")
                 .data(charts)
-                .join((enter) =>
-                    enter
+                .join((enter) => {
+                    const clip = enter
                         .select("defs")
                         .append("clipPath")
                         .attr("id", "scrubber-clip-" + this.viz.id)
-                        .attr("class", "scrubber-clip")
-                        .append("rect")
-                        .attr("width", layout.width)
+                        .attr("class", "scrubber-clip");
+
+                    clip.append("rect")
                         .attr("height", layout.height)
-                        .attr("x", 0)
-                        .attr("y", 0)
-                );
+                        .attr("y", 0);
+
+                    return clip;
+                });
 
             const brush = d3
                 .brushX()
