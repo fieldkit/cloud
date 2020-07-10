@@ -194,4 +194,8 @@ export default {
     border-radius: 4px;
     cursor: pointer;
 }
+
+.debug-panel {
+    font-size: 8px;
+}
 </style>
