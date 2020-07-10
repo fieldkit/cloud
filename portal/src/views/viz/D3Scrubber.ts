@@ -186,7 +186,7 @@ export const D3Scrubber = Vue.extend({
                 .data(charts)
                 .join((enter) =>
                     enter
-                        .append("defs")
+                        .select("defs")
                         .append("clipPath")
                         .attr("id", "scrubber-clip-" + this.viz.id)
                         .attr("class", "scrubber-clip")
@@ -207,7 +207,9 @@ export const D3Scrubber = Vue.extend({
                     const selection = d3.event.selection;
                     if (selection !== null) {
                         const sx = selection.map(x.invert);
-                        clip.attr("x", selection[0]).attr("width", selection[1] - selection[0]);
+                        clip.select("rect")
+                            .attr("x", selection[0])
+                            .attr("width", selection[1] - selection[0]);
                     }
 
                     d3.select(this).call(handles, selection);
@@ -230,6 +232,11 @@ export const D3Scrubber = Vue.extend({
                 return this.viz.visible.toArray();
             };
 
+            const selection: number[] = visible().map(x);
+            clip.select("rect")
+                .attr("x", selection[0])
+                .attr("width", selection[1] - selection[0]);
+
             const brushTop = svg
                 .selectAll(".brush-container")
                 .data(charts)
@@ -239,7 +246,7 @@ export const D3Scrubber = Vue.extend({
                         .attr("class", "brush-container")
                         .call(brush)
                 )
-                .call(brush.move, visible().map(x));
+                .call(brush.move, selection);
         },
     },
     template: `<div class="viz scrubber"></div>`,
