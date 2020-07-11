@@ -1,31 +1,34 @@
 <template>
-    <StandardLayout>
+    <StandardLayout @show-station="showStation" :defaultShowStation="false">
         <div class="explore-view">
             <div class="explore-header">
                 <div class="left">
-                    <h2>Default FieldKit Project</h2>
-                </div>
-                <div class="right">
-                    <div class="btn">Share</div>
-                    <div class="btn">Export</div>
+                    <h2>Data Visualization</h2>
                 </div>
             </div>
-            <VizWorkspace v-if="workspace" :workspace="workspace"></VizWorkspace>
+
+            <div v-if="!workspace">
+                Nothing selected to visualize, please choose a station or project from the left.
+            </div>
+
+            <VizWorkspace v-if="workspace" :workspace="workspace" />
         </div>
     </StandardLayout>
 </template>
 
-<script>
-import StandardLayout from "../StandardLayout";
+<script lang="ts">
+import Vue from "vue";
+import StandardLayout from "../StandardLayout.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
+import { GlobalState } from "@/store/modules/global";
 
 import FKApi from "@/api/api";
 
 import { Workspace } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 
-export default {
+export default Vue.extend({
     name: "ExploreView",
     components: {
         StandardLayout,
@@ -40,9 +43,9 @@ export default {
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
-            user: (s) => s.user.user,
-            stations: (s) => s.stations.stations.user,
-            userProjects: (s) => s.stations.projects.user,
+            user: (s: GlobalState) => s.user.user,
+            stations: (s: GlobalState) => s.stations.stations.user,
+            userProjects: (s: GlobalState) => s.stations.projects.user,
         }),
     },
     beforeMount() {
@@ -62,11 +65,27 @@ export default {
         );
     },
     methods: {
-        showStation(station) {
-            console.log("station");
+        showStation(stationId: number, ...args) {
+            const station = this.$store.state.stations.stations.all[stationId];
+
+            console.log("show-station", stationId, ...args);
+
+            return new FKApi().getQuickSensors([stationId]).then((quickSensors) => {
+                console.log("quick-sensors", quickSensors);
+                if (quickSensors.stations[stationId].length == 0) {
+                    console.log("no sensors");
+                    return;
+                }
+
+                return new FKApi().getAllSensors().then((sensors) => {
+                    this.workspace = new Workspace(sensors);
+                    this.workspace.addStation(quickSensors, station);
+                    return this.workspace.compare();
+                });
+            });
         },
     },
-};
+});
 </script>
 
 <style>

@@ -35,6 +35,12 @@ export default Vue.extend({
         HeaderBar,
         SidebarNav,
     },
+    props: {
+        defaultShowStation: {
+            type: Boolean,
+            default: true,
+        },
+    },
     data: () => {
         return {
             sidebar: {
@@ -61,7 +67,10 @@ export default Vue.extend({
             this.$emit("sidebar-toggle", this.sidebar.narrow);
         },
         showStation(station, ...args) {
-            this.$router.push({ name: "viewStation", params: { id: station.id } });
+            this.$emit("show-station", station.id);
+            if (this.defaultShowStation) {
+                this.$router.push({ name: "viewStation", params: { id: station.id } });
+            }
         },
     },
 });
