@@ -27,11 +27,13 @@ const actions = {
         }
         return null;
     },
-    [ActionTypes.AUTHENTICATE]: ({ commit, dispatch, state }: ActionParameters, payload: LoginPayload) => {
+    [ActionTypes.LOGIN]: ({ commit, dispatch, state }: ActionParameters, payload: LoginPayload) => {
         return new FkApi().login(payload.email, payload.password).then((token) => {
             commit(UPDATE_TOKEN, token);
             return dispatch(ActionTypes.REFRESH_CURRENT_USER).then(() => {
-                return new LoginResponse(token);
+                return dispatch(ActionTypes.AUTHENTICATED).then(() => {
+                    return new LoginResponse(token);
+                });
             });
         });
     },

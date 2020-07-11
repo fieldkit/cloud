@@ -1,5 +1,6 @@
 export const INITIALIZE = "INITIALIZE";
-export const AUTHENTICATE = "AUTHENTICATE";
+export const LOGIN = "LOGIN";
+export const AUTHENTICATED = "AUTHENTICATED";
 export const LOGOUT = "LOGOUT";
 
 export const NEED_COMMON = "NEED_COMMON";

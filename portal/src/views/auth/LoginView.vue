@@ -97,7 +97,7 @@ export default {
             this.failed = false;
 
             return this.$store
-                .dispatch(ActionTypes.AUTHENTICATE, payload)
+                .dispatch(ActionTypes.LOGIN, payload)
                 .then(
                     () => this.$router.push(this.$route.query.after || { name: "projects" }),
                     () => (this.failed = true)
