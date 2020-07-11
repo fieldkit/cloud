@@ -329,15 +329,15 @@ export class Querier {
 }
 
 export class Workspace {
-    public readonly querier = new Querier();
-    public readonly stations: { [index: number]: StationMeta } = {};
+    private readonly querier = new Querier();
+    private readonly stations: { [index: number]: StationMeta } = {};
     private _options: TreeOption[] = [];
 
     public get options(): TreeOption[] {
         return this._options;
     }
 
-    constructor(private readonly meta: SensorsResponse, public groups: Group[] = []) {}
+    constructor(private readonly meta: SensorsResponse, private groups: Group[] = []) {}
 
     private get allVizes(): Viz[] {
         return _(this.groups)
