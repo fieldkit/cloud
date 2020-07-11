@@ -127,7 +127,7 @@ export const ViewingControls = Vue.extend({
 				</div>
 
 				<div class="right chart-type">
-					<select v-on:change="(ev) => raiseChangeChartType(ev.target.value)">
+					<select v-on:change="(ev) => raiseChangeChartType(ev.target.value)" :value="viz.chartType">
 						<option v-for="chartOption in chartTypes" v-bind:value="chartOption.value" v-bind:key="chartOption.value">
 							{{ chartOption.label }}
 						</option>
