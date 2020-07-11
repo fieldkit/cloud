@@ -44,7 +44,7 @@
             </div>
         </div>
         <div v-if="narrow" class="container-side-narrow">
-            <div class="sidebar-header">
+            <div class="sidebar-header sidebar-compass">
                 <img alt="Fieldkit Compass Logo" src="../assets/compass.png" />
             </div>
         </div>
@@ -140,5 +140,13 @@ export default {
     font-size: 14px;
     margin: 0 0 0 30px;
     display: inline-block;
+}
+.sidebar-compass {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sidebar-compass img {
+    align-self: center;
 }
 </style>
