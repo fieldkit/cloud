@@ -60,8 +60,6 @@ export class VizInfo {
 export abstract class Viz {
     public readonly id = Ids.make();
 
-    constructor(public readonly info: VizInfo) {}
-
     public log(...args: any[]) {
         console.log(...["viz:", this.id, this.constructor.name, ...args]);
     }
@@ -121,12 +119,12 @@ export class Graph extends Viz {
     public chartType: ChartType = ChartType.TimeSeries;
     public fastTime: FastTime = FastTime.All;
 
-    constructor(public info: VizInfo, public chartParams: DataQueryParams) {
-        super(info);
+    constructor(public chartParams: DataQueryParams) {
+        super();
     }
 
     public clone(): Viz {
-        const c = new Graph(this.info, this.chartParams);
+        const c = new Graph(this.chartParams);
         c.all = this.all;
         c.visible = this.visible;
         c.chartType = this.chartType;
@@ -203,8 +201,7 @@ export class Graph extends Viz {
     public static fromBookmark(bm: VizBookmark): Viz {
         const visible = new TimeRange(bm[2][0], bm[2][1]);
         const chartParams = new DataQueryParams(visible, bm[0], bm[1]);
-        const info = new VizInfo("TODO");
-        const graph = new Graph(info, chartParams);
+        const graph = new Graph(chartParams);
         graph.chartType = bm[3];
         graph.fastTime = bm[4];
         return graph;
@@ -409,6 +406,10 @@ export class Workspace {
         });
     }
 
+    public vizInfo(viz: Viz): VizInfo {
+        return new VizInfo("TODO");
+    }
+
     public graphZoomed(viz: Viz, zoom: TimeZoom) {
         this.findGroup(viz).zoomed(zoom);
         return this;
@@ -428,8 +429,7 @@ export class Workspace {
     }
 
     public addSensor(sensor: SensorMeta, stations: Stations) {
-        const info = VizInfo.fromSensor(sensor);
-        const graph = new Graph(info, new DataQueryParams(TimeRange.eternity, stations, [sensor.id]));
+        const graph = new Graph(new DataQueryParams(TimeRange.eternity, stations, [sensor.id]));
         return this.addGraph(graph);
     }
 
