@@ -11,7 +11,7 @@
                 Nothing selected to visualize, please choose a station or project from the left.
             </div>
 
-            <VizWorkspace v-if="workspace" :workspace="workspace" />
+            <VizWorkspace v-if="workspace" :workspace="workspace" @change="onChange" />
         </div>
     </StandardLayout>
 </template>
@@ -25,7 +25,7 @@ import { GlobalState } from "@/store/modules/global";
 
 import FKApi from "@/api/api";
 
-import { Workspace } from "./viz";
+import { Workspace, Bookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 
 export default Vue.extend({
@@ -58,13 +58,22 @@ export default Vue.extend({
                         this.workspace.addStation(quickSensors, station);
                         // return this.workspace.compare().compare().combine();
                         // return this.workspace.compare();
-                        return this.workspace.addSensorAll(36);
+                        return this.workspace.addSensorAll(36).with((ws) => {
+                            this.onChange(ws.bookmark());
+                            return ws;
+                        });
                     });
                 });
             }
         );
     },
     methods: {
+        onChange(bookmark: Bookmark) {
+            const value = JSON.stringify(bookmark);
+            console.log("change", value);
+            this.$router.push({ name: "exploreBookmark", params: { bookmark: value } });
+            return this.workspace;
+        },
         showStation(stationId: number, ...args) {
             const station = this.$store.state.stations.stations.all[stationId];
 
@@ -80,7 +89,9 @@ export default Vue.extend({
                 return new FKApi().getAllSensors().then((sensors) => {
                     this.workspace = new Workspace(sensors);
                     this.workspace.addStation(quickSensors, station);
-                    return this.workspace.compare();
+                    return this.workspace.compare().with((ws) => {
+                        return this.onChange(ws.bookmark());
+                    });
                 });
             });
         },

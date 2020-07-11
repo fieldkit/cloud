@@ -2,7 +2,7 @@ import _ from "lodash";
 import Vue from "vue";
 
 import { TimeRange } from "./common";
-import { Workspace, Group, Viz, TreeOption, FastTime, ChartType, TimeZoom } from "./viz";
+import { Workspace, Group, Viz, TreeOption, FastTime, ChartType, TimeZoom, Bookmark } from "./viz";
 import { VizGroup } from "./VizGroup";
 
 export const VizWorkspace = Vue.extend({
@@ -23,29 +23,53 @@ export const VizWorkspace = Vue.extend({
         return this.workspace.query();
     },
     methods: {
+        signal(ws: Workspace): Workspace {
+            const bookmark = ws.bookmark();
+            this.$emit("change", bookmark);
+            console.log("SIGNAL", bookmark);
+            return ws;
+        },
         onGroupTimeZoomed(group: Group, zoom: TimeZoom) {
             group.log("zooming", zoom);
-            return this.workspace.groupZoomed(group, zoom).query();
+            return this.workspace
+                .groupZoomed(group, zoom)
+                .with((this as any).signal)
+                .query();
         },
         onGraphTimeZoomed(group: Group, viz: Viz, zoom: TimeZoom) {
             viz.log("zooming", zoom);
-            return this.workspace.graphZoomed(viz, zoom).query();
+            return this.workspace
+                .graphZoomed(viz, zoom)
+                .with((this as any).signal)
+                .query();
         },
         onRemove(group: Group, viz: Viz) {
             viz.log("removing");
-            return this.workspace.remove(viz).query();
+            return this.workspace
+                .remove(viz)
+                .with((this as any).signal)
+                .query();
         },
         onCompare(group: Group, viz: Viz) {
             viz.log("compare");
-            return this.workspace.compare(viz).query();
+            return this.workspace
+                .compare(viz)
+                .with((this as any).signal)
+                .query();
         },
         onChangeSensors(group: Group, viz: Viz, option: TreeOption) {
             viz.log("sensors", option);
-            return this.workspace.changeSensors(viz, option).query();
+            return this.workspace
+                .changeSensors(viz, option)
+                .with((this as any).signal)
+                .query();
         },
         onChangeChart(group: Group, viz: Viz, chartType: ChartType) {
             viz.log("chart", chartType);
-            return this.workspace.changeChart(viz, chartType).query();
+            return this.workspace
+                .changeChart(viz, chartType)
+                .with((this as any).signal)
+                .query();
         },
     },
     template: `

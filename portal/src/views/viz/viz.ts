@@ -119,6 +119,10 @@ export abstract class Viz {
     public get canRemove(): boolean {
         return true;
     }
+
+    public bookmark(): VizBookmark {
+        return [];
+    }
 }
 
 export class Scrubber {
@@ -148,6 +152,17 @@ export enum ChartType {
     Histogram,
     Range,
     Map,
+}
+
+type VizBookmark = [Stations, Sensors, [number, number], ChartType, FastTime] | [];
+type GroupBookmark = [boolean, VizBookmark[]];
+
+export class Bookmark {
+    constructor(public readonly v: number, public readonly g: GroupBookmark[]) {}
+}
+
+export class TimeZoom {
+    constructor(public readonly fast: FastTime | null, public readonly range: TimeRange | null) {}
 }
 
 export class Graph extends Viz {
@@ -227,6 +242,10 @@ export class Graph extends Viz {
         const allRange = new TimeRange(allArray[0], allArray[1]);
         return !allRange.contains(qd.timeRangeQueried);
     }
+
+    public bookmark(): VizBookmark {
+        return [this.params.stations, this.params.sensors, [this.visible.start, this.visible.end], this.chartType, this.fastTime];
+    }
 }
 
 export class Group {
@@ -288,6 +307,10 @@ export class Group {
         } else {
             return null;
         }
+    }
+
+    public bookmark(): GroupBookmark {
+        return [true, this.vizes.map((v) => v.bookmark())];
     }
 }
 
@@ -527,8 +550,20 @@ export class Workspace {
         this.groups[0].addAll(removing);
         return this;
     }
-}
 
-export class TimeZoom {
-    constructor(public readonly fast: FastTime | null, public readonly range: TimeRange | null) {}
+    public bookmark(): Bookmark {
+        const Version = 1;
+        return new Bookmark(
+            Version,
+            this.groups.map((group) => group.bookmark())
+        );
+    }
+
+    public static fromBookmark(meta: SensorsResponse, bm: Bookmark): Workspace {
+        return new Workspace(meta);
+    }
+
+    public with(callback: (ws: Workspace) => Workspace) {
+        return callback(this);
+    }
 }

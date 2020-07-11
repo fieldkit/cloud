@@ -194,9 +194,22 @@ const routes = [
     },
     {
         path: "/dashboard/explore",
-        name: "explore",
+        name: "exploreDefault",
         component: ExploreView,
-        props: true,
+        props: (route) => {
+            return {};
+        },
+        meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/dashboard/explore/:bookmark",
+        name: "exploreBookmark",
+        component: ExploreView,
+        props: (route) => {
+            return {};
+        },
         meta: {
             secured: true,
         },
