@@ -4,65 +4,13 @@ import { Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from
 import { DisplayStation } from "@/store/modules/stations";
 import FKApi from "@/api/api";
 
-export class QuickSensorStation {
-    constructor(public readonly sensorId: number, public readonly key: string) {}
-}
-
-export class QuickSensors {
-    constructor(public readonly stations: { [index: string]: QuickSensorStation[] }) {}
-}
-
 export class SensorMeta {
+    // TODO Color scale.
     constructor(public readonly id: number, public readonly fullKey: string, public readonly name: string) {}
-
-    public static makePlain(meta: SensorId) {
-        return new SensorMeta(meta.id, meta.key, meta.key);
-    }
-
-    public static makePlainFromQuickie(quickie: QuickSensorStation) {
-        return new SensorMeta(quickie.sensorId, quickie.key, quickie.key);
-    }
 }
 
 export class StationMeta {
-    constructor(private readonly meta: SensorsResponse, private quickSensors: QuickSensors, private station: DisplayStation) {}
-
-    get id(): number {
-        return this.station.id;
-    }
-
-    get name(): string {
-        return this.station.name;
-    }
-
-    get sensors(): SensorMeta[] {
-        // This toString is so annoying. -jlewallen
-        const sensorsByKey = _.keyBy(this.meta.sensors, (s) => s.key);
-        const quickies = this.quickSensors.stations[this.id.toString()].map((q) => SensorMeta.makePlainFromQuickie(q));
-        const fromConfiguration = _(this.station.configurations.all)
-            .take(1)
-            .map((cfg) => cfg.modules)
-            .flatten()
-            .filter((m) => !m.internal)
-            .map((m) => m.sensors)
-            .flatten()
-            .map((s) => {
-                if (!sensorsByKey[s.fullKey]) {
-                    console.log(`missing meta: ${s.fullKey}`);
-                    return null;
-                }
-                return SensorMeta.makePlain(sensorsByKey[s.fullKey]);
-            })
-            .filter((sm) => sm)
-            .value();
-
-        return Object.values(
-            Object.assign(
-                _.keyBy(quickies, (s) => s.id),
-                _.keyBy(fromConfiguration, (s) => s.id)
-            )
-        );
-    }
+    constructor(public readonly id: number, public readonly name: string, public readonly sensors: SensorMeta[]) {}
 }
 
 export class TreeOption {
@@ -385,26 +333,19 @@ export class Querier {
 
 export class Workspace {
     public readonly querier = new Querier();
-    public readonly stations: StationMeta[] = [];
+    public readonly stations: { [index: number]: StationMeta } = {};
+    private _options: TreeOption[] = [];
+
+    public get options(): TreeOption[] {
+        return this._options;
+    }
 
     constructor(private readonly meta: SensorsResponse, public groups: Group[] = []) {}
-
-    public addSensor(sensor: SensorMeta, stations: Stations) {
-        const info = VizInfo.fromSensor(sensor);
-        const graph = new Graph(info, new DataQueryParams(TimeRange.eternity, stations, [sensor.id]));
-        return this.addGraph(graph);
-    }
 
     public addGraph(graph: Graph) {
         const group = new Group();
         group.add(graph);
         this.groups.push(group);
-        return this;
-    }
-
-    public addStation(quickSensors: QuickSensors, station: DisplayStation) {
-        const stationMeta = new StationMeta(this.meta, quickSensors, station);
-        this.stations.push(stationMeta);
         return this;
     }
 
@@ -453,11 +394,19 @@ export class Workspace {
         // above mapped resolve to set the appropriate data.
         const pendingInfo = infoQueries.map((iq) =>
             this.querier.queryInfo(iq.params).then((info) => {
-                console.log(info);
+                return _.map(info.stations, (info, stationId) => {
+                    const name = info[0].stationName;
+                    const sensors = info.map((row) => new SensorMeta(row.sensorId, row.key, row.key));
+                    const station = new StationMeta(Number(stationId), name, sensors);
+                    this.stations[station.id] = station;
+                    return station;
+                });
             })
         );
         const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq.params).then((data) => vq.resolve(data)));
-        return Promise.all([...pendingInfo, ...pendingData]);
+        return Promise.all([...pendingInfo, ...pendingData]).then(() => {
+            this._options = this.updateOptions();
+        });
     }
 
     public graphZoomed(viz: Viz, zoom: TimeZoom) {
@@ -478,8 +427,16 @@ export class Workspace {
         throw new Error("oprhaned viz");
     }
 
-    public get options(): TreeOption[] {
-        const allSensors = _(this.stations)
+    public addSensor(sensor: SensorMeta, stations: Stations) {
+        const info = VizInfo.fromSensor(sensor);
+        const graph = new Graph(info, new DataQueryParams(TimeRange.eternity, stations, [sensor.id]));
+        return this.addGraph(graph);
+    }
+
+    private updateOptions(): TreeOption[] {
+        console.log("workspace: stations:", this.stations);
+
+        const allSensors = _(Object.values(this.stations))
             .map((station: StationMeta) =>
                 station.sensors.map((sensor) => {
                     return {
@@ -494,9 +451,9 @@ export class Workspace {
         const options = _(allSensors)
             .groupBy((s) => s.sensor.fullKey)
             .values()
-            .map((value: { station: DisplayStation; sensor: SensorMeta }[]) => {
+            .map((value) => {
                 const sensor = value[0].sensor;
-                const stations: StationMeta[] = _(value)
+                const stations = _(value)
                     .map((v) => v.station)
                     .value();
 
@@ -533,54 +490,10 @@ export class Workspace {
     }
 
     public compare(viz: Viz) {
-        if (this.stations.length == 0) {
-            throw new Error("no stations");
-        }
-
-        const allSensors = _(this.stations)
-            .map((s) => s.sensors)
-            .flatten()
-            .keyBy((s) => s.fullKey)
-            .value();
-
-        console.log("workspace: sensors:", allSensors);
-
-        if (this.groups.length == 0) {
-            const station = this.stations[0];
-            const stationSensors = station.sensors;
-            console.log("workspace: station:", stationSensors);
-            if (stationSensors.length == 0) {
-                return this;
-            }
-            const sensor = stationSensors[0];
-            this.addSensor(sensor, [station.id]);
-        } else {
+        if (this.groups.length > 0) {
             this.groups.unshift(this.groups[0].clone());
         }
-
         return this;
-    }
-
-    public addSensorAll(id: number) {
-        const allSensors = _(this.stations)
-            .map((station: StationMeta) =>
-                station.sensors.map((sensor) => {
-                    return {
-                        station: station,
-                        sensor: sensor,
-                    };
-                })
-            )
-            .flatten()
-            .groupBy((r) => r.sensor.id)
-            .mapValues((r) => r.map((s) => s.station.id))
-            .value();
-
-        console.log("workspace: adding:", allSensors);
-
-        return allSensors[id].map((stationId) => {
-            return this.addGraph(new Graph(new VizInfo("nothing"), new DataQueryParams(TimeRange.eternity, [stationId], [id])));
-        });
     }
 
     public changeChart(viz: Viz, chartType: ChartType) {

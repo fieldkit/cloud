@@ -112,14 +112,19 @@ type AggregateSummary struct {
 }
 
 type StationSensor struct {
-	SensorID  int64  `db:"sensor_id" json:"sensorId"`
-	StationID int32  `db:"station_id" json:"-"`
-	Key       string `db:"key" json:"key"`
+	SensorID    int64  `db:"sensor_id" json:"sensorId"`
+	StationID   int32  `db:"station_id" json:"-"`
+	StationName string `db:"station_name" json:"name"`
+	Key         string `db:"key" json:"key"`
 }
 
 func (c *SensorService) stationsMeta(ctx context.Context, stations []int64) (*sensor.DataResult, error) {
 	query, args, err := sqlx.In(fmt.Sprintf(`
-		SELECT sensor_id, station_id, s.key FROM %s JOIN fieldkit.aggregated_sensor AS s ON (s.id = sensor_id) WHERE station_id IN (?) GROUP BY sensor_id, station_id, s.key
+		SELECT sensor_id, station_id, s.key, station.name AS station_name
+		FROM %s AS agg
+		JOIN fieldkit.aggregated_sensor AS s ON (s.id = sensor_id)
+		JOIN fieldkit.station AS station ON (agg.station_id = station.id)
+		WHERE station_id IN (?) GROUP BY sensor_id, station_id, s.key, station.name
 		`, "fieldkit.aggregated_24h"), stations)
 	if err != nil {
 		return nil, err

@@ -122,7 +122,8 @@ export const ViewingControls = Vue.extend({
 			</div>
 			<div class="row row-2">
 				<div class="left tree">
-					<treeselect :value="selectedTreeOption" :options="workspace.options" open-direction="bottom" @select="raiseChangeSensors" />
+					<treeselect v-if="workspace.options.length" :value="selectedTreeOption" :options="workspace.options" open-direction="bottom" @select="raiseChangeSensors" />
+					<div v-if="workspace.options.length == 0" class="loading-options">Loading Options</div>
 				</div>
 
 				<div class="right chart-type">

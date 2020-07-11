@@ -48,6 +48,12 @@ export interface SensorDataResponse {
     data: DataRow[];
 }
 
+interface StationInfoResponse {
+    sensorId: number;
+    key: string;
+    stationName: string;
+}
+
 export interface SensorInfoResponse {
-    stations: { [index: string]: { key: string; sensorId: number }[] };
+    stations: { [index: string]: StationInfoResponse[] };
 }
