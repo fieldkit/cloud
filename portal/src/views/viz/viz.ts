@@ -111,7 +111,7 @@ export class TimeZoom {
 }
 
 export class Graph extends Viz {
-    private graphing: QueriedData | null = null;
+    public graphing: QueriedData | null = null;
     public all: QueriedData | null = null;
     public visible: TimeRange = TimeRange.eternity;
     public chartType: ChartType = ChartType.TimeSeries;
@@ -170,26 +170,6 @@ export class Graph extends Viz {
         const sensorParams = option.sensorParams;
         this.chartParams = new DataQueryParams(this.chartParams.when, sensorParams.stations, sensorParams.sensors);
         this.all = null;
-    }
-
-    public set data(qd: QueriedData) {
-        if (this.shouldUpdateAllWith(qd)) {
-            this.all = qd;
-        }
-        this.graphing = qd;
-    }
-
-    public get data(): QueriedData {
-        return this.graphing;
-    }
-
-    private shouldUpdateAllWith(qd: QueriedData): boolean {
-        if (this.all === null) {
-            return true;
-        }
-        const allArray = this.all.timeRange;
-        const allRange = new TimeRange(allArray[0], allArray[1]);
-        return !allRange.contains(qd.timeRangeQueried);
     }
 
     public bookmark(): VizBookmark {
@@ -363,13 +343,13 @@ export class Workspace {
             .map((viz: Graph) => new VizQuery(viz.scrubberParams, (qd) => (viz.all = qd)));
 
         // Now build the queries for the data being viewed.
-        const visibleQueries = allGraphs.map((viz: Graph) => new VizQuery(viz.chartParams, (qd) => (viz.data = qd)));
+        const graphingQueries = allGraphs.map((viz: Graph) => new VizQuery(viz.chartParams, (qd) => (viz.graphing = qd)));
 
         // Combine and make them unique to avoid obvious
         // duplicates. Eventually we can also merge stations/sensors
         // with the same date range and other parameters into one
         // query. Lots of room here.
-        const allQueries = [...scrubberQueries, ...visibleQueries];
+        const allQueries = [...scrubberQueries, ...graphingQueries];
         const uniqueQueries = _(allQueries)
             .groupBy((q) => q.params.queryParams().toString())
             .map((p) => new VizQuery(p[0].params, (qd: QueriedData) => p.map((p) => p.resolve(qd))))
