@@ -79,7 +79,7 @@ export default Vue.extend({
                 if (!this.forcePublic) {
                     const p = this.$getters.projectsById[this.id];
                     if (p) {
-                        return !p.readOnly;
+                        return !p.project.readOnly;
                     }
                 }
                 return false;
