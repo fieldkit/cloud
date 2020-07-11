@@ -47,7 +47,7 @@ export const ViewingControls = Vue.extend({
     },
     computed: {
         selectedTreeOption() {
-            return this.viz.params.sensorParams.id;
+            return this.viz.chartParams.sensorParams.id;
         },
         manualRangeValue() {
             if (this.viz.visible.isExtreme()) {

@@ -738,6 +738,39 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 			Sensors: []*SensorMeta{},
 		},
+		&ModuleMeta{
+			Key: "fk.testing",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyDiagnostics,
+				AllKinds:     []uint32{},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "sin",
+					FirmwareKey:   "sin",
+					UnitOfMeasure: "",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: -1,
+							Maximum: 1.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "saw.weekly",
+					FirmwareKey:   "saw.weekly",
+					UnitOfMeasure: "",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0,
+							Maximum: 1000,
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, m := range mm {

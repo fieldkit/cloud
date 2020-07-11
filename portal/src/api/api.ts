@@ -277,6 +277,11 @@ class FKApi {
             (error) => {
                 const response = error.response;
 
+                if (!response) {
+                    console.log(`api: error: ${error}`);
+                    return error;
+                }
+
                 if (response.status === 401) {
                     if (params.refreshed !== true) {
                         // NOTE I'd like a better way to test for this.

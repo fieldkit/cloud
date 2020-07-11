@@ -24,9 +24,9 @@ export const DebuggingPanel = Vue.extend({
     },
     template: `
 		<div style="debug-panel" style="padding: 20px;">
-			<div> debug {{ viz.id }} stations: {{ viz.params.stations }} sensors: {{ viz.params.sensors }} </div>
+			<div> debug {{ viz.id }} stations: {{ viz.chartParams.stations }} sensors: {{ viz.chartParams.sensors }} </div>
 			<div> visible({{ viz.visible.start | prettyTime }} - {{ viz.visible.end | prettyTime }}) </div>
-			<div> query({{ viz.params.when.start | prettyTime }} - {{ viz.params.when.end | prettyTime }}) </div>
+			<div> query({{ viz.chartParams.when.start | prettyTime }} - {{ viz.chartParams.when.end | prettyTime }}) </div>
 		</div>
 	`,
 });

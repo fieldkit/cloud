@@ -119,8 +119,8 @@ type StationSensor struct {
 
 func (c *SensorService) stationsMeta(ctx context.Context, stations []int64) (*sensor.DataResult, error) {
 	query, args, err := sqlx.In(fmt.Sprintf(`
-			SELECT sensor_id, station_id, s.key FROM %s JOIN fieldkit.aggregated_sensor AS s ON (s.id = sensor_id) WHERE station_id IN (?) GROUP BY sensor_id, station_id, s.key
-			`, "fieldkit.aggregated_24h"), stations)
+		SELECT sensor_id, station_id, s.key FROM %s JOIN fieldkit.aggregated_sensor AS s ON (s.id = sensor_id) WHERE station_id IN (?) GROUP BY sensor_id, station_id, s.key
+		`, "fieldkit.aggregated_24h"), stations)
 	if err != nil {
 		return nil, err
 	}
@@ -194,9 +194,11 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		}
 	}
 
+	message := "querying"
 	if selectedAggregateName != qp.Aggregate {
-		log.Infow("selected", "aggregate", selectedAggregateName, "number_records", summaries[selectedAggregateName].NumberRecords)
+		message = "selected"
 	}
+	log.Infow(message, "aggregate", selectedAggregateName, "number_records", summaries[selectedAggregateName].NumberRecords)
 
 	aggregate := handlers.AggregateTableNames[selectedAggregateName]
 	query, args, err := sqlx.In(fmt.Sprintf(`

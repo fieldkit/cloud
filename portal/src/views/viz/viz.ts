@@ -168,12 +168,12 @@ export class Graph extends Viz {
     public chartType: ChartType = ChartType.TimeSeries;
     public fastTime: FastTime = FastTime.All;
 
-    constructor(public info: VizInfo, public params: DataQueryParams) {
+    constructor(public info: VizInfo, public chartParams: DataQueryParams) {
         super(info);
     }
 
     public clone(): Viz {
-        const c = new Graph(this.info, this.params);
+        const c = new Graph(this.info, this.chartParams);
         c.all = this.all;
         c.visible = this.visible;
         c.chartType = this.chartType;
@@ -182,7 +182,7 @@ export class Graph extends Viz {
     }
 
     public get scrubberParams(): DataQueryParams {
-        return new DataQueryParams(TimeRange.eternity, this.params.stations, this.params.sensors);
+        return new DataQueryParams(TimeRange.eternity, this.chartParams.stations, this.chartParams.sensors);
     }
 
     public zoomed(zoom: TimeZoom): TimeRange {
@@ -194,7 +194,7 @@ export class Graph extends Viz {
             this.fastTime = zoom.fast;
         }
 
-        this.params = new DataQueryParams(this.visible, this.params.stations, this.params.sensors);
+        this.chartParams = new DataQueryParams(this.visible, this.chartParams.stations, this.chartParams.sensors);
 
         return this.visible;
     }
@@ -219,7 +219,7 @@ export class Graph extends Viz {
 
     public changeSensors(option: TreeOption) {
         const sensorParams = option.sensorParams;
-        this.params = new DataQueryParams(this.params.when, sensorParams.stations, sensorParams.sensors);
+        this.chartParams = new DataQueryParams(this.chartParams.when, sensorParams.stations, sensorParams.sensors);
         this.all = null;
     }
 
@@ -244,14 +244,14 @@ export class Graph extends Viz {
     }
 
     public bookmark(): VizBookmark {
-        return [this.params.stations, this.params.sensors, [this.visible.start, this.visible.end], this.chartType, this.fastTime];
+        return [this.chartParams.stations, this.chartParams.sensors, [this.visible.start, this.visible.end], this.chartType, this.fastTime];
     }
 
     public static fromBookmark(bm: VizBookmark): Viz {
         const visible = new TimeRange(bm[2][0], bm[2][1]);
-        const params = new DataQueryParams(visible, bm[0], bm[1]);
+        const chartParams = new DataQueryParams(visible, bm[0], bm[1]);
         const info = new VizInfo("TODO");
-        const graph = new Graph(info, params);
+        const graph = new Graph(info, chartParams);
         graph.chartType = bm[3];
         graph.fastTime = bm[4];
         return graph;
@@ -396,7 +396,7 @@ export class Workspace {
             .map((viz: Graph) => new VizQuery(viz.scrubberParams, (qd) => (viz.all = qd)));
 
         // Now build the queries for the data being viewed.
-        const visibleQueries = allGraphs.filter((viz) => viz).map((viz: Graph) => new VizQuery(viz.params, (qd) => (viz.data = qd)));
+        const visibleQueries = allGraphs.filter((viz) => viz).map((viz: Graph) => new VizQuery(viz.chartParams, (qd) => (viz.data = qd)));
 
         // Combine and make them unique to avoid obvious
         // duplicates. Eventually we can also merge stations/sensors
