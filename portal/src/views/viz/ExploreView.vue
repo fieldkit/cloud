@@ -34,7 +34,12 @@ export default Vue.extend({
         StandardLayout,
         VizWorkspace,
     },
-    props: {},
+    props: {
+        bookmark: {
+            type: Bookmark,
+            required: false,
+        },
+    },
     data: () => {
         return {
             workspace: null,
@@ -49,30 +54,17 @@ export default Vue.extend({
         }),
     },
     beforeMount() {
-        this.$store.watch(
-            (state, getters) => state.stations.stations.all[12],
-            (station, _old) => {
-                return new FKApi().getQuickSensors([station.id]).then((quickSensors) => {
-                    return new FKApi().getAllSensors().then((sensors) => {
-                        this.workspace = new Workspace(sensors);
-                        this.workspace.addStation(quickSensors, station);
-                        // return this.workspace.compare().compare().combine();
-                        // return this.workspace.compare();
-                        return this.workspace.addSensorAll(36).with((ws) => {
-                            this.onChange(ws.bookmark());
-                            return ws;
-                        });
-                    });
-                });
-            }
-        );
+        if (this.bookmark) {
+            return new FKApi().getAllSensors().then((sensors) => {
+                this.workspace = Workspace.fromBookmark(sensors, this.bookmark);
+            });
+        }
     },
     methods: {
         onChange(bookmark: Bookmark) {
-            const value = JSON.stringify(bookmark);
-            console.log("change", value);
-            this.$router.push({ name: "exploreBookmark", params: { bookmark: value } });
-            return this.workspace;
+            return this.$router
+                .push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bookmark) } })
+                .then(() => this.workspace);
         },
         showStation(stationId: number, ...args) {
             const station = this.$store.state.stations.stations.all[stationId];

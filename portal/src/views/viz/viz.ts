@@ -116,13 +116,7 @@ export abstract class Viz {
 
     public abstract clone(): Viz;
 
-    public get canRemove(): boolean {
-        return true;
-    }
-
-    public bookmark(): VizBookmark {
-        return [];
-    }
+    public abstract bookmark(): VizBookmark;
 }
 
 export class Scrubber {
@@ -158,6 +152,8 @@ type VizBookmark = [Stations, Sensors, [number, number], ChartType, FastTime] | 
 type GroupBookmark = [boolean, VizBookmark[]];
 
 export class Bookmark {
+    static Version = 1;
+
     constructor(public readonly v: number, public readonly g: GroupBookmark[]) {}
 }
 
@@ -250,6 +246,16 @@ export class Graph extends Viz {
     public bookmark(): VizBookmark {
         return [this.params.stations, this.params.sensors, [this.visible.start, this.visible.end], this.chartType, this.fastTime];
     }
+
+    public static fromBookmark(bm: VizBookmark): Viz {
+        const visible = new TimeRange(bm[2][0], bm[2][1]);
+        const params = new DataQueryParams(visible, bm[0], bm[1]);
+        const info = new VizInfo("TODO");
+        const graph = new Graph(info, params);
+        graph.chartType = bm[3];
+        graph.fastTime = bm[4];
+        return graph;
+    }
 }
 
 export class Group {
@@ -316,6 +322,10 @@ export class Group {
     public bookmark(): GroupBookmark {
         return [true, this.vizes.map((v) => v.bookmark())];
     }
+
+    public static fromBookmark(bm: GroupBookmark): Group {
+        return new Group(bm[1].map((vm) => Graph.fromBookmark(vm)));
+    }
 }
 
 export class Querier {
@@ -346,9 +356,8 @@ class VizQuery {
 export class Workspace {
     public readonly querier = new Querier();
     public readonly stations: StationMeta[] = [];
-    public groups: Group[] = [];
 
-    constructor(private readonly meta: SensorsResponse) {}
+    constructor(private readonly meta: SensorsResponse, public groups: Group[] = []) {}
 
     public addSensor(sensor: SensorMeta, stations: Stations) {
         const info = VizInfo.fromSensor(sensor);
@@ -557,15 +566,20 @@ export class Workspace {
     }
 
     public bookmark(): Bookmark {
-        const Version = 1;
         return new Bookmark(
-            Version,
+            Bookmark.Version,
             this.groups.map((group) => group.bookmark())
         );
     }
 
     public static fromBookmark(meta: SensorsResponse, bm: Bookmark): Workspace {
-        return new Workspace(meta);
+        if (bm.v !== 1) {
+            throw new Error("unexpected bookmark version");
+        }
+        return new Workspace(
+            meta,
+            bm.g.map((gm) => Group.fromBookmark(gm))
+        );
     }
 
     public with(callback: (ws: Workspace) => Workspace) {

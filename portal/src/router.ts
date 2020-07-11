@@ -17,6 +17,8 @@ import StationsView from "./views/StationsView.vue";
 import UserView from "./views/UserView.vue";
 import ExploreView from "./views/viz/ExploreView.vue";
 
+import { Bookmark } from "./views/viz/viz";
+
 Vue.use(Router);
 
 const routes = [
@@ -208,7 +210,9 @@ const routes = [
         name: "exploreBookmark",
         component: ExploreView,
         props: (route) => {
-            return {};
+            return {
+                bookmark: Object.assign(new Bookmark(1, []), JSON.parse(route.params.bookmark)),
+            };
         },
         meta: {
             secured: true,

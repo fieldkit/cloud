@@ -26,7 +26,6 @@ export const VizWorkspace = Vue.extend({
         signal(ws: Workspace): Workspace {
             const bookmark = ws.bookmark();
             this.$emit("change", bookmark);
-            console.log("SIGNAL", bookmark);
             return ws;
         },
         onGroupTimeZoomed(group: Group, zoom: TimeZoom) {
