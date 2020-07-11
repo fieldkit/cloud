@@ -185,6 +185,10 @@ export class Graph extends Viz {
         return c;
     }
 
+    public get scrubberParams(): DataQueryParams {
+        return new DataQueryParams(TimeRange.eternity, this.params.stations, this.params.sensors);
+    }
+
     public zoomed(zoom: TimeZoom): TimeRange {
         if (zoom.range) {
             this.visible = zoom.range;
@@ -333,6 +337,12 @@ export class Querier {
     }
 }
 
+type ResolveVizData = (qd: QueriedData) => void;
+
+class VizQuery {
+    constructor(public readonly params: DataQueryParams, public readonly resolve: ResolveVizData) {}
+}
+
 export class Workspace {
     public readonly querier = new Querier();
     public readonly stations: StationMeta[] = [];
@@ -367,39 +377,34 @@ export class Workspace {
     }
 
     public query(): Promise<any> {
-        const vizToParams = _(this.allVizes)
-            .map((viz: Graph) =>
-                [viz.params].map((params: DataQueryParams) => {
-                    return {
-                        viz: viz,
-                        params: params,
-                    };
-                })
-            )
-            .flatten()
-            .groupBy((p) => p.params.queryString())
-            .map((p) => {
-                return {
-                    params: p[0].params, // All in this group are identical.
-                    vizes: _(p)
-                        .map((p) => p.viz)
-                        .value(),
-                };
-            })
+        const allGraphs = this.allVizes.map((viz) => viz as Graph);
+
+        // First step is to query to fill in any required scrubbers. I
+        // have tried in previous iterations to be clever about this
+        // and just being very explicit is the best way.
+        const scrubberQueries = allGraphs
+            .filter((viz) => viz && !viz.all)
+            .map((viz: Graph) => new VizQuery(viz.scrubberParams, (qd) => (viz.all = qd)));
+
+        // Now build the queries for the data being viewed.
+        const visibleQueries = allGraphs.filter((viz) => viz).map((viz: Graph) => new VizQuery(viz.params, (qd) => (viz.data = qd)));
+
+        // Combine and make them unique to avoid obvious
+        // duplicates. Eventually we can also merge stations/sensors
+        // with the same date range and other parameters into one
+        // query. Lots of room here.
+        const allQueries = [...scrubberQueries, ...visibleQueries];
+        const uniqueQueries = _(allQueries)
+            .groupBy((q) => q.params.queryString())
+            .map((p) => new VizQuery(p[0].params, (qd: QueriedData) => p.map((p) => p.resolve(qd))))
             .value();
 
-        console.log("workspace: querying", vizToParams.length, "queries");
+        console.log("workspace: querying", uniqueQueries.length, "queries");
 
-        return Promise.all(
-            vizToParams.map((query) => {
-                return this.querier.query(query.params).then((data) => {
-                    query.vizes.forEach((viz: Graph) => {
-                        viz.log("data", query.params.queryString(), data.data.length, data.timeRange, data.dataRange);
-                        viz.data = data;
-                    });
-                });
-            })
-        );
+        // Make all the queries and then give the queried data to the
+        // resolve call for that query. This will end up calling the
+        // above mapped resolve to set the appropriate data.
+        return Promise.all(uniqueQueries.map((vq) => this.querier.query(vq.params).then((data) => vq.resolve(data))));
     }
 
     public graphZoomed(viz: Viz, zoom: TimeZoom) {
