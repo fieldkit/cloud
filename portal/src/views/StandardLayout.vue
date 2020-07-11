@@ -57,12 +57,10 @@ export default Vue.extend({
     },
     methods: {
         onSidebarToggle(...args) {
-            console.log("sidebar-toggle", args);
             this.sidebar.narrow = !this.sidebar.narrow;
             this.$emit("sidebar-toggle", this.sidebar.narrow);
         },
         showStation(station, ...args) {
-            console.log("show-station", station, args);
             this.$router.push({ name: "viewStation", params: { id: station.id } });
         },
     },
