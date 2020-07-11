@@ -763,15 +763,15 @@ class FKApi {
         });
     }
 
-    sensorData(params: any): Promise<any> {
+    sensorData(params: URLSearchParams): Promise<any> {
         return this.invoke({
             authenticated: true,
             method: "GET",
-            url: this.baseUrl + "/sensors/data?" + params.queryString(),
+            url: this.baseUrl + "/sensors/data?" + params.toString(),
         });
     }
 
-    getQuickSensors(stations) {
+    getQuickSensors(stations: number[]) {
         const qp = new URLSearchParams();
         qp.append("stations", stations.join(","));
         return this.invoke({

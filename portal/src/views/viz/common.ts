@@ -70,14 +70,14 @@ export class DataQueryParams {
         return _.isEqual(this, o);
     }
 
-    public queryString(): string {
+    public queryParams(): URLSearchParams {
         const queryParams = new URLSearchParams();
         queryParams.append("start", this.when.start.toString());
         queryParams.append("end", this.when.end.toString());
         queryParams.append("stations", this.stations.join(","));
         queryParams.append("sensors", this.sensors.join(","));
         queryParams.append("resolution", "1000");
-        return queryParams.toString();
+        return queryParams;
     }
 
     public get sensorParams(): SensorParams {

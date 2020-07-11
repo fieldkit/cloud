@@ -47,3 +47,7 @@ export interface SensorDataResponse {
     summaries: { [index: string]: Summary };
     data: DataRow[];
 }
+
+export interface SensorInfoResponse {
+    stations: { [index: string]: { key: string; sensorId: number }[] };
+}

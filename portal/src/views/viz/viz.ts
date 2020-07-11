@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { SensorId, SensorsResponse, SensorDataResponse, ModuleSensor } from "./api";
+import { SensorId, SensorsResponse, SensorDataResponse, SensorInfoResponse, ModuleSensor } from "./api";
 import { Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
 import { DisplayStation } from "@/store/modules/stations";
 import FKApi from "@/api/api";
@@ -46,10 +46,14 @@ export class StationMeta {
             .filter((m) => !m.internal)
             .map((m) => m.sensors)
             .flatten()
-            .map((s) => SensorMeta.makePlain(sensorsByKey[s.fullKey]))
-            .filter((s) => {
-                return true;
+            .map((s) => {
+                if (!sensorsByKey[s.fullKey]) {
+                    console.log(`missing meta: ${s.fullKey}`);
+                    return null;
+                }
+                return SensorMeta.makePlain(sensorsByKey[s.fullKey]);
             })
+            .filter((sm) => sm)
             .value();
 
         return Object.values(
@@ -149,7 +153,8 @@ export enum ChartType {
 }
 
 type VizBookmark = [Stations, Sensors, [number, number], ChartType, FastTime] | [];
-type GroupBookmark = [boolean, VizBookmark[]];
+
+type GroupBookmark = [VizBookmark[]];
 
 export class Bookmark {
     static Version = 1;
@@ -320,37 +325,62 @@ export class Group {
     }
 
     public bookmark(): GroupBookmark {
-        return [true, this.vizes.map((v) => v.bookmark())];
+        return [this.vizes.map((v) => v.bookmark())];
     }
 
     public static fromBookmark(bm: GroupBookmark): Group {
-        return new Group(bm[1].map((vm) => Graph.fromBookmark(vm)));
+        return new Group(bm[0].map((vm) => Graph.fromBookmark(vm)));
     }
+}
+
+type ResolveData = (qd: QueriedData) => void;
+
+class VizQuery {
+    constructor(public readonly params: DataQueryParams, public readonly resolve: ResolveData) {}
+}
+
+class InfoQuery {
+    constructor(public readonly params: Stations) {}
 }
 
 export class Querier {
-    private cache: { [index: string]: QueriedData } = {};
+    private info: { [index: string]: SensorInfoResponse } = {};
+    private data: { [index: string]: QueriedData } = {};
 
-    public query(params: DataQueryParams): Promise<QueriedData> {
+    public queryInfo(params: Stations): Promise<SensorInfoResponse> {
         if (!params) {
             throw new Error("no params");
         }
-        const key = params.queryString();
-        if (this.cache[key]) {
-            return Promise.resolve(this.cache[key]);
+
+        const queryParams = new URLSearchParams();
+        queryParams.append("stations", params.join(","));
+
+        const key = queryParams.toString();
+        if (this.info[key]) {
+            return Promise.resolve(this.info[key]);
         }
-        return new FKApi().sensorData(params).then((sdr: SensorDataResponse) => {
+        return new FKApi().sensorData(queryParams).then((info: SensorInfoResponse) => {
+            this.info[key] = info;
+            return info;
+        });
+    }
+
+    public queryData(params: DataQueryParams): Promise<QueriedData> {
+        if (!params) {
+            throw new Error("no params");
+        }
+
+        const queryParams = params.queryParams();
+        const key = queryParams.toString();
+        if (this.data[key]) {
+            return Promise.resolve(this.data[key]);
+        }
+        return new FKApi().sensorData(queryParams).then((sdr: SensorDataResponse) => {
             const queried = new QueriedData(params.when, sdr);
-            this.cache[key] = queried;
+            this.data[key] = queried;
             return queried;
         });
     }
-}
-
-type ResolveVizData = (qd: QueriedData) => void;
-
-class VizQuery {
-    constructor(public readonly params: DataQueryParams, public readonly resolve: ResolveVizData) {}
 }
 
 export class Workspace {
@@ -386,17 +416,25 @@ export class Workspace {
     }
 
     public query(): Promise<any> {
-        const allGraphs = this.allVizes.map((viz) => viz as Graph);
+        const allGraphs = this.allVizes.map((viz) => viz as Graph).filter((viz) => viz);
 
-        // First step is to query to fill in any required scrubbers. I
+        // First we may need some data for making the UI useful and
+        // pretty. Filling in labels, building drop downs, etc... This
+        // is especially important to do from here because we may have
+        // been instantiated from a Bookmark. Right now we just query
+        // for information on all the stations involved.
+        const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz).map((viz) => viz.chartParams.stations)));
+        const infoQueries = [new InfoQuery(allStationIds)];
+
+        // Second step is to query to fill in any required scrubbers. I
         // have tried in previous iterations to be clever about this
         // and just being very explicit is the best way.
         const scrubberQueries = allGraphs
-            .filter((viz) => viz && !viz.all)
+            .filter((viz) => !viz.all)
             .map((viz: Graph) => new VizQuery(viz.scrubberParams, (qd) => (viz.all = qd)));
 
         // Now build the queries for the data being viewed.
-        const visibleQueries = allGraphs.filter((viz) => viz).map((viz: Graph) => new VizQuery(viz.chartParams, (qd) => (viz.data = qd)));
+        const visibleQueries = allGraphs.map((viz: Graph) => new VizQuery(viz.chartParams, (qd) => (viz.data = qd)));
 
         // Combine and make them unique to avoid obvious
         // duplicates. Eventually we can also merge stations/sensors
@@ -404,16 +442,22 @@ export class Workspace {
         // query. Lots of room here.
         const allQueries = [...scrubberQueries, ...visibleQueries];
         const uniqueQueries = _(allQueries)
-            .groupBy((q) => q.params.queryString())
+            .groupBy((q) => q.params.queryParams().toString())
             .map((p) => new VizQuery(p[0].params, (qd: QueriedData) => p.map((p) => p.resolve(qd))))
             .value();
 
-        console.log("workspace: querying", uniqueQueries.length, "queries");
+        console.log("workspace: querying", uniqueQueries.length, "data", infoQueries.length, "info");
 
         // Make all the queries and then give the queried data to the
         // resolve call for that query. This will end up calling the
         // above mapped resolve to set the appropriate data.
-        return Promise.all(uniqueQueries.map((vq) => this.querier.query(vq.params).then((data) => vq.resolve(data))));
+        const pendingInfo = infoQueries.map((iq) =>
+            this.querier.queryInfo(iq.params).then((info) => {
+                console.log(info);
+            })
+        );
+        const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq.params).then((data) => vq.resolve(data)));
+        return Promise.all([...pendingInfo, ...pendingData]);
     }
 
     public graphZoomed(viz: Viz, zoom: TimeZoom) {

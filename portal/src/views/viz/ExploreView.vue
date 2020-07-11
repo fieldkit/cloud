@@ -55,8 +55,8 @@ export default Vue.extend({
     },
     beforeMount() {
         if (this.bookmark) {
-            return new FKApi().getAllSensors().then((sensors) => {
-                this.workspace = Workspace.fromBookmark(sensors, this.bookmark);
+            return new FKApi().getAllSensors().then((sensorKeys) => {
+                this.workspace = Workspace.fromBookmark(sensorKeys, this.bookmark);
             });
         }
     },
@@ -78,8 +78,8 @@ export default Vue.extend({
                     return;
                 }
 
-                return new FKApi().getAllSensors().then((sensors) => {
-                    this.workspace = new Workspace(sensors);
+                return new FKApi().getAllSensors().then((sensorKeys) => {
+                    this.workspace = new Workspace(sensorKeys);
                     this.workspace.addStation(quickSensors, station);
                     return this.workspace.compare().with((ws) => {
                         return this.onChange(ws.bookmark());
