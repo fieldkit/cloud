@@ -24,4 +24,7 @@ export interface GlobalState {
 
 export interface GlobalGetters {
     projectsById: { [index: number]: DisplayProject };
+    isAuthenticated: boolean;
+    isBusy: boolean;
+    mapped: any;
 }

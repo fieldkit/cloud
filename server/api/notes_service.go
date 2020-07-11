@@ -231,6 +231,10 @@ func (s *NotesService) Upload(ctx context.Context, payload *notes.UploadPayload,
 		Key:         payload.Key,
 	}
 
+	log := Logger(ctx).Sugar()
+
+	log.Infow("media", "station_id", media.StationID, "key", media.Key, "content_type", media.ContentType, "user_id", media.UserID)
+
 	if err := s.options.Database.NamedGetContext(ctx, media, `
 		INSERT INTO fieldkit.notes_media (user_id, station_id, content_type, created, url, key)
 		VALUES (:user_id, :station_id, :content_type, :created, :url, :key) RETURNING *
