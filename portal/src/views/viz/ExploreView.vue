@@ -7,6 +7,10 @@
                 </div>
             </div>
 
+            <div v-if="showNoSensors" class="notification">
+                Oh snap, this station doesn't appear to have any sensors to show you.
+            </div>
+
             <div v-if="!workspace">
                 Nothing selected to visualize, please choose a station or project from the left.
             </div>
@@ -18,6 +22,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import Promise from "bluebird";
 import StandardLayout from "../StandardLayout.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
@@ -43,6 +48,7 @@ export default Vue.extend({
     data: () => {
         return {
             workspace: null,
+            showNoSensors: false,
         };
     },
     computed: {
@@ -66,24 +72,39 @@ export default Vue.extend({
                 .push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bookmark) } })
                 .then(() => this.workspace);
         },
-        showStation(stationId: number, ...args) {
-            const station = this.$store.state.stations.stations.all[stationId];
+        createWorkspaceIfNecessary() {
+            if (this.workspace) {
+                return Promise.resolve(this.workspace);
+            }
 
+            return new FKApi().getAllSensors().then((sensorKeys) => {
+                this.workspace = new Workspace(sensorKeys);
+                return this.workspace;
+            });
+        },
+        showStation(stationId: number, ...args) {
             console.log("show-station", stationId, ...args);
 
-            return new FKApi().getQuickSensors([stationId]).then((quickSensors) => {
-                console.log("quick-sensors", quickSensors);
-                if (quickSensors.stations[stationId].length == 0) {
-                    console.log("no sensors");
-                    return;
-                }
+            const station = this.$store.state.stations.stations.all[stationId];
 
-                return new FKApi().getAllSensors().then((sensorKeys) => {
-                    this.workspace = new Workspace(sensorKeys);
-                    this.workspace.addStation(quickSensors, station);
-                    return this.workspace.compare().with((ws) => {
-                        return this.onChange(ws.bookmark());
-                    });
+            return this.createWorkspaceIfNecessary().then((workspace) => {
+                return new FKApi().getQuickSensors([stationId]).then((quickSensors) => {
+                    console.log("quick-sensors", quickSensors);
+                    if (quickSensors.stations[stationId].length == 0) {
+                        console.log("no sensors");
+                        this.showNoSensors = true;
+                        return Promise.delay(5000).then(() => {
+                            this.showNoSensors = false;
+                        });
+                    }
+
+                    const stations = [stationId];
+                    const sensors = [quickSensors.stations[stationId][0].sensorId];
+
+                    return workspace
+                        .addStandardGraph(stations, sensors)
+                        .eventually((ws) => this.onChange(ws.bookmark()))
+                        .then((ws) => ws.query());
                 });
             });
         },
@@ -219,5 +240,14 @@ export default Vue.extend({
 
 .debug-panel {
     font-size: 8px;
+}
+
+.notification {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f8d7da;
+    border: 2px;
+    border-radius: 4px;
 }
 </style>

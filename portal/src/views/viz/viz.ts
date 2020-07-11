@@ -339,13 +339,6 @@ export class Workspace {
 
     constructor(private readonly meta: SensorsResponse, public groups: Group[] = []) {}
 
-    public addGraph(graph: Graph) {
-        const group = new Group();
-        group.add(graph);
-        this.groups.push(group);
-        return this;
-    }
-
     private get allVizes(): Viz[] {
         return _(this.groups)
             .map((g) => g.vizes)
@@ -400,6 +393,7 @@ export class Workspace {
                 });
             })
         );
+
         const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq.params).then((data) => vq.resolve(data)));
         return Promise.all([...pendingInfo, ...pendingData]).then(() => {
             this._options = this.updateOptions();
@@ -428,9 +422,15 @@ export class Workspace {
         throw new Error("oprhaned viz");
     }
 
-    public addSensor(sensor: SensorMeta, stations: Stations) {
-        const graph = new Graph(new DataQueryParams(TimeRange.eternity, stations, [sensor.id]));
-        return this.addGraph(graph);
+    public addGraph(graph: Graph): Workspace {
+        const group = new Group();
+        group.add(graph);
+        this.groups.unshift(group);
+        return this;
+    }
+
+    public addStandardGraph(stations: Stations, sensors: Sensors): Workspace {
+        return this.addGraph(new Graph(new DataQueryParams(TimeRange.eternity, stations, sensors)));
     }
 
     private updateOptions(): TreeOption[] {
@@ -539,7 +539,13 @@ export class Workspace {
         );
     }
 
+    public eventually(callback: (ws: Workspace) => Promise<any>) {
+        callback(this);
+        return Promise.resolve(this);
+    }
+
     public with(callback: (ws: Workspace) => Workspace) {
-        return callback(this);
+        callback(this);
+        return this;
     }
 }
