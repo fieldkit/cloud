@@ -92,10 +92,10 @@ export default {
     },
     computed: {
         projectStations() {
-            return this.$store.getters.projectsById[this.project.id].stations;
+            return this.$getters.projectsById[this.project.id].stations;
         },
         mappedProject() {
-            return this.$store.getters.projectsById[this.project.id].mapped;
+            return this.$getters.projectsById[this.project.id].mapped;
         },
     },
     methods: {

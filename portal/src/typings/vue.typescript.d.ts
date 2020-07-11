@@ -1,4 +1,4 @@
 declare module "*.vue" {
-    import Vue from "vue";
+    import Vue = require("@/store/strong-vue");
     export default Vue;
 }

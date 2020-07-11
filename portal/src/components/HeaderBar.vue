@@ -20,20 +20,22 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue";
 import FKApi from "@/api/api";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import CommonComponents from "@/views/shared";
+import { GlobalState } from "@/store/modules/global";
 
-export default {
+export default Vue.extend({
     name: "HeaderBar",
     components: {
         ...CommonComponents,
     },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
-        ...mapState({ user: (s) => s.user.user }),
+        ...mapState({ user: (s: GlobalState) => s.user.user }),
         userImage() {
             if (this.$store.state.user.user.photo) {
                 return this.$config.baseUrl + this.$store.state.user.user.photo.url;
@@ -51,7 +53,7 @@ export default {
             this.$emit("toggled");
         },
     },
-};
+});
 </script>
 
 <style scoped>

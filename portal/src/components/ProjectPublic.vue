@@ -118,10 +118,10 @@ export default {
             return this.displayProject.project;
         },
         projectStations() {
-            return this.$store.getters.projectsById[this.displayProject.id].stations;
+            return this.$getters.projectsById[this.displayProject.id].stations;
         },
         projectModules() {
-            return this.$store.getters.projectsById[this.displayProject.id].modules.map((m) => {
+            return this.$getters.projectsById[this.displayProject.id].modules.map((m) => {
                 return {
                     name: m.name,
                     url: this.getModuleImg(m),

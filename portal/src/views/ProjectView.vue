@@ -35,14 +35,16 @@
     </StandardLayout>
 </template>
 
-<script>
-import StandardLayout from "./StandardLayout";
+<script lang="ts">
+import Vue from "@/store/strong-vue";
+import StandardLayout from "./StandardLayout.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
-import ProjectPublic from "../components/ProjectPublic";
-import ProjectAdmin from "../components/ProjectAdmin";
+import ProjectPublic from "../components/ProjectPublic.vue";
+import ProjectAdmin from "../components/ProjectAdmin.vue";
+import { GlobalState } from "@/store/modules/global";
 
-export default {
+export default Vue.extend({
     name: "ProjectView",
     components: {
         StandardLayout,
@@ -67,15 +69,15 @@ export default {
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
-            user: (s) => s.user.user,
-            stations: (s) => s.stations.stations.user,
-            userProjects: (s) => s.stations.projects.user,
+            user: (s: GlobalState) => s.user.user,
+            stations: (s: GlobalState) => s.stations.stations.user,
+            userProjects: (s: GlobalState) => s.stations.projects.user,
             displayProject() {
-                return this.$store.getters.projectsById[this.id];
+                return this.$getters.projectsById[this.id];
             },
             isAdministrator() {
                 if (!this.forcePublic) {
-                    const p = this.$store.getters.projectsById[this.id];
+                    const p = this.$getters.projectsById[this.id];
                     if (p) {
                         return !p.readOnly;
                     }
@@ -114,7 +116,7 @@ export default {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
         },
     },
-};
+});
 </script>
 
 <style scoped>

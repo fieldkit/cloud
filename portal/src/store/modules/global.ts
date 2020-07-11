@@ -1,4 +1,4 @@
-import { StationsState } from "./stations";
+import { StationsState, DisplayProject } from "./stations";
 import { ClockState } from "./clock";
 import { MapState } from "./map";
 import { UserState } from "./user";
@@ -20,4 +20,8 @@ export interface GlobalState {
     readonly map: MapState;
     readonly route: RouteState;
     readonly user: UserState;
+}
+
+export interface GlobalGetters {
+    projectsById: { [index: number]: DisplayProject };
 }

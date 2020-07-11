@@ -21,6 +21,18 @@ const AssetsPlugin = {
     },
 };
 
+Object.defineProperty(Vue.prototype, "$getters", {
+    get: function(this: Vue) {
+        return this.$store.getters;
+    },
+});
+
+Object.defineProperty(Vue.prototype, "$state", {
+    get: function(this: Vue) {
+        return this.$store.state;
+    },
+});
+
 Vue.use(ConfigurationPlugin, Config);
 Vue.use(AssetsPlugin, Config);
 Vue.use(VCalendar, {});

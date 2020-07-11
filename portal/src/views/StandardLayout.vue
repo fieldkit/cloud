@@ -21,13 +21,15 @@
     </div>
 </template>
 
-<script>
-import HeaderBar from "../components/HeaderBar";
-import SidebarNav from "../components/SidebarNav";
+<script lang="ts">
+import Vue from "@/store/strong-vue";
+import HeaderBar from "../components/HeaderBar.vue";
+import SidebarNav from "../components/SidebarNav.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
+import { GlobalState } from "@/store/modules/global";
 
-export default {
+export default Vue.extend({
     name: "StandardLayout",
     components: {
         HeaderBar,
@@ -43,11 +45,11 @@ export default {
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy", mapped: "mapped" }),
         ...mapState({
-            user: (s) => s.user.user,
-            hasNoStations: (s) => s.stations.hasNoStations,
-            stations: (s) => s.stations.stations.user,
-            userProjects: (s) => s.stations.projects.user,
-            anyStations: (s) => s.stations.stations.user.length > 0,
+            user: (s: GlobalState) => s.user.user,
+            hasNoStations: (s: GlobalState) => s.stations.hasNoStations,
+            stations: (s: GlobalState) => s.stations.stations.user,
+            userProjects: (s: GlobalState) => s.stations.projects.user,
+            anyStations: (s: GlobalState) => s.stations.stations.user.length > 0,
         }),
     },
     beforeMount() {
@@ -65,7 +67,7 @@ export default {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
         },
     },
-};
+});
 </script>
 
 <style scoped>
