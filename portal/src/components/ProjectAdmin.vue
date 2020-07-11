@@ -199,7 +199,6 @@ export default {
                 inviteEmail: "",
                 inviteDuplicate: false,
             },
-            newUserImage: "",
             viewingActivityFeed: false,
             mapContainerSize: {
                 width: "677px",
@@ -249,8 +248,10 @@ export default {
             });
         },
     },
-    mounted() {
-        this.newUserImage = this.$loadAsset("new_user.png");
+    watch: {
+        project() {
+            this.form.inviteEmail = "";
+        },
     },
     methods: {
         getProjectUserImage(projectUser) {
