@@ -53,6 +53,8 @@ export const D3TimeSeriesGraph = Vue.extend({
             if (!this.data) {
                 return;
             }
+
+            const vizInfo = this.workspace.vizInfo(this.viz);
             const layout = new ChartLayout(1050, 340, new Margins({ top: 5, bottom: 50, left: 50, right: 0 }));
             const data = this.data;
             const timeRange = data.timeRange;
@@ -130,13 +132,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                     this.raiseTimeZoomed(new TimeZoom(null, newRange));
                 });
 
-            const colors = d3
-                .scaleSequential()
-                .domain([0, 1])
-                .interpolator(() => {
-                    return "#000000";
-                });
-
+            const colors = vizInfo.colorScale;
             const distance = dataRange[1] - dataRange[0];
             const stops = [
                 { offset: "0%", color: colors(dataRange[0]) },

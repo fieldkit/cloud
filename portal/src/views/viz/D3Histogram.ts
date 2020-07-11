@@ -48,6 +48,7 @@ export const D3Histogram = Vue.extend({
                 return;
             }
 
+            const vizInfo = this.workspace.vizInfo(this.viz);
             const layout = new ChartLayout(1050, 340, new Margins({ top: 5, bottom: 50, left: 50, right: 0 }));
             const data = this.data;
             const timeRange = data.timeRange;
@@ -140,7 +141,7 @@ export const D3Histogram = Vue.extend({
                     const w = x(d.x1) - x(d.x0) - 1;
                     return w <= 0 ? MinimumBarWidth : w;
                 })
-                .style("fill", (d) => colors)
+                .style("fill", (d) => vizInfo.colorScale)
                 .attr("height", (d) => {
                     return d.length == 0 ? 0 : layout.height - y(d.length) - layout.margins.bottom - layout.margins.top;
                 });

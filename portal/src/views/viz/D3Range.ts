@@ -47,6 +47,8 @@ export const D3Range = Vue.extend({
             if (!this.data) {
                 return;
             }
+
+            const vizInfo = this.workspace.vizInfo(this.viz);
             const layout = new ChartLayout(1050, 340, new Margins({ top: 5, bottom: 50, left: 50, right: 0 }));
             const data = this.data;
             const timeRange = data.timeRange;
@@ -127,11 +129,7 @@ export const D3Range = Vue.extend({
                 .data(charts)
                 .join((enter) => enter.append("defs"));
 
-            const colors = d3
-                .scaleSequential()
-                .domain([0, 1])
-                .interpolator(() => "#000000");
-
+            const colors = vizInfo.colorScale;
             const stops = [
                 {
                     offset: "0%",
