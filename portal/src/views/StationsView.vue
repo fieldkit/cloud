@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout @sidebar-toggle="onSidebarToggle">
+    <StandardLayout @sidebar-toggle="onSidebarToggle" :viewingStations="true">
         <div class="container-map">
             <StationsMap @mapReady="onMapReady" @showSummary="showSummary" :mapped="mapped" />
             <StationSummary

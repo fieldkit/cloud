@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout>
+    <StandardLayout :viewingProjects="true">
         <div id="loading" v-if="isBusy">
             <img alt="" src="../assets/progress.gif" />
         </div>

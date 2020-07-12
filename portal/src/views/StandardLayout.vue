@@ -2,7 +2,8 @@
     <div class="container-ignored">
         <div class="container-top">
             <SidebarNav
-                viewingStations="true"
+                :viewingStations="viewingStations"
+                :viewingProjects="viewingProjects"
                 :isAuthenticated="isAuthenticated"
                 :stations="stations"
                 :projects="userProjects"
@@ -36,6 +37,14 @@ export default Vue.extend({
         SidebarNav,
     },
     props: {
+        viewingProjects: {
+            type: Boolean,
+            default: false,
+        },
+        viewingStations: {
+            type: Boolean,
+            default: false,
+        },
         defaultShowStation: {
             type: Boolean,
             default: true,

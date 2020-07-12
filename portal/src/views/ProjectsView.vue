@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout>
+    <StandardLayout :viewingProjects="true">
         <div class="main-panel" v-show="!isBusy && isAuthenticated">
             <div id="inner-container">
                 <div id="projects-container">
