@@ -235,15 +235,11 @@ export class Group {
     }
 
     public get scrubbers(): Scrubbers {
-        if (this.vizes.length > 1) {
-            return new Scrubbers(
-                this.id,
-                this.visible_,
-                this.vizes.filter((viz) => (viz as Graph).all).map((viz, i) => new Scrubber(i, (viz as Graph).all))
-            );
-        } else {
-            return null;
-        }
+        return new Scrubbers(
+            this.id,
+            this.visible_,
+            this.vizes.filter((viz) => (viz as Graph).all).map((viz, i) => new Scrubber(i, (viz as Graph).all))
+        );
     }
 
     public bookmark(): GroupBookmark {

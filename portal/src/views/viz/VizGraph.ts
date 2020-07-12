@@ -97,8 +97,6 @@ export const VizGraph = Vue.extend({
 			<component v-bind:is="uiNameOf(viz)" :viz="viz" :workspace="workspace"
 				@viz-time-zoomed="raiseTimeZoomed" />
 
-			<D3Scrubber :viz="viz" @viz-time-zoomed="raiseTimeZoomed" />
-
             <DebuggingPanel :viz="viz" :workspace="workspace" v-if="debug" />
 		</div>
 	`,

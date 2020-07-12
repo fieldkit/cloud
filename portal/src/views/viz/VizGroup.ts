@@ -48,10 +48,7 @@ export const VizGroup = Vue.extend({
         },
     },
     template: `
-		<div>
-			<div v-if="group.scrubbers">
-				<D3MultiScrubber :scrubbers="group.scrubbers" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
-			</div>
+		<div class="group">
 			<component v-for="viz in group.vizes" :key="viz.id" v-bind:is="uiNameOf(viz)" :viz="viz" :workspace="workspace"
 				@viz-time-zoomed="(...args) => raiseVizTimeZoomed(viz, ...args)"
 				@viz-remove="(...args) => raiseRemove(viz, ...args)"
@@ -60,6 +57,9 @@ export const VizGroup = Vue.extend({
 				@viz-change-chart="(...args) => raiseChangeChart(viz, ...args)"
 				/>
 			</component>
+			<div v-if="group.scrubbers">
+				<D3MultiScrubber :scrubbers="group.scrubbers" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
+			</div>
 		</div>
 	`,
 });

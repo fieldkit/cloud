@@ -53,8 +53,8 @@ export const D3MultiScrubber = Vue.extend({
             const scrubberSize = 40;
             const layout = new ChartLayout(
                 1050,
-                scrubberSize * this.scrubbers.rows.length + 30,
-                new Margins({ top: 10, bottom: 20, left: 20, right: 20 })
+                scrubberSize * this.scrubbers.rows.length,
+                new Margins({ top: 0, bottom: 0, left: 0, right: 0 })
             );
             const timeRange = this.scrubbers.timeRange;
             const charts = [
@@ -76,9 +76,9 @@ export const D3MultiScrubber = Vue.extend({
                 .join((enter) => {
                     const svg = enter
                         .append("svg")
+                        .attr("class", "svg-container")
                         .attr("preserveAspectRatio", "xMidYMid meet")
-                        .attr("width", (c) => c.layout.width)
-                        .attr("height", (c) => c.layout.height);
+                        .attr("viewBox", "0 0 " + layout.width + " " + layout.height);
 
                     const defs = svg.append("defs");
 
