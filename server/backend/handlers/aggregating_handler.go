@@ -70,8 +70,10 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 	}
 
 	for key, value := range filtered.Record.Readings {
-		if err := aggregator.AddSample(ctx, db.Time, filtered.Record.Location, key, value.Value); err != nil {
-			return fmt.Errorf("error adding: %v", err)
+		if !filtered.Filters.IsFiltered(key) {
+			if err := aggregator.AddSample(ctx, db.Time, filtered.Record.Location, key, value.Value); err != nil {
+				return fmt.Errorf("error adding: %v", err)
+			}
 		}
 	}
 
@@ -84,5 +86,8 @@ func (v *AggregatingHandler) OnDone(ctx context.Context) error {
 			return err
 		}
 	}
+
+	// Delete out of range data.
+
 	return nil
 }
