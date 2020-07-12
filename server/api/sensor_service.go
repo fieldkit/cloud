@@ -176,8 +176,8 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	selectedAggregateName := qp.Aggregate
 	summaries := make(map[string]*AggregateSummary)
 
-	for name, table := range handlers.AggregateTableNames {
-		summary := &AggregateSummary{}
+	for _, name := range handlers.AggregateNames {
+		table := handlers.AggregateTableNames[name]
 
 		query, args, err := sqlx.In(fmt.Sprintf(`
 			SELECT COUNT(*) AS number_records FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?);
@@ -186,6 +186,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 			return nil, err
 		}
 
+		summary := &AggregateSummary{}
 		if err := c.db.GetContext(ctx, summary, c.db.Rebind(query), args...); err != nil {
 			return nil, err
 		}
