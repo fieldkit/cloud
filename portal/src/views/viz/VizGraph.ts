@@ -46,7 +46,7 @@ export const VizGraph = Vue.extend({
     },
     computed: {
         debug() {
-            return false;
+            return true;
         },
     },
     methods: {

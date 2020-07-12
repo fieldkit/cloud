@@ -340,10 +340,22 @@ export class Workspace {
         // and just being very explicit is the best way.
         const scrubberQueries = allGraphs
             .filter((viz) => !viz.all)
-            .map((viz: Graph) => new VizQuery(viz.scrubberParams, (qd) => (viz.all = qd)));
+            .map(
+                (viz: Graph) =>
+                    new VizQuery(viz.scrubberParams, (qd) => {
+                        viz.all = qd;
+                        return;
+                    })
+            );
 
         // Now build the queries for the data being viewed.
-        const graphingQueries = allGraphs.map((viz: Graph) => new VizQuery(viz.chartParams, (qd) => (viz.graphing = qd)));
+        const graphingQueries = allGraphs.map(
+            (viz: Graph) =>
+                new VizQuery(viz.chartParams, (qd) => {
+                    viz.graphing = qd;
+                    return;
+                })
+        );
 
         // Combine and make them unique to avoid obvious
         // duplicates. Eventually we can also merge stations/sensors
@@ -469,7 +481,7 @@ export class Workspace {
             })
             .value();
 
-        console.log("workspace: options:", options);
+        console.log("workspace: options:", { options: options });
 
         return options;
     }
