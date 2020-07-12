@@ -66,6 +66,7 @@ func TestGetSensorsData(t *testing.T) {
 	ja.Assertf(rr.Body.String(), `
 	{
 		"summaries": "<<PRESENCE>>",
+		"aggregate": "<<PRESENCE>>",
 		"data": "<<PRESENCE>>"
 	}`)
 }
