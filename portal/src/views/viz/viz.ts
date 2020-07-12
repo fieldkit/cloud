@@ -7,7 +7,6 @@ import FKApi from "@/api/api";
 import { ColorScale, createSensorColorScale } from "./d3-helpers";
 
 export class SensorMeta {
-    // TODO Color scale.
     constructor(public readonly id: number, public readonly fullKey: string, public readonly name: string) {}
 }
 
@@ -52,7 +51,7 @@ export class QueriedData {
 }
 
 export class VizInfo {
-    constructor(public readonly colorScale: ColorScale) {}
+    constructor(public readonly colorScale: ColorScale, public readonly station: { name: string }) {}
 }
 
 export abstract class Viz {
@@ -394,16 +393,23 @@ export class Workspace {
         const sensorDetailsByKey = _.keyBy(_.flatten(this.meta.modules.map((m) => m.sensors)), (s) => s.fullKey);
         const keysById = _.keyBy(this.meta.sensors, (s) => s.id);
 
-        if (viz.chartParams.sensors.length != 1) {
-            throw new Error("expected 1 sensor per graph");
+        if (viz.chartParams.stations.length != 1) {
+            throw new Error("expected 1 station per graph, for now");
         }
 
+        if (viz.chartParams.sensors.length != 1) {
+            throw new Error("expected 1 sensor per graph, for now");
+        }
+
+        const stationId = viz.chartParams.stations[0];
         const sensorId = viz.chartParams.sensors[0];
+
+        const station = this.stations[stationId];
         const key = keysById[sensorId].key;
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
 
-        return new VizInfo(scale);
+        return new VizInfo(scale, station);
     }
 
     public graphZoomed(viz: Viz, zoom: TimeZoom) {
