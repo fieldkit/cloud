@@ -31,6 +31,9 @@ export class TimeRange {
     }
 
     public static mergeArrays(ranges: number[][]): TimeRange {
+        if (ranges.length == 0) {
+            return TimeRange.eternity;
+        }
         const min = _(ranges)
             .map((r) => r[0])
             .min();
@@ -38,6 +41,10 @@ export class TimeRange {
             .map((r) => r[1])
             .max();
         return new TimeRange(min, max);
+    }
+
+    public static mergeRanges(ranges: TimeRange[]): TimeRange {
+        return TimeRange.mergeArrays(ranges.map((r) => r.array));
     }
 
     public contains(o: TimeRange): boolean {

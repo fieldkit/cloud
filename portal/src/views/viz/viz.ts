@@ -181,6 +181,7 @@ export class Graph extends Viz {
         const graph = new Graph(chartParams);
         graph.chartType = bm[3];
         graph.fastTime = bm[4];
+        graph.visible = visible;
         return graph;
     }
 }
@@ -189,7 +190,15 @@ export class Group {
     public readonly id = Ids.make();
     private visible_: TimeRange = TimeRange.eternity;
 
-    constructor(public vizes: Viz[] = []) {}
+    constructor(public vizes: Viz[] = []) {
+        // This returns eternity when merging empty array.
+        this.visible_ = TimeRange.mergeRanges(
+            vizes
+                .map((v) => v as Graph)
+                .filter((v) => v)
+                .map((v) => v.visible)
+        );
+    }
 
     public log(...args: any[]) {
         console.log(...["viz:", this.id, this.constructor.name, ...args]);
