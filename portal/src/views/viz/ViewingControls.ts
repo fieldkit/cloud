@@ -105,7 +105,7 @@ export const ViewingControls = Vue.extend({
 			<div class="row row-1">
 				<div class="left buttons">
 					<div class="btn" @click="raiseCompare">Compare</div>
-					<div class="btn" @click="raiseRemove">Remove</div>
+					<div class="btn" @click="raiseRemove" v-if="false">Remove</div>
 				</div>
 				<div class="right time">
 					<span class="view-by">View By:</span>
