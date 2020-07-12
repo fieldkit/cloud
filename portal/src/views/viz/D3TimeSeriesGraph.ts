@@ -84,20 +84,22 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .select(".chart")
                 .selectAll("svg")
                 .data(charts)
-                .join((enter) =>
-                    enter
+                .join((enter) => {
+                    const svg = enter
                         .append("svg")
+                        .attr("class", "svg-container")
                         .attr("preserveAspectRatio", "xMidYMid meet")
-                        .attr("width", (c) => c.layout.width)
-                        .attr("height", (c) => c.layout.height)
-                );
+                        .attr("viewBox", "0 0 " + layout.width + " " + layout.height);
+
+                    return svg;
+                });
 
             svg.selectAll(".x-axis")
                 .data(charts)
                 .join((enter) =>
                     enter
                         .append("g")
-                        .attr("class", "x-axis")
+                        .attr("class", "svg-container-responsive x-axis")
                         .attr("transform", "translate(" + 0 + "," + (layout.height - (layout.margins.bottom + layout.margins.top)) + ")")
                 )
                 .call(xAxis);
@@ -107,7 +109,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .join((enter) =>
                     enter
                         .append("g")
-                        .attr("class", "y-axis")
+                        .attr("class", "svg-container-responsive y-axis")
                         .attr("transform", "translate(" + layout.margins.left + ",0)")
                 )
                 .call(yAxis);
@@ -147,7 +149,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .selectAll(".d3-line")
                 .data(charts)
                 .join((enter) => {
-                    const adding = enter.append("g").attr("class", "d3-line");
+                    const adding = enter.append("g").attr("class", "svg-container-responsive d3-line");
 
                     adding
                         .append("linearGradient")

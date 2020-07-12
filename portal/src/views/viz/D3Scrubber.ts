@@ -83,11 +83,21 @@ export const D3Scrubber = Vue.extend({
                 .selectAll("svg")
                 .data(charts)
                 .join((enter) => {
+                    // This is how to calculate size... if we ever need to dynamically scale this.
+                    const bounding = d3
+                        .select(this.$el)
+                        .node()
+                        .getBoundingClientRect();
+                    const domSizes = {
+                        width: bounding.width,
+                        height: bounding.height,
+                    };
+
                     const svg = enter
                         .append("svg")
+                        .attr("class", "svg-container")
                         .attr("preserveAspectRatio", "xMidYMid meet")
-                        .attr("width", (c) => c.layout.width)
-                        .attr("height", (c) => c.layout.height);
+                        .attr("viewBox", "0 0 " + layout.width + " " + layout.height);
 
                     const defs = svg.append("defs");
 

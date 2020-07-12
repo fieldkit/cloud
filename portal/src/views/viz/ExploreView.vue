@@ -125,7 +125,11 @@ export default Vue.extend({
     text-align: left;
     background-color: #fcfcfc;
     padding: 40px;
-    max-width: 1054px; /* HACK fixed width of svg */
+
+    /* HACK fixed width of svg */
+    /*
+    max-width: 1054px;
+	*/
 }
 .explore-header {
     display: flex;
@@ -249,5 +253,20 @@ export default Vue.extend({
     background-color: #f8d7da;
     border: 2px;
     border-radius: 4px;
+}
+
+.svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    vertical-align: top;
+    overflow: hidden;
+}
+
+.svg-content-responsive {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 0;
 }
 </style>

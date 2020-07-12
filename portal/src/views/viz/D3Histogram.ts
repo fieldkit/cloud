@@ -67,9 +67,9 @@ export const D3Histogram = Vue.extend({
                 .join((enter) => {
                     const adding = enter
                         .append("svg")
+                        .attr("class", "svg-container")
                         .attr("preserveAspectRatio", "xMidYMid meet")
-                        .attr("width", (c) => c.layout.width)
-                        .attr("height", (c) => c.layout.height);
+                        .attr("viewBox", "0 0 " + layout.width + " " + layout.height);
 
                     return adding;
                 });

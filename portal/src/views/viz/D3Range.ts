@@ -96,8 +96,7 @@ export const D3Range = Vue.extend({
                     const adding = enter
                         .append("svg")
                         .attr("preserveAspectRatio", "xMidYMid meet")
-                        .attr("width", (c) => c.layout.width)
-                        .attr("height", (c) => c.layout.height);
+                        .attr("viewBox", "0 0 " + layout.width + " " + layout.height);
 
                     adding.append("defs");
 
