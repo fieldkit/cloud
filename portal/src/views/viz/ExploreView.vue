@@ -68,9 +68,14 @@ export default Vue.extend({
     },
     methods: {
         onChange(bookmark: Bookmark) {
-            return this.$router
-                .push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bookmark) } })
-                .then(() => this.workspace);
+            const activeEncoded = JSON.stringify(this.bookmark);
+            const newEncoded = JSON.stringify(bookmark);
+
+            if (newEncoded == activeEncoded) {
+                return Promise.resolve(this.workspace);
+            }
+
+            return this.$router.push({ name: "exploreBookmark", params: { bookmark: newEncoded } }).then(() => this.workspace);
         },
         createWorkspaceIfNecessary() {
             if (this.workspace) {
