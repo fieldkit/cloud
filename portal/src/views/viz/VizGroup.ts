@@ -34,9 +34,6 @@ export const VizGroup = Vue.extend({
         },
     },
     methods: {
-        uiNameOf(viz: Viz) {
-            return "Viz" + viz.constructor.name;
-        },
         raiseGroupZoomed(zoom: TimeZoom, ...args) {
             return this.$emit("group-time-zoomed", zoom, ...args);
         },
@@ -70,7 +67,7 @@ export const VizGroup = Vue.extend({
 						<div class="icon remove-icon" v-on:click="(ev) => raiseRemove(viz)"></div>
 					</div>
 
-					<component v-bind:is="uiNameOf(viz)" :viz="viz" :workspace="workspace"
+					<VizGraph :viz="viz" :workspace="workspace"
 						@viz-time-zoomed="(...args) => raiseVizTimeZoomed(viz, ...args)"
 						@viz-remove="(...args) => raiseRemove(viz, ...args)"
 						@viz-compare="(...args) => raiseCompare(viz, ...args)"
