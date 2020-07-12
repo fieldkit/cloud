@@ -121,10 +121,10 @@ export default Vue.extend({
 }
 
 .explore-view {
-    height: 100%;
     text-align: left;
     background-color: #fcfcfc;
     padding: 40px;
+    flex-grow: 1;
 }
 .explore-header {
     display: flex;
@@ -151,7 +151,6 @@ export default Vue.extend({
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding-bottom: 100px;
 }
 .tree-container {
     flex: 0;

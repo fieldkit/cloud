@@ -216,6 +216,7 @@ export default {
     color: #6a6d71;
 }
 .location-item {
+    text-align: left;
     margin: 10px;
     width: 100%;
 }

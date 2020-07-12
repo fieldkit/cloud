@@ -165,6 +165,7 @@ export default {
     display: flex;
     flex-direction: column;
     max-width: 1000px;
+    padding-bottom: 100px;
 }
 .header {
     display: flex;
