@@ -32,8 +32,8 @@ export const VizGroup = Vue.extend({
         uiNameOf(viz: Viz) {
             return "Viz" + viz.constructor.name;
         },
-        raiseGroupZoomed(range: TimeRange, ...args) {
-            return this.$emit("group-time-zoomed", new TimeZoom(null, range), ...args);
+        raiseGroupZoomed(zoom: TimeZoom, ...args) {
+            return this.$emit("group-time-zoomed", zoom, ...args);
         },
         raiseVizTimeZoomed(...args) {
             return this.$emit("viz-time-zoomed", ...args);

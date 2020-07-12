@@ -50,7 +50,7 @@ export const D3MultiScrubber = Vue.extend({
                 return;
             }
 
-            const scrubberSize = 40;
+            const scrubberSize = this.scrubbers.rows.length > 1 ? 30 : 40;
             const layout = new ChartLayout(
                 1050,
                 scrubberSize * this.scrubbers.rows.length,
@@ -77,8 +77,7 @@ export const D3MultiScrubber = Vue.extend({
                     const svg = enter
                         .append("svg")
                         .attr("class", "svg-container")
-                        .attr("preserveAspectRatio", "xMidYMid meet")
-                        .attr("viewBox", "0 0 " + layout.width + " " + layout.height);
+                        .attr("preserveAspectRatio", "xMidYMid meet");
 
                     const defs = svg.append("defs");
 
@@ -101,12 +100,18 @@ export const D3MultiScrubber = Vue.extend({
                         .append("feFuncA")
                         .attr("type", "linear")
                         .attr("slope", 0.5);
+
                     const merge = blurFilter.append("feMerge");
                     merge.append("feMergeNode");
                     merge.append("feMergeNode").attr("in", "SourceGraphic");
 
+                    svg.append("g").attr("class", "background-areas");
+
+                    svg.append("g").attr("class", "foreground-areas");
+
                     return svg;
-                });
+                })
+                .attr("viewBox", "0 0 " + layout.width + " " + layout.height);
 
             const area = (scrubber) => {
                 const top = layout.margins.top + scrubberSize * scrubber.index;
@@ -124,6 +129,7 @@ export const D3MultiScrubber = Vue.extend({
             };
 
             const backgroundAreas = svg
+                .select(".background-areas")
                 .selectAll(".background-area")
                 .data((d) => d.scrubbers.rows)
                 .join((enter) =>
@@ -131,34 +137,28 @@ export const D3MultiScrubber = Vue.extend({
                         .append("path")
                         .attr("class", "background-area")
                         .attr("fill", "rgb(220, 222, 223)")
-                        .attr("d", (scrubber) => area(scrubber)(scrubber.data.sdr.data))
-                );
+                )
+                .attr("d", (scrubber) => area(scrubber)(scrubber.data.sdr.data));
 
             const foregroundAreas = svg
+                .select(".foreground-areas")
                 .selectAll(".foreground-area")
                 .data((d) => d.scrubbers.rows)
                 .join((enter) =>
                     enter
                         .append("path")
-                        .attr("clip-path", "url(#scrubber-clip-" + this.scrubbers.id + ")")
                         .attr("class", "foreground-area")
                         .attr("fill", "rgb(45, 158, 204)")
-                        .attr("d", (scrubber) => area(scrubber)(scrubber.data.sdr.data))
-                );
+                )
+                .attr("clip-path", "url(#scrubber-clip-" + this.scrubbers.id + ")")
+                .attr("d", (scrubber) => area(scrubber)(scrubber.data.sdr.data));
 
-            const handles = (g, selection) =>
-                g
-                    .selectAll(".handle-custom")
+            const handles = (g, selection) => {
+                g.selectAll(".handle-custom")
                     .data([{ type: "w" }, { type: "e" }])
                     .join((enter) => {
                         const handle = enter.append("g").attr("class", "handle-custom");
-                        handle
-                            .append("line")
-                            .attr("x1", 0)
-                            .attr("x2", 0)
-                            .attr("y1", -(layout.height - layout.margins.top - layout.margins.bottom) / 2)
-                            .attr("y2", (layout.height - layout.margins.top - layout.margins.bottom) / 2)
-                            .attr("stroke", "black");
+                        handle.append("line").attr("stroke", "black");
                         handle
                             .append("circle")
                             .attr("filter", "url(#dropshadow-" + this.scrubbers.id + ")")
@@ -175,23 +175,34 @@ export const D3MultiScrubber = Vue.extend({
                             : (d, i) => `translate(${selection[i]},${(layout.height + layout.margins.top - layout.margins.bottom) / 2})`
                     );
 
+                g.selectAll("line")
+                    .attr("x1", 0)
+                    .attr("x2", 0)
+                    .attr("y1", -(layout.height - layout.margins.top - layout.margins.bottom) / 2)
+                    .attr("y2", (layout.height - layout.margins.top - layout.margins.bottom) / 2);
+            };
+
             const raiseZoomed = (newTimes) => this.raiseTimeZoomed(newTimes);
 
             const clip = svg
                 .selectAll(".scrubber-clip")
                 .data(charts)
-                .join((enter) =>
-                    enter
-                        .append("defs")
+                .join((enter) => {
+                    const clip = enter
+                        .select("defs")
                         .append("clipPath")
-                        .attr("id", "scrubber-clip-" + this.scrubbers.id)
-                        .attr("class", "scrubber-clip")
-                        .append("rect")
-                        .attr("width", layout.width)
-                        .attr("height", layout.height)
+                        .attr("class", "scrubber-clip");
+
+                    clip.append("rect")
                         .attr("x", 0)
-                        .attr("y", 0)
-                );
+                        .attr("y", 0);
+
+                    return clip;
+                })
+                .attr("id", "scrubber-clip-" + this.scrubbers.id)
+                .select("rect")
+                .attr("width", layout.width)
+                .attr("height", layout.height);
 
             const brush = d3
                 .brushX()
@@ -225,12 +236,8 @@ export const D3MultiScrubber = Vue.extend({
             const brushTop = svg
                 .selectAll(".brush-container")
                 .data(charts)
-                .join((enter) =>
-                    enter
-                        .append("g")
-                        .attr("class", "brush-container")
-                        .call(brush)
-                )
+                .join((enter) => enter.append("g").attr("class", "brush-container"))
+                .call(brush)
                 .call(brush.move, visible().map(x));
         },
     },
