@@ -4,12 +4,12 @@ import Vue from "vue";
 import { TimeRange } from "./common";
 import { Workspace, Viz, Group, TimeZoom } from "./viz";
 import { VizGraph } from "./VizGraph";
-import { D3MultiScrubber } from "./D3MultiScrubber";
+import { D3Scrubber } from "./D3Scrubber";
 
 export const VizGroup = Vue.extend({
     components: {
         VizGraph,
-        D3MultiScrubber,
+        D3Scrubber,
     },
     props: {
         group: {
@@ -80,7 +80,7 @@ export const VizGroup = Vue.extend({
 					</component>
 				</template>
 				<div v-if="group.scrubbers">
-					<D3MultiScrubber :scrubbers="group.scrubbers" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
+					<D3Scrubber :scrubbers="group.scrubbers" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
 				</div>
 			</div>
 		</div>

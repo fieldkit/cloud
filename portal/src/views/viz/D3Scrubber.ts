@@ -3,7 +3,7 @@ import Vue from "vue";
 import * as d3 from "d3";
 
 import { TimeRange, Margins, ChartLayout } from "./common";
-import { Graph, QueriedData, TimeZoom } from "./viz";
+import { QueriedData, Scrubbers, TimeZoom } from "./viz";
 
 export const D3Scrubber = Vue.extend({
     name: "D3Scrubber",
@@ -11,106 +11,79 @@ export const D3Scrubber = Vue.extend({
         return {};
     },
     props: {
-        viz: {
-            type: Graph,
+        scrubbers: {
+            type: Scrubbers,
             required: true,
         },
     },
     computed: {
-        data(): QueriedData {
-            if (this.viz.all && !this.viz.all.empty) {
-                return this.viz.all;
-            }
-            return null;
+        data(): QueriedData[] {
+            return this.scrubbers.rows.map((s) => s.data);
         },
         visible(): TimeRange {
-            return this.viz.visible;
+            return this.scrubbers.visible;
         },
     },
     watch: {
         visible(newValue, oldValue) {
-            this.viz.log("graphing (visible)");
+            console.log("d3scrubber graphing (visible)");
             this.refresh();
         },
         data(newValue, oldValue) {
-            this.viz.log("graphing (data)");
+            console.log("d3scrubber graphing (data)");
             this.refresh();
         },
     },
     mounted() {
-        this.viz.log("mounted");
+        console.log("d3scrubber mounted");
         this.refresh();
     },
     updated() {
-        this.viz.log("updated");
+        console.log("d3scrubber updated");
     },
     methods: {
         raiseTimeZoomed(newTimes) {
             return this.$emit("viz-time-zoomed", new TimeZoom(null, newTimes));
         },
         refresh() {
-            if (!this.data) {
+            if (!this.data || this.data.length == 0) {
                 return;
             }
-            const layout = new ChartLayout(1050, 45, new Margins({ top: 0, bottom: 0, left: 0, right: 0 }));
-            const data = this.data;
-            const timeRange = data.timeRange;
-            const dataRange = data.dataRange;
+
+            const scrubberSize = this.scrubbers.rows.length > 1 ? 30 : 40;
+            const layout = new ChartLayout(
+                1050,
+                scrubberSize * this.scrubbers.rows.length,
+                new Margins({ top: 0, bottom: 0, left: 0, right: 0 })
+            );
+            const timeRange = this.scrubbers.timeRange;
             const charts = [
                 {
                     layout: layout,
+                    scrubbers: this.scrubbers,
                 },
             ];
 
             const x = d3
                 .scaleTime()
-                .domain(timeRange)
+                .domain(timeRange.toArray())
                 .range([layout.margins.left, layout.width - layout.margins.left - layout.margins.right]);
-
-            const y = d3
-                .scaleLinear()
-                .domain(dataRange)
-                .range([layout.height - layout.margins.bottom, layout.margins.top]);
-
-            const area = d3
-                .area()
-                .x((d) => x(d.time))
-                .y0(layout.height - layout.margins.bottom)
-                .y1((d) => y(d.value));
 
             const svg = d3
                 .select(this.$el)
                 .selectAll("svg")
                 .data(charts)
                 .join((enter) => {
-                    // This is how to calculate size... if we ever need to dynamically scale this.
-                    const bounding = d3
-                        .select(this.$el)
-                        .node()
-                        .getBoundingClientRect();
-                    const domSizes = {
-                        width: bounding.width,
-                        height: bounding.height,
-                    };
-
                     const svg = enter
                         .append("svg")
                         .attr("class", "svg-container")
-                        .attr("preserveAspectRatio", "xMidYMid meet")
-                        .attr("viewBox", "0 0 " + layout.width + " " + layout.height);
+                        .attr("preserveAspectRatio", "xMidYMid meet");
 
                     const defs = svg.append("defs");
 
-                    svg.append("rect")
-                        .attr("x", layout.margins.left)
-                        .attr("y", 0)
-                        .attr("width", layout.width)
-                        .attr("height", layout.height)
-                        .attr("fill", "#f4f5f7");
-
                     const blurFilter = defs
                         .append("filter")
-                        .attr("id", "dropshadow-" + this.viz.id)
+                        .attr("id", "dropshadow-" + this.scrubbers.id)
                         .attr("height", "150%")
                         .attr("width", "150%");
                     blurFilter
@@ -127,55 +100,68 @@ export const D3Scrubber = Vue.extend({
                         .append("feFuncA")
                         .attr("type", "linear")
                         .attr("slope", 0.5);
+
                     const merge = blurFilter.append("feMerge");
                     merge.append("feMergeNode");
                     merge.append("feMergeNode").attr("in", "SourceGraphic");
 
-                    return svg;
-                });
+                    svg.append("g").attr("class", "background-areas");
 
-            const backgroundArea = svg
+                    svg.append("g").attr("class", "foreground-areas");
+
+                    return svg;
+                })
+                .attr("viewBox", "0 0 " + layout.width + " " + layout.height);
+
+            const area = (scrubber) => {
+                const top = layout.margins.top + scrubberSize * scrubber.index;
+                const bottom = top + scrubberSize;
+                const y = d3
+                    .scaleLinear()
+                    .domain(scrubber.data.dataRange)
+                    .range([bottom, top]);
+
+                return d3
+                    .area()
+                    .x((d) => x(d.time))
+                    .y0(bottom)
+                    .y1((d) => y(d.value));
+            };
+
+            const backgroundAreas = svg
+                .select(".background-areas")
                 .selectAll(".background-area")
-                .data(charts)
+                .data((d) => d.scrubbers.rows)
                 .join((enter) =>
                     enter
                         .append("path")
                         .attr("class", "background-area")
                         .attr("fill", "rgb(220, 222, 223)")
                 )
-                .data([this.data.data])
-                .attr("d", area);
+                .attr("d", (scrubber) => area(scrubber)(scrubber.data.sdr.data));
 
-            const foregroundArea = svg
+            const foregroundAreas = svg
+                .select(".foreground-areas")
                 .selectAll(".foreground-area")
-                .data(charts)
+                .data((d) => d.scrubbers.rows)
                 .join((enter) =>
                     enter
                         .append("path")
-                        .attr("clip-path", "url(#scrubber-clip-" + this.viz.id + ")")
                         .attr("class", "foreground-area")
                         .attr("fill", "rgb(45, 158, 204)")
                 )
-                .data([this.data.data])
-                .attr("d", area);
+                .attr("clip-path", "url(#scrubber-clip-" + this.scrubbers.id + ")")
+                .attr("d", (scrubber) => area(scrubber)(scrubber.data.sdr.data));
 
-            const handles = (g, selection) =>
-                g
-                    .selectAll(".handle-custom")
+            const handles = (g, selection) => {
+                g.selectAll(".handle-custom")
                     .data([{ type: "w" }, { type: "e" }])
                     .join((enter) => {
                         const handle = enter.append("g").attr("class", "handle-custom");
-                        handle
-                            .append("line")
-                            .attr("x1", 0)
-                            .attr("x2", 0)
-                            .attr("y1", -(layout.height - layout.margins.top - layout.margins.bottom) / 2)
-                            .attr("y2", (layout.height - layout.margins.top - layout.margins.bottom) / 2)
-                            .attr("stroke-width", "2")
-                            .attr("stroke", "#4f4f4f");
+                        handle.append("line").attr("stroke", "black");
                         handle
                             .append("circle")
-                            .attr("filter", "url(#dropshadow-" + this.viz.id + ")")
+                            .attr("filter", "url(#dropshadow-" + this.scrubbers.id + ")")
                             .attr("fill", "white")
                             .attr("cursor", "ew-resize")
                             .attr("r", 9);
@@ -189,6 +175,13 @@ export const D3Scrubber = Vue.extend({
                             : (d, i) => `translate(${selection[i]},${(layout.height + layout.margins.top - layout.margins.bottom) / 2})`
                     );
 
+                g.selectAll("line")
+                    .attr("x1", 0)
+                    .attr("x2", 0)
+                    .attr("y1", -(layout.height - layout.margins.top - layout.margins.bottom) / 2)
+                    .attr("y2", (layout.height - layout.margins.top - layout.margins.bottom) / 2);
+            };
+
             const raiseZoomed = (newTimes) => this.raiseTimeZoomed(newTimes);
 
             const clip = svg
@@ -198,15 +191,18 @@ export const D3Scrubber = Vue.extend({
                     const clip = enter
                         .select("defs")
                         .append("clipPath")
-                        .attr("id", "scrubber-clip-" + this.viz.id)
                         .attr("class", "scrubber-clip");
 
                     clip.append("rect")
-                        .attr("height", layout.height)
+                        .attr("x", 0)
                         .attr("y", 0);
 
                     return clip;
-                });
+                })
+                .attr("id", "scrubber-clip-" + this.scrubbers.id)
+                .select("rect")
+                .attr("width", layout.width)
+                .attr("height", layout.height);
 
             const brush = d3
                 .brushX()
@@ -218,46 +214,31 @@ export const D3Scrubber = Vue.extend({
                     const selection = d3.event.selection;
                     if (selection !== null) {
                         const sx = selection.map(x.invert);
-                        clip.select("rect")
-                            .attr("x", selection[0])
-                            .attr("width", selection[1] - selection[0]);
+                        clip.attr("x", selection[0]).attr("width", selection[1] - selection[0]);
                     }
 
                     d3.select(this).call(handles, selection);
 
                     if (d3.event.type == "end" && d3.event.sourceEvent) {
-                        if (selection != null) {
-                            const start = x.invert(selection[0]);
-                            const end = x.invert(selection[1]);
-                            raiseZoomed(new TimeRange(start.getTime(), end.getTime()));
-                        } else {
-                            raiseZoomed(TimeRange.eternity);
-                        }
+                        const start = x.invert(selection[0]);
+                        const end = x.invert(selection[1]);
+                        raiseZoomed(new TimeRange(start.getTime(), end.getTime()));
                     }
                 });
 
             const visible = () => {
-                if (this.viz.visible.isExtreme()) {
-                    return this.data.timeRange;
+                if (this.scrubbers.visible.isExtreme()) {
+                    return this.scrubbers.timeRange.toArray();
                 }
-                return this.viz.visible.toArray();
+                return this.scrubbers.visible.toArray();
             };
-
-            const selection: number[] = visible().map(x);
-            clip.select("rect")
-                .attr("x", selection[0])
-                .attr("width", selection[1] - selection[0]);
 
             const brushTop = svg
                 .selectAll(".brush-container")
                 .data(charts)
-                .join((enter) =>
-                    enter
-                        .append("g")
-                        .attr("class", "brush-container")
-                        .call(brush)
-                )
-                .call(brush.move, selection);
+                .join((enter) => enter.append("g").attr("class", "brush-container"))
+                .call(brush)
+                .call(brush.move, visible().map(x));
         },
     },
     template: `<div class="viz scrubber"></div>`,
