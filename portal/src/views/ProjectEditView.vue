@@ -4,10 +4,16 @@
             <img alt="" src="../assets/progress.gif" />
         </div>
         <div class="main-panel" v-show="!loading">
-            <router-link :to="{ name: 'viewProject', params: { id: this.id } }">
+            <router-link :to="{ name: 'viewProject', params: { id: id } }" v-if="id">
                 <div class="projects-link">
                     <span class="small-arrow">&lt;</span>
                     Back to Project
+                </div>
+            </router-link>
+            <router-link :to="{ name: 'projects' }" v-else>
+                <div class="projects-link">
+                    <span class="small-arrow">&lt;</span>
+                    Back to Projects
                 </div>
             </router-link>
             <div id="inner-container" v-if="!loading">
