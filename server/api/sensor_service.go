@@ -118,6 +118,16 @@ type StationSensor struct {
 	Key         string `db:"key" json:"key"`
 }
 
+type DataRow struct {
+	ID        int64                `db:"id" json:"id"`
+	StationID int32                `db:"station_id" json:"stationId"`
+	SensorID  int64                `db:"sensor_id" json:"sensorId"`
+	Time      data.NumericWireTime `db:"time" json:"time"`
+	Location  *data.Location       `db:"location" json:"location"`
+	Value     float64              `db:"value" json:"value"`
+	TimeGroup int32                `db:"time_group" json:"tg"`
+}
+
 func (c *SensorService) stationsMeta(ctx context.Context, stations []int64) (*sensor.DataResult, error) {
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT sensor_id, station_id, s.key, station.name AS station_name
@@ -206,10 +216,46 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	}
 	log.Infow(message, "aggregate", selectedAggregateName, "number_records", summaries[selectedAggregateName].NumberRecords)
 
-	aggregate := handlers.AggregateTableNames[selectedAggregateName]
+	tableName := handlers.AggregateTableNames[selectedAggregateName]
+	timeGroupThreshold := handlers.AggregateTimeGroupThresholds[selectedAggregateName]
 	query, args, err := sqlx.In(fmt.Sprintf(`
-		SELECT * FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?) ORDER BY time;
-		`, aggregate), qp.Start, qp.End, qp.Stations, qp.Sensors)
+		WITH
+		with_timestamp_differences AS (
+			SELECT
+				*,
+										   LAG(time) OVER (ORDER BY time) AS previous_timestamp,
+				EXTRACT(epoch FROM (time - LAG(time) OVER (ORDER BY time))) AS time_difference
+			FROM %s
+			WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?)
+			ORDER BY time
+		),
+		with_temporal_clustering AS (
+			SELECT
+				*,
+				CASE WHEN s.time_difference > ?
+					OR s.time_difference IS NULL THEN true
+					ELSE NULL
+				END AS new_temporal_cluster
+			FROM with_timestamp_differences AS s
+		),
+		with_assigned_temporal_clustering AS (
+			SELECT
+				*,
+				COUNT(new_temporal_cluster) OVER (
+					ORDER BY s.time
+					ROWS UNBOUNDED PRECEDING
+				) AS time_group
+			FROM with_temporal_clustering s
+		)
+		SELECT
+			id,
+			time,
+			station_id,
+			sensor_id,
+			value,
+			time_group
+		FROM with_assigned_temporal_clustering
+		`, tableName), qp.Start, qp.End, qp.Stations, qp.Sensors, timeGroupThreshold)
 	if err != nil {
 		return nil, err
 	}
@@ -221,10 +267,10 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 
 	defer queried.Close()
 
-	rows := make([]*data.AggregatedReading, 0)
+	rows := make([]*DataRow, 0)
 
 	for queried.Next() {
-		row := &data.AggregatedReading{}
+		row := &DataRow{}
 		if err = queried.StructScan(row); err != nil {
 			return nil, err
 		}

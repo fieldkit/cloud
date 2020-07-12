@@ -27,6 +27,15 @@ var (
 		"10m": "fieldkit.aggregated_10m",
 		"1m":  "fieldkit.aggregated_1m",
 	}
+	AggregateTimeGroupThresholds = map[string]int{
+		"24h": 86400 * 2,
+		"12h": 86400,
+		"6h":  86400,
+		"1h":  3600 * 4,
+		"30m": 3600 * 2,
+		"10m": 30 * 60,
+		"1m":  2 * 60,
+	}
 )
 
 type aggregation struct {
