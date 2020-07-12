@@ -70,18 +70,28 @@ export const VizWorkspace = Vue.extend({
                 .with((this as any).signal)
                 .query();
         },
+        onChangeLinkage(group: Group, viz: Viz) {
+            viz.log("linkage");
+            return this.workspace
+                .changeLinkage(viz)
+                .with((this as any).signal)
+                .query();
+        },
     },
     template: `
 		<div class="workspace-container">
 			<div class="groups-container">
-				<VizGroup v-for="group in workspace.groups" :key="group.id" :group="group" :workspace="workspace"
-					@group-time-zoomed="(...args) => onGroupTimeZoomed(group, ...args)"
-					@viz-time-zoomed="(...args) => onGraphTimeZoomed(group, ...args)"
-					@viz-remove="(...args) => onRemove(group, ...args)"
-					@viz-compare="(...args) => onCompare(group, ...args)"
-					@viz-change-sensors="(...args) => onChangeSensors(group, ...args)"
-					@viz-change-chart="(...args) => onChangeChart(group, ...args)"
-				/>
+				<template v-for="(group, index) in workspace.groups" :key="group.id">
+					<VizGroup :group="group" :workspace="workspace" :topGroup="index == 0"
+						@group-time-zoomed="(...args) => onGroupTimeZoomed(group, ...args)"
+						@viz-time-zoomed="(...args) => onGraphTimeZoomed(group, ...args)"
+						@viz-remove="(...args) => onRemove(group, ...args)"
+						@viz-compare="(...args) => onCompare(group, ...args)"
+						@viz-change-sensors="(...args) => onChangeSensors(group, ...args)"
+						@viz-change-chart="(...args) => onChangeChart(group, ...args)"
+						@viz-change-linkage="(...args) => onChangeLinkage(group, ...args)"
+					/>
+				</template>
 			</div>
 		</div>
 	`,

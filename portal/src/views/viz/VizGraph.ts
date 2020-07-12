@@ -46,7 +46,7 @@ export const VizGraph = Vue.extend({
     },
     computed: {
         debug() {
-            return true;
+            return false;
         },
     },
     methods: {
@@ -91,8 +91,7 @@ export const VizGraph = Vue.extend({
 				@viz-fast-time="raiseFastTime"
 				@viz-time-zoomed="raiseTimeZoomed"
 				@viz-change-sensors="raiseChangeSensors"
-				@viz-change-chart="raiseChangeChart"
-				/>
+				@viz-change-chart="raiseChangeChart" />
 
 			<component v-bind:is="uiNameOf(viz)" :viz="viz" :workspace="workspace"
 				@viz-time-zoomed="raiseTimeZoomed" />

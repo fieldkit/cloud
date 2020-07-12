@@ -20,6 +20,10 @@ export const VizGroup = Vue.extend({
             type: Workspace,
             required: true,
         },
+        topGroup: {
+            type: Boolean,
+            required: true,
+        },
     },
     data() {
         return {};
@@ -46,19 +50,31 @@ export const VizGroup = Vue.extend({
         raiseChangeChart(...args) {
             return this.$emit("viz-change-chart", ...args);
         },
+        raiseChangeLinkage(...args) {
+            return this.$emit("viz-change-linkage", ...args);
+        },
     },
     template: `
-		<div class="group">
-			<component v-for="viz in group.vizes" :key="viz.id" v-bind:is="uiNameOf(viz)" :viz="viz" :workspace="workspace"
-				@viz-time-zoomed="(...args) => raiseVizTimeZoomed(viz, ...args)"
-				@viz-remove="(...args) => raiseRemove(viz, ...args)"
-				@viz-compare="(...args) => raiseCompare(viz, ...args)"
-				@viz-change-sensors="(...args) => raiseChangeSensors(viz, ...args)"
-				@viz-change-chart="(...args) => raiseChangeChart(viz, ...args)"
-				/>
-			</component>
-			<div v-if="group.scrubbers">
-				<D3MultiScrubber :scrubbers="group.scrubbers" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
+		<div class="">
+			<div class="group-container">
+				<template v-for="(viz, index) in group.vizes" :key="viz.id">
+
+					<div class="link-icon-container" v-on:click="(ev) => raiseChangeLinkage(viz)" v-if="!topGroup || index > 0">
+						<div class="icon link-icon"></div>
+					</div>
+
+					<component v-bind:is="uiNameOf(viz)" :viz="viz" :workspace="workspace"
+						@viz-time-zoomed="(...args) => raiseVizTimeZoomed(viz, ...args)"
+						@viz-remove="(...args) => raiseRemove(viz, ...args)"
+						@viz-compare="(...args) => raiseCompare(viz, ...args)"
+						@viz-change-sensors="(...args) => raiseChangeSensors(viz, ...args)"
+						@viz-change-chart="(...args) => raiseChangeChart(viz, ...args)"
+						/>
+					</component>
+				</template>
+				<div v-if="group.scrubbers">
+					<D3MultiScrubber :scrubbers="group.scrubbers" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
+				</div>
 			</div>
 		</div>
 	`,

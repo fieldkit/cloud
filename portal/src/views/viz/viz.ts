@@ -408,12 +408,12 @@ export class Workspace {
         return new VizInfo(scale, station);
     }
 
-    public graphZoomed(viz: Viz, zoom: TimeZoom) {
+    public graphZoomed(viz: Viz, zoom: TimeZoom): Workspace {
         this.findGroup(viz).zoomed(zoom);
         return this;
     }
 
-    public groupZoomed(group: Group, zoom: TimeZoom) {
+    public groupZoomed(group: Group, zoom: TimeZoom): Workspace {
         group.zoomed(zoom);
         return this;
     }
@@ -488,36 +488,61 @@ export class Workspace {
         return options;
     }
 
-    public remove(viz: Viz) {
+    public remove(viz: Viz): Workspace {
         this.groups = this.groups.map((g) => g.remove(viz)).filter((g) => !g.empty);
         return this;
     }
 
-    public compare(viz: Viz) {
+    public compare(viz: Viz): Workspace {
         if (this.groups.length > 0) {
             this.groups.unshift(this.groups[0].clone());
         }
         return this;
     }
 
-    public changeChart(viz: Viz, chartType: ChartType) {
+    public changeChart(viz: Viz, chartType: ChartType): Workspace {
         if (viz instanceof Graph) {
             viz.changeChart(chartType);
         }
         return this;
     }
 
-    public changeSensors(viz: Viz, option: TreeOption) {
+    public changeSensors(viz: Viz, option: TreeOption): Workspace {
         if (viz instanceof Graph) {
             viz.changeSensors(option);
         }
         return this;
     }
 
+    public changeLinkage(viz: Viz): Workspace {
+        const group = this.findGroup(viz);
+        if (group.vizes.length > 1) {
+            group.remove(viz);
+            this.groups.unshift(new Group([viz]));
+        } else {
+            this.groups.reduce((previous, iter) => {
+                if (iter == group) {
+                    if (previous == null) {
+                        throw new Error("tried linking first group, nice work");
+                    }
+                    this.removeGroup(group);
+                    previous.addAll(group);
+                }
+                return iter;
+            }, null);
+        }
+        return this;
+    }
+
+    private removeGroup(group: Group): Workspace {
+        this.groups = this.groups.filter((g) => g !== group);
+        return this;
+    }
+
     /**
      * Pop first Group and move all the Viz children to the new first Group
      */
-    public combine() {
+    private combine() {
         if (this.groups.length <= 1) {
             return this;
         }

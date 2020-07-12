@@ -160,11 +160,43 @@ export default Vue.extend({
 .tree-container {
     flex: 0;
 }
-.groups-container {
+.group-container {
     border: 2px solid #efefef;
     border-radius: 4px;
     background-color: white;
     padding-bottom: 20px;
+}
+
+.link-icon-container {
+    height: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.link-icon-container .icon {
+    align-self: center;
+    background-color: #fcfcfc;
+    width: 40px;
+    height: 40px;
+    box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.11);
+    border: 1px solid #d8dce0;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.link-icon-container .unlink-icon {
+    background-position: center;
+    background-image: url(../../assets/open_link.png);
+    background-size: 30px;
+    background-repeat: no-repeat;
+}
+
+.link-icon-container .link-icon {
+    background-position: center;
+    background-image: url(../../assets/link.png);
+    background-size: 30px;
+    background-repeat: no-repeat;
 }
 
 /* HACK d3 Real talk, no idea how to do this elsewhere. -jlewallen */
