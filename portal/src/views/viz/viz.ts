@@ -55,7 +55,17 @@ export class VizInfo {
 }
 
 export abstract class Viz {
+    protected busyDepth = 0;
     public readonly id = Ids.make();
+
+    public howBusy(d: number): boolean {
+        this.busyDepth += d;
+        return this.busy;
+    }
+
+    public get busy(): boolean {
+        return this.busyDepth > 0;
+    }
 
     public log(...args: any[]) {
         console.log(...["viz:", this.id, this.constructor.name, ...args]);
@@ -72,6 +82,10 @@ export class Scrubber {
 
 export class Scrubbers {
     public readonly timeRange: TimeRange;
+
+    public get empty(): boolean {
+        return this.rows.length == 0;
+    }
 
     constructor(public readonly id: string, public readonly visible: TimeRange, public readonly rows: Scrubber[]) {
         this.timeRange = TimeRange.mergeArrays(rows.map((s) => s.data.timeRange));
@@ -263,7 +277,11 @@ export class Group {
 type ResolveData = (qd: QueriedData) => void;
 
 class VizQuery {
-    constructor(public readonly params: DataQueryParams, public readonly resolve: ResolveData) {}
+    constructor(public readonly params: DataQueryParams, public readonly vizes: Viz[], public readonly resolve: ResolveData) {}
+
+    public howBusy(d: number): any {
+        return this.vizes.map((v) => v.howBusy(d));
+    }
 }
 
 class InfoQuery {
@@ -274,11 +292,10 @@ export class Querier {
     private info: { [index: string]: SensorInfoResponse } = {};
     private data: { [index: string]: QueriedData } = {};
 
-    public queryInfo(params: Stations): Promise<SensorInfoResponse> {
-        if (!params) {
-            throw new Error("no params");
-        }
+    public queryInfo(iq: InfoQuery): Promise<SensorInfoResponse> {
+        if (!iq.params) throw new Error("no params");
 
+        const params = iq.params;
         const queryParams = new URLSearchParams();
         queryParams.append("stations", params.join(","));
 
@@ -292,21 +309,31 @@ export class Querier {
         });
     }
 
-    public queryData(params: DataQueryParams): Promise<QueriedData> {
-        if (!params) {
-            throw new Error("no params");
-        }
+    public queryData(vq: VizQuery): Promise<QueriedData> {
+        if (!vq.params) throw new Error("no params");
 
+        const params = vq.params;
         const queryParams = params.queryParams();
         const key = queryParams.toString();
         if (this.data[key]) {
+            vq.resolve(this.data[key]);
             return Promise.resolve(this.data[key]);
         }
-        return new FKApi().sensorData(queryParams).then((sdr: SensorDataResponse) => {
-            const queried = new QueriedData(params.when, sdr);
-            this.data[key] = queried;
-            return queried;
-        });
+
+        vq.howBusy(1);
+
+        return new FKApi()
+            .sensorData(queryParams)
+            .then((sdr: SensorDataResponse) => {
+                const queried = new QueriedData(params.when, sdr);
+                this.data[key] = queried;
+                return queried;
+            })
+            .then((data) => {
+                vq.howBusy(-1);
+                vq.resolve(data);
+                return data;
+            });
     }
 }
 
@@ -346,7 +373,7 @@ export class Workspace {
             .filter((viz) => !viz.all)
             .map(
                 (viz: Graph) =>
-                    new VizQuery(viz.scrubberParams, (qd) => {
+                    new VizQuery(viz.scrubberParams, [viz], (qd) => {
                         viz.all = qd;
                         return;
                     })
@@ -355,7 +382,7 @@ export class Workspace {
         // Now build the queries for the data being viewed.
         const graphingQueries = allGraphs.map(
             (viz: Graph) =>
-                new VizQuery(viz.chartParams, (qd) => {
+                new VizQuery(viz.chartParams, [viz], (qd) => {
                     viz.graphing = qd;
                     return;
                 })
@@ -368,7 +395,7 @@ export class Workspace {
         const allQueries = [...scrubberQueries, ...graphingQueries];
         const uniqueQueries = _(allQueries)
             .groupBy((q) => q.params.queryParams().toString())
-            .map((p) => new VizQuery(p[0].params, (qd: QueriedData) => p.map((p) => p.resolve(qd))))
+            .map((p) => new VizQuery(p[0].params, _.flatten(p.map((p) => p.vizes)), (qd: QueriedData) => p.map((p) => p.resolve(qd))))
             .value();
 
         console.log("workspace: querying", uniqueQueries.length, "data", infoQueries.length, "info");
@@ -377,7 +404,7 @@ export class Workspace {
         // resolve call for that query. This will end up calling the
         // above mapped resolve to set the appropriate data.
         const pendingInfo = infoQueries.map((iq) =>
-            this.querier.queryInfo(iq.params).then((info) => {
+            this.querier.queryInfo(iq).then((info) => {
                 return _.map(info.stations, (info, stationId) => {
                     const name = info[0].stationName;
                     const sensors = info.map((row) => new SensorMeta(row.sensorId, row.key, row.key));
@@ -388,7 +415,7 @@ export class Workspace {
             })
         );
 
-        const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq.params).then((data) => vq.resolve(data)));
+        const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq));
         return Promise.all([...pendingInfo, ...pendingData]).then(() => {
             this._options = this.updateOptions();
         });

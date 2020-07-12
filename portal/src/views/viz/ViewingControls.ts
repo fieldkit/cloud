@@ -4,12 +4,15 @@ import Vue from "vue";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
+import Spinner from "@/views/shared/Spinner.vue";
+
 import { TimeRange } from "./common";
 import { Graph, QueriedData, Workspace, FastTime, TimeZoom, ChartType } from "./viz";
 
 export const ViewingControls = Vue.extend({
     name: "ViewingControls",
     components: {
+        Spinner,
         Treeselect,
     },
     data() {
@@ -106,6 +109,7 @@ export const ViewingControls = Vue.extend({
 				<div class="left buttons">
 					<div class="btn" @click="raiseCompare">Compare</div>
 					<div class="btn" @click="raiseRemove" v-if="false">Remove</div>
+					<div class="busy" v-if="viz.busy"><Spinner /></div>
 				</div>
 				<div class="right time">
 					<span class="view-by">View By:</span>

@@ -76,8 +76,11 @@ export const VizGroup = Vue.extend({
 						/>
 					</component>
 				</template>
-				<div v-if="group.scrubbers">
+				<div v-if="group.scrubbers && !group.scrubbers.empty">
 					<D3Scrubber :scrubbers="group.scrubbers" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
+				</div>
+				<div v-else class="loading-scrubber">
+					Loading Scrubber
 				</div>
 			</div>
 		</div>

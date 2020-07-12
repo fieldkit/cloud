@@ -160,6 +160,9 @@ export default Vue.extend({
 .tree-container {
     flex: 0;
 }
+.loading-scrubber {
+    padding: 20px;
+}
 .groups-container {
     border: 2px solid #efefef;
     border-radius: 4px;
@@ -262,6 +265,7 @@ export default Vue.extend({
 
 .controls-container .left {
     display: flex;
+    align-items: baseline;
 }
 
 .controls-container .right {
