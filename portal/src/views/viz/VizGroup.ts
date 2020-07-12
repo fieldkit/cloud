@@ -28,6 +28,11 @@ export const VizGroup = Vue.extend({
     data() {
         return {};
     },
+    computed: {
+        linked(this: any) {
+            return this.group.vizes.length > 1;
+        },
+    },
     methods: {
         uiNameOf(viz: Viz) {
             return "Viz" + viz.constructor.name;
@@ -59,8 +64,10 @@ export const VizGroup = Vue.extend({
 			<div class="group-container">
 				<template v-for="(viz, index) in group.vizes" :key="viz.id">
 
-					<div class="link-icon-container" v-on:click="(ev) => raiseChangeLinkage(viz)" v-if="!topGroup || index > 0">
-						<div class="icon link-icon"></div>
+					<div class="icons-container" v-if="!topGroup || index > 0" v-bind:class="{ 'linked': linked, 'unlinked': !linked }">
+						<div class="invisible-spacing-icon"></div>
+						<div class="icon" v-on:click="(ev) => raiseChangeLinkage(viz)" v-bind:class="{ 'link-icon': !linked, 'unlink-icon': linked }"></div>
+						<div class="icon remove-icon" v-on:click="(ev) => raiseRemove(viz)"></div>
 					</div>
 
 					<component v-bind:is="uiNameOf(viz)" :viz="viz" :workspace="workspace"

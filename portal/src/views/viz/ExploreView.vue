@@ -160,43 +160,72 @@ export default Vue.extend({
 .tree-container {
     flex: 0;
 }
-.group-container {
+.groups-container {
     border: 2px solid #efefef;
     border-radius: 4px;
     background-color: white;
-    padding-bottom: 20px;
+    padding-bottom: 100px;
 }
 
-.link-icon-container {
-    height: 10px;
+.icons-container {
+    margin-top: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: row;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
-.link-icon-container .icon {
-    align-self: center;
+.icons-container.linked {
+    background-color: #efefef;
+    height: 1px;
+}
+
+.icons-container.unlinked {
+    border-top: 1px solid #efefef;
+    border-bottom: 1px solid #efefef;
     background-color: #fcfcfc;
-    width: 40px;
-    height: 40px;
+    height: 8px;
+}
+
+.icons-container div:first-child {
+    margin-right: auto;
+    visibility: hidden;
+}
+.icons-container div:last-child {
+    margin-left: auto;
+}
+.icons-container .icon {
+    background-color: #fcfcfc;
     box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.11);
     border: 1px solid #d8dce0;
     border-radius: 50%;
     cursor: pointer;
 }
-
-.link-icon-container .unlink-icon {
+.icons-container .unlink-icon {
     background-position: center;
     background-image: url(../../assets/open_link.png);
     background-size: 30px;
     background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
 }
-
-.link-icon-container .link-icon {
+.icons-container .link-icon {
     background-position: center;
     background-image: url(../../assets/link.png);
     background-size: 30px;
     background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
+}
+.icons-container .remove-icon {
+    background-position: center;
+    background-image: url(../../assets/Icon_Close_Circle.png);
+    background-size: 20px;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
 }
 
 /* HACK d3 Real talk, no idea how to do this elsewhere. -jlewallen */
