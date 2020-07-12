@@ -333,7 +333,7 @@ export class Workspace {
         // been instantiated from a Bookmark. Right now we just query
         // for information on all the stations involved.
         const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz).map((viz) => viz.chartParams.stations)));
-        const infoQueries = [new InfoQuery(allStationIds)];
+        const infoQueries = allStationIds.length ? [new InfoQuery(allStationIds)] : [];
 
         // Second step is to query to fill in any required scrubbers. I
         // have tried in previous iterations to be clever about this
