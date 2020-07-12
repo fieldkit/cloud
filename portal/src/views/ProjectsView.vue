@@ -1,21 +1,24 @@
 <template>
     <StandardLayout :viewingProjects="true">
-        <div class="main-panel" v-show="!isBusy && isAuthenticated">
-            <div id="inner-container">
-                <div id="projects-container">
-                    <div class="container">
+        <div v-show="!isBusy && isAuthenticated">
+            <div class="projects-container">
+                <div class="container mine">
+                    <div class="header">
+                        <h1 v-if="isAuthenticated">My Projects</h1>
+                        <h1 v-if="!isAuthenticated">Projects</h1>
                         <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
                             <img alt="Add project" src="../assets/add.png" />
                             Add Project
                         </div>
-                        <h1 v-if="isAuthenticated">My Projects</h1>
-                        <h1 v-if="!isAuthenticated">Projects</h1>
-                        <ProjectThumbnails :projects="userProjects" />
                     </div>
-                    <div class="container">
+
+                    <ProjectThumbnails :projects="userProjects" />
+                </div>
+                <div class="container community">
+                    <div class="header">
                         <h1>Community Projects</h1>
-                        <ProjectThumbnails :projects="publicProjects" />
                     </div>
+                    <ProjectThumbnails :projects="publicProjects" />
                 </div>
             </div>
         </div>
@@ -62,12 +65,24 @@ export default {
 </script>
 
 <style scoped>
-#inner-container {
-    margin: 20px 60px;
+.projects-container {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
 }
-#projects-container {
-    width: 890px;
-    margin: 20px 0 0 0;
+
+.container {
+}
+.container.community {
+    border-top: 2px solid #afafaf;
+    margin-right: 20px;
+}
+.container .header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: baseline;
 }
 #loading {
     width: 100%;
@@ -83,13 +98,9 @@ export default {
 .show-link {
     text-decoration: underline;
 }
-.container {
-    float: left;
-}
 #add-project {
-    margin: 40px 0 0 0;
-    float: right;
-    padding: 12px;
+    margin-left: auto;
+    margin-right: 40px;
     cursor: pointer;
 }
 #add-project img {

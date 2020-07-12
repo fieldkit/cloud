@@ -125,11 +125,6 @@ export default Vue.extend({
     text-align: left;
     background-color: #fcfcfc;
     padding: 40px;
-
-    /* HACK fixed width of svg */
-    /*
-    max-width: 1054px;
-	*/
 }
 .explore-header {
     display: flex;

@@ -1,37 +1,17 @@
 <template>
-    <div id="project-summary-container">
-        <div class="project-container" v-if="project">
-            <div class="project-profile-container">
-                <div class="section left-section">
+    <div class="project-public project-container" v-if="project">
+        <div class="header">
+            <div class="left">
+                <div class="project-name">{{ project.name }}</div>
+                <div class="project-dashboard">Project Dashboard</div>
+            </div>
+            <div class="right activity">Activity</div>
+        </div>
+        <div class="details">
+            <div class="left">
+                <div class="photo">
                     <img alt="Fieldkit Project" v-if="project.mediaUrl" :src="getImageUrl(project)" class="project-image" />
                     <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
-                </div>
-                <div class="section right-section">
-                    <div id="project-name">{{ project.name }}</div>
-                    <div class="location" v-if="project.location">
-                        <img alt="Location" src="../assets/icon-location.png" class="icon" />
-                        {{ project.location }}
-                    </div>
-                    <div class="location" v-if="displayProject.places.native">
-                        <img alt="Location" src="../assets/icon-location.png" class="icon" />
-                        Native Lands: {{ displayProject.places.native }}
-                    </div>
-                    <div class="time-container">
-                        <div class="time" v-if="project.startTime">Started: {{ project.startTime | prettyDate }}</div>
-                        <span v-if="project.startTime && displayProject.duration">&nbsp;|&nbsp;</span>
-                        <div class="time" v-if="displayProject.duration">{{ displayProject.duration | prettyDuration }}</div>
-                    </div>
-                    <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
-                    <div class="project-detail">{{ project.description }}</div>
-                    <div class="module-icons">
-                        <img
-                            v-for="module in projectModules"
-                            v-bind:key="module.name"
-                            alt="Module icon"
-                            class="module-icon"
-                            :src="module.url"
-                        />
-                    </div>
                 </div>
 
                 <div class="follow-btn">
@@ -45,17 +25,55 @@
                 </div>
             </div>
 
-            <div id="recent-update" v-if="mostRecentUpdate">
-                <div class="activity-icon">
-                    <img :src="mostRecentUpdate.icon" />
+            <div class="right">
+                <div class="details-heading">
+                    Project Details
                 </div>
-                <div class="activity-heading">Project Update</div>
-                <div class="activity-byline">by {{ mostRecentUpdate.name }} | {{ mostRecentUpdate.time.toLocaleDateString() }}</div>
-                <div class="activity-text">
-                    {{ mostRecentUpdate.text }}
+                <div class="details-top">
+                    <div class="details-left">
+                        <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
+                        <div class="project-detail">{{ project.description }}</div>
+                    </div>
+                    <div class="details-right">
+                        <div class="time-container">
+                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <template v-if="project.startTime">Started: {{ project.startTime | prettyDate }}</template>
+                        </div>
+                        <div class="duration-container">
+                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <template v-if="displayProject.duration">{{ displayProject.duration | prettyDuration }}</template>
+                        </div>
+                        <div class="location-container" v-if="project.location">
+                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <template>{{ project.location }}</template>
+                        </div>
+                        <div class="location-container" v-if="displayProject.places.native">
+                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <template>Native Lands: {{ displayProject.places.native }}</template>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-bottom">
+                    <div class="details-team">
+                        <div class="title">Team</div>
+                    </div>
+                    <div class="details-modules">
+                        <div class="title">Modules</div>
+
+                        <img
+                            v-for="module in projectModules"
+                            v-bind:key="module.name"
+                            alt="Module icon"
+                            class="module-icon"
+                            :src="module.url"
+                        />
+                    </div>
                 </div>
             </div>
+        </div>
 
+        <div class="project-stations">
             <ProjectStations
                 :project="project"
                 :admin="false"
@@ -63,19 +81,9 @@
                 :listSize="listSize"
                 :userStations="userStations"
             />
-
-            <div class="team-container">
-                <div class="section-heading">{{ getTeamHeading() }}</div>
-                <div v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.id" class="team-member">
-                    <UserPhoto :user="projectUser.user" />
-                    <span class="user-name">{{ projectUser.user.name }}</span>
-                </div>
-            </div>
-            <div id="public-activity-feed-container">
-                <div class="heading">Recent Activity</div>
-                <ProjectActivity :displayProject="displayProject" :viewing="true" />
-            </div>
         </div>
+
+        <ProjectActivity :displayProject="displayProject" v-if="false" />
     </div>
 </template>
 
@@ -153,153 +161,89 @@ export default {
 </script>
 
 <style scoped>
-#project-summary-container {
-    width: 1080px;
-    margin: 0 0 0 30px;
-    background-color: #ffffff;
-    z-index: 2;
+.project-public {
+    display: flex;
+    flex-direction: column;
+    max-width: 1000px;
 }
-.project-profile-container {
-    float: left;
-    width: 820px;
-    padding: 20px;
-    border: 1px solid #d8dce0;
+.header {
+    display: flex;
+    flex-direction: row;
 }
-#project-name {
+.header .left {
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+}
+.header .right {
+    margin-left: auto;
+}
+.header .project-name {
     font-size: 24px;
     font-weight: bold;
     margin: 0 15px 0 0;
     display: inline-block;
 }
-.show-link {
-    text-decoration: underline;
-}
-.project-container {
-    font-size: 16px;
-    font-weight: lighter;
-    overflow: hidden;
-}
-.project-image {
-    max-width: 288px;
-    max-height: 139px;
-}
-.section {
-}
-.left-section {
-    width: 380px;
-}
-.right-section {
-}
-.section-heading {
+.header .project-dashboard {
     font-size: 20px;
-    font-weight: 600;
-    float: left;
-    margin: 0 0 35px 0;
-}
-.time {
-    font-size: 14px;
+    font-weight: bold;
+    margin: 0 15px 0 0;
     display: inline-block;
 }
-.project-detail {
-    overflow-wrap: break-word;
-    font-size: 16px;
-    line-height: 24px;
+
+.details {
+    display: flex;
+    flex-direction: row;
 }
-.follow-btn {
-    float: right;
-    clear: both;
-    margin: -20px 0 0 0;
-    border: 1px solid #cccdcf;
-    border-radius: 3px;
-    width: 80px;
-    height: 23px;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 5px 5px 0 5px;
-    text-align: center;
-    cursor: pointer;
-}
-.follow-btn img {
-    vertical-align: middle;
-    margin: 0 3px 4px 0;
-}
-.space {
-    width: 100%;
-    float: left;
-    margin: 30px 0 0 0;
-    border-bottom: solid 1px #d8dce0;
-}
-#recent-update {
-    width: 820px;
-    float: left;
-    margin: 22px 0 0 0;
-    padding: 20px;
+.details > .left {
+    flex: 1;
+    border: 2px solid #d8dce0;
     border-radius: 2px;
-    border: 1px solid #d8dce0;
-}
-.activity-icon {
-    float: left;
-    margin-left: 40px;
-}
-.activity-icon img {
-    width: 35px;
-}
-.activity-heading {
-    float: left;
-    margin-left: 14px;
-    font-size: 20px;
-    font-weight: 600;
-}
-.activity-byline {
-    float: left;
-    clear: both;
-    margin: -14px 0 0 90px;
-    font-size: 16px;
-}
-.activity-text {
-    float: left;
-    clear: both;
-    margin-left: 90px;
-    font-size: 16px;
-    line-height: 24px;
-    margin-top: 9px;
-}
-.team-icons,
-.module-icons {
-    width: 225px;
-    margin: 10px 0;
-    float: left;
-}
-.user-icon,
-.module-icon {
-    width: 32px;
-    margin: 2px 5px;
-    float: left;
-}
-.team-container {
-    width: 310px;
-    margin: 22px 0 0 0;
+    margin-right: 20px;
+    background-color: white;
     padding: 20px;
-    border: 1px solid #d8dce0;
-    float: left;
-    clear: both;
 }
-.team-member {
-    float: left;
-    clear: both;
+.details > .right {
+    flex: 2;
+    border: 2px solid #d8dce0;
+    border-radius: 2px;
+    background-color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
 }
-#public-activity-feed-container {
-    float: left;
-    width: 480px;
-    height: 312px;
-    margin: 22px 0 0 32px;
-    border: 1px solid #d8dce0;
-    background: white;
+.project-stations {
 }
-#public-activity-feed-container .heading {
-    font-size: 20px;
-    font-weight: 600;
-    float: left;
-    margin: 20px;
+
+.details .details-heading {
+    font-weight: bold;
+    padding-bottom: 20px;
+}
+.details .details-top {
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 20px;
+}
+.details .details-left {
+    padding-right: 20px;
+    flex-grow: 1;
+}
+.details .details-right {
+    flex-grow: 1;
+}
+.details .details-bottom {
+    border-top: 1px solid #d8dce0;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: row;
+}
+.details-bottom .details-team {
+    flex: 1;
+}
+.details-bottom .details-modules {
+    flex: 1;
+}
+.details-bottom .title {
+    font-weight: bold;
 }
 </style>

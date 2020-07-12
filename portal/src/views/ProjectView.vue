@@ -120,20 +120,26 @@ export default Vue.extend({
 </script>
 
 <style scoped>
+.main-panel {
+    height: 100%;
+    text-align: left;
+    background-color: #fcfcfc;
+    padding: 40px;
+}
 .small-arrow {
     font-size: 11px;
     float: left;
     margin: 2px 5px 0 0;
 }
 .projects-link {
-    margin: 40px 0 0 90px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     font-size: 14px;
     cursor: pointer;
 }
 .inner-container {
 }
 .view-container {
-    margin: 20px 60px;
 }
 #projects-container {
     width: 890px;

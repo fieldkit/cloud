@@ -1,78 +1,59 @@
 <template>
-    <div id="project-summary-container">
-        <div id="activity-feed-container" v-show="viewingActivityFeed">
-            <!-- bottom margin has to be minus at least (height - 80) -->
-            <div id="close-feed-btn" v-on:click="closeActivityFeed">
-                <img alt="Close" src="../assets/close.png" />
-            </div>
-            <div class="heading">Activity History</div>
-            <ProjectActivity :displayProject="displayProject" :viewing="viewingActivityFeed" />
-        </div>
-        <div class="project-container" v-if="project">
+    <div class="project-admin project-container" v-if="project">
+        <div class="header">
             <div class="left">
-                <div id="project-name">{{ project.name }}</div>
-                <div class="dashboard-heading">Project Dashboard</div>
-                <div class="activity-btn" v-on:click="openActivityFeed">
-                    <img src="../assets/notification.png" />
-                    Activity
-                </div>
-                <div class="project-image-actions-container">
-                    <img alt="Fieldkit Project" v-if="project.photo" :src="getImageUrl(project)" class="project-image" />
+                <div class="project-name">{{ project.name }}</div>
+                <div class="project-dashboard">Project Dashboard</div>
+            </div>
+            <div class="right activity">Activity</div>
+        </div>
+        <div class="details">
+            <div class="left">
+                <div class="photo">
+                    <img alt="Fieldkit Project" v-if="project.mediaUrl" :src="getImageUrl(project)" class="project-image" />
                     <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
-
-                    <div class="actions-icon-container">
-                        <div class="action left" v-on:click="addUpdate">
-                            <img src="../assets/update.png" />
-                            <div class="label">Update</div>
-                        </div>
-                        <div class="action" v-on:click="viewProfile">
-                            <img src="../assets/profile.png" />
-                            <div class="label">View Profile</div>
-                        </div>
-                        <div class="action right">
-                            <img src="../assets/share.png" />
-                            <div class="label">Share</div>
-                        </div>
-                    </div>
-                    <div class="stat follows">
-                        <img alt="Follows" src="../assets/heart.png" class="follow-icon" />
-                        <span>{{ project.numberOfFollowers + (project.numberOfFollowers == 1 ? " Follow" : " Follows") }}</span>
-                    </div>
                 </div>
-                <div class="project-details-container">
-                    <div class="section-heading">Project Details</div>
-                    <div v-on:click="editProject" class="edit-link">Edit Project</div>
-                    <div class="goal-and-description">
+
+                <div class="follow-btn"></div>
+            </div>
+
+            <div class="right">
+                <div class="details-heading">
+                    <div class="title">Project Details</div>
+                    <div v-on:click="editProject" class="link">Edit Project</div>
+                </div>
+                <div class="details-top">
+                    <div class="details-left">
                         <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
                         <div class="project-detail">{{ project.description }}</div>
                     </div>
-                    <div class="time-and-location">
-                        <div class="time" v-if="project.startTime">
-                            <img alt="Calendar" src="../assets/icon-calendar.png" class="icon" />
-                            Start date: {{ project.startTime | prettyDate }}
-                        </div>
-                        <div class="time" v-if="displayProject.duration">
-                            <img alt="Time" src="../assets/icon-time.png" class="icon" />
-                            Duration: {{ displayProject.duration | prettyDuration }}
-                        </div>
-                        <div class="location" v-if="project.location">
+                    <div class="details-right">
+                        <div class="time-container">
                             <img alt="Location" src="../assets/icon-location.png" class="icon" />
-                            {{ project.location }}
+                            <template v-if="project.startTime">Started: {{ project.startTime | prettyDate }}</template>
                         </div>
-                        <div class="location" v-if="displayProject.places.native">
+                        <div class="duration-container">
                             <img alt="Location" src="../assets/icon-location.png" class="icon" />
-                            Native Lands: {{ displayProject.places.native }}
+                            <template v-if="displayProject.duration">{{ displayProject.duration | prettyDuration }}</template>
+                        </div>
+                        <div class="location-container" v-if="project.location">
+                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <template>{{ project.location }}</template>
+                        </div>
+                        <div class="location-container" v-if="displayProject.places.native">
+                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <template>Native Lands: {{ displayProject.places.native }}</template>
                         </div>
                     </div>
-                    <div class="space"></div>
-                    <div class="team-icons">
-                        <div class="icon-section-label">Team</div>
-                        <span v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.email">
-                            <UserPhoto :user="projectUser.user" />
-                        </span>
+                </div>
+
+                <div class="details-bottom">
+                    <div class="details-team">
+                        <div class="title">Team</div>
                     </div>
-                    <div class="module-icons">
-                        <div class="icon-section-label">Modules</div>
+                    <div class="details-modules">
+                        <div class="title">Modules</div>
+
                         <img
                             v-for="module in projectModules"
                             v-bind:key="module.name"
@@ -83,85 +64,94 @@
                     </div>
                 </div>
             </div>
+        </div>
 
+        <div class="row-section project-stations">
             <ProjectStations
                 :project="project"
-                :admin="true"
+                :admin="false"
                 :mapContainerSize="mapContainerSize"
                 :listSize="listSize"
                 :userStations="userStations"
             />
+        </div>
 
-            <ProjectDataFiles :projectStations="displayProject.stations" />
+        <div class="row-section data-readings">
+            <div class="project-data">
+                <ProjectDataFiles :projectStations="displayProject.stations" />
+            </div>
+            <div class="project-readings">
+                <StationsReadings :project="project" />
+            </div>
+        </div>
 
-            <StationsReadings :project="project" />
-
-            <div class="manage-team-container">
-                <div class="section-heading">Manage Team</div>
-                <div class="users-container">
-                    <div class="user-row">
-                        <div class="cell-heading">Members ({{ displayProject.users.length }})</div>
-                        <div class="cell-heading">Role</div>
-                        <div class="cell-heading"></div>
-                        <div class="cell"></div>
-                    </div>
-                    <div class="user-row" v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.email">
-                        <div class="cell">
-                            <UserPhoto :user="projectUser.user" />
-                            <div class="invite-name">
-                                <div v-if="projectUser.user.name != projectUser.user.email">{{ projectUser.user.name }}</div>
-                                <div class="email">{{ projectUser.user.email }}</div>
-                            </div>
-                        </div>
-                        <div class="cell">{{ projectUser.role }}</div>
-                        <div class="cell invite-status">Invite {{ projectUser.membership.toLowerCase() }}</div>
-                        <div class="cell">
-                            <img
-                                alt="Remove user"
-                                src="../assets/close-icon.png"
-                                class="remove-btn"
-                                :data-user="projectUser.user.id"
-                                v-on:click="(ev) => removeUser(ev, projectUser)"
-                            />
+        <div class="row-section manage-team-container">
+            <div class="section-heading">Manage Team</div>
+            <div class="users-container">
+                <div class="user-row">
+                    <div class="cell-heading">Members ({{ displayProject.users.length }})</div>
+                    <div class="cell-heading">Role</div>
+                    <div class="cell-heading"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="user-row" v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.email">
+                    <div class="cell">
+                        <UserPhoto :user="projectUser.user" />
+                        <div class="invite-name">
+                            <div v-if="projectUser.user.name != projectUser.user.email">{{ projectUser.user.name }}</div>
+                            <div class="email">{{ projectUser.user.email }}</div>
                         </div>
                     </div>
-                    <div class="user-row">
-                        <div class="cell">
-                            <input
-                                class="text-input"
-                                placeholder="New member email"
-                                keyboardType="email"
-                                autocorrect="false"
-                                autocapitalizationType="none"
-                                v-model="form.inviteEmail"
-                            />
-                            <div class="validation-errors" v-if="$v.form.inviteEmail.$error || form.inviteDuplicate">
-                                <span class="validation-error" v-if="!$v.form.inviteEmail.required">
-                                    Email is a required field.
-                                </span>
-                                <span class="validation-error" v-if="!$v.form.inviteEmail.email">
-                                    Must be a valid email address.
-                                </span>
-                                <span class="validation-error" v-if="form.inviteDuplicate">
-                                    This user is already invited.
-                                </span>
-                            </div>
-                        </div>
-                        <div class="cell role-dropdown-container">
-                            <select v-model="selectedRole">
-                                <option v-for="role in roleOptions" v-bind:value="role.code" v-bind:key="role.code + role.name">
-                                    {{ role.name }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="cell">
-                            <button class="invite-btn" v-on:click="sendInvite">Invite</button>
-                        </div>
-                        <div class="cell"></div>
+                    <div class="cell">{{ projectUser.role }}</div>
+                    <div class="cell invite-status">Invite {{ projectUser.membership.toLowerCase() }}</div>
+                    <div class="cell">
+                        <img
+                            alt="Remove user"
+                            src="../assets/close-icon.png"
+                            class="remove-btn"
+                            :data-user="projectUser.user.id"
+                            v-on:click="(ev) => removeUser(ev, projectUser)"
+                        />
                     </div>
+                </div>
+                <div class="user-row">
+                    <div class="cell">
+                        <input
+                            class="text-input"
+                            placeholder="New member email"
+                            keyboardType="email"
+                            autocorrect="false"
+                            autocapitalizationType="none"
+                            v-model="form.inviteEmail"
+                        />
+                        <div class="validation-errors" v-if="$v.form.inviteEmail.$error || form.inviteDuplicate">
+                            <span class="validation-error" v-if="!$v.form.inviteEmail.required">
+                                Email is a required field.
+                            </span>
+                            <span class="validation-error" v-if="!$v.form.inviteEmail.email">
+                                Must be a valid email address.
+                            </span>
+                            <span class="validation-error" v-if="form.inviteDuplicate">
+                                This user is already invited.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="cell role-dropdown-container">
+                        <select v-model="selectedRole">
+                            <option v-for="role in roleOptions" v-bind:value="role.code" v-bind:key="role.code + role.name">
+                                {{ role.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="cell">
+                        <button class="invite-btn" v-on:click="sendInvite">Invite</button>
+                    </div>
+                    <div class="cell"></div>
                 </div>
             </div>
         </div>
+
+        <ProjectActivity :displayProject="displayProject" v-if="false" />
     </div>
 </template>
 
@@ -329,6 +319,150 @@ export default {
 </script>
 
 <style scoped>
+.project-admin {
+    display: flex;
+    flex-direction: column;
+    max-width: 1000px;
+}
+.header {
+    display: flex;
+    flex-direction: row;
+}
+.header .left {
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+}
+.header .right {
+    margin-left: auto;
+}
+.header .project-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 15px 0 0;
+    display: inline-block;
+}
+.header .project-dashboard {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0 15px 0 0;
+    display: inline-block;
+}
+
+.details {
+    display: flex;
+    flex-direction: row;
+}
+.details > .left {
+    flex: 1;
+    border: 2px solid #d8dce0;
+    border-radius: 2px;
+    margin-right: 20px;
+    background-color: white;
+    padding: 20px;
+}
+.details > .right {
+    flex: 2;
+    border: 2px solid #d8dce0;
+    border-radius: 2px;
+    background-color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.project-stations {
+}
+
+.row-section {
+}
+
+.details .details-heading {
+    display: flex;
+    flex-direction: row;
+}
+.details .details-heading .title {
+    font-weight: bold;
+    padding-bottom: 20px;
+}
+.details .details-heading .link {
+    margin-left: auto;
+    font-weight: bold;
+    padding-bottom: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.details .details-top {
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 20px;
+}
+.details .details-left {
+    padding-right: 20px;
+    flex-grow: 1;
+}
+.details .details-right {
+    flex-grow: 1;
+}
+.details .details-bottom {
+    border-top: 1px solid #d8dce0;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: row;
+}
+.details-bottom .details-team {
+    flex: 1;
+}
+.details-bottom .details-modules {
+    flex: 1;
+}
+.details-bottom .title {
+    font-weight: bold;
+}
+.row-section.data-readings {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+}
+.project-data {
+    margin-right: 20px;
+}
+.project-data,
+.project-readings {
+    border: 2px solid #d8dce0;
+    border-radius: 2px;
+    background-color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.data-readings .project-data {
+    flex: 2;
+}
+.data-readings .project-readings {
+    flex: 1;
+}
+.manage-team-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #d8dce0;
+    background: white;
+    padding: 20px;
+}
+.manage-team-container .user-row {
+}
+
+.user-row .cell {
+    text-align: left;
+}
+
+.manage-team-container .section-heading {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+/*
 #project-summary-container {
     width: 1080px;
     margin: 0 0 0 30px;
@@ -449,9 +583,6 @@ export default {
 }
 .edit-link {
     float: right;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
 }
 .goal-and-description {
     float: left;
@@ -512,6 +643,7 @@ export default {
     float: left;
     clear: both;
 }
+*/
 .invite-btn {
     width: 80px;
     height: 28px;
@@ -547,6 +679,20 @@ export default {
     font-size: 15px;
     padding: 4px 0 4px 8px;
 }
+.validation-error {
+    color: #c42c44;
+    display: block;
+}
+.remove-btn {
+    margin: 12px 0 0 0;
+    float: right;
+    cursor: pointer;
+}
+.invite-name {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 20px;
+}
 .role-dropdown-container select {
     font-size: 13px;
     color: #6a6d71;
@@ -561,19 +707,5 @@ export default {
     -moz-appearance: none;
     -webkit-appearance: none;
     appearance: none;
-}
-.validation-error {
-    color: #c42c44;
-    display: block;
-}
-.remove-btn {
-    margin: 12px 0 0 0;
-    float: right;
-    cursor: pointer;
-}
-.invite-name {
-    display: inline-block;
-    vertical-align: top;
-    margin-top: 20px;
 }
 </style>

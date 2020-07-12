@@ -146,12 +146,6 @@ export default {
 
 <style scoped>
 .readings-container {
-    position: relative;
-    float: left;
-    width: 415px;
-    height: 300px;
-    margin: 22px 0 0 0;
-    border: 1px solid #d8dce0;
 }
 .heading {
     font-size: 20px;
@@ -168,7 +162,6 @@ export default {
 }
 .sensors-container {
     width: 100%;
-    height: 150px;
 }
 .left {
     float: left;
@@ -210,11 +203,10 @@ export default {
 .no-readings {
     float: left;
     clear: both;
-    margin: 25px;
+    margin: 0 25px 25px 25px;
 }
 .pagination-section {
     width: 100%;
-    position: absolute;
     bottom: 25px;
     text-align: center;
 }

@@ -1,5 +1,5 @@
 <template>
-    <div class="stations-container" :style="{ width: mapContainerSize.outerWidth }">
+    <div class="stations-container">
         <div class="section-heading stations-heading">
             FieldKit Stations
             <div class="add-station" v-on:click="showStationSelect" v-if="admin && !addingStation">
@@ -15,41 +15,42 @@
                 </select>
             </div>
         </div>
-        <div class="space"></div>
-        <div id="stations-list" :style="{ width: listSize.width, height: listSize.height }">
-            <div class="toggle-icon-container" v-on:click="toggleStations">
-                <img v-if="showStationsList" alt="Collapse List" src="../assets/tab-collapse.png" class="toggle-icon" />
-                <img v-if="!showStationsList" alt="Expand List" src="../assets/tab-expand.png" class="toggle-icon" />
-            </div>
-            <div v-if="projectStations.length == 0" class="project-stations-no-stations">
-                <h3>No Stations</h3>
-                <p>
-                    Add a station to this project to include its recent data and activities.
-                </p>
-            </div>
-            <div v-if="projectStations.length > 0">
-                <div v-for="station in projectStations" v-bind:key="station.id">
-                    <div class="station-box" :style="{ width: listSize.boxWidth }">
-                        <div class="delete-link">
-                            <img alt="Delete" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation(station)" />
+        <div class="section-body">
+            <div id="stations-list">
+                <div class="toggle-icon-container" v-on:click="toggleStations" v-if="false">
+                    <img v-if="showStationsList" alt="Collapse List" src="../assets/tab-collapse.png" class="toggle-icon" />
+                    <img v-if="!showStationsList" alt="Expand List" src="../assets/tab-expand.png" class="toggle-icon" />
+                </div>
+                <div v-if="projectStations.length == 0" class="project-stations-no-stations">
+                    <h3>No Stations</h3>
+                    <p>
+                        Add a station to this project to include its recent data and activities.
+                    </p>
+                </div>
+                <div v-if="projectStations.length > 0">
+                    <div v-for="station in projectStations" v-bind:key="station.id">
+                        <div class="station-box" :style="{ width: listSize.boxWidth }">
+                            <div class="delete-link">
+                                <img alt="Delete" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation(station)" />
+                            </div>
+                            <span class="station-name" v-on:click="showStation(station)">
+                                {{ station.name }}
+                            </span>
+                            <div class="last-seen">Last seen {{ station.updated | prettyDate }}</div>
                         </div>
-                        <span class="station-name" v-on:click="showStation(station)">
-                            {{ station.name }}
-                        </span>
-                        <div class="last-seen">Last seen {{ station.updated | prettyDate }}</div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div id="stations-map-container" :style="{ width: mapContainerSize.width, height: mapContainerSize.height }">
-            <StationsMap @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" :mapped="mappedProject" />
-            <StationSummary
-                v-show="activeStation"
-                :station="activeStation"
-                :compact="true"
-                :summarySize="summarySize"
-                ref="stationSummary"
-            />
+            <div id="stations-map-container">
+                <StationsMap @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" :mapped="mappedProject" />
+                <StationSummary
+                    v-show="activeStation"
+                    :station="activeStation"
+                    :compact="true"
+                    :summarySize="summarySize"
+                    ref="stationSummary"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -100,7 +101,9 @@ export default {
     },
     methods: {
         onMapReady(map) {
+            console.log("map ready resize");
             this.map = map;
+            this.map.resize();
         },
         showStation(station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
@@ -175,15 +178,24 @@ export default {
 .section-heading {
     font-size: 20px;
     font-weight: 600;
-    float: left;
-    margin: 0 0 35px 0;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 35px;
+    border-bottom: 1px solid lightgray;
 }
 .stations-heading {
-    width: 100%;
-    margin: 25px 0 25px 25px;
+    display: flex;
+    flex-direction: row;
 }
-.stations-container .space {
-    margin: 0;
+.section-body {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+.stations-container {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
 }
 .station-name {
     font-size: 14px;
@@ -219,18 +231,18 @@ export default {
     border-bottom: solid 1px #d8dce0;
 }
 .stations-container {
-    float: left;
     margin: 22px 0 0 0;
-    border: 1px solid #d8dce0;
+    border: 2px solid #d8dce0;
+    background-color: #ffffff;
 }
 #stations-list {
-    float: left;
     transition: width 0.5s;
+    flex: 1;
 }
 #stations-map-container {
-    float: left;
     transition: width 0.5s;
     position: relative;
+    flex: 2;
 }
 .station-box {
     height: 38px;
