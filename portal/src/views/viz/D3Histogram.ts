@@ -120,13 +120,6 @@ export const D3Histogram = Vue.extend({
                 )
                 .call(yAxis);
 
-            const colors = d3
-                .scaleSequential()
-                .domain([0, 1])
-                .interpolator(() => {
-                    return "#000000";
-                });
-
             // NOTE Why 800?
             const MinimumBarWidth = 800 / NumberOfBins;
             svg.selectAll(".histogram-bar")
@@ -141,7 +134,7 @@ export const D3Histogram = Vue.extend({
                     const w = x(d.x1) - x(d.x0) - 1;
                     return w <= 0 ? MinimumBarWidth : w;
                 })
-                .style("fill", (d) => vizInfo.colorScale)
+                .style("fill", vizInfo.colorScale)
                 .attr("height", (d) => {
                     return d.length == 0 ? 0 : layout.height - y(d.length) - layout.margins.bottom - layout.margins.top;
                 });
