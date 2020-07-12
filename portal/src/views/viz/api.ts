@@ -45,6 +45,7 @@ export interface DataRow {
 
 export interface SensorDataResponse {
     summaries: { [index: string]: Summary };
+    aggregate: string;
     data: DataRow[];
 }
 

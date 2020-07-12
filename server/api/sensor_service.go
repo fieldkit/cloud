@@ -233,9 +233,11 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 
 	data := struct {
 		Summaries map[string]*AggregateSummary `json:"summaries"`
+		Aggregate string                       `json:"aggregate"`
 		Data      interface{}                  `json:"data"`
 	}{
 		summaries,
+		selectedAggregateName,
 		rows,
 	}
 
