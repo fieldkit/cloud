@@ -44,7 +44,11 @@ export const VizGraph = Vue.extend({
     updated() {
         this.viz.log("updated");
     },
-    watch: {},
+    computed: {
+        debug() {
+            return false;
+        },
+    },
     methods: {
         raiseTimeZoomed(...args) {
             return this.$emit("viz-time-zoomed", ...args);
@@ -95,7 +99,7 @@ export const VizGraph = Vue.extend({
 
 			<D3Scrubber :viz="viz" @viz-time-zoomed="raiseTimeZoomed" />
 
-            <DebuggingPanel :viz="viz" :workspace="workspace" />
+            <DebuggingPanel :viz="viz" :workspace="workspace" v-if="debug" />
 		</div>
 	`,
 });
