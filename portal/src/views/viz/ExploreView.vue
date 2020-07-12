@@ -59,10 +59,15 @@ export default Vue.extend({
             userProjects: (s: GlobalState) => s.stations.projects.user,
         }),
     },
-    beforeMount() {
+    beforeMount(this: any) {
         if (this.bookmark) {
             return new FKApi().getAllSensors().then((sensorKeys) => {
-                this.workspace = Workspace.fromBookmark(sensorKeys, this.bookmark);
+                if (this.bookmark.s.length > 0) {
+                    return this.showStation(this.bookmark.s[0]);
+                }
+                if (this.bookmark.g.length > 0) {
+                    this.workspace = Workspace.fromBookmark(sensorKeys, this.bookmark);
+                }
             });
         }
     },
@@ -87,8 +92,8 @@ export default Vue.extend({
                 return this.workspace;
             });
         },
-        showStation(stationId: number, ...args) {
-            console.log("show-station", stationId, ...args);
+        showStation(stationId: number) {
+            console.log("show-station", stationId);
 
             const station = this.$store.state.stations.stations.all[stationId];
 

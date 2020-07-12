@@ -116,7 +116,7 @@ type GroupBookmark = [VizBookmark[]];
 export class Bookmark {
     static Version = 1;
 
-    constructor(public readonly v: number, public readonly g: GroupBookmark[]) {}
+    constructor(public readonly v: number, public readonly g: GroupBookmark[], public readonly s: number[] = []) {}
 }
 
 export class TimeZoom {
@@ -612,5 +612,11 @@ export class Workspace {
     public with(callback: (ws: Workspace) => Workspace) {
         callback(this);
         return this;
+    }
+}
+
+export class BookmarkFactory {
+    public static forStation(stationId: number): Bookmark {
+        return new Bookmark(Bookmark.Version, [], [stationId]);
     }
 }

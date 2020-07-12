@@ -78,11 +78,9 @@
                         </template>
                     </div>
                 </div>
-                <router-link :to="{ name: 'viewData', query: { stationId: station.id } }">
-                    <div id="view-data-btn" class="section">
-                        Explore Data
-                    </div>
-                </router-link>
+                <div id="view-data-btn" class="section" v-on:click="onClickExplore">
+                    Explore Data
+                </div>
             </template>
         </div>
     </div>
@@ -93,6 +91,8 @@ import _ from "lodash";
 import * as utils from "../utilities";
 import FKApi from "../api/api";
 import { makeAuthenticatedApiUrl } from "@/api/api";
+import { BookmarkFactory } from "@/views/viz/viz";
+import Config from "@/secrets";
 
 export default {
     name: "StationSummary",
@@ -117,6 +117,14 @@ export default {
     methods: {
         viewSummary() {
             this.viewingSummary = true;
+        },
+        onClickExplore() {
+            if (Config.EnableNewViz) {
+                const bm = BookmarkFactory.forStation(this.station.id);
+                return this.$router.push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bm) } });
+            } else {
+                return this.$router.push({ name: "viewData", query: { stationId: this.station.id } });
+            }
         },
         /*
         getCounter(moduleIndex, sensorIndex) {
