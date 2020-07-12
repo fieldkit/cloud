@@ -156,6 +156,7 @@ export default Vue.extend({
     height: 100%;
     display: flex;
     flex-direction: column;
+    padding-bottom: 100px;
 }
 .tree-container {
     flex: 0;
@@ -164,7 +165,6 @@ export default Vue.extend({
     border: 2px solid #efefef;
     border-radius: 4px;
     background-color: white;
-    padding-bottom: 100px;
 }
 
 .icons-container {
