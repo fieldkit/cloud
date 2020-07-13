@@ -167,6 +167,11 @@ func (c *SensorService) stationsMeta(ctx context.Context, stations []int64) (*se
 	}, nil
 }
 
+type AggregateInfo struct {
+	Name     string `json:"name"`
+	Interval int    `json:"interval"`
+}
+
 func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (*sensor.DataResult, error) {
 	log := Logger(ctx).Sugar()
 
@@ -315,9 +320,9 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		FROM complete
 		`, tableName)
 
+	interval := handlers.AggregateIntervals[selectedAggregateName]
 	timeGroupThreshold := handlers.AggregateTimeGroupThresholds[selectedAggregateName]
 	buildQuery := func() (query string, args []interface{}, err error) {
-		interval := handlers.AggregateIntervals[selectedAggregateName]
 		if payload.Complete != nil && *payload.Complete {
 			return sqlx.In(sqlQueryComplete, qp.Start, qp.End, interval, qp.Start, qp.End, qp.Stations, qp.Sensors, timeGroupThreshold)
 		}
@@ -349,11 +354,14 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 
 	data := struct {
 		Summaries map[string]*AggregateSummary `json:"summaries"`
-		Aggregate string                       `json:"aggregate"`
+		Aggregate AggregateInfo                `json:"aggregate"`
 		Data      interface{}                  `json:"data"`
 	}{
 		summaries,
-		selectedAggregateName,
+		AggregateInfo{
+			Name:     selectedAggregateName,
+			Interval: interval,
+		},
 		rows,
 	}
 
