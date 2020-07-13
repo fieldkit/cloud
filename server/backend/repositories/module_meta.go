@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/fieldkit/cloud/server/common/errors"
@@ -45,7 +46,9 @@ func (r *ModuleMetaRepository) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, 
 			return module, nil
 		}
 	}
-	return nil, errors.Structured("missing module meta", "manufacturer", m.Manufacturer, "kind", m.Kind)
+
+	message := fmt.Sprintf("missing sensor meta (%v, %v)", m.Manufacturer, m.Kind)
+	return nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind)
 }
 
 func (r *ModuleMetaRepository) FindSensorMeta(m *HeaderFields, sensor string) (mm *ModuleMeta, sm *SensorMeta, err error) {
@@ -80,7 +83,8 @@ func (r *ModuleMetaRepository) FindSensorMeta(m *HeaderFields, sensor string) (m
 		}
 	}
 
-	return nil, nil, errors.Structured("missing sensor meta", "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
+	message := fmt.Sprintf("missing sensor meta (%v, %v, %v)", m.Manufacturer, m.Kind, sensor)
+	return nil, nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
 }
 
 func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error) {

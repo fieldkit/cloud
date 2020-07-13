@@ -137,7 +137,8 @@ func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler, pa
 			return fmt.Errorf("error loading provision: %v", err)
 		} else {
 			if meta, err := rw.loadMeta(ctx, provision, data.MetaRecordID, handler); err != nil {
-				return fmt.Errorf("error loading meta: %v", err)
+				// return fmt.Errorf("error loading meta: %v", err)
+				log.Infow("warning", "error", err)
 			} else {
 				if err := handler.OnData(ctx, provision, nil, data, meta); err != nil {
 					return fmt.Errorf("error handling row: %v", err)
@@ -195,12 +196,12 @@ func (rw *RecordWalker) loadMeta(ctx context.Context, provision *data.Provision,
 		return nil, fmt.Errorf("error finding meta: %v", id)
 	}
 
-	rw.metas[id] = records[0]
-	rw.metaRecords += 1
-
 	if err := handler.OnMeta(ctx, provision, nil, records[0]); err != nil {
 		return nil, err
 	}
+
+	rw.metas[id] = records[0]
+	rw.metaRecords += 1
 
 	return records[0], nil
 }
