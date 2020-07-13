@@ -252,4 +252,9 @@ export default {
 .details-bottom .title {
     font-weight: bold;
 }
+
+.module-icon {
+    width: 35px;
+    height: 35px;
+}
 </style>

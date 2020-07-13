@@ -714,4 +714,9 @@ export default {
     -webkit-appearance: none;
     appearance: none;
 }
+
+.module-icon {
+    width: 35px;
+    height: 35px;
+}
 </style>
