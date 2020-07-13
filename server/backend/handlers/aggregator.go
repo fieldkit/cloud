@@ -36,6 +36,15 @@ var (
 		"10m": 30 * 60,
 		"1m":  2 * 60,
 	}
+	AggregateIntervals = map[string]int{
+		"24h": 86400,
+		"12h": 86400 / 2,
+		"6h":  86400 / 4,
+		"1h":  3600,
+		"30m": 30 * 60,
+		"10m": 10 * 60,
+		"1m":  60,
+	}
 )
 
 type aggregation struct {

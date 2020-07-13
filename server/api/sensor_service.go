@@ -108,7 +108,9 @@ func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) 
 }
 
 type AggregateSummary struct {
-	NumberRecords int64 `db:"number_records" json:"numberRecords"`
+	NumberRecords int64                 `db:"number_records" json:"numberRecords"`
+	Start         *data.NumericWireTime `db:"start" json:"start"`
+	End           *data.NumericWireTime `db:"end" json:"end"`
 }
 
 type StationSensor struct {
@@ -119,13 +121,13 @@ type StationSensor struct {
 }
 
 type DataRow struct {
-	ID        int64                `db:"id" json:"id"`
-	StationID int32                `db:"station_id" json:"stationId"`
-	SensorID  int64                `db:"sensor_id" json:"sensorId"`
 	Time      data.NumericWireTime `db:"time" json:"time"`
-	Location  *data.Location       `db:"location" json:"location"`
-	Value     float64              `db:"value" json:"value"`
-	TimeGroup int32                `db:"time_group" json:"tg"`
+	ID        *int64               `db:"id" json:"-"`
+	StationID *int32               `db:"station_id" json:"stationId,omitempty"`
+	SensorID  *int64               `db:"sensor_id" json:"sensorId,omitempty"`
+	Location  *data.Location       `db:"location" json:"location,omitempty"`
+	Value     *float64             `db:"value" json:"value,omitempty"`
+	TimeGroup *int32               `db:"time_group" json:"tg,omitempty"`
 }
 
 func (c *SensorService) stationsMeta(ctx context.Context, stations []int64) (*sensor.DataResult, error) {
@@ -190,7 +192,11 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		table := handlers.AggregateTableNames[name]
 
 		query, args, err := sqlx.In(fmt.Sprintf(`
-			SELECT COUNT(*) AS number_records FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?);
+			SELECT
+			MIN(time) AS start,
+			MAX(time) AS end,
+			COUNT(*) AS number_records
+			FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?);
 			`, table), qp.Start, qp.End, qp.Stations, qp.Sensors)
 		if err != nil {
 			return nil, err
@@ -217,8 +223,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	log.Infow(message, "aggregate", selectedAggregateName, "number_records", summaries[selectedAggregateName].NumberRecords)
 
 	tableName := handlers.AggregateTableNames[selectedAggregateName]
-	timeGroupThreshold := handlers.AggregateTimeGroupThresholds[selectedAggregateName]
-	query, args, err := sqlx.In(fmt.Sprintf(`
+	sqlQueryIncomplete := fmt.Sprintf(`
 		WITH
 		with_timestamp_differences AS (
 			SELECT
@@ -238,7 +243,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 				END AS new_temporal_cluster
 			FROM with_timestamp_differences AS s
 		),
-		with_assigned_temporal_clustering AS (
+		time_grouped AS (
 			SELECT
 				*,
 				COUNT(new_temporal_cluster) OVER (
@@ -254,8 +259,72 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 			sensor_id,
 			value,
 			time_group
-		FROM with_assigned_temporal_clustering
-		`, tableName), qp.Start, qp.End, qp.Stations, qp.Sensors, timeGroupThreshold)
+		FROM time_grouped
+		`, tableName)
+
+	sqlQueryComplete := fmt.Sprintf(`
+		WITH
+		expected_samples AS (
+			SELECT dd AS time
+			FROM generate_series(?::timestamp, ?::timestamp, ?::interval) AS dd
+		),
+		with_timestamp_differences AS (
+			SELECT
+				*,
+										   LAG(time) OVER (ORDER BY time) AS previous_timestamp,
+				EXTRACT(epoch FROM (time - LAG(time) OVER (ORDER BY time))) AS time_difference
+			FROM %s
+			WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?)
+			ORDER BY time
+		),
+		with_temporal_clustering AS (
+			SELECT
+				*,
+				CASE WHEN s.time_difference > ?
+					OR s.time_difference IS NULL THEN true
+					ELSE NULL
+				END AS new_temporal_cluster
+			FROM with_timestamp_differences AS s
+		),
+		time_grouped AS (
+			SELECT
+				*,
+				COUNT(new_temporal_cluster) OVER (
+					ORDER BY s.time
+					ROWS UNBOUNDED PRECEDING
+				) AS time_group
+			FROM with_temporal_clustering s
+		),
+		complete AS (
+			SELECT
+				id,
+				es.time,
+				station_id,
+				sensor_id,
+				value,
+				time_group
+			FROM expected_samples AS es LEFT JOIN time_grouped AS samples ON (es.time = samples.time)
+		)
+		SELECT
+			id,
+			time,
+			station_id,
+			sensor_id,
+			value,
+			time_group
+		FROM complete
+		`, tableName)
+
+	timeGroupThreshold := handlers.AggregateTimeGroupThresholds[selectedAggregateName]
+	buildQuery := func() (query string, args []interface{}, err error) {
+		interval := handlers.AggregateIntervals[selectedAggregateName]
+		if payload.Complete != nil && *payload.Complete {
+			return sqlx.In(sqlQueryComplete, qp.Start, qp.End, interval, qp.Start, qp.End, qp.Stations, qp.Sensors, timeGroupThreshold)
+		}
+		return sqlx.In(sqlQueryIncomplete, qp.Start, qp.End, qp.Stations, qp.Sensors, timeGroupThreshold)
+	}
+
+	query, args, err := buildQuery()
 	if err != nil {
 		return nil, err
 	}
