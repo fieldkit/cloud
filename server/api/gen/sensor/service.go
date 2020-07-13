@@ -51,6 +51,7 @@ type DataPayload struct {
 	Sensors    *string
 	Resolution *int32
 	Aggregate  *string
+	Complete   *bool
 }
 
 // DataResult is the result type of the sensor service data method.

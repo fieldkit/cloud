@@ -100,7 +100,7 @@ func NewDataUnauthorizedResponseBody(res sensor.Unauthorized) DataUnauthorizedRe
 }
 
 // NewDataPayload builds a sensor service data endpoint payload.
-func NewDataPayload(start *int64, end *int64, stations *string, sensors *string, resolution *int32, aggregate *string, auth string) *sensor.DataPayload {
+func NewDataPayload(start *int64, end *int64, stations *string, sensors *string, resolution *int32, aggregate *string, complete *bool, auth string) *sensor.DataPayload {
 	v := &sensor.DataPayload{}
 	v.Start = start
 	v.End = end
@@ -108,6 +108,7 @@ func NewDataPayload(start *int64, end *int64, stations *string, sensors *string,
 	v.Sensors = sensors
 	v.Resolution = resolution
 	v.Aggregate = aggregate
+	v.Complete = complete
 	v.Auth = auth
 
 	return v

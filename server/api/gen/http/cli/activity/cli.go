@@ -241,6 +241,7 @@ func ParseEndpoint(
 		sensorDataSensorsFlag    = sensorDataFlags.String("sensors", "", "")
 		sensorDataResolutionFlag = sensorDataFlags.String("resolution", "", "")
 		sensorDataAggregateFlag  = sensorDataFlags.String("aggregate", "", "")
+		sensorDataCompleteFlag   = sensorDataFlags.String("complete", "", "")
 		sensorDataAuthFlag       = sensorDataFlags.String("auth", "REQUIRED", "")
 
 		informationFlags = flag.NewFlagSet("information", flag.ContinueOnError)
@@ -694,7 +695,7 @@ func ParseEndpoint(
 				data = nil
 			case "data":
 				endpoint = c.Data()
-				data, err = sensorc.BuildDataPayload(*sensorDataStartFlag, *sensorDataEndFlag, *sensorDataStationsFlag, *sensorDataSensorsFlag, *sensorDataResolutionFlag, *sensorDataAggregateFlag, *sensorDataAuthFlag)
+				data, err = sensorc.BuildDataPayload(*sensorDataStartFlag, *sensorDataEndFlag, *sensorDataStationsFlag, *sensorDataSensorsFlag, *sensorDataResolutionFlag, *sensorDataAggregateFlag, *sensorDataCompleteFlag, *sensorDataAuthFlag)
 			}
 		case "information":
 			c := informationc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -1208,7 +1209,7 @@ Example:
 }
 
 func sensorDataUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] sensor data -start INT64 -end INT64 -stations STRING -sensors STRING -resolution INT32 -aggregate STRING -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] sensor data -start INT64 -end INT64 -stations STRING -sensors STRING -resolution INT32 -aggregate STRING -complete BOOL -auth STRING
 
 Data implements data.
     -start INT64: 
@@ -1217,10 +1218,11 @@ Data implements data.
     -sensors STRING: 
     -resolution INT32: 
     -aggregate STRING: 
+    -complete BOOL: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor data --start 1305916028401326816 --end 3648053334773642674 --stations "Molestiae dolor est aperiam molestiae quia." --sensors "Fugiat aspernatur dolor asperiores." --resolution 1729531005 --aggregate "Facilis hic ea incidunt saepe et." --auth "Et deserunt sequi est sunt qui."
+    `+os.Args[0]+` sensor data --start 1305916028401326816 --end 3648053334773642674 --stations "Molestiae dolor est aperiam molestiae quia." --sensors "Fugiat aspernatur dolor asperiores." --resolution 1729531005 --aggregate "Facilis hic ea incidunt saepe et." --complete true --auth "Deserunt sequi est sunt qui occaecati."
 `, os.Args[0])
 }
 
@@ -1247,7 +1249,7 @@ DeviceLayout implements device layout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information device- layout --device-id "Et vero aut qui." --auth "Dolor eveniet ipsum aperiam et eaque."
+    `+os.Args[0]+` information device- layout --device-id "Dolor eveniet ipsum aperiam et eaque." --auth "Impedit ipsam enim minima recusandae modi aliquid."
 `, os.Args[0])
 }
 
@@ -1258,7 +1260,7 @@ FirmwareStatistics implements firmware statistics.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information firmware- statistics --auth "Eligendi repudiandae aut expedita iste."
+    `+os.Args[0]+` information firmware- statistics --auth "Quia ad."
 `, os.Args[0])
 }
 
@@ -1289,11 +1291,11 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` station add --body '{
-      "deviceId": "Odit rerum officiis eius quas at.",
-      "locationName": "Sed sunt ab voluptatem quibusdam iusto.",
-      "name": "Sit nemo praesentium.",
-      "statusPb": "Ducimus omnis sit et."
-   }' --auth "Eveniet illum."
+      "deviceId": "Dolore consequatur tenetur aut minima.",
+      "locationName": "Fugit sapiente.",
+      "name": "Eveniet illum.",
+      "statusPb": "Recusandae enim numquam quae adipisci."
+   }' --auth "Non quis."
 `, os.Args[0])
 }
 
@@ -1305,7 +1307,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 292906630 --auth "Velit commodi error consequatur consequatur consequatur est."
+    `+os.Args[0]+` station get --id 717917438 --auth "Consequatur consequatur."
 `, os.Args[0])
 }
 

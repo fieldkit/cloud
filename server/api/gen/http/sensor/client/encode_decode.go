@@ -162,6 +162,9 @@ func EncodeDataRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.R
 		if p.Aggregate != nil {
 			values.Add("aggregate", *p.Aggregate)
 		}
+		if p.Complete != nil {
+			values.Add("complete", fmt.Sprintf("%v", *p.Complete))
+		}
 		req.URL.RawQuery = values.Encode()
 		return nil
 	}
