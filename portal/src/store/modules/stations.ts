@@ -24,6 +24,7 @@ export const PROJECT_FOLLOWS = "PROJECT_FOLLOWS";
 export const PROJECT_STATIONS = "PROJECT_STATIONS";
 export const PROJECT_ACTIVITY = "PROJECT_ACTIVITY";
 export const STATION_UPDATE = "STATION_UPDATE";
+export const PROJECT_UPDATE = "STATION_UPDATE";
 
 export class StationsState {
     stations: { all: { [index: number]: DisplayStation }; user: Station[] } = { all: {}, user: [] };
@@ -363,7 +364,10 @@ const mutations = {
         Vue.set(state.projectActivities, payload.projectId, payload.activities);
     },
     [STATION_UPDATE]: (state: StationsState, payload: Station) => {
-        Vue.set(state.stations.all, payload.id, new DisplayStation(payload));
+        Vue.set(state.stations, payload.id, new DisplayStation(payload));
+    },
+    [PROJECT_UPDATE]: (state: StationsState, project: Project) => {
+        Vue.set(state.projects, project.id, project);
     },
 };
 

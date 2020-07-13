@@ -89,6 +89,7 @@
 
 <script>
 import FKApi from "../api/api";
+import * as ActionTypes from "@/store/actions";
 
 export default {
     name: "ProjectForm",
@@ -200,18 +201,18 @@ export default {
                     id: this.project.id,
                 };
                 return api.uploadProjectImage(params).then(() => {
-                    return api.updateProject(data).then((project) => {
-                        this.$router.push({
+                    return this.$store.dispatch(ActionTypes.SAVE_PROJECT, data).then(() => {
+                        return this.$router.push({
                             name: "viewProject",
-                            params: { id: project.id },
+                            params: { id: this.project.id },
                         });
                     });
                 });
             } else {
-                return api.updateProject(data).then((project) => {
-                    this.$router.push({
+                return this.$store.dispatch(ActionTypes.SAVE_PROJECT, data).then(() => {
+                    return this.$router.push({
                         name: "viewProject",
-                        params: { id: project.id },
+                        params: { id: this.project.id },
                     });
                 });
             }

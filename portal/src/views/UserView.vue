@@ -9,12 +9,7 @@
                 <div class="image-container">
                     <div id="image-heading">Profile picture</div>
                     <img src="../assets/Profile_Image.png" v-if="!user.photo && !previewImage" />
-                    <img
-                        alt="User image"
-                        :src="$config.baseUrl + '/' + user.photo.url"
-                        v-if="user.photo && !previewImage"
-                        class="user-image"
-                    />
+                    <img alt="User image" :src="$config.baseUrl + user.photo.url" v-if="user.photo && !previewImage" class="user-image" />
                     <img :src="previewImage" class="user-image" v-if="!user.photo || previewImage" />
                     <br />
                     <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />
