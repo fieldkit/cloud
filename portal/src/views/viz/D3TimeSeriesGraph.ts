@@ -223,8 +223,8 @@ export const D3TimeSeriesGraph = Vue.extend({
                         .append("g")
                         .attr("class", "brush")
                         .attr("data-chart", this.viz.id)
-                        .call(brush)
-                );
+                )
+                .call(brush);
 
             line.selectAll(".circle")
                 .data(data.data.filter((d) => d.value))
