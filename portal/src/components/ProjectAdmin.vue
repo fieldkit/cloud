@@ -10,8 +10,8 @@
         <div class="details">
             <div class="left">
                 <div class="photo">
-                    <img alt="Fieldkit Project" v-if="project.mediaUrl" :src="getImageUrl(project)" class="project-image" />
-                    <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
+                    <img alt="FieldKit Project" v-if="project.mediaUrl" :src="getImageUrl(project)" class="project-image" />
+                    <img alt="Default FieldKit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
                 </div>
 
                 <div class="follow-btn"></div>
@@ -74,7 +74,7 @@
         <div class="row-section project-stations">
             <ProjectStations
                 :project="project"
-                :admin="false"
+                :admin="true"
                 :mapContainerSize="mapContainerSize"
                 :listSize="listSize"
                 :userStations="userStations"

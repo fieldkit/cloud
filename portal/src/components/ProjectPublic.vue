@@ -10,8 +10,8 @@
         <div class="details">
             <div class="left">
                 <div class="photo">
-                    <img alt="Fieldkit Project" v-if="project.mediaUrl" :src="getImageUrl(project)" class="project-image" />
-                    <img alt="Default Fieldkit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
+                    <img alt="FieldKit Project" v-if="project.mediaUrl" :src="getImageUrl(project)" class="project-image" />
+                    <img alt="Default FieldKit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
                 </div>
 
                 <div class="follow-btn">
@@ -35,13 +35,13 @@
                         <div class="project-detail">{{ project.description }}</div>
                     </div>
                     <div class="details-right">
-                        <div class="time-container">
+                        <div class="time-container" v-if="project.startTime">
                             <img alt="Location" src="../assets/icon-location.png" class="icon" />
-                            <template v-if="project.startTime">Started: {{ project.startTime | prettyDate }}</template>
+                            <template>Started: {{ project.startTime | prettyDate }}</template>
                         </div>
-                        <div class="duration-container">
+                        <div class="duration-container" v-if="displayProject.duration">
                             <img alt="Location" src="../assets/icon-location.png" class="icon" />
-                            <template v-if="displayProject.duration">{{ displayProject.duration | prettyDuration }}</template>
+                            <template>{{ displayProject.duration | prettyDuration }}</template>
                         </div>
                         <div class="location-container" v-if="project.location">
                             <img alt="Location" src="../assets/icon-location.png" class="icon" />

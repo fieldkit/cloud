@@ -3,7 +3,7 @@
         <div v-if="!narrow" class="container-side-wide">
             <div class="sidebar-header">
                 <router-link :to="{ name: 'projects' }" class="project-link">
-                    <img alt="Fieldkit Logo" id="header-logo" src="../assets/FieldKit_Logo_Blue.png" />
+                    <img alt="FieldKit Logo" id="header-logo" src="../assets/FieldKit_Logo_Blue.png" />
                 </router-link>
             </div>
             <div id="inner-nav">
@@ -45,7 +45,7 @@
         </div>
         <div v-if="narrow" class="container-side-narrow">
             <div class="sidebar-header sidebar-compass">
-                <img alt="Fieldkit Compass Logo" src="../assets/compass.png" />
+                <img alt="FieldKit Compass Logo" src="../assets/compass.png" />
             </div>
         </div>
     </div>

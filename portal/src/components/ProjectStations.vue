@@ -204,7 +204,7 @@ export default {
 }
 .station-dropdown,
 .add-station {
-    float: right;
+    margin-left: auto;
     font-size: 14px;
     margin-right: 50px;
     cursor: pointer;
