@@ -168,8 +168,11 @@ func (c *SensorService) stationsMeta(ctx context.Context, stations []int64) (*se
 }
 
 type AggregateInfo struct {
-	Name     string `json:"name"`
-	Interval int32  `json:"interval"`
+	Name     string    `json:"name"`
+	Interval int32     `json:"interval"`
+	Complete bool      `json:"complete"`
+	Start    time.Time `json:"start"`
+	End      time.Time `json:"end"`
 }
 
 func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (*sensor.DataResult, error) {
@@ -297,12 +300,13 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		complete AS (
 			SELECT
 				id,
-				es.time,
+				es.time AS time,
 				station_id,
 				sensor_id,
 				value,
 				time_group
-			FROM expected_samples AS es LEFT JOIN time_grouped AS samples ON (es.time = samples.time)
+			FROM expected_samples AS es
+			LEFT JOIN time_grouped AS samples ON (es.time = samples.time)
 		)
 		SELECT
 			id,
@@ -377,6 +381,9 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		AggregateInfo{
 			Name:     selectedAggregateName,
 			Interval: interval,
+			Complete: payload.Complete != nil && *payload.Complete,
+			Start:    queryStart,
+			End:      queryEnd,
 		},
 		rows,
 	}

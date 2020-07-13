@@ -62,7 +62,7 @@ type Aggregated struct {
 }
 
 func (a *aggregation) getTime(original time.Time) time.Time {
-	return original.Truncate(a.interval)
+	return original.UTC().Truncate(a.interval)
 }
 
 func (a *aggregation) canAdd(t time.Time) bool {
