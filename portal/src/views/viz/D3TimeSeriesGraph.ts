@@ -91,6 +91,17 @@ export const D3TimeSeriesGraph = Vue.extend({
                         .attr("preserveAspectRatio", "xMidYMid meet")
                         .attr("viewBox", "0 0 " + layout.width + " " + layout.height);
 
+                    const defs = svg.append("defs");
+
+                    const clip = defs
+                        .append("clipPath")
+                        .attr("id", "clip-" + this.viz.id)
+                        .append("rect")
+                        .attr("width", layout.width - layout.margins.left * 2 - layout.margins.right)
+                        .attr("height", layout.height)
+                        .attr("x", layout.margins.left)
+                        .attr("y", 0);
+
                     return svg;
                 });
 
@@ -149,7 +160,10 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .selectAll(".d3-line")
                 .data(charts)
                 .join((enter) => {
-                    const adding = enter.append("g").attr("class", "svg-container-responsive d3-line");
+                    const adding = enter
+                        .append("g")
+                        .attr("class", "svg-container-responsive d3-line")
+                        .attr("clip-path", "url(#clip-" + this.viz.id + ")");
 
                     adding
                         .append("linearGradient")
