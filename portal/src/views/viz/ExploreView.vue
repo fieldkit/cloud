@@ -11,7 +11,7 @@
                 Oh snap, this station doesn't appear to have any sensors to show you.
             </div>
 
-            <div v-if="!workspace">
+            <div v-if="!workspace && !bookmark">
                 Nothing selected to visualize, please choose a station or project from the left.
             </div>
 

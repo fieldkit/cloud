@@ -11,7 +11,11 @@ export class SensorMeta {
 }
 
 export class StationMeta {
-    constructor(public readonly id: number, public readonly name: string, public readonly sensors: SensorMeta[]) {}
+    constructor(public readonly id: number, public readonly name: string, public readonly sensors: SensorMeta[]) {
+        if (!this.id) throw new Error("id is required");
+        if (!this.name) throw new Error("name is required");
+        if (!this.sensors) throw new Error("sensors is required");
+    }
 }
 
 export class TreeOption {
@@ -406,7 +410,7 @@ export class Workspace {
         const pendingInfo = infoQueries.map((iq) =>
             this.querier.queryInfo(iq).then((info) => {
                 return _.map(info.stations, (info, stationId) => {
-                    const name = info[0].stationName;
+                    const name = info[0].name;
                     const sensors = info.map((row) => new SensorMeta(row.sensorId, row.key, row.key));
                     const station = new StationMeta(Number(stationId), name, sensors);
                     this.stations[station.id] = station;
@@ -512,7 +516,8 @@ export class Workspace {
                     });
 
                 if (children.length == 0) {
-                    return new TreeOption(sensorParams.id, label, sensorParams);
+                    const stationName = _.first(stations.map((station) => station.name));
+                    return new TreeOption(sensorParams.id, stationName + " : " + label, sensorParams);
                 }
 
                 return new TreeOption(sensorParams.id, label, sensorParams, children);
