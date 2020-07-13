@@ -354,6 +354,10 @@ export class Workspace {
         return this._options;
     }
 
+    public get empty(): boolean {
+        return this.allVizes.length === 0;
+    }
+
     constructor(private readonly meta: SensorsResponse, private groups: Group[] = []) {}
 
     private get allVizes(): Viz[] {

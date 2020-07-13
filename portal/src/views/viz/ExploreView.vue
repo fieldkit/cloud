@@ -15,7 +15,7 @@
                 Nothing selected to visualize, please choose a station or project from the left.
             </div>
 
-            <VizWorkspace v-if="workspace" :workspace="workspace" @change="onChange" />
+            <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
         </div>
     </StandardLayout>
 </template>
