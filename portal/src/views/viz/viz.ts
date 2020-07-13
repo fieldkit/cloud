@@ -35,8 +35,12 @@ export class QueriedData {
 
     constructor(public readonly timeRangeQueried: TimeRange, private readonly sdr: SensorDataResponse) {
         if (this.sdr.data.length > 0) {
-            const values = _(this.sdr.data).map((d) => d.value);
-            const times = _(this.sdr.data).map((d) => d.time);
+            const values = _(this.sdr.data)
+                .filter((d) => d.value)
+                .map((d) => d.value);
+            const times = _(this.sdr.data)
+                .filter((d) => d.value)
+                .map((d) => d.time);
             this.dataRange = [values.min(), values.max()];
             this.timeRangeData = [times.min(), times.max()];
 

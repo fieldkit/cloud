@@ -36,7 +36,7 @@ var (
 		"10m": 30 * 60,
 		"1m":  2 * 60,
 	}
-	AggregateIntervals = map[string]int{
+	AggregateIntervals = map[string]int32{
 		"24h": 86400,
 		"12h": 86400 / 2,
 		"6h":  86400 / 4,

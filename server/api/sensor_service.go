@@ -169,7 +169,7 @@ func (c *SensorService) stationsMeta(ctx context.Context, stations []int64) (*se
 
 type AggregateInfo struct {
 	Name     string `json:"name"`
-	Interval int    `json:"interval"`
+	Interval int32  `json:"interval"`
 }
 
 func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (*sensor.DataResult, error) {
@@ -221,13 +221,6 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		}
 	}
 
-	summary := summaries[selectedAggregateName]
-	message := "querying"
-	if selectedAggregateName != qp.Aggregate {
-		message = "selected"
-	}
-	log.Infow(message, "aggregate", selectedAggregateName, "number_records", summary.NumberRecords)
-
 	tableName := handlers.AggregateTableNames[selectedAggregateName]
 	sqlQueryIncomplete := fmt.Sprintf(`
 		WITH
@@ -272,7 +265,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		WITH
 		expected_samples AS (
 			SELECT dd AS time
-			FROM generate_series(?::timestamp, ?::timestamp, ?::interval) AS dd
+			FROM generate_series(?::timestamp, ?::timestamp, ? * interval '1 sec') AS dd
 		),
 		with_timestamp_differences AS (
 			SELECT
@@ -321,6 +314,8 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		FROM complete
 		`, tableName)
 
+	summary := summaries[selectedAggregateName]
+
 	queryStart := qp.Start
 	if summary.Start != nil && queryStart.Before(summary.Start.Time()) {
 		queryStart = summary.Start.Time()
@@ -333,11 +328,19 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	interval := handlers.AggregateIntervals[selectedAggregateName]
 	timeGroupThreshold := handlers.AggregateTimeGroupThresholds[selectedAggregateName]
 
+	message := "querying"
+	if selectedAggregateName != qp.Aggregate {
+		message = "selected"
+	}
+	log.Infow(message, "aggregate", selectedAggregateName, "number_records", summary.NumberRecords, "start", queryStart, "end", queryEnd, "interval", interval, "tgs", timeGroupThreshold)
+
 	rows := make([]*DataRow, 0)
 
 	if summary.NumberRecords > 0 {
 		buildQuery := func() (query string, args []interface{}, err error) {
 			if payload.Complete != nil && *payload.Complete {
+				queryStart = queryStart.Truncate(time.Duration(interval) * time.Second)
+				queryEnd = queryEnd.Truncate(time.Duration(interval) * time.Second)
 				return sqlx.In(sqlQueryComplete, queryStart, queryEnd, interval, queryStart, queryEnd, qp.Stations, qp.Sensors, timeGroupThreshold)
 			}
 			return sqlx.In(sqlQueryIncomplete, queryStart, queryEnd, qp.Stations, qp.Sensors, timeGroupThreshold)
