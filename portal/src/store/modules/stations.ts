@@ -384,6 +384,9 @@ const mutations = {
     },
     [PROJECT_UPDATE]: (state: StationsState, project: Project) => {
         Vue.set(state.projects, project.id, project);
+        if (state.user.projects[project.id]) {
+            Vue.set(state.user.projects, project.id, project);
+        }
     },
 };
 
