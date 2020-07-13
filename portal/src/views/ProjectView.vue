@@ -70,8 +70,8 @@ export default Vue.extend({
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
-            stations: (s: GlobalState) => s.stations.stations.user,
-            userProjects: (s: GlobalState) => s.stations.projects.user,
+            stations: (s: GlobalState) => s.stations.user.stations,
+            userProjects: (s: GlobalState) => s.stations.user.projects,
             displayProject() {
                 return this.$getters.projectsById[this.id];
             },

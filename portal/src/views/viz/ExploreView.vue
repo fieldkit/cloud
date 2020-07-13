@@ -24,6 +24,7 @@
 import Vue from "vue";
 import Promise from "bluebird";
 import StandardLayout from "../StandardLayout.vue";
+
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
@@ -55,8 +56,8 @@ export default Vue.extend({
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
-            stations: (s: GlobalState) => s.stations.stations.user,
-            userProjects: (s: GlobalState) => s.stations.projects.user,
+            stations: (s: GlobalState) => s.stations.user.stations,
+            userProjects: (s: GlobalState) => s.stations.user.projects,
         }),
     },
     watch: {
@@ -100,7 +101,7 @@ export default Vue.extend({
         showStation(stationId: number) {
             console.log("viz: show-station", stationId);
 
-            const station = this.$store.state.stations.stations.all[stationId];
+            const station = this.$store.state.stations.stations[stationId];
 
             return this.createWorkspaceIfNecessary().then((workspace) => {
                 return new FKApi().getQuickSensors([stationId]).then((quickSensors) => {

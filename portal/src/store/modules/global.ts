@@ -2,6 +2,7 @@ import { StationsState, DisplayProject } from "./stations";
 import { ClockState } from "./clock";
 import { MapState } from "./map";
 import { UserState } from "./user";
+import { LayoutState } from "./layout";
 
 export interface RouteState {
     name: string | null;

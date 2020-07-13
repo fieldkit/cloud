@@ -30,14 +30,17 @@
     </StandardLayout>
 </template>
 
-<script>
-import StandardLayout from "./StandardLayout";
-import StationSummary from "../components/StationSummary";
-import StationsMap from "../components/StationsMap";
+<script lang="ts">
+import Vue from "vue";
+import StandardLayout from "./StandardLayout.vue";
+import StationSummary from "../components/StationSummary.vue";
+import StationsMap from "../components/StationsMap.vue";
+
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
+import { GlobalState } from "@/store/modules/global";
 
-export default {
+export default Vue.extend({
     name: "StationsView",
     components: {
         StandardLayout,
@@ -49,6 +52,7 @@ export default {
     },
     data: () => {
         return {
+            map: null,
             showNoStationsMessage: true,
             summarySize: {
                 width: "415px",
@@ -61,14 +65,15 @@ export default {
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy", mapped: "mapped" }),
         ...mapState({
-            user: (s) => s.user.user,
-            hasNoStations: (s) => s.stations.hasNoStations,
-            stations: (s) => s.stations.stations.user,
-            userProjects: (s) => s.stations.projects.user,
-            anyStations: (s) => s.stations.stations.user.length > 0,
+            user: (s: GlobalState) => s.user.user,
+            hasNoStations: (s: GlobalState) => s.stations.hasNoStations,
+            stations: (s: GlobalState) => s.stations.user.stations,
+            userProjects: (s: GlobalState) => s.stations.user.projects,
+            anyStations: (s: GlobalState) => s.stations.user.stations.length > 0,
         }),
         activeStation() {
-            return this.$store.state.stations.stations.all[this.id];
+            console.log("station", this.$store.state.stations.stations[this.id]);
+            return this.$store.state.stations.stations[this.id];
         },
     },
     beforeMount() {
@@ -92,11 +97,10 @@ export default {
             }
         },
         showSummary(params, preserveRoute) {
-            this.$router.push({ name: "viewStation", params: params });
-            this.activeStationId = params.id;
+            return this.$router.push({ name: "viewStation", params: params });
         },
         closeSummary() {
-            this.activeStationId = null;
+            return this.$router.push({ name: "stations" });
         },
         onMapReady(map) {
             this.map = map;
@@ -111,7 +115,7 @@ export default {
             this.showNoStationsMessage = false;
         },
     },
-};
+});
 </script>
 
 <style scoped>

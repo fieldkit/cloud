@@ -27,13 +27,25 @@ export const STATION_UPDATE = "STATION_UPDATE";
 export const PROJECT_UPDATE = "STATION_UPDATE";
 
 export class StationsState {
-    stations: { all: { [index: number]: DisplayStation }; user: Station[] } = { all: {}, user: [] };
-    projects: { user: Project[]; community: Project[] } = { user: [], community: [] };
+    stations: { [index: number]: DisplayStation } = {};
+    hasNoStations: boolean;
+    projects: { [index: number]: Project } = {};
     projectUsers: { [index: number]: ProjectUser[] } = {};
     projectFollowers: { [index: number]: ProjectFollowers } = {};
     projectStations: { [index: number]: DisplayStation[] } = {};
     projectActivities: { [index: number]: Activity[] } = {};
-    hasNoStations: boolean;
+    user: {
+        stations: DisplayStation[];
+        projects: Project[];
+    } = {
+        stations: [],
+        projects: [],
+    };
+    community: {
+        projects: Project[];
+    } = {
+        projects: [],
+    };
 }
 
 export function whenWasStationUpdated(station: Station): Date {
@@ -181,8 +193,7 @@ export class DisplayProject {
 
 const getters = {
     projectsById(state: StationsState): { [index: number]: DisplayProject } {
-        return _(state.projects.user)
-            .concat(state.projects.community)
+        return _(Object.values(state.projects))
             .map((p) => {
                 const users = state.projectUsers[p.id] || [];
                 const stations = state.projectStations[p.id] || [];
@@ -196,7 +207,7 @@ const getters = {
         return _.keyBy(state.stations, (p) => p.id);
     },
     mapped(state: StationsState): MappedStations {
-        return new MappedStations(Object.values(state.stations.all));
+        return new MappedStations(Object.values(state.stations));
     },
 };
 
@@ -328,24 +339,29 @@ const actions = {
         { commit, dispatch }: { commit: any; dispatch: any },
         payload: { id: number; token: string }
     ) => {
-        console.log(payload);
         await new FKApi().declineInvite(payload);
+    },
+    [ActionTypes.SAVE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: any) => {
+        const project = await new FKApi().updateProject(payload);
+
+        commit(PROJECT_UPDATE, project);
     },
 };
 
 const mutations = {
     [HAVE_COMMUNITY_PROJECTS]: (state: StationsState, projects: Project[]) => {
-        state.projects.community = projects;
+        Vue.set(state.community, "projects", projects);
+        Vue.set(state, "projects", { ...state.projects, ..._.keyBy(projects, (p) => p.id) });
     },
     [HAVE_USER_PROJECTS]: (state: StationsState, projects: Project[]) => {
-        state.projects.user = projects;
+        Vue.set(state.user, "projects", projects);
+        Vue.set(state, "projects", { ...state.projects, ..._.keyBy(projects, (p) => p.id) });
     },
-    [HAVE_USER_STATIONS]: (state: StationsState, stations: Station[]) => {
-        state.stations.user = stations;
-        state.hasNoStations = stations.length == 0;
-        stations.forEach((station) => {
-            Vue.set(state.stations.all, station.id, new DisplayStation(station));
-        });
+    [HAVE_USER_STATIONS]: (state: StationsState, payload: Station[]) => {
+        const stations = payload.map((station) => new DisplayStation(station));
+        Vue.set(state.user, "stations", stations);
+        Vue.set(state, "stations", { ...state.stations, ..._.keyBy(stations, (s) => s.id) });
+        Vue.set(state, "hasNoStations", stations.length == 0);
     },
     [PROJECT_USERS]: (state: StationsState, payload: { projectId: number; users: ProjectUser[] }) => {
         Vue.set(state.projectUsers, payload.projectId, payload.users);

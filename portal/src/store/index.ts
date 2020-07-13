@@ -6,6 +6,7 @@ import { user } from "./modules/user";
 import { stations } from "./modules/stations";
 import { map } from "./modules/map";
 import { progress } from "./modules/progress";
+import { layout } from "./modules/layout";
 // import * as MutationTypes from "./mutations";
 // import * as ActionTypes from "./actions";
 
@@ -47,6 +48,7 @@ export default function() {
             stations,
             map,
             progress,
+            layout,
         },
         // This was causing a call stack error (_traverse)
         strict: process.env.NODE_ENV !== "production",

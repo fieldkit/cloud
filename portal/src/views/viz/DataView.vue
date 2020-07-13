@@ -12,7 +12,7 @@
                 </router-link>
                 <div>
                     <div id="project-name">
-                        {{ userProjects[0] ? userProjects[0].name : "" }}
+                        {{ userProjects && userProjects[0] ? userProjects[0].name : "" }}
                     </div>
                     <div class="block-label">Data visualization</div>
                 </div>
@@ -90,8 +90,8 @@ export default {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
             user: (s) => s.user.user,
-            stations: (s) => s.stations.stations.user,
-            userProjects: (s) => s.stations.projects.user,
+            stations: (s) => s.stations.user.stations,
+            userProjects: (s) => s.stations.user.projects,
         }),
     },
     async beforeCreate() {
@@ -154,7 +154,7 @@ export default {
             const processedData = this.processData(result);
             const processed = processedData.data;
             //sort data by date
-            processed.sort(function(a, b) {
+            processed.sort(function (a, b) {
                 return a.date.getTime() - b.date.getTime();
             });
             const origEnd = processed[processed.length - 1].date;
@@ -182,7 +182,7 @@ export default {
 
         processModulesMeta(meta) {
             // temp color function for sensors without ranges
-            const black = function() {
+            const black = function () {
                 return "#000000";
             };
 
@@ -193,20 +193,14 @@ export default {
                         let colors;
                         const expected = expectedRanges[s.firmware_key];
                         if (expected) {
-                            colors = d3
-                                .scaleSequential()
-                                .domain([expected[0], expected[1]])
-                                .interpolator(d3.interpolatePlasma);
+                            colors = d3.scaleSequential().domain([expected[0], expected[1]]).interpolator(d3.interpolatePlasma);
                         } else if (s.ranges.length > 0) {
                             colors = d3
                                 .scaleSequential()
                                 .domain([s.ranges[0].minimum, s.ranges[0].maximum])
                                 .interpolator(d3.interpolatePlasma);
                         } else {
-                            colors = d3
-                                .scaleSequential()
-                                .domain([0, 1])
-                                .interpolator(black);
+                            colors = d3.scaleSequential().domain([0, 1]).interpolator(black);
                         }
                         m.name = m.key;
                         s.name = s.firmware_key;

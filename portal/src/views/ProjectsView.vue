@@ -44,9 +44,9 @@ export default {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
             user: (s) => s.user.user,
-            stations: (s) => s.stations.stations.user,
-            userProjects: (s) => s.stations.projects.user,
-            publicProjects: (s) => s.stations.projects.community,
+            stations: (s) => s.stations.user.stations,
+            userProjects: (s) => s.stations.user.projects,
+            publicProjects: (s) => s.stations.community.projects,
         }),
     },
     methods: {
