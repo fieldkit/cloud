@@ -10,5 +10,6 @@ declare module "vue/types/vue" {
         $loadAssets(path: string);
         $getters: GlobalGetters;
         $state: GlobalState;
+        $seriousError: (error: Error) => void;
     }
 }

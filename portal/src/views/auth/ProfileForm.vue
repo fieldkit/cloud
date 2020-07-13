@@ -1,22 +1,21 @@
 <template>
     <div class="profile-change">
         <form id="form" @submit.prevent="saveForm">
+            <h3>Profile Picture</h3>
             <div class="user-image image-container">
-                <div id="image-heading">Profile picture</div>
                 <ImageUploader :image="{ url: null }" v-if="!user.photo" @change="onImage" />
                 <ImageUploader :image="{ url: user.photo.url }" v-if="user.photo" @change="onImage" />
             </div>
-            <div class="input-container">
-                <input v-model="form.name" class="inputText" type="text" />
-                <span class="floating-label">Name</span>
+            <h3>User Profile</h3>
+            <div>
+                <TextField v-model="form.name" label="Name" />
 
                 <div class="validation-errors" v-if="$v.form.name.$error">
                     <div v-if="!$v.form.name.required">Name is a required field.</div>
                 </div>
             </div>
-            <div class="input-container">
-                <input v-model="form.email" type="text" class="text-field" />
-                <span class="floating-label">Email</span>
+            <div>
+                <TextField v-model="form.email" label="Email" />
 
                 <div class="validation-errors" v-if="$v.form.email.$error">
                     <div v-if="!$v.form.email.required">Email is a required field.</div>
@@ -29,22 +28,21 @@
                     </div>
                 </div>
             </div>
-            <div class="input-container">
-                <input v-model="form.bio" type="text" class="text-field" />
-                <span class="floating-label">Bio</span>
+            <div>
+                <TextField v-model="form.bio" label="Bio" />
 
                 <div class="validation-errors" v-if="$v.form.name.$error">
                     <div v-if="!$v.form.bio.required">Bio is a required field.</div>
                 </div>
             </div>
-            <button class="save-btn" type="submit">Update</button>
+            <button class="save" type="submit">Update</button>
         </form>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import ImageUploader from "../shared/ImageUploader.vue";
+import CommonComponents from "@/views/shared";
 
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
 
@@ -55,7 +53,7 @@ import * as ActionTypes from "@/store/actions";
 export default Vue.extend({
     name: "ProfileForm",
     components: {
-        ImageUploader,
+        ...CommonComponents,
     },
     props: {
         user: {
@@ -167,6 +165,9 @@ export default Vue.extend({
     flex-direction: column;
     margin: 10px 0 0 0px;
 }
+form > div {
+    margin-bottom: 20px;
+}
 #public-checkbox-container {
 }
 #public-checkbox-container input {
@@ -183,7 +184,8 @@ export default Vue.extend({
 .password-change {
     margin-top: 20px;
 }
-.save-btn {
+button.save {
+    margin-top: 20px;
     width: 300px;
     height: 50px;
     color: white;

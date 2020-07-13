@@ -6,14 +6,7 @@
                 <h1>Log In to Your Account</h1>
                 <div class="outer-input-container">
                     <div class="input-container middle-container">
-                        <input
-                            keyboardType="email"
-                            autocorrect="false"
-                            autocapitalizationType="none"
-                            class="inputText"
-                            v-model="form.email"
-                        />
-                        <span class="floating-label">Email</span>
+                        <TextField v-model="form.email" label="Email" />
 
                         <div class="validation-errors" v-if="$v.form.email.$error">
                             <div v-if="!$v.form.email.required">Email is a required field.</div>
@@ -23,8 +16,7 @@
                 </div>
                 <div class="outer-input-container">
                     <div class="input-container middle-container">
-                        <input name="password" secure="true" type="password" class="inputText" v-model="form.password" />
-                        <span class="floating-label">Password</span>
+                        <TextField v-model="form.password" label="Password" type="password" />
 
                         <div class="validation-errors" v-if="$v.form.password.$error">
                             <div v-if="!$v.form.password.required">This is a required field.</div>
@@ -51,12 +43,19 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue";
+import CommonComponents from "@/views/shared";
+
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
+
 import FKApi, { LoginPayload } from "@/api/api";
 import * as ActionTypes from "@/store/actions";
 
-export default {
+export default Vue.extend({
+    components: {
+        ...CommonComponents,
+    },
     data() {
         return {
             form: {
@@ -99,7 +98,12 @@ export default {
             return this.$store
                 .dispatch(ActionTypes.LOGIN, payload)
                 .then(
-                    () => this.$router.push(this.$route.query.after || { name: "projects" }),
+                    () => {
+                        if (this.$route.query.after) {
+                            return this.$router.push(this.$route.query.after[0]);
+                        }
+                        return this.$router.push({ name: "projects" });
+                    },
                     () => (this.failed = true)
                 )
                 .finally(() => {
@@ -107,7 +111,7 @@ export default {
                 });
         },
     },
-};
+});
 </script>
 
 <style scoped>

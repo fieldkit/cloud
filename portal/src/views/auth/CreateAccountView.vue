@@ -6,14 +6,7 @@
                 <h1>Create Your Account</h1>
                 <div class="outer-input-container">
                     <div class="input-container">
-                        <input
-                            keyboardType="name"
-                            autocorrect="false"
-                            autocapitalizationType="none"
-                            class="inputText"
-                            v-model="form.name"
-                        />
-                        <span class="floating-label">Name</span>
+                        <TextField v-model="form.name" label="Name" />
 
                         <div class="validation-errors" v-if="$v.form.name.$error">
                             <div v-if="!$v.form.name.required">Name is a required field.</div>
@@ -22,14 +15,7 @@
                 </div>
                 <div class="outer-input-container">
                     <div class="input-container middle-container">
-                        <input
-                            keyboardType="email"
-                            autocorrect="false"
-                            autocapitalizationType="none"
-                            class="inputText"
-                            v-model="form.email"
-                        />
-                        <span class="floating-label">Email</span>
+                        <TextField v-model="form.email" label="Email" keyboardType="email" />
 
                         <div class="validation-errors" v-if="$v.form.email.$error">
                             <div v-if="!$v.form.email.required">Email is a required field.</div>
@@ -45,8 +31,7 @@
                 </div>
                 <div class="outer-input-container">
                     <div class="input-container middle-container">
-                        <input name="password" secure="true" type="password" class="inputText" v-model="form.password" />
-                        <span class="floating-label">Password</span>
+                        <TextField v-model="form.password" label="Password" type="password" />
 
                         <div class="validation-errors" v-if="$v.form.password.$error">
                             <div v-if="!$v.form.password.required">This is a required field.</div>
@@ -56,14 +41,7 @@
                 </div>
                 <div class="outer-input-container">
                     <div class="input-container middle-container">
-                        <input
-                            secure="true"
-                            name="passwordConfirmation"
-                            type="password"
-                            class="inputText"
-                            v-model="form.passwordConfirmation"
-                        />
-                        <span class="floating-label">Confirm Password</span>
+                        <TextField v-model="form.passwordConfirmation" label="Confirm password" type="password" />
 
                         <div class="validation-errors" v-if="$v.form.passwordConfirmation.$error">
                             <div v-if="!$v.form.passwordConfirmation.required">Confirmation is a required field.</div>
@@ -105,12 +83,18 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue";
+import CommonComponents from "@/views/shared";
+
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
 import FKApi from "@/api/api";
 
-export default {
+export default Vue.extend({
     name: "CreateAccountView",
+    components: {
+        ...CommonComponents,
+    },
     data() {
         return {
             form: {
@@ -133,7 +117,7 @@ export default {
             email: {
                 required,
                 email,
-                taken: function () {
+                taken: function (this: any) {
                     return this.available;
                 },
             },
@@ -173,7 +157,7 @@ export default {
             });
         },
     },
-};
+});
 </script>
 
 <style scoped>

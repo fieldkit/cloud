@@ -1,41 +1,39 @@
 <template>
     <div class="password-change">
         <form id="form" @submit.prevent="saveForm">
-            <div class="password-change-heading">Change password</div>
-            <div class="input-container">
-                <input v-model="form.existing" secure="true" type="password" class="text-field" />
-                <span class="floating-label">Current password</span>
+            <h3>Change Password</h3>
+            <div>
+                <TextField v-model="form.existing" label="Current password" type="password" />
 
                 <div class="validation-errors" v-if="$v.form.existing.$error">
                     <div v-if="!$v.form.existing.required">This is a required field.</div>
                     <div v-if="!$v.form.existing.min">Password must be at least 10 characters.</div>
                 </div>
             </div>
-            <div class="input-container">
-                <input v-model="form.password" secure="true" type="password" class="text-field" />
-                <span class="floating-label">New password</span>
+            <div>
+                <TextField v-model="form.password" label="New password" type="password" />
 
                 <div class="validation-errors" v-if="$v.form.password.$error">
                     <div v-if="!$v.form.password.required">This is a required field.</div>
                     <div v-if="!$v.form.password.min">Password must be at least 10 characters.</div>
                 </div>
             </div>
-            <div class="input-container">
-                <input v-model="form.passwordConfirmation" secure="true" type="password" class="text-field" />
-                <span class="floating-label">Confirm new password</span>
+            <div>
+                <TextField v-model="form.passwordConfirmation" label="Confirm new password" type="password" />
 
                 <div class="validation-errors" v-if="$v.form.passwordConfirmation.$error">
                     <div v-if="!$v.form.passwordConfirmation.required">Confirmation is a required field.</div>
                     <div v-if="!$v.form.passwordConfirmation.sameAsPassword">Passwords must match.</div>
                 </div>
             </div>
-            <button class="save-btn" type="submit">Change password</button>
+            <button class="save" type="submit">Change password</button>
         </form>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import CommonComponents from "@/views/shared";
 
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
 
@@ -45,7 +43,9 @@ import * as ActionTypes from "@/store/actions";
 
 export default Vue.extend({
     name: "ChangePasswordFOrm",
-    components: {},
+    components: {
+        ...CommonComponents,
+    },
     props: {
         user: {
             type: Object,
@@ -112,10 +112,14 @@ export default Vue.extend({
     font-weight: 500;
     margin-bottom: 40px;
 }
+form > div {
+    margin-bottom: 20px;
+}
 .password-change {
     margin-top: 20px;
 }
-.save-btn {
+button.save {
+    margin-top: 20px;
     width: 300px;
     height: 50px;
     color: white;

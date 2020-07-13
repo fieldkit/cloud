@@ -9,14 +9,8 @@
                         <div class="reset-instructions">
                             Enter your email address below, and password reset instructions will be sent.
                         </div>
-                        <input
-                            keyboardType="email"
-                            autocorrect="false"
-                            autocapitalizationType="none"
-                            class="inputText"
-                            v-model="form.email"
-                        />
-                        <span class="floating-label">Email</span>
+
+                        <TextField v-model="form.email" label="Email" keyboardType="email" />
 
                         <div class="validation-errors" v-if="$v.form.email.$error">
                             <div v-if="!$v.form.email.required">Email is a required field.</div>
@@ -52,12 +46,18 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue";
+import CommonComponents from "@/views/shared";
+
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
 import FKApi from "@/api/api";
 
-export default {
+export default Vue.extend({
     name: "RecoverAccountView",
+    components: {
+        ...CommonComponents,
+    },
     data() {
         return {
             form: {
@@ -93,7 +93,7 @@ export default {
             return this.save().finally(() => (this.resending = false));
         },
     },
-};
+});
 </script>
 
 <style scoped>

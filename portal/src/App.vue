@@ -63,6 +63,9 @@ button {
     font-size: 36px;
     margin-top: 40px;
 }
+
+/* Deprecated in favor of TextField */
+
 input:focus ~ .floating-label,
 input:not(:focus):valid ~ .floating-label {
     top: -48px;
@@ -72,8 +75,7 @@ input:not(:focus):valid ~ .floating-label {
 input:invalid {
     box-shadow: none;
 }
-.inputText,
-.text-field {
+.inputText {
     outline: 0;
     color: #2c3e50;
     font-size: 16px;
@@ -83,8 +85,7 @@ input:invalid {
     border-bottom: 2px solid #d8dce0;
     padding-bottom: 4px;
 }
-.inputText:focus,
-.text-field:focus {
+.inputText:focus {
     border-bottom: 2px solid #52b5e4;
 }
 .floating-label {
