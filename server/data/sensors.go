@@ -32,6 +32,10 @@ func (nw *NumericWireTime) Scan(src interface{}) error {
 	return nil
 }
 
+func (nw *NumericWireTime) Time() time.Time {
+	return time.Time(*nw)
+}
+
 type AggregatedReading struct {
 	ID        int64           `db:"id" json:"id"`
 	StationID int32           `db:"station_id" json:"stationId"`

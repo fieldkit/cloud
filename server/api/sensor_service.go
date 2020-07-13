@@ -221,11 +221,12 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		}
 	}
 
+	summary := summaries[selectedAggregateName]
 	message := "querying"
 	if selectedAggregateName != qp.Aggregate {
 		message = "selected"
 	}
-	log.Infow(message, "aggregate", selectedAggregateName, "number_records", summaries[selectedAggregateName].NumberRecords)
+	log.Infow(message, "aggregate", selectedAggregateName, "number_records", summary.NumberRecords)
 
 	tableName := handlers.AggregateTableNames[selectedAggregateName]
 	sqlQueryIncomplete := fmt.Sprintf(`
@@ -236,7 +237,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 										   LAG(time) OVER (ORDER BY time) AS previous_timestamp,
 				EXTRACT(epoch FROM (time - LAG(time) OVER (ORDER BY time))) AS time_difference
 			FROM %s
-			WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?)
+			WHERE time >= ? AND time <= ? AND station_id IN (?) AND sensor_id IN (?)
 			ORDER BY time
 		),
 		with_temporal_clustering AS (
@@ -279,7 +280,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 										   LAG(time) OVER (ORDER BY time) AS previous_timestamp,
 				EXTRACT(epoch FROM (time - LAG(time) OVER (ORDER BY time))) AS time_difference
 			FROM %s
-			WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?)
+			WHERE time >= ? AND time <= ? AND station_id IN (?) AND sensor_id IN (?)
 			ORDER BY time
 		),
 		with_temporal_clustering AS (
@@ -320,36 +321,48 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		FROM complete
 		`, tableName)
 
+	queryStart := qp.Start
+	if summary.Start != nil && queryStart.Before(summary.Start.Time()) {
+		queryStart = summary.Start.Time()
+	}
+	queryEnd := qp.End
+	if summary.End != nil && queryEnd.After(summary.End.Time()) {
+		queryEnd = summary.End.Time()
+	}
+
 	interval := handlers.AggregateIntervals[selectedAggregateName]
 	timeGroupThreshold := handlers.AggregateTimeGroupThresholds[selectedAggregateName]
-	buildQuery := func() (query string, args []interface{}, err error) {
-		if payload.Complete != nil && *payload.Complete {
-			return sqlx.In(sqlQueryComplete, qp.Start, qp.End, interval, qp.Start, qp.End, qp.Stations, qp.Sensors, timeGroupThreshold)
-		}
-		return sqlx.In(sqlQueryIncomplete, qp.Start, qp.End, qp.Stations, qp.Sensors, timeGroupThreshold)
-	}
-
-	query, args, err := buildQuery()
-	if err != nil {
-		return nil, err
-	}
-
-	queried, err := c.db.QueryxContext(ctx, c.db.Rebind(query), args...)
-	if err != nil {
-		return nil, err
-	}
-
-	defer queried.Close()
 
 	rows := make([]*DataRow, 0)
 
-	for queried.Next() {
-		row := &DataRow{}
-		if err = queried.StructScan(row); err != nil {
+	if summary.NumberRecords > 0 {
+		buildQuery := func() (query string, args []interface{}, err error) {
+			if payload.Complete != nil && *payload.Complete {
+				return sqlx.In(sqlQueryComplete, queryStart, queryEnd, interval, queryStart, queryEnd, qp.Stations, qp.Sensors, timeGroupThreshold)
+			}
+			return sqlx.In(sqlQueryIncomplete, queryStart, queryEnd, qp.Stations, qp.Sensors, timeGroupThreshold)
+		}
+
+		query, args, err := buildQuery()
+		if err != nil {
 			return nil, err
 		}
 
-		rows = append(rows, row)
+		queried, err := c.db.QueryxContext(ctx, c.db.Rebind(query), args...)
+		if err != nil {
+			return nil, err
+		}
+
+		defer queried.Close()
+
+		for queried.Next() {
+			row := &DataRow{}
+			if err = queried.StructScan(row); err != nil {
+				return nil, err
+			}
+
+			rows = append(rows, row)
+		}
 	}
 
 	data := struct {

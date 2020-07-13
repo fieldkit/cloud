@@ -88,7 +88,7 @@ export const D3Histogram = Vue.extend({
                 .domain(x.domain())
                 .thresholds(thresholds);
 
-            const bins = histogram(this.data.data);
+            const bins = histogram(this.data.data.filter((d) => d.value));
 
             this.viz.log("bins", bins);
 

@@ -84,6 +84,7 @@ export class DataQueryParams {
         queryParams.append("stations", this.stations.join(","));
         queryParams.append("sensors", this.sensors.join(","));
         queryParams.append("resolution", "1000");
+        queryParams.append("complete", "true");
         return queryParams;
     }
 

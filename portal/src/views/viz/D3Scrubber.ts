@@ -128,6 +128,8 @@ export const D3Scrubber = Vue.extend({
                     .y1((d) => y(d.value));
             };
 
+            const renderedArea = (scrubber) => area(scrubber)(scrubber.data.sdr.data.filter((d) => d.value));
+
             const backgroundAreas = svg
                 .select(".background-areas")
                 .selectAll(".background-area")
@@ -138,7 +140,7 @@ export const D3Scrubber = Vue.extend({
                         .attr("class", "background-area")
                         .attr("fill", "rgb(220, 222, 223)")
                 )
-                .attr("d", (scrubber) => area(scrubber)(scrubber.data.sdr.data));
+                .attr("d", renderedArea);
 
             const foregroundAreas = svg
                 .select(".foreground-areas")
@@ -151,7 +153,7 @@ export const D3Scrubber = Vue.extend({
                         .attr("fill", "rgb(45, 158, 204)")
                 )
                 .attr("clip-path", "url(#scrubber-clip-" + this.scrubbers.id + ")")
-                .attr("d", (scrubber) => area(scrubber)(scrubber.data.sdr.data));
+                .attr("d", renderedArea);
 
             const handles = (g, selection) => {
                 g.selectAll(".handle-custom")

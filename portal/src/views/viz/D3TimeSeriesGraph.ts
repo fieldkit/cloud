@@ -187,7 +187,7 @@ export const D3TimeSeriesGraph = Vue.extend({
 
             const lineFn = d3
                 .line()
-                .defined((d) => true)
+                .defined((d) => d.value)
                 .x((d) => x(d.time))
                 .y((d) => y(d.value))
                 .curve(d3.curveBasis);
@@ -202,7 +202,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                         .attr("stroke-dasharray", "4,4")
                         .attr("fill", "none")
                 )
-                .attr("d", lineFn(data.data));
+                .attr("d", lineFn(data.data.filter(lineFn.defined())));
 
             line.selectAll(".data-line")
                 .data(charts)
@@ -227,7 +227,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                 );
 
             line.selectAll(".circle")
-                .data(data.data)
+                .data(data.data.filter((d) => d.value))
                 .join(
                     (enter) =>
                         enter
@@ -238,7 +238,8 @@ export const D3TimeSeriesGraph = Vue.extend({
                     (exiting) => exiting.remove()
                 )
                 .attr("cx", (d) => x(d.time))
-                .attr("cy", (d) => y(d.value));
+                .attr("cy", (d) => y(d.value))
+                .attr("fill", (d) => colors(d.value));
         },
     },
     template: `<div class="viz time-series-graph"><div class="chart" @dblclick="onDouble"></div></div>`,

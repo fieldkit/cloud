@@ -73,7 +73,7 @@ export const D3Range = Vue.extend({
                 .domain(dataRange)
                 .range([layout.height - (layout.margins.bottom + layout.margins.top), layout.margins.top]);
 
-            const bins = histogram(this.data.data);
+            const bins = histogram(this.data.data.filter((d) => d.value));
 
             this.viz.log("bins", bins);
 
