@@ -59,6 +59,11 @@ export default Vue.extend({
             userProjects: (s: GlobalState) => s.stations.projects.user,
         }),
     },
+    watch: {
+        $route(to, from) {
+            console.log("viz: route");
+        },
+    },
     beforeMount(this: any) {
         if (this.bookmark) {
             return new FKApi().getAllSensors().then((sensorKeys) => {
@@ -93,15 +98,15 @@ export default Vue.extend({
             });
         },
         showStation(stationId: number) {
-            console.log("show-station", stationId);
+            console.log("viz: show-station", stationId);
 
             const station = this.$store.state.stations.stations.all[stationId];
 
             return this.createWorkspaceIfNecessary().then((workspace) => {
                 return new FKApi().getQuickSensors([stationId]).then((quickSensors) => {
-                    console.log("quick-sensors", quickSensors);
+                    console.log("viz: quick-sensors", quickSensors);
                     if (quickSensors.stations[stationId].length == 0) {
-                        console.log("no sensors");
+                        console.log("viz: no sensors");
                         this.showNoSensors = true;
                         return Promise.delay(5000).then(() => {
                             this.showNoSensors = false;
