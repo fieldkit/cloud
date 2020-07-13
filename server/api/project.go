@@ -316,6 +316,7 @@ func (c *ProjectController) ListStation(ctx *app.ListStationProjectContext) erro
 	return ctx.OK(ProjectsType(projects, followers, roles))
 }
 
+/*
 func (c *ProjectController) SaveImage(ctx *app.SaveImageProjectContext) error {
 	p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
 	if err != nil {
@@ -377,7 +378,7 @@ func (c *ProjectController) GetImage(ctx *app.GetImageProjectContext) error {
 
 	return ctx.OK(nil)
 }
-
+*/
 func (c *ProjectController) InviteUser(ctx *app.InviteUserProjectContext) error {
 	p, err := NewPermissions(ctx, c.options).ForProjectByID(ctx.ProjectID)
 	if err != nil {

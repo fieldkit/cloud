@@ -1135,45 +1135,6 @@ func (ctx *GetProjectContext) BadRequest() error {
 	return nil
 }
 
-// GetImageProjectContext provides the project get image action context.
-type GetImageProjectContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	ProjectID int
-}
-
-// NewGetImageProjectContext parses the incoming request URL and body, performs validations and creates the
-// context used by the project controller get image action.
-func NewGetImageProjectContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetImageProjectContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := GetImageProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["projectId"]
-	if len(paramProjectID) > 0 {
-		rawProjectID := paramProjectID[0]
-		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
-			rctx.ProjectID = projectID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *GetImageProjectContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "image/png")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
 // InviteUserProjectContext provides the project invite user action context.
 type InviteUserProjectContext struct {
 	context.Context
@@ -1414,49 +1375,6 @@ func (ctx *RemoveUserProjectContext) OK() error {
 
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *RemoveUserProjectContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// SaveImageProjectContext provides the project save image action context.
-type SaveImageProjectContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	ProjectID int
-}
-
-// NewSaveImageProjectContext parses the incoming request URL and body, performs validations and creates the
-// context used by the project controller save image action.
-func NewSaveImageProjectContext(ctx context.Context, r *http.Request, service *goa.Service) (*SaveImageProjectContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := SaveImageProjectContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramProjectID := req.Params["projectId"]
-	if len(paramProjectID) > 0 {
-		rawProjectID := paramProjectID[0]
-		if projectID, err2 := strconv.Atoi(rawProjectID); err2 == nil {
-			rctx.ProjectID = projectID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("projectId", rawProjectID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *SaveImageProjectContext) OK(r *Project) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.project+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *SaveImageProjectContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
 	return nil
 }

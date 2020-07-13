@@ -9,6 +9,7 @@ package project
 
 import (
 	"context"
+	"io"
 
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
@@ -16,13 +17,33 @@ import (
 
 // Endpoints wraps the "project" service endpoints.
 type Endpoints struct {
-	AddUpdate    goa.Endpoint
-	DeleteUpdate goa.Endpoint
-	ModifyUpdate goa.Endpoint
-	Invites      goa.Endpoint
-	LookupInvite goa.Endpoint
-	AcceptInvite goa.Endpoint
-	RejectInvite goa.Endpoint
+	AddUpdate     goa.Endpoint
+	DeleteUpdate  goa.Endpoint
+	ModifyUpdate  goa.Endpoint
+	Invites       goa.Endpoint
+	LookupInvite  goa.Endpoint
+	AcceptInvite  goa.Endpoint
+	RejectInvite  goa.Endpoint
+	UploadMedia   goa.Endpoint
+	DownloadMedia goa.Endpoint
+}
+
+// UploadMediaRequestData holds both the payload and the HTTP request body
+// reader of the "upload media" method.
+type UploadMediaRequestData struct {
+	// Payload is the method payload.
+	Payload *UploadMediaPayload
+	// Body streams the HTTP request body.
+	Body io.ReadCloser
+}
+
+// DownloadMediaResponseData holds both the result and the HTTP response body
+// reader of the "download media" method.
+type DownloadMediaResponseData struct {
+	// Result is the method result.
+	Result *DownloadMediaResult
+	// Body streams the HTTP response body.
+	Body io.ReadCloser
 }
 
 // NewEndpoints wraps the methods of the "project" service with endpoints.
@@ -30,13 +51,15 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		AddUpdate:    NewAddUpdateEndpoint(s, a.JWTAuth),
-		DeleteUpdate: NewDeleteUpdateEndpoint(s, a.JWTAuth),
-		ModifyUpdate: NewModifyUpdateEndpoint(s, a.JWTAuth),
-		Invites:      NewInvitesEndpoint(s, a.JWTAuth),
-		LookupInvite: NewLookupInviteEndpoint(s, a.JWTAuth),
-		AcceptInvite: NewAcceptInviteEndpoint(s, a.JWTAuth),
-		RejectInvite: NewRejectInviteEndpoint(s, a.JWTAuth),
+		AddUpdate:     NewAddUpdateEndpoint(s, a.JWTAuth),
+		DeleteUpdate:  NewDeleteUpdateEndpoint(s, a.JWTAuth),
+		ModifyUpdate:  NewModifyUpdateEndpoint(s, a.JWTAuth),
+		Invites:       NewInvitesEndpoint(s, a.JWTAuth),
+		LookupInvite:  NewLookupInviteEndpoint(s, a.JWTAuth),
+		AcceptInvite:  NewAcceptInviteEndpoint(s, a.JWTAuth),
+		RejectInvite:  NewRejectInviteEndpoint(s, a.JWTAuth),
+		UploadMedia:   NewUploadMediaEndpoint(s, a.JWTAuth),
+		DownloadMedia: NewDownloadMediaEndpoint(s),
 	}
 }
 
@@ -49,6 +72,8 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.LookupInvite = m(e.LookupInvite)
 	e.AcceptInvite = m(e.AcceptInvite)
 	e.RejectInvite = m(e.RejectInvite)
+	e.UploadMedia = m(e.UploadMedia)
+	e.DownloadMedia = m(e.DownloadMedia)
 }
 
 // NewAddUpdateEndpoint returns an endpoint function that calls the method "add
@@ -201,5 +226,37 @@ func NewRejectInviteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endp
 			return nil, err
 		}
 		return nil, s.RejectInvite(ctx, p)
+	}
+}
+
+// NewUploadMediaEndpoint returns an endpoint function that calls the method
+// "upload media" of service "project".
+func NewUploadMediaEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		ep := req.(*UploadMediaRequestData)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, ep.Payload.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.UploadMedia(ctx, ep.Payload, ep.Body)
+	}
+}
+
+// NewDownloadMediaEndpoint returns an endpoint function that calls the method
+// "download media" of service "project".
+func NewDownloadMediaEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*DownloadMediaPayload)
+		res, body, err := s.DownloadMedia(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		return &DownloadMediaResponseData{Result: res, Body: body}, nil
 	}
 }

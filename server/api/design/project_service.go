@@ -202,5 +202,68 @@ var _ = Service("project", func() {
 		})
 	})
 
+	Method("upload media", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("contentLength", Int64)
+			Required("contentLength")
+			Attribute("contentType", String)
+			Required("contentType")
+			Attribute("projectId", Int32)
+			Required("projectId")
+		})
+
+		HTTP(func() {
+			POST("projects/{projectId}/media")
+
+			Header("contentType:Content-Type")
+			Header("contentLength:Content-Length")
+
+			SkipRequestBodyEncodeDecode()
+
+			httpAuthentication()
+		})
+	})
+
+	Method("download media", func() {
+		/*
+			Security(JWTAuth, func() {
+				Scope("api:access")
+			})
+		*/
+
+		Payload(func() {
+			// Token("auth")
+			// Required("auth")
+			Attribute("projectId", Int32)
+			Required("projectId")
+		})
+
+		Result(func() {
+			Attribute("length", Int64)
+			Required("length")
+			Attribute("contentType", String)
+			Required("contentType")
+		})
+
+		HTTP(func() {
+			GET("projects/{projectId}/media")
+
+			SkipResponseBodyEncodeDecode()
+
+			Response(func() {
+				Header("length:Content-Length")
+				Header("contentType:Content-Type")
+			})
+
+			// httpAuthenticationQueryString()
+		})
+	})
+
 	commonOptions()
 })

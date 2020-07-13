@@ -9,6 +9,7 @@ package project
 
 import (
 	"context"
+	"io"
 
 	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
 	"goa.design/goa/v3/security"
@@ -30,6 +31,10 @@ type Service interface {
 	AcceptInvite(context.Context, *AcceptInvitePayload) (err error)
 	// RejectInvite implements reject invite.
 	RejectInvite(context.Context, *RejectInvitePayload) (err error)
+	// UploadMedia implements upload media.
+	UploadMedia(context.Context, *UploadMediaPayload, io.ReadCloser) (err error)
+	// DownloadMedia implements download media.
+	DownloadMedia(context.Context, *DownloadMediaPayload) (res *DownloadMediaResult, body io.ReadCloser, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -46,7 +51,7 @@ const ServiceName = "project"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [7]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept invite", "reject invite"}
+var MethodNames = [9]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept invite", "reject invite", "upload media", "download media"}
 
 // AddUpdatePayload is the payload type of the project service add update
 // method.
@@ -111,6 +116,28 @@ type RejectInvitePayload struct {
 	Auth  string
 	ID    int64
 	Token *string
+}
+
+// UploadMediaPayload is the payload type of the project service upload media
+// method.
+type UploadMediaPayload struct {
+	Auth          string
+	ContentLength int64
+	ContentType   string
+	ProjectID     int32
+}
+
+// DownloadMediaPayload is the payload type of the project service download
+// media method.
+type DownloadMediaPayload struct {
+	ProjectID int32
+}
+
+// DownloadMediaResult is the result type of the project service download media
+// method.
+type DownloadMediaResult struct {
+	Length      int64
+	ContentType string
 }
 
 type PendingInvite struct {

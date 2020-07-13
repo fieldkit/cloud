@@ -209,3 +209,59 @@ func BuildRejectInvitePayload(projectRejectInviteID string, projectRejectInviteT
 
 	return v, nil
 }
+
+// BuildUploadMediaPayload builds the payload for the project upload media
+// endpoint from CLI flags.
+func BuildUploadMediaPayload(projectUploadMediaProjectID string, projectUploadMediaContentType string, projectUploadMediaContentLength string, projectUploadMediaAuth string) (*project.UploadMediaPayload, error) {
+	var err error
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectUploadMediaProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var contentType string
+	{
+		contentType = projectUploadMediaContentType
+	}
+	var contentLength int64
+	{
+		contentLength, err = strconv.ParseInt(projectUploadMediaContentLength, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for contentLength, must be INT64")
+		}
+	}
+	var auth string
+	{
+		auth = projectUploadMediaAuth
+	}
+	v := &project.UploadMediaPayload{}
+	v.ProjectID = projectID
+	v.ContentType = contentType
+	v.ContentLength = contentLength
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildDownloadMediaPayload builds the payload for the project download media
+// endpoint from CLI flags.
+func BuildDownloadMediaPayload(projectDownloadMediaProjectID string) (*project.DownloadMediaPayload, error) {
+	var err error
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectDownloadMediaProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	v := &project.DownloadMediaPayload{}
+	v.ProjectID = projectID
+
+	return v, nil
+}

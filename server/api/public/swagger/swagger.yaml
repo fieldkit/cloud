@@ -140,7 +140,7 @@ definitions:
     description: DeviceDataRecord media type (default view)
     example:
       data:
-        Possimus labore qui possimus porro quaerat.: 8c87d5f2-4e71-492f-aa55-ad955d9fdf3b
+        Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -151,7 +151,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Possimus labore qui possimus porro quaerat.: 8c87d5f2-4e71-492f-aa55-ad955d9fdf3b
+          Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
         type: object
       id:
         example: 3.1889681637076403e+18
@@ -191,7 +191,7 @@ definitions:
       (default view)
     example:
     - data:
-        Possimus labore qui possimus porro quaerat.: 8c87d5f2-4e71-492f-aa55-ad955d9fdf3b
+        Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -199,15 +199,7 @@ definitions:
       record: 7.193395211552676e+18
       time: "1980-07-29T04:01:26Z"
     - data:
-        Possimus labore qui possimus porro quaerat.: 8c87d5f2-4e71-492f-aa55-ad955d9fdf3b
-      id: 3.1889681637076403e+18
-      location:
-      - 0.859735501027165
-      meta: 4.735156023355616e+18
-      record: 7.193395211552676e+18
-      time: "1980-07-29T04:01:26Z"
-    - data:
-        Possimus labore qui possimus porro quaerat.: 8c87d5f2-4e71-492f-aa55-ad955d9fdf3b
+        Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -224,7 +216,7 @@ definitions:
     example:
       data:
       - data:
-          Possimus labore qui possimus porro quaerat.: 8c87d5f2-4e71-492f-aa55-ad955d9fdf3b
+          Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -232,7 +224,7 @@ definitions:
         record: 7.193395211552676e+18
         time: "1980-07-29T04:01:26Z"
       - data:
-          Possimus labore qui possimus porro quaerat.: 8c87d5f2-4e71-492f-aa55-ad955d9fdf3b
+          Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -240,7 +232,7 @@ definitions:
         record: 7.193395211552676e+18
         time: "1980-07-29T04:01:26Z"
       - data:
-          Possimus labore qui possimus porro quaerat.: 8c87d5f2-4e71-492f-aa55-ad955d9fdf3b
+          Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -249,7 +241,7 @@ definitions:
         time: "1980-07-29T04:01:26Z"
       meta:
       - data:
-          Vel est.: acd6f1de-9b74-4879-ae75-3b3ae0015ac1
+          Vel est.: 6d2f3c0b-8cf9-4b0f-8d24-279ab6ab33fb
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
@@ -336,7 +328,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Vel est.: acd6f1de-9b74-4879-ae75-3b3ae0015ac1
+        Vel est.: 6d2f3c0b-8cf9-4b0f-8d24-279ab6ab33fb
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -344,7 +336,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Vel est.: acd6f1de-9b74-4879-ae75-3b3ae0015ac1
+          Vel est.: 6d2f3c0b-8cf9-4b0f-8d24-279ab6ab33fb
         type: object
       id:
         example: 2.827138534810339e+18
@@ -370,12 +362,17 @@ definitions:
       (default view)
     example:
     - data:
-        Vel est.: acd6f1de-9b74-4879-ae75-3b3ae0015ac1
+        Vel est.: 6d2f3c0b-8cf9-4b0f-8d24-279ab6ab33fb
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
     - data:
-        Vel est.: acd6f1de-9b74-4879-ae75-3b3ae0015ac1
+        Vel est.: 6d2f3c0b-8cf9-4b0f-8d24-279ab6ab33fb
+      id: 2.827138534810339e+18
+      record: 1.2626736114732598e+18
+      time: "2000-09-09T05:59:52Z"
+    - data:
+        Vel est.: 6d2f3c0b-8cf9-4b0f-8d24-279ab6ab33fb
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -2892,54 +2889,6 @@ paths:
       - jwt:
         - api:access
       summary: invite user project
-      tags:
-      - project
-  /projects/{projectId}/media:
-    get:
-      description: Get a project image
-      operationId: project#get image
-      parameters:
-      - in: path
-        name: projectId
-        required: true
-        type: integer
-      produces:
-      - image/png
-      responses:
-        "200":
-          description: OK
-      schemes:
-      - https
-      summary: get image project
-      tags:
-      - project
-    post:
-      description: |-
-        Save a project image
-
-        Required security scopes:
-          * `api:access`
-      operationId: project#save image
-      parameters:
-      - in: path
-        name: projectId
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.project+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Project'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: save image project
       tags:
       - project
   /projects/{projectId}/members:

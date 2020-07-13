@@ -11,6 +11,7 @@ import (
 	"context"
 	"net/http"
 
+	project "github.com/fieldkit/cloud/server/api/gen/project"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -45,6 +46,14 @@ type Client struct {
 	// invite endpoint.
 	RejectInviteDoer goahttp.Doer
 
+	// UploadMedia Doer is the HTTP client used to make requests to the upload
+	// media endpoint.
+	UploadMediaDoer goahttp.Doer
+
+	// DownloadMedia Doer is the HTTP client used to make requests to the download
+	// media endpoint.
+	DownloadMediaDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -75,6 +84,8 @@ func NewClient(
 		LookupInviteDoer:    doer,
 		AcceptInviteDoer:    doer,
 		RejectInviteDoer:    doer,
+		UploadMediaDoer:     doer,
+		DownloadMediaDoer:   doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -249,5 +260,53 @@ func (c *Client) RejectInvite() goa.Endpoint {
 			return nil, goahttp.ErrRequestError("project", "reject invite", err)
 		}
 		return decodeResponse(resp)
+	}
+}
+
+// UploadMedia returns an endpoint that makes HTTP requests to the project
+// service upload media server.
+func (c *Client) UploadMedia() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUploadMediaRequest(c.encoder)
+		decodeResponse = DecodeUploadMediaResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildUploadMediaRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UploadMediaDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "upload media", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// DownloadMedia returns an endpoint that makes HTTP requests to the project
+// service download media server.
+func (c *Client) DownloadMedia() goa.Endpoint {
+	var (
+		decodeResponse = DecodeDownloadMediaResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDownloadMediaRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DownloadMediaDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "download media", err)
+		}
+		res, err := decodeResponse(resp)
+		if err != nil {
+			resp.Body.Close()
+			return nil, goahttp.ErrDecodingError("project", "download media", err)
+		}
+		return &project.DownloadMediaResponseData{Result: res.(*project.DownloadMediaResult), Body: resp.Body}, nil
 	}
 }

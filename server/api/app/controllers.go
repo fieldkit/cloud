@@ -1334,14 +1334,12 @@ type ProjectController interface {
 	AddStation(*AddStationProjectContext) error
 	Delete(*DeleteProjectContext) error
 	Get(*GetProjectContext) error
-	GetImage(*GetImageProjectContext) error
 	InviteUser(*InviteUserProjectContext) error
 	List(*ListProjectContext) error
 	ListCurrent(*ListCurrentProjectContext) error
 	ListStation(*ListStationProjectContext) error
 	RemoveStation(*RemoveStationProjectContext) error
 	RemoveUser(*RemoveUserProjectContext) error
-	SaveImage(*SaveImageProjectContext) error
 	Update(*UpdateProjectContext) error
 }
 
@@ -1352,7 +1350,6 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	service.Mux.Handle("OPTIONS", "/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/stations/:stationId", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/projects/:projectId/media", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/projects/:projectId/invite", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/stations/:stationId/projects", ctrl.MuxHandler("preflight", handleProjectOrigin(cors.HandlePreflight()), nil))
@@ -1431,22 +1428,6 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	h = handleProjectOrigin(h)
 	service.Mux.Handle("GET", "/projects/:projectId", ctrl.MuxHandler("get", h, nil))
 	service.LogInfo("mount", "ctrl", "Project", "action", "Get", "route", "GET /projects/:projectId", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewGetImageProjectContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.GetImage(rctx)
-	}
-	h = handleProjectOrigin(h)
-	service.Mux.Handle("GET", "/projects/:projectId/media", ctrl.MuxHandler("get image", h, nil))
-	service.LogInfo("mount", "ctrl", "Project", "action", "GetImage", "route", "GET /projects/:projectId/media")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -1560,23 +1541,6 @@ func MountProjectController(service *goa.Service, ctrl ProjectController) {
 	h = handleProjectOrigin(h)
 	service.Mux.Handle("DELETE", "/projects/:projectId/members", ctrl.MuxHandler("remove user", h, unmarshalRemoveUserProjectPayload))
 	service.LogInfo("mount", "ctrl", "Project", "action", "RemoveUser", "route", "DELETE /projects/:projectId/members", "security", "jwt")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewSaveImageProjectContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.SaveImage(rctx)
-	}
-	h = handleSecurity("jwt", h, "api:access")
-	h = handleProjectOrigin(h)
-	service.Mux.Handle("POST", "/projects/:projectId/media", ctrl.MuxHandler("save image", h, nil))
-	service.LogInfo("mount", "ctrl", "Project", "action", "SaveImage", "route", "POST /projects/:projectId/media", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

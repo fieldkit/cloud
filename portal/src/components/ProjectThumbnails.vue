@@ -41,7 +41,7 @@ export default {
     props: { projects: { required: true } },
     methods: {
         getImageUrl(project) {
-            return this.$config.baseUrl + "/" + project.photo;
+            return this.$config.baseUrl + project.photo;
         },
     },
 };

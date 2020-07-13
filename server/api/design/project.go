@@ -154,31 +154,33 @@ var _ = Resource("project", func() {
 		})
 	})
 
-	Action("save image", func() {
-		Routing(POST("/projects/:projectId/media"))
-		Description("Save a project image")
-		Params(func() {
-			Param("projectId", Integer)
-			Required("projectId")
+	/*
+		Action("save image", func() {
+			Routing(POST("/projects/:projectId/media"))
+			Description("Save a project image")
+			Params(func() {
+				Param("projectId", Integer)
+				Required("projectId")
+			})
+			Response(BadRequest)
+			Response(OK, func() {
+				Media(Project)
+			})
 		})
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(Project)
-		})
-	})
 
-	Action("get image", func() {
-		NoSecurity()
-		Routing(GET("/projects/:projectId/media"))
-		Description("Get a project image")
-		Params(func() {
-			Param("projectId", Integer)
-			Required("projectId")
+		Action("get image", func() {
+			NoSecurity()
+			Routing(GET("/projects/:projectId/media"))
+			Description("Get a project image")
+			Params(func() {
+				Param("projectId", Integer)
+				Required("projectId")
+			})
+			Response(OK, func() {
+				Media("image/png")
+			})
 		})
-		Response(OK, func() {
-			Media("image/png")
-		})
-	})
+	*/
 
 	Action("invite user", func() {
 		Routing(POST("/projects/:projectId/invite"))

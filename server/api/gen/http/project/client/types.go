@@ -165,6 +165,38 @@ type RejectInviteNotFoundResponseBody string
 // "reject invite" endpoint HTTP response body for the "unauthorized" error.
 type RejectInviteUnauthorizedResponseBody string
 
+// UploadMediaBadRequestResponseBody is the type of the "project" service
+// "upload media" endpoint HTTP response body for the "bad-request" error.
+type UploadMediaBadRequestResponseBody string
+
+// UploadMediaForbiddenResponseBody is the type of the "project" service
+// "upload media" endpoint HTTP response body for the "forbidden" error.
+type UploadMediaForbiddenResponseBody string
+
+// UploadMediaNotFoundResponseBody is the type of the "project" service "upload
+// media" endpoint HTTP response body for the "not-found" error.
+type UploadMediaNotFoundResponseBody string
+
+// UploadMediaUnauthorizedResponseBody is the type of the "project" service
+// "upload media" endpoint HTTP response body for the "unauthorized" error.
+type UploadMediaUnauthorizedResponseBody string
+
+// DownloadMediaBadRequestResponseBody is the type of the "project" service
+// "download media" endpoint HTTP response body for the "bad-request" error.
+type DownloadMediaBadRequestResponseBody string
+
+// DownloadMediaForbiddenResponseBody is the type of the "project" service
+// "download media" endpoint HTTP response body for the "forbidden" error.
+type DownloadMediaForbiddenResponseBody string
+
+// DownloadMediaNotFoundResponseBody is the type of the "project" service
+// "download media" endpoint HTTP response body for the "not-found" error.
+type DownloadMediaNotFoundResponseBody string
+
+// DownloadMediaUnauthorizedResponseBody is the type of the "project" service
+// "download media" endpoint HTTP response body for the "unauthorized" error.
+type DownloadMediaUnauthorizedResponseBody string
+
 // PendingInviteResponseBody is used to define fields on response body types.
 type PendingInviteResponseBody struct {
 	ID      *int64                      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -436,6 +468,72 @@ func NewRejectInviteNotFound(body RejectInviteNotFoundResponseBody) project.NotF
 // NewRejectInviteUnauthorized builds a project service reject invite endpoint
 // unauthorized error.
 func NewRejectInviteUnauthorized(body RejectInviteUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
+// NewUploadMediaBadRequest builds a project service upload media endpoint
+// bad-request error.
+func NewUploadMediaBadRequest(body UploadMediaBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewUploadMediaForbidden builds a project service upload media endpoint
+// forbidden error.
+func NewUploadMediaForbidden(body UploadMediaForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
+// NewUploadMediaNotFound builds a project service upload media endpoint
+// not-found error.
+func NewUploadMediaNotFound(body UploadMediaNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewUploadMediaUnauthorized builds a project service upload media endpoint
+// unauthorized error.
+func NewUploadMediaUnauthorized(body UploadMediaUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
+// NewDownloadMediaResultOK builds a "project" service "download media"
+// endpoint result from a HTTP "OK" response.
+func NewDownloadMediaResultOK(length int64, contentType string) *project.DownloadMediaResult {
+	v := &project.DownloadMediaResult{}
+	v.Length = length
+	v.ContentType = contentType
+
+	return v
+}
+
+// NewDownloadMediaBadRequest builds a project service download media endpoint
+// bad-request error.
+func NewDownloadMediaBadRequest(body DownloadMediaBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewDownloadMediaForbidden builds a project service download media endpoint
+// forbidden error.
+func NewDownloadMediaForbidden(body DownloadMediaForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
+// NewDownloadMediaNotFound builds a project service download media endpoint
+// not-found error.
+func NewDownloadMediaNotFound(body DownloadMediaNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewDownloadMediaUnauthorized builds a project service download media
+// endpoint unauthorized error.
+func NewDownloadMediaUnauthorized(body DownloadMediaUnauthorizedResponseBody) project.Unauthorized {
 	v := project.Unauthorized(body)
 	return v
 }

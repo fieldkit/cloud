@@ -45,3 +45,13 @@ func AcceptInviteProjectPath(id int64) string {
 func RejectInviteProjectPath(id int64) string {
 	return fmt.Sprintf("/projects/invites/%v/reject", id)
 }
+
+// UploadMediaProjectPath returns the URL path to the project service upload media HTTP endpoint.
+func UploadMediaProjectPath(projectID int32) string {
+	return fmt.Sprintf("/projects/%v/media", projectID)
+}
+
+// DownloadMediaProjectPath returns the URL path to the project service download media HTTP endpoint.
+func DownloadMediaProjectPath(projectID int32) string {
+	return fmt.Sprintf("/projects/%v/media", projectID)
+}

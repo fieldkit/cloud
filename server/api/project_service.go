@@ -2,12 +2,15 @@ package api
 
 import (
 	"context"
+	"io"
+	"io/ioutil"
 	"time"
 
 	"goa.design/goa/v3/security"
 
 	project "github.com/fieldkit/cloud/server/api/gen/project"
 
+	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -300,6 +303,57 @@ func (c *ProjectService) RejectInvite(ctx context.Context, payload *project.Reje
 	log.Infow("rejecting", "invite_id", invite.ID)
 
 	return nil
+}
+
+func (s *ProjectService) UploadMedia(ctx context.Context, payload *project.UploadMediaPayload, body io.ReadCloser) error {
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	mr := repositories.NewMediaRepository(s.options.MediaFiles)
+	saved, err := mr.SaveFromService(ctx, body, payload.ContentLength)
+	if err != nil {
+		return err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	log.Infow("media", "project_id", payload.ProjectID, "content_type", saved.MimeType, "user_id", p.UserID())
+
+	project := &data.Project{}
+	if err := s.options.Database.GetContext(ctx, project, `
+		UPDATE fieldkit.project SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *
+		`, saved.URL, saved.MimeType, payload.ProjectID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *ProjectService) DownloadMedia(ctx context.Context, payload *project.DownloadMediaPayload) (*project.DownloadMediaResult, io.ReadCloser, error) {
+	resource := &data.Project{}
+	if err := s.options.Database.GetContext(ctx, resource, `
+		SELECT media_url, media_content_type FROM fieldkit.project WHERE id = $1
+		`, payload.ProjectID); err != nil {
+		return nil, nil, err
+	}
+
+	if resource.MediaURL == nil || resource.MediaContentType == nil {
+		return nil, nil, project.NotFound("not found")
+	}
+
+	mr := repositories.NewMediaRepository(s.options.MediaFiles)
+
+	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
+	if err != nil {
+		return nil, nil, project.NotFound("not found")
+	}
+
+	return &project.DownloadMediaResult{
+		Length:      int64(lm.Size),
+		ContentType: *resource.MediaContentType,
+	}, ioutil.NopCloser(lm.Reader), nil
 }
 
 func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
