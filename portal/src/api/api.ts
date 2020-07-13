@@ -238,8 +238,14 @@ export function makeAuthenticatedApiUrl(url) {
     return Config.API_HOST + url + "?token=" + token;
 }
 
+export enum Auth {
+    None,
+    Required,
+    Optional,
+}
+
 export interface InvokeParams {
-    authenticated: boolean;
+    auth: Auth;
     method: string;
     url: string;
     data?: any;
@@ -259,7 +265,16 @@ class FKApi {
         const headers = {
             "Content-Type": "application/json",
         };
-        if (params.authenticated) {
+        if (params.auth == Auth.Optional) {
+            if (this.token.authenticated) {
+                const token = this.token.getHeader();
+                headers["Authorization"] = token;
+            }
+        }
+        if (params.auth == Auth.Required) {
+            if (!this.token.authenticated) {
+                throw new TokenError("no token");
+            }
             const token = this.token.getHeader();
             headers["Authorization"] = token;
         }
@@ -386,7 +401,7 @@ class FKApi {
 
     register(user) {
         return this.invoke({
-            authenticated: false,
+            auth: Auth.None,
             method: "POST",
             url: this.baseUrl + "/users",
             data: user,
@@ -395,7 +410,7 @@ class FKApi {
 
     resendCreateAccount(userId) {
         return this.invoke({
-            authenticated: false,
+            auth: Auth.None,
             method: "POST",
             url: this.baseUrl + "/users/" + userId + "/validate-email",
         });
@@ -403,7 +418,7 @@ class FKApi {
 
     updatePassword(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "PATCH",
             url: this.baseUrl + "/users/" + data.userId + "/password",
             data: { newPassword: data.newPassword, oldPassword: data.oldPassword },
@@ -412,7 +427,7 @@ class FKApi {
 
     sendResetPasswordEmail(email) {
         return this.invoke({
-            authenticated: false,
+            auth: Auth.None,
             method: "POST",
             url: this.baseUrl + "/user/recovery/lookup",
             data: { email: email },
@@ -421,7 +436,7 @@ class FKApi {
 
     resetPassword(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/user/recovery",
             data: { password: data.password, token: data.token },
@@ -430,7 +445,7 @@ class FKApi {
 
     getStationFromVuex(id): Promise<Station> {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/stations/" + id,
         });
@@ -438,7 +453,7 @@ class FKApi {
 
     getStation(id): Promise<Station> {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/stations/@/" + id,
         });
@@ -449,7 +464,7 @@ class FKApi {
             return onNoAuth();
         }
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/stations",
         });
@@ -457,7 +472,7 @@ class FKApi {
 
     getCurrentUser(): Promise<CurrentUser> {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/user",
         });
@@ -465,7 +480,7 @@ class FKApi {
 
     getUsersByProject(projectId): Promise<ProjectUsers> {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/users/project/" + projectId,
         });
@@ -473,7 +488,7 @@ class FKApi {
 
     sendInvite(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/projects/" + data.projectId + "/invite",
             data: { email: data.email, role: data.role },
@@ -482,7 +497,7 @@ class FKApi {
 
     getInvitesByToken(inviteToken) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/projects/invites/" + inviteToken,
         });
@@ -490,7 +505,7 @@ class FKApi {
 
     getInvitesByUser() {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/projects/invites/pending",
         });
@@ -498,7 +513,7 @@ class FKApi {
 
     acceptInvite(payload: { id: number; token: string }) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/projects/invites/" + payload.id + "/accept?token=" + payload.token,
         });
@@ -506,7 +521,7 @@ class FKApi {
 
     declineInvite(payload: { id: number; token: string }) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/projects/invites/" + payload.id + "/reject?token=" + payload.token,
             data: {
@@ -517,7 +532,7 @@ class FKApi {
 
     getStationsByProject(projectId) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/projects/" + projectId + "/stations",
         });
@@ -525,7 +540,7 @@ class FKApi {
 
     addStationToProject(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/projects/" + data.projectId + "/stations/" + data.stationId,
         });
@@ -533,7 +548,7 @@ class FKApi {
 
     removeStationFromProject(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "DELETE",
             url: this.baseUrl + "/projects/" + data.projectId + "/stations/" + data.stationId,
         });
@@ -541,7 +556,7 @@ class FKApi {
 
     removeUserFromProject(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "DELETE",
             url: this.baseUrl + "/projects/" + data.projectId + "/members",
             data: { email: data.email },
@@ -550,7 +565,7 @@ class FKApi {
 
     uploadUserImage(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/user/media",
             data: data.image,
@@ -559,7 +574,7 @@ class FKApi {
 
     updateUser(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "PATCH",
             url: this.baseUrl + "/users/" + data.id,
             data: data,
@@ -571,7 +586,7 @@ class FKApi {
             return onNoAuth();
         }
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/user/projects",
         });
@@ -579,7 +594,7 @@ class FKApi {
 
     getPublicProjects(): Promise<ProjectsResponse> {
         return this.invoke({
-            authenticated: false,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/projects",
         });
@@ -587,7 +602,7 @@ class FKApi {
 
     getProject(id): Promise<Project> {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/projects/" + id,
         });
@@ -595,7 +610,7 @@ class FKApi {
 
     getProjectActivity(id): Promise<ProjectActivityResponse> {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/projects/" + id + "/activity",
         });
@@ -603,7 +618,7 @@ class FKApi {
 
     addDefaultProject() {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/projects",
             data: {
@@ -616,7 +631,7 @@ class FKApi {
 
     addProject(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/projects",
             data: data,
@@ -625,7 +640,7 @@ class FKApi {
 
     updateProject(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "PATCH",
             url: this.baseUrl + "/projects/" + data.id,
             data: data,
@@ -634,7 +649,7 @@ class FKApi {
 
     uploadProjectImage(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/projects/" + data.id + "/media",
             contentType: data.type,
@@ -644,7 +659,7 @@ class FKApi {
 
     deleteProject(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "DELETE",
             url: this.baseUrl + "/projects/" + data.projectId,
         });
@@ -652,7 +667,7 @@ class FKApi {
 
     getProjectFollows(projectId): Promise<ProjectFollowers> {
         return this.invoke({
-            authenticated: false,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/projects/" + projectId + "/followers",
         });
@@ -660,7 +675,7 @@ class FKApi {
 
     followProject(projectId) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/projects/" + projectId + "/follow",
         });
@@ -668,7 +683,7 @@ class FKApi {
 
     unfollowProject(projectId) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/projects/" + projectId + "/unfollow",
         });
@@ -676,7 +691,7 @@ class FKApi {
 
     deleteFieldNote(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "DELETE",
             url: this.baseUrl + "/stations/" + data.stationId + "/field-notes/" + data.fieldNoteId,
         });
@@ -684,7 +699,7 @@ class FKApi {
 
     getModulesMeta() {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/modules/meta",
         });
@@ -699,7 +714,7 @@ class FKApi {
         }
 
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/data/devices/" + deviceId + "/summary/json?start=" + start + "&end=" + end,
         });
@@ -707,7 +722,7 @@ class FKApi {
 
     getStationDataByDeviceId(deviceId) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/data/devices/" + deviceId + "/data",
         });
@@ -715,7 +730,7 @@ class FKApi {
 
     getJSONDataByDeviceId(deviceId, page, pageSize) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/data/devices/" + deviceId + "/data/json?page=" + page + "&pageSize=" + pageSize,
         });
@@ -723,7 +738,7 @@ class FKApi {
 
     getFieldNotes(stationId) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/stations/" + stationId + "/field-notes",
         });
@@ -731,7 +746,7 @@ class FKApi {
 
     addProjectUpdate(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/projects/" + data.projectId + "/updates",
             data: data,
@@ -740,7 +755,7 @@ class FKApi {
 
     updateProjectUpdate(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/projects/" + data.projectId + "/updates/" + data.updateId,
             data: data,
@@ -749,7 +764,7 @@ class FKApi {
 
     deleteProjectUpdate(data) {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "DELETE",
             url: this.baseUrl + "/projects/" + data.projectId + "/updates/" + data.updateId,
         });
@@ -757,7 +772,7 @@ class FKApi {
 
     getAllSensors() {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/sensors",
         });
@@ -765,7 +780,7 @@ class FKApi {
 
     sensorData(params: URLSearchParams): Promise<any> {
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/sensors/data?" + params.toString(),
         });
@@ -775,7 +790,7 @@ class FKApi {
         const qp = new URLSearchParams();
         qp.append("stations", stations.join(","));
         return this.invoke({
-            authenticated: true,
+            auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/sensors/data?" + qp.toString(),
         });
