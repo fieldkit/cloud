@@ -140,7 +140,7 @@ definitions:
     description: DeviceDataRecord media type (default view)
     example:
       data:
-        Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
+        Possimus labore qui possimus porro quaerat.: b45cd9ec-9e46-4d32-9aed-7bbe5f1483a0
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -151,7 +151,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
+          Possimus labore qui possimus porro quaerat.: b45cd9ec-9e46-4d32-9aed-7bbe5f1483a0
         type: object
       id:
         example: 3.1889681637076403e+18
@@ -191,7 +191,7 @@ definitions:
       (default view)
     example:
     - data:
-        Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
+        Possimus labore qui possimus porro quaerat.: b45cd9ec-9e46-4d32-9aed-7bbe5f1483a0
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -199,7 +199,7 @@ definitions:
       record: 7.193395211552676e+18
       time: "1980-07-29T04:01:26Z"
     - data:
-        Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
+        Possimus labore qui possimus porro quaerat.: b45cd9ec-9e46-4d32-9aed-7bbe5f1483a0
       id: 3.1889681637076403e+18
       location:
       - 0.859735501027165
@@ -216,7 +216,7 @@ definitions:
     example:
       data:
       - data:
-          Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
+          Possimus labore qui possimus porro quaerat.: b45cd9ec-9e46-4d32-9aed-7bbe5f1483a0
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -224,7 +224,7 @@ definitions:
         record: 7.193395211552676e+18
         time: "1980-07-29T04:01:26Z"
       - data:
-          Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
+          Possimus labore qui possimus porro quaerat.: b45cd9ec-9e46-4d32-9aed-7bbe5f1483a0
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -232,7 +232,7 @@ definitions:
         record: 7.193395211552676e+18
         time: "1980-07-29T04:01:26Z"
       - data:
-          Possimus labore qui possimus porro quaerat.: a6ab853e-9665-4c89-87a9-4c0bc712aea3
+          Possimus labore qui possimus porro quaerat.: b45cd9ec-9e46-4d32-9aed-7bbe5f1483a0
         id: 3.1889681637076403e+18
         location:
         - 0.859735501027165
@@ -241,7 +241,7 @@ definitions:
         time: "1980-07-29T04:01:26Z"
       meta:
       - data:
-          Vel est.: 6d2f3c0b-8cf9-4b0f-8d24-279ab6ab33fb
+          Vel est.: 81e7e34a-65c5-4761-baf8-06ae5345eee8
         id: 2.827138534810339e+18
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
@@ -328,7 +328,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Vel est.: 6d2f3c0b-8cf9-4b0f-8d24-279ab6ab33fb
+        Vel est.: 81e7e34a-65c5-4761-baf8-06ae5345eee8
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -336,7 +336,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Vel est.: 6d2f3c0b-8cf9-4b0f-8d24-279ab6ab33fb
+          Vel est.: 81e7e34a-65c5-4761-baf8-06ae5345eee8
         type: object
       id:
         example: 2.827138534810339e+18
@@ -362,17 +362,17 @@ definitions:
       (default view)
     example:
     - data:
-        Vel est.: 6d2f3c0b-8cf9-4b0f-8d24-279ab6ab33fb
+        Vel est.: 81e7e34a-65c5-4761-baf8-06ae5345eee8
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
     - data:
-        Vel est.: 6d2f3c0b-8cf9-4b0f-8d24-279ab6ab33fb
+        Vel est.: 81e7e34a-65c5-4761-baf8-06ae5345eee8
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
     - data:
-        Vel est.: 6d2f3c0b-8cf9-4b0f-8d24-279ab6ab33fb
+        Vel est.: 81e7e34a-65c5-4761-baf8-06ae5345eee8
       id: 2.827138534810339e+18
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
@@ -3668,6 +3668,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
       schemes:
       - https
       security:
@@ -3792,6 +3796,8 @@ produces:
 responses:
   BadRequest:
     description: Bad Request
+  Forbidden:
+    description: Forbidden
   NoContent:
     description: No Content
   NotFound:

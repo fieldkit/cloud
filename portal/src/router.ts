@@ -6,6 +6,7 @@ import LoginView from "./views/auth/LoginView.vue";
 import CreateAccountView from "./views/auth/CreateAccountView.vue";
 import RecoverAccountView from "./views/auth/RecoverAccountView.vue";
 import ResetPasswordView from "./views/auth/ResetPasswordView.vue";
+import UserView from "./views/auth/UserView.vue";
 
 import DataView from "./views/viz/DataView.vue";
 import InvitesView from "./views/InvitesView.vue";
@@ -14,7 +15,6 @@ import ProjectEditView from "./views/ProjectEditView.vue";
 import ProjectUpdateEditView from "./views/ProjectUpdateEditView.vue";
 import ProjectView from "./views/ProjectView.vue";
 import StationsView from "./views/StationsView.vue";
-import UserView from "./views/UserView.vue";
 import ExploreView from "./views/viz/ExploreView.vue";
 
 import { Bookmark } from "./views/viz/viz";

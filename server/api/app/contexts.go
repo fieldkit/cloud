@@ -1681,6 +1681,18 @@ func (ctx *ChangePasswordUserContext) OK(r *User) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ChangePasswordUserContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// Forbidden sends a HTTP response with status code 403.
+func (ctx *ChangePasswordUserContext) Forbidden() error {
+	ctx.ResponseData.WriteHeader(403)
+	return nil
+}
+
 // GetCurrentUserContext provides the user get current action context.
 type GetCurrentUserContext struct {
 	context.Context

@@ -133,6 +133,13 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 
 	log.Infow("validation", "token", validationToken.Token)
 
+	/*
+		project := data.Project{
+			Name:        "Default FieldKit Project",
+			Description: "",
+		}
+	*/
+
 	c.options.Metrics.UserAdded()
 
 	c.options.Metrics.EmailVerificationSent()
@@ -175,19 +182,19 @@ func (c *UserController) ChangePassword(ctx *app.ChangePasswordUserContext) erro
 	user := &data.User{}
 	err := c.options.Database.GetContext(ctx, user, `SELECT * FROM fieldkit.user WHERE id = $1`, claims["sub"])
 	if err == sql.ErrNoRows {
-		return data.IncorrectPasswordError
+		return ctx.BadRequest()
 	}
 	if err != nil {
 		return err
 	}
 
 	if user.ID != int32(ctx.UserID) {
-		return fmt.Errorf("invalid user id")
+		return ctx.Forbidden()
 	}
 
 	err = user.CheckPassword(ctx.Payload.OldPassword)
 	if err == data.IncorrectPasswordError {
-		return data.IncorrectPasswordError
+		return ctx.BadRequest()
 	}
 	if err != nil {
 		return err

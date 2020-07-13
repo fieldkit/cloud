@@ -254,6 +254,8 @@ var _ = Resource("user", func() {
 			Required("userId")
 		})
 		Payload(UpdateUserPasswordPayload)
+		Response(BadRequest)
+		Response(Forbidden)
 		Response(OK, func() {
 			Media(User)
 		})
