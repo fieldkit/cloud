@@ -6,6 +6,7 @@ require (
 	github.com/O-C-R/singlepage v0.0.0-20170327184421-bbbe2159ecec
 	github.com/PyYoshi/goa-logging-zap v0.2.3
 	github.com/ajg/form v1.5.1
+	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
 	github.com/armon/go-metrics v0.0.0-20180713145231-3c58d8115a78
 	github.com/aws/aws-lambda-go v0.0.0-20180413184133-ea03c2814414
 	github.com/aws/aws-sdk-go v1.29.20

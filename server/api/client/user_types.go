@@ -136,15 +136,15 @@ func (ut *AddFirmwarePayload) Validate() (err error) {
 
 // addProjectPayload user type.
 type addProjectPayload struct {
-	Description *string    `form:"description,omitempty" json:"description,omitempty" yaml:"description,omitempty" xml:"description,omitempty"`
-	EndTime     *time.Time `form:"endTime,omitempty" json:"endTime,omitempty" yaml:"endTime,omitempty" xml:"endTime,omitempty"`
-	Goal        *string    `form:"goal,omitempty" json:"goal,omitempty" yaml:"goal,omitempty" xml:"goal,omitempty"`
-	Location    *string    `form:"location,omitempty" json:"location,omitempty" yaml:"location,omitempty" xml:"location,omitempty"`
-	Name        *string    `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
-	Private     *bool      `form:"private,omitempty" json:"private,omitempty" yaml:"private,omitempty" xml:"private,omitempty"`
-	Slug        *string    `form:"slug,omitempty" json:"slug,omitempty" yaml:"slug,omitempty" xml:"slug,omitempty"`
-	StartTime   *time.Time `form:"startTime,omitempty" json:"startTime,omitempty" yaml:"startTime,omitempty" xml:"startTime,omitempty"`
-	Tags        *string    `form:"tags,omitempty" json:"tags,omitempty" yaml:"tags,omitempty" xml:"tags,omitempty"`
+	Description *string `form:"description,omitempty" json:"description,omitempty" yaml:"description,omitempty" xml:"description,omitempty"`
+	EndTime     *string `form:"endTime,omitempty" json:"endTime,omitempty" yaml:"endTime,omitempty" xml:"endTime,omitempty"`
+	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" yaml:"goal,omitempty" xml:"goal,omitempty"`
+	Location    *string `form:"location,omitempty" json:"location,omitempty" yaml:"location,omitempty" xml:"location,omitempty"`
+	Name        *string `form:"name,omitempty" json:"name,omitempty" yaml:"name,omitempty" xml:"name,omitempty"`
+	Private     *bool   `form:"private,omitempty" json:"private,omitempty" yaml:"private,omitempty" xml:"private,omitempty"`
+	Slug        *string `form:"slug,omitempty" json:"slug,omitempty" yaml:"slug,omitempty" xml:"slug,omitempty"`
+	StartTime   *string `form:"startTime,omitempty" json:"startTime,omitempty" yaml:"startTime,omitempty" xml:"startTime,omitempty"`
+	Tags        *string `form:"tags,omitempty" json:"tags,omitempty" yaml:"tags,omitempty" xml:"tags,omitempty"`
 }
 
 // Validate validates the addProjectPayload type instance.
@@ -206,15 +206,15 @@ func (ut *addProjectPayload) Publicize() *AddProjectPayload {
 
 // AddProjectPayload user type.
 type AddProjectPayload struct {
-	Description string     `form:"description" json:"description" yaml:"description" xml:"description"`
-	EndTime     *time.Time `form:"endTime,omitempty" json:"endTime,omitempty" yaml:"endTime,omitempty" xml:"endTime,omitempty"`
-	Goal        *string    `form:"goal,omitempty" json:"goal,omitempty" yaml:"goal,omitempty" xml:"goal,omitempty"`
-	Location    *string    `form:"location,omitempty" json:"location,omitempty" yaml:"location,omitempty" xml:"location,omitempty"`
-	Name        string     `form:"name" json:"name" yaml:"name" xml:"name"`
-	Private     *bool      `form:"private,omitempty" json:"private,omitempty" yaml:"private,omitempty" xml:"private,omitempty"`
-	Slug        string     `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
-	StartTime   *time.Time `form:"startTime,omitempty" json:"startTime,omitempty" yaml:"startTime,omitempty" xml:"startTime,omitempty"`
-	Tags        *string    `form:"tags,omitempty" json:"tags,omitempty" yaml:"tags,omitempty" xml:"tags,omitempty"`
+	Description string  `form:"description" json:"description" yaml:"description" xml:"description"`
+	EndTime     *string `form:"endTime,omitempty" json:"endTime,omitempty" yaml:"endTime,omitempty" xml:"endTime,omitempty"`
+	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" yaml:"goal,omitempty" xml:"goal,omitempty"`
+	Location    *string `form:"location,omitempty" json:"location,omitempty" yaml:"location,omitempty" xml:"location,omitempty"`
+	Name        string  `form:"name" json:"name" yaml:"name" xml:"name"`
+	Private     *bool   `form:"private,omitempty" json:"private,omitempty" yaml:"private,omitempty" xml:"private,omitempty"`
+	Slug        string  `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
+	StartTime   *string `form:"startTime,omitempty" json:"startTime,omitempty" yaml:"startTime,omitempty" xml:"startTime,omitempty"`
+	Tags        *string `form:"tags,omitempty" json:"tags,omitempty" yaml:"tags,omitempty" xml:"tags,omitempty"`
 }
 
 // Validate validates the AddProjectPayload type instance.

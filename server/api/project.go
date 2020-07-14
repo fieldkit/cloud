@@ -13,7 +13,7 @@ import (
 )
 
 func ProjectType(project *data.Project, numberOfFollowers int32, role *data.Role) *app.Project {
-	return &app.Project{
+	wm := &app.Project{
 		ID:                int(project.ID),
 		Name:              project.Name,
 		Slug:              project.Slug,
@@ -22,12 +22,22 @@ func ProjectType(project *data.Project, numberOfFollowers int32, role *data.Role
 		Location:          project.Location,
 		Tags:              project.Tags,
 		Private:           project.Private,
-		StartTime:         project.StartTime,
-		EndTime:           project.EndTime,
 		Photo:             makePhotoURL(fmt.Sprintf("/projects/%d/media", project.ID), project.MediaURL),
 		ReadOnly:          role.IsProjectReadOnly(),
 		NumberOfFollowers: int(numberOfFollowers),
 	}
+
+	if project.StartTime != nil {
+		startString := (*project.StartTime).Format(time.RFC3339)
+		wm.StartTime = &startString
+	}
+
+	if project.EndTime != nil {
+		endString := (*project.EndTime).Format(time.RFC3339)
+		wm.EndTime = &endString
+	}
+
+	return wm
 }
 
 func findNumberOfFollowers(followers []*FollowersSummary, id int32) int32 {
@@ -114,8 +124,13 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 		Location:    location,
 		Tags:        tags,
 		Private:     private,
-		StartTime:   ctx.Payload.StartTime,
-		EndTime:     ctx.Payload.EndTime,
+	}
+
+	if start, err := tryParseDate(ctx.Payload.StartTime); err == nil {
+		project.StartTime = &start
+	}
+	if end, err := tryParseDate(ctx.Payload.EndTime); err == nil {
+		project.EndTime = &end
 	}
 
 	role := data.AdministratorRole
@@ -174,8 +189,17 @@ func (c *ProjectController) Update(ctx *app.UpdateProjectContext) error {
 		Location:    location,
 		Tags:        tags,
 		Private:     private,
-		StartTime:   ctx.Payload.StartTime,
-		EndTime:     ctx.Payload.EndTime,
+	}
+
+	if start, err := tryParseDate(ctx.Payload.StartTime); err == nil {
+		project.StartTime = &start
+	} else {
+		fmt.Printf("%v %v\n", ctx.Payload.StartTime, err)
+	}
+	if end, err := tryParseDate(ctx.Payload.EndTime); err == nil {
+		project.EndTime = &end
+	} else {
+		fmt.Printf("%v %v\n", ctx.Payload.EndTime, err)
 	}
 
 	role := data.AdministratorRole
