@@ -786,6 +786,14 @@ class FKApi {
         });
     }
 
+    tailSensorData(params: URLSearchParams): Promise<any> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + "/sensors/data?" + params.toString(),
+        });
+    }
+
     getQuickSensors(stations: number[]) {
         const qp = new URLSearchParams();
         qp.append("stations", stations.join(","));

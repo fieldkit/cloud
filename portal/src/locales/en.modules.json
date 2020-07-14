@@ -99,5 +99,13 @@
                 "random_9": "Random 9"
             }
         }
-    }
+    },
+    "fk.testing.sin": "Sin(x)",
+    "fk.testing.saw.weekly": "Saw(x)",
+    "fk.water.temp.temp": "Temperature",
+    "fk.water.ph.ph": "pH",
+    "fk.water.do.do": "DO",
+    "fk.water.ec.ec": "EC",
+    "fk.water.ec.tds": "TDS",
+    "fk.water.ec.salinity": "Salinity"
 }

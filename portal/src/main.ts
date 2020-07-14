@@ -55,7 +55,11 @@ Vue.filter("prettyDate", (value) => {
     return moment(value).format("M/D/YYYY");
 });
 
-Vue.filter("prettyReading", (sensor) => {
+export interface ReadingLike {
+    reading: number;
+}
+
+Vue.filter("prettyReading", (sensor: ReadingLike) => {
     if (!sensor.reading) {
         return "--";
     }
