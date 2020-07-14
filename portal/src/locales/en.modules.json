@@ -1,41 +1,39 @@
 {
     "modules": {
-        "water": {
-            "ec": {
-                "name": "Water Conductivity",
-                "sensors": {
-                    "ec": "Conductivity",
-                    "tds": "Total Dissolved Solids",
-                    "salinity": "Salinity"
-                }
-            },
-            "ph": {
-                "name": "Water pH",
-                "sensors": {
-                    "ph": "pH"
-                }
-            },
-            "do": {
-                "name": "Water Dissolved Oxygen",
-                "sensors": {
-                    "do": "Dissolved Oxygen"
-                }
-            },
-            "temp": {
-                "name": "Water Temperature",
-                "sensors": {
-                    "temp": "Temperature"
-                }
-            },
-            "orp": {
-                "name": "Water ORP",
-                "sensors": {
-                    "orp": "ORP"
-                }
-            },
-            "unknown": {
-                "name": "Water"
+        "water.ec": {
+            "name": "Water Conductivity",
+            "sensors": {
+                "ec": "Conductivity",
+                "tds": "Total Dissolved Solids",
+                "salinity": "Salinity"
             }
+        },
+        "water.ph": {
+            "name": "Water pH",
+            "sensors": {
+                "ph": "pH"
+            }
+        },
+        "water.do": {
+            "name": "Water Dissolved Oxygen",
+            "sensors": {
+                "do": "Dissolved Oxygen"
+            }
+        },
+        "water.temp": {
+            "name": "Water Temperature",
+            "sensors": {
+                "temp": "Temperature"
+            }
+        },
+        "water.orp": {
+            "name": "Water ORP",
+            "sensors": {
+                "orp": "ORP"
+            }
+        },
+        "water.unknown": {
+            "name": "Water"
         },
         "weather": {
             "name": "Weather",
@@ -98,14 +96,12 @@
                 "random_8": "Random 8",
                 "random_9": "Random 9"
             }
+        },
+        "testing": {
+            "sensors": {
+                "sin": "Sin(x)",
+                "saw.weekly": "Saw(x)"
+            }
         }
-    },
-    "fk.testing.sin": "Sin(x)",
-    "fk.testing.saw.weekly": "Saw(x)",
-    "fk.water.temp.temp": "Temperature",
-    "fk.water.ph.ph": "pH",
-    "fk.water.do.do": "DO",
-    "fk.water.ec.ec": "EC",
-    "fk.water.ec.tds": "TDS",
-    "fk.water.ec.salinity": "Salinity"
+    }
 }

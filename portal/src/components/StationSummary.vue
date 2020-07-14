@@ -1,87 +1,89 @@
 <template>
     <div
-        id="station-summary-container"
+        class="station-hover-summary"
         :style="{ width: summarySize.width, top: summarySize.top, left: summarySize.left }"
         v-if="viewingSummary && station"
     >
-        <div v-if="station" id="close-form-btn" v-on:click="wantCloseSummary">
-            <img alt="Close" src="../assets/close.png" />
-        </div>
-        <div class="station-container" v-if="station">
-            <div class="left image-container">
-                <img alt="Station image" :src="stationSmallPhoto" class="station-element" />
-            </div>
-            <div class="left" :style="{ 'max-width': summarySize.constrainTop }">
-                <div id="station-name" class="station-element">{{ station.name }}</div>
-                <div class="station-element">
-                    Last Synced
-                    <span class="small-light">{{ getSyncedDate() }}</span>
+        <div class="upper-half">
+            <div class="row general-row">
+                <div class="image-container">
+                    <img alt="Station Image" :src="stationSmallPhoto" class="" />
                 </div>
-                <div class="station-element">
-                    <img id="battery" alt="Battery level" :src="getBatteryImg()" />
-                    <span class="small-light">{{ station.battery }}%</span>
-                </div>
-                <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
-                    <img v-if="!module.internal" alt="Module icon" class="small-space" :src="getModuleImg(module)" />
-                </div>
-            </div>
-            <div class="spacer"></div>
-            <div id="location-container" class="section">
-                <div class="location-item" v-if="station.placeNameOther">
-                    <img alt="location-icon" src="../assets/icon-location.png" />
-                    {{ station.locationName ? station.locationName : station.placeNameOther }}
-                </div>
-                <div class="location-item" v-if="station.placeNameNative">
-                    <img alt="location-icon" src="../assets/icon-location.png" />
-                    Native Land: {{ station.placeNameNative }}
-                </div>
-                <div class="left" v-if="station.location">
-                    {{ station.location.latitude | prettyCoordinate }}
-                    <br />
-                    Latitude
-                </div>
-                <div class="left" v-if="station.location">
-                    {{ station.location.longitude | prettyCoordinate }}
-                    <br />
-                    Longitude
-                </div>
-                <div class="left" v-if="!station.location">
-                    --
-                    <br />
-                    Latitude
-                </div>
-                <div class="left" v-if="!station.location">
-                    --
-                    <br />
-                    Longitude
-                </div>
-            </div>
-            <template v-if="!compact">
-                <div class="spacer"></div>
-                <div id="readings-container" class="section" v-if="station.modules.length > 0">
-                    <div id="readings-label">Latest Reading</div>
-                    <div v-for="(module, moduleIndex) in station.modules" v-bind:key="module.id">
-                        <template v-if="!module.internal">
-                            <div
-                                v-for="(sensor, sensorIndex) in module.sensors"
-                                v-bind:key="sensor.id"
-                                :class="getLeftOrRight(moduleIndex, sensorIndex) % 2 == 1 ? 'left-reading' : 'right-reading'"
-                            >
-                                <div class="left sensor-name">{{ getSensorName(module, sensor) }}</div>
-                                <div class="right sensor-unit">
-                                    {{ sensor.unitOfMeasure }}
-                                </div>
-                                <div class="right sensor-reading">
-                                    {{ sensor | prettyReading }}
-                                </div>
-                            </div>
-                        </template>
+                <div class="station-details">
+                    <div class="station-name">{{ station.name }}</div>
+                    <div class="station-synced">
+                        Last Synced
+                        <span class="small-light">{{ getSyncedDate() }}</span>
+                    </div>
+                    <div class="station-battery">
+                        <img class="battery" alt="Battery Level" :src="getBatteryImg()" />
+                        <span class="small-light">{{ station.battery }}</span>
+                    </div>
+                    <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
+                        <img v-if="!module.internal" alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
                     </div>
                 </div>
-                <div id="view-data-btn" class="section" v-on:click="onClickExplore">
-                    Explore Data
+                <div class="close-button" v-on:click="wantCloseSummary">
+                    <img alt="Close" src="../assets/close.png" />
                 </div>
-            </template>
+            </div>
+
+            <div class="row where-row">
+                <div class="location-container" v-if="station.locationName ? station.locationName : station.placeNameOther">
+                    <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                    <template>{{ station.locationName ? station.locationName : station.placeNameOther }}</template>
+                </div>
+                <div class="location-container" v-else>
+                    <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                    <template>Awaiting Location</template>
+                </div>
+
+                <div class="location-container" v-if="station.placeNameNative">
+                    <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                    <template>Native Lands: {{ station.placeNameNative }}</template>
+                </div>
+                <div class="location-container" v-else>
+                    <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                    <template>Native Lands: Awaiting Location</template>
+                </div>
+
+                <div class="coordinates-row">
+                    <div v-if="station.location" class="location-coordinates valid">
+                        <div class="coordinate latitude">
+                            {{ station.location.latitude | prettyCoordinate }}
+                            <br />
+                            Latitude
+                        </div>
+                        <div class="coordinate longitude">
+                            {{ station.location.longitude | prettyCoordinate }}
+                            <br />
+                            Longitude
+                        </div>
+                    </div>
+                    <!--
+                    <div v-else class="location-coordinates missing">
+                        <div class="coordinate latitude">
+                            --
+                            <br />
+                            Latitude
+                        </div>
+                        <div class="coordinate longitude">
+                            --
+                            <br />
+                            Longitude
+                        </div>
+                    </div>
+					-->
+                    <div class="empty"></div>
+                </div>
+            </div>
+            <div class="readings-container" v-if="!compact">
+                <div class="title">Latest Readings</div>
+                <LatestStationReadings :id="station.id" />
+            </div>
+            <div class="explore-button" v-on:click="onClickExplore">
+                Explore Data
+            </div>
         </div>
     </div>
 </template>
@@ -114,9 +116,6 @@ export default {
             return makeAuthenticatedApiUrl(this.station.photos.small);
         },
     },
-    mounted() {
-        // console.log(this.station);
-    },
     methods: {
         viewSummary() {
             this.viewingSummary = true;
@@ -124,24 +123,6 @@ export default {
         onClickExplore() {
             const bm = BookmarkFactory.forStation(this.station.id);
             return this.$router.push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bm) } });
-        },
-        /*
-        getCounter(moduleIndex, sensorIndex) {
-            if (this.modulesSensors[moduleIndex]) {
-                if (!this.modulesSensors[moduleIndex][sensorIndex]) {
-                    this.moduleSensorCounter += 1;
-                    this.modulesSensors[moduleIndex][sensorIndex] = this.moduleSensorCounter;
-                }
-            } else {
-                this.moduleSensorCounter += 1;
-                this.modulesSensors[moduleIndex] = {};
-                this.modulesSensors[moduleIndex][sensorIndex] = this.moduleSensorCounter;
-            }
-            return this.modulesSensors[moduleIndex][sensorIndex];
-        },
-		*/
-        getLeftOrRight(moduleIndex, sensorIndex) {
-            return 1;
         },
         getSyncedDate() {
             return utils.getUpdatedDate(this.station);
@@ -168,11 +149,10 @@ export default {
             const newName = utils.convertOldFirmwareResponse(module);
             return this.$t(newName + ".sensors." + sensor.name);
         },
-        getModuleImg(module) {
+        getModuleIcon(module) {
             return this.$loadAsset(utils.getModuleImg(module));
         },
         wantCloseSummary() {
-            console.log("wantCloseSummary");
             this.$emit("closeSummary");
             if (!this.compact) {
                 if (this.$route.name != "stations") {
@@ -185,18 +165,16 @@ export default {
 </script>
 
 <style scoped>
-#station-summary-container {
+.station-hover-summary {
     position: absolute;
     background-color: #ffffff;
-    padding: 0 20px 20px 10px;
     border: 1px solid rgb(215, 220, 225);
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
 }
-.station-container {
-    margin: 20px 0 0 0;
-    font-size: 14px;
-    font-weight: lighter;
-    overflow: hidden;
+.upper-half {
 }
 .image-container {
     width: 124px;
@@ -207,108 +185,82 @@ export default {
     max-width: 124px;
     max-height: 100px;
 }
-.section {
-    width: 100%;
-    float: left;
-}
-.spacer {
-    float: left;
-    width: 100%;
-    margin: 5px 0 10px 10px;
-    border-bottom: 1px solid #f1eeee;
-    height: 1px;
-}
-.small-light {
-    font-size: 12px;
-    color: #6a6d71;
-}
-.location-item {
-    text-align: left;
-    margin: 10px;
-    width: 100%;
-}
-.location-item img {
-    float: left;
-    margin: 2px 5px 0 0;
-}
-.native-land-link {
-    font-weight: bold;
-    text-decoration: underline;
-}
-.left {
-    float: left;
-}
-.right {
-    float: right;
-}
-.station-element {
-    margin: 5px 5px 0 5px;
-}
-#station-name {
+.station-name {
     font-size: 18px;
     font-weight: bold;
 }
-#battery {
-    margin-right: 5px;
+.station-synced {
+    font-size: 14px;
+}
+.battery {
     width: 20px;
     height: 11px;
 }
 .module-icon-container {
     float: left;
+    margin-right: 5px;
 }
-.small-space {
-    margin: 3px;
+.location-coordinates {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-basis: 50%;
 }
-#location-container .left {
-    margin-left: 10px;
+.location-coordinates .coordinate {
+    display: flex;
+    flex-direction: column;
 }
-#readings-label {
-    margin: 0 0 10px 10px;
+.general-row {
+    display: flex;
+    flex-direction: row;
 }
-.left-reading,
-.right-reading {
-    width: 42%;
-    margin: 8px 0;
-    padding: 5px 10px;
-    background-color: #f4f5f7;
-    border-radius: 2px;
+.coordinates-row {
+    display: flex;
+    flex-direction: row;
 }
-.left-reading {
-    float: left;
-    margin-left: 10px;
+.where-row > div {
+    margin-top: 10px;
 }
-.right-reading {
-    float: right;
-    margin-right: 3px;
+.where-row {
+    border-top: 1px solid #f1eeee;
+    margin-top: 20px;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
 }
-.sensor-name {
-    font-size: 11px;
-    line-height: 20px;
+.close-button {
+    margin-left: auto;
+    cursor: pointer;
 }
-.sensor-reading {
-    font-size: 16px;
+.station-details {
+    text-align: left;
 }
-.sensor-unit {
-    font-size: 10px;
-    margin: 6px 0 0 4px;
+.where-row {
+    text-align: left;
+    font-size: 14px;
+    color: #2c3e50;
 }
-#view-data-btn {
-    width: 90%;
+.readings-container {
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #f1eeee;
+    text-align: left;
+    font-size: 14px;
+    color: #2c3e50;
+}
+.readings-container div.title {
+    padding-bottom: 10px;
+}
+.explore-button {
     font-size: 18px;
     font-weight: bold;
     color: #ffffff;
     text-align: center;
     padding: 10px;
-    margin: 30px 0 0 10px;
+    margin: 20px 0 0 0px;
     background-color: #ce596b;
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
-    cursor: pointer;
-}
-#close-form-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
     cursor: pointer;
 }
 </style>

@@ -4,10 +4,11 @@
             <div v-for="sensor in sensors" v-bind:key="sensor.key" class="reading-container">
                 <div class="reading">
                     <div class="name">{{ $t(sensor.labelKey) }}</div>
-                    <div class="uom">{{ sensor.unitOfMeasure }}</div>
                     <div class="value">{{ sensor | prettyReading }}</div>
+                    <div class="uom">{{ sensor.unitOfMeasure }}</div>
                 </div>
             </div>
+            <div v-if="sensors.length == 0">No readings yet.</div>
         </template>
         <div class="loading" v-if="loading">Loading</div>
     </div>
@@ -48,8 +49,13 @@ export default Vue.extend({
             sensors: [],
         };
     },
-    beforeMount() {
+    beforeMount(this: any) {
         return this.refresh();
+    },
+    watch: {
+        id() {
+            this.refresh();
+        },
     },
     methods: {
         refresh() {
@@ -112,28 +118,28 @@ export default Vue.extend({
 .readings-simple {
     display: flex;
     flex-wrap: wrap;
-    table-layout: auto;
 }
 .readings-simple .reading-container {
     background-color: white;
     flex: 50%;
+    margin-bottom: 10px;
 }
 .reading {
     background-color: #efefef;
-    margin: 10px;
     display: flex;
     flex-direction: row;
     padding: 5px;
+    margin: 5px 5px;
 }
 .reading .name {
     font-size: 12px;
     line-height: 20px;
 }
-.reading .uom {
-    font-size: 10px;
-}
 .reading .value {
     margin-left: auto;
     font-size: 16px;
+}
+.reading .uom {
+    font-size: 10px;
 }
 </style>

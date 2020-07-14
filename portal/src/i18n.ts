@@ -1,3 +1,4 @@
+import _ from "lodash";
 import Vue from "vue";
 import VueI18n, { LocaleMessages } from "vue-i18n";
 
@@ -17,6 +18,30 @@ function loadLocaleMessages(): LocaleMessages {
             }
         }
     });
+
+    const keys = _(messages.en.modules)
+        .map((module, moduleKey) => {
+            return _(module.sensors)
+                .map((sensorName, sensorKey) => {
+                    const normalizedKey = sensorKey
+                        .split(".")
+                        .map((p) =>
+                            _.camelCase(p)
+                                .replace("10M", "10m")
+                                .replace("2M", "2m")
+                        )
+                        .join(".");
+                    const fullKey = ["fk", moduleKey, normalizedKey].join(".");
+                    return [fullKey, sensorName];
+                })
+                .value();
+        })
+        .flatten()
+        .fromPairs()
+        .value();
+
+    Object.assign(messages.en, keys);
+
     return messages;
 }
 
