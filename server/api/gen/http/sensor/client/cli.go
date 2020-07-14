@@ -16,7 +16,7 @@ import (
 
 // BuildDataPayload builds the payload for the sensor data endpoint from CLI
 // flags.
-func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataStations string, sensorDataSensors string, sensorDataResolution string, sensorDataAggregate string, sensorDataComplete string, sensorDataAuth string) (*sensor.DataPayload, error) {
+func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataStations string, sensorDataSensors string, sensorDataResolution string, sensorDataAggregate string, sensorDataComplete string, sensorDataTail string, sensorDataAuth string) (*sensor.DataPayload, error) {
 	var err error
 	var start *int64
 	{
@@ -79,6 +79,18 @@ func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataSt
 			}
 		}
 	}
+	var tail *int32
+	{
+		if sensorDataTail != "" {
+			var v int64
+			v, err = strconv.ParseInt(sensorDataTail, 10, 32)
+			val := int32(v)
+			tail = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for tail, must be INT32")
+			}
+		}
+	}
 	var auth string
 	{
 		auth = sensorDataAuth
@@ -91,6 +103,7 @@ func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataSt
 	v.Resolution = resolution
 	v.Aggregate = aggregate
 	v.Complete = complete
+	v.Tail = tail
 	v.Auth = auth
 
 	return v, nil

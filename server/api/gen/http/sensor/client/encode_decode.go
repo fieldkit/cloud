@@ -165,6 +165,9 @@ func EncodeDataRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.R
 		if p.Complete != nil {
 			values.Add("complete", fmt.Sprintf("%v", *p.Complete))
 		}
+		if p.Tail != nil {
+			values.Add("tail", fmt.Sprintf("%v", *p.Tail))
+		}
 		req.URL.RawQuery = values.Encode()
 		return nil
 	}

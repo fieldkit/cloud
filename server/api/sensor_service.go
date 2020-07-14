@@ -41,6 +41,7 @@ type QueryParams struct {
 	Stations   []int64   `json:"stations"`
 	Resolution int32     `json:"resolution"`
 	Aggregate  string    `json:"aggregate"`
+	Tail       int32     `json:"tail"`
 }
 
 func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) {
@@ -95,6 +96,11 @@ func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) 
 		aggregate = *payload.Aggregate
 	}
 
+	tail := int32(0)
+	if payload.Tail != nil {
+		tail = *payload.Tail
+	}
+
 	qp = &QueryParams{
 		Start:      start,
 		End:        end,
@@ -102,6 +108,7 @@ func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) 
 		Stations:   stations,
 		Sensors:    sensors,
 		Aggregate:  aggregate,
+		Tail:       tail,
 	}
 
 	return
@@ -128,6 +135,57 @@ type DataRow struct {
 	Location  *data.Location       `db:"location" json:"location,omitempty"`
 	Value     *float64             `db:"value" json:"value,omitempty"`
 	TimeGroup *int32               `db:"time_group" json:"tg,omitempty"`
+}
+
+func (c *SensorService) tail(ctx context.Context, qp *QueryParams) (*sensor.DataResult, error) {
+	query, args, err := sqlx.In(fmt.Sprintf(`
+		SELECT
+		id,
+		time,
+		station_id,
+		sensor_id,
+		value
+		FROM (
+			SELECT
+				ROW_NUMBER() OVER (PARTITION BY agg.sensor_id ORDER BY time DESC) AS r,
+				agg.*
+			FROM %s AS agg
+			WHERE agg.station_id IN (?)
+		) AS q
+		WHERE
+		q.r <= ?
+		`, "fieldkit.aggregated_1m"), qp.Stations, qp.Tail)
+	if err != nil {
+		return nil, err
+	}
+
+	queried, err := c.db.QueryxContext(ctx, c.db.Rebind(query), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	defer queried.Close()
+
+	rows := make([]*DataRow, 0)
+
+	for queried.Next() {
+		row := &DataRow{}
+		if err = queried.StructScan(row); err != nil {
+			return nil, err
+		}
+
+		rows = append(rows, row)
+	}
+
+	data := struct {
+		Data interface{} `json:"data"`
+	}{
+		rows,
+	}
+
+	return &sensor.DataResult{
+		Object: data,
+	}, nil
 }
 
 func (c *SensorService) stationsMeta(ctx context.Context, stations []int64) (*sensor.DataResult, error) {
@@ -189,7 +247,10 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return nil, sensor.BadRequest("at least one station required")
 	}
 
-	if len(qp.Sensors) == 0 {
+	if qp.Tail > 0 {
+		log.Infow("HI")
+		return c.tail(ctx, qp)
+	} else if len(qp.Sensors) == 0 {
 		return c.stationsMeta(ctx, qp.Stations)
 	}
 

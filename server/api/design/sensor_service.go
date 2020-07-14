@@ -35,6 +35,7 @@ var _ = Service("sensor", func() {
 			Attribute("resolution", Int32)
 			Attribute("aggregate", String)
 			Attribute("complete", Boolean)
+			Attribute("tail", Int32)
 		})
 
 		Result(func() {
@@ -53,6 +54,7 @@ var _ = Service("sensor", func() {
 				Param("resolution")
 				Param("aggregate")
 				Param("complete")
+				Param("tail")
 			})
 
 			Response(func() {
