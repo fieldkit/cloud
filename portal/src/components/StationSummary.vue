@@ -92,10 +92,13 @@ import * as utils from "../utilities";
 import FKApi from "../api/api";
 import { makeAuthenticatedApiUrl } from "@/api/api";
 import { BookmarkFactory } from "@/views/viz/viz";
-import Config from "@/secrets";
+import CommonComponents from "@/views/shared";
 
 export default {
     name: "StationSummary",
+    components: {
+        ...CommonComponents,
+    },
     data: () => {
         return {
             viewingSummary: true,
@@ -119,12 +122,8 @@ export default {
             this.viewingSummary = true;
         },
         onClickExplore() {
-            if (Config.EnableNewViz) {
-                const bm = BookmarkFactory.forStation(this.station.id);
-                return this.$router.push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bm) } });
-            } else {
-                return this.$router.push({ name: "viewData", query: { stationId: this.station.id } });
-            }
+            const bm = BookmarkFactory.forStation(this.station.id);
+            return this.$router.push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bm) } });
         },
         /*
         getCounter(moduleIndex, sensorIndex) {
