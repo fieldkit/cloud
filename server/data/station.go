@@ -77,6 +77,9 @@ func (s *Station) UpdateFromStatus(ctx context.Context, raw string) error {
 
 		if status.Gps != nil {
 			gps := status.Gps
+
+			log.Infow("gps", "device_id", s.DeviceID, "station_id", s.ID, "gps", gps)
+
 			if gps.Fix > 0 {
 				log.Infow("status: has gps fix", "station_id", s.ID, "gps", gps)
 				s.Location = NewLocation([]float64{
@@ -89,14 +92,14 @@ func (s *Station) UpdateFromStatus(ctx context.Context, raw string) error {
 					float64(gps.Longitude),
 					float64(gps.Latitude),
 				})
-			} else {
-				log.Infow("status: empty gps", "station_id", s.ID, "gps", gps)
 			}
 		} else {
 			log.Infow("status: no gps in status", "station_id", s.ID)
 		}
 
 		if status.Recording != nil {
+			log.Infow("recording", "device_id", s.DeviceID, "station_id", s.ID, "recording", status.Recording)
+
 			recordingStartedAt := int64(status.Recording.StartedTime)
 			if recordingStartedAt > 0 {
 				s.RecordingStartedAt = &recordingStartedAt
@@ -104,6 +107,8 @@ func (s *Station) UpdateFromStatus(ctx context.Context, raw string) error {
 		}
 
 		if status.Firmware != nil {
+			log.Infow("firmware", "device_id", s.DeviceID, "station_id", s.ID, "firmware", status.Firmware)
+
 			firmwareTime := int64(status.Firmware.Timestamp)
 			s.FirmwareTime = &firmwareTime
 
