@@ -45,14 +45,14 @@ Vue.filter("prettyTime", (value) => {
     if (!value) {
         return "N/A";
     }
-    return moment(value).format("MM/DD/YYYY HH:mm:ss");
+    return moment(value).format("M/D/YYYY HH:mm:ss");
 });
 
 Vue.filter("prettyDate", (value) => {
     if (!value) {
         return "N/A";
     }
-    return moment(value).format("MM/DD/YYYY");
+    return moment(value).format("M/D/YYYY");
 });
 
 Vue.filter("prettyReading", (sensor) => {

@@ -4,31 +4,21 @@
             <img alt="" src="../assets/progress.gif" />
         </div>
         <div class="main-panel" v-show="!loading">
-            <router-link :to="{ name: 'viewProject', params: { id: id } }" v-if="id">
-                <div class="projects-link">
-                    <span class="small-arrow">&lt;</span>
-                    Back to Project
-                </div>
-            </router-link>
-            <router-link :to="{ name: 'projects' }" v-else>
-                <div class="projects-link">
-                    <span class="small-arrow">&lt;</span>
-                    Back to Projects
-                </div>
-            </router-link>
-            <div id="inner-container" v-if="!loading">
+            <div v-if="!loading">
                 <ProjectForm :project="activeProject" @updating="onProjectUpdate" />
             </div>
         </div>
     </StandardLayout>
 </template>
 
-<script>
-import StandardLayout from "./StandardLayout";
-import FKApi from "../api/api";
-import ProjectForm from "../components/ProjectForm";
+<script lang="ts">
+import Vue from "@/store/strong-vue";
+import StandardLayout from "./StandardLayout.vue";
+import ProjectForm from "../components/ProjectForm.vue";
 
-export default {
+import FKApi from "../api/api";
+
+export default Vue.extend({
     name: "ProjectEditView",
     components: {
         StandardLayout,
@@ -46,7 +36,7 @@ export default {
             loading: true,
         };
     },
-    mounted() {
+    mounted(this: any) {
         if (this.id) {
             return this.getProject(this.id);
         } else {
@@ -73,7 +63,7 @@ export default {
             this.loading = true;
         },
     },
-};
+});
 </script>
 
 <style scoped>
@@ -83,16 +73,8 @@ export default {
     margin: 2px 5px 0 0;
 }
 .projects-link {
-    margin: 40px 0 0 90px;
     font-size: 14px;
     cursor: pointer;
-}
-#inner-container {
-    margin: 20px 60px;
-}
-#projects-container {
-    width: 890px;
-    margin: 20px 0 0 0;
 }
 #loading {
     width: 100%;
@@ -100,16 +82,8 @@ export default {
     background-color: rgba(255, 255, 255, 0.65);
     text-align: center;
 }
-.no-user-message {
-    float: left;
-    font-size: 20px;
-    margin: 40px 0 0 40px;
-}
 .show-link {
     text-decoration: underline;
-}
-.container {
-    float: left;
 }
 #add-project {
     margin: 40px 0 0 0;
@@ -119,5 +93,10 @@ export default {
 }
 #add-project img {
     vertical-align: bottom;
+}
+.main-panel {
+    padding: 20px;
+    background: #fcfcfc;
+    height: 100%;
 }
 </style>

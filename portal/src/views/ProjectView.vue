@@ -38,10 +38,11 @@
 <script lang="ts">
 import Vue from "@/store/strong-vue";
 import StandardLayout from "./StandardLayout.vue";
-import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "@/store/actions";
 import ProjectPublic from "../components/ProjectPublic.vue";
 import ProjectAdmin from "../components/ProjectAdmin.vue";
+
+import { mapState, mapGetters } from "vuex";
+import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
 
 export default Vue.extend({

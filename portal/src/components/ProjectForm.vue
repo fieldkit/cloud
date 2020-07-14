@@ -1,180 +1,214 @@
 <template>
-    <div id="project-form-container">
-        <div id="close-form-btn" v-on:click="closeForm">
-            <img alt="Close" src="../assets/close.png" />
-        </div>
-        <h2>{{ this.formHeading }}</h2>
-        <div class="outer-input-container">
-            <div class="input-container">
-                <input v-model="name" class="inputText" required="" />
-                <span class="floating-label">Project Name</span>
+    <div class="project-form">
+        <div class="header-row">
+            <h2 v-if="!project">New Project</h2>
+            <h2 v-if="project && project.id">Edit Project</h2>
+
+            <div class="close-form-button" v-on:click="closeForm">
+                <img alt="Close" src="../assets/close.png" />
             </div>
         </div>
-        <div class="outer-input-container">
-            <div class="input-container">
-                <input v-model="description" class="inputText" required="" />
-                <span class="floating-label">Short Description</span>
-            </div>
-        </div>
-        <div class="outer-input-container">
-            <div class="input-container">
-                <input v-model="goal" class="inputText" required="" />
-                <span class="floating-label">Project Goal</span>
-            </div>
-        </div>
-        <div class="image-container">
-            <img alt="Project image" :src="imageUrl" class="custom-image" v-if="hasImage && !previewImage" />
-            <img :src="previewImage" class="custom-image" v-if="!hasImage || previewImage" />
-            <img alt="Add project image" src="../assets/add_image.png" class="custom-image" v-if="!hasImage && !previewImage" />
-            <div class="image-instruct">{{ this.hasImage ? "Change image " : "Add an image to your project " }}</div>
-            <input type="file" accept="image/gif, image/jpeg, image/png" @change="uploadImage" />
-        </div>
-        <div class="outer-input-container">
-            <div class="input-container">
-                <input v-model="location" class="inputText" required="" />
-                <span class="floating-label">Location</span>
-            </div>
-        </div>
-        <div id="start-date">
+
+        <form id="form" @submit.prevent="saveForm">
             <div class="outer-input-container">
-                <div class="input-container">
-                    <input v-model="displayStartDate" class="inputText" required="" />
-                    <span class="floating-label">Start Date</span>
+                <TextField v-model="form.name" label="Project Name" />
+
+                <div class="validation-errors" v-if="$v.form.name.$error">
+                    <div v-if="!$v.form.name.required">Name is a required field.</div>
                 </div>
             </div>
-            <v-date-picker v-model="startDate" @input="updateDisplayDates" :popover="{ placement: 'bottom', visibility: 'click' }">
-                <button>
-                    <img alt="Calendar" src="../assets/calendar.png" />
-                </button>
-            </v-date-picker>
-        </div>
-        <div id="end-date">
             <div class="outer-input-container">
-                <div class="input-container">
-                    <input v-model="displayEndDate" class="inputText" required="" />
-                    <span class="floating-label">End Date</span>
+                <TextField v-model="form.description" label="Short Description" />
+
+                <div class="validation-errors" v-if="$v.form.description.$error">
+                    <div v-if="!$v.form.description.required">This is a required field.</div>
                 </div>
             </div>
-            <v-date-picker v-model="endDate" @input="updateDisplayDates" :popover="{ placement: 'bottom', visibility: 'click' }">
-                <button>
-                    <img alt="Calendar" src="../assets/calendar.png" />
-                </button>
-            </v-date-picker>
-        </div>
-        <div class="outer-input-container">
-            <div class="input-container">
-                <input v-model="tags" class="inputText" required="" />
-                <span class="floating-label">Tags</span>
+            <div class="outer-input-container">
+                <TextField v-model="form.goal" label="Project Goal" />
+
+                <div class="validation-errors" v-if="$v.form.goal.$error">
+                    <div v-if="!$v.form.goal.required">Project goal is a required field.</div>
+                </div>
             </div>
-        </div>
-        <div id="public-checkbox-container">
-            <input type="checkbox" id="checkbox" v-model="publicProject" />
-            <label for="checkbox">Make this project public</label>
-            <img alt="Info" src="../assets/info.png" />
-        </div>
-        <div class="action-container">
-            <button class="save-btn" v-if="formType == 'add'" v-on:click="addProject">
-                Add
-            </button>
-            <button class="save-btn" v-if="formType == 'update'" v-on:click="updateProject">
-                Update
-            </button>
-            <div v-if="formType == 'update'" class="delete-container" v-on:click="deleteProject">
-                <img alt="Delete" src="../assets/Delete.png" />
-                Delete this project
+            <div class="image-container">
+                <ImageUploader :image="{ url: project ? project.photo : null }" @change="onImage" />
             </div>
-        </div>
+            <div class="outer-input-container">
+                <TextField v-model="form.location" label="Location" />
+
+                <div class="validation-errors" v-if="$v.form.location.$error">
+                    <div v-if="!$v.form.location.required">Location is a required field.</div>
+                </div>
+            </div>
+
+            <div class="dates-row">
+                <div class="date-container">
+                    <div class="outer-input-container">
+                        <TextField v-model="form.startTime" label="Start" />
+                    </div>
+                    <v-date-picker :value="form.pickedStart" @input="updateStart" :popover="{ placement: 'bottom', visibility: 'click' }">
+                        <button type="button">
+                            <img alt="Calendar" src="../assets/calendar.png" />
+                        </button>
+                    </v-date-picker>
+                </div>
+                <div class="space-hack"></div>
+                <div class="date-container">
+                    <div class="outer-input-container">
+                        <TextField v-model="form.endTime" label="End" />
+                    </div>
+                    <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'bottom', visibility: 'click' }">
+                        <button type="button">
+                            <img alt="Calendar" src="../assets/calendar.png" />
+                        </button>
+                    </v-date-picker>
+                </div>
+            </div>
+
+            <div class="outer-input-container">
+                <TextField v-model="form.tags" label="Tags" />
+
+                <div class="validation-errors" v-if="$v.form.tags.$error"></div>
+            </div>
+            <div id="public-checkbox-container">
+                <input type="checkbox" id="checkbox" v-model="form.publicProject" />
+                <label for="checkbox">Make this project public</label>
+                <img alt="Info" src="../assets/info.png" />
+            </div>
+            <div class="action-container">
+                <button class="save-button" v-if="!project" type="submit">Add</button>
+                <button class="save-button" v-if="project && project.id" type="submit">Update</button>
+                <div v-if="project && project.id" class="delete-container" v-on:click="deleteProject">
+                    <img alt="Delete" src="../assets/Delete.png" />
+                    Delete this project
+                </div>
+            </div>
+        </form>
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import _ from "lodash";
+import moment from "moment";
+import Vue from "@/store/strong-vue";
+import StandardLayout from "./StandardLayout.vue";
+import CommonComponents from "@/views/shared";
+
+import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
+
 import FKApi from "../api/api";
 import * as ActionTypes from "@/store/actions";
 
-export default {
+export default Vue.extend({
     name: "ProjectForm",
+    components: {
+        ...CommonComponents,
+    },
     props: {
-        project: {},
+        project: {
+            type: Object,
+            required: false,
+        },
     },
     data: () => {
         return {
-            form: {},
-            formType: "add",
-            formHeading: "New Project",
-            name: "",
-            description: "",
-            goal: "",
-            imageName: "",
-            location: "",
-            startDate: null,
-            displayStartDate: "",
-            endDate: null,
-            displayEndDate: "",
-            tags: "",
-            publicProject: false,
-            hasImage: false,
-            imageUrl: "",
-            previewImage: null,
-            acceptedImageTypes: ["jpg", "jpeg", "png", "gif"],
+            image: null,
+            form: {
+                name: "",
+                description: "",
+                goal: "",
+                location: "",
+                startTime: "",
+                endTime: "",
+                tags: "",
+                publicProject: false,
+                pickedStart: null,
+                pickedEnd: null,
+            },
         };
     },
-    mounted() {
+    validations: {
+        form: {
+            name: {
+                required,
+            },
+            description: {
+                required,
+            },
+            goal: {
+                required,
+            },
+            location: {
+                required,
+            },
+            startDate: {},
+            endTime: {},
+            tags: {},
+        },
+    },
+    mounted(this: any) {
         if (this.project) {
-            this.formHeading = "Edit Project";
-            this.formType = "update";
-            this.name = this.project.name;
-            this.description = this.project.description;
-            this.goal = this.project.goal;
-            this.location = this.project.location;
-            this.startDate = this.project.startTime;
-            this.endDate = this.project.endTime;
-            this.tags = this.project.tags;
-            this.publicProject = !this.project.private;
-            this.updateDisplayDates();
-            if (this.project.photo) {
-                this.imageUrl = this.$config.baseUrl + "/" + this.project.photo;
-                this.hasImage = true;
-            } else {
-                this.imageUrl = "";
-                this.hasImage = false;
-            }
-        } else {
-            this.formType = "add";
-            this.formHeading = "New Project";
-            this.resetFields();
+            this.form = {
+                name: this.project.name,
+                description: this.project.description,
+                goal: this.project.goal,
+                location: this.project.location,
+                startTime: this.$options.filters.prettyDate(this.project.startTime || ""),
+                endTime: this.$options.filters.prettyDate(this.project.endTime || ""),
+                tags: this.project.tags,
+                publicProject: !this.project.private,
+            };
         }
     },
-    methods: {
-        createParams() {
-            const data = {
-                description: this.description,
-                endTime: this.endDate,
-                goal: this.goal,
-                location: this.location,
-                name: this.name,
-                private: !this.publicProject,
-                slug: "proj-" + Date.now(),
-                startTime: this.startDate,
-                tags: this.tags,
-            };
-            if (this.project) {
-                data.id = this.project.id;
-                data.slug = this.project.slug;
+    computed: {
+        imageUrl(this: any) {
+            if (this.project.photo) {
+                return this.$config.baseUrl + this.project.photo;
             }
-            return data;
+            return null;
+        },
+    },
+    methods: {
+        saveForm() {
+            this.$v.form.$touch();
+            if (this.$v.form.$pending || this.$v.form.$error) {
+                console.log("save form, validation error");
+                return;
+            }
+
+            if (this.project && this.project.id) {
+                return this.updateProject();
+            }
+            return this.addProject();
+        },
+        createParams() {
+            const makeLocalTime = (str) => {
+                if (!str || str.length == 0) {
+                    return null;
+                }
+                return moment(str, "M/D/YYYY").toISOString();
+            };
+            return _.extend(this.form, {
+                id: this.project?.id || null,
+                private: !this.form.publicProject,
+                slug: "proj-" + Date.now(),
+                startTime: makeLocalTime(this.form.startTime),
+                endTime: makeLocalTime(this.form.endTime),
+            });
         },
         addProject() {
             this.$emit("updating");
-            const api = new FKApi();
+
             const data = this.createParams();
-            if (this.sendingImage) {
-                return api.addProject(data).then((project) => {
+            if (this.image) {
+                return new FKApi().addProject(data).then((project) => {
                     const params = {
-                        type: this.imageType,
-                        image: this.sendingImage,
+                        type: this.image.type,
+                        image: this.image.image,
                         id: project.id,
                     };
-                    return api.uploadProjectImage(params).then(() => {
+                    return new FKApi().uploadProjectImage(params).then(() => {
                         return this.$router.push({
                             name: "viewProject",
                             params: { id: project.id },
@@ -182,7 +216,7 @@ export default {
                     });
                 });
             } else {
-                return api.addProject(data).then((project) => {
+                return new FKApi().addProject(data).then((project) => {
                     return this.$router.push({
                         name: "viewProject",
                         params: { id: project.id },
@@ -192,15 +226,15 @@ export default {
         },
         updateProject() {
             this.$emit("updating");
-            const api = new FKApi();
+
             const data = this.createParams();
-            if (this.sendingImage) {
-                const params = {
-                    type: this.imageType,
-                    image: this.sendingImage,
+            if (this.image) {
+                const payload = {
+                    type: this.image.type,
+                    image: this.image.image,
                     id: this.project.id,
                 };
-                return api.uploadProjectImage(params).then(() => {
+                return new FKApi().uploadProjectImage(payload).then(() => {
                     return this.$store.dispatch(ActionTypes.SAVE_PROJECT, data).then(() => {
                         return this.$router.push({
                             name: "viewProject",
@@ -219,63 +253,16 @@ export default {
         },
         deleteProject() {
             if (window.confirm("Are you sure you want to delete this project?")) {
-                const api = new FKApi();
-                const params = {
-                    projectId: this.project.id,
-                };
-                return api.deleteProject(params).then(() => {
-                    this.$router.push({ name: "projects" });
+                return new FKApi().deleteProject({ projectId: this.project.id }).then(() => {
+                    return this.$router.push({ name: "projects" });
                 });
             }
         },
-        updateDisplayDates() {
-            if (this.startDate) {
-                const d = new Date(this.startDate);
-                this.displayStartDate = d.toLocaleDateString("en-US");
-            }
-            if (this.endDate) {
-                const d = new Date(this.endDate);
-                this.displayEndDate = d.toLocaleDateString("en-US");
-            }
+        updateStart(date, ...args) {
+            this.form.startTime = date ? moment(date).format("M/D/YYYY") : "";
         },
-        resetFields() {
-            this.name = "";
-            this.description = "";
-            this.goal = "";
-            this.imageName = "";
-            this.location = "";
-            this.startDate = null;
-            this.displayStartDate = "";
-            this.endDate = null;
-            this.displayEndDate = "";
-            this.tags = "";
-            this.publicProject = false;
-            this.hasImage = false;
-            this.imageUrl = "";
-            this.previewImage = null;
-        },
-        uploadImage(event) {
-            this.previewImage = null;
-            this.sendingImage = null;
-            let valid = false;
-            if (event.target.files.length > 0) {
-                this.acceptedImageTypes.forEach((t) => {
-                    if (event.target.files[0].type.indexOf(t) > -1) {
-                        valid = true;
-                    }
-                });
-            }
-            if (!valid) {
-                return;
-            }
-            this.imageType = event.target.files[0].type;
-            const image = event.target.files[0];
-            this.sendingImage = image;
-            const reader = new FileReader();
-            reader.readAsDataURL(image);
-            reader.onload = (event) => {
-                this.previewImage = event.target.result;
-            };
+        updateEnd(date, ...args) {
+            this.form.endTime = date ? moment(date).format("M/D/YYYY") : "";
         },
         closeForm() {
             if (this.project) {
@@ -284,74 +271,68 @@ export default {
                 return this.$router.push({ name: "projects" });
             }
         },
+        onImage(image) {
+            this.image = image;
+        },
     },
-};
+});
 </script>
 
 <style scoped>
-#project-form-container {
-    width: 700px;
-    float: left;
-    padding: 0 15px 15px 15px;
-    margin: 25px 0;
-    border: 1px solid rgb(215, 220, 225);
+.project-form {
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #d8dce0;
+    background: white;
+    padding: 20px;
 }
-.outer-input-container {
-    float: left;
-    width: 98%;
-    margin: 19px 0 0 0;
+
+form > div {
+    margin-bottom: 20px;
 }
-#start-date .outer-input-container,
-#end-date .outer-input-container {
-    width: 100%;
-    margin: 0;
+
+.header-row {
+    display: flex;
+    flex-direction: row;
 }
-.input-container {
-    margin: auto;
-    width: 100%;
-    text-align: left;
+
+.dates-row {
+    display: flex;
+    flex-direction: row;
+}
+.dates-row > div {
+    flex: 1;
 }
 .image-container {
     width: 100%;
     margin: 15px 0;
-    float: left;
 }
-.custom-image {
+/deep/ .image-container img {
     max-width: 275px;
     max-height: 135px;
     margin-right: 10px;
 }
-.image-instruct {
-    font-size: 14px;
-    margin-right: 5px;
-    display: inline-block;
+.date-container {
+    flex: 1;
+    display: flex;
 }
-
-#start-date,
-#end-date {
-    width: 47%;
-    margin: 19px 0 0 0;
+.date-container .outer-input-container {
+    flex-grow: 1;
 }
-#start-date {
-    float: left;
-}
-#end-date {
-    float: right;
-}
-#start-date button,
-#end-date button {
+.date-container button {
     position: absolute;
     margin: -4px 0 0 -30px;
     background: none;
     padding: 0;
     border: none;
 }
-#start-date img,
-#end-date img {
+.date-container img {
     vertical-align: bottom;
     padding-bottom: 2px;
     margin-left: 4px;
 }
+
 #public-checkbox-container {
     margin: 15px 0;
     width: 98%;
@@ -371,10 +352,10 @@ export default {
 }
 
 .action-container {
-    float: left;
-    clear: both;
+    display: flex;
+    align-items: baseline;
 }
-.save-btn {
+.save-button {
     width: 300px;
     height: 50px;
     font-size: 18px;
@@ -382,22 +363,25 @@ export default {
     background-color: #ce596b;
     border: none;
     border-radius: 5px;
-    margin: 50px 0 20px 0;
 }
-
-#close-form-btn {
-    float: right;
+.close-form-button {
+    margin-left: auto;
     margin-top: 15px;
     cursor: pointer;
 }
-
 .delete-container {
+    margin-left: auto;
     cursor: pointer;
-    margin-left: 230px;
     display: inline-block;
 }
 .delete-container img {
     width: 12px;
     margin-right: 4px;
+}
+.validation-errors {
+    color: #c42c44;
+    display: block;
+    font-size: 14px;
+    margin-bottom: 25px;
 }
 </style>
