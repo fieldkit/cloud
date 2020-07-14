@@ -1,6 +1,7 @@
 package data
 
 import (
+	"context"
 	"encoding/hex"
 	"strconv"
 	"time"
@@ -51,13 +52,15 @@ func (s *Station) ParseHttpReply(raw string) (*pb.HttpReply, error) {
 	return record, nil
 }
 
-func (s *Station) UpdateFromStatus(raw string) error {
+func (s *Station) UpdateFromStatus(ctx context.Context, raw string) error {
 	record, err := s.ParseHttpReply(raw)
 	if err != nil {
 		return err
 	}
 
 	if record.Status != nil {
+		log := Logger(ctx).Sugar()
+
 		status := record.Status
 
 		if status.Power != nil && status.Power.Battery != nil {
@@ -75,16 +78,22 @@ func (s *Station) UpdateFromStatus(raw string) error {
 		if status.Gps != nil {
 			gps := status.Gps
 			if gps.Fix > 0 {
+				log.Infow("status: has gps fix", "station_id", s.ID, "gps", gps)
 				s.Location = NewLocation([]float64{
 					float64(gps.Longitude),
 					float64(gps.Latitude),
 				})
 			} else if gps.Time > 0 && s.Location == nil {
+				log.Infow("status: has old fix", "station_id", s.ID, "gps", gps)
 				s.Location = NewLocation([]float64{
 					float64(gps.Longitude),
 					float64(gps.Latitude),
 				})
+			} else {
+				log.Infow("status: empty gps", "station_id", s.ID, "gps", gps)
 			}
+		} else {
+			log.Infow("status: no gps in status", "station_id", s.ID)
 		}
 
 		if status.Recording != nil {

@@ -42,21 +42,21 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 	}
 
 	if rawStatusPb != nil {
-		if err := station.UpdateFromStatus(*rawStatusPb); err != nil {
-			log.Errorw("error updating from status", "error", err, "status", *rawStatusPb)
-			// return err
+		log.Infow("updating station from status", "station_id", station.ID)
+
+		if err := station.UpdateFromStatus(ctx, *rawStatusPb); err != nil {
+			log.Errorw("error updating from status", "error", err)
 		}
 
 		if err := sr.UpdateStationModelFromStatus(ctx, station, *rawStatusPb); err != nil {
-			log.Errorw("error updating model status", "error", err, "status", *rawStatusPb)
-			// return err
+			log.Errorw("error updating model status", "error", err)
 		}
 
 		if station.Location != nil && c.options.locations != nil {
+			log.Infow("describing location", "station_id", station.ID)
 			names, err := c.options.locations.Describe(ctx, station.Location)
 			if err != nil {
 				log.Errorw("error updating from location", "error", err)
-				// return err
 			} else if names != nil {
 				station.PlaceOther = names.OtherLandName
 				station.PlaceNative = names.NativeLandName
