@@ -2,6 +2,14 @@
     <StandardLayout>
         <div class="container">
             <div class="delete-user">
+                <div v-if="deletion.failed" class="notification failed">
+                    Oops, there was a problem.
+                </div>
+
+                <div v-if="deletion.success" class="notification success">
+                    They're toast.
+                </div>
+
                 <form id="delete-user-form" @submit.prevent="deleteUser">
                     <h2>Delete User</h2>
                     <div>
@@ -76,9 +84,11 @@ export default Vue.extend({
             return new FKApi().adminDeleteUser(this.form).then(
                 () => {
                     this.deletion.success = true;
+                    this.deletion.failed = false;
                 },
                 () => {
                     this.deletion.failed = true;
+                    this.deletion.success = false;
                 }
             );
         },
@@ -106,5 +116,18 @@ export default Vue.extend({
     font-size: 18px;
     font-weight: 600;
     border-radius: 5px;
+}
+.notification.success {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 2px;
+    border-radius: 4px;
+}
+.notification.success {
+    background-color: #d4edda;
+}
+.notification.failed {
+    background-color: #f8d7da;
 }
 </style>
