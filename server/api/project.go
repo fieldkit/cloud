@@ -133,21 +133,17 @@ func (c *ProjectController) Add(ctx *app.AddProjectContext) error {
 		project.EndTime = &end
 	}
 
-	role := data.AdministratorRole
-
-	if err := c.options.Database.NamedGetContext(ctx, project, `
-		INSERT INTO fieldkit.project (name, slug, description, goal, location, tags, private, start_time, end_time) VALUES
-		(:name, :slug, :description, :goal, :location, :tags, :private, :start_time, :end_time) RETURNING *`, project); err != nil {
+	pr, err := repositories.NewProjectRepository(c.options.Database)
+	if err != nil {
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, `
-		INSERT INTO fieldkit.project_user (project_id, user_id, role) VALUES ($1, $2, $3)
-		`, project.ID, p.UserID(), role.ID); err != nil {
+	project, err = pr.AddProject(ctx, p.UserID(), project)
+	if err != nil {
 		return err
 	}
 
-	return ctx.OK(ProjectType(project, 0, role))
+	return ctx.OK(ProjectType(project, 0, data.AdministratorRole))
 }
 
 func (c *ProjectController) Update(ctx *app.UpdateProjectContext) error {

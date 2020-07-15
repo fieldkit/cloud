@@ -133,16 +133,18 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 
 	log.Infow("validation", "token", validationToken.Token)
 
-	/*
-		project := data.Project{
-			Name:        "Default FieldKit Project",
-			Description: "",
-		}
-	*/
-
 	c.options.Metrics.UserAdded()
 
 	c.options.Metrics.EmailVerificationSent()
+
+	pr, err := repositories.NewProjectRepository(c.options.Database)
+	if err != nil {
+		return err
+	}
+
+	if _, err := pr.AddDefaultProject(ctx, user); err != nil {
+		return err
+	}
 
 	return ctx.OK(UserType(user))
 }
