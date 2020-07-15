@@ -26,6 +26,7 @@
                     <div class="details-left">
                         <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
                         <div class="project-detail">{{ project.description }}</div>
+                        <DisplayProjectTags :tags="project.tags" />
                     </div>
                     <div class="details-right">
                         <div class="time-container" v-if="project.startTime">

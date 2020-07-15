@@ -67,7 +67,7 @@
             </div>
 
             <div class="outer-input-container">
-                <TextField v-model="form.tags" label="Tags" />
+                <vue-tags-input v-model="form.tag" :tags="form.tags" @tags-changed="onTagsChanged" />
 
                 <div class="validation-errors" v-if="$v.form.tags.$error"></div>
             </div>
@@ -94,6 +94,9 @@ import moment from "moment";
 import Vue from "@/store/strong-vue";
 import StandardLayout from "./StandardLayout.vue";
 import CommonComponents from "@/views/shared";
+import VueTagsInput from "@johmun/vue-tags-input";
+
+import { tryParseTags } from "@/utilities";
 
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
 
@@ -103,6 +106,7 @@ import * as ActionTypes from "@/store/actions";
 export default Vue.extend({
     name: "ProjectForm",
     components: {
+        VueTagsInput,
         ...CommonComponents,
     },
     props: {
@@ -121,7 +125,8 @@ export default Vue.extend({
                 location: "",
                 startTime: "",
                 endTime: "",
-                tags: "",
+                tags: [],
+                tag: "",
                 publicProject: false,
                 pickedStart: null,
                 pickedEnd: null,
@@ -156,7 +161,7 @@ export default Vue.extend({
                 location: this.project.location,
                 startTime: this.$options.filters.prettyDate(this.project.startTime || ""),
                 endTime: this.$options.filters.prettyDate(this.project.endTime || ""),
-                tags: this.project.tags,
+                tags: tryParseTags(this.project.tags),
                 publicProject: !this.project.private,
             };
         }
@@ -182,6 +187,9 @@ export default Vue.extend({
             }
             return this.addProject();
         },
+        onTagsChanged(newTags) {
+            this.form.tags = newTags;
+        },
         createParams() {
             const makeLocalTime = (str) => {
                 if (!str || str.length == 0) {
@@ -189,12 +197,13 @@ export default Vue.extend({
                 }
                 return moment(str, "M/D/YYYY").toISOString();
             };
-            return _.extend(this.form, {
+            return _.extend({}, this.form, {
                 id: this.project?.id || null,
                 private: !this.form.publicProject,
                 slug: "proj-" + Date.now(),
                 startTime: makeLocalTime(this.form.startTime),
                 endTime: makeLocalTime(this.form.endTime),
+                tags: JSON.stringify(this.form.tags.map((tag) => tag.text)),
             });
         },
         addProject() {
@@ -383,5 +392,9 @@ form > div {
     display: block;
     font-size: 14px;
     margin-bottom: 25px;
+}
+
+/deep/ .ti-tag {
+    background-color: #0a67aa;
 }
 </style>

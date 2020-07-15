@@ -10,6 +10,7 @@
         "build-webpack": "webpack --config build/webpack.dev.js"
     },
     "dependencies": {
+        "@johmun/vue-tags-input": "^2.1.0",
         "@riophae/vue-treeselect": "^0.4.0",
         "@types/node": "^14.0.14",
         "@types/vuelidate": "^0.7.13",

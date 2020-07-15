@@ -155,3 +155,24 @@ export function getRunTime(project) {
     }
     return runTense + displayValue + " " + timeUnits[unit];
 }
+
+export function tryParseTags(rawTags: string) {
+    if (rawTags.length == 0) {
+        return [];
+    }
+    try {
+        const hopefullyArray = JSON.parse(rawTags);
+        return hopefullyArray.map((text) => {
+            return {
+                text: text,
+            };
+        });
+    } catch (error) {
+        console.log("invalid tags field", error);
+    }
+    return rawTags.split(" ").map((text) => {
+        return {
+            text: text,
+        };
+    });
+}
