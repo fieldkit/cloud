@@ -93,6 +93,7 @@ generate-v3-example:
 
 clean:
 	rm -rf $(BUILD)
+	rm -rf portal/node_modules
 
 schema-production:
 	@mkdir -p schema-production

@@ -503,7 +503,12 @@ func (c *ProjectController) AddStation(ctx *app.AddStationProjectContext) error 
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, `INSERT INTO fieldkit.project_station (project_id, station_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`, ctx.ProjectID, ctx.StationID); err != nil {
+	pr, err := repositories.NewProjectRepository(c.options.Database)
+	if err != nil {
+		return err
+	}
+
+	if err := pr.AddStationToProjectByID(ctx, int32(ctx.ProjectID), int32(ctx.StationID)); err != nil {
 		return err
 	}
 

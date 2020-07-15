@@ -132,6 +132,15 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		return nil, err
 	}
 
+	pr, err := repositories.NewProjectRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := pr.AddStationToDefaultProjectMaybe(ctx, adding); err != nil {
+		return nil, err
+	}
+
 	return c.Get(ctx, &station.GetPayload{
 		Auth: payload.Auth,
 		ID:   adding.ID,
