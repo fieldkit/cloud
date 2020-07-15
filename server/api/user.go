@@ -724,3 +724,69 @@ func (c *UserController) ProjectRoles(ctx *app.ProjectRolesUserContext) error {
 	}
 	return ctx.OK(roles)
 }
+
+func (c *UserController) AdminDelete(ctx *app.AdminDeleteUserContext) error {
+	log := Logger(ctx).Sugar()
+
+	token := jwt.ContextJWT(ctx)
+	if token == nil {
+		return fmt.Errorf("JWT token is missing from context") // internal error
+	}
+
+	claims, ok := token.Claims.(jwtgo.MapClaims)
+	if !ok {
+		return fmt.Errorf("JWT claims error") // internal error
+	}
+
+	admin := &data.User{}
+	err := c.options.Database.GetContext(ctx, admin, `SELECT * FROM fieldkit.user WHERE id = $1`, claims["sub"])
+	if err != nil {
+		return ctx.Forbidden(fmt.Errorf("forbidden"))
+	}
+
+	err = admin.CheckPassword(ctx.Payload.Password)
+	if err != nil {
+		return ctx.Forbidden(fmt.Errorf("forbidden"))
+	}
+
+	user := &data.User{}
+	if err = c.options.Database.GetContext(ctx, user, `SELECT * FROM fieldkit.user WHERE LOWER(email) = LOWER($1)`, ctx.Payload.Email); err != nil {
+		return ctx.Forbidden(fmt.Errorf("forbidden"))
+	}
+
+	log.Infow("deleting", "user_id", user.ID)
+
+	queries := []string{
+		`DELETE FROM fieldkit.project_invite WHERE user_id = $1`,
+		`DELETE FROM fieldkit.project_follower WHERE follower_id = $1`,
+		`DELETE FROM fieldkit.project_user WHERE user_id = $1`,
+
+		`DELETE FROM fieldkit.field_note_media WHERE user_id = $1`,
+		`DELETE FROM fieldkit.field_note WHERE user_id = $1`,
+		`DELETE FROM fieldkit.field_note WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.notes_media WHERE id IN (SELECT media_id FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)))`,
+		`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))`,
+		`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.aggregated_24h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.aggregated_12h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.aggregated_6h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.aggregated_1h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.aggregated_30m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.aggregated_10m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.aggregated_1m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.visible_configuration WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.project_station WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.station_activity WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.station_ingestion WHERE uploader_id = $1`,
+		`DELETE FROM fieldkit.station WHERE owner_id = $1`,
+		`DELETE FROM fieldkit.user WHERE id = $1`,
+	}
+
+	for _, query := range queries {
+		if _, err := c.options.Database.ExecContext(ctx, query, user.ID); err != nil {
+			return err
+		}
+	}
+
+	return ctx.NoContent()
+}

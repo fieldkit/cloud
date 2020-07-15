@@ -803,6 +803,15 @@ class FKApi {
             url: this.baseUrl + "/sensors/data?" + qp.toString(),
         });
     }
+
+    adminDeleteUser(payload) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/admin/user",
+            data: payload,
+        });
+    }
 }
 
 export default FKApi;

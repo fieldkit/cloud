@@ -2273,6 +2273,7 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 type UserController interface {
 	goa.Muxer
 	Add(*AddUserContext) error
+	AdminDelete(*AdminDeleteUserContext) error
 	ChangePassword(*ChangePasswordUserContext) error
 	GetCurrent(*GetCurrentUserContext) error
 	GetCurrentUserImage(*GetCurrentUserImageUserContext) error
@@ -2297,6 +2298,7 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/users", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/admin/user", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/users/:userId/password", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/user/media", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
@@ -2334,6 +2336,29 @@ func MountUserController(service *goa.Service, ctrl UserController) {
 	h = handleUserOrigin(h)
 	service.Mux.Handle("POST", "/users", ctrl.MuxHandler("add", h, unmarshalAddUserPayload))
 	service.LogInfo("mount", "ctrl", "User", "action", "Add", "route", "POST /users")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewAdminDeleteUserContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*AdminDeleteUserPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.AdminDelete(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:admin")
+	h = handleUserOrigin(h)
+	service.Mux.Handle("DELETE", "/admin/user", ctrl.MuxHandler("admin delete", h, unmarshalAdminDeleteUserPayload))
+	service.LogInfo("mount", "ctrl", "User", "action", "AdminDelete", "route", "DELETE /admin/user", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -2830,6 +2855,21 @@ func handleUserOrigin(h goa.Handler) goa.Handler {
 // unmarshalAddUserPayload unmarshals the request body into the context request data Payload field.
 func unmarshalAddUserPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &addUserPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalAdminDeleteUserPayload unmarshals the request body into the context request data Payload field.
+func unmarshalAdminDeleteUserPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &adminDeleteUserPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}

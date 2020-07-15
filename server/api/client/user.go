@@ -52,6 +52,53 @@ func (c *Client) NewAddUserRequest(ctx context.Context, path string, payload *Ad
 	return req, nil
 }
 
+// AdminDeleteUserPayload is the user admin delete action payload.
+type AdminDeleteUserPayload struct {
+	Email    string `form:"email" json:"email" yaml:"email" xml:"email"`
+	Password string `form:"password" json:"password" yaml:"password" xml:"password"`
+}
+
+// AdminDeleteUserPath computes a request path to the admin delete action of user.
+func AdminDeleteUserPath() string {
+
+	return fmt.Sprintf("/admin/user")
+}
+
+// AdminDeleteUser makes a request to the admin delete action endpoint of the user resource
+func (c *Client) AdminDeleteUser(ctx context.Context, path string, payload *AdminDeleteUserPayload) (*http.Response, error) {
+	req, err := c.NewAdminDeleteUserRequest(ctx, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewAdminDeleteUserRequest create the request corresponding to the admin delete action endpoint of the user resource.
+func (c *Client) NewAdminDeleteUserRequest(ctx context.Context, path string, payload *AdminDeleteUserPayload) (*http.Request, error) {
+	var body bytes.Buffer
+	err := c.Encoder.Encode(payload, &body, "*/*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("DELETE", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	header.Set("Content-Type", "application/json")
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
+	}
+	return req, nil
+}
+
 // ChangePasswordUserPath computes a request path to the change password action of user.
 func ChangePasswordUserPath(userID int) string {
 	param0 := strconv.Itoa(userID)

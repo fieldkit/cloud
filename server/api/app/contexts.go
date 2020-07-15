@@ -1643,6 +1643,94 @@ func (ctx *AddUserContext) Unauthorized() error {
 	return nil
 }
 
+// AdminDeleteUserContext provides the user admin delete action context.
+type AdminDeleteUserContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *AdminDeleteUserPayload
+}
+
+// NewAdminDeleteUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller admin delete action.
+func NewAdminDeleteUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*AdminDeleteUserContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := AdminDeleteUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// adminDeleteUserPayload is the user admin delete action payload.
+type adminDeleteUserPayload struct {
+	Email    *string `form:"email,omitempty" json:"email,omitempty" yaml:"email,omitempty" xml:"email,omitempty"`
+	Password *string `form:"password,omitempty" json:"password,omitempty" yaml:"password,omitempty" xml:"password,omitempty"`
+}
+
+// Validate runs the validation rules defined in the design.
+func (payload *adminDeleteUserPayload) Validate() (err error) {
+	if payload.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "email"))
+	}
+	if payload.Password == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "password"))
+	}
+	return
+}
+
+// Publicize creates AdminDeleteUserPayload from adminDeleteUserPayload
+func (payload *adminDeleteUserPayload) Publicize() *AdminDeleteUserPayload {
+	var pub AdminDeleteUserPayload
+	if payload.Email != nil {
+		pub.Email = *payload.Email
+	}
+	if payload.Password != nil {
+		pub.Password = *payload.Password
+	}
+	return &pub
+}
+
+// AdminDeleteUserPayload is the user admin delete action payload.
+type AdminDeleteUserPayload struct {
+	Email    string `form:"email" json:"email" yaml:"email" xml:"email"`
+	Password string `form:"password" json:"password" yaml:"password" xml:"password"`
+}
+
+// Validate runs the validation rules defined in the design.
+func (payload *AdminDeleteUserPayload) Validate() (err error) {
+	if payload.Email == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "email"))
+	}
+	if payload.Password == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "password"))
+	}
+	return
+}
+
+// NoContent sends a HTTP response with status code 204.
+func (ctx *AdminDeleteUserContext) NoContent() error {
+	ctx.ResponseData.WriteHeader(204)
+	return nil
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *AdminDeleteUserContext) Unauthorized(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 401, r)
+}
+
+// Forbidden sends a HTTP response with status code 403.
+func (ctx *AdminDeleteUserContext) Forbidden(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 403, r)
+}
+
 // ChangePasswordUserContext provides the user change password action context.
 type ChangePasswordUserContext struct {
 	context.Context

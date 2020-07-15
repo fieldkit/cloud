@@ -136,6 +136,20 @@ var TransmissionToken = MediaType("application/vnd.app.user.transmission.token+j
 	})
 })
 
+var AdminDeletePayload = MediaType("application/vnd.app.admin.user.delete+json", func() {
+	TypeName("AdminDeletePayload")
+	Attributes(func() {
+		Attribute("email", String)
+		Required("email")
+		Attribute("password", String)
+		Required("password")
+	})
+	View("default", func() {
+		Attribute("email")
+		Attribute("password")
+	})
+})
+
 var _ = Resource("user", func() {
 	Security(JWT, func() { // Use JWT to auth requests to this endpoint
 		Scope("api:access") // Enforce presence of "api" scope in JWT claims.
@@ -335,5 +349,16 @@ var _ = Resource("user", func() {
 		Response(OK, func() {
 			Media(CollectionOf(ProjectRole))
 		})
+	})
+
+	Action("admin delete", func() {
+		Routing(DELETE("admin/user"))
+		Security(JWT, func() {
+			Scope("api:admin")
+		})
+		Payload(AdminDeletePayload)
+		Response(Unauthorized, ErrorMedia)
+		Response(Forbidden, ErrorMedia)
+		Response(NoContent)
 	})
 })

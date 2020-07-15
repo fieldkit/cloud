@@ -14,6 +14,32 @@ import (
 	"unicode/utf8"
 )
 
+// AdminDeletePayload media type (default view)
+//
+// Identifier: application/vnd.app.admin.user.delete+json; view=default
+type AdminDeletePayload struct {
+	Email    string `form:"email" json:"email" yaml:"email" xml:"email"`
+	Password string `form:"password" json:"password" yaml:"password" xml:"password"`
+}
+
+// Validate validates the AdminDeletePayload media type instance.
+func (mt *AdminDeletePayload) Validate() (err error) {
+	if mt.Email == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "email"))
+	}
+	if mt.Password == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "password"))
+	}
+	return
+}
+
+// DecodeAdminDeletePayload decodes the AdminDeletePayload instance encoded in resp body.
+func (c *Client) DecodeAdminDeletePayload(resp *http.Response) (*AdminDeletePayload, error) {
+	var decoded AdminDeletePayload
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // DeviceDataRecordsResponse media type (default view)
 //
 // Identifier: application/vnd.app.device.data+json; view=default

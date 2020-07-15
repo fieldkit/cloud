@@ -17,7 +17,7 @@ import ProjectView from "./views/ProjectView.vue";
 import StationsView from "./views/StationsView.vue";
 import ExploreView from "./views/viz/ExploreView.vue";
 
-import StationAdmin from "./views/admin/StationAdmin.vue";
+import AdminMain from "./views/admin/AdminMain.vue";
 
 import { Bookmark } from "./views/viz/viz";
 
@@ -221,13 +221,11 @@ const routes = [
         },
     },
     {
-        path: "/admin/stations/:stationId",
-        name: "adminStation",
-        component: StationAdmin,
+        path: "/admin",
+        name: "adminMain",
+        component: AdminMain,
         props: (route) => {
-            return {
-                id: Number(route.params.stationId),
-            };
+            return {};
         },
         meta: {
             admin: true,
