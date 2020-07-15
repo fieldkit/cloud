@@ -73,7 +73,8 @@ var User = MediaType("application/vnd.app.user+json", func() {
 		Attribute("email")
 		Attribute("bio")
 		Attribute("photo", UserPhoto)
-		Required("id", "name", "email", "bio")
+		Attribute("admin", Boolean)
+		Required("id", "name", "email", "bio", "admin")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -81,6 +82,7 @@ var User = MediaType("application/vnd.app.user+json", func() {
 		Attribute("email")
 		Attribute("bio")
 		Attribute("photo")
+		Attribute("admin")
 	})
 })
 

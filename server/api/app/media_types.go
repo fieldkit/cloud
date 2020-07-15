@@ -626,6 +626,7 @@ func (mt *Projects) Validate() (err error) {
 //
 // Identifier: application/vnd.app.user+json; view=default
 type User struct {
+	Admin bool       `form:"admin" json:"admin" yaml:"admin" xml:"admin"`
 	Bio   string     `form:"bio" json:"bio" yaml:"bio" xml:"bio"`
 	Email string     `form:"email" json:"email" yaml:"email" xml:"email"`
 	ID    int        `form:"id" json:"id" yaml:"id" xml:"id"`
@@ -645,6 +646,7 @@ func (mt *User) Validate() (err error) {
 	if mt.Bio == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "bio"))
 	}
+
 	if err2 := goa.ValidateFormat(goa.FormatEmail, mt.Email); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.email`, mt.Email, goa.FormatEmail, err2))
 	}

@@ -22,6 +22,7 @@ func UserType(user *data.User) *app.User {
 		Name:  user.Name,
 		Email: user.Email,
 		Bio:   user.Bio,
+		Admin: user.Admin,
 	}
 
 	if user.MediaURL != nil {
