@@ -84,6 +84,7 @@ export class DisplayStation {
     updated: Date;
     configurations: Configurations;
     receivedAt: Date | null = null;
+    deployedAt: Date | null = null;
     totalReadings = 0;
     location: Location | null = null;
     photos: Photos;
@@ -99,6 +100,7 @@ export class DisplayStation {
         this.photos = station.photos;
         this.placeNameOther = station.placeNameOther;
         this.placeNameNative = station.placeNameNative;
+        this.deployedAt = station.recordingStartedAt;
         this.modules =
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))

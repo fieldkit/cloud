@@ -17,6 +17,8 @@ import ProjectView from "./views/ProjectView.vue";
 import StationsView from "./views/StationsView.vue";
 import ExploreView from "./views/viz/ExploreView.vue";
 
+import NotesView from "./views/notes/NotesView.vue";
+
 import AdminMain from "./views/admin/AdminMain.vue";
 
 import { Bookmark } from "./views/viz/viz";
@@ -214,6 +216,30 @@ const routes = [
         props: (route) => {
             return {
                 bookmark: Object.assign(new Bookmark(1, []), JSON.parse(route.params.bookmark)),
+            };
+        },
+        meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/notes",
+        name: "viewNotes",
+        component: NotesView,
+        props: (route) => {
+            return {};
+        },
+        meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/notes/:stationId",
+        name: "viewStationNotes",
+        component: NotesView,
+        props: (route) => {
+            return {
+                id: Number(route.params.stationId),
             };
         },
         meta: {

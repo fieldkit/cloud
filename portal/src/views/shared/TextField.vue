@@ -1,7 +1,7 @@
 <template>
     <label class="has-float-label">
         <input :value="value" :type="type" @input="onInput" :placeholder="placeholder || label" />
-        <span>{{ label }}</span>
+        <span v-if="label">{{ label }}</span>
     </label>
 </template>
 
@@ -26,7 +26,7 @@ export default Vue.extend({
         },
         label: {
             type: String,
-            required: true,
+            required: false,
         },
     },
     methods: {

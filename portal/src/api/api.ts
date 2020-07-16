@@ -219,6 +219,7 @@ export interface Station {
     location: HasLocation | null;
     placeNameOther: string | null;
     placeNameNative: string | null;
+    recordingStartedAt: Date | null;
 }
 
 export interface ProjectsResponse {
@@ -810,6 +811,34 @@ class FKApi {
             method: "DELETE",
             url: this.baseUrl + "/admin/user",
             data: payload,
+        });
+    }
+
+    public getStationNotes(stationId: number): Promise<any> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + "/stations/" + stationId + "/notes",
+        });
+    }
+
+    public patchStationNotes(stationId: number, payload: any): Promise<any> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "PATCH",
+            url: this.baseUrl + "/stations/" + stationId + "/notes",
+            data: { notes: payload },
+        });
+    }
+
+    public uploadStationMedia(stationId: number, key: string, file: any): Promise<any> {
+        const qp = new URLSearchParams();
+        qp.append("key", key);
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/stations/" + stationId + "/media" + "?" + qp.toString(),
+            data: file,
         });
     }
 }
