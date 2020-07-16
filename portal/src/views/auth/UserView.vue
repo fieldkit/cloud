@@ -72,7 +72,7 @@ export default Vue.extend({
             console.log("form", form);
             this.loading = true;
             if (form.image) {
-                return this.$store.dispatch(ActionTypes.UPLOAD_USER_PHOTO, { type: form.image.type, image: form.image.image }).then(() => {
+                return this.$store.dispatch(ActionTypes.UPLOAD_USER_PHOTO, { type: form.image.type, file: form.image.file }).then(() => {
                     return this.$store.dispatch(ActionTypes.UPDATE_USER_PROFILE, { user: form }).then(() => {
                         this.loading = false;
                         this.notifySaved = true;

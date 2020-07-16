@@ -568,7 +568,7 @@ class FKApi {
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/user/media",
-            data: data.image,
+            data: data.file,
         });
     }
 
@@ -647,13 +647,13 @@ class FKApi {
         });
     }
 
-    uploadProjectImage(data) {
+    uploadProjectImage(payload) {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
-            url: this.baseUrl + "/projects/" + data.id + "/media",
-            contentType: data.type,
-            data: data.image,
+            url: this.baseUrl + "/projects/" + payload.id + "/media",
+            contentType: payload.type,
+            data: payload.file,
         });
     }
 

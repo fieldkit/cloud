@@ -129,7 +129,6 @@ export default Vue.extend({
             return this.$emit("change-password", this.changePasswordForm);
         },
         onImage(image) {
-            console.log("image", image);
             this.form.image = image;
         },
     },

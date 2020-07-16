@@ -214,7 +214,7 @@ export default Vue.extend({
                 return new FKApi().addProject(data).then((project) => {
                     const params = {
                         type: this.image.type,
-                        image: this.image.image,
+                        file: this.image.file,
                         id: project.id,
                     };
                     return new FKApi().uploadProjectImage(params).then(() => {
@@ -240,7 +240,7 @@ export default Vue.extend({
             if (this.image) {
                 const payload = {
                     type: this.image.type,
-                    image: this.image.image,
+                    file: this.image.file,
                     id: this.project.id,
                 };
                 return new FKApi().uploadProjectImage(payload).then(() => {

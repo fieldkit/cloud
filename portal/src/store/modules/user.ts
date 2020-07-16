@@ -48,7 +48,7 @@ const actions = {
         });
     },
     [ActionTypes.UPLOAD_USER_PHOTO]: ({ commit, dispatch, state }: ActionParameters, payload: any) => {
-        return new FkApi().uploadUserImage({ type: payload.type, image: payload.image }).then(() => {
+        return new FkApi().uploadUserImage({ type: payload.type, file: payload.file }).then(() => {
             return dispatch(ActionTypes.REFRESH_CURRENT_USER);
         });
     },
