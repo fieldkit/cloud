@@ -22,7 +22,7 @@ export function getUpdatedDate(station) {
 export function serializePromiseChain(all, fn) {
     return all.reduce((accum, value, index) => {
         return accum.then((allValues) => {
-            return fn(value, index).then((singleValue) => {
+            return Promise.resolve(fn(value, index)).then((singleValue) => {
                 allValues.push(singleValue);
                 return allValues;
             });
