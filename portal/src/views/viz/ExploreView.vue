@@ -3,7 +3,8 @@
         <div class="explore-view">
             <div class="explore-header">
                 <div class="left">
-                    <h2>Data Visualization</h2>
+                    <h2>Data View</h2>
+                    <h2>Data View</h2>
                 </div>
             </div>
 
