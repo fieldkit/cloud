@@ -8,12 +8,28 @@
                 <div class="side">
                     <StationTabs :stations="stations" :selected="selectedStation" @selected="onSelected" />
                 </div>
-                <div class="main" v-if="selectedStation && selectedNotes">
-                    <NotesForm :station="selectedStation" :notes="selectedNotes" @save="saveForm" v-bind:key="id" @change="onChange" />
-                </div>
-                <div v-else class="main empty">
-                    Please choose a station from the left.
-                </div>
+                <template v-if="loading">
+                    <div class="main">
+                        <Spinner />
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="main" v-if="selectedStation && selectedNotes">
+                        <div class="notifications">
+                            <div v-if="failed" class="notification failed">
+                                Oops, there was a problem.
+                            </div>
+
+                            <div v-if="success" class="notification success">
+                                Saved.
+                            </div>
+                        </div>
+                        <NotesForm :station="selectedStation" :notes="selectedNotes" @save="saveForm" v-bind:key="id" @change="onChange" />
+                    </div>
+                    <div v-else class="main empty">
+                        Please choose a station from the left.
+                    </div>
+                </template>
             </div>
         </div>
     </StandardLayout>
@@ -56,6 +72,9 @@ export default Vue.extend({
         return {
             notes: {},
             dirty: false,
+            loading: false,
+            success: false,
+            failed: false,
         };
     },
     computed: {
@@ -78,15 +97,15 @@ export default Vue.extend({
             return null;
         },
     },
+    watch: {
+        id(this: any) {
+            return this.loadNotes(this.id);
+        },
+    },
     mounted(this: any) {
-        return this.load(this.$store.state.stations.user.stations).then(() => {
-            return this.$store.watch(
-                (state) => state.stations.user.stations,
-                (newStations, oldStations) => {
-                    return this.load(newStations);
-                }
-            );
-        });
+        if (this.id) {
+            return this.loadNotes(this.id);
+        }
     },
     beforeRouteUpdate(this: any, to, from, next) {
         console.log("router: update");
@@ -101,14 +120,14 @@ export default Vue.extend({
         }
     },
     methods: {
-        load(this: any, stations: any[]) {
-            return Promise.all(
-                stations.map((station) => {
-                    return new FKApi().getStationNotes(station.id).then((notes) => {
-                        Vue.set(this.notes, station.id, notes);
-                    });
-                })
-            );
+        loadNotes(this: any, stationId: number) {
+            this.success = false;
+            this.failed = false;
+            Vue.set(this, "loading", true);
+            return new FKApi().getStationNotes(stationId).then((notes) => {
+                Vue.set(this.notes, stationId, notes);
+                Vue.set(this, "loading", false);
+            });
         },
         onSelected(this: any, station) {
             if (this.id != station.id) {
@@ -135,6 +154,9 @@ export default Vue.extend({
             return true;
         },
         saveForm(this: any, formNotes: Notes) {
+            this.success = false;
+            this.failed = false;
+
             return serializePromiseChain(formNotes.addedPhotos, (photo) => {
                 return new FKApi().uploadStationMedia(this.id, photo.key, photo.file).then((media) => {
                     console.log(media);
@@ -145,9 +167,11 @@ export default Vue.extend({
                 return new FKApi().patchStationNotes(this.id, payload).then(
                     (updated) => {
                         this.dirty = false;
+                        this.success = true;
                         console.log("success", updated);
                     },
                     () => {
+                        this.failed = true;
                         console.log("failed");
                     }
                 );
@@ -188,5 +212,28 @@ export default Vue.extend({
 }
 .notes-view .lower .main.empty {
     padding: 20px;
+}
+
+.notification.success {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 2px;
+    border-radius: 4px;
+}
+.notification.success {
+    background-color: #d4edda;
+}
+.notification.failed {
+    background-color: #f8d7da;
+}
+.notifications {
+    padding: 10px;
+}
+
+.spinner {
+    margin-top: 40px;
+    margin-left: auto;
+    margin-right: auto;
 }
 </style>
