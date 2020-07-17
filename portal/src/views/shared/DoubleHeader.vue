@@ -2,10 +2,10 @@
     <div class="double-header">
         <div class="back">
             <span class="small-arrow">&lt;</span>
-            Back to dashboard
+            {{ backTitle }}
         </div>
-        <div class="one">Field Notes</div>
-        <div class="two">Project Name</div>
+        <div class="one">{{ title }}</div>
+        <div class="two">{{ subtitle }}</div>
     </div>
 </template>
 
@@ -18,11 +18,15 @@ export default Vue.extend({
     props: {
         title: {
             type: String,
-            default: "",
+            required: true,
         },
         subtitle: {
             type: String,
-            default: "",
+            required: true,
+        },
+        backTitle: {
+            type: String,
+            required: true,
         },
     },
     methods: {},
@@ -41,6 +45,7 @@ export default Vue.extend({
     letter-spacing: 0.06px;
     color: #2c3e50;
     margin-bottom: 20px;
+    cursor: pointer;
 }
 .one {
     font-weight: 900;

@@ -2,7 +2,7 @@
     <StandardLayout>
         <div class="notes-view">
             <div class="header">
-                <DoubleHeader />
+                <DoubleHeader title="Project" subtitle="Field Notes" backTitle="Back to dashboard" />
             </div>
             <div class="lower">
                 <div class="side">
