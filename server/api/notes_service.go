@@ -37,6 +37,8 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 		}
 
 		note := &data.Note{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 			StationID: payload.StationID,
 			AuthorID:  p.UserID(),
 			Key:       webNote.Key,
@@ -44,8 +46,8 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 		}
 
 		if err := s.options.Database.NamedGetContext(ctx, note, `
-			INSERT INTO fieldkit.notes (station_id, author_id, created_at, key, body) VALUES
-			(:station_id, :author_id, :created_at, :key, :body) RETURNING *
+			INSERT INTO fieldkit.notes (station_id, author_id, created_at, updated_at, key, body) VALUES
+			(:station_id, :author_id, :created_at, :updated_at, :key, :body) RETURNING *
 		`, note); err != nil {
 			return nil, err
 		}
@@ -69,6 +71,7 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 
 		note := &data.Note{
 			ID:        webNote.ID,
+			UpdatedAt: time.Now(),
 			StationID: payload.StationID,
 			AuthorID:  p.UserID(),
 			Key:       webNote.Key,
@@ -76,7 +79,7 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 		}
 
 		if err := s.options.Database.NamedGetContext(ctx, note, `
-			UPDATE fieldkit.notes SET key = :key, body = :body WHERE id = :id RETURNING *
+			UPDATE fieldkit.notes SET key = :key, body = :body, updated_at = :updated_at WHERE id = :id RETURNING *
 		`, note); err != nil {
 			return nil, err
 		}
@@ -175,9 +178,11 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 		}
 		webNotes = append(webNotes, &notes.FieldNote{
 			ID:        n.ID,
-			CreatedAt: n.Created.Unix() * 1000,
+			CreatedAt: n.CreatedAt.Unix() * 1000,
+			UpdatedAt: n.UpdatedAt.Unix() * 1000,
 			Author:    byID[n.AuthorID],
 			Media:     media,
+			Version:   n.Version,
 			Key:       n.Key,
 			Body:      n.Body,
 		})

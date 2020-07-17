@@ -569,8 +569,10 @@ func marshalNotesviewsFieldNoteViewToFieldNoteResponseBody(v *notesviews.FieldNo
 	res := &FieldNoteResponseBody{
 		ID:        *v.ID,
 		CreatedAt: *v.CreatedAt,
+		UpdatedAt: *v.UpdatedAt,
 		Key:       v.Key,
 		Body:      v.Body,
+		Version:   *v.Version,
 	}
 	if v.Author != nil {
 		res.Author = marshalNotesviewsFieldNoteAuthorViewToFieldNoteAuthorResponseBody(v.Author)

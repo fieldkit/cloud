@@ -54,8 +54,10 @@ type FieldNoteMedia struct {
 type Note struct {
 	ID        int64     `db:"id,omitempty"`
 	StationID int32     `db:"station_id"`
-	Created   time.Time `db:"created_at"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 	AuthorID  int32     `db:"author_id"`
+	Version   int64     `db:"version"`
 	Key       *string   `db:"key"`
 	Body      *string   `db:"body"`
 }

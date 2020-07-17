@@ -30,11 +30,13 @@ var FieldNoteAuthor = Type("FieldNoteAuthor", func() {
 var FieldNote = Type("FieldNote", func() {
 	Attribute("id", Int64)
 	Attribute("createdAt", Int64)
+	Attribute("updatedAt", Int64)
 	Attribute("author", FieldNoteAuthor)
 	Attribute("key", String)
 	Attribute("body", String)
+	Attribute("version", Int64)
 	Attribute("media", ArrayOf(NoteMedia))
-	Required("id", "createdAt", "author", "media")
+	Required("id", "createdAt", "updatedAt", "author", "media", "version")
 })
 
 var ExistingFieldNote = Type("ExistingFieldNote", func() {

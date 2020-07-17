@@ -131,9 +131,11 @@ type NewFieldNoteRequestBody struct {
 type FieldNoteResponseBody struct {
 	ID        *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	CreatedAt *int64                       `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
+	UpdatedAt *int64                       `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
 	Author    *FieldNoteAuthorResponseBody `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
 	Key       *string                      `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	Body      *string                      `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	Version   *int64                       `form:"version,omitempty" json:"version,omitempty" xml:"version,omitempty"`
 	Media     []*NoteMediaResponseBody     `form:"media,omitempty" json:"media,omitempty" xml:"media,omitempty"`
 }
 
@@ -337,11 +339,17 @@ func ValidateFieldNoteResponseBody(body *FieldNoteResponseBody) (err error) {
 	if body.CreatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("createdAt", "body"))
 	}
+	if body.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "body"))
+	}
 	if body.Author == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
 	}
 	if body.Media == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("media", "body"))
+	}
+	if body.Version == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("version", "body"))
 	}
 	if body.Author != nil {
 		if err2 := ValidateFieldNoteAuthorResponseBody(body.Author); err2 != nil {

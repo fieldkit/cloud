@@ -109,9 +109,11 @@ type UploadUnauthorizedResponseBody string
 type FieldNoteResponseBody struct {
 	ID        int64                        `form:"id" json:"id" xml:"id"`
 	CreatedAt int64                        `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	UpdatedAt int64                        `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 	Author    *FieldNoteAuthorResponseBody `form:"author" json:"author" xml:"author"`
 	Key       *string                      `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	Body      *string                      `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	Version   int64                        `form:"version" json:"version" xml:"version"`
 	Media     []*NoteMediaResponseBody     `form:"media" json:"media" xml:"media"`
 }
 

@@ -37,9 +37,11 @@ type FieldNotesView struct {
 type FieldNoteView struct {
 	ID        *int64
 	CreatedAt *int64
+	UpdatedAt *int64
 	Author    *FieldNoteAuthorView
 	Key       *string
 	Body      *string
+	Version   *int64
 	Media     []*NoteMediaView
 }
 
@@ -136,11 +138,17 @@ func ValidateFieldNoteView(result *FieldNoteView) (err error) {
 	if result.CreatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("createdAt", "result"))
 	}
+	if result.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "result"))
+	}
 	if result.Author == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("author", "result"))
 	}
 	if result.Media == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("media", "result"))
+	}
+	if result.Version == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("version", "result"))
 	}
 	if result.Author != nil {
 		if err2 := ValidateFieldNoteAuthorView(result.Author); err2 != nil {

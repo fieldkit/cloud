@@ -1068,7 +1068,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes get --station-id 1079511492 --auth "Aut provident porro ut."
+    `+os.Args[0]+` notes get --station-id 1827134368 --auth "Sint quis occaecati sequi aut provident porro."
 `, os.Args[0])
 }
 

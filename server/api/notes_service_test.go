@@ -50,6 +50,8 @@ func TestCreateStationNotes(t *testing.T) {
 			"key": "key-1",
 			"body": "Hello, world!",
 			"createdAt": "<<PRESENCE>>",
+			"updatedAt": "<<PRESENCE>>",
+			"version": "<<PRESENCE>>",
 			"author": "<<PRESENCE>>",
 			"media": []
 		}],
@@ -104,6 +106,8 @@ func TestUpdateStationNotes(t *testing.T) {
 			"key": "key-2",
 			"body": "Jacob",
 			"createdAt": "<<PRESENCE>>",
+			"updatedAt": "<<PRESENCE>>",
+			"version": "<<PRESENCE>>",
 			"author": "<<PRESENCE>>",
 			"media": []
 		}]

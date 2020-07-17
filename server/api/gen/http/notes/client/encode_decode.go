@@ -697,8 +697,10 @@ func unmarshalFieldNoteResponseBodyToNotesviewsFieldNoteView(v *FieldNoteRespons
 	res := &notesviews.FieldNoteView{
 		ID:        v.ID,
 		CreatedAt: v.CreatedAt,
+		UpdatedAt: v.UpdatedAt,
 		Key:       v.Key,
 		Body:      v.Body,
+		Version:   v.Version,
 	}
 	res.Author = unmarshalFieldNoteAuthorResponseBodyToNotesviewsFieldNoteAuthorView(v.Author)
 	res.Media = make([]*notesviews.NoteMediaView, len(v.Media))
