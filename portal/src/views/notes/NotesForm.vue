@@ -38,7 +38,7 @@ import NewPhoto from "../../assets/placeholder_station_thumbnail.png";
 
 import { required } from "vuelidate/lib/validators";
 
-import { Notes, AddedPhoto } from "./model";
+import { Notes, AddedPhoto, NoteMedia } from "./model";
 
 import { makeAuthenticatedApiUrl } from "@/api/api";
 
@@ -74,7 +74,7 @@ export default Vue.extend({
     },
     computed: {
         photos(this: any) {
-            return this.notes.media;
+            return NoteMedia.onlyPhotos(this.notes.media);
         },
     },
     mounted(this: any) {
