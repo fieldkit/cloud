@@ -2,11 +2,24 @@
     <StandardLayout>
         <div class="notes-view">
             <div class="header">
-                <DoubleHeader title="Project" subtitle="Field Notes" backTitle="Back to dashboard" />
+                <DoubleHeader
+                    :title="project.name"
+                    subtitle="Field Notes"
+                    backTitle="Back to dashboard"
+                    backRoute="projects"
+                    v-if="project"
+                />
+                <DoubleHeader
+                    title="My Stations"
+                    subtitle="Field Notes"
+                    backTitle="Back to dashboard"
+                    backRoute="projects"
+                    v-if="!project"
+                />
             </div>
             <div class="lower">
                 <div class="side">
-                    <StationTabs :stations="stations" :selected="selectedStation" @selected="onSelected" />
+                    <StationTabs :stations="visibleStations" :selected="selectedStation" @selected="onSelected" />
                 </div>
                 <template v-if="loading">
                     <div class="main">
@@ -24,7 +37,13 @@
                                 Saved.
                             </div>
                         </div>
-                        <NotesForm :station="selectedStation" :notes="selectedNotes" @save="saveForm" v-bind:key="id" @change="onChange" />
+                        <NotesForm
+                            :station="selectedStation"
+                            :notes="selectedNotes"
+                            @save="saveForm"
+                            v-bind:key="stationId"
+                            @change="onChange"
+                        />
                     </div>
                     <div v-else class="main empty">
                         Please choose a station from the left.
@@ -63,7 +82,11 @@ export default Vue.extend({
         NotesForm,
     },
     props: {
-        id: {
+        projectId: {
+            type: Number,
+            required: false,
+        },
+        stationId: {
             type: Number,
             required: false,
         },
@@ -84,28 +107,52 @@ export default Vue.extend({
             stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
         }),
+        project() {
+            if (this.projectId) {
+                return this.$getters.projectsById[this.projectId];
+            }
+            return null;
+        },
+        visibleStations() {
+            if (this.projectId) {
+                const project = this.$getters.projectsById[this.projectId];
+                if (project) {
+                    return project.stations;
+                }
+                return [];
+            }
+            return this.$store.state.stations.user.stations;
+        },
         selectedStation() {
-            if (this.id && this.stations) {
-                return _.first(this.stations.filter((station) => station.id == this.id));
+            if (this.stationId) {
+                const station = this.$getters.stationsById[this.stationId];
+                if (station) {
+                    return station;
+                }
             }
             return null;
         },
         selectedNotes() {
-            if (this.id && this.notes) {
-                return this.notes[this.id];
+            if (this.stationId && this.notes) {
+                return this.notes[this.stationId];
             }
             return null;
         },
     },
     watch: {
-        id(this: any) {
-            return this.loadNotes(this.id);
+        stationId(this: any) {
+            return this.loadNotes(this.stationId);
         },
     },
     mounted(this: any) {
-        if (this.id) {
-            return this.loadNotes(this.id);
+        const pending = [];
+        if (this.projectId) {
+            pending.push(this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId }));
         }
+        if (this.stationId) {
+            pending.push(this.loadNotes(this.stationId));
+        }
+        return Promise.all(pending);
     },
     beforeRouteUpdate(this: any, to, from, next) {
         console.log("router: update");
@@ -130,10 +177,11 @@ export default Vue.extend({
             });
         },
         onSelected(this: any, station) {
-            if (this.id != station.id) {
+            if (this.stationId != station.id) {
                 return this.$router.push({
-                    name: "viewStationNotes",
+                    name: this.projectId ? "viewProjectStationNotes" : "viewStationNotes",
                     params: {
+                        projectId: this.projectId,
                         stationId: station.id,
                     },
                 });
@@ -144,7 +192,7 @@ export default Vue.extend({
         },
         maybeConfirmLeave() {
             if (this.dirty) {
-                if (window.confirm("Do you really want to leave? you have unsaved changes!")) {
+                if (window.confirm("You may have unsaved changes, are you sure you'd like to leave?")) {
                     this.dirty = false;
                     return true;
                 } else {
@@ -158,13 +206,13 @@ export default Vue.extend({
             this.failed = false;
 
             return serializePromiseChain(formNotes.addedPhotos, (photo) => {
-                return new FKApi().uploadStationMedia(this.id, photo.key, photo.file).then((media) => {
+                return new FKApi().uploadStationMedia(this.stationId, photo.key, photo.file).then((media) => {
                     console.log(media);
                     return [];
                 });
             }).then(() => {
-                const payload = mergeNotes(this.notes[this.id], formNotes);
-                return new FKApi().patchStationNotes(this.id, payload).then(
+                const payload = mergeNotes(this.notes[this.stationId], formNotes);
+                return new FKApi().patchStationNotes(this.stationId, payload).then(
                     (updated) => {
                         this.dirty = false;
                         this.success = true;

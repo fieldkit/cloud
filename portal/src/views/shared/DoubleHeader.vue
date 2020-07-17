@@ -1,6 +1,6 @@
 <template>
     <div class="double-header">
-        <div class="back">
+        <div class="back" v-on:click="onBack">
             <span class="small-arrow">&lt;</span>
             {{ backTitle }}
         </div>
@@ -14,7 +14,6 @@ import Vue from "vue";
 
 export default Vue.extend({
     name: "DoubleHeader",
-    components: {},
     props: {
         title: {
             type: String,
@@ -28,8 +27,16 @@ export default Vue.extend({
             type: String,
             required: true,
         },
+        backRoute: {
+            type: String,
+            required: true,
+        },
     },
-    methods: {},
+    methods: {
+        onBack() {
+            this.$router.push({ name: this.backRoute });
+        },
+    },
 });
 </script>
 

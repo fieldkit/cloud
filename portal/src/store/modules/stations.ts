@@ -160,6 +160,7 @@ export class MappedStations {
 
 export class DisplayProject {
     id: number;
+    name: string;
     modules: ProjectModule[];
     duration: number | null = null;
     mapped: MappedStations;
@@ -172,6 +173,7 @@ export class DisplayProject {
         public readonly activities: Activity[]
     ) {
         this.id = project.id;
+        this.name = project.name;
         this.modules = _(stations)
             .filter((station) => station.configurations.all.length > 0)
             .map((station) => station.configurations.all[0].modules.filter((m) => !m.internal))

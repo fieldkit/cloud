@@ -25,7 +25,7 @@ export default Vue.extend({
         },
         placeholder: {
             type: String,
-            required: true,
+            required: false,
         },
         allowPreview: {
             type: Boolean,

@@ -223,8 +223,35 @@ const routes = [
         },
     },
     {
+        path: "/dashboard/projects/:projectId/notes",
+        name: "viewProjectNotes",
+        component: NotesView,
+        props: (route) => {
+            return {
+                projectId: Number(route.params.projectId),
+            };
+        },
+        meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/dashboard/projects/:projectId/notes/:stationId",
+        name: "viewProjectStationNotes",
+        component: NotesView,
+        props: (route) => {
+            return {
+                projectId: Number(route.params.projectId),
+                stationId: Number(route.params.stationId),
+            };
+        },
+        meta: {
+            secured: true,
+        },
+    },
+    {
         path: "/notes",
-        name: "viewNotes",
+        name: "viewMyNotes",
         component: NotesView,
         props: (route) => {
             return {};
@@ -239,7 +266,7 @@ const routes = [
         component: NotesView,
         props: (route) => {
             return {
-                id: Number(route.params.stationId),
+                stationId: Number(route.params.stationId),
             };
         },
         meta: {

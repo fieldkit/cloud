@@ -14,6 +14,10 @@
                     <img alt="Default FieldKit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
                 </div>
 
+                <DisplayProjectTags :tags="project.tags" />
+
+                <div v-on:click="openProjectNotes" class="link">View Field Notes</div>
+
                 <div class="follow-btn"></div>
             </div>
 
@@ -26,7 +30,6 @@
                     <div class="details-left">
                         <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
                         <div class="project-detail">{{ project.description }}</div>
-                        <DisplayProjectTags :tags="project.tags" />
                     </div>
                     <div class="details-right">
                         <div class="time-container" v-if="project.startTime">
@@ -256,6 +259,9 @@ export default {
             }
             return null;
         },
+        openProjectNotes() {
+            return this.$router.push({ name: "viewProjectNotes", params: { projectId: this.project.id } });
+        },
         editProject() {
             return this.$router.push({ name: "editProject", params: { id: this.project.id } });
         },
@@ -393,7 +399,7 @@ export default {
     font-weight: bold;
     padding-bottom: 20px;
 }
-.details .details-heading .link {
+.link {
     margin-left: auto;
     font-weight: bold;
     padding-bottom: 20px;
