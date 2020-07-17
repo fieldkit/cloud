@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export function getUpdatedDate(station) {
     let date = null;
     // try more accurate first: lastUploads
@@ -162,7 +164,8 @@ export function tryParseTags(rawTags: string) {
     }
     try {
         const hopefullyArray = JSON.parse(rawTags);
-        return hopefullyArray.map((text) => {
+        const array = _.isArray(hopefullyArray) ? hopefullyArray : [hopefullyArray];
+        return array.map((text) => {
             return {
                 text: text,
             };
