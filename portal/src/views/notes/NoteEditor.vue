@@ -2,10 +2,16 @@
     <div class="note-editor">
         <div class="title">{{ note.help.title }}</div>
         <div class="field" v-if="!readOnly">
-            <TextField v-model="body" @input="v.$touch()" />
+            <TextAreaField v-model="body" @input="v.$touch()" />
         </div>
         <div class="field" v-if="readOnly">
             {{ note.body }}
+        </div>
+        <div class="attached-audio" v-for="audio in note.audio" v-bind:key="audio.key">
+            <div class="audio-title">
+                {{ audio.key }}
+            </div>
+            <VueAudio :file="makeAudioUrl(audio)" />
         </div>
     </div>
 </template>
@@ -13,10 +19,11 @@
 <script lang="ts">
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
+import VueAudio from "vue-audio";
 
 import { required } from "vuelidate/lib/validators";
 
-import FKApi from "@/api/api";
+import FKApi, { makeAuthenticatedApiUrl } from "@/api/api";
 
 export default Vue.extend({
     model: {
@@ -26,6 +33,7 @@ export default Vue.extend({
     name: "NoteEditor",
     components: {
         ...CommonComponents,
+        VueAudio,
     },
     props: {
         readOnly: {
@@ -51,7 +59,11 @@ export default Vue.extend({
             },
         },
     },
-    methods: {},
+    methods: {
+        makeAudioUrl(audio) {
+            return makeAuthenticatedApiUrl(audio.url);
+        },
+    },
 });
 </script>
 
@@ -67,5 +79,21 @@ export default Vue.extend({
 .field {
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+.attached-audio {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 10px;
+    border: 2px solid #d8dce0;
+    border-radius: 4px;
+    background-color: #fcfcfc;
+    padding: 8px;
+}
+
+.audio-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 10px;
 }
 </style>

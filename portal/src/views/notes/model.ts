@@ -51,7 +51,25 @@ export class NoteHelp {
     constructor(public readonly title: string) {}
 }
 
-export class NoteMedia {}
+export class NoteMedia {
+    constructor(public readonly key: string) {}
+
+    public static onlyAudio(media: NoteMedia[]): NoteMedia[] {
+        return media.filter(NoteMedia.isAudio);
+    }
+
+    public static onlyPhotos(media: NoteMedia[]): NoteMedia[] {
+        return media.filter(NoteMedia.isPhoto);
+    }
+
+    public static isPhoto(nm: NoteMedia): boolean {
+        return !NoteMedia.isAudio(nm);
+    }
+
+    public static isAudio(nm: NoteMedia): boolean {
+        return /(m4a|caf)$/.test(nm.key.toLowerCase());
+    }
+}
 
 export class NoteForm {
     constructor(
@@ -99,7 +117,11 @@ export class Notes {
             if (!formNotes[key]) {
                 throw new Error("unexpected note");
             }
-            formNotes[key].body = portalNote.body;
+            Object.assign(formNotes[key], {
+                photos: NoteMedia.onlyPhotos(portalNote.media),
+                audio: NoteMedia.onlyAudio(portalNote.media),
+                body: portalNote.body,
+            });
             return formNotes;
         }, new Notes());
     }
