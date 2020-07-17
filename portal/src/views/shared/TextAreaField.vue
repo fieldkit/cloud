@@ -65,7 +65,6 @@ export default Vue.extend({
     },
     methods: {
         onInput(ev) {
-            console.log("HI");
             this.$emit("input", ev.target.value);
         },
     },
