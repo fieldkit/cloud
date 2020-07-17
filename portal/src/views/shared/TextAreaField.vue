@@ -1,14 +1,8 @@
 <template>
     <label class="has-float-label">
         <ResizeAuto>
-            <template v-slot:default="{ resize }">
-                <textarea
-                    rows="2"
-                    :value="value"
-                    :type="type"
-                    :placeholder="placeholder || label"
-                    @input="(ev) => resize(ev) || onInput(ev)"
-                />
+            <template v-slot:default="{}">
+                <textarea rows="2" :value="value" :type="type" :placeholder="placeholder || label" @input="(ev) => onInput(ev)" />
             </template>
         </ResizeAuto>
         <span v-if="label">{{ label }}</span>
@@ -21,16 +15,27 @@ import Vue, { PropType } from "vue";
 const ResizeAuto = Vue.extend({
     name: "ResizeAuto",
     methods: {
-        resize(event) {
-            event.target.style.height = "auto";
-            event.target.style.height = `${event.target.scrollHeight}px`;
+        resize(ev) {
+            ev.target.style.height = "auto";
+            ev.target.style.height = `${ev.target.scrollHeight}px`;
         },
     },
     mounted() {
         this.$nextTick(() => {
             const el: any = this.$el;
-            el.setAttribute("style", "height", `${this.$el.scrollHeight}px`);
+            el.setAttribute("style", "height:" + this.$el.scrollHeight + "px");
         });
+
+        this.$el.addEventListener("input", this.resize);
+    },
+    updated() {
+        this.$nextTick(() => {
+            const el: any = this.$el;
+            el.setAttribute("style", "height:" + this.$el.scrollHeight + "px");
+        });
+    },
+    beforeDestroy() {
+        this.$el.removeEventListener("input", this.resize);
     },
     render(this: any) {
         return this.$scopedSlots.default({
