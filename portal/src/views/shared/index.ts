@@ -4,6 +4,7 @@ import TextField from "./TextField.vue";
 import LatestStationReadings from "./LatestStationReadings.vue";
 import DisplayProjectTags from "./DisplayProjectTags.vue";
 import DoubleHeader from "./DoubleHeader.vue";
+import Spinner from "./Spinner.vue";
 
 export default {
     UserPhoto,
@@ -12,4 +13,5 @@ export default {
     LatestStationReadings,
     DisplayProjectTags,
     DoubleHeader,
+    Spinner,
 };

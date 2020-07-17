@@ -1,5 +1,5 @@
 <template>
-    <div class="loader"></div>
+    <div class="spinner loader"></div>
 </template>
 
 <script lang="ts">
