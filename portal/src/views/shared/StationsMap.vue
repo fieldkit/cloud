@@ -20,7 +20,7 @@
 
 <script>
 import Mapbox from "mapbox-gl-vue";
-import Config from "../secrets";
+import Config from "@/secrets";
 
 export default {
     name: "StationsMap",

@@ -24,8 +24,8 @@
 
 <script lang="ts">
 import Vue from "@/store/strong-vue";
-import HeaderBar from "../components/HeaderBar.vue";
-import SidebarNav from "../components/SidebarNav.vue";
+import HeaderBar from "./shared/HeaderBar.vue";
+import SidebarNav from "./shared/SidebarNav.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";

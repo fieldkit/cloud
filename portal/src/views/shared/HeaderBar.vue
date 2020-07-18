@@ -2,7 +2,7 @@
     <div id="white-header" class="header">
         <div class="header-inner-section">
             <div class="menu-icon-container">
-                <img alt="Menu icon" src="../assets/menu.png" v-on:click="toggleSidebar" />
+                <img alt="Menu icon" src="@/assets/menu.png" v-on:click="toggleSidebar" />
             </div>
             <div class="text-elements">
                 <div class="user-name">

@@ -86,8 +86,7 @@
 
 <script>
 import _ from "lodash";
-import * as utils from "../utilities";
-import FKApi from "../api/api";
+import * as utils from "@/utilities";
 import { makeAuthenticatedApiUrl } from "@/api/api";
 import { BookmarkFactory } from "@/views/viz/viz";
 import CommonComponents from "@/views/shared";

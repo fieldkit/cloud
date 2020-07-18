@@ -5,7 +5,7 @@
             <StationSummary v-if="activeStation" class="summary-container" @close="closeSummary" :station="activeStation" />
             <div v-if="isAuthenticated && showNoStationsMessage && hasNoStations" id="no-stations">
                 <div id="close-notice-btn" v-on:click="closeNotice">
-                    <img alt="Close" src="../assets/close.png" />
+                    <img alt="Close" src="@/assets/close.png" />
                 </div>
                 <p class="heading">Add a New Station</p>
                 <p class="text">
@@ -13,10 +13,10 @@
                     your account.
                 </p>
                 <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
-                    <img alt="App store" src="../assets/appstore.png" class="app-btn" />
+                    <img alt="App store" src="@/assets/appstore.png" class="app-btn" />
                 </a>
                 <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
-                    <img alt="Google Play" src="../assets/googleplay.png" class="app-btn" />
+                    <img alt="Google Play" src="@/assets/googleplay.png" class="app-btn" />
                 </a>
             </div>
         </div>
@@ -26,8 +26,8 @@
 <script lang="ts">
 import Vue from "vue";
 import StandardLayout from "./StandardLayout.vue";
-import StationSummary from "../components/StationSummary.vue";
-import StationsMap from "../components/StationsMap.vue";
+import StationSummary from "./shared/StationSummary.vue";
+import StationsMap from "./shared/StationsMap.vue";
 
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";

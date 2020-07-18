@@ -52,8 +52,8 @@ import Vue from "vue";
 import * as utils from "../../utilities";
 import * as ActionTypes from "@/store/actions";
 import FKApi from "@/api/api";
-import StationSummary from "@/components/StationSummary.vue";
-import StationsMap from "@/components/StationsMap.vue";
+import StationSummary from "@/views/shared/StationSummary.vue";
+import StationsMap from "@/views/shared/StationsMap.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
 import TinyStation from "@/views/shared/TinyStation.vue";
 
