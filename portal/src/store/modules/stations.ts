@@ -24,7 +24,7 @@ export const PROJECT_FOLLOWS = "PROJECT_FOLLOWS";
 export const PROJECT_STATIONS = "PROJECT_STATIONS";
 export const PROJECT_ACTIVITY = "PROJECT_ACTIVITY";
 export const STATION_UPDATE = "STATION_UPDATE";
-export const PROJECT_UPDATE = "STATION_UPDATE";
+export const PROJECT_UPDATE = "PROJECT_UPDATE";
 
 export class StationsState {
     stations: { [index: number]: DisplayStation } = {};
