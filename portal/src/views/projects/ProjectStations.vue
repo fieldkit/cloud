@@ -1,18 +1,11 @@
 <template>
     <div class="stations-container">
+        <StationPickerModal :stations="userStations" @add="onAddStation" @close="onCloseStationPicker" v-if="addingStation" />
         <div class="section-heading stations-heading">
             FieldKit Stations
-            <div class="add-station" v-on:click="showStationSelect" v-if="admin && !addingStation">
+            <div class="add-station" v-on:click="showStationPicker" v-if="admin">
                 <img src="@/assets/add.png" class="add-station-btn" />
                 Add Station
-            </div>
-            <div class="station-dropdown" v-if="addingStation">
-                Add a station:
-                <select v-model="selectedStationId" v-on:change="stationSelected">
-                    <option v-for="station in userStations" v-bind:value="station.id" v-bind:key="station.id">
-                        {{ station.name }}
-                    </option>
-                </select>
             </div>
         </div>
         <div class="section-body">
@@ -62,11 +55,13 @@ import * as ActionTypes from "@/store/actions";
 import FKApi from "@/api/api";
 import StationSummary from "@/components/StationSummary";
 import StationsMap from "@/components/StationsMap";
+import StationPickerModal from "@/views/shared/StationPickerModal.vue";
 
 export default {
     name: "ProjectStations",
     components: {
         StationSummary,
+        StationPickerModal,
         StationsMap,
     },
     data: () => {
@@ -75,7 +70,6 @@ export default {
             following: false,
             showStationsList: true,
             addingStation: false,
-            selectedStationId: null,
             summarySize: {
                 width: "359px",
                 top: "-300px",
@@ -108,15 +102,20 @@ export default {
         showStation(station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
         },
-        showStationSelect() {
+        showStationPicker() {
             this.addingStation = true;
         },
-        async stationSelected() {
+        onAddStation(stationId) {
+            this.addingStation = false;
+
             const payload = {
                 projectId: this.project.id,
-                stationId: this.selectedStationId,
+                stationId: stationId,
             };
-            await this.$store.dispatch(ActionTypes.STATION_PROJECT_ADD, payload);
+            return this.$store.dispatch(ActionTypes.STATION_PROJECT_ADD, payload);
+        },
+        onCloseStationPicker() {
+            this.addingStation = false;
         },
         async deleteStation(station) {
             if (window.confirm("Are you sure you want to remove this station?")) {
@@ -212,12 +211,6 @@ export default {
 .add-station-btn {
     width: 18px;
     vertical-align: text-top;
-}
-.station-dropdown select {
-    font-size: 16px;
-    border: 1px solid lightgray;
-    border-radius: 4px;
-    padding: 2px 4px;
 }
 .last-seen {
     font-size: 12px;

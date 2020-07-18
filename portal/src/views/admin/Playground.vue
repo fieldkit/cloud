@@ -1,7 +1,7 @@
 <template>
     <StandardLayout>
         <button v-on:click="onToggle">Modal</button>
-        <StationPickerModal :stations="stations" :open="modalOpen" @close="onToggle" v-if="modalOpen" />
+        <StationPickerModal :stations="stations" @close="onToggle" v-if="modalOpen" />
     </StandardLayout>
 </template>
 

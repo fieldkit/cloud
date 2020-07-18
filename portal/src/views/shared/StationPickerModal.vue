@@ -2,7 +2,7 @@
     <div class="modal-mask">
         <div class="modal-wrapper">
             <div class="modal-container">
-                <StationPicker :stations="stations" @add="(data) => $emit('add', data)" @close="$emit('close')" />
+                <StationPicker :stations="stations" @add="(id) => $emit('add', id)" @close="$emit('close')" />
             </div>
         </div>
     </div>
@@ -20,10 +20,6 @@ export default Vue.extend({
     props: {
         stations: {
             type: Array,
-            required: true,
-        },
-        open: {
-            type: Boolean,
             required: true,
         },
     },
