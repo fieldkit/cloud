@@ -49,10 +49,10 @@ export default Vue.extend({
         },
     },
     computed: {
-        stations() {
+        stations(this: any) {
             return this.displayProject.stations;
         },
-        visibleStation() {
+        visibleStation(this: any) {
             if (this.displayProject.stations.length > 0) {
                 return this.displayProject.stations[this.index];
             }
