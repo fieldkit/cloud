@@ -1,213 +1,96 @@
 <template>
     <div class="readings-container">
         <div class="heading">Latest Readings</div>
-        <div class="station-name">
-            {{ currentStation.name }}
-        </div>
-        <div v-if="!modules || modules.length == 0" class="no-readings">
-            No readings uploaded yet
-        </div>
-        <div class="sensors-container">
-            <div v-for="(module, moduleIndex) in modules" v-bind:key="module.id">
-                <div
-                    v-for="(sensor, sensorIndex) in module.sensors"
-                    v-bind:key="sensor.id"
-                    :class="getCounter(moduleIndex, sensorIndex) % 2 == 1 ? 'left-reading' : 'right-reading'"
-                >
-                    <div class="left sensor-name">{{ getSensorName(module, sensor) }}</div>
-                    <div class="right sensor-unit">
-                        {{ sensor.unit_of_measure }}
-                    </div>
-                    <div class="right sensor-reading">
-                        {{ getReading(sensor) }}
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <Pagination
-            class="pagination-section"
-            :currentPage="currentIndex"
-            :pageCount="pageCount"
-            :numVisiblePages="stationsPerPage"
-            @nextPage="onPageChange('next')"
-            @previousPage="onPageChange('previous')"
-            @loadPage="onPageChange"
-        />
+        <template v-if="!stations.length">
+            <div class="empty-project">
+                There are no stations in this project.
+            </div>
+        </template>
+        <template v-else>
+            <div class="station-name">
+                {{ visibleStation.name }}
+            </div>
+            <div class="sensors-container">
+                <LatestStationReadings :id="visibleStation.id" />
+            </div>
+            <div class="pagination">
+                <PaginationControls :page="index" :totalPages="stations.length" @new-page="onNewStation" />
+            </div>
+        </template>
     </div>
 </template>
 
-<script>
-import FKApi from "@/api/api";
-import * as utils from "@/utilities";
-import Pagination from "@/components/Pagination";
+<script lang="ts">
+import Vue from "vue";
 
-export default {
+import LatestStationReadings from "@/views/shared/LatestStationReadings.vue";
+import PaginationControls from "@/views/shared/PaginationControls.vue";
+
+export default Vue.extend({
     name: "StationsReadings",
     components: {
-        Pagination,
+        LatestStationReadings,
+        PaginationControls,
     },
     data: () => {
         return {
-            stations: [],
-            currentStation: {},
-            currentIndex: 1,
-            pageCount: 0,
-            stationsPerPage: 1,
-            modules: [],
-            moduleSensorCounter: 0,
-            modulesSensors: {},
+            index: 0,
         };
     },
-    props: ["project"],
-    async beforeCreate() {
-        this.api = new FKApi();
+    props: {
+        project: {
+            type: Object,
+            required: true,
+        },
+        displayProject: {
+            type: Object,
+            required: true,
+        },
     },
-    mounted() {
-        this.fetchStations();
+    computed: {
+        stations() {
+            return this.displayProject.stations;
+        },
+        visibleStation() {
+            if (this.displayProject.stations.length > 0) {
+                return this.displayProject.stations[this.index];
+            }
+            return null;
+        },
+    },
+    mounted(this: any) {
+        // console.log("display", this.displayProject);
+        // console.log("project", this.project);
     },
     methods: {
-        onPageChange(value) {
-            switch (value) {
-                case "next":
-                    this.currentIndex += 1;
-                    break;
-                case "previous":
-                    this.currentIndex -= 1;
-                    break;
-                default:
-                    this.currentIndex = value;
-            }
-            this.modules = [];
-            this.modulesSensors = {};
-            this.moduleSensorCounter = 0;
-            this.currentStation = this.stations[this.currentIndex - 1];
-            if (!this.currentStation) {
-                this.currentStation = {};
-            } else {
-                this.setModules();
-            }
-        },
-
-        fetchStations() {
-            this.api.getStationsByProject(this.project.id).then((result) => {
-                this.stations = result.stations;
-                this.pageCount = this.stations.length;
-                this.currentStation = this.stations[this.currentIndex - 1];
-                if (!this.currentStation) {
-                    this.currentStation = {};
-                } else {
-                    this.setModules();
-                }
-            });
-        },
-
-        setModules() {
-            if (
-                this.currentStation.configurations &&
-                this.currentStation.configurations.all &&
-                this.currentStation.configurations.all.length > 0
-            ) {
-                this.modules = this.currentStation.configurations.all[0].modules.filter((m) => {
-                    return !m.internal;
-                });
-            }
-        },
-
-        getCounter(moduleIndex, sensorIndex) {
-            if (this.modulesSensors[moduleIndex]) {
-                if (!this.modulesSensors[moduleIndex][sensorIndex]) {
-                    this.moduleSensorCounter += 1;
-                    this.modulesSensors[moduleIndex][sensorIndex] = this.moduleSensorCounter;
-                }
-            } else {
-                this.moduleSensorCounter += 1;
-                this.modulesSensors[moduleIndex] = {};
-                this.modulesSensors[moduleIndex][sensorIndex] = this.moduleSensorCounter;
-            }
-            return this.modulesSensors[moduleIndex][sensorIndex];
-        },
-
-        getReading(sensor) {
-            if (!sensor.reading) {
-                return "--";
-            }
-            return sensor.reading.last || sensor.reading.last == 0 ? sensor.reading.last.toFixed(1) : "--";
-        },
-
-        getSensorName(module, sensor) {
-            const newName = utils.convertOldFirmwareResponse(module);
-            return this.$t(newName + ".sensors." + sensor.name);
-            // return this.$t(module.name + "." + sensor.name);
+        onNewStation(this: any, index: number) {
+            this.index = index;
         },
     },
-};
+});
 </script>
 
 <style scoped>
 .readings-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
 }
 .heading {
     font-size: 20px;
     font-weight: 600;
-    float: left;
-    margin: 25px 25px 16px 25px;
 }
 .station-name {
     font-size: 14px;
     font-weight: 600;
-    float: left;
-    clear: both;
-    margin: 0 0 12px 25px;
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 .sensors-container {
-    width: 100%;
 }
-.left {
-    float: left;
-}
-.right {
-    float: right;
-}
-.left-reading,
-.right-reading {
-    width: 42%;
-    margin: 8px 0;
-    padding: 5px 10px;
-    background-color: #f4f5f7;
-    border-radius: 2px;
-}
-.left-reading {
-    float: left;
-    clear: both;
-    margin-left: 10px;
-}
-.right-reading {
-    float: right;
-    margin-right: 3px;
-}
-.sensor-name {
-    font-size: 12px;
-    font-weight: 600;
-    display: inline-block;
-}
-.sensor-reading {
-    font-size: 16px;
-    display: inline-block;
-}
-.sensor-unit {
-    font-size: 10px;
-    margin: 6px 0 0 4px;
-    display: inline-block;
-}
-.no-readings {
-    float: left;
-    clear: both;
-    margin: 0 25px 25px 25px;
-}
-.pagination-section {
-    width: 100%;
-    bottom: 25px;
-    text-align: center;
+
+.pagination {
+    margin-top: auto;
 }
 </style>

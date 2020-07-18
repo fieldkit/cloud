@@ -17,7 +17,7 @@
         "water.do": {
             "name": "Water Dissolved Oxygen",
             "sensors": {
-                "do": "Dissolved Oxygen"
+                "do": "DO"
             }
         },
         "water.temp": {

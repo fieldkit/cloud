@@ -108,8 +108,8 @@ export default Vue.extend({
 }
 .pages .page {
     font-size: 14px;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-left: 6px;
+    margin-right: 6px;
     cursor: pointer;
 }
 .pages .page.selected {

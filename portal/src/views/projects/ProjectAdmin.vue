@@ -90,7 +90,7 @@
                 <ProjectDataFiles :projectStations="displayProject.stations" />
             </div>
             <div class="project-readings">
-                <StationsReadings :project="project" />
+                <StationsReadings :project="project" :displayProject="displayProject" />
             </div>
         </div>
 
@@ -166,15 +166,14 @@
 
 <script>
 import { required, email } from "vuelidate/lib/validators";
-import FKApi from "@/api/api";
-import * as ActionTypes from "@/store/actions";
-import * as utils from "../../utilities";
+import CommonComponents from "@/views/shared";
 import ProjectStations from "./ProjectStations";
 import ProjectActivity from "./ProjectActivity";
 import ProjectDataFiles from "./ProjectDataFiles";
-import CommonComponents from "@/views/shared";
-
 import StationsReadings from "./StationsReadings.vue";
+
+import * as ActionTypes from "@/store/actions";
+import * as utils from "../../utilities";
 
 export default {
     name: "ProjectAdmin",
