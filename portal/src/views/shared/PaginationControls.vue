@@ -1,6 +1,6 @@
 <template>
     <div class="pagination">
-        <div class="button" v-on:click="onPrevious" v-bind:class="{ enabled: canPagePrevious }">Previous</div>
+        <div class="button" v-on:click="onPrevious" v-bind:class="{ enabled: canPagePrevious }">◀</div>
         <div class="pages">
             <div
                 v-for="page in pages"
@@ -9,10 +9,10 @@
                 v-bind:class="{ selected: page.selected }"
                 v-on:click="onPage(page.number)"
             >
-                {{ page.number + 1 }}
+                ●
             </div>
         </div>
-        <div class="button" v-on:click="onNext" v-bind:class="{ enabled: canPageNext }">Next</div>
+        <div class="button" v-on:click="onNext" v-bind:class="{ enabled: canPageNext }">▶</div>
     </div>
 </template>
 
@@ -30,6 +30,10 @@ export default Vue.extend({
         totalPages: {
             type: Number,
             required: true,
+        },
+        maximumPages: {
+            type: Number,
+            default: 7,
         },
     },
     computed: {
@@ -68,51 +72,38 @@ export default Vue.extend({
 
 <style scoped>
 .pagination .button {
-    font-size: 14px;
-    color: #000000;
-    text-align: center;
-    padding: 10px;
-    background-color: #efefef;
-    border: 1px solid rgb(215, 220, 225);
-    border-radius: 4px;
+    font-size: 22px;
+    color: #d8d8d8;
+    justify-content: center;
+    align-items: center;
+}
+.pagination .button:first-child {
+    margin-right: 10px;
+}
+.pagination .button:last-child {
+    margin-left: 10px;
 }
 .pagination .button.enabled {
-    font-size: 14px;
-    font-weight: bold;
-    color: #000000;
-    text-align: center;
-    padding: 10px;
-    background-color: #efefef;
-    border: 1px solid rgb(215, 220, 225);
-    border-radius: 4px;
+    color: #2c3e50;
     cursor: pointer;
-}
-.footer .button {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    padding: 10px;
-    margin: 20px 0 0 0px;
-    border: 1px solid rgb(215, 220, 225);
-    border-radius: 4px;
-    color: #000000;
-    background-color: #efefef;
 }
 .pagination {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
 }
 .pages {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
 }
 .pages .page {
-    font-size: 14px;
+    font-size: 22px;
     margin-left: 6px;
     margin-right: 6px;
     cursor: pointer;
+    color: #d8d8d8;
 }
 .pages .page.selected {
     font-weight: 900;
+    color: #2c3e50;
 }
 </style>
