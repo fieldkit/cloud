@@ -20,6 +20,7 @@ import ExploreView from "./views/viz/ExploreView.vue";
 import NotesView from "./views/notes/NotesView.vue";
 
 import AdminMain from "./views/admin/AdminMain.vue";
+import Playground from "./views/admin/Playground.vue";
 
 import { Bookmark } from "./views/viz/viz";
 
@@ -270,6 +271,18 @@ const routes = [
             };
         },
         meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/admin/playground",
+        name: "adminPlayground",
+        component: Playground,
+        props: (route) => {
+            return {};
+        },
+        meta: {
+            admin: true,
             secured: true,
         },
     },

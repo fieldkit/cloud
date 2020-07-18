@@ -96,6 +96,7 @@ input:invalid {
     text-align: left;
     transition: 0.2s ease all;
 }
+/*
 .disabled {
     background-color: rgb(210, 210, 210);
     cursor: not-allowed;
@@ -104,4 +105,5 @@ input:invalid {
     font-size: 18px;
     border-radius: 5px;
 }
+*/
 </style>
