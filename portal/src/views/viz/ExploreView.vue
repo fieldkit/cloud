@@ -345,4 +345,12 @@ export default Vue.extend({
     top: 10px;
     left: 0;
 }
+
+.viz.map {
+}
+
+.viz.map .viz-map {
+    height: 350px;
+    margin-bottom: 20px;
+}
 </style>
