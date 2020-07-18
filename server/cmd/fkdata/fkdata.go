@@ -19,6 +19,8 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 )
 
+const SecondsPerWeek = int64(60 * 60 * 24 * 7)
+
 type Options struct {
 	StationID int
 	All       bool
@@ -120,8 +122,6 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 
 	aggregator := handlers.NewAggregator(db, stationID, 1000)
 
-	SecondsPerWeek := int64(60 * 60 * 24 * 7)
-
 	sinFunc := func(period int64) SampleFunc {
 		return func(t time.Time) float64 {
 			scaled := float64(t.Unix()%period) / float64(period)
@@ -142,14 +142,18 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 		"fk.testing.saw.weekly": sawFunc(SecondsPerWeek, 1000),
 	}
 
+	location := NewRandomLocation()
+
 	for sampled.Before(end) {
 		if err := aggregator.NextTime(ctx, sampled); err != nil {
 			return fmt.Errorf("error adding: %v", err)
 		}
 
+		location.Move(sampled)
+
 		for sensorKey, fn := range funcs {
 			value := fn(sampled)
-			if err := aggregator.AddSample(ctx, sampled, []float64{}, sensorKey, value); err != nil {
+			if err := aggregator.AddSample(ctx, sampled, location.Coords, sensorKey, value); err != nil {
 				return err
 			}
 		}
@@ -166,4 +170,31 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 
 type IDRow struct {
 	ID int64 `db:"id"`
+}
+
+type RandomLocation struct {
+	Coords []float64
+}
+
+func NewRandomLocation() (rl *RandomLocation) {
+	return &RandomLocation{
+		Coords: []float64{},
+	}
+}
+
+func (rl *RandomLocation) Move(t time.Time) {
+	period := SecondsPerWeek * 4
+	scaled := float64(t.Unix()%period) / float64(period)
+	radians := scaled * math.Pi * 2
+	x := math.Sin(radians)
+	y := math.Cos(radians)
+
+	center := []float64{-115.4093893, 35.0691767}
+	radius := float64(1 / 100.0)
+	coords := []float64{
+		center[0] + y*radius,
+		center[1] + x*radius,
+		0,
+	}
+	rl.Coords = coords
 }
