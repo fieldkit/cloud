@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import StandardLayout from "./StandardLayout";
-import FKApi from "../api/api";
-import ProjectUpdateForm from "../components/ProjectUpdateForm";
+import StandardLayout from "../StandardLayout";
+import FKApi from "@/api/api";
+import ProjectUpdateForm from "./ProjectUpdateForm";
 
 export default {
     name: "ProjectEditView",

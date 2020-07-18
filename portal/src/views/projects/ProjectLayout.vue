@@ -11,7 +11,7 @@
             <div class="left">
                 <div class="photo">
                     <img alt="FieldKit Project" v-if="project.photo" :src="getImageUrl(project)" class="project-image" />
-                    <img alt="Default FieldKit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
+                    <img alt="Default FieldKit Project" v-else src="@/assets/fieldkit_project.png" class="project-image" />
                 </div>
 
                 <div class="follow-btn">
@@ -19,7 +19,7 @@
                         Following
                     </span>
                     <span v-else v-on:click="followProject">
-                        <img alt="Follow" src="../assets/heart_gray.png" class="icon" />
+                        <img alt="Follow" src="@/assets/heart_gray.png" class="icon" />
                         Follow
                     </span>
                 </div>
@@ -36,19 +36,19 @@
                     </div>
                     <div class="details-right">
                         <div class="time-container" v-if="project.startTime">
-                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                             <template>Started: {{ project.startTime | prettyDate }}</template>
                         </div>
                         <div class="duration-container" v-if="displayProject.duration">
-                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                             <template>{{ displayProject.duration | prettyDuration }}</template>
                         </div>
                         <div class="location-container" v-if="project.location">
-                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                             <template>{{ project.location }}</template>
                         </div>
                         <div class="location-container" v-if="displayProject.places.native">
-                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                             <template>Native Lands: {{ displayProject.places.native }}</template>
                         </div>
                     </div>

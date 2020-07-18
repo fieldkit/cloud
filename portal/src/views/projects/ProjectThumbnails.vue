@@ -4,24 +4,24 @@
             <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
                 <div class="project-image-container">
                     <img alt="FieldKit Project" v-if="project.photo" :src="getImageUrl(project)" class="project-image" />
-                    <img alt="FieldKit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
+                    <img alt="FieldKit Project" v-else src="@/assets/fieldkit_project.png" class="project-image" />
                 </div>
 
-                <img v-if="project.private" alt="Private project" src="../assets/private.png" class="private-icon" />
+                <img v-if="project.private" alt="Private project" src="@/assets/private.png" class="private-icon" />
 
                 <div class="project-name">{{ project.name }}</div>
                 <div class="project-description">{{ project.description }}</div>
                 <div class="stats-icon-container">
                     <div class="stat follows" v-if="project.numberOfFollowers">
-                        <img alt="Follows" src="../assets/heart.png" class="follow-icon" />
+                        <img alt="Follows" src="@/assets/heart.png" class="follow-icon" />
                         <span>{{ project.numberOfFollowers }}</span>
                     </div>
                     <div class="stat notifications" v-if="project.notifications">
-                        <img alt="Notifications" src="../assets/notification.png" class="notify-icon" />
+                        <img alt="Notifications" src="@/assets/notification.png" class="notify-icon" />
                         <span>2</span>
                     </div>
                     <div class="stat comments" v-if="project.comments">
-                        <img alt="Comments" src="../assets/comment.png" class="comment-icon" />
+                        <img alt="Comments" src="@/assets/comment.png" class="comment-icon" />
                         <span>3</span>
                     </div>
                 </div>

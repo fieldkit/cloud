@@ -1,7 +1,7 @@
 <template>
     <div id="project-form-container">
         <div id="close-form-btn" v-on:click="closeForm">
-            <img alt="Close" src="../assets/close.png" />
+            <img alt="Close" src="@/assets/close.png" />
         </div>
         <h2>{{ this.formHeading }}</h2>
         <div class="outer-input-container">
@@ -19,7 +19,7 @@
                 Update
             </button>
             <div v-if="formType == 'update'" class="delete-container" v-on:click="deleteProjectUpdate">
-                <img alt="Delete" src="../assets/Delete.png" />
+                <img alt="Delete" src="@/assets/Delete.png" />
                 Delete this update
             </div>
         </div>
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import FKApi from "../api/api";
+import FKApi from "@/api/api";
 
 export default {
     name: "ProjectUpdateForm",

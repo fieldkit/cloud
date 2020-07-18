@@ -3,7 +3,7 @@
         <div class="section-heading stations-heading">
             FieldKit Stations
             <div class="add-station" v-on:click="showStationSelect" v-if="admin && !addingStation">
-                <img src="../assets/add.png" class="add-station-btn" />
+                <img src="@/assets/add.png" class="add-station-btn" />
                 Add Station
             </div>
             <div class="station-dropdown" v-if="addingStation">
@@ -18,8 +18,8 @@
         <div class="section-body">
             <div id="stations-list">
                 <div class="toggle-icon-container" v-on:click="toggleStations" v-if="false">
-                    <img v-if="showStationsList" alt="Collapse List" src="../assets/tab-collapse.png" class="toggle-icon" />
-                    <img v-if="!showStationsList" alt="Expand List" src="../assets/tab-expand.png" class="toggle-icon" />
+                    <img v-if="showStationsList" alt="Collapse List" src="@/assets/tab-collapse.png" class="toggle-icon" />
+                    <img v-if="!showStationsList" alt="Expand List" src="@/assets/tab-expand.png" class="toggle-icon" />
                 </div>
                 <div v-if="projectStations.length == 0" class="project-stations-no-stations">
                     <h3>No Stations</h3>
@@ -31,7 +31,7 @@
                     <div v-for="station in projectStations" v-bind:key="station.id">
                         <div class="station-box" :style="{ width: listSize.boxWidth }">
                             <div class="delete-link">
-                                <img alt="Delete" src="../assets/Delete.png" :data-id="station.id" v-on:click="deleteStation(station)" />
+                                <img alt="Delete" src="@/assets/Delete.png" :data-id="station.id" v-on:click="deleteStation(station)" />
                             </div>
                             <span class="station-name" v-on:click="showStation(station)">
                                 {{ station.name }}
@@ -57,7 +57,7 @@
 
 <script>
 import _ from "lodash";
-import * as utils from "../utilities";
+import * as utils from "../../utilities";
 import * as ActionTypes from "@/store/actions";
 import FKApi from "@/api/api";
 import StationSummary from "@/components/StationSummary";

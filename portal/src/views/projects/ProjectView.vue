@@ -1,7 +1,7 @@
 <template>
     <StandardLayout :viewingProjects="true">
         <div id="loading" v-if="isBusy">
-            <img alt="" src="../assets/progress.gif" />
+            <img alt="" src="@/assets/progress.gif" />
         </div>
         <div class="main-panel" v-show="!isBusy && isAuthenticated">
             <div class="inner-container">
@@ -37,9 +37,9 @@
 
 <script lang="ts">
 import Vue from "@/store/strong-vue";
-import StandardLayout from "./StandardLayout.vue";
-import ProjectPublic from "../components/ProjectPublic.vue";
-import ProjectAdmin from "../components/ProjectAdmin.vue";
+import StandardLayout from "../StandardLayout.vue";
+import ProjectPublic from "./ProjectPublic.vue";
+import ProjectAdmin from "./ProjectAdmin.vue";
 
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";

@@ -1,7 +1,7 @@
 <template>
     <StandardLayout :viewingProjects="true">
         <div id="loading" v-if="loading">
-            <img alt="" src="../assets/progress.gif" />
+            <img alt="" src="@/assets/progress.gif" />
         </div>
         <div class="main-panel" v-show="!loading">
             <div v-if="!loading">
@@ -13,10 +13,10 @@
 
 <script lang="ts">
 import Vue from "@/store/strong-vue";
-import StandardLayout from "./StandardLayout.vue";
-import ProjectForm from "../components/ProjectForm.vue";
+import StandardLayout from "../StandardLayout.vue";
+import ProjectForm from "./ProjectForm.vue";
 
-import FKApi from "../api/api";
+import FKApi from "@/api/api";
 
 export default Vue.extend({
     name: "ProjectEditView",

@@ -8,12 +8,13 @@ import RecoverAccountView from "./views/auth/RecoverAccountView.vue";
 import ResetPasswordView from "./views/auth/ResetPasswordView.vue";
 import UserView from "./views/auth/UserView.vue";
 
-import DataView from "./views/viz/DataView.vue";
 import InvitesView from "./views/InvitesView.vue";
-import ProjectsView from "./views/ProjectsView.vue";
-import ProjectEditView from "./views/ProjectEditView.vue";
-import ProjectUpdateEditView from "./views/ProjectUpdateEditView.vue";
-import ProjectView from "./views/ProjectView.vue";
+
+import ProjectsView from "./views/projects/ProjectsView.vue";
+import ProjectEditView from "./views/projects/ProjectEditView.vue";
+import ProjectUpdateEditView from "./views/projects/ProjectUpdateEditView.vue";
+import ProjectView from "./views/projects/ProjectView.vue";
+
 import StationsView from "./views/StationsView.vue";
 import ExploreView from "./views/viz/ExploreView.vue";
 
@@ -188,15 +189,6 @@ const routes = [
         },
         meta: {
             bodyClass: "map-view",
-        },
-    },
-    {
-        path: "/dashboard/data",
-        name: "viewData",
-        component: DataView,
-        props: true,
-        meta: {
-            secured: true,
         },
     },
     {

@@ -11,7 +11,7 @@
             <div class="left">
                 <div class="photo">
                     <img alt="FieldKit Project" v-if="project.photo" :src="getImageUrl(project)" class="project-image" />
-                    <img alt="Default FieldKit Project" v-else src="../assets/fieldkit_project.png" class="project-image" />
+                    <img alt="Default FieldKit Project" v-else src="@/assets/fieldkit_project.png" class="project-image" />
                 </div>
 
                 <DisplayProjectTags :tags="project.tags" />
@@ -33,19 +33,19 @@
                     </div>
                     <div class="details-right">
                         <div class="time-container" v-if="project.startTime">
-                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                             <template>Started: {{ project.startTime | prettyDate }}</template>
                         </div>
                         <div class="duration-container" v-if="displayProject.duration">
-                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                             <template>{{ displayProject.duration | prettyDuration }}</template>
                         </div>
                         <div class="location-container" v-if="project.location">
-                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                             <template>{{ project.location }}</template>
                         </div>
                         <div class="location-container" v-if="displayProject.places.native">
-                            <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                             <template>Native Lands: {{ displayProject.places.native }}</template>
                         </div>
                     </div>
@@ -116,7 +116,7 @@
                     <div class="cell">
                         <img
                             alt="Remove user"
-                            src="../assets/close-icon.png"
+                            src="@/assets/close-icon.png"
                             class="remove-btn"
                             :data-user="projectUser.user.id"
                             v-on:click="(ev) => removeUser(ev, projectUser)"
@@ -166,14 +166,15 @@
 
 <script>
 import { required, email } from "vuelidate/lib/validators";
-import FKApi from "../api/api";
+import FKApi from "@/api/api";
 import * as ActionTypes from "@/store/actions";
-import * as utils from "../utilities";
-import ProjectStations from "../components/ProjectStations";
-import ProjectActivity from "../components/ProjectActivity";
-import ProjectDataFiles from "../components/ProjectDataFiles";
-import StationsReadings from "../components/StationsReadings";
+import * as utils from "../../utilities";
+import ProjectStations from "./ProjectStations";
+import ProjectActivity from "./ProjectActivity";
+import ProjectDataFiles from "./ProjectDataFiles";
 import CommonComponents from "@/views/shared";
+
+import StationsReadings from "@/components/StationsReadings";
 
 export default {
     name: "ProjectAdmin",

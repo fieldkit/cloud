@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="loading" v-if="loading">
-            <img alt="" src="../assets/progress.gif" />
+            <img alt="" src="@/assets/progress.gif" />
         </div>
         <template v-if="!loading">
             <div class="inner-feed-container" v-if="activities.length > 0">
@@ -15,7 +15,7 @@
                         <div class="activity-text">
                             {{ activity.records.toLocaleString() }} readings uploaded from {{ activity.name }}, with
                             {{ activity.errors ? " an error." : "no errors." }}
-                            <img src="../assets/Icon_Warning_error.png" v-if="activity.errors" class="activity-error" />
+                            <img src="@/assets/Icon_Warning_error.png" v-if="activity.errors" class="activity-error" />
                         </div>
                     </div>
                     <div class="activity-text-container" v-if="activity.type == 'update'">
@@ -30,7 +30,7 @@
                         <div class="activity-date">{{ activity.time.toLocaleDateString() }}</div>
                         <div class="activity-text">{{ activity.name }} was deployed.</div>
                         <div class="activity-text">
-                            <img src="../assets/icon-location.png" />
+                            <img src="@/assets/icon-location.png" />
                             {{ activity.location[1] + ", " + activity.location[0] }}
                         </div>
                     </div>
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import FKApi from "../api/api";
+import FKApi from "@/api/api";
 
 export default {
     name: "ProjectActivity",

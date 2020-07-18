@@ -5,7 +5,7 @@
             <h2 v-if="project && project.id">Edit Project</h2>
 
             <div class="close-form-button" v-on:click="closeForm">
-                <img alt="Close" src="../assets/close.png" />
+                <img alt="Close" src="@/assets/close.png" />
             </div>
         </div>
 
@@ -49,7 +49,7 @@
                     </div>
                     <v-date-picker :value="form.pickedStart" @input="updateStart" :popover="{ placement: 'bottom', visibility: 'click' }">
                         <button type="button">
-                            <img alt="Calendar" src="../assets/calendar.png" />
+                            <img alt="Calendar" src="@/assets/calendar.png" />
                         </button>
                     </v-date-picker>
                 </div>
@@ -60,7 +60,7 @@
                     </div>
                     <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'bottom', visibility: 'click' }">
                         <button type="button">
-                            <img alt="Calendar" src="../assets/calendar.png" />
+                            <img alt="Calendar" src="@/assets/calendar.png" />
                         </button>
                     </v-date-picker>
                 </div>
@@ -74,13 +74,13 @@
             <div id="public-checkbox-container">
                 <input type="checkbox" id="checkbox" v-model="form.publicProject" />
                 <label for="checkbox">Make this project public</label>
-                <img alt="Info" src="../assets/info.png" />
+                <img alt="Info" src="@/assets/info.png" />
             </div>
             <div class="action-container">
                 <button class="save-button" v-if="!project" type="submit">Add</button>
                 <button class="save-button" v-if="project && project.id" type="submit">Update</button>
                 <div v-if="project && project.id" class="delete-container" v-on:click="deleteProject">
-                    <img alt="Delete" src="../assets/Delete.png" />
+                    <img alt="Delete" src="@/assets/Delete.png" />
                     Delete this project
                 </div>
             </div>
@@ -92,7 +92,7 @@
 import _ from "lodash";
 import moment from "moment";
 import Vue from "@/store/strong-vue";
-import StandardLayout from "./StandardLayout.vue";
+import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
 import VueTagsInput from "@johmun/vue-tags-input";
 
@@ -100,7 +100,7 @@ import { tryParseTags } from "@/utilities";
 
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
 
-import FKApi from "../api/api";
+import FKApi from "@/api/api";
 import * as ActionTypes from "@/store/actions";
 
 export default Vue.extend({

@@ -7,7 +7,7 @@
                         <h1 v-if="isAuthenticated">My Projects</h1>
                         <h1 v-if="!isAuthenticated">Projects</h1>
                         <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
-                            <img alt="Add project" src="../assets/add.png" />
+                            <img alt="Add project" src="@/assets/add.png" />
                             Add Project
                         </div>
                     </div>
@@ -26,8 +26,8 @@
 </template>
 
 <script>
-import StandardLayout from "./StandardLayout";
-import ProjectThumbnails from "../components/ProjectThumbnails";
+import StandardLayout from "../StandardLayout";
+import ProjectThumbnails from "./ProjectThumbnails";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 
