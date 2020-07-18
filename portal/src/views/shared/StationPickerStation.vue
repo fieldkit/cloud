@@ -1,8 +1,12 @@
 <template>
-    <div class="sps" v-on:click="onClicked" v-bind:class="{ selected: selected }">
-        <div class="name">{{ station.name }}</div>
-        <div class="location">{{ location }}</div>
-        <div class="status">{{ status }}</div>
+    <div class="sps" v-bind:class="{ selected: selected }">
+        <div class="standard" v-on:click="onClicked">
+            <div class="name">{{ station.name }}</div>
+            <div class="status">{{ status }}</div>
+            <div class="location" v-if="!narrow">{{ location }}</div>
+            <div class="seen" v-if="!narrow">{{ station.updated | prettyDate }}</div>
+        </div>
+        <slot></slot>
     </div>
 </template>
 
@@ -19,7 +23,11 @@ export default Vue.extend({
         },
         selected: {
             type: Boolean,
-            required: true,
+            default: false,
+        },
+        narrow: {
+            type: Boolean,
+            default: false,
         },
     },
     computed: {
@@ -47,17 +55,21 @@ export default Vue.extend({
 </script>
 
 <style scoped>
+.sps.selected {
+    border: 2px solid #1b80c9;
+}
 .sps {
     display: flex;
-    flex-direction: column;
     min-width: 260px;
     border: 2px solid #d8dce0;
     border-radius: 2px;
-    padding: 10px;
-    text-align: left;
 }
-.sps.selected {
-    border: 2px solid #1b80c9;
+.sps .standard {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    width: 100%;
 }
 .sps .name {
     color: #2c3e50;
@@ -65,10 +77,14 @@ export default Vue.extend({
     font-weight: 500;
 }
 .sps .location {
-    font-size: 14px;
-    color: #2c3e50;
+    font-size: 12px;
+    color: #6a6d71;
 }
 .sps .status {
+    font-size: 12px;
+    color: #6a6d71;
+}
+.sps .seen {
     font-size: 12px;
     color: #6a6d71;
 }

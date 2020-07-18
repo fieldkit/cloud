@@ -174,7 +174,7 @@ import ProjectActivity from "./ProjectActivity";
 import ProjectDataFiles from "./ProjectDataFiles";
 import CommonComponents from "@/views/shared";
 
-import StationsReadings from "@/components/StationsReadings";
+import StationsReadings from "./StationsReadings.vue";
 
 export default {
     name: "ProjectAdmin",

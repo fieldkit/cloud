@@ -1,9 +1,5 @@
 <template>
-    <div
-        class="station-hover-summary"
-        :style="{ width: summarySize.width, top: summarySize.top, left: summarySize.left }"
-        v-if="viewingSummary && station"
-    >
+    <div class="station-hover-summary" v-if="viewingSummary && station">
         <div class="upper-half">
             <div class="row general-row">
                 <div class="image-container">
@@ -24,26 +20,26 @@
                     </div>
                 </div>
                 <div class="close-button" v-on:click="wantCloseSummary">
-                    <img alt="Close" src="../assets/close.png" />
+                    <img alt="Close" src="@/assets/close.png" />
                 </div>
             </div>
 
             <div class="row where-row">
                 <div class="location-container" v-if="station.locationName ? station.locationName : station.placeNameOther">
-                    <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                    <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                     <template>{{ station.locationName ? station.locationName : station.placeNameOther }}</template>
                 </div>
                 <div class="location-container" v-else>
-                    <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                    <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                     <template>Awaiting Location</template>
                 </div>
 
                 <div class="location-container" v-if="station.placeNameNative">
-                    <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                    <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                     <template>Native Lands: {{ station.placeNameNative }}</template>
                 </div>
                 <div class="location-container" v-else>
-                    <img alt="Location" src="../assets/icon-location.png" class="icon" />
+                    <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                     <template>Native Lands: Awaiting Location</template>
                 </div>
 
@@ -77,11 +73,11 @@
                     <div class="empty"></div>
                 </div>
             </div>
-            <div class="readings-container" v-if="!compact">
+            <div class="readings-container" v-if="readings">
                 <div class="title">Latest Readings</div>
                 <LatestStationReadings :id="station.id" />
             </div>
-            <div class="explore-button" v-on:click="onClickExplore">
+            <div class="explore-button" v-if="readings" v-on:click="onClickExplore">
                 Explore Data
             </div>
         </div>
@@ -107,9 +103,14 @@ export default {
         };
     },
     props: {
-        station: { required: true },
-        summarySize: { required: true },
-        compact: { default: false },
+        station: {
+            type: Object,
+            required: true,
+        },
+        readings: {
+            type: Boolean,
+            default: true,
+        },
     },
     computed: {
         stationSmallPhoto() {
@@ -153,12 +154,7 @@ export default {
             return this.$loadAsset(utils.getModuleImg(module));
         },
         wantCloseSummary() {
-            this.$emit("closeSummary");
-            if (!this.compact) {
-                if (this.$route.name != "stations") {
-                    this.$router.push({ name: "stations" });
-                }
-            }
+            this.$emit("close");
         },
     },
 };
@@ -173,8 +169,6 @@ export default {
     display: flex;
     flex-direction: column;
     padding: 20px;
-}
-.upper-half {
 }
 .image-container {
     width: 124px;

@@ -38,9 +38,9 @@
 </template>
 
 <script>
-import FKApi from "../api/api";
-import * as utils from "../utilities";
-import Pagination from "../components/Pagination";
+import FKApi from "@/api/api";
+import * as utils from "@/utilities";
+import Pagination from "@/components/Pagination";
 
 export default {
     name: "StationsReadings",

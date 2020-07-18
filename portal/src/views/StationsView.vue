@@ -2,14 +2,7 @@
     <StandardLayout @sidebar-toggle="onSidebarToggle" :viewingStations="true">
         <div class="container-map">
             <StationsMap @mapReady="onMapReady" @showSummary="showSummary" :mapped="mapped" />
-            <StationSummary
-                v-if="activeStation"
-                @closeSummary="closeSummary"
-                class="summary-container"
-                :station="activeStation"
-                :summarySize="summarySize"
-                ref="stationSummary"
-            />
+            <StationSummary v-if="activeStation" class="summary-container" @close="closeSummary" :station="activeStation" />
             <div v-if="isAuthenticated && showNoStationsMessage && hasNoStations" id="no-stations">
                 <div id="close-notice-btn" v-on:click="closeNotice">
                     <img alt="Close" src="../assets/close.png" />
@@ -54,12 +47,6 @@ export default Vue.extend({
         return {
             map: null,
             showNoStationsMessage: true,
-            summarySize: {
-                width: "415px",
-                top: "120px",
-                left: "360px",
-                constrainTop: "285px",
-            },
         };
     },
     computed: {
@@ -142,6 +129,13 @@ export default Vue.extend({
 .container-map {
     flex-grow: 1;
 }
+
+/deep/ .station-hover-summary {
+    left: 360px;
+    top: 120px;
+    width: 415px;
+}
+
 #stations-view-panel {
     margin: 0;
 }

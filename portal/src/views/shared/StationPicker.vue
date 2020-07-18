@@ -16,21 +16,7 @@
                 <StationPickerStation :station="station" :selected="selected === station.id" @selected="(ev) => onSelected(station)" />
             </div>
         </div>
-        <div class="pagination">
-            <div class="button" v-on:click="onPrevious" v-bind:class="{ enabled: canPagePrevious }">Previous</div>
-            <div class="pages">
-                <div
-                    v-for="page in pages"
-                    v-bind:key="page.number"
-                    class="page"
-                    v-bind:class="{ selected: page.selected }"
-                    v-on:click="onPage(page.number)"
-                >
-                    {{ page.number + 1 }}
-                </div>
-            </div>
-            <div class="button" v-on:click="onNext" v-bind:class="{ enabled: canPageNext }">Next</div>
-        </div>
+        <PaginationControls :page="paging.number" :totalPages="totalPages()" @new-page="onNewPage" />
         <div class="footer">
             <div class="button" v-on:click="onAdd" v-bind:class="{ enabled: selected }">Add Station</div>
         </div>
@@ -40,8 +26,10 @@
 <script lang="ts">
 import _ from "lodash";
 import Vue, { PropType } from "vue";
-import StationPickerStation from "./StationPickerStation.vue";
 import CommonComponents from "@/views/shared";
+import StationPickerStation from "./StationPickerStation.vue";
+import PaginationControls from "./PaginationControls.vue";
+
 import { DisplayStation } from "@/store/modules/stations";
 
 export default Vue.extend({
@@ -49,11 +37,16 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
         StationPickerStation,
+        PaginationControls,
     },
     props: {
         stations: {
             type: Array,
             required: true,
+        },
+        filter: {
+            type: Function,
+            default: (station) => true,
         },
     },
     data() {
@@ -67,20 +60,6 @@ export default Vue.extend({
         };
     },
     computed: {
-        pages(this: any) {
-            return _.range(0, this.totalPages()).map((p) => {
-                return {
-                    selected: this.paging.number == p,
-                    number: p,
-                };
-            });
-        },
-        canPageNext(this: any) {
-            return this.paging.number < this.totalPages() - 1;
-        },
-        canPagePrevious(this: any) {
-            return this.paging.number > 0;
-        },
         visible(this: any) {
             const start = this.paging.number * this.paging.size;
             const end = start + this.paging.size;
@@ -88,15 +67,15 @@ export default Vue.extend({
         },
     },
     methods: {
-        filteredStations() {
+        filteredStations(this: any) {
             if (this.search.length === 0) {
-                return this.stations;
+                return this.stations.filter(this.filter);
             }
-            return _.filter(this.stations, (station) => {
+            return _.filter(this.stations.filter(this.filter), (station) => {
                 return station.name.toLowerCase().indexOf(this.search.toLowerCase()) >= 0;
             });
         },
-        totalPages() {
+        totalPages(this: any) {
             return Math.ceil(this.filteredStations().length / this.paging.size);
         },
         onSelected(this: any, station: DisplayStation) {
@@ -110,21 +89,8 @@ export default Vue.extend({
                 this.$emit("add", this.selected);
             }
         },
-        onPrevious() {
-            if (this.paging.number > 0) {
-                this.paging.number--;
-            }
-        },
-        onNext() {
-            if (this.paging.number < this.totalPages() - 1) {
-                this.paging.number++;
-            }
-        },
-        onPage(this: any, page: number) {
+        onNewPage(this: any, page: number) {
             this.paging.number = page;
-        },
-        onSearch(this: any, search: string) {
-            // console.log("search", search);
         },
     },
 });
@@ -168,26 +134,6 @@ export default Vue.extend({
 .station-picker .footer {
     display: flex;
 }
-.pagination .button {
-    font-size: 14px;
-    color: #000000;
-    text-align: center;
-    padding: 10px;
-    background-color: #efefef;
-    border: 1px solid rgb(215, 220, 225);
-    border-radius: 4px;
-}
-.pagination .button.enabled {
-    font-size: 14px;
-    font-weight: bold;
-    color: #000000;
-    text-align: center;
-    padding: 10px;
-    background-color: #efefef;
-    border: 1px solid rgb(215, 220, 225);
-    border-radius: 4px;
-    cursor: pointer;
-}
 .footer .button {
     font-size: 18px;
     font-weight: bold;
@@ -203,23 +149,6 @@ export default Vue.extend({
     color: #ffffff;
     background-color: #ce596b;
     cursor: pointer;
-}
-.pagination {
-    display: flex;
-    justify-content: space-between;
-}
-.pages {
-    display: flex;
-    justify-content: space-evenly;
-}
-.pages .page {
-    font-size: 14px;
-    margin-left: 10px;
-    margin-right: 10px;
-    cursor: pointer;
-}
-.pages .page.selected {
-    font-weight: 900;
 }
 input {
     font-size: inherit;

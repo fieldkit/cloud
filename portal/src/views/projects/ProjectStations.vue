@@ -9,73 +9,73 @@
             </div>
         </div>
         <div class="section-body">
-            <div id="stations-list">
-                <div class="toggle-icon-container" v-on:click="toggleStations" v-if="false">
-                    <img v-if="showStationsList" alt="Collapse List" src="@/assets/tab-collapse.png" class="toggle-icon" />
-                    <img v-if="!showStationsList" alt="Expand List" src="@/assets/tab-expand.png" class="toggle-icon" />
-                </div>
+            <div class="stations-panel">
                 <div v-if="projectStations.length == 0" class="project-stations-no-stations">
                     <h3>No Stations</h3>
                     <p>
                         Add a station to this project to include its recent data and activities.
                     </p>
                 </div>
-                <div v-if="projectStations.length > 0">
-                    <div v-for="station in projectStations" v-bind:key="station.id">
-                        <div class="station-box" :style="{ width: listSize.boxWidth }">
-                            <div class="delete-link">
-                                <img alt="Delete" src="@/assets/Delete.png" :data-id="station.id" v-on:click="deleteStation(station)" />
-                            </div>
-                            <span class="station-name" v-on:click="showStation(station)">
-                                {{ station.name }}
-                            </span>
-                            <div class="last-seen">Last seen {{ station.updated | prettyDate }}</div>
+                <div v-if="projectStations.length > 0" class="stations">
+                    <TinyStation
+                        v-for="station in visibleStations"
+                        v-bind:key="station.id"
+                        :station="station"
+                        :narrow="true"
+                        @selected="showSummary(station)"
+                    >
+                        <div class="station-links">
+                            <div class="notes" v-on:click="openNotes(station)">Notes</div>
+                            <div class="remove" v-on:click="removeStation(station)">Delete</div>
                         </div>
-                    </div>
+                    </TinyStation>
+                </div>
+                <div class="pagination">
+                    <PaginationControls :page="page" :totalPages="totalPages" @new-page="onNewPage" />
                 </div>
             </div>
-            <div id="stations-map-container">
+            <div class="toggle-icon-container" v-on:click="toggleStations" v-if="false">
+                <img v-if="showStationsPanel" alt="Collapse List" src="@/assets/tab-collapse.png" class="toggle-icon" />
+                <img v-if="!showStationsPanel" alt="Expand List" src="@/assets/tab-expand.png" class="toggle-icon" />
+            </div>
+            <div class="project-stations-map-container">
                 <StationsMap @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" :mapped="mappedProject" />
-                <StationSummary
-                    v-show="activeStation"
-                    :station="activeStation"
-                    :compact="true"
-                    :summarySize="summarySize"
-                    ref="stationSummary"
-                />
+                <StationSummary v-if="activeStation" :station="activeStation" :readings="false" @close="onCloseSummary" />
             </div>
         </div>
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import _ from "lodash";
+import Vue from "vue";
 import * as utils from "../../utilities";
 import * as ActionTypes from "@/store/actions";
 import FKApi from "@/api/api";
-import StationSummary from "@/components/StationSummary";
-import StationsMap from "@/components/StationsMap";
+import StationSummary from "@/components/StationSummary.vue";
+import StationsMap from "@/components/StationsMap.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
+import TinyStation from "@/views/shared/TinyStation.vue";
 
-export default {
+import PaginationControls from "@/views/shared/PaginationControls.vue";
+
+export default Vue.extend({
     name: "ProjectStations",
     components: {
         StationSummary,
         StationPickerModal,
         StationsMap,
+        PaginationControls,
+        TinyStation,
     },
     data: () => {
         return {
-            activeStation: null,
+            activeStationId: null,
             following: false,
-            showStationsList: true,
+            showStationsPanel: true,
             addingStation: false,
-            summarySize: {
-                width: "359px",
-                top: "-300px",
-                left: "122px",
-                constrainTop: "230px",
-            },
+            page: 0,
+            pageSize: 4,
         };
     },
     props: {
@@ -86,28 +86,47 @@ export default {
         userStations: { required: true },
     },
     computed: {
-        projectStations() {
+        projectStations(this: any) {
             return this.$getters.projectsById[this.project.id].stations;
         },
-        mappedProject() {
+        mappedProject(this: any) {
             return this.$getters.projectsById[this.project.id].mapped;
+        },
+        activeStation(this: any) {
+            if (this.activeStationId) {
+                return this.$getters.stationsById[this.activeStationId];
+            }
+            return null;
+        },
+        visibleStations(this: any) {
+            if (!this.projectStations) {
+                return [];
+            }
+            const start = this.page * this.pageSize;
+            const end = start + this.pageSize;
+            return this.projectStations.slice(start, end);
+        },
+        totalPages() {
+            if (this.projectStations) {
+                return Math.ceil(this.projectStations.length / this.pageSize);
+            }
+            return 0;
         },
     },
     methods: {
-        onMapReady(map) {
+        onMapReady(this: any, map) {
             console.log("map ready resize");
             this.map = map;
             this.map.resize();
         },
-        showStation(station) {
+        showStation(this: any, station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
         },
-        showStationPicker() {
+        showStationPicker(this: any) {
             this.addingStation = true;
         },
-        onAddStation(stationId) {
+        onAddStation(this: any, stationId) {
             this.addingStation = false;
-
             const payload = {
                 projectId: this.project.id,
                 stationId: stationId,
@@ -117,50 +136,41 @@ export default {
         onCloseStationPicker() {
             this.addingStation = false;
         },
-        async deleteStation(station) {
-            if (window.confirm("Are you sure you want to remove this station?")) {
-                const payload = {
-                    projectId: this.project.id,
-                    stationId: station.Id,
-                };
-                await this.$store.dispatch(ActionTypes.STATION_PROJECT_REMOVE, payload);
-            }
-        },
-        toggleStations() {
-            const stationsMap = document.getElementById("stations-map-container");
-            this.showStationsList = !this.showStationsList;
-            if (this.showStationsList) {
-                document.getElementById("stations-list").style.width = this.listSize.width;
-                stationsMap.style.width = this.mapContainerSize.width;
-                stationsMap.style["margin-left"] = "0";
-                this.map.resize();
-                document.getElementById("stations-map-container").style.transition = "width 0.5s";
-                const boxes = document.getElementsByClassName("station-box");
-                Array.from(boxes).forEach((b) => {
-                    b.style.opacity = 1;
-                });
-            } else {
-                const boxes = document.getElementsByClassName("station-box");
-                Array.from(boxes).forEach((b) => {
-                    b.style.opacity = 0;
-                });
-                document.getElementById("stations-list").style.width = "1px";
-                stationsMap.addEventListener("transitionend", this.postExpandMap, true);
-                stationsMap.style.width = this.mapContainerSize.outerWidth;
-                stationsMap.style["margin-left"] = "-1px";
-            }
-        },
-        postExpandMap() {
-            this.map.resize();
-            document.getElementById("stations-map-container").style.transition = "width 0s";
-            document.getElementById("stations-map-container").removeEventListener("transitionend", this.postExpandMap, true);
-        },
         showSummary(station) {
-            console.log("this.activeStationId", station.id);
+            console.log("showSummay", station);
             this.activeStationId = station.id;
         },
+        removeStation(this: any, station) {
+            console.log("remove", station);
+            if (!window.confirm("Are you sure you want to remove this station?")) {
+                return;
+            }
+            const payload = {
+                projectId: this.project.id,
+                stationId: station.id,
+            };
+            return this.$store.dispatch(ActionTypes.STATION_PROJECT_REMOVE, payload);
+        },
+        openNotes(this: any, station) {
+            return this.$router.push({
+                name: "viewProjectStationNotes",
+                params: {
+                    projectId: this.project.id,
+                    stationId: station.id,
+                },
+            });
+        },
+        onCloseSummary() {
+            this.activeStationId = null;
+        },
+        toggleStations() {
+            //
+        },
+        onNewPage(this: any, page: number) {
+            this.page = page;
+        },
     },
-};
+});
 </script>
 
 <style scoped>
@@ -189,10 +199,9 @@ export default {
 .section-body {
     display: flex;
     flex-direction: row;
-    height: 100%;
+    height: 342px;
 }
 .stations-container {
-    height: 400px;
     display: flex;
     flex-direction: column;
 }
@@ -201,11 +210,10 @@ export default {
     font-weight: 600;
     cursor: pointer;
 }
-.station-dropdown,
 .add-station {
     margin-left: auto;
     font-size: 14px;
-    margin-right: 50px;
+    margin-right: 10px;
     cursor: pointer;
 }
 .add-station-btn {
@@ -217,22 +225,24 @@ export default {
     font-weight: 600;
     color: #6a6d71;
 }
-.space {
-    width: 100%;
-    float: left;
-    margin: 30px 0 0 0;
-    border-bottom: solid 1px #d8dce0;
-}
 .stations-container {
     margin: 22px 0 0 0;
     border: 2px solid #d8dce0;
     background-color: #ffffff;
 }
-#stations-list {
+.stations-panel {
     transition: width 0.5s;
     flex: 1;
+    display: flex;
+    flex-direction: column;
 }
-#stations-map-container {
+.stations-panel .stations {
+    padding: 10px;
+}
+.stations-panel .stations > * {
+    margin-bottom: 10px;
+}
+.project-stations-map-container {
     transition: width 0.5s;
     position: relative;
     flex: 2;
@@ -244,13 +254,6 @@ export default {
     border: 1px solid #d8dce0;
     transition: opacity 0.25s;
 }
-.delete-link {
-    float: right;
-    opacity: 0;
-}
-.delete-link:hover {
-    opacity: 1;
-}
 .project-stations-no-stations {
     width: 80%;
     text-align: center;
@@ -260,5 +263,37 @@ export default {
 .project-stations-no-stations h1 {
 }
 .project-stations-no-stations p {
+}
+
+.station-links {
+    margin-left: auto;
+    width: 5em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    border-left: 1px solid #d8dce0;
+    padding-left: 10px;
+    text-align: center;
+}
+
+.station-links .remove {
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.station-links .notes {
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.pagination {
+    margin-top: auto;
+    padding: 5px;
+}
+
+/deep/ .station-hover-summary {
+    width: 359px;
+    top: 30px;
+    left: 122px;
 }
 </style>
