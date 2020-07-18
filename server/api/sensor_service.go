@@ -320,6 +320,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 			time,
 			station_id,
 			sensor_id,
+			ST_AsBinary(location) AS location,
 			value,
 			time_group
 		FROM time_grouped
@@ -364,6 +365,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 				es.time AS time,
 				station_id,
 				sensor_id,
+				location,
 				value,
 				time_group
 			FROM expected_samples AS es
@@ -374,6 +376,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 			time,
 			station_id,
 			sensor_id,
+			ST_AsBinary(location) AS location,
 			value,
 			time_group
 		FROM complete

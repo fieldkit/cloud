@@ -107,8 +107,9 @@ func (a *aggregation) close() (*Aggregated, error) {
 	}
 
 	aggregated := &Aggregated{
-		Time:   a.opened,
-		Values: agg,
+		Time:     a.opened,
+		Location: a.location,
+		Values:   agg,
 	}
 
 	a.opened = time.Time{}
@@ -196,10 +197,9 @@ func (v *Aggregator) upsertBatch(ctx context.Context, a *aggregation, batch []*A
 func (v *Aggregator) upsertSingle(ctx context.Context, a *aggregation, d *Aggregated) error {
 	var location *data.Location
 
-	if d.Location != nil {
+	if d.Location != nil && len(d.Location) == 3 {
 		location = data.NewLocation(d.Location)
 	}
-
 	if v.sensors == nil {
 		if err := v.refreshSensors(ctx); err != nil {
 			return err
