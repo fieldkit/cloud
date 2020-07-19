@@ -4,7 +4,6 @@
             <div class="explore-header">
                 <div class="left">
                     <h2>Data View</h2>
-                    <h2>Data View</h2>
                 </div>
             </div>
 
