@@ -40,9 +40,7 @@ func CreateGoaV2Handler(ctx context.Context, controllerOptions *ControllerOption
 	app.MountProjectController(service, NewProjectController(service, controllerOptions))
 	app.MountPictureController(service, NewPictureController(service, controllerOptions))
 	app.MountFirmwareController(service, NewFirmwareController(service, controllerOptions))
-	app.MountFieldNoteController(service, NewFieldNoteController(service, controllerOptions))
 	app.MountDataController(service, NewDataController(ctx, service, controllerOptions))
-	app.MountJSONDataController(service, NewJSONDataController(ctx, service, controllerOptions))
 	app.MountRecordsController(service, NewRecordsController(ctx, service, controllerOptions))
 
 	service.Mux.HandleNotFound(func(rw http.ResponseWriter, req *http.Request, params url.Values) {
