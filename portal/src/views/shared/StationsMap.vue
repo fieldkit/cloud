@@ -18,11 +18,12 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue";
 import Mapbox from "mapbox-gl-vue";
 import Config from "@/secrets";
 
-export default {
+export default Vue.extend({
     name: "StationsMap",
     components: {
         Mapbox,
@@ -34,15 +35,16 @@ export default {
     },
     props: {
         mapped: {
+            type: Object,
             required: true,
         },
     },
     methods: {
-        onMapInitialized(map) {
+        onMapInitialized(this: any, map) {
             console.log("map: initialized");
             this.map = map;
         },
-        onMapLoaded(map) {
+        onMapLoaded(this: any, map) {
             console.log("map: loaded (emit ready)");
             this.map = map;
 
@@ -62,7 +64,7 @@ export default {
 
             this.updateMap();
         },
-        updateMap() {
+        updateMap(this: any) {
             if (!this.map && this.mapped && this.mapped.valid) {
                 return;
             }
@@ -98,7 +100,7 @@ export default {
             }
         },
     },
-};
+});
 </script>
 
 <style scoped>

@@ -51,7 +51,7 @@ export default Vue.extend({
         };
     },
     watch: {
-        id() {
+        id(this: any) {
             return this.refresh();
         },
     },
