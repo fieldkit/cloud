@@ -81,7 +81,7 @@ definitions:
     description: DeviceDataRecord media type (default view)
     example:
       data:
-        Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
+        Blanditiis recusandae est quidem.: 8a6b698a-1637-4e17-95e6-e54fdafa4ca5
       id: 4.96580577271105e+18
       location:
       - 0.8522260143236732
@@ -92,7 +92,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
+          Blanditiis recusandae est quidem.: 8a6b698a-1637-4e17-95e6-e54fdafa4ca5
         type: object
       id:
         example: 4.96580577271105e+18
@@ -132,7 +132,7 @@ definitions:
       (default view)
     example:
     - data:
-        Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
+        Blanditiis recusandae est quidem.: 8a6b698a-1637-4e17-95e6-e54fdafa4ca5
       id: 4.96580577271105e+18
       location:
       - 0.8522260143236732
@@ -140,7 +140,7 @@ definitions:
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
     - data:
-        Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
+        Blanditiis recusandae est quidem.: 8a6b698a-1637-4e17-95e6-e54fdafa4ca5
       id: 4.96580577271105e+18
       location:
       - 0.8522260143236732
@@ -148,7 +148,7 @@ definitions:
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
     - data:
-        Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
+        Blanditiis recusandae est quidem.: 8a6b698a-1637-4e17-95e6-e54fdafa4ca5
       id: 4.96580577271105e+18
       location:
       - 0.8522260143236732
@@ -165,7 +165,7 @@ definitions:
     example:
       data:
       - data:
-          Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
+          Blanditiis recusandae est quidem.: 8a6b698a-1637-4e17-95e6-e54fdafa4ca5
         id: 4.96580577271105e+18
         location:
         - 0.8522260143236732
@@ -173,7 +173,7 @@ definitions:
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
+          Blanditiis recusandae est quidem.: 8a6b698a-1637-4e17-95e6-e54fdafa4ca5
         id: 4.96580577271105e+18
         location:
         - 0.8522260143236732
@@ -182,12 +182,12 @@ definitions:
         time: "2000-09-09T05:59:52Z"
       meta:
       - data:
-          Cumque nihil.: 36ab2039-7539-4698-a633-3b9a4135cde7
+          Cumque nihil.: bdb3cc77-8be9-4ef6-9ff9-4ce8812de6a5
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
       - data:
-          Cumque nihil.: 36ab2039-7539-4698-a633-3b9a4135cde7
+          Cumque nihil.: bdb3cc77-8be9-4ef6-9ff9-4ce8812de6a5
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
@@ -274,7 +274,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Cumque nihil.: 36ab2039-7539-4698-a633-3b9a4135cde7
+        Cumque nihil.: bdb3cc77-8be9-4ef6-9ff9-4ce8812de6a5
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -282,7 +282,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Cumque nihil.: 36ab2039-7539-4698-a633-3b9a4135cde7
+          Cumque nihil.: bdb3cc77-8be9-4ef6-9ff9-4ce8812de6a5
         type: object
       id:
         example: 4.464267130479644e+18
@@ -308,12 +308,12 @@ definitions:
       (default view)
     example:
     - data:
-        Cumque nihil.: 36ab2039-7539-4698-a633-3b9a4135cde7
+        Cumque nihil.: bdb3cc77-8be9-4ef6-9ff9-4ce8812de6a5
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
     - data:
-        Cumque nihil.: 36ab2039-7539-4698-a633-3b9a4135cde7
+        Cumque nihil.: bdb3cc77-8be9-4ef6-9ff9-4ce8812de6a5
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -1198,110 +1198,6 @@ paths:
       summary: project roles user
       tags:
       - user
-  /records/data/{recordId}:
-    get:
-      description: |-
-        Required security scopes:
-          * `api:access`
-      operationId: records#data
-      parameters:
-      - in: path
-        name: recordId
-        required: true
-        type: integer
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: data records
-      tags:
-      - records
-  /records/data/{recordId}/filtered:
-    get:
-      description: |-
-        Required security scopes:
-          * `api:access`
-      operationId: records#filtered
-      parameters:
-      - in: path
-        name: recordId
-        required: true
-        type: integer
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: filtered records
-      tags:
-      - records
-  /records/data/{recordId}/resolved:
-    get:
-      description: |-
-        Required security scopes:
-          * `api:access`
-      operationId: records#resolved
-      parameters:
-      - in: path
-        name: recordId
-        required: true
-        type: integer
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: resolved records
-      tags:
-      - records
-  /records/meta/{recordId}:
-    get:
-      description: |-
-        Required security scopes:
-          * `api:access`
-      operationId: records#meta
-      parameters:
-      - in: path
-        name: recordId
-        required: true
-        type: integer
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: meta records
-      tags:
-      - records
   /refresh:
     post:
       description: Creates a valid JWT given a refresh token.

@@ -2,147 +2,145 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 
-	"github.com/goadesign/goa"
+	"goa.design/goa/v3/security"
 
-	"github.com/fieldkit/cloud/server/common/errors"
+	records "github.com/fieldkit/cloud/server/api/gen/records"
 
-	"github.com/fieldkit/cloud/server/api/app"
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common/errors"
 	"github.com/fieldkit/cloud/server/data"
 )
 
-type RecordsController struct {
+type RecordsService struct {
 	options *ControllerOptions
-	*goa.Controller
 }
 
-func NewRecordsController(ctx context.Context, service *goa.Service, options *ControllerOptions) *RecordsController {
-	return &RecordsController{
-		options:    options,
-		Controller: service.NewController("RecordsController"),
+func NewRecordsService(ctx context.Context, options *ControllerOptions) *RecordsService {
+	return &RecordsService{
+		options: options,
 	}
 }
 
-func writeJSON(responseData *goa.ResponseData, obj interface{}) error {
-	bytes, err := json.Marshal(obj)
-	if err != nil {
-		return err
-	}
-	responseData.Header().Set("Content-Type", "application/json")
-	responseData.WriteHeader(200)
-	responseData.Write(bytes)
-	return nil
-}
-
-func (c *RecordsController) Data(ctx *app.DataRecordsContext) error {
+func (c *RecordsService) Data(ctx context.Context, payload *records.DataPayload) (*records.DataResult, error) {
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	dataRecords := make([]*data.DataRecord, 0)
 	if err := c.options.Database.SelectContext(ctx, &dataRecords, `
 		SELECT id, provision_id, time, number, meta_record_id, ST_AsBinary(location) AS location, raw, pb FROM fieldkit.data_record WHERE (id = $1)
-		`, ctx.RecordID); err != nil {
-		return errors.Structured(err, "data_record_id", ctx.RecordID)
+		`, payload.RecordID); err != nil {
+		return nil, errors.Structured(err, "data_record_id", payload.RecordID)
 	}
 
 	if len(dataRecords) == 0 {
-		return ctx.NotFound()
+		return nil, records.NotFound("not found")
 	}
 
 	metaRecords := make([]*data.MetaRecord, 0)
 	if err := c.options.Database.SelectContext(ctx, &metaRecords, `
 		SELECT * FROM fieldkit.meta_record WHERE (id = $1)
 		`, dataRecords[0].MetaRecordID); err != nil {
-		return errors.Structured(err, "meta_record_id", dataRecords[0].MetaRecordID)
+		return nil, errors.Structured(err, "meta_record_id", dataRecords[0].MetaRecordID)
 	}
 
 	if len(metaRecords) == 0 {
-		return writeJSON(ctx.ResponseData, struct {
+		obj := struct {
 			Data *data.DataRecord `json:"data"`
 		}{
 			dataRecords[0],
-		})
+		}
+
+		return &records.DataResult{
+			Object: obj,
+		}, nil
 	}
 
 	_ = p
 
-	return writeJSON(ctx.ResponseData, struct {
+	obj := struct {
 		Data *data.DataRecord `json:"data"`
 		Meta *data.MetaRecord `json:"meta"`
 	}{
 		dataRecords[0],
 		metaRecords[0],
-	})
+	}
+
+	return &records.DataResult{
+		Object: obj,
+	}, nil
 }
 
-func (c *RecordsController) Meta(ctx *app.MetaRecordsContext) error {
+func (c *RecordsService) Meta(ctx context.Context, payload *records.MetaPayload) (*records.MetaResult, error) {
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	records := make([]*data.MetaRecord, 0)
-	if err := c.options.Database.SelectContext(ctx, &records, `SELECT * FROM fieldkit.meta_record WHERE (id = $1)`, ctx.RecordID); err != nil {
-		return err
+	metaRecords := make([]*data.MetaRecord, 0)
+	if err := c.options.Database.SelectContext(ctx, &metaRecords, `SELECT * FROM fieldkit.meta_record WHERE (id = $1)`, payload.RecordID); err != nil {
+		return nil, err
 	}
 
-	if len(records) == 0 {
-		return ctx.NotFound()
+	if len(metaRecords) == 0 {
+		return nil, records.NotFound("not found")
 	}
 
 	_ = p
 
-	return writeJSON(ctx.ResponseData, struct {
+	obj := struct {
 		Meta *data.MetaRecord `json:"meta"`
 	}{
-		records[0],
-	})
+		metaRecords[0],
+	}
+
+	return &records.MetaResult{
+		Object: obj,
+	}, nil
 }
 
-func (c *RecordsController) Resolved(ctx *app.ResolvedRecordsContext) error {
+func (c *RecordsService) Resolved(ctx context.Context, payload *records.ResolvedPayload) (*records.ResolvedResult, error) {
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	dbDatas := make([]*data.DataRecord, 0)
 	if err := c.options.Database.SelectContext(ctx, &dbDatas, `
 		SELECT id, provision_id, time, number, meta_record_id, ST_AsBinary(location) AS location, raw, pb FROM fieldkit.data_record WHERE (id = $1)
-		`, ctx.RecordID); err != nil {
-		return err
+		`, payload.RecordID); err != nil {
+		return nil, err
 	}
 
 	if len(dbDatas) == 0 {
-		return ctx.NotFound()
+		return nil, records.NotFound("not found")
 	}
 
 	dbMetas := make([]*data.MetaRecord, 0)
 	if err := c.options.Database.SelectContext(ctx, &dbMetas, `
 		SELECT * FROM fieldkit.meta_record WHERE (id = $1)
 		`, dbDatas[0].MetaRecordID); err != nil {
-		return err
+		return nil, err
 	}
 
 	metaFactory := repositories.NewMetaFactory()
 	for _, dbMeta := range dbMetas {
 		_, err := metaFactory.Add(ctx, dbMeta, false)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	filtered, err := metaFactory.Resolve(ctx, dbDatas[0], true, false)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	_ = p
 
-	return writeJSON(ctx.ResponseData, struct {
+	obj := struct {
 		Data     *data.DataRecord             `json:"data"`
 		Meta     *data.MetaRecord             `json:"meta"`
 		Filtered *repositories.FilteredRecord `json:"filtered"`
@@ -150,9 +148,20 @@ func (c *RecordsController) Resolved(ctx *app.ResolvedRecordsContext) error {
 		dbDatas[0],
 		dbMetas[0],
 		filtered,
-	})
+	}
+
+	return &records.ResolvedResult{
+		Object: obj,
+	}, nil
 }
 
-func (c *RecordsController) Filtered(ctx *app.FilteredRecordsContext) error {
-	return writeJSON(ctx.ResponseData, struct{}{})
+func (s *RecordsService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
+	return Authenticate(ctx, AuthAttempt{
+		Token:        token,
+		Scheme:       scheme,
+		Key:          s.options.JWTHMACKey,
+		NotFound:     func(m string) error { return records.NotFound(m) },
+		Unauthorized: func(m string) error { return records.Unauthorized(m) },
+		Forbidden:    func(m string) error { return records.Forbidden(m) },
+	})
 }

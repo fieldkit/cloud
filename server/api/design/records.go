@@ -1,48 +1,73 @@
 package design
 
 import (
-	. "github.com/goadesign/goa/design"
-	. "github.com/goadesign/goa/design/apidsl"
+	. "goa.design/goa/v3/dsl"
 )
 
-var _ = Resource("records", func() {
-	Security(JWT, func() {
+var _ = Service("records", func() {
+	Security(JWTAuth, func() {
 		Scope("api:access")
 	})
 
-	Action("data", func() {
-		Routing(GET("records/data/:recordId"))
-		Params(func() {
-			Param("recordId", Integer)
+	Method("data", func() {
+		Payload(func() {
+			Token("auth")
+			Attribute("recordId", Int64)
 		})
-		Response(NotFound)
-		Response(OK)
+
+		Result(func() {
+			Attribute("object", Any)
+			Required("object")
+		})
+
+		HTTP(func() {
+			GET("records/data/{recordId}")
+
+			Response(StatusOK, func() {
+				Body("object")
+			})
+		})
 	})
 
-	Action("meta", func() {
-		Routing(GET("records/meta/:recordId"))
-		Params(func() {
-			Param("recordId", Integer)
+	Method("meta", func() {
+		Payload(func() {
+			Token("auth")
+			Attribute("recordId", Int64)
 		})
-		Response(NotFound)
-		Response(OK)
+
+		Result(func() {
+			Attribute("object", Any)
+			Required("object")
+		})
+
+		HTTP(func() {
+			GET("records/meta/{recordId}")
+
+			Response(StatusOK, func() {
+				Body("object")
+			})
+		})
 	})
 
-	Action("resolved", func() {
-		Routing(GET("records/data/:recordId/resolved"))
-		Params(func() {
-			Param("recordId", Integer)
+	Method("resolved", func() {
+		Payload(func() {
+			Token("auth")
+			Attribute("recordId", Int64)
 		})
-		Response(NotFound)
-		Response(OK)
+
+		Result(func() {
+			Attribute("object", Any)
+			Required("object")
+		})
+
+		HTTP(func() {
+			GET("records/data/{recordId}/resolved")
+
+			Response(StatusOK, func() {
+				Body("object")
+			})
+		})
 	})
 
-	Action("filtered", func() {
-		Routing(GET("records/data/:recordId/filtered"))
-		Params(func() {
-			Param("recordId", Integer)
-		})
-		Response(NotFound)
-		Response(OK)
-	})
+	commonOptions()
 })

@@ -151,30 +151,3 @@ func TestGetDataRecordResolved(t *testing.T) {
 		}
 	}`)
 }
-
-func TestGetDataRecordFiltered(t *testing.T) {
-	assert := assert.New(t)
-	e, err := tests.NewTestEnv()
-	assert.NoError(err)
-
-	fd, err := e.AddStations(1)
-	assert.NoError(err)
-
-	ar, err := e.AddMetaAndData(fd.Stations[0], fd.Owner)
-	assert.NoError(err)
-
-	api, err := NewTestableApi(e)
-	assert.NoError(err)
-
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/data/%d/filtered", ar.Data.Records[0].ID), nil)
-	req.Header.Add("Authorization", e.NewAuthorizationHeader())
-	rr := tests.ExecuteRequest(req, api)
-
-	assert.Equal(http.StatusOK, rr.Code)
-
-	// NOTE This always just returns {}
-	ja := jsonassert.New(t)
-	ja.Assertf(rr.Body.String(), `
-	{
-	}`)
-}

@@ -51,6 +51,9 @@ import (
 
 	notesSvr "github.com/fieldkit/cloud/server/api/gen/http/notes/server"
 	notes "github.com/fieldkit/cloud/server/api/gen/notes"
+
+	recordsSvr "github.com/fieldkit/cloud/server/api/gen/http/records/server"
+	records "github.com/fieldkit/cloud/server/api/gen/records"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -90,6 +93,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	notesSvc := NewNotesService(ctx, options)
 	notesEndpoints := notes.NewEndpoints(notesSvc)
 
+	recordsSvc := NewRecordsService(ctx, options)
+	recordsEndpoints := records.NewEndpoints(recordsSvc)
+
 	logErrors := logErrors()
 
 	modulesEndpoints.Use(logErrors)
@@ -104,6 +110,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	informationEndpoints.Use(logErrors)
 	sensorEndpoints.Use(logErrors)
 	notesEndpoints.Use(logErrors)
+	recordsEndpoints.Use(logErrors)
 
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
@@ -127,6 +134,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	informationServer := informationSvr.New(informationEndpoints, mux, dec, enc, eh, nil)
 	sensorServer := sensorSvr.New(sensorEndpoints, mux, dec, enc, eh, nil)
 	notesServer := notesSvr.New(notesEndpoints, mux, dec, enc, eh, nil)
+	recordsServer := recordsSvr.New(recordsEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
@@ -140,6 +148,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	informationSvr.Mount(mux, informationServer)
 	sensorSvr.Mount(mux, sensorServer)
 	notesSvr.Mount(mux, notesServer)
+	recordsSvr.Mount(mux, recordsServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -177,6 +186,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range notesServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range recordsServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 

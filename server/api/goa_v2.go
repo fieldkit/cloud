@@ -40,7 +40,6 @@ func CreateGoaV2Handler(ctx context.Context, controllerOptions *ControllerOption
 	app.MountPictureController(service, NewPictureController(service, controllerOptions))
 	app.MountFirmwareController(service, NewFirmwareController(service, controllerOptions))
 	app.MountDataController(service, NewDataController(ctx, service, controllerOptions))
-	app.MountRecordsController(service, NewRecordsController(ctx, service, controllerOptions))
 
 	service.Mux.HandleNotFound(func(rw http.ResponseWriter, req *http.Request, params url.Values) {
 		handle404.ServeHTTP(rw, req)
