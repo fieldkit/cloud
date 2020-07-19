@@ -5,23 +5,18 @@
         </div>
         <div class="main-panel" v-show="!isBusy && isAuthenticated">
             <div class="inner-container">
-                <router-link :to="{ name: 'projects' }" v-if="!previewing">
+                <router-link :to="{ name: 'projects' }">
                     <div class="projects-link">
                         <span class="small-arrow">&lt;</span>
                         Back to Projects
                     </div>
                 </router-link>
-                <div class="projects-link" v-if="previewing" v-on:click="switchToAdmin">
-                    <span class="small-arrow">&lt;</span>
-                    Back to Project Dashboard
-                </div>
                 <div class="view-container">
                     <ProjectAdmin
                         v-if="isAdministrator && displayProject"
                         :user="user"
                         :displayProject="displayProject"
                         :userStations="stations"
-                        @viewProfile="switchToPublic"
                     />
                     <ProjectPublic
                         v-if="!isAdministrator && displayProject"
@@ -63,9 +58,7 @@ export default Vue.extend({
         },
     },
     data: () => {
-        return {
-            previewing: false,
-        };
+        return {};
     },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
@@ -102,16 +95,6 @@ export default Vue.extend({
             } else {
                 this.$router.push("/");
             }
-        },
-        switchToAdmin() {
-            this.previewing = false;
-            // this.adminView = true;
-            // this.publicView = false;
-        },
-        switchToPublic() {
-            this.previewing = true;
-            // this.publicView = true;
-            // this.adminView = false;
         },
         showStation(station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
