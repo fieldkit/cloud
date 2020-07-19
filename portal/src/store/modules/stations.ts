@@ -190,6 +190,7 @@ export class DisplayProject {
         }
         this.places.native = _(stations)
             .map((s) => s.placeNameNative)
+            .uniq()
             .filter((n) => n && n.length > 0)
             .join(", ");
     }
