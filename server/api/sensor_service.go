@@ -42,6 +42,7 @@ type QueryParams struct {
 	Resolution int32     `json:"resolution"`
 	Aggregate  string    `json:"aggregate"`
 	Tail       int32     `json:"tail"`
+	Complete   bool      `json:"complete"`
 }
 
 func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) {
@@ -101,6 +102,8 @@ func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) 
 		tail = *payload.Tail
 	}
 
+	complete := payload.Complete != nil && *payload.Complete
+
 	qp = &QueryParams{
 		Start:      start,
 		End:        end,
@@ -109,6 +112,7 @@ func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) 
 		Sensors:    sensors,
 		Aggregate:  aggregate,
 		Tail:       tail,
+		Complete:   complete,
 	}
 
 	return
@@ -248,7 +252,6 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	}
 
 	if qp.Tail > 0 {
-		log.Infow("HI")
 		return c.tail(ctx, qp)
 	} else if len(qp.Sensors) == 0 {
 		return c.stationsMeta(ctx, qp.Stations)
@@ -400,15 +403,43 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	if selectedAggregateName != qp.Aggregate {
 		message = "selected"
 	}
+
+	if qp.Complete {
+		queryStart = queryStart.UTC().Truncate(time.Duration(interval) * time.Second)
+		queryEnd = queryEnd.UTC().Truncate(time.Duration(interval) * time.Second)
+	}
+
 	log.Infow(message, "aggregate", selectedAggregateName, "number_records", summary.NumberRecords, "start", queryStart, "end", queryEnd, "interval", interval, "tgs", timeGroupThreshold)
+
+	if false {
+		query, args, err := sqlx.In(`SELECT dd AS time FROM generate_series($1::timestamp, $2::timestamp, $3 * interval '1 sec') AS dd`, queryStart, queryEnd, interval)
+		if err != nil {
+			return nil, err
+		}
+
+		queried, err := c.db.QueryxContext(ctx, c.db.Rebind(query), args...)
+		if err != nil {
+			return nil, err
+		}
+
+		defer queried.Close()
+
+		type TestingRow struct {
+			Time time.Time `db:"time"`
+		}
+		for queried.Next() {
+			row := &TestingRow{}
+			if err = queried.StructScan(row); err != nil {
+				return nil, err
+			}
+		}
+	}
 
 	rows := make([]*DataRow, 0)
 
 	if summary.NumberRecords > 0 {
 		buildQuery := func() (query string, args []interface{}, err error) {
-			if payload.Complete != nil && *payload.Complete {
-				queryStart = queryStart.Truncate(time.Duration(interval) * time.Second)
-				queryEnd = queryEnd.Truncate(time.Duration(interval) * time.Second)
+			if qp.Complete {
 				return sqlx.In(sqlQueryComplete, queryStart, queryEnd, interval, queryStart, queryEnd, qp.Stations, qp.Sensors, timeGroupThreshold)
 			}
 			return sqlx.In(sqlQueryIncomplete, queryStart, queryEnd, qp.Stations, qp.Sensors, timeGroupThreshold)
