@@ -42,8 +42,9 @@ export default {
             console.log("map: initialized");
             this.map = map;
         },
-        onMapLoaded() {
+        onMapLoaded(map) {
             console.log("map: loaded (emit ready)");
+            this.map = map;
 
             if (!this.map.hasImage("dot")) {
                 const compass = this.$loadAsset("Icon_Map_Dot.png");
@@ -57,7 +58,7 @@ export default {
 
             this.map.resize();
 
-            this.$emit("mapReady", this.map);
+            this.$emit("map-ready", this.map);
 
             this.updateMap();
         },

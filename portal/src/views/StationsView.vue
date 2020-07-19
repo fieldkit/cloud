@@ -59,7 +59,6 @@ export default Vue.extend({
             anyStations: (s: GlobalState) => s.stations.user.stations.length > 0,
         }),
         activeStation() {
-            console.log("station", this.$store.state.stations.stations[this.id]);
             return this.$store.state.stations.stations[this.id];
         },
     },
@@ -93,7 +92,6 @@ export default Vue.extend({
             this.map = map;
         },
         onSidebarToggle() {
-            console.log("stations toggle");
             if (this.map) {
                 this.map.resize();
             }
