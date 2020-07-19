@@ -183,7 +183,7 @@ export const D3Map = Vue.extend({
                 this.map.removeSource("route");
             }
         },
-        mapInitialized(map) {
+        mapLoaded(map) {
             this.viz.log("map: ready");
             this.map = map;
             this.map.resize();
@@ -205,7 +205,7 @@ export const D3Map = Vue.extend({
                 show: true,
                 position: 'bottom-left',
             }"
-            @map-init="mapInitialized"
+            @map-load="mapLoaded"
         />
         <div class="no-data-with-location" v-if="noData">No {{ chart.sensor.label }} data found with location information.</div>
 	</div>`,
