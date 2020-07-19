@@ -368,6 +368,12 @@ export default {
     margin-right: 20px;
     background-color: white;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.details .photo {
+    display: flex;
+    flex-direction: column;
 }
 .details > .right {
     flex: 2;
@@ -392,10 +398,11 @@ export default {
     font-weight: bold;
     padding-bottom: 20px;
 }
-.link {
+.details .details-heading .link {
     margin-left: auto;
+}
+.link {
     font-weight: bold;
-    padding-bottom: 20px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
