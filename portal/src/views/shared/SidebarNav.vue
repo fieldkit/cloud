@@ -2,7 +2,7 @@
     <div>
         <div v-if="!narrow" class="container-side-wide">
             <div class="sidebar-header">
-                <router-link :to="{ name: 'projects' }" class="project-link">
+                <router-link :to="{ name: 'projects' }">
                     <img alt="FieldKit Logo" id="header-logo" src="@/assets/FieldKit_Logo_Blue.png" />
                 </router-link>
             </div>
