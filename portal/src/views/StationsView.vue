@@ -1,7 +1,7 @@
 <template>
     <StandardLayout @sidebar-toggle="onSidebarToggle" :viewingStations="true">
         <div class="container-map">
-            <StationsMap @mapReady="onMapReady" @showSummary="showSummary" :mapped="mapped" />
+            <StationsMap @show-summary="showSummary" :mapped="mapped" :layoutChanges="layoutChanges" />
             <StationSummary v-if="activeStation" class="summary-container" @close="closeSummary" :station="activeStation" />
             <div v-if="isAuthenticated && showNoStationsMessage && hasNoStations" id="no-stations">
                 <div id="close-notice-btn" v-on:click="closeNotice">
@@ -45,7 +45,7 @@ export default Vue.extend({
     },
     data: () => {
         return {
-            map: null,
+            layoutChanges: 0,
             showNoStationsMessage: true,
         };
     },
@@ -88,13 +88,8 @@ export default Vue.extend({
         closeSummary() {
             return this.$router.push({ name: "stations" });
         },
-        onMapReady(map) {
-            this.map = map;
-        },
         onSidebarToggle() {
-            if (this.map) {
-                this.map.resize();
-            }
+            this.layoutChanges++;
         },
         closeNotice() {
             this.showNoStationsMessage = false;

@@ -38,6 +38,17 @@ export default Vue.extend({
             type: Object,
             required: true,
         },
+        layoutChanges: {
+            type: Number,
+            default: 0,
+        },
+    },
+    watch: {
+        layoutChanges(this: any) {
+            if (this.map) {
+                this.map.resize();
+            }
+        },
     },
     methods: {
         onMapInitialized(this: any, map) {
@@ -45,7 +56,7 @@ export default Vue.extend({
             this.map = map;
         },
         onMapLoaded(this: any, map) {
-            console.log("map: loaded (emit ready)");
+            console.log("map: loaded");
             this.map = map;
 
             if (!this.map.hasImage("dot")) {
@@ -60,12 +71,13 @@ export default Vue.extend({
 
             this.map.resize();
 
-            this.$emit("map-ready", this.map);
-
             this.updateMap();
         },
         updateMap(this: any) {
-            if (!this.map && this.mapped && this.mapped.valid) {
+            if (!this.map) {
+                return;
+            }
+            if (!this.mapped || !this.mapped.valid) {
                 return;
             }
 
@@ -93,7 +105,7 @@ export default Vue.extend({
                 this.map.on("click", "station-markers", (e) => {
                     const id = e.features[0].properties.id;
                     console.log("map: click", id);
-                    this.$emit("showSummary", { id: id });
+                    this.$emit("show-summary", { id: id });
                 });
             } else {
                 console.log("map: ignored", this.mapped);

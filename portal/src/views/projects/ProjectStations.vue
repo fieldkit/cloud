@@ -39,7 +39,7 @@
                 <img v-if="!showStationsPanel" alt="Expand List" src="@/assets/tab-expand.png" class="toggle-icon" />
             </div>
             <div class="project-stations-map-container">
-                <StationsMap @mapReady="onMapReady" @showSummary="showSummary" ref="stationsMap" :mapped="mappedProject" />
+                <StationsMap @show-summary="showSummary" :mapped="mappedProject" />
                 <StationSummary v-if="activeStation" :station="activeStation" :readings="false" @close="onCloseSummary" />
             </div>
         </div>
@@ -114,11 +114,6 @@ export default Vue.extend({
         },
     },
     methods: {
-        onMapReady(this: any, map) {
-            console.log("map ready resize");
-            this.map = map;
-            this.map.resize();
-        },
         showStation(this: any, station) {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
         },
