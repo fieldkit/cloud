@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="section-body">
-            <div class="stations-panel">
+            <div class="stations-panel" v-show="showStationsPanel">
                 <div v-if="projectStations.length == 0" class="project-stations-no-stations">
                     <h3>No Stations</h3>
                     <p>
@@ -34,12 +34,12 @@
                     <PaginationControls :page="page" :totalPages="totalPages" @new-page="onNewPage" />
                 </div>
             </div>
-            <div class="toggle-icon-container" v-on:click="toggleStations" v-if="false">
+            <div class="toggle-icon-container" v-on:click="toggleStationsPanel">
                 <img v-if="showStationsPanel" alt="Collapse List" src="@/assets/tab-collapse.png" class="toggle-icon" />
                 <img v-if="!showStationsPanel" alt="Expand List" src="@/assets/tab-expand.png" class="toggle-icon" />
             </div>
             <div class="project-stations-map-container">
-                <StationsMap @show-summary="showSummary" :mapped="mappedProject" />
+                <StationsMap @show-summary="showSummary" :mapped="mappedProject" :layoutChanges="layoutChanges" />
                 <StationSummary v-if="activeStation" :station="activeStation" :readings="false" @close="onCloseSummary" />
             </div>
         </div>
@@ -71,6 +71,7 @@ export default Vue.extend({
     data: () => {
         return {
             activeStationId: null,
+            layoutChanges: 0,
             following: false,
             showStationsPanel: true,
             addingStation: false,
@@ -158,8 +159,10 @@ export default Vue.extend({
         onCloseSummary() {
             this.activeStationId = null;
         },
-        toggleStations() {
-            //
+        toggleStationsPanel() {
+            this.layoutChanges++;
+            this.showStationsPanel = !this.showStationsPanel;
+            console.log("toggle", this.showStationsPanel, this.layoutChanges);
         },
         onNewPage(this: any, page: number) {
             this.page = page;
@@ -171,7 +174,7 @@ export default Vue.extend({
 <style scoped>
 .toggle-icon-container {
     float: right;
-    margin: 16px -34px 0 0;
+    margin: 16px -38px 0 0;
     position: relative;
     z-index: 2;
     cursor: pointer;
