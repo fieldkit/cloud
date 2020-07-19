@@ -1,12 +1,5 @@
 <template>
     <div class="project-admin project-container" v-if="project">
-        <div class="header">
-            <div class="left">
-                <div class="project-name">{{ project.name }}</div>
-                <div class="project-dashboard">Project Dashboard</div>
-            </div>
-            <div class="right activity">Activity</div>
-        </div>
         <div class="details">
             <div class="left">
                 <div class="photo">

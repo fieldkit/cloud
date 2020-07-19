@@ -1,22 +1,9 @@
 <template>
     <StandardLayout>
         <div class="notes-view">
-            <div class="header">
-                <DoubleHeader
-                    :title="project.name"
-                    subtitle="Field Notes"
-                    backTitle="Back to dashboard"
-                    backRoute="projects"
-                    v-if="project"
-                />
-                <DoubleHeader
-                    title="My Stations"
-                    subtitle="Field Notes"
-                    backTitle="Back to dashboard"
-                    backRoute="projects"
-                    v-if="!project"
-                />
-            </div>
+            <DoubleHeader :title="project.name" subtitle="Field Notes" backTitle="Back to dashboard" backRoute="projects" v-if="project" />
+            <DoubleHeader title="My Stations" subtitle="Field Notes" backTitle="Back to dashboard" backRoute="projects" v-if="!project" />
+
             <div class="lower">
                 <div class="side">
                     <StationTabs :stations="visibleStations" :selected="selectedStation" @selected="onSelected" />
@@ -235,6 +222,7 @@ export default Vue.extend({
     flex-direction: column;
     height: 100%;
     background-color: #fcfcfc;
+    text-align: left;
 }
 .notes-view .header {
     margin-top: 40px;

@@ -1,37 +1,28 @@
 <template>
     <StandardLayout :viewingProjects="true">
-        <div id="loading" v-if="isBusy">
-            <img alt="" src="@/assets/progress.gif" />
-        </div>
-        <div class="main-panel" v-show="!isBusy && isAuthenticated">
-            <div class="inner-container">
-                <router-link :to="{ name: 'projects' }">
-                    <div class="projects-link">
-                        <span class="small-arrow">&lt;</span>
-                        Back to Projects
-                    </div>
-                </router-link>
-                <div class="view-container">
-                    <ProjectAdmin
-                        v-if="isAdministrator && displayProject"
-                        :user="user"
-                        :displayProject="displayProject"
-                        :userStations="stations"
-                    />
-                    <ProjectPublic
-                        v-if="!isAdministrator && displayProject"
-                        :user="user"
-                        :displayProject="displayProject"
-                        :userStations="stations"
-                    />
-                </div>
-            </div>
+        <div class="project-view" v-if="displayProject">
+            <DoubleHeader
+                :title="displayProject.name"
+                subtitle="Project Dashbord"
+                backTitle="Back to dashboard"
+                backRoute="projects"
+                v-if="displayProject"
+            />
+
+            <ProjectAdmin v-if="isAdministrator" :user="user" :displayProject="displayProject" :userStations="stations" />
+            <ProjectPublic
+                v-if="!isAdministrator && displayProject"
+                :user="user"
+                :displayProject="displayProject"
+                :userStations="stations"
+            />
         </div>
     </StandardLayout>
 </template>
 
 <script lang="ts">
 import Vue from "@/store/strong-vue";
+import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 import ProjectPublic from "./ProjectPublic.vue";
 import ProjectAdmin from "./ProjectAdmin.vue";
@@ -43,6 +34,7 @@ import { GlobalState } from "@/store/modules/global";
 export default Vue.extend({
     name: "ProjectView",
     components: {
+        ...CommonComponents,
         StandardLayout,
         ProjectPublic,
         ProjectAdmin,
@@ -104,11 +96,13 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.main-panel {
+.project-view {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    text-align: left;
     background-color: #fcfcfc;
     padding: 40px;
+    text-align: left;
 }
 .small-arrow {
     font-size: 11px;

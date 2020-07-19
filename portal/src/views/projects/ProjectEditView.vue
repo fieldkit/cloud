@@ -1,12 +1,7 @@
 <template>
     <StandardLayout :viewingProjects="true">
-        <div id="loading" v-if="loading">
-            <img alt="" src="@/assets/progress.gif" />
-        </div>
-        <div class="main-panel" v-show="!loading">
-            <div v-if="!loading">
-                <ProjectForm :project="activeProject" @updating="onProjectUpdate" />
-            </div>
+        <div class="main-panel" v-if="!loading">
+            <ProjectForm :project="activeProject" @updating="onProjectUpdate" />
         </div>
     </StandardLayout>
 </template>
@@ -67,6 +62,14 @@ export default Vue.extend({
 </script>
 
 <style scoped>
+.main-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #fcfcfc;
+    text-align: left;
+    padding: 40px;
+}
 .small-arrow {
     font-size: 11px;
     float: left;
@@ -93,10 +96,5 @@ export default Vue.extend({
 }
 #add-project img {
     vertical-align: bottom;
-}
-.main-panel {
-    padding: 20px;
-    background: #fcfcfc;
-    height: 100%;
 }
 </style>

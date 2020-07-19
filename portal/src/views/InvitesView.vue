@@ -1,21 +1,16 @@
 <template>
     <StandardLayout>
-        <div id="loading" v-if="loading">
-            <img alt="" src="../assets/progress.gif" />
-        </div>
-        <div class="main-panel" v-show="!loading">
-            <div class="view-user" v-if="user">
-                <div id="user-name">Hi, {{ this.user.name }}</div>
-                <div class="notification" v-if="invalidToken">
-                    Sorry, that invite link appears to have been already used or is invalid.
-                </div>
-                <div v-if="pending.length == 0" class="invite-heading">You have no pending invites.</div>
-                <div v-if="pending.length > 0" class="invite-heading">You've been invited to the following projects:</div>
-                <div v-for="invite in pending" v-bind:key="invite.id" class="project-row">
-                    <div class="project-name">{{ invite.project.name }}</div>
-                    <div class="accept-link" :data-id="invite.id" v-on:click="(ev) => accept(ev, invite)">Accept</div>
-                    <div class="decline-link" :data-id="invite.id" v-on:click="(ev) => decline(ev, invite)">Decline</div>
-                </div>
+        <div class="invites-view" v-if="user && !loading">
+            <div id="user-name">Hi, {{ user.name }}</div>
+            <div class="notification" v-if="invalidToken">
+                Sorry, that invite link appears to have been already used or is invalid.
+            </div>
+            <div v-if="pending.length == 0" class="invite-heading">You have no pending invites.</div>
+            <div v-if="pending.length > 0" class="invite-heading">You've been invited to the following projects:</div>
+            <div v-for="invite in pending" v-bind:key="invite.id" class="project-row">
+                <div class="project-name">{{ invite.project.name }}</div>
+                <div class="accept-link" :data-id="invite.id" v-on:click="(ev) => accept(ev, invite)">Accept</div>
+                <div class="decline-link" :data-id="invite.id" v-on:click="(ev) => decline(ev, invite)">Decline</div>
             </div>
         </div>
     </StandardLayout>
@@ -92,22 +87,13 @@ export default {
 </script>
 
 <style scoped>
-#account-heading {
-    font-weight: bold;
-    font-size: 24px;
-    float: left;
-    margin: 15px 0 0 15px;
-}
-#loading {
-    width: 100%;
+.invites-view {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.65);
-    text-align: center;
-}
-.no-user-message {
-    float: left;
-    font-size: 20px;
-    margin: 40px 0 0 40px;
+    background-color: #fcfcfc;
+    padding: 40px;
+    text-align: left;
 }
 .show-link {
     text-decoration: underline;
@@ -115,20 +101,17 @@ export default {
 #user-name {
     font-size: 24px;
     font-weight: bold;
-    margin: 30px 15px 0 20px;
 }
 .invite-heading {
     float: left;
     clear: both;
     font-size: 18px;
-    margin: 30px 0 0 20px;
 }
 .project-row {
     float: left;
     clear: both;
     min-width: 600px;
-    padding: 8px;
-    margin: 30px 0 0 20px;
+    margin: 30px 0 0 0;
     border-bottom: 2px solid #d8dce0;
 }
 .project-name {
@@ -171,7 +154,6 @@ export default {
     font-weight: 600;
 }
 .notification {
-    margin: 20px;
     padding: 20px;
     background-color: #f8d7da;
     border: 2px;

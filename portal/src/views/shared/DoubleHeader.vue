@@ -1,11 +1,11 @@
 <template>
     <div class="double-header">
-        <div class="back" v-on:click="onBack">
+        <div class="back" v-on:click="onBack" v-if="backTitle && backRoute">
             <span class="small-arrow">&lt;</span>
             {{ backTitle }}
         </div>
         <div class="one">{{ title }}</div>
-        <div class="two">{{ subtitle }}</div>
+        <div class="two" v-if="subtitle">{{ subtitle }}</div>
     </div>
 </template>
 
@@ -21,15 +21,15 @@ export default Vue.extend({
         },
         subtitle: {
             type: String,
-            required: true,
+            default: null,
         },
         backTitle: {
             type: String,
-            required: true,
+            default: null,
         },
         backRoute: {
             type: String,
-            required: true,
+            default: null,
         },
     },
     methods: {
@@ -43,7 +43,6 @@ export default Vue.extend({
 <style>
 .double-header {
     text-align: left;
-    padding-left: 40px;
 }
 .double-header > div {
 }

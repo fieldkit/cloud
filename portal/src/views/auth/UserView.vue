@@ -1,24 +1,23 @@
 <template>
     <StandardLayout>
-        <div id="loading" v-if="loading">
-            <img alt="" src="../../assets/progress.gif" />
-        </div>
-        <div class="main-panel" v-show="!isBusy && isAuthenticated" v-if="user">
-            <div class="heading">My Account</div>
-            <div class="notification success" v-if="notifySaved">
-                Profile saved.
-            </div>
+        <div class="user-view" v-if="user">
+            <div class="container">
+                <div class="heading">My Account</div>
+                <div class="notification success" v-if="notifySaved">
+                    Profile saved.
+                </div>
 
-            <ProfileForm :user="user" @save="saveForm" />
+                <ProfileForm :user="user" @save="saveForm" />
 
-            <div class="notification success" v-if="notifyPasswordChanged">
-                Password changed.
-            </div>
-            <div class="notification failed" v-if="!passwordOk">
-                Please check your password and try again.
-            </div>
+                <div class="notification success" v-if="notifyPasswordChanged">
+                    Password changed.
+                </div>
+                <div class="notification failed" v-if="!passwordOk">
+                    Please check your password and try again.
+                </div>
 
-            <ChangePasswordForm :user="user" @save="changePassword" />
+                <ChangePasswordForm :user="user" @save="changePassword" />
+            </div>
         </div>
     </StandardLayout>
 </template>
@@ -116,19 +115,20 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.main-panel {
+.user-view {
     display: flex;
     flex-direction: column;
+    height: 100%;
+    background-color: #fcfcfc;
+    padding: 40px;
+    text-align: left;
+}
+.container {
     max-width: 700px;
-    padding: 20px;
 }
 .heading {
     font-weight: bold;
     font-size: 24px;
-}
-#close-form-btn {
-    margin-top: 15px;
-    cursor: pointer;
 }
 .image-container {
     margin-bottom: 40px;

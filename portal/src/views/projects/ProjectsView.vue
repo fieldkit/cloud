@@ -1,25 +1,23 @@
 <template>
     <StandardLayout :viewingProjects="true">
-        <div v-show="!isBusy && isAuthenticated">
-            <div class="projects-container">
-                <div class="container mine">
-                    <div class="header">
-                        <h1 v-if="isAuthenticated">My Projects</h1>
-                        <h1 v-if="!isAuthenticated">Projects</h1>
-                        <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
-                            <img alt="Add project" src="@/assets/add.png" />
-                            Add Project
-                        </div>
+        <div class="projects-view">
+            <div class="container mine">
+                <div class="header">
+                    <h1 v-if="isAuthenticated">My Projects</h1>
+                    <h1 v-if="!isAuthenticated">Projects</h1>
+                    <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
+                        <img alt="Add project" src="@/assets/add.png" />
+                        Add Project
                     </div>
+                </div>
 
-                    <ProjectThumbnails :projects="userProjects" />
+                <ProjectThumbnails :projects="userProjects" />
+            </div>
+            <div class="container community">
+                <div class="header">
+                    <h1>Community Projects</h1>
                 </div>
-                <div class="container community">
-                    <div class="header">
-                        <h1>Community Projects</h1>
-                    </div>
-                    <ProjectThumbnails :projects="publicProjects" />
-                </div>
+                <ProjectThumbnails :projects="publicProjects" />
             </div>
         </div>
     </StandardLayout>
@@ -65,14 +63,16 @@ export default {
 </script>
 
 <style scoped>
-.projects-container {
-    margin-left: 20px;
+.projects-view {
     display: flex;
     flex-direction: column;
-    max-width: 900px;
+    height: 100%;
+    background-color: #fcfcfc;
+    padding: 40px;
+    text-align: left;
 }
-
 .container {
+    max-width: 900px;
 }
 .container.community {
     border-top: 2px solid #afafaf;

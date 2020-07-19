@@ -1,11 +1,7 @@
 <template>
     <StandardLayout @show-station="showStation" :defaultShowStation="false">
         <div class="explore-view">
-            <div class="explore-header">
-                <div class="left">
-                    <h2>Data View</h2>
-                </div>
-            </div>
+            <DoubleHeader title="Data View" />
 
             <div v-if="showNoSensors" class="notification">
                 Oh snap, this station doesn't appear to have any sensors to show you.
@@ -23,6 +19,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Promise from "bluebird";
+import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 
 import { mapState, mapGetters } from "vuex";
@@ -37,6 +34,7 @@ import { VizWorkspace } from "./VizWorkspace";
 export default Vue.extend({
     name: "ExploreView",
     components: {
+        ...CommonComponents,
         StandardLayout,
         VizWorkspace,
     },
