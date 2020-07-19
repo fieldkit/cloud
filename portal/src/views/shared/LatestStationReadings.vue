@@ -45,17 +45,18 @@ export default Vue.extend({
     },
     data: () => {
         return {
+            allSensorsMemoized: _.memoize(() => new FKApi().getAllSensors()),
             loading: true,
             sensors: [],
         };
     },
-    beforeMount(this: any) {
-        return this.refresh();
-    },
     watch: {
         id() {
-            this.refresh();
+            return this.refresh();
         },
+    },
+    beforeMount(this: any) {
+        return this.refresh();
     },
     methods: {
         refresh() {
@@ -66,11 +67,9 @@ export default Vue.extend({
                 return new FKApi().tailSensorData(params);
             };
 
-            const meta = () => new FKApi().getAllSensors();
-
             this.loading = true;
 
-            return Promise.all([data(), meta()])
+            return Promise.all([data(), this.allSensorsMemoized()])
                 .then(([data, meta]) => {
                     const idsToKey = _.mapValues(
                         _.keyBy(meta.sensors, (k) => k.id),
@@ -104,7 +103,6 @@ export default Vue.extend({
                         .value();
                 })
                 .then((sensors) => {
-                    console.log("sensors", sensors);
                     this.sensors = sensors;
                     this.loading = false;
                     return this.sensors;
