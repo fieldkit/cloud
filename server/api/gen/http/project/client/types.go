@@ -8,6 +8,8 @@
 package client
 
 import (
+	"unicode/utf8"
+
 	project "github.com/fieldkit/cloud/server/api/gen/project"
 	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
 	goa "goa.design/goa/v3/pkg"
@@ -23,6 +25,47 @@ type AddUpdateRequestBody struct {
 // endpoint HTTP request body.
 type ModifyUpdateRequestBody struct {
 	Body string `form:"body" json:"body" xml:"body"`
+}
+
+// AddRequestBody is the type of the "project" service "add" endpoint HTTP
+// request body.
+type AddRequestBody struct {
+	Name        string  `form:"name" json:"name" xml:"name"`
+	Slug        string  `form:"slug" json:"slug" xml:"slug"`
+	Description string  `form:"description" json:"description" xml:"description"`
+	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
+	Location    *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Tags        *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
+	Private     *bool   `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	StartTime   *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime     *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+}
+
+// UpdateRequestBody is the type of the "project" service "update" endpoint
+// HTTP request body.
+type UpdateRequestBody struct {
+	Name        string  `form:"name" json:"name" xml:"name"`
+	Slug        string  `form:"slug" json:"slug" xml:"slug"`
+	Description string  `form:"description" json:"description" xml:"description"`
+	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
+	Location    *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Tags        *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
+	Private     *bool   `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	StartTime   *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime     *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+}
+
+// InviteRequestBody is the type of the "project" service "invite" endpoint
+// HTTP request body.
+type InviteRequestBody struct {
+	Email string `form:"email" json:"email" xml:"email"`
+	Role  int32  `form:"role" json:"role" xml:"role"`
+}
+
+// RemoveUserRequestBody is the type of the "project" service "remove user"
+// endpoint HTTP request body.
+type RemoveUserRequestBody struct {
+	Email string `form:"email" json:"email" xml:"email"`
 }
 
 // AddUpdateResponseBody is the type of the "project" service "add update"
@@ -51,6 +94,72 @@ type InvitesResponseBody struct {
 // invite" endpoint HTTP response body.
 type LookupInviteResponseBody struct {
 	Pending []*PendingInviteResponseBody `form:"pending,omitempty" json:"pending,omitempty" xml:"pending,omitempty"`
+}
+
+// AddResponseBody is the type of the "project" service "add" endpoint HTTP
+// response body.
+type AddResponseBody struct {
+	ID                *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name              *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Slug              *string `form:"slug,omitempty" json:"slug,omitempty" xml:"slug,omitempty"`
+	Description       *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Goal              *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
+	Location          *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Tags              *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
+	Private           *bool   `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly          *bool   `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
+	NumberOfFollowers *int32  `form:"numberOfFollowers,omitempty" json:"numberOfFollowers,omitempty" xml:"numberOfFollowers,omitempty"`
+}
+
+// UpdateResponseBody is the type of the "project" service "update" endpoint
+// HTTP response body.
+type UpdateResponseBody struct {
+	ID                *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name              *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Slug              *string `form:"slug,omitempty" json:"slug,omitempty" xml:"slug,omitempty"`
+	Description       *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Goal              *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
+	Location          *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Tags              *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
+	Private           *bool   `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly          *bool   `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
+	NumberOfFollowers *int32  `form:"numberOfFollowers,omitempty" json:"numberOfFollowers,omitempty" xml:"numberOfFollowers,omitempty"`
+}
+
+// GetResponseBody is the type of the "project" service "get" endpoint HTTP
+// response body.
+type GetResponseBody struct {
+	ID                *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name              *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Slug              *string `form:"slug,omitempty" json:"slug,omitempty" xml:"slug,omitempty"`
+	Description       *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Goal              *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
+	Location          *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Tags              *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
+	Private           *bool   `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly          *bool   `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
+	NumberOfFollowers *int32  `form:"numberOfFollowers,omitempty" json:"numberOfFollowers,omitempty" xml:"numberOfFollowers,omitempty"`
+}
+
+// ListCommunityResponseBody is the type of the "project" service "list
+// community" endpoint HTTP response body.
+type ListCommunityResponseBody struct {
+	Projects ProjectCollectionResponseBody `form:"projects,omitempty" json:"projects,omitempty" xml:"projects,omitempty"`
+}
+
+// ListMineResponseBody is the type of the "project" service "list mine"
+// endpoint HTTP response body.
+type ListMineResponseBody struct {
+	Projects ProjectCollectionResponseBody `form:"projects,omitempty" json:"projects,omitempty" xml:"projects,omitempty"`
 }
 
 // AddUpdateBadRequestResponseBody is the type of the "project" service "add
@@ -165,6 +274,166 @@ type RejectInviteNotFoundResponseBody string
 // "reject invite" endpoint HTTP response body for the "unauthorized" error.
 type RejectInviteUnauthorizedResponseBody string
 
+// AddBadRequestResponseBody is the type of the "project" service "add"
+// endpoint HTTP response body for the "bad-request" error.
+type AddBadRequestResponseBody string
+
+// AddForbiddenResponseBody is the type of the "project" service "add" endpoint
+// HTTP response body for the "forbidden" error.
+type AddForbiddenResponseBody string
+
+// AddNotFoundResponseBody is the type of the "project" service "add" endpoint
+// HTTP response body for the "not-found" error.
+type AddNotFoundResponseBody string
+
+// AddUnauthorizedResponseBody is the type of the "project" service "add"
+// endpoint HTTP response body for the "unauthorized" error.
+type AddUnauthorizedResponseBody string
+
+// UpdateBadRequestResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "bad-request" error.
+type UpdateBadRequestResponseBody string
+
+// UpdateForbiddenResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "forbidden" error.
+type UpdateForbiddenResponseBody string
+
+// UpdateNotFoundResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "not-found" error.
+type UpdateNotFoundResponseBody string
+
+// UpdateUnauthorizedResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "unauthorized" error.
+type UpdateUnauthorizedResponseBody string
+
+// GetBadRequestResponseBody is the type of the "project" service "get"
+// endpoint HTTP response body for the "bad-request" error.
+type GetBadRequestResponseBody string
+
+// GetForbiddenResponseBody is the type of the "project" service "get" endpoint
+// HTTP response body for the "forbidden" error.
+type GetForbiddenResponseBody string
+
+// GetNotFoundResponseBody is the type of the "project" service "get" endpoint
+// HTTP response body for the "not-found" error.
+type GetNotFoundResponseBody string
+
+// GetUnauthorizedResponseBody is the type of the "project" service "get"
+// endpoint HTTP response body for the "unauthorized" error.
+type GetUnauthorizedResponseBody string
+
+// ListCommunityBadRequestResponseBody is the type of the "project" service
+// "list community" endpoint HTTP response body for the "bad-request" error.
+type ListCommunityBadRequestResponseBody string
+
+// ListCommunityForbiddenResponseBody is the type of the "project" service
+// "list community" endpoint HTTP response body for the "forbidden" error.
+type ListCommunityForbiddenResponseBody string
+
+// ListCommunityNotFoundResponseBody is the type of the "project" service "list
+// community" endpoint HTTP response body for the "not-found" error.
+type ListCommunityNotFoundResponseBody string
+
+// ListCommunityUnauthorizedResponseBody is the type of the "project" service
+// "list community" endpoint HTTP response body for the "unauthorized" error.
+type ListCommunityUnauthorizedResponseBody string
+
+// ListMineBadRequestResponseBody is the type of the "project" service "list
+// mine" endpoint HTTP response body for the "bad-request" error.
+type ListMineBadRequestResponseBody string
+
+// ListMineForbiddenResponseBody is the type of the "project" service "list
+// mine" endpoint HTTP response body for the "forbidden" error.
+type ListMineForbiddenResponseBody string
+
+// ListMineNotFoundResponseBody is the type of the "project" service "list
+// mine" endpoint HTTP response body for the "not-found" error.
+type ListMineNotFoundResponseBody string
+
+// ListMineUnauthorizedResponseBody is the type of the "project" service "list
+// mine" endpoint HTTP response body for the "unauthorized" error.
+type ListMineUnauthorizedResponseBody string
+
+// InviteBadRequestResponseBody is the type of the "project" service "invite"
+// endpoint HTTP response body for the "bad-request" error.
+type InviteBadRequestResponseBody string
+
+// InviteForbiddenResponseBody is the type of the "project" service "invite"
+// endpoint HTTP response body for the "forbidden" error.
+type InviteForbiddenResponseBody string
+
+// InviteNotFoundResponseBody is the type of the "project" service "invite"
+// endpoint HTTP response body for the "not-found" error.
+type InviteNotFoundResponseBody string
+
+// InviteUnauthorizedResponseBody is the type of the "project" service "invite"
+// endpoint HTTP response body for the "unauthorized" error.
+type InviteUnauthorizedResponseBody string
+
+// RemoveUserBadRequestResponseBody is the type of the "project" service
+// "remove user" endpoint HTTP response body for the "bad-request" error.
+type RemoveUserBadRequestResponseBody string
+
+// RemoveUserForbiddenResponseBody is the type of the "project" service "remove
+// user" endpoint HTTP response body for the "forbidden" error.
+type RemoveUserForbiddenResponseBody string
+
+// RemoveUserNotFoundResponseBody is the type of the "project" service "remove
+// user" endpoint HTTP response body for the "not-found" error.
+type RemoveUserNotFoundResponseBody string
+
+// RemoveUserUnauthorizedResponseBody is the type of the "project" service
+// "remove user" endpoint HTTP response body for the "unauthorized" error.
+type RemoveUserUnauthorizedResponseBody string
+
+// AddStationBadRequestResponseBody is the type of the "project" service "add
+// station" endpoint HTTP response body for the "bad-request" error.
+type AddStationBadRequestResponseBody string
+
+// AddStationForbiddenResponseBody is the type of the "project" service "add
+// station" endpoint HTTP response body for the "forbidden" error.
+type AddStationForbiddenResponseBody string
+
+// AddStationNotFoundResponseBody is the type of the "project" service "add
+// station" endpoint HTTP response body for the "not-found" error.
+type AddStationNotFoundResponseBody string
+
+// AddStationUnauthorizedResponseBody is the type of the "project" service "add
+// station" endpoint HTTP response body for the "unauthorized" error.
+type AddStationUnauthorizedResponseBody string
+
+// RemoveStationBadRequestResponseBody is the type of the "project" service
+// "remove station" endpoint HTTP response body for the "bad-request" error.
+type RemoveStationBadRequestResponseBody string
+
+// RemoveStationForbiddenResponseBody is the type of the "project" service
+// "remove station" endpoint HTTP response body for the "forbidden" error.
+type RemoveStationForbiddenResponseBody string
+
+// RemoveStationNotFoundResponseBody is the type of the "project" service
+// "remove station" endpoint HTTP response body for the "not-found" error.
+type RemoveStationNotFoundResponseBody string
+
+// RemoveStationUnauthorizedResponseBody is the type of the "project" service
+// "remove station" endpoint HTTP response body for the "unauthorized" error.
+type RemoveStationUnauthorizedResponseBody string
+
+// DeleteBadRequestResponseBody is the type of the "project" service "delete"
+// endpoint HTTP response body for the "bad-request" error.
+type DeleteBadRequestResponseBody string
+
+// DeleteForbiddenResponseBody is the type of the "project" service "delete"
+// endpoint HTTP response body for the "forbidden" error.
+type DeleteForbiddenResponseBody string
+
+// DeleteNotFoundResponseBody is the type of the "project" service "delete"
+// endpoint HTTP response body for the "not-found" error.
+type DeleteNotFoundResponseBody string
+
+// DeleteUnauthorizedResponseBody is the type of the "project" service "delete"
+// endpoint HTTP response body for the "unauthorized" error.
+type DeleteUnauthorizedResponseBody string
+
 // UploadMediaBadRequestResponseBody is the type of the "project" service
 // "upload media" endpoint HTTP response body for the "bad-request" error.
 type UploadMediaBadRequestResponseBody string
@@ -211,6 +480,27 @@ type ProjectSummaryResponseBody struct {
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 }
 
+// ProjectCollectionResponseBody is used to define fields on response body
+// types.
+type ProjectCollectionResponseBody []*ProjectResponseBody
+
+// ProjectResponseBody is used to define fields on response body types.
+type ProjectResponseBody struct {
+	ID                *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name              *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Slug              *string `form:"slug,omitempty" json:"slug,omitempty" xml:"slug,omitempty"`
+	Description       *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Goal              *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
+	Location          *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Tags              *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
+	Private           *bool   `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly          *bool   `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
+	NumberOfFollowers *int32  `form:"numberOfFollowers,omitempty" json:"numberOfFollowers,omitempty" xml:"numberOfFollowers,omitempty"`
+}
+
 // NewAddUpdateRequestBody builds the HTTP request body from the payload of the
 // "add update" endpoint of the "project" service.
 func NewAddUpdateRequestBody(p *project.AddUpdatePayload) *AddUpdateRequestBody {
@@ -225,6 +515,59 @@ func NewAddUpdateRequestBody(p *project.AddUpdatePayload) *AddUpdateRequestBody 
 func NewModifyUpdateRequestBody(p *project.ModifyUpdatePayload) *ModifyUpdateRequestBody {
 	body := &ModifyUpdateRequestBody{
 		Body: p.Body,
+	}
+	return body
+}
+
+// NewAddRequestBody builds the HTTP request body from the payload of the "add"
+// endpoint of the "project" service.
+func NewAddRequestBody(p *project.AddPayload) *AddRequestBody {
+	body := &AddRequestBody{
+		Name:        p.Project.Name,
+		Slug:        p.Project.Slug,
+		Description: p.Project.Description,
+		Goal:        p.Project.Goal,
+		Location:    p.Project.Location,
+		Tags:        p.Project.Tags,
+		Private:     p.Project.Private,
+		StartTime:   p.Project.StartTime,
+		EndTime:     p.Project.EndTime,
+	}
+	return body
+}
+
+// NewUpdateRequestBody builds the HTTP request body from the payload of the
+// "update" endpoint of the "project" service.
+func NewUpdateRequestBody(p *project.UpdatePayload) *UpdateRequestBody {
+	body := &UpdateRequestBody{
+		Name:        p.Project.Name,
+		Slug:        p.Project.Slug,
+		Description: p.Project.Description,
+		Goal:        p.Project.Goal,
+		Location:    p.Project.Location,
+		Tags:        p.Project.Tags,
+		Private:     p.Project.Private,
+		StartTime:   p.Project.StartTime,
+		EndTime:     p.Project.EndTime,
+	}
+	return body
+}
+
+// NewInviteRequestBody builds the HTTP request body from the payload of the
+// "invite" endpoint of the "project" service.
+func NewInviteRequestBody(p *project.InvitePayload) *InviteRequestBody {
+	body := &InviteRequestBody{
+		Email: p.Invite.Email,
+		Role:  p.Invite.Role,
+	}
+	return body
+}
+
+// NewRemoveUserRequestBody builds the HTTP request body from the payload of
+// the "remove user" endpoint of the "project" service.
+func NewRemoveUserRequestBody(p *project.RemoveUserPayload) *RemoveUserRequestBody {
+	body := &RemoveUserRequestBody{
+		Email: p.Remove.Email,
 	}
 	return body
 }
@@ -472,6 +815,362 @@ func NewRejectInviteUnauthorized(body RejectInviteUnauthorizedResponseBody) proj
 	return v
 }
 
+// NewAddProjectOK builds a "project" service "add" endpoint result from a HTTP
+// "OK" response.
+func NewAddProjectOK(body *AddResponseBody) *projectviews.ProjectView {
+	v := &projectviews.ProjectView{
+		ID:                body.ID,
+		Name:              body.Name,
+		Slug:              body.Slug,
+		Description:       body.Description,
+		Goal:              body.Goal,
+		Location:          body.Location,
+		Tags:              body.Tags,
+		Private:           body.Private,
+		StartTime:         body.StartTime,
+		EndTime:           body.EndTime,
+		Photo:             body.Photo,
+		ReadOnly:          body.ReadOnly,
+		NumberOfFollowers: body.NumberOfFollowers,
+	}
+
+	return v
+}
+
+// NewAddBadRequest builds a project service add endpoint bad-request error.
+func NewAddBadRequest(body AddBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewAddForbidden builds a project service add endpoint forbidden error.
+func NewAddForbidden(body AddForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
+// NewAddNotFound builds a project service add endpoint not-found error.
+func NewAddNotFound(body AddNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewAddUnauthorized builds a project service add endpoint unauthorized error.
+func NewAddUnauthorized(body AddUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
+// NewUpdateProjectOK builds a "project" service "update" endpoint result from
+// a HTTP "OK" response.
+func NewUpdateProjectOK(body *UpdateResponseBody) *projectviews.ProjectView {
+	v := &projectviews.ProjectView{
+		ID:                body.ID,
+		Name:              body.Name,
+		Slug:              body.Slug,
+		Description:       body.Description,
+		Goal:              body.Goal,
+		Location:          body.Location,
+		Tags:              body.Tags,
+		Private:           body.Private,
+		StartTime:         body.StartTime,
+		EndTime:           body.EndTime,
+		Photo:             body.Photo,
+		ReadOnly:          body.ReadOnly,
+		NumberOfFollowers: body.NumberOfFollowers,
+	}
+
+	return v
+}
+
+// NewUpdateBadRequest builds a project service update endpoint bad-request
+// error.
+func NewUpdateBadRequest(body UpdateBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewUpdateForbidden builds a project service update endpoint forbidden error.
+func NewUpdateForbidden(body UpdateForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
+// NewUpdateNotFound builds a project service update endpoint not-found error.
+func NewUpdateNotFound(body UpdateNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewUpdateUnauthorized builds a project service update endpoint unauthorized
+// error.
+func NewUpdateUnauthorized(body UpdateUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
+// NewGetProjectOK builds a "project" service "get" endpoint result from a HTTP
+// "OK" response.
+func NewGetProjectOK(body *GetResponseBody) *projectviews.ProjectView {
+	v := &projectviews.ProjectView{
+		ID:                body.ID,
+		Name:              body.Name,
+		Slug:              body.Slug,
+		Description:       body.Description,
+		Goal:              body.Goal,
+		Location:          body.Location,
+		Tags:              body.Tags,
+		Private:           body.Private,
+		StartTime:         body.StartTime,
+		EndTime:           body.EndTime,
+		Photo:             body.Photo,
+		ReadOnly:          body.ReadOnly,
+		NumberOfFollowers: body.NumberOfFollowers,
+	}
+
+	return v
+}
+
+// NewGetBadRequest builds a project service get endpoint bad-request error.
+func NewGetBadRequest(body GetBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewGetForbidden builds a project service get endpoint forbidden error.
+func NewGetForbidden(body GetForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
+// NewGetNotFound builds a project service get endpoint not-found error.
+func NewGetNotFound(body GetNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewGetUnauthorized builds a project service get endpoint unauthorized error.
+func NewGetUnauthorized(body GetUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
+// NewListCommunityProjectsOK builds a "project" service "list community"
+// endpoint result from a HTTP "OK" response.
+func NewListCommunityProjectsOK(body *ListCommunityResponseBody) *projectviews.ProjectsView {
+	v := &projectviews.ProjectsView{}
+	v.Projects = make([]*projectviews.ProjectView, len(body.Projects))
+	for i, val := range body.Projects {
+		v.Projects[i] = unmarshalProjectResponseBodyToProjectviewsProjectView(val)
+	}
+
+	return v
+}
+
+// NewListCommunityBadRequest builds a project service list community endpoint
+// bad-request error.
+func NewListCommunityBadRequest(body ListCommunityBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewListCommunityForbidden builds a project service list community endpoint
+// forbidden error.
+func NewListCommunityForbidden(body ListCommunityForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
+// NewListCommunityNotFound builds a project service list community endpoint
+// not-found error.
+func NewListCommunityNotFound(body ListCommunityNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewListCommunityUnauthorized builds a project service list community
+// endpoint unauthorized error.
+func NewListCommunityUnauthorized(body ListCommunityUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
+// NewListMineProjectsOK builds a "project" service "list mine" endpoint result
+// from a HTTP "OK" response.
+func NewListMineProjectsOK(body *ListMineResponseBody) *projectviews.ProjectsView {
+	v := &projectviews.ProjectsView{}
+	v.Projects = make([]*projectviews.ProjectView, len(body.Projects))
+	for i, val := range body.Projects {
+		v.Projects[i] = unmarshalProjectResponseBodyToProjectviewsProjectView(val)
+	}
+
+	return v
+}
+
+// NewListMineBadRequest builds a project service list mine endpoint
+// bad-request error.
+func NewListMineBadRequest(body ListMineBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewListMineForbidden builds a project service list mine endpoint forbidden
+// error.
+func NewListMineForbidden(body ListMineForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
+// NewListMineNotFound builds a project service list mine endpoint not-found
+// error.
+func NewListMineNotFound(body ListMineNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewListMineUnauthorized builds a project service list mine endpoint
+// unauthorized error.
+func NewListMineUnauthorized(body ListMineUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
+// NewInviteBadRequest builds a project service invite endpoint bad-request
+// error.
+func NewInviteBadRequest(body InviteBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewInviteForbidden builds a project service invite endpoint forbidden error.
+func NewInviteForbidden(body InviteForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
+// NewInviteNotFound builds a project service invite endpoint not-found error.
+func NewInviteNotFound(body InviteNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewInviteUnauthorized builds a project service invite endpoint unauthorized
+// error.
+func NewInviteUnauthorized(body InviteUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
+// NewRemoveUserBadRequest builds a project service remove user endpoint
+// bad-request error.
+func NewRemoveUserBadRequest(body RemoveUserBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewRemoveUserForbidden builds a project service remove user endpoint
+// forbidden error.
+func NewRemoveUserForbidden(body RemoveUserForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
+// NewRemoveUserNotFound builds a project service remove user endpoint
+// not-found error.
+func NewRemoveUserNotFound(body RemoveUserNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewRemoveUserUnauthorized builds a project service remove user endpoint
+// unauthorized error.
+func NewRemoveUserUnauthorized(body RemoveUserUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
+// NewAddStationBadRequest builds a project service add station endpoint
+// bad-request error.
+func NewAddStationBadRequest(body AddStationBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewAddStationForbidden builds a project service add station endpoint
+// forbidden error.
+func NewAddStationForbidden(body AddStationForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
+// NewAddStationNotFound builds a project service add station endpoint
+// not-found error.
+func NewAddStationNotFound(body AddStationNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewAddStationUnauthorized builds a project service add station endpoint
+// unauthorized error.
+func NewAddStationUnauthorized(body AddStationUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
+// NewRemoveStationBadRequest builds a project service remove station endpoint
+// bad-request error.
+func NewRemoveStationBadRequest(body RemoveStationBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewRemoveStationForbidden builds a project service remove station endpoint
+// forbidden error.
+func NewRemoveStationForbidden(body RemoveStationForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
+// NewRemoveStationNotFound builds a project service remove station endpoint
+// not-found error.
+func NewRemoveStationNotFound(body RemoveStationNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewRemoveStationUnauthorized builds a project service remove station
+// endpoint unauthorized error.
+func NewRemoveStationUnauthorized(body RemoveStationUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
+// NewDeleteBadRequest builds a project service delete endpoint bad-request
+// error.
+func NewDeleteBadRequest(body DeleteBadRequestResponseBody) project.BadRequest {
+	v := project.BadRequest(body)
+	return v
+}
+
+// NewDeleteForbidden builds a project service delete endpoint forbidden error.
+func NewDeleteForbidden(body DeleteForbiddenResponseBody) project.Forbidden {
+	v := project.Forbidden(body)
+	return v
+}
+
+// NewDeleteNotFound builds a project service delete endpoint not-found error.
+func NewDeleteNotFound(body DeleteNotFoundResponseBody) project.NotFound {
+	v := project.NotFound(body)
+	return v
+}
+
+// NewDeleteUnauthorized builds a project service delete endpoint unauthorized
+// error.
+func NewDeleteUnauthorized(body DeleteUnauthorizedResponseBody) project.Unauthorized {
+	v := project.Unauthorized(body)
+	return v
+}
+
 // NewUploadMediaBadRequest builds a project service upload media endpoint
 // bad-request error.
 func NewUploadMediaBadRequest(body UploadMediaBadRequestResponseBody) project.BadRequest {
@@ -569,6 +1268,63 @@ func ValidateProjectSummaryResponseBody(body *ProjectSummaryResponseBody) (err e
 	}
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	return
+}
+
+// ValidateProjectCollectionResponseBody runs the validations defined on
+// ProjectCollectionResponseBody
+func ValidateProjectCollectionResponseBody(body ProjectCollectionResponseBody) (err error) {
+	for _, e := range body {
+		if e != nil {
+			if err2 := ValidateProjectResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateProjectResponseBody runs the validations defined on
+// ProjectResponseBody
+func ValidateProjectResponseBody(body *ProjectResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Slug == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("slug", "body"))
+	}
+	if body.Description == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("description", "body"))
+	}
+	if body.Goal == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("goal", "body"))
+	}
+	if body.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("location", "body"))
+	}
+	if body.Private == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("private", "body"))
+	}
+	if body.Tags == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("tags", "body"))
+	}
+	if body.ReadOnly == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("readOnly", "body"))
+	}
+	if body.NumberOfFollowers == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("numberOfFollowers", "body"))
+	}
+	if body.Slug != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.slug", *body.Slug, "^[[:alnum:]]+(-[[:alnum:]]+)*$"))
+	}
+	if body.Slug != nil {
+		if utf8.RuneCountInString(*body.Slug) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.slug", *body.Slug, utf8.RuneCountInString(*body.Slug), 40, false))
+		}
 	}
 	return
 }

@@ -8,6 +8,8 @@
 package server
 
 import (
+	"unicode/utf8"
+
 	project "github.com/fieldkit/cloud/server/api/gen/project"
 	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
 	goa "goa.design/goa/v3/pkg"
@@ -23,6 +25,47 @@ type AddUpdateRequestBody struct {
 // endpoint HTTP request body.
 type ModifyUpdateRequestBody struct {
 	Body *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+}
+
+// AddRequestBody is the type of the "project" service "add" endpoint HTTP
+// request body.
+type AddRequestBody struct {
+	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Slug        *string `form:"slug,omitempty" json:"slug,omitempty" xml:"slug,omitempty"`
+	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
+	Location    *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Tags        *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
+	Private     *bool   `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	StartTime   *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime     *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+}
+
+// UpdateRequestBody is the type of the "project" service "update" endpoint
+// HTTP request body.
+type UpdateRequestBody struct {
+	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Slug        *string `form:"slug,omitempty" json:"slug,omitempty" xml:"slug,omitempty"`
+	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
+	Location    *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Tags        *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
+	Private     *bool   `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	StartTime   *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime     *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+}
+
+// InviteRequestBody is the type of the "project" service "invite" endpoint
+// HTTP request body.
+type InviteRequestBody struct {
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Role  *int32  `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
+}
+
+// RemoveUserRequestBody is the type of the "project" service "remove user"
+// endpoint HTTP request body.
+type RemoveUserRequestBody struct {
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 }
 
 // AddUpdateResponseBody is the type of the "project" service "add update"
@@ -49,6 +92,72 @@ type InvitesResponseBody struct {
 // invite" endpoint HTTP response body.
 type LookupInviteResponseBody struct {
 	Pending []*PendingInviteResponseBody `form:"pending" json:"pending" xml:"pending"`
+}
+
+// AddResponseBody is the type of the "project" service "add" endpoint HTTP
+// response body.
+type AddResponseBody struct {
+	ID                int32   `form:"id" json:"id" xml:"id"`
+	Name              string  `form:"name" json:"name" xml:"name"`
+	Slug              string  `form:"slug" json:"slug" xml:"slug"`
+	Description       string  `form:"description" json:"description" xml:"description"`
+	Goal              string  `form:"goal" json:"goal" xml:"goal"`
+	Location          string  `form:"location" json:"location" xml:"location"`
+	Tags              string  `form:"tags" json:"tags" xml:"tags"`
+	Private           bool    `form:"private" json:"private" xml:"private"`
+	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly          bool    `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	NumberOfFollowers int32   `form:"numberOfFollowers" json:"numberOfFollowers" xml:"numberOfFollowers"`
+}
+
+// UpdateResponseBody is the type of the "project" service "update" endpoint
+// HTTP response body.
+type UpdateResponseBody struct {
+	ID                int32   `form:"id" json:"id" xml:"id"`
+	Name              string  `form:"name" json:"name" xml:"name"`
+	Slug              string  `form:"slug" json:"slug" xml:"slug"`
+	Description       string  `form:"description" json:"description" xml:"description"`
+	Goal              string  `form:"goal" json:"goal" xml:"goal"`
+	Location          string  `form:"location" json:"location" xml:"location"`
+	Tags              string  `form:"tags" json:"tags" xml:"tags"`
+	Private           bool    `form:"private" json:"private" xml:"private"`
+	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly          bool    `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	NumberOfFollowers int32   `form:"numberOfFollowers" json:"numberOfFollowers" xml:"numberOfFollowers"`
+}
+
+// GetResponseBody is the type of the "project" service "get" endpoint HTTP
+// response body.
+type GetResponseBody struct {
+	ID                int32   `form:"id" json:"id" xml:"id"`
+	Name              string  `form:"name" json:"name" xml:"name"`
+	Slug              string  `form:"slug" json:"slug" xml:"slug"`
+	Description       string  `form:"description" json:"description" xml:"description"`
+	Goal              string  `form:"goal" json:"goal" xml:"goal"`
+	Location          string  `form:"location" json:"location" xml:"location"`
+	Tags              string  `form:"tags" json:"tags" xml:"tags"`
+	Private           bool    `form:"private" json:"private" xml:"private"`
+	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly          bool    `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	NumberOfFollowers int32   `form:"numberOfFollowers" json:"numberOfFollowers" xml:"numberOfFollowers"`
+}
+
+// ListCommunityResponseBody is the type of the "project" service "list
+// community" endpoint HTTP response body.
+type ListCommunityResponseBody struct {
+	Projects ProjectResponseBodyCollection `form:"projects" json:"projects" xml:"projects"`
+}
+
+// ListMineResponseBody is the type of the "project" service "list mine"
+// endpoint HTTP response body.
+type ListMineResponseBody struct {
+	Projects ProjectResponseBodyCollection `form:"projects" json:"projects" xml:"projects"`
 }
 
 // AddUpdateBadRequestResponseBody is the type of the "project" service "add
@@ -163,6 +272,166 @@ type RejectInviteNotFoundResponseBody string
 // "reject invite" endpoint HTTP response body for the "unauthorized" error.
 type RejectInviteUnauthorizedResponseBody string
 
+// AddBadRequestResponseBody is the type of the "project" service "add"
+// endpoint HTTP response body for the "bad-request" error.
+type AddBadRequestResponseBody string
+
+// AddForbiddenResponseBody is the type of the "project" service "add" endpoint
+// HTTP response body for the "forbidden" error.
+type AddForbiddenResponseBody string
+
+// AddNotFoundResponseBody is the type of the "project" service "add" endpoint
+// HTTP response body for the "not-found" error.
+type AddNotFoundResponseBody string
+
+// AddUnauthorizedResponseBody is the type of the "project" service "add"
+// endpoint HTTP response body for the "unauthorized" error.
+type AddUnauthorizedResponseBody string
+
+// UpdateBadRequestResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "bad-request" error.
+type UpdateBadRequestResponseBody string
+
+// UpdateForbiddenResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "forbidden" error.
+type UpdateForbiddenResponseBody string
+
+// UpdateNotFoundResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "not-found" error.
+type UpdateNotFoundResponseBody string
+
+// UpdateUnauthorizedResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "unauthorized" error.
+type UpdateUnauthorizedResponseBody string
+
+// GetBadRequestResponseBody is the type of the "project" service "get"
+// endpoint HTTP response body for the "bad-request" error.
+type GetBadRequestResponseBody string
+
+// GetForbiddenResponseBody is the type of the "project" service "get" endpoint
+// HTTP response body for the "forbidden" error.
+type GetForbiddenResponseBody string
+
+// GetNotFoundResponseBody is the type of the "project" service "get" endpoint
+// HTTP response body for the "not-found" error.
+type GetNotFoundResponseBody string
+
+// GetUnauthorizedResponseBody is the type of the "project" service "get"
+// endpoint HTTP response body for the "unauthorized" error.
+type GetUnauthorizedResponseBody string
+
+// ListCommunityBadRequestResponseBody is the type of the "project" service
+// "list community" endpoint HTTP response body for the "bad-request" error.
+type ListCommunityBadRequestResponseBody string
+
+// ListCommunityForbiddenResponseBody is the type of the "project" service
+// "list community" endpoint HTTP response body for the "forbidden" error.
+type ListCommunityForbiddenResponseBody string
+
+// ListCommunityNotFoundResponseBody is the type of the "project" service "list
+// community" endpoint HTTP response body for the "not-found" error.
+type ListCommunityNotFoundResponseBody string
+
+// ListCommunityUnauthorizedResponseBody is the type of the "project" service
+// "list community" endpoint HTTP response body for the "unauthorized" error.
+type ListCommunityUnauthorizedResponseBody string
+
+// ListMineBadRequestResponseBody is the type of the "project" service "list
+// mine" endpoint HTTP response body for the "bad-request" error.
+type ListMineBadRequestResponseBody string
+
+// ListMineForbiddenResponseBody is the type of the "project" service "list
+// mine" endpoint HTTP response body for the "forbidden" error.
+type ListMineForbiddenResponseBody string
+
+// ListMineNotFoundResponseBody is the type of the "project" service "list
+// mine" endpoint HTTP response body for the "not-found" error.
+type ListMineNotFoundResponseBody string
+
+// ListMineUnauthorizedResponseBody is the type of the "project" service "list
+// mine" endpoint HTTP response body for the "unauthorized" error.
+type ListMineUnauthorizedResponseBody string
+
+// InviteBadRequestResponseBody is the type of the "project" service "invite"
+// endpoint HTTP response body for the "bad-request" error.
+type InviteBadRequestResponseBody string
+
+// InviteForbiddenResponseBody is the type of the "project" service "invite"
+// endpoint HTTP response body for the "forbidden" error.
+type InviteForbiddenResponseBody string
+
+// InviteNotFoundResponseBody is the type of the "project" service "invite"
+// endpoint HTTP response body for the "not-found" error.
+type InviteNotFoundResponseBody string
+
+// InviteUnauthorizedResponseBody is the type of the "project" service "invite"
+// endpoint HTTP response body for the "unauthorized" error.
+type InviteUnauthorizedResponseBody string
+
+// RemoveUserBadRequestResponseBody is the type of the "project" service
+// "remove user" endpoint HTTP response body for the "bad-request" error.
+type RemoveUserBadRequestResponseBody string
+
+// RemoveUserForbiddenResponseBody is the type of the "project" service "remove
+// user" endpoint HTTP response body for the "forbidden" error.
+type RemoveUserForbiddenResponseBody string
+
+// RemoveUserNotFoundResponseBody is the type of the "project" service "remove
+// user" endpoint HTTP response body for the "not-found" error.
+type RemoveUserNotFoundResponseBody string
+
+// RemoveUserUnauthorizedResponseBody is the type of the "project" service
+// "remove user" endpoint HTTP response body for the "unauthorized" error.
+type RemoveUserUnauthorizedResponseBody string
+
+// AddStationBadRequestResponseBody is the type of the "project" service "add
+// station" endpoint HTTP response body for the "bad-request" error.
+type AddStationBadRequestResponseBody string
+
+// AddStationForbiddenResponseBody is the type of the "project" service "add
+// station" endpoint HTTP response body for the "forbidden" error.
+type AddStationForbiddenResponseBody string
+
+// AddStationNotFoundResponseBody is the type of the "project" service "add
+// station" endpoint HTTP response body for the "not-found" error.
+type AddStationNotFoundResponseBody string
+
+// AddStationUnauthorizedResponseBody is the type of the "project" service "add
+// station" endpoint HTTP response body for the "unauthorized" error.
+type AddStationUnauthorizedResponseBody string
+
+// RemoveStationBadRequestResponseBody is the type of the "project" service
+// "remove station" endpoint HTTP response body for the "bad-request" error.
+type RemoveStationBadRequestResponseBody string
+
+// RemoveStationForbiddenResponseBody is the type of the "project" service
+// "remove station" endpoint HTTP response body for the "forbidden" error.
+type RemoveStationForbiddenResponseBody string
+
+// RemoveStationNotFoundResponseBody is the type of the "project" service
+// "remove station" endpoint HTTP response body for the "not-found" error.
+type RemoveStationNotFoundResponseBody string
+
+// RemoveStationUnauthorizedResponseBody is the type of the "project" service
+// "remove station" endpoint HTTP response body for the "unauthorized" error.
+type RemoveStationUnauthorizedResponseBody string
+
+// DeleteBadRequestResponseBody is the type of the "project" service "delete"
+// endpoint HTTP response body for the "bad-request" error.
+type DeleteBadRequestResponseBody string
+
+// DeleteForbiddenResponseBody is the type of the "project" service "delete"
+// endpoint HTTP response body for the "forbidden" error.
+type DeleteForbiddenResponseBody string
+
+// DeleteNotFoundResponseBody is the type of the "project" service "delete"
+// endpoint HTTP response body for the "not-found" error.
+type DeleteNotFoundResponseBody string
+
+// DeleteUnauthorizedResponseBody is the type of the "project" service "delete"
+// endpoint HTTP response body for the "unauthorized" error.
+type DeleteUnauthorizedResponseBody string
+
 // UploadMediaBadRequestResponseBody is the type of the "project" service
 // "upload media" endpoint HTTP response body for the "bad-request" error.
 type UploadMediaBadRequestResponseBody string
@@ -209,6 +478,27 @@ type ProjectSummaryResponseBody struct {
 	Name string `form:"name" json:"name" xml:"name"`
 }
 
+// ProjectResponseBodyCollection is used to define fields on response body
+// types.
+type ProjectResponseBodyCollection []*ProjectResponseBody
+
+// ProjectResponseBody is used to define fields on response body types.
+type ProjectResponseBody struct {
+	ID                int32   `form:"id" json:"id" xml:"id"`
+	Name              string  `form:"name" json:"name" xml:"name"`
+	Slug              string  `form:"slug" json:"slug" xml:"slug"`
+	Description       string  `form:"description" json:"description" xml:"description"`
+	Goal              string  `form:"goal" json:"goal" xml:"goal"`
+	Location          string  `form:"location" json:"location" xml:"location"`
+	Tags              string  `form:"tags" json:"tags" xml:"tags"`
+	Private           bool    `form:"private" json:"private" xml:"private"`
+	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly          bool    `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	NumberOfFollowers int32   `form:"numberOfFollowers" json:"numberOfFollowers" xml:"numberOfFollowers"`
+}
+
 // NewAddUpdateResponseBody builds the HTTP response body from the result of
 // the "add update" endpoint of the "project" service.
 func NewAddUpdateResponseBody(res *projectviews.ProjectUpdateView) *AddUpdateResponseBody {
@@ -250,6 +540,95 @@ func NewLookupInviteResponseBody(res *projectviews.PendingInvitesView) *LookupIn
 		body.Pending = make([]*PendingInviteResponseBody, len(res.Pending))
 		for i, val := range res.Pending {
 			body.Pending[i] = marshalProjectviewsPendingInviteViewToPendingInviteResponseBody(val)
+		}
+	}
+	return body
+}
+
+// NewAddResponseBody builds the HTTP response body from the result of the
+// "add" endpoint of the "project" service.
+func NewAddResponseBody(res *projectviews.ProjectView) *AddResponseBody {
+	body := &AddResponseBody{
+		ID:                *res.ID,
+		Name:              *res.Name,
+		Slug:              *res.Slug,
+		Description:       *res.Description,
+		Goal:              *res.Goal,
+		Location:          *res.Location,
+		Tags:              *res.Tags,
+		Private:           *res.Private,
+		StartTime:         res.StartTime,
+		EndTime:           res.EndTime,
+		Photo:             res.Photo,
+		ReadOnly:          *res.ReadOnly,
+		NumberOfFollowers: *res.NumberOfFollowers,
+	}
+	return body
+}
+
+// NewUpdateResponseBody builds the HTTP response body from the result of the
+// "update" endpoint of the "project" service.
+func NewUpdateResponseBody(res *projectviews.ProjectView) *UpdateResponseBody {
+	body := &UpdateResponseBody{
+		ID:                *res.ID,
+		Name:              *res.Name,
+		Slug:              *res.Slug,
+		Description:       *res.Description,
+		Goal:              *res.Goal,
+		Location:          *res.Location,
+		Tags:              *res.Tags,
+		Private:           *res.Private,
+		StartTime:         res.StartTime,
+		EndTime:           res.EndTime,
+		Photo:             res.Photo,
+		ReadOnly:          *res.ReadOnly,
+		NumberOfFollowers: *res.NumberOfFollowers,
+	}
+	return body
+}
+
+// NewGetResponseBody builds the HTTP response body from the result of the
+// "get" endpoint of the "project" service.
+func NewGetResponseBody(res *projectviews.ProjectView) *GetResponseBody {
+	body := &GetResponseBody{
+		ID:                *res.ID,
+		Name:              *res.Name,
+		Slug:              *res.Slug,
+		Description:       *res.Description,
+		Goal:              *res.Goal,
+		Location:          *res.Location,
+		Tags:              *res.Tags,
+		Private:           *res.Private,
+		StartTime:         res.StartTime,
+		EndTime:           res.EndTime,
+		Photo:             res.Photo,
+		ReadOnly:          *res.ReadOnly,
+		NumberOfFollowers: *res.NumberOfFollowers,
+	}
+	return body
+}
+
+// NewListCommunityResponseBody builds the HTTP response body from the result
+// of the "list community" endpoint of the "project" service.
+func NewListCommunityResponseBody(res *projectviews.ProjectsView) *ListCommunityResponseBody {
+	body := &ListCommunityResponseBody{}
+	if res.Projects != nil {
+		body.Projects = make([]*ProjectResponseBody, len(res.Projects))
+		for i, val := range res.Projects {
+			body.Projects[i] = marshalProjectviewsProjectViewToProjectResponseBody(val)
+		}
+	}
+	return body
+}
+
+// NewListMineResponseBody builds the HTTP response body from the result of the
+// "list mine" endpoint of the "project" service.
+func NewListMineResponseBody(res *projectviews.ProjectsView) *ListMineResponseBody {
+	body := &ListMineResponseBody{}
+	if res.Projects != nil {
+		body.Projects = make([]*ProjectResponseBody, len(res.Projects))
+		for i, val := range res.Projects {
+			body.Projects[i] = marshalProjectviewsProjectViewToProjectResponseBody(val)
 		}
 	}
 	return body
@@ -451,6 +830,286 @@ func NewRejectInviteUnauthorizedResponseBody(res project.Unauthorized) RejectInv
 	return body
 }
 
+// NewAddBadRequestResponseBody builds the HTTP response body from the result
+// of the "add" endpoint of the "project" service.
+func NewAddBadRequestResponseBody(res project.BadRequest) AddBadRequestResponseBody {
+	body := AddBadRequestResponseBody(res)
+	return body
+}
+
+// NewAddForbiddenResponseBody builds the HTTP response body from the result of
+// the "add" endpoint of the "project" service.
+func NewAddForbiddenResponseBody(res project.Forbidden) AddForbiddenResponseBody {
+	body := AddForbiddenResponseBody(res)
+	return body
+}
+
+// NewAddNotFoundResponseBody builds the HTTP response body from the result of
+// the "add" endpoint of the "project" service.
+func NewAddNotFoundResponseBody(res project.NotFound) AddNotFoundResponseBody {
+	body := AddNotFoundResponseBody(res)
+	return body
+}
+
+// NewAddUnauthorizedResponseBody builds the HTTP response body from the result
+// of the "add" endpoint of the "project" service.
+func NewAddUnauthorizedResponseBody(res project.Unauthorized) AddUnauthorizedResponseBody {
+	body := AddUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewUpdateBadRequestResponseBody builds the HTTP response body from the
+// result of the "update" endpoint of the "project" service.
+func NewUpdateBadRequestResponseBody(res project.BadRequest) UpdateBadRequestResponseBody {
+	body := UpdateBadRequestResponseBody(res)
+	return body
+}
+
+// NewUpdateForbiddenResponseBody builds the HTTP response body from the result
+// of the "update" endpoint of the "project" service.
+func NewUpdateForbiddenResponseBody(res project.Forbidden) UpdateForbiddenResponseBody {
+	body := UpdateForbiddenResponseBody(res)
+	return body
+}
+
+// NewUpdateNotFoundResponseBody builds the HTTP response body from the result
+// of the "update" endpoint of the "project" service.
+func NewUpdateNotFoundResponseBody(res project.NotFound) UpdateNotFoundResponseBody {
+	body := UpdateNotFoundResponseBody(res)
+	return body
+}
+
+// NewUpdateUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "update" endpoint of the "project" service.
+func NewUpdateUnauthorizedResponseBody(res project.Unauthorized) UpdateUnauthorizedResponseBody {
+	body := UpdateUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewGetBadRequestResponseBody builds the HTTP response body from the result
+// of the "get" endpoint of the "project" service.
+func NewGetBadRequestResponseBody(res project.BadRequest) GetBadRequestResponseBody {
+	body := GetBadRequestResponseBody(res)
+	return body
+}
+
+// NewGetForbiddenResponseBody builds the HTTP response body from the result of
+// the "get" endpoint of the "project" service.
+func NewGetForbiddenResponseBody(res project.Forbidden) GetForbiddenResponseBody {
+	body := GetForbiddenResponseBody(res)
+	return body
+}
+
+// NewGetNotFoundResponseBody builds the HTTP response body from the result of
+// the "get" endpoint of the "project" service.
+func NewGetNotFoundResponseBody(res project.NotFound) GetNotFoundResponseBody {
+	body := GetNotFoundResponseBody(res)
+	return body
+}
+
+// NewGetUnauthorizedResponseBody builds the HTTP response body from the result
+// of the "get" endpoint of the "project" service.
+func NewGetUnauthorizedResponseBody(res project.Unauthorized) GetUnauthorizedResponseBody {
+	body := GetUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewListCommunityBadRequestResponseBody builds the HTTP response body from
+// the result of the "list community" endpoint of the "project" service.
+func NewListCommunityBadRequestResponseBody(res project.BadRequest) ListCommunityBadRequestResponseBody {
+	body := ListCommunityBadRequestResponseBody(res)
+	return body
+}
+
+// NewListCommunityForbiddenResponseBody builds the HTTP response body from the
+// result of the "list community" endpoint of the "project" service.
+func NewListCommunityForbiddenResponseBody(res project.Forbidden) ListCommunityForbiddenResponseBody {
+	body := ListCommunityForbiddenResponseBody(res)
+	return body
+}
+
+// NewListCommunityNotFoundResponseBody builds the HTTP response body from the
+// result of the "list community" endpoint of the "project" service.
+func NewListCommunityNotFoundResponseBody(res project.NotFound) ListCommunityNotFoundResponseBody {
+	body := ListCommunityNotFoundResponseBody(res)
+	return body
+}
+
+// NewListCommunityUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "list community" endpoint of the "project" service.
+func NewListCommunityUnauthorizedResponseBody(res project.Unauthorized) ListCommunityUnauthorizedResponseBody {
+	body := ListCommunityUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewListMineBadRequestResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "project" service.
+func NewListMineBadRequestResponseBody(res project.BadRequest) ListMineBadRequestResponseBody {
+	body := ListMineBadRequestResponseBody(res)
+	return body
+}
+
+// NewListMineForbiddenResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "project" service.
+func NewListMineForbiddenResponseBody(res project.Forbidden) ListMineForbiddenResponseBody {
+	body := ListMineForbiddenResponseBody(res)
+	return body
+}
+
+// NewListMineNotFoundResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "project" service.
+func NewListMineNotFoundResponseBody(res project.NotFound) ListMineNotFoundResponseBody {
+	body := ListMineNotFoundResponseBody(res)
+	return body
+}
+
+// NewListMineUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "project" service.
+func NewListMineUnauthorizedResponseBody(res project.Unauthorized) ListMineUnauthorizedResponseBody {
+	body := ListMineUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewInviteBadRequestResponseBody builds the HTTP response body from the
+// result of the "invite" endpoint of the "project" service.
+func NewInviteBadRequestResponseBody(res project.BadRequest) InviteBadRequestResponseBody {
+	body := InviteBadRequestResponseBody(res)
+	return body
+}
+
+// NewInviteForbiddenResponseBody builds the HTTP response body from the result
+// of the "invite" endpoint of the "project" service.
+func NewInviteForbiddenResponseBody(res project.Forbidden) InviteForbiddenResponseBody {
+	body := InviteForbiddenResponseBody(res)
+	return body
+}
+
+// NewInviteNotFoundResponseBody builds the HTTP response body from the result
+// of the "invite" endpoint of the "project" service.
+func NewInviteNotFoundResponseBody(res project.NotFound) InviteNotFoundResponseBody {
+	body := InviteNotFoundResponseBody(res)
+	return body
+}
+
+// NewInviteUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "invite" endpoint of the "project" service.
+func NewInviteUnauthorizedResponseBody(res project.Unauthorized) InviteUnauthorizedResponseBody {
+	body := InviteUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewRemoveUserBadRequestResponseBody builds the HTTP response body from the
+// result of the "remove user" endpoint of the "project" service.
+func NewRemoveUserBadRequestResponseBody(res project.BadRequest) RemoveUserBadRequestResponseBody {
+	body := RemoveUserBadRequestResponseBody(res)
+	return body
+}
+
+// NewRemoveUserForbiddenResponseBody builds the HTTP response body from the
+// result of the "remove user" endpoint of the "project" service.
+func NewRemoveUserForbiddenResponseBody(res project.Forbidden) RemoveUserForbiddenResponseBody {
+	body := RemoveUserForbiddenResponseBody(res)
+	return body
+}
+
+// NewRemoveUserNotFoundResponseBody builds the HTTP response body from the
+// result of the "remove user" endpoint of the "project" service.
+func NewRemoveUserNotFoundResponseBody(res project.NotFound) RemoveUserNotFoundResponseBody {
+	body := RemoveUserNotFoundResponseBody(res)
+	return body
+}
+
+// NewRemoveUserUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "remove user" endpoint of the "project" service.
+func NewRemoveUserUnauthorizedResponseBody(res project.Unauthorized) RemoveUserUnauthorizedResponseBody {
+	body := RemoveUserUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewAddStationBadRequestResponseBody builds the HTTP response body from the
+// result of the "add station" endpoint of the "project" service.
+func NewAddStationBadRequestResponseBody(res project.BadRequest) AddStationBadRequestResponseBody {
+	body := AddStationBadRequestResponseBody(res)
+	return body
+}
+
+// NewAddStationForbiddenResponseBody builds the HTTP response body from the
+// result of the "add station" endpoint of the "project" service.
+func NewAddStationForbiddenResponseBody(res project.Forbidden) AddStationForbiddenResponseBody {
+	body := AddStationForbiddenResponseBody(res)
+	return body
+}
+
+// NewAddStationNotFoundResponseBody builds the HTTP response body from the
+// result of the "add station" endpoint of the "project" service.
+func NewAddStationNotFoundResponseBody(res project.NotFound) AddStationNotFoundResponseBody {
+	body := AddStationNotFoundResponseBody(res)
+	return body
+}
+
+// NewAddStationUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "add station" endpoint of the "project" service.
+func NewAddStationUnauthorizedResponseBody(res project.Unauthorized) AddStationUnauthorizedResponseBody {
+	body := AddStationUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewRemoveStationBadRequestResponseBody builds the HTTP response body from
+// the result of the "remove station" endpoint of the "project" service.
+func NewRemoveStationBadRequestResponseBody(res project.BadRequest) RemoveStationBadRequestResponseBody {
+	body := RemoveStationBadRequestResponseBody(res)
+	return body
+}
+
+// NewRemoveStationForbiddenResponseBody builds the HTTP response body from the
+// result of the "remove station" endpoint of the "project" service.
+func NewRemoveStationForbiddenResponseBody(res project.Forbidden) RemoveStationForbiddenResponseBody {
+	body := RemoveStationForbiddenResponseBody(res)
+	return body
+}
+
+// NewRemoveStationNotFoundResponseBody builds the HTTP response body from the
+// result of the "remove station" endpoint of the "project" service.
+func NewRemoveStationNotFoundResponseBody(res project.NotFound) RemoveStationNotFoundResponseBody {
+	body := RemoveStationNotFoundResponseBody(res)
+	return body
+}
+
+// NewRemoveStationUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "remove station" endpoint of the "project" service.
+func NewRemoveStationUnauthorizedResponseBody(res project.Unauthorized) RemoveStationUnauthorizedResponseBody {
+	body := RemoveStationUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewDeleteBadRequestResponseBody builds the HTTP response body from the
+// result of the "delete" endpoint of the "project" service.
+func NewDeleteBadRequestResponseBody(res project.BadRequest) DeleteBadRequestResponseBody {
+	body := DeleteBadRequestResponseBody(res)
+	return body
+}
+
+// NewDeleteForbiddenResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "project" service.
+func NewDeleteForbiddenResponseBody(res project.Forbidden) DeleteForbiddenResponseBody {
+	body := DeleteForbiddenResponseBody(res)
+	return body
+}
+
+// NewDeleteNotFoundResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "project" service.
+func NewDeleteNotFoundResponseBody(res project.NotFound) DeleteNotFoundResponseBody {
+	body := DeleteNotFoundResponseBody(res)
+	return body
+}
+
+// NewDeleteUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "delete" endpoint of the "project" service.
+func NewDeleteUnauthorizedResponseBody(res project.Unauthorized) DeleteUnauthorizedResponseBody {
+	body := DeleteUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewUploadMediaBadRequestResponseBody builds the HTTP response body from the
 // result of the "upload media" endpoint of the "project" service.
 func NewUploadMediaBadRequestResponseBody(res project.BadRequest) UploadMediaBadRequestResponseBody {
@@ -582,6 +1241,134 @@ func NewRejectInvitePayload(id int64, token *string, auth string) *project.Rejec
 	return v
 }
 
+// NewAddPayload builds a project service add endpoint payload.
+func NewAddPayload(body *AddRequestBody, auth string) *project.AddPayload {
+	v := &project.AddProjectFields{
+		Name:        *body.Name,
+		Slug:        *body.Slug,
+		Description: *body.Description,
+		Goal:        body.Goal,
+		Location:    body.Location,
+		Tags:        body.Tags,
+		Private:     body.Private,
+		StartTime:   body.StartTime,
+		EndTime:     body.EndTime,
+	}
+	res := &project.AddPayload{
+		Project: v,
+	}
+	res.Auth = auth
+
+	return res
+}
+
+// NewUpdatePayload builds a project service update endpoint payload.
+func NewUpdatePayload(body *UpdateRequestBody, projectID int32, auth string) *project.UpdatePayload {
+	v := &project.AddProjectFields{
+		Name:        *body.Name,
+		Slug:        *body.Slug,
+		Description: *body.Description,
+		Goal:        body.Goal,
+		Location:    body.Location,
+		Tags:        body.Tags,
+		Private:     body.Private,
+		StartTime:   body.StartTime,
+		EndTime:     body.EndTime,
+	}
+	res := &project.UpdatePayload{
+		Project: v,
+	}
+	res.ProjectID = projectID
+	res.Auth = auth
+
+	return res
+}
+
+// NewGetPayload builds a project service get endpoint payload.
+func NewGetPayload(projectID int32, auth *string) *project.GetPayload {
+	v := &project.GetPayload{}
+	v.ProjectID = projectID
+	v.Auth = auth
+
+	return v
+}
+
+// NewListCommunityPayload builds a project service list community endpoint
+// payload.
+func NewListCommunityPayload(auth *string) *project.ListCommunityPayload {
+	v := &project.ListCommunityPayload{}
+	v.Auth = auth
+
+	return v
+}
+
+// NewListMinePayload builds a project service list mine endpoint payload.
+func NewListMinePayload(auth string) *project.ListMinePayload {
+	v := &project.ListMinePayload{}
+	v.Auth = auth
+
+	return v
+}
+
+// NewInvitePayload builds a project service invite endpoint payload.
+func NewInvitePayload(body *InviteRequestBody, projectID int32, auth string) *project.InvitePayload {
+	v := &project.InviteUserFields{
+		Email: *body.Email,
+		Role:  *body.Role,
+	}
+	res := &project.InvitePayload{
+		Invite: v,
+	}
+	res.ProjectID = projectID
+	res.Auth = auth
+
+	return res
+}
+
+// NewRemoveUserPayload builds a project service remove user endpoint payload.
+func NewRemoveUserPayload(body *RemoveUserRequestBody, projectID int32, auth string) *project.RemoveUserPayload {
+	v := &project.RemoveUserFields{
+		Email: *body.Email,
+	}
+	res := &project.RemoveUserPayload{
+		Remove: v,
+	}
+	res.ProjectID = projectID
+	res.Auth = auth
+
+	return res
+}
+
+// NewAddStationPayload builds a project service add station endpoint payload.
+func NewAddStationPayload(projectID int32, stationID int32, auth string) *project.AddStationPayload {
+	v := &project.AddStationPayload{}
+	v.ProjectID = projectID
+	v.StationID = stationID
+	v.Auth = auth
+
+	return v
+}
+
+// NewRemoveStationPayload builds a project service remove station endpoint
+// payload.
+func NewRemoveStationPayload(projectID int32, stationID int32, auth string) *project.RemoveStationPayload {
+	v := &project.RemoveStationPayload{}
+	v.ProjectID = projectID
+	v.StationID = stationID
+	v.Auth = auth
+
+	return v
+}
+
+// NewDeletePayload builds a project service delete endpoint payload.
+func NewDeletePayload(projectID int32, auth string) *project.DeletePayload {
+	v := &project.DeletePayload{}
+	v.ProjectID = projectID
+	v.Auth = auth
+
+	return v
+}
+
 // NewUploadMediaPayload builds a project service upload media endpoint payload.
 func NewUploadMediaPayload(projectID int32, contentType string, contentLength int64, auth string) *project.UploadMediaPayload {
 	v := &project.UploadMediaPayload{}
@@ -616,6 +1403,70 @@ func ValidateAddUpdateRequestBody(body *AddUpdateRequestBody) (err error) {
 func ValidateModifyUpdateRequestBody(body *ModifyUpdateRequestBody) (err error) {
 	if body.Body == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("body", "body"))
+	}
+	return
+}
+
+// ValidateAddRequestBody runs the validations defined on AddRequestBody
+func ValidateAddRequestBody(body *AddRequestBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Slug == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("slug", "body"))
+	}
+	if body.Description == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("description", "body"))
+	}
+	if body.Slug != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.slug", *body.Slug, "^[[:alnum:]]+(-[[:alnum:]]+)*$"))
+	}
+	if body.Slug != nil {
+		if utf8.RuneCountInString(*body.Slug) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.slug", *body.Slug, utf8.RuneCountInString(*body.Slug), 40, false))
+		}
+	}
+	return
+}
+
+// ValidateUpdateRequestBody runs the validations defined on UpdateRequestBody
+func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Slug == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("slug", "body"))
+	}
+	if body.Description == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("description", "body"))
+	}
+	if body.Slug != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.slug", *body.Slug, "^[[:alnum:]]+(-[[:alnum:]]+)*$"))
+	}
+	if body.Slug != nil {
+		if utf8.RuneCountInString(*body.Slug) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.slug", *body.Slug, utf8.RuneCountInString(*body.Slug), 40, false))
+		}
+	}
+	return
+}
+
+// ValidateInviteRequestBody runs the validations defined on InviteRequestBody
+func ValidateInviteRequestBody(body *InviteRequestBody) (err error) {
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
+	}
+	if body.Role == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("role", "body"))
+	}
+	return
+}
+
+// ValidateRemoveUserRequestBody runs the validations defined on Remove
+// UserRequestBody
+func ValidateRemoveUserRequestBody(body *RemoveUserRequestBody) (err error) {
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
 	}
 	return
 }

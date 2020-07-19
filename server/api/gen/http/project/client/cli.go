@@ -11,8 +11,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"unicode/utf8"
 
 	project "github.com/fieldkit/cloud/server/api/gen/project"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildAddUpdatePayload builds the payload for the project add update endpoint
@@ -23,7 +25,7 @@ func BuildAddUpdatePayload(projectAddUpdateBody string, projectAddUpdateProjectI
 	{
 		err = json.Unmarshal([]byte(projectAddUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Sit sed et animi repudiandae rem non.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Explicabo quis similique nisi et voluptates mollitia.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -88,7 +90,7 @@ func BuildModifyUpdatePayload(projectModifyUpdateBody string, projectModifyUpdat
 	{
 		err = json.Unmarshal([]byte(projectModifyUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Perferendis id et id.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"A dicta culpa aperiam incidunt quia repudiandae.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -205,6 +207,317 @@ func BuildRejectInvitePayload(projectRejectInviteID string, projectRejectInviteT
 	v := &project.RejectInvitePayload{}
 	v.ID = id
 	v.Token = token
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildAddPayload builds the payload for the project add endpoint from CLI
+// flags.
+func BuildAddPayload(projectAddBody string, projectAddAuth string) (*project.AddPayload, error) {
+	var err error
+	var body AddRequestBody
+	{
+		err = json.Unmarshal([]byte(projectAddBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Quas at eligendi sed sunt.\",\n      \"endTime\": \"Recusandae enim numquam quae adipisci.\",\n      \"goal\": \"Voluptatem quibusdam iusto animi ducimus.\",\n      \"location\": \"Sit et alias.\",\n      \"name\": \"Sit nemo praesentium.\",\n      \"private\": false,\n      \"slug\": \"dwf\",\n      \"startTime\": \"Fugit sapiente.\",\n      \"tags\": \"Illum sint dolore consequatur tenetur aut.\"\n   }'")
+		}
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.slug", body.Slug, "^[[:alnum:]]+(-[[:alnum:]]+)*$"))
+		if utf8.RuneCountInString(body.Slug) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.slug", body.Slug, utf8.RuneCountInString(body.Slug), 40, false))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	var auth string
+	{
+		auth = projectAddAuth
+	}
+	v := &project.AddProjectFields{
+		Name:        body.Name,
+		Slug:        body.Slug,
+		Description: body.Description,
+		Goal:        body.Goal,
+		Location:    body.Location,
+		Tags:        body.Tags,
+		Private:     body.Private,
+		StartTime:   body.StartTime,
+		EndTime:     body.EndTime,
+	}
+	res := &project.AddPayload{
+		Project: v,
+	}
+	res.Auth = auth
+
+	return res, nil
+}
+
+// BuildUpdatePayload builds the payload for the project update endpoint from
+// CLI flags.
+func BuildUpdatePayload(projectUpdateBody string, projectUpdateProjectID string, projectUpdateAuth string) (*project.UpdatePayload, error) {
+	var err error
+	var body UpdateRequestBody
+	{
+		err = json.Unmarshal([]byte(projectUpdateBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Pariatur consectetur velit commodi.\",\n      \"endTime\": \"Minima magni non corporis ratione.\",\n      \"goal\": \"Consequatur consequatur consequatur est.\",\n      \"location\": \"Consequuntur nostrum tempora placeat fuga numquam.\",\n      \"name\": \"Est quidem repellendus ab repellat.\",\n      \"private\": true,\n      \"slug\": \"vpm\",\n      \"startTime\": \"Excepturi consectetur expedita ipsa similique.\",\n      \"tags\": \"Voluptatem cum.\"\n   }'")
+		}
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.slug", body.Slug, "^[[:alnum:]]+(-[[:alnum:]]+)*$"))
+		if utf8.RuneCountInString(body.Slug) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.slug", body.Slug, utf8.RuneCountInString(body.Slug), 40, false))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectUpdateProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = projectUpdateAuth
+	}
+	v := &project.AddProjectFields{
+		Name:        body.Name,
+		Slug:        body.Slug,
+		Description: body.Description,
+		Goal:        body.Goal,
+		Location:    body.Location,
+		Tags:        body.Tags,
+		Private:     body.Private,
+		StartTime:   body.StartTime,
+		EndTime:     body.EndTime,
+	}
+	res := &project.UpdatePayload{
+		Project: v,
+	}
+	res.ProjectID = projectID
+	res.Auth = auth
+
+	return res, nil
+}
+
+// BuildGetPayload builds the payload for the project get endpoint from CLI
+// flags.
+func BuildGetPayload(projectGetProjectID string, projectGetAuth string) (*project.GetPayload, error) {
+	var err error
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectGetProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var auth *string
+	{
+		if projectGetAuth != "" {
+			auth = &projectGetAuth
+		}
+	}
+	v := &project.GetPayload{}
+	v.ProjectID = projectID
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildListCommunityPayload builds the payload for the project list community
+// endpoint from CLI flags.
+func BuildListCommunityPayload(projectListCommunityAuth string) (*project.ListCommunityPayload, error) {
+	var auth *string
+	{
+		if projectListCommunityAuth != "" {
+			auth = &projectListCommunityAuth
+		}
+	}
+	v := &project.ListCommunityPayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildListMinePayload builds the payload for the project list mine endpoint
+// from CLI flags.
+func BuildListMinePayload(projectListMineAuth string) (*project.ListMinePayload, error) {
+	var auth string
+	{
+		auth = projectListMineAuth
+	}
+	v := &project.ListMinePayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildInvitePayload builds the payload for the project invite endpoint from
+// CLI flags.
+func BuildInvitePayload(projectInviteBody string, projectInviteProjectID string, projectInviteAuth string) (*project.InvitePayload, error) {
+	var err error
+	var body InviteRequestBody
+	{
+		err = json.Unmarshal([]byte(projectInviteBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Qui natus cum.\",\n      \"role\": 344156284\n   }'")
+		}
+	}
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectInviteProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = projectInviteAuth
+	}
+	v := &project.InviteUserFields{
+		Email: body.Email,
+		Role:  body.Role,
+	}
+	res := &project.InvitePayload{
+		Invite: v,
+	}
+	res.ProjectID = projectID
+	res.Auth = auth
+
+	return res, nil
+}
+
+// BuildRemoveUserPayload builds the payload for the project remove user
+// endpoint from CLI flags.
+func BuildRemoveUserPayload(projectRemoveUserBody string, projectRemoveUserProjectID string, projectRemoveUserAuth string) (*project.RemoveUserPayload, error) {
+	var err error
+	var body RemoveUserRequestBody
+	{
+		err = json.Unmarshal([]byte(projectRemoveUserBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Temporibus labore impedit molestiae aut asperiores.\"\n   }'")
+		}
+	}
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectRemoveUserProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = projectRemoveUserAuth
+	}
+	v := &project.RemoveUserFields{
+		Email: body.Email,
+	}
+	res := &project.RemoveUserPayload{
+		Remove: v,
+	}
+	res.ProjectID = projectID
+	res.Auth = auth
+
+	return res, nil
+}
+
+// BuildAddStationPayload builds the payload for the project add station
+// endpoint from CLI flags.
+func BuildAddStationPayload(projectAddStationProjectID string, projectAddStationStationID string, projectAddStationAuth string) (*project.AddStationPayload, error) {
+	var err error
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectAddStationProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var stationID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectAddStationStationID, 10, 32)
+		stationID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for stationID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = projectAddStationAuth
+	}
+	v := &project.AddStationPayload{}
+	v.ProjectID = projectID
+	v.StationID = stationID
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildRemoveStationPayload builds the payload for the project remove station
+// endpoint from CLI flags.
+func BuildRemoveStationPayload(projectRemoveStationProjectID string, projectRemoveStationStationID string, projectRemoveStationAuth string) (*project.RemoveStationPayload, error) {
+	var err error
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectRemoveStationProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var stationID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectRemoveStationStationID, 10, 32)
+		stationID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for stationID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = projectRemoveStationAuth
+	}
+	v := &project.RemoveStationPayload{}
+	v.ProjectID = projectID
+	v.StationID = stationID
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildDeletePayload builds the payload for the project delete endpoint from
+// CLI flags.
+func BuildDeletePayload(projectDeleteProjectID string, projectDeleteAuth string) (*project.DeletePayload, error) {
+	var err error
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectDeleteProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = projectDeleteAuth
+	}
+	v := &project.DeletePayload{}
+	v.ProjectID = projectID
 	v.Auth = auth
 
 	return v, nil

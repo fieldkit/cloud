@@ -113,65 +113,6 @@ func (mt *DeviceDataSummary) Validate() (err error) {
 	return
 }
 
-// JSONDataResponse media type (default view)
-//
-// Identifier: application/vnd.app.device.json.data+json; view=default
-type JSONDataResponse struct {
-	Versions []*JSONDataVersion `form:"versions" json:"versions" yaml:"versions" xml:"versions"`
-}
-
-// Validate validates the JSONDataResponse media type instance.
-func (mt *JSONDataResponse) Validate() (err error) {
-	if mt.Versions == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "versions"))
-	}
-	for _, e := range mt.Versions {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// JSONDataSummaryResponse media type (default view)
-//
-// Identifier: application/vnd.app.device.json.data.summary+json; view=default
-type JSONDataSummaryResponse struct {
-	Data       []*JSONDataRow        `form:"data" json:"data" yaml:"data" xml:"data"`
-	Modules    []*JSONDataMetaModule `form:"modules" json:"modules" yaml:"modules" xml:"modules"`
-	Statistics *JSONDataStatistics   `form:"statistics" json:"statistics" yaml:"statistics" xml:"statistics"`
-}
-
-// Validate validates the JSONDataSummaryResponse media type instance.
-func (mt *JSONDataSummaryResponse) Validate() (err error) {
-	if mt.Modules == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "modules"))
-	}
-	if mt.Data == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "data"))
-	}
-	if mt.Statistics == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "statistics"))
-	}
-	for _, e := range mt.Data {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	for _, e := range mt.Modules {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
 // DeviceMetaRecord media type (default view)
 //
 // Identifier: application/vnd.app.device.meta.record+json; view=default
@@ -284,91 +225,6 @@ func (mt *DeviceDataSummaryResponse) Validate() (err error) {
 	return
 }
 
-// FieldNoteMedia media type (default view)
-//
-// Identifier: application/vnd.app.field_note_media+json; view=default
-type FieldNoteMedia struct {
-	ContentType string    `form:"content_type" json:"content_type" yaml:"content_type" xml:"content_type"`
-	Created     time.Time `form:"created" json:"created" yaml:"created" xml:"created"`
-	ID          int       `form:"id" json:"id" yaml:"id" xml:"id"`
-	URL         string    `form:"url" json:"url" yaml:"url" xml:"url"`
-	UserID      int       `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`
-}
-
-// Validate validates the FieldNoteMedia media type instance.
-func (mt *FieldNoteMedia) Validate() (err error) {
-
-	if mt.URL == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
-	}
-	if mt.ContentType == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "content_type"))
-	}
-	return
-}
-
-// FieldNoteQueryResult media type (default view)
-//
-// Identifier: application/vnd.app.field_note_result+json; view=default
-type FieldNoteQueryResult struct {
-	CategoryKey      string    `form:"category_key" json:"category_key" yaml:"category_key" xml:"category_key"`
-	Created          time.Time `form:"created" json:"created" yaml:"created" xml:"created"`
-	Creator          string    `form:"creator" json:"creator" yaml:"creator" xml:"creator"`
-	ID               int       `form:"id" json:"id" yaml:"id" xml:"id"`
-	MediaContentType *string   `form:"media_content_type,omitempty" json:"media_content_type,omitempty" yaml:"media_content_type,omitempty" xml:"media_content_type,omitempty"`
-	MediaID          *int      `form:"media_id,omitempty" json:"media_id,omitempty" yaml:"media_id,omitempty" xml:"media_id,omitempty"`
-	MediaURL         *string   `form:"media_url,omitempty" json:"media_url,omitempty" yaml:"media_url,omitempty" xml:"media_url,omitempty"`
-	Note             *string   `form:"note,omitempty" json:"note,omitempty" yaml:"note,omitempty" xml:"note,omitempty"`
-	UserID           int       `form:"user_id" json:"user_id" yaml:"user_id" xml:"user_id"`
-}
-
-// Validate validates the FieldNoteQueryResult media type instance.
-func (mt *FieldNoteQueryResult) Validate() (err error) {
-
-	if mt.CategoryKey == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "category_key"))
-	}
-	if mt.Creator == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "creator"))
-	}
-	return
-}
-
-// FieldNoteQueryResultCollection is the media type for an array of FieldNoteQueryResult (default view)
-//
-// Identifier: application/vnd.app.field_note_result+json; type=collection; view=default
-type FieldNoteQueryResultCollection []*FieldNoteQueryResult
-
-// Validate validates the FieldNoteQueryResultCollection media type instance.
-func (mt FieldNoteQueryResultCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// FieldNotes media type (default view)
-//
-// Identifier: application/vnd.app.field_notes+json; view=default
-type FieldNotes struct {
-	Notes FieldNoteQueryResultCollection `form:"notes" json:"notes" yaml:"notes" xml:"notes"`
-}
-
-// Validate validates the FieldNotes media type instance.
-func (mt *FieldNotes) Validate() (err error) {
-	if mt.Notes == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "notes"))
-	}
-	if err2 := mt.Notes.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
-	}
-	return
-}
-
 // FirmwareSummary media type (default view)
 //
 // Identifier: application/vnd.app.firmware+json; view=default
@@ -476,57 +332,6 @@ func (mt *MediaReferenceResponse) Validate() (err error) {
 	return
 }
 
-// Project media type (default view)
-//
-// Identifier: application/vnd.app.project+json; view=default
-type Project struct {
-	Description       string  `form:"description" json:"description" yaml:"description" xml:"description"`
-	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" yaml:"endTime,omitempty" xml:"endTime,omitempty"`
-	Goal              string  `form:"goal" json:"goal" yaml:"goal" xml:"goal"`
-	ID                int     `form:"id" json:"id" yaml:"id" xml:"id"`
-	Location          string  `form:"location" json:"location" yaml:"location" xml:"location"`
-	Name              string  `form:"name" json:"name" yaml:"name" xml:"name"`
-	NumberOfFollowers int     `form:"numberOfFollowers" json:"numberOfFollowers" yaml:"numberOfFollowers" xml:"numberOfFollowers"`
-	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" yaml:"photo,omitempty" xml:"photo,omitempty"`
-	Private           bool    `form:"private" json:"private" yaml:"private" xml:"private"`
-	ReadOnly          bool    `form:"readOnly" json:"readOnly" yaml:"readOnly" xml:"readOnly"`
-	Slug              string  `form:"slug" json:"slug" yaml:"slug" xml:"slug"`
-	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" yaml:"startTime,omitempty" xml:"startTime,omitempty"`
-	Tags              string  `form:"tags" json:"tags" yaml:"tags" xml:"tags"`
-}
-
-// Validate validates the Project media type instance.
-func (mt *Project) Validate() (err error) {
-
-	if mt.Name == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
-	}
-	if mt.Slug == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "slug"))
-	}
-	if mt.Description == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "description"))
-	}
-	if mt.Goal == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "goal"))
-	}
-	if mt.Location == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "location"))
-	}
-
-	if mt.Tags == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "tags"))
-	}
-
-	if ok := goa.ValidatePattern(`^[[:alnum:]]+(-[[:alnum:]]+)*$`, mt.Slug); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.slug`, mt.Slug, `^[[:alnum:]]+(-[[:alnum:]]+)*$`))
-	}
-	if utf8.RuneCountInString(mt.Slug) > 40 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.slug`, mt.Slug, utf8.RuneCountInString(mt.Slug), 40, false))
-	}
-	return
-}
-
 // ProjectRole media type (default view)
 //
 // Identifier: application/vnd.app.project.role+json; view=default
@@ -602,41 +407,6 @@ func (mt ProjectUserCollection) Validate() (err error) {
 				err = goa.MergeErrors(err, err2)
 			}
 		}
-	}
-	return
-}
-
-// ProjectCollection is the media type for an array of Project (default view)
-//
-// Identifier: application/vnd.app.project+json; type=collection; view=default
-type ProjectCollection []*Project
-
-// Validate validates the ProjectCollection media type instance.
-func (mt ProjectCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// Projects media type (default view)
-//
-// Identifier: application/vnd.app.projects+json; view=default
-type Projects struct {
-	Projects ProjectCollection `form:"projects" json:"projects" yaml:"projects" xml:"projects"`
-}
-
-// Validate validates the Projects media type instance.
-func (mt *Projects) Validate() (err error) {
-	if mt.Projects == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "projects"))
-	}
-	if err2 := mt.Projects.Validate(); err2 != nil {
-		err = goa.MergeErrors(err, err2)
 	}
 	return
 }

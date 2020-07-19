@@ -31,6 +31,26 @@ type Service interface {
 	AcceptInvite(context.Context, *AcceptInvitePayload) (err error)
 	// RejectInvite implements reject invite.
 	RejectInvite(context.Context, *RejectInvitePayload) (err error)
+	// Add implements add.
+	Add(context.Context, *AddPayload) (res *Project, err error)
+	// Update implements update.
+	Update(context.Context, *UpdatePayload) (res *Project, err error)
+	// Get implements get.
+	Get(context.Context, *GetPayload) (res *Project, err error)
+	// ListCommunity implements list community.
+	ListCommunity(context.Context, *ListCommunityPayload) (res *Projects, err error)
+	// ListMine implements list mine.
+	ListMine(context.Context, *ListMinePayload) (res *Projects, err error)
+	// Invite implements invite.
+	Invite(context.Context, *InvitePayload) (err error)
+	// RemoveUser implements remove user.
+	RemoveUser(context.Context, *RemoveUserPayload) (err error)
+	// AddStation implements add station.
+	AddStation(context.Context, *AddStationPayload) (err error)
+	// RemoveStation implements remove station.
+	RemoveStation(context.Context, *RemoveStationPayload) (err error)
+	// Delete implements delete.
+	Delete(context.Context, *DeletePayload) (err error)
 	// UploadMedia implements upload media.
 	UploadMedia(context.Context, *UploadMediaPayload, io.ReadCloser) (err error)
 	// DownloadMedia implements download media.
@@ -51,7 +71,7 @@ const ServiceName = "project"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [9]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept invite", "reject invite", "upload media", "download media"}
+var MethodNames = [19]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept invite", "reject invite", "add", "update", "get", "list community", "list mine", "invite", "remove user", "add station", "remove station", "delete", "upload media", "download media"}
 
 // AddUpdatePayload is the payload type of the project service add update
 // method.
@@ -118,6 +138,95 @@ type RejectInvitePayload struct {
 	Token *string
 }
 
+// AddPayload is the payload type of the project service add method.
+type AddPayload struct {
+	Auth    string
+	Project *AddProjectFields
+}
+
+// Project is the result type of the project service add method.
+type Project struct {
+	ID                int32
+	Name              string
+	Slug              string
+	Description       string
+	Goal              string
+	Location          string
+	Tags              string
+	Private           bool
+	StartTime         *string
+	EndTime           *string
+	Photo             *string
+	ReadOnly          bool
+	NumberOfFollowers int32
+}
+
+// UpdatePayload is the payload type of the project service update method.
+type UpdatePayload struct {
+	Auth      string
+	ProjectID int32
+	Project   *AddProjectFields
+}
+
+// GetPayload is the payload type of the project service get method.
+type GetPayload struct {
+	Auth      *string
+	ProjectID int32
+}
+
+// ListCommunityPayload is the payload type of the project service list
+// community method.
+type ListCommunityPayload struct {
+	Auth *string
+}
+
+// Projects is the result type of the project service list community method.
+type Projects struct {
+	Projects ProjectCollection
+}
+
+// ListMinePayload is the payload type of the project service list mine method.
+type ListMinePayload struct {
+	Auth string
+}
+
+// InvitePayload is the payload type of the project service invite method.
+type InvitePayload struct {
+	Auth      string
+	ProjectID int32
+	Invite    *InviteUserFields
+}
+
+// RemoveUserPayload is the payload type of the project service remove user
+// method.
+type RemoveUserPayload struct {
+	Auth      string
+	ProjectID int32
+	Remove    *RemoveUserFields
+}
+
+// AddStationPayload is the payload type of the project service add station
+// method.
+type AddStationPayload struct {
+	Auth      string
+	ProjectID int32
+	StationID int32
+}
+
+// RemoveStationPayload is the payload type of the project service remove
+// station method.
+type RemoveStationPayload struct {
+	Auth      string
+	ProjectID int32
+	StationID int32
+}
+
+// DeletePayload is the payload type of the project service delete method.
+type DeletePayload struct {
+	Auth      string
+	ProjectID int32
+}
+
 // UploadMediaPayload is the payload type of the project service upload media
 // method.
 type UploadMediaPayload struct {
@@ -150,6 +259,29 @@ type PendingInvite struct {
 type ProjectSummary struct {
 	ID   int64
 	Name string
+}
+
+type AddProjectFields struct {
+	Name        string
+	Slug        string
+	Description string
+	Goal        *string
+	Location    *string
+	Tags        *string
+	Private     *bool
+	StartTime   *string
+	EndTime     *string
+}
+
+type ProjectCollection []*Project
+
+type InviteUserFields struct {
+	Email string
+	Role  int32
+}
+
+type RemoveUserFields struct {
+	Email string
 }
 
 // unauthorized
@@ -230,6 +362,31 @@ func NewViewedPendingInvites(res *PendingInvites, view string) *projectviews.Pen
 	return &projectviews.PendingInvites{Projected: p, View: "default"}
 }
 
+// NewProject initializes result type Project from viewed result type Project.
+func NewProject(vres *projectviews.Project) *Project {
+	return newProject(vres.Projected)
+}
+
+// NewViewedProject initializes viewed result type Project from result type
+// Project using the given view.
+func NewViewedProject(res *Project, view string) *projectviews.Project {
+	p := newProjectView(res)
+	return &projectviews.Project{Projected: p, View: "default"}
+}
+
+// NewProjects initializes result type Projects from viewed result type
+// Projects.
+func NewProjects(vres *projectviews.Projects) *Projects {
+	return newProjects(vres.Projected)
+}
+
+// NewViewedProjects initializes viewed result type Projects from result type
+// Projects using the given view.
+func NewViewedProjects(res *Projects, view string) *projectviews.Projects {
+	p := newProjectsView(res)
+	return &projectviews.Projects{Projected: p, View: "default"}
+}
+
 // newProjectUpdate converts projected type ProjectUpdate to service type
 // ProjectUpdate.
 func newProjectUpdate(vres *projectviews.ProjectUpdateView) *ProjectUpdate {
@@ -275,6 +432,106 @@ func newPendingInvitesView(res *PendingInvites) *projectviews.PendingInvitesView
 		for i, val := range res.Pending {
 			vres.Pending[i] = transformPendingInviteToProjectviewsPendingInviteView(val)
 		}
+	}
+	return vres
+}
+
+// newProject converts projected type Project to service type Project.
+func newProject(vres *projectviews.ProjectView) *Project {
+	res := &Project{
+		StartTime: vres.StartTime,
+		EndTime:   vres.EndTime,
+		Photo:     vres.Photo,
+	}
+	if vres.ID != nil {
+		res.ID = *vres.ID
+	}
+	if vres.Name != nil {
+		res.Name = *vres.Name
+	}
+	if vres.Slug != nil {
+		res.Slug = *vres.Slug
+	}
+	if vres.Description != nil {
+		res.Description = *vres.Description
+	}
+	if vres.Goal != nil {
+		res.Goal = *vres.Goal
+	}
+	if vres.Location != nil {
+		res.Location = *vres.Location
+	}
+	if vres.Tags != nil {
+		res.Tags = *vres.Tags
+	}
+	if vres.Private != nil {
+		res.Private = *vres.Private
+	}
+	if vres.ReadOnly != nil {
+		res.ReadOnly = *vres.ReadOnly
+	}
+	if vres.NumberOfFollowers != nil {
+		res.NumberOfFollowers = *vres.NumberOfFollowers
+	}
+	return res
+}
+
+// newProjectView projects result type Project to projected type ProjectView
+// using the "default" view.
+func newProjectView(res *Project) *projectviews.ProjectView {
+	vres := &projectviews.ProjectView{
+		ID:                &res.ID,
+		Name:              &res.Name,
+		Slug:              &res.Slug,
+		Description:       &res.Description,
+		Goal:              &res.Goal,
+		Location:          &res.Location,
+		Tags:              &res.Tags,
+		Private:           &res.Private,
+		StartTime:         res.StartTime,
+		EndTime:           res.EndTime,
+		Photo:             res.Photo,
+		ReadOnly:          &res.ReadOnly,
+		NumberOfFollowers: &res.NumberOfFollowers,
+	}
+	return vres
+}
+
+// newProjects converts projected type Projects to service type Projects.
+func newProjects(vres *projectviews.ProjectsView) *Projects {
+	res := &Projects{}
+	if vres.Projects != nil {
+		res.Projects = newProjectCollection(vres.Projects)
+	}
+	return res
+}
+
+// newProjectsView projects result type Projects to projected type ProjectsView
+// using the "default" view.
+func newProjectsView(res *Projects) *projectviews.ProjectsView {
+	vres := &projectviews.ProjectsView{}
+	if res.Projects != nil {
+		vres.Projects = newProjectCollectionView(res.Projects)
+	}
+	return vres
+}
+
+// newProjectCollection converts projected type ProjectCollection to service
+// type ProjectCollection.
+func newProjectCollection(vres projectviews.ProjectCollectionView) ProjectCollection {
+	res := make(ProjectCollection, len(vres))
+	for i, n := range vres {
+		res[i] = newProject(n)
+	}
+	return res
+}
+
+// newProjectCollectionView projects result type ProjectCollection to projected
+// type ProjectCollectionView using the "default" view.
+func newProjectCollectionView(res ProjectCollection) projectviews.ProjectCollectionView {
+	vres := make(projectviews.ProjectCollectionView, len(res))
+	for i, n := range res {
+		vres[i] = newProjectView(n)
 	}
 	return vres
 }

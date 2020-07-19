@@ -32,7 +32,7 @@ type Permissions interface {
 	Unwrap() (permissions Permissions, err error)
 	UserID() int32
 	IsAdmin() bool
-	ForProjectByID(id int) (permissions ProjectPermissions, err error)
+	ForProjectByID(id int32) (permissions ProjectPermissions, err error)
 	ForStationByID(id int) (permissions StationPermissions, err error)
 	ForStationByDeviceID(id []byte) (permissions StationPermissions, err error)
 	ForStation(station *data.Station) (permissions StationPermissions, err error)
@@ -178,7 +178,7 @@ func (p *defaultPermissions) Unwrap() (Permissions, error) {
 	return p, nil
 }
 
-func (p *defaultPermissions) ForProjectByID(id int) (permissions ProjectPermissions, err error) {
+func (p *defaultPermissions) ForProjectByID(id int32) (permissions ProjectPermissions, err error) {
 	if err := p.unwrap(); err != nil {
 		return nil, err
 	}

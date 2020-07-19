@@ -46,6 +46,56 @@ func RejectInviteProjectPath(id int64) string {
 	return fmt.Sprintf("/projects/invites/%v/reject", id)
 }
 
+// AddProjectPath returns the URL path to the project service add HTTP endpoint.
+func AddProjectPath() string {
+	return "/projects"
+}
+
+// UpdateProjectPath returns the URL path to the project service update HTTP endpoint.
+func UpdateProjectPath(projectID int32) string {
+	return fmt.Sprintf("/projects/%v", projectID)
+}
+
+// GetProjectPath returns the URL path to the project service get HTTP endpoint.
+func GetProjectPath(projectID int32) string {
+	return fmt.Sprintf("/projects/%v", projectID)
+}
+
+// ListCommunityProjectPath returns the URL path to the project service list community HTTP endpoint.
+func ListCommunityProjectPath() string {
+	return "/projects"
+}
+
+// ListMineProjectPath returns the URL path to the project service list mine HTTP endpoint.
+func ListMineProjectPath() string {
+	return "/user/projects"
+}
+
+// InviteProjectPath returns the URL path to the project service invite HTTP endpoint.
+func InviteProjectPath(projectID int32) string {
+	return fmt.Sprintf("/projects/%v/invite", projectID)
+}
+
+// RemoveUserProjectPath returns the URL path to the project service remove user HTTP endpoint.
+func RemoveUserProjectPath(projectID int32) string {
+	return fmt.Sprintf("/projects/%v/members", projectID)
+}
+
+// AddStationProjectPath returns the URL path to the project service add station HTTP endpoint.
+func AddStationProjectPath(projectID int32, stationID int32) string {
+	return fmt.Sprintf("/projects/%v/stations/%v", projectID, stationID)
+}
+
+// RemoveStationProjectPath returns the URL path to the project service remove station HTTP endpoint.
+func RemoveStationProjectPath(projectID int32, stationID int32) string {
+	return fmt.Sprintf("/projects/%v/stations/%v", projectID, stationID)
+}
+
+// DeleteProjectPath returns the URL path to the project service delete HTTP endpoint.
+func DeleteProjectPath(projectID int32) string {
+	return fmt.Sprintf("/projects/%v", projectID)
+}
+
 // UploadMediaProjectPath returns the URL path to the project service upload media HTTP endpoint.
 func UploadMediaProjectPath(projectID int32) string {
 	return fmt.Sprintf("/projects/%v/media", projectID)

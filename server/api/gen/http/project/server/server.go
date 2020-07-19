@@ -29,6 +29,16 @@ type Server struct {
 	LookupInvite  http.Handler
 	AcceptInvite  http.Handler
 	RejectInvite  http.Handler
+	Add           http.Handler
+	Update        http.Handler
+	Get           http.Handler
+	ListCommunity http.Handler
+	ListMine      http.Handler
+	Invite        http.Handler
+	RemoveUser    http.Handler
+	AddStation    http.Handler
+	RemoveStation http.Handler
+	Delete        http.Handler
 	UploadMedia   http.Handler
 	DownloadMedia http.Handler
 	CORS          http.Handler
@@ -74,6 +84,16 @@ func New(
 			{"LookupInvite", "GET", "/projects/invites/{token}"},
 			{"AcceptInvite", "POST", "/projects/invites/{id}/accept"},
 			{"RejectInvite", "POST", "/projects/invites/{id}/reject"},
+			{"Add", "POST", "/projects"},
+			{"Update", "PATCH", "/projects/{projectId}"},
+			{"Get", "GET", "/projects/{projectId}"},
+			{"ListCommunity", "GET", "/projects"},
+			{"ListMine", "GET", "/user/projects"},
+			{"Invite", "POST", "/projects/{projectId}/invite"},
+			{"RemoveUser", "DELETE", "/projects/{projectId}/members"},
+			{"AddStation", "POST", "/projects/{projectId}/stations/{stationId}"},
+			{"RemoveStation", "DELETE", "/projects/{projectId}/stations/{stationId}"},
+			{"Delete", "DELETE", "/projects/{projectId}"},
 			{"UploadMedia", "POST", "/projects/{projectId}/media"},
 			{"DownloadMedia", "GET", "/projects/{projectId}/media"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/updates"},
@@ -82,6 +102,12 @@ func New(
 			{"CORS", "OPTIONS", "/projects/invites/{token}"},
 			{"CORS", "OPTIONS", "/projects/invites/{id}/accept"},
 			{"CORS", "OPTIONS", "/projects/invites/{id}/reject"},
+			{"CORS", "OPTIONS", "/projects"},
+			{"CORS", "OPTIONS", "/projects/{projectId}"},
+			{"CORS", "OPTIONS", "/user/projects"},
+			{"CORS", "OPTIONS", "/projects/{projectId}/invite"},
+			{"CORS", "OPTIONS", "/projects/{projectId}/members"},
+			{"CORS", "OPTIONS", "/projects/{projectId}/stations/{stationId}"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/media"},
 		},
 		AddUpdate:     NewAddUpdateHandler(e.AddUpdate, mux, decoder, encoder, errhandler, formatter),
@@ -91,6 +117,16 @@ func New(
 		LookupInvite:  NewLookupInviteHandler(e.LookupInvite, mux, decoder, encoder, errhandler, formatter),
 		AcceptInvite:  NewAcceptInviteHandler(e.AcceptInvite, mux, decoder, encoder, errhandler, formatter),
 		RejectInvite:  NewRejectInviteHandler(e.RejectInvite, mux, decoder, encoder, errhandler, formatter),
+		Add:           NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
+		Update:        NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
+		Get:           NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		ListCommunity: NewListCommunityHandler(e.ListCommunity, mux, decoder, encoder, errhandler, formatter),
+		ListMine:      NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
+		Invite:        NewInviteHandler(e.Invite, mux, decoder, encoder, errhandler, formatter),
+		RemoveUser:    NewRemoveUserHandler(e.RemoveUser, mux, decoder, encoder, errhandler, formatter),
+		AddStation:    NewAddStationHandler(e.AddStation, mux, decoder, encoder, errhandler, formatter),
+		RemoveStation: NewRemoveStationHandler(e.RemoveStation, mux, decoder, encoder, errhandler, formatter),
+		Delete:        NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
 		UploadMedia:   NewUploadMediaHandler(e.UploadMedia, mux, decoder, encoder, errhandler, formatter),
 		DownloadMedia: NewDownloadMediaHandler(e.DownloadMedia, mux, decoder, encoder, errhandler, formatter),
 		CORS:          NewCORSHandler(),
@@ -109,6 +145,16 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.LookupInvite = m(s.LookupInvite)
 	s.AcceptInvite = m(s.AcceptInvite)
 	s.RejectInvite = m(s.RejectInvite)
+	s.Add = m(s.Add)
+	s.Update = m(s.Update)
+	s.Get = m(s.Get)
+	s.ListCommunity = m(s.ListCommunity)
+	s.ListMine = m(s.ListMine)
+	s.Invite = m(s.Invite)
+	s.RemoveUser = m(s.RemoveUser)
+	s.AddStation = m(s.AddStation)
+	s.RemoveStation = m(s.RemoveStation)
+	s.Delete = m(s.Delete)
 	s.UploadMedia = m(s.UploadMedia)
 	s.DownloadMedia = m(s.DownloadMedia)
 	s.CORS = m(s.CORS)
@@ -123,6 +169,16 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountLookupInviteHandler(mux, h.LookupInvite)
 	MountAcceptInviteHandler(mux, h.AcceptInvite)
 	MountRejectInviteHandler(mux, h.RejectInvite)
+	MountAddHandler(mux, h.Add)
+	MountUpdateHandler(mux, h.Update)
+	MountGetHandler(mux, h.Get)
+	MountListCommunityHandler(mux, h.ListCommunity)
+	MountListMineHandler(mux, h.ListMine)
+	MountInviteHandler(mux, h.Invite)
+	MountRemoveUserHandler(mux, h.RemoveUser)
+	MountAddStationHandler(mux, h.AddStation)
+	MountRemoveStationHandler(mux, h.RemoveStation)
+	MountDeleteHandler(mux, h.Delete)
 	MountUploadMediaHandler(mux, h.UploadMedia)
 	MountDownloadMediaHandler(mux, h.DownloadMedia)
 	MountCORSHandler(mux, h.CORS)
@@ -485,6 +541,516 @@ func NewRejectInviteHandler(
 	})
 }
 
+// MountAddHandler configures the mux to serve the "project" service "add"
+// endpoint.
+func MountAddHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/projects", f)
+}
+
+// NewAddHandler creates a HTTP handler which loads the HTTP request and calls
+// the "project" service "add" endpoint.
+func NewAddHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeAddRequest(mux, decoder)
+		encodeResponse = EncodeAddResponse(encoder)
+		encodeError    = EncodeAddError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "add")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountUpdateHandler configures the mux to serve the "project" service
+// "update" endpoint.
+func MountUpdateHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("PATCH", "/projects/{projectId}", f)
+}
+
+// NewUpdateHandler creates a HTTP handler which loads the HTTP request and
+// calls the "project" service "update" endpoint.
+func NewUpdateHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUpdateRequest(mux, decoder)
+		encodeResponse = EncodeUpdateResponse(encoder)
+		encodeError    = EncodeUpdateError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "update")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountGetHandler configures the mux to serve the "project" service "get"
+// endpoint.
+func MountGetHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/projects/{projectId}", f)
+}
+
+// NewGetHandler creates a HTTP handler which loads the HTTP request and calls
+// the "project" service "get" endpoint.
+func NewGetHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeGetRequest(mux, decoder)
+		encodeResponse = EncodeGetResponse(encoder)
+		encodeError    = EncodeGetError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "get")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountListCommunityHandler configures the mux to serve the "project" service
+// "list community" endpoint.
+func MountListCommunityHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/projects", f)
+}
+
+// NewListCommunityHandler creates a HTTP handler which loads the HTTP request
+// and calls the "project" service "list community" endpoint.
+func NewListCommunityHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeListCommunityRequest(mux, decoder)
+		encodeResponse = EncodeListCommunityResponse(encoder)
+		encodeError    = EncodeListCommunityError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "list community")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountListMineHandler configures the mux to serve the "project" service "list
+// mine" endpoint.
+func MountListMineHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/user/projects", f)
+}
+
+// NewListMineHandler creates a HTTP handler which loads the HTTP request and
+// calls the "project" service "list mine" endpoint.
+func NewListMineHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeListMineRequest(mux, decoder)
+		encodeResponse = EncodeListMineResponse(encoder)
+		encodeError    = EncodeListMineError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "list mine")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountInviteHandler configures the mux to serve the "project" service
+// "invite" endpoint.
+func MountInviteHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/projects/{projectId}/invite", f)
+}
+
+// NewInviteHandler creates a HTTP handler which loads the HTTP request and
+// calls the "project" service "invite" endpoint.
+func NewInviteHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeInviteRequest(mux, decoder)
+		encodeResponse = EncodeInviteResponse(encoder)
+		encodeError    = EncodeInviteError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "invite")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountRemoveUserHandler configures the mux to serve the "project" service
+// "remove user" endpoint.
+func MountRemoveUserHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("DELETE", "/projects/{projectId}/members", f)
+}
+
+// NewRemoveUserHandler creates a HTTP handler which loads the HTTP request and
+// calls the "project" service "remove user" endpoint.
+func NewRemoveUserHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeRemoveUserRequest(mux, decoder)
+		encodeResponse = EncodeRemoveUserResponse(encoder)
+		encodeError    = EncodeRemoveUserError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "remove user")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountAddStationHandler configures the mux to serve the "project" service
+// "add station" endpoint.
+func MountAddStationHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/projects/{projectId}/stations/{stationId}", f)
+}
+
+// NewAddStationHandler creates a HTTP handler which loads the HTTP request and
+// calls the "project" service "add station" endpoint.
+func NewAddStationHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeAddStationRequest(mux, decoder)
+		encodeResponse = EncodeAddStationResponse(encoder)
+		encodeError    = EncodeAddStationError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "add station")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountRemoveStationHandler configures the mux to serve the "project" service
+// "remove station" endpoint.
+func MountRemoveStationHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("DELETE", "/projects/{projectId}/stations/{stationId}", f)
+}
+
+// NewRemoveStationHandler creates a HTTP handler which loads the HTTP request
+// and calls the "project" service "remove station" endpoint.
+func NewRemoveStationHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeRemoveStationRequest(mux, decoder)
+		encodeResponse = EncodeRemoveStationResponse(encoder)
+		encodeError    = EncodeRemoveStationError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "remove station")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountDeleteHandler configures the mux to serve the "project" service
+// "delete" endpoint.
+func MountDeleteHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("DELETE", "/projects/{projectId}", f)
+}
+
+// NewDeleteHandler creates a HTTP handler which loads the HTTP request and
+// calls the "project" service "delete" endpoint.
+func NewDeleteHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDeleteRequest(mux, decoder)
+		encodeResponse = EncodeDeleteResponse(encoder)
+		encodeError    = EncodeDeleteError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "delete")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountUploadMediaHandler configures the mux to serve the "project" service
 // "upload media" endpoint.
 func MountUploadMediaHandler(mux goahttp.Muxer, h http.Handler) {
@@ -612,6 +1178,12 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/projects/invites/{token}", f)
 	mux.Handle("OPTIONS", "/projects/invites/{id}/accept", f)
 	mux.Handle("OPTIONS", "/projects/invites/{id}/reject", f)
+	mux.Handle("OPTIONS", "/projects", f)
+	mux.Handle("OPTIONS", "/projects/{projectId}", f)
+	mux.Handle("OPTIONS", "/user/projects", f)
+	mux.Handle("OPTIONS", "/projects/{projectId}/invite", f)
+	mux.Handle("OPTIONS", "/projects/{projectId}/members", f)
+	mux.Handle("OPTIONS", "/projects/{projectId}/stations/{stationId}", f)
 	mux.Handle("OPTIONS", "/projects/{projectId}/media", f)
 }
 

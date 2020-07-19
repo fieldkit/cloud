@@ -893,6 +893,1211 @@ func DecodeRejectInviteResponse(decoder func(*http.Response) goahttp.Decoder, re
 	}
 }
 
+// BuildAddRequest instantiates a HTTP request object with method and path set
+// to call the "project" service "add" endpoint
+func (c *Client) BuildAddRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AddProjectPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "add", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeAddRequest returns an encoder for requests sent to the project add
+// server.
+func EncodeAddRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.AddPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "add", "*project.AddPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		body := NewAddRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("project", "add", err)
+		}
+		return nil
+	}
+}
+
+// DecodeAddResponse returns a decoder for responses returned by the project
+// add endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeAddResponse may return the following errors:
+//	- "bad-request" (type project.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type project.Forbidden): http.StatusForbidden
+//	- "not-found" (type project.NotFound): http.StatusNotFound
+//	- "unauthorized" (type project.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body AddResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "add", err)
+			}
+			p := NewAddProjectOK(&body)
+			view := "default"
+			vres := &projectviews.Project{Projected: p, View: view}
+			if err = projectviews.ValidateProject(vres); err != nil {
+				return nil, goahttp.ErrValidationError("project", "add", err)
+			}
+			res := project.NewProject(vres)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body AddBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "add", err)
+			}
+			return nil, NewAddBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body AddForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "add", err)
+			}
+			return nil, NewAddForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body AddNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "add", err)
+			}
+			return nil, NewAddNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body AddUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "add", err)
+			}
+			return nil, NewAddUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "add", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildUpdateRequest instantiates a HTTP request object with method and path
+// set to call the "project" service "update" endpoint
+func (c *Client) BuildUpdateRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		projectID int32
+	)
+	{
+		p, ok := v.(*project.UpdatePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("project", "update", "*project.UpdatePayload", v)
+		}
+		projectID = p.ProjectID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UpdateProjectPath(projectID)}
+	req, err := http.NewRequest("PATCH", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "update", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeUpdateRequest returns an encoder for requests sent to the project
+// update server.
+func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.UpdatePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "update", "*project.UpdatePayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		body := NewUpdateRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("project", "update", err)
+		}
+		return nil
+	}
+}
+
+// DecodeUpdateResponse returns a decoder for responses returned by the project
+// update endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeUpdateResponse may return the following errors:
+//	- "bad-request" (type project.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type project.Forbidden): http.StatusForbidden
+//	- "not-found" (type project.NotFound): http.StatusNotFound
+//	- "unauthorized" (type project.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body UpdateResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "update", err)
+			}
+			p := NewUpdateProjectOK(&body)
+			view := "default"
+			vres := &projectviews.Project{Projected: p, View: view}
+			if err = projectviews.ValidateProject(vres); err != nil {
+				return nil, goahttp.ErrValidationError("project", "update", err)
+			}
+			res := project.NewProject(vres)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body UpdateBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "update", err)
+			}
+			return nil, NewUpdateBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body UpdateForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "update", err)
+			}
+			return nil, NewUpdateForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body UpdateNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "update", err)
+			}
+			return nil, NewUpdateNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body UpdateUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "update", err)
+			}
+			return nil, NewUpdateUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "update", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildGetRequest instantiates a HTTP request object with method and path set
+// to call the "project" service "get" endpoint
+func (c *Client) BuildGetRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		projectID int32
+	)
+	{
+		p, ok := v.(*project.GetPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("project", "get", "*project.GetPayload", v)
+		}
+		projectID = p.ProjectID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetProjectPath(projectID)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "get", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeGetRequest returns an encoder for requests sent to the project get
+// server.
+func EncodeGetRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.GetPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "get", "*project.GetPayload", v)
+		}
+		if p.Auth != nil {
+			head := *p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeGetResponse returns a decoder for responses returned by the project
+// get endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeGetResponse may return the following errors:
+//	- "bad-request" (type project.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type project.Forbidden): http.StatusForbidden
+//	- "not-found" (type project.NotFound): http.StatusNotFound
+//	- "unauthorized" (type project.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body GetResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "get", err)
+			}
+			p := NewGetProjectOK(&body)
+			view := "default"
+			vres := &projectviews.Project{Projected: p, View: view}
+			if err = projectviews.ValidateProject(vres); err != nil {
+				return nil, goahttp.ErrValidationError("project", "get", err)
+			}
+			res := project.NewProject(vres)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body GetBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "get", err)
+			}
+			return nil, NewGetBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body GetForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "get", err)
+			}
+			return nil, NewGetForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body GetNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "get", err)
+			}
+			return nil, NewGetNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body GetUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "get", err)
+			}
+			return nil, NewGetUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "get", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildListCommunityRequest instantiates a HTTP request object with method and
+// path set to call the "project" service "list community" endpoint
+func (c *Client) BuildListCommunityRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListCommunityProjectPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "list community", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeListCommunityRequest returns an encoder for requests sent to the
+// project list community server.
+func EncodeListCommunityRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.ListCommunityPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "list community", "*project.ListCommunityPayload", v)
+		}
+		if p.Auth != nil {
+			head := *p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeListCommunityResponse returns a decoder for responses returned by the
+// project list community endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeListCommunityResponse may return the following errors:
+//	- "bad-request" (type project.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type project.Forbidden): http.StatusForbidden
+//	- "not-found" (type project.NotFound): http.StatusNotFound
+//	- "unauthorized" (type project.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeListCommunityResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ListCommunityResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "list community", err)
+			}
+			p := NewListCommunityProjectsOK(&body)
+			view := "default"
+			vres := &projectviews.Projects{Projected: p, View: view}
+			if err = projectviews.ValidateProjects(vres); err != nil {
+				return nil, goahttp.ErrValidationError("project", "list community", err)
+			}
+			res := project.NewProjects(vres)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body ListCommunityBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "list community", err)
+			}
+			return nil, NewListCommunityBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body ListCommunityForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "list community", err)
+			}
+			return nil, NewListCommunityForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body ListCommunityNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "list community", err)
+			}
+			return nil, NewListCommunityNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body ListCommunityUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "list community", err)
+			}
+			return nil, NewListCommunityUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "list community", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildListMineRequest instantiates a HTTP request object with method and path
+// set to call the "project" service "list mine" endpoint
+func (c *Client) BuildListMineRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListMineProjectPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "list mine", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeListMineRequest returns an encoder for requests sent to the project
+// list mine server.
+func EncodeListMineRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.ListMinePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "list mine", "*project.ListMinePayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeListMineResponse returns a decoder for responses returned by the
+// project list mine endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeListMineResponse may return the following errors:
+//	- "bad-request" (type project.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type project.Forbidden): http.StatusForbidden
+//	- "not-found" (type project.NotFound): http.StatusNotFound
+//	- "unauthorized" (type project.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeListMineResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ListMineResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "list mine", err)
+			}
+			p := NewListMineProjectsOK(&body)
+			view := "default"
+			vres := &projectviews.Projects{Projected: p, View: view}
+			if err = projectviews.ValidateProjects(vres); err != nil {
+				return nil, goahttp.ErrValidationError("project", "list mine", err)
+			}
+			res := project.NewProjects(vres)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body ListMineBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "list mine", err)
+			}
+			return nil, NewListMineBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body ListMineForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "list mine", err)
+			}
+			return nil, NewListMineForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body ListMineNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "list mine", err)
+			}
+			return nil, NewListMineNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body ListMineUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "list mine", err)
+			}
+			return nil, NewListMineUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "list mine", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildInviteRequest instantiates a HTTP request object with method and path
+// set to call the "project" service "invite" endpoint
+func (c *Client) BuildInviteRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		projectID int32
+	)
+	{
+		p, ok := v.(*project.InvitePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("project", "invite", "*project.InvitePayload", v)
+		}
+		projectID = p.ProjectID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: InviteProjectPath(projectID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "invite", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeInviteRequest returns an encoder for requests sent to the project
+// invite server.
+func EncodeInviteRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.InvitePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "invite", "*project.InvitePayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		body := NewInviteRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("project", "invite", err)
+		}
+		return nil
+	}
+}
+
+// DecodeInviteResponse returns a decoder for responses returned by the project
+// invite endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeInviteResponse may return the following errors:
+//	- "bad-request" (type project.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type project.Forbidden): http.StatusForbidden
+//	- "not-found" (type project.NotFound): http.StatusNotFound
+//	- "unauthorized" (type project.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeInviteResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body InviteBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "invite", err)
+			}
+			return nil, NewInviteBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body InviteForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "invite", err)
+			}
+			return nil, NewInviteForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body InviteNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "invite", err)
+			}
+			return nil, NewInviteNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body InviteUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "invite", err)
+			}
+			return nil, NewInviteUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "invite", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildRemoveUserRequest instantiates a HTTP request object with method and
+// path set to call the "project" service "remove user" endpoint
+func (c *Client) BuildRemoveUserRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		projectID int32
+	)
+	{
+		p, ok := v.(*project.RemoveUserPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("project", "remove user", "*project.RemoveUserPayload", v)
+		}
+		projectID = p.ProjectID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: RemoveUserProjectPath(projectID)}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "remove user", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeRemoveUserRequest returns an encoder for requests sent to the project
+// remove user server.
+func EncodeRemoveUserRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.RemoveUserPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "remove user", "*project.RemoveUserPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		body := NewRemoveUserRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("project", "remove user", err)
+		}
+		return nil
+	}
+}
+
+// DecodeRemoveUserResponse returns a decoder for responses returned by the
+// project remove user endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeRemoveUserResponse may return the following errors:
+//	- "bad-request" (type project.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type project.Forbidden): http.StatusForbidden
+//	- "not-found" (type project.NotFound): http.StatusNotFound
+//	- "unauthorized" (type project.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeRemoveUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body RemoveUserBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "remove user", err)
+			}
+			return nil, NewRemoveUserBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body RemoveUserForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "remove user", err)
+			}
+			return nil, NewRemoveUserForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body RemoveUserNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "remove user", err)
+			}
+			return nil, NewRemoveUserNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body RemoveUserUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "remove user", err)
+			}
+			return nil, NewRemoveUserUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "remove user", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildAddStationRequest instantiates a HTTP request object with method and
+// path set to call the "project" service "add station" endpoint
+func (c *Client) BuildAddStationRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		projectID int32
+		stationID int32
+	)
+	{
+		p, ok := v.(*project.AddStationPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("project", "add station", "*project.AddStationPayload", v)
+		}
+		projectID = p.ProjectID
+		stationID = p.StationID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AddStationProjectPath(projectID, stationID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "add station", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeAddStationRequest returns an encoder for requests sent to the project
+// add station server.
+func EncodeAddStationRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.AddStationPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "add station", "*project.AddStationPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeAddStationResponse returns a decoder for responses returned by the
+// project add station endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeAddStationResponse may return the following errors:
+//	- "bad-request" (type project.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type project.Forbidden): http.StatusForbidden
+//	- "not-found" (type project.NotFound): http.StatusNotFound
+//	- "unauthorized" (type project.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeAddStationResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body AddStationBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "add station", err)
+			}
+			return nil, NewAddStationBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body AddStationForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "add station", err)
+			}
+			return nil, NewAddStationForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body AddStationNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "add station", err)
+			}
+			return nil, NewAddStationNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body AddStationUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "add station", err)
+			}
+			return nil, NewAddStationUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "add station", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildRemoveStationRequest instantiates a HTTP request object with method and
+// path set to call the "project" service "remove station" endpoint
+func (c *Client) BuildRemoveStationRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		projectID int32
+		stationID int32
+	)
+	{
+		p, ok := v.(*project.RemoveStationPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("project", "remove station", "*project.RemoveStationPayload", v)
+		}
+		projectID = p.ProjectID
+		stationID = p.StationID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: RemoveStationProjectPath(projectID, stationID)}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "remove station", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeRemoveStationRequest returns an encoder for requests sent to the
+// project remove station server.
+func EncodeRemoveStationRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.RemoveStationPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "remove station", "*project.RemoveStationPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeRemoveStationResponse returns a decoder for responses returned by the
+// project remove station endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeRemoveStationResponse may return the following errors:
+//	- "bad-request" (type project.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type project.Forbidden): http.StatusForbidden
+//	- "not-found" (type project.NotFound): http.StatusNotFound
+//	- "unauthorized" (type project.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeRemoveStationResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body RemoveStationBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "remove station", err)
+			}
+			return nil, NewRemoveStationBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body RemoveStationForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "remove station", err)
+			}
+			return nil, NewRemoveStationForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body RemoveStationNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "remove station", err)
+			}
+			return nil, NewRemoveStationNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body RemoveStationUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "remove station", err)
+			}
+			return nil, NewRemoveStationUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "remove station", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildDeleteRequest instantiates a HTTP request object with method and path
+// set to call the "project" service "delete" endpoint
+func (c *Client) BuildDeleteRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		projectID int32
+	)
+	{
+		p, ok := v.(*project.DeletePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("project", "delete", "*project.DeletePayload", v)
+		}
+		projectID = p.ProjectID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteProjectPath(projectID)}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "delete", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeDeleteRequest returns an encoder for requests sent to the project
+// delete server.
+func EncodeDeleteRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.DeletePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "delete", "*project.DeletePayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeDeleteResponse returns a decoder for responses returned by the project
+// delete endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeDeleteResponse may return the following errors:
+//	- "bad-request" (type project.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type project.Forbidden): http.StatusForbidden
+//	- "not-found" (type project.NotFound): http.StatusNotFound
+//	- "unauthorized" (type project.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body DeleteBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "delete", err)
+			}
+			return nil, NewDeleteBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body DeleteForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "delete", err)
+			}
+			return nil, NewDeleteForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body DeleteNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "delete", err)
+			}
+			return nil, NewDeleteNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body DeleteUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "delete", err)
+			}
+			return nil, NewDeleteUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "delete", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildUploadMediaRequest instantiates a HTTP request object with method and
 // path set to call the "project" service "upload media" endpoint
 func (c *Client) BuildUploadMediaRequest(ctx context.Context, v interface{}) (*http.Request, error) {
@@ -1175,6 +2380,28 @@ func unmarshalProjectSummaryResponseBodyToProjectviewsProjectSummaryView(v *Proj
 	res := &projectviews.ProjectSummaryView{
 		ID:   v.ID,
 		Name: v.Name,
+	}
+
+	return res
+}
+
+// unmarshalProjectResponseBodyToProjectviewsProjectView builds a value of type
+// *projectviews.ProjectView from a value of type *ProjectResponseBody.
+func unmarshalProjectResponseBodyToProjectviewsProjectView(v *ProjectResponseBody) *projectviews.ProjectView {
+	res := &projectviews.ProjectView{
+		ID:                v.ID,
+		Name:              v.Name,
+		Slug:              v.Slug,
+		Description:       v.Description,
+		Goal:              v.Goal,
+		Location:          v.Location,
+		Tags:              v.Tags,
+		Private:           v.Private,
+		StartTime:         v.StartTime,
+		EndTime:           v.EndTime,
+		Photo:             v.Photo,
+		ReadOnly:          v.ReadOnly,
+		NumberOfFollowers: v.NumberOfFollowers,
 	}
 
 	return res

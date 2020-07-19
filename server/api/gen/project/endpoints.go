@@ -24,6 +24,16 @@ type Endpoints struct {
 	LookupInvite  goa.Endpoint
 	AcceptInvite  goa.Endpoint
 	RejectInvite  goa.Endpoint
+	Add           goa.Endpoint
+	Update        goa.Endpoint
+	Get           goa.Endpoint
+	ListCommunity goa.Endpoint
+	ListMine      goa.Endpoint
+	Invite        goa.Endpoint
+	RemoveUser    goa.Endpoint
+	AddStation    goa.Endpoint
+	RemoveStation goa.Endpoint
+	Delete        goa.Endpoint
 	UploadMedia   goa.Endpoint
 	DownloadMedia goa.Endpoint
 }
@@ -58,6 +68,16 @@ func NewEndpoints(s Service) *Endpoints {
 		LookupInvite:  NewLookupInviteEndpoint(s, a.JWTAuth),
 		AcceptInvite:  NewAcceptInviteEndpoint(s, a.JWTAuth),
 		RejectInvite:  NewRejectInviteEndpoint(s, a.JWTAuth),
+		Add:           NewAddEndpoint(s, a.JWTAuth),
+		Update:        NewUpdateEndpoint(s, a.JWTAuth),
+		Get:           NewGetEndpoint(s, a.JWTAuth),
+		ListCommunity: NewListCommunityEndpoint(s, a.JWTAuth),
+		ListMine:      NewListMineEndpoint(s, a.JWTAuth),
+		Invite:        NewInviteEndpoint(s, a.JWTAuth),
+		RemoveUser:    NewRemoveUserEndpoint(s, a.JWTAuth),
+		AddStation:    NewAddStationEndpoint(s, a.JWTAuth),
+		RemoveStation: NewRemoveStationEndpoint(s, a.JWTAuth),
+		Delete:        NewDeleteEndpoint(s, a.JWTAuth),
 		UploadMedia:   NewUploadMediaEndpoint(s, a.JWTAuth),
 		DownloadMedia: NewDownloadMediaEndpoint(s),
 	}
@@ -72,6 +92,16 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.LookupInvite = m(e.LookupInvite)
 	e.AcceptInvite = m(e.AcceptInvite)
 	e.RejectInvite = m(e.RejectInvite)
+	e.Add = m(e.Add)
+	e.Update = m(e.Update)
+	e.Get = m(e.Get)
+	e.ListCommunity = m(e.ListCommunity)
+	e.ListMine = m(e.ListMine)
+	e.Invite = m(e.Invite)
+	e.RemoveUser = m(e.RemoveUser)
+	e.AddStation = m(e.AddStation)
+	e.RemoveStation = m(e.RemoveStation)
+	e.Delete = m(e.Delete)
 	e.UploadMedia = m(e.UploadMedia)
 	e.DownloadMedia = m(e.DownloadMedia)
 }
@@ -226,6 +256,229 @@ func NewRejectInviteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endp
 			return nil, err
 		}
 		return nil, s.RejectInvite(ctx, p)
+	}
+}
+
+// NewAddEndpoint returns an endpoint function that calls the method "add" of
+// service "project".
+func NewAddEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*AddPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.Add(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedProject(res, "default")
+		return vres, nil
+	}
+}
+
+// NewUpdateEndpoint returns an endpoint function that calls the method
+// "update" of service "project".
+func NewUpdateEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*UpdatePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.Update(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedProject(res, "default")
+		return vres, nil
+	}
+}
+
+// NewGetEndpoint returns an endpoint function that calls the method "get" of
+// service "project".
+func NewGetEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*GetPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		var token string
+		if p.Auth != nil {
+			token = *p.Auth
+		}
+		ctx, err = authJWTFn(ctx, token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.Get(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedProject(res, "default")
+		return vres, nil
+	}
+}
+
+// NewListCommunityEndpoint returns an endpoint function that calls the method
+// "list community" of service "project".
+func NewListCommunityEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*ListCommunityPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		var token string
+		if p.Auth != nil {
+			token = *p.Auth
+		}
+		ctx, err = authJWTFn(ctx, token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.ListCommunity(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedProjects(res, "default")
+		return vres, nil
+	}
+}
+
+// NewListMineEndpoint returns an endpoint function that calls the method "list
+// mine" of service "project".
+func NewListMineEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*ListMinePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.ListMine(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedProjects(res, "default")
+		return vres, nil
+	}
+}
+
+// NewInviteEndpoint returns an endpoint function that calls the method
+// "invite" of service "project".
+func NewInviteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*InvitePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.Invite(ctx, p)
+	}
+}
+
+// NewRemoveUserEndpoint returns an endpoint function that calls the method
+// "remove user" of service "project".
+func NewRemoveUserEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*RemoveUserPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.RemoveUser(ctx, p)
+	}
+}
+
+// NewAddStationEndpoint returns an endpoint function that calls the method
+// "add station" of service "project".
+func NewAddStationEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*AddStationPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.AddStation(ctx, p)
+	}
+}
+
+// NewRemoveStationEndpoint returns an endpoint function that calls the method
+// "remove station" of service "project".
+func NewRemoveStationEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*RemoveStationPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.RemoveStation(ctx, p)
+	}
+}
+
+// NewDeleteEndpoint returns an endpoint function that calls the method
+// "delete" of service "project".
+func NewDeleteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*DeletePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.Delete(ctx, p)
 	}
 }
 

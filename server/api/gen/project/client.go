@@ -23,12 +23,22 @@ type Client struct {
 	LookupInviteEndpoint  goa.Endpoint
 	AcceptInviteEndpoint  goa.Endpoint
 	RejectInviteEndpoint  goa.Endpoint
+	AddEndpoint           goa.Endpoint
+	UpdateEndpoint        goa.Endpoint
+	GetEndpoint           goa.Endpoint
+	ListCommunityEndpoint goa.Endpoint
+	ListMineEndpoint      goa.Endpoint
+	InviteEndpoint        goa.Endpoint
+	RemoveUserEndpoint    goa.Endpoint
+	AddStationEndpoint    goa.Endpoint
+	RemoveStationEndpoint goa.Endpoint
+	DeleteEndpoint        goa.Endpoint
 	UploadMediaEndpoint   goa.Endpoint
 	DownloadMediaEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "project" service client given the endpoints.
-func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptInvite, rejectInvite, uploadMedia, downloadMedia goa.Endpoint) *Client {
+func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptInvite, rejectInvite, add, update, get, listCommunity, listMine, invite, removeUser, addStation, removeStation, delete_, uploadMedia, downloadMedia goa.Endpoint) *Client {
 	return &Client{
 		AddUpdateEndpoint:     addUpdate,
 		DeleteUpdateEndpoint:  deleteUpdate,
@@ -37,6 +47,16 @@ func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acc
 		LookupInviteEndpoint:  lookupInvite,
 		AcceptInviteEndpoint:  acceptInvite,
 		RejectInviteEndpoint:  rejectInvite,
+		AddEndpoint:           add,
+		UpdateEndpoint:        update,
+		GetEndpoint:           get,
+		ListCommunityEndpoint: listCommunity,
+		ListMineEndpoint:      listMine,
+		InviteEndpoint:        invite,
+		RemoveUserEndpoint:    removeUser,
+		AddStationEndpoint:    addStation,
+		RemoveStationEndpoint: removeStation,
+		DeleteEndpoint:        delete_,
 		UploadMediaEndpoint:   uploadMedia,
 		DownloadMediaEndpoint: downloadMedia,
 	}
@@ -97,6 +117,86 @@ func (c *Client) AcceptInvite(ctx context.Context, p *AcceptInvitePayload) (err 
 // RejectInvite calls the "reject invite" endpoint of the "project" service.
 func (c *Client) RejectInvite(ctx context.Context, p *RejectInvitePayload) (err error) {
 	_, err = c.RejectInviteEndpoint(ctx, p)
+	return
+}
+
+// Add calls the "add" endpoint of the "project" service.
+func (c *Client) Add(ctx context.Context, p *AddPayload) (res *Project, err error) {
+	var ires interface{}
+	ires, err = c.AddEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Project), nil
+}
+
+// Update calls the "update" endpoint of the "project" service.
+func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *Project, err error) {
+	var ires interface{}
+	ires, err = c.UpdateEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Project), nil
+}
+
+// Get calls the "get" endpoint of the "project" service.
+func (c *Client) Get(ctx context.Context, p *GetPayload) (res *Project, err error) {
+	var ires interface{}
+	ires, err = c.GetEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Project), nil
+}
+
+// ListCommunity calls the "list community" endpoint of the "project" service.
+func (c *Client) ListCommunity(ctx context.Context, p *ListCommunityPayload) (res *Projects, err error) {
+	var ires interface{}
+	ires, err = c.ListCommunityEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Projects), nil
+}
+
+// ListMine calls the "list mine" endpoint of the "project" service.
+func (c *Client) ListMine(ctx context.Context, p *ListMinePayload) (res *Projects, err error) {
+	var ires interface{}
+	ires, err = c.ListMineEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Projects), nil
+}
+
+// Invite calls the "invite" endpoint of the "project" service.
+func (c *Client) Invite(ctx context.Context, p *InvitePayload) (err error) {
+	_, err = c.InviteEndpoint(ctx, p)
+	return
+}
+
+// RemoveUser calls the "remove user" endpoint of the "project" service.
+func (c *Client) RemoveUser(ctx context.Context, p *RemoveUserPayload) (err error) {
+	_, err = c.RemoveUserEndpoint(ctx, p)
+	return
+}
+
+// AddStation calls the "add station" endpoint of the "project" service.
+func (c *Client) AddStation(ctx context.Context, p *AddStationPayload) (err error) {
+	_, err = c.AddStationEndpoint(ctx, p)
+	return
+}
+
+// RemoveStation calls the "remove station" endpoint of the "project" service.
+func (c *Client) RemoveStation(ctx context.Context, p *RemoveStationPayload) (err error) {
+	_, err = c.RemoveStationEndpoint(ctx, p)
+	return
+}
+
+// Delete calls the "delete" endpoint of the "project" service.
+func (c *Client) Delete(ctx context.Context, p *DeletePayload) (err error) {
+	_, err = c.DeleteEndpoint(ctx, p)
 	return
 }
 

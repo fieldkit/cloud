@@ -1,54 +1,28 @@
 consumes:
 - application/json
 definitions:
-  AddFieldNotePayload:
-    example:
-      category_id: 5.818748906515777e+18
-      created: "1983-02-15T07:10:31Z"
-      media_id: 4.2755944943097697e+18
-      note: Repellat autem ut unde.
-    properties:
-      category_id:
-        example: 5.818748906515777e+18
-        format: int64
-        type: integer
-      created:
-        example: "1983-02-15T07:10:31Z"
-        format: date-time
-        type: string
-      media_id:
-        example: 4.2755944943097697e+18
-        format: int64
-        type: integer
-      note:
-        example: Repellat autem ut unde.
-        type: string
-    required:
-    - created
-    title: AddFieldNotePayload
-    type: object
   AddFirmwarePayload:
     example:
-      etag: Est consequatur.
-      meta: Voluptas omnis velit.
-      module: Accusamus quod a.
-      profile: Aut est rem atque in debitis.
-      url: Velit aut hic.
+      etag: Consequatur non nisi dolor autem sint vitae.
+      meta: Corrupti ipsum fugit.
+      module: Odio vel tempore.
+      profile: Facere et quo vel aut.
+      url: Quisquam voluptatem doloribus.
     properties:
       etag:
-        example: Est consequatur.
+        example: Consequatur non nisi dolor autem sint vitae.
         type: string
       meta:
-        example: Voluptas omnis velit.
+        example: Corrupti ipsum fugit.
         type: string
       module:
-        example: Accusamus quod a.
+        example: Odio vel tempore.
         type: string
       profile:
-        example: Aut est rem atque in debitis.
+        example: Facere et quo vel aut.
         type: string
       url:
-        example: Velit aut hic.
+        example: Quisquam voluptatem doloribus.
         type: string
     required:
     - etag
@@ -58,74 +32,27 @@ definitions:
     - meta
     title: AddFirmwarePayload
     type: object
-  AddProjectPayload:
-    example:
-      description: Culpa unde.
-      endTime: Cumque ut ut consequatur ea.
-      goal: Veritatis delectus sit veritatis.
-      location: Ad et corporis et quasi laborum.
-      name: Quia omnis dolorum.
-      private: false
-      slug: fdiw072s4w
-      startTime: Ut veniam cumque repudiandae libero sapiente.
-      tags: Quia sit necessitatibus possimus.
-    properties:
-      description:
-        example: Culpa unde.
-        type: string
-      endTime:
-        example: Cumque ut ut consequatur ea.
-        type: string
-      goal:
-        example: Veritatis delectus sit veritatis.
-        type: string
-      location:
-        example: Ad et corporis et quasi laborum.
-        type: string
-      name:
-        example: Quia omnis dolorum.
-        type: string
-      private:
-        example: false
-        type: boolean
-      slug:
-        example: fdiw072s4w
-        maxLength: 40
-        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
-        type: string
-      startTime:
-        example: Ut veniam cumque repudiandae libero sapiente.
-        type: string
-      tags:
-        example: Quia sit necessitatibus possimus.
-        type: string
-    required:
-    - name
-    - slug
-    - description
-    title: AddProjectPayload
-    type: object
   AddUserPayload:
     example:
-      email: carlos@haleypollich.info
-      invite_token: Mollitia nobis.
-      name: zymno95gdv
-      password: bmmrted8hy
+      email: andre@okonrenner.biz
+      invite_token: Illo voluptatem ea hic aliquid.
+      name: ufpoe7n4jt
+      password: 77aketl8qk
     properties:
       email:
-        example: carlos@haleypollich.info
+        example: andre@okonrenner.biz
         format: email
         type: string
       invite_token:
-        example: Mollitia nobis.
+        example: Illo voluptatem ea hic aliquid.
         type: string
       name:
-        example: zymno95gdv
+        example: ufpoe7n4jt
         maxLength: 256
         pattern: \S
         type: string
       password:
-        example: bmmrted8hy
+        example: 77aketl8qk
         minLength: 10
         type: string
     required:
@@ -154,7 +81,7 @@ definitions:
     description: DeviceDataRecord media type (default view)
     example:
       data:
-        Blanditiis recusandae est quidem.: d09d0f05-c45c-4bff-b226-120c1bb4cfed
+        Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
       id: 4.96580577271105e+18
       location:
       - 0.8522260143236732
@@ -165,7 +92,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Blanditiis recusandae est quidem.: d09d0f05-c45c-4bff-b226-120c1bb4cfed
+          Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
         type: object
       id:
         example: 4.96580577271105e+18
@@ -205,7 +132,7 @@ definitions:
       (default view)
     example:
     - data:
-        Blanditiis recusandae est quidem.: d09d0f05-c45c-4bff-b226-120c1bb4cfed
+        Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
       id: 4.96580577271105e+18
       location:
       - 0.8522260143236732
@@ -213,7 +140,15 @@ definitions:
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
     - data:
-        Blanditiis recusandae est quidem.: d09d0f05-c45c-4bff-b226-120c1bb4cfed
+        Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
+      id: 4.96580577271105e+18
+      location:
+      - 0.8522260143236732
+      meta: 2.827138534810339e+18
+      record: 1.2626736114732598e+18
+      time: "2000-09-09T05:59:52Z"
+    - data:
+        Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
       id: 4.96580577271105e+18
       location:
       - 0.8522260143236732
@@ -230,7 +165,7 @@ definitions:
     example:
       data:
       - data:
-          Blanditiis recusandae est quidem.: d09d0f05-c45c-4bff-b226-120c1bb4cfed
+          Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
         id: 4.96580577271105e+18
         location:
         - 0.8522260143236732
@@ -238,7 +173,7 @@ definitions:
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Blanditiis recusandae est quidem.: d09d0f05-c45c-4bff-b226-120c1bb4cfed
+          Blanditiis recusandae est quidem.: fff48701-cf2c-48db-b2d9-ce0f86eb4683
         id: 4.96580577271105e+18
         location:
         - 0.8522260143236732
@@ -247,17 +182,12 @@ definitions:
         time: "2000-09-09T05:59:52Z"
       meta:
       - data:
-          Cumque nihil.: eeb5d6c9-afbd-436b-8ede-f075d8fb0665
+          Cumque nihil.: 36ab2039-7539-4698-a633-3b9a4135cde7
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
       - data:
-          Cumque nihil.: eeb5d6c9-afbd-436b-8ede-f075d8fb0665
-        id: 4.464267130479644e+18
-        record: 3.682513715611599e+17
-        time: "1984-12-27T14:09:02Z"
-      - data:
-          Cumque nihil.: eeb5d6c9-afbd-436b-8ede-f075d8fb0665
+          Cumque nihil.: 36ab2039-7539-4698-a633-3b9a4135cde7
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
@@ -300,39 +230,39 @@ definitions:
     description: DeviceDataSummaryResponse media type (default view)
     example:
       provisions:
-      - created: "2014-07-30T10:09:02Z"
+      - created: "1999-12-23T16:40:46Z"
         data:
           first: 5.950820709492612e+18
           last: 1.4511460751907422e+16
           size: 8.241352239231275e+18
-        generation: Eligendi ut voluptatem et ratione.
+        generation: Ducimus quia explicabo unde.
         meta:
-          first: 3.5152866867021005e+17
-          last: 3.625934693101941e+18
-          size: 1.5355433818472102e+18
-        updated: "1978-01-02T21:38:58Z"
-      - created: "2014-07-30T10:09:02Z"
+          first: 2.1561011880848727e+18
+          last: 8.344434564913581e+18
+          size: 1.3719603805288297e+18
+        updated: "1995-06-04T14:42:32Z"
+      - created: "1999-12-23T16:40:46Z"
         data:
           first: 5.950820709492612e+18
           last: 1.4511460751907422e+16
           size: 8.241352239231275e+18
-        generation: Eligendi ut voluptatem et ratione.
+        generation: Ducimus quia explicabo unde.
         meta:
-          first: 3.5152866867021005e+17
-          last: 3.625934693101941e+18
-          size: 1.5355433818472102e+18
-        updated: "1978-01-02T21:38:58Z"
-      - created: "2014-07-30T10:09:02Z"
+          first: 2.1561011880848727e+18
+          last: 8.344434564913581e+18
+          size: 1.3719603805288297e+18
+        updated: "1995-06-04T14:42:32Z"
+      - created: "1999-12-23T16:40:46Z"
         data:
           first: 5.950820709492612e+18
           last: 1.4511460751907422e+16
           size: 8.241352239231275e+18
-        generation: Eligendi ut voluptatem et ratione.
+        generation: Ducimus quia explicabo unde.
         meta:
-          first: 3.5152866867021005e+17
-          last: 3.625934693101941e+18
-          size: 1.5355433818472102e+18
-        updated: "1978-01-02T21:38:58Z"
+          first: 2.1561011880848727e+18
+          last: 8.344434564913581e+18
+          size: 1.3719603805288297e+18
+        updated: "1995-06-04T14:42:32Z"
     properties:
       provisions:
         $ref: '#/definitions/DeviceProvisionSummaryCollection'
@@ -344,7 +274,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Cumque nihil.: eeb5d6c9-afbd-436b-8ede-f075d8fb0665
+        Cumque nihil.: 36ab2039-7539-4698-a633-3b9a4135cde7
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -352,7 +282,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Cumque nihil.: eeb5d6c9-afbd-436b-8ede-f075d8fb0665
+          Cumque nihil.: 36ab2039-7539-4698-a633-3b9a4135cde7
         type: object
       id:
         example: 4.464267130479644e+18
@@ -378,17 +308,12 @@ definitions:
       (default view)
     example:
     - data:
-        Cumque nihil.: eeb5d6c9-afbd-436b-8ede-f075d8fb0665
+        Cumque nihil.: 36ab2039-7539-4698-a633-3b9a4135cde7
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
     - data:
-        Cumque nihil.: eeb5d6c9-afbd-436b-8ede-f075d8fb0665
-      id: 4.464267130479644e+18
-      record: 3.682513715611599e+17
-      time: "1984-12-27T14:09:02Z"
-    - data:
-        Cumque nihil.: eeb5d6c9-afbd-436b-8ede-f075d8fb0665
+        Cumque nihil.: 36ab2039-7539-4698-a633-3b9a4135cde7
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -400,20 +325,20 @@ definitions:
   DeviceMetaSummary:
     description: DeviceMetaSummary media type (default view)
     example:
-      first: 3.5152866867021005e+17
-      last: 3.625934693101941e+18
-      size: 1.5355433818472102e+18
+      first: 2.1561011880848727e+18
+      last: 8.344434564913581e+18
+      size: 1.3719603805288297e+18
     properties:
       first:
-        example: 3.5152866867021005e+17
+        example: 2.1561011880848727e+18
         format: int64
         type: integer
       last:
-        example: 3.625934693101941e+18
+        example: 8.344434564913581e+18
         format: int64
         type: integer
       size:
-        example: 1.5355433818472102e+18
+        example: 1.3719603805288297e+18
         format: int64
         type: integer
     required:
@@ -425,31 +350,31 @@ definitions:
   DeviceProvisionSummary:
     description: DeviceProvisionSummary media type (default view)
     example:
-      created: "2014-07-30T10:09:02Z"
+      created: "1999-12-23T16:40:46Z"
       data:
         first: 5.950820709492612e+18
         last: 1.4511460751907422e+16
         size: 8.241352239231275e+18
-      generation: Eligendi ut voluptatem et ratione.
+      generation: Ducimus quia explicabo unde.
       meta:
-        first: 3.5152866867021005e+17
-        last: 3.625934693101941e+18
-        size: 1.5355433818472102e+18
-      updated: "1978-01-02T21:38:58Z"
+        first: 2.1561011880848727e+18
+        last: 8.344434564913581e+18
+        size: 1.3719603805288297e+18
+      updated: "1995-06-04T14:42:32Z"
     properties:
       created:
-        example: "2014-07-30T10:09:02Z"
+        example: "1999-12-23T16:40:46Z"
         format: date-time
         type: string
       data:
         $ref: '#/definitions/DeviceDataSummary'
       generation:
-        example: Eligendi ut voluptatem et ratione.
+        example: Ducimus quia explicabo unde.
         type: string
       meta:
         $ref: '#/definitions/DeviceMetaSummary'
       updated:
-        example: "1978-01-02T21:38:58Z"
+        example: "1995-06-04T14:42:32Z"
         format: date-time
         type: string
     required:
@@ -465,229 +390,90 @@ definitions:
     description: DeviceProvisionSummaryCollection is the media type for an array of
       DeviceProvisionSummary (default view)
     example:
-    - created: "2014-07-30T10:09:02Z"
+    - created: "1999-12-23T16:40:46Z"
       data:
         first: 5.950820709492612e+18
         last: 1.4511460751907422e+16
         size: 8.241352239231275e+18
-      generation: Eligendi ut voluptatem et ratione.
+      generation: Ducimus quia explicabo unde.
       meta:
-        first: 3.5152866867021005e+17
-        last: 3.625934693101941e+18
-        size: 1.5355433818472102e+18
-      updated: "1978-01-02T21:38:58Z"
+        first: 2.1561011880848727e+18
+        last: 8.344434564913581e+18
+        size: 1.3719603805288297e+18
+      updated: "1995-06-04T14:42:32Z"
+    - created: "1999-12-23T16:40:46Z"
+      data:
+        first: 5.950820709492612e+18
+        last: 1.4511460751907422e+16
+        size: 8.241352239231275e+18
+      generation: Ducimus quia explicabo unde.
+      meta:
+        first: 2.1561011880848727e+18
+        last: 8.344434564913581e+18
+        size: 1.3719603805288297e+18
+      updated: "1995-06-04T14:42:32Z"
+    - created: "1999-12-23T16:40:46Z"
+      data:
+        first: 5.950820709492612e+18
+        last: 1.4511460751907422e+16
+        size: 8.241352239231275e+18
+      generation: Ducimus quia explicabo unde.
+      meta:
+        first: 2.1561011880848727e+18
+        last: 8.344434564913581e+18
+        size: 1.3719603805288297e+18
+      updated: "1995-06-04T14:42:32Z"
     items:
       $ref: '#/definitions/DeviceProvisionSummary'
     title: 'Mediatype identifier: application/vnd.app.device.provision.summary+json;
       type=collection; view=default'
     type: array
-  FieldNoteMedia:
-    description: FieldNoteMedia media type (default view)
-    example:
-      content_type: Quibusdam optio autem et.
-      created: "1981-12-23T16:20:45Z"
-      id: 7.394410472893407e+18
-      url: Natus dolores quo suscipit voluptatem magni in.
-      user_id: 1.0770916006735844e+18
-    properties:
-      content_type:
-        example: Quibusdam optio autem et.
-        type: string
-      created:
-        example: "1981-12-23T16:20:45Z"
-        format: date-time
-        type: string
-      id:
-        example: 7.394410472893407e+18
-        format: int64
-        type: integer
-      url:
-        example: Natus dolores quo suscipit voluptatem magni in.
-        type: string
-      user_id:
-        example: 1.0770916006735844e+18
-        format: int64
-        type: integer
-    required:
-    - id
-    - created
-    - user_id
-    - url
-    - content_type
-    title: 'Mediatype identifier: application/vnd.app.field_note_media+json; view=default'
-    type: object
-  FieldNoteQueryResult:
-    description: FieldNoteQueryResult media type (default view)
-    example:
-      category_key: Nostrum facere dignissimos.
-      created: "1992-08-02T16:08:06Z"
-      creator: Quam soluta.
-      id: 8.732123841310651e+17
-      media_content_type: Quis ut repellendus ratione.
-      media_id: 5.66413114730693e+18
-      media_url: Rerum praesentium.
-      note: Et dolores a voluptas sed.
-      user_id: 3.363931848075795e+18
-    properties:
-      category_key:
-        example: Nostrum facere dignissimos.
-        type: string
-      created:
-        example: "1992-08-02T16:08:06Z"
-        format: date-time
-        type: string
-      creator:
-        example: Quam soluta.
-        type: string
-      id:
-        example: 8.732123841310651e+17
-        format: int64
-        type: integer
-      media_content_type:
-        example: Quis ut repellendus ratione.
-        type: string
-      media_id:
-        example: 5.66413114730693e+18
-        format: int64
-        type: integer
-      media_url:
-        example: Rerum praesentium.
-        type: string
-      note:
-        example: Et dolores a voluptas sed.
-        type: string
-      user_id:
-        example: 3.363931848075795e+18
-        format: int64
-        type: integer
-    required:
-    - id
-    - created
-    - user_id
-    - category_key
-    - creator
-    title: 'Mediatype identifier: application/vnd.app.field_note_result+json; view=default'
-    type: object
-  FieldNoteQueryResultCollection:
-    description: FieldNoteQueryResultCollection is the media type for an array of
-      FieldNoteQueryResult (default view)
-    example:
-    - category_key: Nostrum facere dignissimos.
-      created: "1992-08-02T16:08:06Z"
-      creator: Quam soluta.
-      id: 8.732123841310651e+17
-      media_content_type: Quis ut repellendus ratione.
-      media_id: 5.66413114730693e+18
-      media_url: Rerum praesentium.
-      note: Et dolores a voluptas sed.
-      user_id: 3.363931848075795e+18
-    - category_key: Nostrum facere dignissimos.
-      created: "1992-08-02T16:08:06Z"
-      creator: Quam soluta.
-      id: 8.732123841310651e+17
-      media_content_type: Quis ut repellendus ratione.
-      media_id: 5.66413114730693e+18
-      media_url: Rerum praesentium.
-      note: Et dolores a voluptas sed.
-      user_id: 3.363931848075795e+18
-    - category_key: Nostrum facere dignissimos.
-      created: "1992-08-02T16:08:06Z"
-      creator: Quam soluta.
-      id: 8.732123841310651e+17
-      media_content_type: Quis ut repellendus ratione.
-      media_id: 5.66413114730693e+18
-      media_url: Rerum praesentium.
-      note: Et dolores a voluptas sed.
-      user_id: 3.363931848075795e+18
-    items:
-      $ref: '#/definitions/FieldNoteQueryResult'
-    title: 'Mediatype identifier: application/vnd.app.field_note_result+json; type=collection;
-      view=default'
-    type: array
-  FieldNotes:
-    description: FieldNotes media type (default view)
-    example:
-      notes:
-      - category_key: Nostrum facere dignissimos.
-        created: "1992-08-02T16:08:06Z"
-        creator: Quam soluta.
-        id: 8.732123841310651e+17
-        media_content_type: Quis ut repellendus ratione.
-        media_id: 5.66413114730693e+18
-        media_url: Rerum praesentium.
-        note: Et dolores a voluptas sed.
-        user_id: 3.363931848075795e+18
-      - category_key: Nostrum facere dignissimos.
-        created: "1992-08-02T16:08:06Z"
-        creator: Quam soluta.
-        id: 8.732123841310651e+17
-        media_content_type: Quis ut repellendus ratione.
-        media_id: 5.66413114730693e+18
-        media_url: Rerum praesentium.
-        note: Et dolores a voluptas sed.
-        user_id: 3.363931848075795e+18
-      - category_key: Nostrum facere dignissimos.
-        created: "1992-08-02T16:08:06Z"
-        creator: Quam soluta.
-        id: 8.732123841310651e+17
-        media_content_type: Quis ut repellendus ratione.
-        media_id: 5.66413114730693e+18
-        media_url: Rerum praesentium.
-        note: Et dolores a voluptas sed.
-        user_id: 3.363931848075795e+18
-    properties:
-      notes:
-        $ref: '#/definitions/FieldNoteQueryResultCollection'
-    required:
-    - notes
-    title: 'Mediatype identifier: application/vnd.app.field_notes+json; view=default'
-    type: object
   FirmwareSummary:
     description: FirmwareSummary media type (default view)
     example:
-      buildNumber: 4.1557808189131945e+18
-      buildTime: 3.9228075248411167e+18
-      etag: Quo eos fuga.
-      id: 5.800495860446959e+18
+      buildNumber: 3.3996582137513426e+18
+      buildTime: 2.0900096315712476e+18
+      etag: Assumenda excepturi dolores dolores.
+      id: 7.939690497281767e+18
       meta:
-        Voluptatem consequatur nihil et.: ce135501-8422-46b4-8e1f-700030fe2ab7
-      module: Beatae itaque ipsa soluta minus consequatur.
-      profile: Sed magni consequatur et.
-      time: "1997-04-21T07:32:29Z"
-      url: Eos iure ea dolorem.
+        Velit quo eveniet in consequatur debitis.: 2.3896460062125133e+18
+      module: Et amet amet reiciendis.
+      profile: Sapiente ipsa expedita qui eum enim deleniti.
+      time: "1983-11-17T05:30:25Z"
+      url: Qui aut et quidem quis.
     properties:
       buildNumber:
-        example: 4.1557808189131945e+18
+        example: 3.3996582137513426e+18
         format: int64
         type: integer
       buildTime:
-        example: 3.9228075248411167e+18
+        example: 2.0900096315712476e+18
         format: int64
         type: integer
       etag:
-        example: Quo eos fuga.
+        example: Assumenda excepturi dolores dolores.
         type: string
       id:
-        example: 5.800495860446959e+18
+        example: 7.939690497281767e+18
         format: int64
         type: integer
       meta:
         additionalProperties: true
         example:
-          Voluptatem consequatur nihil et.: ce135501-8422-46b4-8e1f-700030fe2ab7
+          Velit quo eveniet in consequatur debitis.: 2.3896460062125133e+18
         type: object
       module:
-        example: Beatae itaque ipsa soluta minus consequatur.
+        example: Et amet amet reiciendis.
         type: string
       profile:
-        example: Sed magni consequatur et.
+        example: Sapiente ipsa expedita qui eum enim deleniti.
         type: string
       time:
-        example: "1997-04-21T07:32:29Z"
+        example: "1983-11-17T05:30:25Z"
         format: date-time
         type: string
       url:
-        example: Eos iure ea dolorem.
+        example: Qui aut et quidem quis.
         type: string
     required:
     - id
@@ -705,36 +491,36 @@ definitions:
     description: FirmwareSummaryCollection is the media type for an array of FirmwareSummary
       (default view)
     example:
-    - buildNumber: 4.1557808189131945e+18
-      buildTime: 3.9228075248411167e+18
-      etag: Quo eos fuga.
-      id: 5.800495860446959e+18
+    - buildNumber: 3.3996582137513426e+18
+      buildTime: 2.0900096315712476e+18
+      etag: Assumenda excepturi dolores dolores.
+      id: 7.939690497281767e+18
       meta:
-        Voluptatem consequatur nihil et.: ce135501-8422-46b4-8e1f-700030fe2ab7
-      module: Beatae itaque ipsa soluta minus consequatur.
-      profile: Sed magni consequatur et.
-      time: "1997-04-21T07:32:29Z"
-      url: Eos iure ea dolorem.
-    - buildNumber: 4.1557808189131945e+18
-      buildTime: 3.9228075248411167e+18
-      etag: Quo eos fuga.
-      id: 5.800495860446959e+18
+        Velit quo eveniet in consequatur debitis.: 2.3896460062125133e+18
+      module: Et amet amet reiciendis.
+      profile: Sapiente ipsa expedita qui eum enim deleniti.
+      time: "1983-11-17T05:30:25Z"
+      url: Qui aut et quidem quis.
+    - buildNumber: 3.3996582137513426e+18
+      buildTime: 2.0900096315712476e+18
+      etag: Assumenda excepturi dolores dolores.
+      id: 7.939690497281767e+18
       meta:
-        Voluptatem consequatur nihil et.: ce135501-8422-46b4-8e1f-700030fe2ab7
-      module: Beatae itaque ipsa soluta minus consequatur.
-      profile: Sed magni consequatur et.
-      time: "1997-04-21T07:32:29Z"
-      url: Eos iure ea dolorem.
-    - buildNumber: 4.1557808189131945e+18
-      buildTime: 3.9228075248411167e+18
-      etag: Quo eos fuga.
-      id: 5.800495860446959e+18
+        Velit quo eveniet in consequatur debitis.: 2.3896460062125133e+18
+      module: Et amet amet reiciendis.
+      profile: Sapiente ipsa expedita qui eum enim deleniti.
+      time: "1983-11-17T05:30:25Z"
+      url: Qui aut et quidem quis.
+    - buildNumber: 3.3996582137513426e+18
+      buildTime: 2.0900096315712476e+18
+      etag: Assumenda excepturi dolores dolores.
+      id: 7.939690497281767e+18
       meta:
-        Voluptatem consequatur nihil et.: ce135501-8422-46b4-8e1f-700030fe2ab7
-      module: Beatae itaque ipsa soluta minus consequatur.
-      profile: Sed magni consequatur et.
-      time: "1997-04-21T07:32:29Z"
-      url: Eos iure ea dolorem.
+        Velit quo eveniet in consequatur debitis.: 2.3896460062125133e+18
+      module: Et amet amet reiciendis.
+      profile: Sapiente ipsa expedita qui eum enim deleniti.
+      time: "1983-11-17T05:30:25Z"
+      url: Qui aut et quidem quis.
     items:
       $ref: '#/definitions/FirmwareSummary'
     title: 'Mediatype identifier: application/vnd.app.firmware+json; type=collection;
@@ -744,36 +530,16 @@ definitions:
     description: Firmwares media type (default view)
     example:
       firmwares:
-      - buildNumber: 4.1557808189131945e+18
-        buildTime: 3.9228075248411167e+18
-        etag: Quo eos fuga.
-        id: 5.800495860446959e+18
+      - buildNumber: 3.3996582137513426e+18
+        buildTime: 2.0900096315712476e+18
+        etag: Assumenda excepturi dolores dolores.
+        id: 7.939690497281767e+18
         meta:
-          Voluptatem consequatur nihil et.: ce135501-8422-46b4-8e1f-700030fe2ab7
-        module: Beatae itaque ipsa soluta minus consequatur.
-        profile: Sed magni consequatur et.
-        time: "1997-04-21T07:32:29Z"
-        url: Eos iure ea dolorem.
-      - buildNumber: 4.1557808189131945e+18
-        buildTime: 3.9228075248411167e+18
-        etag: Quo eos fuga.
-        id: 5.800495860446959e+18
-        meta:
-          Voluptatem consequatur nihil et.: ce135501-8422-46b4-8e1f-700030fe2ab7
-        module: Beatae itaque ipsa soluta minus consequatur.
-        profile: Sed magni consequatur et.
-        time: "1997-04-21T07:32:29Z"
-        url: Eos iure ea dolorem.
-      - buildNumber: 4.1557808189131945e+18
-        buildTime: 3.9228075248411167e+18
-        etag: Quo eos fuga.
-        id: 5.800495860446959e+18
-        meta:
-          Voluptatem consequatur nihil et.: ce135501-8422-46b4-8e1f-700030fe2ab7
-        module: Beatae itaque ipsa soluta minus consequatur.
-        profile: Sed magni consequatur et.
-        time: "1997-04-21T07:32:29Z"
-        url: Eos iure ea dolorem.
+          Velit quo eveniet in consequatur debitis.: 2.3896460062125133e+18
+        module: Et amet amet reiciendis.
+        profile: Sapiente ipsa expedita qui eum enim deleniti.
+        time: "1983-11-17T05:30:25Z"
+        url: Qui aut et quidem quis.
     properties:
       firmwares:
         $ref: '#/definitions/FirmwareSummaryCollection'
@@ -781,856 +547,17 @@ definitions:
     - firmwares
     title: 'Mediatype identifier: application/vnd.app.firmwares+json; view=default'
     type: object
-  InviteUserPayload:
-    example:
-      email: Consequuntur officiis autem soluta error expedita.
-      role: 8.674012810851236e+18
-    properties:
-      email:
-        example: Consequuntur officiis autem soluta error expedita.
-        type: string
-      role:
-        example: 8.674012810851236e+18
-        format: int64
-        type: integer
-    required:
-    - email
-    - role
-    title: InviteUserPayload
-    type: object
-  JSONDataMeta:
-    example:
-      id: 7.53445128899346e+17
-      station:
-        firmware:
-          build: Sit enim.
-          hash: Assumenda excepturi dolores dolores.
-          number: Molestias sit velit quo.
-          timestamp: 4.838316499908597e+18
-          version: Consequatur debitis sit ratione aut.
-        id: Amet amet reiciendis odit sapiente.
-        modules:
-        - id: Qui eum enim deleniti sint velit.
-          kind: 5.114928591801609e+18
-          manufacturer: 1.3454925712804016e+17
-          name: Quidem quis fugit commodi ut.
-          sensors:
-          - key: Aperiam amet.
-            name: Dolore laboriosam soluta quia molestias.
-            ranges:
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-          version: 6.04033343035064e+18
-        - id: Qui eum enim deleniti sint velit.
-          kind: 5.114928591801609e+18
-          manufacturer: 1.3454925712804016e+17
-          name: Quidem quis fugit commodi ut.
-          sensors:
-          - key: Aperiam amet.
-            name: Dolore laboriosam soluta quia molestias.
-            ranges:
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-          version: 6.04033343035064e+18
-        - id: Qui eum enim deleniti sint velit.
-          kind: 5.114928591801609e+18
-          manufacturer: 1.3454925712804016e+17
-          name: Quidem quis fugit commodi ut.
-          sensors:
-          - key: Aperiam amet.
-            name: Dolore laboriosam soluta quia molestias.
-            ranges:
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-          version: 6.04033343035064e+18
-        name: Repellendus cupiditate nemo doloribus.
-    properties:
-      id:
-        example: 7.53445128899346e+17
-        format: int64
-        type: integer
-      station:
-        $ref: '#/definitions/JSONDataMetaStation'
-    required:
-    - id
-    title: JSONDataMeta
-    type: object
-  JSONDataMetaModule:
-    example:
-      id: Qui eum enim deleniti sint velit.
-      kind: 5.114928591801609e+18
-      manufacturer: 1.3454925712804016e+17
-      name: Quidem quis fugit commodi ut.
-      sensors:
-      - key: Aperiam amet.
-        name: Dolore laboriosam soluta quia molestias.
-        ranges:
-        - maximum: 0.5154325820299152
-          minimum: 0.5396661989137204
-        - maximum: 0.5154325820299152
-          minimum: 0.5396661989137204
-        - maximum: 0.5154325820299152
-          minimum: 0.5396661989137204
-        unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-      version: 6.04033343035064e+18
-    properties:
-      id:
-        example: Qui eum enim deleniti sint velit.
-        type: string
-      kind:
-        example: 5.114928591801609e+18
-        format: int64
-        type: integer
-      manufacturer:
-        example: 1.3454925712804016e+17
-        format: int64
-        type: integer
-      name:
-        example: Quidem quis fugit commodi ut.
-        type: string
-      sensors:
-        example:
-        - key: Aperiam amet.
-          name: Dolore laboriosam soluta quia molestias.
-          ranges:
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-        items:
-          $ref: '#/definitions/JSONDataMetaSensor'
-        type: array
-      version:
-        example: 6.04033343035064e+18
-        format: int64
-        type: integer
-    required:
-    - id
-    - name
-    - kind
-    - version
-    - manufacturer
-    title: JSONDataMetaModule
-    type: object
-  JSONDataMetaSensor:
-    example:
-      key: Aperiam amet.
-      name: Dolore laboriosam soluta quia molestias.
-      ranges:
-      - maximum: 0.5154325820299152
-        minimum: 0.5396661989137204
-      - maximum: 0.5154325820299152
-        minimum: 0.5396661989137204
-      - maximum: 0.5154325820299152
-        minimum: 0.5396661989137204
-      unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-    properties:
-      key:
-        example: Aperiam amet.
-        type: string
-      name:
-        example: Dolore laboriosam soluta quia molestias.
-        type: string
-      ranges:
-        example:
-        - maximum: 0.5154325820299152
-          minimum: 0.5396661989137204
-        - maximum: 0.5154325820299152
-          minimum: 0.5396661989137204
-        - maximum: 0.5154325820299152
-          minimum: 0.5396661989137204
-        items:
-          $ref: '#/definitions/JSONDataMetaSensorRange'
-        type: array
-      unitOfMeasure:
-        example: Ipsam reprehenderit totam dolorem impedit hic.
-        type: string
-    required:
-    - name
-    - key
-    - unitOfMeasure
-    - ranges
-    title: JSONDataMetaSensor
-    type: object
-  JSONDataMetaSensorRange:
-    example:
-      maximum: 0.5154325820299152
-      minimum: 0.5396661989137204
-    properties:
-      maximum:
-        example: 0.5154325820299152
-        format: double
-        type: number
-      minimum:
-        example: 0.5396661989137204
-        format: double
-        type: number
-    required:
-    - minimum
-    - maximum
-    title: JSONDataMetaSensorRange
-    type: object
-  JSONDataMetaStation:
-    example:
-      firmware:
-        build: Sit enim.
-        hash: Assumenda excepturi dolores dolores.
-        number: Molestias sit velit quo.
-        timestamp: 4.838316499908597e+18
-        version: Consequatur debitis sit ratione aut.
-      id: Amet amet reiciendis odit sapiente.
-      modules:
-      - id: Qui eum enim deleniti sint velit.
-        kind: 5.114928591801609e+18
-        manufacturer: 1.3454925712804016e+17
-        name: Quidem quis fugit commodi ut.
-        sensors:
-        - key: Aperiam amet.
-          name: Dolore laboriosam soluta quia molestias.
-          ranges:
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-        version: 6.04033343035064e+18
-      - id: Qui eum enim deleniti sint velit.
-        kind: 5.114928591801609e+18
-        manufacturer: 1.3454925712804016e+17
-        name: Quidem quis fugit commodi ut.
-        sensors:
-        - key: Aperiam amet.
-          name: Dolore laboriosam soluta quia molestias.
-          ranges:
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-        version: 6.04033343035064e+18
-      - id: Qui eum enim deleniti sint velit.
-        kind: 5.114928591801609e+18
-        manufacturer: 1.3454925712804016e+17
-        name: Quidem quis fugit commodi ut.
-        sensors:
-        - key: Aperiam amet.
-          name: Dolore laboriosam soluta quia molestias.
-          ranges:
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-        version: 6.04033343035064e+18
-      name: Repellendus cupiditate nemo doloribus.
-    properties:
-      firmware:
-        $ref: '#/definitions/JSONDataMetaStationFirmware'
-      id:
-        example: Amet amet reiciendis odit sapiente.
-        type: string
-      modules:
-        example:
-        - id: Qui eum enim deleniti sint velit.
-          kind: 5.114928591801609e+18
-          manufacturer: 1.3454925712804016e+17
-          name: Quidem quis fugit commodi ut.
-          sensors:
-          - key: Aperiam amet.
-            name: Dolore laboriosam soluta quia molestias.
-            ranges:
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-          version: 6.04033343035064e+18
-        - id: Qui eum enim deleniti sint velit.
-          kind: 5.114928591801609e+18
-          manufacturer: 1.3454925712804016e+17
-          name: Quidem quis fugit commodi ut.
-          sensors:
-          - key: Aperiam amet.
-            name: Dolore laboriosam soluta quia molestias.
-            ranges:
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-          version: 6.04033343035064e+18
-        - id: Qui eum enim deleniti sint velit.
-          kind: 5.114928591801609e+18
-          manufacturer: 1.3454925712804016e+17
-          name: Quidem quis fugit commodi ut.
-          sensors:
-          - key: Aperiam amet.
-            name: Dolore laboriosam soluta quia molestias.
-            ranges:
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-          version: 6.04033343035064e+18
-        items:
-          $ref: '#/definitions/JSONDataMetaModule'
-        type: array
-      name:
-        example: Repellendus cupiditate nemo doloribus.
-        type: string
-    required:
-    - id
-    - name
-    - modules
-    - firmware
-    title: JSONDataMetaStation
-    type: object
-  JSONDataMetaStationFirmware:
-    example:
-      build: Sit enim.
-      hash: Assumenda excepturi dolores dolores.
-      number: Molestias sit velit quo.
-      timestamp: 4.838316499908597e+18
-      version: Consequatur debitis sit ratione aut.
-    properties:
-      build:
-        example: Sit enim.
-        type: string
-      hash:
-        example: Assumenda excepturi dolores dolores.
-        type: string
-      number:
-        example: Molestias sit velit quo.
-        type: string
-      timestamp:
-        example: 4.838316499908597e+18
-        format: int64
-        type: integer
-      version:
-        example: Consequatur debitis sit ratione aut.
-        type: string
-    required:
-    - version
-    - build
-    - number
-    - timestamp
-    - hash
-    title: JSONDataMetaStationFirmware
-    type: object
-  JSONDataResponse:
-    description: JSONDataResponse media type (default view)
-    example:
-      versions:
-      - data:
-        - d:
-            Perspiciatis quasi error voluptatem et.: 0183cefe-8ea8-40a4-82f8-3fcc0923ad58
-          location:
-          - 0.18978283373136304
-          - 0.18978283373136304
-          metas:
-          - 4.969073115164926e+18
-          - 4.969073115164926e+18
-          - 4.969073115164926e+18
-          time: 7.153631552386024e+18
-        meta:
-          id: 7.53445128899346e+17
-          station:
-            firmware:
-              build: Sit enim.
-              hash: Assumenda excepturi dolores dolores.
-              number: Molestias sit velit quo.
-              timestamp: 4.838316499908597e+18
-              version: Consequatur debitis sit ratione aut.
-            id: Amet amet reiciendis odit sapiente.
-            modules:
-            - id: Qui eum enim deleniti sint velit.
-              kind: 5.114928591801609e+18
-              manufacturer: 1.3454925712804016e+17
-              name: Quidem quis fugit commodi ut.
-              sensors:
-              - key: Aperiam amet.
-                name: Dolore laboriosam soluta quia molestias.
-                ranges:
-                - maximum: 0.5154325820299152
-                  minimum: 0.5396661989137204
-                - maximum: 0.5154325820299152
-                  minimum: 0.5396661989137204
-                - maximum: 0.5154325820299152
-                  minimum: 0.5396661989137204
-                unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-              version: 6.04033343035064e+18
-            - id: Qui eum enim deleniti sint velit.
-              kind: 5.114928591801609e+18
-              manufacturer: 1.3454925712804016e+17
-              name: Quidem quis fugit commodi ut.
-              sensors:
-              - key: Aperiam amet.
-                name: Dolore laboriosam soluta quia molestias.
-                ranges:
-                - maximum: 0.5154325820299152
-                  minimum: 0.5396661989137204
-                - maximum: 0.5154325820299152
-                  minimum: 0.5396661989137204
-                - maximum: 0.5154325820299152
-                  minimum: 0.5396661989137204
-                unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-              version: 6.04033343035064e+18
-            - id: Qui eum enim deleniti sint velit.
-              kind: 5.114928591801609e+18
-              manufacturer: 1.3454925712804016e+17
-              name: Quidem quis fugit commodi ut.
-              sensors:
-              - key: Aperiam amet.
-                name: Dolore laboriosam soluta quia molestias.
-                ranges:
-                - maximum: 0.5154325820299152
-                  minimum: 0.5396661989137204
-                - maximum: 0.5154325820299152
-                  minimum: 0.5396661989137204
-                - maximum: 0.5154325820299152
-                  minimum: 0.5396661989137204
-                unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-              version: 6.04033343035064e+18
-            name: Repellendus cupiditate nemo doloribus.
-    properties:
-      versions:
-        example:
-        - data:
-          - d:
-              Perspiciatis quasi error voluptatem et.: 0183cefe-8ea8-40a4-82f8-3fcc0923ad58
-            location:
-            - 0.18978283373136304
-            - 0.18978283373136304
-            metas:
-            - 4.969073115164926e+18
-            - 4.969073115164926e+18
-            - 4.969073115164926e+18
-            time: 7.153631552386024e+18
-          meta:
-            id: 7.53445128899346e+17
-            station:
-              firmware:
-                build: Sit enim.
-                hash: Assumenda excepturi dolores dolores.
-                number: Molestias sit velit quo.
-                timestamp: 4.838316499908597e+18
-                version: Consequatur debitis sit ratione aut.
-              id: Amet amet reiciendis odit sapiente.
-              modules:
-              - id: Qui eum enim deleniti sint velit.
-                kind: 5.114928591801609e+18
-                manufacturer: 1.3454925712804016e+17
-                name: Quidem quis fugit commodi ut.
-                sensors:
-                - key: Aperiam amet.
-                  name: Dolore laboriosam soluta quia molestias.
-                  ranges:
-                  - maximum: 0.5154325820299152
-                    minimum: 0.5396661989137204
-                  - maximum: 0.5154325820299152
-                    minimum: 0.5396661989137204
-                  - maximum: 0.5154325820299152
-                    minimum: 0.5396661989137204
-                  unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-                version: 6.04033343035064e+18
-              - id: Qui eum enim deleniti sint velit.
-                kind: 5.114928591801609e+18
-                manufacturer: 1.3454925712804016e+17
-                name: Quidem quis fugit commodi ut.
-                sensors:
-                - key: Aperiam amet.
-                  name: Dolore laboriosam soluta quia molestias.
-                  ranges:
-                  - maximum: 0.5154325820299152
-                    minimum: 0.5396661989137204
-                  - maximum: 0.5154325820299152
-                    minimum: 0.5396661989137204
-                  - maximum: 0.5154325820299152
-                    minimum: 0.5396661989137204
-                  unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-                version: 6.04033343035064e+18
-              - id: Qui eum enim deleniti sint velit.
-                kind: 5.114928591801609e+18
-                manufacturer: 1.3454925712804016e+17
-                name: Quidem quis fugit commodi ut.
-                sensors:
-                - key: Aperiam amet.
-                  name: Dolore laboriosam soluta quia molestias.
-                  ranges:
-                  - maximum: 0.5154325820299152
-                    minimum: 0.5396661989137204
-                  - maximum: 0.5154325820299152
-                    minimum: 0.5396661989137204
-                  - maximum: 0.5154325820299152
-                    minimum: 0.5396661989137204
-                  unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-                version: 6.04033343035064e+18
-              name: Repellendus cupiditate nemo doloribus.
-        items:
-          $ref: '#/definitions/JSONDataVersion'
-        type: array
-    required:
-    - versions
-    title: 'Mediatype identifier: application/vnd.app.device.json.data+json; view=default'
-    type: object
-  JSONDataRow:
-    example:
-      d:
-        Perspiciatis quasi error voluptatem et.: 0183cefe-8ea8-40a4-82f8-3fcc0923ad58
-      location:
-      - 0.18978283373136304
-      - 0.18978283373136304
-      metas:
-      - 4.969073115164926e+18
-      - 4.969073115164926e+18
-      - 4.969073115164926e+18
-      time: 7.153631552386024e+18
-    properties:
-      d:
-        additionalProperties: true
-        example:
-          Perspiciatis quasi error voluptatem et.: 0183cefe-8ea8-40a4-82f8-3fcc0923ad58
-        type: object
-      location:
-        example:
-        - 0.18978283373136304
-        - 0.18978283373136304
-        items:
-          example: 0.18978283373136304
-          format: double
-          type: number
-        type: array
-      metas:
-        example:
-        - 4.969073115164926e+18
-        - 4.969073115164926e+18
-        - 4.969073115164926e+18
-        items:
-          example: 4.969073115164926e+18
-          format: int64
-          type: integer
-        type: array
-      time:
-        example: 7.153631552386024e+18
-        format: int64
-        type: integer
-    required:
-    - time
-    - location
-    - d
-    title: JSONDataRow
-    type: object
-  JSONDataStatistics:
-    example:
-      end: "1986-01-17T16:31:06Z"
-      number_of_data_records: 1.7786854944268452e+18
-      number_of_meta_records: 9.080818063375066e+18
-      start: "1990-12-03T02:23:07Z"
-    properties:
-      end:
-        example: "1986-01-17T16:31:06Z"
-        format: date-time
-        type: string
-      number_of_data_records:
-        example: 1.7786854944268452e+18
-        format: int64
-        type: integer
-      number_of_meta_records:
-        example: 9.080818063375066e+18
-        format: int64
-        type: integer
-      start:
-        example: "1990-12-03T02:23:07Z"
-        format: date-time
-        type: string
-    required:
-    - start
-    - end
-    - number_of_data_records
-    - number_of_meta_records
-    title: JSONDataStatistics
-    type: object
-  JSONDataSummaryResponse:
-    description: JSONDataSummaryResponse media type (default view)
-    example:
-      data:
-      - d:
-          Perspiciatis quasi error voluptatem et.: 0183cefe-8ea8-40a4-82f8-3fcc0923ad58
-        location:
-        - 0.18978283373136304
-        - 0.18978283373136304
-        metas:
-        - 4.969073115164926e+18
-        - 4.969073115164926e+18
-        - 4.969073115164926e+18
-        time: 7.153631552386024e+18
-      modules:
-      - id: Qui eum enim deleniti sint velit.
-        kind: 5.114928591801609e+18
-        manufacturer: 1.3454925712804016e+17
-        name: Quidem quis fugit commodi ut.
-        sensors:
-        - key: Aperiam amet.
-          name: Dolore laboriosam soluta quia molestias.
-          ranges:
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-        version: 6.04033343035064e+18
-      - id: Qui eum enim deleniti sint velit.
-        kind: 5.114928591801609e+18
-        manufacturer: 1.3454925712804016e+17
-        name: Quidem quis fugit commodi ut.
-        sensors:
-        - key: Aperiam amet.
-          name: Dolore laboriosam soluta quia molestias.
-          ranges:
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-        version: 6.04033343035064e+18
-      - id: Qui eum enim deleniti sint velit.
-        kind: 5.114928591801609e+18
-        manufacturer: 1.3454925712804016e+17
-        name: Quidem quis fugit commodi ut.
-        sensors:
-        - key: Aperiam amet.
-          name: Dolore laboriosam soluta quia molestias.
-          ranges:
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          - maximum: 0.5154325820299152
-            minimum: 0.5396661989137204
-          unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-        version: 6.04033343035064e+18
-      statistics:
-        end: "1986-01-17T16:31:06Z"
-        number_of_data_records: 1.7786854944268452e+18
-        number_of_meta_records: 9.080818063375066e+18
-        start: "1990-12-03T02:23:07Z"
-    properties:
-      data:
-        example:
-        - d:
-            Perspiciatis quasi error voluptatem et.: 0183cefe-8ea8-40a4-82f8-3fcc0923ad58
-          location:
-          - 0.18978283373136304
-          - 0.18978283373136304
-          metas:
-          - 4.969073115164926e+18
-          - 4.969073115164926e+18
-          - 4.969073115164926e+18
-          time: 7.153631552386024e+18
-        items:
-          $ref: '#/definitions/JSONDataRow'
-        type: array
-      modules:
-        example:
-        - id: Qui eum enim deleniti sint velit.
-          kind: 5.114928591801609e+18
-          manufacturer: 1.3454925712804016e+17
-          name: Quidem quis fugit commodi ut.
-          sensors:
-          - key: Aperiam amet.
-            name: Dolore laboriosam soluta quia molestias.
-            ranges:
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-          version: 6.04033343035064e+18
-        - id: Qui eum enim deleniti sint velit.
-          kind: 5.114928591801609e+18
-          manufacturer: 1.3454925712804016e+17
-          name: Quidem quis fugit commodi ut.
-          sensors:
-          - key: Aperiam amet.
-            name: Dolore laboriosam soluta quia molestias.
-            ranges:
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-          version: 6.04033343035064e+18
-        - id: Qui eum enim deleniti sint velit.
-          kind: 5.114928591801609e+18
-          manufacturer: 1.3454925712804016e+17
-          name: Quidem quis fugit commodi ut.
-          sensors:
-          - key: Aperiam amet.
-            name: Dolore laboriosam soluta quia molestias.
-            ranges:
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            - maximum: 0.5154325820299152
-              minimum: 0.5396661989137204
-            unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-          version: 6.04033343035064e+18
-        items:
-          $ref: '#/definitions/JSONDataMetaModule'
-        type: array
-      statistics:
-        $ref: '#/definitions/JSONDataStatistics'
-    required:
-    - modules
-    - data
-    - statistics
-    title: 'Mediatype identifier: application/vnd.app.device.json.data.summary+json;
-      view=default'
-    type: object
-  JSONDataVersion:
-    example:
-      data:
-      - d:
-          Perspiciatis quasi error voluptatem et.: 0183cefe-8ea8-40a4-82f8-3fcc0923ad58
-        location:
-        - 0.18978283373136304
-        - 0.18978283373136304
-        metas:
-        - 4.969073115164926e+18
-        - 4.969073115164926e+18
-        - 4.969073115164926e+18
-        time: 7.153631552386024e+18
-      meta:
-        id: 7.53445128899346e+17
-        station:
-          firmware:
-            build: Sit enim.
-            hash: Assumenda excepturi dolores dolores.
-            number: Molestias sit velit quo.
-            timestamp: 4.838316499908597e+18
-            version: Consequatur debitis sit ratione aut.
-          id: Amet amet reiciendis odit sapiente.
-          modules:
-          - id: Qui eum enim deleniti sint velit.
-            kind: 5.114928591801609e+18
-            manufacturer: 1.3454925712804016e+17
-            name: Quidem quis fugit commodi ut.
-            sensors:
-            - key: Aperiam amet.
-              name: Dolore laboriosam soluta quia molestias.
-              ranges:
-              - maximum: 0.5154325820299152
-                minimum: 0.5396661989137204
-              - maximum: 0.5154325820299152
-                minimum: 0.5396661989137204
-              - maximum: 0.5154325820299152
-                minimum: 0.5396661989137204
-              unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-            version: 6.04033343035064e+18
-          - id: Qui eum enim deleniti sint velit.
-            kind: 5.114928591801609e+18
-            manufacturer: 1.3454925712804016e+17
-            name: Quidem quis fugit commodi ut.
-            sensors:
-            - key: Aperiam amet.
-              name: Dolore laboriosam soluta quia molestias.
-              ranges:
-              - maximum: 0.5154325820299152
-                minimum: 0.5396661989137204
-              - maximum: 0.5154325820299152
-                minimum: 0.5396661989137204
-              - maximum: 0.5154325820299152
-                minimum: 0.5396661989137204
-              unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-            version: 6.04033343035064e+18
-          - id: Qui eum enim deleniti sint velit.
-            kind: 5.114928591801609e+18
-            manufacturer: 1.3454925712804016e+17
-            name: Quidem quis fugit commodi ut.
-            sensors:
-            - key: Aperiam amet.
-              name: Dolore laboriosam soluta quia molestias.
-              ranges:
-              - maximum: 0.5154325820299152
-                minimum: 0.5396661989137204
-              - maximum: 0.5154325820299152
-                minimum: 0.5396661989137204
-              - maximum: 0.5154325820299152
-                minimum: 0.5396661989137204
-              unitOfMeasure: Ipsam reprehenderit totam dolorem impedit hic.
-            version: 6.04033343035064e+18
-          name: Repellendus cupiditate nemo doloribus.
-    properties:
-      data:
-        example:
-        - d:
-            Perspiciatis quasi error voluptatem et.: 0183cefe-8ea8-40a4-82f8-3fcc0923ad58
-          location:
-          - 0.18978283373136304
-          - 0.18978283373136304
-          metas:
-          - 4.969073115164926e+18
-          - 4.969073115164926e+18
-          - 4.969073115164926e+18
-          time: 7.153631552386024e+18
-        items:
-          $ref: '#/definitions/JSONDataRow'
-        type: array
-      meta:
-        $ref: '#/definitions/JSONDataMeta'
-    title: JSONDataVersion
-    type: object
   LoginPayload:
     example:
-      email: ambrose@purdyleannon.name
-      password: 6qg0z6y1io
+      email: iva@halvorson.com
+      password: 0uepd168s1
     properties:
       email:
-        example: ambrose@purdyleannon.name
+        example: iva@halvorson.com
         format: email
         type: string
       password:
-        example: 6qg0z6y1io
+        example: 0uepd168s1
         minLength: 10
         type: string
     required:
@@ -1641,141 +568,33 @@ definitions:
   MediaReferenceResponse:
     description: MediaReferenceResponse media type (default view)
     example:
-      id: 3.1106551483003817e+18
-      url: Quas voluptates ad consectetur occaecati occaecati.
+      id: 6.7501331093025e+18
+      url: Et ratione porro iusto quaerat ea quibusdam.
     properties:
       id:
-        example: 3.1106551483003817e+18
+        example: 6.7501331093025e+18
         format: int64
         type: integer
       url:
-        example: Quas voluptates ad consectetur occaecati occaecati.
+        example: Et ratione porro iusto quaerat ea quibusdam.
         type: string
     required:
     - id
     - url
     title: 'Mediatype identifier: application/vnd.app.media+json; view=default'
     type: object
-  Project:
-    description: Project media type (default view)
-    example:
-      description: Sint excepturi rerum deleniti rem sint.
-      endTime: Ad laboriosam voluptatem explicabo magnam sunt.
-      goal: Rerum rerum et quia ut incidunt consequatur.
-      id: 6.091445377979088e+18
-      location: Vitae itaque consequatur non nisi dolor.
-      name: Sint vitae et corrupti ipsum fugit nisi.
-      numberOfFollowers: 4.86881556417374e+18
-      photo: Tempore laboriosam facere et quo vel.
-      private: true
-      readOnly: true
-      slug: rowl9c0x3f
-      startTime: Illo officiis dignissimos.
-      tags: Quo assumenda voluptas voluptate.
-    properties:
-      description:
-        example: Sint excepturi rerum deleniti rem sint.
-        type: string
-      endTime:
-        example: Ad laboriosam voluptatem explicabo magnam sunt.
-        type: string
-      goal:
-        example: Rerum rerum et quia ut incidunt consequatur.
-        type: string
-      id:
-        example: 6.091445377979088e+18
-        format: int64
-        type: integer
-      location:
-        example: Vitae itaque consequatur non nisi dolor.
-        type: string
-      name:
-        example: Sint vitae et corrupti ipsum fugit nisi.
-        type: string
-      numberOfFollowers:
-        example: 4.86881556417374e+18
-        format: int64
-        type: integer
-      photo:
-        example: Tempore laboriosam facere et quo vel.
-        type: string
-      private:
-        example: true
-        type: boolean
-      readOnly:
-        example: true
-        type: boolean
-      slug:
-        example: rowl9c0x3f
-        maxLength: 40
-        pattern: ^[[:alnum:]]+(-[[:alnum:]]+)*$
-        type: string
-      startTime:
-        example: Illo officiis dignissimos.
-        type: string
-      tags:
-        example: Quo assumenda voluptas voluptate.
-        type: string
-    required:
-    - id
-    - name
-    - slug
-    - description
-    - goal
-    - location
-    - private
-    - tags
-    - readOnly
-    - numberOfFollowers
-    title: 'Mediatype identifier: application/vnd.app.project+json; view=default'
-    type: object
-  ProjectCollection:
-    description: ProjectCollection is the media type for an array of Project (default
-      view)
-    example:
-    - description: Sint excepturi rerum deleniti rem sint.
-      endTime: Ad laboriosam voluptatem explicabo magnam sunt.
-      goal: Rerum rerum et quia ut incidunt consequatur.
-      id: 6.091445377979088e+18
-      location: Vitae itaque consequatur non nisi dolor.
-      name: Sint vitae et corrupti ipsum fugit nisi.
-      numberOfFollowers: 4.86881556417374e+18
-      photo: Tempore laboriosam facere et quo vel.
-      private: true
-      readOnly: true
-      slug: rowl9c0x3f
-      startTime: Illo officiis dignissimos.
-      tags: Quo assumenda voluptas voluptate.
-    - description: Sint excepturi rerum deleniti rem sint.
-      endTime: Ad laboriosam voluptatem explicabo magnam sunt.
-      goal: Rerum rerum et quia ut incidunt consequatur.
-      id: 6.091445377979088e+18
-      location: Vitae itaque consequatur non nisi dolor.
-      name: Sint vitae et corrupti ipsum fugit nisi.
-      numberOfFollowers: 4.86881556417374e+18
-      photo: Tempore laboriosam facere et quo vel.
-      private: true
-      readOnly: true
-      slug: rowl9c0x3f
-      startTime: Illo officiis dignissimos.
-      tags: Quo assumenda voluptas voluptate.
-    items:
-      $ref: '#/definitions/Project'
-    title: 'Mediatype identifier: application/vnd.app.project+json; type=collection;
-      view=default'
-    type: array
   ProjectRole:
     description: ProjectRole media type (default view)
     example:
-      id: 2.6046592717759237e+18
-      name: Nisi ea sed ducimus molestiae.
+      id: 5.391817057665317e+18
+      name: Et autem aliquid voluptate.
     properties:
       id:
-        example: 2.6046592717759237e+18
+        example: 5.391817057665317e+18
         format: int64
         type: integer
       name:
-        example: Nisi ea sed ducimus molestiae.
+        example: Et autem aliquid voluptate.
         type: string
     required:
     - id
@@ -1786,8 +605,12 @@ definitions:
     description: ProjectRoleCollection is the media type for an array of ProjectRole
       (default view)
     example:
-    - id: 2.6046592717759237e+18
-      name: Nisi ea sed ducimus molestiae.
+    - id: 5.391817057665317e+18
+      name: Et autem aliquid voluptate.
+    - id: 5.391817057665317e+18
+      name: Et autem aliquid voluptate.
+    - id: 5.391817057665317e+18
+      name: Et autem aliquid voluptate.
     items:
       $ref: '#/definitions/ProjectRole'
     title: 'Mediatype identifier: application/vnd.app.project.role+json; type=collection;
@@ -1796,22 +619,22 @@ definitions:
   ProjectUser:
     description: ProjectUser media type (default view)
     example:
-      membership: Consequatur numquam repellat accusamus ipsa rerum et.
-      role: Dolorem consequatur quidem sed.
+      membership: Quo suscipit.
+      role: Magni in ipsam asperiores nostrum facere dignissimos.
       user:
         admin: true
-        bio: Expedita impedit et incidunt illo voluptatem.
-        email: christop.hyatt@cummings.org
-        id: 7.102592152060354e+18
-        name: sx7rjw265h
+        bio: Quam soluta.
+        email: guido.jaskolski@friesen.biz
+        id: 3.6759918910091996e+18
+        name: 5qmtbwjv73
         photo:
-          url: Molestias et praesentium.
+          url: Ipsa et hic sunt ut.
     properties:
       membership:
-        example: Consequatur numquam repellat accusamus ipsa rerum et.
+        example: Quo suscipit.
         type: string
       role:
-        example: Dolorem consequatur quidem sed.
+        example: Magni in ipsam asperiores nostrum facere dignissimos.
         type: string
       user:
         $ref: '#/definitions/User'
@@ -1825,26 +648,36 @@ definitions:
     description: ProjectUserCollection is the media type for an array of ProjectUser
       (default view)
     example:
-    - membership: Consequatur numquam repellat accusamus ipsa rerum et.
-      role: Dolorem consequatur quidem sed.
+    - membership: Quo suscipit.
+      role: Magni in ipsam asperiores nostrum facere dignissimos.
       user:
         admin: true
-        bio: Expedita impedit et incidunt illo voluptatem.
-        email: christop.hyatt@cummings.org
-        id: 7.102592152060354e+18
-        name: sx7rjw265h
+        bio: Quam soluta.
+        email: guido.jaskolski@friesen.biz
+        id: 3.6759918910091996e+18
+        name: 5qmtbwjv73
         photo:
-          url: Molestias et praesentium.
-    - membership: Consequatur numquam repellat accusamus ipsa rerum et.
-      role: Dolorem consequatur quidem sed.
+          url: Ipsa et hic sunt ut.
+    - membership: Quo suscipit.
+      role: Magni in ipsam asperiores nostrum facere dignissimos.
       user:
         admin: true
-        bio: Expedita impedit et incidunt illo voluptatem.
-        email: christop.hyatt@cummings.org
-        id: 7.102592152060354e+18
-        name: sx7rjw265h
+        bio: Quam soluta.
+        email: guido.jaskolski@friesen.biz
+        id: 3.6759918910091996e+18
+        name: 5qmtbwjv73
         photo:
-          url: Molestias et praesentium.
+          url: Ipsa et hic sunt ut.
+    - membership: Quo suscipit.
+      role: Magni in ipsam asperiores nostrum facere dignissimos.
+      user:
+        admin: true
+        bio: Quam soluta.
+        email: guido.jaskolski@friesen.biz
+        id: 3.6759918910091996e+18
+        name: 5qmtbwjv73
+        photo:
+          url: Ipsa et hic sunt ut.
     items:
       $ref: '#/definitions/ProjectUser'
     title: 'Mediatype identifier: application/vnd.app.project.user+json; type=collection;
@@ -1854,36 +687,16 @@ definitions:
     description: ProjectUsers media type (default view)
     example:
       users:
-      - membership: Consequatur numquam repellat accusamus ipsa rerum et.
-        role: Dolorem consequatur quidem sed.
+      - membership: Quo suscipit.
+        role: Magni in ipsam asperiores nostrum facere dignissimos.
         user:
           admin: true
-          bio: Expedita impedit et incidunt illo voluptatem.
-          email: christop.hyatt@cummings.org
-          id: 7.102592152060354e+18
-          name: sx7rjw265h
+          bio: Quam soluta.
+          email: guido.jaskolski@friesen.biz
+          id: 3.6759918910091996e+18
+          name: 5qmtbwjv73
           photo:
-            url: Molestias et praesentium.
-      - membership: Consequatur numquam repellat accusamus ipsa rerum et.
-        role: Dolorem consequatur quidem sed.
-        user:
-          admin: true
-          bio: Expedita impedit et incidunt illo voluptatem.
-          email: christop.hyatt@cummings.org
-          id: 7.102592152060354e+18
-          name: sx7rjw265h
-          photo:
-            url: Molestias et praesentium.
-      - membership: Consequatur numquam repellat accusamus ipsa rerum et.
-        role: Dolorem consequatur quidem sed.
-        user:
-          admin: true
-          bio: Expedita impedit et incidunt illo voluptatem.
-          email: christop.hyatt@cummings.org
-          id: 7.102592152060354e+18
-          name: sx7rjw265h
-          photo:
-            url: Molestias et praesentium.
+            url: Ipsa et hic sunt ut.
     properties:
       users:
         $ref: '#/definitions/ProjectUserCollection'
@@ -1891,49 +704,12 @@ definitions:
     - users
     title: 'Mediatype identifier: application/vnd.app.users+json; view=default'
     type: object
-  Projects:
-    description: Projects media type (default view)
-    example:
-      projects:
-      - description: Sint excepturi rerum deleniti rem sint.
-        endTime: Ad laboriosam voluptatem explicabo magnam sunt.
-        goal: Rerum rerum et quia ut incidunt consequatur.
-        id: 6.091445377979088e+18
-        location: Vitae itaque consequatur non nisi dolor.
-        name: Sint vitae et corrupti ipsum fugit nisi.
-        numberOfFollowers: 4.86881556417374e+18
-        photo: Tempore laboriosam facere et quo vel.
-        private: true
-        readOnly: true
-        slug: rowl9c0x3f
-        startTime: Illo officiis dignissimos.
-        tags: Quo assumenda voluptas voluptate.
-      - description: Sint excepturi rerum deleniti rem sint.
-        endTime: Ad laboriosam voluptatem explicabo magnam sunt.
-        goal: Rerum rerum et quia ut incidunt consequatur.
-        id: 6.091445377979088e+18
-        location: Vitae itaque consequatur non nisi dolor.
-        name: Sint vitae et corrupti ipsum fugit nisi.
-        numberOfFollowers: 4.86881556417374e+18
-        photo: Tempore laboriosam facere et quo vel.
-        private: true
-        readOnly: true
-        slug: rowl9c0x3f
-        startTime: Illo officiis dignissimos.
-        tags: Quo assumenda voluptas voluptate.
-    properties:
-      projects:
-        $ref: '#/definitions/ProjectCollection'
-    required:
-    - projects
-    title: 'Mediatype identifier: application/vnd.app.projects+json; view=default'
-    type: object
   RecoveryLookupPayload:
     example:
-      email: Ducimus assumenda quod nesciunt.
+      email: Sequi eum aspernatur nulla rerum aliquam.
     properties:
       email:
-        example: Ducimus assumenda quod nesciunt.
+        example: Sequi eum aspernatur nulla rerum aliquam.
         type: string
     required:
     - email
@@ -1941,15 +717,15 @@ definitions:
     type: object
   RecoveryPayload:
     example:
-      password: 7o19cvxj91
-      token: Sit id officia ipsa quam consectetur rerum.
+      password: x8rzq05j6w
+      token: Placeat consequatur quod eum.
     properties:
       password:
-        example: 7o19cvxj91
+        example: x8rzq05j6w
         minLength: 10
         type: string
       token:
-        example: Sit id officia ipsa quam consectetur rerum.
+        example: Placeat consequatur quod eum.
         type: string
     required:
     - token
@@ -1958,33 +734,22 @@ definitions:
     type: object
   RefreshUserPayload:
     example:
-      refresh_token: Omnis ut.
+      refresh_token: Esse dignissimos mollitia.
     properties:
       refresh_token:
-        example: Omnis ut.
+        example: Esse dignissimos mollitia.
         type: string
     required:
     - refresh_token
     title: RefreshUserPayload
     type: object
-  RemoveUserPayload:
-    example:
-      email: Rem et.
-    properties:
-      email:
-        example: Rem et.
-        type: string
-    required:
-    - email
-    title: RemoveUserPayload
-    type: object
   TransmissionToken:
     description: TransmissionToken media type (default view)
     example:
-      token: Esse dignissimos mollitia.
+      token: Quia ut incidunt consequatur magni et.
     properties:
       token:
-        example: Esse dignissimos mollitia.
+        example: Quia ut incidunt consequatur magni et.
         type: string
     required:
     - token
@@ -1993,15 +758,15 @@ definitions:
     type: object
   UpdateUserPasswordPayload:
     example:
-      newPassword: rrcazxi7no
-      oldPassword: n31c5gcvpi
+      newPassword: eb63hu9e7a
+      oldPassword: biiuahxosx
     properties:
       newPassword:
-        example: rrcazxi7no
+        example: eb63hu9e7a
         minLength: 10
         type: string
       oldPassword:
-        example: n31c5gcvpi
+        example: biiuahxosx
         minLength: 10
         type: string
     required:
@@ -2011,19 +776,19 @@ definitions:
     type: object
   UpdateUserPayload:
     example:
-      bio: Esse sapiente.
-      email: macey@binsschmidt.net
-      name: 90susr7y4n
+      bio: Occaecati est consequatur dolorum voluptas omnis.
+      email: jeffery@walshbartell.com
+      name: s9vmohafdi
     properties:
       bio:
-        example: Esse sapiente.
+        example: Occaecati est consequatur dolorum voluptas omnis.
         type: string
       email:
-        example: macey@binsschmidt.net
+        example: jeffery@walshbartell.com
         format: email
         type: string
       name:
-        example: 90susr7y4n
+        example: s9vmohafdi
         maxLength: 256
         pattern: \S
         type: string
@@ -2037,29 +802,29 @@ definitions:
     description: User media type (default view)
     example:
       admin: true
-      bio: Expedita impedit et incidunt illo voluptatem.
-      email: christop.hyatt@cummings.org
-      id: 7.102592152060354e+18
-      name: sx7rjw265h
+      bio: Quam soluta.
+      email: guido.jaskolski@friesen.biz
+      id: 3.6759918910091996e+18
+      name: 5qmtbwjv73
       photo:
-        url: Molestias et praesentium.
+        url: Ipsa et hic sunt ut.
     properties:
       admin:
         example: true
         type: boolean
       bio:
-        example: Expedita impedit et incidunt illo voluptatem.
+        example: Quam soluta.
         type: string
       email:
-        example: christop.hyatt@cummings.org
+        example: guido.jaskolski@friesen.biz
         format: email
         type: string
       id:
-        example: 7.102592152060354e+18
+        example: 3.6759918910091996e+18
         format: int64
         type: integer
       name:
-        example: sx7rjw265h
+        example: 5qmtbwjv73
         maxLength: 256
         pattern: \S
         type: string
@@ -2075,10 +840,10 @@ definitions:
     type: object
   UserPhoto:
     example:
-      url: Molestias et praesentium.
+      url: Ipsa et hic sunt ut.
     properties:
       url:
-        example: Molestias et praesentium.
+        example: Ipsa et hic sunt ut.
         type: string
     title: UserPhoto
     type: object
@@ -2204,56 +969,6 @@ paths:
       summary: device data data
       tags:
       - data
-  /data/devices/{deviceId}/data/json:
-    get:
-      description: |-
-        Retrieve data
-
-        Required security scopes:
-          * `api:access`
-      operationId: jsonData#get
-      parameters:
-      - in: path
-        name: deviceId
-        required: true
-        type: string
-      - in: query
-        name: end
-        required: false
-        type: integer
-      - in: query
-        name: internal
-        required: false
-        type: boolean
-      - in: query
-        name: page
-        required: false
-        type: integer
-      - in: query
-        name: pageSize
-        required: false
-        type: integer
-      - in: query
-        name: start
-        required: false
-        type: integer
-      produces:
-      - application/vnd.app.device.json.data+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/JSONDataResponse'
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: get jsonData
-      tags:
-      - jsonData
   /data/devices/{deviceId}/summary:
     get:
       description: |-
@@ -2284,64 +999,6 @@ paths:
       summary: device summary data
       tags:
       - data
-  /data/devices/{deviceId}/summary/json:
-    get:
-      description: |-
-        Retrieve summarized data
-
-        Required security scopes:
-          * `api:access`
-      operationId: jsonData#summary
-      parameters:
-      - in: path
-        name: deviceId
-        required: true
-        type: string
-      - in: query
-        name: end
-        required: false
-        type: integer
-      - in: query
-        name: internal
-        required: false
-        type: boolean
-      - in: query
-        name: interval
-        required: false
-        type: integer
-      - in: query
-        name: page
-        required: false
-        type: integer
-      - in: query
-        name: pageSize
-        required: false
-        type: integer
-      - in: query
-        name: resolution
-        required: false
-        type: integer
-      - in: query
-        name: start
-        required: false
-        type: integer
-      produces:
-      - application/vnd.app.device.json.data.summary+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/JSONDataSummaryResponse'
-        "404":
-          description: Not Found
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: summary jsonData
-      tags:
-      - jsonData
   /firmware:
     get:
       description: List firmware
@@ -2505,205 +1162,6 @@ paths:
       summary: logout user
       tags:
       - user
-  /projects:
-    get:
-      description: List projects
-      operationId: project#list
-      produces:
-      - application/vnd.app.projects+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Projects'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      summary: list project
-      tags:
-      - project
-    post:
-      description: |-
-        Add a project
-
-        Required security scopes:
-          * `api:access`
-      operationId: project#add
-      parameters:
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/AddProjectPayload'
-      produces:
-      - application/vnd.app.project+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Project'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: add project
-      tags:
-      - project
-  /projects/{projectId}:
-    delete:
-      description: |-
-        Delete project
-
-        Required security scopes:
-          * `api:access`
-      operationId: project#delete
-      parameters:
-      - in: path
-        name: projectId
-        required: true
-        type: integer
-      responses:
-        "204":
-          description: OK
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: delete project
-      tags:
-      - project
-    get:
-      description: |-
-        Get a project
-
-        Required security scopes:
-          * `api:access`
-      operationId: project#get
-      parameters:
-      - in: path
-        name: projectId
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.project+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Project'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: get project
-      tags:
-      - project
-    patch:
-      description: |-
-        Update a project
-
-        Required security scopes:
-          * `api:access`
-      operationId: project#update
-      parameters:
-      - in: path
-        name: projectId
-        required: true
-        type: integer
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/AddProjectPayload'
-      produces:
-      - application/vnd.app.project+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Project'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: update project
-      tags:
-      - project
-  /projects/{projectId}/invite:
-    post:
-      description: |-
-        Invite a user to project
-
-        Required security scopes:
-          * `api:access`
-      operationId: project#invite user
-      parameters:
-      - in: path
-        name: projectId
-        required: true
-        type: integer
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/InviteUserPayload'
-      responses:
-        "204":
-          description: OK
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: invite user project
-      tags:
-      - project
-  /projects/{projectId}/members:
-    delete:
-      description: |-
-        Remove a user from project
-
-        Required security scopes:
-          * `api:access`
-      operationId: project#remove user
-      parameters:
-      - in: path
-        name: projectId
-        required: true
-        type: integer
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/RemoveUserPayload'
-      responses:
-        "204":
-          description: OK
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: remove user project
-      tags:
-      - project
   /projects/{projectId}/picture:
     get:
       description: Get a project's picture
@@ -2725,63 +1183,6 @@ paths:
       summary: project get id picture
       tags:
       - picture
-  /projects/{projectId}/stations/{stationId}:
-    delete:
-      description: |-
-        Required security scopes:
-          * `api:access`
-      operationId: project#remove station
-      parameters:
-      - in: path
-        name: projectId
-        required: true
-        type: integer
-      - in: path
-        name: stationId
-        required: true
-        type: integer
-      responses:
-        "204":
-          description: OK
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: remove station project
-      tags:
-      - project
-    post:
-      description: |-
-        Add a station to project
-
-        Required security scopes:
-          * `api:access`
-      operationId: project#add station
-      parameters:
-      - in: path
-        name: projectId
-        required: true
-        type: integer
-      - in: path
-        name: stationId
-        required: true
-        type: integer
-      responses:
-        "204":
-          description: OK
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: add station project
-      tags:
-      - project
   /projects/roles:
     get:
       operationId: user#project roles
@@ -2925,221 +1326,6 @@ paths:
       summary: refresh user
       tags:
       - user
-  /stations/{stationId}/field-note-media:
-    post:
-      description: |-
-        Save a field note image
-
-        Required security scopes:
-          * `api:access`
-      operationId: field_note#save media
-      parameters:
-      - in: path
-        name: stationId
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.field_note_media+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/FieldNoteMedia'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: save media field_note
-      tags:
-      - field_note
-  /stations/{stationId}/field-note-media/{mediaId}:
-    get:
-      description: Get a field note image
-      operationId: field_note#get media
-      parameters:
-      - in: path
-        name: mediaId
-        required: true
-        type: integer
-      - in: path
-        name: stationId
-        required: true
-        type: integer
-      produces:
-      - image/png
-      responses:
-        "200":
-          description: OK
-      schemes:
-      - https
-      summary: get media field_note
-      tags:
-      - field_note
-  /stations/{stationId}/field-notes:
-    get:
-      description: |-
-        Get all field notes for a station
-
-        Required security scopes:
-          * `api:access`
-      operationId: field_note#get
-      parameters:
-      - in: path
-        name: stationId
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.field_notes+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/FieldNotes'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: get field_note
-      tags:
-      - field_note
-    post:
-      description: |-
-        Add a field note
-
-        Required security scopes:
-          * `api:access`
-      operationId: field_note#add
-      parameters:
-      - in: path
-        name: stationId
-        required: true
-        type: integer
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/AddFieldNotePayload'
-      produces:
-      - application/vnd.app.field_note_result+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/FieldNoteQueryResult'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: add field_note
-      tags:
-      - field_note
-  /stations/{stationId}/field-notes/{fieldNoteId}:
-    delete:
-      description: |-
-        Remove a field note
-
-        Required security scopes:
-          * `api:access`
-      operationId: field_note#delete
-      parameters:
-      - in: path
-        name: fieldNoteId
-        required: true
-        type: integer
-      - in: path
-        name: stationId
-        required: true
-        type: integer
-      responses:
-        "204":
-          description: OK
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: delete field_note
-      tags:
-      - field_note
-    patch:
-      description: |-
-        Update a field note
-
-        Required security scopes:
-          * `api:access`
-      operationId: field_note#update
-      parameters:
-      - in: path
-        name: fieldNoteId
-        required: true
-        type: integer
-      - in: path
-        name: stationId
-        required: true
-        type: integer
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/AddFieldNotePayload'
-      produces:
-      - application/vnd.app.field_note_result+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/FieldNoteQueryResult'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: update field_note
-      tags:
-      - field_note
-  /stations/{stationId}/projects:
-    get:
-      description: |-
-        List the station's projects
-
-        Required security scopes:
-          * `api:access`
-      operationId: project#list station
-      parameters:
-      - in: path
-        name: stationId
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.projects+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Projects'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: list station project
-      tags:
-      - project
   /swagger.json:
     get:
       operationId: swagger#/swagger.json
@@ -3251,31 +1437,6 @@ paths:
       summary: save current user image user
       tags:
       - user
-  /user/projects:
-    get:
-      description: |-
-        List the authenticated user's projects
-
-        Required security scopes:
-          * `api:access`
-      operationId: project#list current
-      produces:
-      - application/vnd.app.projects+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Projects'
-        "400":
-          description: Bad Request
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: list current project
-      tags:
-      - project
   /user/recovery:
     post:
       operationId: user#recovery

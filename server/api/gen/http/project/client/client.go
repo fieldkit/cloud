@@ -46,6 +46,41 @@ type Client struct {
 	// invite endpoint.
 	RejectInviteDoer goahttp.Doer
 
+	// Add Doer is the HTTP client used to make requests to the add endpoint.
+	AddDoer goahttp.Doer
+
+	// Update Doer is the HTTP client used to make requests to the update endpoint.
+	UpdateDoer goahttp.Doer
+
+	// Get Doer is the HTTP client used to make requests to the get endpoint.
+	GetDoer goahttp.Doer
+
+	// ListCommunity Doer is the HTTP client used to make requests to the list
+	// community endpoint.
+	ListCommunityDoer goahttp.Doer
+
+	// ListMine Doer is the HTTP client used to make requests to the list mine
+	// endpoint.
+	ListMineDoer goahttp.Doer
+
+	// Invite Doer is the HTTP client used to make requests to the invite endpoint.
+	InviteDoer goahttp.Doer
+
+	// RemoveUser Doer is the HTTP client used to make requests to the remove user
+	// endpoint.
+	RemoveUserDoer goahttp.Doer
+
+	// AddStation Doer is the HTTP client used to make requests to the add station
+	// endpoint.
+	AddStationDoer goahttp.Doer
+
+	// RemoveStation Doer is the HTTP client used to make requests to the remove
+	// station endpoint.
+	RemoveStationDoer goahttp.Doer
+
+	// Delete Doer is the HTTP client used to make requests to the delete endpoint.
+	DeleteDoer goahttp.Doer
+
 	// UploadMedia Doer is the HTTP client used to make requests to the upload
 	// media endpoint.
 	UploadMediaDoer goahttp.Doer
@@ -84,6 +119,16 @@ func NewClient(
 		LookupInviteDoer:    doer,
 		AcceptInviteDoer:    doer,
 		RejectInviteDoer:    doer,
+		AddDoer:             doer,
+		UpdateDoer:          doer,
+		GetDoer:             doer,
+		ListCommunityDoer:   doer,
+		ListMineDoer:        doer,
+		InviteDoer:          doer,
+		RemoveUserDoer:      doer,
+		AddStationDoer:      doer,
+		RemoveStationDoer:   doer,
+		DeleteDoer:          doer,
 		UploadMediaDoer:     doer,
 		DownloadMediaDoer:   doer,
 		CORSDoer:            doer,
@@ -258,6 +303,246 @@ func (c *Client) RejectInvite() goa.Endpoint {
 		resp, err := c.RejectInviteDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("project", "reject invite", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Add returns an endpoint that makes HTTP requests to the project service add
+// server.
+func (c *Client) Add() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAddRequest(c.encoder)
+		decodeResponse = DecodeAddResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildAddRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AddDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "add", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Update returns an endpoint that makes HTTP requests to the project service
+// update server.
+func (c *Client) Update() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUpdateRequest(c.encoder)
+		decodeResponse = DecodeUpdateResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildUpdateRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UpdateDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "update", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Get returns an endpoint that makes HTTP requests to the project service get
+// server.
+func (c *Client) Get() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeGetRequest(c.encoder)
+		decodeResponse = DecodeGetResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildGetRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.GetDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "get", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// ListCommunity returns an endpoint that makes HTTP requests to the project
+// service list community server.
+func (c *Client) ListCommunity() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeListCommunityRequest(c.encoder)
+		decodeResponse = DecodeListCommunityResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildListCommunityRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ListCommunityDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "list community", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// ListMine returns an endpoint that makes HTTP requests to the project service
+// list mine server.
+func (c *Client) ListMine() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeListMineRequest(c.encoder)
+		decodeResponse = DecodeListMineResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildListMineRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ListMineDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "list mine", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Invite returns an endpoint that makes HTTP requests to the project service
+// invite server.
+func (c *Client) Invite() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeInviteRequest(c.encoder)
+		decodeResponse = DecodeInviteResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildInviteRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.InviteDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "invite", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// RemoveUser returns an endpoint that makes HTTP requests to the project
+// service remove user server.
+func (c *Client) RemoveUser() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeRemoveUserRequest(c.encoder)
+		decodeResponse = DecodeRemoveUserResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildRemoveUserRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.RemoveUserDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "remove user", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// AddStation returns an endpoint that makes HTTP requests to the project
+// service add station server.
+func (c *Client) AddStation() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAddStationRequest(c.encoder)
+		decodeResponse = DecodeAddStationResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildAddStationRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AddStationDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "add station", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// RemoveStation returns an endpoint that makes HTTP requests to the project
+// service remove station server.
+func (c *Client) RemoveStation() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeRemoveStationRequest(c.encoder)
+		decodeResponse = DecodeRemoveStationResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildRemoveStationRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.RemoveStationDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "remove station", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Delete returns an endpoint that makes HTTP requests to the project service
+// delete server.
+func (c *Client) Delete() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDeleteRequest(c.encoder)
+		decodeResponse = DecodeDeleteResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDeleteRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DeleteDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "delete", err)
 		}
 		return decodeResponse(resp)
 	}

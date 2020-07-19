@@ -8,6 +8,8 @@
 package views
 
 import (
+	"unicode/utf8"
+
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -23,6 +25,22 @@ type ProjectUpdate struct {
 type PendingInvites struct {
 	// Type to project
 	Projected *PendingInvitesView
+	// View to render
+	View string
+}
+
+// Project is the viewed result type that is projected based on a view.
+type Project struct {
+	// Type to project
+	Projected *ProjectView
+	// View to render
+	View string
+}
+
+// Projects is the viewed result type that is projected based on a view.
+type Projects struct {
+	// Type to project
+	Projected *ProjectsView
 	// View to render
 	View string
 }
@@ -53,6 +71,31 @@ type ProjectSummaryView struct {
 	Name *string
 }
 
+// ProjectView is a type that runs validations on a projected type.
+type ProjectView struct {
+	ID                *int32
+	Name              *string
+	Slug              *string
+	Description       *string
+	Goal              *string
+	Location          *string
+	Tags              *string
+	Private           *bool
+	StartTime         *string
+	EndTime           *string
+	Photo             *string
+	ReadOnly          *bool
+	NumberOfFollowers *int32
+}
+
+// ProjectsView is a type that runs validations on a projected type.
+type ProjectsView struct {
+	Projects ProjectCollectionView
+}
+
+// ProjectCollectionView is a type that runs validations on a projected type.
+type ProjectCollectionView []*ProjectView
+
 var (
 	// ProjectUpdateMap is a map of attribute names in result type ProjectUpdate
 	// indexed by view name.
@@ -67,6 +110,51 @@ var (
 	PendingInvitesMap = map[string][]string{
 		"default": []string{
 			"pending",
+		},
+	}
+	// ProjectMap is a map of attribute names in result type Project indexed by
+	// view name.
+	ProjectMap = map[string][]string{
+		"default": []string{
+			"id",
+			"name",
+			"slug",
+			"description",
+			"goal",
+			"location",
+			"tags",
+			"private",
+			"startTime",
+			"endTime",
+			"photo",
+			"readOnly",
+			"numberOfFollowers",
+		},
+	}
+	// ProjectsMap is a map of attribute names in result type Projects indexed by
+	// view name.
+	ProjectsMap = map[string][]string{
+		"default": []string{
+			"projects",
+		},
+	}
+	// ProjectCollectionMap is a map of attribute names in result type
+	// ProjectCollection indexed by view name.
+	ProjectCollectionMap = map[string][]string{
+		"default": []string{
+			"id",
+			"name",
+			"slug",
+			"description",
+			"goal",
+			"location",
+			"tags",
+			"private",
+			"startTime",
+			"endTime",
+			"photo",
+			"readOnly",
+			"numberOfFollowers",
 		},
 	}
 )
@@ -89,6 +177,30 @@ func ValidatePendingInvites(result *PendingInvites) (err error) {
 	switch result.View {
 	case "default", "":
 		err = ValidatePendingInvitesView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateProject runs the validations defined on the viewed result type
+// Project.
+func ValidateProject(result *Project) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateProjectView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateProjects runs the validations defined on the viewed result type
+// Projects.
+func ValidateProjects(result *Projects) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateProjectsView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
 	}
@@ -153,6 +265,73 @@ func ValidateProjectSummaryView(result *ProjectSummaryView) (err error) {
 	}
 	if result.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	return
+}
+
+// ValidateProjectView runs the validations defined on ProjectView using the
+// "default" view.
+func ValidateProjectView(result *ProjectView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	if result.Slug == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("slug", "result"))
+	}
+	if result.Description == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("description", "result"))
+	}
+	if result.Goal == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("goal", "result"))
+	}
+	if result.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("location", "result"))
+	}
+	if result.Private == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("private", "result"))
+	}
+	if result.Tags == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("tags", "result"))
+	}
+	if result.ReadOnly == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("readOnly", "result"))
+	}
+	if result.NumberOfFollowers == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("numberOfFollowers", "result"))
+	}
+	if result.Slug != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("result.slug", *result.Slug, "^[[:alnum:]]+(-[[:alnum:]]+)*$"))
+	}
+	if result.Slug != nil {
+		if utf8.RuneCountInString(*result.Slug) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("result.slug", *result.Slug, utf8.RuneCountInString(*result.Slug), 40, false))
+		}
+	}
+	return
+}
+
+// ValidateProjectsView runs the validations defined on ProjectsView using the
+// "default" view.
+func ValidateProjectsView(result *ProjectsView) (err error) {
+
+	if result.Projects != nil {
+		if err2 := ValidateProjectCollectionView(result.Projects); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateProjectCollectionView runs the validations defined on
+// ProjectCollectionView using the "default" view.
+func ValidateProjectCollectionView(result ProjectCollectionView) (err error) {
+	for _, item := range result {
+		if err2 := ValidateProjectView(item); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }
