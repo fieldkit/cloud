@@ -4,7 +4,7 @@
             "name": "Water Conductivity",
             "sensors": {
                 "ec": "Conductivity",
-                "tds": "Total Dissolved Solids",
+                "tds": "TDS",
                 "salinity": "Salinity"
             }
         },
