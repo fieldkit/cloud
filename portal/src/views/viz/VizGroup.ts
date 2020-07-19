@@ -40,6 +40,9 @@ export const VizGroup = Vue.extend({
         raiseVizTimeZoomed(...args) {
             return this.$emit("viz-time-zoomed", ...args);
         },
+        raiseVizGeoZoomed(...args) {
+            return this.$emit("viz-geo-zoomed", ...args);
+        },
         raiseRemove(...args) {
             return this.$emit("viz-remove", ...args);
         },
@@ -69,6 +72,7 @@ export const VizGroup = Vue.extend({
 
 					<VizGraph :viz="viz" :workspace="workspace"
 						@viz-time-zoomed="(...args) => raiseVizTimeZoomed(viz, ...args)"
+						@viz-geo-zoomed="(...args) => raiseVizGeoZoomed(viz, ...args)"
 						@viz-remove="(...args) => raiseRemove(viz, ...args)"
 						@viz-compare="(...args) => raiseCompare(viz, ...args)"
 						@viz-change-sensors="(...args) => raiseChangeSensors(viz, ...args)"

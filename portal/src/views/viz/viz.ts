@@ -117,7 +117,7 @@ export enum ChartType {
     Map,
 }
 
-type VizBookmark = [Stations, Sensors, [number, number], ChartType, FastTime] | [];
+type VizBookmark = [Stations, Sensors, [number, number], [[number, number], [number, number]] | [], ChartType, FastTime] | [];
 
 type GroupBookmark = [VizBookmark[]];
 
@@ -125,6 +125,10 @@ export class Bookmark {
     static Version = 1;
 
     constructor(public readonly v: number, public readonly g: GroupBookmark[], public readonly s: number[] = []) {}
+}
+
+export class GeoZoom {
+    constructor(public readonly bounds: [[number, number], [number, number]]) {}
 }
 
 export class TimeZoom {
@@ -137,6 +141,7 @@ export class Graph extends Viz {
     public visible: TimeRange = TimeRange.eternity;
     public chartType: ChartType = ChartType.TimeSeries;
     public fastTime: FastTime = FastTime.All;
+    public geo: GeoZoom | null = null;
 
     constructor(public chartParams: DataQueryParams) {
         super();
@@ -155,7 +160,7 @@ export class Graph extends Viz {
         return new DataQueryParams(TimeRange.eternity, this.chartParams.stations, this.chartParams.sensors);
     }
 
-    public zoomed(zoom: TimeZoom): TimeRange {
+    public timeZoomed(zoom: TimeZoom): TimeRange {
         if (zoom.range) {
             this.visible = zoom.range;
             this.fastTime = FastTime.Custom;
@@ -167,6 +172,11 @@ export class Graph extends Viz {
         this.chartParams = new DataQueryParams(this.visible, this.chartParams.stations, this.chartParams.sensors);
 
         return this.visible;
+    }
+
+    public geoZoomed(zoom: GeoZoom): GeoZoom {
+        this.geo = zoom;
+        return this.geo;
     }
 
     private getFastRange(fastTime: FastTime) {
@@ -194,15 +204,23 @@ export class Graph extends Viz {
     }
 
     public bookmark(): VizBookmark {
-        return [this.chartParams.stations, this.chartParams.sensors, [this.visible.start, this.visible.end], this.chartType, this.fastTime];
+        return [
+            this.chartParams.stations,
+            this.chartParams.sensors,
+            [this.visible.start, this.visible.end],
+            this.geo ? this.geo.bounds : [],
+            this.chartType,
+            this.fastTime,
+        ];
     }
 
     public static fromBookmark(bm: VizBookmark): Viz {
         const visible = new TimeRange(bm[2][0], bm[2][1]);
         const chartParams = new DataQueryParams(visible, bm[0], bm[1]);
         const graph = new Graph(chartParams);
-        graph.chartType = bm[3];
-        graph.fastTime = bm[4];
+        graph.geo = bm[3].length ? new GeoZoom(bm[3]) : null;
+        graph.chartType = bm[4];
+        graph.fastTime = bm[5];
         graph.visible = visible;
         return graph;
     }
@@ -255,12 +273,20 @@ export class Group {
         return this.vizes.indexOf(viz) >= 0;
     }
 
-    public zoomed(zoom: TimeZoom) {
+    public timeZoomed(zoom: TimeZoom) {
         this.vizes.forEach((viz) => {
             if (viz instanceof Graph) {
                 // Yeah this is kind of weird... the idea though is
                 // that they'll all return the same thing.
-                this.visible_ = viz.zoomed(zoom);
+                this.visible_ = viz.timeZoomed(zoom);
+            }
+        });
+    }
+
+    public geoZoomed(zoom: GeoZoom) {
+        this.vizes.forEach((viz) => {
+            if (viz instanceof Graph) {
+                viz.geoZoomed(zoom);
             }
         });
     }
@@ -456,13 +482,18 @@ export class Workspace {
         return new VizInfo(scale, station);
     }
 
-    public graphZoomed(viz: Viz, zoom: TimeZoom): Workspace {
-        this.findGroup(viz).zoomed(zoom);
+    public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {
+        this.findGroup(viz).timeZoomed(zoom);
+        return this;
+    }
+
+    public graphGeoZoomed(viz: Viz, zoom: GeoZoom): Workspace {
+        this.findGroup(viz).geoZoomed(zoom);
         return this;
     }
 
     public groupZoomed(group: Group, zoom: TimeZoom): Workspace {
-        group.zoomed(zoom);
+        group.timeZoomed(zoom);
         return this;
     }
 

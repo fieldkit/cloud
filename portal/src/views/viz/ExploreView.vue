@@ -83,6 +83,9 @@ export default Vue.extend({
             const activeEncoded = JSON.stringify(this.bookmark);
             const newEncoded = JSON.stringify(bookmark);
 
+            console.log("viz: new", newEncoded);
+            console.log("viz: old", activeEncoded);
+
             if (newEncoded == activeEncoded) {
                 return Promise.resolve(this.workspace);
             }

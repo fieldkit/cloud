@@ -2,7 +2,7 @@ import _ from "lodash";
 import Vue from "vue";
 
 import { TimeRange } from "./common";
-import { Workspace, Group, Viz, TreeOption, FastTime, ChartType, TimeZoom, Bookmark } from "./viz";
+import { Workspace, Group, Viz, TreeOption, FastTime, ChartType, TimeZoom, GeoZoom, Bookmark } from "./viz";
 import { VizGroup } from "./VizGroup";
 
 export const VizWorkspace = Vue.extend({
@@ -38,7 +38,14 @@ export const VizWorkspace = Vue.extend({
         onGraphTimeZoomed(group: Group, viz: Viz, zoom: TimeZoom) {
             viz.log("zooming", zoom);
             return this.workspace
-                .graphZoomed(viz, zoom)
+                .graphTimeZoomed(viz, zoom)
+                .with((this as any).signal)
+                .query();
+        },
+        onGraphGeoZoomed(group: Group, viz: Viz, zoom: GeoZoom) {
+            viz.log("zooming(geo)", zoom.bounds);
+            return this.workspace
+                .graphGeoZoomed(viz, zoom)
                 .with((this as any).signal)
                 .query();
         },
@@ -85,6 +92,7 @@ export const VizWorkspace = Vue.extend({
 					<VizGroup :group="group" :workspace="workspace" :topGroup="index == 0"
 						@group-time-zoomed="(...args) => onGroupTimeZoomed(group, ...args)"
 						@viz-time-zoomed="(...args) => onGraphTimeZoomed(group, ...args)"
+						@viz-geo-zoomed="(...args) => onGraphGeoZoomed(group, ...args)"
 						@viz-remove="(...args) => onRemove(group, ...args)"
 						@viz-compare="(...args) => onCompare(group, ...args)"
 						@viz-change-sensors="(...args) => onChangeSensors(group, ...args)"

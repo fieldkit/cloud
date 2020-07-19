@@ -6,7 +6,7 @@ import { LngLatBounds } from "mapbox-gl";
 import * as d3 from "d3";
 
 import { Time, TimeRange, Margins, ChartLayout } from "./common";
-import { Graph, QueriedData, Workspace } from "./viz";
+import { Graph, QueriedData, Workspace, GeoZoom } from "./viz";
 
 import Config from "@/secrets";
 
@@ -17,9 +17,9 @@ export const D3Map = Vue.extend({
     },
     data() {
         return {
-            coordinates: [-118, 34],
             mapboxToken: Config.MAPBOX_ACCESS_TOKEN,
             map: null,
+            refreshed: false,
         };
     },
     props: {
@@ -54,11 +54,24 @@ export const D3Map = Vue.extend({
         this.viz.log("updated");
     },
     methods: {
-        refresh() {
+        ready() {
             if (!this.data) {
-                return;
+                return false;
             }
             if (!this.map) {
+                return false;
+            }
+
+            const viewableData = this.data.data.filter((d) => d.location && d.location.length);
+
+            if (viewableData.length == 0) {
+                return false;
+            }
+
+            return true;
+        },
+        refresh() {
+            if (!this.ready()) {
                 return;
             }
             const data = this.data.data;
@@ -66,11 +79,7 @@ export const D3Map = Vue.extend({
             const vizInfo = this.workspace.vizInfo(this.viz);
             const colors = vizInfo.colorScale;
 
-            this.viz.log("data", located.length);
-
-            if (located.length == 0) {
-                return;
-            }
+            this.viz.log("map-refresh: data", located.length);
 
             // I wonder if there's a more d3 way to do this.
             this.removePreviousMapped();
@@ -151,20 +160,35 @@ export const D3Map = Vue.extend({
                 },
             });
 
-            const coordinates = geojson.geometry.coordinates;
-            const bounds = coordinates.reduce((bounds, c) => bounds.extend(c, c), new LngLatBounds(coordinates[0], coordinates[0]));
+            if (this.viz.geo) {
+                const bounds = this.viz.geo.bounds;
 
-            this.viz.log("bounds", bounds.toArray());
+                this.viz.log("map-refresh: bounds(viz)", bounds);
 
-            this.map.fitBounds(bounds.toArray(), {
-                padding: 20,
-                duration: 0,
-            });
+                this.map.fitBounds(bounds, {
+                    padding: 20,
+                    duration: 0,
+                });
+            } else {
+                const coordinates = geojson.geometry.coordinates;
+                const bounds = coordinates.reduce((bounds, c) => bounds.extend(c, c), new LngLatBounds(coordinates[0], coordinates[0]));
+
+                this.viz.log("map-refresh: bounds(data)", bounds.toArray());
+
+                this.map.fitBounds(bounds.toArray(), {
+                    padding: 20,
+                    duration: 0,
+                });
+            }
 
             const z = this.map.getZoom();
             if (z > 19) {
                 this.map.setZoom(19);
             }
+
+            this.viz.log("map-refresh: done");
+
+            this.refreshed = true;
         },
         removePreviousMapped() {
             if (this.map.getLayer("arrow-layer")) {
@@ -189,6 +213,25 @@ export const D3Map = Vue.extend({
             this.map.resize();
             this.refresh();
         },
+        mapMoveEnd(...args) {
+            if (this.ready() && this.refreshed) {
+                this.viz.log("map-move-end");
+                this.$emit("viz-geo-zoomed", new GeoZoom(this.map.getBounds().toArray()));
+            } else {
+                this.viz.log("map-move-end(ignored)");
+            }
+        },
+        mapZoomEnd(...args) {
+            // Our moveEnd handler above is enough.
+            /*
+            if (this.ready() && this.refreshed) {
+                this.viz.log("map-zoom-end");
+                this.$emit("viz-geo-zoomed", new GeoZoom(this.map.getBounds().toArray()));
+            } else {
+                this.viz.log("map-zoom-end(ignored)");
+            }
+			*/
+        },
     },
     template: `
 	<div class="viz map">
@@ -198,7 +241,6 @@ export const D3Map = Vue.extend({
             :map-options="{
                 container: this.viz.id + '-map',
                 style: 'mapbox://styles/mapbox/light-v10',
-                center: coordinates,
                 zoom: 10,
             }"
             :nav-control="{
@@ -206,7 +248,8 @@ export const D3Map = Vue.extend({
                 position: 'bottom-left',
             }"
             @map-load="mapLoaded"
+			@map-moveend="mapMoveEnd"
+			@map-zoomend="mapZoomEnd"
         />
-        <div class="no-data-with-location" v-if="noData">No {{ chart.sensor.label }} data found with location information.</div>
 	</div>`,
 });
