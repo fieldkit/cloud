@@ -8,7 +8,7 @@ import (
 )
 
 type Firmware struct {
-	ID        int64          `db:"id"`
+	ID        int32          `db:"id"`
 	Time      time.Time      `db:"time"`
 	Module    string         `db:"module"`
 	Profile   string         `db:"profile"`

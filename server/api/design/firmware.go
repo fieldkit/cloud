@@ -1,8 +1,7 @@
 package design
 
 import (
-	. "github.com/goadesign/goa/design"
-	. "github.com/goadesign/goa/design/apidsl"
+	. "goa.design/goa/v3/dsl"
 )
 
 var AddFirmwarePayload = Type("AddFirmwarePayload", func() {
@@ -18,25 +17,18 @@ var AddFirmwarePayload = Type("AddFirmwarePayload", func() {
 	Required("meta")
 })
 
-var UpdateDeviceFirmwarePayload = Type("UpdateDeviceFirmwarePayload", func() {
-	Attribute("deviceId", Integer)
-	Required("deviceId")
-	Attribute("firmwareId", Integer)
-	Required("firmwareId")
-})
-
-var FirmwareSummary = MediaType("application/vnd.app.firmware+json", func() {
+var FirmwareSummary = ResultType("application/vnd.app.firmware+json", func() {
 	TypeName("FirmwareSummary")
 	Attributes(func() {
-		Attribute("id", Integer)
-		Attribute("time", DateTime)
+		Attribute("id", Int32)
+		Attribute("time", String)
 		Attribute("etag", String)
 		Attribute("module", String)
 		Attribute("profile", String)
 		Attribute("url", String)
-		Attribute("meta", HashOf(String, Any))
-		Attribute("buildTime", Integer)
-		Attribute("buildNumber", Integer)
+		Attribute("meta", MapOf(String, Any))
+		Attribute("buildNumber", Int32)
+		Attribute("buildTime", Int64)
 		Required("id")
 		Required("time")
 		Required("etag")
@@ -44,8 +36,8 @@ var FirmwareSummary = MediaType("application/vnd.app.firmware+json", func() {
 		Required("profile")
 		Required("url")
 		Required("meta")
-		Required("buildTime")
 		Required("buildNumber")
+		Required("buildTime")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -55,12 +47,12 @@ var FirmwareSummary = MediaType("application/vnd.app.firmware+json", func() {
 		Attribute("profile")
 		Attribute("url")
 		Attribute("meta")
-		Attribute("buildTime")
 		Attribute("buildNumber")
+		Attribute("buildTime")
 	})
 })
 
-var Firmwares = MediaType("application/vnd.app.firmwares+json", func() {
+var Firmwares = ResultType("application/vnd.app.firmwares+json", func() {
 	TypeName("Firmwares")
 	Attributes(func() {
 		Attribute("firmwares", CollectionOf(FirmwareSummary))
@@ -71,62 +63,93 @@ var Firmwares = MediaType("application/vnd.app.firmwares+json", func() {
 	})
 })
 
-var _ = Resource("Firmware", func() {
-	Action("download", func() {
-		Routing(GET("firmware/:firmwareId/download"))
-		Params(func() {
-			Param("firmwareId", Integer)
+var _ = Service("firmware", func() {
+	Method("download", func() {
+		Payload(func() {
+			Attribute("firmwareId", Int32)
 			Required("firmwareId")
 		})
-		Response(NotFound)
-		Response(OK, func() {
-			Status(200)
-			Headers(func() {
-				Header("ETag")
+
+		Result(func() {
+			Attribute("length", Int64)
+			Required("length")
+			Attribute("contentType", String)
+			Required("contentType")
+		})
+
+		HTTP(func() {
+			GET("firmware/{firmwareId}/download")
+
+			SkipResponseBodyEncodeDecode()
+
+			Response(func() {
+				Header("length:Content-Length")
+				Header("contentType:Content-Type")
 			})
 		})
 	})
 
-	Action("add", func() {
-		Security(JWT, func() {
+	Method("add", func() {
+		Security(JWTAuth, func() {
 			Scope("api:admin")
 		})
-		Routing(PATCH("firmware"))
-		Description("Add firmware")
-		Params(func() {
-		})
-		Payload(AddFirmwarePayload)
-		Response(BadRequest)
-		Response(OK)
-	})
 
-	Action("list", func() {
-		Routing(GET("firmware"))
-		Description("List firmware")
-		Params(func() {
-			Param("module", String)
-			Param("profile", String)
-			Param("pageSize", Integer)
-			Param("page", Integer)
+		Payload(func() {
+			Token("auth")
+			Attribute("firmware", AddFirmwarePayload)
+			Required("firmware")
 		})
-		Response(OK, func() {
-			Media(Firmwares)
+
+		HTTP(func() {
+			PATCH("firmware")
+
+			Body("firmware")
 		})
 	})
 
-	Action("delete", func() {
-		Security(JWT, func() {
+	Method("list", func() {
+		Security(JWTAuth, func() {
+		})
+
+		Payload(func() {
+			Token("auth")
+			Attribute("module", String)
+			Attribute("profile", String)
+			Attribute("pageSize", Int32)
+			Attribute("page", Int32)
+		})
+
+		Result(Firmwares)
+
+		HTTP(func() {
+			GET("firmware")
+
+			Params(func() {
+				Param("module")
+				Param("profile")
+				Param("pageSize")
+				Param("page")
+			})
+		})
+	})
+
+	Method("delete", func() {
+		Security(JWTAuth, func() {
 			Scope("api:admin")
 		})
-		Routing(DELETE("firmware/:firmwareId"))
-		Description("Delete firmware")
-		Params(func() {
-			Param("firmwareId", Integer)
+
+		Payload(func() {
+			Token("auth")
+			Attribute("firmwareId", Int32)
 			Required("firmwareId")
 		})
-		Response(NotFound)
-		Response(OK, func() {
-			Status(200)
+
+		HTTP(func() {
+			DELETE("firmware/{firmwareId}")
+
+			Response(StatusOK)
 		})
 	})
+
+	commonOptions()
 })
