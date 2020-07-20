@@ -63,7 +63,7 @@ func TestAnyInvalidAuthorization(t *testing.T) {
 	}`)
 }
 
-func TestAnyGetReturnsStatusOK(t *testing.T) {
+func TestAnyGetReturnsStatusMethodNotAllowed(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -75,7 +75,7 @@ func TestAnyGetReturnsStatusOK(t *testing.T) {
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
 	rr := tests.ExecuteRequest(req, handler)
 
-	assert.Equal(http.StatusOK, rr.Code)
+	assert.Equal(http.StatusMethodNotAllowed, rr.Code)
 
 	ja := jsonassert.New(t)
 	ja.Assertf(rr.Body.String(), `{}`)

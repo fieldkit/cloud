@@ -2,12 +2,16 @@ package ingester
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"mime"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/lib/pq"
@@ -15,7 +19,6 @@ import (
 	jwtgo "github.com/dgrijalva/jwt-go"
 
 	"github.com/goadesign/goa"
-	"github.com/goadesign/goa/middleware/security/jwt"
 
 	"github.com/conservify/sqlxcache"
 
@@ -35,26 +38,33 @@ var (
 )
 
 type IngesterOptions struct {
-	Database                 *sqlxcache.DB
-	AuthenticationMiddleware goa.Middleware
-	Files                    files.FileArchive
-	Publisher                jobs.MessagePublisher
-	Metrics                  *logging.Metrics
+	Database   *sqlxcache.DB
+	Files      files.FileArchive
+	Publisher  jobs.MessagePublisher
+	Metrics    *logging.Metrics
+	JwtHMACKey []byte
 }
 
 func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 	errorHandler := goahelpers.ErrorHandler(true)
 
-	handler := useMiddleware(errorHandler, useMiddleware(o.AuthenticationMiddleware, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
+	handler := useMiddleware(errorHandler, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
 		startedAt := time.Now()
 
-		userID, err := getUserID(ctx)
+		userID, err := getUserID(ctx, o, req)
 		if err != nil {
-			return err
+			serviceError := NewUnauthorizedServiceError()
+			body, err := json.Marshal(serviceError)
+			if err != nil {
+				return err
+			}
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write(body)
+			return nil
 		}
 
 		if req.Method == http.MethodGet {
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusMethodNotAllowed)
 			w.Write([]byte("{}"))
 			return nil
 		}
@@ -129,7 +139,7 @@ func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
 		}
 
 		return writeSuccess(ctx, w, req, ingestion)
-	}))
+	})
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
@@ -274,17 +284,21 @@ func useMiddleware(middleware goa.Middleware, next goa.Handler) goa.Handler {
 	}
 }
 
-func getUserID(ctx context.Context) (int32, error) {
+func getUserID(ctx context.Context, o *IngesterOptions, req *http.Request) (int32, error) {
 	log := Logger(ctx).Sugar()
 
-	token := jwt.ContextJWT(ctx)
-	if token == nil {
-		return 0, fmt.Errorf("JWT token is missing from context")
+	header := req.Header.Get("Authorization")
+	if header == "" {
+		return 0, fmt.Errorf("no authorization header")
 	}
 
-	claims, ok := token.Claims.(jwtgo.MapClaims)
-	if !ok {
-		return 0, fmt.Errorf("JWT claims error")
+	token := strings.ReplaceAll(header, "Bearer ", "")
+	claims := make(jwtgo.MapClaims)
+	_, err := jwtgo.ParseWithClaims(token, claims, func(t *jwtgo.Token) (interface{}, error) {
+		return o.JwtHMACKey, nil
+	})
+	if err != nil {
+		return 0, err
 	}
 
 	id := int32(claims["sub"].(float64))
@@ -292,4 +306,27 @@ func getUserID(ctx context.Context) (int32, error) {
 	log.Infow("scopes", "scopes", claims["scopes"], "user_id", id)
 
 	return id, nil
+}
+
+type ServiceError struct {
+	ID     string `json:"id"`
+	Code   string `json:"code"`
+	Detail string `json:"detail"`
+	Status int32  `json:"status"`
+}
+
+func NewUnauthorizedServiceError() *ServiceError {
+	return &ServiceError{
+		ID:     newErrorID(),
+		Code:   "jwt_security_error",
+		Detail: "",
+		Status: 401,
+	}
+}
+
+// https://github.com/goadesign/goa/blob/master/error.go#L312
+func newErrorID() string {
+	b := make([]byte, 6)
+	io.ReadFull(rand.Reader, b)
+	return base64.StdEncoding.EncodeToString(b)
 }

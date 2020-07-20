@@ -15,7 +15,6 @@ import (
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/api"
 	"github.com/fieldkit/cloud/server/files"
 )
 
@@ -45,22 +44,17 @@ func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOp
 		return nil, nil, err
 	}
 
-	jwtMiddleware, err := api.NewJWTMiddleware(jwtHMACKey)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	publisher, err := jobs.NewPqJobQueue(ctx, database, metrics, config.PostgresURL, "messages")
 	if err != nil {
 		return nil, nil, err
 	}
 
 	options := &IngesterOptions{
-		AuthenticationMiddleware: jwtMiddleware,
-		Database:                 database,
-		Files:                    files,
-		Publisher:                publisher,
-		Metrics:                  metrics,
+		Database:   database,
+		Files:      files,
+		Publisher:  publisher,
+		Metrics:    metrics,
+		JwtHMACKey: jwtHMACKey,
 	}
 
 	handler := Ingester(ctx, options)
