@@ -121,5 +121,435 @@ var _ = Service("user", func() {
 		})
 	})
 
+	Method("login", func() {
+		Payload(func() {
+			Attribute("login", LoginFields)
+			Required("login")
+		})
+
+		Result(func() {
+			Attribute("authorization", String)
+			Required("authorization")
+		})
+
+		HTTP(func() {
+			POST("login")
+
+			Body("login")
+
+			Response(StatusNoContent, func() {
+				Headers(func() {
+					Header("authorization:Authorization")
+				})
+			})
+		})
+	})
+
+	Method("recovery lookup", func() {
+		Payload(func() {
+			Attribute("recovery", RecoveryLookupFields)
+			Required("recovery")
+		})
+
+		HTTP(func() {
+			POST("user/recovery/lookup")
+
+			Body("recovery")
+		})
+	})
+
+	Method("recovery", func() {
+		Payload(func() {
+			Attribute("recovery", RecoveryFields)
+			Required("recovery")
+		})
+
+		HTTP(func() {
+			POST("user/recovery")
+
+			Body("recovery")
+		})
+	})
+
+	Method("logout", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+		})
+
+		HTTP(func() {
+			POST("logout")
+
+			Response(StatusNoContent)
+
+			httpAuthentication()
+		})
+	})
+
+	Method("refresh", func() {
+		Payload(func() {
+			Attribute("refreshToken", String)
+			Required("refreshToken")
+		})
+
+		Result(func() {
+			Attribute("authorization", String)
+			Required("authorization")
+		})
+
+		HTTP(func() {
+			POST("refresh")
+
+			Response(StatusNoContent, func() {
+				Headers(func() {
+					Header("authorization:Authorization")
+				})
+			})
+		})
+	})
+
+	Method("send validation", func() {
+		Payload(func() {
+			Attribute("userId", Int32)
+			Required("userId")
+		})
+
+		HTTP(func() {
+			POST("users/{userId}/validate-email")
+
+			Response(StatusNoContent)
+		})
+	})
+
+	Method("validate", func() {
+		Payload(func() {
+			Attribute("token", String)
+			Required("token")
+		})
+
+		Result(func() {
+			Attribute("location", String)
+			Required("location")
+		})
+
+		HTTP(func() {
+			GET("validate")
+
+			Params(func() {
+				Param("token")
+			})
+
+			Response(StatusFound, func() {
+				Headers(func() {
+					Header("location:Location")
+				})
+			})
+		})
+	})
+
+	Method("add", func() {
+		Payload(func() {
+			Attribute("user", AddUserFields)
+			Required("user")
+		})
+
+		Result(User)
+
+		HTTP(func() {
+			POST("users")
+
+			Body("user")
+		})
+	})
+
+	Method("update", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("userId", Int32)
+			Required("userId")
+			Attribute("update", UpdateUserFields)
+			Required("update")
+		})
+
+		Result(User)
+
+		HTTP(func() {
+			PATCH("users/{userId}")
+
+			Body("update")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("change password", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("userId", Int32)
+			Required("userId")
+			Attribute("change", UpdateUserPasswordFields)
+			Required("change")
+		})
+
+		Result(User)
+
+		HTTP(func() {
+			PATCH("users/{userId}/password")
+
+			Body("change")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("get current", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+		})
+
+		Result(User)
+
+		HTTP(func() {
+			GET("user")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("list by project", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("projectId", Int32)
+			Required("projectId")
+		})
+
+		Result(ProjectUsers)
+
+		HTTP(func() {
+			GET("users/project/{projectId}")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("issue transmission token", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+		})
+
+		Result(TransmissionToken)
+
+		HTTP(func() {
+			GET("user/transmission-token")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("project roles", func() {
+		Result(CollectionOf(ProjectRole))
+
+		HTTP(func() {
+			GET("projects/roles")
+		})
+	})
+
+	Method("admin delete", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("delete", AdminDeleteFields)
+			Required("delete")
+		})
+
+		HTTP(func() {
+			DELETE("admin/user")
+
+			Body("delete")
+
+			httpAuthentication()
+		})
+	})
+
 	commonOptions()
+})
+
+var AddUserFields = Type("AddUserFields", func() {
+	Attribute("name", String, func() {
+		Pattern(`\S`)
+		MaxLength(256)
+	})
+	Attribute("email", String, func() {
+		Format("email")
+	})
+	Attribute("password", String, func() {
+		MinLength(10)
+	})
+	Attribute("invite_token", String)
+	Required("name", "email", "password")
+})
+
+var UpdateUserFields = Type("UpdateUserFields", func() {
+	Reference(AddUserFields)
+	Attribute("name")
+	Attribute("email")
+	Attribute("bio")
+	Required("name", "email", "bio")
+})
+
+var UpdateUserPasswordFields = Type("UpdateUserPasswordFields", func() {
+	Attribute("oldPassword", String, func() {
+		MinLength(10)
+	})
+	Attribute("newPassword", String, func() {
+		MinLength(10)
+	})
+	Required("oldPassword", "newPassword")
+})
+
+var LoginFields = Type("LoginFields", func() {
+	Reference(AddUserFields)
+	Attribute("email")
+	Attribute("password", String, func() {
+		MinLength(10)
+	})
+	Required("email", "password")
+})
+
+var RecoveryLookupFields = Type("RecoveryLookupFields", func() {
+	Attribute("email", String)
+	Required("email")
+})
+
+var RecoveryFields = Type("RecoveryFields", func() {
+	Attribute("token", String)
+	Attribute("password", String, func() {
+		MinLength(10)
+	})
+	Required("token", "password")
+})
+
+var UserPhoto = Type("UserPhoto", func() {
+	Attribute("url", String)
+})
+
+var User = ResultType("application/vnd.app.user+json", func() {
+	TypeName("User")
+	Reference(AddUserFields)
+	Attributes(func() {
+		Attribute("id", Int32)
+		Attribute("name")
+		Attribute("email")
+		Attribute("bio")
+		Attribute("photo", UserPhoto)
+		Attribute("admin", Boolean)
+		Required("id", "name", "email", "bio", "admin")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("name")
+		Attribute("email")
+		Attribute("bio")
+		Attribute("photo")
+		Attribute("admin")
+	})
+})
+
+var ProjectRole = ResultType("application/vnd.app.project.role+json", func() {
+	TypeName("ProjectRole")
+	Attributes(func() {
+		Attribute("id", Int32)
+		Attribute("name", String)
+		Required("id", "name")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("name")
+	})
+})
+
+var ProjectUser = ResultType("application/vnd.app.project.user+json", func() {
+	TypeName("ProjectUser")
+	Attributes(func() {
+		Attribute("user", User)
+		Attribute("role", String)
+		Attribute("membership", String)
+		Required("user", "role", "membership")
+	})
+	View("default", func() {
+		Attribute("user")
+		Attribute("role")
+		Attribute("membership")
+	})
+})
+
+var ProjectUsers = ResultType("application/vnd.app.users+json", func() {
+	TypeName("ProjectUsers")
+	Attributes(func() {
+		Attribute("users", CollectionOf(ProjectUser))
+		Required("users")
+	})
+	View("default", func() {
+		Attribute("users")
+	})
+})
+
+var TransmissionToken = ResultType("application/vnd.app.user.transmission.token+json", func() {
+	TypeName("TransmissionToken")
+	Attributes(func() {
+		Attribute("token", String)
+		Required("token")
+	})
+	View("default", func() {
+		Attribute("token")
+	})
+})
+
+var AdminDeleteFields = ResultType("application/vnd.app.admin.user.delete+json", func() {
+	TypeName("AdminDeleteFields")
+	Attributes(func() {
+		Attribute("email", String)
+		Required("email")
+		Attribute("password", String)
+		Required("password")
+	})
+	/*
+		View("default", func() {
+			Attribute("email")
+			Attribute("password")
+		})
+	*/
 })

@@ -9,6 +9,7 @@ package server
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -452,11 +453,1622 @@ func EncodeDownloadPhotoError(encoder func(context.Context, http.ResponseWriter)
 	}
 }
 
+// EncodeLoginResponse returns an encoder for responses returned by the user
+// login endpoint.
+func EncodeLoginResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*user.LoginResult)
+		w.Header().Set("Authorization", res.Authorization)
+		w.WriteHeader(http.StatusNoContent)
+		return nil
+	}
+}
+
+// DecodeLoginRequest returns a decoder for requests sent to the user login
+// endpoint.
+func DecodeLoginRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body LoginRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateLoginRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewLoginPayload(&body)
+
+		return payload, nil
+	}
+}
+
+// EncodeLoginError returns an encoder for errors returned by the login user
+// endpoint.
+func EncodeLoginError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewLoginBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewLoginForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewLoginNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewLoginUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeRecoveryLookupResponse returns an encoder for responses returned by
+// the user recovery lookup endpoint.
+func EncodeRecoveryLookupResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		w.WriteHeader(http.StatusOK)
+		return nil
+	}
+}
+
+// DecodeRecoveryLookupRequest returns a decoder for requests sent to the user
+// recovery lookup endpoint.
+func DecodeRecoveryLookupRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body RecoveryLookupRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateRecoveryLookupRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewRecoveryLookupPayload(&body)
+
+		return payload, nil
+	}
+}
+
+// EncodeRecoveryLookupError returns an encoder for errors returned by the
+// recovery lookup user endpoint.
+func EncodeRecoveryLookupError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRecoveryLookupBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRecoveryLookupForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRecoveryLookupNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRecoveryLookupUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeRecoveryResponse returns an encoder for responses returned by the user
+// recovery endpoint.
+func EncodeRecoveryResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		w.WriteHeader(http.StatusOK)
+		return nil
+	}
+}
+
+// DecodeRecoveryRequest returns a decoder for requests sent to the user
+// recovery endpoint.
+func DecodeRecoveryRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body RecoveryRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateRecoveryRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewRecoveryPayload(&body)
+
+		return payload, nil
+	}
+}
+
+// EncodeRecoveryError returns an encoder for errors returned by the recovery
+// user endpoint.
+func EncodeRecoveryError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRecoveryBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRecoveryForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRecoveryNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRecoveryUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeLogoutResponse returns an encoder for responses returned by the user
+// logout endpoint.
+func EncodeLogoutResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		w.WriteHeader(http.StatusNoContent)
+		return nil
+	}
+}
+
+// DecodeLogoutRequest returns a decoder for requests sent to the user logout
+// endpoint.
+func DecodeLogoutRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			auth string
+			err  error
+		)
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewLogoutPayload(auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeLogoutError returns an encoder for errors returned by the logout user
+// endpoint.
+func EncodeLogoutError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewLogoutBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewLogoutForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewLogoutNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewLogoutUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeRefreshResponse returns an encoder for responses returned by the user
+// refresh endpoint.
+func EncodeRefreshResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*user.RefreshResult)
+		w.Header().Set("Authorization", res.Authorization)
+		w.WriteHeader(http.StatusNoContent)
+		return nil
+	}
+}
+
+// DecodeRefreshRequest returns a decoder for requests sent to the user refresh
+// endpoint.
+func DecodeRefreshRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body RefreshRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateRefreshRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewRefreshPayload(&body)
+
+		return payload, nil
+	}
+}
+
+// EncodeRefreshError returns an encoder for errors returned by the refresh
+// user endpoint.
+func EncodeRefreshError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRefreshBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRefreshForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRefreshNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewRefreshUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeSendValidationResponse returns an encoder for responses returned by
+// the user send validation endpoint.
+func EncodeSendValidationResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		w.WriteHeader(http.StatusNoContent)
+		return nil
+	}
+}
+
+// DecodeSendValidationRequest returns a decoder for requests sent to the user
+// send validation endpoint.
+func DecodeSendValidationRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			userID int32
+			err    error
+
+			params = mux.Vars(r)
+		)
+		{
+			userIDRaw := params["userId"]
+			v, err2 := strconv.ParseInt(userIDRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("userID", userIDRaw, "integer"))
+			}
+			userID = int32(v)
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewSendValidationPayload(userID)
+
+		return payload, nil
+	}
+}
+
+// EncodeSendValidationError returns an encoder for errors returned by the send
+// validation user endpoint.
+func EncodeSendValidationError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewSendValidationBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewSendValidationForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewSendValidationNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewSendValidationUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeValidateResponse returns an encoder for responses returned by the user
+// validate endpoint.
+func EncodeValidateResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*user.ValidateResult)
+		w.Header().Set("Location", res.Location)
+		w.WriteHeader(http.StatusFound)
+		return nil
+	}
+}
+
+// DecodeValidateRequest returns a decoder for requests sent to the user
+// validate endpoint.
+func DecodeValidateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			token string
+			err   error
+		)
+		token = r.URL.Query().Get("token")
+		if token == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("token", "query string"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewValidatePayload(token)
+
+		return payload, nil
+	}
+}
+
+// EncodeValidateError returns an encoder for errors returned by the validate
+// user endpoint.
+func EncodeValidateError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewValidateBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewValidateForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewValidateNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewValidateUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeAddResponse returns an encoder for responses returned by the user add
+// endpoint.
+func EncodeAddResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*userviews.User)
+		enc := encoder(ctx, w)
+		body := NewAddResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeAddRequest returns a decoder for requests sent to the user add
+// endpoint.
+func DecodeAddRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body AddRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateAddRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewAddPayload(&body)
+
+		return payload, nil
+	}
+}
+
+// EncodeAddError returns an encoder for errors returned by the add user
+// endpoint.
+func EncodeAddError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAddBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAddForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAddNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAddUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeUpdateResponse returns an encoder for responses returned by the user
+// update endpoint.
+func EncodeUpdateResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*userviews.User)
+		enc := encoder(ctx, w)
+		body := NewUpdateResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeUpdateRequest returns a decoder for requests sent to the user update
+// endpoint.
+func DecodeUpdateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body UpdateRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateUpdateRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+
+		var (
+			userID int32
+			auth   string
+
+			params = mux.Vars(r)
+		)
+		{
+			userIDRaw := params["userId"]
+			v, err2 := strconv.ParseInt(userIDRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("userID", userIDRaw, "integer"))
+			}
+			userID = int32(v)
+		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewUpdatePayload(&body, userID, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeUpdateError returns an encoder for errors returned by the update user
+// endpoint.
+func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUpdateBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUpdateForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUpdateNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUpdateUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeChangePasswordResponse returns an encoder for responses returned by
+// the user change password endpoint.
+func EncodeChangePasswordResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*userviews.User)
+		enc := encoder(ctx, w)
+		body := NewChangePasswordResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeChangePasswordRequest returns a decoder for requests sent to the user
+// change password endpoint.
+func DecodeChangePasswordRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body ChangePasswordRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateChangePasswordRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+
+		var (
+			userID int32
+			auth   string
+
+			params = mux.Vars(r)
+		)
+		{
+			userIDRaw := params["userId"]
+			v, err2 := strconv.ParseInt(userIDRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("userID", userIDRaw, "integer"))
+			}
+			userID = int32(v)
+		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewChangePasswordPayload(&body, userID, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeChangePasswordError returns an encoder for errors returned by the
+// change password user endpoint.
+func EncodeChangePasswordError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewChangePasswordBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewChangePasswordForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewChangePasswordNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewChangePasswordUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeGetCurrentResponse returns an encoder for responses returned by the
+// user get current endpoint.
+func EncodeGetCurrentResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*userviews.User)
+		enc := encoder(ctx, w)
+		body := NewGetCurrentResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeGetCurrentRequest returns a decoder for requests sent to the user get
+// current endpoint.
+func DecodeGetCurrentRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			auth string
+			err  error
+		)
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewGetCurrentPayload(auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeGetCurrentError returns an encoder for errors returned by the get
+// current user endpoint.
+func EncodeGetCurrentError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetCurrentBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetCurrentForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetCurrentNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetCurrentUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeListByProjectResponse returns an encoder for responses returned by the
+// user list by project endpoint.
+func EncodeListByProjectResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*userviews.ProjectUsers)
+		enc := encoder(ctx, w)
+		body := NewListByProjectResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeListByProjectRequest returns a decoder for requests sent to the user
+// list by project endpoint.
+func DecodeListByProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			projectID int32
+			auth      string
+			err       error
+
+			params = mux.Vars(r)
+		)
+		{
+			projectIDRaw := params["projectId"]
+			v, err2 := strconv.ParseInt(projectIDRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("projectID", projectIDRaw, "integer"))
+			}
+			projectID = int32(v)
+		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewListByProjectPayload(projectID, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeListByProjectError returns an encoder for errors returned by the list
+// by project user endpoint.
+func EncodeListByProjectError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListByProjectBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListByProjectForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListByProjectNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListByProjectUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeIssueTransmissionTokenResponse returns an encoder for responses
+// returned by the user issue transmission token endpoint.
+func EncodeIssueTransmissionTokenResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*userviews.TransmissionToken)
+		enc := encoder(ctx, w)
+		body := NewIssueTransmissionTokenResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeIssueTransmissionTokenRequest returns a decoder for requests sent to
+// the user issue transmission token endpoint.
+func DecodeIssueTransmissionTokenRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			auth string
+			err  error
+		)
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewIssueTransmissionTokenPayload(auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeIssueTransmissionTokenError returns an encoder for errors returned by
+// the issue transmission token user endpoint.
+func EncodeIssueTransmissionTokenError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewIssueTransmissionTokenBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewIssueTransmissionTokenForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewIssueTransmissionTokenNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewIssueTransmissionTokenUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeProjectRolesResponse returns an encoder for responses returned by the
+// user project roles endpoint.
+func EncodeProjectRolesResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(userviews.ProjectRoleCollection)
+		enc := encoder(ctx, w)
+		body := NewProjectRoleResponseCollection(res.Projected)
+		w.WriteHeader(http.StatusNoContent)
+		return enc.Encode(body)
+	}
+}
+
+// EncodeProjectRolesError returns an encoder for errors returned by the
+// project roles user endpoint.
+func EncodeProjectRolesError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewProjectRolesBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewProjectRolesForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewProjectRolesNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewProjectRolesUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeAdminDeleteResponse returns an encoder for responses returned by the
+// user admin delete endpoint.
+func EncodeAdminDeleteResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		w.WriteHeader(http.StatusOK)
+		return nil
+	}
+}
+
+// DecodeAdminDeleteRequest returns a decoder for requests sent to the user
+// admin delete endpoint.
+func DecodeAdminDeleteRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body AdminDeleteRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateAdminDeleteRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+
+		var (
+			auth string
+		)
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewAdminDeletePayload(&body, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeAdminDeleteError returns an encoder for errors returned by the admin
+// delete user endpoint.
+func EncodeAdminDeleteError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(user.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAdminDeleteBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(user.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAdminDeleteForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(user.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAdminDeleteNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(user.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAdminDeleteUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // marshalUserviewsAvailableRoleViewToAvailableRoleResponseBody builds a value
 // of type *AvailableRoleResponseBody from a value of type
 // *userviews.AvailableRoleView.
 func marshalUserviewsAvailableRoleViewToAvailableRoleResponseBody(v *userviews.AvailableRoleView) *AvailableRoleResponseBody {
 	res := &AvailableRoleResponseBody{
+		ID:   *v.ID,
+		Name: *v.Name,
+	}
+
+	return res
+}
+
+// marshalUserviewsUserPhotoViewToUserPhotoResponseBody builds a value of type
+// *UserPhotoResponseBody from a value of type *userviews.UserPhotoView.
+func marshalUserviewsUserPhotoViewToUserPhotoResponseBody(v *userviews.UserPhotoView) *UserPhotoResponseBody {
+	if v == nil {
+		return nil
+	}
+	res := &UserPhotoResponseBody{
+		URL: v.URL,
+	}
+
+	return res
+}
+
+// marshalUserviewsProjectUserViewToProjectUserResponseBody builds a value of
+// type *ProjectUserResponseBody from a value of type
+// *userviews.ProjectUserView.
+func marshalUserviewsProjectUserViewToProjectUserResponseBody(v *userviews.ProjectUserView) *ProjectUserResponseBody {
+	res := &ProjectUserResponseBody{
+		Role:       *v.Role,
+		Membership: *v.Membership,
+	}
+	if v.User != nil {
+		res.User = marshalUserviewsUserViewToUserResponseBody(v.User)
+	}
+
+	return res
+}
+
+// marshalUserviewsUserViewToUserResponseBody builds a value of type
+// *UserResponseBody from a value of type *userviews.UserView.
+func marshalUserviewsUserViewToUserResponseBody(v *userviews.UserView) *UserResponseBody {
+	res := &UserResponseBody{
+		ID:    *v.ID,
+		Name:  *v.Name,
+		Email: *v.Email,
+		Bio:   *v.Bio,
+		Admin: *v.Admin,
+	}
+	if v.Photo != nil {
+		res.Photo = marshalUserviewsUserPhotoViewToUserPhotoResponseBody(v.Photo)
+	}
+
+	return res
+}
+
+// marshalUserviewsProjectRoleViewToProjectRoleResponse builds a value of type
+// *ProjectRoleResponse from a value of type *userviews.ProjectRoleView.
+func marshalUserviewsProjectRoleViewToProjectRoleResponse(v *userviews.ProjectRoleView) *ProjectRoleResponse {
+	res := &ProjectRoleResponse{
 		ID:   *v.ID,
 		Name: *v.Name,
 	}

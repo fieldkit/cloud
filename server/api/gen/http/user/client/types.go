@@ -8,16 +8,135 @@
 package client
 
 import (
+	"unicode/utf8"
+
 	user "github.com/fieldkit/cloud/server/api/gen/user"
 	userviews "github.com/fieldkit/cloud/server/api/gen/user/views"
 	goa "goa.design/goa/v3/pkg"
 )
+
+// LoginRequestBody is the type of the "user" service "login" endpoint HTTP
+// request body.
+type LoginRequestBody struct {
+	Email    string `form:"email" json:"email" xml:"email"`
+	Password string `form:"password" json:"password" xml:"password"`
+}
+
+// RecoveryLookupRequestBody is the type of the "user" service "recovery
+// lookup" endpoint HTTP request body.
+type RecoveryLookupRequestBody struct {
+	Email string `form:"email" json:"email" xml:"email"`
+}
+
+// RecoveryRequestBody is the type of the "user" service "recovery" endpoint
+// HTTP request body.
+type RecoveryRequestBody struct {
+	Token    string `form:"token" json:"token" xml:"token"`
+	Password string `form:"password" json:"password" xml:"password"`
+}
+
+// RefreshRequestBody is the type of the "user" service "refresh" endpoint HTTP
+// request body.
+type RefreshRequestBody struct {
+	RefreshToken string `form:"refreshToken" json:"refreshToken" xml:"refreshToken"`
+}
+
+// AddRequestBody is the type of the "user" service "add" endpoint HTTP request
+// body.
+type AddRequestBody struct {
+	Name        string  `form:"name" json:"name" xml:"name"`
+	Email       string  `form:"email" json:"email" xml:"email"`
+	Password    string  `form:"password" json:"password" xml:"password"`
+	InviteToken *string `form:"invite_token,omitempty" json:"invite_token,omitempty" xml:"invite_token,omitempty"`
+}
+
+// UpdateRequestBody is the type of the "user" service "update" endpoint HTTP
+// request body.
+type UpdateRequestBody struct {
+	Name  string `form:"name" json:"name" xml:"name"`
+	Email string `form:"email" json:"email" xml:"email"`
+	Bio   string `form:"bio" json:"bio" xml:"bio"`
+}
+
+// ChangePasswordRequestBody is the type of the "user" service "change
+// password" endpoint HTTP request body.
+type ChangePasswordRequestBody struct {
+	OldPassword string `form:"oldPassword" json:"oldPassword" xml:"oldPassword"`
+	NewPassword string `form:"newPassword" json:"newPassword" xml:"newPassword"`
+}
+
+// AdminDeleteRequestBody is the type of the "user" service "admin delete"
+// endpoint HTTP request body.
+type AdminDeleteRequestBody struct {
+	Email    string `form:"email" json:"email" xml:"email"`
+	Password string `form:"password" json:"password" xml:"password"`
+}
 
 // RolesResponseBody is the type of the "user" service "roles" endpoint HTTP
 // response body.
 type RolesResponseBody struct {
 	Roles []*AvailableRoleResponseBody `form:"roles,omitempty" json:"roles,omitempty" xml:"roles,omitempty"`
 }
+
+// AddResponseBody is the type of the "user" service "add" endpoint HTTP
+// response body.
+type AddResponseBody struct {
+	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Bio   *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+}
+
+// UpdateResponseBody is the type of the "user" service "update" endpoint HTTP
+// response body.
+type UpdateResponseBody struct {
+	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Bio   *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+}
+
+// ChangePasswordResponseBody is the type of the "user" service "change
+// password" endpoint HTTP response body.
+type ChangePasswordResponseBody struct {
+	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Bio   *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+}
+
+// GetCurrentResponseBody is the type of the "user" service "get current"
+// endpoint HTTP response body.
+type GetCurrentResponseBody struct {
+	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Bio   *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+}
+
+// ListByProjectResponseBody is the type of the "user" service "list by
+// project" endpoint HTTP response body.
+type ListByProjectResponseBody struct {
+	Users ProjectUserCollectionResponseBody `form:"users,omitempty" json:"users,omitempty" xml:"users,omitempty"`
+}
+
+// IssueTransmissionTokenResponseBody is the type of the "user" service "issue
+// transmission token" endpoint HTTP response body.
+type IssueTransmissionTokenResponseBody struct {
+	Token *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+}
+
+// ProjectRolesResponseBody is the type of the "user" service "project roles"
+// endpoint HTTP response body.
+type ProjectRolesResponseBody []*ProjectRoleResponse
 
 // RolesBadRequestResponseBody is the type of the "user" service "roles"
 // endpoint HTTP response body for the "bad-request" error.
@@ -83,10 +202,367 @@ type DownloadPhotoNotFoundResponseBody string
 // "download photo" endpoint HTTP response body for the "unauthorized" error.
 type DownloadPhotoUnauthorizedResponseBody string
 
+// LoginBadRequestResponseBody is the type of the "user" service "login"
+// endpoint HTTP response body for the "bad-request" error.
+type LoginBadRequestResponseBody string
+
+// LoginForbiddenResponseBody is the type of the "user" service "login"
+// endpoint HTTP response body for the "forbidden" error.
+type LoginForbiddenResponseBody string
+
+// LoginNotFoundResponseBody is the type of the "user" service "login" endpoint
+// HTTP response body for the "not-found" error.
+type LoginNotFoundResponseBody string
+
+// LoginUnauthorizedResponseBody is the type of the "user" service "login"
+// endpoint HTTP response body for the "unauthorized" error.
+type LoginUnauthorizedResponseBody string
+
+// RecoveryLookupBadRequestResponseBody is the type of the "user" service
+// "recovery lookup" endpoint HTTP response body for the "bad-request" error.
+type RecoveryLookupBadRequestResponseBody string
+
+// RecoveryLookupForbiddenResponseBody is the type of the "user" service
+// "recovery lookup" endpoint HTTP response body for the "forbidden" error.
+type RecoveryLookupForbiddenResponseBody string
+
+// RecoveryLookupNotFoundResponseBody is the type of the "user" service
+// "recovery lookup" endpoint HTTP response body for the "not-found" error.
+type RecoveryLookupNotFoundResponseBody string
+
+// RecoveryLookupUnauthorizedResponseBody is the type of the "user" service
+// "recovery lookup" endpoint HTTP response body for the "unauthorized" error.
+type RecoveryLookupUnauthorizedResponseBody string
+
+// RecoveryBadRequestResponseBody is the type of the "user" service "recovery"
+// endpoint HTTP response body for the "bad-request" error.
+type RecoveryBadRequestResponseBody string
+
+// RecoveryForbiddenResponseBody is the type of the "user" service "recovery"
+// endpoint HTTP response body for the "forbidden" error.
+type RecoveryForbiddenResponseBody string
+
+// RecoveryNotFoundResponseBody is the type of the "user" service "recovery"
+// endpoint HTTP response body for the "not-found" error.
+type RecoveryNotFoundResponseBody string
+
+// RecoveryUnauthorizedResponseBody is the type of the "user" service
+// "recovery" endpoint HTTP response body for the "unauthorized" error.
+type RecoveryUnauthorizedResponseBody string
+
+// LogoutBadRequestResponseBody is the type of the "user" service "logout"
+// endpoint HTTP response body for the "bad-request" error.
+type LogoutBadRequestResponseBody string
+
+// LogoutForbiddenResponseBody is the type of the "user" service "logout"
+// endpoint HTTP response body for the "forbidden" error.
+type LogoutForbiddenResponseBody string
+
+// LogoutNotFoundResponseBody is the type of the "user" service "logout"
+// endpoint HTTP response body for the "not-found" error.
+type LogoutNotFoundResponseBody string
+
+// LogoutUnauthorizedResponseBody is the type of the "user" service "logout"
+// endpoint HTTP response body for the "unauthorized" error.
+type LogoutUnauthorizedResponseBody string
+
+// RefreshBadRequestResponseBody is the type of the "user" service "refresh"
+// endpoint HTTP response body for the "bad-request" error.
+type RefreshBadRequestResponseBody string
+
+// RefreshForbiddenResponseBody is the type of the "user" service "refresh"
+// endpoint HTTP response body for the "forbidden" error.
+type RefreshForbiddenResponseBody string
+
+// RefreshNotFoundResponseBody is the type of the "user" service "refresh"
+// endpoint HTTP response body for the "not-found" error.
+type RefreshNotFoundResponseBody string
+
+// RefreshUnauthorizedResponseBody is the type of the "user" service "refresh"
+// endpoint HTTP response body for the "unauthorized" error.
+type RefreshUnauthorizedResponseBody string
+
+// SendValidationBadRequestResponseBody is the type of the "user" service "send
+// validation" endpoint HTTP response body for the "bad-request" error.
+type SendValidationBadRequestResponseBody string
+
+// SendValidationForbiddenResponseBody is the type of the "user" service "send
+// validation" endpoint HTTP response body for the "forbidden" error.
+type SendValidationForbiddenResponseBody string
+
+// SendValidationNotFoundResponseBody is the type of the "user" service "send
+// validation" endpoint HTTP response body for the "not-found" error.
+type SendValidationNotFoundResponseBody string
+
+// SendValidationUnauthorizedResponseBody is the type of the "user" service
+// "send validation" endpoint HTTP response body for the "unauthorized" error.
+type SendValidationUnauthorizedResponseBody string
+
+// ValidateBadRequestResponseBody is the type of the "user" service "validate"
+// endpoint HTTP response body for the "bad-request" error.
+type ValidateBadRequestResponseBody string
+
+// ValidateForbiddenResponseBody is the type of the "user" service "validate"
+// endpoint HTTP response body for the "forbidden" error.
+type ValidateForbiddenResponseBody string
+
+// ValidateNotFoundResponseBody is the type of the "user" service "validate"
+// endpoint HTTP response body for the "not-found" error.
+type ValidateNotFoundResponseBody string
+
+// ValidateUnauthorizedResponseBody is the type of the "user" service
+// "validate" endpoint HTTP response body for the "unauthorized" error.
+type ValidateUnauthorizedResponseBody string
+
+// AddBadRequestResponseBody is the type of the "user" service "add" endpoint
+// HTTP response body for the "bad-request" error.
+type AddBadRequestResponseBody string
+
+// AddForbiddenResponseBody is the type of the "user" service "add" endpoint
+// HTTP response body for the "forbidden" error.
+type AddForbiddenResponseBody string
+
+// AddNotFoundResponseBody is the type of the "user" service "add" endpoint
+// HTTP response body for the "not-found" error.
+type AddNotFoundResponseBody string
+
+// AddUnauthorizedResponseBody is the type of the "user" service "add" endpoint
+// HTTP response body for the "unauthorized" error.
+type AddUnauthorizedResponseBody string
+
+// UpdateBadRequestResponseBody is the type of the "user" service "update"
+// endpoint HTTP response body for the "bad-request" error.
+type UpdateBadRequestResponseBody string
+
+// UpdateForbiddenResponseBody is the type of the "user" service "update"
+// endpoint HTTP response body for the "forbidden" error.
+type UpdateForbiddenResponseBody string
+
+// UpdateNotFoundResponseBody is the type of the "user" service "update"
+// endpoint HTTP response body for the "not-found" error.
+type UpdateNotFoundResponseBody string
+
+// UpdateUnauthorizedResponseBody is the type of the "user" service "update"
+// endpoint HTTP response body for the "unauthorized" error.
+type UpdateUnauthorizedResponseBody string
+
+// ChangePasswordBadRequestResponseBody is the type of the "user" service
+// "change password" endpoint HTTP response body for the "bad-request" error.
+type ChangePasswordBadRequestResponseBody string
+
+// ChangePasswordForbiddenResponseBody is the type of the "user" service
+// "change password" endpoint HTTP response body for the "forbidden" error.
+type ChangePasswordForbiddenResponseBody string
+
+// ChangePasswordNotFoundResponseBody is the type of the "user" service "change
+// password" endpoint HTTP response body for the "not-found" error.
+type ChangePasswordNotFoundResponseBody string
+
+// ChangePasswordUnauthorizedResponseBody is the type of the "user" service
+// "change password" endpoint HTTP response body for the "unauthorized" error.
+type ChangePasswordUnauthorizedResponseBody string
+
+// GetCurrentBadRequestResponseBody is the type of the "user" service "get
+// current" endpoint HTTP response body for the "bad-request" error.
+type GetCurrentBadRequestResponseBody string
+
+// GetCurrentForbiddenResponseBody is the type of the "user" service "get
+// current" endpoint HTTP response body for the "forbidden" error.
+type GetCurrentForbiddenResponseBody string
+
+// GetCurrentNotFoundResponseBody is the type of the "user" service "get
+// current" endpoint HTTP response body for the "not-found" error.
+type GetCurrentNotFoundResponseBody string
+
+// GetCurrentUnauthorizedResponseBody is the type of the "user" service "get
+// current" endpoint HTTP response body for the "unauthorized" error.
+type GetCurrentUnauthorizedResponseBody string
+
+// ListByProjectBadRequestResponseBody is the type of the "user" service "list
+// by project" endpoint HTTP response body for the "bad-request" error.
+type ListByProjectBadRequestResponseBody string
+
+// ListByProjectForbiddenResponseBody is the type of the "user" service "list
+// by project" endpoint HTTP response body for the "forbidden" error.
+type ListByProjectForbiddenResponseBody string
+
+// ListByProjectNotFoundResponseBody is the type of the "user" service "list by
+// project" endpoint HTTP response body for the "not-found" error.
+type ListByProjectNotFoundResponseBody string
+
+// ListByProjectUnauthorizedResponseBody is the type of the "user" service
+// "list by project" endpoint HTTP response body for the "unauthorized" error.
+type ListByProjectUnauthorizedResponseBody string
+
+// IssueTransmissionTokenBadRequestResponseBody is the type of the "user"
+// service "issue transmission token" endpoint HTTP response body for the
+// "bad-request" error.
+type IssueTransmissionTokenBadRequestResponseBody string
+
+// IssueTransmissionTokenForbiddenResponseBody is the type of the "user"
+// service "issue transmission token" endpoint HTTP response body for the
+// "forbidden" error.
+type IssueTransmissionTokenForbiddenResponseBody string
+
+// IssueTransmissionTokenNotFoundResponseBody is the type of the "user" service
+// "issue transmission token" endpoint HTTP response body for the "not-found"
+// error.
+type IssueTransmissionTokenNotFoundResponseBody string
+
+// IssueTransmissionTokenUnauthorizedResponseBody is the type of the "user"
+// service "issue transmission token" endpoint HTTP response body for the
+// "unauthorized" error.
+type IssueTransmissionTokenUnauthorizedResponseBody string
+
+// ProjectRolesBadRequestResponseBody is the type of the "user" service
+// "project roles" endpoint HTTP response body for the "bad-request" error.
+type ProjectRolesBadRequestResponseBody string
+
+// ProjectRolesForbiddenResponseBody is the type of the "user" service "project
+// roles" endpoint HTTP response body for the "forbidden" error.
+type ProjectRolesForbiddenResponseBody string
+
+// ProjectRolesNotFoundResponseBody is the type of the "user" service "project
+// roles" endpoint HTTP response body for the "not-found" error.
+type ProjectRolesNotFoundResponseBody string
+
+// ProjectRolesUnauthorizedResponseBody is the type of the "user" service
+// "project roles" endpoint HTTP response body for the "unauthorized" error.
+type ProjectRolesUnauthorizedResponseBody string
+
+// AdminDeleteBadRequestResponseBody is the type of the "user" service "admin
+// delete" endpoint HTTP response body for the "bad-request" error.
+type AdminDeleteBadRequestResponseBody string
+
+// AdminDeleteForbiddenResponseBody is the type of the "user" service "admin
+// delete" endpoint HTTP response body for the "forbidden" error.
+type AdminDeleteForbiddenResponseBody string
+
+// AdminDeleteNotFoundResponseBody is the type of the "user" service "admin
+// delete" endpoint HTTP response body for the "not-found" error.
+type AdminDeleteNotFoundResponseBody string
+
+// AdminDeleteUnauthorizedResponseBody is the type of the "user" service "admin
+// delete" endpoint HTTP response body for the "unauthorized" error.
+type AdminDeleteUnauthorizedResponseBody string
+
 // AvailableRoleResponseBody is used to define fields on response body types.
 type AvailableRoleResponseBody struct {
 	ID   *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+}
+
+// UserPhotoResponseBody is used to define fields on response body types.
+type UserPhotoResponseBody struct {
+	URL *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+}
+
+// ProjectUserCollectionResponseBody is used to define fields on response body
+// types.
+type ProjectUserCollectionResponseBody []*ProjectUserResponseBody
+
+// ProjectUserResponseBody is used to define fields on response body types.
+type ProjectUserResponseBody struct {
+	User       *UserResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
+	Role       *string           `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
+	Membership *string           `form:"membership,omitempty" json:"membership,omitempty" xml:"membership,omitempty"`
+}
+
+// UserResponseBody is used to define fields on response body types.
+type UserResponseBody struct {
+	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Bio   *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+}
+
+// ProjectRoleResponse is used to define fields on response body types.
+type ProjectRoleResponse struct {
+	ID   *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+}
+
+// NewLoginRequestBody builds the HTTP request body from the payload of the
+// "login" endpoint of the "user" service.
+func NewLoginRequestBody(p *user.LoginPayload) *LoginRequestBody {
+	body := &LoginRequestBody{
+		Email:    p.Login.Email,
+		Password: p.Login.Password,
+	}
+	return body
+}
+
+// NewRecoveryLookupRequestBody builds the HTTP request body from the payload
+// of the "recovery lookup" endpoint of the "user" service.
+func NewRecoveryLookupRequestBody(p *user.RecoveryLookupPayload) *RecoveryLookupRequestBody {
+	body := &RecoveryLookupRequestBody{
+		Email: p.Recovery.Email,
+	}
+	return body
+}
+
+// NewRecoveryRequestBody builds the HTTP request body from the payload of the
+// "recovery" endpoint of the "user" service.
+func NewRecoveryRequestBody(p *user.RecoveryPayload) *RecoveryRequestBody {
+	body := &RecoveryRequestBody{
+		Token:    p.Recovery.Token,
+		Password: p.Recovery.Password,
+	}
+	return body
+}
+
+// NewRefreshRequestBody builds the HTTP request body from the payload of the
+// "refresh" endpoint of the "user" service.
+func NewRefreshRequestBody(p *user.RefreshPayload) *RefreshRequestBody {
+	body := &RefreshRequestBody{
+		RefreshToken: p.RefreshToken,
+	}
+	return body
+}
+
+// NewAddRequestBody builds the HTTP request body from the payload of the "add"
+// endpoint of the "user" service.
+func NewAddRequestBody(p *user.AddPayload) *AddRequestBody {
+	body := &AddRequestBody{
+		Name:        p.User.Name,
+		Email:       p.User.Email,
+		Password:    p.User.Password,
+		InviteToken: p.User.InviteToken,
+	}
+	return body
+}
+
+// NewUpdateRequestBody builds the HTTP request body from the payload of the
+// "update" endpoint of the "user" service.
+func NewUpdateRequestBody(p *user.UpdatePayload) *UpdateRequestBody {
+	body := &UpdateRequestBody{
+		Name:  p.Update.Name,
+		Email: p.Update.Email,
+		Bio:   p.Update.Bio,
+	}
+	return body
+}
+
+// NewChangePasswordRequestBody builds the HTTP request body from the payload
+// of the "change password" endpoint of the "user" service.
+func NewChangePasswordRequestBody(p *user.ChangePasswordPayload) *ChangePasswordRequestBody {
+	body := &ChangePasswordRequestBody{
+		OldPassword: p.Change.OldPassword,
+		NewPassword: p.Change.NewPassword,
+	}
+	return body
+}
+
+// NewAdminDeleteRequestBody builds the HTTP request body from the payload of
+// the "admin delete" endpoint of the "user" service.
+func NewAdminDeleteRequestBody(p *user.AdminDeletePayload) *AdminDeleteRequestBody {
+	body := &AdminDeleteRequestBody{
+		Email:    p.Delete.Email,
+		Password: p.Delete.Password,
+	}
+	return body
 }
 
 // NewRolesAvailableRolesOK builds a "user" service "roles" endpoint result
@@ -216,9 +692,612 @@ func NewDownloadPhotoUnauthorized(body DownloadPhotoUnauthorizedResponseBody) us
 	return v
 }
 
+// NewLoginResultNoContent builds a "user" service "login" endpoint result from
+// a HTTP "NoContent" response.
+func NewLoginResultNoContent(authorization string) *user.LoginResult {
+	v := &user.LoginResult{}
+	v.Authorization = authorization
+
+	return v
+}
+
+// NewLoginBadRequest builds a user service login endpoint bad-request error.
+func NewLoginBadRequest(body LoginBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewLoginForbidden builds a user service login endpoint forbidden error.
+func NewLoginForbidden(body LoginForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewLoginNotFound builds a user service login endpoint not-found error.
+func NewLoginNotFound(body LoginNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewLoginUnauthorized builds a user service login endpoint unauthorized error.
+func NewLoginUnauthorized(body LoginUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewRecoveryLookupBadRequest builds a user service recovery lookup endpoint
+// bad-request error.
+func NewRecoveryLookupBadRequest(body RecoveryLookupBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewRecoveryLookupForbidden builds a user service recovery lookup endpoint
+// forbidden error.
+func NewRecoveryLookupForbidden(body RecoveryLookupForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewRecoveryLookupNotFound builds a user service recovery lookup endpoint
+// not-found error.
+func NewRecoveryLookupNotFound(body RecoveryLookupNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewRecoveryLookupUnauthorized builds a user service recovery lookup endpoint
+// unauthorized error.
+func NewRecoveryLookupUnauthorized(body RecoveryLookupUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewRecoveryBadRequest builds a user service recovery endpoint bad-request
+// error.
+func NewRecoveryBadRequest(body RecoveryBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewRecoveryForbidden builds a user service recovery endpoint forbidden error.
+func NewRecoveryForbidden(body RecoveryForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewRecoveryNotFound builds a user service recovery endpoint not-found error.
+func NewRecoveryNotFound(body RecoveryNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewRecoveryUnauthorized builds a user service recovery endpoint unauthorized
+// error.
+func NewRecoveryUnauthorized(body RecoveryUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewLogoutBadRequest builds a user service logout endpoint bad-request error.
+func NewLogoutBadRequest(body LogoutBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewLogoutForbidden builds a user service logout endpoint forbidden error.
+func NewLogoutForbidden(body LogoutForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewLogoutNotFound builds a user service logout endpoint not-found error.
+func NewLogoutNotFound(body LogoutNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewLogoutUnauthorized builds a user service logout endpoint unauthorized
+// error.
+func NewLogoutUnauthorized(body LogoutUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewRefreshResultNoContent builds a "user" service "refresh" endpoint result
+// from a HTTP "NoContent" response.
+func NewRefreshResultNoContent(authorization string) *user.RefreshResult {
+	v := &user.RefreshResult{}
+	v.Authorization = authorization
+
+	return v
+}
+
+// NewRefreshBadRequest builds a user service refresh endpoint bad-request
+// error.
+func NewRefreshBadRequest(body RefreshBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewRefreshForbidden builds a user service refresh endpoint forbidden error.
+func NewRefreshForbidden(body RefreshForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewRefreshNotFound builds a user service refresh endpoint not-found error.
+func NewRefreshNotFound(body RefreshNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewRefreshUnauthorized builds a user service refresh endpoint unauthorized
+// error.
+func NewRefreshUnauthorized(body RefreshUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewSendValidationBadRequest builds a user service send validation endpoint
+// bad-request error.
+func NewSendValidationBadRequest(body SendValidationBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewSendValidationForbidden builds a user service send validation endpoint
+// forbidden error.
+func NewSendValidationForbidden(body SendValidationForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewSendValidationNotFound builds a user service send validation endpoint
+// not-found error.
+func NewSendValidationNotFound(body SendValidationNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewSendValidationUnauthorized builds a user service send validation endpoint
+// unauthorized error.
+func NewSendValidationUnauthorized(body SendValidationUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewValidateResultFound builds a "user" service "validate" endpoint result
+// from a HTTP "Found" response.
+func NewValidateResultFound(location string) *user.ValidateResult {
+	v := &user.ValidateResult{}
+	v.Location = location
+
+	return v
+}
+
+// NewValidateBadRequest builds a user service validate endpoint bad-request
+// error.
+func NewValidateBadRequest(body ValidateBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewValidateForbidden builds a user service validate endpoint forbidden error.
+func NewValidateForbidden(body ValidateForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewValidateNotFound builds a user service validate endpoint not-found error.
+func NewValidateNotFound(body ValidateNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewValidateUnauthorized builds a user service validate endpoint unauthorized
+// error.
+func NewValidateUnauthorized(body ValidateUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewAddUserOK builds a "user" service "add" endpoint result from a HTTP "OK"
+// response.
+func NewAddUserOK(body *AddResponseBody) *userviews.UserView {
+	v := &userviews.UserView{
+		ID:    body.ID,
+		Name:  body.Name,
+		Email: body.Email,
+		Bio:   body.Bio,
+		Admin: body.Admin,
+	}
+	if body.Photo != nil {
+		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
+	}
+
+	return v
+}
+
+// NewAddBadRequest builds a user service add endpoint bad-request error.
+func NewAddBadRequest(body AddBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewAddForbidden builds a user service add endpoint forbidden error.
+func NewAddForbidden(body AddForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewAddNotFound builds a user service add endpoint not-found error.
+func NewAddNotFound(body AddNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewAddUnauthorized builds a user service add endpoint unauthorized error.
+func NewAddUnauthorized(body AddUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewUpdateUserOK builds a "user" service "update" endpoint result from a HTTP
+// "OK" response.
+func NewUpdateUserOK(body *UpdateResponseBody) *userviews.UserView {
+	v := &userviews.UserView{
+		ID:    body.ID,
+		Name:  body.Name,
+		Email: body.Email,
+		Bio:   body.Bio,
+		Admin: body.Admin,
+	}
+	if body.Photo != nil {
+		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
+	}
+
+	return v
+}
+
+// NewUpdateBadRequest builds a user service update endpoint bad-request error.
+func NewUpdateBadRequest(body UpdateBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewUpdateForbidden builds a user service update endpoint forbidden error.
+func NewUpdateForbidden(body UpdateForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewUpdateNotFound builds a user service update endpoint not-found error.
+func NewUpdateNotFound(body UpdateNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewUpdateUnauthorized builds a user service update endpoint unauthorized
+// error.
+func NewUpdateUnauthorized(body UpdateUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewChangePasswordUserOK builds a "user" service "change password" endpoint
+// result from a HTTP "OK" response.
+func NewChangePasswordUserOK(body *ChangePasswordResponseBody) *userviews.UserView {
+	v := &userviews.UserView{
+		ID:    body.ID,
+		Name:  body.Name,
+		Email: body.Email,
+		Bio:   body.Bio,
+		Admin: body.Admin,
+	}
+	if body.Photo != nil {
+		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
+	}
+
+	return v
+}
+
+// NewChangePasswordBadRequest builds a user service change password endpoint
+// bad-request error.
+func NewChangePasswordBadRequest(body ChangePasswordBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewChangePasswordForbidden builds a user service change password endpoint
+// forbidden error.
+func NewChangePasswordForbidden(body ChangePasswordForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewChangePasswordNotFound builds a user service change password endpoint
+// not-found error.
+func NewChangePasswordNotFound(body ChangePasswordNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewChangePasswordUnauthorized builds a user service change password endpoint
+// unauthorized error.
+func NewChangePasswordUnauthorized(body ChangePasswordUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewGetCurrentUserOK builds a "user" service "get current" endpoint result
+// from a HTTP "OK" response.
+func NewGetCurrentUserOK(body *GetCurrentResponseBody) *userviews.UserView {
+	v := &userviews.UserView{
+		ID:    body.ID,
+		Name:  body.Name,
+		Email: body.Email,
+		Bio:   body.Bio,
+		Admin: body.Admin,
+	}
+	if body.Photo != nil {
+		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
+	}
+
+	return v
+}
+
+// NewGetCurrentBadRequest builds a user service get current endpoint
+// bad-request error.
+func NewGetCurrentBadRequest(body GetCurrentBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewGetCurrentForbidden builds a user service get current endpoint forbidden
+// error.
+func NewGetCurrentForbidden(body GetCurrentForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewGetCurrentNotFound builds a user service get current endpoint not-found
+// error.
+func NewGetCurrentNotFound(body GetCurrentNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewGetCurrentUnauthorized builds a user service get current endpoint
+// unauthorized error.
+func NewGetCurrentUnauthorized(body GetCurrentUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewListByProjectProjectUsersOK builds a "user" service "list by project"
+// endpoint result from a HTTP "OK" response.
+func NewListByProjectProjectUsersOK(body *ListByProjectResponseBody) *userviews.ProjectUsersView {
+	v := &userviews.ProjectUsersView{}
+	v.Users = make([]*userviews.ProjectUserView, len(body.Users))
+	for i, val := range body.Users {
+		v.Users[i] = unmarshalProjectUserResponseBodyToUserviewsProjectUserView(val)
+	}
+
+	return v
+}
+
+// NewListByProjectBadRequest builds a user service list by project endpoint
+// bad-request error.
+func NewListByProjectBadRequest(body ListByProjectBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewListByProjectForbidden builds a user service list by project endpoint
+// forbidden error.
+func NewListByProjectForbidden(body ListByProjectForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewListByProjectNotFound builds a user service list by project endpoint
+// not-found error.
+func NewListByProjectNotFound(body ListByProjectNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewListByProjectUnauthorized builds a user service list by project endpoint
+// unauthorized error.
+func NewListByProjectUnauthorized(body ListByProjectUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewIssueTransmissionTokenTransmissionTokenOK builds a "user" service "issue
+// transmission token" endpoint result from a HTTP "OK" response.
+func NewIssueTransmissionTokenTransmissionTokenOK(body *IssueTransmissionTokenResponseBody) *userviews.TransmissionTokenView {
+	v := &userviews.TransmissionTokenView{
+		Token: body.Token,
+	}
+
+	return v
+}
+
+// NewIssueTransmissionTokenBadRequest builds a user service issue transmission
+// token endpoint bad-request error.
+func NewIssueTransmissionTokenBadRequest(body IssueTransmissionTokenBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewIssueTransmissionTokenForbidden builds a user service issue transmission
+// token endpoint forbidden error.
+func NewIssueTransmissionTokenForbidden(body IssueTransmissionTokenForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewIssueTransmissionTokenNotFound builds a user service issue transmission
+// token endpoint not-found error.
+func NewIssueTransmissionTokenNotFound(body IssueTransmissionTokenNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewIssueTransmissionTokenUnauthorized builds a user service issue
+// transmission token endpoint unauthorized error.
+func NewIssueTransmissionTokenUnauthorized(body IssueTransmissionTokenUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewProjectRolesProjectRoleCollectionNoContent builds a "user" service
+// "project roles" endpoint result from a HTTP "NoContent" response.
+func NewProjectRolesProjectRoleCollectionNoContent(body ProjectRolesResponseBody) userviews.ProjectRoleCollectionView {
+	v := make([]*userviews.ProjectRoleView, len(body))
+	for i, val := range body {
+		v[i] = unmarshalProjectRoleResponseToUserviewsProjectRoleView(val)
+	}
+	return v
+}
+
+// NewProjectRolesBadRequest builds a user service project roles endpoint
+// bad-request error.
+func NewProjectRolesBadRequest(body ProjectRolesBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewProjectRolesForbidden builds a user service project roles endpoint
+// forbidden error.
+func NewProjectRolesForbidden(body ProjectRolesForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewProjectRolesNotFound builds a user service project roles endpoint
+// not-found error.
+func NewProjectRolesNotFound(body ProjectRolesNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewProjectRolesUnauthorized builds a user service project roles endpoint
+// unauthorized error.
+func NewProjectRolesUnauthorized(body ProjectRolesUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
+// NewAdminDeleteBadRequest builds a user service admin delete endpoint
+// bad-request error.
+func NewAdminDeleteBadRequest(body AdminDeleteBadRequestResponseBody) user.BadRequest {
+	v := user.BadRequest(body)
+	return v
+}
+
+// NewAdminDeleteForbidden builds a user service admin delete endpoint
+// forbidden error.
+func NewAdminDeleteForbidden(body AdminDeleteForbiddenResponseBody) user.Forbidden {
+	v := user.Forbidden(body)
+	return v
+}
+
+// NewAdminDeleteNotFound builds a user service admin delete endpoint not-found
+// error.
+func NewAdminDeleteNotFound(body AdminDeleteNotFoundResponseBody) user.NotFound {
+	v := user.NotFound(body)
+	return v
+}
+
+// NewAdminDeleteUnauthorized builds a user service admin delete endpoint
+// unauthorized error.
+func NewAdminDeleteUnauthorized(body AdminDeleteUnauthorizedResponseBody) user.Unauthorized {
+	v := user.Unauthorized(body)
+	return v
+}
+
 // ValidateAvailableRoleResponseBody runs the validations defined on
 // AvailableRoleResponseBody
 func ValidateAvailableRoleResponseBody(body *AvailableRoleResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	return
+}
+
+// ValidateProjectUserCollectionResponseBody runs the validations defined on
+// ProjectUserCollectionResponseBody
+func ValidateProjectUserCollectionResponseBody(body ProjectUserCollectionResponseBody) (err error) {
+	for _, e := range body {
+		if e != nil {
+			if err2 := ValidateProjectUserResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateProjectUserResponseBody runs the validations defined on
+// ProjectUserResponseBody
+func ValidateProjectUserResponseBody(body *ProjectUserResponseBody) (err error) {
+	if body.User == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("user", "body"))
+	}
+	if body.Role == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("role", "body"))
+	}
+	if body.Membership == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("membership", "body"))
+	}
+	if body.User != nil {
+		if err2 := ValidateUserResponseBody(body.User); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateUserResponseBody runs the validations defined on UserResponseBody
+func ValidateUserResponseBody(body *UserResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
+	}
+	if body.Bio == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bio", "body"))
+	}
+	if body.Admin == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("admin", "body"))
+	}
+	if body.Name != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", *body.Name, "\\S"))
+	}
+	if body.Name != nil {
+		if utf8.RuneCountInString(*body.Name) > 256 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", *body.Name, utf8.RuneCountInString(*body.Name), 256, false))
+		}
+	}
+	if body.Email != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
+	}
+	return
+}
+
+// ValidateProjectRoleResponse runs the validations defined on
+// ProjectRoleResponse
+func ValidateProjectRoleResponse(body *ProjectRoleResponse) (err error) {
 	if body.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
 	}

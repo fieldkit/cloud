@@ -8,10 +8,13 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
+	"unicode/utf8"
 
 	user "github.com/fieldkit/cloud/server/api/gen/user"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildRolesPayload builds the payload for the user roles endpoint from CLI
@@ -95,4 +98,351 @@ func BuildDownloadPhotoPayload(userDownloadPhotoUserID string) (*user.DownloadPh
 	v.UserID = userID
 
 	return v, nil
+}
+
+// BuildLoginPayload builds the payload for the user login endpoint from CLI
+// flags.
+func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
+	var err error
+	var body LoginRequestBody
+	{
+		err = json.Unmarshal([]byte(userLoginBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"sydnie@watsicalangworth.info\",\n      \"password\": \"qsf\"\n   }'")
+		}
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
+
+		if utf8.RuneCountInString(body.Password) < 10 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 10, true))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &user.LoginFields{
+		Email:    body.Email,
+		Password: body.Password,
+	}
+	res := &user.LoginPayload{
+		Login: v,
+	}
+
+	return res, nil
+}
+
+// BuildRecoveryLookupPayload builds the payload for the user recovery lookup
+// endpoint from CLI flags.
+func BuildRecoveryLookupPayload(userRecoveryLookupBody string) (*user.RecoveryLookupPayload, error) {
+	var err error
+	var body RecoveryLookupRequestBody
+	{
+		err = json.Unmarshal([]byte(userRecoveryLookupBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Dolores eveniet ipsum in quos incidunt.\"\n   }'")
+		}
+	}
+	v := &user.RecoveryLookupFields{
+		Email: body.Email,
+	}
+	res := &user.RecoveryLookupPayload{
+		Recovery: v,
+	}
+
+	return res, nil
+}
+
+// BuildRecoveryPayload builds the payload for the user recovery endpoint from
+// CLI flags.
+func BuildRecoveryPayload(userRecoveryBody string) (*user.RecoveryPayload, error) {
+	var err error
+	var body RecoveryRequestBody
+	{
+		err = json.Unmarshal([]byte(userRecoveryBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"password\": \"kxt\",\n      \"token\": \"Et porro et inventore voluptatem.\"\n   }'")
+		}
+		if utf8.RuneCountInString(body.Password) < 10 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 10, true))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &user.RecoveryFields{
+		Token:    body.Token,
+		Password: body.Password,
+	}
+	res := &user.RecoveryPayload{
+		Recovery: v,
+	}
+
+	return res, nil
+}
+
+// BuildLogoutPayload builds the payload for the user logout endpoint from CLI
+// flags.
+func BuildLogoutPayload(userLogoutAuth string) (*user.LogoutPayload, error) {
+	var auth string
+	{
+		auth = userLogoutAuth
+	}
+	v := &user.LogoutPayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildRefreshPayload builds the payload for the user refresh endpoint from
+// CLI flags.
+func BuildRefreshPayload(userRefreshBody string) (*user.RefreshPayload, error) {
+	var err error
+	var body RefreshRequestBody
+	{
+		err = json.Unmarshal([]byte(userRefreshBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"refreshToken\": \"Repellendus corrupti sequi nemo.\"\n   }'")
+		}
+	}
+	v := &user.RefreshPayload{
+		RefreshToken: body.RefreshToken,
+	}
+
+	return v, nil
+}
+
+// BuildSendValidationPayload builds the payload for the user send validation
+// endpoint from CLI flags.
+func BuildSendValidationPayload(userSendValidationUserID string) (*user.SendValidationPayload, error) {
+	var err error
+	var userID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(userSendValidationUserID, 10, 32)
+		userID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for userID, must be INT32")
+		}
+	}
+	v := &user.SendValidationPayload{}
+	v.UserID = userID
+
+	return v, nil
+}
+
+// BuildValidatePayload builds the payload for the user validate endpoint from
+// CLI flags.
+func BuildValidatePayload(userValidateToken string) (*user.ValidatePayload, error) {
+	var token string
+	{
+		token = userValidateToken
+	}
+	v := &user.ValidatePayload{}
+	v.Token = token
+
+	return v, nil
+}
+
+// BuildAddPayload builds the payload for the user add endpoint from CLI flags.
+func BuildAddPayload(userAddBody string) (*user.AddPayload, error) {
+	var err error
+	var body AddRequestBody
+	{
+		err = json.Unmarshal([]byte(userAddBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Est temporibus labore impedit.\",\n      \"endTime\": \"Fugit distinctio nobis earum.\",\n      \"goal\": \"Aut asperiores eos quos enim quisquam.\",\n      \"location\": \"Adipisci eaque non qui.\",\n      \"name\": \"Laborum ullam nisi dolor vitae ratione ea.\",\n      \"private\": true,\n      \"startTime\": \"Dignissimos enim eos doloremque possimus omnis sed.\",\n      \"tags\": \"Ut aliquid placeat.\"\n   }'")
+		}
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
+		if utf8.RuneCountInString(body.Name) > 256 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 256, false))
+		}
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
+
+		if utf8.RuneCountInString(body.Password) < 10 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 10, true))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &user.AddUserFields{
+		Name:        body.Name,
+		Email:       body.Email,
+		Password:    body.Password,
+		InviteToken: body.InviteToken,
+	}
+	res := &user.AddPayload{
+		User: v,
+	}
+
+	return res, nil
+}
+
+// BuildUpdatePayload builds the payload for the user update endpoint from CLI
+// flags.
+func BuildUpdatePayload(userUpdateBody string, userUpdateUserID string, userUpdateAuth string) (*user.UpdatePayload, error) {
+	var err error
+	var body UpdateRequestBody
+	{
+		err = json.Unmarshal([]byte(userUpdateBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Tempora laboriosam ab.\",\n      \"endTime\": \"Iusto ducimus quia optio provident fuga sunt.\",\n      \"goal\": \"Voluptas rem necessitatibus ipsa qui iste.\",\n      \"location\": \"Veniam esse reprehenderit non laborum nobis.\",\n      \"name\": \"Tempore sed consequuntur pariatur.\",\n      \"private\": true,\n      \"startTime\": \"Iste voluptate.\",\n      \"tags\": \"Molestiae amet accusamus sed maiores dolorem.\"\n   }'")
+		}
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
+		if utf8.RuneCountInString(body.Name) > 256 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 256, false))
+		}
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	var userID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(userUpdateUserID, 10, 32)
+		userID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for userID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = userUpdateAuth
+	}
+	v := &user.UpdateUserFields{
+		Name:  body.Name,
+		Email: body.Email,
+		Bio:   body.Bio,
+	}
+	res := &user.UpdatePayload{
+		Update: v,
+	}
+	res.UserID = userID
+	res.Auth = auth
+
+	return res, nil
+}
+
+// BuildChangePasswordPayload builds the payload for the user change password
+// endpoint from CLI flags.
+func BuildChangePasswordPayload(userChangePasswordBody string, userChangePasswordUserID string, userChangePasswordAuth string) (*user.ChangePasswordPayload, error) {
+	var err error
+	var body ChangePasswordRequestBody
+	{
+		err = json.Unmarshal([]byte(userChangePasswordBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"newPassword\": \"8tq\",\n      \"oldPassword\": \"gb9\"\n   }'")
+		}
+		if utf8.RuneCountInString(body.OldPassword) < 10 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.oldPassword", body.OldPassword, utf8.RuneCountInString(body.OldPassword), 10, true))
+		}
+		if utf8.RuneCountInString(body.NewPassword) < 10 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.newPassword", body.NewPassword, utf8.RuneCountInString(body.NewPassword), 10, true))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	var userID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(userChangePasswordUserID, 10, 32)
+		userID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for userID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = userChangePasswordAuth
+	}
+	v := &user.UpdateUserPasswordFields{
+		OldPassword: body.OldPassword,
+		NewPassword: body.NewPassword,
+	}
+	res := &user.ChangePasswordPayload{
+		Change: v,
+	}
+	res.UserID = userID
+	res.Auth = auth
+
+	return res, nil
+}
+
+// BuildGetCurrentPayload builds the payload for the user get current endpoint
+// from CLI flags.
+func BuildGetCurrentPayload(userGetCurrentAuth string) (*user.GetCurrentPayload, error) {
+	var auth string
+	{
+		auth = userGetCurrentAuth
+	}
+	v := &user.GetCurrentPayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildListByProjectPayload builds the payload for the user list by project
+// endpoint from CLI flags.
+func BuildListByProjectPayload(userListByProjectProjectID string, userListByProjectAuth string) (*user.ListByProjectPayload, error) {
+	var err error
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(userListByProjectProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = userListByProjectAuth
+	}
+	v := &user.ListByProjectPayload{}
+	v.ProjectID = projectID
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildIssueTransmissionTokenPayload builds the payload for the user issue
+// transmission token endpoint from CLI flags.
+func BuildIssueTransmissionTokenPayload(userIssueTransmissionTokenAuth string) (*user.IssueTransmissionTokenPayload, error) {
+	var auth string
+	{
+		auth = userIssueTransmissionTokenAuth
+	}
+	v := &user.IssueTransmissionTokenPayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildAdminDeletePayload builds the payload for the user admin delete
+// endpoint from CLI flags.
+func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth string) (*user.AdminDeletePayload, error) {
+	var err error
+	var body AdminDeleteRequestBody
+	{
+		err = json.Unmarshal([]byte(userAdminDeleteBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Porro perspiciatis voluptate harum eum et quia.\",\n      \"password\": \"Consectetur ad.\"\n   }'")
+		}
+	}
+	var auth string
+	{
+		auth = userAdminDeleteAuth
+	}
+	v := &user.AdminDeleteFields{
+		Email:    body.Email,
+		Password: body.Password,
+	}
+	res := &user.AdminDeletePayload{
+		Delete: v,
+	}
+	res.Auth = auth
+
+	return res, nil
 }

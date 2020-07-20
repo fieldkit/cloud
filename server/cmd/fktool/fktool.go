@@ -297,9 +297,13 @@ func main() {
 	log.Printf("authenticated as %s (%s)", o.Email, o.Host)
 
 	if o.FirmwareFile != "" {
-		err := uploadFirmware(ctx, c, o.Module, o.Profile, o.FirmwareFile, o.DryRun)
-		if err != nil {
-			log.Fatalf("error adding firmware: %v", err)
-		}
+		/*
+			err := uploadFirmware(ctx, c, o.Module, o.Profile, o.FirmwareFile, o.DryRun)
+			if err != nil {
+				log.Fatalf("error adding firmware: %v", err)
+			}
+		*/
 	}
+
+	_ = c
 }

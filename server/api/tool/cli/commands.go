@@ -87,102 +87,6 @@ type (
 		PrettyPrint bool
 	}
 
-	// AddUserCommand is the command line data structure for the add action of user
-	AddUserCommand struct {
-		Payload     string
-		ContentType string
-		PrettyPrint bool
-	}
-
-	// AdminDeleteUserCommand is the command line data structure for the admin delete action of user
-	AdminDeleteUserCommand struct {
-		Payload     string
-		ContentType string
-		PrettyPrint bool
-	}
-
-	// ChangePasswordUserCommand is the command line data structure for the change password action of user
-	ChangePasswordUserCommand struct {
-		Payload     string
-		ContentType string
-		UserID      int
-		PrettyPrint bool
-	}
-
-	// GetCurrentUserCommand is the command line data structure for the get current action of user
-	GetCurrentUserCommand struct {
-		PrettyPrint bool
-	}
-
-	// ListByProjectUserCommand is the command line data structure for the list by project action of user
-	ListByProjectUserCommand struct {
-		ProjectID   string
-		PrettyPrint bool
-	}
-
-	// LoginUserCommand is the command line data structure for the login action of user
-	LoginUserCommand struct {
-		Payload     string
-		ContentType string
-		PrettyPrint bool
-	}
-
-	// LogoutUserCommand is the command line data structure for the logout action of user
-	LogoutUserCommand struct {
-		PrettyPrint bool
-	}
-
-	// ProjectRolesUserCommand is the command line data structure for the project roles action of user
-	ProjectRolesUserCommand struct {
-		PrettyPrint bool
-	}
-
-	// RecoveryUserCommand is the command line data structure for the recovery action of user
-	RecoveryUserCommand struct {
-		Payload     string
-		ContentType string
-		PrettyPrint bool
-	}
-
-	// RecoveryLookupUserCommand is the command line data structure for the recovery lookup action of user
-	RecoveryLookupUserCommand struct {
-		Payload     string
-		ContentType string
-		PrettyPrint bool
-	}
-
-	// RefreshUserCommand is the command line data structure for the refresh action of user
-	RefreshUserCommand struct {
-		Payload     string
-		ContentType string
-		PrettyPrint bool
-	}
-
-	// SendValidationUserCommand is the command line data structure for the send validation action of user
-	SendValidationUserCommand struct {
-		UserID      int
-		PrettyPrint bool
-	}
-
-	// TransmissionTokenUserCommand is the command line data structure for the transmission token action of user
-	TransmissionTokenUserCommand struct {
-		PrettyPrint bool
-	}
-
-	// UpdateUserCommand is the command line data structure for the update action of user
-	UpdateUserCommand struct {
-		Payload     string
-		ContentType string
-		UserID      int
-		PrettyPrint bool
-	}
-
-	// ValidateUserCommand is the command line data structure for the validate action of user
-	ValidateUserCommand struct {
-		Token       string
-		PrettyPrint bool
-	}
-
 	// DownloadCommand is the command line data structure for the download command.
 	DownloadCommand struct {
 		// OutFile is the path to the download output file.
@@ -195,9 +99,9 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 	var command, sub *cobra.Command
 	command = &cobra.Command{
 		Use:   "add",
-		Short: `add action`,
+		Short: `Add firmware`,
 	}
-	tmp21 := new(AddFirmwareCommand)
+	tmp18 := new(AddFirmwareCommand)
 	sub = &cobra.Command{
 		Use:   `firmware ["/firmware"]`,
 		Short: ``,
@@ -206,88 +110,109 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 Payload example:
 
 {
-   "etag": "Consequatur non nisi dolor autem sint vitae.",
-   "meta": "Corrupti ipsum fugit.",
-   "module": "Odio vel tempore.",
-   "profile": "Facere et quo vel aut.",
-   "url": "Quisquam voluptatem doloribus."
+   "etag": "Quod provident dolorum provident eligendi ut.",
+   "meta": "Et ratione porro iusto quaerat ea quibusdam.",
+   "module": "Autem et autem aliquid.",
+   "profile": "Natus dolores quo suscipit voluptatem magni in.",
+   "url": "Asperiores nostrum."
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp21.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp18.Run(c, args) },
 	}
-	tmp21.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp21.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	tmp22 := new(AddUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/users"]`,
-		Short: ``,
-		Long: `
-
-Payload example:
-
-{
-   "email": "andre@okonrenner.biz",
-   "invite_token": "Illo voluptatem ea hic aliquid.",
-   "name": "ufpoe7n4jt",
-   "password": "77aketl8qk"
-}`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp22.Run(c, args) },
-	}
-	tmp22.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp22.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "admin-delete",
-		Short: ``,
-	}
-	tmp23 := new(AdminDeleteUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/admin/user"]`,
-		Short: ``,
-		Long: `
-
-Payload example:
-
-{
-   "email": "Perspiciatis natus possimus labore.",
-   "password": "Possimus porro quaerat in qui."
-}`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp23.Run(c, args) },
-	}
-	tmp23.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp23.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "change-password",
-		Short: `Update a user password`,
-	}
-	tmp24 := new(ChangePasswordUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/users/USERID/password"]`,
-		Short: ``,
-		Long: `
-
-Payload example:
-
-{
-   "newPassword": "eb63hu9e7a",
-   "oldPassword": "biiuahxosx"
-}`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp24.Run(c, args) },
-	}
-	tmp24.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp24.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp18.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp18.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "delete",
 		Short: `Delete firmware`,
 	}
-	tmp25 := new(DeleteFirmwareCommand)
+	tmp19 := new(DeleteFirmwareCommand)
 	sub = &cobra.Command{
 		Use:   `firmware ["/firmware/FIRMWAREID"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp19.Run(c, args) },
+	}
+	tmp19.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp19.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "device-data",
+		Short: `Retrieve data`,
+	}
+	tmp20 := new(DeviceDataDataCommand)
+	sub = &cobra.Command{
+		Use:   `data ["/data/devices/DEVICEID/data"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp20.Run(c, args) },
+	}
+	tmp20.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp20.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "device-summary",
+		Short: `Retrieve summary`,
+	}
+	tmp21 := new(DeviceSummaryDataCommand)
+	sub = &cobra.Command{
+		Use:   `data ["/data/devices/DEVICEID/summary"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp21.Run(c, args) },
+	}
+	tmp21.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp21.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "download",
+		Short: ``,
+	}
+	tmp22 := new(DownloadFirmwareCommand)
+	sub = &cobra.Command{
+		Use:   `firmware ["/firmware/FIRMWAREID/download"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp22.Run(c, args) },
+	}
+	tmp22.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp22.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "list",
+		Short: `List firmware`,
+	}
+	tmp23 := new(ListFirmwareCommand)
+	sub = &cobra.Command{
+		Use:   `firmware ["/firmware"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp23.Run(c, args) },
+	}
+	tmp23.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp23.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "project-getid",
+		Short: `Get a project's picture`,
+	}
+	tmp24 := new(ProjectGetIDPictureCommand)
+	sub = &cobra.Command{
+		Use:   `picture ["/projects/PROJECTID/picture"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp24.Run(c, args) },
+	}
+	tmp24.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp24.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "user-getid",
+		Short: `Get a user's picture`,
+	}
+	tmp25 := new(UserGetIDPictureCommand)
+	sub = &cobra.Command{
+		Use:   `picture ["/users/USERID/picture"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp25.Run(c, args) },
 	}
@@ -296,308 +221,17 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "device-data",
-		Short: `Retrieve data`,
+		Use:   "user-saveid",
+		Short: `Save a user's picture`,
 	}
-	tmp26 := new(DeviceDataDataCommand)
+	tmp26 := new(UserSaveIDPictureCommand)
 	sub = &cobra.Command{
-		Use:   `data ["/data/devices/DEVICEID/data"]`,
+		Use:   `picture ["/users/USERID/picture"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp26.Run(c, args) },
 	}
 	tmp26.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp26.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "device-summary",
-		Short: `Retrieve summary`,
-	}
-	tmp27 := new(DeviceSummaryDataCommand)
-	sub = &cobra.Command{
-		Use:   `data ["/data/devices/DEVICEID/summary"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp27.Run(c, args) },
-	}
-	tmp27.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp27.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "download",
-		Short: ``,
-	}
-	tmp28 := new(DownloadFirmwareCommand)
-	sub = &cobra.Command{
-		Use:   `firmware ["/firmware/FIRMWAREID/download"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp28.Run(c, args) },
-	}
-	tmp28.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp28.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "get-current",
-		Short: `Get the authenticated user`,
-	}
-	tmp29 := new(GetCurrentUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/user"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp29.Run(c, args) },
-	}
-	tmp29.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp29.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "list",
-		Short: `List firmware`,
-	}
-	tmp30 := new(ListFirmwareCommand)
-	sub = &cobra.Command{
-		Use:   `firmware ["/firmware"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp30.Run(c, args) },
-	}
-	tmp30.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp30.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "list-by-project",
-		Short: `List users by project`,
-	}
-	tmp31 := new(ListByProjectUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/users/project/PROJECTID"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp31.Run(c, args) },
-	}
-	tmp31.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp31.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "login",
-		Short: `Creates a valid JWT given login credentials.`,
-	}
-	tmp32 := new(LoginUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/login"]`,
-		Short: ``,
-		Long: `
-
-Payload example:
-
-{
-   "email": "iva@halvorson.com",
-   "password": "0uepd168s1"
-}`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp32.Run(c, args) },
-	}
-	tmp32.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp32.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "logout",
-		Short: `Creates a valid JWT given login credentials.`,
-	}
-	tmp33 := new(LogoutUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/logout"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp33.Run(c, args) },
-	}
-	tmp33.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp33.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "project-getid",
-		Short: `Get a project's picture`,
-	}
-	tmp34 := new(ProjectGetIDPictureCommand)
-	sub = &cobra.Command{
-		Use:   `picture ["/projects/PROJECTID/picture"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp34.Run(c, args) },
-	}
-	tmp34.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp34.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "project-roles",
-		Short: ``,
-	}
-	tmp35 := new(ProjectRolesUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/projects/roles"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp35.Run(c, args) },
-	}
-	tmp35.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp35.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "recovery",
-		Short: ``,
-	}
-	tmp36 := new(RecoveryUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/user/recovery"]`,
-		Short: ``,
-		Long: `
-
-Payload example:
-
-{
-   "password": "x8rzq05j6w",
-   "token": "Placeat consequatur quod eum."
-}`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp36.Run(c, args) },
-	}
-	tmp36.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp36.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "recovery-lookup",
-		Short: ``,
-	}
-	tmp37 := new(RecoveryLookupUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/user/recovery/lookup"]`,
-		Short: ``,
-		Long: `
-
-Payload example:
-
-{
-   "email": "Sequi eum aspernatur nulla rerum aliquam."
-}`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp37.Run(c, args) },
-	}
-	tmp37.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp37.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "refresh",
-		Short: `Creates a valid JWT given a refresh token.`,
-	}
-	tmp38 := new(RefreshUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/refresh"]`,
-		Short: ``,
-		Long: `
-
-Payload example:
-
-{
-   "refresh_token": "Esse dignissimos mollitia."
-}`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp38.Run(c, args) },
-	}
-	tmp38.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp38.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "send-validation",
-		Short: ``,
-	}
-	tmp39 := new(SendValidationUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/users/USERID/validate-email"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp39.Run(c, args) },
-	}
-	tmp39.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp39.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "transmission-token",
-		Short: ``,
-	}
-	tmp40 := new(TransmissionTokenUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/user/transmission-token"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp40.Run(c, args) },
-	}
-	tmp40.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp40.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "update",
-		Short: `Update a user`,
-	}
-	tmp41 := new(UpdateUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/users/USERID"]`,
-		Short: ``,
-		Long: `
-
-Payload example:
-
-{
-   "bio": "Occaecati est consequatur dolorum voluptas omnis.",
-   "email": "jeffery@walshbartell.com",
-   "name": "s9vmohafdi"
-}`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp41.Run(c, args) },
-	}
-	tmp41.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp41.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "user-getid",
-		Short: `Get a user's picture`,
-	}
-	tmp42 := new(UserGetIDPictureCommand)
-	sub = &cobra.Command{
-		Use:   `picture ["/users/USERID/picture"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp42.Run(c, args) },
-	}
-	tmp42.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp42.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "user-saveid",
-		Short: `Save a user's picture`,
-	}
-	tmp43 := new(UserSaveIDPictureCommand)
-	sub = &cobra.Command{
-		Use:   `picture ["/users/USERID/picture"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp43.Run(c, args) },
-	}
-	tmp43.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp43.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "validate",
-		Short: `Validate a user's email address.`,
-	}
-	tmp44 := new(ValidateUserCommand)
-	sub = &cobra.Command{
-		Use:   `user ["/validate"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp44.Run(c, args) },
-	}
-	tmp44.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp44.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 
@@ -1065,446 +699,4 @@ func (cmd *UserSaveIDPictureCommand) Run(c *client.Client, args []string) error 
 func (cmd *UserSaveIDPictureCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var userID int
 	cc.Flags().IntVar(&cmd.UserID, "userId", userID, ``)
-}
-
-// Run makes the HTTP request corresponding to the AddUserCommand command.
-func (cmd *AddUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = "/users"
-	}
-	var payload client.AddUserPayload
-	if cmd.Payload != "" {
-		err := json.Unmarshal([]byte(cmd.Payload), &payload)
-		if err != nil {
-			return fmt.Errorf("failed to deserialize payload: %s", err)
-		}
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.AddUser(ctx, path, &payload)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *AddUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
-	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
-}
-
-// Run makes the HTTP request corresponding to the AdminDeleteUserCommand command.
-func (cmd *AdminDeleteUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = "/admin/user"
-	}
-	var payload client.AdminDeleteUserPayload
-	if cmd.Payload != "" {
-		err := json.Unmarshal([]byte(cmd.Payload), &payload)
-		if err != nil {
-			return fmt.Errorf("failed to deserialize payload: %s", err)
-		}
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.AdminDeleteUser(ctx, path, &payload)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *AdminDeleteUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
-	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
-}
-
-// Run makes the HTTP request corresponding to the ChangePasswordUserCommand command.
-func (cmd *ChangePasswordUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/users/%v/password", cmd.UserID)
-	}
-	var payload client.UpdateUserPasswordPayload
-	if cmd.Payload != "" {
-		err := json.Unmarshal([]byte(cmd.Payload), &payload)
-		if err != nil {
-			return fmt.Errorf("failed to deserialize payload: %s", err)
-		}
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ChangePasswordUser(ctx, path, &payload)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *ChangePasswordUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
-	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
-	var userID int
-	cc.Flags().IntVar(&cmd.UserID, "userId", userID, ``)
-}
-
-// Run makes the HTTP request corresponding to the GetCurrentUserCommand command.
-func (cmd *GetCurrentUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = "/user"
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.GetCurrentUser(ctx, path)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *GetCurrentUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-}
-
-// Run makes the HTTP request corresponding to the ListByProjectUserCommand command.
-func (cmd *ListByProjectUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/users/project/%v", url.QueryEscape(cmd.ProjectID))
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ListByProjectUser(ctx, path)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *ListByProjectUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var projectID string
-	cc.Flags().StringVar(&cmd.ProjectID, "projectId", projectID, ``)
-}
-
-// Run makes the HTTP request corresponding to the LoginUserCommand command.
-func (cmd *LoginUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = "/login"
-	}
-	var payload client.LoginPayload
-	if cmd.Payload != "" {
-		err := json.Unmarshal([]byte(cmd.Payload), &payload)
-		if err != nil {
-			return fmt.Errorf("failed to deserialize payload: %s", err)
-		}
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.LoginUser(ctx, path, &payload)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *LoginUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
-	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
-}
-
-// Run makes the HTTP request corresponding to the LogoutUserCommand command.
-func (cmd *LogoutUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = "/logout"
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.LogoutUser(ctx, path)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *LogoutUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-}
-
-// Run makes the HTTP request corresponding to the ProjectRolesUserCommand command.
-func (cmd *ProjectRolesUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = "/projects/roles"
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ProjectRolesUser(ctx, path)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *ProjectRolesUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-}
-
-// Run makes the HTTP request corresponding to the RecoveryUserCommand command.
-func (cmd *RecoveryUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = "/user/recovery"
-	}
-	var payload client.RecoveryPayload
-	if cmd.Payload != "" {
-		err := json.Unmarshal([]byte(cmd.Payload), &payload)
-		if err != nil {
-			return fmt.Errorf("failed to deserialize payload: %s", err)
-		}
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.RecoveryUser(ctx, path, &payload)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *RecoveryUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
-	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
-}
-
-// Run makes the HTTP request corresponding to the RecoveryLookupUserCommand command.
-func (cmd *RecoveryLookupUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = "/user/recovery/lookup"
-	}
-	var payload client.RecoveryLookupPayload
-	if cmd.Payload != "" {
-		err := json.Unmarshal([]byte(cmd.Payload), &payload)
-		if err != nil {
-			return fmt.Errorf("failed to deserialize payload: %s", err)
-		}
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.RecoveryLookupUser(ctx, path, &payload)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *RecoveryLookupUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
-	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
-}
-
-// Run makes the HTTP request corresponding to the RefreshUserCommand command.
-func (cmd *RefreshUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = "/refresh"
-	}
-	var payload client.RefreshUserPayload
-	if cmd.Payload != "" {
-		err := json.Unmarshal([]byte(cmd.Payload), &payload)
-		if err != nil {
-			return fmt.Errorf("failed to deserialize payload: %s", err)
-		}
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.RefreshUser(ctx, path, &payload)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *RefreshUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
-	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
-}
-
-// Run makes the HTTP request corresponding to the SendValidationUserCommand command.
-func (cmd *SendValidationUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/users/%v/validate-email", cmd.UserID)
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.SendValidationUser(ctx, path)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *SendValidationUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var userID int
-	cc.Flags().IntVar(&cmd.UserID, "userId", userID, ``)
-}
-
-// Run makes the HTTP request corresponding to the TransmissionTokenUserCommand command.
-func (cmd *TransmissionTokenUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = "/user/transmission-token"
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.TransmissionTokenUser(ctx, path)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *TransmissionTokenUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-}
-
-// Run makes the HTTP request corresponding to the UpdateUserCommand command.
-func (cmd *UpdateUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/users/%v", cmd.UserID)
-	}
-	var payload client.UpdateUserPayload
-	if cmd.Payload != "" {
-		err := json.Unmarshal([]byte(cmd.Payload), &payload)
-		if err != nil {
-			return fmt.Errorf("failed to deserialize payload: %s", err)
-		}
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.UpdateUser(ctx, path, &payload)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *UpdateUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
-	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
-	var userID int
-	cc.Flags().IntVar(&cmd.UserID, "userId", userID, ``)
-}
-
-// Run makes the HTTP request corresponding to the ValidateUserCommand command.
-func (cmd *ValidateUserCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = "/validate"
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ValidateUser(ctx, path, cmd.Token)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *ValidateUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var token string
-	cc.Flags().StringVar(&cmd.Token, "token", token, ``)
 }

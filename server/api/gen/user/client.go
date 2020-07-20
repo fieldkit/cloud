@@ -16,19 +16,49 @@ import (
 
 // Client is the "user" service client.
 type Client struct {
-	RolesEndpoint         goa.Endpoint
-	DeleteEndpoint        goa.Endpoint
-	UploadPhotoEndpoint   goa.Endpoint
-	DownloadPhotoEndpoint goa.Endpoint
+	RolesEndpoint                  goa.Endpoint
+	DeleteEndpoint                 goa.Endpoint
+	UploadPhotoEndpoint            goa.Endpoint
+	DownloadPhotoEndpoint          goa.Endpoint
+	LoginEndpoint                  goa.Endpoint
+	RecoveryLookupEndpoint         goa.Endpoint
+	RecoveryEndpoint               goa.Endpoint
+	LogoutEndpoint                 goa.Endpoint
+	RefreshEndpoint                goa.Endpoint
+	SendValidationEndpoint         goa.Endpoint
+	ValidateEndpoint               goa.Endpoint
+	AddEndpoint                    goa.Endpoint
+	UpdateEndpoint                 goa.Endpoint
+	ChangePasswordEndpoint         goa.Endpoint
+	GetCurrentEndpoint             goa.Endpoint
+	ListByProjectEndpoint          goa.Endpoint
+	IssueTransmissionTokenEndpoint goa.Endpoint
+	ProjectRolesEndpoint           goa.Endpoint
+	AdminDeleteEndpoint            goa.Endpoint
 }
 
 // NewClient initializes a "user" service client given the endpoints.
-func NewClient(roles, delete_, uploadPhoto, downloadPhoto goa.Endpoint) *Client {
+func NewClient(roles, delete_, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, logout, refresh, sendValidation, validate, add, update, changePassword, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminDelete goa.Endpoint) *Client {
 	return &Client{
-		RolesEndpoint:         roles,
-		DeleteEndpoint:        delete_,
-		UploadPhotoEndpoint:   uploadPhoto,
-		DownloadPhotoEndpoint: downloadPhoto,
+		RolesEndpoint:                  roles,
+		DeleteEndpoint:                 delete_,
+		UploadPhotoEndpoint:            uploadPhoto,
+		DownloadPhotoEndpoint:          downloadPhoto,
+		LoginEndpoint:                  login,
+		RecoveryLookupEndpoint:         recoveryLookup,
+		RecoveryEndpoint:               recovery,
+		LogoutEndpoint:                 logout,
+		RefreshEndpoint:                refresh,
+		SendValidationEndpoint:         sendValidation,
+		ValidateEndpoint:               validate,
+		AddEndpoint:                    add,
+		UpdateEndpoint:                 update,
+		ChangePasswordEndpoint:         changePassword,
+		GetCurrentEndpoint:             getCurrent,
+		ListByProjectEndpoint:          listByProject,
+		IssueTransmissionTokenEndpoint: issueTransmissionToken,
+		ProjectRolesEndpoint:           projectRoles,
+		AdminDeleteEndpoint:            adminDelete,
 	}
 }
 
@@ -63,4 +93,135 @@ func (c *Client) DownloadPhoto(ctx context.Context, p *DownloadPhotoPayload) (re
 	}
 	o := ires.(*DownloadPhotoResponseData)
 	return o.Result, o.Body, nil
+}
+
+// Login calls the "login" endpoint of the "user" service.
+func (c *Client) Login(ctx context.Context, p *LoginPayload) (res *LoginResult, err error) {
+	var ires interface{}
+	ires, err = c.LoginEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*LoginResult), nil
+}
+
+// RecoveryLookup calls the "recovery lookup" endpoint of the "user" service.
+func (c *Client) RecoveryLookup(ctx context.Context, p *RecoveryLookupPayload) (err error) {
+	_, err = c.RecoveryLookupEndpoint(ctx, p)
+	return
+}
+
+// Recovery calls the "recovery" endpoint of the "user" service.
+func (c *Client) Recovery(ctx context.Context, p *RecoveryPayload) (err error) {
+	_, err = c.RecoveryEndpoint(ctx, p)
+	return
+}
+
+// Logout calls the "logout" endpoint of the "user" service.
+func (c *Client) Logout(ctx context.Context, p *LogoutPayload) (err error) {
+	_, err = c.LogoutEndpoint(ctx, p)
+	return
+}
+
+// Refresh calls the "refresh" endpoint of the "user" service.
+func (c *Client) Refresh(ctx context.Context, p *RefreshPayload) (res *RefreshResult, err error) {
+	var ires interface{}
+	ires, err = c.RefreshEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*RefreshResult), nil
+}
+
+// SendValidation calls the "send validation" endpoint of the "user" service.
+func (c *Client) SendValidation(ctx context.Context, p *SendValidationPayload) (err error) {
+	_, err = c.SendValidationEndpoint(ctx, p)
+	return
+}
+
+// Validate calls the "validate" endpoint of the "user" service.
+func (c *Client) Validate(ctx context.Context, p *ValidatePayload) (res *ValidateResult, err error) {
+	var ires interface{}
+	ires, err = c.ValidateEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*ValidateResult), nil
+}
+
+// Add calls the "add" endpoint of the "user" service.
+func (c *Client) Add(ctx context.Context, p *AddPayload) (res *User, err error) {
+	var ires interface{}
+	ires, err = c.AddEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*User), nil
+}
+
+// Update calls the "update" endpoint of the "user" service.
+func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *User, err error) {
+	var ires interface{}
+	ires, err = c.UpdateEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*User), nil
+}
+
+// ChangePassword calls the "change password" endpoint of the "user" service.
+func (c *Client) ChangePassword(ctx context.Context, p *ChangePasswordPayload) (res *User, err error) {
+	var ires interface{}
+	ires, err = c.ChangePasswordEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*User), nil
+}
+
+// GetCurrent calls the "get current" endpoint of the "user" service.
+func (c *Client) GetCurrent(ctx context.Context, p *GetCurrentPayload) (res *User, err error) {
+	var ires interface{}
+	ires, err = c.GetCurrentEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*User), nil
+}
+
+// ListByProject calls the "list by project" endpoint of the "user" service.
+func (c *Client) ListByProject(ctx context.Context, p *ListByProjectPayload) (res *ProjectUsers, err error) {
+	var ires interface{}
+	ires, err = c.ListByProjectEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*ProjectUsers), nil
+}
+
+// IssueTransmissionToken calls the "issue transmission token" endpoint of the
+// "user" service.
+func (c *Client) IssueTransmissionToken(ctx context.Context, p *IssueTransmissionTokenPayload) (res *TransmissionToken, err error) {
+	var ires interface{}
+	ires, err = c.IssueTransmissionTokenEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*TransmissionToken), nil
+}
+
+// ProjectRoles calls the "project roles" endpoint of the "user" service.
+func (c *Client) ProjectRoles(ctx context.Context) (res ProjectRoleCollection, err error) {
+	var ires interface{}
+	ires, err = c.ProjectRolesEndpoint(ctx, nil)
+	if err != nil {
+		return
+	}
+	return ires.(ProjectRoleCollection), nil
+}
+
+// AdminDelete calls the "admin delete" endpoint of the "user" service.
+func (c *Client) AdminDelete(ctx context.Context, p *AdminDeletePayload) (err error) {
+	_, err = c.AdminDeleteEndpoint(ctx, p)
+	return
 }

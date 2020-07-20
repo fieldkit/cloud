@@ -8,6 +8,8 @@
 package views
 
 import (
+	"unicode/utf8"
+
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -15,6 +17,40 @@ import (
 type AvailableRoles struct {
 	// Type to project
 	Projected *AvailableRolesView
+	// View to render
+	View string
+}
+
+// User is the viewed result type that is projected based on a view.
+type User struct {
+	// Type to project
+	Projected *UserView
+	// View to render
+	View string
+}
+
+// ProjectUsers is the viewed result type that is projected based on a view.
+type ProjectUsers struct {
+	// Type to project
+	Projected *ProjectUsersView
+	// View to render
+	View string
+}
+
+// TransmissionToken is the viewed result type that is projected based on a
+// view.
+type TransmissionToken struct {
+	// Type to project
+	Projected *TransmissionTokenView
+	// View to render
+	View string
+}
+
+// ProjectRoleCollection is the viewed result type that is projected based on a
+// view.
+type ProjectRoleCollection struct {
+	// Type to project
+	Projected ProjectRoleCollectionView
 	// View to render
 	View string
 }
@@ -30,12 +66,117 @@ type AvailableRoleView struct {
 	Name *string
 }
 
+// UserView is a type that runs validations on a projected type.
+type UserView struct {
+	ID    *int32
+	Name  *string
+	Email *string
+	Bio   *string
+	Photo *UserPhotoView
+	Admin *bool
+}
+
+// UserPhotoView is a type that runs validations on a projected type.
+type UserPhotoView struct {
+	URL *string
+}
+
+// ProjectUsersView is a type that runs validations on a projected type.
+type ProjectUsersView struct {
+	Users ProjectUserCollectionView
+}
+
+// ProjectUserCollectionView is a type that runs validations on a projected
+// type.
+type ProjectUserCollectionView []*ProjectUserView
+
+// ProjectUserView is a type that runs validations on a projected type.
+type ProjectUserView struct {
+	User       *UserView
+	Role       *string
+	Membership *string
+}
+
+// TransmissionTokenView is a type that runs validations on a projected type.
+type TransmissionTokenView struct {
+	Token *string
+}
+
+// ProjectRoleCollectionView is a type that runs validations on a projected
+// type.
+type ProjectRoleCollectionView []*ProjectRoleView
+
+// ProjectRoleView is a type that runs validations on a projected type.
+type ProjectRoleView struct {
+	ID   *int32
+	Name *string
+}
+
 var (
 	// AvailableRolesMap is a map of attribute names in result type AvailableRoles
 	// indexed by view name.
 	AvailableRolesMap = map[string][]string{
 		"default": []string{
 			"roles",
+		},
+	}
+	// UserMap is a map of attribute names in result type User indexed by view name.
+	UserMap = map[string][]string{
+		"default": []string{
+			"id",
+			"name",
+			"email",
+			"bio",
+			"photo",
+			"admin",
+		},
+	}
+	// ProjectUsersMap is a map of attribute names in result type ProjectUsers
+	// indexed by view name.
+	ProjectUsersMap = map[string][]string{
+		"default": []string{
+			"users",
+		},
+	}
+	// TransmissionTokenMap is a map of attribute names in result type
+	// TransmissionToken indexed by view name.
+	TransmissionTokenMap = map[string][]string{
+		"default": []string{
+			"token",
+		},
+	}
+	// ProjectRoleCollectionMap is a map of attribute names in result type
+	// ProjectRoleCollection indexed by view name.
+	ProjectRoleCollectionMap = map[string][]string{
+		"default": []string{
+			"id",
+			"name",
+		},
+	}
+	// ProjectUserCollectionMap is a map of attribute names in result type
+	// ProjectUserCollection indexed by view name.
+	ProjectUserCollectionMap = map[string][]string{
+		"default": []string{
+			"user",
+			"role",
+			"membership",
+		},
+	}
+	// ProjectUserMap is a map of attribute names in result type ProjectUser
+	// indexed by view name.
+	ProjectUserMap = map[string][]string{
+		"default": []string{
+			"user",
+			"role",
+			"membership",
+		},
+	}
+	// ProjectRoleMap is a map of attribute names in result type ProjectRole
+	// indexed by view name.
+	ProjectRoleMap = map[string][]string{
+		"default": []string{
+			"id",
+			"name",
 		},
 	}
 )
@@ -46,6 +187,53 @@ func ValidateAvailableRoles(result *AvailableRoles) (err error) {
 	switch result.View {
 	case "default", "":
 		err = ValidateAvailableRolesView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateUser runs the validations defined on the viewed result type User.
+func ValidateUser(result *User) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateUserView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateProjectUsers runs the validations defined on the viewed result type
+// ProjectUsers.
+func ValidateProjectUsers(result *ProjectUsers) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateProjectUsersView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateTransmissionToken runs the validations defined on the viewed result
+// type TransmissionToken.
+func ValidateTransmissionToken(result *TransmissionToken) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateTransmissionTokenView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateProjectRoleCollection runs the validations defined on the viewed
+// result type ProjectRoleCollection.
+func ValidateProjectRoleCollection(result ProjectRoleCollection) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateProjectRoleCollectionView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
 	}
@@ -70,6 +258,116 @@ func ValidateAvailableRolesView(result *AvailableRolesView) (err error) {
 
 // ValidateAvailableRoleView runs the validations defined on AvailableRoleView.
 func ValidateAvailableRoleView(result *AvailableRoleView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	return
+}
+
+// ValidateUserView runs the validations defined on UserView using the
+// "default" view.
+func ValidateUserView(result *UserView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	if result.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "result"))
+	}
+	if result.Bio == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bio", "result"))
+	}
+	if result.Admin == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("admin", "result"))
+	}
+	if result.Name != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("result.name", *result.Name, "\\S"))
+	}
+	if result.Name != nil {
+		if utf8.RuneCountInString(*result.Name) > 256 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("result.name", *result.Name, utf8.RuneCountInString(*result.Name), 256, false))
+		}
+	}
+	if result.Email != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("result.email", *result.Email, goa.FormatEmail))
+	}
+	return
+}
+
+// ValidateUserPhotoView runs the validations defined on UserPhotoView.
+func ValidateUserPhotoView(result *UserPhotoView) (err error) {
+
+	return
+}
+
+// ValidateProjectUsersView runs the validations defined on ProjectUsersView
+// using the "default" view.
+func ValidateProjectUsersView(result *ProjectUsersView) (err error) {
+
+	if result.Users != nil {
+		if err2 := ValidateProjectUserCollectionView(result.Users); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateProjectUserCollectionView runs the validations defined on
+// ProjectUserCollectionView using the "default" view.
+func ValidateProjectUserCollectionView(result ProjectUserCollectionView) (err error) {
+	for _, item := range result {
+		if err2 := ValidateProjectUserView(item); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateProjectUserView runs the validations defined on ProjectUserView
+// using the "default" view.
+func ValidateProjectUserView(result *ProjectUserView) (err error) {
+	if result.Role == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("role", "result"))
+	}
+	if result.Membership == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("membership", "result"))
+	}
+	if result.User != nil {
+		if err2 := ValidateUserView(result.User); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateTransmissionTokenView runs the validations defined on
+// TransmissionTokenView using the "default" view.
+func ValidateTransmissionTokenView(result *TransmissionTokenView) (err error) {
+	if result.Token == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("token", "result"))
+	}
+	return
+}
+
+// ValidateProjectRoleCollectionView runs the validations defined on
+// ProjectRoleCollectionView using the "default" view.
+func ValidateProjectRoleCollectionView(result ProjectRoleCollectionView) (err error) {
+	for _, item := range result {
+		if err2 := ValidateProjectRoleView(item); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateProjectRoleView runs the validations defined on ProjectRoleView
+// using the "default" view.
+func ValidateProjectRoleView(result *ProjectRoleView) (err error) {
 	if result.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
 	}

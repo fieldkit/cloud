@@ -35,8 +35,6 @@ func CreateGoaV2Handler(ctx context.Context, controllerOptions *ControllerOption
 
 	app.UseJWTMiddleware(service, jwtMiddleware)
 
-	app.MountSwaggerController(service, NewSwaggerController(service))
-	app.MountUserController(service, NewUserController(service, controllerOptions))
 	app.MountPictureController(service, NewPictureController(service, controllerOptions))
 	app.MountFirmwareController(service, NewFirmwareController(service, controllerOptions))
 	app.MountDataController(service, NewDataController(ctx, service, controllerOptions))

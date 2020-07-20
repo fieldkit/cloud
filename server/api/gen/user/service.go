@@ -25,6 +25,36 @@ type Service interface {
 	UploadPhoto(context.Context, *UploadPhotoPayload, io.ReadCloser) (err error)
 	// DownloadPhoto implements download photo.
 	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadPhotoResult, body io.ReadCloser, err error)
+	// Login implements login.
+	Login(context.Context, *LoginPayload) (res *LoginResult, err error)
+	// RecoveryLookup implements recovery lookup.
+	RecoveryLookup(context.Context, *RecoveryLookupPayload) (err error)
+	// Recovery implements recovery.
+	Recovery(context.Context, *RecoveryPayload) (err error)
+	// Logout implements logout.
+	Logout(context.Context, *LogoutPayload) (err error)
+	// Refresh implements refresh.
+	Refresh(context.Context, *RefreshPayload) (res *RefreshResult, err error)
+	// SendValidation implements send validation.
+	SendValidation(context.Context, *SendValidationPayload) (err error)
+	// Validate implements validate.
+	Validate(context.Context, *ValidatePayload) (res *ValidateResult, err error)
+	// Add implements add.
+	Add(context.Context, *AddPayload) (res *User, err error)
+	// Update implements update.
+	Update(context.Context, *UpdatePayload) (res *User, err error)
+	// ChangePassword implements change password.
+	ChangePassword(context.Context, *ChangePasswordPayload) (res *User, err error)
+	// GetCurrent implements get current.
+	GetCurrent(context.Context, *GetCurrentPayload) (res *User, err error)
+	// ListByProject implements list by project.
+	ListByProject(context.Context, *ListByProjectPayload) (res *ProjectUsers, err error)
+	// IssueTransmissionToken implements issue transmission token.
+	IssueTransmissionToken(context.Context, *IssueTransmissionTokenPayload) (res *TransmissionToken, err error)
+	// ProjectRoles implements project roles.
+	ProjectRoles(context.Context) (res ProjectRoleCollection, err error)
+	// AdminDelete implements admin delete.
+	AdminDelete(context.Context, *AdminDeletePayload) (err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -41,7 +71,7 @@ const ServiceName = "user"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"roles", "delete", "upload photo", "download photo"}
+var MethodNames = [19]string{"roles", "delete", "upload photo", "download photo", "login", "recovery lookup", "recovery", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "get current", "list by project", "issue transmission token", "project roles", "admin delete"}
 
 // RolesPayload is the payload type of the user service roles method.
 type RolesPayload struct {
@@ -80,9 +110,185 @@ type DownloadPhotoResult struct {
 	ContentType string
 }
 
+// LoginPayload is the payload type of the user service login method.
+type LoginPayload struct {
+	Login *LoginFields
+}
+
+// LoginResult is the result type of the user service login method.
+type LoginResult struct {
+	Authorization string
+}
+
+// RecoveryLookupPayload is the payload type of the user service recovery
+// lookup method.
+type RecoveryLookupPayload struct {
+	Recovery *RecoveryLookupFields
+}
+
+// RecoveryPayload is the payload type of the user service recovery method.
+type RecoveryPayload struct {
+	Recovery *RecoveryFields
+}
+
+// LogoutPayload is the payload type of the user service logout method.
+type LogoutPayload struct {
+	Auth string
+}
+
+// RefreshPayload is the payload type of the user service refresh method.
+type RefreshPayload struct {
+	RefreshToken string
+}
+
+// RefreshResult is the result type of the user service refresh method.
+type RefreshResult struct {
+	Authorization string
+}
+
+// SendValidationPayload is the payload type of the user service send
+// validation method.
+type SendValidationPayload struct {
+	UserID int32
+}
+
+// ValidatePayload is the payload type of the user service validate method.
+type ValidatePayload struct {
+	Token string
+}
+
+// ValidateResult is the result type of the user service validate method.
+type ValidateResult struct {
+	Location string
+}
+
+// AddPayload is the payload type of the user service add method.
+type AddPayload struct {
+	User *AddUserFields
+}
+
+// User is the result type of the user service add method.
+type User struct {
+	ID    int32
+	Name  string
+	Email string
+	Bio   string
+	Photo *UserPhoto
+	Admin bool
+}
+
+// UpdatePayload is the payload type of the user service update method.
+type UpdatePayload struct {
+	Auth   string
+	UserID int32
+	Update *UpdateUserFields
+}
+
+// ChangePasswordPayload is the payload type of the user service change
+// password method.
+type ChangePasswordPayload struct {
+	Auth   string
+	UserID int32
+	Change *UpdateUserPasswordFields
+}
+
+// GetCurrentPayload is the payload type of the user service get current method.
+type GetCurrentPayload struct {
+	Auth string
+}
+
+// ListByProjectPayload is the payload type of the user service list by project
+// method.
+type ListByProjectPayload struct {
+	Auth      string
+	ProjectID int32
+}
+
+// ProjectUsers is the result type of the user service list by project method.
+type ProjectUsers struct {
+	Users ProjectUserCollection
+}
+
+// IssueTransmissionTokenPayload is the payload type of the user service issue
+// transmission token method.
+type IssueTransmissionTokenPayload struct {
+	Auth string
+}
+
+// TransmissionToken is the result type of the user service issue transmission
+// token method.
+type TransmissionToken struct {
+	Token string
+}
+
+// ProjectRoleCollection is the result type of the user service project roles
+// method.
+type ProjectRoleCollection []*ProjectRole
+
+// AdminDeletePayload is the payload type of the user service admin delete
+// method.
+type AdminDeletePayload struct {
+	Auth   string
+	Delete *AdminDeleteFields
+}
+
 type AvailableRole struct {
 	ID   int32
 	Name string
+}
+
+type LoginFields struct {
+	Email    string
+	Password string
+}
+
+type RecoveryLookupFields struct {
+	Email string
+}
+
+type RecoveryFields struct {
+	Token    string
+	Password string
+}
+
+type AddUserFields struct {
+	Name        string
+	Email       string
+	Password    string
+	InviteToken *string
+}
+
+type UserPhoto struct {
+	URL *string
+}
+
+type UpdateUserFields struct {
+	Name  string
+	Email string
+	Bio   string
+}
+
+type UpdateUserPasswordFields struct {
+	OldPassword string
+	NewPassword string
+}
+
+type ProjectUserCollection []*ProjectUser
+
+type ProjectUser struct {
+	User       *User
+	Role       string
+	Membership string
+}
+
+type ProjectRole struct {
+	ID   int32
+	Name string
+}
+
+type AdminDeleteFields struct {
+	Email    string
+	Password string
 }
 
 // unauthorized
@@ -150,6 +356,58 @@ func NewViewedAvailableRoles(res *AvailableRoles, view string) *userviews.Availa
 	return &userviews.AvailableRoles{Projected: p, View: "default"}
 }
 
+// NewUser initializes result type User from viewed result type User.
+func NewUser(vres *userviews.User) *User {
+	return newUser(vres.Projected)
+}
+
+// NewViewedUser initializes viewed result type User from result type User
+// using the given view.
+func NewViewedUser(res *User, view string) *userviews.User {
+	p := newUserView(res)
+	return &userviews.User{Projected: p, View: "default"}
+}
+
+// NewProjectUsers initializes result type ProjectUsers from viewed result type
+// ProjectUsers.
+func NewProjectUsers(vres *userviews.ProjectUsers) *ProjectUsers {
+	return newProjectUsers(vres.Projected)
+}
+
+// NewViewedProjectUsers initializes viewed result type ProjectUsers from
+// result type ProjectUsers using the given view.
+func NewViewedProjectUsers(res *ProjectUsers, view string) *userviews.ProjectUsers {
+	p := newProjectUsersView(res)
+	return &userviews.ProjectUsers{Projected: p, View: "default"}
+}
+
+// NewTransmissionToken initializes result type TransmissionToken from viewed
+// result type TransmissionToken.
+func NewTransmissionToken(vres *userviews.TransmissionToken) *TransmissionToken {
+	return newTransmissionToken(vres.Projected)
+}
+
+// NewViewedTransmissionToken initializes viewed result type TransmissionToken
+// from result type TransmissionToken using the given view.
+func NewViewedTransmissionToken(res *TransmissionToken, view string) *userviews.TransmissionToken {
+	p := newTransmissionTokenView(res)
+	return &userviews.TransmissionToken{Projected: p, View: "default"}
+}
+
+// NewProjectRoleCollection initializes result type ProjectRoleCollection from
+// viewed result type ProjectRoleCollection.
+func NewProjectRoleCollection(vres userviews.ProjectRoleCollection) ProjectRoleCollection {
+	return newProjectRoleCollection(vres.Projected)
+}
+
+// NewViewedProjectRoleCollection initializes viewed result type
+// ProjectRoleCollection from result type ProjectRoleCollection using the given
+// view.
+func NewViewedProjectRoleCollection(res ProjectRoleCollection, view string) userviews.ProjectRoleCollection {
+	p := newProjectRoleCollectionView(res)
+	return userviews.ProjectRoleCollection{Projected: p, View: "default"}
+}
+
 // newAvailableRoles converts projected type AvailableRoles to service type
 // AvailableRoles.
 func newAvailableRoles(vres *userviews.AvailableRolesView) *AvailableRoles {
@@ -176,6 +434,177 @@ func newAvailableRolesView(res *AvailableRoles) *userviews.AvailableRolesView {
 	return vres
 }
 
+// newUser converts projected type User to service type User.
+func newUser(vres *userviews.UserView) *User {
+	res := &User{}
+	if vres.ID != nil {
+		res.ID = *vres.ID
+	}
+	if vres.Name != nil {
+		res.Name = *vres.Name
+	}
+	if vres.Email != nil {
+		res.Email = *vres.Email
+	}
+	if vres.Bio != nil {
+		res.Bio = *vres.Bio
+	}
+	if vres.Admin != nil {
+		res.Admin = *vres.Admin
+	}
+	if vres.Photo != nil {
+		res.Photo = transformUserviewsUserPhotoViewToUserPhoto(vres.Photo)
+	}
+	return res
+}
+
+// newUserView projects result type User to projected type UserView using the
+// "default" view.
+func newUserView(res *User) *userviews.UserView {
+	vres := &userviews.UserView{
+		ID:    &res.ID,
+		Name:  &res.Name,
+		Email: &res.Email,
+		Bio:   &res.Bio,
+		Admin: &res.Admin,
+	}
+	if res.Photo != nil {
+		vres.Photo = transformUserPhotoToUserviewsUserPhotoView(res.Photo)
+	}
+	return vres
+}
+
+// newProjectUsers converts projected type ProjectUsers to service type
+// ProjectUsers.
+func newProjectUsers(vres *userviews.ProjectUsersView) *ProjectUsers {
+	res := &ProjectUsers{}
+	if vres.Users != nil {
+		res.Users = newProjectUserCollection(vres.Users)
+	}
+	return res
+}
+
+// newProjectUsersView projects result type ProjectUsers to projected type
+// ProjectUsersView using the "default" view.
+func newProjectUsersView(res *ProjectUsers) *userviews.ProjectUsersView {
+	vres := &userviews.ProjectUsersView{}
+	if res.Users != nil {
+		vres.Users = newProjectUserCollectionView(res.Users)
+	}
+	return vres
+}
+
+// newProjectUserCollection converts projected type ProjectUserCollection to
+// service type ProjectUserCollection.
+func newProjectUserCollection(vres userviews.ProjectUserCollectionView) ProjectUserCollection {
+	res := make(ProjectUserCollection, len(vres))
+	for i, n := range vres {
+		res[i] = newProjectUser(n)
+	}
+	return res
+}
+
+// newProjectUserCollectionView projects result type ProjectUserCollection to
+// projected type ProjectUserCollectionView using the "default" view.
+func newProjectUserCollectionView(res ProjectUserCollection) userviews.ProjectUserCollectionView {
+	vres := make(userviews.ProjectUserCollectionView, len(res))
+	for i, n := range res {
+		vres[i] = newProjectUserView(n)
+	}
+	return vres
+}
+
+// newProjectUser converts projected type ProjectUser to service type
+// ProjectUser.
+func newProjectUser(vres *userviews.ProjectUserView) *ProjectUser {
+	res := &ProjectUser{}
+	if vres.Role != nil {
+		res.Role = *vres.Role
+	}
+	if vres.Membership != nil {
+		res.Membership = *vres.Membership
+	}
+	if vres.User != nil {
+		res.User = newUser(vres.User)
+	}
+	return res
+}
+
+// newProjectUserView projects result type ProjectUser to projected type
+// ProjectUserView using the "default" view.
+func newProjectUserView(res *ProjectUser) *userviews.ProjectUserView {
+	vres := &userviews.ProjectUserView{
+		Role:       &res.Role,
+		Membership: &res.Membership,
+	}
+	if res.User != nil {
+		vres.User = newUserView(res.User)
+	}
+	return vres
+}
+
+// newTransmissionToken converts projected type TransmissionToken to service
+// type TransmissionToken.
+func newTransmissionToken(vres *userviews.TransmissionTokenView) *TransmissionToken {
+	res := &TransmissionToken{}
+	if vres.Token != nil {
+		res.Token = *vres.Token
+	}
+	return res
+}
+
+// newTransmissionTokenView projects result type TransmissionToken to projected
+// type TransmissionTokenView using the "default" view.
+func newTransmissionTokenView(res *TransmissionToken) *userviews.TransmissionTokenView {
+	vres := &userviews.TransmissionTokenView{
+		Token: &res.Token,
+	}
+	return vres
+}
+
+// newProjectRoleCollection converts projected type ProjectRoleCollection to
+// service type ProjectRoleCollection.
+func newProjectRoleCollection(vres userviews.ProjectRoleCollectionView) ProjectRoleCollection {
+	res := make(ProjectRoleCollection, len(vres))
+	for i, n := range vres {
+		res[i] = newProjectRole(n)
+	}
+	return res
+}
+
+// newProjectRoleCollectionView projects result type ProjectRoleCollection to
+// projected type ProjectRoleCollectionView using the "default" view.
+func newProjectRoleCollectionView(res ProjectRoleCollection) userviews.ProjectRoleCollectionView {
+	vres := make(userviews.ProjectRoleCollectionView, len(res))
+	for i, n := range res {
+		vres[i] = newProjectRoleView(n)
+	}
+	return vres
+}
+
+// newProjectRole converts projected type ProjectRole to service type
+// ProjectRole.
+func newProjectRole(vres *userviews.ProjectRoleView) *ProjectRole {
+	res := &ProjectRole{}
+	if vres.ID != nil {
+		res.ID = *vres.ID
+	}
+	if vres.Name != nil {
+		res.Name = *vres.Name
+	}
+	return res
+}
+
+// newProjectRoleView projects result type ProjectRole to projected type
+// ProjectRoleView using the "default" view.
+func newProjectRoleView(res *ProjectRole) *userviews.ProjectRoleView {
+	vres := &userviews.ProjectRoleView{
+		ID:   &res.ID,
+		Name: &res.Name,
+	}
+	return vres
+}
+
 // transformUserviewsAvailableRoleViewToAvailableRole builds a value of type
 // *AvailableRole from a value of type *userviews.AvailableRoleView.
 func transformUserviewsAvailableRoleViewToAvailableRole(v *userviews.AvailableRoleView) *AvailableRole {
@@ -196,6 +625,32 @@ func transformAvailableRoleToUserviewsAvailableRoleView(v *AvailableRole) *userv
 	res := &userviews.AvailableRoleView{
 		ID:   &v.ID,
 		Name: &v.Name,
+	}
+
+	return res
+}
+
+// transformUserviewsUserPhotoViewToUserPhoto builds a value of type *UserPhoto
+// from a value of type *userviews.UserPhotoView.
+func transformUserviewsUserPhotoViewToUserPhoto(v *userviews.UserPhotoView) *UserPhoto {
+	if v == nil {
+		return nil
+	}
+	res := &UserPhoto{
+		URL: v.URL,
+	}
+
+	return res
+}
+
+// transformUserPhotoToUserviewsUserPhotoView builds a value of type
+// *userviews.UserPhotoView from a value of type *UserPhoto.
+func transformUserPhotoToUserviewsUserPhotoView(v *UserPhoto) *userviews.UserPhotoView {
+	if v == nil {
+		return nil
+	}
+	res := &userviews.UserPhotoView{
+		URL: v.URL,
 	}
 
 	return res
