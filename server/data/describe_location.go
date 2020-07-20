@@ -94,7 +94,7 @@ func (ls *DescribeLocations) queryNative(ctx context.Context, l *Location) (name
 		names = append(names, feature.Properties.Name)
 	}
 	if len(names) > 0 {
-		all := strings.Join(names, ",")
+		all := strings.Join(names, ", ")
 		return &all, nil
 	}
 
