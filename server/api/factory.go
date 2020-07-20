@@ -11,10 +11,5 @@ func CreateApi(ctx context.Context, controllerOptions *ControllerOptions) (http.
 		return nil, err
 	}
 
-	goaV2Handler, err := CreateGoaV2Handler(ctx, controllerOptions, goaV3Handler)
-	if err != nil {
-		return nil, err
-	}
-
-	return goaV2Handler, nil
+	return goaV3Handler, nil
 }

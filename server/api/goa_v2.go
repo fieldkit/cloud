@@ -6,42 +6,10 @@ import (
 	"encoding/base64"
 	"io"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/goadesign/goa"
-	"github.com/goadesign/goa/middleware"
-	"github.com/goadesign/goa/middleware/gzip"
-
-	"github.com/fieldkit/cloud/server/common/goahelpers"
-	"github.com/fieldkit/cloud/server/common/logging"
-
-	"github.com/fieldkit/cloud/server/api/app"
 )
-
-func CreateGoaV2Handler(ctx context.Context, controllerOptions *ControllerOptions, handle404 http.Handler) (http.Handler, error) {
-	jwtMiddleware, err := controllerOptions.Config.NewJWTMiddleware()
-	if err != nil {
-		return nil, err
-	}
-
-	service := goa.New("fieldkit")
-	service.WithLogger(logging.NewGoaAdapter(logging.Logger(ctx)))
-
-	service.Use(gzip.Middleware(6))
-	service.Use(goahelpers.ErrorHandler(true))
-	service.Use(middleware.Recover())
-
-	app.UseJWTMiddleware(service, jwtMiddleware)
-
-	service.Mux.HandleNotFound(func(rw http.ResponseWriter, req *http.Request, params url.Values) {
-		handle404.ServeHTTP(rw, req)
-	})
-
-	setupErrorHandling()
-
-	return service.Mux, nil
-}
 
 // https://github.com/goadesign/goa/blob/master/error.go#L312
 func newErrorID() string {
