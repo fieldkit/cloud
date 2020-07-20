@@ -88,15 +88,12 @@ func TestUpdateProjectWhenAdministrator(t *testing.T) {
 	assert.NoError(err)
 
 	newName := faker.UUIDDigit()
-	newSlug := faker.UUIDDigit()
 	payload, err := json.Marshal(
 		struct {
 			Name        string `json:"name"`
-			Slug        string `json:"slug"`
 			Description string `json:"description"`
 		}{
 			Name:        newName,
-			Slug:        newSlug,
 			Description: "New Description",
 		},
 	)
@@ -113,7 +110,6 @@ func TestUpdateProjectWhenAdministrator(t *testing.T) {
 	{
 		"id": "<<PRESENCE>>",
 		"name": "%s",
-		"slug": "%s",
 		"description": "New Description",
 		"private": true,
 		"readOnly": false,
@@ -121,7 +117,7 @@ func TestUpdateProjectWhenAdministrator(t *testing.T) {
 		"goal": "",
 		"numberOfFollowers": 0,
 		"tags": ""
-	}`, newName, newSlug)
+	}`, newName)
 }
 
 func TestUpdateProjectWhenNotMember(t *testing.T) {
@@ -141,11 +137,9 @@ func TestUpdateProjectWhenNotMember(t *testing.T) {
 	payload, err := json.Marshal(
 		struct {
 			Name        string `json:"name"`
-			Slug        string `json:"slug"`
 			Description string `json:"description"`
 		}{
 			Name:        "New Name",
-			Slug:        "new-slug",
 			Description: "New Description",
 		},
 	)
@@ -188,7 +182,6 @@ func TestGetProjectMember(t *testing.T) {
 			"description": "<<PRESENCE>>",
 			"tags": "<<PRESENCE>>",
 			"location": "<<PRESENCE>>",
-			"slug": "<<PRESENCE>>",
 			"readOnly": true,
 			"private": false,
 			"name": "<<PRESENCE>>",
@@ -227,7 +220,6 @@ func TestGetProjectAdministrator(t *testing.T) {
 			"description": "<<PRESENCE>>",
 			"tags": "<<PRESENCE>>",
 			"location": "<<PRESENCE>>",
-			"slug": "<<PRESENCE>>",
 			"readOnly": false,
 			"private": false,
 			"name": "<<PRESENCE>>",

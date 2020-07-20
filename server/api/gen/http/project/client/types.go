@@ -8,8 +8,6 @@
 package client
 
 import (
-	"unicode/utf8"
-
 	project "github.com/fieldkit/cloud/server/api/gen/project"
 	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
 	goa "goa.design/goa/v3/pkg"
@@ -31,7 +29,6 @@ type ModifyUpdateRequestBody struct {
 // request body.
 type AddRequestBody struct {
 	Name        string  `form:"name" json:"name" xml:"name"`
-	Slug        string  `form:"slug" json:"slug" xml:"slug"`
 	Description string  `form:"description" json:"description" xml:"description"`
 	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location    *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
@@ -45,7 +42,6 @@ type AddRequestBody struct {
 // HTTP request body.
 type UpdateRequestBody struct {
 	Name        string  `form:"name" json:"name" xml:"name"`
-	Slug        string  `form:"slug" json:"slug" xml:"slug"`
 	Description string  `form:"description" json:"description" xml:"description"`
 	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location    *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
@@ -101,7 +97,6 @@ type LookupInviteResponseBody struct {
 type AddResponseBody struct {
 	ID                *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name              *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Slug              *string `form:"slug,omitempty" json:"slug,omitempty" xml:"slug,omitempty"`
 	Description       *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	Goal              *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location          *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
@@ -119,7 +114,6 @@ type AddResponseBody struct {
 type UpdateResponseBody struct {
 	ID                *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name              *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Slug              *string `form:"slug,omitempty" json:"slug,omitempty" xml:"slug,omitempty"`
 	Description       *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	Goal              *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location          *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
@@ -137,7 +131,6 @@ type UpdateResponseBody struct {
 type GetResponseBody struct {
 	ID                *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name              *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Slug              *string `form:"slug,omitempty" json:"slug,omitempty" xml:"slug,omitempty"`
 	Description       *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	Goal              *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location          *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
@@ -488,7 +481,6 @@ type ProjectCollectionResponseBody []*ProjectResponseBody
 type ProjectResponseBody struct {
 	ID                *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name              *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Slug              *string `form:"slug,omitempty" json:"slug,omitempty" xml:"slug,omitempty"`
 	Description       *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	Goal              *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location          *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
@@ -524,7 +516,6 @@ func NewModifyUpdateRequestBody(p *project.ModifyUpdatePayload) *ModifyUpdateReq
 func NewAddRequestBody(p *project.AddPayload) *AddRequestBody {
 	body := &AddRequestBody{
 		Name:        p.Project.Name,
-		Slug:        p.Project.Slug,
 		Description: p.Project.Description,
 		Goal:        p.Project.Goal,
 		Location:    p.Project.Location,
@@ -541,7 +532,6 @@ func NewAddRequestBody(p *project.AddPayload) *AddRequestBody {
 func NewUpdateRequestBody(p *project.UpdatePayload) *UpdateRequestBody {
 	body := &UpdateRequestBody{
 		Name:        p.Project.Name,
-		Slug:        p.Project.Slug,
 		Description: p.Project.Description,
 		Goal:        p.Project.Goal,
 		Location:    p.Project.Location,
@@ -821,7 +811,6 @@ func NewAddProjectOK(body *AddResponseBody) *projectviews.ProjectView {
 	v := &projectviews.ProjectView{
 		ID:                body.ID,
 		Name:              body.Name,
-		Slug:              body.Slug,
 		Description:       body.Description,
 		Goal:              body.Goal,
 		Location:          body.Location,
@@ -867,7 +856,6 @@ func NewUpdateProjectOK(body *UpdateResponseBody) *projectviews.ProjectView {
 	v := &projectviews.ProjectView{
 		ID:                body.ID,
 		Name:              body.Name,
-		Slug:              body.Slug,
 		Description:       body.Description,
 		Goal:              body.Goal,
 		Location:          body.Location,
@@ -915,7 +903,6 @@ func NewGetProjectOK(body *GetResponseBody) *projectviews.ProjectView {
 	v := &projectviews.ProjectView{
 		ID:                body.ID,
 		Name:              body.Name,
-		Slug:              body.Slug,
 		Description:       body.Description,
 		Goal:              body.Goal,
 		Location:          body.Location,
@@ -1294,9 +1281,6 @@ func ValidateProjectResponseBody(body *ProjectResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
-	if body.Slug == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("slug", "body"))
-	}
 	if body.Description == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("description", "body"))
 	}
@@ -1317,14 +1301,6 @@ func ValidateProjectResponseBody(body *ProjectResponseBody) (err error) {
 	}
 	if body.NumberOfFollowers == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("numberOfFollowers", "body"))
-	}
-	if body.Slug != nil {
-		err = goa.MergeErrors(err, goa.ValidatePattern("body.slug", *body.Slug, "^[[:alnum:]]+(-[[:alnum:]]+)*$"))
-	}
-	if body.Slug != nil {
-		if utf8.RuneCountInString(*body.Slug) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.slug", *body.Slug, utf8.RuneCountInString(*body.Slug), 40, false))
-		}
 	}
 	return
 }

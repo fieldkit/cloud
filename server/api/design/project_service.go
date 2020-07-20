@@ -6,10 +6,6 @@ import (
 
 var AddProjectFields = Type("AddProjectFields", func() {
 	Attribute("name", String)
-	Attribute("slug", String, func() {
-		Pattern("^[[:alnum:]]+(-[[:alnum:]]+)*$")
-		MaxLength(40)
-	})
 	Attribute("description", String)
 	Attribute("goal", String)
 	Attribute("location", String)
@@ -17,7 +13,7 @@ var AddProjectFields = Type("AddProjectFields", func() {
 	Attribute("private", Boolean)
 	Attribute("startTime", String)
 	Attribute("endTime", String)
-	Required("name", "slug", "description")
+	Required("name", "description")
 })
 
 var InviteUserFields = Type("InviteUserFields", func() {
@@ -38,7 +34,6 @@ var Project = ResultType("application/vnd.app.project+json", func() {
 	Attributes(func() {
 		Attribute("id", Int32)
 		Attribute("name")
-		Attribute("slug")
 		Attribute("description")
 		Attribute("goal")
 		Attribute("location")
@@ -49,12 +44,11 @@ var Project = ResultType("application/vnd.app.project+json", func() {
 		Attribute("photo")
 		Attribute("readOnly", Boolean)
 		Attribute("numberOfFollowers", Int32)
-		Required("id", "name", "slug", "description", "goal", "location", "private", "tags", "readOnly", "numberOfFollowers")
+		Required("id", "name", "description", "goal", "location", "private", "tags", "readOnly", "numberOfFollowers")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("name")
-		Attribute("slug")
 		Attribute("description")
 		Attribute("goal")
 		Attribute("location")

@@ -102,12 +102,11 @@ func (e *TestEnv) AddProject() (*data.Project, error) {
 
 	project := &data.Project{
 		Name: name + " Project",
-		Slug: name,
 	}
 
 	if err := e.DB.NamedGetContext(e.Ctx, project, `
-		INSERT INTO fieldkit.project (name, slug)
-		VALUES (:name, :slug)
+		INSERT INTO fieldkit.project (name)
+		VALUES (:name)
 		RETURNING *
 		`, project); err != nil {
 		return nil, err

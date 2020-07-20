@@ -8,8 +8,6 @@
 package views
 
 import (
-	"unicode/utf8"
-
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -75,7 +73,6 @@ type ProjectSummaryView struct {
 type ProjectView struct {
 	ID                *int32
 	Name              *string
-	Slug              *string
 	Description       *string
 	Goal              *string
 	Location          *string
@@ -118,7 +115,6 @@ var (
 		"default": []string{
 			"id",
 			"name",
-			"slug",
 			"description",
 			"goal",
 			"location",
@@ -144,7 +140,6 @@ var (
 		"default": []string{
 			"id",
 			"name",
-			"slug",
 			"description",
 			"goal",
 			"location",
@@ -278,9 +273,6 @@ func ValidateProjectView(result *ProjectView) (err error) {
 	if result.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
 	}
-	if result.Slug == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("slug", "result"))
-	}
 	if result.Description == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("description", "result"))
 	}
@@ -301,14 +293,6 @@ func ValidateProjectView(result *ProjectView) (err error) {
 	}
 	if result.NumberOfFollowers == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("numberOfFollowers", "result"))
-	}
-	if result.Slug != nil {
-		err = goa.MergeErrors(err, goa.ValidatePattern("result.slug", *result.Slug, "^[[:alnum:]]+(-[[:alnum:]]+)*$"))
-	}
-	if result.Slug != nil {
-		if utf8.RuneCountInString(*result.Slug) > 40 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("result.slug", *result.Slug, utf8.RuneCountInString(*result.Slug), 40, false))
-		}
 	}
 	return
 }

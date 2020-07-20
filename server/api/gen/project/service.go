@@ -148,7 +148,6 @@ type AddPayload struct {
 type Project struct {
 	ID                int32
 	Name              string
-	Slug              string
 	Description       string
 	Goal              string
 	Location          string
@@ -263,7 +262,6 @@ type ProjectSummary struct {
 
 type AddProjectFields struct {
 	Name        string
-	Slug        string
 	Description string
 	Goal        *string
 	Location    *string
@@ -449,9 +447,6 @@ func newProject(vres *projectviews.ProjectView) *Project {
 	if vres.Name != nil {
 		res.Name = *vres.Name
 	}
-	if vres.Slug != nil {
-		res.Slug = *vres.Slug
-	}
 	if vres.Description != nil {
 		res.Description = *vres.Description
 	}
@@ -482,7 +477,6 @@ func newProjectView(res *Project) *projectviews.ProjectView {
 	vres := &projectviews.ProjectView{
 		ID:                &res.ID,
 		Name:              &res.Name,
-		Slug:              &res.Slug,
 		Description:       &res.Description,
 		Goal:              &res.Goal,
 		Location:          &res.Location,

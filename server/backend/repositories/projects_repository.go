@@ -28,8 +28,8 @@ func (pr *ProjectRepository) AddDefaultProject(ctx context.Context, user *data.U
 
 func (pr *ProjectRepository) AddProject(ctx context.Context, userID int32, project *data.Project) (*data.Project, error) {
 	if err := pr.db.NamedGetContext(ctx, project, `
-		INSERT INTO fieldkit.project (name, slug, description, goal, location, tags, private, start_time, end_time) VALUES
-		(:name, :slug, :description, :goal, :location, :tags, :private, :start_time, :end_time) RETURNING *`, project); err != nil {
+		INSERT INTO fieldkit.project (name, description, goal, location, tags, private, start_time, end_time) VALUES
+		(:name, :description, :goal, :location, :tags, :private, :start_time, :end_time) RETURNING *`, project); err != nil {
 		return nil, err
 	}
 

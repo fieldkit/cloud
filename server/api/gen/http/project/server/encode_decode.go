@@ -2268,7 +2268,6 @@ func marshalProjectviewsProjectViewToProjectResponseBody(v *projectviews.Project
 	res := &ProjectResponseBody{
 		ID:                *v.ID,
 		Name:              *v.Name,
-		Slug:              *v.Slug,
 		Description:       *v.Description,
 		Goal:              *v.Goal,
 		Location:          *v.Location,

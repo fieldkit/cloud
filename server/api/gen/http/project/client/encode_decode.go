@@ -2391,7 +2391,6 @@ func unmarshalProjectResponseBodyToProjectviewsProjectView(v *ProjectResponseBod
 	res := &projectviews.ProjectView{
 		ID:                v.ID,
 		Name:              v.Name,
-		Slug:              v.Slug,
 		Description:       v.Description,
 		Goal:              v.Goal,
 		Location:          v.Location,

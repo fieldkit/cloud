@@ -199,7 +199,6 @@ export default Vue.extend({
             return _.extend({}, this.form, {
                 id: this.project?.id || null,
                 private: !this.form.publicProject,
-                slug: "proj-" + Date.now(),
                 startTime: makeLocalTime(this.form.startTime),
                 endTime: makeLocalTime(this.form.endTime),
                 tags: JSON.stringify(this.form.tags.map((tag) => tag.text)),

@@ -54,7 +54,6 @@ func (c *ProjectService) Add(ctx context.Context, payload *project.AddPayload) (
 
 	newProject := &data.Project{
 		Name:        payload.Project.Name,
-		Slug:        payload.Project.Slug,
 		Description: payload.Project.Description,
 		Goal:        goal,
 		Location:    location,
@@ -115,7 +114,6 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 	updating := &data.Project{
 		ID:          payload.ProjectID,
 		Name:        payload.Project.Name,
-		Slug:        payload.Project.Slug,
 		Description: payload.Project.Description,
 		Goal:        goal,
 		Location:    location,
@@ -133,7 +131,7 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 	role := data.AdministratorRole
 
 	if err := c.options.Database.NamedGetContext(ctx, updating, `
-		UPDATE fieldkit.project SET name = :name, slug = :slug, description = :description, goal = :goal, location = :location,
+		UPDATE fieldkit.project SET name = :name, description = :description, goal = :goal, location = :location,
 		tags = :tags, private = :private, start_time = :start_time, end_time = :end_time WHERE id = :id RETURNING *`, updating); err != nil {
 		return nil, err
 	}
@@ -745,7 +743,6 @@ func ProjectType(dm *data.Project, numberOfFollowers int32, role *data.Role) *pr
 	wm := &project.Project{
 		ID:                dm.ID,
 		Name:              dm.Name,
-		Slug:              dm.Slug,
 		Description:       dm.Description,
 		Goal:              dm.Goal,
 		Location:          dm.Location,
