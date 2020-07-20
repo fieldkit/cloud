@@ -90,9 +90,7 @@ export default Vue.extend({
                 required,
                 email,
             },
-            bio: {
-                required,
-            },
+            bio: {},
         },
         changePasswordForm: {
             existing: {
