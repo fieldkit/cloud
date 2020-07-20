@@ -1,6 +1,6 @@
 <template>
     <div class="profile-change">
-        <form id="form" @submit.prevent="saveForm">
+        <form @submit.prevent="saveForm">
             <h3>Profile Picture</h3>
             <div class="user-image image-container">
                 <ImageUploader :image="{ url: null }" v-if="!user.photo" @change="onImage" />

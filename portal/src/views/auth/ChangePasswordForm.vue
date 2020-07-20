@@ -1,6 +1,6 @@
 <template>
     <div class="password-change">
-        <form id="form" @submit.prevent="saveForm">
+        <form @submit.prevent="saveForm">
             <h3>Change Password</h3>
             <div>
                 <TextField v-model="form.existing" label="Current password" type="password" />
