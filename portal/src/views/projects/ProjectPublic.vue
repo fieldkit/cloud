@@ -259,4 +259,8 @@ export default {
     max-width: 400px;
     max-height: 400px;
 }
+
+.project-container {
+    margin-top: 20px;
+}
 </style>

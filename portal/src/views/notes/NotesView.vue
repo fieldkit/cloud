@@ -1,8 +1,8 @@
 <template>
     <StandardLayout>
         <div class="notes-view">
-            <DoubleHeader :title="project.name" subtitle="Field Notes" backTitle="Back to dashboard" backRoute="projects" v-if="project" />
-            <DoubleHeader title="My Stations" subtitle="Field Notes" backTitle="Back to dashboard" backRoute="projects" v-if="!project" />
+            <DoubleHeader :title="project.name" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="project" />
+            <DoubleHeader title="My Stations" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="!project" />
 
             <div class="lower">
                 <div class="side">

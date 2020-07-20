@@ -4,7 +4,7 @@
             <DoubleHeader
                 :title="displayProject.name"
                 subtitle="Project Dashbord"
-                backTitle="Back to dashboard"
+                backTitle="Back to Dashboard"
                 backRoute="projects"
                 v-if="displayProject"
             />
