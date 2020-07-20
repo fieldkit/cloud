@@ -68,7 +68,7 @@ func getAuthAttempt(ctx context.Context) *AuthAttempt {
 	if v, ok := ctx.Value("authAttempt").(*AuthAttempt); ok {
 		return v
 	}
-	return NewGoaV2AuthAttemptForErrors()
+	return nil
 }
 
 func addClaimsToContext(ctx context.Context, claims jwtgo.MapClaims) context.Context {
@@ -115,13 +115,10 @@ func (p *defaultPermissions) getClaims() (jwtgo.MapClaims, error) {
 		}
 	}
 
-	if token, err := getGoaV2AuthorizationHeader(p.context); err == nil && len(token) > 0 {
-		if claims, err := AuthenticateAgainstToken(p.context, token, p.options.JWTHMACKey); err == nil {
-			return claims, nil
-		}
-	}
-
 	authAttempt := getAuthAttempt(p.context)
+	if authAttempt == nil {
+		return nil, fmt.Errorf("invalid auth attempted")
+	}
 
 	return nil, authAttempt.Unauthorized("unauthorized")
 }

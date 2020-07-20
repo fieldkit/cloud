@@ -2,9 +2,11 @@ package api
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
+	"io"
 	"net/http"
-	"strings"
 
 	goa "goa.design/goa/v3/pkg"
 
@@ -232,6 +234,13 @@ type ErrorNamer interface {
 	ErrorName() string
 }
 
+// https://github.com/goadesign/goa/blob/master/error.go#L312
+func newErrorID() string {
+	b := make([]byte, 6)
+	io.ReadFull(rand.Reader, b)
+	return base64.StdEncoding.EncodeToString(b)
+}
+
 func logErrors() func(goa.Endpoint) goa.Endpoint {
 	return func(e goa.Endpoint) goa.Endpoint {
 		return func(ctx context.Context, request interface{}) (response interface{}, err error) {
@@ -262,18 +271,6 @@ type AuthAttempt struct {
 	Unauthorized GenerateError
 	Forbidden    GenerateError
 	NotFound     GenerateError
-}
-
-func AuthenticateAgainstToken(ctx context.Context, token string, key []byte) (jwt.MapClaims, error) {
-	cleansed := strings.ReplaceAll(token, "Bearer ", "")
-	claims := make(jwt.MapClaims)
-	_, err := jwt.ParseWithClaims(cleansed, claims, func(t *jwt.Token) (interface{}, error) {
-		return key, nil
-	})
-	if err != nil {
-		return nil, fmt.Errorf("invalid token")
-	}
-	return claims, nil
 }
 
 func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
