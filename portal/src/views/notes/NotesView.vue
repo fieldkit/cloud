@@ -223,6 +223,8 @@ export default Vue.extend({
     height: 100%;
     background-color: #fcfcfc;
     text-align: left;
+    margin-left: 40px;
+    margin-right: 40px;
 }
 .notes-view .header {
     margin-top: 40px;
@@ -235,8 +237,6 @@ export default Vue.extend({
     border: 1px solid #d8dce0;
     background: white;
     margin-top: 20px;
-    margin-left: 40px;
-    margin-right: 40px;
 }
 .notes-view .lower .side {
     flex-basis: 16rem;
