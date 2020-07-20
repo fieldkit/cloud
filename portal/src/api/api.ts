@@ -460,14 +460,14 @@ class FKApi {
         });
     }
 
-    getStations(onNoAuth: OnNoAuth<StationsResponse>): Promise<StationsResponse> {
+    getUserStations(onNoAuth: OnNoAuth<StationsResponse>): Promise<StationsResponse> {
         if (!this.token.authenticated()) {
             return onNoAuth();
         }
         return this.invoke({
             auth: Auth.Required,
             method: "GET",
-            url: this.baseUrl + "/stations",
+            url: this.baseUrl + "/user/stations",
         });
     }
 

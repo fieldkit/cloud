@@ -51,7 +51,6 @@ var StationSensor = Type("StationSensor", func() {
 	Attribute("fullKey", String)
 	Attribute("ranges", ArrayOf(SensorRange))
 	Required("name", "unitOfMeasure", "key", "fullKey", "ranges")
-
 })
 
 var StationModule = Type("StationModule", func() {
@@ -198,7 +197,6 @@ var _ = Service("station", func() {
 
 		HTTP(func() {
 			GET("stations/{id}")
-			GET("stations/@/{id}")
 
 			httpAuthentication()
 		})
@@ -215,8 +213,8 @@ var _ = Service("station", func() {
 			Attribute("id", Int32)
 			Required("id")
 			Attribute("name", String)
-			Attribute("location_name", String)
-			Attribute("status_pb", String)
+			Attribute("locationName", String)
+			Attribute("statusPb", String)
 			Required("name")
 		})
 
@@ -242,7 +240,7 @@ var _ = Service("station", func() {
 		Result(StationsFull)
 
 		HTTP(func() {
-			GET("stations")
+			GET("user/stations")
 
 			httpAuthentication()
 		})

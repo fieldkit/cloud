@@ -26,8 +26,8 @@ type AddRequestBody struct {
 // HTTP request body.
 type UpdateRequestBody struct {
 	Name         string  `form:"name" json:"name" xml:"name"`
-	LocationName *string `form:"location_name,omitempty" json:"location_name,omitempty" xml:"location_name,omitempty"`
-	StatusPb     *string `form:"status_pb,omitempty" json:"status_pb,omitempty" xml:"status_pb,omitempty"`
+	LocationName *string `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
+	StatusPb     *string `form:"statusPb,omitempty" json:"statusPb,omitempty" xml:"statusPb,omitempty"`
 }
 
 // AddResponseBody is the type of the "station" service "add" endpoint HTTP

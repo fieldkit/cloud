@@ -27,7 +27,7 @@ func TestGetStationsMine(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("GET", "/stations", nil)
+	req, _ := http.NewRequest("GET", "/user/stations", nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr := tests.ExecuteRequest(req, api)
 
@@ -415,7 +415,7 @@ func TestUpdateMyStationWithProtobufStatus(t *testing.T) {
 	payload, err := json.Marshal(
 		struct {
 			Name     string `json:"name"`
-			StatusPB []byte `json:"status_pb"`
+			StatusPB []byte `json:"statusPb"`
 		}{
 			Name:     "New Name",
 			StatusPB: replyBuffer.Bytes(),
@@ -448,7 +448,7 @@ func TestGetStationUpdatedWithProtobufStatus(t *testing.T) {
 	payload, err := json.Marshal(
 		struct {
 			Name     string `json:"name"`
-			StatusPB []byte `json:"status_pb"`
+			StatusPB []byte `json:"statusPb"`
 		}{
 			Name:     "New Name",
 			StatusPB: replyBuffer.Bytes(),
@@ -508,7 +508,7 @@ func TestUpdateMyStationWithProtobufStatusTwice(t *testing.T) {
 	payload, err := json.Marshal(
 		struct {
 			Name     string `json:"name"`
-			StatusPB []byte `json:"status_pb"`
+			StatusPB []byte `json:"statusPb"`
 		}{
 			Name:     "New Name",
 			StatusPB: replyBuffer.Bytes(),
@@ -557,7 +557,7 @@ func TestUpdateMyStationWithProtobufLiveReadingsTwice(t *testing.T) {
 	payload, err := json.Marshal(
 		struct {
 			Name     string `json:"name"`
-			StatusPB []byte `json:"status_pb"`
+			StatusPB []byte `json:"statusPb"`
 		}{
 			Name:     "New Name",
 			StatusPB: replyBuffer.Bytes(),

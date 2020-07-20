@@ -244,7 +244,7 @@ const actions = {
     [ActionTypes.NEED_STATIONS]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
         commit(MutationTypes.LOADING, { stations: true });
         const [stations] = await Promise.all([
-            new FKApi().getStations(() => {
+            new FKApi().getUserStations(() => {
                 return Promise.resolve({
                     stations: [],
                 });

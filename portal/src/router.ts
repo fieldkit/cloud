@@ -326,7 +326,15 @@ export default function routerFactory(store) {
             queryParams.append("after", to.fullPath);
             next("/login?" + queryParams.toString());
         } else {
-            next();
+            if (to.name === null) {
+                if (store.getters.isAuthenticated) {
+                    next("/dashboard");
+                } else {
+                    next("/login");
+                }
+            } else {
+                next();
+            }
         }
     });
 

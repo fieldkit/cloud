@@ -34,7 +34,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 
 	payload, err := json.Marshal(
 		struct {
-			DeviceID string `json:"device_id"`
+			DeviceID string `json:"deviceId"`
 			Name     string `json:"name"`
 		}{
 			DeviceID: station.DeviceIDHex(),
@@ -43,7 +43,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("POST", "/stations", bytes.NewReader(payload))
+	req, _ := http.NewRequest("POST", "/user/stations", bytes.NewReader(payload))
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
 	rr := tests.ExecuteRequest(req, api)
 
@@ -75,7 +75,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 		Verbose:  true,
 	}))
 
-	req, _ = http.NewRequest("GET", "/stations", nil)
+	req, _ = http.NewRequest("GET", "/user/stations", nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
 	rr = tests.ExecuteRequest(req, api)
 

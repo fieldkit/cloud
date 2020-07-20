@@ -66,14 +66,13 @@ func New(
 		Mounts: []*MountPoint{
 			{"Add", "POST", "/stations"},
 			{"Get", "GET", "/stations/{id}"},
-			{"Get", "GET", "/stations/@/{id}"},
 			{"Update", "PATCH", "/stations/{id}"},
-			{"ListMine", "GET", "/stations"},
+			{"ListMine", "GET", "/user/stations"},
 			{"ListProject", "GET", "/projects/{id}/stations"},
 			{"Photo", "GET", "/stations/{id}/photo"},
 			{"CORS", "OPTIONS", "/stations"},
 			{"CORS", "OPTIONS", "/stations/{id}"},
-			{"CORS", "OPTIONS", "/stations/@/{id}"},
+			{"CORS", "OPTIONS", "/user/stations"},
 			{"CORS", "OPTIONS", "/projects/{id}/stations"},
 			{"CORS", "OPTIONS", "/stations/{id}/photo"},
 		},
@@ -173,7 +172,6 @@ func MountGetHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("GET", "/stations/{id}", f)
-	mux.Handle("GET", "/stations/@/{id}", f)
 }
 
 // NewGetHandler creates a HTTP handler which loads the HTTP request and calls
@@ -275,7 +273,7 @@ func MountListMineHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/stations", f)
+	mux.Handle("GET", "/user/stations", f)
 }
 
 // NewListMineHandler creates a HTTP handler which loads the HTTP request and
@@ -439,7 +437,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	}
 	mux.Handle("OPTIONS", "/stations", f)
 	mux.Handle("OPTIONS", "/stations/{id}", f)
-	mux.Handle("OPTIONS", "/stations/@/{id}", f)
+	mux.Handle("OPTIONS", "/user/stations", f)
 	mux.Handle("OPTIONS", "/projects/{id}/stations", f)
 	mux.Handle("OPTIONS", "/stations/{id}/photo", f)
 }

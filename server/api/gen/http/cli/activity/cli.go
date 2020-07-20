@@ -1761,7 +1761,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 1616796085 --auth "Magni incidunt ut quo pariatur possimus odio."
+    `+os.Args[0]+` station get --id 1671793266 --auth "Animi magni incidunt."
 `, os.Args[0])
 }
 
@@ -1775,10 +1775,10 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "location_name": "Architecto eos quod.",
-      "name": "Quis voluptas quod autem dolor alias.",
-      "status_pb": "Minima harum quidem commodi qui."
-   }' --id 1900386803 --auth "Corporis omnis."
+      "locationName": "Culpa earum ut est quaerat.",
+      "name": "Ut voluptatem quas tempore et.",
+      "statusPb": "Quis voluptas quod autem dolor alias."
+   }' --id 1827365107 --auth "Eos quod aut minima harum."
 `, os.Args[0])
 }
 
@@ -1789,7 +1789,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- mine --auth "Et sit sit cumque."
+    `+os.Args[0]+` station list- mine --auth "Ea asperiores eum."
 `, os.Args[0])
 }
 
@@ -1801,7 +1801,7 @@ ListProject implements list project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project --id 120394322 --auth "Et neque ad."
+    `+os.Args[0]+` station list- project --id 2124554983 --auth "Cumque et soluta suscipit non."
 `, os.Args[0])
 }
 
@@ -1813,7 +1813,7 @@ Photo implements photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station photo --id 251506824 --auth "Dicta et."
+    `+os.Args[0]+` station photo --id 679237469 --auth "Molestias dicta."
 `, os.Args[0])
 }
 

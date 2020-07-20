@@ -1765,47 +1765,6 @@ paths:
       security:
       - jwt_header_Authorization: []
   /stations:
-    get:
-      tags:
-      - station
-      summary: list mine station
-      description: |2-
-
-        **Required security scopes for jwt**:
-          * `api:access`
-      operationId: station#list mine
-      parameters:
-      - name: Authorization
-        in: header
-        description: authentication token
-        required: true
-        type: string
-        pattern: ^Bearer [^ ]+$
-      responses:
-        "200":
-          description: OK response.
-          schema:
-            $ref: '#/definitions/StationListMineResponseBody'
-        "400":
-          description: Bad Request response.
-          schema:
-            $ref: '#/definitions/StationListMineBadRequestResponseBody'
-        "401":
-          description: Unauthorized response.
-          schema:
-            $ref: '#/definitions/StationListMineUnauthorizedResponseBody'
-        "403":
-          description: Forbidden response.
-          schema:
-            $ref: '#/definitions/StationListMineForbiddenResponseBody'
-        "404":
-          description: Not Found response.
-          schema:
-            $ref: '#/definitions/StationListMineNotFoundResponseBody'
-      schemes:
-      - http
-      security:
-      - jwt_header_Authorization: []
     post:
       tags:
       - station
@@ -1851,53 +1810,6 @@ paths:
           description: Not Found response.
           schema:
             $ref: '#/definitions/StationAddNotFoundResponseBody'
-      schemes:
-      - http
-      security:
-      - jwt_header_Authorization: []
-  /stations/@/{id}:
-    get:
-      tags:
-      - station
-      summary: get station
-      description: |2-
-
-        **Required security scopes for jwt**:
-          * `api:access`
-      operationId: station#get#1
-      parameters:
-      - name: id
-        in: path
-        required: true
-        type: integer
-        format: int32
-      - name: Authorization
-        in: header
-        description: authentication token
-        required: true
-        type: string
-        pattern: ^Bearer [^ ]+$
-      responses:
-        "200":
-          description: OK response.
-          schema:
-            $ref: '#/definitions/StationGetResponseBody'
-        "400":
-          description: Bad Request response.
-          schema:
-            $ref: '#/definitions/StationGetBadRequestResponseBody'
-        "401":
-          description: Unauthorized response.
-          schema:
-            $ref: '#/definitions/StationGetUnauthorizedResponseBody'
-        "403":
-          description: Forbidden response.
-          schema:
-            $ref: '#/definitions/StationGetForbiddenResponseBody'
-        "404":
-          description: Not Found response.
-          schema:
-            $ref: '#/definitions/StationGetNotFoundResponseBody'
       schemes:
       - http
       security:
@@ -2519,6 +2431,48 @@ paths:
           description: Not Found response.
           schema:
             $ref: '#/definitions/ProjectListMineNotFoundResponseBody'
+      schemes:
+      - http
+      security:
+      - jwt_header_Authorization: []
+  /user/stations:
+    get:
+      tags:
+      - station
+      summary: list mine station
+      description: |2-
+
+        **Required security scopes for jwt**:
+          * `api:access`
+      operationId: station#list mine
+      parameters:
+      - name: Authorization
+        in: header
+        description: authentication token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/StationListMineResponseBody'
+        "400":
+          description: Bad Request response.
+          schema:
+            $ref: '#/definitions/StationListMineBadRequestResponseBody'
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/StationListMineUnauthorizedResponseBody'
+        "403":
+          description: Forbidden response.
+          schema:
+            $ref: '#/definitions/StationListMineForbiddenResponseBody'
+        "404":
+          description: Not Found response.
+          schema:
+            $ref: '#/definitions/StationListMineNotFoundResponseBody'
       schemes:
       - http
       security:
@@ -14725,6 +14679,1398 @@ definitions:
           type: Reprehenderit voluptas.
           uploadId: Sit quo cum eius reprehenderit perferendis.
           url: Officia dicta necessitatibus aut quod sit voluptatem.
+      - battery: 0.7187137
+        configurations:
+          all:
+          - id: 1933733758780511388
+            metaRecordId: 4267605909038189909
+            modules:
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            provisionId: 6355864670896011465
+            sourceId: 754029818
+            time: 1815316146079842021
+          - id: 1933733758780511388
+            metaRecordId: 4267605909038189909
+            modules:
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            provisionId: 6355864670896011465
+            sourceId: 754029818
+            time: 1815316146079842021
+          - id: 1933733758780511388
+            metaRecordId: 4267605909038189909
+            modules:
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            provisionId: 6355864670896011465
+            sourceId: 754029818
+            time: 1815316146079842021
+        deviceId: Alias ipsam reiciendis aliquam impedit omnis.
+        firmwareNumber: 309746614
+        firmwareTime: 7687583470849153916
+        id: 1219820550
+        images:
+        - url: Vitae non a quia alias ut repellat.
+        - url: Vitae non a quia alias ut repellat.
+        - url: Vitae non a quia alias ut repellat.
+        - url: Vitae non a quia alias ut repellat.
+        location:
+          latitude: 0.664524923732283
+          longitude: 0.7115721593087961
+        locationName: Aliquid voluptas deleniti inventore laudantium libero.
+        memoryAvailable: 1020380936
+        memoryUsed: 1206489359
+        name: Ipsa earum voluptate.
+        owner:
+          id: 1702140844
+          name: Eveniet animi impedit laborum.
+        photos:
+          small: Eum voluptatem rem delectus laboriosam harum.
+        placeNameNative: Laborum nesciunt debitis dolores.
+        placeNameOther: Est animi.
+        readOnly: true
+        recordingStartedAt: 258370770638175285
+        updated: 1899432996205111693
+        uploads:
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+      - battery: 0.7187137
+        configurations:
+          all:
+          - id: 1933733758780511388
+            metaRecordId: 4267605909038189909
+            modules:
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            provisionId: 6355864670896011465
+            sourceId: 754029818
+            time: 1815316146079842021
+          - id: 1933733758780511388
+            metaRecordId: 4267605909038189909
+            modules:
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            provisionId: 6355864670896011465
+            sourceId: 754029818
+            time: 1815316146079842021
+          - id: 1933733758780511388
+            metaRecordId: 4267605909038189909
+            modules:
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            provisionId: 6355864670896011465
+            sourceId: 754029818
+            time: 1815316146079842021
+        deviceId: Alias ipsam reiciendis aliquam impedit omnis.
+        firmwareNumber: 309746614
+        firmwareTime: 7687583470849153916
+        id: 1219820550
+        images:
+        - url: Vitae non a quia alias ut repellat.
+        - url: Vitae non a quia alias ut repellat.
+        - url: Vitae non a quia alias ut repellat.
+        - url: Vitae non a quia alias ut repellat.
+        location:
+          latitude: 0.664524923732283
+          longitude: 0.7115721593087961
+        locationName: Aliquid voluptas deleniti inventore laudantium libero.
+        memoryAvailable: 1020380936
+        memoryUsed: 1206489359
+        name: Ipsa earum voluptate.
+        owner:
+          id: 1702140844
+          name: Eveniet animi impedit laborum.
+        photos:
+          small: Eum voluptatem rem delectus laboriosam harum.
+        placeNameNative: Laborum nesciunt debitis dolores.
+        placeNameOther: Est animi.
+        readOnly: true
+        recordingStartedAt: 258370770638175285
+        updated: 1899432996205111693
+        uploads:
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
     required:
     - stations
   StationListMineUnauthorizedResponseBody:
@@ -14756,6 +16102,1398 @@ definitions:
     description: List ProjectResponseBody result type (default view)
     example:
       stations:
+      - battery: 0.7187137
+        configurations:
+          all:
+          - id: 1933733758780511388
+            metaRecordId: 4267605909038189909
+            modules:
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            provisionId: 6355864670896011465
+            sourceId: 754029818
+            time: 1815316146079842021
+          - id: 1933733758780511388
+            metaRecordId: 4267605909038189909
+            modules:
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            provisionId: 6355864670896011465
+            sourceId: 754029818
+            time: 1815316146079842021
+          - id: 1933733758780511388
+            metaRecordId: 4267605909038189909
+            modules:
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            provisionId: 6355864670896011465
+            sourceId: 754029818
+            time: 1815316146079842021
+        deviceId: Alias ipsam reiciendis aliquam impedit omnis.
+        firmwareNumber: 309746614
+        firmwareTime: 7687583470849153916
+        id: 1219820550
+        images:
+        - url: Vitae non a quia alias ut repellat.
+        - url: Vitae non a quia alias ut repellat.
+        - url: Vitae non a quia alias ut repellat.
+        - url: Vitae non a quia alias ut repellat.
+        location:
+          latitude: 0.664524923732283
+          longitude: 0.7115721593087961
+        locationName: Aliquid voluptas deleniti inventore laudantium libero.
+        memoryAvailable: 1020380936
+        memoryUsed: 1206489359
+        name: Ipsa earum voluptate.
+        owner:
+          id: 1702140844
+          name: Eveniet animi impedit laborum.
+        photos:
+          small: Eum voluptatem rem delectus laboriosam harum.
+        placeNameNative: Laborum nesciunt debitis dolores.
+        placeNameOther: Est animi.
+        readOnly: true
+        recordingStartedAt: 258370770638175285
+        updated: 1899432996205111693
+        uploads:
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+      - battery: 0.7187137
+        configurations:
+          all:
+          - id: 1933733758780511388
+            metaRecordId: 4267605909038189909
+            modules:
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            provisionId: 6355864670896011465
+            sourceId: 754029818
+            time: 1815316146079842021
+          - id: 1933733758780511388
+            metaRecordId: 4267605909038189909
+            modules:
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            provisionId: 6355864670896011465
+            sourceId: 754029818
+            time: 1815316146079842021
+          - id: 1933733758780511388
+            metaRecordId: 4267605909038189909
+            modules:
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            - flags: 411492663
+              fullKey: Explicabo ducimus ut.
+              hardwareId: Hic eligendi voluptatibus delectus enim quia quaerat.
+              id: 6208697536717512040
+              internal: false
+              metaRecordId: 7047755536341877362
+              name: A sequi.
+              position: 1601351085
+              sensors:
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+              - fullKey: Molestiae ad placeat exercitationem.
+                key: Et non dolore est consequatur.
+                name: Et quo.
+                ranges:
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                - maximum: 0.14832576
+                  minimum: 0.4190794
+                reading:
+                  last: 0.22434391
+                  time: 2451117607040924737
+                unitOfMeasure: Et quo.
+            provisionId: 6355864670896011465
+            sourceId: 754029818
+            time: 1815316146079842021
+        deviceId: Alias ipsam reiciendis aliquam impedit omnis.
+        firmwareNumber: 309746614
+        firmwareTime: 7687583470849153916
+        id: 1219820550
+        images:
+        - url: Vitae non a quia alias ut repellat.
+        - url: Vitae non a quia alias ut repellat.
+        - url: Vitae non a quia alias ut repellat.
+        - url: Vitae non a quia alias ut repellat.
+        location:
+          latitude: 0.664524923732283
+          longitude: 0.7115721593087961
+        locationName: Aliquid voluptas deleniti inventore laudantium libero.
+        memoryAvailable: 1020380936
+        memoryUsed: 1206489359
+        name: Ipsa earum voluptate.
+        owner:
+          id: 1702140844
+          name: Eveniet animi impedit laborum.
+        photos:
+          small: Eum voluptatem rem delectus laboriosam harum.
+        placeNameNative: Laborum nesciunt debitis dolores.
+        placeNameOther: Est animi.
+        readOnly: true
+        recordingStartedAt: 258370770638175285
+        updated: 1899432996205111693
+        uploads:
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
+        - blocks:
+          - 1910336117585170868
+          - 8954295507017692777
+          id: 9117949933922090463
+          size: 6867156604380084191
+          time: 6166064921945974471
+          type: Reprehenderit voluptas.
+          uploadId: Sit quo cum eius reprehenderit perferendis.
+          url: Officia dicta necessitatibus aut quod sit voluptatem.
       - battery: 0.7187137
         configurations:
           all:
@@ -16456,19 +19194,19 @@ definitions:
     title: StationUpdateRequestBody
     type: object
     properties:
-      location_name:
+      locationName:
         type: string
         example: Corrupti atque explicabo dolorem quo quidem occaecati.
       name:
         type: string
         example: Facilis quos labore ducimus quis aut iste.
-      status_pb:
+      statusPb:
         type: string
         example: Beatae dolore ad nam aperiam architecto.
     example:
-      location_name: Exercitationem nisi deserunt repellat.
+      locationName: Exercitationem nisi deserunt repellat.
       name: Rem mollitia quis animi.
-      status_pb: Repudiandae saepe qui aut modi.
+      statusPb: Repudiandae saepe qui aut modi.
     required:
     - name
   StationUpdateResponseBody:
