@@ -112,7 +112,8 @@ func (c *UserController) Add(ctx *app.AddUserContext) error {
 	}
 
 	if err := c.options.Database.NamedGetContext(ctx, user, `
-		INSERT INTO fieldkit.user (name, username, email, password, bio) VALUES (:name, :email, :email, :password, :bio) RETURNING *
+		INSERT INTO fieldkit.user (name, username, email, password, bio, created_at, updated_at)
+		VALUES (:name, :email, :email, :password, :bio, NOW(), NOW()) RETURNING *
 		`, user); err != nil {
 		return err
 	}
@@ -159,7 +160,7 @@ func (c *UserController) Update(ctx *app.UpdateUserContext) error {
 	}
 
 	if err := c.options.Database.NamedGetContext(ctx, user, `
-		UPDATE fieldkit.user SET name = :name, username = :email, email = :email, bio = :bio WHERE id = :id RETURNING *
+		UPDATE fieldkit.user SET name = :name, username = :email, email = :email, bio = :bio, updated_at = NOW() WHERE id = :id RETURNING *
 		`, user); err != nil {
 		return err
 	}
