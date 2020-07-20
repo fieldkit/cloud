@@ -38,6 +38,20 @@ const routes = [
         },
     },
     {
+        path: "/spoof",
+        name: "spoof",
+        component: LoginView,
+        props: (route) => {
+            return {
+                spoofing: true,
+            };
+        },
+        meta: {
+            bodyClass: "blue-background",
+            secured: false,
+        },
+    },
+    {
         path: "/register",
         name: "register",
         component: CreateAccountView,

@@ -4,6 +4,16 @@
         <div>
             <form id="form" @submit.prevent="save">
                 <h1>Log In to Your Account</h1>
+                <div class="outer-input-container" v-if="spoofing">
+                    <div class="input-container middle-container">
+                        <TextField v-model="form.spoofEmail" label="Spoof Email" />
+
+                        <div class="validation-errors" v-if="$v.form.spoofEmail.$error">
+                            <div v-if="!$v.form.spoofEmail.required">Spoof Email is a required field.</div>
+                            <div v-if="!$v.form.spoofEmail.email">Must be a valid email address.</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="outer-input-container">
                     <div class="input-container middle-container">
                         <TextField v-model="form.email" label="Email" />
@@ -56,9 +66,16 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
     },
+    props: {
+        spoofing: {
+            type: Boolean,
+            default: false,
+        },
+    },
     data() {
         return {
             form: {
+                spoofEmail: "",
                 email: "",
                 password: "",
             },
@@ -66,14 +83,31 @@ export default Vue.extend({
             failed: false,
         };
     },
-    validations: {
-        form: {
-            email: {
-                required,
-                email,
+    validations() {
+        if (this.spoofing) {
+            return {
+                form: {
+                    spoofEmail: {
+                        required,
+                        email,
+                    },
+                    email: {
+                        required,
+                        email,
+                    },
+                    password: { required, min: minLength(10) },
+                },
+            };
+        }
+        return {
+            form: {
+                email: {
+                    required,
+                    email,
+                },
+                password: { required, min: minLength(10) },
             },
-            password: { required, min: minLength(10) },
-        },
+        };
     },
     methods: {
         forwardAfterQuery() {
@@ -84,13 +118,19 @@ export default Vue.extend({
             }
             return {};
         },
+        createPayload() {
+            if (this.spoofing) {
+                return new LoginPayload(this.form.spoofEmail, this.form.email + " " + this.form.password);
+            }
+            return new LoginPayload(this.form.email, this.form.password);
+        },
         save() {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
                 return;
             }
 
-            const payload = new LoginPayload(this.form.email, this.form.password);
+            const payload = this.createPayload();
 
             this.busy = true;
             this.failed = false;
