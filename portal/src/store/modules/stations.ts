@@ -35,16 +35,16 @@ export class StationsState {
     projectStations: { [index: number]: DisplayStation[] } = {};
     projectActivities: { [index: number]: Activity[] } = {};
     user: {
-        stations: DisplayStation[];
-        projects: Project[];
+        stations: { [index: number]: DisplayStation };
+        projects: { [index: number]: Project };
     } = {
-        stations: [],
-        projects: [],
+        stations: {},
+        projects: {},
     };
     community: {
-        projects: Project[];
+        projects: { [index: number]: Project };
     } = {
-        projects: [],
+        projects: {},
     };
 }
 
@@ -348,16 +348,28 @@ const actions = {
 
 const mutations = {
     [HAVE_COMMUNITY_PROJECTS]: (state: StationsState, projects: Project[]) => {
-        Vue.set(state.community, "projects", projects);
+        Vue.set(
+            state.community,
+            "projects",
+            _.keyBy(projects, (p) => p.id)
+        );
         Vue.set(state, "projects", { ...state.projects, ..._.keyBy(projects, (p) => p.id) });
     },
     [HAVE_USER_PROJECTS]: (state: StationsState, projects: Project[]) => {
-        Vue.set(state.user, "projects", projects);
+        Vue.set(
+            state.user,
+            "projects",
+            _.keyBy(projects, (p) => p.id)
+        );
         Vue.set(state, "projects", { ...state.projects, ..._.keyBy(projects, (p) => p.id) });
     },
     [HAVE_USER_STATIONS]: (state: StationsState, payload: Station[]) => {
         const stations = payload.map((station) => new DisplayStation(station));
-        Vue.set(state.user, "stations", stations);
+        Vue.set(
+            state.user,
+            "stations",
+            _.keyBy(stations, (s) => s.id)
+        );
         Vue.set(state, "stations", { ...state.stations, ..._.keyBy(stations, (s) => s.id) });
         Vue.set(state, "hasNoStations", stations.length == 0);
     },
@@ -382,9 +394,7 @@ const mutations = {
     },
     [PROJECT_UPDATE]: (state: StationsState, project: Project) => {
         Vue.set(state.projects, project.id, project);
-        if (state.user.projects[project.id]) {
-            Vue.set(state.user.projects, project.id, project);
-        }
+        Vue.set(state.user.projects, project.id, project);
     },
 };
 

@@ -62,9 +62,9 @@ export default Vue.extend({
         ...mapState({
             user: (s: GlobalState) => s.user.user,
             hasNoStations: (s: GlobalState) => s.stations.hasNoStations,
-            stations: (s: GlobalState) => s.stations.user.stations,
-            userProjects: (s: GlobalState) => s.stations.user.projects,
-            anyStations: (s: GlobalState) => s.stations.user.stations.length > 0,
+            stations: (s: GlobalState) => Object.values(s.stations.user.stations),
+            userProjects: (s: GlobalState) => Object.values(s.stations.user.projects),
+            anyStations: (s: GlobalState) => Object.values(s.stations.user.stations).length > 0,
         }),
     },
     beforeMount() {
