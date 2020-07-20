@@ -1,38 +1,20 @@
 package api
 
 import (
-	"bufio"
 	"bytes"
 	"image"
 	"image/color"
 	"image/png"
-	"io"
 	"math"
 	"math/rand"
 
-	"github.com/goadesign/goa"
 	"github.com/llgcode/draw2d/draw2dimg"
 	"github.com/lucasb-eyer/go-colorful"
-
-	"github.com/fieldkit/cloud/server/api/app"
-	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
 const (
 	float64MaxUint64 = float64(math.MaxUint64)
 )
-
-type PictureController struct {
-	*goa.Controller
-	options *ControllerOptions
-}
-
-func NewPictureController(service *goa.Service, options *ControllerOptions) *PictureController {
-	return &PictureController{
-		options:    options,
-		Controller: service.NewController("PictureController"),
-	}
-}
 
 func UserDefaultPicture(id int64) ([]byte, error) {
 	r := rand.New(rand.NewSource(id))
@@ -176,57 +158,4 @@ func StationDefaultPicture(id int64) ([]byte, error) {
 	}
 
 	return picture.Bytes(), nil
-}
-
-func (c *PictureController) UserGetID(ctx *app.UserGetIDPictureContext) error {
-	picture, err := UserDefaultPicture(int64(ctx.UserID))
-	if err != nil {
-		return err
-	}
-
-	mr := repositories.NewMediaRepository(c.options.MediaFiles)
-
-	lm, err := mr.LoadByKey(ctx, "598c0282-5c8c-4bdd-9e82-950ab796c059")
-	if err != nil {
-		return err
-	}
-
-	if lm != nil {
-		writer := bufio.NewWriter(ctx.ResponseData)
-
-		_, err = io.Copy(writer, lm.Reader)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	return ctx.OK(picture)
-}
-
-func (c *PictureController) UserSaveID(ctx *app.UserSaveIDPictureContext) error {
-	mr := repositories.NewMediaRepository(c.options.MediaFiles)
-
-	saved, err := mr.Save(ctx, ctx.RequestData)
-	if err != nil {
-		return err
-	}
-
-	// Need to save URL and ID with whatever this media should be attached to.
-
-	_ = saved
-
-	return ctx.OK(&app.MediaReferenceResponse{
-		ID:  0,
-		URL: "",
-	})
-}
-
-func (c *PictureController) ProjectGetID(ctx *app.ProjectGetIDPictureContext) error {
-	picture, err := ProjectDefaultPicture(int64(ctx.ProjectID))
-	if err != nil {
-		return err
-	}
-
-	return ctx.OK(picture)
 }

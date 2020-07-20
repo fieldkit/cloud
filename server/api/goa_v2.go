@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	_ "fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -34,8 +33,6 @@ func CreateGoaV2Handler(ctx context.Context, controllerOptions *ControllerOption
 	service.Use(middleware.Recover())
 
 	app.UseJWTMiddleware(service, jwtMiddleware)
-
-	app.MountPictureController(service, NewPictureController(service, controllerOptions))
 
 	service.Mux.HandleNotFound(func(rw http.ResponseWriter, req *http.Request, params url.Values) {
 		handle404.ServeHTTP(rw, req)
