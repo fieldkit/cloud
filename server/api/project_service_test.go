@@ -15,6 +15,23 @@ import (
 	"github.com/fieldkit/cloud/server/tests"
 )
 
+func TestGetProjectsAllNoAuth(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	_, err = e.AddStations(5)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", "/projects", nil)
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+}
+
 func TestGetProjectsAll(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()

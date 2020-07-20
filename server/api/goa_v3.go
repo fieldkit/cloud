@@ -258,9 +258,14 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 		return a.Key, nil
 	})
 	if err != nil {
+		// Authentication is optional if required scopes is empty.
+		if len(a.Scheme.RequiredScopes) == 0 {
+			return ctx, nil
+		}
 		return ctx, a.Unauthorized("invalid token")
 	}
 
+	// Make sure this token we've been given has valid scopes.
 	if claims["scopes"] == nil {
 		return ctx, a.Unauthorized("invalid scopes")
 	}
@@ -272,6 +277,9 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 	for _, scp := range scopes {
 		scopesInToken = append(scopesInToken, scp.(string))
 	}
+
+	// We have a good token that has scopes, note that this does play
+	// nice with schemes that don't have any required scopes.
 	if err := a.Scheme.Validate(scopesInToken); err != nil {
 		return ctx, a.Unauthorized("invalid scopes")
 	}

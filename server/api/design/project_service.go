@@ -326,9 +326,8 @@ var _ = Service("project", func() {
 	})
 
 	Method("get", func() {
-		// Is this optional?
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {
@@ -347,9 +346,8 @@ var _ = Service("project", func() {
 	})
 
 	Method("list community", func() {
-		// Is this optional?
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {

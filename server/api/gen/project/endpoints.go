@@ -316,7 +316,7 @@ func NewGetEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 		sc := security.JWTScheme{
 			Name:           "jwt",
 			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
+			RequiredScopes: []string{},
 		}
 		var token string
 		if p.Auth != nil {
@@ -344,7 +344,7 @@ func NewListCommunityEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.End
 		sc := security.JWTScheme{
 			Name:           "jwt",
 			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
+			RequiredScopes: []string{},
 		}
 		var token string
 		if p.Auth != nil {
