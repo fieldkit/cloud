@@ -57,6 +57,9 @@ import (
 
 	firmware "github.com/fieldkit/cloud/server/api/gen/firmware"
 	firmwareSvr "github.com/fieldkit/cloud/server/api/gen/http/firmware/server"
+
+	datas "github.com/fieldkit/cloud/server/api/gen/data"
+	datasSvr "github.com/fieldkit/cloud/server/api/gen/http/data/server"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -102,6 +105,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	firmwareSvc := NewFirmwareService(ctx, options)
 	firmwareEndpoints := firmware.NewEndpoints(firmwareSvc)
 
+	dataSvc := NewDataService(ctx, options)
+	dataEndpoints := datas.NewEndpoints(dataSvc)
+
 	logErrors := logErrors()
 
 	modulesEndpoints.Use(logErrors)
@@ -118,6 +124,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	notesEndpoints.Use(logErrors)
 	recordsEndpoints.Use(logErrors)
 	firmwareEndpoints.Use(logErrors)
+	dataEndpoints.Use(logErrors)
 
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
@@ -143,6 +150,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	notesServer := notesSvr.New(notesEndpoints, mux, dec, enc, eh, nil)
 	recordsServer := recordsSvr.New(recordsEndpoints, mux, dec, enc, eh, nil)
 	firmwareServer := firmwareSvr.New(firmwareEndpoints, mux, dec, enc, eh, nil)
+	dataServer := datasSvr.New(dataEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
@@ -158,6 +166,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	notesSvr.Mount(mux, notesServer)
 	recordsSvr.Mount(mux, recordsServer)
 	firmwareSvr.Mount(mux, firmwareServer)
+	datasSvr.Mount(mux, dataServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -201,6 +210,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range firmwareServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range dataServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 

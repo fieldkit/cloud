@@ -1,81 +1,34 @@
 package design
 
 import (
-	. "github.com/goadesign/goa/design"
-	. "github.com/goadesign/goa/design/apidsl"
+	. "goa.design/goa/v3/dsl"
 )
 
-var _ = Resource("data", func() {
-	Security(JWT, func() {
+var _ = Service("data", func() {
+	Security(JWTAuth, func() {
 		Scope("api:access")
 	})
 
-	Action("device summary", func() {
-		Routing(GET("data/devices/:deviceId/summary"))
-		Description("Retrieve summary")
-		Response(NotFound)
-		Response(OK, func() {
-			Media(DeviceDataSummaryResponse)
+	Method("device summary", func() {
+		Result(DeviceDataSummaryResponse)
+
+		Payload(func() {
+			Token("auth")
+			Attribute("deviceId", String)
+			Required("deviceId")
+		})
+
+		HTTP(func() {
+			GET("data/devices/{deviceId}/summary")
 		})
 	})
 
-	Action("device data", func() {
-		Routing(GET("data/devices/:deviceId/data"))
-		Description("Retrieve data")
-		Params(func() {
-			Param("firstBlock", Integer)
-			Param("lastBlock", Integer)
-			Param("page", Integer)
-			Param("pageSize", Integer)
-		})
-		Response(NotFound)
-		Response(OK, func() {
-			Media(DeviceDataRecordsResponse)
-		})
-	})
-})
-
-var DeviceMetaRecord = MediaType("application/vnd.app.device.meta.record+json", func() {
-	TypeName("DeviceMetaRecord")
-	Attributes(func() {
-		Attribute("id", Integer)
-		Attribute("time", DateTime)
-		Attribute("record", Integer)
-		Attribute("data", HashOf(String, Any))
-		Required("id", "time", "record", "data")
-	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("time")
-		Attribute("record")
-		Attribute("data")
-	})
-})
-
-var DeviceDataRecord = MediaType("application/vnd.app.device.data.record+json", func() {
-	TypeName("DeviceDataRecord")
-	Attributes(func() {
-		Attribute("id", Integer)
-		Attribute("time", DateTime)
-		Attribute("record", Integer)
-		Attribute("meta", Integer)
-		Attribute("location", ArrayOf(Number))
-		Attribute("data", HashOf(String, Any))
-		Required("id", "time", "record", "meta", "location", "data")
-	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("time")
-		Attribute("record")
-		Attribute("meta")
-		Attribute("location")
-		Attribute("data")
-	})
+	commonOptions()
 })
 
 var DeviceStreamSummary = Type("DeviceStreamSummary", func() {
-	Attribute("records", Integer)
-	Attribute("size", Integer)
+	Attribute("records", Int64)
+	Attribute("size", Int64)
 })
 
 var DeviceDataStreamsSummary = Type("DeviceDataStreamsSummary", func() {
@@ -83,26 +36,12 @@ var DeviceDataStreamsSummary = Type("DeviceDataStreamsSummary", func() {
 	Attribute("data", DeviceStreamSummary)
 })
 
-var DeviceDataRecordsResponse = MediaType("application/vnd.app.device.data+json", func() {
-	TypeName("DeviceDataRecordsResponse")
-	Attributes(func() {
-		Attribute("meta", CollectionOf(DeviceMetaRecord))
-		Attribute("data", CollectionOf(DeviceDataRecord))
-		Required("meta")
-		Required("data")
-	})
-	View("default", func() {
-		Attribute("meta")
-		Attribute("data")
-	})
-})
-
-var DeviceProvisionSummary = MediaType("application/vnd.app.device.provision.summary+json", func() {
+var DeviceProvisionSummary = ResultType("application/vnd.app.device.provision.summary+json", func() {
 	TypeName("DeviceProvisionSummary")
 	Attributes(func() {
 		Attribute("generation", String)
-		Attribute("created", DateTime)
-		Attribute("updated", DateTime)
+		Attribute("created", Int64)
+		Attribute("updated", Int64)
 		Attribute("meta", DeviceMetaSummary)
 		Attribute("data", DeviceDataSummary)
 
@@ -121,12 +60,12 @@ var DeviceProvisionSummary = MediaType("application/vnd.app.device.provision.sum
 	})
 })
 
-var DeviceMetaSummary = MediaType("application/vnd.app.device.meta.summary+json", func() {
+var DeviceMetaSummary = ResultType("application/vnd.app.device.meta.summary+json", func() {
 	TypeName("DeviceMetaSummary")
 	Attributes(func() {
-		Attribute("size", Integer)
-		Attribute("first", Integer)
-		Attribute("last", Integer)
+		Attribute("size", Int64)
+		Attribute("first", Int64)
+		Attribute("last", Int64)
 		Required("size")
 		Required("first")
 		Required("last")
@@ -138,12 +77,12 @@ var DeviceMetaSummary = MediaType("application/vnd.app.device.meta.summary+json"
 	})
 })
 
-var DeviceDataSummary = MediaType("application/vnd.app.device.data.summary+json", func() {
+var DeviceDataSummary = ResultType("application/vnd.app.device.data.summary+json", func() {
 	TypeName("DeviceDataSummary")
 	Attributes(func() {
-		Attribute("size", Integer)
-		Attribute("first", Integer)
-		Attribute("last", Integer)
+		Attribute("size", Int64)
+		Attribute("first", Int64)
+		Attribute("last", Int64)
 		Required("size")
 		Required("first")
 		Required("last")
@@ -155,7 +94,7 @@ var DeviceDataSummary = MediaType("application/vnd.app.device.data.summary+json"
 	})
 })
 
-var DeviceDataSummaryResponse = MediaType("application/vnd.app.device.summary+json", func() {
+var DeviceDataSummaryResponse = ResultType("application/vnd.app.device.summary+json", func() {
 	TypeName("DeviceDataSummaryResponse")
 	Attributes(func() {
 		Attribute("provisions", CollectionOf(DeviceProvisionSummary))

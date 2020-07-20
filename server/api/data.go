@@ -4,22 +4,20 @@ import (
 	"context"
 	"encoding/hex"
 
-	"github.com/goadesign/goa"
+	"goa.design/goa/v3/security"
 
-	"github.com/fieldkit/cloud/server/api/app"
-	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
+
+	datas "github.com/fieldkit/cloud/server/api/gen/data"
 )
 
-type DataController struct {
-	*goa.Controller
+type DataService struct {
 	options *ControllerOptions
 }
 
-func NewDataController(ctx context.Context, service *goa.Service, options *ControllerOptions) *DataController {
-	return &DataController{
-		options:    options,
-		Controller: service.NewController("DataController"),
+func NewDataService(ctx context.Context, options *ControllerOptions) *DataService {
+	return &DataService{
+		options: options,
 	}
 }
 
@@ -34,33 +32,33 @@ type BlocksSummaryRow struct {
 	Blocks data.Int64Range
 }
 
-func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error {
+func (s *DataService) DeviceSummary(ctx context.Context, payload *datas.DeviceSummaryPayload) (*datas.DeviceDataSummaryResponse, error) {
 	log := Logger(ctx).Sugar()
 
-	deviceIdBytes, err := data.DecodeBinaryString(ctx.DeviceID)
+	deviceIdBytes, err := data.DecodeBinaryString(payload.DeviceID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	p, err := NewPermissions(ctx, c.options).ForStationByDeviceID(deviceIdBytes)
+	p, err := NewPermissions(ctx, s.options).ForStationByDeviceID(deviceIdBytes)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := p.CanView(); err != nil {
-		return err
+		return nil, err
 	}
 
 	log.Infow("summary", "device_id", deviceIdBytes)
 
 	provisions := make([]*data.Provision, 0)
-	if err := c.options.Database.SelectContext(ctx, &provisions, `SELECT * FROM fieldkit.provision WHERE (device_id = $1) ORDER BY updated DESC`, deviceIdBytes); err != nil {
-		return err
+	if err := s.options.Database.SelectContext(ctx, &provisions, `SELECT * FROM fieldkit.provision WHERE (device_id = $1) ORDER BY updated DESC`, deviceIdBytes); err != nil {
+		return nil, err
 	}
 
 	var rows = make([]ProvisionSummaryRow, 0)
-	if err := c.options.Database.SelectContext(ctx, &rows, `SELECT generation, type, range_merge(blocks) AS blocks FROM fieldkit.ingestion WHERE (device_id = $1) GROUP BY type, generation`, deviceIdBytes); err != nil {
-		return err
+	if err := s.options.Database.SelectContext(ctx, &rows, `SELECT generation, type, range_merge(blocks) AS blocks FROM fieldkit.ingestion WHERE (device_id = $1) GROUP BY type, generation`, deviceIdBytes); err != nil {
+		return nil, err
 	}
 
 	var blockSummaries = make(map[string]map[string]BlocksSummaryRow)
@@ -75,110 +73,39 @@ func (c *DataController) DeviceSummary(ctx *app.DeviceSummaryDataContext) error 
 		}
 	}
 
-	provisionVms := make([]*app.DeviceProvisionSummary, len(provisions))
+	provisionVms := make([]*datas.DeviceProvisionSummary, len(provisions))
 	for i, p := range provisions {
 		g := hex.EncodeToString(p.GenerationID)
 		byType := blockSummaries[g]
-		provisionVms[i] = &app.DeviceProvisionSummary{
+		provisionVms[i] = &datas.DeviceProvisionSummary{
 			Generation: g,
-			Created:    p.Created,
-			Updated:    p.Updated,
-			Meta: &app.DeviceMetaSummary{
-				Size:  int(0),
-				First: int(byType[data.MetaTypeName].Blocks[0]),
-				Last:  int(byType[data.MetaTypeName].Blocks[1]),
+			Created:    p.Created.Unix(),
+			Updated:    p.Updated.Unix(),
+			Meta: &datas.DeviceMetaSummary{
+				Size:  int64(0),
+				First: int64(byType[data.MetaTypeName].Blocks[0]),
+				Last:  int64(byType[data.MetaTypeName].Blocks[1]),
 			},
-			Data: &app.DeviceDataSummary{
-				Size:  int(0),
-				First: int(byType[data.DataTypeName].Blocks[0]),
-				Last:  int(byType[data.DataTypeName].Blocks[1]),
+			Data: &datas.DeviceDataSummary{
+				Size:  int64(0),
+				First: int64(byType[data.DataTypeName].Blocks[0]),
+				Last:  int64(byType[data.DataTypeName].Blocks[1]),
 			},
 		}
 	}
 
-	return ctx.OK(&app.DeviceDataSummaryResponse{
+	return &datas.DeviceDataSummaryResponse{
 		Provisions: provisionVms,
-	})
+	}, nil
 }
 
-func (c *DataController) DeviceData(ctx *app.DeviceDataDataContext) error {
-	deviceIdBytes, err := data.DecodeBinaryString(ctx.DeviceID)
-	if err != nil {
-		return err
-	}
-
-	p, err := NewPermissions(ctx, c.options).ForStationByDeviceID(deviceIdBytes)
-	if err != nil {
-		return err
-	}
-
-	if err := p.CanView(); err != nil {
-		return err
-	}
-
-	log := Logger(ctx).Sugar()
-
-	_ = log
-
-	rr, err := repositories.NewRecordRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
-
-	pageNumber := 0
-	if ctx.Page != nil {
-		pageNumber = *ctx.Page
-	}
-
-	pageSize := 200
-	if ctx.PageSize != nil {
-		pageSize = *ctx.PageSize
-	}
-
-	page, err := rr.QueryDevice(ctx, ctx.DeviceID, pageNumber, pageSize)
-	if err != nil {
-		return err
-	}
-
-	dataVms := make([]*app.DeviceDataRecord, len(page.Data))
-	for i, r := range page.Data {
-		data, err := r.GetData()
-		if err != nil {
-			return err
-		}
-
-		coordinates := []float64{}
-		if r.Location != nil {
-			coordinates = r.Location.Coordinates()
-		}
-
-		dataVms[i] = &app.DeviceDataRecord{
-			ID:       int(r.ID),
-			Time:     r.Time,
-			Record:   int(r.Number),
-			Meta:     int(r.MetaRecordID),
-			Location: coordinates,
-			Data:     data,
-		}
-	}
-
-	metaVms := make([]*app.DeviceMetaRecord, len(page.Meta))
-	for _, r := range page.Meta {
-		data, err := r.GetData()
-		if err != nil {
-			return err
-		}
-
-		metaVms = append(metaVms, &app.DeviceMetaRecord{
-			ID:     int(r.ID),
-			Time:   r.Time,
-			Record: int(r.Number),
-			Data:   data,
-		})
-	}
-
-	return ctx.OK(&app.DeviceDataRecordsResponse{
-		Meta: metaVms,
-		Data: dataVms,
+func (s *DataService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
+	return Authenticate(ctx, AuthAttempt{
+		Token:        token,
+		Scheme:       scheme,
+		Key:          s.options.JWTHMACKey,
+		NotFound:     func(m string) error { return datas.NotFound(m) },
+		Unauthorized: func(m string) error { return datas.Unauthorized(m) },
+		Forbidden:    func(m string) error { return datas.Forbidden(m) },
 	})
 }

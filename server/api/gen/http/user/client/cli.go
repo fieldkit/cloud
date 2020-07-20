@@ -108,7 +108,7 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userLoginBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"tamara.sporer@sporer.biz\",\n      \"password\": \"0ts\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"sherwood_mitchell@kuvalisbode.com\",\n      \"password\": \"3i8\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
@@ -138,7 +138,7 @@ func BuildRecoveryLookupPayload(userRecoveryLookupBody string) (*user.RecoveryLo
 	{
 		err = json.Unmarshal([]byte(userRecoveryLookupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Autem non dolorem dolor qui occaecati et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Ratione nam voluptatibus et incidunt.\"\n   }'")
 		}
 	}
 	v := &user.RecoveryLookupFields{
@@ -159,7 +159,7 @@ func BuildRecoveryPayload(userRecoveryBody string) (*user.RecoveryPayload, error
 	{
 		err = json.Unmarshal([]byte(userRecoveryBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"password\": \"j7f\",\n      \"token\": \"Quia eos deleniti esse.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"password\": \"hhf\",\n      \"token\": \"Error et nostrum quia aut voluptatum consequatur.\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Password) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 10, true))
@@ -200,7 +200,7 @@ func BuildRefreshPayload(userRefreshBody string) (*user.RefreshPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userRefreshBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"refreshToken\": \"Quibusdam quis rerum reiciendis enim reprehenderit.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"refreshToken\": \"Dignissimos qui consequuntur.\"\n   }'")
 		}
 	}
 	v := &user.RefreshPayload{
@@ -249,7 +249,7 @@ func BuildAddPayload(userAddBody string) (*user.AddPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Dolores ut odit.\",\n      \"meta\": \"Impedit ipsam enim minima recusandae modi aliquid.\",\n      \"module\": \"Animi est rerum similique architecto.\",\n      \"profile\": \"Et vero aut qui.\",\n      \"url\": \"Dolor eveniet ipsum aperiam et eaque.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Consequuntur enim vitae dolor nisi.\",\n      \"meta\": \"Totam sit tempore aliquam vel.\",\n      \"module\": \"Ea non.\",\n      \"profile\": \"Quis voluptas est et explicabo.\",\n      \"url\": \"Harum aut minima omnis voluptates.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -285,7 +285,7 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateUserID string, userUpda
 	{
 		err = json.Unmarshal([]byte(userUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Molestiae ad placeat exercitationem.\",\n      \"endTime\": \"Odit ratione expedita numquam.\",\n      \"goal\": \"Saepe iure.\",\n      \"location\": \"Accusantium ab nesciunt omnis et.\",\n      \"name\": \"Et non dolore est consequatur.\",\n      \"private\": false,\n      \"startTime\": \"Omnis saepe modi at maiores ullam voluptatem.\",\n      \"tags\": \"Facere consequatur voluptate debitis rerum.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Eligendi veritatis.\",\n      \"endTime\": \"Porro aut non quidem harum.\",\n      \"goal\": \"Et ipsum magnam et odio sit tempora.\",\n      \"location\": \"Impedit molestias magnam.\",\n      \"name\": \"Et perferendis temporibus.\",\n      \"private\": true,\n      \"startTime\": \"Id et sequi fugiat nemo non.\",\n      \"tags\": \"Magni in expedita.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -332,7 +332,7 @@ func BuildChangePasswordPayload(userChangePasswordBody string, userChangePasswor
 	{
 		err = json.Unmarshal([]byte(userChangePasswordBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"newPassword\": \"f8i\",\n      \"oldPassword\": \"w0y\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"newPassword\": \"87l\",\n      \"oldPassword\": \"je4\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.OldPassword) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.oldPassword", body.OldPassword, utf8.RuneCountInString(body.OldPassword), 10, true))
@@ -428,7 +428,7 @@ func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth str
 	{
 		err = json.Unmarshal([]byte(userAdminDeleteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Ut mollitia quas tenetur quae aut.\",\n      \"password\": \"Est laudantium eius deleniti quis voluptatem non.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Adipisci dolore unde maxime vero occaecati cum.\",\n      \"password\": \"Minus consequatur consequatur harum est.\"\n   }'")
 		}
 	}
 	var auth string
