@@ -74,7 +74,6 @@
             <div id="public-checkbox-container">
                 <input type="checkbox" id="checkbox" v-model="form.publicProject" />
                 <label for="checkbox">Make this project public</label>
-                <img alt="Info" src="@/assets/info.png" />
             </div>
             <div class="action-container">
                 <button class="save-button" v-if="!project" type="submit">Add</button>
