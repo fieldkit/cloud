@@ -260,8 +260,13 @@ const actions = {
         commit(MutationTypes.LOADING, { projects: true });
 
         const api = new FKApi();
-        const [users, stations] = await Promise.all([api.getUsersByProject(payload.id), api.getStationsByProject(payload.id)]);
+        const [project, users, stations] = await Promise.all([
+            api.getProject(payload.id),
+            api.getUsersByProject(payload.id),
+            api.getStationsByProject(payload.id),
+        ]);
 
+        commit(PROJECT_UPDATE, project);
         commit(PROJECT_USERS, { projectId: payload.id, users: users.users });
         commit(PROJECT_STATIONS, { projectId: payload.id, stations: stations.stations });
 
