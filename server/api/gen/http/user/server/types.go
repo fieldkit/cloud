@@ -50,6 +50,38 @@ type DeleteNotFoundResponseBody string
 // endpoint HTTP response body for the "unauthorized" error.
 type DeleteUnauthorizedResponseBody string
 
+// UploadPhotoBadRequestResponseBody is the type of the "user" service "upload
+// photo" endpoint HTTP response body for the "bad-request" error.
+type UploadPhotoBadRequestResponseBody string
+
+// UploadPhotoForbiddenResponseBody is the type of the "user" service "upload
+// photo" endpoint HTTP response body for the "forbidden" error.
+type UploadPhotoForbiddenResponseBody string
+
+// UploadPhotoNotFoundResponseBody is the type of the "user" service "upload
+// photo" endpoint HTTP response body for the "not-found" error.
+type UploadPhotoNotFoundResponseBody string
+
+// UploadPhotoUnauthorizedResponseBody is the type of the "user" service
+// "upload photo" endpoint HTTP response body for the "unauthorized" error.
+type UploadPhotoUnauthorizedResponseBody string
+
+// DownloadPhotoBadRequestResponseBody is the type of the "user" service
+// "download photo" endpoint HTTP response body for the "bad-request" error.
+type DownloadPhotoBadRequestResponseBody string
+
+// DownloadPhotoForbiddenResponseBody is the type of the "user" service
+// "download photo" endpoint HTTP response body for the "forbidden" error.
+type DownloadPhotoForbiddenResponseBody string
+
+// DownloadPhotoNotFoundResponseBody is the type of the "user" service
+// "download photo" endpoint HTTP response body for the "not-found" error.
+type DownloadPhotoNotFoundResponseBody string
+
+// DownloadPhotoUnauthorizedResponseBody is the type of the "user" service
+// "download photo" endpoint HTTP response body for the "unauthorized" error.
+type DownloadPhotoUnauthorizedResponseBody string
+
 // AvailableRoleResponseBody is used to define fields on response body types.
 type AvailableRoleResponseBody struct {
 	ID   int32  `form:"id" json:"id" xml:"id"`
@@ -125,6 +157,62 @@ func NewDeleteUnauthorizedResponseBody(res user.Unauthorized) DeleteUnauthorized
 	return body
 }
 
+// NewUploadPhotoBadRequestResponseBody builds the HTTP response body from the
+// result of the "upload photo" endpoint of the "user" service.
+func NewUploadPhotoBadRequestResponseBody(res user.BadRequest) UploadPhotoBadRequestResponseBody {
+	body := UploadPhotoBadRequestResponseBody(res)
+	return body
+}
+
+// NewUploadPhotoForbiddenResponseBody builds the HTTP response body from the
+// result of the "upload photo" endpoint of the "user" service.
+func NewUploadPhotoForbiddenResponseBody(res user.Forbidden) UploadPhotoForbiddenResponseBody {
+	body := UploadPhotoForbiddenResponseBody(res)
+	return body
+}
+
+// NewUploadPhotoNotFoundResponseBody builds the HTTP response body from the
+// result of the "upload photo" endpoint of the "user" service.
+func NewUploadPhotoNotFoundResponseBody(res user.NotFound) UploadPhotoNotFoundResponseBody {
+	body := UploadPhotoNotFoundResponseBody(res)
+	return body
+}
+
+// NewUploadPhotoUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "upload photo" endpoint of the "user" service.
+func NewUploadPhotoUnauthorizedResponseBody(res user.Unauthorized) UploadPhotoUnauthorizedResponseBody {
+	body := UploadPhotoUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewDownloadPhotoBadRequestResponseBody builds the HTTP response body from
+// the result of the "download photo" endpoint of the "user" service.
+func NewDownloadPhotoBadRequestResponseBody(res user.BadRequest) DownloadPhotoBadRequestResponseBody {
+	body := DownloadPhotoBadRequestResponseBody(res)
+	return body
+}
+
+// NewDownloadPhotoForbiddenResponseBody builds the HTTP response body from the
+// result of the "download photo" endpoint of the "user" service.
+func NewDownloadPhotoForbiddenResponseBody(res user.Forbidden) DownloadPhotoForbiddenResponseBody {
+	body := DownloadPhotoForbiddenResponseBody(res)
+	return body
+}
+
+// NewDownloadPhotoNotFoundResponseBody builds the HTTP response body from the
+// result of the "download photo" endpoint of the "user" service.
+func NewDownloadPhotoNotFoundResponseBody(res user.NotFound) DownloadPhotoNotFoundResponseBody {
+	body := DownloadPhotoNotFoundResponseBody(res)
+	return body
+}
+
+// NewDownloadPhotoUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "download photo" endpoint of the "user" service.
+func NewDownloadPhotoUnauthorizedResponseBody(res user.Unauthorized) DownloadPhotoUnauthorizedResponseBody {
+	body := DownloadPhotoUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewRolesPayload builds a user service roles endpoint payload.
 func NewRolesPayload(auth string) *user.RolesPayload {
 	v := &user.RolesPayload{}
@@ -138,6 +226,25 @@ func NewDeletePayload(userID int32, auth string) *user.DeletePayload {
 	v := &user.DeletePayload{}
 	v.UserID = userID
 	v.Auth = auth
+
+	return v
+}
+
+// NewUploadPhotoPayload builds a user service upload photo endpoint payload.
+func NewUploadPhotoPayload(contentType string, contentLength int64, auth string) *user.UploadPhotoPayload {
+	v := &user.UploadPhotoPayload{}
+	v.ContentType = contentType
+	v.ContentLength = contentLength
+	v.Auth = auth
+
+	return v
+}
+
+// NewDownloadPhotoPayload builds a user service download photo endpoint
+// payload.
+func NewDownloadPhotoPayload(userID int32) *user.DownloadPhotoPayload {
+	v := &user.DownloadPhotoPayload{}
+	v.UserID = userID
 
 	return v
 }

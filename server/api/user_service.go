@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"io"
+	"io/ioutil"
 
 	"goa.design/goa/v3/security"
 
@@ -40,6 +42,55 @@ func (s *UserService) Delete(ctx context.Context, payload *user.DeletePayload) e
 		return err
 	}
 	return r.Delete(ctx, payload.UserID)
+}
+
+func (s *UserService) UploadPhoto(ctx context.Context, payload *user.UploadPhotoPayload, body io.ReadCloser) error {
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	mr := repositories.NewMediaRepository(s.options.MediaFiles)
+	saved, err := mr.SaveFromService(ctx, body, payload.ContentLength)
+	if err != nil {
+		return err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	log.Infow("media", "content_type", saved.MimeType, "user_id", p.UserID())
+
+	user := &data.User{}
+	if err := s.options.Database.GetContext(ctx, user, `
+		UPDATE fieldkit.user SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *
+		`, saved.URL, saved.MimeType, p.UserID()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadPhotoPayload) (*user.DownloadPhotoResult, io.ReadCloser, error) {
+	resource := &data.User{}
+	if err := s.options.Database.GetContext(ctx, resource, `SELECT * FROM fieldkit.user WHERE id = $1`, payload.UserID); err != nil {
+		return nil, nil, err
+	}
+
+	if resource.MediaURL == nil || resource.MediaContentType == nil {
+		return nil, nil, user.NotFound("not found")
+	}
+
+	mr := repositories.NewMediaRepository(s.options.MediaFiles)
+
+	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
+	if err != nil {
+		return nil, nil, user.NotFound("not found")
+	}
+
+	return &user.DownloadPhotoResult{
+		Length:      int64(lm.Size),
+		ContentType: *resource.MediaContentType,
+	}, ioutil.NopCloser(lm.Reader), nil
 }
 
 func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {

@@ -9,6 +9,7 @@ package server
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"regexp"
 
@@ -20,10 +21,12 @@ import (
 
 // Server lists the user service endpoint HTTP handlers.
 type Server struct {
-	Mounts []*MountPoint
-	Roles  http.Handler
-	Delete http.Handler
-	CORS   http.Handler
+	Mounts        []*MountPoint
+	Roles         http.Handler
+	Delete        http.Handler
+	UploadPhoto   http.Handler
+	DownloadPhoto http.Handler
+	CORS          http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -61,12 +64,18 @@ func New(
 		Mounts: []*MountPoint{
 			{"Roles", "GET", "/roles"},
 			{"Delete", "DELETE", "/admin/users/{userId}"},
+			{"UploadPhoto", "POST", "/user/media"},
+			{"DownloadPhoto", "GET", "/user/{userId}/media"},
 			{"CORS", "OPTIONS", "/roles"},
 			{"CORS", "OPTIONS", "/admin/users/{userId}"},
+			{"CORS", "OPTIONS", "/user/media"},
+			{"CORS", "OPTIONS", "/user/{userId}/media"},
 		},
-		Roles:  NewRolesHandler(e.Roles, mux, decoder, encoder, errhandler, formatter),
-		Delete: NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
-		CORS:   NewCORSHandler(),
+		Roles:         NewRolesHandler(e.Roles, mux, decoder, encoder, errhandler, formatter),
+		Delete:        NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
+		UploadPhoto:   NewUploadPhotoHandler(e.UploadPhoto, mux, decoder, encoder, errhandler, formatter),
+		DownloadPhoto: NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
+		CORS:          NewCORSHandler(),
 	}
 }
 
@@ -77,6 +86,8 @@ func (s *Server) Service() string { return "user" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Roles = m(s.Roles)
 	s.Delete = m(s.Delete)
+	s.UploadPhoto = m(s.UploadPhoto)
+	s.DownloadPhoto = m(s.DownloadPhoto)
 	s.CORS = m(s.CORS)
 }
 
@@ -84,6 +95,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountRolesHandler(mux, h.Roles)
 	MountDeleteHandler(mux, h.Delete)
+	MountUploadPhotoHandler(mux, h.UploadPhoto)
+	MountDownloadPhotoHandler(mux, h.DownloadPhoto)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -189,6 +202,117 @@ func NewDeleteHandler(
 	})
 }
 
+// MountUploadPhotoHandler configures the mux to serve the "user" service
+// "upload photo" endpoint.
+func MountUploadPhotoHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleUserOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/user/media", f)
+}
+
+// NewUploadPhotoHandler creates a HTTP handler which loads the HTTP request
+// and calls the "user" service "upload photo" endpoint.
+func NewUploadPhotoHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUploadPhotoRequest(mux, decoder)
+		encodeResponse = EncodeUploadPhotoResponse(encoder)
+		encodeError    = EncodeUploadPhotoError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "upload photo")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		data := &user.UploadPhotoRequestData{Payload: payload.(*user.UploadPhotoPayload), Body: r.Body}
+		res, err := endpoint(ctx, data)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountDownloadPhotoHandler configures the mux to serve the "user" service
+// "download photo" endpoint.
+func MountDownloadPhotoHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleUserOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/user/{userId}/media", f)
+}
+
+// NewDownloadPhotoHandler creates a HTTP handler which loads the HTTP request
+// and calls the "user" service "download photo" endpoint.
+func NewDownloadPhotoHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDownloadPhotoRequest(mux, decoder)
+		encodeResponse = EncodeDownloadPhotoResponse(encoder)
+		encodeError    = EncodeDownloadPhotoError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "download photo")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		o := res.(*user.DownloadPhotoResponseData)
+		defer o.Body.Close()
+		if err := encodeResponse(ctx, w, o.Result); err != nil {
+			errhandler(ctx, w, err)
+			return
+		}
+		if _, err := io.Copy(w, o.Body); err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service user.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -201,6 +325,8 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	}
 	mux.Handle("OPTIONS", "/roles", f)
 	mux.Handle("OPTIONS", "/admin/users/{userId}", f)
+	mux.Handle("OPTIONS", "/user/media", f)
+	mux.Handle("OPTIONS", "/user/{userId}/media", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

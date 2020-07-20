@@ -50,3 +50,49 @@ func BuildDeletePayload(userDeleteUserID string, userDeleteAuth string) (*user.D
 
 	return v, nil
 }
+
+// BuildUploadPhotoPayload builds the payload for the user upload photo
+// endpoint from CLI flags.
+func BuildUploadPhotoPayload(userUploadPhotoContentType string, userUploadPhotoContentLength string, userUploadPhotoAuth string) (*user.UploadPhotoPayload, error) {
+	var err error
+	var contentType string
+	{
+		contentType = userUploadPhotoContentType
+	}
+	var contentLength int64
+	{
+		contentLength, err = strconv.ParseInt(userUploadPhotoContentLength, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for contentLength, must be INT64")
+		}
+	}
+	var auth string
+	{
+		auth = userUploadPhotoAuth
+	}
+	v := &user.UploadPhotoPayload{}
+	v.ContentType = contentType
+	v.ContentLength = contentLength
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildDownloadPhotoPayload builds the payload for the user download photo
+// endpoint from CLI flags.
+func BuildDownloadPhotoPayload(userDownloadPhotoUserID string) (*user.DownloadPhotoPayload, error) {
+	var err error
+	var userID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(userDownloadPhotoUserID, 10, 32)
+		userID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for userID, must be INT32")
+		}
+	}
+	v := &user.DownloadPhotoPayload{}
+	v.UserID = userID
+
+	return v, nil
+}

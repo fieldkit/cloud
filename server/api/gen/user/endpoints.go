@@ -9,6 +9,7 @@ package user
 
 import (
 	"context"
+	"io"
 
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
@@ -16,8 +17,28 @@ import (
 
 // Endpoints wraps the "user" service endpoints.
 type Endpoints struct {
-	Roles  goa.Endpoint
-	Delete goa.Endpoint
+	Roles         goa.Endpoint
+	Delete        goa.Endpoint
+	UploadPhoto   goa.Endpoint
+	DownloadPhoto goa.Endpoint
+}
+
+// UploadPhotoRequestData holds both the payload and the HTTP request body
+// reader of the "upload photo" method.
+type UploadPhotoRequestData struct {
+	// Payload is the method payload.
+	Payload *UploadPhotoPayload
+	// Body streams the HTTP request body.
+	Body io.ReadCloser
+}
+
+// DownloadPhotoResponseData holds both the result and the HTTP response body
+// reader of the "download photo" method.
+type DownloadPhotoResponseData struct {
+	// Result is the method result.
+	Result *DownloadPhotoResult
+	// Body streams the HTTP response body.
+	Body io.ReadCloser
 }
 
 // NewEndpoints wraps the methods of the "user" service with endpoints.
@@ -25,8 +46,10 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Roles:  NewRolesEndpoint(s, a.JWTAuth),
-		Delete: NewDeleteEndpoint(s, a.JWTAuth),
+		Roles:         NewRolesEndpoint(s, a.JWTAuth),
+		Delete:        NewDeleteEndpoint(s, a.JWTAuth),
+		UploadPhoto:   NewUploadPhotoEndpoint(s, a.JWTAuth),
+		DownloadPhoto: NewDownloadPhotoEndpoint(s),
 	}
 }
 
@@ -34,6 +57,8 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Roles = m(e.Roles)
 	e.Delete = m(e.Delete)
+	e.UploadPhoto = m(e.UploadPhoto)
+	e.DownloadPhoto = m(e.DownloadPhoto)
 }
 
 // NewRolesEndpoint returns an endpoint function that calls the method "roles"
@@ -76,5 +101,37 @@ func NewDeleteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 			return nil, err
 		}
 		return nil, s.Delete(ctx, p)
+	}
+}
+
+// NewUploadPhotoEndpoint returns an endpoint function that calls the method
+// "upload photo" of service "user".
+func NewUploadPhotoEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		ep := req.(*UploadPhotoRequestData)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, ep.Payload.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.UploadPhoto(ctx, ep.Payload, ep.Body)
+	}
+}
+
+// NewDownloadPhotoEndpoint returns an endpoint function that calls the method
+// "download photo" of service "user".
+func NewDownloadPhotoEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*DownloadPhotoPayload)
+		res, body, err := s.DownloadPhoto(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		return &DownloadPhotoResponseData{Result: res, Body: body}, nil
 	}
 }

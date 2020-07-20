@@ -9,6 +9,7 @@ package user
 
 import (
 	"context"
+	"io"
 
 	userviews "github.com/fieldkit/cloud/server/api/gen/user/views"
 	"goa.design/goa/v3/security"
@@ -20,6 +21,10 @@ type Service interface {
 	Roles(context.Context, *RolesPayload) (res *AvailableRoles, err error)
 	// Delete implements delete.
 	Delete(context.Context, *DeletePayload) (err error)
+	// UploadPhoto implements upload photo.
+	UploadPhoto(context.Context, *UploadPhotoPayload, io.ReadCloser) (err error)
+	// DownloadPhoto implements download photo.
+	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadPhotoResult, body io.ReadCloser, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -36,7 +41,7 @@ const ServiceName = "user"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [2]string{"roles", "delete"}
+var MethodNames = [4]string{"roles", "delete", "upload photo", "download photo"}
 
 // RolesPayload is the payload type of the user service roles method.
 type RolesPayload struct {
@@ -52,6 +57,27 @@ type AvailableRoles struct {
 type DeletePayload struct {
 	Auth   string
 	UserID int32
+}
+
+// UploadPhotoPayload is the payload type of the user service upload photo
+// method.
+type UploadPhotoPayload struct {
+	Auth          string
+	ContentLength int64
+	ContentType   string
+}
+
+// DownloadPhotoPayload is the payload type of the user service download photo
+// method.
+type DownloadPhotoPayload struct {
+	UserID int32
+}
+
+// DownloadPhotoResult is the result type of the user service download photo
+// method.
+type DownloadPhotoResult struct {
+	Length      int64
+	ContentType string
 }
 
 type AvailableRole struct {

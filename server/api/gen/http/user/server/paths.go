@@ -20,3 +20,13 @@ func RolesUserPath() string {
 func DeleteUserPath(userID int32) string {
 	return fmt.Sprintf("/admin/users/%v", userID)
 }
+
+// UploadPhotoUserPath returns the URL path to the user service upload photo HTTP endpoint.
+func UploadPhotoUserPath() string {
+	return "/user/media"
+}
+
+// DownloadPhotoUserPath returns the URL path to the user service download photo HTTP endpoint.
+func DownloadPhotoUserPath(userID int32) string {
+	return fmt.Sprintf("/user/%v/media", userID)
+}

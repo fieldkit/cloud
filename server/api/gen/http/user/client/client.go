@@ -11,6 +11,7 @@ import (
 	"context"
 	"net/http"
 
+	user "github.com/fieldkit/cloud/server/api/gen/user"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -22,6 +23,14 @@ type Client struct {
 
 	// Delete Doer is the HTTP client used to make requests to the delete endpoint.
 	DeleteDoer goahttp.Doer
+
+	// UploadPhoto Doer is the HTTP client used to make requests to the upload
+	// photo endpoint.
+	UploadPhotoDoer goahttp.Doer
+
+	// DownloadPhoto Doer is the HTTP client used to make requests to the download
+	// photo endpoint.
+	DownloadPhotoDoer goahttp.Doer
 
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
@@ -48,6 +57,8 @@ func NewClient(
 	return &Client{
 		RolesDoer:           doer,
 		DeleteDoer:          doer,
+		UploadPhotoDoer:     doer,
+		DownloadPhotoDoer:   doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -102,5 +113,53 @@ func (c *Client) Delete() goa.Endpoint {
 			return nil, goahttp.ErrRequestError("user", "delete", err)
 		}
 		return decodeResponse(resp)
+	}
+}
+
+// UploadPhoto returns an endpoint that makes HTTP requests to the user service
+// upload photo server.
+func (c *Client) UploadPhoto() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUploadPhotoRequest(c.encoder)
+		decodeResponse = DecodeUploadPhotoResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildUploadPhotoRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UploadPhotoDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("user", "upload photo", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// DownloadPhoto returns an endpoint that makes HTTP requests to the user
+// service download photo server.
+func (c *Client) DownloadPhoto() goa.Endpoint {
+	var (
+		decodeResponse = DecodeDownloadPhotoResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDownloadPhotoRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DownloadPhotoDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("user", "download photo", err)
+		}
+		res, err := decodeResponse(resp)
+		if err != nil {
+			resp.Body.Close()
+			return nil, goahttp.ErrDecodingError("user", "download photo", err)
+		}
+		return &user.DownloadPhotoResponseData{Result: res.(*user.DownloadPhotoResult), Body: resp.Body}, nil
 	}
 }

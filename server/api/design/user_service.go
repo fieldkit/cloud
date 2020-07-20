@@ -60,5 +60,66 @@ var _ = Service("user", func() {
 		})
 	})
 
+	Method("upload photo", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("contentLength", Int64)
+			Required("contentLength")
+			Attribute("contentType", String)
+			Required("contentType")
+		})
+
+		HTTP(func() {
+			POST("user/media")
+
+			Header("contentType:Content-Type")
+			Header("contentLength:Content-Length")
+
+			SkipRequestBodyEncodeDecode()
+
+			httpAuthentication()
+		})
+	})
+
+	Method("download photo", func() {
+		/*
+			Security(JWTAuth, func() {
+				Scope("api:access")
+			})
+		*/
+
+		Payload(func() {
+			// Token("auth")
+			// Required("auth")
+			Attribute("userId", Int32)
+			Required("userId")
+		})
+
+		Result(func() {
+			Attribute("length", Int64)
+			Required("length")
+			Attribute("contentType", String)
+			Required("contentType")
+		})
+
+		HTTP(func() {
+			GET("user/{userId}/media")
+
+			SkipResponseBodyEncodeDecode()
+
+			Response(func() {
+				Header("length:Content-Length")
+				Header("contentType:Content-Type")
+			})
+
+			// httpAuthenticationQueryString()
+		})
+	})
+
 	commonOptions()
 })

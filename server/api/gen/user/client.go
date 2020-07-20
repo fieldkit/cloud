@@ -9,21 +9,26 @@ package user
 
 import (
 	"context"
+	"io"
 
 	goa "goa.design/goa/v3/pkg"
 )
 
 // Client is the "user" service client.
 type Client struct {
-	RolesEndpoint  goa.Endpoint
-	DeleteEndpoint goa.Endpoint
+	RolesEndpoint         goa.Endpoint
+	DeleteEndpoint        goa.Endpoint
+	UploadPhotoEndpoint   goa.Endpoint
+	DownloadPhotoEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "user" service client given the endpoints.
-func NewClient(roles, delete_ goa.Endpoint) *Client {
+func NewClient(roles, delete_, uploadPhoto, downloadPhoto goa.Endpoint) *Client {
 	return &Client{
-		RolesEndpoint:  roles,
-		DeleteEndpoint: delete_,
+		RolesEndpoint:         roles,
+		DeleteEndpoint:        delete_,
+		UploadPhotoEndpoint:   uploadPhoto,
+		DownloadPhotoEndpoint: downloadPhoto,
 	}
 }
 
@@ -41,4 +46,21 @@ func (c *Client) Roles(ctx context.Context, p *RolesPayload) (res *AvailableRole
 func (c *Client) Delete(ctx context.Context, p *DeletePayload) (err error) {
 	_, err = c.DeleteEndpoint(ctx, p)
 	return
+}
+
+// UploadPhoto calls the "upload photo" endpoint of the "user" service.
+func (c *Client) UploadPhoto(ctx context.Context, p *UploadPhotoPayload, req io.ReadCloser) (err error) {
+	_, err = c.UploadPhotoEndpoint(ctx, &UploadPhotoRequestData{Payload: p, Body: req})
+	return
+}
+
+// DownloadPhoto calls the "download photo" endpoint of the "user" service.
+func (c *Client) DownloadPhoto(ctx context.Context, p *DownloadPhotoPayload) (res *DownloadPhotoResult, resp io.ReadCloser, err error) {
+	var ires interface{}
+	ires, err = c.DownloadPhotoEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	o := ires.(*DownloadPhotoResponseData)
+	return o.Result, o.Body, nil
 }

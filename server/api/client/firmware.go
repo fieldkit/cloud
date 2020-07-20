@@ -149,12 +149,12 @@ func (c *Client) NewListFirmwareRequest(ctx context.Context, path string, module
 		values.Set("module", *module)
 	}
 	if page != nil {
-		tmp51 := strconv.Itoa(*page)
-		values.Set("page", tmp51)
+		tmp47 := strconv.Itoa(*page)
+		values.Set("page", tmp47)
 	}
 	if pageSize != nil {
-		tmp52 := strconv.Itoa(*pageSize)
-		values.Set("pageSize", tmp52)
+		tmp48 := strconv.Itoa(*pageSize)
+		values.Set("pageSize", tmp48)
 	}
 	if profile != nil {
 		values.Set("profile", *profile)

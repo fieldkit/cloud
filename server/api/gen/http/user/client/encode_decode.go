@@ -10,13 +10,17 @@ package client
 import (
 	"bytes"
 	"context"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
+	"strconv"
 
 	user "github.com/fieldkit/cloud/server/api/gen/user"
 	userviews "github.com/fieldkit/cloud/server/api/gen/user/views"
 	goahttp "goa.design/goa/v3/http"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildRolesRequest instantiates a HTTP request object with method and path
@@ -248,6 +252,262 @@ func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("user", "delete", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildUploadPhotoRequest instantiates a HTTP request object with method and
+// path set to call the "user" service "upload photo" endpoint
+func (c *Client) BuildUploadPhotoRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		body io.Reader
+	)
+	rd, ok := v.(*user.UploadPhotoRequestData)
+	if !ok {
+		return nil, goahttp.ErrInvalidType("user", "upload photo", "user.UploadPhotoRequestData", v)
+	}
+	body = rd.Body
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UploadPhotoUserPath()}
+	req, err := http.NewRequest("POST", u.String(), body)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("user", "upload photo", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeUploadPhotoRequest returns an encoder for requests sent to the user
+// upload photo server.
+func EncodeUploadPhotoRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		data, ok := v.(*user.UploadPhotoRequestData)
+		if !ok {
+			return goahttp.ErrInvalidType("user", "upload photo", "*user.UploadPhotoRequestData", v)
+		}
+		p := data.Payload
+		{
+			head := p.ContentType
+			req.Header.Set("Content-Type", head)
+		}
+		{
+			head := p.ContentLength
+			headStr := strconv.FormatInt(head, 10)
+			req.Header.Set("Content-Length", headStr)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeUploadPhotoResponse returns a decoder for responses returned by the
+// user upload photo endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeUploadPhotoResponse may return the following errors:
+//	- "bad-request" (type user.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type user.Forbidden): http.StatusForbidden
+//	- "not-found" (type user.NotFound): http.StatusNotFound
+//	- "unauthorized" (type user.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeUploadPhotoResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body UploadPhotoBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "upload photo", err)
+			}
+			return nil, NewUploadPhotoBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body UploadPhotoForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "upload photo", err)
+			}
+			return nil, NewUploadPhotoForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body UploadPhotoNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "upload photo", err)
+			}
+			return nil, NewUploadPhotoNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body UploadPhotoUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "upload photo", err)
+			}
+			return nil, NewUploadPhotoUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("user", "upload photo", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// // BuildUploadPhotoStreamPayload creates a streaming endpoint request payload
+// from the method payload and the path to the file to be streamed
+func BuildUploadPhotoStreamPayload(payload interface{}, fpath string) (*user.UploadPhotoRequestData, error) {
+	f, err := os.Open(fpath)
+	if err != nil {
+		return nil, err
+	}
+	return &user.UploadPhotoRequestData{
+		Payload: payload.(*user.UploadPhotoPayload),
+		Body:    f,
+	}, nil
+}
+
+// BuildDownloadPhotoRequest instantiates a HTTP request object with method and
+// path set to call the "user" service "download photo" endpoint
+func (c *Client) BuildDownloadPhotoRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		userID int32
+	)
+	{
+		p, ok := v.(*user.DownloadPhotoPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("user", "download photo", "*user.DownloadPhotoPayload", v)
+		}
+		userID = p.UserID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DownloadPhotoUserPath(userID)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("user", "download photo", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// DecodeDownloadPhotoResponse returns a decoder for responses returned by the
+// user download photo endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeDownloadPhotoResponse may return the following errors:
+//	- "bad-request" (type user.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type user.Forbidden): http.StatusForbidden
+//	- "not-found" (type user.NotFound): http.StatusNotFound
+//	- "unauthorized" (type user.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeDownloadPhotoResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				length      int64
+				contentType string
+				err         error
+			)
+			{
+				lengthRaw := resp.Header.Get("Content-Length")
+				if lengthRaw == "" {
+					return nil, goahttp.ErrValidationError("user", "download photo", goa.MissingFieldError("Content-Length", "header"))
+				}
+				v, err2 := strconv.ParseInt(lengthRaw, 10, 64)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("length", lengthRaw, "integer"))
+				}
+				length = v
+			}
+			contentTypeRaw := resp.Header.Get("Content-Type")
+			if contentTypeRaw == "" {
+				err = goa.MergeErrors(err, goa.MissingFieldError("Content-Type", "header"))
+			}
+			contentType = contentTypeRaw
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "download photo", err)
+			}
+			res := NewDownloadPhotoResultOK(length, contentType)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body DownloadPhotoBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "download photo", err)
+			}
+			return nil, NewDownloadPhotoBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body DownloadPhotoForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "download photo", err)
+			}
+			return nil, NewDownloadPhotoForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body DownloadPhotoNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "download photo", err)
+			}
+			return nil, NewDownloadPhotoNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body DownloadPhotoUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "download photo", err)
+			}
+			return nil, NewDownloadPhotoUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("user", "download photo", resp.StatusCode, string(body))
 		}
 	}
 }

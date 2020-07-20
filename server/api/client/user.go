@@ -175,40 +175,6 @@ func (c *Client) NewGetCurrentUserRequest(ctx context.Context, path string) (*ht
 	return req, nil
 }
 
-// GetCurrentUserImageUserPath computes a request path to the get current user image action of user.
-func GetCurrentUserImageUserPath() string {
-
-	return fmt.Sprintf("/user/media")
-}
-
-// Get the authenticated user's image
-func (c *Client) GetCurrentUserImageUser(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewGetCurrentUserImageUserRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewGetCurrentUserImageUserRequest create the request corresponding to the get current user image action endpoint of the user resource.
-func (c *Client) NewGetCurrentUserImageUserRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
-	}
-	return req, nil
-}
-
 // GetIDUserPath computes a request path to the get id action of user.
 func GetIDUserPath(userID int) string {
 	param0 := strconv.Itoa(userID)
@@ -240,36 +206,6 @@ func (c *Client) NewGetIDUserRequest(ctx context.Context, path string) (*http.Re
 		if err := c.JWTSigner.Sign(req); err != nil {
 			return nil, err
 		}
-	}
-	return req, nil
-}
-
-// GetUserImageUserPath computes a request path to the get user image action of user.
-func GetUserImageUserPath(userID int) string {
-	param0 := strconv.Itoa(userID)
-
-	return fmt.Sprintf("/user/%s/media", param0)
-}
-
-// Get a user image
-func (c *Client) GetUserImageUser(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewGetUserImageUserRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewGetUserImageUserRequest create the request corresponding to the get user image action endpoint of the user resource.
-func (c *Client) NewGetUserImageUserRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
 	}
 	return req, nil
 }
@@ -518,40 +454,6 @@ func (c *Client) NewRefreshUserRequest(ctx context.Context, path string, payload
 	}
 	header := req.Header
 	header.Set("Content-Type", "application/json")
-	return req, nil
-}
-
-// SaveCurrentUserImageUserPath computes a request path to the save current user image action of user.
-func SaveCurrentUserImageUserPath() string {
-
-	return fmt.Sprintf("/user/media")
-}
-
-// Save the authenticated user's image
-func (c *Client) SaveCurrentUserImageUser(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewSaveCurrentUserImageUserRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewSaveCurrentUserImageUserRequest create the request corresponding to the save current user image action endpoint of the user resource.
-func (c *Client) NewSaveCurrentUserImageUserRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("POST", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
-	}
 	return req, nil
 }
 

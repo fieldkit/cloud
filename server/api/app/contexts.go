@@ -667,41 +667,6 @@ func (ctx *GetCurrentUserContext) OK(r *User) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
-// GetCurrentUserImageUserContext provides the user get current user image action context.
-type GetCurrentUserImageUserContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-}
-
-// NewGetCurrentUserImageUserContext parses the incoming request URL and body, performs validations and creates the
-// context used by the user controller get current user image action.
-func NewGetCurrentUserImageUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetCurrentUserImageUserContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := GetCurrentUserImageUserContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *GetCurrentUserImageUserContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "image/png")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *GetCurrentUserImageUserContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
 // GetIDUserContext provides the user get id action context.
 type GetIDUserContext struct {
 	context.Context
@@ -737,45 +702,6 @@ func (ctx *GetIDUserContext) OK(r *User) error {
 		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.user+json")
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// GetUserImageUserContext provides the user get user image action context.
-type GetUserImageUserContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	UserID int
-}
-
-// NewGetUserImageUserContext parses the incoming request URL and body, performs validations and creates the
-// context used by the user controller get user image action.
-func NewGetUserImageUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetUserImageUserContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := GetUserImageUserContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramUserID := req.Params["userId"]
-	if len(paramUserID) > 0 {
-		rawUserID := paramUserID[0]
-		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
-			rctx.UserID = userID
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("userId", rawUserID, "integer"))
-		}
-	}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *GetUserImageUserContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "image/png")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
 }
 
 // ListByProjectUserContext provides the user list by project action context.
@@ -1048,39 +974,6 @@ func (ctx *RefreshUserContext) NoContent() error {
 // Unauthorized sends a HTTP response with status code 401.
 func (ctx *RefreshUserContext) Unauthorized() error {
 	ctx.ResponseData.WriteHeader(401)
-	return nil
-}
-
-// SaveCurrentUserImageUserContext provides the user save current user image action context.
-type SaveCurrentUserImageUserContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-}
-
-// NewSaveCurrentUserImageUserContext parses the incoming request URL and body, performs validations and creates the
-// context used by the user controller save current user image action.
-func NewSaveCurrentUserImageUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*SaveCurrentUserImageUserContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := SaveCurrentUserImageUserContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *SaveCurrentUserImageUserContext) OK(r *User) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.app.user+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *SaveCurrentUserImageUserContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
 
