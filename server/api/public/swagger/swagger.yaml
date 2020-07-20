@@ -81,7 +81,7 @@ definitions:
     description: DeviceDataRecord media type (default view)
     example:
       data:
-        Blanditiis recusandae est quidem.: 14805115-96a6-4ebf-8fb3-431af1f0fecc
+        Blanditiis recusandae est quidem.: bc5e4ef1-24b6-4fa1-ace5-d42455ab83e3
       id: 4.96580577271105e+18
       location:
       - 0.8522260143236732
@@ -92,7 +92,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Blanditiis recusandae est quidem.: 14805115-96a6-4ebf-8fb3-431af1f0fecc
+          Blanditiis recusandae est quidem.: bc5e4ef1-24b6-4fa1-ace5-d42455ab83e3
         type: object
       id:
         example: 4.96580577271105e+18
@@ -132,7 +132,7 @@ definitions:
       (default view)
     example:
     - data:
-        Blanditiis recusandae est quidem.: 14805115-96a6-4ebf-8fb3-431af1f0fecc
+        Blanditiis recusandae est quidem.: bc5e4ef1-24b6-4fa1-ace5-d42455ab83e3
       id: 4.96580577271105e+18
       location:
       - 0.8522260143236732
@@ -140,15 +140,7 @@ definitions:
       record: 1.2626736114732598e+18
       time: "2000-09-09T05:59:52Z"
     - data:
-        Blanditiis recusandae est quidem.: 14805115-96a6-4ebf-8fb3-431af1f0fecc
-      id: 4.96580577271105e+18
-      location:
-      - 0.8522260143236732
-      meta: 2.827138534810339e+18
-      record: 1.2626736114732598e+18
-      time: "2000-09-09T05:59:52Z"
-    - data:
-        Blanditiis recusandae est quidem.: 14805115-96a6-4ebf-8fb3-431af1f0fecc
+        Blanditiis recusandae est quidem.: bc5e4ef1-24b6-4fa1-ace5-d42455ab83e3
       id: 4.96580577271105e+18
       location:
       - 0.8522260143236732
@@ -165,7 +157,7 @@ definitions:
     example:
       data:
       - data:
-          Blanditiis recusandae est quidem.: 14805115-96a6-4ebf-8fb3-431af1f0fecc
+          Blanditiis recusandae est quidem.: bc5e4ef1-24b6-4fa1-ace5-d42455ab83e3
         id: 4.96580577271105e+18
         location:
         - 0.8522260143236732
@@ -173,7 +165,7 @@ definitions:
         record: 1.2626736114732598e+18
         time: "2000-09-09T05:59:52Z"
       - data:
-          Blanditiis recusandae est quidem.: 14805115-96a6-4ebf-8fb3-431af1f0fecc
+          Blanditiis recusandae est quidem.: bc5e4ef1-24b6-4fa1-ace5-d42455ab83e3
         id: 4.96580577271105e+18
         location:
         - 0.8522260143236732
@@ -182,12 +174,12 @@ definitions:
         time: "2000-09-09T05:59:52Z"
       meta:
       - data:
-          Cumque nihil.: b61b6335-7aab-4eb0-b87d-ec94436819dd
+          Cumque nihil.: b987199b-b7e8-4653-8056-91d7d1fa7094
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
       - data:
-          Cumque nihil.: b61b6335-7aab-4eb0-b87d-ec94436819dd
+          Cumque nihil.: b987199b-b7e8-4653-8056-91d7d1fa7094
         id: 4.464267130479644e+18
         record: 3.682513715611599e+17
         time: "1984-12-27T14:09:02Z"
@@ -274,7 +266,7 @@ definitions:
     description: DeviceMetaRecord media type (default view)
     example:
       data:
-        Cumque nihil.: b61b6335-7aab-4eb0-b87d-ec94436819dd
+        Cumque nihil.: b987199b-b7e8-4653-8056-91d7d1fa7094
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -282,7 +274,7 @@ definitions:
       data:
         additionalProperties: true
         example:
-          Cumque nihil.: b61b6335-7aab-4eb0-b87d-ec94436819dd
+          Cumque nihil.: b987199b-b7e8-4653-8056-91d7d1fa7094
         type: object
       id:
         example: 4.464267130479644e+18
@@ -308,12 +300,17 @@ definitions:
       (default view)
     example:
     - data:
-        Cumque nihil.: b61b6335-7aab-4eb0-b87d-ec94436819dd
+        Cumque nihil.: b987199b-b7e8-4653-8056-91d7d1fa7094
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
     - data:
-        Cumque nihil.: b61b6335-7aab-4eb0-b87d-ec94436819dd
+        Cumque nihil.: b987199b-b7e8-4653-8056-91d7d1fa7094
+      id: 4.464267130479644e+18
+      record: 3.682513715611599e+17
+      time: "1984-12-27T14:09:02Z"
+    - data:
+        Cumque nihil.: b987199b-b7e8-4653-8056-91d7d1fa7094
       id: 4.464267130479644e+18
       record: 3.682513715611599e+17
       time: "1984-12-27T14:09:02Z"
@@ -1357,33 +1354,6 @@ paths:
       tags:
       - user
   /users/{userId}:
-    get:
-      description: |-
-        Get a user
-
-        Required security scopes:
-          * `api:access`
-      operationId: user#get id
-      parameters:
-      - in: path
-        name: userId
-        required: true
-        type: integer
-      produces:
-      - application/vnd.app.user+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/User'
-      schemes:
-      - https
-      security:
-      - jwt:
-        - api:access
-      summary: get id user
-      tags:
-      - user
     patch:
       description: |-
         Update a user

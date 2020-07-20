@@ -285,18 +285,6 @@ var _ = Resource("user", func() {
 		})
 	})
 
-	Action("get id", func() {
-		Routing(GET("users/:userId"))
-		Description("Get a user")
-		Params(func() {
-			Param("userId", Integer)
-			Required("userId")
-		})
-		Response(OK, func() {
-			Media(User)
-		})
-	})
-
 	Action("list by project", func() {
 		Routing(GET("users/project/:projectId"))
 		Description("List users by project")

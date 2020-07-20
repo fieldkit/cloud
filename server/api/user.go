@@ -569,15 +569,6 @@ func (c *UserController) GetCurrent(ctx *app.GetCurrentUserContext) error {
 	return ctx.OK(UserType(user))
 }
 
-func (c *UserController) GetID(ctx *app.GetIDUserContext) error {
-	user := &data.User{}
-	if err := c.options.Database.GetContext(ctx, user, `SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1`, ctx.UserID); err != nil {
-		return err
-	}
-
-	return ctx.OK(UserType(user))
-}
-
 func (c *UserController) ListByProject(ctx *app.ListByProjectUserContext) error {
 	users := []*data.ProjectUserAndUser{}
 	if err := c.options.Database.SelectContext(ctx, &users, `

@@ -175,41 +175,6 @@ func (c *Client) NewGetCurrentUserRequest(ctx context.Context, path string) (*ht
 	return req, nil
 }
 
-// GetIDUserPath computes a request path to the get id action of user.
-func GetIDUserPath(userID int) string {
-	param0 := strconv.Itoa(userID)
-
-	return fmt.Sprintf("/users/%s", param0)
-}
-
-// Get a user
-func (c *Client) GetIDUser(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewGetIDUserRequest(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewGetIDUserRequest create the request corresponding to the get id action endpoint of the user resource.
-func (c *Client) NewGetIDUserRequest(ctx context.Context, path string) (*http.Request, error) {
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
-	}
-	return req, nil
-}
-
 // ListByProjectUserPath computes a request path to the list by project action of user.
 func ListByProjectUserPath(projectID string) string {
 	param0 := projectID
