@@ -87,8 +87,6 @@ export default {
     z-index: 10;
 }
 .stats-icon-container {
-    position: absolute;
-    bottom: 20px;
 }
 .stat {
     display: inline-block;
