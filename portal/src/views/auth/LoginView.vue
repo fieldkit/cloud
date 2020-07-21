@@ -54,6 +54,7 @@
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 
@@ -139,8 +140,11 @@ export default Vue.extend({
                 .dispatch(ActionTypes.LOGIN, payload)
                 .then(
                     () => {
-                        if (this.$route.query.after && this.$route.query.after.length > 0 && this.$route.query.after[0]) {
-                            return this.$router.push(this.$route.query.after[0]);
+                        if (this.$route.query.after) {
+                            if (_.isArray(this.$route.query.after)) {
+                                return this.$router.push(this.$route.query.after[0]);
+                            }
+                            return this.$router.push(this.$route.query.after);
                         }
                         return this.$router.push({ name: "projects" });
                     },
