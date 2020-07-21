@@ -15,6 +15,7 @@
 
                 <div class="validation-errors" v-if="$v.form.name.$error">
                     <div v-if="!$v.form.name.required">Name is a required field.</div>
+                    <div v-if="!$v.form.name.maxLength">This field has a limit of 100 characters.</div>
                 </div>
             </div>
             <div class="outer-input-container">
@@ -22,6 +23,7 @@
 
                 <div class="validation-errors" v-if="$v.form.description.$error">
                     <div v-if="!$v.form.description.required">This is a required field.</div>
+                    <div v-if="!$v.form.description.maxLength">This field has a limit of 100 characters.</div>
                 </div>
             </div>
             <div class="outer-input-container">
@@ -29,6 +31,7 @@
 
                 <div class="validation-errors" v-if="$v.form.goal.$error">
                     <div v-if="!$v.form.goal.required">Project goal is a required field.</div>
+                    <div v-if="!$v.form.goal.maxLength">This field has a limit of 100 characters.</div>
                 </div>
             </div>
             <div class="image-container">
@@ -39,6 +42,7 @@
 
                 <div class="validation-errors" v-if="$v.form.location.$error">
                     <div v-if="!$v.form.location.required">Location is a required field.</div>
+                    <div v-if="!$v.form.location.maxLength">This field has a limit of 100 characters.</div>
                 </div>
             </div>
 
@@ -85,7 +89,9 @@
             <div class="outer-input-container">
                 <vue-tags-input v-model="form.tag" :tags="form.tags" @tags-changed="onTagsChanged" />
 
-                <div class="validation-errors" v-if="$v.form.tags.$error"></div>
+                <div class="validation-errors" v-if="$v.form.tags.$error">
+                    <div v-if="!$v.form.tags.maxLength">This field has a limit of 100 characters.</div>
+                </div>
             </div>
             <div id="public-checkbox-container">
                 <input type="checkbox" id="checkbox" v-model="form.publicProject" />
@@ -113,7 +119,7 @@ import VueTagsInput from "@johmun/vue-tags-input";
 
 import { tryParseTags } from "@/utilities";
 
-import { helpers, required, email, minValue, minLength, sameAs } from "vuelidate/lib/validators";
+import { helpers, required, email, minValue, maxLength, minLength, sameAs } from "vuelidate/lib/validators";
 
 import FKApi from "@/api/api";
 import * as ActionTypes from "@/store/actions";
@@ -152,15 +158,19 @@ export default Vue.extend({
         form: {
             name: {
                 required,
+                maxLength: maxLength(100),
             },
             description: {
                 required,
+                maxLength: maxLength(100),
             },
             goal: {
                 required,
+                maxLength: maxLength(100),
             },
             location: {
                 required,
+                maxLength: maxLength(100),
             },
             startTime: {
                 date: function (value) {
@@ -178,7 +188,12 @@ export default Vue.extend({
                     return true;
                 },
             },
-            tags: {},
+            tags: {
+                maxLength: (value) => {
+                    const raw = JSON.stringify(value.map((tag) => tag.text));
+                    return raw.length <= 100;
+                },
+            },
         },
     },
     mounted(this: any) {
