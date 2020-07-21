@@ -103,7 +103,6 @@ export default Vue.extend({
     color: #d8d8d8;
 }
 .pages .page.selected {
-    font-weight: 900;
     color: #2c3e50;
 }
 </style>
