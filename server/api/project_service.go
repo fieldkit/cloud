@@ -198,7 +198,19 @@ func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (
 		return nil, err
 	}
 
-	return ProjectType(project, 0, relationships[project.ID]), nil
+	followerSummaries := []*data.FollowersSummary{}
+	if err := c.options.Database.SelectContext(ctx, &followerSummaries, `
+		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN ($1) GROUP BY f.project_id
+		`, payload.ProjectID); err != nil {
+		return nil, err
+	}
+
+	followers := int32(0)
+	if len(followerSummaries) > 0 {
+		followers = followerSummaries[0].Followers
+	}
+
+	return ProjectType(project, followers, relationships[project.ID]), nil
 }
 
 func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.ListCommunityPayload) (*project.Projects, error) {
@@ -237,22 +249,22 @@ func (c *ProjectService) ListMine(ctx context.Context, payload *project.ListMine
 		return nil, err
 	}
 
-	projects := []*data.Project{}
-	if err := c.options.Database.SelectContext(ctx, &projects, `
-		SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS pu ON pu.project_id = p.id WHERE pu.user_id = $1 ORDER BY p.name
-		`, p.UserID()); err != nil {
+	relationships, err := c.projects.QueryUserProjectRelationships(ctx, p.UserID())
+	if err != nil {
 		return nil, err
 	}
 
-	relationships, err := c.projects.QueryUserProjectRelationships(ctx, p.UserID())
-	if err != nil {
+	projects := []*data.Project{}
+	if err := c.options.Database.SelectContext(ctx, &projects, `
+		SELECT * FROM fieldkit.project WHERE id IN (SELECT project_id FROM fieldkit.project_user WHERE user_id = $1) ORDER BY name
+		`, p.UserID()); err != nil {
 		return nil, err
 	}
 
 	followers := []*data.FollowersSummary{}
 	if err := c.options.Database.SelectContext(ctx, &followers, `
 		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (
-			SELECT p.id FROM fieldkit.project AS p JOIN fieldkit.project_user AS pu ON pu.project_id = p.id WHERE pu.user_id = $1
+			SELECT project_id FROM fieldkit.project_user WHERE user_id = $1
 		) GROUP BY f.project_id
 		`, p.UserID()); err != nil {
 		return nil, err

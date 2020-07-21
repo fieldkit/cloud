@@ -7,15 +7,7 @@
                     <img alt="Default FieldKit Project" v-else src="@/assets/fieldkit_project.png" class="project-image" />
                 </div>
 
-                <div class="follow-btn">
-                    <span v-if="following" v-on:click="unfollowProject">
-                        Following
-                    </span>
-                    <span v-else v-on:click="followProject">
-                        <img alt="Follow" src="@/assets/heart_gray.png" class="icon" />
-                        Follow
-                    </span>
-                </div>
+                <FollowPanel :project="project" v-bind:key="project.id" />
             </div>
 
             <div class="right">
@@ -96,9 +88,7 @@ export default {
         ProjectActivity,
     },
     data: () => {
-        return {
-            following: false,
-        };
+        return {};
     },
     props: {
         user: {
@@ -128,14 +118,6 @@ export default {
         },
     },
     methods: {
-        async followProject() {
-            await this.$store.dispatch(ActionTypes.PROJECT_FOLLOW, { projectId: this.project.id });
-            this.following = true;
-        },
-        async unfollowProject() {
-            await this.$store.dispatch(ActionTypes.PROJECT_UNFOLLOW, { projectId: this.project.id });
-            this.following = false;
-        },
         getImageUrl(project) {
             return this.$config.baseUrl + project.photo;
         },
@@ -195,6 +177,9 @@ export default {
     margin-right: 20px;
     background-color: white;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
 }
 .details > .right {
     flex: 2;

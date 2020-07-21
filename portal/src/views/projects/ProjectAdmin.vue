@@ -9,9 +9,7 @@
 
                 <DisplayProjectTags :tags="project.tags" />
 
-                <div v-on:click="openProjectNotes" class="link">View Field Notes</div>
-
-                <div class="follow-btn"></div>
+                <FollowPanel :project="project" v-bind:key="project.id" />
             </div>
 
             <div class="right">
@@ -354,6 +352,7 @@ export default {
     padding: 20px;
     display: flex;
     flex-direction: column;
+    justify-content: space-evenly;
 }
 .details .photo {
     display: flex;

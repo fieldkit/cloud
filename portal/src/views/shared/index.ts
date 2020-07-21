@@ -6,6 +6,7 @@ import LatestStationReadings from "./LatestStationReadings.vue";
 import DisplayProjectTags from "./DisplayProjectTags.vue";
 import DoubleHeader from "./DoubleHeader.vue";
 import Spinner from "./Spinner.vue";
+import FollowPanel from "./FollowPanel.vue";
 
 export default {
     UserPhoto,
@@ -16,4 +17,5 @@ export default {
     DisplayProjectTags,
     DoubleHeader,
     Spinner,
+    FollowPanel,
 };

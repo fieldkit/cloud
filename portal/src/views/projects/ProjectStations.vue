@@ -72,7 +72,6 @@ export default Vue.extend({
         return {
             activeStationId: null,
             layoutChanges: 0,
-            following: false,
             showStationsPanel: true,
             addingStation: false,
             page: 0,
