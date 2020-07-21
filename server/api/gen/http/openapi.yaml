@@ -466,7 +466,7 @@ paths:
       - http
       security:
       - jwt_header_Authorization: []
-    patch:
+    post:
       tags:
       - firmware
       summary: add firmware

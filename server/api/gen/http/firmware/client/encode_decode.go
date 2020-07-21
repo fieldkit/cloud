@@ -147,7 +147,7 @@ func DecodeDownloadResponse(decoder func(*http.Response) goahttp.Decoder, restor
 // to call the "firmware" service "add" endpoint
 func (c *Client) BuildAddRequest(ctx context.Context, v interface{}) (*http.Request, error) {
 	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AddFirmwarePath()}
-	req, err := http.NewRequest("PATCH", u.String(), nil)
+	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("firmware", "add", u.String(), err)
 	}

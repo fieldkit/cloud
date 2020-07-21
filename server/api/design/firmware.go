@@ -101,7 +101,7 @@ var _ = Service("firmware", func() {
 		})
 
 		HTTP(func() {
-			PATCH("firmware")
+			POST("firmware")
 
 			Body("firmware")
 		})

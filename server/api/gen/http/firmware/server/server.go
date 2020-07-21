@@ -63,7 +63,7 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"Download", "GET", "/firmware/{firmwareId}/download"},
-			{"Add", "PATCH", "/firmware"},
+			{"Add", "POST", "/firmware"},
 			{"List", "GET", "/firmware"},
 			{"Delete", "DELETE", "/firmware/{firmwareId}"},
 			{"CORS", "OPTIONS", "/firmware/{firmwareId}/download"},
@@ -167,7 +167,7 @@ func MountAddHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("PATCH", "/firmware", f)
+	mux.Handle("POST", "/firmware", f)
 }
 
 // NewAddHandler creates a HTTP handler which loads the HTTP request and calls
