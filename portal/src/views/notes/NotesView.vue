@@ -5,36 +5,41 @@
             <DoubleHeader title="My Stations" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="!project" />
 
             <div class="lower">
-                <div class="side">
-                    <StationTabs :stations="visibleStations" :selected="selectedStation" @selected="onSelected" />
+                <div class="main empty" v-if="!hasStations">
+                    There are no stations to view.
                 </div>
-                <template v-if="loading">
-                    <div class="main">
-                        <Spinner />
-                    </div>
-                </template>
                 <template v-else>
-                    <div class="main" v-if="selectedStation && selectedNotes">
-                        <div class="notifications">
-                            <div v-if="failed" class="notification failed">
-                                Oops, there was a problem.
-                            </div>
-
-                            <div v-if="success" class="notification success">
-                                Saved.
-                            </div>
+                    <div class="side">
+                        <StationTabs :stations="visibleStations" :selected="selectedStation" @selected="onSelected" />
+                    </div>
+                    <template v-if="loading">
+                        <div class="main">
+                            <Spinner />
                         </div>
-                        <NotesForm
-                            :station="selectedStation"
-                            :notes="selectedNotes"
-                            @save="saveForm"
-                            v-bind:key="stationId"
-                            @change="onChange"
-                        />
-                    </div>
-                    <div v-else class="main empty">
-                        Please choose a station from the left.
-                    </div>
+                    </template>
+                    <template v-else>
+                        <div class="main" v-if="selectedStation && selectedNotes">
+                            <div class="notifications">
+                                <div v-if="failed" class="notification failed">
+                                    Oops, there was a problem.
+                                </div>
+
+                                <div v-if="success" class="notification success">
+                                    Saved.
+                                </div>
+                            </div>
+                            <NotesForm
+                                :station="selectedStation"
+                                :notes="selectedNotes"
+                                @save="saveForm"
+                                v-bind:key="stationId"
+                                @change="onChange"
+                            />
+                        </div>
+                        <div v-else class="main empty">
+                            Please choose a station from the left.
+                        </div>
+                    </template>
                 </template>
             </div>
         </div>
@@ -94,6 +99,9 @@ export default Vue.extend({
             stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
         }),
+        hasStations(this: any) {
+            return this.visibleStations.length > 0;
+        },
         project() {
             if (this.projectId) {
                 return this.$getters.projectsById[this.projectId];
@@ -223,8 +231,7 @@ export default Vue.extend({
     height: 100%;
     background-color: #fcfcfc;
     text-align: left;
-    margin-left: 40px;
-    margin-right: 40px;
+    padding: 40px;
 }
 .notes-view .header {
     margin-top: 40px;
