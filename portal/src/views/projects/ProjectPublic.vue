@@ -73,13 +73,7 @@
         </div>
 
         <div class="project-stations">
-            <ProjectStations
-                :project="project"
-                :admin="false"
-                :mapContainerSize="mapContainerSize"
-                :listSize="listSize"
-                :userStations="userStations"
-            />
+            <ProjectStations :project="project" :admin="false" :userStations="userStations" />
         </div>
 
         <ProjectActivity :displayProject="displayProject" v-if="false" />
@@ -103,23 +97,20 @@ export default {
     },
     data: () => {
         return {
-            displayStartDate: "",
-            displayRunTime: "",
-            mostRecentUpdate: null,
             following: false,
-            mapContainerSize: {
-                width: "540px",
-                height: "332px",
-                outerWidth: "860px",
-            },
-            listSize: {
-                width: "320px",
-                height: "332px",
-                boxWidth: "250px",
-            },
         };
     },
-    props: { user: {}, userStations: {}, displayProject: {} },
+    props: {
+        user: {
+            required: true,
+        },
+        userStations: {
+            required: true,
+        },
+        displayProject: {
+            required: true,
+        },
+    },
     computed: {
         project() {
             return this.displayProject.project;

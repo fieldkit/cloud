@@ -82,9 +82,12 @@ export default Vue.extend({
     props: {
         project: { required: true },
         admin: { required: true },
-        mapContainerSize: { required: true },
-        listSize: { required: true },
         userStations: { required: true },
+    },
+    watch: {
+        project() {
+            this.activeStationId = null;
+        },
     },
     computed: {
         projectStations(this: any) {
