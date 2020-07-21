@@ -1,7 +1,7 @@
 <template>
     <div class="datafiles-container">
         <div class="heading">Data Files</div>
-        <div class="">
+        <div class="message">
             No readings have been uploaded yet.
         </div>
     </div>
@@ -27,5 +27,8 @@ export default {
 .heading {
     font-size: 20px;
     font-weight: 600;
+}
+.message {
+    margin-top: 10px;
 }
 </style>
