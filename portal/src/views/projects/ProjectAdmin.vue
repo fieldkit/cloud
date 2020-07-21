@@ -26,11 +26,11 @@
                     </div>
                     <div class="details-right">
                         <div class="time-container" v-if="project.startTime">
-                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                            <img alt="Location" src="@/assets/icon-calendar.png" class="icon" />
                             <template>Started: {{ project.startTime | prettyDate }}</template>
                         </div>
                         <div class="duration-container" v-if="displayProject.duration">
-                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                            <img alt="Location" src="@/assets/icon-time.png" class="icon" />
                             <template>{{ displayProject.duration | prettyDuration }}</template>
                         </div>
                         <div class="location-container" v-if="project.location">
