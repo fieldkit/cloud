@@ -102,13 +102,15 @@ export class Notes {
 
     constructor(public readonly addedPhotos: AddedPhoto[] = []) {}
 
-    public get completed(): string {
+    public get progress(): { total: number; completed: number } {
         const progress = _.map(Notes.Keys, (key) => {
             return this[key].body.length > 0 ? 1 : 0;
         });
         const done = _.sum(progress);
-        const percentage = (done > 0 ? done / progress.length : 0) * 100;
-        return percentage.toFixed(0);
+        return {
+            total: Notes.Keys.length,
+            completed: done,
+        };
     }
 
     public static createFrom(portalNotes: PortalStationNotesReply): Notes {

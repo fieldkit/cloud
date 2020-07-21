@@ -3,7 +3,7 @@
         <div class="inner">
             <div class="header">
                 <div class="name">{{ station.name }}</div>
-                <div class="completed">{{ form.completed }}% Complete</div>
+                <div class="completed">{{ completed }}% Complete</div>
                 <div class="buttons">
                     <div class="button" v-on:click="onSave">Save</div>
                 </div>
@@ -75,6 +75,12 @@ export default Vue.extend({
     computed: {
         photos(this: any) {
             return NoteMedia.onlyPhotos(this.notes.media);
+        },
+        completed(this: any) {
+            const notesProgress = this.form.progress;
+            const anyPhotos = NoteMedia.onlyPhotos(this.form.addedPhotos).length + NoteMedia.onlyPhotos(this.notes.media).length > 0;
+            const percentage = ((notesProgress.completed + anyPhotos) / (notesProgress.total + 1)) * 100;
+            return percentage.toFixed(0);
         },
     },
     mounted(this: any) {
