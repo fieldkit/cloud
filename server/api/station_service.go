@@ -269,10 +269,10 @@ func (c *StationService) Photo(ctx context.Context, payload *station.PhotoPayloa
 	x := uint(124)
 	y := uint(100)
 
-	allMedia := []*data.MediaForStation{}
+	allMedia := []*data.FieldNoteMedia{}
 	if err := c.options.Database.SelectContext(ctx, &allMedia, `
-		SELECT s.id AS station_id, fnm.* FROM fieldkit.station AS s JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id) JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
-		WHERE s.id = $1 ORDER BY fnm.created DESC`, payload.ID); err != nil {
+		SELECT * FROM fieldkit.notes_media WHERE station_id = $1 ORDER BY created_at DESC
+		`, payload.ID); err != nil {
 		return defaultPhoto(payload.ID)
 	}
 
@@ -323,7 +323,7 @@ func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *secu
 	})
 }
 
-func transformImages(id int32, from []*data.MediaForStation) (to []*station.ImageRef) {
+func transformImages(id int32, from []*data.FieldNoteMedia) (to []*station.ImageRef) {
 	to = make([]*station.ImageRef, 0, len(from))
 	for _, v := range from {
 		to = append(to, &station.ImageRef{

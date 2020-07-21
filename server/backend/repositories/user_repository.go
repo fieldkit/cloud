@@ -81,14 +81,12 @@ func (r *UserRepository) Delete(ctx context.Context, id int32) (err error) {
 	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.validation_token WHERE user_id = $1`, id); err != nil {
 		return err
 	}
-
-	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.field_note_media WHERE user_id = $1`, id); err != nil {
+	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.notes_media WHERE user_id = $1`, id); err != nil {
 		return err
 	}
-	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.field_note WHERE user_id = $1`, id); err != nil {
+	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.notes WHERE user_id = $1`, id); err != nil {
 		return err
 	}
-
 	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.station_ingestion WHERE uploader_id = $1`, id); err != nil {
 		return err
 	}
@@ -98,11 +96,9 @@ func (r *UserRepository) Delete(ctx context.Context, id int32) (err error) {
 	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.station WHERE owner_id = $1`, id); err != nil {
 		return err
 	}
-
 	if _, err := r.db.ExecContext(ctx, `UPDATE fieldkit.ingestion SET user_id = 2 WHERE user_id = $1`, id); err != nil {
 		return err
 	}
-
 	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.user WHERE id = $1`, id); err != nil {
 		return err
 	}

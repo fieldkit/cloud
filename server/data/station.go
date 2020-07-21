@@ -130,7 +130,7 @@ type StationFull struct {
 	Station        *Station
 	Owner          *User
 	Ingestions     []*Ingestion
-	Media          []*MediaForStation
+	Media          []*FieldNoteMedia
 	Configurations []*StationConfiguration
 	Modules        []*StationModule
 	Sensors        []*ModuleSensor

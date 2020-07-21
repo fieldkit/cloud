@@ -399,15 +399,9 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	media := []*data.MediaForStation{}
+	media := []*data.FieldNoteMedia{}
 	if err := r.db.SelectContext(ctx, &media, `
-		SELECT
-			s.id AS station_id, fnm.*
-		FROM fieldkit.station AS s
-		JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id)
-		JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
-		WHERE s.id = $1
-		ORDER BY fnm.created DESC
+		SELECT * FROM fieldkit.notes_media WHERE station_id = $1 ORDER BY created_at DESC
 		`, stations[0].ID); err != nil {
 		return nil, err
 	}
@@ -500,15 +494,9 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		return nil, err
 	}
 
-	media := []*data.MediaForStation{}
+	media := []*data.FieldNoteMedia{}
 	if err := r.db.SelectContext(ctx, &media, `
-		SELECT
-			s.id AS station_id, fnm.*
-		FROM fieldkit.station AS s
-		JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id)
-		JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
-		WHERE s.owner_id = $1
-		ORDER BY fnm.created DESC
+		SELECT * FROM fieldkit.notes_media WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1) ORDER BY created_at DESC
 		`, id); err != nil {
 		return nil, err
 	}
@@ -602,15 +590,9 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		return nil, err
 	}
 
-	media := []*data.MediaForStation{}
+	media := []*data.FieldNoteMedia{}
 	if err := r.db.SelectContext(ctx, &media, `
-		SELECT
-			s.id AS station_id, fnm.*
-		FROM fieldkit.station AS s
-		JOIN fieldkit.field_note AS fn ON (fn.station_id = s.id)
-		JOIN fieldkit.field_note_media AS fnm ON (fn.media_id = fnm.id)
-		WHERE s.id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
-		ORDER BY fnm.created DESC
+		SELECT * FROM fieldkit.notes_media WHERE station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1) ORDER BY created_at DESC
 		`, id); err != nil {
 		return nil, err
 	}
@@ -687,12 +669,12 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 	return r.toStationFull(stations, owners, ingestions, media, provisions, configurations, modules, sensors)
 }
 
-func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, ingestions []*data.Ingestion, media []*data.MediaForStation,
+func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, ingestions []*data.Ingestion, media []*data.FieldNoteMedia,
 	provisions []*data.Provision, configurations []*data.StationConfiguration,
 	modules []*data.StationModule, sensors []*data.ModuleSensor) ([]*data.StationFull, error) {
 	ownersByID := make(map[int32]*data.User)
 	ingestionsByDeviceID := make(map[string][]*data.Ingestion)
-	mediaByStationID := make(map[int32][]*data.MediaForStation)
+	mediaByStationID := make(map[int32][]*data.FieldNoteMedia)
 	modulesByStationID := make(map[int32][]*data.StationModule)
 	sensorsByStationID := make(map[int32][]*data.ModuleSensor)
 	stationIDsByDeviceID := make(map[string]int32)
@@ -700,7 +682,7 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 	for _, station := range stations {
 		key := hex.EncodeToString(station.DeviceID)
 		ingestionsByDeviceID[key] = make([]*data.Ingestion, 0)
-		mediaByStationID[station.ID] = make([]*data.MediaForStation, 0)
+		mediaByStationID[station.ID] = make([]*data.FieldNoteMedia, 0)
 		modulesByStationID[station.ID] = make([]*data.StationModule, 0)
 		sensorsByStationID[station.ID] = make([]*data.ModuleSensor, 0)
 		stationIDsByDeviceID[key] = station.ID
@@ -716,7 +698,7 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 	}
 
 	for _, v := range media {
-		mediaByStationID[v.ID] = append(mediaByStationID[v.ID], v)
+		mediaByStationID[v.StationID] = append(mediaByStationID[v.StationID], v)
 	}
 
 	stationIDsByProvisionID := make(map[int64]int32)

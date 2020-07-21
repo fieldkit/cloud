@@ -173,6 +173,7 @@ export default {
     width: 124px;
     height: 100px;
     text-align: center;
+    padding-right: 10px;
 }
 .image-container img {
     max-width: 124px;

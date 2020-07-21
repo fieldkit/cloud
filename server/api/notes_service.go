@@ -228,7 +228,7 @@ func (s *NotesService) Upload(ctx context.Context, payload *notes.UploadPayload,
 	}
 
 	media := &data.FieldNoteMedia{
-		Created:     time.Now(),
+		CreatedAt:   time.Now(),
 		StationID:   payload.StationID,
 		UserID:      p.UserID(),
 		ContentType: saved.MimeType,
@@ -241,8 +241,8 @@ func (s *NotesService) Upload(ctx context.Context, payload *notes.UploadPayload,
 	log.Infow("media", "station_id", media.StationID, "key", media.Key, "content_type", media.ContentType, "user_id", media.UserID)
 
 	if err := s.options.Database.NamedGetContext(ctx, media, `
-		INSERT INTO fieldkit.notes_media (user_id, station_id, content_type, created, url, key)
-		VALUES (:user_id, :station_id, :content_type, :created, :url, :key) RETURNING *
+		INSERT INTO fieldkit.notes_media (user_id, station_id, content_type, created_at, url, key)
+		VALUES (:user_id, :station_id, :content_type, :created_at, :url, :key) RETURNING *
 		`, media); err != nil {
 		return nil, err
 	}
