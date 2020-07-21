@@ -398,9 +398,11 @@ export default {
 .details .details-left {
     padding-right: 20px;
     flex-grow: 1;
+    flex: 2;
 }
 .details .details-right {
     flex-grow: 1;
+    flex: 1;
 }
 .details .details-bottom {
     border-top: 1px solid #d8dce0;
