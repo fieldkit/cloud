@@ -24,6 +24,7 @@ export const PROJECT_FOLLOWS = "PROJECT_FOLLOWS";
 export const PROJECT_STATIONS = "PROJECT_STATIONS";
 export const PROJECT_ACTIVITY = "PROJECT_ACTIVITY";
 export const STATION_UPDATE = "STATION_UPDATE";
+export const PROJECT_LOADED = "PROJECT_LOADED";
 export const PROJECT_UPDATE = "PROJECT_UPDATE";
 
 export class StationsState {
@@ -266,7 +267,7 @@ const actions = {
             api.getStationsByProject(payload.id),
         ]);
 
-        commit(PROJECT_UPDATE, project);
+        commit(PROJECT_LOADED, project);
         commit(PROJECT_USERS, { projectId: payload.id, users: users.users });
         commit(PROJECT_STATIONS, { projectId: payload.id, stations: stations.stations });
 
@@ -391,6 +392,9 @@ const mutations = {
     },
     [STATION_UPDATE]: (state: StationsState, payload: Station) => {
         Vue.set(state.stations, payload.id, new DisplayStation(payload));
+    },
+    [PROJECT_LOADED]: (state: StationsState, project: Project) => {
+        Vue.set(state.projects, project.id, project);
     },
     [PROJECT_UPDATE]: (state: StationsState, project: Project) => {
         Vue.set(state.projects, project.id, project);
