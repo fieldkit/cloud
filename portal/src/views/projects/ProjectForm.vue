@@ -43,26 +43,42 @@
             </div>
 
             <div class="dates-row">
-                <div class="date-container">
-                    <div class="outer-input-container">
-                        <TextField v-model="form.startTime" label="Start" />
+                <div class="outer-date-container">
+                    <div class="date-container">
+                        <div class="outer-input-container">
+                            <TextField v-model="form.startTime" label="Start" />
+                        </div>
+                        <v-date-picker
+                            :value="form.pickedStart"
+                            @input="updateStart"
+                            :popover="{ placement: 'bottom', visibility: 'click' }"
+                        >
+                            <button type="button">
+                                <img alt="Calendar" src="@/assets/calendar.png" />
+                            </button>
+                        </v-date-picker>
                     </div>
-                    <v-date-picker :value="form.pickedStart" @input="updateStart" :popover="{ placement: 'bottom', visibility: 'click' }">
-                        <button type="button">
-                            <img alt="Calendar" src="@/assets/calendar.png" />
-                        </button>
-                    </v-date-picker>
+
+                    <div class="validation-errors" v-if="$v.form.startTime.$error">
+                        <div v-if="!$v.form.startTime.date">Please enter a valid date.</div>
+                    </div>
                 </div>
                 <div class="space-hack"></div>
-                <div class="date-container">
-                    <div class="outer-input-container">
-                        <TextField v-model="form.endTime" label="End" />
+                <div class="outer-date-container">
+                    <div class="date-container">
+                        <div class="outer-input-container">
+                            <TextField v-model="form.endTime" label="End" />
+                        </div>
+                        <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'bottom', visibility: 'click' }">
+                            <button type="button">
+                                <img alt="Calendar" src="@/assets/calendar.png" />
+                            </button>
+                        </v-date-picker>
                     </div>
-                    <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'bottom', visibility: 'click' }">
-                        <button type="button">
-                            <img alt="Calendar" src="@/assets/calendar.png" />
-                        </button>
-                    </v-date-picker>
+
+                    <div class="validation-errors" v-if="$v.form.endTime.$error">
+                        <div v-if="!$v.form.endTime.date">Please enter a valid date.</div>
+                    </div>
                 </div>
             </div>
 
@@ -97,7 +113,7 @@ import VueTagsInput from "@johmun/vue-tags-input";
 
 import { tryParseTags } from "@/utilities";
 
-import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
+import { helpers, required, email, minValue, minLength, sameAs } from "vuelidate/lib/validators";
 
 import FKApi from "@/api/api";
 import * as ActionTypes from "@/store/actions";
@@ -146,8 +162,22 @@ export default Vue.extend({
             location: {
                 required,
             },
-            startDate: {},
-            endTime: {},
+            startTime: {
+                date: function (value) {
+                    if (value && value.length > 0) {
+                        return moment(value).isValid();
+                    }
+                    return true;
+                },
+            },
+            endTime: {
+                date: function (value) {
+                    if (value && value.length > 0) {
+                        return moment(value).isValid();
+                    }
+                    return true;
+                },
+            },
             tags: {},
         },
     },
@@ -158,8 +188,8 @@ export default Vue.extend({
                 description: this.project.description,
                 goal: this.project.goal,
                 location: this.project.location,
-                startTime: this.$options.filters.prettyDate(this.project.startTime || ""),
-                endTime: this.$options.filters.prettyDate(this.project.endTime || ""),
+                startTime: this.prettyDate(this.project.startTime),
+                endTime: this.prettyDate(this.project.endTime),
                 tags: tryParseTags(this.project.tags),
                 publicProject: !this.project.private,
             };
@@ -271,6 +301,12 @@ export default Vue.extend({
         updateEnd(date, ...args) {
             this.form.endTime = date ? moment(date).format("M/D/YYYY") : "";
         },
+        prettyDate(date) {
+            if (date) {
+                return moment(date).format("M/D/YYYY");
+            }
+            return "";
+        },
         closeForm() {
             if (this.project) {
                 return this.$router.push({ name: "viewProject", params: { id: this.project.id } });
@@ -356,6 +392,11 @@ form > div {
 #public-checkbox-container img {
     float: left;
     margin: 2px 5px;
+}
+
+.outer-date-container {
+    display: flex;
+    flex-direction: column;
 }
 
 .action-container {
