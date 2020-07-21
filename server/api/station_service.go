@@ -132,7 +132,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		return nil, err
 	}
 
-	pr, err := repositories.NewProjectRepository(c.options.Database)
+	pr := repositories.NewProjectRepository(c.options.Database)
 	if err != nil {
 		return nil, err
 	}

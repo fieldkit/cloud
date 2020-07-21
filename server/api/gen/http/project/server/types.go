@@ -93,52 +93,52 @@ type LookupInviteResponseBody struct {
 // AddResponseBody is the type of the "project" service "add" endpoint HTTP
 // response body.
 type AddResponseBody struct {
-	ID                int32   `form:"id" json:"id" xml:"id"`
-	Name              string  `form:"name" json:"name" xml:"name"`
-	Description       string  `form:"description" json:"description" xml:"description"`
-	Goal              string  `form:"goal" json:"goal" xml:"goal"`
-	Location          string  `form:"location" json:"location" xml:"location"`
-	Tags              string  `form:"tags" json:"tags" xml:"tags"`
-	Private           bool    `form:"private" json:"private" xml:"private"`
-	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly          bool    `form:"readOnly" json:"readOnly" xml:"readOnly"`
-	NumberOfFollowers int32   `form:"numberOfFollowers" json:"numberOfFollowers" xml:"numberOfFollowers"`
+	ID          int32                         `form:"id" json:"id" xml:"id"`
+	Name        string                        `form:"name" json:"name" xml:"name"`
+	Description string                        `form:"description" json:"description" xml:"description"`
+	Goal        string                        `form:"goal" json:"goal" xml:"goal"`
+	Location    string                        `form:"location" json:"location" xml:"location"`
+	Tags        string                        `form:"tags" json:"tags" xml:"tags"`
+	Private     bool                          `form:"private" json:"private" xml:"private"`
+	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly    bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	Following   *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
 }
 
 // UpdateResponseBody is the type of the "project" service "update" endpoint
 // HTTP response body.
 type UpdateResponseBody struct {
-	ID                int32   `form:"id" json:"id" xml:"id"`
-	Name              string  `form:"name" json:"name" xml:"name"`
-	Description       string  `form:"description" json:"description" xml:"description"`
-	Goal              string  `form:"goal" json:"goal" xml:"goal"`
-	Location          string  `form:"location" json:"location" xml:"location"`
-	Tags              string  `form:"tags" json:"tags" xml:"tags"`
-	Private           bool    `form:"private" json:"private" xml:"private"`
-	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly          bool    `form:"readOnly" json:"readOnly" xml:"readOnly"`
-	NumberOfFollowers int32   `form:"numberOfFollowers" json:"numberOfFollowers" xml:"numberOfFollowers"`
+	ID          int32                         `form:"id" json:"id" xml:"id"`
+	Name        string                        `form:"name" json:"name" xml:"name"`
+	Description string                        `form:"description" json:"description" xml:"description"`
+	Goal        string                        `form:"goal" json:"goal" xml:"goal"`
+	Location    string                        `form:"location" json:"location" xml:"location"`
+	Tags        string                        `form:"tags" json:"tags" xml:"tags"`
+	Private     bool                          `form:"private" json:"private" xml:"private"`
+	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly    bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	Following   *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
 }
 
 // GetResponseBody is the type of the "project" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
-	ID                int32   `form:"id" json:"id" xml:"id"`
-	Name              string  `form:"name" json:"name" xml:"name"`
-	Description       string  `form:"description" json:"description" xml:"description"`
-	Goal              string  `form:"goal" json:"goal" xml:"goal"`
-	Location          string  `form:"location" json:"location" xml:"location"`
-	Tags              string  `form:"tags" json:"tags" xml:"tags"`
-	Private           bool    `form:"private" json:"private" xml:"private"`
-	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly          bool    `form:"readOnly" json:"readOnly" xml:"readOnly"`
-	NumberOfFollowers int32   `form:"numberOfFollowers" json:"numberOfFollowers" xml:"numberOfFollowers"`
+	ID          int32                         `form:"id" json:"id" xml:"id"`
+	Name        string                        `form:"name" json:"name" xml:"name"`
+	Description string                        `form:"description" json:"description" xml:"description"`
+	Goal        string                        `form:"goal" json:"goal" xml:"goal"`
+	Location    string                        `form:"location" json:"location" xml:"location"`
+	Tags        string                        `form:"tags" json:"tags" xml:"tags"`
+	Private     bool                          `form:"private" json:"private" xml:"private"`
+	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly    bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	Following   *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
 }
 
 // ListCommunityResponseBody is the type of the "project" service "list
@@ -471,24 +471,30 @@ type ProjectSummaryResponseBody struct {
 	Name string `form:"name" json:"name" xml:"name"`
 }
 
+// ProjectFollowingResponseBody is used to define fields on response body types.
+type ProjectFollowingResponseBody struct {
+	Total     int32 `form:"total" json:"total" xml:"total"`
+	Following bool  `form:"following" json:"following" xml:"following"`
+}
+
 // ProjectResponseBodyCollection is used to define fields on response body
 // types.
 type ProjectResponseBodyCollection []*ProjectResponseBody
 
 // ProjectResponseBody is used to define fields on response body types.
 type ProjectResponseBody struct {
-	ID                int32   `form:"id" json:"id" xml:"id"`
-	Name              string  `form:"name" json:"name" xml:"name"`
-	Description       string  `form:"description" json:"description" xml:"description"`
-	Goal              string  `form:"goal" json:"goal" xml:"goal"`
-	Location          string  `form:"location" json:"location" xml:"location"`
-	Tags              string  `form:"tags" json:"tags" xml:"tags"`
-	Private           bool    `form:"private" json:"private" xml:"private"`
-	StartTime         *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime           *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo             *string `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly          bool    `form:"readOnly" json:"readOnly" xml:"readOnly"`
-	NumberOfFollowers int32   `form:"numberOfFollowers" json:"numberOfFollowers" xml:"numberOfFollowers"`
+	ID          int32                         `form:"id" json:"id" xml:"id"`
+	Name        string                        `form:"name" json:"name" xml:"name"`
+	Description string                        `form:"description" json:"description" xml:"description"`
+	Goal        string                        `form:"goal" json:"goal" xml:"goal"`
+	Location    string                        `form:"location" json:"location" xml:"location"`
+	Tags        string                        `form:"tags" json:"tags" xml:"tags"`
+	Private     bool                          `form:"private" json:"private" xml:"private"`
+	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly    bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	Following   *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
 }
 
 // NewAddUpdateResponseBody builds the HTTP response body from the result of
@@ -541,18 +547,20 @@ func NewLookupInviteResponseBody(res *projectviews.PendingInvitesView) *LookupIn
 // "add" endpoint of the "project" service.
 func NewAddResponseBody(res *projectviews.ProjectView) *AddResponseBody {
 	body := &AddResponseBody{
-		ID:                *res.ID,
-		Name:              *res.Name,
-		Description:       *res.Description,
-		Goal:              *res.Goal,
-		Location:          *res.Location,
-		Tags:              *res.Tags,
-		Private:           *res.Private,
-		StartTime:         res.StartTime,
-		EndTime:           res.EndTime,
-		Photo:             res.Photo,
-		ReadOnly:          *res.ReadOnly,
-		NumberOfFollowers: *res.NumberOfFollowers,
+		ID:          *res.ID,
+		Name:        *res.Name,
+		Description: *res.Description,
+		Goal:        *res.Goal,
+		Location:    *res.Location,
+		Tags:        *res.Tags,
+		Private:     *res.Private,
+		StartTime:   res.StartTime,
+		EndTime:     res.EndTime,
+		Photo:       res.Photo,
+		ReadOnly:    *res.ReadOnly,
+	}
+	if res.Following != nil {
+		body.Following = marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(res.Following)
 	}
 	return body
 }
@@ -561,18 +569,20 @@ func NewAddResponseBody(res *projectviews.ProjectView) *AddResponseBody {
 // "update" endpoint of the "project" service.
 func NewUpdateResponseBody(res *projectviews.ProjectView) *UpdateResponseBody {
 	body := &UpdateResponseBody{
-		ID:                *res.ID,
-		Name:              *res.Name,
-		Description:       *res.Description,
-		Goal:              *res.Goal,
-		Location:          *res.Location,
-		Tags:              *res.Tags,
-		Private:           *res.Private,
-		StartTime:         res.StartTime,
-		EndTime:           res.EndTime,
-		Photo:             res.Photo,
-		ReadOnly:          *res.ReadOnly,
-		NumberOfFollowers: *res.NumberOfFollowers,
+		ID:          *res.ID,
+		Name:        *res.Name,
+		Description: *res.Description,
+		Goal:        *res.Goal,
+		Location:    *res.Location,
+		Tags:        *res.Tags,
+		Private:     *res.Private,
+		StartTime:   res.StartTime,
+		EndTime:     res.EndTime,
+		Photo:       res.Photo,
+		ReadOnly:    *res.ReadOnly,
+	}
+	if res.Following != nil {
+		body.Following = marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(res.Following)
 	}
 	return body
 }
@@ -581,18 +591,20 @@ func NewUpdateResponseBody(res *projectviews.ProjectView) *UpdateResponseBody {
 // "get" endpoint of the "project" service.
 func NewGetResponseBody(res *projectviews.ProjectView) *GetResponseBody {
 	body := &GetResponseBody{
-		ID:                *res.ID,
-		Name:              *res.Name,
-		Description:       *res.Description,
-		Goal:              *res.Goal,
-		Location:          *res.Location,
-		Tags:              *res.Tags,
-		Private:           *res.Private,
-		StartTime:         res.StartTime,
-		EndTime:           res.EndTime,
-		Photo:             res.Photo,
-		ReadOnly:          *res.ReadOnly,
-		NumberOfFollowers: *res.NumberOfFollowers,
+		ID:          *res.ID,
+		Name:        *res.Name,
+		Description: *res.Description,
+		Goal:        *res.Goal,
+		Location:    *res.Location,
+		Tags:        *res.Tags,
+		Private:     *res.Private,
+		StartTime:   res.StartTime,
+		EndTime:     res.EndTime,
+		Photo:       res.Photo,
+		ReadOnly:    *res.ReadOnly,
+	}
+	if res.Following != nil {
+		body.Following = marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(res.Following)
 	}
 	return body
 }

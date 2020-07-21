@@ -2262,22 +2262,36 @@ func marshalProjectviewsProjectSummaryViewToProjectSummaryResponseBody(v *projec
 	return res
 }
 
+// marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody builds
+// a value of type *ProjectFollowingResponseBody from a value of type
+// *projectviews.ProjectFollowingView.
+func marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(v *projectviews.ProjectFollowingView) *ProjectFollowingResponseBody {
+	res := &ProjectFollowingResponseBody{
+		Total:     *v.Total,
+		Following: *v.Following,
+	}
+
+	return res
+}
+
 // marshalProjectviewsProjectViewToProjectResponseBody builds a value of type
 // *ProjectResponseBody from a value of type *projectviews.ProjectView.
 func marshalProjectviewsProjectViewToProjectResponseBody(v *projectviews.ProjectView) *ProjectResponseBody {
 	res := &ProjectResponseBody{
-		ID:                *v.ID,
-		Name:              *v.Name,
-		Description:       *v.Description,
-		Goal:              *v.Goal,
-		Location:          *v.Location,
-		Tags:              *v.Tags,
-		Private:           *v.Private,
-		StartTime:         v.StartTime,
-		EndTime:           v.EndTime,
-		Photo:             v.Photo,
-		ReadOnly:          *v.ReadOnly,
-		NumberOfFollowers: *v.NumberOfFollowers,
+		ID:          *v.ID,
+		Name:        *v.Name,
+		Description: *v.Description,
+		Goal:        *v.Goal,
+		Location:    *v.Location,
+		Tags:        *v.Tags,
+		Private:     *v.Private,
+		StartTime:   v.StartTime,
+		EndTime:     v.EndTime,
+		Photo:       v.Photo,
+		ReadOnly:    *v.ReadOnly,
+	}
+	if v.Following != nil {
+		res.Following = marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(v.Following)
 	}
 
 	return res

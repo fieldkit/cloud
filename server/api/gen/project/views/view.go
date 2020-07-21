@@ -71,18 +71,24 @@ type ProjectSummaryView struct {
 
 // ProjectView is a type that runs validations on a projected type.
 type ProjectView struct {
-	ID                *int32
-	Name              *string
-	Description       *string
-	Goal              *string
-	Location          *string
-	Tags              *string
-	Private           *bool
-	StartTime         *string
-	EndTime           *string
-	Photo             *string
-	ReadOnly          *bool
-	NumberOfFollowers *int32
+	ID          *int32
+	Name        *string
+	Description *string
+	Goal        *string
+	Location    *string
+	Tags        *string
+	Private     *bool
+	StartTime   *string
+	EndTime     *string
+	Photo       *string
+	ReadOnly    *bool
+	Following   *ProjectFollowingView
+}
+
+// ProjectFollowingView is a type that runs validations on a projected type.
+type ProjectFollowingView struct {
+	Total     *int32
+	Following *bool
 }
 
 // ProjectsView is a type that runs validations on a projected type.
@@ -124,7 +130,7 @@ var (
 			"endTime",
 			"photo",
 			"readOnly",
-			"numberOfFollowers",
+			"following",
 		},
 	}
 	// ProjectsMap is a map of attribute names in result type Projects indexed by
@@ -149,7 +155,7 @@ var (
 			"endTime",
 			"photo",
 			"readOnly",
-			"numberOfFollowers",
+			"following",
 		},
 	}
 )
@@ -291,8 +297,25 @@ func ValidateProjectView(result *ProjectView) (err error) {
 	if result.ReadOnly == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("readOnly", "result"))
 	}
-	if result.NumberOfFollowers == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("numberOfFollowers", "result"))
+	if result.Following == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("following", "result"))
+	}
+	if result.Following != nil {
+		if err2 := ValidateProjectFollowingView(result.Following); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateProjectFollowingView runs the validations defined on
+// ProjectFollowingView.
+func ValidateProjectFollowingView(result *ProjectFollowingView) (err error) {
+	if result.Total == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("total", "result"))
+	}
+	if result.Following == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("following", "result"))
 	}
 	return
 }

@@ -2385,23 +2385,35 @@ func unmarshalProjectSummaryResponseBodyToProjectviewsProjectSummaryView(v *Proj
 	return res
 }
 
+// unmarshalProjectFollowingResponseBodyToProjectviewsProjectFollowingView
+// builds a value of type *projectviews.ProjectFollowingView from a value of
+// type *ProjectFollowingResponseBody.
+func unmarshalProjectFollowingResponseBodyToProjectviewsProjectFollowingView(v *ProjectFollowingResponseBody) *projectviews.ProjectFollowingView {
+	res := &projectviews.ProjectFollowingView{
+		Total:     v.Total,
+		Following: v.Following,
+	}
+
+	return res
+}
+
 // unmarshalProjectResponseBodyToProjectviewsProjectView builds a value of type
 // *projectviews.ProjectView from a value of type *ProjectResponseBody.
 func unmarshalProjectResponseBodyToProjectviewsProjectView(v *ProjectResponseBody) *projectviews.ProjectView {
 	res := &projectviews.ProjectView{
-		ID:                v.ID,
-		Name:              v.Name,
-		Description:       v.Description,
-		Goal:              v.Goal,
-		Location:          v.Location,
-		Tags:              v.Tags,
-		Private:           v.Private,
-		StartTime:         v.StartTime,
-		EndTime:           v.EndTime,
-		Photo:             v.Photo,
-		ReadOnly:          v.ReadOnly,
-		NumberOfFollowers: v.NumberOfFollowers,
+		ID:          v.ID,
+		Name:        v.Name,
+		Description: v.Description,
+		Goal:        v.Goal,
+		Location:    v.Location,
+		Tags:        v.Tags,
+		Private:     v.Private,
+		StartTime:   v.StartTime,
+		EndTime:     v.EndTime,
+		Photo:       v.Photo,
+		ReadOnly:    v.ReadOnly,
 	}
+	res.Following = unmarshalProjectFollowingResponseBodyToProjectviewsProjectFollowingView(v.Following)
 
 	return res
 }

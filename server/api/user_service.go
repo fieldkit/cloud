@@ -139,7 +139,7 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 
 	s.options.Metrics.EmailVerificationSent()
 
-	pr, err := repositories.NewProjectRepository(s.options.Database)
+	pr := repositories.NewProjectRepository(s.options.Database)
 	if err != nil {
 		return nil, err
 	}

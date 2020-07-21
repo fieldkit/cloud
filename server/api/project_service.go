@@ -17,12 +17,14 @@ import (
 )
 
 type ProjectService struct {
-	options *ControllerOptions
+	projects *repositories.ProjectRepository
+	options  *ControllerOptions
 }
 
 func NewProjectService(ctx context.Context, options *ControllerOptions) *ProjectService {
 	return &ProjectService{
-		options: options,
+		projects: repositories.NewProjectRepository(options.Database),
+		options:  options,
 	}
 }
 
@@ -68,17 +70,16 @@ func (c *ProjectService) Add(ctx context.Context, payload *project.AddPayload) (
 		newProject.EndTime = &end
 	}
 
-	pr, err := repositories.NewProjectRepository(c.options.Database)
+	newProject, err = c.projects.AddProject(ctx, p.UserID(), newProject)
 	if err != nil {
 		return nil, err
 	}
 
-	newProject, err = pr.AddProject(ctx, p.UserID(), newProject)
-	if err != nil {
-		return nil, err
+	relationship := &data.UserProjectRelationship{
+		MemberRole: data.AdministratorRole.ID,
 	}
 
-	return ProjectType(newProject, 0, data.AdministratorRole), nil
+	return ProjectType(newProject, 0, relationship), nil
 }
 
 func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayload) (*project.Project, error) {
@@ -128,15 +129,17 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 		updating.EndTime = &end
 	}
 
-	role := data.AdministratorRole
-
 	if err := c.options.Database.NamedGetContext(ctx, updating, `
 		UPDATE fieldkit.project SET name = :name, description = :description, goal = :goal, location = :location,
 		tags = :tags, private = :private, start_time = :start_time, end_time = :end_time WHERE id = :id RETURNING *`, updating); err != nil {
 		return nil, err
 	}
 
-	return ProjectType(updating, 0, role), nil
+	relationship := &data.UserProjectRelationship{
+		MemberRole: data.AdministratorRole.ID,
+	}
+
+	return ProjectType(updating, 0, relationship), nil
 }
 
 func (c *ProjectService) AddStation(ctx context.Context, payload *project.AddStationPayload) error {
@@ -149,12 +152,7 @@ func (c *ProjectService) AddStation(ctx context.Context, payload *project.AddSta
 		return err
 	}
 
-	pr, err := repositories.NewProjectRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
-
-	if err := pr.AddStationToProjectByID(ctx, payload.ProjectID, payload.StationID); err != nil {
+	if err := c.projects.AddStationToProjectByID(ctx, payload.ProjectID, payload.StationID); err != nil {
 		return err
 	}
 
@@ -179,20 +177,18 @@ func (c *ProjectService) RemoveStation(ctx context.Context, payload *project.Rem
 }
 
 func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (*project.Project, error) {
-	role := data.PublicRole
+	relationships := make(map[int32]*data.UserProjectRelationship)
 
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err == nil {
-		projectUsers := []*data.ProjectUser{}
-		if err := c.options.Database.SelectContext(ctx, &projectUsers, `
-			SELECT * FROM fieldkit.project_user WHERE project_id = $1 AND user_id = $2
-			`, payload.ProjectID, p.UserID()); err != nil {
+		relationships, err = c.projects.QueryUserProjectRelationships(ctx, p.UserID())
+		if err != nil {
 			return nil, err
 		}
+	}
 
-		if len(projectUsers) > 0 {
-			role = projectUsers[0].LookupRole()
-		}
+	if relationships[payload.ProjectID] == nil {
+		relationships[payload.ProjectID] = &data.UserProjectRelationship{}
 	}
 
 	project := &data.Project{}
@@ -202,21 +198,17 @@ func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (
 		return nil, err
 	}
 
-	return ProjectType(project, 0, role), nil
+	return ProjectType(project, 0, relationships[project.ID]), nil
 }
 
 func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.ListCommunityPayload) (*project.Projects, error) {
-	roles := make(map[int32]*data.Role)
+	relationships := make(map[int32]*data.UserProjectRelationship)
 
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err == nil {
-		projectUsers := []*data.ProjectUser{}
-		if err := c.options.Database.SelectContext(ctx, &projectUsers, `SELECT * FROM fieldkit.project_user WHERE user_id = $1`, p.UserID()); err != nil {
+		relationships, err = c.projects.QueryUserProjectRelationships(ctx, p.UserID())
+		if err != nil {
 			return nil, err
-		}
-
-		for _, pu := range projectUsers {
-			roles[pu.ProjectID] = pu.LookupRole()
 		}
 	}
 
@@ -227,7 +219,7 @@ func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.Lis
 		return nil, err
 	}
 
-	followers := []*FollowersSummary{}
+	followers := []*data.FollowersSummary{}
 	if err := c.options.Database.SelectContext(ctx, &followers, `
 		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (
 			SELECT id FROM fieldkit.project ORDER BY name LIMIT 10
@@ -236,7 +228,7 @@ func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.Lis
 		return nil, err
 	}
 
-	return ProjectsType(projects, followers, roles), nil
+	return ProjectsType(projects, followers, relationships), nil
 }
 
 func (c *ProjectService) ListMine(ctx context.Context, payload *project.ListMinePayload) (*project.Projects, error) {
@@ -245,14 +237,19 @@ func (c *ProjectService) ListMine(ctx context.Context, payload *project.ListMine
 		return nil, err
 	}
 
-	projects := []*data.ProjectUserAndProject{}
+	projects := []*data.Project{}
 	if err := c.options.Database.SelectContext(ctx, &projects, `
-		SELECT pu.*, p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS pu ON pu.project_id = p.id WHERE pu.user_id = $1 ORDER BY p.name
+		SELECT p.* FROM fieldkit.project AS p JOIN fieldkit.project_user AS pu ON pu.project_id = p.id WHERE pu.user_id = $1 ORDER BY p.name
 		`, p.UserID()); err != nil {
 		return nil, err
 	}
 
-	followers := []*FollowersSummary{}
+	relationships, err := c.projects.QueryUserProjectRelationships(ctx, p.UserID())
+	if err != nil {
+		return nil, err
+	}
+
+	followers := []*data.FollowersSummary{}
 	if err := c.options.Database.SelectContext(ctx, &followers, `
 		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (
 			SELECT p.id FROM fieldkit.project AS p JOIN fieldkit.project_user AS pu ON pu.project_id = p.id WHERE pu.user_id = $1
@@ -261,7 +258,7 @@ func (c *ProjectService) ListMine(ctx context.Context, payload *project.ListMine
 		return nil, err
 	}
 
-	return ProjectUserAndProjectsType(projects, followers), nil
+	return ProjectsType(projects, followers, relationships), nil
 }
 
 func (c *ProjectService) Invite(ctx context.Context, payload *project.InvitePayload) error {
@@ -739,18 +736,23 @@ func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *secu
 	})
 }
 
-func ProjectType(dm *data.Project, numberOfFollowers int32, role *data.Role) *project.Project {
+func ProjectType(dm *data.Project, numberOfFollowers int32, userRelationship *data.UserProjectRelationship) *project.Project {
+	role := userRelationship.LookupRole()
+
 	wm := &project.Project{
-		ID:                dm.ID,
-		Name:              dm.Name,
-		Description:       dm.Description,
-		Goal:              dm.Goal,
-		Location:          dm.Location,
-		Tags:              dm.Tags,
-		Private:           dm.Private,
-		Photo:             makePhotoURL(fmt.Sprintf("/projects/%d/media", dm.ID), dm.MediaURL),
-		ReadOnly:          role.IsProjectReadOnly(),
-		NumberOfFollowers: numberOfFollowers,
+		ID:          dm.ID,
+		Name:        dm.Name,
+		Description: dm.Description,
+		Goal:        dm.Goal,
+		Location:    dm.Location,
+		Tags:        dm.Tags,
+		Private:     dm.Private,
+		Photo:       makePhotoURL(fmt.Sprintf("/projects/%d/media", dm.ID), dm.MediaURL),
+		ReadOnly:    role.IsProjectReadOnly(),
+		Following: &project.ProjectFollowing{
+			Total:     numberOfFollowers,
+			Following: userRelationship.Following,
+		},
 	}
 
 	if dm.StartTime != nil {
@@ -766,7 +768,7 @@ func ProjectType(dm *data.Project, numberOfFollowers int32, role *data.Role) *pr
 	return wm
 }
 
-func findNumberOfFollowers(followers []*FollowersSummary, id int32) int32 {
+func findNumberOfFollowers(followers []*data.FollowersSummary, id int32) int32 {
 	for _, f := range followers {
 		if f.ProjectID == id {
 			return f.Followers
@@ -775,35 +777,18 @@ func findNumberOfFollowers(followers []*FollowersSummary, id int32) int32 {
 	return 0
 }
 
-func ProjectsType(projects []*data.Project, followers []*FollowersSummary, roles map[int32]*data.Role) *project.Projects {
+func ProjectsType(projects []*data.Project, followers []*data.FollowersSummary, relationships map[int32]*data.UserProjectRelationship) *project.Projects {
 	projectsCollection := make([]*project.Project, len(projects))
 	for i, project := range projects {
 		numberOfFollowers := findNumberOfFollowers(followers, project.ID)
-		if role, ok := roles[project.ID]; ok {
-			projectsCollection[i] = ProjectType(project, numberOfFollowers, role)
+		if rel, ok := relationships[project.ID]; ok {
+			projectsCollection[i] = ProjectType(project, numberOfFollowers, rel)
 		} else {
-			projectsCollection[i] = ProjectType(project, numberOfFollowers, data.PublicRole)
+			projectsCollection[i] = ProjectType(project, numberOfFollowers, &data.UserProjectRelationship{})
 		}
 	}
 
 	return &project.Projects{
 		Projects: projectsCollection,
 	}
-}
-
-func ProjectUserAndProjectsType(projects []*data.ProjectUserAndProject, followers []*FollowersSummary) *project.Projects {
-	projectsCollection := make([]*project.Project, len(projects))
-	for i, project := range projects {
-		numberOfFollowers := findNumberOfFollowers(followers, project.ID)
-		projectsCollection[i] = ProjectType(&project.Project, numberOfFollowers, project.ProjectUser.LookupRole())
-	}
-
-	return &project.Projects{
-		Projects: projectsCollection,
-	}
-}
-
-type FollowersSummary struct {
-	ProjectID int32 `db:"project_id"`
-	Followers int32 `db:"followers"`
 }

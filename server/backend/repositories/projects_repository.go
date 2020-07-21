@@ -12,8 +12,8 @@ type ProjectRepository struct {
 	db *sqlxcache.DB
 }
 
-func NewProjectRepository(db *sqlxcache.DB) (pr *ProjectRepository, err error) {
-	return &ProjectRepository{db: db}, nil
+func NewProjectRepository(db *sqlxcache.DB) (pr *ProjectRepository) {
+	return &ProjectRepository{db: db}
 }
 
 func (pr *ProjectRepository) AddDefaultProject(ctx context.Context, user *data.User) (project *data.Project, err error) {
@@ -66,4 +66,28 @@ func (pr *ProjectRepository) AddStationToDefaultProjectMaybe(ctx context.Context
 	}
 
 	return pr.AddStationToProjectByID(ctx, projectIDs[0], station.ID)
+}
+
+func (pr *ProjectRepository) QueryUserProjectRelationships(ctx context.Context, userID int32) (map[int32]*data.UserProjectRelationship, error) {
+	all := []*data.UserProjectRelationship{}
+	if err := pr.db.SelectContext(ctx, &all, `
+		SELECT
+			p.id AS project_id,
+			COUNT(f.*) > 0 AS following,
+			COALESCE(MAX(m.role), -1) AS member_role
+		FROM fieldkit.project AS p
+		LEFT JOIN fieldkit.project_follower AS f ON (p.id = f.project_id AND f.follower_id = $1)
+		LEFT JOIN fieldkit.project_user AS m ON (p.id = m.project_id AND m.user_id = $1)
+		GROUP BY p.id
+		`, userID); err != nil {
+		return nil, err
+	}
+
+	relationships := make(map[int32]*data.UserProjectRelationship)
+
+	for _, rel := range all {
+		relationships[rel.ProjectID] = rel
+	}
+
+	return relationships, nil
 }

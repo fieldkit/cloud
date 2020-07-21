@@ -40,7 +40,7 @@ func (u *ProjectUser) LookupRole() *Role {
 			return role
 		}
 	}
-	return nil
+	return PublicRole
 }
 
 func (u *ProjectUser) RoleName() string {
@@ -70,4 +70,27 @@ func (u *ProjectInvite) LookupRole() *Role {
 		}
 	}
 	return MemberRole
+}
+
+type FollowersSummary struct {
+	ProjectID int32 `db:"project_id"`
+	Followers int32 `db:"followers"`
+}
+
+type UserProjectRelationship struct {
+	ProjectID  int32 `db:"project_id"`
+	Following  bool  `db:"following"`
+	MemberRole int32 `db:"member_role"`
+}
+
+func (r *UserProjectRelationship) LookupRole() *Role {
+	if r.MemberRole < 0 {
+		return PublicRole
+	}
+	for _, role := range Roles {
+		if role.ID == r.MemberRole {
+			return role
+		}
+	}
+	return PublicRole
 }

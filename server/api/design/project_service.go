@@ -28,6 +28,13 @@ var RemoveUserFields = Type("RemoveUserFields", func() {
 	Required("email")
 })
 
+var ProjectFollowing = Type("ProjectFollowing", func() {
+	Attribute("total", Int32)
+	Required("total")
+	Attribute("following", Boolean)
+	Required("following")
+})
+
 var Project = ResultType("application/vnd.app.project+json", func() {
 	TypeName("Project")
 	Reference(AddProjectFields)
@@ -43,8 +50,8 @@ var Project = ResultType("application/vnd.app.project+json", func() {
 		Attribute("endTime", String)
 		Attribute("photo")
 		Attribute("readOnly", Boolean)
-		Attribute("numberOfFollowers", Int32)
-		Required("id", "name", "description", "goal", "location", "private", "tags", "readOnly", "numberOfFollowers")
+		Attribute("following", ProjectFollowing)
+		Required("id", "name", "description", "goal", "location", "private", "tags", "readOnly", "following")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -58,7 +65,7 @@ var Project = ResultType("application/vnd.app.project+json", func() {
 		Attribute("endTime")
 		Attribute("photo")
 		Attribute("readOnly")
-		Attribute("numberOfFollowers")
+		Attribute("following")
 	})
 })
 

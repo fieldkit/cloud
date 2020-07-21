@@ -146,18 +146,18 @@ type AddPayload struct {
 
 // Project is the result type of the project service add method.
 type Project struct {
-	ID                int32
-	Name              string
-	Description       string
-	Goal              string
-	Location          string
-	Tags              string
-	Private           bool
-	StartTime         *string
-	EndTime           *string
-	Photo             *string
-	ReadOnly          bool
-	NumberOfFollowers int32
+	ID          int32
+	Name        string
+	Description string
+	Goal        string
+	Location    string
+	Tags        string
+	Private     bool
+	StartTime   *string
+	EndTime     *string
+	Photo       *string
+	ReadOnly    bool
+	Following   *ProjectFollowing
 }
 
 // UpdatePayload is the payload type of the project service update method.
@@ -269,6 +269,11 @@ type AddProjectFields struct {
 	Private     *bool
 	StartTime   *string
 	EndTime     *string
+}
+
+type ProjectFollowing struct {
+	Total     int32
+	Following bool
 }
 
 type ProjectCollection []*Project
@@ -465,8 +470,8 @@ func newProject(vres *projectviews.ProjectView) *Project {
 	if vres.ReadOnly != nil {
 		res.ReadOnly = *vres.ReadOnly
 	}
-	if vres.NumberOfFollowers != nil {
-		res.NumberOfFollowers = *vres.NumberOfFollowers
+	if vres.Following != nil {
+		res.Following = transformProjectviewsProjectFollowingViewToProjectFollowing(vres.Following)
 	}
 	return res
 }
@@ -475,18 +480,20 @@ func newProject(vres *projectviews.ProjectView) *Project {
 // using the "default" view.
 func newProjectView(res *Project) *projectviews.ProjectView {
 	vres := &projectviews.ProjectView{
-		ID:                &res.ID,
-		Name:              &res.Name,
-		Description:       &res.Description,
-		Goal:              &res.Goal,
-		Location:          &res.Location,
-		Tags:              &res.Tags,
-		Private:           &res.Private,
-		StartTime:         res.StartTime,
-		EndTime:           res.EndTime,
-		Photo:             res.Photo,
-		ReadOnly:          &res.ReadOnly,
-		NumberOfFollowers: &res.NumberOfFollowers,
+		ID:          &res.ID,
+		Name:        &res.Name,
+		Description: &res.Description,
+		Goal:        &res.Goal,
+		Location:    &res.Location,
+		Tags:        &res.Tags,
+		Private:     &res.Private,
+		StartTime:   res.StartTime,
+		EndTime:     res.EndTime,
+		Photo:       res.Photo,
+		ReadOnly:    &res.ReadOnly,
+	}
+	if res.Following != nil {
+		vres.Following = transformProjectFollowingToProjectviewsProjectFollowingView(res.Following)
 	}
 	return vres
 }
@@ -580,6 +587,33 @@ func transformProjectSummaryToProjectviewsProjectSummaryView(v *ProjectSummary) 
 	res := &projectviews.ProjectSummaryView{
 		ID:   &v.ID,
 		Name: &v.Name,
+	}
+
+	return res
+}
+
+// transformProjectviewsProjectFollowingViewToProjectFollowing builds a value
+// of type *ProjectFollowing from a value of type
+// *projectviews.ProjectFollowingView.
+func transformProjectviewsProjectFollowingViewToProjectFollowing(v *projectviews.ProjectFollowingView) *ProjectFollowing {
+	if v == nil {
+		return nil
+	}
+	res := &ProjectFollowing{
+		Total:     *v.Total,
+		Following: *v.Following,
+	}
+
+	return res
+}
+
+// transformProjectFollowingToProjectviewsProjectFollowingView builds a value
+// of type *projectviews.ProjectFollowingView from a value of type
+// *ProjectFollowing.
+func transformProjectFollowingToProjectviewsProjectFollowingView(v *ProjectFollowing) *projectviews.ProjectFollowingView {
+	res := &projectviews.ProjectFollowingView{
+		Total:     &v.Total,
+		Following: &v.Following,
 	}
 
 	return res
