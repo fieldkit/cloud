@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -8,7 +9,9 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -23,9 +26,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-
-	fk "github.com/fieldkit/cloud/server/api/client"
-	fktesting "github.com/fieldkit/cloud/server/tools"
 )
 
 type options struct {
@@ -186,7 +186,7 @@ func hasFile(session *session.Session, id string) (string, error) {
 	return fmt.Sprintf("https://%s.s3.amazonaws.com/%s", bucket, id), nil
 }
 
-func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, profileOverride, filename string, dryRun bool) error {
+func uploadFirmware(ctx context.Context, fkc *FkClient, moduleOverride, profileOverride, filename string, dryRun bool) error {
 	id, err := getFileHash(filename)
 	if err != nil {
 		return fmt.Errorf("error getting file hash: %v", filename)
@@ -251,7 +251,7 @@ func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, profileOv
 		return fmt.Errorf("error serializing metadata: %v", err)
 	}
 
-	addFirmwarePayload := fk.AddFirmwarePayload{
+	addFirmwarePayload := AddFirmwarePayload{
 		Etag:    metadata.ETag,
 		Module:  metadata.Module,
 		Profile: metadata.Profile,
@@ -260,12 +260,12 @@ func uploadFirmware(ctx context.Context, c *fk.Client, moduleOverride, profileOv
 	}
 
 	if !dryRun {
-		r, err := c.AddFirmware(ctx, fk.AddFirmwarePath(), &addFirmwarePayload)
+		err := fkc.AddFirmware(ctx, &addFirmwarePayload)
 		if err != nil {
 			return fmt.Errorf("error adding firmware: %v", err)
 		}
 
-		log.Printf("added: %v", r)
+		log.Printf("added")
 	}
 
 	log.Printf("done!")
@@ -289,7 +289,9 @@ func main() {
 
 	flag.Parse()
 
-	c, err := fktesting.CreateAndAuthenticate(ctx, o.Host, o.Scheme, o.Email, o.Password)
+	fkc := NewFkClient(o.Host, o.Scheme)
+
+	err := fkc.Login(ctx, o.Email, o.Password)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
@@ -297,13 +299,111 @@ func main() {
 	log.Printf("authenticated as %s (%s)", o.Email, o.Host)
 
 	if o.FirmwareFile != "" {
-		/*
-			err := uploadFirmware(ctx, c, o.Module, o.Profile, o.FirmwareFile, o.DryRun)
-			if err != nil {
-				log.Fatalf("error adding firmware: %v", err)
-			}
-		*/
+		err := uploadFirmware(ctx, fkc, o.Module, o.Profile, o.FirmwareFile, o.DryRun)
+		if err != nil {
+			log.Fatalf("error adding firmware: %v", err)
+		}
+	}
+}
+
+type FkClient struct {
+	scheme string
+	host   string
+	http   *http.Client
+	auth   string
+}
+
+func NewFkClient(host, scheme string) (fkc *FkClient) {
+	return &FkClient{
+		scheme: scheme,
+		host:   host,
+		http:   http.DefaultClient,
+	}
+}
+
+func (fkc *FkClient) Login(ctx context.Context, email, password string) error {
+	payload := &LoginPayload{
+		Email:    email,
+		Password: password,
 	}
 
-	_ = c
+	requestBody, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf("%s://%s/%s", fkc.scheme, fkc.host, "login")
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return err
+	}
+
+	response, err := fkc.http.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("invalid username or password")
+	}
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+
+	fkc.auth = response.Header.Get("Authorization")
+
+	_ = body
+
+	return nil
+}
+
+func (fkc *FkClient) AddFirmware(ctx context.Context, payload *AddFirmwarePayload) error {
+	requestBody, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf("%s://%s/%s", fkc.scheme, fkc.host, "firmware")
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	req.Header.Set("Authorization", fkc.auth)
+	if err != nil {
+		return err
+	}
+
+	response, err := fkc.http.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusNoContent && response.StatusCode != http.StatusOK {
+		return fmt.Errorf("error adding firmware")
+	}
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+
+	_ = body
+
+	return nil
+}
+
+type LoginPayload struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type AddFirmwarePayload struct {
+	Etag    string `json"etag"`
+	Module  string `json:"module"`
+	Profile string `json:"profile"`
+	URL     string `json:"url"`
+	Meta    string `json:"meta"`
 }
