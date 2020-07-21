@@ -1,3 +1,4 @@
+import _ from "lodash";
 import Vue from "vue";
 import Vuex from "vuex";
 import Vuelidate from "vuelidate";
@@ -74,7 +75,7 @@ Vue.filter("prettyCoordinate", (value) => {
 });
 
 Vue.filter("prettyDuration", (value) => {
-    return moment.duration(value / 1000, "seconds").humanize();
+    return _.capitalize(moment.duration(value / 1000, "seconds").humanize());
 });
 
 const store = storeFactory();
