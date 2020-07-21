@@ -1,7 +1,7 @@
 <template>
     <div class="datafiles-container">
         <div class="heading">Data Files</div>
-        <div class="readings-stats-container">
+        <div class="">
             No readings have been uploaded yet.
         </div>
     </div>
@@ -15,7 +15,9 @@ export default {
     data: () => {
         return {};
     },
-    props: { projectStations: { required: true } },
+    props: {
+        projectStations: { required: true },
+    },
 };
 </script>
 
@@ -24,16 +26,6 @@ export default {
 }
 .heading {
     font-size: 20px;
-    font-weight: 600;
-    float: left;
-    margin: 25px;
-}
-.readings-stats-container {
-    float: left;
-    clear: both;
-    margin: 0 25px 25px 25px;
-}
-.stat {
     font-weight: 600;
 }
 </style>
