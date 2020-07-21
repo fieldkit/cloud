@@ -39,7 +39,7 @@ portal/src/secrets.ts: portal/src/secrets.ts.template
 binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata
 
 portal/node_modules:
-	cd portal && npm install
+	cd portal && yarn install
 
 tests: portal/node_modules
 	if [ -f portal/node_modules/.yarn-integrity ]; then  \
