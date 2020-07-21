@@ -72,7 +72,6 @@ export default {
     text-align: left;
 }
 .container {
-    max-width: 900px;
 }
 .container.community {
     border-top: 2px solid #afafaf;

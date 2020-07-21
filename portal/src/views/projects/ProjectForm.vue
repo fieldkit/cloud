@@ -323,7 +323,6 @@ export default Vue.extend({
 
 <style scoped>
 .project-form {
-    max-width: 800px;
     display: flex;
     flex-direction: column;
     border: 1px solid #d8dce0;
