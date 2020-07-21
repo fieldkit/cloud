@@ -69,13 +69,7 @@
         </div>
 
         <div class="row-section project-stations">
-            <ProjectStations
-                :project="project"
-                :admin="true"
-                :mapContainerSize="mapContainerSize"
-                :listSize="listSize"
-                :userStations="userStations"
-            />
+            <ProjectStations :project="project" :admin="true" :userStations="userStations" />
         </div>
 
         <div class="row-section data-readings">
@@ -192,16 +186,6 @@ export default {
                 inviteDuplicate: false,
             },
             viewingActivityFeed: false,
-            mapContainerSize: {
-                width: "677px",
-                height: "332px",
-                outerWidth: "1022px",
-            },
-            listSize: {
-                width: "345px",
-                height: "332px",
-                boxWidth: "274px",
-            },
             selectedRole: -1,
             roleOptions: [
                 {
