@@ -1,52 +1,58 @@
 package design
 
 import (
-	. "github.com/goadesign/goa/design/apidsl"
+	cors "goa.design/plugins/v3/cors/dsl"
+
+	. "goa.design/goa/v3/dsl"
 )
 
-var corsRules = func() {
-	Headers("Authorization", "Content-Type")
-	Expose("Authorization", "Content-Type")
-	Methods("GET", "OPTIONS", "POST", "DELETE", "PATCH", "PUT")
-}
-
-var _ = API("fieldkit", func() {
-	Title("Fieldkit API")
-	Description("A one-click open platform for field researchers and explorers.")
-	Host("api.fieldkit.org")
-	Scheme("https")
-	Origin("https://fieldkit.org:8080", corsRules)
-	Origin("https://*.fieldkit.org:8080", corsRules)
-	Origin("https://fieldkit.org", corsRules)
-	Origin("https://*.fieldkit.org", corsRules)
-	Origin("https://fieldkit.team", corsRules)
-	Origin("https://*.fieldkit.team", corsRules)
-	Origin("https://fkdev.org", corsRules)
-	Origin("https://*.fkdev.org", corsRules)
-	Origin("/(.+[.])?127.0.0.1:\\d+/", corsRules)       // Dev
-	Origin("/(.+[.])?localhost:\\d+/", corsRules)       // Dev
-	Origin("/(.+[.])?fieldkit.org:\\d+/", corsRules)    // Dev
-	Origin("/(.+[.])?local.fkdev.org:\\d+/", corsRules) // Dev
-	Consumes("application/json")
-	Produces("application/json")
-})
-
-var JWT = JWTSecurity("jwt", func() {
-	Header("Authorization")
+var JWTAuth = JWTSecurity("jwt", func() {
 	Scope("api:access", "API access")
 	Scope("api:admin", "API admin access")
 	Scope("api:ingestion", "Ingestion access")
 })
 
-var Location = MediaType("application/vnd.app.location+json", func() {
-	TypeName("Location")
-	Attributes(func() {
-		Attribute("location", func() {
-			Format("uri")
-		})
-		Required("location")
+func commonOptions() {
+	corsRules := func() {
+		cors.Headers("Authorization", "Content-Type")
+		cors.Expose("Authorization", "Content-Type")
+		cors.Methods("GET", "OPTIONS", "POST", "DELETE", "PATCH", "PUT")
+	}
+
+	cors.Origin("https://fieldkit.org:8080", corsRules)
+	cors.Origin("https://*.fieldkit.org:8080", corsRules)
+	cors.Origin("https://fieldkit.org", corsRules)
+	cors.Origin("https://*.fieldkit.org", corsRules)
+	cors.Origin("https://fkdev.org", corsRules)
+	cors.Origin("https://*.fkdev.org", corsRules)
+	cors.Origin("/(.+[.])?127.0.0.1:\\d+/", corsRules)       // Dev
+	cors.Origin("/(.+[.])?localhost:\\d+/", corsRules)       // Dev
+	cors.Origin("/(.+[.])?fieldkit.org:\\d+/", corsRules)    // Dev
+	cors.Origin("/(.+[.])?local.fkdev.org:\\d+/", corsRules) // Dev
+
+	Error("unauthorized", String, "unauthorized")
+	Error("forbidden", String, "forbidden")
+	Error("not-found", String, "not-found")
+	Error("bad-request", String, "bad-request")
+
+	HTTP(func() {
+		Response("unauthorized", StatusUnauthorized)
+		Response("forbidden", StatusForbidden)
+		Response("not-found", StatusNotFound)
+		Response("bad-request", StatusBadRequest)
 	})
-	View("default", func() {
-		Attribute("location")
+}
+
+func httpAuthentication() {
+	Header("auth:Authorization", String, "authentication token", func() {
+		Pattern("^Bearer [^ ]+$")
 	})
-})
+}
+
+func httpAuthenticationQueryString() {
+	Param("auth:token", String, "authentication token")
+}
+
+func DateTimeFormatting() {
+	Format(FormatDateTime)
+}
