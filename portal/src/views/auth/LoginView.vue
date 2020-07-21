@@ -144,7 +144,7 @@ export default Vue.extend({
                             if (_.isArray(this.$route.query.after)) {
                                 return this.$router.push(this.$route.query.after[0]);
                             }
-                            return this.$router.push(this.$route.query.after);
+                            return this.$router.push(this.$route.query.after as string);
                         }
                         return this.$router.push({ name: "projects" });
                     },
