@@ -91,3 +91,19 @@ func (pr *ProjectRepository) QueryUserProjectRelationships(ctx context.Context, 
 
 	return relationships, nil
 }
+
+func (pr *ProjectRepository) Delete(ctx context.Context, projectID int32) error {
+	if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project_station WHERE project_id = $1`, projectID); err != nil {
+		return err
+	}
+	if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project_follower WHERE project_id = $1`, projectID); err != nil {
+		return err
+	}
+	if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project_user WHERE project_id = $1`, projectID); err != nil {
+		return err
+	}
+	if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project WHERE id = $1`, projectID); err != nil {
+		return err
+	}
+	return nil
+}

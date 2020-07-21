@@ -169,7 +169,9 @@ func (c *ProjectService) RemoveStation(ctx context.Context, payload *project.Rem
 		return err
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project_station WHERE project_id = $1 AND station_id = $2`, payload.ProjectID, payload.StationID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `
+		DELETE FROM fieldkit.project_station WHERE project_id = $1 AND station_id = $2
+		`, payload.ProjectID, payload.StationID); err != nil {
 		return err
 	}
 
@@ -390,15 +392,7 @@ func (c *ProjectService) Delete(ctx context.Context, payload *project.DeletePayl
 		}
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project_station WHERE project_id = $1`, payload.ProjectID); err != nil {
-		return err
-	}
-
-	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project_user WHERE project_id = $1`, payload.ProjectID); err != nil {
-		return err
-	}
-
-	if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.project WHERE id = $1`, payload.ProjectID); err != nil {
+	if err := c.projects.Delete(ctx, payload.ProjectID); err != nil {
 		return err
 	}
 
