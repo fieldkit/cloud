@@ -16,7 +16,7 @@ import Vue, { PropType } from "vue";
 import * as ActionTypes from "@/store/actions";
 
 export class ProjectFollowing {
-    constructor(public readonly following: bool, public readonly total: number) {}
+    constructor(public readonly following: boolean, public readonly total: number) {}
 }
 
 export default Vue.extend({

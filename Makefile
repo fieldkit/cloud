@@ -13,7 +13,6 @@ GO ?= env GOOS=$(GOOS) GOARCH=$(GOARCH) go
 BUILD ?= $(abspath build)
 WORKING_DIRECTORY ?= `pwd`
 DOCKER_TAG ?= master
-
 SERVER_SOURCES = $(shell find server -type f -name '*.go')
 
 default: setup binaries tests gotests
@@ -48,6 +47,7 @@ tests: portal/node_modules
 	else                                                 \
 	cd portal && npm install;                            \
 	fi
+	cd portal && vue-cli-service build
 	cd portal && vue-cli-service test:unit
 
 gotests:
