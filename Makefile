@@ -82,12 +82,9 @@ $(BUILD)/fkdata: server/cmd/fkdata/*.go $(SERVER_SOURCES)
 	cd server/cmd/fkdata && $(GO) build -o $@ *.go
 
 generate:
-	./tools/goa-generate.sh
-
-generate-v3:
 	cd server/api && goa gen github.com/fieldkit/cloud/server/api/design
 
-generate-v3-example:
+generate-goa-example:
 	mkdir -p server/api/example
 	cd server/api/example && goa example github.com/fieldkit/cloud/server/api/design
 
