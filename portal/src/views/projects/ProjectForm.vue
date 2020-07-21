@@ -239,7 +239,7 @@ export default Vue.extend({
 
             const data = this.createParams();
             if (this.image) {
-                return new FKApi().addProject(data).then((project) => {
+                return this.$store.dispatch(ActionTypes.ADD_PROJECT, data).then((project) => {
                     const params = {
                         type: this.image.type,
                         file: this.image.file,
@@ -253,7 +253,7 @@ export default Vue.extend({
                     });
                 });
             } else {
-                return new FKApi().addProject(data).then((project) => {
+                return this.$store.dispatch(ActionTypes.ADD_PROJECT, data).then((project) => {
                     return this.$router.push({
                         name: "viewProject",
                         params: { id: project.id },
@@ -290,7 +290,7 @@ export default Vue.extend({
         },
         deleteProject() {
             if (window.confirm("Are you sure you want to delete this project?")) {
-                return new FKApi().deleteProject({ projectId: this.project.id }).then(() => {
+                return this.$store.dispatch(ActionTypes.DELETE_PROJECT, { projectId: this.project.id }).then(() => {
                     return this.$router.push({ name: "projects" });
                 });
             }

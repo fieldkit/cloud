@@ -26,6 +26,7 @@ export const PROJECT_ACTIVITY = "PROJECT_ACTIVITY";
 export const STATION_UPDATE = "STATION_UPDATE";
 export const PROJECT_LOADED = "PROJECT_LOADED";
 export const PROJECT_UPDATE = "PROJECT_UPDATE";
+export const PROJECT_DELETED = "PROJECT_DELETED";
 
 export class StationsState {
     stations: { [index: number]: DisplayStation } = {};
@@ -340,10 +341,26 @@ const actions = {
     ) => {
         await new FKApi().declineInvite(payload);
     },
+    [ActionTypes.DELETE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+        await new FKApi().deleteProject(payload);
+
+        commit(PROJECT_DELETED, payload);
+
+        return payload;
+    },
+    [ActionTypes.ADD_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: any) => {
+        const project = await new FKApi().addProject(payload);
+
+        commit(PROJECT_UPDATE, project);
+
+        return project;
+    },
     [ActionTypes.SAVE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: any) => {
         const project = await new FKApi().updateProject(payload);
 
         commit(PROJECT_UPDATE, project);
+
+        return project;
     },
 };
 
@@ -399,6 +416,10 @@ const mutations = {
     [PROJECT_UPDATE]: (state: StationsState, project: Project) => {
         Vue.set(state.projects, project.id, project);
         Vue.set(state.user.projects, project.id, project);
+    },
+    [PROJECT_DELETED]: (state: StationsState, payload: { projectId: number }) => {
+        delete state.projects[payload.projectId];
+        delete state.user.projects[payload.projectId];
     },
 };
 
