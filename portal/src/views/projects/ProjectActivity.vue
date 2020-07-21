@@ -43,20 +43,24 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue";
 import FKApi from "@/api/api";
 
-export default {
+export default Vue.extend({
     name: "ProjectActivity",
+    props: {
+        displayProject: { required: true },
+        viewing: { required: true },
+    },
     data: () => {
         return {};
     },
-    props: { displayProject: { required: true }, viewing: { required: true } },
     computed: {
-        loading() {
+        loading(this: any) {
             return false;
         },
-        activities() {
+        activities(this: any) {
             const compass = this.$loadAsset("compass-icon.png");
             return this.displayProject.activities.map((a, i) => {
                 if (a.type == "StationIngestion") {
@@ -91,7 +95,7 @@ export default {
             });
         },
     },
-};
+});
 </script>
 
 <style scoped>
