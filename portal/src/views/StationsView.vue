@@ -2,7 +2,13 @@
     <StandardLayout @sidebar-toggle="onSidebarToggle" :viewingStations="true">
         <div class="container-map">
             <StationsMap @show-summary="showSummary" :mapped="mapped" :layoutChanges="layoutChanges" />
-            <StationSummary v-if="activeStation" class="summary-container" @close="closeSummary" :station="activeStation" />
+            <StationSummary
+                v-if="activeStation"
+                class="summary-container"
+                @close="closeSummary"
+                :station="activeStation"
+                v-bind:key="activeStation.id"
+            />
             <div v-if="isAuthenticated && showNoStationsMessage && hasNoStations" id="no-stations">
                 <div id="close-notice-btn" v-on:click="closeNotice">
                     <img alt="Close" src="@/assets/close.png" />
