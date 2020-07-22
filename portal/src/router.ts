@@ -21,6 +21,7 @@ import ExploreView from "./views/viz/ExploreView.vue";
 import NotesView from "./views/notes/NotesView.vue";
 
 import AdminMain from "./views/admin/AdminMain.vue";
+import AdminUsers from "./views/admin/AdminUsers.vue";
 import AdminStations from "./views/admin/AdminStations.vue";
 import Playground from "./views/admin/Playground.vue";
 
@@ -297,6 +298,18 @@ const routes = [
         path: "/admin",
         name: "adminMain",
         component: AdminMain,
+        props: (route) => {
+            return {};
+        },
+        meta: {
+            admin: true,
+            secured: true,
+        },
+    },
+    {
+        path: "/admin/users",
+        name: "adminUsers",
+        component: AdminUsers,
         props: (route) => {
             return {};
         },

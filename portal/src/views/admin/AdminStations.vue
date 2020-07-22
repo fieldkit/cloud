@@ -1,6 +1,10 @@
 <template>
     <StandardLayout>
         <div class="container">
+            <router-link :to="{ name: 'adminMain' }" class="link">
+                Back to Admin
+            </router-link>
+
             <vue-confirm-dialog />
 
             <table class="stations">
@@ -146,6 +150,7 @@ export default Vue.extend({
 }
 .stations {
     font-size: 15px;
+    margin-top: 1em;
 }
 .stations thead tr th {
     background-color: #fcfcfc;
