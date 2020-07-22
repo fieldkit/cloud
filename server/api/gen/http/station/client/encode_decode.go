@@ -692,6 +692,11 @@ func EncodeDownloadPhotoRequest(encoder func(*http.Request) goahttp.Encoder) fun
 			head := p.Auth
 			req.Header.Set("Authorization", head)
 		}
+		values := req.URL.Query()
+		if p.Size != nil {
+			values.Add("size", fmt.Sprintf("%v", *p.Size))
+		}
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }

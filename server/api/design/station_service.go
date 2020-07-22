@@ -310,6 +310,7 @@ var _ = Service("station", func() {
 			Required("auth")
 			Attribute("stationId", Int32)
 			Required("stationId")
+			Attribute("size", Int32)
 		})
 
 		Result(func() {
@@ -323,6 +324,10 @@ var _ = Service("station", func() {
 			GET("stations/{stationId}/photo")
 
 			SkipResponseBodyEncodeDecode()
+
+			Params(func() {
+				Param("size")
+			})
 
 			Response(func() {
 				Header("length:Content-Length")

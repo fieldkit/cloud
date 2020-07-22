@@ -839,9 +839,10 @@ func NewListProjectPayload(id int32, auth string) *station.ListProjectPayload {
 
 // NewDownloadPhotoPayload builds a station service download photo endpoint
 // payload.
-func NewDownloadPhotoPayload(stationID int32, auth string) *station.DownloadPhotoPayload {
+func NewDownloadPhotoPayload(stationID int32, size *int32, auth string) *station.DownloadPhotoPayload {
 	v := &station.DownloadPhotoPayload{}
 	v.StationID = stationID
+	v.Size = size
 	v.Auth = auth
 
 	return v

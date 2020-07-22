@@ -259,6 +259,7 @@ func ParseEndpoint(
 
 		projectDownloadPhotoFlags         = flag.NewFlagSet("download- photo", flag.ExitOnError)
 		projectDownloadPhotoProjectIDFlag = projectDownloadPhotoFlags.String("project-id", "REQUIRED", "")
+		projectDownloadPhotoSizeFlag      = projectDownloadPhotoFlags.String("size", "", "")
 		projectDownloadPhotoAuthFlag      = projectDownloadPhotoFlags.String("auth", "REQUIRED", "")
 
 		recordsFlags = flag.NewFlagSet("records", flag.ContinueOnError)
@@ -323,6 +324,7 @@ func ParseEndpoint(
 
 		stationDownloadPhotoFlags         = flag.NewFlagSet("download- photo", flag.ExitOnError)
 		stationDownloadPhotoStationIDFlag = stationDownloadPhotoFlags.String("station-id", "REQUIRED", "")
+		stationDownloadPhotoSizeFlag      = stationDownloadPhotoFlags.String("size", "", "")
 		stationDownloadPhotoAuthFlag      = stationDownloadPhotoFlags.String("auth", "REQUIRED", "")
 
 		stationListAllFlags        = flag.NewFlagSet("list- all", flag.ExitOnError)
@@ -1044,7 +1046,7 @@ func ParseEndpoint(
 				}
 			case "download- photo":
 				endpoint = c.DownloadPhoto()
-				data, err = projectc.BuildDownloadPhotoPayload(*projectDownloadPhotoProjectIDFlag, *projectDownloadPhotoAuthFlag)
+				data, err = projectc.BuildDownloadPhotoPayload(*projectDownloadPhotoProjectIDFlag, *projectDownloadPhotoSizeFlag, *projectDownloadPhotoAuthFlag)
 			}
 		case "records":
 			c := recordsc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -1099,7 +1101,7 @@ func ParseEndpoint(
 				data, err = stationc.BuildListProjectPayload(*stationListProjectIDFlag, *stationListProjectAuthFlag)
 			case "download- photo":
 				endpoint = c.DownloadPhoto()
-				data, err = stationc.BuildDownloadPhotoPayload(*stationDownloadPhotoStationIDFlag, *stationDownloadPhotoAuthFlag)
+				data, err = stationc.BuildDownloadPhotoPayload(*stationDownloadPhotoStationIDFlag, *stationDownloadPhotoSizeFlag, *stationDownloadPhotoAuthFlag)
 			case "list- all":
 				endpoint = c.ListAll()
 				data, err = stationc.BuildListAllPayload(*stationListAllPageFlag, *stationListAllPageSizeFlag, *stationListAllOwnerIDFlag, *stationListAllQueryFlag, *stationListAllSortByFlag, *stationListAllAuthFlag)
@@ -1906,14 +1908,15 @@ Example:
 }
 
 func projectDownloadPhotoUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] project download- photo -project-id INT32 -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] project download- photo -project-id INT32 -size INT32 -auth STRING
 
 DownloadPhoto implements download photo.
     -project-id INT32: 
+    -size INT32: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project download- photo --project-id 2029038510 --auth "Saepe ratione aut."
+    `+os.Args[0]+` project download- photo --project-id 2029038510 --size 1949282857 --auth "Ratione aut ipsum repellendus tempora."
 `, os.Args[0])
 }
 
@@ -1940,7 +1943,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records data --record-id 5076441648736172250 --auth "Sed amet."
+    `+os.Args[0]+` records data --record-id 1440963268009732467 --auth "Omnis nemo laboriosam est eaque."
 `, os.Args[0])
 }
 
@@ -1952,7 +1955,7 @@ Meta implements meta.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records meta --record-id 5986736887240582156 --auth "Inventore est nihil iusto harum."
+    `+os.Args[0]+` records meta --record-id 3624348312650152989 --auth "Commodi provident ipsum."
 `, os.Args[0])
 }
 
@@ -1964,7 +1967,7 @@ Resolved implements resolved.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records resolved --record-id 478854751835917515 --auth "Corporis laborum soluta quaerat autem quo nihil."
+    `+os.Args[0]+` records resolved --record-id 3877742340982884050 --auth "Dicta eum eveniet."
 `, os.Args[0])
 }
 
@@ -2007,7 +2010,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor data --start 3964493134304467504 --end 8766268983563613968 --stations "Pariatur et nemo." --sensors "Est debitis ducimus laboriosam earum." --resolution 559498044 --aggregate "Dolorem enim et doloremque labore ut ut." --complete false --tail 1748209884 --auth "Facilis ut ut et eos."
+    `+os.Args[0]+` sensor data --start 2273318164685943474 --end 2572131857258504703 --stations "Debitis ducimus." --sensors "Earum aspernatur." --resolution 1144058735 --aggregate "Enim et doloremque labore ut ut." --complete false --tail 1748209884 --auth "Facilis ut ut et eos."
 `, os.Args[0])
 }
 
@@ -2139,14 +2142,15 @@ Example:
 }
 
 func stationDownloadPhotoUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station download- photo -station-id INT32 -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] station download- photo -station-id INT32 -size INT32 -auth STRING
 
 DownloadPhoto implements download photo.
     -station-id INT32: 
+    -size INT32: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station download- photo --station-id 163950966 --auth "Aperiam consequatur aliquam dolorum explicabo."
+    `+os.Args[0]+` station download- photo --station-id 163950966 --size 1332055869 --auth "Consequatur aliquam dolorum explicabo eos doloribus rem."
 `, os.Args[0])
 }
 
@@ -2162,7 +2166,7 @@ ListAll implements list all.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- all --page 1053597584 --page-size 1978512324 --owner-id 358771488 --query "Dicta modi quam dolorem." --sort-by "Quo aut." --auth "Eum ut."
+    `+os.Args[0]+` station list- all --page 342103645 --page-size 1688356307 --owner-id 641939720 --query "Quo aut." --sort-by "Eum ut." --auth "Repellendus corrupti sequi nemo."
 `, os.Args[0])
 }
 

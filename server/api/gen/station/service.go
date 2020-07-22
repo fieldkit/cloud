@@ -121,6 +121,7 @@ type ListProjectPayload struct {
 type DownloadPhotoPayload struct {
 	Auth      string
 	StationID int32
+	Size      *int32
 }
 
 // DownloadPhotoResult is the result type of the station service download photo

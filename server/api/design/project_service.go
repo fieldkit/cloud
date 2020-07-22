@@ -524,6 +524,7 @@ var _ = Service("project", func() {
 			Required("auth")
 			Attribute("projectId", Int32)
 			Required("projectId")
+			Attribute("size", Int32)
 		})
 
 		Result(func() {
@@ -537,6 +538,10 @@ var _ = Service("project", func() {
 			GET("projects/{projectId}/media")
 
 			SkipResponseBodyEncodeDecode()
+
+			Params(func() {
+				Param("size")
+			})
 
 			Response(func() {
 				Header("length:Content-Length")

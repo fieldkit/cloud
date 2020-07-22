@@ -2149,6 +2149,7 @@ func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) g
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			projectID int32
+			size      *int32
 			auth      string
 			err       error
 
@@ -2162,6 +2163,17 @@ func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) g
 			}
 			projectID = int32(v)
 		}
+		{
+			sizeRaw := r.URL.Query().Get("size")
+			if sizeRaw != "" {
+				v, err2 := strconv.ParseInt(sizeRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("size", sizeRaw, "integer"))
+				}
+				pv := int32(v)
+				size = &pv
+			}
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -2169,7 +2181,7 @@ func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) g
 		if err != nil {
 			return nil, err
 		}
-		payload := NewDownloadPhotoPayload(projectID, auth)
+		payload := NewDownloadPhotoPayload(projectID, size, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]

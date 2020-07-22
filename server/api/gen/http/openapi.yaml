@@ -1362,6 +1362,11 @@ paths:
           * `api:access`
       operationId: project#download photo
       parameters:
+      - name: size
+        in: query
+        required: false
+        type: integer
+        format: int32
       - name: projectId
         in: path
         required: true
@@ -2668,6 +2673,11 @@ paths:
           * `api:access`
       operationId: station#download photo
       parameters:
+      - name: size
+        in: query
+        required: false
+        type: integer
+        format: int32
       - name: stationId
         in: path
         required: true
@@ -11551,57 +11561,57 @@ definitions:
         items:
           $ref: '#/definitions/EssentialStationResponseBody'
         example:
-        - createdAt: 4612866152682539380
-          deviceId: Corrupti sequi nemo doloribus provident.
-          firmwareNumber: 91188908
-          firmwareTime: 1118528075470560568
-          id: 2950963068831862672
-          lastIngestionAt: 8347318272237555614
+        - createdAt: 7335110621939120230
+          deviceId: Quis quia.
+          firmwareNumber: 1958194388
+          firmwareTime: 3129297021558987222
+          id: 5393083596451763567
+          lastIngestionAt: 8088996067079744674
           location:
             latitude: 0.5436462183413504
             longitude: 0.5474526821783962
-          memoryAvailable: 1883366160
-          memoryUsed: 728596239
-          name: Quia autem dolorem repellendus ut dolorum fugiat.
+          memoryAvailable: 978999998
+          memoryUsed: 1074016595
+          name: Dolorem repellendus.
           owner:
             id: 2072225442
             name: Sed reiciendis consequatur hic cumque.
-          recordingStartedAt: 8410380857956560289
-          updatedAt: 4204772975421710183
-        - createdAt: 4612866152682539380
-          deviceId: Corrupti sequi nemo doloribus provident.
-          firmwareNumber: 91188908
-          firmwareTime: 1118528075470560568
-          id: 2950963068831862672
-          lastIngestionAt: 8347318272237555614
+          recordingStartedAt: 5965933709475656141
+          updatedAt: 4626552890917778444
+        - createdAt: 7335110621939120230
+          deviceId: Quis quia.
+          firmwareNumber: 1958194388
+          firmwareTime: 3129297021558987222
+          id: 5393083596451763567
+          lastIngestionAt: 8088996067079744674
           location:
             latitude: 0.5436462183413504
             longitude: 0.5474526821783962
-          memoryAvailable: 1883366160
-          memoryUsed: 728596239
-          name: Quia autem dolorem repellendus ut dolorum fugiat.
+          memoryAvailable: 978999998
+          memoryUsed: 1074016595
+          name: Dolorem repellendus.
           owner:
             id: 2072225442
             name: Sed reiciendis consequatur hic cumque.
-          recordingStartedAt: 8410380857956560289
-          updatedAt: 4204772975421710183
-        - createdAt: 4612866152682539380
-          deviceId: Corrupti sequi nemo doloribus provident.
-          firmwareNumber: 91188908
-          firmwareTime: 1118528075470560568
-          id: 2950963068831862672
-          lastIngestionAt: 8347318272237555614
+          recordingStartedAt: 5965933709475656141
+          updatedAt: 4626552890917778444
+        - createdAt: 7335110621939120230
+          deviceId: Quis quia.
+          firmwareNumber: 1958194388
+          firmwareTime: 3129297021558987222
+          id: 5393083596451763567
+          lastIngestionAt: 8088996067079744674
           location:
             latitude: 0.5436462183413504
             longitude: 0.5474526821783962
-          memoryAvailable: 1883366160
-          memoryUsed: 728596239
-          name: Quia autem dolorem repellendus ut dolorum fugiat.
+          memoryAvailable: 978999998
+          memoryUsed: 1074016595
+          name: Dolorem repellendus.
           owner:
             id: 2072225442
             name: Sed reiciendis consequatur hic cumque.
-          recordingStartedAt: 8410380857956560289
-          updatedAt: 4204772975421710183
+          recordingStartedAt: 5965933709475656141
+          updatedAt: 4626552890917778444
       total:
         type: integer
         example: 1702310108
@@ -11609,57 +11619,57 @@ definitions:
     description: List AllResponseBody result type (default view)
     example:
       stations:
-      - createdAt: 4612866152682539380
-        deviceId: Corrupti sequi nemo doloribus provident.
-        firmwareNumber: 91188908
-        firmwareTime: 1118528075470560568
-        id: 2950963068831862672
-        lastIngestionAt: 8347318272237555614
+      - createdAt: 7335110621939120230
+        deviceId: Quis quia.
+        firmwareNumber: 1958194388
+        firmwareTime: 3129297021558987222
+        id: 5393083596451763567
+        lastIngestionAt: 8088996067079744674
         location:
           latitude: 0.5436462183413504
           longitude: 0.5474526821783962
-        memoryAvailable: 1883366160
-        memoryUsed: 728596239
-        name: Quia autem dolorem repellendus ut dolorum fugiat.
+        memoryAvailable: 978999998
+        memoryUsed: 1074016595
+        name: Dolorem repellendus.
         owner:
           id: 2072225442
           name: Sed reiciendis consequatur hic cumque.
-        recordingStartedAt: 8410380857956560289
-        updatedAt: 4204772975421710183
-      - createdAt: 4612866152682539380
-        deviceId: Corrupti sequi nemo doloribus provident.
-        firmwareNumber: 91188908
-        firmwareTime: 1118528075470560568
-        id: 2950963068831862672
-        lastIngestionAt: 8347318272237555614
+        recordingStartedAt: 5965933709475656141
+        updatedAt: 4626552890917778444
+      - createdAt: 7335110621939120230
+        deviceId: Quis quia.
+        firmwareNumber: 1958194388
+        firmwareTime: 3129297021558987222
+        id: 5393083596451763567
+        lastIngestionAt: 8088996067079744674
         location:
           latitude: 0.5436462183413504
           longitude: 0.5474526821783962
-        memoryAvailable: 1883366160
-        memoryUsed: 728596239
-        name: Quia autem dolorem repellendus ut dolorum fugiat.
+        memoryAvailable: 978999998
+        memoryUsed: 1074016595
+        name: Dolorem repellendus.
         owner:
           id: 2072225442
           name: Sed reiciendis consequatur hic cumque.
-        recordingStartedAt: 8410380857956560289
-        updatedAt: 4204772975421710183
-      - createdAt: 4612866152682539380
-        deviceId: Corrupti sequi nemo doloribus provident.
-        firmwareNumber: 91188908
-        firmwareTime: 1118528075470560568
-        id: 2950963068831862672
-        lastIngestionAt: 8347318272237555614
+        recordingStartedAt: 5965933709475656141
+        updatedAt: 4626552890917778444
+      - createdAt: 7335110621939120230
+        deviceId: Quis quia.
+        firmwareNumber: 1958194388
+        firmwareTime: 3129297021558987222
+        id: 5393083596451763567
+        lastIngestionAt: 8088996067079744674
         location:
           latitude: 0.5436462183413504
           longitude: 0.5474526821783962
-        memoryAvailable: 1883366160
-        memoryUsed: 728596239
-        name: Quia autem dolorem repellendus ut dolorum fugiat.
+        memoryAvailable: 978999998
+        memoryUsed: 1074016595
+        name: Dolorem repellendus.
         owner:
           id: 2072225442
           name: Sed reiciendis consequatur hic cumque.
-        recordingStartedAt: 8410380857956560289
-        updatedAt: 4204772975421710183
+        recordingStartedAt: 5965933709475656141
+        updatedAt: 4626552890917778444
       total: 683611693
     required:
     - stations

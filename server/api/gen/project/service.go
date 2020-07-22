@@ -240,6 +240,7 @@ type UploadPhotoPayload struct {
 type DownloadPhotoPayload struct {
 	Auth      string
 	ProjectID int32
+	Size      *int32
 }
 
 // DownloadPhotoResult is the result type of the project service download photo

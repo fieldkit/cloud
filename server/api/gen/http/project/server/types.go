@@ -1381,9 +1381,10 @@ func NewUploadPhotoPayload(projectID int32, contentType string, contentLength in
 
 // NewDownloadPhotoPayload builds a project service download photo endpoint
 // payload.
-func NewDownloadPhotoPayload(projectID int32, auth string) *project.DownloadPhotoPayload {
+func NewDownloadPhotoPayload(projectID int32, size *int32, auth string) *project.DownloadPhotoPayload {
 	v := &project.DownloadPhotoPayload{}
 	v.ProjectID = projectID
+	v.Size = size
 	v.Auth = auth
 
 	return v
