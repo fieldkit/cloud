@@ -3,7 +3,7 @@
         <div class="upper-half">
             <div class="row general-row">
                 <div class="image-container">
-                    <img alt="Station Image" :src="stationSmallPhoto" class="" />
+                    <img alt="Station Image" :src="photo" class="" v-if="photo" />
                 </div>
                 <div class="station-details">
                     <div class="station-name">{{ station.name }}</div>
@@ -12,7 +12,7 @@
                         <span class="small-light">{{ getSyncedDate() }}</span>
                     </div>
                     <div class="station-battery">
-                        <img class="battery" alt="Battery Level" :src="getBatteryImg()" />
+                        <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
                         <span class="small-light">{{ station.battery }}</span>
                     </div>
                     <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
@@ -86,10 +86,11 @@
 
 <script>
 import _ from "lodash";
-import * as utils from "@/utilities";
-import { makeAuthenticatedApiUrl } from "@/api/api";
-import { BookmarkFactory } from "@/views/viz/viz";
 import CommonComponents from "@/views/shared";
+import { BookmarkFactory } from "@/views/viz/viz";
+
+import FKApi, { makeAuthenticatedApiUrl } from "@/api/api";
+import * as utils from "@/utilities";
 
 export default {
     name: "StationSummary",
@@ -99,6 +100,7 @@ export default {
     data: () => {
         return {
             viewingSummary: true,
+            photo: null,
         };
     },
     props: {
@@ -111,10 +113,10 @@ export default {
             default: true,
         },
     },
-    computed: {
-        stationSmallPhoto() {
-            return makeAuthenticatedApiUrl(this.station.photos.small);
-        },
+    mounted() {
+        return new FKApi().loadMedia(this.station.photos.small).then((photo) => {
+            this.photo = photo;
+        });
     },
     methods: {
         viewSummary() {
@@ -127,27 +129,8 @@ export default {
         getSyncedDate() {
             return utils.getUpdatedDate(this.station);
         },
-        getBatteryImg() {
-            const battery = this.station.battery;
-            let img = "";
-            if (battery == 0) {
-                img = "0.png";
-            } else if (battery <= 20) {
-                img = "20.png";
-            } else if (battery <= 40) {
-                img = "40.png";
-            } else if (battery <= 60) {
-                img = "60.png";
-            } else if (battery <= 80) {
-                img = "80.png";
-            } else {
-                img = "100.png";
-            }
-            return this.$loadAsset("battery/" + img);
-        },
-        getSensorName(module, sensor) {
-            const newName = utils.convertOldFirmwareResponse(module);
-            return this.$t(newName + ".sensors." + sensor.name);
+        getBatteryIcon() {
+            return this.$loadAsset(utils.getBatteryIcon(this.station.battery));
         },
         getModuleIcon(module) {
             return this.$loadAsset(utils.getModuleImg(module));

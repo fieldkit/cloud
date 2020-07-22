@@ -105,6 +105,22 @@ export function getModuleImg(module) {
     }
 }
 
+export function getBatteryIcon(percentage: number): string {
+    if (percentage == 0) {
+        return "battery/0.png";
+    } else if (percentage <= 20) {
+        return "battery/20.png";
+    } else if (percentage <= 40) {
+        return "battery/40.png";
+    } else if (percentage <= 60) {
+        return "battery/60.png";
+    } else if (percentage <= 80) {
+        return "battery/80.png";
+    } else {
+        return "battery/100.png";
+    }
+}
+
 export function getRunTime(project) {
     const timeUnits = ["seconds", "minutes", "hours", "days", "weeks", "months", "years"];
     const start = new Date(project.start_time);

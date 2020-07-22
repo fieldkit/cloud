@@ -40,7 +40,13 @@
             </div>
             <div class="project-stations-map-container">
                 <StationsMap @show-summary="showSummary" :mapped="mappedProject" :layoutChanges="layoutChanges" />
-                <StationSummary v-if="activeStation" :station="activeStation" :readings="false" @close="onCloseSummary" />
+                <StationSummary
+                    v-if="activeStation"
+                    :station="activeStation"
+                    :readings="false"
+                    @close="onCloseSummary"
+                    v-bind:key="activeStation.id"
+                />
             </div>
         </div>
     </div>

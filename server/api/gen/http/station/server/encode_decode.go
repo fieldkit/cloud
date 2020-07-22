@@ -626,9 +626,9 @@ func DecodePhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.D
 			}
 			id = int32(v)
 		}
-		auth = r.URL.Query().Get("token")
+		auth = r.Header.Get("Authorization")
 		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("token", "query string"))
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
 		}
 		if err != nil {
 			return nil, err

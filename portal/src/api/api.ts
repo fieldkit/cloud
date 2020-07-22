@@ -252,6 +252,7 @@ export interface InvokeParams {
     data?: any;
     contentType?: string;
     refreshed?: boolean | null;
+    blob?: boolean | null;
 }
 
 class FKApi {
@@ -284,12 +285,13 @@ class FKApi {
             url: params.url,
             headers: headers,
             data: params.data,
+            responseType: params.blob === true ? "blob" : "json",
         };
     }
 
     private invoke(params: InvokeParams): Promise<any> {
         return axios(this.makeParams(params)).then(
-            (response) => this.handle(response),
+            (response) => this.handle(params, response),
             (error) => {
                 const response = error.response;
 
@@ -354,14 +356,12 @@ class FKApi {
         );
     }
 
-    private handle(response) {
+    private handle(params: InvokeParams, response) {
         if (response.status == 200) {
-            // eslint-disable-next-line no-constant-condition
-            if (false) {
-                return keysToCamelWithWarnings(response.data);
-            } else {
-                return keysToCamel(response.data);
+            if (params.blob === true) {
+                return response.data;
             }
+            return keysToCamel(response.data);
         } else if (response.status == 204) {
             return true;
         } else {
@@ -858,6 +858,21 @@ class FKApi {
             auth: Auth.Required,
             method: "DELETE",
             url: this.baseUrl + "/admin/stations/" + stationId,
+        });
+    }
+
+    public loadMedia(url: string): Promise<any> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            blob: true,
+            url: this.baseUrl + url,
+        }).then((blob) => {
+            const reader = new FileReader();
+            return new Promise((resolve, reject) => {
+                reader.onloadend = () => resolve(reader.result as string);
+                reader.readAsDataURL(blob);
+            });
         });
     }
 }

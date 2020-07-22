@@ -2496,16 +2496,17 @@ paths:
           * `api:access`
       operationId: station#photo
       parameters:
-      - name: token
-        in: query
-        description: authentication token
-        required: true
-        type: string
       - name: id
         in: path
         required: true
         type: integer
         format: int32
+      - name: Authorization
+        in: header
+        description: authentication token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
       responses:
         "200":
           description: OK response.
@@ -2533,7 +2534,7 @@ paths:
       schemes:
       - http
       security:
-      - jwt_query_token: []
+      - jwt_header_Authorization: []
   /stations/{stationId}/media:
     post:
       tags:

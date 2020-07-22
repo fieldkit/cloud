@@ -688,9 +688,10 @@ func EncodePhotoRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.
 		if !ok {
 			return goahttp.ErrInvalidType("station", "photo", "*station.PhotoPayload", v)
 		}
-		values := req.URL.Query()
-		values.Add("token", p.Auth)
-		req.URL.RawQuery = values.Encode()
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
 		return nil
 	}
 }
