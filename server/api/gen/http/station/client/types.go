@@ -121,6 +121,7 @@ type ListProjectResponseBody struct {
 // HTTP response body.
 type ListAllResponseBody struct {
 	Stations []*EssentialStationResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
+	Total    *int32                          `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
 }
 
 // AddBadRequestResponseBody is the type of the "station" service "add"
@@ -691,7 +692,9 @@ func NewPhotoUnauthorized(body PhotoUnauthorizedResponseBody) station.Unauthoriz
 // NewListAllPageOfStationsOK builds a "station" service "list all" endpoint
 // result from a HTTP "OK" response.
 func NewListAllPageOfStationsOK(body *ListAllResponseBody) *stationviews.PageOfStationsView {
-	v := &stationviews.PageOfStationsView{}
+	v := &stationviews.PageOfStationsView{
+		Total: body.Total,
+	}
 	v.Stations = make([]*stationviews.EssentialStationView, len(body.Stations))
 	for i, val := range body.Stations {
 		v.Stations[i] = unmarshalEssentialStationResponseBodyToStationviewsEssentialStationView(val)

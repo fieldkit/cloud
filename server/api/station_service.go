@@ -283,14 +283,14 @@ func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPa
 		qp.PageSize = *payload.PageSize
 	}
 
-	dm, err := sr.QueryEssentialStations(ctx, qp)
+	queried, err := sr.QueryEssentialStations(ctx, qp)
 	if err != nil {
 		return nil, err
 	}
 
 	stationsWm := make([]*station.EssentialStation, 0)
 
-	for _, es := range dm {
+	for _, es := range queried.Stations {
 		recordingStartedAt := es.RecordingStartedAt
 		var lastIngestionAt *int64
 
@@ -300,7 +300,6 @@ func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPa
 		}
 
 		var location *station.StationLocation = nil
-
 		if es.Location != nil {
 			location = &station.StationLocation{
 				Latitude:  es.Location.Latitude(),
@@ -330,6 +329,7 @@ func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPa
 
 	wm := &station.PageOfStations{
 		Stations: stationsWm,
+		Total:    queried.Total,
 	}
 
 	return wm, nil

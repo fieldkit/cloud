@@ -121,6 +121,7 @@ type ListProjectResponseBody struct {
 // HTTP response body.
 type ListAllResponseBody struct {
 	Stations []*EssentialStationResponseBody `form:"stations" json:"stations" xml:"stations"`
+	Total    int32                           `form:"total" json:"total" xml:"total"`
 }
 
 // AddBadRequestResponseBody is the type of the "station" service "add"
@@ -532,7 +533,9 @@ func NewListProjectResponseBody(res *stationviews.StationsFullView) *ListProject
 // NewListAllResponseBody builds the HTTP response body from the result of the
 // "list all" endpoint of the "station" service.
 func NewListAllResponseBody(res *stationviews.PageOfStationsView) *ListAllResponseBody {
-	body := &ListAllResponseBody{}
+	body := &ListAllResponseBody{
+		Total: *res.Total,
+	}
 	if res.Stations != nil {
 		body.Stations = make([]*EssentialStationResponseBody, len(res.Stations))
 		for i, val := range res.Stations {

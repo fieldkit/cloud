@@ -180,9 +180,12 @@ var PageOfStations = ResultType("application/vnd.app.stations.essential.page", f
 	Attributes(func() {
 		Attribute("stations", ArrayOf(EssentialStation))
 		Required("stations")
+		Attribute("total", Int32)
+		Required("total")
 	})
 	View("default", func() {
 		Attribute("stations")
+		Attribute("total")
 	})
 })
 

@@ -791,23 +791,40 @@ type EssentialQueryParams struct {
 	PageSize int32
 }
 
-func (sr *StationRepository) QueryEssentialStations(ctx context.Context, qp *EssentialQueryParams) ([]*data.EssentialStation, error) {
+type QueriedEssential struct {
+	Stations []*data.EssentialStation
+	Total    int32
+}
+
+func (sr *StationRepository) QueryEssentialStations(ctx context.Context, qp *EssentialQueryParams) (*QueriedEssential, error) {
+	total := int32(0)
+	if err := sr.db.GetContext(ctx, &total, `SELECT COUNT(*) FROM fieldkit.station AS s`); err != nil {
+		return nil, err
+	}
+
 	stations := []*data.EssentialStation{}
 	if err := sr.db.SelectContext(ctx, &stations, `
-		SELECT
-			s.id, s.device_id, s.name, u.id AS owner_id, u.name AS owner_name,
-			s.created_at, s.updated_at,
-			s.memory_used, s.memory_available,
-			s.firmware_time, s.firmware_number,
-			s.recording_started_at,
-			ST_AsBinary(location) AS location,
-			(SELECT MAX(i.time) AS last_ingestion_at FROM fieldkit.ingestion AS i WHERE i.device_id = s.device_id)
-		FROM fieldkit.station AS s
-		JOIN fieldkit.user AS u ON (s.owner_id = u.id)
-		ORDER BY id
+		SELECT q.* FROM
+		(
+			SELECT
+				s.id, s.device_id, s.name, u.id AS owner_id, u.name AS owner_name,
+				s.created_at, s.updated_at,
+				s.memory_used, s.memory_available,
+				s.firmware_time, s.firmware_number,
+				s.recording_started_at,
+				ST_AsBinary(location) AS location,
+				(SELECT MAX(i.time) AS last_ingestion_at FROM fieldkit.ingestion AS i WHERE i.device_id = s.device_id)
+			FROM fieldkit.station AS s
+			JOIN fieldkit.user AS u ON (s.owner_id = u.id)
+        ) AS q
+		ORDER BY CASE WHEN q.last_ingestion_at IS NULL THEN 1 ELSE 0 END, q.last_ingestion_at DESC
 		LIMIT $1 OFFSET $2
 		`, qp.PageSize, qp.PageSize*qp.Page); err != nil {
 		return nil, err
 	}
-	return stations, nil
+
+	return &QueriedEssential{
+		Stations: stations,
+		Total:    total,
+	}, nil
 }

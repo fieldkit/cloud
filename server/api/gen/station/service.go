@@ -139,6 +139,7 @@ type ListAllPayload struct {
 // PageOfStations is the result type of the station service list all method.
 type PageOfStations struct {
 	Stations []*EssentialStation
+	Total    int32
 }
 
 type StationOwner struct {
@@ -468,6 +469,9 @@ func newStationFullCollectionView(res StationFullCollection) stationviews.Statio
 // PageOfStations.
 func newPageOfStations(vres *stationviews.PageOfStationsView) *PageOfStations {
 	res := &PageOfStations{}
+	if vres.Total != nil {
+		res.Total = *vres.Total
+	}
 	if vres.Stations != nil {
 		res.Stations = make([]*EssentialStation, len(vres.Stations))
 		for i, val := range vres.Stations {
@@ -480,7 +484,9 @@ func newPageOfStations(vres *stationviews.PageOfStationsView) *PageOfStations {
 // newPageOfStationsView projects result type PageOfStations to projected type
 // PageOfStationsView using the "default" view.
 func newPageOfStationsView(res *PageOfStations) *stationviews.PageOfStationsView {
-	vres := &stationviews.PageOfStationsView{}
+	vres := &stationviews.PageOfStationsView{
+		Total: &res.Total,
+	}
 	if res.Stations != nil {
 		vres.Stations = make([]*stationviews.EssentialStationView, len(res.Stations))
 		for i, val := range res.Stations {

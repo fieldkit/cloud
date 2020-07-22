@@ -596,6 +596,8 @@ func TestGetStationsAll(t *testing.T) {
 	fd, err := e.AddStations(5)
 	assert.NoError(err)
 
+	fd.Owner.Admin = true
+
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
@@ -605,9 +607,11 @@ func TestGetStationsAll(t *testing.T) {
 
 	assert.Equal(http.StatusOK, rr.Code)
 
+	// Lots of stations get created in this database.
 	ja := jsonassert.New(t)
 	ja.Assertf(rr.Body.String(), `
 	{
-		"stations": "<<PRESENCE>>"
+		"stations": "<<PRESENCE>>",
+		"total": "<<PRESENCE>>"
 	}`)
 }

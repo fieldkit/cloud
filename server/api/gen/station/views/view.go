@@ -155,6 +155,7 @@ type StationFullCollectionView []*StationFullView
 // PageOfStationsView is a type that runs validations on a projected type.
 type PageOfStationsView struct {
 	Stations []*EssentialStationView
+	Total    *int32
 }
 
 // EssentialStationView is a type that runs validations on a projected type.
@@ -213,6 +214,7 @@ var (
 	PageOfStationsMap = map[string][]string{
 		"default": []string{
 			"stations",
+			"total",
 		},
 	}
 	// StationFullCollectionMap is a map of attribute names in result type
@@ -570,6 +572,9 @@ func ValidateStationFullCollectionView(result StationFullCollectionView) (err er
 func ValidatePageOfStationsView(result *PageOfStationsView) (err error) {
 	if result.Stations == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("stations", "result"))
+	}
+	if result.Total == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("total", "result"))
 	}
 	for _, e := range result.Stations {
 		if e != nil {
