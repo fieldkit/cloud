@@ -12,15 +12,10 @@ timestamps {
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} sudo mv fk-cloud-stack.tar /tmp/incoming-stacks"
                 }
 
-				def success = false
-				if (params.DeployFrom.indexOf("fkdev.org") >= 0) {
-					success = watchDeployment(url: "https://api.fkdev.org/status", seconds: 60)
-				}
-				else {
-					success = watchDeployment(url: "https://api.fieldkit.org/status", seconds: 60)
-				}
+				def isDev = params.DeployFrom.indexOf("fkdev.org") >= 0
+				def statusUrl = isDev ? "https://api.fkdev.org/status" : "https://api.fieldkit.org/status"
 
-				if (success) {
+				if (watchDeployment(url: statusUrl, seconds: 60)) {
 					slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Deployed And Ready (<${env.BUILD_URL}|Open>)"
 				}
 				else {
