@@ -12,6 +12,13 @@ timestamps {
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} sudo mv fk-cloud-stack.tar /tmp/incoming-stacks"
                 }
 
+				if (params.DeployFrom.indexOf("fkdev.org") >= 0) {
+					watchDeployment(url: "https://api.fkdev.org/status")
+				}
+				else {
+					watchDeployment(url: "https://api.fieldkit.org/status")
+				}
+
                 notifySuccess()
             }
         }
