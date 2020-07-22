@@ -45,3 +45,8 @@ func PhotoStationPath(id int32) string {
 func ListAllStationPath() string {
 	return "/admin/stations"
 }
+
+// DeleteStationPath returns the URL path to the station service delete HTTP endpoint.
+func DeleteStationPath(stationID int32) string {
+	return fmt.Sprintf("/admin/stations/%v", stationID)
+}

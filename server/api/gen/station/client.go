@@ -23,10 +23,11 @@ type Client struct {
 	ListProjectEndpoint goa.Endpoint
 	PhotoEndpoint       goa.Endpoint
 	ListAllEndpoint     goa.Endpoint
+	DeleteEndpoint      goa.Endpoint
 }
 
 // NewClient initializes a "station" service client given the endpoints.
-func NewClient(add, get, update, listMine, listProject, photo, listAll goa.Endpoint) *Client {
+func NewClient(add, get, update, listMine, listProject, photo, listAll, delete_ goa.Endpoint) *Client {
 	return &Client{
 		AddEndpoint:         add,
 		GetEndpoint:         get,
@@ -35,6 +36,7 @@ func NewClient(add, get, update, listMine, listProject, photo, listAll goa.Endpo
 		ListProjectEndpoint: listProject,
 		PhotoEndpoint:       photo,
 		ListAllEndpoint:     listAll,
+		DeleteEndpoint:      delete_,
 	}
 }
 
@@ -107,4 +109,10 @@ func (c *Client) ListAll(ctx context.Context, p *ListAllPayload) (res *PageOfSta
 		return
 	}
 	return ires.(*PageOfStations), nil
+}
+
+// Delete calls the "delete" endpoint of the "station" service.
+func (c *Client) Delete(ctx context.Context, p *DeletePayload) (err error) {
+	_, err = c.DeleteEndpoint(ctx, p)
+	return
 }

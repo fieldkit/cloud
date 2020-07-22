@@ -335,6 +335,15 @@ func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPa
 	return wm, nil
 }
 
+func (c *StationService) Delete(ctx context.Context, payload *station.DeletePayload) error {
+	sr, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
+		return err
+	}
+
+	return sr.Delete(ctx, payload.StationID)
+}
+
 func (c *StationService) Photo(ctx context.Context, payload *station.PhotoPayload) (*station.PhotoResult, io.ReadCloser, error) {
 	x := uint(124)
 	y := uint(100)

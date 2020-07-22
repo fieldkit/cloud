@@ -927,6 +927,120 @@ func DecodeListAllResponse(decoder func(*http.Response) goahttp.Decoder, restore
 	}
 }
 
+// BuildDeleteRequest instantiates a HTTP request object with method and path
+// set to call the "station" service "delete" endpoint
+func (c *Client) BuildDeleteRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		stationID int32
+	)
+	{
+		p, ok := v.(*station.DeletePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("station", "delete", "*station.DeletePayload", v)
+		}
+		stationID = p.StationID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteStationPath(stationID)}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "delete", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeDeleteRequest returns an encoder for requests sent to the station
+// delete server.
+func EncodeDeleteRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.DeletePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "delete", "*station.DeletePayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeDeleteResponse returns a decoder for responses returned by the station
+// delete endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeDeleteResponse may return the following errors:
+//	- "bad-request" (type station.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type station.Forbidden): http.StatusForbidden
+//	- "not-found" (type station.NotFound): http.StatusNotFound
+//	- "unauthorized" (type station.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body DeleteBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "delete", err)
+			}
+			return nil, NewDeleteBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body DeleteForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "delete", err)
+			}
+			return nil, NewDeleteForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body DeleteNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "delete", err)
+			}
+			return nil, NewDeleteNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body DeleteUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "delete", err)
+			}
+			return nil, NewDeleteUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "delete", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView builds a
 // value of type *stationviews.StationOwnerView from a value of type
 // *StationOwnerResponseBody.

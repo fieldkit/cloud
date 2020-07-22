@@ -236,6 +236,22 @@ type ListAllNotFoundResponseBody string
 // all" endpoint HTTP response body for the "unauthorized" error.
 type ListAllUnauthorizedResponseBody string
 
+// DeleteBadRequestResponseBody is the type of the "station" service "delete"
+// endpoint HTTP response body for the "bad-request" error.
+type DeleteBadRequestResponseBody string
+
+// DeleteForbiddenResponseBody is the type of the "station" service "delete"
+// endpoint HTTP response body for the "forbidden" error.
+type DeleteForbiddenResponseBody string
+
+// DeleteNotFoundResponseBody is the type of the "station" service "delete"
+// endpoint HTTP response body for the "not-found" error.
+type DeleteNotFoundResponseBody string
+
+// DeleteUnauthorizedResponseBody is the type of the "station" service "delete"
+// endpoint HTTP response body for the "unauthorized" error.
+type DeleteUnauthorizedResponseBody string
+
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
 	ID   int32  `form:"id" json:"id" xml:"id"`
@@ -741,6 +757,34 @@ func NewListAllUnauthorizedResponseBody(res station.Unauthorized) ListAllUnautho
 	return body
 }
 
+// NewDeleteBadRequestResponseBody builds the HTTP response body from the
+// result of the "delete" endpoint of the "station" service.
+func NewDeleteBadRequestResponseBody(res station.BadRequest) DeleteBadRequestResponseBody {
+	body := DeleteBadRequestResponseBody(res)
+	return body
+}
+
+// NewDeleteForbiddenResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "station" service.
+func NewDeleteForbiddenResponseBody(res station.Forbidden) DeleteForbiddenResponseBody {
+	body := DeleteForbiddenResponseBody(res)
+	return body
+}
+
+// NewDeleteNotFoundResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "station" service.
+func NewDeleteNotFoundResponseBody(res station.NotFound) DeleteNotFoundResponseBody {
+	body := DeleteNotFoundResponseBody(res)
+	return body
+}
+
+// NewDeleteUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "delete" endpoint of the "station" service.
+func NewDeleteUnauthorizedResponseBody(res station.Unauthorized) DeleteUnauthorizedResponseBody {
+	body := DeleteUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewAddPayload builds a station service add endpoint payload.
 func NewAddPayload(body *AddRequestBody, auth string) *station.AddPayload {
 	v := &station.AddPayload{
@@ -810,6 +854,15 @@ func NewListAllPayload(page *int32, pageSize *int32, ownerID *int32, query *stri
 	v.OwnerID = ownerID
 	v.Query = query
 	v.SortBy = sortBy
+	v.Auth = auth
+
+	return v
+}
+
+// NewDeletePayload builds a station service delete endpoint payload.
+func NewDeletePayload(stationID int32, auth string) *station.DeletePayload {
+	v := &station.DeletePayload{}
+	v.StationID = stationID
 	v.Auth = auth
 
 	return v

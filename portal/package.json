@@ -28,6 +28,7 @@
         "vue-audio": "^0.0.12",
         "vue-body-class": "^3.0.2",
         "vue-class-component": "^7.2.3",
+        "vue-confirm-dialog": "^1.0.2",
         "vue-i18n": "^8.17.0",
         "vue-property-decorator": "^8.4.2",
         "vue-router": "^3.2.0",

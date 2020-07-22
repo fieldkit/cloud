@@ -3,6 +3,8 @@ import Vue from "vue";
 import Vuex from "vuex";
 import Vuelidate from "vuelidate";
 import VCalendar from "v-calendar";
+import VueConfirmDialog from "vue-confirm-dialog";
+
 import moment from "moment";
 import { sync } from "vuex-router-sync";
 import i18n from "./i18n";
@@ -39,6 +41,8 @@ Vue.use(AssetsPlugin, Config);
 Vue.use(VCalendar, {});
 Vue.use(Vuex);
 Vue.use(Vuelidate);
+Vue.use(VueConfirmDialog);
+Vue.component("vue-confirm-dialog", VueConfirmDialog.default);
 
 Vue.config.productionTip = false;
 

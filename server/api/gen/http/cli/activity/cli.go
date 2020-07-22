@@ -48,7 +48,7 @@ project (add- update|delete- update|modify- update|invites|lookup- invite|accept
 records (data|meta|resolved)
 sensor (meta|data)
 information (device- layout|firmware- statistics)
-station (add|get|update|list- mine|list- project|photo|list- all)
+station (add|get|update|list- mine|list- project|photo|list- all|delete)
 tasks five
 test (get|error|email)
 user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery|logout|refresh|send- validation|validate|add|update|change- password|get- current|list- by- project|issue- transmission- token|project- roles|admin- delete)
@@ -332,6 +332,10 @@ func ParseEndpoint(
 		stationListAllSortByFlag   = stationListAllFlags.String("sort-by", "", "")
 		stationListAllAuthFlag     = stationListAllFlags.String("auth", "REQUIRED", "")
 
+		stationDeleteFlags         = flag.NewFlagSet("delete", flag.ExitOnError)
+		stationDeleteStationIDFlag = stationDeleteFlags.String("station-id", "REQUIRED", "")
+		stationDeleteAuthFlag      = stationDeleteFlags.String("auth", "REQUIRED", "")
+
 		tasksFlags = flag.NewFlagSet("tasks", flag.ContinueOnError)
 
 		tasksFiveFlags = flag.NewFlagSet("five", flag.ExitOnError)
@@ -490,6 +494,7 @@ func ParseEndpoint(
 	stationListProjectFlags.Usage = stationListProjectUsage
 	stationPhotoFlags.Usage = stationPhotoUsage
 	stationListAllFlags.Usage = stationListAllUsage
+	stationDeleteFlags.Usage = stationDeleteUsage
 
 	tasksFlags.Usage = tasksUsage
 	tasksFiveFlags.Usage = tasksFiveUsage
@@ -781,6 +786,9 @@ func ParseEndpoint(
 
 			case "list- all":
 				epf = stationListAllFlags
+
+			case "delete":
+				epf = stationDeleteFlags
 
 			}
 
@@ -1094,6 +1102,9 @@ func ParseEndpoint(
 			case "list- all":
 				endpoint = c.ListAll()
 				data, err = stationc.BuildListAllPayload(*stationListAllPageFlag, *stationListAllPageSizeFlag, *stationListAllOwnerIDFlag, *stationListAllQueryFlag, *stationListAllSortByFlag, *stationListAllAuthFlag)
+			case "delete":
+				endpoint = c.Delete()
+				data, err = stationc.BuildDeletePayload(*stationDeleteStationIDFlag, *stationDeleteAuthFlag)
 			}
 		case "tasks":
 			c := tasksc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -2050,6 +2061,7 @@ COMMAND:
     list- project: ListProject implements list project.
     photo: Photo implements photo.
     list- all: ListAll implements list all.
+    delete: Delete implements delete.
 
 Additional help:
     %s station COMMAND --help
@@ -2149,6 +2161,18 @@ ListAll implements list all.
 
 Example:
     `+os.Args[0]+` station list- all --page 2095412820 --page-size 1217195507 --owner-id 644676979 --query "Dolorem repellendus." --sort-by "Dolorum fugiat distinctio ut quos." --auth "Occaecati sint voluptatem perferendis reprehenderit."
+`, os.Args[0])
+}
+
+func stationDeleteUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station delete -station-id INT32 -auth STRING
+
+Delete implements delete.
+    -station-id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station delete --station-id 1778730953 --auth "Eos molestiae."
 `, os.Args[0])
 }
 

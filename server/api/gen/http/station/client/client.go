@@ -42,6 +42,9 @@ type Client struct {
 	// endpoint.
 	ListAllDoer goahttp.Doer
 
+	// Delete Doer is the HTTP client used to make requests to the delete endpoint.
+	DeleteDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -72,6 +75,7 @@ func NewClient(
 		ListProjectDoer:     doer,
 		PhotoDoer:           doer,
 		ListAllDoer:         doer,
+		DeleteDoer:          doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -249,6 +253,30 @@ func (c *Client) ListAll() goa.Endpoint {
 		resp, err := c.ListAllDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("station", "list all", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Delete returns an endpoint that makes HTTP requests to the station service
+// delete server.
+func (c *Client) Delete() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDeleteRequest(c.encoder)
+		decodeResponse = DecodeDeleteResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDeleteRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DeleteDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "delete", err)
 		}
 		return decodeResponse(resp)
 	}

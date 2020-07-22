@@ -828,3 +828,30 @@ func (sr *StationRepository) QueryEssentialStations(ctx context.Context, qp *Ess
 		Total:    total,
 	}, nil
 }
+
+func (sr *StationRepository) Delete(ctx context.Context, stationID int32) error {
+	queries := []string{
+		`DELETE FROM fieldkit.aggregated_24h WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.aggregated_12h WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.aggregated_6h WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.aggregated_1h WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.aggregated_30m WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.aggregated_10m WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.aggregated_1m WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.visible_configuration WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.notes_media WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.notes WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.station_activity WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.project_station WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.station WHERE id IN ($1)`,
+	}
+
+	return sr.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+		for _, query := range queries {
+			if _, err := sr.db.ExecContext(ctx, query, stationID); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}

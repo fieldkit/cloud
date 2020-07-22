@@ -227,3 +227,27 @@ func BuildListAllPayload(stationListAllPage string, stationListAllPageSize strin
 
 	return v, nil
 }
+
+// BuildDeletePayload builds the payload for the station delete endpoint from
+// CLI flags.
+func BuildDeletePayload(stationDeleteStationID string, stationDeleteAuth string) (*station.DeletePayload, error) {
+	var err error
+	var stationID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationDeleteStationID, 10, 32)
+		stationID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for stationID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = stationDeleteAuth
+	}
+	v := &station.DeletePayload{}
+	v.StationID = stationID
+	v.Auth = auth
+
+	return v, nil
+}

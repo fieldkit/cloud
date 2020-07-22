@@ -77,6 +77,51 @@ paths:
       - http
       security:
       - jwt_header_Authorization: []
+  /admin/stations/{stationId}:
+    delete:
+      tags:
+      - station
+      summary: delete station
+      description: |2-
+
+        **Required security scopes for jwt**:
+          * `api:admin`
+      operationId: station#delete
+      parameters:
+      - name: stationId
+        in: path
+        required: true
+        type: integer
+        format: int32
+      - name: Authorization
+        in: header
+        description: authentication token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: Bad Request response.
+          schema:
+            $ref: '#/definitions/StationDeleteBadRequestResponseBody'
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/StationDeleteUnauthorizedResponseBody'
+        "403":
+          description: Forbidden response.
+          schema:
+            $ref: '#/definitions/StationDeleteForbiddenResponseBody'
+        "404":
+          description: Not Found response.
+          schema:
+            $ref: '#/definitions/StationDeleteNotFoundResponseBody'
+      schemes:
+      - http
+      security:
+      - jwt_header_Authorization: []
   /admin/user:
     delete:
       tags:
@@ -3634,14 +3679,14 @@ definitions:
     properties:
       id:
         type: integer
-        example: 1634767946
+        example: 2057049245
         format: int32
       name:
         type: string
-        example: Nesciunt ut.
+        example: Dolorem corrupti ex fugiat.
     example:
-      id: 1346795605
-      name: Autem qui est rem.
+      id: 1361276670
+      name: Eum et recusandae ut.
     required:
     - id
     - name
@@ -9207,6 +9252,26 @@ definitions:
         time: 3559555809243335166
     required:
     - all
+  StationDeleteBadRequestResponseBody:
+    title: StationDeleteBadRequestResponseBody
+    type: string
+    description: bad-request
+    example: Necessitatibus delectus laborum.
+  StationDeleteForbiddenResponseBody:
+    title: StationDeleteForbiddenResponseBody
+    type: string
+    description: forbidden
+    example: Et molestiae tempore.
+  StationDeleteNotFoundResponseBody:
+    title: StationDeleteNotFoundResponseBody
+    type: string
+    description: not-found
+    example: Eaque nihil natus.
+  StationDeleteUnauthorizedResponseBody:
+    title: StationDeleteUnauthorizedResponseBody
+    type: string
+    description: unauthorized
+    example: Nam quos voluptatem qui fugiat omnis.
   StationFullResponseBody:
     title: 'Mediatype identifier: application/vnd.app.station.full; view=default'
     type: object
@@ -16008,82 +16073,82 @@ definitions:
     title: TasksFiveBadRequestResponseBody
     type: string
     description: bad-request
-    example: Necessitatibus delectus laborum.
+    example: Quibusdam rerum.
   TasksFiveForbiddenResponseBody:
     title: TasksFiveForbiddenResponseBody
     type: string
     description: forbidden
-    example: Et molestiae tempore.
+    example: Maxime aspernatur voluptatum debitis dolorum eum.
   TasksFiveNotFoundResponseBody:
     title: TasksFiveNotFoundResponseBody
     type: string
     description: not-found
-    example: Eaque nihil natus.
+    example: Autem beatae.
   TasksFiveUnauthorizedResponseBody:
     title: TasksFiveUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Nam quos voluptatem qui fugiat omnis.
+    example: A minima omnis consequatur autem.
   TestEmailBadRequestResponseBody:
     title: TestEmailBadRequestResponseBody
     type: string
     description: bad-request
-    example: Et asperiores provident ducimus.
+    example: Temporibus officia aut nobis qui inventore iusto.
   TestEmailForbiddenResponseBody:
     title: TestEmailForbiddenResponseBody
     type: string
     description: forbidden
-    example: Hic similique placeat.
+    example: Autem qui est rem.
   TestEmailNotFoundResponseBody:
     title: TestEmailNotFoundResponseBody
     type: string
     description: not-found
-    example: Quam harum eum enim nam.
+    example: Vel nam ducimus beatae cum.
   TestEmailUnauthorizedResponseBody:
     title: TestEmailUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Possimus quos.
+    example: Et nesciunt ut eligendi.
   TestErrorBadRequestResponseBody:
     title: TestErrorBadRequestResponseBody
     type: string
     description: bad-request
-    example: Nihil ipsa dicta nostrum quod cupiditate cum.
+    example: Et asperiores provident ducimus.
   TestErrorForbiddenResponseBody:
     title: TestErrorForbiddenResponseBody
     type: string
     description: forbidden
-    example: Accusamus qui.
+    example: Hic similique placeat.
   TestErrorNotFoundResponseBody:
     title: TestErrorNotFoundResponseBody
     type: string
     description: not-found
-    example: Nisi ipsam nulla.
+    example: Quam harum eum enim nam.
   TestErrorUnauthorizedResponseBody:
     title: TestErrorUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: Enim reiciendis natus in nulla.
+    example: Possimus quos.
   TestGetBadRequestResponseBody:
     title: TestGetBadRequestResponseBody
     type: string
     description: bad-request
-    example: Quibusdam rerum.
+    example: Nihil ipsa dicta nostrum quod cupiditate cum.
   TestGetForbiddenResponseBody:
     title: TestGetForbiddenResponseBody
     type: string
     description: forbidden
-    example: Maxime aspernatur voluptatum debitis dolorum eum.
+    example: Accusamus qui.
   TestGetNotFoundResponseBody:
     title: TestGetNotFoundResponseBody
     type: string
     description: not-found
-    example: Autem beatae.
+    example: Nisi ipsam nulla.
   TestGetUnauthorizedResponseBody:
     title: TestGetUnauthorizedResponseBody
     type: string
     description: credentials are invalid
-    example: A minima omnis consequatur autem.
+    example: Enim reiciendis natus in nulla.
   UserAddBadRequestResponseBody:
     title: UserAddBadRequestResponseBody
     type: string
@@ -16137,18 +16202,18 @@ definitions:
         example: true
       bio:
         type: string
-        example: Et veniam aut.
+        example: Dolorem sapiente voluptates qui corrupti.
       email:
         type: string
-        example: herman@legros.com
+        example: adalberto_mraz@jewessward.name
         format: email
       id:
         type: integer
-        example: 1706806185
+        example: 1308515288
         format: int32
       name:
         type: string
-        example: wq0
+        example: 0r9
         pattern: \S
         maxLength: 256
       photo:
@@ -16156,10 +16221,10 @@ definitions:
     description: AddResponseBody result type (default view)
     example:
       admin: true
-      bio: Deleniti dolores omnis impedit.
-      email: madilyn.bartoletti@grady.com
-      id: 52189712
-      name: yyz
+      bio: Ex repellendus.
+      email: bettie@tremblayzieme.biz
+      id: 1937757792
+      name: cv8
       photo:
         url: Eum a voluptatem et aspernatur unde.
     required:
@@ -16172,7 +16237,7 @@ definitions:
     title: UserAddUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Repellendus aspernatur rerum accusamus animi laborum.
+    example: Accusamus animi laborum.
   UserAdminDeleteBadRequestResponseBody:
     title: UserAdminDeleteBadRequestResponseBody
     type: string
@@ -16292,42 +16357,42 @@ definitions:
     title: UserDeleteBadRequestResponseBody
     type: string
     description: bad-request
-    example: Odit maiores minima officiis itaque error.
+    example: Tempora beatae.
   UserDeleteForbiddenResponseBody:
     title: UserDeleteForbiddenResponseBody
     type: string
     description: forbidden
-    example: Sed et hic est iusto veritatis.
+    example: Ratione vel pariatur perspiciatis quia.
   UserDeleteNotFoundResponseBody:
     title: UserDeleteNotFoundResponseBody
     type: string
     description: not-found
-    example: Est ipsam exercitationem repudiandae omnis dolorem numquam.
+    example: Veritatis ut qui qui eos quas cum.
   UserDeleteUnauthorizedResponseBody:
     title: UserDeleteUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Eum et recusandae ut.
+    example: Et cumque dignissimos perspiciatis qui eaque blanditiis.
   UserDownloadPhotoBadRequestResponseBody:
     title: UserDownloadPhotoBadRequestResponseBody
     type: string
     description: bad-request
-    example: Neque et est ex numquam delectus.
+    example: Officiis consectetur accusantium.
   UserDownloadPhotoForbiddenResponseBody:
     title: UserDownloadPhotoForbiddenResponseBody
     type: string
     description: forbidden
-    example: Tempora beatae.
+    example: Quaerat quaerat iure id maiores laborum ullam.
   UserDownloadPhotoNotFoundResponseBody:
     title: UserDownloadPhotoNotFoundResponseBody
     type: string
     description: not-found
-    example: Voluptas cum.
+    example: Omnis iste aut aperiam animi sit.
   UserDownloadPhotoUnauthorizedResponseBody:
     title: UserDownloadPhotoUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Eos quas cum.
+    example: Voluptatem optio accusantium quidem et suscipit eum.
   UserGetCurrentBadRequestResponseBody:
     title: UserGetCurrentBadRequestResponseBody
     type: string
@@ -16496,32 +16561,32 @@ definitions:
     title: UserLoginBadRequestResponseBody
     type: string
     description: bad-request
-    example: Quaerat quaerat iure id maiores laborum ullam.
+    example: Dolores optio omnis necessitatibus.
   UserLoginForbiddenResponseBody:
     title: UserLoginForbiddenResponseBody
     type: string
     description: forbidden
-    example: Aperiam est officiis.
+    example: Consequatur corrupti temporibus ut.
   UserLoginNotFoundResponseBody:
     title: UserLoginNotFoundResponseBody
     type: string
     description: not-found
-    example: Voluptatem optio accusantium quidem et suscipit eum.
+    example: Similique fugiat non.
   UserLoginRequestBody:
     title: UserLoginRequestBody
     type: object
     properties:
       email:
         type: string
-        example: scarlett.auer@feil.info
+        example: loren.windler@gutkowski.org
         format: email
       password:
         type: string
-        example: 4eo
+        example: ltx
         minLength: 10
     example:
-      email: maritza@mccullough.info
-      password: 7cv
+      email: wilford_gutmann@buckridgekunde.com
+      password: coz
     required:
     - email
     - password
@@ -16530,36 +16595,36 @@ definitions:
     title: UserLoginUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Deserunt rerum aperiam consequatur aut.
+    example: Quibusdam nisi eius.
   UserLogoutBadRequestResponseBody:
     title: UserLogoutBadRequestResponseBody
     type: string
     description: bad-request
-    example: Fuga suscipit consectetur ea voluptas.
+    example: Voluptatum sit laborum esse illum dignissimos.
   UserLogoutForbiddenResponseBody:
     title: UserLogoutForbiddenResponseBody
     type: string
     description: forbidden
-    example: Dolor qui laborum voluptates.
+    example: Eligendi aut error aut ipsam fuga suscipit.
   UserLogoutNotFoundResponseBody:
     title: UserLogoutNotFoundResponseBody
     type: string
     description: not-found
-    example: Voluptatem facere voluptatem eligendi aut error aut.
+    example: Ea voluptas sit illo.
   UserLogoutUnauthorizedResponseBody:
     title: UserLogoutUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Enim unde quia non itaque velit sit.
+    example: Laborum voluptates quasi voluptatem facere.
   UserPhotoResponseBody:
     title: UserPhotoResponseBody
     type: object
     properties:
       url:
         type: string
-        example: Aut dolorem sapiente voluptates qui corrupti.
+        example: Rem quam accusamus dolor tempora enim.
     example:
-      url: Rem quam accusamus dolor tempora enim.
+      url: Labore voluptas velit.
   UserProjectRoleResponseCollection:
     title: 'Mediatype identifier: application/vnd.app.project.role+json; type=collection;
       view=default'
@@ -16597,62 +16662,62 @@ definitions:
     title: UserRecoveryBadRequestResponseBody
     type: string
     description: bad-request
-    example: Reprehenderit ea nemo labore odit ut quos.
+    example: Rerum cumque odit.
   UserRecoveryForbiddenResponseBody:
     title: UserRecoveryForbiddenResponseBody
     type: string
     description: forbidden
-    example: Sed ut fugit eos et.
+    example: Eveniet sed.
   UserRecoveryLookupBadRequestResponseBody:
     title: UserRecoveryLookupBadRequestResponseBody
     type: string
     description: bad-request
-    example: Et pariatur voluptates dolor recusandae fugiat soluta.
+    example: Sed ut fugit eos et.
   UserRecoveryLookupForbiddenResponseBody:
     title: UserRecoveryLookupForbiddenResponseBody
     type: string
     description: forbidden
-    example: Alias ratione odio sint explicabo.
+    example: Saepe blanditiis.
   UserRecoveryLookupNotFoundResponseBody:
     title: UserRecoveryLookupNotFoundResponseBody
     type: string
     description: not-found
-    example: Ut sequi pariatur ratione voluptatibus.
+    example: Omnis amet id et.
   UserRecoveryLookupRequestBody:
     title: UserRecoveryLookupRequestBody
     type: object
     properties:
       email:
         type: string
-        example: Praesentium pariatur ratione eius nisi.
+        example: Nisi autem sint aspernatur aut fugit.
     example:
-      email: Saepe blanditiis.
+      email: Reprehenderit ea nemo labore odit ut quos.
     required:
     - email
   UserRecoveryLookupUnauthorizedResponseBody:
     title: UserRecoveryLookupUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Vitae illo reiciendis reiciendis doloribus id ut.
+    example: Similique praesentium pariatur ratione eius nisi.
   UserRecoveryNotFoundResponseBody:
     title: UserRecoveryNotFoundResponseBody
     type: string
     description: not-found
-    example: Nisi autem sint aspernatur aut fugit.
+    example: Vel numquam.
   UserRecoveryRequestBody:
     title: UserRecoveryRequestBody
     type: object
     properties:
       password:
         type: string
-        example: syu
+        example: lc8
         minLength: 10
       token:
         type: string
-        example: Aliquid ipsam nihil.
+        example: Sed voluptas.
     example:
-      password: bgl
-      token: Numquam sunt rerum cumque odit iste.
+      password: nas
+      token: Quia non itaque.
     required:
     - token
     - password
@@ -16660,38 +16725,38 @@ definitions:
     title: UserRecoveryUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Omnis amet id et.
+    example: Aliquid ipsam nihil.
   UserRefreshBadRequestResponseBody:
     title: UserRefreshBadRequestResponseBody
     type: string
     description: bad-request
-    example: Quae ut maxime ea suscipit aut voluptatem.
+    example: Animi dignissimos fugit culpa necessitatibus.
   UserRefreshForbiddenResponseBody:
     title: UserRefreshForbiddenResponseBody
     type: string
     description: forbidden
-    example: Illum dignissimos ut.
+    example: In quae ut maxime.
   UserRefreshNotFoundResponseBody:
     title: UserRefreshNotFoundResponseBody
     type: string
     description: not-found
-    example: Autem atque impedit deleniti.
+    example: Suscipit aut voluptatem itaque placeat sed amet.
   UserRefreshRequestBody:
     title: UserRefreshRequestBody
     type: object
     properties:
       refreshToken:
         type: string
-        example: Placeat sed amet minima.
+        example: Aspernatur recusandae.
     example:
-      refreshToken: Dignissimos fugit culpa necessitatibus nam aspernatur recusandae.
+      refreshToken: Vero dicta.
     required:
     - refreshToken
   UserRefreshUnauthorizedResponseBody:
     title: UserRefreshUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Illo excepturi voluptatum sit laborum.
+    example: Numquam autem atque impedit.
   UserResponseBody:
     title: 'Mediatype identifier: application/vnd.app.user+json; view=default'
     type: object
@@ -16736,17 +16801,17 @@ definitions:
     title: UserRolesBadRequestResponseBody
     type: string
     description: bad-request
-    example: Corrupti ex fugiat culpa.
+    example: Maiores minima officiis itaque.
   UserRolesForbiddenResponseBody:
     title: UserRolesForbiddenResponseBody
     type: string
     description: forbidden
-    example: Inventore temporibus.
+    example: Ipsam exercitationem.
   UserRolesNotFoundResponseBody:
     title: UserRolesNotFoundResponseBody
     type: string
     description: not-found
-    example: Aut nobis qui inventore iusto hic animi.
+    example: Omnis dolorem numquam cupiditate.
   UserRolesResponseBody:
     title: 'Mediatype identifier: application/vnd.app.roles.available; view=default'
     type: object
@@ -16760,13 +16825,9 @@ definitions:
           name: Assumenda natus accusamus doloremque ullam quasi.
         - id: 1915069344
           name: Assumenda natus accusamus doloremque ullam quasi.
-        - id: 1915069344
-          name: Assumenda natus accusamus doloremque ullam quasi.
     description: RolesResponseBody result type (default view)
     example:
       roles:
-      - id: 1915069344
-        name: Assumenda natus accusamus doloremque ullam quasi.
       - id: 1915069344
         name: Assumenda natus accusamus doloremque ullam quasi.
       - id: 1915069344
@@ -16777,27 +16838,27 @@ definitions:
     title: UserRolesUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Ducimus beatae.
+    example: Hic est iusto veritatis repudiandae.
   UserSendValidationBadRequestResponseBody:
     title: UserSendValidationBadRequestResponseBody
     type: string
     description: bad-request
-    example: Ea sunt.
+    example: Eum id.
   UserSendValidationForbiddenResponseBody:
     title: UserSendValidationForbiddenResponseBody
     type: string
     description: forbidden
-    example: Excepturi cumque.
+    example: Ipsam incidunt corporis qui alias.
   UserSendValidationNotFoundResponseBody:
     title: UserSendValidationNotFoundResponseBody
     type: string
     description: not-found
-    example: Ipsam incidunt corporis qui alias.
+    example: Ea sunt.
   UserSendValidationUnauthorizedResponseBody:
     title: UserSendValidationUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Vero dicta.
+    example: Excepturi cumque.
   UserUpdateBadRequestResponseBody:
     title: UserUpdateBadRequestResponseBody
     type: string
@@ -16887,42 +16948,42 @@ definitions:
     title: UserUploadPhotoBadRequestResponseBody
     type: string
     description: bad-request
-    example: Ut qui.
+    example: Aperiam est officiis.
   UserUploadPhotoForbiddenResponseBody:
     title: UserUploadPhotoForbiddenResponseBody
     type: string
     description: forbidden
-    example: Quibusdam ratione vel pariatur.
+    example: Neque et est ex numquam delectus.
   UserUploadPhotoNotFoundResponseBody:
     title: UserUploadPhotoNotFoundResponseBody
     type: string
     description: not-found
-    example: Quia itaque.
+    example: Deserunt rerum aperiam consequatur aut.
   UserUploadPhotoUnauthorizedResponseBody:
     title: UserUploadPhotoUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Cumque dignissimos perspiciatis qui eaque.
+    example: Voluptas cum.
   UserValidateBadRequestResponseBody:
     title: UserValidateBadRequestResponseBody
     type: string
     description: bad-request
-    example: Iste pariatur.
+    example: Non ipsum aut ducimus quo.
   UserValidateForbiddenResponseBody:
     title: UserValidateForbiddenResponseBody
     type: string
     description: forbidden
-    example: Ut omnis consequatur odit mollitia aut corrupti.
+    example: Quo minus molestiae.
   UserValidateNotFoundResponseBody:
     title: UserValidateNotFoundResponseBody
     type: string
     description: not-found
-    example: Quo minus molestiae.
+    example: Iste pariatur.
   UserValidateUnauthorizedResponseBody:
     title: UserValidateUnauthorizedResponseBody
     type: string
     description: unauthorized
-    example: Eum id.
+    example: Ut omnis consequatur odit mollitia aut corrupti.
 securityDefinitions:
   jwt_header_Authorization:
     type: apiKey

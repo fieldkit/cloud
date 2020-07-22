@@ -236,6 +236,22 @@ type ListAllNotFoundResponseBody string
 // all" endpoint HTTP response body for the "unauthorized" error.
 type ListAllUnauthorizedResponseBody string
 
+// DeleteBadRequestResponseBody is the type of the "station" service "delete"
+// endpoint HTTP response body for the "bad-request" error.
+type DeleteBadRequestResponseBody string
+
+// DeleteForbiddenResponseBody is the type of the "station" service "delete"
+// endpoint HTTP response body for the "forbidden" error.
+type DeleteForbiddenResponseBody string
+
+// DeleteNotFoundResponseBody is the type of the "station" service "delete"
+// endpoint HTTP response body for the "not-found" error.
+type DeleteNotFoundResponseBody string
+
+// DeleteUnauthorizedResponseBody is the type of the "station" service "delete"
+// endpoint HTTP response body for the "unauthorized" error.
+type DeleteUnauthorizedResponseBody string
+
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
 	ID   *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -727,6 +743,32 @@ func NewListAllNotFound(body ListAllNotFoundResponseBody) station.NotFound {
 // NewListAllUnauthorized builds a station service list all endpoint
 // unauthorized error.
 func NewListAllUnauthorized(body ListAllUnauthorizedResponseBody) station.Unauthorized {
+	v := station.Unauthorized(body)
+	return v
+}
+
+// NewDeleteBadRequest builds a station service delete endpoint bad-request
+// error.
+func NewDeleteBadRequest(body DeleteBadRequestResponseBody) station.BadRequest {
+	v := station.BadRequest(body)
+	return v
+}
+
+// NewDeleteForbidden builds a station service delete endpoint forbidden error.
+func NewDeleteForbidden(body DeleteForbiddenResponseBody) station.Forbidden {
+	v := station.Forbidden(body)
+	return v
+}
+
+// NewDeleteNotFound builds a station service delete endpoint not-found error.
+func NewDeleteNotFound(body DeleteNotFoundResponseBody) station.NotFound {
+	v := station.NotFound(body)
+	return v
+}
+
+// NewDeleteUnauthorized builds a station service delete endpoint unauthorized
+// error.
+func NewDeleteUnauthorized(body DeleteUnauthorizedResponseBody) station.Unauthorized {
 	v := station.Unauthorized(body)
 	return v
 }

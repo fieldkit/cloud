@@ -24,6 +24,7 @@ type Endpoints struct {
 	ListProject goa.Endpoint
 	Photo       goa.Endpoint
 	ListAll     goa.Endpoint
+	Delete      goa.Endpoint
 }
 
 // PhotoResponseData holds both the result and the HTTP response body reader of
@@ -47,6 +48,7 @@ func NewEndpoints(s Service) *Endpoints {
 		ListProject: NewListProjectEndpoint(s, a.JWTAuth),
 		Photo:       NewPhotoEndpoint(s, a.JWTAuth),
 		ListAll:     NewListAllEndpoint(s, a.JWTAuth),
+		Delete:      NewDeleteEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -59,6 +61,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ListProject = m(e.ListProject)
 	e.Photo = m(e.Photo)
 	e.ListAll = m(e.ListAll)
+	e.Delete = m(e.Delete)
 }
 
 // NewAddEndpoint returns an endpoint function that calls the method "add" of
@@ -225,5 +228,24 @@ func NewListAllEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint 
 		}
 		vres := NewViewedPageOfStations(res, "default")
 		return vres, nil
+	}
+}
+
+// NewDeleteEndpoint returns an endpoint function that calls the method
+// "delete" of service "station".
+func NewDeleteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*DeletePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:admin"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.Delete(ctx, p)
 	}
 }

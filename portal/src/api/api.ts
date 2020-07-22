@@ -852,6 +852,14 @@ class FKApi {
             url: this.baseUrl + "/admin/stations?" + qp.toString(),
         });
     }
+
+    public deleteStation(stationId: number): Promise<any> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/admin/stations/" + stationId,
+        });
+    }
 }
 
 export interface EssentialStation {

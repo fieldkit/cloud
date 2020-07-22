@@ -1,6 +1,8 @@
 <template>
     <StandardLayout>
         <div class="container">
+            <vue-confirm-dialog />
+
             <table class="stations">
                 <thead>
                     <tr class="header">
@@ -35,7 +37,9 @@
                                 {{ station.location.latitude | prettyCoordinate }}, {{ station.location.longitude | prettyCoordinate }}
                             </div>
                         </td>
-                        <td></td>
+                        <td>
+                            <div class="button" v-on:click="deleteStation(station)">Delete</div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -53,7 +57,7 @@ import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 
-import FKApi from "@/api/api";
+import FKApi, { EssentialStation } from "@/api/api";
 
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
@@ -81,7 +85,6 @@ export default Vue.extend({
     methods: {
         refresh() {
             return new FKApi().getAllStations(this.page, this.pageSize).then((page) => {
-                console.log("page", page);
                 this.totalPages = Math.ceil(page.total / this.pageSize);
                 this.stations = page.stations;
             });
@@ -89,6 +92,22 @@ export default Vue.extend({
         onNewPage(this: any, page: number) {
             this.page = page;
             return this.refresh();
+        },
+        deleteStation(this: any, station: EssentialStation) {
+            return this.$confirm({
+                message: `Are you sure? This operation cannot be undone.`,
+                button: {
+                    no: "No",
+                    yes: "Yes",
+                },
+                callback: (confirm) => {
+                    if (confirm) {
+                        return new FKApi().deleteStation(station.id).then(() => {
+                            return this.refresh();
+                        });
+                    }
+                },
+            });
         },
     },
 });
@@ -141,5 +160,17 @@ export default Vue.extend({
 .stations .device-id {
     font-family: monospace;
     font-size: 14px;
+}
+.stations .date {
+    text-align: right;
+}
+.stations .button {
+    font-size: 12px;
+    padding: 5px;
+    background-color: #ffffff;
+    border: 1px solid rgb(215, 220, 225);
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
 }
 </style>

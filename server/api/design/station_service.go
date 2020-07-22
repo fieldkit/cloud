@@ -365,5 +365,24 @@ var _ = Service("station", func() {
 		})
 	})
 
+	Method("delete", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("stationId", Int32)
+			Required("stationId")
+		})
+
+		HTTP(func() {
+			DELETE("admin/stations/{stationId}")
+
+			httpAuthentication()
+		})
+	})
+
 	commonOptions()
 })
