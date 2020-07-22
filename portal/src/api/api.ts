@@ -841,6 +841,29 @@ class FKApi {
             data: file,
         });
     }
+
+    public getAllStations(page: number, pageSize: number): Promise<PageOfStations> {
+        const qp = new URLSearchParams();
+        qp.append("page", page.toString());
+        qp.append("pageSize", pageSize.toString());
+        return this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + "/admin/stations?" + qp.toString(),
+        });
+    }
+}
+
+export interface EssentialStation {
+    id: number;
+    name: string;
+    deviceId: string;
+    owner: { id: number; name: string };
+}
+
+export interface PageOfStations {
+    stations: EssentialStation[];
+    total: number;
 }
 
 export default FKApi;
