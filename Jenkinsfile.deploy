@@ -12,14 +12,20 @@ timestamps {
                     sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} sudo mv fk-cloud-stack.tar /tmp/incoming-stacks"
                 }
 
+				def success = false
 				if (params.DeployFrom.indexOf("fkdev.org") >= 0) {
-					watchDeployment(url: "https://api.fkdev.org/status")
+					success = watchDeployment(url: "https://api.fkdev.org/status", seconds: 60)
 				}
 				else {
-					watchDeployment(url: "https://api.fieldkit.org/status")
+					success = watchDeployment(url: "https://api.fieldkit.org/status", seconds: 60)
 				}
 
-                notifySuccess()
+				if (success) {
+					slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Deployed And Ready (<${env.BUILD_URL}|Open>)"
+				}
+				else {
+					slackSend channel: '#automation', color: 'danger', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Oh, no. Deploy took too long (<${env.BUILD_URL}|Open>)"
+				}
             }
         }
         catch (Exception e) {
