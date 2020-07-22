@@ -1,6 +1,8 @@
 <template>
     <StandardLayout>
         <div class="container">
+            <vue-confirm-dialog />
+
             <div class="delete-user">
                 <div v-if="deletion.failed" class="notification failed">
                     Oops, there was a problem.
@@ -75,22 +77,33 @@ export default Vue.extend({
         },
     },
     methods: {
-        deleteUser() {
+        deleteUser(this: any) {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
                 return;
             }
 
-            return new FKApi().adminDeleteUser(this.form).then(
-                () => {
-                    this.deletion.success = true;
-                    this.deletion.failed = false;
+            return this.$confirm({
+                message: `Are you sure? This operation cannot be undone.`,
+                button: {
+                    no: "No",
+                    yes: "Yes",
                 },
-                () => {
-                    this.deletion.failed = true;
-                    this.deletion.success = false;
-                }
-            );
+                callback: (confirm) => {
+                    if (confirm) {
+                        return new FKApi().adminDeleteUser(this.form).then(
+                            () => {
+                                this.deletion.success = true;
+                                this.deletion.failed = false;
+                            },
+                            () => {
+                                this.deletion.failed = true;
+                                this.deletion.success = false;
+                            }
+                        );
+                    }
+                },
+            });
         },
     },
 });
