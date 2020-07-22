@@ -204,21 +204,21 @@ type ListProjectNotFoundResponseBody string
 // "list project" endpoint HTTP response body for the "unauthorized" error.
 type ListProjectUnauthorizedResponseBody string
 
-// PhotoBadRequestResponseBody is the type of the "station" service "photo"
-// endpoint HTTP response body for the "bad-request" error.
-type PhotoBadRequestResponseBody string
+// DownloadPhotoBadRequestResponseBody is the type of the "station" service
+// "download photo" endpoint HTTP response body for the "bad-request" error.
+type DownloadPhotoBadRequestResponseBody string
 
-// PhotoForbiddenResponseBody is the type of the "station" service "photo"
-// endpoint HTTP response body for the "forbidden" error.
-type PhotoForbiddenResponseBody string
+// DownloadPhotoForbiddenResponseBody is the type of the "station" service
+// "download photo" endpoint HTTP response body for the "forbidden" error.
+type DownloadPhotoForbiddenResponseBody string
 
-// PhotoNotFoundResponseBody is the type of the "station" service "photo"
-// endpoint HTTP response body for the "not-found" error.
-type PhotoNotFoundResponseBody string
+// DownloadPhotoNotFoundResponseBody is the type of the "station" service
+// "download photo" endpoint HTTP response body for the "not-found" error.
+type DownloadPhotoNotFoundResponseBody string
 
-// PhotoUnauthorizedResponseBody is the type of the "station" service "photo"
-// endpoint HTTP response body for the "unauthorized" error.
-type PhotoUnauthorizedResponseBody string
+// DownloadPhotoUnauthorizedResponseBody is the type of the "station" service
+// "download photo" endpoint HTTP response body for the "unauthorized" error.
+type DownloadPhotoUnauthorizedResponseBody string
 
 // ListAllBadRequestResponseBody is the type of the "station" service "list
 // all" endpoint HTTP response body for the "bad-request" error.
@@ -701,31 +701,31 @@ func NewListProjectUnauthorizedResponseBody(res station.Unauthorized) ListProjec
 	return body
 }
 
-// NewPhotoBadRequestResponseBody builds the HTTP response body from the result
-// of the "photo" endpoint of the "station" service.
-func NewPhotoBadRequestResponseBody(res station.BadRequest) PhotoBadRequestResponseBody {
-	body := PhotoBadRequestResponseBody(res)
+// NewDownloadPhotoBadRequestResponseBody builds the HTTP response body from
+// the result of the "download photo" endpoint of the "station" service.
+func NewDownloadPhotoBadRequestResponseBody(res station.BadRequest) DownloadPhotoBadRequestResponseBody {
+	body := DownloadPhotoBadRequestResponseBody(res)
 	return body
 }
 
-// NewPhotoForbiddenResponseBody builds the HTTP response body from the result
-// of the "photo" endpoint of the "station" service.
-func NewPhotoForbiddenResponseBody(res station.Forbidden) PhotoForbiddenResponseBody {
-	body := PhotoForbiddenResponseBody(res)
+// NewDownloadPhotoForbiddenResponseBody builds the HTTP response body from the
+// result of the "download photo" endpoint of the "station" service.
+func NewDownloadPhotoForbiddenResponseBody(res station.Forbidden) DownloadPhotoForbiddenResponseBody {
+	body := DownloadPhotoForbiddenResponseBody(res)
 	return body
 }
 
-// NewPhotoNotFoundResponseBody builds the HTTP response body from the result
-// of the "photo" endpoint of the "station" service.
-func NewPhotoNotFoundResponseBody(res station.NotFound) PhotoNotFoundResponseBody {
-	body := PhotoNotFoundResponseBody(res)
+// NewDownloadPhotoNotFoundResponseBody builds the HTTP response body from the
+// result of the "download photo" endpoint of the "station" service.
+func NewDownloadPhotoNotFoundResponseBody(res station.NotFound) DownloadPhotoNotFoundResponseBody {
+	body := DownloadPhotoNotFoundResponseBody(res)
 	return body
 }
 
-// NewPhotoUnauthorizedResponseBody builds the HTTP response body from the
-// result of the "photo" endpoint of the "station" service.
-func NewPhotoUnauthorizedResponseBody(res station.Unauthorized) PhotoUnauthorizedResponseBody {
-	body := PhotoUnauthorizedResponseBody(res)
+// NewDownloadPhotoUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "download photo" endpoint of the "station" service.
+func NewDownloadPhotoUnauthorizedResponseBody(res station.Unauthorized) DownloadPhotoUnauthorizedResponseBody {
+	body := DownloadPhotoUnauthorizedResponseBody(res)
 	return body
 }
 
@@ -837,10 +837,11 @@ func NewListProjectPayload(id int32, auth string) *station.ListProjectPayload {
 	return v
 }
 
-// NewPhotoPayload builds a station service photo endpoint payload.
-func NewPhotoPayload(id int32, auth string) *station.PhotoPayload {
-	v := &station.PhotoPayload{}
-	v.ID = id
+// NewDownloadPhotoPayload builds a station service download photo endpoint
+// payload.
+func NewDownloadPhotoPayload(stationID int32, auth string) *station.DownloadPhotoPayload {
+	v := &station.DownloadPhotoPayload{}
+	v.StationID = stationID
 	v.Auth = auth
 
 	return v

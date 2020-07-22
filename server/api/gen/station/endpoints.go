@@ -17,21 +17,21 @@ import (
 
 // Endpoints wraps the "station" service endpoints.
 type Endpoints struct {
-	Add         goa.Endpoint
-	Get         goa.Endpoint
-	Update      goa.Endpoint
-	ListMine    goa.Endpoint
-	ListProject goa.Endpoint
-	Photo       goa.Endpoint
-	ListAll     goa.Endpoint
-	Delete      goa.Endpoint
+	Add           goa.Endpoint
+	Get           goa.Endpoint
+	Update        goa.Endpoint
+	ListMine      goa.Endpoint
+	ListProject   goa.Endpoint
+	DownloadPhoto goa.Endpoint
+	ListAll       goa.Endpoint
+	Delete        goa.Endpoint
 }
 
-// PhotoResponseData holds both the result and the HTTP response body reader of
-// the "photo" method.
-type PhotoResponseData struct {
+// DownloadPhotoResponseData holds both the result and the HTTP response body
+// reader of the "download photo" method.
+type DownloadPhotoResponseData struct {
 	// Result is the method result.
-	Result *PhotoResult
+	Result *DownloadPhotoResult
 	// Body streams the HTTP response body.
 	Body io.ReadCloser
 }
@@ -41,14 +41,14 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Add:         NewAddEndpoint(s, a.JWTAuth),
-		Get:         NewGetEndpoint(s, a.JWTAuth),
-		Update:      NewUpdateEndpoint(s, a.JWTAuth),
-		ListMine:    NewListMineEndpoint(s, a.JWTAuth),
-		ListProject: NewListProjectEndpoint(s, a.JWTAuth),
-		Photo:       NewPhotoEndpoint(s, a.JWTAuth),
-		ListAll:     NewListAllEndpoint(s, a.JWTAuth),
-		Delete:      NewDeleteEndpoint(s, a.JWTAuth),
+		Add:           NewAddEndpoint(s, a.JWTAuth),
+		Get:           NewGetEndpoint(s, a.JWTAuth),
+		Update:        NewUpdateEndpoint(s, a.JWTAuth),
+		ListMine:      NewListMineEndpoint(s, a.JWTAuth),
+		ListProject:   NewListProjectEndpoint(s, a.JWTAuth),
+		DownloadPhoto: NewDownloadPhotoEndpoint(s, a.JWTAuth),
+		ListAll:       NewListAllEndpoint(s, a.JWTAuth),
+		Delete:        NewDeleteEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -59,7 +59,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Update = m(e.Update)
 	e.ListMine = m(e.ListMine)
 	e.ListProject = m(e.ListProject)
-	e.Photo = m(e.Photo)
+	e.DownloadPhoto = m(e.DownloadPhoto)
 	e.ListAll = m(e.ListAll)
 	e.Delete = m(e.Delete)
 }
@@ -184,11 +184,11 @@ func NewListProjectEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpo
 	}
 }
 
-// NewPhotoEndpoint returns an endpoint function that calls the method "photo"
-// of service "station".
-func NewPhotoEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+// NewDownloadPhotoEndpoint returns an endpoint function that calls the method
+// "download photo" of service "station".
+func NewDownloadPhotoEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*PhotoPayload)
+		p := req.(*DownloadPhotoPayload)
 		var err error
 		sc := security.JWTScheme{
 			Name:           "jwt",
@@ -199,11 +199,11 @@ func NewPhotoEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		res, body, err := s.Photo(ctx, p)
+		res, body, err := s.DownloadPhoto(ctx, p)
 		if err != nil {
 			return nil, err
 		}
-		return &PhotoResponseData{Result: res, Body: body}, nil
+		return &DownloadPhotoResponseData{Result: res, Body: body}, nil
 	}
 }
 

@@ -96,12 +96,12 @@ func DeleteProjectPath(projectID int32) string {
 	return fmt.Sprintf("/projects/%v", projectID)
 }
 
-// UploadMediaProjectPath returns the URL path to the project service upload media HTTP endpoint.
-func UploadMediaProjectPath(projectID int32) string {
+// UploadPhotoProjectPath returns the URL path to the project service upload photo HTTP endpoint.
+func UploadPhotoProjectPath(projectID int32) string {
 	return fmt.Sprintf("/projects/%v/media", projectID)
 }
 
-// DownloadMediaProjectPath returns the URL path to the project service download media HTTP endpoint.
-func DownloadMediaProjectPath(projectID int32) string {
+// DownloadPhotoProjectPath returns the URL path to the project service download photo HTTP endpoint.
+func DownloadPhotoProjectPath(projectID int32) string {
 	return fmt.Sprintf("/projects/%v/media", projectID)
 }

@@ -27,8 +27,8 @@ type Service interface {
 	ListMine(context.Context, *ListMinePayload) (res *StationsFull, err error)
 	// ListProject implements list project.
 	ListProject(context.Context, *ListProjectPayload) (res *StationsFull, err error)
-	// Photo implements photo.
-	Photo(context.Context, *PhotoPayload) (res *PhotoResult, body io.ReadCloser, err error)
+	// DownloadPhoto implements download photo.
+	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadPhotoResult, body io.ReadCloser, err error)
 	// ListAll implements list all.
 	ListAll(context.Context, *ListAllPayload) (res *PageOfStations, err error)
 	// Delete implements delete.
@@ -49,7 +49,7 @@ const ServiceName = "station"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [8]string{"add", "get", "update", "list mine", "list project", "photo", "list all", "delete"}
+var MethodNames = [8]string{"add", "get", "update", "list mine", "list project", "download photo", "list all", "delete"}
 
 // AddPayload is the payload type of the station service add method.
 type AddPayload struct {
@@ -116,14 +116,16 @@ type ListProjectPayload struct {
 	ID   int32
 }
 
-// PhotoPayload is the payload type of the station service photo method.
-type PhotoPayload struct {
-	Auth string
-	ID   int32
+// DownloadPhotoPayload is the payload type of the station service download
+// photo method.
+type DownloadPhotoPayload struct {
+	Auth      string
+	StationID int32
 }
 
-// PhotoResult is the result type of the station service photo method.
-type PhotoResult struct {
+// DownloadPhotoResult is the result type of the station service download photo
+// method.
+type DownloadPhotoResult struct {
 	Length      int64
 	ContentType string
 }

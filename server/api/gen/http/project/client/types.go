@@ -427,37 +427,37 @@ type DeleteNotFoundResponseBody string
 // endpoint HTTP response body for the "unauthorized" error.
 type DeleteUnauthorizedResponseBody string
 
-// UploadMediaBadRequestResponseBody is the type of the "project" service
-// "upload media" endpoint HTTP response body for the "bad-request" error.
-type UploadMediaBadRequestResponseBody string
+// UploadPhotoBadRequestResponseBody is the type of the "project" service
+// "upload photo" endpoint HTTP response body for the "bad-request" error.
+type UploadPhotoBadRequestResponseBody string
 
-// UploadMediaForbiddenResponseBody is the type of the "project" service
-// "upload media" endpoint HTTP response body for the "forbidden" error.
-type UploadMediaForbiddenResponseBody string
+// UploadPhotoForbiddenResponseBody is the type of the "project" service
+// "upload photo" endpoint HTTP response body for the "forbidden" error.
+type UploadPhotoForbiddenResponseBody string
 
-// UploadMediaNotFoundResponseBody is the type of the "project" service "upload
-// media" endpoint HTTP response body for the "not-found" error.
-type UploadMediaNotFoundResponseBody string
+// UploadPhotoNotFoundResponseBody is the type of the "project" service "upload
+// photo" endpoint HTTP response body for the "not-found" error.
+type UploadPhotoNotFoundResponseBody string
 
-// UploadMediaUnauthorizedResponseBody is the type of the "project" service
-// "upload media" endpoint HTTP response body for the "unauthorized" error.
-type UploadMediaUnauthorizedResponseBody string
+// UploadPhotoUnauthorizedResponseBody is the type of the "project" service
+// "upload photo" endpoint HTTP response body for the "unauthorized" error.
+type UploadPhotoUnauthorizedResponseBody string
 
-// DownloadMediaBadRequestResponseBody is the type of the "project" service
-// "download media" endpoint HTTP response body for the "bad-request" error.
-type DownloadMediaBadRequestResponseBody string
+// DownloadPhotoBadRequestResponseBody is the type of the "project" service
+// "download photo" endpoint HTTP response body for the "bad-request" error.
+type DownloadPhotoBadRequestResponseBody string
 
-// DownloadMediaForbiddenResponseBody is the type of the "project" service
-// "download media" endpoint HTTP response body for the "forbidden" error.
-type DownloadMediaForbiddenResponseBody string
+// DownloadPhotoForbiddenResponseBody is the type of the "project" service
+// "download photo" endpoint HTTP response body for the "forbidden" error.
+type DownloadPhotoForbiddenResponseBody string
 
-// DownloadMediaNotFoundResponseBody is the type of the "project" service
-// "download media" endpoint HTTP response body for the "not-found" error.
-type DownloadMediaNotFoundResponseBody string
+// DownloadPhotoNotFoundResponseBody is the type of the "project" service
+// "download photo" endpoint HTTP response body for the "not-found" error.
+type DownloadPhotoNotFoundResponseBody string
 
-// DownloadMediaUnauthorizedResponseBody is the type of the "project" service
-// "download media" endpoint HTTP response body for the "unauthorized" error.
-type DownloadMediaUnauthorizedResponseBody string
+// DownloadPhotoUnauthorizedResponseBody is the type of the "project" service
+// "download photo" endpoint HTTP response body for the "unauthorized" error.
+type DownloadPhotoUnauthorizedResponseBody string
 
 // PendingInviteResponseBody is used to define fields on response body types.
 type PendingInviteResponseBody struct {
@@ -1164,68 +1164,68 @@ func NewDeleteUnauthorized(body DeleteUnauthorizedResponseBody) project.Unauthor
 	return v
 }
 
-// NewUploadMediaBadRequest builds a project service upload media endpoint
+// NewUploadPhotoBadRequest builds a project service upload photo endpoint
 // bad-request error.
-func NewUploadMediaBadRequest(body UploadMediaBadRequestResponseBody) project.BadRequest {
+func NewUploadPhotoBadRequest(body UploadPhotoBadRequestResponseBody) project.BadRequest {
 	v := project.BadRequest(body)
 	return v
 }
 
-// NewUploadMediaForbidden builds a project service upload media endpoint
+// NewUploadPhotoForbidden builds a project service upload photo endpoint
 // forbidden error.
-func NewUploadMediaForbidden(body UploadMediaForbiddenResponseBody) project.Forbidden {
+func NewUploadPhotoForbidden(body UploadPhotoForbiddenResponseBody) project.Forbidden {
 	v := project.Forbidden(body)
 	return v
 }
 
-// NewUploadMediaNotFound builds a project service upload media endpoint
+// NewUploadPhotoNotFound builds a project service upload photo endpoint
 // not-found error.
-func NewUploadMediaNotFound(body UploadMediaNotFoundResponseBody) project.NotFound {
+func NewUploadPhotoNotFound(body UploadPhotoNotFoundResponseBody) project.NotFound {
 	v := project.NotFound(body)
 	return v
 }
 
-// NewUploadMediaUnauthorized builds a project service upload media endpoint
+// NewUploadPhotoUnauthorized builds a project service upload photo endpoint
 // unauthorized error.
-func NewUploadMediaUnauthorized(body UploadMediaUnauthorizedResponseBody) project.Unauthorized {
+func NewUploadPhotoUnauthorized(body UploadPhotoUnauthorizedResponseBody) project.Unauthorized {
 	v := project.Unauthorized(body)
 	return v
 }
 
-// NewDownloadMediaResultOK builds a "project" service "download media"
+// NewDownloadPhotoResultOK builds a "project" service "download photo"
 // endpoint result from a HTTP "OK" response.
-func NewDownloadMediaResultOK(length int64, contentType string) *project.DownloadMediaResult {
-	v := &project.DownloadMediaResult{}
+func NewDownloadPhotoResultOK(length int64, contentType string) *project.DownloadPhotoResult {
+	v := &project.DownloadPhotoResult{}
 	v.Length = length
 	v.ContentType = contentType
 
 	return v
 }
 
-// NewDownloadMediaBadRequest builds a project service download media endpoint
+// NewDownloadPhotoBadRequest builds a project service download photo endpoint
 // bad-request error.
-func NewDownloadMediaBadRequest(body DownloadMediaBadRequestResponseBody) project.BadRequest {
+func NewDownloadPhotoBadRequest(body DownloadPhotoBadRequestResponseBody) project.BadRequest {
 	v := project.BadRequest(body)
 	return v
 }
 
-// NewDownloadMediaForbidden builds a project service download media endpoint
+// NewDownloadPhotoForbidden builds a project service download photo endpoint
 // forbidden error.
-func NewDownloadMediaForbidden(body DownloadMediaForbiddenResponseBody) project.Forbidden {
+func NewDownloadPhotoForbidden(body DownloadPhotoForbiddenResponseBody) project.Forbidden {
 	v := project.Forbidden(body)
 	return v
 }
 
-// NewDownloadMediaNotFound builds a project service download media endpoint
+// NewDownloadPhotoNotFound builds a project service download photo endpoint
 // not-found error.
-func NewDownloadMediaNotFound(body DownloadMediaNotFoundResponseBody) project.NotFound {
+func NewDownloadPhotoNotFound(body DownloadPhotoNotFoundResponseBody) project.NotFound {
 	v := project.NotFound(body)
 	return v
 }
 
-// NewDownloadMediaUnauthorized builds a project service download media
+// NewDownloadPhotoUnauthorized builds a project service download photo
 // endpoint unauthorized error.
-func NewDownloadMediaUnauthorized(body DownloadMediaUnauthorizedResponseBody) project.Unauthorized {
+func NewDownloadPhotoUnauthorized(body DownloadPhotoUnauthorizedResponseBody) project.Unauthorized {
 	v := project.Unauthorized(body)
 	return v
 }

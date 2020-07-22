@@ -81,13 +81,13 @@ type Client struct {
 	// Delete Doer is the HTTP client used to make requests to the delete endpoint.
 	DeleteDoer goahttp.Doer
 
-	// UploadMedia Doer is the HTTP client used to make requests to the upload
-	// media endpoint.
-	UploadMediaDoer goahttp.Doer
+	// UploadPhoto Doer is the HTTP client used to make requests to the upload
+	// photo endpoint.
+	UploadPhotoDoer goahttp.Doer
 
-	// DownloadMedia Doer is the HTTP client used to make requests to the download
-	// media endpoint.
-	DownloadMediaDoer goahttp.Doer
+	// DownloadPhoto Doer is the HTTP client used to make requests to the download
+	// photo endpoint.
+	DownloadPhotoDoer goahttp.Doer
 
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
@@ -129,8 +129,8 @@ func NewClient(
 		AddStationDoer:      doer,
 		RemoveStationDoer:   doer,
 		DeleteDoer:          doer,
-		UploadMediaDoer:     doer,
-		DownloadMediaDoer:   doer,
+		UploadPhotoDoer:     doer,
+		DownloadPhotoDoer:   doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -548,15 +548,15 @@ func (c *Client) Delete() goa.Endpoint {
 	}
 }
 
-// UploadMedia returns an endpoint that makes HTTP requests to the project
-// service upload media server.
-func (c *Client) UploadMedia() goa.Endpoint {
+// UploadPhoto returns an endpoint that makes HTTP requests to the project
+// service upload photo server.
+func (c *Client) UploadPhoto() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeUploadMediaRequest(c.encoder)
-		decodeResponse = DecodeUploadMediaResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeUploadPhotoRequest(c.encoder)
+		decodeResponse = DecodeUploadPhotoResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildUploadMediaRequest(ctx, v)
+		req, err := c.BuildUploadPhotoRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
@@ -564,34 +564,39 @@ func (c *Client) UploadMedia() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.UploadMediaDoer.Do(req)
+		resp, err := c.UploadPhotoDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("project", "upload media", err)
+			return nil, goahttp.ErrRequestError("project", "upload photo", err)
 		}
 		return decodeResponse(resp)
 	}
 }
 
-// DownloadMedia returns an endpoint that makes HTTP requests to the project
-// service download media server.
-func (c *Client) DownloadMedia() goa.Endpoint {
+// DownloadPhoto returns an endpoint that makes HTTP requests to the project
+// service download photo server.
+func (c *Client) DownloadPhoto() goa.Endpoint {
 	var (
-		decodeResponse = DecodeDownloadMediaResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeDownloadPhotoRequest(c.encoder)
+		decodeResponse = DecodeDownloadPhotoResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildDownloadMediaRequest(ctx, v)
+		req, err := c.BuildDownloadPhotoRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.DownloadMediaDoer.Do(req)
+		err = encodeRequest(req, v)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("project", "download media", err)
+			return nil, err
+		}
+		resp, err := c.DownloadPhotoDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "download photo", err)
 		}
 		res, err := decodeResponse(resp)
 		if err != nil {
 			resp.Body.Close()
-			return nil, goahttp.ErrDecodingError("project", "download media", err)
+			return nil, goahttp.ErrDecodingError("project", "download photo", err)
 		}
-		return &project.DownloadMediaResponseData{Result: res.(*project.DownloadMediaResult), Body: resp.Body}, nil
+		return &project.DownloadPhotoResponseData{Result: res.(*project.DownloadPhotoResult), Body: resp.Body}, nil
 	}
 }

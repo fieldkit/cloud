@@ -51,10 +51,10 @@ type Service interface {
 	RemoveStation(context.Context, *RemoveStationPayload) (err error)
 	// Delete implements delete.
 	Delete(context.Context, *DeletePayload) (err error)
-	// UploadMedia implements upload media.
-	UploadMedia(context.Context, *UploadMediaPayload, io.ReadCloser) (err error)
-	// DownloadMedia implements download media.
-	DownloadMedia(context.Context, *DownloadMediaPayload) (res *DownloadMediaResult, body io.ReadCloser, err error)
+	// UploadPhoto implements upload photo.
+	UploadPhoto(context.Context, *UploadPhotoPayload, io.ReadCloser) (err error)
+	// DownloadPhoto implements download photo.
+	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadPhotoResult, body io.ReadCloser, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -71,7 +71,7 @@ const ServiceName = "project"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [19]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept invite", "reject invite", "add", "update", "get", "list community", "list mine", "invite", "remove user", "add station", "remove station", "delete", "upload media", "download media"}
+var MethodNames = [19]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept invite", "reject invite", "add", "update", "get", "list community", "list mine", "invite", "remove user", "add station", "remove station", "delete", "upload photo", "download photo"}
 
 // AddUpdatePayload is the payload type of the project service add update
 // method.
@@ -226,24 +226,25 @@ type DeletePayload struct {
 	ProjectID int32
 }
 
-// UploadMediaPayload is the payload type of the project service upload media
+// UploadPhotoPayload is the payload type of the project service upload photo
 // method.
-type UploadMediaPayload struct {
+type UploadPhotoPayload struct {
 	Auth          string
+	ProjectID     int32
 	ContentLength int64
 	ContentType   string
-	ProjectID     int32
 }
 
-// DownloadMediaPayload is the payload type of the project service download
-// media method.
-type DownloadMediaPayload struct {
+// DownloadPhotoPayload is the payload type of the project service download
+// photo method.
+type DownloadPhotoPayload struct {
+	Auth      string
 	ProjectID int32
 }
 
-// DownloadMediaResult is the result type of the project service download media
+// DownloadPhotoResult is the result type of the project service download photo
 // method.
-type DownloadMediaResult struct {
+type DownloadPhotoResult struct {
 	Length      int64
 	ContentType string
 }

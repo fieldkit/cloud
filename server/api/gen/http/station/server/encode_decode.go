@@ -593,11 +593,11 @@ func EncodeListProjectError(encoder func(context.Context, http.ResponseWriter) g
 	}
 }
 
-// EncodePhotoResponse returns an encoder for responses returned by the station
-// photo endpoint.
-func EncodePhotoResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeDownloadPhotoResponse returns an encoder for responses returned by the
+// station download photo endpoint.
+func EncodeDownloadPhotoResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*station.PhotoResult)
+		res := v.(*station.DownloadPhotoResult)
 		val := res.Length
 		lengths := strconv.FormatInt(val, 10)
 		w.Header().Set("Content-Length", lengths)
@@ -607,24 +607,24 @@ func EncodePhotoResponse(encoder func(context.Context, http.ResponseWriter) goah
 	}
 }
 
-// DecodePhotoRequest returns a decoder for requests sent to the station photo
-// endpoint.
-func DecodePhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+// DecodeDownloadPhotoRequest returns a decoder for requests sent to the
+// station download photo endpoint.
+func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id   int32
-			auth string
-			err  error
+			stationID int32
+			auth      string
+			err       error
 
 			params = mux.Vars(r)
 		)
 		{
-			idRaw := params["id"]
-			v, err2 := strconv.ParseInt(idRaw, 10, 32)
+			stationIDRaw := params["stationId"]
+			v, err2 := strconv.ParseInt(stationIDRaw, 10, 32)
 			if err2 != nil {
-				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("id", idRaw, "integer"))
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("stationID", stationIDRaw, "integer"))
 			}
-			id = int32(v)
+			stationID = int32(v)
 		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
@@ -633,7 +633,7 @@ func DecodePhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.D
 		if err != nil {
 			return nil, err
 		}
-		payload := NewPhotoPayload(id, auth)
+		payload := NewDownloadPhotoPayload(stationID, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
@@ -644,9 +644,9 @@ func DecodePhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.D
 	}
 }
 
-// EncodePhotoError returns an encoder for errors returned by the photo station
-// endpoint.
-func EncodePhotoError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeDownloadPhotoError returns an encoder for errors returned by the
+// download photo station endpoint.
+func EncodeDownloadPhotoError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		en, ok := v.(ErrorNamer)
@@ -661,7 +661,7 @@ func EncodePhotoError(encoder func(context.Context, http.ResponseWriter) goahttp
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewPhotoBadRequestResponseBody(res)
+				body = NewDownloadPhotoBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
@@ -673,7 +673,7 @@ func EncodePhotoError(encoder func(context.Context, http.ResponseWriter) goahttp
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewPhotoForbiddenResponseBody(res)
+				body = NewDownloadPhotoForbiddenResponseBody(res)
 			}
 			w.Header().Set("goa-error", "forbidden")
 			w.WriteHeader(http.StatusForbidden)
@@ -685,7 +685,7 @@ func EncodePhotoError(encoder func(context.Context, http.ResponseWriter) goahttp
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewPhotoNotFoundResponseBody(res)
+				body = NewDownloadPhotoNotFoundResponseBody(res)
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
@@ -697,7 +697,7 @@ func EncodePhotoError(encoder func(context.Context, http.ResponseWriter) goahttp
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewPhotoUnauthorizedResponseBody(res)
+				body = NewDownloadPhotoUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", "unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)

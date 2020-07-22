@@ -34,24 +34,24 @@ type Endpoints struct {
 	AddStation    goa.Endpoint
 	RemoveStation goa.Endpoint
 	Delete        goa.Endpoint
-	UploadMedia   goa.Endpoint
-	DownloadMedia goa.Endpoint
+	UploadPhoto   goa.Endpoint
+	DownloadPhoto goa.Endpoint
 }
 
-// UploadMediaRequestData holds both the payload and the HTTP request body
-// reader of the "upload media" method.
-type UploadMediaRequestData struct {
+// UploadPhotoRequestData holds both the payload and the HTTP request body
+// reader of the "upload photo" method.
+type UploadPhotoRequestData struct {
 	// Payload is the method payload.
-	Payload *UploadMediaPayload
+	Payload *UploadPhotoPayload
 	// Body streams the HTTP request body.
 	Body io.ReadCloser
 }
 
-// DownloadMediaResponseData holds both the result and the HTTP response body
-// reader of the "download media" method.
-type DownloadMediaResponseData struct {
+// DownloadPhotoResponseData holds both the result and the HTTP response body
+// reader of the "download photo" method.
+type DownloadPhotoResponseData struct {
 	// Result is the method result.
-	Result *DownloadMediaResult
+	Result *DownloadPhotoResult
 	// Body streams the HTTP response body.
 	Body io.ReadCloser
 }
@@ -78,8 +78,8 @@ func NewEndpoints(s Service) *Endpoints {
 		AddStation:    NewAddStationEndpoint(s, a.JWTAuth),
 		RemoveStation: NewRemoveStationEndpoint(s, a.JWTAuth),
 		Delete:        NewDeleteEndpoint(s, a.JWTAuth),
-		UploadMedia:   NewUploadMediaEndpoint(s, a.JWTAuth),
-		DownloadMedia: NewDownloadMediaEndpoint(s),
+		UploadPhoto:   NewUploadPhotoEndpoint(s, a.JWTAuth),
+		DownloadPhoto: NewDownloadPhotoEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -102,8 +102,8 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.AddStation = m(e.AddStation)
 	e.RemoveStation = m(e.RemoveStation)
 	e.Delete = m(e.Delete)
-	e.UploadMedia = m(e.UploadMedia)
-	e.DownloadMedia = m(e.DownloadMedia)
+	e.UploadPhoto = m(e.UploadPhoto)
+	e.DownloadPhoto = m(e.DownloadPhoto)
 }
 
 // NewAddUpdateEndpoint returns an endpoint function that calls the method "add
@@ -482,11 +482,11 @@ func NewDeleteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	}
 }
 
-// NewUploadMediaEndpoint returns an endpoint function that calls the method
-// "upload media" of service "project".
-func NewUploadMediaEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+// NewUploadPhotoEndpoint returns an endpoint function that calls the method
+// "upload photo" of service "project".
+func NewUploadPhotoEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		ep := req.(*UploadMediaRequestData)
+		ep := req.(*UploadPhotoRequestData)
 		var err error
 		sc := security.JWTScheme{
 			Name:           "jwt",
@@ -497,19 +497,29 @@ func NewUploadMediaEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpo
 		if err != nil {
 			return nil, err
 		}
-		return nil, s.UploadMedia(ctx, ep.Payload, ep.Body)
+		return nil, s.UploadPhoto(ctx, ep.Payload, ep.Body)
 	}
 }
 
-// NewDownloadMediaEndpoint returns an endpoint function that calls the method
-// "download media" of service "project".
-func NewDownloadMediaEndpoint(s Service) goa.Endpoint {
+// NewDownloadPhotoEndpoint returns an endpoint function that calls the method
+// "download photo" of service "project".
+func NewDownloadPhotoEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*DownloadMediaPayload)
-		res, body, err := s.DownloadMedia(ctx, p)
+		p := req.(*DownloadPhotoPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
 		if err != nil {
 			return nil, err
 		}
-		return &DownloadMediaResponseData{Result: res, Body: body}, nil
+		res, body, err := s.DownloadPhoto(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		return &DownloadPhotoResponseData{Result: res, Body: body}, nil
 	}
 }

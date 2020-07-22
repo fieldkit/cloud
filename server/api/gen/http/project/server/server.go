@@ -39,8 +39,8 @@ type Server struct {
 	AddStation    http.Handler
 	RemoveStation http.Handler
 	Delete        http.Handler
-	UploadMedia   http.Handler
-	DownloadMedia http.Handler
+	UploadPhoto   http.Handler
+	DownloadPhoto http.Handler
 	CORS          http.Handler
 }
 
@@ -94,8 +94,8 @@ func New(
 			{"AddStation", "POST", "/projects/{projectId}/stations/{stationId}"},
 			{"RemoveStation", "DELETE", "/projects/{projectId}/stations/{stationId}"},
 			{"Delete", "DELETE", "/projects/{projectId}"},
-			{"UploadMedia", "POST", "/projects/{projectId}/media"},
-			{"DownloadMedia", "GET", "/projects/{projectId}/media"},
+			{"UploadPhoto", "POST", "/projects/{projectId}/media"},
+			{"DownloadPhoto", "GET", "/projects/{projectId}/media"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/updates"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/updates/{updateId}"},
 			{"CORS", "OPTIONS", "/projects/invites/pending"},
@@ -127,8 +127,8 @@ func New(
 		AddStation:    NewAddStationHandler(e.AddStation, mux, decoder, encoder, errhandler, formatter),
 		RemoveStation: NewRemoveStationHandler(e.RemoveStation, mux, decoder, encoder, errhandler, formatter),
 		Delete:        NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
-		UploadMedia:   NewUploadMediaHandler(e.UploadMedia, mux, decoder, encoder, errhandler, formatter),
-		DownloadMedia: NewDownloadMediaHandler(e.DownloadMedia, mux, decoder, encoder, errhandler, formatter),
+		UploadPhoto:   NewUploadPhotoHandler(e.UploadPhoto, mux, decoder, encoder, errhandler, formatter),
+		DownloadPhoto: NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
 		CORS:          NewCORSHandler(),
 	}
 }
@@ -155,8 +155,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.AddStation = m(s.AddStation)
 	s.RemoveStation = m(s.RemoveStation)
 	s.Delete = m(s.Delete)
-	s.UploadMedia = m(s.UploadMedia)
-	s.DownloadMedia = m(s.DownloadMedia)
+	s.UploadPhoto = m(s.UploadPhoto)
+	s.DownloadPhoto = m(s.DownloadPhoto)
 	s.CORS = m(s.CORS)
 }
 
@@ -179,8 +179,8 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountAddStationHandler(mux, h.AddStation)
 	MountRemoveStationHandler(mux, h.RemoveStation)
 	MountDeleteHandler(mux, h.Delete)
-	MountUploadMediaHandler(mux, h.UploadMedia)
-	MountDownloadMediaHandler(mux, h.DownloadMedia)
+	MountUploadPhotoHandler(mux, h.UploadPhoto)
+	MountDownloadPhotoHandler(mux, h.DownloadPhoto)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -1051,9 +1051,9 @@ func NewDeleteHandler(
 	})
 }
 
-// MountUploadMediaHandler configures the mux to serve the "project" service
-// "upload media" endpoint.
-func MountUploadMediaHandler(mux goahttp.Muxer, h http.Handler) {
+// MountUploadPhotoHandler configures the mux to serve the "project" service
+// "upload photo" endpoint.
+func MountUploadPhotoHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -1063,9 +1063,9 @@ func MountUploadMediaHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("POST", "/projects/{projectId}/media", f)
 }
 
-// NewUploadMediaHandler creates a HTTP handler which loads the HTTP request
-// and calls the "project" service "upload media" endpoint.
-func NewUploadMediaHandler(
+// NewUploadPhotoHandler creates a HTTP handler which loads the HTTP request
+// and calls the "project" service "upload photo" endpoint.
+func NewUploadPhotoHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -1074,13 +1074,13 @@ func NewUploadMediaHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeUploadMediaRequest(mux, decoder)
-		encodeResponse = EncodeUploadMediaResponse(encoder)
-		encodeError    = EncodeUploadMediaError(encoder, formatter)
+		decodeRequest  = DecodeUploadPhotoRequest(mux, decoder)
+		encodeResponse = EncodeUploadPhotoResponse(encoder)
+		encodeError    = EncodeUploadPhotoError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "upload media")
+		ctx = context.WithValue(ctx, goa.MethodKey, "upload photo")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -1089,7 +1089,7 @@ func NewUploadMediaHandler(
 			}
 			return
 		}
-		data := &project.UploadMediaRequestData{Payload: payload.(*project.UploadMediaPayload), Body: r.Body}
+		data := &project.UploadPhotoRequestData{Payload: payload.(*project.UploadPhotoPayload), Body: r.Body}
 		res, err := endpoint(ctx, data)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil {
@@ -1103,9 +1103,9 @@ func NewUploadMediaHandler(
 	})
 }
 
-// MountDownloadMediaHandler configures the mux to serve the "project" service
-// "download media" endpoint.
-func MountDownloadMediaHandler(mux goahttp.Muxer, h http.Handler) {
+// MountDownloadPhotoHandler configures the mux to serve the "project" service
+// "download photo" endpoint.
+func MountDownloadPhotoHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -1115,9 +1115,9 @@ func MountDownloadMediaHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("GET", "/projects/{projectId}/media", f)
 }
 
-// NewDownloadMediaHandler creates a HTTP handler which loads the HTTP request
-// and calls the "project" service "download media" endpoint.
-func NewDownloadMediaHandler(
+// NewDownloadPhotoHandler creates a HTTP handler which loads the HTTP request
+// and calls the "project" service "download photo" endpoint.
+func NewDownloadPhotoHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -1126,13 +1126,13 @@ func NewDownloadMediaHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeDownloadMediaRequest(mux, decoder)
-		encodeResponse = EncodeDownloadMediaResponse(encoder)
-		encodeError    = EncodeDownloadMediaError(encoder, formatter)
+		decodeRequest  = DecodeDownloadPhotoRequest(mux, decoder)
+		encodeResponse = EncodeDownloadPhotoResponse(encoder)
+		encodeError    = EncodeDownloadPhotoError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "download media")
+		ctx = context.WithValue(ctx, goa.MethodKey, "download photo")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -1148,7 +1148,7 @@ func NewDownloadMediaHandler(
 			}
 			return
 		}
-		o := res.(*project.DownloadMediaResponseData)
+		o := res.(*project.DownloadPhotoResponseData)
 		defer o.Body.Close()
 		if err := encodeResponse(ctx, w, o.Result); err != nil {
 			errhandler(ctx, w, err)

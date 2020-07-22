@@ -486,7 +486,7 @@ var _ = Service("project", func() {
 		})
 	})
 
-	Method("upload media", func() {
+	Method("upload photo", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
 		})
@@ -494,12 +494,12 @@ var _ = Service("project", func() {
 		Payload(func() {
 			Token("auth")
 			Required("auth")
+			Attribute("projectId", Int32)
+			Required("projectId")
 			Attribute("contentLength", Int64)
 			Required("contentLength")
 			Attribute("contentType", String)
 			Required("contentType")
-			Attribute("projectId", Int32)
-			Required("projectId")
 		})
 
 		HTTP(func() {
@@ -514,16 +514,14 @@ var _ = Service("project", func() {
 		})
 	})
 
-	Method("download media", func() {
-		/*
-			Security(JWTAuth, func() {
-				Scope("api:access")
-			})
-		*/
+	Method("download photo", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
 
 		Payload(func() {
-			// Token("auth")
-			// Required("auth")
+			Token("auth")
+			Required("auth")
 			Attribute("projectId", Int32)
 			Required("projectId")
 		})
@@ -545,7 +543,7 @@ var _ = Service("project", func() {
 				Header("contentType:Content-Type")
 			})
 
-			// httpAuthenticationQueryString()
+			httpAuthentication()
 		})
 	})
 

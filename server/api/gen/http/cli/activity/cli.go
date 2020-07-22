@@ -44,11 +44,11 @@ following (follow|unfollow|followers)
 ingestion (process- pending|process- station|process- ingestion|delete)
 modules meta
 notes (update|get|media|upload)
-project (add- update|delete- update|modify- update|invites|lookup- invite|accept- invite|reject- invite|add|update|get|list- community|list- mine|invite|remove- user|add- station|remove- station|delete|upload- media|download- media)
+project (add- update|delete- update|modify- update|invites|lookup- invite|accept- invite|reject- invite|add|update|get|list- community|list- mine|invite|remove- user|add- station|remove- station|delete|upload- photo|download- photo)
 records (data|meta|resolved)
 sensor (meta|data)
 information (device- layout|firmware- statistics)
-station (add|get|update|list- mine|list- project|photo|list- all|delete)
+station (add|get|update|list- mine|list- project|download- photo|list- all|delete)
 tasks five
 test (get|error|email)
 user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery|logout|refresh|send- validation|validate|add|update|change- password|get- current|list- by- project|issue- transmission- token|project- roles|admin- delete)
@@ -250,15 +250,16 @@ func ParseEndpoint(
 		projectDeleteProjectIDFlag = projectDeleteFlags.String("project-id", "REQUIRED", "")
 		projectDeleteAuthFlag      = projectDeleteFlags.String("auth", "REQUIRED", "")
 
-		projectUploadMediaFlags             = flag.NewFlagSet("upload- media", flag.ExitOnError)
-		projectUploadMediaProjectIDFlag     = projectUploadMediaFlags.String("project-id", "REQUIRED", "")
-		projectUploadMediaContentTypeFlag   = projectUploadMediaFlags.String("content-type", "REQUIRED", "")
-		projectUploadMediaContentLengthFlag = projectUploadMediaFlags.String("content-length", "REQUIRED", "")
-		projectUploadMediaAuthFlag          = projectUploadMediaFlags.String("auth", "REQUIRED", "")
-		projectUploadMediaStreamFlag        = projectUploadMediaFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
+		projectUploadPhotoFlags             = flag.NewFlagSet("upload- photo", flag.ExitOnError)
+		projectUploadPhotoProjectIDFlag     = projectUploadPhotoFlags.String("project-id", "REQUIRED", "")
+		projectUploadPhotoContentTypeFlag   = projectUploadPhotoFlags.String("content-type", "REQUIRED", "")
+		projectUploadPhotoContentLengthFlag = projectUploadPhotoFlags.String("content-length", "REQUIRED", "")
+		projectUploadPhotoAuthFlag          = projectUploadPhotoFlags.String("auth", "REQUIRED", "")
+		projectUploadPhotoStreamFlag        = projectUploadPhotoFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
 
-		projectDownloadMediaFlags         = flag.NewFlagSet("download- media", flag.ExitOnError)
-		projectDownloadMediaProjectIDFlag = projectDownloadMediaFlags.String("project-id", "REQUIRED", "")
+		projectDownloadPhotoFlags         = flag.NewFlagSet("download- photo", flag.ExitOnError)
+		projectDownloadPhotoProjectIDFlag = projectDownloadPhotoFlags.String("project-id", "REQUIRED", "")
+		projectDownloadPhotoAuthFlag      = projectDownloadPhotoFlags.String("auth", "REQUIRED", "")
 
 		recordsFlags = flag.NewFlagSet("records", flag.ContinueOnError)
 
@@ -320,9 +321,9 @@ func ParseEndpoint(
 		stationListProjectIDFlag   = stationListProjectFlags.String("id", "REQUIRED", "")
 		stationListProjectAuthFlag = stationListProjectFlags.String("auth", "REQUIRED", "")
 
-		stationPhotoFlags    = flag.NewFlagSet("photo", flag.ExitOnError)
-		stationPhotoIDFlag   = stationPhotoFlags.String("id", "REQUIRED", "")
-		stationPhotoAuthFlag = stationPhotoFlags.String("auth", "REQUIRED", "")
+		stationDownloadPhotoFlags         = flag.NewFlagSet("download- photo", flag.ExitOnError)
+		stationDownloadPhotoStationIDFlag = stationDownloadPhotoFlags.String("station-id", "REQUIRED", "")
+		stationDownloadPhotoAuthFlag      = stationDownloadPhotoFlags.String("auth", "REQUIRED", "")
 
 		stationListAllFlags        = flag.NewFlagSet("list- all", flag.ExitOnError)
 		stationListAllPageFlag     = stationListAllFlags.String("page", "", "")
@@ -470,8 +471,8 @@ func ParseEndpoint(
 	projectAddStationFlags.Usage = projectAddStationUsage
 	projectRemoveStationFlags.Usage = projectRemoveStationUsage
 	projectDeleteFlags.Usage = projectDeleteUsage
-	projectUploadMediaFlags.Usage = projectUploadMediaUsage
-	projectDownloadMediaFlags.Usage = projectDownloadMediaUsage
+	projectUploadPhotoFlags.Usage = projectUploadPhotoUsage
+	projectDownloadPhotoFlags.Usage = projectDownloadPhotoUsage
 
 	recordsFlags.Usage = recordsUsage
 	recordsDataFlags.Usage = recordsDataUsage
@@ -492,7 +493,7 @@ func ParseEndpoint(
 	stationUpdateFlags.Usage = stationUpdateUsage
 	stationListMineFlags.Usage = stationListMineUsage
 	stationListProjectFlags.Usage = stationListProjectUsage
-	stationPhotoFlags.Usage = stationPhotoUsage
+	stationDownloadPhotoFlags.Usage = stationDownloadPhotoUsage
 	stationListAllFlags.Usage = stationListAllUsage
 	stationDeleteFlags.Usage = stationDeleteUsage
 
@@ -723,11 +724,11 @@ func ParseEndpoint(
 			case "delete":
 				epf = projectDeleteFlags
 
-			case "upload- media":
-				epf = projectUploadMediaFlags
+			case "upload- photo":
+				epf = projectUploadPhotoFlags
 
-			case "download- media":
-				epf = projectDownloadMediaFlags
+			case "download- photo":
+				epf = projectDownloadPhotoFlags
 
 			}
 
@@ -781,8 +782,8 @@ func ParseEndpoint(
 			case "list- project":
 				epf = stationListProjectFlags
 
-			case "photo":
-				epf = stationPhotoFlags
+			case "download- photo":
+				epf = stationDownloadPhotoFlags
 
 			case "list- all":
 				epf = stationListAllFlags
@@ -1035,15 +1036,15 @@ func ParseEndpoint(
 			case "delete":
 				endpoint = c.Delete()
 				data, err = projectc.BuildDeletePayload(*projectDeleteProjectIDFlag, *projectDeleteAuthFlag)
-			case "upload- media":
-				endpoint = c.UploadMedia()
-				data, err = projectc.BuildUploadMediaPayload(*projectUploadMediaProjectIDFlag, *projectUploadMediaContentTypeFlag, *projectUploadMediaContentLengthFlag, *projectUploadMediaAuthFlag)
+			case "upload- photo":
+				endpoint = c.UploadPhoto()
+				data, err = projectc.BuildUploadPhotoPayload(*projectUploadPhotoProjectIDFlag, *projectUploadPhotoContentTypeFlag, *projectUploadPhotoContentLengthFlag, *projectUploadPhotoAuthFlag)
 				if err == nil {
-					data, err = projectc.BuildUploadMediaStreamPayload(data, *projectUploadMediaStreamFlag)
+					data, err = projectc.BuildUploadPhotoStreamPayload(data, *projectUploadPhotoStreamFlag)
 				}
-			case "download- media":
-				endpoint = c.DownloadMedia()
-				data, err = projectc.BuildDownloadMediaPayload(*projectDownloadMediaProjectIDFlag)
+			case "download- photo":
+				endpoint = c.DownloadPhoto()
+				data, err = projectc.BuildDownloadPhotoPayload(*projectDownloadPhotoProjectIDFlag, *projectDownloadPhotoAuthFlag)
 			}
 		case "records":
 			c := recordsc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -1096,9 +1097,9 @@ func ParseEndpoint(
 			case "list- project":
 				endpoint = c.ListProject()
 				data, err = stationc.BuildListProjectPayload(*stationListProjectIDFlag, *stationListProjectAuthFlag)
-			case "photo":
-				endpoint = c.Photo()
-				data, err = stationc.BuildPhotoPayload(*stationPhotoIDFlag, *stationPhotoAuthFlag)
+			case "download- photo":
+				endpoint = c.DownloadPhoto()
+				data, err = stationc.BuildDownloadPhotoPayload(*stationDownloadPhotoStationIDFlag, *stationDownloadPhotoAuthFlag)
 			case "list- all":
 				endpoint = c.ListAll()
 				data, err = stationc.BuildListAllPayload(*stationListAllPageFlag, *stationListAllPageSizeFlag, *stationListAllOwnerIDFlag, *stationListAllQueryFlag, *stationListAllSortByFlag, *stationListAllAuthFlag)
@@ -1646,8 +1647,8 @@ COMMAND:
     add- station: AddStation implements add station.
     remove- station: RemoveStation implements remove station.
     delete: Delete implements delete.
-    upload- media: UploadMedia implements upload media.
-    download- media: DownloadMedia implements download media.
+    upload- photo: UploadPhoto implements upload photo.
+    download- photo: DownloadPhoto implements download photo.
 
 Additional help:
     %s project COMMAND --help
@@ -1889,10 +1890,10 @@ Example:
 `, os.Args[0])
 }
 
-func projectUploadMediaUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] project upload- media -project-id INT32 -content-type STRING -content-length INT64 -auth STRING -stream STRING
+func projectUploadPhotoUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] project upload- photo -project-id INT32 -content-type STRING -content-length INT64 -auth STRING -stream STRING
 
-UploadMedia implements upload media.
+UploadPhoto implements upload photo.
     -project-id INT32: 
     -content-type STRING: 
     -content-length INT64: 
@@ -1900,18 +1901,19 @@ UploadMedia implements upload media.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` project upload- media --project-id 1178378676 --content-type "Qui sed." --content-length 4712243829337867207 --auth "Dolore sed libero." --stream "goa.png"
+    `+os.Args[0]+` project upload- photo --project-id 1178378676 --content-type "Qui sed." --content-length 4712243829337867207 --auth "Dolore sed libero." --stream "goa.png"
 `, os.Args[0])
 }
 
-func projectDownloadMediaUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] project download- media -project-id INT32
+func projectDownloadPhotoUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] project download- photo -project-id INT32 -auth STRING
 
-DownloadMedia implements download media.
+DownloadPhoto implements download photo.
     -project-id INT32: 
+    -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project download- media --project-id 2029038510
+    `+os.Args[0]+` project download- photo --project-id 2029038510 --auth "Saepe ratione aut."
 `, os.Args[0])
 }
 
@@ -2059,7 +2061,7 @@ COMMAND:
     update: Update implements update.
     list- mine: ListMine implements list mine.
     list- project: ListProject implements list project.
-    photo: Photo implements photo.
+    download- photo: DownloadPhoto implements download photo.
     list- all: ListAll implements list all.
     delete: Delete implements delete.
 
@@ -2136,15 +2138,15 @@ Example:
 `, os.Args[0])
 }
 
-func stationPhotoUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station photo -id INT32 -auth STRING
+func stationDownloadPhotoUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station download- photo -station-id INT32 -auth STRING
 
-Photo implements photo.
-    -id INT32: 
+DownloadPhoto implements download photo.
+    -station-id INT32: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station photo --id 163950966 --auth "Aperiam consequatur aliquam dolorum explicabo."
+    `+os.Args[0]+` station download- photo --station-id 163950966 --auth "Aperiam consequatur aliquam dolorum explicabo."
 `, os.Args[0])
 }
 
@@ -2160,7 +2162,7 @@ ListAll implements list all.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- all --page 2095412820 --page-size 1217195507 --owner-id 644676979 --query "Dolorem repellendus." --sort-by "Dolorum fugiat distinctio ut quos." --auth "Occaecati sint voluptatem perferendis reprehenderit."
+    `+os.Args[0]+` station list- all --page 1053597584 --page-size 1978512324 --owner-id 358771488 --query "Dicta modi quam dolorem." --sort-by "Quo aut." --auth "Eum ut."
 `, os.Args[0])
 }
 
@@ -2172,7 +2174,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station delete --station-id 1778730953 --auth "Eos molestiae."
+    `+os.Args[0]+` station delete --station-id 1701843080 --auth "Assumenda nostrum."
 `, os.Args[0])
 }
 
@@ -2221,7 +2223,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 5382302037333769966
+    `+os.Args[0]+` test get --id 5444067400592158562
 `, os.Args[0])
 }
 
@@ -2243,7 +2245,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Autem ratione." --auth "Debitis enim aut aut."
+    `+os.Args[0]+` test email --address "Omnis tempore." --auth "Ut aut."
 `, os.Args[0])
 }
 
@@ -2285,7 +2287,7 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Dolorum maiores."
+    `+os.Args[0]+` user roles --auth "Aut consectetur facere et eligendi ut culpa."
 `, os.Args[0])
 }
 
@@ -2297,7 +2299,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user delete --user-id 502612197 --auth "Et eum qui quidem."
+    `+os.Args[0]+` user delete --user-id 1570944135 --auth "Amet aut aperiam."
 `, os.Args[0])
 }
 
@@ -2311,7 +2313,7 @@ UploadPhoto implements upload photo.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` user upload- photo --content-type "Minima omnis magni porro deserunt." --content-length 4762538191105177287 --auth "Quia illo voluptas quam totam quas voluptatem." --stream "goa.png"
+    `+os.Args[0]+` user upload- photo --content-type "Doloremque ut placeat possimus assumenda autem non." --content-length 6116845486724025535 --auth "Qui occaecati et ipsam." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -2322,7 +2324,7 @@ DownloadPhoto implements download photo.
     -user-id INT32: 
 
 Example:
-    `+os.Args[0]+` user download- photo --user-id 313679737
+    `+os.Args[0]+` user download- photo --user-id 973288802
 `, os.Args[0])
 }
 
@@ -2334,8 +2336,8 @@ Login implements login.
 
 Example:
     `+os.Args[0]+` user login --body '{
-      "email": "korbin.schuppe@fadel.net",
-      "password": "cw9"
+      "email": "arturo@conn.info",
+      "password": "h01"
    }'
 `, os.Args[0])
 }
@@ -2348,7 +2350,7 @@ RecoveryLookup implements recovery lookup.
 
 Example:
     `+os.Args[0]+` user recovery- lookup --body '{
-      "email": "Libero fugiat non."
+      "email": "Quibusdam quis rerum reiciendis enim reprehenderit."
    }'
 `, os.Args[0])
 }
@@ -2361,8 +2363,8 @@ Recovery implements recovery.
 
 Example:
     `+os.Args[0]+` user recovery --body '{
-      "password": "eoe",
-      "token": "Quia autem ut."
+      "password": "e60",
+      "token": "Exercitationem veritatis."
    }'
 `, os.Args[0])
 }
@@ -2374,7 +2376,7 @@ Logout implements logout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user logout --auth "Et consectetur voluptas."
+    `+os.Args[0]+` user logout --auth "Pariatur voluptatem accusantium cupiditate autem voluptate."
 `, os.Args[0])
 }
 
@@ -2386,7 +2388,7 @@ Refresh implements refresh.
 
 Example:
     `+os.Args[0]+` user refresh --body '{
-      "refreshToken": "Nihil est commodi omnis nihil fugiat."
+      "refreshToken": "Earum veritatis."
    }'
 `, os.Args[0])
 }
@@ -2398,7 +2400,7 @@ SendValidation implements send validation.
     -user-id INT32: 
 
 Example:
-    `+os.Args[0]+` user send- validation --user-id 1237848055
+    `+os.Args[0]+` user send- validation --user-id 1173335978
 `, os.Args[0])
 }
 
@@ -2409,7 +2411,7 @@ Validate implements validate.
     -token STRING: 
 
 Example:
-    `+os.Args[0]+` user validate --token "Quam quos accusamus laborum."
+    `+os.Args[0]+` user validate --token "Soluta aperiam qui aut nihil est commodi."
 `, os.Args[0])
 }
 
@@ -2448,7 +2450,7 @@ Example:
       "private": false,
       "startTime": "Eius reprehenderit.",
       "tags": "Sunt qui sit."
-   }' --user-id 1325042098 --auth "Impedit qui."
+   }' --user-id 224076294 --auth "Quibusdam animi maiores explicabo temporibus."
 `, os.Args[0])
 }
 
@@ -2462,9 +2464,9 @@ ChangePassword implements change password.
 
 Example:
     `+os.Args[0]+` user change- password --body '{
-      "newPassword": "6s1",
-      "oldPassword": "4f1"
-   }' --user-id 1917285403 --auth "Rerum sit at."
+      "newPassword": "920",
+      "oldPassword": "oeb"
+   }' --user-id 1905525852 --auth "Quas sint qui numquam et accusantium aspernatur."
 `, os.Args[0])
 }
 
@@ -2475,7 +2477,7 @@ GetCurrent implements get current.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user get- current --auth "In dignissimos."
+    `+os.Args[0]+` user get- current --auth "Hic quia commodi nihil mollitia sit."
 `, os.Args[0])
 }
 
@@ -2487,7 +2489,7 @@ ListByProject implements list by project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user list- by- project --project-id 2074047860 --auth "Qui quis velit voluptatum."
+    `+os.Args[0]+` user list- by- project --project-id 1316511536 --auth "Quibusdam qui est."
 `, os.Args[0])
 }
 
@@ -2498,7 +2500,7 @@ IssueTransmissionToken implements issue transmission token.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user issue- transmission- token --auth "Beatae dignissimos incidunt quibusdam corrupti."
+    `+os.Args[0]+` user issue- transmission- token --auth "Dicta magni consequuntur aut placeat aut."
 `, os.Args[0])
 }
 
@@ -2523,6 +2525,6 @@ Example:
     `+os.Args[0]+` user admin- delete --body '{
       "email": "Consectetur at voluptatem deserunt illum eos.",
       "password": "Animi explicabo quis similique nisi."
-   }' --auth "Beatae doloremque sit."
+   }' --auth "Eos molestiae adipisci dolorem voluptatem officia et."
 `, os.Args[0])
 }

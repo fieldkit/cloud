@@ -680,7 +680,7 @@ func (c *ProjectService) RejectInvite(ctx context.Context, payload *project.Reje
 	return nil
 }
 
-func (s *ProjectService) UploadMedia(ctx context.Context, payload *project.UploadMediaPayload, body io.ReadCloser) error {
+func (s *ProjectService) UploadPhoto(ctx context.Context, payload *project.UploadPhotoPayload, body io.ReadCloser) error {
 	p, err := NewPermissions(ctx, s.options).Unwrap()
 	if err != nil {
 		return err
@@ -706,7 +706,7 @@ func (s *ProjectService) UploadMedia(ctx context.Context, payload *project.Uploa
 	return nil
 }
 
-func (s *ProjectService) DownloadMedia(ctx context.Context, payload *project.DownloadMediaPayload) (*project.DownloadMediaResult, io.ReadCloser, error) {
+func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.DownloadPhotoPayload) (*project.DownloadPhotoResult, io.ReadCloser, error) {
 	resource := &data.Project{}
 	if err := s.options.Database.GetContext(ctx, resource, `
 		SELECT media_url, media_content_type FROM fieldkit.project WHERE id = $1
@@ -725,7 +725,7 @@ func (s *ProjectService) DownloadMedia(ctx context.Context, payload *project.Dow
 		return nil, nil, project.NotFound("not found")
 	}
 
-	return &project.DownloadMediaResult{
+	return &project.DownloadPhotoResult{
 		Length:      int64(lm.Size),
 		ContentType: *resource.MediaContentType,
 	}, ioutil.NopCloser(lm.Reader), nil

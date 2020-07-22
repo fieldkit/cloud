@@ -16,27 +16,27 @@ import (
 
 // Client is the "station" service client.
 type Client struct {
-	AddEndpoint         goa.Endpoint
-	GetEndpoint         goa.Endpoint
-	UpdateEndpoint      goa.Endpoint
-	ListMineEndpoint    goa.Endpoint
-	ListProjectEndpoint goa.Endpoint
-	PhotoEndpoint       goa.Endpoint
-	ListAllEndpoint     goa.Endpoint
-	DeleteEndpoint      goa.Endpoint
+	AddEndpoint           goa.Endpoint
+	GetEndpoint           goa.Endpoint
+	UpdateEndpoint        goa.Endpoint
+	ListMineEndpoint      goa.Endpoint
+	ListProjectEndpoint   goa.Endpoint
+	DownloadPhotoEndpoint goa.Endpoint
+	ListAllEndpoint       goa.Endpoint
+	DeleteEndpoint        goa.Endpoint
 }
 
 // NewClient initializes a "station" service client given the endpoints.
-func NewClient(add, get, update, listMine, listProject, photo, listAll, delete_ goa.Endpoint) *Client {
+func NewClient(add, get, update, listMine, listProject, downloadPhoto, listAll, delete_ goa.Endpoint) *Client {
 	return &Client{
-		AddEndpoint:         add,
-		GetEndpoint:         get,
-		UpdateEndpoint:      update,
-		ListMineEndpoint:    listMine,
-		ListProjectEndpoint: listProject,
-		PhotoEndpoint:       photo,
-		ListAllEndpoint:     listAll,
-		DeleteEndpoint:      delete_,
+		AddEndpoint:           add,
+		GetEndpoint:           get,
+		UpdateEndpoint:        update,
+		ListMineEndpoint:      listMine,
+		ListProjectEndpoint:   listProject,
+		DownloadPhotoEndpoint: downloadPhoto,
+		ListAllEndpoint:       listAll,
+		DeleteEndpoint:        delete_,
 	}
 }
 
@@ -90,14 +90,14 @@ func (c *Client) ListProject(ctx context.Context, p *ListProjectPayload) (res *S
 	return ires.(*StationsFull), nil
 }
 
-// Photo calls the "photo" endpoint of the "station" service.
-func (c *Client) Photo(ctx context.Context, p *PhotoPayload) (res *PhotoResult, resp io.ReadCloser, err error) {
+// DownloadPhoto calls the "download photo" endpoint of the "station" service.
+func (c *Client) DownloadPhoto(ctx context.Context, p *DownloadPhotoPayload) (res *DownloadPhotoResult, resp io.ReadCloser, err error) {
 	var ires interface{}
-	ires, err = c.PhotoEndpoint(ctx, p)
+	ires, err = c.DownloadPhotoEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	o := ires.(*PhotoResponseData)
+	o := ires.(*DownloadPhotoResponseData)
 	return o.Result, o.Body, nil
 }
 

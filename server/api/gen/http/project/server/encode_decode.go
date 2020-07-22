@@ -2002,18 +2002,18 @@ func EncodeDeleteError(encoder func(context.Context, http.ResponseWriter) goahtt
 	}
 }
 
-// EncodeUploadMediaResponse returns an encoder for responses returned by the
-// project upload media endpoint.
-func EncodeUploadMediaResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeUploadPhotoResponse returns an encoder for responses returned by the
+// project upload photo endpoint.
+func EncodeUploadPhotoResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		w.WriteHeader(http.StatusOK)
 		return nil
 	}
 }
 
-// DecodeUploadMediaRequest returns a decoder for requests sent to the project
-// upload media endpoint.
-func DecodeUploadMediaRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+// DecodeUploadPhotoRequest returns a decoder for requests sent to the project
+// upload photo endpoint.
+func DecodeUploadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			projectID     int32
@@ -2054,7 +2054,7 @@ func DecodeUploadMediaRequest(mux goahttp.Muxer, decoder func(*http.Request) goa
 		if err != nil {
 			return nil, err
 		}
-		payload := NewUploadMediaPayload(projectID, contentType, contentLength, auth)
+		payload := NewUploadPhotoPayload(projectID, contentType, contentLength, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
@@ -2065,9 +2065,9 @@ func DecodeUploadMediaRequest(mux goahttp.Muxer, decoder func(*http.Request) goa
 	}
 }
 
-// EncodeUploadMediaError returns an encoder for errors returned by the upload
-// media project endpoint.
-func EncodeUploadMediaError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeUploadPhotoError returns an encoder for errors returned by the upload
+// photo project endpoint.
+func EncodeUploadPhotoError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		en, ok := v.(ErrorNamer)
@@ -2082,7 +2082,7 @@ func EncodeUploadMediaError(encoder func(context.Context, http.ResponseWriter) g
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUploadMediaBadRequestResponseBody(res)
+				body = NewUploadPhotoBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
@@ -2094,7 +2094,7 @@ func EncodeUploadMediaError(encoder func(context.Context, http.ResponseWriter) g
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUploadMediaForbiddenResponseBody(res)
+				body = NewUploadPhotoForbiddenResponseBody(res)
 			}
 			w.Header().Set("goa-error", "forbidden")
 			w.WriteHeader(http.StatusForbidden)
@@ -2106,7 +2106,7 @@ func EncodeUploadMediaError(encoder func(context.Context, http.ResponseWriter) g
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUploadMediaNotFoundResponseBody(res)
+				body = NewUploadPhotoNotFoundResponseBody(res)
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
@@ -2118,7 +2118,7 @@ func EncodeUploadMediaError(encoder func(context.Context, http.ResponseWriter) g
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUploadMediaUnauthorizedResponseBody(res)
+				body = NewUploadPhotoUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", "unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)
@@ -2129,11 +2129,11 @@ func EncodeUploadMediaError(encoder func(context.Context, http.ResponseWriter) g
 	}
 }
 
-// EncodeDownloadMediaResponse returns an encoder for responses returned by the
-// project download media endpoint.
-func EncodeDownloadMediaResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeDownloadPhotoResponse returns an encoder for responses returned by the
+// project download photo endpoint.
+func EncodeDownloadPhotoResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*project.DownloadMediaResult)
+		res := v.(*project.DownloadPhotoResult)
 		val := res.Length
 		lengths := strconv.FormatInt(val, 10)
 		w.Header().Set("Content-Length", lengths)
@@ -2143,12 +2143,13 @@ func EncodeDownloadMediaResponse(encoder func(context.Context, http.ResponseWrit
 	}
 }
 
-// DecodeDownloadMediaRequest returns a decoder for requests sent to the
-// project download media endpoint.
-func DecodeDownloadMediaRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+// DecodeDownloadPhotoRequest returns a decoder for requests sent to the
+// project download photo endpoint.
+func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			projectID int32
+			auth      string
 			err       error
 
 			params = mux.Vars(r)
@@ -2161,18 +2162,27 @@ func DecodeDownloadMediaRequest(mux goahttp.Muxer, decoder func(*http.Request) g
 			}
 			projectID = int32(v)
 		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
 		if err != nil {
 			return nil, err
 		}
-		payload := NewDownloadMediaPayload(projectID)
+		payload := NewDownloadPhotoPayload(projectID, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
 
 		return payload, nil
 	}
 }
 
-// EncodeDownloadMediaError returns an encoder for errors returned by the
-// download media project endpoint.
-func EncodeDownloadMediaError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeDownloadPhotoError returns an encoder for errors returned by the
+// download photo project endpoint.
+func EncodeDownloadPhotoError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		en, ok := v.(ErrorNamer)
@@ -2187,7 +2197,7 @@ func EncodeDownloadMediaError(encoder func(context.Context, http.ResponseWriter)
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewDownloadMediaBadRequestResponseBody(res)
+				body = NewDownloadPhotoBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
@@ -2199,7 +2209,7 @@ func EncodeDownloadMediaError(encoder func(context.Context, http.ResponseWriter)
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewDownloadMediaForbiddenResponseBody(res)
+				body = NewDownloadPhotoForbiddenResponseBody(res)
 			}
 			w.Header().Set("goa-error", "forbidden")
 			w.WriteHeader(http.StatusForbidden)
@@ -2211,7 +2221,7 @@ func EncodeDownloadMediaError(encoder func(context.Context, http.ResponseWriter)
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewDownloadMediaNotFoundResponseBody(res)
+				body = NewDownloadPhotoNotFoundResponseBody(res)
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
@@ -2223,7 +2233,7 @@ func EncodeDownloadMediaError(encoder func(context.Context, http.ResponseWriter)
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewDownloadMediaUnauthorizedResponseBody(res)
+				body = NewDownloadPhotoUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", "unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)

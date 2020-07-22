@@ -344,36 +344,36 @@ func (c *StationService) Delete(ctx context.Context, payload *station.DeletePayl
 	return sr.Delete(ctx, payload.StationID)
 }
 
-func (c *StationService) Photo(ctx context.Context, payload *station.PhotoPayload) (*station.PhotoResult, io.ReadCloser, error) {
+func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.DownloadPhotoPayload) (*station.DownloadPhotoResult, io.ReadCloser, error) {
 	x := uint(124)
 	y := uint(100)
 
 	allMedia := []*data.FieldNoteMedia{}
 	if err := c.options.Database.SelectContext(ctx, &allMedia, `
 		SELECT * FROM fieldkit.notes_media WHERE station_id = $1 ORDER BY created_at DESC
-		`, payload.ID); err != nil {
-		return defaultPhoto(payload.ID)
+		`, payload.StationID); err != nil {
+		return defaultPhoto(payload.StationID)
 	}
 
 	if len(allMedia) == 0 {
-		return defaultPhoto(payload.ID)
+		return defaultPhoto(payload.StationID)
 	}
 
 	mr := repositories.NewMediaRepository(c.options.MediaFiles)
 
 	lm, err := mr.LoadByURL(ctx, allMedia[0].URL)
 	if err != nil {
-		return defaultPhoto(payload.ID)
+		return defaultPhoto(payload.StationID)
 	}
 
 	original, _, err := image.Decode(lm.Reader)
 	if err != nil {
-		return defaultPhoto(payload.ID)
+		return defaultPhoto(payload.StationID)
 	}
 
 	cropped, err := smartCrop(original, x, y)
 	if err != nil {
-		return defaultPhoto(payload.ID)
+		return defaultPhoto(payload.StationID)
 	}
 
 	options := jpeg.Options{
@@ -385,7 +385,7 @@ func (c *StationService) Photo(ctx context.Context, payload *station.PhotoPayloa
 		return nil, nil, err
 	}
 
-	return &station.PhotoResult{
+	return &station.DownloadPhotoResult{
 		Length:      int64(len(buf.Bytes())),
 		ContentType: "image/jpg",
 	}, ioutil.NopCloser(buf), nil
@@ -599,7 +599,7 @@ func transformAllStationFull(p Permissions, sfs []*data.StationFull) ([]*station
 	return stations, nil
 }
 
-func defaultPhoto(id int32) (*station.PhotoResult, io.ReadCloser, error) {
+func defaultPhoto(id int32) (*station.DownloadPhotoResult, io.ReadCloser, error) {
 	defaultPhotoContentType := "image/png"
 	defaultPhoto, err := StationDefaultPicture(int64(id))
 	if err != nil {
@@ -607,7 +607,7 @@ func defaultPhoto(id int32) (*station.PhotoResult, io.ReadCloser, error) {
 		return nil, nil, err
 	}
 
-	return &station.PhotoResult{
+	return &station.DownloadPhotoResult{
 		ContentType: defaultPhotoContentType,
 		Length:      int64(len(defaultPhoto)),
 	}, ioutil.NopCloser(bytes.NewBuffer(defaultPhoto)), nil

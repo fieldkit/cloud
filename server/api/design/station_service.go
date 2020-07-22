@@ -300,7 +300,7 @@ var _ = Service("station", func() {
 		})
 	})
 
-	Method("photo", func() {
+	Method("download photo", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
 		})
@@ -308,25 +308,25 @@ var _ = Service("station", func() {
 		Payload(func() {
 			Token("auth")
 			Required("auth")
-			Attribute("id", Int32)
-			Required("id")
+			Attribute("stationId", Int32)
+			Required("stationId")
 		})
 
 		Result(func() {
 			Attribute("length", Int64)
 			Required("length")
-			Attribute("content_type", String)
-			Required("content_type")
+			Attribute("contentType", String)
+			Required("contentType")
 		})
 
 		HTTP(func() {
-			GET("stations/{id}/photo")
+			GET("stations/{stationId}/photo")
 
 			SkipResponseBodyEncodeDecode()
 
 			Response(func() {
 				Header("length:Content-Length")
-				Header("content_type:Content-Type")
+				Header("contentType:Content-Type")
 			})
 
 			httpAuthentication()

@@ -204,21 +204,21 @@ type ListProjectNotFoundResponseBody string
 // "list project" endpoint HTTP response body for the "unauthorized" error.
 type ListProjectUnauthorizedResponseBody string
 
-// PhotoBadRequestResponseBody is the type of the "station" service "photo"
-// endpoint HTTP response body for the "bad-request" error.
-type PhotoBadRequestResponseBody string
+// DownloadPhotoBadRequestResponseBody is the type of the "station" service
+// "download photo" endpoint HTTP response body for the "bad-request" error.
+type DownloadPhotoBadRequestResponseBody string
 
-// PhotoForbiddenResponseBody is the type of the "station" service "photo"
-// endpoint HTTP response body for the "forbidden" error.
-type PhotoForbiddenResponseBody string
+// DownloadPhotoForbiddenResponseBody is the type of the "station" service
+// "download photo" endpoint HTTP response body for the "forbidden" error.
+type DownloadPhotoForbiddenResponseBody string
 
-// PhotoNotFoundResponseBody is the type of the "station" service "photo"
-// endpoint HTTP response body for the "not-found" error.
-type PhotoNotFoundResponseBody string
+// DownloadPhotoNotFoundResponseBody is the type of the "station" service
+// "download photo" endpoint HTTP response body for the "not-found" error.
+type DownloadPhotoNotFoundResponseBody string
 
-// PhotoUnauthorizedResponseBody is the type of the "station" service "photo"
-// endpoint HTTP response body for the "unauthorized" error.
-type PhotoUnauthorizedResponseBody string
+// DownloadPhotoUnauthorizedResponseBody is the type of the "station" service
+// "download photo" endpoint HTTP response body for the "unauthorized" error.
+type DownloadPhotoUnauthorizedResponseBody string
 
 // ListAllBadRequestResponseBody is the type of the "station" service "list
 // all" endpoint HTTP response body for the "bad-request" error.
@@ -670,37 +670,40 @@ func NewListProjectUnauthorized(body ListProjectUnauthorizedResponseBody) statio
 	return v
 }
 
-// NewPhotoResultOK builds a "station" service "photo" endpoint result from a
-// HTTP "OK" response.
-func NewPhotoResultOK(length int64, contentType string) *station.PhotoResult {
-	v := &station.PhotoResult{}
+// NewDownloadPhotoResultOK builds a "station" service "download photo"
+// endpoint result from a HTTP "OK" response.
+func NewDownloadPhotoResultOK(length int64, contentType string) *station.DownloadPhotoResult {
+	v := &station.DownloadPhotoResult{}
 	v.Length = length
 	v.ContentType = contentType
 
 	return v
 }
 
-// NewPhotoBadRequest builds a station service photo endpoint bad-request error.
-func NewPhotoBadRequest(body PhotoBadRequestResponseBody) station.BadRequest {
+// NewDownloadPhotoBadRequest builds a station service download photo endpoint
+// bad-request error.
+func NewDownloadPhotoBadRequest(body DownloadPhotoBadRequestResponseBody) station.BadRequest {
 	v := station.BadRequest(body)
 	return v
 }
 
-// NewPhotoForbidden builds a station service photo endpoint forbidden error.
-func NewPhotoForbidden(body PhotoForbiddenResponseBody) station.Forbidden {
+// NewDownloadPhotoForbidden builds a station service download photo endpoint
+// forbidden error.
+func NewDownloadPhotoForbidden(body DownloadPhotoForbiddenResponseBody) station.Forbidden {
 	v := station.Forbidden(body)
 	return v
 }
 
-// NewPhotoNotFound builds a station service photo endpoint not-found error.
-func NewPhotoNotFound(body PhotoNotFoundResponseBody) station.NotFound {
+// NewDownloadPhotoNotFound builds a station service download photo endpoint
+// not-found error.
+func NewDownloadPhotoNotFound(body DownloadPhotoNotFoundResponseBody) station.NotFound {
 	v := station.NotFound(body)
 	return v
 }
 
-// NewPhotoUnauthorized builds a station service photo endpoint unauthorized
-// error.
-func NewPhotoUnauthorized(body PhotoUnauthorizedResponseBody) station.Unauthorized {
+// NewDownloadPhotoUnauthorized builds a station service download photo
+// endpoint unauthorized error.
+func NewDownloadPhotoUnauthorized(body DownloadPhotoUnauthorizedResponseBody) station.Unauthorized {
 	v := station.Unauthorized(body)
 	return v
 }

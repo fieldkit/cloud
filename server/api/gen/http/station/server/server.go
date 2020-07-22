@@ -21,16 +21,16 @@ import (
 
 // Server lists the station service endpoint HTTP handlers.
 type Server struct {
-	Mounts      []*MountPoint
-	Add         http.Handler
-	Get         http.Handler
-	Update      http.Handler
-	ListMine    http.Handler
-	ListProject http.Handler
-	Photo       http.Handler
-	ListAll     http.Handler
-	Delete      http.Handler
-	CORS        http.Handler
+	Mounts        []*MountPoint
+	Add           http.Handler
+	Get           http.Handler
+	Update        http.Handler
+	ListMine      http.Handler
+	ListProject   http.Handler
+	DownloadPhoto http.Handler
+	ListAll       http.Handler
+	Delete        http.Handler
+	CORS          http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -71,26 +71,26 @@ func New(
 			{"Update", "PATCH", "/stations/{id}"},
 			{"ListMine", "GET", "/user/stations"},
 			{"ListProject", "GET", "/projects/{id}/stations"},
-			{"Photo", "GET", "/stations/{id}/photo"},
+			{"DownloadPhoto", "GET", "/stations/{stationId}/photo"},
 			{"ListAll", "GET", "/admin/stations"},
 			{"Delete", "DELETE", "/admin/stations/{stationId}"},
 			{"CORS", "OPTIONS", "/stations"},
 			{"CORS", "OPTIONS", "/stations/{id}"},
 			{"CORS", "OPTIONS", "/user/stations"},
 			{"CORS", "OPTIONS", "/projects/{id}/stations"},
-			{"CORS", "OPTIONS", "/stations/{id}/photo"},
+			{"CORS", "OPTIONS", "/stations/{stationId}/photo"},
 			{"CORS", "OPTIONS", "/admin/stations"},
 			{"CORS", "OPTIONS", "/admin/stations/{stationId}"},
 		},
-		Add:         NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
-		Get:         NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
-		Update:      NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
-		ListMine:    NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
-		ListProject: NewListProjectHandler(e.ListProject, mux, decoder, encoder, errhandler, formatter),
-		Photo:       NewPhotoHandler(e.Photo, mux, decoder, encoder, errhandler, formatter),
-		ListAll:     NewListAllHandler(e.ListAll, mux, decoder, encoder, errhandler, formatter),
-		Delete:      NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
-		CORS:        NewCORSHandler(),
+		Add:           NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
+		Get:           NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		Update:        NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
+		ListMine:      NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
+		ListProject:   NewListProjectHandler(e.ListProject, mux, decoder, encoder, errhandler, formatter),
+		DownloadPhoto: NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
+		ListAll:       NewListAllHandler(e.ListAll, mux, decoder, encoder, errhandler, formatter),
+		Delete:        NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
+		CORS:          NewCORSHandler(),
 	}
 }
 
@@ -104,7 +104,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Update = m(s.Update)
 	s.ListMine = m(s.ListMine)
 	s.ListProject = m(s.ListProject)
-	s.Photo = m(s.Photo)
+	s.DownloadPhoto = m(s.DownloadPhoto)
 	s.ListAll = m(s.ListAll)
 	s.Delete = m(s.Delete)
 	s.CORS = m(s.CORS)
@@ -117,7 +117,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountUpdateHandler(mux, h.Update)
 	MountListMineHandler(mux, h.ListMine)
 	MountListProjectHandler(mux, h.ListProject)
-	MountPhotoHandler(mux, h.Photo)
+	MountDownloadPhotoHandler(mux, h.DownloadPhoto)
 	MountListAllHandler(mux, h.ListAll)
 	MountDeleteHandler(mux, h.Delete)
 	MountCORSHandler(mux, h.CORS)
@@ -378,21 +378,21 @@ func NewListProjectHandler(
 	})
 }
 
-// MountPhotoHandler configures the mux to serve the "station" service "photo"
-// endpoint.
-func MountPhotoHandler(mux goahttp.Muxer, h http.Handler) {
+// MountDownloadPhotoHandler configures the mux to serve the "station" service
+// "download photo" endpoint.
+func MountDownloadPhotoHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := handleStationOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/stations/{id}/photo", f)
+	mux.Handle("GET", "/stations/{stationId}/photo", f)
 }
 
-// NewPhotoHandler creates a HTTP handler which loads the HTTP request and
-// calls the "station" service "photo" endpoint.
-func NewPhotoHandler(
+// NewDownloadPhotoHandler creates a HTTP handler which loads the HTTP request
+// and calls the "station" service "download photo" endpoint.
+func NewDownloadPhotoHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -401,13 +401,13 @@ func NewPhotoHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodePhotoRequest(mux, decoder)
-		encodeResponse = EncodePhotoResponse(encoder)
-		encodeError    = EncodePhotoError(encoder, formatter)
+		decodeRequest  = DecodeDownloadPhotoRequest(mux, decoder)
+		encodeResponse = EncodeDownloadPhotoResponse(encoder)
+		encodeError    = EncodeDownloadPhotoError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "photo")
+		ctx = context.WithValue(ctx, goa.MethodKey, "download photo")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -423,7 +423,7 @@ func NewPhotoHandler(
 			}
 			return
 		}
-		o := res.(*station.PhotoResponseData)
+		o := res.(*station.DownloadPhotoResponseData)
 		defer o.Body.Close()
 		if err := encodeResponse(ctx, w, o.Result); err != nil {
 			errhandler(ctx, w, err)
@@ -553,7 +553,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/stations/{id}", f)
 	mux.Handle("OPTIONS", "/user/stations", f)
 	mux.Handle("OPTIONS", "/projects/{id}/stations", f)
-	mux.Handle("OPTIONS", "/stations/{id}/photo", f)
+	mux.Handle("OPTIONS", "/stations/{stationId}/photo", f)
 	mux.Handle("OPTIONS", "/admin/stations", f)
 	mux.Handle("OPTIONS", "/admin/stations/{stationId}", f)
 }

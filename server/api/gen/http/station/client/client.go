@@ -35,8 +35,9 @@ type Client struct {
 	// project endpoint.
 	ListProjectDoer goahttp.Doer
 
-	// Photo Doer is the HTTP client used to make requests to the photo endpoint.
-	PhotoDoer goahttp.Doer
+	// DownloadPhoto Doer is the HTTP client used to make requests to the download
+	// photo endpoint.
+	DownloadPhotoDoer goahttp.Doer
 
 	// ListAll Doer is the HTTP client used to make requests to the list all
 	// endpoint.
@@ -73,7 +74,7 @@ func NewClient(
 		UpdateDoer:          doer,
 		ListMineDoer:        doer,
 		ListProjectDoer:     doer,
-		PhotoDoer:           doer,
+		DownloadPhotoDoer:   doer,
 		ListAllDoer:         doer,
 		DeleteDoer:          doer,
 		CORSDoer:            doer,
@@ -205,15 +206,15 @@ func (c *Client) ListProject() goa.Endpoint {
 	}
 }
 
-// Photo returns an endpoint that makes HTTP requests to the station service
-// photo server.
-func (c *Client) Photo() goa.Endpoint {
+// DownloadPhoto returns an endpoint that makes HTTP requests to the station
+// service download photo server.
+func (c *Client) DownloadPhoto() goa.Endpoint {
 	var (
-		encodeRequest  = EncodePhotoRequest(c.encoder)
-		decodeResponse = DecodePhotoResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeDownloadPhotoRequest(c.encoder)
+		decodeResponse = DecodeDownloadPhotoResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildPhotoRequest(ctx, v)
+		req, err := c.BuildDownloadPhotoRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
@@ -221,16 +222,16 @@ func (c *Client) Photo() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.PhotoDoer.Do(req)
+		resp, err := c.DownloadPhotoDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("station", "photo", err)
+			return nil, goahttp.ErrRequestError("station", "download photo", err)
 		}
 		res, err := decodeResponse(resp)
 		if err != nil {
 			resp.Body.Close()
-			return nil, goahttp.ErrDecodingError("station", "photo", err)
+			return nil, goahttp.ErrDecodingError("station", "download photo", err)
 		}
-		return &station.PhotoResponseData{Result: res.(*station.PhotoResult), Body: resp.Body}, nil
+		return &station.DownloadPhotoResponseData{Result: res.(*station.DownloadPhotoResult), Body: resp.Body}, nil
 	}
 }
 

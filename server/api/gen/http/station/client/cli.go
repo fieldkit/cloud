@@ -137,25 +137,25 @@ func BuildListProjectPayload(stationListProjectID string, stationListProjectAuth
 	return v, nil
 }
 
-// BuildPhotoPayload builds the payload for the station photo endpoint from CLI
-// flags.
-func BuildPhotoPayload(stationPhotoID string, stationPhotoAuth string) (*station.PhotoPayload, error) {
+// BuildDownloadPhotoPayload builds the payload for the station download photo
+// endpoint from CLI flags.
+func BuildDownloadPhotoPayload(stationDownloadPhotoStationID string, stationDownloadPhotoAuth string) (*station.DownloadPhotoPayload, error) {
 	var err error
-	var id int32
+	var stationID int32
 	{
 		var v int64
-		v, err = strconv.ParseInt(stationPhotoID, 10, 32)
-		id = int32(v)
+		v, err = strconv.ParseInt(stationDownloadPhotoStationID, 10, 32)
+		stationID = int32(v)
 		if err != nil {
-			return nil, fmt.Errorf("invalid value for id, must be INT32")
+			return nil, fmt.Errorf("invalid value for stationID, must be INT32")
 		}
 	}
 	var auth string
 	{
-		auth = stationPhotoAuth
+		auth = stationDownloadPhotoAuth
 	}
-	v := &station.PhotoPayload{}
-	v.ID = id
+	v := &station.DownloadPhotoPayload{}
+	v.StationID = stationID
 	v.Auth = auth
 
 	return v, nil

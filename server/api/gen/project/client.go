@@ -33,12 +33,12 @@ type Client struct {
 	AddStationEndpoint    goa.Endpoint
 	RemoveStationEndpoint goa.Endpoint
 	DeleteEndpoint        goa.Endpoint
-	UploadMediaEndpoint   goa.Endpoint
-	DownloadMediaEndpoint goa.Endpoint
+	UploadPhotoEndpoint   goa.Endpoint
+	DownloadPhotoEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "project" service client given the endpoints.
-func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptInvite, rejectInvite, add, update, get, listCommunity, listMine, invite, removeUser, addStation, removeStation, delete_, uploadMedia, downloadMedia goa.Endpoint) *Client {
+func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptInvite, rejectInvite, add, update, get, listCommunity, listMine, invite, removeUser, addStation, removeStation, delete_, uploadPhoto, downloadPhoto goa.Endpoint) *Client {
 	return &Client{
 		AddUpdateEndpoint:     addUpdate,
 		DeleteUpdateEndpoint:  deleteUpdate,
@@ -57,8 +57,8 @@ func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acc
 		AddStationEndpoint:    addStation,
 		RemoveStationEndpoint: removeStation,
 		DeleteEndpoint:        delete_,
-		UploadMediaEndpoint:   uploadMedia,
-		DownloadMediaEndpoint: downloadMedia,
+		UploadPhotoEndpoint:   uploadPhoto,
+		DownloadPhotoEndpoint: downloadPhoto,
 	}
 }
 
@@ -200,19 +200,19 @@ func (c *Client) Delete(ctx context.Context, p *DeletePayload) (err error) {
 	return
 }
 
-// UploadMedia calls the "upload media" endpoint of the "project" service.
-func (c *Client) UploadMedia(ctx context.Context, p *UploadMediaPayload, req io.ReadCloser) (err error) {
-	_, err = c.UploadMediaEndpoint(ctx, &UploadMediaRequestData{Payload: p, Body: req})
+// UploadPhoto calls the "upload photo" endpoint of the "project" service.
+func (c *Client) UploadPhoto(ctx context.Context, p *UploadPhotoPayload, req io.ReadCloser) (err error) {
+	_, err = c.UploadPhotoEndpoint(ctx, &UploadPhotoRequestData{Payload: p, Body: req})
 	return
 }
 
-// DownloadMedia calls the "download media" endpoint of the "project" service.
-func (c *Client) DownloadMedia(ctx context.Context, p *DownloadMediaPayload) (res *DownloadMediaResult, resp io.ReadCloser, err error) {
+// DownloadPhoto calls the "download photo" endpoint of the "project" service.
+func (c *Client) DownloadPhoto(ctx context.Context, p *DownloadPhotoPayload) (res *DownloadPhotoResult, resp io.ReadCloser, err error) {
 	var ires interface{}
-	ires, err = c.DownloadMediaEndpoint(ctx, p)
+	ires, err = c.DownloadPhotoEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	o := ires.(*DownloadMediaResponseData)
+	o := ires.(*DownloadPhotoResponseData)
 	return o.Result, o.Body, nil
 }
