@@ -265,6 +265,76 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 	return
 }
 
+func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPayload) (*station.PageOfStations, error) {
+	sr, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	qp := &repositories.EssentialQueryParams{
+		Page:     0,
+		PageSize: 20,
+	}
+
+	if payload.Page != nil {
+		qp.Page = *payload.Page
+	}
+	if payload.PageSize != nil {
+		qp.PageSize = *payload.PageSize
+	}
+
+	dm, err := sr.QueryEssentialStations(ctx, qp)
+	if err != nil {
+		return nil, err
+	}
+
+	stationsWm := make([]*station.EssentialStation, 0)
+
+	for _, es := range dm {
+		recordingStartedAt := es.RecordingStartedAt
+		var lastIngestionAt *int64
+
+		if es.LastIngestionAt != nil {
+			jsEpoch := es.LastIngestionAt.Unix() * 1000
+			lastIngestionAt = &jsEpoch
+		}
+
+		var location *station.StationLocation = nil
+
+		if es.Location != nil {
+			location = &station.StationLocation{
+				Latitude:  es.Location.Latitude(),
+				Longitude: es.Location.Longitude(),
+			}
+		}
+
+		stationsWm = append(stationsWm, &station.EssentialStation{
+			ID:       es.ID,
+			Name:     es.Name,
+			DeviceID: hex.EncodeToString(es.DeviceID),
+			Owner: &station.StationOwner{
+				ID:   es.OwnerID,
+				Name: es.OwnerName,
+			},
+			CreatedAt:          es.CreatedAt.Unix() * 1000,
+			UpdatedAt:          es.UpdatedAt.Unix() * 1000,
+			RecordingStartedAt: recordingStartedAt,
+			MemoryUsed:         es.MemoryUsed,
+			MemoryAvailable:    es.MemoryAvailable,
+			FirmwareNumber:     es.FirmwareNumber,
+			FirmwareTime:       es.FirmwareTime,
+			Location:           location,
+			LastIngestionAt:    lastIngestionAt,
+		})
+	}
+
+	wm := &station.PageOfStations{
+		Stations: stationsWm,
+	}
+
+	return wm, nil
+}
+
 func (c *StationService) Photo(ctx context.Context, payload *station.PhotoPayload) (*station.PhotoResult, io.ReadCloser, error) {
 	x := uint(124)
 	y := uint(100)

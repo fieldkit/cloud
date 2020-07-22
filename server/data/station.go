@@ -135,3 +135,20 @@ type StationFull struct {
 	Modules        []*StationModule
 	Sensors        []*ModuleSensor
 }
+
+type EssentialStation struct {
+	ID                 int64      `db:"id"`
+	Name               string     `db:"name"`
+	DeviceID           []byte     `db:"device_id"`
+	OwnerID            int32      `db:"owner_id"`
+	OwnerName          string     `db:"owner_name"`
+	CreatedAt          time.Time  `db:"created_at,omitempty"`
+	UpdatedAt          time.Time  `db:"updated_at,omitempty"`
+	RecordingStartedAt *int64     `db:"recording_started_at"`
+	MemoryUsed         *int32     `db:"memory_used"`
+	MemoryAvailable    *int32     `db:"memory_available"`
+	FirmwareNumber     *int32     `db:"firmware_number"`
+	FirmwareTime       *int64     `db:"firmware_time"`
+	Location           *Location  `db:"location"`
+	LastIngestionAt    *time.Time `db:"last_ingestion_at,omitempty"`
+}

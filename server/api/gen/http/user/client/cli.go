@@ -108,7 +108,7 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userLoginBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"sherwood_mitchell@kuvalisbode.com\",\n      \"password\": \"3i8\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"zita.herman@zboncak.info\",\n      \"password\": \"ko4\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
@@ -138,7 +138,7 @@ func BuildRecoveryLookupPayload(userRecoveryLookupBody string) (*user.RecoveryLo
 	{
 		err = json.Unmarshal([]byte(userRecoveryLookupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Ratione nam voluptatibus et incidunt.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Deserunt quia quaerat dolores odio aut omnis.\"\n   }'")
 		}
 	}
 	v := &user.RecoveryLookupFields{
@@ -159,7 +159,7 @@ func BuildRecoveryPayload(userRecoveryBody string) (*user.RecoveryPayload, error
 	{
 		err = json.Unmarshal([]byte(userRecoveryBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"password\": \"hhf\",\n      \"token\": \"Error et nostrum quia aut voluptatum consequatur.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"password\": \"uhx\",\n      \"token\": \"Voluptatem iusto expedita molestiae.\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Password) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 10, true))
@@ -200,7 +200,7 @@ func BuildRefreshPayload(userRefreshBody string) (*user.RefreshPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userRefreshBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"refreshToken\": \"Dignissimos qui consequuntur.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"refreshToken\": \"Nemo labore ut qui animi corrupti quia.\"\n   }'")
 		}
 	}
 	v := &user.RefreshPayload{
@@ -249,7 +249,7 @@ func BuildAddPayload(userAddBody string) (*user.AddPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Consequuntur enim vitae dolor nisi.\",\n      \"meta\": \"Totam sit tempore aliquam vel.\",\n      \"module\": \"Ea non.\",\n      \"profile\": \"Quis voluptas est et explicabo.\",\n      \"url\": \"Harum aut minima omnis voluptates.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Eligendi repudiandae aut expedita iste.\",\n      \"meta\": \"Quia ad.\",\n      \"module\": \"Maxime corporis.\",\n      \"profile\": \"Nesciunt iste eius et.\",\n      \"url\": \"Omnis tempore aut maxime.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -285,7 +285,7 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateUserID string, userUpda
 	{
 		err = json.Unmarshal([]byte(userUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Dolorum et perferendis temporibus iure.\",\n      \"endTime\": \"Porro aut non quidem harum.\",\n      \"goal\": \"Veritatis est et ipsum magnam et.\",\n      \"location\": \"Sit tempora sit.\",\n      \"name\": \"Voluptas sit quis asperiores.\",\n      \"private\": true,\n      \"startTime\": \"Et sequi fugiat nemo non.\",\n      \"tags\": \"Molestias magnam harum magni in expedita aliquid.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Veniam cupiditate eos maiores.\",\n      \"endTime\": \"Eos sint officia dicta necessitatibus.\",\n      \"goal\": \"Et architecto est voluptatibus labore ut.\",\n      \"location\": \"Consequatur consectetur eveniet animi impedit laborum.\",\n      \"name\": \"Laborum dolores ullam ipsum dicta eaque.\",\n      \"private\": false,\n      \"startTime\": \"Eius reprehenderit.\",\n      \"tags\": \"Sunt qui sit.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -332,7 +332,7 @@ func BuildChangePasswordPayload(userChangePasswordBody string, userChangePasswor
 	{
 		err = json.Unmarshal([]byte(userChangePasswordBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"newPassword\": \"87l\",\n      \"oldPassword\": \"je4\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"newPassword\": \"3a7\",\n      \"oldPassword\": \"6s1\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.OldPassword) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.oldPassword", body.OldPassword, utf8.RuneCountInString(body.OldPassword), 10, true))
@@ -428,7 +428,7 @@ func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth str
 	{
 		err = json.Unmarshal([]byte(userAdminDeleteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Adipisci dolore unde maxime vero occaecati cum.\",\n      \"password\": \"Minus consequatur consequatur harum est.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Consectetur at voluptatem deserunt illum eos.\",\n      \"password\": \"Animi explicabo quis similique nisi.\"\n   }'")
 		}
 	}
 	var auth string

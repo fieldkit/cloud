@@ -23,6 +23,7 @@ type Endpoints struct {
 	ListMine    goa.Endpoint
 	ListProject goa.Endpoint
 	Photo       goa.Endpoint
+	ListAll     goa.Endpoint
 }
 
 // PhotoResponseData holds both the result and the HTTP response body reader of
@@ -45,6 +46,7 @@ func NewEndpoints(s Service) *Endpoints {
 		ListMine:    NewListMineEndpoint(s, a.JWTAuth),
 		ListProject: NewListProjectEndpoint(s, a.JWTAuth),
 		Photo:       NewPhotoEndpoint(s, a.JWTAuth),
+		ListAll:     NewListAllEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -56,6 +58,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ListMine = m(e.ListMine)
 	e.ListProject = m(e.ListProject)
 	e.Photo = m(e.Photo)
+	e.ListAll = m(e.ListAll)
 }
 
 // NewAddEndpoint returns an endpoint function that calls the method "add" of
@@ -198,5 +201,29 @@ func NewPhotoEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 			return nil, err
 		}
 		return &PhotoResponseData{Result: res, Body: body}, nil
+	}
+}
+
+// NewListAllEndpoint returns an endpoint function that calls the method "list
+// all" of service "station".
+func NewListAllEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*ListAllPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:admin"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.ListAll(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedPageOfStations(res, "default")
+		return vres, nil
 	}
 }

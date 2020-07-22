@@ -40,3 +40,8 @@ func ListProjectStationPath(id int32) string {
 func PhotoStationPath(id int32) string {
 	return fmt.Sprintf("/stations/%v/photo", id)
 }
+
+// ListAllStationPath returns the URL path to the station service list all HTTP endpoint.
+func ListAllStationPath() string {
+	return "/admin/stations"
+}

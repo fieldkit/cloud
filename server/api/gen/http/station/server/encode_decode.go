@@ -708,6 +708,154 @@ func EncodePhotoError(encoder func(context.Context, http.ResponseWriter) goahttp
 	}
 }
 
+// EncodeListAllResponse returns an encoder for responses returned by the
+// station list all endpoint.
+func EncodeListAllResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*stationviews.PageOfStations)
+		enc := encoder(ctx, w)
+		body := NewListAllResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeListAllRequest returns a decoder for requests sent to the station list
+// all endpoint.
+func DecodeListAllRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			page     *int32
+			pageSize *int32
+			ownerID  *int32
+			query    *string
+			sortBy   *string
+			auth     string
+			err      error
+		)
+		{
+			pageRaw := r.URL.Query().Get("page")
+			if pageRaw != "" {
+				v, err2 := strconv.ParseInt(pageRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("page", pageRaw, "integer"))
+				}
+				pv := int32(v)
+				page = &pv
+			}
+		}
+		{
+			pageSizeRaw := r.URL.Query().Get("pageSize")
+			if pageSizeRaw != "" {
+				v, err2 := strconv.ParseInt(pageSizeRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("pageSize", pageSizeRaw, "integer"))
+				}
+				pv := int32(v)
+				pageSize = &pv
+			}
+		}
+		{
+			ownerIDRaw := r.URL.Query().Get("ownerId")
+			if ownerIDRaw != "" {
+				v, err2 := strconv.ParseInt(ownerIDRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("ownerID", ownerIDRaw, "integer"))
+				}
+				pv := int32(v)
+				ownerID = &pv
+			}
+		}
+		queryRaw := r.URL.Query().Get("query")
+		if queryRaw != "" {
+			query = &queryRaw
+		}
+		sortByRaw := r.URL.Query().Get("sortBy")
+		if sortByRaw != "" {
+			sortBy = &sortByRaw
+		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewListAllPayload(page, pageSize, ownerID, query, sortBy, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeListAllError returns an encoder for errors returned by the list all
+// station endpoint.
+func EncodeListAllError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad-request":
+			res := v.(station.BadRequest)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListAllBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(station.Forbidden)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListAllForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(station.NotFound)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListAllNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(station.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListAllUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // marshalStationviewsStationOwnerViewToStationOwnerResponseBody builds a value
 // of type *StationOwnerResponseBody from a value of type
 // *stationviews.StationOwnerView.
@@ -928,6 +1076,33 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 	}
 	if v.Configurations != nil {
 		res.Configurations = marshalStationviewsStationConfigurationsViewToStationConfigurationsResponseBody(v.Configurations)
+	}
+	if v.Location != nil {
+		res.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(v.Location)
+	}
+
+	return res
+}
+
+// marshalStationviewsEssentialStationViewToEssentialStationResponseBody builds
+// a value of type *EssentialStationResponseBody from a value of type
+// *stationviews.EssentialStationView.
+func marshalStationviewsEssentialStationViewToEssentialStationResponseBody(v *stationviews.EssentialStationView) *EssentialStationResponseBody {
+	res := &EssentialStationResponseBody{
+		ID:                 *v.ID,
+		DeviceID:           *v.DeviceID,
+		Name:               *v.Name,
+		CreatedAt:          *v.CreatedAt,
+		UpdatedAt:          *v.UpdatedAt,
+		RecordingStartedAt: v.RecordingStartedAt,
+		MemoryUsed:         v.MemoryUsed,
+		MemoryAvailable:    v.MemoryAvailable,
+		FirmwareNumber:     v.FirmwareNumber,
+		FirmwareTime:       v.FirmwareTime,
+		LastIngestionAt:    v.LastIngestionAt,
+	}
+	if v.Owner != nil {
+		res.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(v.Owner)
 	}
 	if v.Location != nil {
 		res.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(v.Location)

@@ -156,6 +156,36 @@ var StationsFull = ResultType("application/vnd.app.stations.full", func() {
 	})
 })
 
+var EssentialStation = Type("EssentialStation", func() {
+	Attribute("id", Int64)
+	Attribute("deviceId")
+	Attribute("name")
+	Attribute("owner", Owner)
+	Attribute("createdAt", Int64)
+	Attribute("updatedAt", Int64)
+
+	Required("id", "deviceId", "name", "owner", "createdAt", "updatedAt")
+
+	Attribute("recordingStartedAt", Int64)
+	Attribute("memoryUsed", Int32)
+	Attribute("memoryAvailable", Int32)
+	Attribute("firmwareNumber", Int32)
+	Attribute("firmwareTime", Int64)
+	Attribute("location", StationLocation)
+	Attribute("lastIngestionAt", Int64)
+})
+
+var PageOfStations = ResultType("application/vnd.app.stations.essential.page", func() {
+	TypeName("PageOfStations")
+	Attributes(func() {
+		Attribute("stations", ArrayOf(EssentialStation))
+		Required("stations")
+	})
+	View("default", func() {
+		Attribute("stations")
+	})
+})
+
 var _ = Service("station", func() {
 	Method("add", func() {
 		Security(JWTAuth, func() {
@@ -297,6 +327,38 @@ var _ = Service("station", func() {
 			})
 
 			httpAuthenticationQueryString()
+		})
+	})
+
+	Method("list all", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("page", Int32)
+			Attribute("pageSize", Int32)
+			Attribute("ownerId", Int32)
+			Attribute("query", String)
+			Attribute("sortBy", String)
+		})
+
+		Result(PageOfStations)
+
+		HTTP(func() {
+			GET("admin/stations")
+
+			Params(func() {
+				Param("page")
+				Param("pageSize")
+				Param("ownerId", Int32)
+				Param("query", String)
+				Param("sortBy", String)
+			})
+
+			httpAuthentication()
 		})
 	})
 

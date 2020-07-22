@@ -22,10 +22,11 @@ type Client struct {
 	ListMineEndpoint    goa.Endpoint
 	ListProjectEndpoint goa.Endpoint
 	PhotoEndpoint       goa.Endpoint
+	ListAllEndpoint     goa.Endpoint
 }
 
 // NewClient initializes a "station" service client given the endpoints.
-func NewClient(add, get, update, listMine, listProject, photo goa.Endpoint) *Client {
+func NewClient(add, get, update, listMine, listProject, photo, listAll goa.Endpoint) *Client {
 	return &Client{
 		AddEndpoint:         add,
 		GetEndpoint:         get,
@@ -33,6 +34,7 @@ func NewClient(add, get, update, listMine, listProject, photo goa.Endpoint) *Cli
 		ListMineEndpoint:    listMine,
 		ListProjectEndpoint: listProject,
 		PhotoEndpoint:       photo,
+		ListAllEndpoint:     listAll,
 	}
 }
 
@@ -95,4 +97,14 @@ func (c *Client) Photo(ctx context.Context, p *PhotoPayload) (res *PhotoResult, 
 	}
 	o := ires.(*PhotoResponseData)
 	return o.Result, o.Body, nil
+}
+
+// ListAll calls the "list all" endpoint of the "station" service.
+func (c *Client) ListAll(ctx context.Context, p *ListAllPayload) (res *PageOfStations, err error) {
+	var ires interface{}
+	ires, err = c.ListAllEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*PageOfStations), nil
 }

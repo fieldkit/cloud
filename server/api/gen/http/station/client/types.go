@@ -117,6 +117,12 @@ type ListProjectResponseBody struct {
 	Stations StationFullCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
 }
 
+// ListAllResponseBody is the type of the "station" service "list all" endpoint
+// HTTP response body.
+type ListAllResponseBody struct {
+	Stations []*EssentialStationResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
+}
+
 // AddBadRequestResponseBody is the type of the "station" service "add"
 // endpoint HTTP response body for the "bad-request" error.
 type AddBadRequestResponseBody string
@@ -212,6 +218,22 @@ type PhotoNotFoundResponseBody string
 // PhotoUnauthorizedResponseBody is the type of the "station" service "photo"
 // endpoint HTTP response body for the "unauthorized" error.
 type PhotoUnauthorizedResponseBody string
+
+// ListAllBadRequestResponseBody is the type of the "station" service "list
+// all" endpoint HTTP response body for the "bad-request" error.
+type ListAllBadRequestResponseBody string
+
+// ListAllForbiddenResponseBody is the type of the "station" service "list all"
+// endpoint HTTP response body for the "forbidden" error.
+type ListAllForbiddenResponseBody string
+
+// ListAllNotFoundResponseBody is the type of the "station" service "list all"
+// endpoint HTTP response body for the "not-found" error.
+type ListAllNotFoundResponseBody string
+
+// ListAllUnauthorizedResponseBody is the type of the "station" service "list
+// all" endpoint HTTP response body for the "unauthorized" error.
+type ListAllUnauthorizedResponseBody string
 
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
@@ -324,6 +346,23 @@ type StationFullResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+}
+
+// EssentialStationResponseBody is used to define fields on response body types.
+type EssentialStationResponseBody struct {
+	ID                 *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	DeviceID           *string                      `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
+	Name               *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Owner              *StationOwnerResponseBody    `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
+	CreatedAt          *int64                       `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
+	UpdatedAt          *int64                       `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	RecordingStartedAt *int64                       `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
+	MemoryUsed         *int32                       `form:"memoryUsed,omitempty" json:"memoryUsed,omitempty" xml:"memoryUsed,omitempty"`
+	MemoryAvailable    *int32                       `form:"memoryAvailable,omitempty" json:"memoryAvailable,omitempty" xml:"memoryAvailable,omitempty"`
+	FirmwareNumber     *int32                       `form:"firmwareNumber,omitempty" json:"firmwareNumber,omitempty" xml:"firmwareNumber,omitempty"`
+	FirmwareTime       *int64                       `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
+	Location           *StationLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	LastIngestionAt    *int64                       `form:"lastIngestionAt,omitempty" json:"lastIngestionAt,omitempty" xml:"lastIngestionAt,omitempty"`
 }
 
 // NewAddRequestBody builds the HTTP request body from the payload of the "add"
@@ -649,6 +688,46 @@ func NewPhotoUnauthorized(body PhotoUnauthorizedResponseBody) station.Unauthoriz
 	return v
 }
 
+// NewListAllPageOfStationsOK builds a "station" service "list all" endpoint
+// result from a HTTP "OK" response.
+func NewListAllPageOfStationsOK(body *ListAllResponseBody) *stationviews.PageOfStationsView {
+	v := &stationviews.PageOfStationsView{}
+	v.Stations = make([]*stationviews.EssentialStationView, len(body.Stations))
+	for i, val := range body.Stations {
+		v.Stations[i] = unmarshalEssentialStationResponseBodyToStationviewsEssentialStationView(val)
+	}
+
+	return v
+}
+
+// NewListAllBadRequest builds a station service list all endpoint bad-request
+// error.
+func NewListAllBadRequest(body ListAllBadRequestResponseBody) station.BadRequest {
+	v := station.BadRequest(body)
+	return v
+}
+
+// NewListAllForbidden builds a station service list all endpoint forbidden
+// error.
+func NewListAllForbidden(body ListAllForbiddenResponseBody) station.Forbidden {
+	v := station.Forbidden(body)
+	return v
+}
+
+// NewListAllNotFound builds a station service list all endpoint not-found
+// error.
+func NewListAllNotFound(body ListAllNotFoundResponseBody) station.NotFound {
+	v := station.NotFound(body)
+	return v
+}
+
+// NewListAllUnauthorized builds a station service list all endpoint
+// unauthorized error.
+func NewListAllUnauthorized(body ListAllUnauthorizedResponseBody) station.Unauthorized {
+	v := station.Unauthorized(body)
+	return v
+}
+
 // ValidateStationOwnerResponseBody runs the validations defined on
 // StationOwnerResponseBody
 func ValidateStationOwnerResponseBody(body *StationOwnerResponseBody) (err error) {
@@ -922,6 +1001,40 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 	}
 	if body.Configurations != nil {
 		if err2 := ValidateStationConfigurationsResponseBody(body.Configurations); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if body.Location != nil {
+		if err2 := ValidateStationLocationResponseBody(body.Location); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateEssentialStationResponseBody runs the validations defined on
+// EssentialStationResponseBody
+func ValidateEssentialStationResponseBody(body *EssentialStationResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.DeviceID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("deviceId", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Owner == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("owner", "body"))
+	}
+	if body.CreatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("createdAt", "body"))
+	}
+	if body.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "body"))
+	}
+	if body.Owner != nil {
+		if err2 := ValidateStationOwnerResponseBody(body.Owner); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}

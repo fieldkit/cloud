@@ -10,6 +10,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -790,6 +791,142 @@ func DecodePhotoResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 	}
 }
 
+// BuildListAllRequest instantiates a HTTP request object with method and path
+// set to call the "station" service "list all" endpoint
+func (c *Client) BuildListAllRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListAllStationPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "list all", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeListAllRequest returns an encoder for requests sent to the station
+// list all server.
+func EncodeListAllRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.ListAllPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "list all", "*station.ListAllPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		values := req.URL.Query()
+		if p.Page != nil {
+			values.Add("page", fmt.Sprintf("%v", *p.Page))
+		}
+		if p.PageSize != nil {
+			values.Add("pageSize", fmt.Sprintf("%v", *p.PageSize))
+		}
+		if p.OwnerID != nil {
+			values.Add("ownerId", fmt.Sprintf("%v", *p.OwnerID))
+		}
+		if p.Query != nil {
+			values.Add("query", *p.Query)
+		}
+		if p.SortBy != nil {
+			values.Add("sortBy", *p.SortBy)
+		}
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeListAllResponse returns a decoder for responses returned by the
+// station list all endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeListAllResponse may return the following errors:
+//	- "bad-request" (type station.BadRequest): http.StatusBadRequest
+//	- "forbidden" (type station.Forbidden): http.StatusForbidden
+//	- "not-found" (type station.NotFound): http.StatusNotFound
+//	- "unauthorized" (type station.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeListAllResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ListAllResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list all", err)
+			}
+			p := NewListAllPageOfStationsOK(&body)
+			view := "default"
+			vres := &stationviews.PageOfStations{Projected: p, View: view}
+			if err = stationviews.ValidatePageOfStations(vres); err != nil {
+				return nil, goahttp.ErrValidationError("station", "list all", err)
+			}
+			res := station.NewPageOfStations(vres)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body ListAllBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list all", err)
+			}
+			return nil, NewListAllBadRequest(body)
+		case http.StatusForbidden:
+			var (
+				body ListAllForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list all", err)
+			}
+			return nil, NewListAllForbidden(body)
+		case http.StatusNotFound:
+			var (
+				body ListAllNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list all", err)
+			}
+			return nil, NewListAllNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body ListAllUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list all", err)
+			}
+			return nil, NewListAllUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "list all", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView builds a
 // value of type *stationviews.StationOwnerView from a value of type
 // *StationOwnerResponseBody.
@@ -991,6 +1128,31 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 	}
 	res.Photos = unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView(v.Photos)
 	res.Configurations = unmarshalStationConfigurationsResponseBodyToStationviewsStationConfigurationsView(v.Configurations)
+	if v.Location != nil {
+		res.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(v.Location)
+	}
+
+	return res
+}
+
+// unmarshalEssentialStationResponseBodyToStationviewsEssentialStationView
+// builds a value of type *stationviews.EssentialStationView from a value of
+// type *EssentialStationResponseBody.
+func unmarshalEssentialStationResponseBodyToStationviewsEssentialStationView(v *EssentialStationResponseBody) *stationviews.EssentialStationView {
+	res := &stationviews.EssentialStationView{
+		ID:                 v.ID,
+		DeviceID:           v.DeviceID,
+		Name:               v.Name,
+		CreatedAt:          v.CreatedAt,
+		UpdatedAt:          v.UpdatedAt,
+		RecordingStartedAt: v.RecordingStartedAt,
+		MemoryUsed:         v.MemoryUsed,
+		MemoryAvailable:    v.MemoryAvailable,
+		FirmwareNumber:     v.FirmwareNumber,
+		FirmwareTime:       v.FirmwareTime,
+		LastIngestionAt:    v.LastIngestionAt,
+	}
+	res.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v.Owner)
 	if v.Location != nil {
 		res.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(v.Location)
 	}

@@ -117,6 +117,12 @@ type ListProjectResponseBody struct {
 	Stations StationFullResponseBodyCollection `form:"stations" json:"stations" xml:"stations"`
 }
 
+// ListAllResponseBody is the type of the "station" service "list all" endpoint
+// HTTP response body.
+type ListAllResponseBody struct {
+	Stations []*EssentialStationResponseBody `form:"stations" json:"stations" xml:"stations"`
+}
+
 // AddBadRequestResponseBody is the type of the "station" service "add"
 // endpoint HTTP response body for the "bad-request" error.
 type AddBadRequestResponseBody string
@@ -212,6 +218,22 @@ type PhotoNotFoundResponseBody string
 // PhotoUnauthorizedResponseBody is the type of the "station" service "photo"
 // endpoint HTTP response body for the "unauthorized" error.
 type PhotoUnauthorizedResponseBody string
+
+// ListAllBadRequestResponseBody is the type of the "station" service "list
+// all" endpoint HTTP response body for the "bad-request" error.
+type ListAllBadRequestResponseBody string
+
+// ListAllForbiddenResponseBody is the type of the "station" service "list all"
+// endpoint HTTP response body for the "forbidden" error.
+type ListAllForbiddenResponseBody string
+
+// ListAllNotFoundResponseBody is the type of the "station" service "list all"
+// endpoint HTTP response body for the "not-found" error.
+type ListAllNotFoundResponseBody string
+
+// ListAllUnauthorizedResponseBody is the type of the "station" service "list
+// all" endpoint HTTP response body for the "unauthorized" error.
+type ListAllUnauthorizedResponseBody string
 
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
@@ -324,6 +346,23 @@ type StationFullResponseBody struct {
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
+}
+
+// EssentialStationResponseBody is used to define fields on response body types.
+type EssentialStationResponseBody struct {
+	ID                 int64                        `form:"id" json:"id" xml:"id"`
+	DeviceID           string                       `form:"deviceId" json:"deviceId" xml:"deviceId"`
+	Name               string                       `form:"name" json:"name" xml:"name"`
+	Owner              *StationOwnerResponseBody    `form:"owner" json:"owner" xml:"owner"`
+	CreatedAt          int64                        `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	UpdatedAt          int64                        `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
+	RecordingStartedAt *int64                       `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
+	MemoryUsed         *int32                       `form:"memoryUsed,omitempty" json:"memoryUsed,omitempty" xml:"memoryUsed,omitempty"`
+	MemoryAvailable    *int32                       `form:"memoryAvailable,omitempty" json:"memoryAvailable,omitempty" xml:"memoryAvailable,omitempty"`
+	FirmwareNumber     *int32                       `form:"firmwareNumber,omitempty" json:"firmwareNumber,omitempty" xml:"firmwareNumber,omitempty"`
+	FirmwareTime       *int64                       `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
+	Location           *StationLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	LastIngestionAt    *int64                       `form:"lastIngestionAt,omitempty" json:"lastIngestionAt,omitempty" xml:"lastIngestionAt,omitempty"`
 }
 
 // NewAddResponseBody builds the HTTP response body from the result of the
@@ -485,6 +524,19 @@ func NewListProjectResponseBody(res *stationviews.StationsFullView) *ListProject
 		body.Stations = make([]*StationFullResponseBody, len(res.Stations))
 		for i, val := range res.Stations {
 			body.Stations[i] = marshalStationviewsStationFullViewToStationFullResponseBody(val)
+		}
+	}
+	return body
+}
+
+// NewListAllResponseBody builds the HTTP response body from the result of the
+// "list all" endpoint of the "station" service.
+func NewListAllResponseBody(res *stationviews.PageOfStationsView) *ListAllResponseBody {
+	body := &ListAllResponseBody{}
+	if res.Stations != nil {
+		body.Stations = make([]*EssentialStationResponseBody, len(res.Stations))
+		for i, val := range res.Stations {
+			body.Stations[i] = marshalStationviewsEssentialStationViewToEssentialStationResponseBody(val)
 		}
 	}
 	return body
@@ -658,6 +710,34 @@ func NewPhotoUnauthorizedResponseBody(res station.Unauthorized) PhotoUnauthorize
 	return body
 }
 
+// NewListAllBadRequestResponseBody builds the HTTP response body from the
+// result of the "list all" endpoint of the "station" service.
+func NewListAllBadRequestResponseBody(res station.BadRequest) ListAllBadRequestResponseBody {
+	body := ListAllBadRequestResponseBody(res)
+	return body
+}
+
+// NewListAllForbiddenResponseBody builds the HTTP response body from the
+// result of the "list all" endpoint of the "station" service.
+func NewListAllForbiddenResponseBody(res station.Forbidden) ListAllForbiddenResponseBody {
+	body := ListAllForbiddenResponseBody(res)
+	return body
+}
+
+// NewListAllNotFoundResponseBody builds the HTTP response body from the result
+// of the "list all" endpoint of the "station" service.
+func NewListAllNotFoundResponseBody(res station.NotFound) ListAllNotFoundResponseBody {
+	body := ListAllNotFoundResponseBody(res)
+	return body
+}
+
+// NewListAllUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "list all" endpoint of the "station" service.
+func NewListAllUnauthorizedResponseBody(res station.Unauthorized) ListAllUnauthorizedResponseBody {
+	body := ListAllUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewAddPayload builds a station service add endpoint payload.
 func NewAddPayload(body *AddRequestBody, auth string) *station.AddPayload {
 	v := &station.AddPayload{
@@ -714,6 +794,19 @@ func NewListProjectPayload(id int32, auth string) *station.ListProjectPayload {
 func NewPhotoPayload(id int32, auth string) *station.PhotoPayload {
 	v := &station.PhotoPayload{}
 	v.ID = id
+	v.Auth = auth
+
+	return v
+}
+
+// NewListAllPayload builds a station service list all endpoint payload.
+func NewListAllPayload(page *int32, pageSize *int32, ownerID *int32, query *string, sortBy *string, auth string) *station.ListAllPayload {
+	v := &station.ListAllPayload{}
+	v.Page = page
+	v.PageSize = pageSize
+	v.OwnerID = ownerID
+	v.Query = query
+	v.SortBy = sortBy
 	v.Auth = auth
 
 	return v

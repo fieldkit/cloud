@@ -785,3 +785,29 @@ func newModuleSensor(s *pbapp.SensorCapabilities, m *data.StationModule, c *data
 		ReadingValue:    value,
 	}
 }
+
+type EssentialQueryParams struct {
+	Page     int32
+	PageSize int32
+}
+
+func (sr *StationRepository) QueryEssentialStations(ctx context.Context, qp *EssentialQueryParams) ([]*data.EssentialStation, error) {
+	stations := []*data.EssentialStation{}
+	if err := sr.db.SelectContext(ctx, &stations, `
+		SELECT
+			s.id, s.device_id, s.name, u.id AS owner_id, u.name AS owner_name,
+			s.created_at, s.updated_at,
+			s.memory_used, s.memory_available,
+			s.firmware_time, s.firmware_number,
+			s.recording_started_at,
+			ST_AsBinary(location) AS location,
+			(SELECT MAX(i.time) AS last_ingestion_at FROM fieldkit.ingestion AS i WHERE i.device_id = s.device_id)
+		FROM fieldkit.station AS s
+		JOIN fieldkit.user AS u ON (s.owner_id = u.id)
+		ORDER BY id
+		LIMIT $1 OFFSET $2
+		`, qp.PageSize, qp.PageSize*qp.Page); err != nil {
+		return nil, err
+	}
+	return stations, nil
+}

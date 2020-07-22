@@ -38,6 +38,10 @@ type Client struct {
 	// Photo Doer is the HTTP client used to make requests to the photo endpoint.
 	PhotoDoer goahttp.Doer
 
+	// ListAll Doer is the HTTP client used to make requests to the list all
+	// endpoint.
+	ListAllDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -67,6 +71,7 @@ func NewClient(
 		ListMineDoer:        doer,
 		ListProjectDoer:     doer,
 		PhotoDoer:           doer,
+		ListAllDoer:         doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -222,5 +227,29 @@ func (c *Client) Photo() goa.Endpoint {
 			return nil, goahttp.ErrDecodingError("station", "photo", err)
 		}
 		return &station.PhotoResponseData{Result: res.(*station.PhotoResult), Body: resp.Body}, nil
+	}
+}
+
+// ListAll returns an endpoint that makes HTTP requests to the station service
+// list all server.
+func (c *Client) ListAll() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeListAllRequest(c.encoder)
+		decodeResponse = DecodeListAllResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildListAllRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ListAllDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "list all", err)
+		}
+		return decodeResponse(resp)
 	}
 }

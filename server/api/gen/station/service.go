@@ -29,6 +29,8 @@ type Service interface {
 	ListProject(context.Context, *ListProjectPayload) (res *StationsFull, err error)
 	// Photo implements photo.
 	Photo(context.Context, *PhotoPayload) (res *PhotoResult, body io.ReadCloser, err error)
+	// ListAll implements list all.
+	ListAll(context.Context, *ListAllPayload) (res *PageOfStations, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -45,7 +47,7 @@ const ServiceName = "station"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [6]string{"add", "get", "update", "list mine", "list project", "photo"}
+var MethodNames = [7]string{"add", "get", "update", "list mine", "list project", "photo", "list all"}
 
 // AddPayload is the payload type of the station service add method.
 type AddPayload struct {
@@ -124,6 +126,21 @@ type PhotoResult struct {
 	ContentType string
 }
 
+// ListAllPayload is the payload type of the station service list all method.
+type ListAllPayload struct {
+	Auth     string
+	Page     *int32
+	PageSize *int32
+	OwnerID  *int32
+	Query    *string
+	SortBy   *string
+}
+
+// PageOfStations is the result type of the station service list all method.
+type PageOfStations struct {
+	Stations []*EssentialStation
+}
+
 type StationOwner struct {
 	ID   int32
 	Name string
@@ -197,6 +214,22 @@ type StationLocation struct {
 }
 
 type StationFullCollection []*StationFull
+
+type EssentialStation struct {
+	ID                 int64
+	DeviceID           string
+	Name               string
+	Owner              *StationOwner
+	CreatedAt          int64
+	UpdatedAt          int64
+	RecordingStartedAt *int64
+	MemoryUsed         *int32
+	MemoryAvailable    *int32
+	FirmwareNumber     *int32
+	FirmwareTime       *int64
+	Location           *StationLocation
+	LastIngestionAt    *int64
+}
 
 // unauthorized
 type Unauthorized string
@@ -274,6 +307,19 @@ func NewStationsFull(vres *stationviews.StationsFull) *StationsFull {
 func NewViewedStationsFull(res *StationsFull, view string) *stationviews.StationsFull {
 	p := newStationsFullView(res)
 	return &stationviews.StationsFull{Projected: p, View: "default"}
+}
+
+// NewPageOfStations initializes result type PageOfStations from viewed result
+// type PageOfStations.
+func NewPageOfStations(vres *stationviews.PageOfStations) *PageOfStations {
+	return newPageOfStations(vres.Projected)
+}
+
+// NewViewedPageOfStations initializes viewed result type PageOfStations from
+// result type PageOfStations using the given view.
+func NewViewedPageOfStations(res *PageOfStations, view string) *stationviews.PageOfStations {
+	p := newPageOfStationsView(res)
+	return &stationviews.PageOfStations{Projected: p, View: "default"}
 }
 
 // newStationFull converts projected type StationFull to service type
@@ -414,6 +460,32 @@ func newStationFullCollectionView(res StationFullCollection) stationviews.Statio
 	vres := make(stationviews.StationFullCollectionView, len(res))
 	for i, n := range res {
 		vres[i] = newStationFullView(n)
+	}
+	return vres
+}
+
+// newPageOfStations converts projected type PageOfStations to service type
+// PageOfStations.
+func newPageOfStations(vres *stationviews.PageOfStationsView) *PageOfStations {
+	res := &PageOfStations{}
+	if vres.Stations != nil {
+		res.Stations = make([]*EssentialStation, len(vres.Stations))
+		for i, val := range vres.Stations {
+			res.Stations[i] = transformStationviewsEssentialStationViewToEssentialStation(val)
+		}
+	}
+	return res
+}
+
+// newPageOfStationsView projects result type PageOfStations to projected type
+// PageOfStationsView using the "default" view.
+func newPageOfStationsView(res *PageOfStations) *stationviews.PageOfStationsView {
+	vres := &stationviews.PageOfStationsView{}
+	if res.Stations != nil {
+		vres.Stations = make([]*stationviews.EssentialStationView, len(res.Stations))
+		for i, val := range res.Stations {
+			vres.Stations[i] = transformEssentialStationToStationviewsEssentialStationView(val)
+		}
 	}
 	return vres
 }
@@ -772,6 +844,63 @@ func transformStationLocationToStationviewsStationLocationView(v *StationLocatio
 	res := &stationviews.StationLocationView{
 		Latitude:  &v.Latitude,
 		Longitude: &v.Longitude,
+	}
+
+	return res
+}
+
+// transformStationviewsEssentialStationViewToEssentialStation builds a value
+// of type *EssentialStation from a value of type
+// *stationviews.EssentialStationView.
+func transformStationviewsEssentialStationViewToEssentialStation(v *stationviews.EssentialStationView) *EssentialStation {
+	if v == nil {
+		return nil
+	}
+	res := &EssentialStation{
+		ID:                 *v.ID,
+		DeviceID:           *v.DeviceID,
+		Name:               *v.Name,
+		CreatedAt:          *v.CreatedAt,
+		UpdatedAt:          *v.UpdatedAt,
+		RecordingStartedAt: v.RecordingStartedAt,
+		MemoryUsed:         v.MemoryUsed,
+		MemoryAvailable:    v.MemoryAvailable,
+		FirmwareNumber:     v.FirmwareNumber,
+		FirmwareTime:       v.FirmwareTime,
+		LastIngestionAt:    v.LastIngestionAt,
+	}
+	if v.Owner != nil {
+		res.Owner = transformStationviewsStationOwnerViewToStationOwner(v.Owner)
+	}
+	if v.Location != nil {
+		res.Location = transformStationviewsStationLocationViewToStationLocation(v.Location)
+	}
+
+	return res
+}
+
+// transformEssentialStationToStationviewsEssentialStationView builds a value
+// of type *stationviews.EssentialStationView from a value of type
+// *EssentialStation.
+func transformEssentialStationToStationviewsEssentialStationView(v *EssentialStation) *stationviews.EssentialStationView {
+	res := &stationviews.EssentialStationView{
+		ID:                 &v.ID,
+		DeviceID:           &v.DeviceID,
+		Name:               &v.Name,
+		CreatedAt:          &v.CreatedAt,
+		UpdatedAt:          &v.UpdatedAt,
+		RecordingStartedAt: v.RecordingStartedAt,
+		MemoryUsed:         v.MemoryUsed,
+		MemoryAvailable:    v.MemoryAvailable,
+		FirmwareNumber:     v.FirmwareNumber,
+		FirmwareTime:       v.FirmwareTime,
+		LastIngestionAt:    v.LastIngestionAt,
+	}
+	if v.Owner != nil {
+		res.Owner = transformStationOwnerToStationviewsStationOwnerView(v.Owner)
+	}
+	if v.Location != nil {
+		res.Location = transformStationLocationToStationviewsStationLocationView(v.Location)
 	}
 
 	return res

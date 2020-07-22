@@ -27,6 +27,14 @@ type StationsFull struct {
 	View string
 }
 
+// PageOfStations is the viewed result type that is projected based on a view.
+type PageOfStations struct {
+	// Type to project
+	Projected *PageOfStationsView
+	// View to render
+	View string
+}
+
 // StationFullView is a type that runs validations on a projected type.
 type StationFullView struct {
 	ID                 *int32
@@ -144,6 +152,28 @@ type StationsFullView struct {
 // type.
 type StationFullCollectionView []*StationFullView
 
+// PageOfStationsView is a type that runs validations on a projected type.
+type PageOfStationsView struct {
+	Stations []*EssentialStationView
+}
+
+// EssentialStationView is a type that runs validations on a projected type.
+type EssentialStationView struct {
+	ID                 *int64
+	DeviceID           *string
+	Name               *string
+	Owner              *StationOwnerView
+	CreatedAt          *int64
+	UpdatedAt          *int64
+	RecordingStartedAt *int64
+	MemoryUsed         *int32
+	MemoryAvailable    *int32
+	FirmwareNumber     *int32
+	FirmwareTime       *int64
+	Location           *StationLocationView
+	LastIngestionAt    *int64
+}
+
 var (
 	// StationFullMap is a map of attribute names in result type StationFull
 	// indexed by view name.
@@ -174,6 +204,13 @@ var (
 	// StationsFullMap is a map of attribute names in result type StationsFull
 	// indexed by view name.
 	StationsFullMap = map[string][]string{
+		"default": []string{
+			"stations",
+		},
+	}
+	// PageOfStationsMap is a map of attribute names in result type PageOfStations
+	// indexed by view name.
+	PageOfStationsMap = map[string][]string{
 		"default": []string{
 			"stations",
 		},
@@ -224,6 +261,18 @@ func ValidateStationsFull(result *StationsFull) (err error) {
 	switch result.View {
 	case "default", "":
 		err = ValidateStationsFullView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidatePageOfStations runs the validations defined on the viewed result
+// type PageOfStations.
+func ValidatePageOfStations(result *PageOfStations) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidatePageOfStationsView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
 	}
@@ -510,6 +559,56 @@ func ValidateStationsFullView(result *StationsFullView) (err error) {
 func ValidateStationFullCollectionView(result StationFullCollectionView) (err error) {
 	for _, item := range result {
 		if err2 := ValidateStationFullView(item); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidatePageOfStationsView runs the validations defined on
+// PageOfStationsView using the "default" view.
+func ValidatePageOfStationsView(result *PageOfStationsView) (err error) {
+	if result.Stations == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("stations", "result"))
+	}
+	for _, e := range result.Stations {
+		if e != nil {
+			if err2 := ValidateEssentialStationView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateEssentialStationView runs the validations defined on
+// EssentialStationView.
+func ValidateEssentialStationView(result *EssentialStationView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.DeviceID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("deviceId", "result"))
+	}
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	if result.Owner == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("owner", "result"))
+	}
+	if result.CreatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("createdAt", "result"))
+	}
+	if result.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "result"))
+	}
+	if result.Owner != nil {
+		if err2 := ValidateStationOwnerView(result.Owner); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if result.Location != nil {
+		if err2 := ValidateStationLocationView(result.Location); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}

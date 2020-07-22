@@ -23,7 +23,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"deviceId\": \"Non omnis pariatur velit.\",\n      \"locationName\": \"Aut a impedit velit quas molestias qui.\",\n      \"name\": \"Iste ex dolor.\",\n      \"statusPb\": \"Quis deleniti asperiores inventore sunt omnis et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"deviceId\": \"Laboriosam nihil sunt.\",\n      \"locationName\": \"Pariatur unde ut velit illum animi voluptates.\",\n      \"name\": \"Nam in ad quis.\",\n      \"statusPb\": \"Hic fugit.\"\n   }'")
 		}
 	}
 	var auth string
@@ -73,7 +73,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"locationName\": \"Delectus a nesciunt ullam sit asperiores.\",\n      \"name\": \"Sed fuga.\",\n      \"statusPb\": \"Rerum ut qui reiciendis commodi eveniet.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"locationName\": \"Quisquam numquam fugit.\",\n      \"name\": \"Consequuntur sequi distinctio natus aliquam blanditiis.\",\n      \"statusPb\": \"Quia reiciendis dolorem consequatur maxime qui.\"\n   }'")
 		}
 	}
 	var id int32
@@ -156,6 +156,73 @@ func BuildPhotoPayload(stationPhotoID string, stationPhotoAuth string) (*station
 	}
 	v := &station.PhotoPayload{}
 	v.ID = id
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildListAllPayload builds the payload for the station list all endpoint
+// from CLI flags.
+func BuildListAllPayload(stationListAllPage string, stationListAllPageSize string, stationListAllOwnerID string, stationListAllQuery string, stationListAllSortBy string, stationListAllAuth string) (*station.ListAllPayload, error) {
+	var err error
+	var page *int32
+	{
+		if stationListAllPage != "" {
+			var v int64
+			v, err = strconv.ParseInt(stationListAllPage, 10, 32)
+			val := int32(v)
+			page = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for page, must be INT32")
+			}
+		}
+	}
+	var pageSize *int32
+	{
+		if stationListAllPageSize != "" {
+			var v int64
+			v, err = strconv.ParseInt(stationListAllPageSize, 10, 32)
+			val := int32(v)
+			pageSize = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for pageSize, must be INT32")
+			}
+		}
+	}
+	var ownerID *int32
+	{
+		if stationListAllOwnerID != "" {
+			var v int64
+			v, err = strconv.ParseInt(stationListAllOwnerID, 10, 32)
+			val := int32(v)
+			ownerID = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for ownerID, must be INT32")
+			}
+		}
+	}
+	var query *string
+	{
+		if stationListAllQuery != "" {
+			query = &stationListAllQuery
+		}
+	}
+	var sortBy *string
+	{
+		if stationListAllSortBy != "" {
+			sortBy = &stationListAllSortBy
+		}
+	}
+	var auth string
+	{
+		auth = stationListAllAuth
+	}
+	v := &station.ListAllPayload{}
+	v.Page = page
+	v.PageSize = pageSize
+	v.OwnerID = ownerID
+	v.Query = query
+	v.SortBy = sortBy
 	v.Auth = auth
 
 	return v, nil
