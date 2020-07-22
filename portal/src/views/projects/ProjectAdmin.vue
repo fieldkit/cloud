@@ -403,6 +403,9 @@ export default {
     flex-grow: 1;
     flex: 1;
 }
+.details .details-right .icon {
+    padding-right: 0.2em;
+}
 .details .details-bottom {
     border-top: 1px solid #d8dce0;
     padding-top: 20px;
