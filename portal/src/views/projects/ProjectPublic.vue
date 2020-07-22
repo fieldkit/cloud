@@ -233,8 +233,8 @@ export default {
 }
 
 .project-image {
-    max-width: 400px;
-    max-height: 400px;
+    width: 100%;
+    height: auto;
 }
 
 .project-container {
