@@ -72,10 +72,10 @@ func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // update endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeUpdateResponse may return the following errors:
-//	- "bad-request" (type notes.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type notes.Forbidden): http.StatusForbidden
-//	- "not-found" (type notes.NotFound): http.StatusNotFound
-//	- "unauthorized" (type notes.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -109,36 +109,6 @@ func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			}
 			res := notes.NewFieldNotes(vres)
 			return res, nil
-		case http.StatusBadRequest:
-			var (
-				body UpdateBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "update", err)
-			}
-			return nil, NewUpdateBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body UpdateForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "update", err)
-			}
-			return nil, NewUpdateForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body UpdateNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "update", err)
-			}
-			return nil, NewUpdateNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body UpdateUnauthorizedResponseBody
@@ -148,7 +118,53 @@ func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("notes", "update", err)
 			}
-			return nil, NewUpdateUnauthorized(body)
+			err = ValidateUpdateUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "update", err)
+			}
+			return nil, NewUpdateUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body UpdateForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "update", err)
+			}
+			err = ValidateUpdateForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "update", err)
+			}
+			return nil, NewUpdateForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body UpdateNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "update", err)
+			}
+			err = ValidateUpdateNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "update", err)
+			}
+			return nil, NewUpdateNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body UpdateBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "update", err)
+			}
+			err = ValidateUpdateBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "update", err)
+			}
+			return nil, NewUpdateBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("notes", "update", resp.StatusCode, string(body))
@@ -201,10 +217,10 @@ func EncodeGetRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Re
 // endpoint. restoreBody controls whether the response body should be restored
 // after having been read.
 // DecodeGetResponse may return the following errors:
-//	- "bad-request" (type notes.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type notes.Forbidden): http.StatusForbidden
-//	- "not-found" (type notes.NotFound): http.StatusNotFound
-//	- "unauthorized" (type notes.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -238,36 +254,6 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			}
 			res := notes.NewFieldNotes(vres)
 			return res, nil
-		case http.StatusBadRequest:
-			var (
-				body GetBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "get", err)
-			}
-			return nil, NewGetBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body GetForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "get", err)
-			}
-			return nil, NewGetForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body GetNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "get", err)
-			}
-			return nil, NewGetNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body GetUnauthorizedResponseBody
@@ -277,7 +263,53 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("notes", "get", err)
 			}
-			return nil, NewGetUnauthorized(body)
+			err = ValidateGetUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "get", err)
+			}
+			return nil, NewGetUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body GetForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "get", err)
+			}
+			err = ValidateGetForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "get", err)
+			}
+			return nil, NewGetForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body GetNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "get", err)
+			}
+			err = ValidateGetNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "get", err)
+			}
+			return nil, NewGetNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body GetBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "get", err)
+			}
+			err = ValidateGetBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "get", err)
+			}
+			return nil, NewGetBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("notes", "get", resp.StatusCode, string(body))
@@ -329,10 +361,10 @@ func EncodeDownloadMediaRequest(encoder func(*http.Request) goahttp.Encoder) fun
 // notes download media endpoint. restoreBody controls whether the response
 // body should be restored after having been read.
 // DecodeDownloadMediaResponse may return the following errors:
-//	- "bad-request" (type notes.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type notes.Forbidden): http.StatusForbidden
-//	- "not-found" (type notes.NotFound): http.StatusNotFound
-//	- "unauthorized" (type notes.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeDownloadMediaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -374,36 +406,6 @@ func DecodeDownloadMediaResponse(decoder func(*http.Response) goahttp.Decoder, r
 			}
 			res := NewDownloadMediaResultOK(length, contentType)
 			return res, nil
-		case http.StatusBadRequest:
-			var (
-				body DownloadMediaBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "download media", err)
-			}
-			return nil, NewDownloadMediaBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body DownloadMediaForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "download media", err)
-			}
-			return nil, NewDownloadMediaForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body DownloadMediaNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "download media", err)
-			}
-			return nil, NewDownloadMediaNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body DownloadMediaUnauthorizedResponseBody
@@ -413,7 +415,53 @@ func DecodeDownloadMediaResponse(decoder func(*http.Response) goahttp.Decoder, r
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("notes", "download media", err)
 			}
-			return nil, NewDownloadMediaUnauthorized(body)
+			err = ValidateDownloadMediaUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "download media", err)
+			}
+			return nil, NewDownloadMediaUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body DownloadMediaForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "download media", err)
+			}
+			err = ValidateDownloadMediaForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "download media", err)
+			}
+			return nil, NewDownloadMediaForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body DownloadMediaNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "download media", err)
+			}
+			err = ValidateDownloadMediaNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "download media", err)
+			}
+			return nil, NewDownloadMediaNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body DownloadMediaBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "download media", err)
+			}
+			err = ValidateDownloadMediaBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "download media", err)
+			}
+			return nil, NewDownloadMediaBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("notes", "download media", resp.StatusCode, string(body))
@@ -482,10 +530,10 @@ func EncodeUploadMediaRequest(encoder func(*http.Request) goahttp.Encoder) func(
 // notes upload media endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeUploadMediaResponse may return the following errors:
-//	- "bad-request" (type notes.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type notes.Forbidden): http.StatusForbidden
-//	- "not-found" (type notes.NotFound): http.StatusNotFound
-//	- "unauthorized" (type notes.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeUploadMediaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -519,36 +567,6 @@ func DecodeUploadMediaResponse(decoder func(*http.Response) goahttp.Decoder, res
 			}
 			res := notes.NewNoteMedia(vres)
 			return res, nil
-		case http.StatusBadRequest:
-			var (
-				body UploadMediaBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "upload media", err)
-			}
-			return nil, NewUploadMediaBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body UploadMediaForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "upload media", err)
-			}
-			return nil, NewUploadMediaForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body UploadMediaNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "upload media", err)
-			}
-			return nil, NewUploadMediaNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body UploadMediaUnauthorizedResponseBody
@@ -558,7 +576,53 @@ func DecodeUploadMediaResponse(decoder func(*http.Response) goahttp.Decoder, res
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("notes", "upload media", err)
 			}
-			return nil, NewUploadMediaUnauthorized(body)
+			err = ValidateUploadMediaUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "upload media", err)
+			}
+			return nil, NewUploadMediaUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body UploadMediaForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "upload media", err)
+			}
+			err = ValidateUploadMediaForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "upload media", err)
+			}
+			return nil, NewUploadMediaForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body UploadMediaNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "upload media", err)
+			}
+			err = ValidateUploadMediaNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "upload media", err)
+			}
+			return nil, NewUploadMediaNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body UploadMediaBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "upload media", err)
+			}
+			err = ValidateUploadMediaBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "upload media", err)
+			}
+			return nil, NewUploadMediaBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("notes", "upload media", resp.StatusCode, string(body))

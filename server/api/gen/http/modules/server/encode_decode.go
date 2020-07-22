@@ -13,6 +13,7 @@ import (
 
 	modules "github.com/fieldkit/cloud/server/api/gen/modules"
 	goahttp "goa.design/goa/v3/http"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // EncodeMetaResponse returns an encoder for responses returned by the modules
@@ -37,20 +38,20 @@ func EncodeMetaError(encoder func(context.Context, http.ResponseWriter) goahttp.
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "bad-request":
-			res := v.(modules.BadRequest)
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewMetaBadRequestResponseBody(res)
+				body = NewMetaUnauthorizedResponseBody(res)
 			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "forbidden":
-			res := v.(modules.Forbidden)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -62,7 +63,7 @@ func EncodeMetaError(encoder func(context.Context, http.ResponseWriter) goahttp.
 			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
-			res := v.(modules.NotFound)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -73,17 +74,17 @@ func EncodeMetaError(encoder func(context.Context, http.ResponseWriter) goahttp.
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(modules.Unauthorized)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewMetaUnauthorizedResponseBody(res)
+				body = NewMetaBadRequestResponseBody(res)
 			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)

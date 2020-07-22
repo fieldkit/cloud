@@ -310,7 +310,16 @@ func TestAddStationAlreadyOthers(t *testing.T) {
 
 	assert.Equal(http.StatusBadRequest, rr.Code)
 
-	assert.Equal("\"station already registered to another user\"\n", rr.Body.String())
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+	{
+		"id": "<<PRESENCE>>",
+		"name": "bad-request",
+		"message": "station already registered to another user",
+		"timeout": false,
+		"fault": false,
+		"temporary": false
+	}`)
 }
 
 func TestUpdateMyStation(t *testing.T) {

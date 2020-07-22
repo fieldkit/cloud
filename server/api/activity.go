@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"reflect"
 	"sort"
@@ -121,7 +122,7 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 		SELECT * FROM fieldkit.project WHERE id = $1
 		`, payload.ID); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, activity.NotFound("project not found")
+			return nil, activity.MakeNotFound(errors.New("project not found"))
 		}
 		return nil, err
 	}
@@ -230,9 +231,9 @@ func (s *ActivityService) JWTAuth(ctx context.Context, token string, scheme *sec
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		NotFound:     func(m string) error { return activity.NotFound(m) },
-		Unauthorized: func(m string) error { return activity.Unauthorized(m) },
-		Forbidden:    func(m string) error { return activity.Forbidden(m) },
+		NotFound:     func(m string) error { return activity.MakeNotFound(errors.New(m)) },
+		Unauthorized: func(m string) error { return activity.MakeUnauthorized(errors.New(m)) },
+		Forbidden:    func(m string) error { return activity.MakeForbidden(errors.New(m)) },
 	})
 }
 

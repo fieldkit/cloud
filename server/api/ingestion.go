@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"goa.design/goa/v3/security"
@@ -126,7 +127,7 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 		return err
 	}
 	if i == nil {
-		return ingestion.NotFound("not found")
+		return ingestion.MakeNotFound(errors.New("not found"))
 	}
 
 	p, err := NewPermissions(ctx, c.options).ForStationByDeviceID(i.DeviceID)
@@ -160,7 +161,7 @@ func (c *IngestionService) Delete(ctx context.Context, payload *ingestion.Delete
 		return err
 	}
 	if i == nil {
-		return ingestion.NotFound("not found")
+		return ingestion.MakeNotFound(errors.New("not found"))
 	}
 
 	p, err := NewPermissions(ctx, c.options).ForStationByDeviceID(i.DeviceID)
@@ -206,8 +207,8 @@ func (s *IngestionService) JWTAuth(ctx context.Context, token string, scheme *se
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		NotFound:     func(m string) error { return ingestion.NotFound(m) },
-		Unauthorized: func(m string) error { return ingestion.Unauthorized(m) },
-		Forbidden:    func(m string) error { return ingestion.Forbidden(m) },
+		NotFound:     func(m string) error { return ingestion.MakeNotFound(errors.New(m)) },
+		Unauthorized: func(m string) error { return ingestion.MakeUnauthorized(errors.New(m)) },
+		Forbidden:    func(m string) error { return ingestion.MakeForbidden(errors.New(m)) },
 	})
 }

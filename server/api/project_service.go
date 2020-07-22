@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -198,7 +199,7 @@ func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (
 		SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1
 		`, payload.ProjectID); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, project.NotFound("not found")
+			return nil, project.MakeNotFound(errors.New("not found"))
 		}
 		return nil, err
 	}
@@ -299,7 +300,7 @@ func (c *ProjectService) Invite(ctx context.Context, payload *project.InvitePayl
 		return err
 	}
 	if existing > 0 {
-		return project.BadRequest("duplicate")
+		return project.MakeBadRequest(errors.New("duplicate"))
 	}
 
 	token, err := data.NewToken(20)
@@ -353,7 +354,7 @@ func (c *ProjectService) RemoveUser(ctx context.Context, payload *project.Remove
 		}
 	} else {
 		if removing.ID == p.UserID() {
-			return project.BadRequest("no removing yourself")
+			return project.MakeBadRequest(errors.New("no removing yourself"))
 		}
 	}
 
@@ -555,7 +556,7 @@ func (c *ProjectService) LookupInvite(ctx context.Context, payload *project.Look
 	}
 
 	if len(all) != 1 {
-		return nil, project.NotFound("invalid invite token")
+		return nil, project.MakeNotFound(errors.New("invalid invite token"))
 	}
 
 	projects := []*data.Project{}
@@ -611,7 +612,7 @@ func (c *ProjectService) AcceptInvite(ctx context.Context, payload *project.Acce
 	if user.Email != invite.InvitedEmail {
 		if payload.Token == nil {
 			log.Infow("accept failed, no token")
-			return project.Unauthorized("permission denied")
+			return project.MakeUnauthorized(errors.New("permission denied"))
 		}
 		given := data.Token{}
 		if err := given.UnmarshalText([]byte(*payload.Token)); err != nil {
@@ -619,7 +620,7 @@ func (c *ProjectService) AcceptInvite(ctx context.Context, payload *project.Acce
 		}
 		if given.String() != invite.Token.String() {
 			log.Infow("accept failed, email mismatch, no token")
-			return project.Unauthorized("permission denied")
+			return project.MakeUnauthorized(errors.New("permission denied"))
 		}
 	}
 
@@ -662,7 +663,7 @@ func (c *ProjectService) RejectInvite(ctx context.Context, payload *project.Reje
 	if user.Email != invite.InvitedEmail {
 		if payload.Token == nil {
 			log.Infow("decline failed, email mismatch, no token")
-			return project.Unauthorized("permission denied")
+			return project.MakeUnauthorized(errors.New("permission denied"))
 		}
 		given := data.Token{}
 		if err := given.UnmarshalText([]byte(*payload.Token)); err != nil {
@@ -670,7 +671,7 @@ func (c *ProjectService) RejectInvite(ctx context.Context, payload *project.Reje
 		}
 		if given.String() != invite.Token.String() {
 			log.Infow("decline failed, token mismatch")
-			return project.Unauthorized("permission denied")
+			return project.MakeUnauthorized(errors.New("permission denied"))
 		}
 	}
 
@@ -718,14 +719,14 @@ func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.Dow
 	}
 
 	if resource.MediaURL == nil || resource.MediaContentType == nil {
-		return nil, nil, project.NotFound("not found")
+		return nil, nil, project.MakeNotFound(errors.New("not found"))
 	}
 
 	mr := repositories.NewMediaRepository(s.options.MediaFiles)
 
 	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
 	if err != nil {
-		return nil, nil, project.NotFound("not found")
+		return nil, nil, project.MakeNotFound(errors.New("not found"))
 	}
 
 	return &project.DownloadPhotoResult{
@@ -739,9 +740,9 @@ func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *secu
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		NotFound:     func(m string) error { return project.NotFound(m) },
-		Unauthorized: func(m string) error { return project.Unauthorized(m) },
-		Forbidden:    func(m string) error { return project.Forbidden(m) },
+		NotFound:     func(m string) error { return project.MakeNotFound(errors.New(m)) },
+		Unauthorized: func(m string) error { return project.MakeUnauthorized(errors.New(m)) },
+		Forbidden:    func(m string) error { return project.MakeForbidden(errors.New(m)) },
 	})
 }
 

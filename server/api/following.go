@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 
 	"goa.design/goa/v3/security"
 
@@ -103,8 +104,8 @@ func (s *FollowingService) JWTAuth(ctx context.Context, token string, scheme *se
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		NotFound:     func(m string) error { return following.NotFound(m) },
-		Unauthorized: func(m string) error { return following.Unauthorized(m) },
-		Forbidden:    func(m string) error { return following.Forbidden(m) },
+		NotFound:     func(m string) error { return following.MakeNotFound(errors.New(m)) },
+		Unauthorized: func(m string) error { return following.MakeUnauthorized(errors.New(m)) },
+		Forbidden:    func(m string) error { return following.MakeForbidden(errors.New(m)) },
 	})
 }

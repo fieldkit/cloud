@@ -20,42 +20,154 @@ type DeviceLayoutResponseBody struct {
 	Sensors        map[string][]*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
 }
 
-// DeviceLayoutBadRequestResponseBody is the type of the "information" service
-// "device layout" endpoint HTTP response body for the "bad-request" error.
-type DeviceLayoutBadRequestResponseBody string
-
-// DeviceLayoutForbiddenResponseBody is the type of the "information" service
-// "device layout" endpoint HTTP response body for the "forbidden" error.
-type DeviceLayoutForbiddenResponseBody string
-
-// DeviceLayoutNotFoundResponseBody is the type of the "information" service
-// "device layout" endpoint HTTP response body for the "not-found" error.
-type DeviceLayoutNotFoundResponseBody string
-
 // DeviceLayoutUnauthorizedResponseBody is the type of the "information"
 // service "device layout" endpoint HTTP response body for the "unauthorized"
 // error.
-type DeviceLayoutUnauthorizedResponseBody string
+type DeviceLayoutUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
 
-// FirmwareStatisticsBadRequestResponseBody is the type of the "information"
-// service "firmware statistics" endpoint HTTP response body for the
-// "bad-request" error.
-type FirmwareStatisticsBadRequestResponseBody string
+// DeviceLayoutForbiddenResponseBody is the type of the "information" service
+// "device layout" endpoint HTTP response body for the "forbidden" error.
+type DeviceLayoutForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
 
-// FirmwareStatisticsForbiddenResponseBody is the type of the "information"
-// service "firmware statistics" endpoint HTTP response body for the
-// "forbidden" error.
-type FirmwareStatisticsForbiddenResponseBody string
+// DeviceLayoutNotFoundResponseBody is the type of the "information" service
+// "device layout" endpoint HTTP response body for the "not-found" error.
+type DeviceLayoutNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
 
-// FirmwareStatisticsNotFoundResponseBody is the type of the "information"
-// service "firmware statistics" endpoint HTTP response body for the
-// "not-found" error.
-type FirmwareStatisticsNotFoundResponseBody string
+// DeviceLayoutBadRequestResponseBody is the type of the "information" service
+// "device layout" endpoint HTTP response body for the "bad-request" error.
+type DeviceLayoutBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
 
 // FirmwareStatisticsUnauthorizedResponseBody is the type of the "information"
 // service "firmware statistics" endpoint HTTP response body for the
 // "unauthorized" error.
-type FirmwareStatisticsUnauthorizedResponseBody string
+type FirmwareStatisticsUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// FirmwareStatisticsForbiddenResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "forbidden" error.
+type FirmwareStatisticsForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// FirmwareStatisticsNotFoundResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "not-found" error.
+type FirmwareStatisticsNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// FirmwareStatisticsBadRequestResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "bad-request" error.
+type FirmwareStatisticsBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
 
 // StationConfigurationResponseBody is used to define fields on response body
 // types.
@@ -124,31 +236,63 @@ func NewDeviceLayoutResponseViewOK(body *DeviceLayoutResponseBody) *informationv
 	return v
 }
 
-// NewDeviceLayoutBadRequest builds a information service device layout
-// endpoint bad-request error.
-func NewDeviceLayoutBadRequest(body DeviceLayoutBadRequestResponseBody) information.BadRequest {
-	v := information.BadRequest(body)
+// NewDeviceLayoutUnauthorized builds a information service device layout
+// endpoint unauthorized error.
+func NewDeviceLayoutUnauthorized(body *DeviceLayoutUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
 	return v
 }
 
 // NewDeviceLayoutForbidden builds a information service device layout endpoint
 // forbidden error.
-func NewDeviceLayoutForbidden(body DeviceLayoutForbiddenResponseBody) information.Forbidden {
-	v := information.Forbidden(body)
+func NewDeviceLayoutForbidden(body *DeviceLayoutForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
 	return v
 }
 
 // NewDeviceLayoutNotFound builds a information service device layout endpoint
 // not-found error.
-func NewDeviceLayoutNotFound(body DeviceLayoutNotFoundResponseBody) information.NotFound {
-	v := information.NotFound(body)
+func NewDeviceLayoutNotFound(body *DeviceLayoutNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
 	return v
 }
 
-// NewDeviceLayoutUnauthorized builds a information service device layout
-// endpoint unauthorized error.
-func NewDeviceLayoutUnauthorized(body DeviceLayoutUnauthorizedResponseBody) information.Unauthorized {
-	v := information.Unauthorized(body)
+// NewDeviceLayoutBadRequest builds a information service device layout
+// endpoint bad-request error.
+func NewDeviceLayoutBadRequest(body *DeviceLayoutBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
 	return v
 }
 
@@ -163,32 +307,256 @@ func NewFirmwareStatisticsResultOK(body interface{}) *information.FirmwareStatis
 	return res
 }
 
-// NewFirmwareStatisticsBadRequest builds a information service firmware
-// statistics endpoint bad-request error.
-func NewFirmwareStatisticsBadRequest(body FirmwareStatisticsBadRequestResponseBody) information.BadRequest {
-	v := information.BadRequest(body)
+// NewFirmwareStatisticsUnauthorized builds a information service firmware
+// statistics endpoint unauthorized error.
+func NewFirmwareStatisticsUnauthorized(body *FirmwareStatisticsUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
 	return v
 }
 
 // NewFirmwareStatisticsForbidden builds a information service firmware
 // statistics endpoint forbidden error.
-func NewFirmwareStatisticsForbidden(body FirmwareStatisticsForbiddenResponseBody) information.Forbidden {
-	v := information.Forbidden(body)
+func NewFirmwareStatisticsForbidden(body *FirmwareStatisticsForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
 	return v
 }
 
 // NewFirmwareStatisticsNotFound builds a information service firmware
 // statistics endpoint not-found error.
-func NewFirmwareStatisticsNotFound(body FirmwareStatisticsNotFoundResponseBody) information.NotFound {
-	v := information.NotFound(body)
+func NewFirmwareStatisticsNotFound(body *FirmwareStatisticsNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
 	return v
 }
 
-// NewFirmwareStatisticsUnauthorized builds a information service firmware
-// statistics endpoint unauthorized error.
-func NewFirmwareStatisticsUnauthorized(body FirmwareStatisticsUnauthorizedResponseBody) information.Unauthorized {
-	v := information.Unauthorized(body)
+// NewFirmwareStatisticsBadRequest builds a information service firmware
+// statistics endpoint bad-request error.
+func NewFirmwareStatisticsBadRequest(body *FirmwareStatisticsBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
 	return v
+}
+
+// ValidateDeviceLayoutUnauthorizedResponseBody runs the validations defined on
+// device layout_unauthorized_response_body
+func ValidateDeviceLayoutUnauthorizedResponseBody(body *DeviceLayoutUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateDeviceLayoutForbiddenResponseBody runs the validations defined on
+// device layout_forbidden_response_body
+func ValidateDeviceLayoutForbiddenResponseBody(body *DeviceLayoutForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateDeviceLayoutNotFoundResponseBody runs the validations defined on
+// device layout_not-found_response_body
+func ValidateDeviceLayoutNotFoundResponseBody(body *DeviceLayoutNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateDeviceLayoutBadRequestResponseBody runs the validations defined on
+// device layout_bad-request_response_body
+func ValidateDeviceLayoutBadRequestResponseBody(body *DeviceLayoutBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateFirmwareStatisticsUnauthorizedResponseBody runs the validations
+// defined on firmware statistics_unauthorized_response_body
+func ValidateFirmwareStatisticsUnauthorizedResponseBody(body *FirmwareStatisticsUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateFirmwareStatisticsForbiddenResponseBody runs the validations defined
+// on firmware statistics_forbidden_response_body
+func ValidateFirmwareStatisticsForbiddenResponseBody(body *FirmwareStatisticsForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateFirmwareStatisticsNotFoundResponseBody runs the validations defined
+// on firmware statistics_not-found_response_body
+func ValidateFirmwareStatisticsNotFoundResponseBody(body *FirmwareStatisticsNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateFirmwareStatisticsBadRequestResponseBody runs the validations
+// defined on firmware statistics_bad-request_response_body
+func ValidateFirmwareStatisticsBadRequestResponseBody(body *FirmwareStatisticsBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
 }
 
 // ValidateStationConfigurationResponseBody runs the validations defined on

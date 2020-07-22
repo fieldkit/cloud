@@ -13,6 +13,7 @@ import (
 
 	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
 	goahttp "goa.design/goa/v3/http"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // EncodeFiveResponse returns an encoder for responses returned by the tasks
@@ -34,20 +35,8 @@ func EncodeFiveError(encoder func(context.Context, http.ResponseWriter) goahttp.
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "bad-request":
-			res := v.(tasks.BadRequest)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewFiveBadRequestResponseBody(res)
-			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
 		case "forbidden":
-			res := v.(tasks.Forbidden)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -59,7 +48,7 @@ func EncodeFiveError(encoder func(context.Context, http.ResponseWriter) goahttp.
 			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
-			res := v.(tasks.NotFound)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -69,6 +58,18 @@ func EncodeFiveError(encoder func(context.Context, http.ResponseWriter) goahttp.
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewFiveBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		case "unauthorized":
 			res := v.(tasks.Unauthorized)

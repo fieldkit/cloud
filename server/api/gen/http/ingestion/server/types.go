@@ -9,186 +9,523 @@ package server
 
 import (
 	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
+	goa "goa.design/goa/v3/pkg"
 )
-
-// ProcessPendingBadRequestResponseBody is the type of the "ingestion" service
-// "process pending" endpoint HTTP response body for the "bad-request" error.
-type ProcessPendingBadRequestResponseBody string
-
-// ProcessPendingForbiddenResponseBody is the type of the "ingestion" service
-// "process pending" endpoint HTTP response body for the "forbidden" error.
-type ProcessPendingForbiddenResponseBody string
-
-// ProcessPendingNotFoundResponseBody is the type of the "ingestion" service
-// "process pending" endpoint HTTP response body for the "not-found" error.
-type ProcessPendingNotFoundResponseBody string
 
 // ProcessPendingUnauthorizedResponseBody is the type of the "ingestion"
 // service "process pending" endpoint HTTP response body for the "unauthorized"
 // error.
-type ProcessPendingUnauthorizedResponseBody string
+type ProcessPendingUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ProcessStationBadRequestResponseBody is the type of the "ingestion" service
-// "process station" endpoint HTTP response body for the "bad-request" error.
-type ProcessStationBadRequestResponseBody string
+// ProcessPendingForbiddenResponseBody is the type of the "ingestion" service
+// "process pending" endpoint HTTP response body for the "forbidden" error.
+type ProcessPendingForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ProcessStationForbiddenResponseBody is the type of the "ingestion" service
-// "process station" endpoint HTTP response body for the "forbidden" error.
-type ProcessStationForbiddenResponseBody string
+// ProcessPendingNotFoundResponseBody is the type of the "ingestion" service
+// "process pending" endpoint HTTP response body for the "not-found" error.
+type ProcessPendingNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ProcessStationNotFoundResponseBody is the type of the "ingestion" service
-// "process station" endpoint HTTP response body for the "not-found" error.
-type ProcessStationNotFoundResponseBody string
+// ProcessPendingBadRequestResponseBody is the type of the "ingestion" service
+// "process pending" endpoint HTTP response body for the "bad-request" error.
+type ProcessPendingBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // ProcessStationUnauthorizedResponseBody is the type of the "ingestion"
 // service "process station" endpoint HTTP response body for the "unauthorized"
 // error.
-type ProcessStationUnauthorizedResponseBody string
+type ProcessStationUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ProcessIngestionBadRequestResponseBody is the type of the "ingestion"
-// service "process ingestion" endpoint HTTP response body for the
-// "bad-request" error.
-type ProcessIngestionBadRequestResponseBody string
+// ProcessStationForbiddenResponseBody is the type of the "ingestion" service
+// "process station" endpoint HTTP response body for the "forbidden" error.
+type ProcessStationForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ProcessIngestionForbiddenResponseBody is the type of the "ingestion" service
-// "process ingestion" endpoint HTTP response body for the "forbidden" error.
-type ProcessIngestionForbiddenResponseBody string
+// ProcessStationNotFoundResponseBody is the type of the "ingestion" service
+// "process station" endpoint HTTP response body for the "not-found" error.
+type ProcessStationNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ProcessIngestionNotFoundResponseBody is the type of the "ingestion" service
-// "process ingestion" endpoint HTTP response body for the "not-found" error.
-type ProcessIngestionNotFoundResponseBody string
+// ProcessStationBadRequestResponseBody is the type of the "ingestion" service
+// "process station" endpoint HTTP response body for the "bad-request" error.
+type ProcessStationBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // ProcessIngestionUnauthorizedResponseBody is the type of the "ingestion"
 // service "process ingestion" endpoint HTTP response body for the
 // "unauthorized" error.
-type ProcessIngestionUnauthorizedResponseBody string
+type ProcessIngestionUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DeleteBadRequestResponseBody is the type of the "ingestion" service "delete"
-// endpoint HTTP response body for the "bad-request" error.
-type DeleteBadRequestResponseBody string
+// ProcessIngestionForbiddenResponseBody is the type of the "ingestion" service
+// "process ingestion" endpoint HTTP response body for the "forbidden" error.
+type ProcessIngestionForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DeleteForbiddenResponseBody is the type of the "ingestion" service "delete"
-// endpoint HTTP response body for the "forbidden" error.
-type DeleteForbiddenResponseBody string
+// ProcessIngestionNotFoundResponseBody is the type of the "ingestion" service
+// "process ingestion" endpoint HTTP response body for the "not-found" error.
+type ProcessIngestionNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DeleteNotFoundResponseBody is the type of the "ingestion" service "delete"
-// endpoint HTTP response body for the "not-found" error.
-type DeleteNotFoundResponseBody string
+// ProcessIngestionBadRequestResponseBody is the type of the "ingestion"
+// service "process ingestion" endpoint HTTP response body for the
+// "bad-request" error.
+type ProcessIngestionBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // DeleteUnauthorizedResponseBody is the type of the "ingestion" service
 // "delete" endpoint HTTP response body for the "unauthorized" error.
-type DeleteUnauthorizedResponseBody string
+type DeleteUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// NewProcessPendingBadRequestResponseBody builds the HTTP response body from
+// DeleteForbiddenResponseBody is the type of the "ingestion" service "delete"
+// endpoint HTTP response body for the "forbidden" error.
+type DeleteForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteNotFoundResponseBody is the type of the "ingestion" service "delete"
+// endpoint HTTP response body for the "not-found" error.
+type DeleteNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteBadRequestResponseBody is the type of the "ingestion" service "delete"
+// endpoint HTTP response body for the "bad-request" error.
+type DeleteBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// NewProcessPendingUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "process pending" endpoint of the "ingestion" service.
-func NewProcessPendingBadRequestResponseBody(res ingestion.BadRequest) ProcessPendingBadRequestResponseBody {
-	body := ProcessPendingBadRequestResponseBody(res)
+func NewProcessPendingUnauthorizedResponseBody(res *goa.ServiceError) *ProcessPendingUnauthorizedResponseBody {
+	body := &ProcessPendingUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewProcessPendingForbiddenResponseBody builds the HTTP response body from
 // the result of the "process pending" endpoint of the "ingestion" service.
-func NewProcessPendingForbiddenResponseBody(res ingestion.Forbidden) ProcessPendingForbiddenResponseBody {
-	body := ProcessPendingForbiddenResponseBody(res)
+func NewProcessPendingForbiddenResponseBody(res *goa.ServiceError) *ProcessPendingForbiddenResponseBody {
+	body := &ProcessPendingForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewProcessPendingNotFoundResponseBody builds the HTTP response body from the
 // result of the "process pending" endpoint of the "ingestion" service.
-func NewProcessPendingNotFoundResponseBody(res ingestion.NotFound) ProcessPendingNotFoundResponseBody {
-	body := ProcessPendingNotFoundResponseBody(res)
+func NewProcessPendingNotFoundResponseBody(res *goa.ServiceError) *ProcessPendingNotFoundResponseBody {
+	body := &ProcessPendingNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewProcessPendingUnauthorizedResponseBody builds the HTTP response body from
+// NewProcessPendingBadRequestResponseBody builds the HTTP response body from
 // the result of the "process pending" endpoint of the "ingestion" service.
-func NewProcessPendingUnauthorizedResponseBody(res ingestion.Unauthorized) ProcessPendingUnauthorizedResponseBody {
-	body := ProcessPendingUnauthorizedResponseBody(res)
-	return body
-}
-
-// NewProcessStationBadRequestResponseBody builds the HTTP response body from
-// the result of the "process station" endpoint of the "ingestion" service.
-func NewProcessStationBadRequestResponseBody(res ingestion.BadRequest) ProcessStationBadRequestResponseBody {
-	body := ProcessStationBadRequestResponseBody(res)
-	return body
-}
-
-// NewProcessStationForbiddenResponseBody builds the HTTP response body from
-// the result of the "process station" endpoint of the "ingestion" service.
-func NewProcessStationForbiddenResponseBody(res ingestion.Forbidden) ProcessStationForbiddenResponseBody {
-	body := ProcessStationForbiddenResponseBody(res)
-	return body
-}
-
-// NewProcessStationNotFoundResponseBody builds the HTTP response body from the
-// result of the "process station" endpoint of the "ingestion" service.
-func NewProcessStationNotFoundResponseBody(res ingestion.NotFound) ProcessStationNotFoundResponseBody {
-	body := ProcessStationNotFoundResponseBody(res)
+func NewProcessPendingBadRequestResponseBody(res *goa.ServiceError) *ProcessPendingBadRequestResponseBody {
+	body := &ProcessPendingBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewProcessStationUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "process station" endpoint of the "ingestion" service.
-func NewProcessStationUnauthorizedResponseBody(res ingestion.Unauthorized) ProcessStationUnauthorizedResponseBody {
-	body := ProcessStationUnauthorizedResponseBody(res)
+func NewProcessStationUnauthorizedResponseBody(res *goa.ServiceError) *ProcessStationUnauthorizedResponseBody {
+	body := &ProcessStationUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewProcessIngestionBadRequestResponseBody builds the HTTP response body from
-// the result of the "process ingestion" endpoint of the "ingestion" service.
-func NewProcessIngestionBadRequestResponseBody(res ingestion.BadRequest) ProcessIngestionBadRequestResponseBody {
-	body := ProcessIngestionBadRequestResponseBody(res)
+// NewProcessStationForbiddenResponseBody builds the HTTP response body from
+// the result of the "process station" endpoint of the "ingestion" service.
+func NewProcessStationForbiddenResponseBody(res *goa.ServiceError) *ProcessStationForbiddenResponseBody {
+	body := &ProcessStationForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewProcessIngestionForbiddenResponseBody builds the HTTP response body from
-// the result of the "process ingestion" endpoint of the "ingestion" service.
-func NewProcessIngestionForbiddenResponseBody(res ingestion.Forbidden) ProcessIngestionForbiddenResponseBody {
-	body := ProcessIngestionForbiddenResponseBody(res)
+// NewProcessStationNotFoundResponseBody builds the HTTP response body from the
+// result of the "process station" endpoint of the "ingestion" service.
+func NewProcessStationNotFoundResponseBody(res *goa.ServiceError) *ProcessStationNotFoundResponseBody {
+	body := &ProcessStationNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewProcessIngestionNotFoundResponseBody builds the HTTP response body from
-// the result of the "process ingestion" endpoint of the "ingestion" service.
-func NewProcessIngestionNotFoundResponseBody(res ingestion.NotFound) ProcessIngestionNotFoundResponseBody {
-	body := ProcessIngestionNotFoundResponseBody(res)
+// NewProcessStationBadRequestResponseBody builds the HTTP response body from
+// the result of the "process station" endpoint of the "ingestion" service.
+func NewProcessStationBadRequestResponseBody(res *goa.ServiceError) *ProcessStationBadRequestResponseBody {
+	body := &ProcessStationBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewProcessIngestionUnauthorizedResponseBody builds the HTTP response body
 // from the result of the "process ingestion" endpoint of the "ingestion"
 // service.
-func NewProcessIngestionUnauthorizedResponseBody(res ingestion.Unauthorized) ProcessIngestionUnauthorizedResponseBody {
-	body := ProcessIngestionUnauthorizedResponseBody(res)
+func NewProcessIngestionUnauthorizedResponseBody(res *goa.ServiceError) *ProcessIngestionUnauthorizedResponseBody {
+	body := &ProcessIngestionUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDeleteBadRequestResponseBody builds the HTTP response body from the
-// result of the "delete" endpoint of the "ingestion" service.
-func NewDeleteBadRequestResponseBody(res ingestion.BadRequest) DeleteBadRequestResponseBody {
-	body := DeleteBadRequestResponseBody(res)
+// NewProcessIngestionForbiddenResponseBody builds the HTTP response body from
+// the result of the "process ingestion" endpoint of the "ingestion" service.
+func NewProcessIngestionForbiddenResponseBody(res *goa.ServiceError) *ProcessIngestionForbiddenResponseBody {
+	body := &ProcessIngestionForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDeleteForbiddenResponseBody builds the HTTP response body from the result
-// of the "delete" endpoint of the "ingestion" service.
-func NewDeleteForbiddenResponseBody(res ingestion.Forbidden) DeleteForbiddenResponseBody {
-	body := DeleteForbiddenResponseBody(res)
+// NewProcessIngestionNotFoundResponseBody builds the HTTP response body from
+// the result of the "process ingestion" endpoint of the "ingestion" service.
+func NewProcessIngestionNotFoundResponseBody(res *goa.ServiceError) *ProcessIngestionNotFoundResponseBody {
+	body := &ProcessIngestionNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDeleteNotFoundResponseBody builds the HTTP response body from the result
-// of the "delete" endpoint of the "ingestion" service.
-func NewDeleteNotFoundResponseBody(res ingestion.NotFound) DeleteNotFoundResponseBody {
-	body := DeleteNotFoundResponseBody(res)
+// NewProcessIngestionBadRequestResponseBody builds the HTTP response body from
+// the result of the "process ingestion" endpoint of the "ingestion" service.
+func NewProcessIngestionBadRequestResponseBody(res *goa.ServiceError) *ProcessIngestionBadRequestResponseBody {
+	body := &ProcessIngestionBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewDeleteUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "delete" endpoint of the "ingestion" service.
-func NewDeleteUnauthorizedResponseBody(res ingestion.Unauthorized) DeleteUnauthorizedResponseBody {
-	body := DeleteUnauthorizedResponseBody(res)
+func NewDeleteUnauthorizedResponseBody(res *goa.ServiceError) *DeleteUnauthorizedResponseBody {
+	body := &DeleteUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteForbiddenResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "ingestion" service.
+func NewDeleteForbiddenResponseBody(res *goa.ServiceError) *DeleteForbiddenResponseBody {
+	body := &DeleteForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteNotFoundResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "ingestion" service.
+func NewDeleteNotFoundResponseBody(res *goa.ServiceError) *DeleteNotFoundResponseBody {
+	body := &DeleteNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteBadRequestResponseBody builds the HTTP response body from the
+// result of the "delete" endpoint of the "ingestion" service.
+func NewDeleteBadRequestResponseBody(res *goa.ServiceError) *DeleteBadRequestResponseBody {
+	body := &DeleteBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 

@@ -51,10 +51,10 @@ func (c *Client) BuildDownloadRequest(ctx context.Context, v interface{}) (*http
 // firmware download endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeDownloadResponse may return the following errors:
-//	- "bad-request" (type firmware.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type firmware.Forbidden): http.StatusForbidden
-//	- "not-found" (type firmware.NotFound): http.StatusNotFound
-//	- "unauthorized" (type firmware.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeDownloadResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -96,36 +96,6 @@ func DecodeDownloadResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			}
 			res := NewDownloadResultOK(length, contentType)
 			return res, nil
-		case http.StatusBadRequest:
-			var (
-				body DownloadBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("firmware", "download", err)
-			}
-			return nil, NewDownloadBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body DownloadForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("firmware", "download", err)
-			}
-			return nil, NewDownloadForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body DownloadNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("firmware", "download", err)
-			}
-			return nil, NewDownloadNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body DownloadUnauthorizedResponseBody
@@ -135,7 +105,53 @@ func DecodeDownloadResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("firmware", "download", err)
 			}
-			return nil, NewDownloadUnauthorized(body)
+			err = ValidateDownloadUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "download", err)
+			}
+			return nil, NewDownloadUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body DownloadForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("firmware", "download", err)
+			}
+			err = ValidateDownloadForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "download", err)
+			}
+			return nil, NewDownloadForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body DownloadNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("firmware", "download", err)
+			}
+			err = ValidateDownloadNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "download", err)
+			}
+			return nil, NewDownloadNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body DownloadBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("firmware", "download", err)
+			}
+			err = ValidateDownloadBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "download", err)
+			}
+			return nil, NewDownloadBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("firmware", "download", resp.StatusCode, string(body))
@@ -182,10 +198,10 @@ func EncodeAddRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Re
 // add endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeAddResponse may return the following errors:
-//	- "bad-request" (type firmware.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type firmware.Forbidden): http.StatusForbidden
-//	- "not-found" (type firmware.NotFound): http.StatusNotFound
-//	- "unauthorized" (type firmware.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -204,36 +220,6 @@ func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
-		case http.StatusBadRequest:
-			var (
-				body AddBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("firmware", "add", err)
-			}
-			return nil, NewAddBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body AddForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("firmware", "add", err)
-			}
-			return nil, NewAddForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body AddNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("firmware", "add", err)
-			}
-			return nil, NewAddNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body AddUnauthorizedResponseBody
@@ -243,7 +229,53 @@ func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("firmware", "add", err)
 			}
-			return nil, NewAddUnauthorized(body)
+			err = ValidateAddUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "add", err)
+			}
+			return nil, NewAddUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body AddForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("firmware", "add", err)
+			}
+			err = ValidateAddForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "add", err)
+			}
+			return nil, NewAddForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body AddNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("firmware", "add", err)
+			}
+			err = ValidateAddNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "add", err)
+			}
+			return nil, NewAddNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body AddBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("firmware", "add", err)
+			}
+			err = ValidateAddBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "add", err)
+			}
+			return nil, NewAddBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("firmware", "add", resp.StatusCode, string(body))
@@ -300,10 +332,10 @@ func EncodeListRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.R
 // list endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeListResponse may return the following errors:
-//	- "bad-request" (type firmware.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type firmware.Forbidden): http.StatusForbidden
-//	- "not-found" (type firmware.NotFound): http.StatusNotFound
-//	- "unauthorized" (type firmware.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeListResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -337,36 +369,6 @@ func DecodeListResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 			}
 			res := firmware.NewFirmwares(vres)
 			return res, nil
-		case http.StatusBadRequest:
-			var (
-				body ListBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("firmware", "list", err)
-			}
-			return nil, NewListBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body ListForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("firmware", "list", err)
-			}
-			return nil, NewListForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body ListNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("firmware", "list", err)
-			}
-			return nil, NewListNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body ListUnauthorizedResponseBody
@@ -376,7 +378,53 @@ func DecodeListResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("firmware", "list", err)
 			}
-			return nil, NewListUnauthorized(body)
+			err = ValidateListUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "list", err)
+			}
+			return nil, NewListUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ListForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("firmware", "list", err)
+			}
+			err = ValidateListForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "list", err)
+			}
+			return nil, NewListForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ListNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("firmware", "list", err)
+			}
+			err = ValidateListNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "list", err)
+			}
+			return nil, NewListNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ListBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("firmware", "list", err)
+			}
+			err = ValidateListBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "list", err)
+			}
+			return nil, NewListBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("firmware", "list", resp.StatusCode, string(body))
@@ -429,10 +477,10 @@ func EncodeDeleteRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // firmware delete endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeDeleteResponse may return the following errors:
-//	- "bad-request" (type firmware.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type firmware.Forbidden): http.StatusForbidden
-//	- "not-found" (type firmware.NotFound): http.StatusNotFound
-//	- "unauthorized" (type firmware.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -451,36 +499,6 @@ func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
-		case http.StatusBadRequest:
-			var (
-				body DeleteBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("firmware", "delete", err)
-			}
-			return nil, NewDeleteBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body DeleteForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("firmware", "delete", err)
-			}
-			return nil, NewDeleteForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body DeleteNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("firmware", "delete", err)
-			}
-			return nil, NewDeleteNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body DeleteUnauthorizedResponseBody
@@ -490,7 +508,53 @@ func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("firmware", "delete", err)
 			}
-			return nil, NewDeleteUnauthorized(body)
+			err = ValidateDeleteUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "delete", err)
+			}
+			return nil, NewDeleteUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body DeleteForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("firmware", "delete", err)
+			}
+			err = ValidateDeleteForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "delete", err)
+			}
+			return nil, NewDeleteForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body DeleteNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("firmware", "delete", err)
+			}
+			err = ValidateDeleteNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "delete", err)
+			}
+			return nil, NewDeleteNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body DeleteBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("firmware", "delete", err)
+			}
+			err = ValidateDeleteBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("firmware", "delete", err)
+			}
+			return nil, NewDeleteBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("firmware", "delete", resp.StatusCode, string(body))

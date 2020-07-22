@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 
-	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -63,20 +62,20 @@ func EncodeProcessPendingError(encoder func(context.Context, http.ResponseWriter
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "bad-request":
-			res := v.(ingestion.BadRequest)
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewProcessPendingBadRequestResponseBody(res)
+				body = NewProcessPendingUnauthorizedResponseBody(res)
 			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "forbidden":
-			res := v.(ingestion.Forbidden)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -88,7 +87,7 @@ func EncodeProcessPendingError(encoder func(context.Context, http.ResponseWriter
 			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
-			res := v.(ingestion.NotFound)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -99,17 +98,17 @@ func EncodeProcessPendingError(encoder func(context.Context, http.ResponseWriter
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(ingestion.Unauthorized)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewProcessPendingUnauthorizedResponseBody(res)
+				body = NewProcessPendingBadRequestResponseBody(res)
 			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -184,20 +183,20 @@ func EncodeProcessStationError(encoder func(context.Context, http.ResponseWriter
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "bad-request":
-			res := v.(ingestion.BadRequest)
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewProcessStationBadRequestResponseBody(res)
+				body = NewProcessStationUnauthorizedResponseBody(res)
 			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "forbidden":
-			res := v.(ingestion.Forbidden)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -209,7 +208,7 @@ func EncodeProcessStationError(encoder func(context.Context, http.ResponseWriter
 			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
-			res := v.(ingestion.NotFound)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -220,17 +219,17 @@ func EncodeProcessStationError(encoder func(context.Context, http.ResponseWriter
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(ingestion.Unauthorized)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewProcessStationUnauthorizedResponseBody(res)
+				body = NewProcessStationBadRequestResponseBody(res)
 			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -294,20 +293,20 @@ func EncodeProcessIngestionError(encoder func(context.Context, http.ResponseWrit
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "bad-request":
-			res := v.(ingestion.BadRequest)
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewProcessIngestionBadRequestResponseBody(res)
+				body = NewProcessIngestionUnauthorizedResponseBody(res)
 			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "forbidden":
-			res := v.(ingestion.Forbidden)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -319,7 +318,7 @@ func EncodeProcessIngestionError(encoder func(context.Context, http.ResponseWrit
 			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
-			res := v.(ingestion.NotFound)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -330,17 +329,17 @@ func EncodeProcessIngestionError(encoder func(context.Context, http.ResponseWrit
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(ingestion.Unauthorized)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewProcessIngestionUnauthorizedResponseBody(res)
+				body = NewProcessIngestionBadRequestResponseBody(res)
 			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -404,20 +403,20 @@ func EncodeDeleteError(encoder func(context.Context, http.ResponseWriter) goahtt
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "bad-request":
-			res := v.(ingestion.BadRequest)
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewDeleteBadRequestResponseBody(res)
+				body = NewDeleteUnauthorizedResponseBody(res)
 			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "forbidden":
-			res := v.(ingestion.Forbidden)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -429,7 +428,7 @@ func EncodeDeleteError(encoder func(context.Context, http.ResponseWriter) goahtt
 			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
-			res := v.(ingestion.NotFound)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -440,17 +439,17 @@ func EncodeDeleteError(encoder func(context.Context, http.ResponseWriter) goahtt
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(ingestion.Unauthorized)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewDeleteUnauthorizedResponseBody(res)
+				body = NewDeleteBadRequestResponseBody(res)
 			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)

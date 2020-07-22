@@ -10,6 +10,7 @@ package server
 import (
 	data "github.com/fieldkit/cloud/server/api/gen/data"
 	dataviews "github.com/fieldkit/cloud/server/api/gen/data/views"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // DeviceSummaryResponseBody is the type of the "data" service "device summary"
@@ -18,21 +19,77 @@ type DeviceSummaryResponseBody struct {
 	Provisions DeviceProvisionSummaryResponseBodyCollection `form:"provisions" json:"provisions" xml:"provisions"`
 }
 
-// DeviceSummaryBadRequestResponseBody is the type of the "data" service
-// "device summary" endpoint HTTP response body for the "bad-request" error.
-type DeviceSummaryBadRequestResponseBody string
+// DeviceSummaryUnauthorizedResponseBody is the type of the "data" service
+// "device summary" endpoint HTTP response body for the "unauthorized" error.
+type DeviceSummaryUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // DeviceSummaryForbiddenResponseBody is the type of the "data" service "device
 // summary" endpoint HTTP response body for the "forbidden" error.
-type DeviceSummaryForbiddenResponseBody string
+type DeviceSummaryForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // DeviceSummaryNotFoundResponseBody is the type of the "data" service "device
 // summary" endpoint HTTP response body for the "not-found" error.
-type DeviceSummaryNotFoundResponseBody string
+type DeviceSummaryNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DeviceSummaryUnauthorizedResponseBody is the type of the "data" service
-// "device summary" endpoint HTTP response body for the "unauthorized" error.
-type DeviceSummaryUnauthorizedResponseBody string
+// DeviceSummaryBadRequestResponseBody is the type of the "data" service
+// "device summary" endpoint HTTP response body for the "bad-request" error.
+type DeviceSummaryBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // DeviceProvisionSummaryResponseBodyCollection is used to define fields on
 // response body types.
@@ -77,31 +134,59 @@ func NewDeviceSummaryResponseBody(res *dataviews.DeviceDataSummaryResponseView) 
 	return body
 }
 
-// NewDeviceSummaryBadRequestResponseBody builds the HTTP response body from
+// NewDeviceSummaryUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "device summary" endpoint of the "data" service.
-func NewDeviceSummaryBadRequestResponseBody(res data.BadRequest) DeviceSummaryBadRequestResponseBody {
-	body := DeviceSummaryBadRequestResponseBody(res)
+func NewDeviceSummaryUnauthorizedResponseBody(res *goa.ServiceError) *DeviceSummaryUnauthorizedResponseBody {
+	body := &DeviceSummaryUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewDeviceSummaryForbiddenResponseBody builds the HTTP response body from the
 // result of the "device summary" endpoint of the "data" service.
-func NewDeviceSummaryForbiddenResponseBody(res data.Forbidden) DeviceSummaryForbiddenResponseBody {
-	body := DeviceSummaryForbiddenResponseBody(res)
+func NewDeviceSummaryForbiddenResponseBody(res *goa.ServiceError) *DeviceSummaryForbiddenResponseBody {
+	body := &DeviceSummaryForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewDeviceSummaryNotFoundResponseBody builds the HTTP response body from the
 // result of the "device summary" endpoint of the "data" service.
-func NewDeviceSummaryNotFoundResponseBody(res data.NotFound) DeviceSummaryNotFoundResponseBody {
-	body := DeviceSummaryNotFoundResponseBody(res)
+func NewDeviceSummaryNotFoundResponseBody(res *goa.ServiceError) *DeviceSummaryNotFoundResponseBody {
+	body := &DeviceSummaryNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDeviceSummaryUnauthorizedResponseBody builds the HTTP response body from
+// NewDeviceSummaryBadRequestResponseBody builds the HTTP response body from
 // the result of the "device summary" endpoint of the "data" service.
-func NewDeviceSummaryUnauthorizedResponseBody(res data.Unauthorized) DeviceSummaryUnauthorizedResponseBody {
-	body := DeviceSummaryUnauthorizedResponseBody(res)
+func NewDeviceSummaryBadRequestResponseBody(res *goa.ServiceError) *DeviceSummaryBadRequestResponseBody {
+	body := &DeviceSummaryBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 

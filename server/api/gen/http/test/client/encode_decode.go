@@ -49,9 +49,9 @@ func (c *Client) BuildGetRequest(ctx context.Context, v interface{}) (*http.Requ
 // endpoint. restoreBody controls whether the response body should be restored
 // after having been read.
 // DecodeGetResponse may return the following errors:
-//	- "bad-request" (type test.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type test.Forbidden): http.StatusForbidden
-//	- "not-found" (type test.NotFound): http.StatusNotFound
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- "unauthorized" (type test.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
@@ -71,16 +71,6 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
-		case http.StatusBadRequest:
-			var (
-				body GetBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("test", "get", err)
-			}
-			return nil, NewGetBadRequest(body)
 		case http.StatusForbidden:
 			var (
 				body GetForbiddenResponseBody
@@ -90,7 +80,11 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("test", "get", err)
 			}
-			return nil, NewGetForbidden(body)
+			err = ValidateGetForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("test", "get", err)
+			}
+			return nil, NewGetForbidden(&body)
 		case http.StatusNotFound:
 			var (
 				body GetNotFoundResponseBody
@@ -100,7 +94,25 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("test", "get", err)
 			}
-			return nil, NewGetNotFound(body)
+			err = ValidateGetNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("test", "get", err)
+			}
+			return nil, NewGetNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body GetBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("test", "get", err)
+			}
+			err = ValidateGetBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("test", "get", err)
+			}
+			return nil, NewGetBadRequest(&body)
 		case http.StatusUnauthorized:
 			var (
 				body GetUnauthorizedResponseBody
@@ -137,9 +149,9 @@ func (c *Client) BuildErrorRequest(ctx context.Context, v interface{}) (*http.Re
 // error endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeErrorResponse may return the following errors:
-//	- "bad-request" (type test.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type test.Forbidden): http.StatusForbidden
-//	- "not-found" (type test.NotFound): http.StatusNotFound
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- "unauthorized" (type test.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeErrorResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
@@ -159,16 +171,6 @@ func DecodeErrorResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 		switch resp.StatusCode {
 		case http.StatusNoContent:
 			return nil, nil
-		case http.StatusBadRequest:
-			var (
-				body ErrorBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("test", "error", err)
-			}
-			return nil, NewErrorBadRequest(body)
 		case http.StatusForbidden:
 			var (
 				body ErrorForbiddenResponseBody
@@ -178,7 +180,11 @@ func DecodeErrorResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("test", "error", err)
 			}
-			return nil, NewErrorForbidden(body)
+			err = ValidateErrorForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("test", "error", err)
+			}
+			return nil, NewErrorForbidden(&body)
 		case http.StatusNotFound:
 			var (
 				body ErrorNotFoundResponseBody
@@ -188,7 +194,25 @@ func DecodeErrorResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("test", "error", err)
 			}
-			return nil, NewErrorNotFound(body)
+			err = ValidateErrorNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("test", "error", err)
+			}
+			return nil, NewErrorNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ErrorBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("test", "error", err)
+			}
+			err = ValidateErrorBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("test", "error", err)
+			}
+			return nil, NewErrorBadRequest(&body)
 		case http.StatusUnauthorized:
 			var (
 				body ErrorUnauthorizedResponseBody
@@ -244,9 +268,9 @@ func EncodeEmailRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.
 // email endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeEmailResponse may return the following errors:
-//	- "bad-request" (type test.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type test.Forbidden): http.StatusForbidden
-//	- "not-found" (type test.NotFound): http.StatusNotFound
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- "unauthorized" (type test.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeEmailResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
@@ -266,16 +290,6 @@ func DecodeEmailResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
-		case http.StatusBadRequest:
-			var (
-				body EmailBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("test", "email", err)
-			}
-			return nil, NewEmailBadRequest(body)
 		case http.StatusForbidden:
 			var (
 				body EmailForbiddenResponseBody
@@ -285,7 +299,11 @@ func DecodeEmailResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("test", "email", err)
 			}
-			return nil, NewEmailForbidden(body)
+			err = ValidateEmailForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("test", "email", err)
+			}
+			return nil, NewEmailForbidden(&body)
 		case http.StatusNotFound:
 			var (
 				body EmailNotFoundResponseBody
@@ -295,7 +313,25 @@ func DecodeEmailResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("test", "email", err)
 			}
-			return nil, NewEmailNotFound(body)
+			err = ValidateEmailNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("test", "email", err)
+			}
+			return nil, NewEmailNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body EmailBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("test", "email", err)
+			}
+			err = ValidateEmailBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("test", "email", err)
+			}
+			return nil, NewEmailBadRequest(&body)
 		case http.StatusUnauthorized:
 			var (
 				body EmailUnauthorizedResponseBody

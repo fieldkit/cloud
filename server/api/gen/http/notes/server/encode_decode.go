@@ -94,20 +94,20 @@ func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahtt
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "bad-request":
-			res := v.(notes.BadRequest)
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUpdateBadRequestResponseBody(res)
+				body = NewUpdateUnauthorizedResponseBody(res)
 			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "forbidden":
-			res := v.(notes.Forbidden)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -119,7 +119,7 @@ func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahtt
 			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
-			res := v.(notes.NotFound)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -130,17 +130,17 @@ func EncodeUpdateError(encoder func(context.Context, http.ResponseWriter) goahtt
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(notes.Unauthorized)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUpdateUnauthorizedResponseBody(res)
+				body = NewUpdateBadRequestResponseBody(res)
 			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -207,20 +207,20 @@ func EncodeGetError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "bad-request":
-			res := v.(notes.BadRequest)
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewGetBadRequestResponseBody(res)
+				body = NewGetUnauthorizedResponseBody(res)
 			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "forbidden":
-			res := v.(notes.Forbidden)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -232,7 +232,7 @@ func EncodeGetError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
-			res := v.(notes.NotFound)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -243,17 +243,17 @@ func EncodeGetError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(notes.Unauthorized)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewGetUnauthorizedResponseBody(res)
+				body = NewGetBadRequestResponseBody(res)
 			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -322,20 +322,20 @@ func EncodeDownloadMediaError(encoder func(context.Context, http.ResponseWriter)
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "bad-request":
-			res := v.(notes.BadRequest)
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewDownloadMediaBadRequestResponseBody(res)
+				body = NewDownloadMediaUnauthorizedResponseBody(res)
 			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "forbidden":
-			res := v.(notes.Forbidden)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -347,7 +347,7 @@ func EncodeDownloadMediaError(encoder func(context.Context, http.ResponseWriter)
 			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
-			res := v.(notes.NotFound)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -358,17 +358,17 @@ func EncodeDownloadMediaError(encoder func(context.Context, http.ResponseWriter)
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(notes.Unauthorized)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewDownloadMediaUnauthorizedResponseBody(res)
+				body = NewDownloadMediaBadRequestResponseBody(res)
 			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -457,20 +457,20 @@ func EncodeUploadMediaError(encoder func(context.Context, http.ResponseWriter) g
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "bad-request":
-			res := v.(notes.BadRequest)
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUploadMediaBadRequestResponseBody(res)
+				body = NewUploadMediaUnauthorizedResponseBody(res)
 			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "forbidden":
-			res := v.(notes.Forbidden)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -482,7 +482,7 @@ func EncodeUploadMediaError(encoder func(context.Context, http.ResponseWriter) g
 			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
-			res := v.(notes.NotFound)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -493,17 +493,17 @@ func EncodeUploadMediaError(encoder func(context.Context, http.ResponseWriter) g
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(notes.Unauthorized)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUploadMediaUnauthorizedResponseBody(res)
+				body = NewUploadMediaBadRequestResponseBody(res)
 			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)

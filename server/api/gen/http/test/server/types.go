@@ -9,74 +9,222 @@ package server
 
 import (
 	test "github.com/fieldkit/cloud/server/api/gen/test"
+	goa "goa.design/goa/v3/pkg"
 )
-
-// GetBadRequestResponseBody is the type of the "test" service "get" endpoint
-// HTTP response body for the "bad-request" error.
-type GetBadRequestResponseBody string
 
 // GetForbiddenResponseBody is the type of the "test" service "get" endpoint
 // HTTP response body for the "forbidden" error.
-type GetForbiddenResponseBody string
+type GetForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // GetNotFoundResponseBody is the type of the "test" service "get" endpoint
 // HTTP response body for the "not-found" error.
-type GetNotFoundResponseBody string
+type GetNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetBadRequestResponseBody is the type of the "test" service "get" endpoint
+// HTTP response body for the "bad-request" error.
+type GetBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // GetUnauthorizedResponseBody is the type of the "test" service "get" endpoint
 // HTTP response body for the "unauthorized" error.
 type GetUnauthorizedResponseBody string
 
-// ErrorBadRequestResponseBody is the type of the "test" service "error"
-// endpoint HTTP response body for the "bad-request" error.
-type ErrorBadRequestResponseBody string
-
 // ErrorForbiddenResponseBody is the type of the "test" service "error"
 // endpoint HTTP response body for the "forbidden" error.
-type ErrorForbiddenResponseBody string
+type ErrorForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // ErrorNotFoundResponseBody is the type of the "test" service "error" endpoint
 // HTTP response body for the "not-found" error.
-type ErrorNotFoundResponseBody string
+type ErrorNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ErrorBadRequestResponseBody is the type of the "test" service "error"
+// endpoint HTTP response body for the "bad-request" error.
+type ErrorBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // ErrorUnauthorizedResponseBody is the type of the "test" service "error"
 // endpoint HTTP response body for the "unauthorized" error.
 type ErrorUnauthorizedResponseBody string
 
-// EmailBadRequestResponseBody is the type of the "test" service "email"
-// endpoint HTTP response body for the "bad-request" error.
-type EmailBadRequestResponseBody string
-
 // EmailForbiddenResponseBody is the type of the "test" service "email"
 // endpoint HTTP response body for the "forbidden" error.
-type EmailForbiddenResponseBody string
+type EmailForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // EmailNotFoundResponseBody is the type of the "test" service "email" endpoint
 // HTTP response body for the "not-found" error.
-type EmailNotFoundResponseBody string
+type EmailNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// EmailBadRequestResponseBody is the type of the "test" service "email"
+// endpoint HTTP response body for the "bad-request" error.
+type EmailBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // EmailUnauthorizedResponseBody is the type of the "test" service "email"
 // endpoint HTTP response body for the "unauthorized" error.
 type EmailUnauthorizedResponseBody string
 
-// NewGetBadRequestResponseBody builds the HTTP response body from the result
-// of the "get" endpoint of the "test" service.
-func NewGetBadRequestResponseBody(res test.BadRequest) GetBadRequestResponseBody {
-	body := GetBadRequestResponseBody(res)
-	return body
-}
-
 // NewGetForbiddenResponseBody builds the HTTP response body from the result of
 // the "get" endpoint of the "test" service.
-func NewGetForbiddenResponseBody(res test.Forbidden) GetForbiddenResponseBody {
-	body := GetForbiddenResponseBody(res)
+func NewGetForbiddenResponseBody(res *goa.ServiceError) *GetForbiddenResponseBody {
+	body := &GetForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewGetNotFoundResponseBody builds the HTTP response body from the result of
 // the "get" endpoint of the "test" service.
-func NewGetNotFoundResponseBody(res test.NotFound) GetNotFoundResponseBody {
-	body := GetNotFoundResponseBody(res)
+func NewGetNotFoundResponseBody(res *goa.ServiceError) *GetNotFoundResponseBody {
+	body := &GetNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetBadRequestResponseBody builds the HTTP response body from the result
+// of the "get" endpoint of the "test" service.
+func NewGetBadRequestResponseBody(res *goa.ServiceError) *GetBadRequestResponseBody {
+	body := &GetBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
@@ -87,24 +235,45 @@ func NewGetUnauthorizedResponseBody(res test.Unauthorized) GetUnauthorizedRespon
 	return body
 }
 
-// NewErrorBadRequestResponseBody builds the HTTP response body from the result
-// of the "error" endpoint of the "test" service.
-func NewErrorBadRequestResponseBody(res test.BadRequest) ErrorBadRequestResponseBody {
-	body := ErrorBadRequestResponseBody(res)
-	return body
-}
-
 // NewErrorForbiddenResponseBody builds the HTTP response body from the result
 // of the "error" endpoint of the "test" service.
-func NewErrorForbiddenResponseBody(res test.Forbidden) ErrorForbiddenResponseBody {
-	body := ErrorForbiddenResponseBody(res)
+func NewErrorForbiddenResponseBody(res *goa.ServiceError) *ErrorForbiddenResponseBody {
+	body := &ErrorForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewErrorNotFoundResponseBody builds the HTTP response body from the result
 // of the "error" endpoint of the "test" service.
-func NewErrorNotFoundResponseBody(res test.NotFound) ErrorNotFoundResponseBody {
-	body := ErrorNotFoundResponseBody(res)
+func NewErrorNotFoundResponseBody(res *goa.ServiceError) *ErrorNotFoundResponseBody {
+	body := &ErrorNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewErrorBadRequestResponseBody builds the HTTP response body from the result
+// of the "error" endpoint of the "test" service.
+func NewErrorBadRequestResponseBody(res *goa.ServiceError) *ErrorBadRequestResponseBody {
+	body := &ErrorBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
@@ -115,24 +284,45 @@ func NewErrorUnauthorizedResponseBody(res test.Unauthorized) ErrorUnauthorizedRe
 	return body
 }
 
-// NewEmailBadRequestResponseBody builds the HTTP response body from the result
-// of the "email" endpoint of the "test" service.
-func NewEmailBadRequestResponseBody(res test.BadRequest) EmailBadRequestResponseBody {
-	body := EmailBadRequestResponseBody(res)
-	return body
-}
-
 // NewEmailForbiddenResponseBody builds the HTTP response body from the result
 // of the "email" endpoint of the "test" service.
-func NewEmailForbiddenResponseBody(res test.Forbidden) EmailForbiddenResponseBody {
-	body := EmailForbiddenResponseBody(res)
+func NewEmailForbiddenResponseBody(res *goa.ServiceError) *EmailForbiddenResponseBody {
+	body := &EmailForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewEmailNotFoundResponseBody builds the HTTP response body from the result
 // of the "email" endpoint of the "test" service.
-func NewEmailNotFoundResponseBody(res test.NotFound) EmailNotFoundResponseBody {
-	body := EmailNotFoundResponseBody(res)
+func NewEmailNotFoundResponseBody(res *goa.ServiceError) *EmailNotFoundResponseBody {
+	body := &EmailNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewEmailBadRequestResponseBody builds the HTTP response body from the result
+// of the "email" endpoint of the "test" service.
+func NewEmailBadRequestResponseBody(res *goa.ServiceError) *EmailBadRequestResponseBody {
+	body := &EmailBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 

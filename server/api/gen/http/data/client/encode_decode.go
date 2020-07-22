@@ -64,10 +64,10 @@ func EncodeDeviceSummaryRequest(encoder func(*http.Request) goahttp.Encoder) fun
 // data device summary endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeDeviceSummaryResponse may return the following errors:
-//	- "bad-request" (type data.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type data.Forbidden): http.StatusForbidden
-//	- "not-found" (type data.NotFound): http.StatusNotFound
-//	- "unauthorized" (type data.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeDeviceSummaryResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -101,36 +101,6 @@ func DecodeDeviceSummaryResponse(decoder func(*http.Response) goahttp.Decoder, r
 			}
 			res := data.NewDeviceDataSummaryResponse(vres)
 			return res, nil
-		case http.StatusBadRequest:
-			var (
-				body DeviceSummaryBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("data", "device summary", err)
-			}
-			return nil, NewDeviceSummaryBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body DeviceSummaryForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("data", "device summary", err)
-			}
-			return nil, NewDeviceSummaryForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body DeviceSummaryNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("data", "device summary", err)
-			}
-			return nil, NewDeviceSummaryNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body DeviceSummaryUnauthorizedResponseBody
@@ -140,7 +110,53 @@ func DecodeDeviceSummaryResponse(decoder func(*http.Response) goahttp.Decoder, r
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("data", "device summary", err)
 			}
-			return nil, NewDeviceSummaryUnauthorized(body)
+			err = ValidateDeviceSummaryUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("data", "device summary", err)
+			}
+			return nil, NewDeviceSummaryUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body DeviceSummaryForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("data", "device summary", err)
+			}
+			err = ValidateDeviceSummaryForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("data", "device summary", err)
+			}
+			return nil, NewDeviceSummaryForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body DeviceSummaryNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("data", "device summary", err)
+			}
+			err = ValidateDeviceSummaryNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("data", "device summary", err)
+			}
+			return nil, NewDeviceSummaryNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body DeviceSummaryBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("data", "device summary", err)
+			}
+			err = ValidateDeviceSummaryBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("data", "device summary", err)
+			}
+			return nil, NewDeviceSummaryBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("data", "device summary", resp.StatusCode, string(body))

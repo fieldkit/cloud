@@ -70,10 +70,10 @@ func EncodeStationRequest(encoder func(*http.Request) goahttp.Encoder) func(*htt
 // activity station endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeStationResponse may return the following errors:
-//	- "bad-request" (type activity.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type activity.Forbidden): http.StatusForbidden
-//	- "not-found" (type activity.NotFound): http.StatusNotFound
-//	- "unauthorized" (type activity.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeStationResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -107,36 +107,6 @@ func DecodeStationResponse(decoder func(*http.Response) goahttp.Decoder, restore
 			}
 			res := activity.NewStationActivityPage(vres)
 			return res, nil
-		case http.StatusBadRequest:
-			var (
-				body StationBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("activity", "station", err)
-			}
-			return nil, NewStationBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body StationForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("activity", "station", err)
-			}
-			return nil, NewStationForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body StationNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("activity", "station", err)
-			}
-			return nil, NewStationNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body StationUnauthorizedResponseBody
@@ -146,7 +116,53 @@ func DecodeStationResponse(decoder func(*http.Response) goahttp.Decoder, restore
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("activity", "station", err)
 			}
-			return nil, NewStationUnauthorized(body)
+			err = ValidateStationUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("activity", "station", err)
+			}
+			return nil, NewStationUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body StationForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("activity", "station", err)
+			}
+			err = ValidateStationForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("activity", "station", err)
+			}
+			return nil, NewStationForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body StationNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("activity", "station", err)
+			}
+			err = ValidateStationNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("activity", "station", err)
+			}
+			return nil, NewStationNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body StationBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("activity", "station", err)
+			}
+			err = ValidateStationBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("activity", "station", err)
+			}
+			return nil, NewStationBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("activity", "station", resp.StatusCode, string(body))
@@ -204,10 +220,10 @@ func EncodeProjectRequest(encoder func(*http.Request) goahttp.Encoder) func(*htt
 // activity project endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeProjectResponse may return the following errors:
-//	- "bad-request" (type activity.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type activity.Forbidden): http.StatusForbidden
-//	- "not-found" (type activity.NotFound): http.StatusNotFound
-//	- "unauthorized" (type activity.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeProjectResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -241,36 +257,6 @@ func DecodeProjectResponse(decoder func(*http.Response) goahttp.Decoder, restore
 			}
 			res := activity.NewProjectActivityPage(vres)
 			return res, nil
-		case http.StatusBadRequest:
-			var (
-				body ProjectBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("activity", "project", err)
-			}
-			return nil, NewProjectBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body ProjectForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("activity", "project", err)
-			}
-			return nil, NewProjectForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body ProjectNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("activity", "project", err)
-			}
-			return nil, NewProjectNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body ProjectUnauthorizedResponseBody
@@ -280,7 +266,53 @@ func DecodeProjectResponse(decoder func(*http.Response) goahttp.Decoder, restore
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("activity", "project", err)
 			}
-			return nil, NewProjectUnauthorized(body)
+			err = ValidateProjectUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("activity", "project", err)
+			}
+			return nil, NewProjectUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ProjectForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("activity", "project", err)
+			}
+			err = ValidateProjectForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("activity", "project", err)
+			}
+			return nil, NewProjectForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ProjectNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("activity", "project", err)
+			}
+			err = ValidateProjectNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("activity", "project", err)
+			}
+			return nil, NewProjectNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ProjectBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("activity", "project", err)
+			}
+			err = ValidateProjectBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("activity", "project", err)
+			}
+			return nil, NewProjectBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("activity", "project", resp.StatusCode, string(body))

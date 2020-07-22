@@ -12,9 +12,9 @@ import (
 	"net/http"
 	"strings"
 
-	data "github.com/fieldkit/cloud/server/api/gen/data"
 	dataviews "github.com/fieldkit/cloud/server/api/gen/data/views"
 	goahttp "goa.design/goa/v3/http"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // EncodeDeviceSummaryResponse returns an encoder for responses returned by the
@@ -67,20 +67,20 @@ func EncodeDeviceSummaryError(encoder func(context.Context, http.ResponseWriter)
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "bad-request":
-			res := v.(data.BadRequest)
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewDeviceSummaryBadRequestResponseBody(res)
+				body = NewDeviceSummaryUnauthorizedResponseBody(res)
 			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "forbidden":
-			res := v.(data.Forbidden)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -92,7 +92,7 @@ func EncodeDeviceSummaryError(encoder func(context.Context, http.ResponseWriter)
 			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "not-found":
-			res := v.(data.NotFound)
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
@@ -103,17 +103,17 @@ func EncodeDeviceSummaryError(encoder func(context.Context, http.ResponseWriter)
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(data.Unauthorized)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewDeviceSummaryUnauthorizedResponseBody(res)
+				body = NewDeviceSummaryBadRequestResponseBody(res)
 			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)

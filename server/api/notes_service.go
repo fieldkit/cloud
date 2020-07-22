@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -33,7 +34,7 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 
 	for _, webNote := range payload.Notes.Creating {
 		if webNote.Body == nil && (webNote.MediaIds == nil || len(webNote.MediaIds) == 0) {
-			return nil, notes.BadRequest("body or media is required")
+			return nil, notes.MakeBadRequest(errors.New("body or media is required"))
 		}
 
 		note := &data.Note{
@@ -62,11 +63,11 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 	}
 	for _, webNote := range payload.Notes.Notes {
 		if webNote.ID == 0 {
-			return nil, notes.BadRequest("id is required")
+			return nil, notes.MakeBadRequest(errors.New("id is required"))
 		}
 
 		if webNote.Body == nil && (webNote.MediaIds == nil || len(webNote.MediaIds) == 0) {
-			return nil, notes.BadRequest("body or media is required")
+			return nil, notes.MakeBadRequest(errors.New("body or media is required"))
 		}
 
 		note := &data.Note{
@@ -206,7 +207,7 @@ func (s *NotesService) DownloadMedia(ctx context.Context, payload *notes.Downloa
 
 	lm, err := mr.LoadByURL(ctx, allMedia.URL)
 	if err != nil {
-		return nil, nil, notes.NotFound("not found")
+		return nil, nil, notes.MakeNotFound(errors.New("not found"))
 	}
 
 	return &notes.DownloadMediaResult{
@@ -260,8 +261,8 @@ func (s *NotesService) JWTAuth(ctx context.Context, token string, scheme *securi
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		NotFound:     func(m string) error { return notes.NotFound(m) },
-		Unauthorized: func(m string) error { return notes.Unauthorized(m) },
-		Forbidden:    func(m string) error { return notes.Forbidden(m) },
+		NotFound:     func(m string) error { return notes.MakeNotFound(errors.New(m)) },
+		Unauthorized: func(m string) error { return notes.MakeUnauthorized(errors.New(m)) },
+		Forbidden:    func(m string) error { return notes.MakeForbidden(errors.New(m)) },
 	})
 }

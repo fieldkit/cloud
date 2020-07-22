@@ -10,6 +10,7 @@ package server
 import (
 	information "github.com/fieldkit/cloud/server/api/gen/information"
 	informationviews "github.com/fieldkit/cloud/server/api/gen/information/views"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // DeviceLayoutResponseBody is the type of the "information" service "device
@@ -19,42 +20,154 @@ type DeviceLayoutResponseBody struct {
 	Sensors        map[string][]*StationSensorResponseBody `form:"sensors" json:"sensors" xml:"sensors"`
 }
 
-// DeviceLayoutBadRequestResponseBody is the type of the "information" service
-// "device layout" endpoint HTTP response body for the "bad-request" error.
-type DeviceLayoutBadRequestResponseBody string
-
-// DeviceLayoutForbiddenResponseBody is the type of the "information" service
-// "device layout" endpoint HTTP response body for the "forbidden" error.
-type DeviceLayoutForbiddenResponseBody string
-
-// DeviceLayoutNotFoundResponseBody is the type of the "information" service
-// "device layout" endpoint HTTP response body for the "not-found" error.
-type DeviceLayoutNotFoundResponseBody string
-
 // DeviceLayoutUnauthorizedResponseBody is the type of the "information"
 // service "device layout" endpoint HTTP response body for the "unauthorized"
 // error.
-type DeviceLayoutUnauthorizedResponseBody string
+type DeviceLayoutUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// FirmwareStatisticsBadRequestResponseBody is the type of the "information"
-// service "firmware statistics" endpoint HTTP response body for the
-// "bad-request" error.
-type FirmwareStatisticsBadRequestResponseBody string
+// DeviceLayoutForbiddenResponseBody is the type of the "information" service
+// "device layout" endpoint HTTP response body for the "forbidden" error.
+type DeviceLayoutForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// FirmwareStatisticsForbiddenResponseBody is the type of the "information"
-// service "firmware statistics" endpoint HTTP response body for the
-// "forbidden" error.
-type FirmwareStatisticsForbiddenResponseBody string
+// DeviceLayoutNotFoundResponseBody is the type of the "information" service
+// "device layout" endpoint HTTP response body for the "not-found" error.
+type DeviceLayoutNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// FirmwareStatisticsNotFoundResponseBody is the type of the "information"
-// service "firmware statistics" endpoint HTTP response body for the
-// "not-found" error.
-type FirmwareStatisticsNotFoundResponseBody string
+// DeviceLayoutBadRequestResponseBody is the type of the "information" service
+// "device layout" endpoint HTTP response body for the "bad-request" error.
+type DeviceLayoutBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // FirmwareStatisticsUnauthorizedResponseBody is the type of the "information"
 // service "firmware statistics" endpoint HTTP response body for the
 // "unauthorized" error.
-type FirmwareStatisticsUnauthorizedResponseBody string
+type FirmwareStatisticsUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// FirmwareStatisticsForbiddenResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "forbidden" error.
+type FirmwareStatisticsForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// FirmwareStatisticsNotFoundResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "not-found" error.
+type FirmwareStatisticsNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// FirmwareStatisticsBadRequestResponseBody is the type of the "information"
+// service "firmware statistics" endpoint HTTP response body for the
+// "bad-request" error.
+type FirmwareStatisticsBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // StationConfigurationResponseBody is used to define fields on response body
 // types.
@@ -126,63 +239,119 @@ func NewDeviceLayoutResponseBody(res *informationviews.DeviceLayoutResponseView)
 	return body
 }
 
-// NewDeviceLayoutBadRequestResponseBody builds the HTTP response body from the
-// result of the "device layout" endpoint of the "information" service.
-func NewDeviceLayoutBadRequestResponseBody(res information.BadRequest) DeviceLayoutBadRequestResponseBody {
-	body := DeviceLayoutBadRequestResponseBody(res)
+// NewDeviceLayoutUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "device layout" endpoint of the "information" service.
+func NewDeviceLayoutUnauthorizedResponseBody(res *goa.ServiceError) *DeviceLayoutUnauthorizedResponseBody {
+	body := &DeviceLayoutUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewDeviceLayoutForbiddenResponseBody builds the HTTP response body from the
 // result of the "device layout" endpoint of the "information" service.
-func NewDeviceLayoutForbiddenResponseBody(res information.Forbidden) DeviceLayoutForbiddenResponseBody {
-	body := DeviceLayoutForbiddenResponseBody(res)
+func NewDeviceLayoutForbiddenResponseBody(res *goa.ServiceError) *DeviceLayoutForbiddenResponseBody {
+	body := &DeviceLayoutForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewDeviceLayoutNotFoundResponseBody builds the HTTP response body from the
 // result of the "device layout" endpoint of the "information" service.
-func NewDeviceLayoutNotFoundResponseBody(res information.NotFound) DeviceLayoutNotFoundResponseBody {
-	body := DeviceLayoutNotFoundResponseBody(res)
+func NewDeviceLayoutNotFoundResponseBody(res *goa.ServiceError) *DeviceLayoutNotFoundResponseBody {
+	body := &DeviceLayoutNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDeviceLayoutUnauthorizedResponseBody builds the HTTP response body from
-// the result of the "device layout" endpoint of the "information" service.
-func NewDeviceLayoutUnauthorizedResponseBody(res information.Unauthorized) DeviceLayoutUnauthorizedResponseBody {
-	body := DeviceLayoutUnauthorizedResponseBody(res)
-	return body
-}
-
-// NewFirmwareStatisticsBadRequestResponseBody builds the HTTP response body
-// from the result of the "firmware statistics" endpoint of the "information"
-// service.
-func NewFirmwareStatisticsBadRequestResponseBody(res information.BadRequest) FirmwareStatisticsBadRequestResponseBody {
-	body := FirmwareStatisticsBadRequestResponseBody(res)
-	return body
-}
-
-// NewFirmwareStatisticsForbiddenResponseBody builds the HTTP response body
-// from the result of the "firmware statistics" endpoint of the "information"
-// service.
-func NewFirmwareStatisticsForbiddenResponseBody(res information.Forbidden) FirmwareStatisticsForbiddenResponseBody {
-	body := FirmwareStatisticsForbiddenResponseBody(res)
-	return body
-}
-
-// NewFirmwareStatisticsNotFoundResponseBody builds the HTTP response body from
-// the result of the "firmware statistics" endpoint of the "information"
-// service.
-func NewFirmwareStatisticsNotFoundResponseBody(res information.NotFound) FirmwareStatisticsNotFoundResponseBody {
-	body := FirmwareStatisticsNotFoundResponseBody(res)
+// NewDeviceLayoutBadRequestResponseBody builds the HTTP response body from the
+// result of the "device layout" endpoint of the "information" service.
+func NewDeviceLayoutBadRequestResponseBody(res *goa.ServiceError) *DeviceLayoutBadRequestResponseBody {
+	body := &DeviceLayoutBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewFirmwareStatisticsUnauthorizedResponseBody builds the HTTP response body
 // from the result of the "firmware statistics" endpoint of the "information"
 // service.
-func NewFirmwareStatisticsUnauthorizedResponseBody(res information.Unauthorized) FirmwareStatisticsUnauthorizedResponseBody {
-	body := FirmwareStatisticsUnauthorizedResponseBody(res)
+func NewFirmwareStatisticsUnauthorizedResponseBody(res *goa.ServiceError) *FirmwareStatisticsUnauthorizedResponseBody {
+	body := &FirmwareStatisticsUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewFirmwareStatisticsForbiddenResponseBody builds the HTTP response body
+// from the result of the "firmware statistics" endpoint of the "information"
+// service.
+func NewFirmwareStatisticsForbiddenResponseBody(res *goa.ServiceError) *FirmwareStatisticsForbiddenResponseBody {
+	body := &FirmwareStatisticsForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewFirmwareStatisticsNotFoundResponseBody builds the HTTP response body from
+// the result of the "firmware statistics" endpoint of the "information"
+// service.
+func NewFirmwareStatisticsNotFoundResponseBody(res *goa.ServiceError) *FirmwareStatisticsNotFoundResponseBody {
+	body := &FirmwareStatisticsNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewFirmwareStatisticsBadRequestResponseBody builds the HTTP response body
+// from the result of the "firmware statistics" endpoint of the "information"
+// service.
+func NewFirmwareStatisticsBadRequestResponseBody(res *goa.ServiceError) *FirmwareStatisticsBadRequestResponseBody {
+	body := &FirmwareStatisticsBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 

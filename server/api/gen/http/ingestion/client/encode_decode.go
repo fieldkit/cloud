@@ -54,10 +54,10 @@ func EncodeProcessPendingRequest(encoder func(*http.Request) goahttp.Encoder) fu
 // ingestion process pending endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeProcessPendingResponse may return the following errors:
-//	- "bad-request" (type ingestion.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type ingestion.Forbidden): http.StatusForbidden
-//	- "not-found" (type ingestion.NotFound): http.StatusNotFound
-//	- "unauthorized" (type ingestion.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeProcessPendingResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -76,36 +76,6 @@ func DecodeProcessPendingResponse(decoder func(*http.Response) goahttp.Decoder, 
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
-		case http.StatusBadRequest:
-			var (
-				body ProcessPendingBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("ingestion", "process pending", err)
-			}
-			return nil, NewProcessPendingBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body ProcessPendingForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("ingestion", "process pending", err)
-			}
-			return nil, NewProcessPendingForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body ProcessPendingNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("ingestion", "process pending", err)
-			}
-			return nil, NewProcessPendingNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body ProcessPendingUnauthorizedResponseBody
@@ -115,7 +85,53 @@ func DecodeProcessPendingResponse(decoder func(*http.Response) goahttp.Decoder, 
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("ingestion", "process pending", err)
 			}
-			return nil, NewProcessPendingUnauthorized(body)
+			err = ValidateProcessPendingUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "process pending", err)
+			}
+			return nil, NewProcessPendingUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ProcessPendingForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "process pending", err)
+			}
+			err = ValidateProcessPendingForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "process pending", err)
+			}
+			return nil, NewProcessPendingForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ProcessPendingNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "process pending", err)
+			}
+			err = ValidateProcessPendingNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "process pending", err)
+			}
+			return nil, NewProcessPendingNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ProcessPendingBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "process pending", err)
+			}
+			err = ValidateProcessPendingBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "process pending", err)
+			}
+			return nil, NewProcessPendingBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("ingestion", "process pending", resp.StatusCode, string(body))
@@ -173,10 +189,10 @@ func EncodeProcessStationRequest(encoder func(*http.Request) goahttp.Encoder) fu
 // ingestion process station endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeProcessStationResponse may return the following errors:
-//	- "bad-request" (type ingestion.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type ingestion.Forbidden): http.StatusForbidden
-//	- "not-found" (type ingestion.NotFound): http.StatusNotFound
-//	- "unauthorized" (type ingestion.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeProcessStationResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -195,36 +211,6 @@ func DecodeProcessStationResponse(decoder func(*http.Response) goahttp.Decoder, 
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
-		case http.StatusBadRequest:
-			var (
-				body ProcessStationBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("ingestion", "process station", err)
-			}
-			return nil, NewProcessStationBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body ProcessStationForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("ingestion", "process station", err)
-			}
-			return nil, NewProcessStationForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body ProcessStationNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("ingestion", "process station", err)
-			}
-			return nil, NewProcessStationNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body ProcessStationUnauthorizedResponseBody
@@ -234,7 +220,53 @@ func DecodeProcessStationResponse(decoder func(*http.Response) goahttp.Decoder, 
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("ingestion", "process station", err)
 			}
-			return nil, NewProcessStationUnauthorized(body)
+			err = ValidateProcessStationUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "process station", err)
+			}
+			return nil, NewProcessStationUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ProcessStationForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "process station", err)
+			}
+			err = ValidateProcessStationForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "process station", err)
+			}
+			return nil, NewProcessStationForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ProcessStationNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "process station", err)
+			}
+			err = ValidateProcessStationNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "process station", err)
+			}
+			return nil, NewProcessStationNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ProcessStationBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "process station", err)
+			}
+			err = ValidateProcessStationBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "process station", err)
+			}
+			return nil, NewProcessStationBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("ingestion", "process station", resp.StatusCode, string(body))
@@ -287,10 +319,10 @@ func EncodeProcessIngestionRequest(encoder func(*http.Request) goahttp.Encoder) 
 // the ingestion process ingestion endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeProcessIngestionResponse may return the following errors:
-//	- "bad-request" (type ingestion.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type ingestion.Forbidden): http.StatusForbidden
-//	- "not-found" (type ingestion.NotFound): http.StatusNotFound
-//	- "unauthorized" (type ingestion.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeProcessIngestionResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -309,36 +341,6 @@ func DecodeProcessIngestionResponse(decoder func(*http.Response) goahttp.Decoder
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
-		case http.StatusBadRequest:
-			var (
-				body ProcessIngestionBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("ingestion", "process ingestion", err)
-			}
-			return nil, NewProcessIngestionBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body ProcessIngestionForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("ingestion", "process ingestion", err)
-			}
-			return nil, NewProcessIngestionForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body ProcessIngestionNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("ingestion", "process ingestion", err)
-			}
-			return nil, NewProcessIngestionNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body ProcessIngestionUnauthorizedResponseBody
@@ -348,7 +350,53 @@ func DecodeProcessIngestionResponse(decoder func(*http.Response) goahttp.Decoder
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("ingestion", "process ingestion", err)
 			}
-			return nil, NewProcessIngestionUnauthorized(body)
+			err = ValidateProcessIngestionUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "process ingestion", err)
+			}
+			return nil, NewProcessIngestionUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ProcessIngestionForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "process ingestion", err)
+			}
+			err = ValidateProcessIngestionForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "process ingestion", err)
+			}
+			return nil, NewProcessIngestionForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ProcessIngestionNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "process ingestion", err)
+			}
+			err = ValidateProcessIngestionNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "process ingestion", err)
+			}
+			return nil, NewProcessIngestionNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ProcessIngestionBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "process ingestion", err)
+			}
+			err = ValidateProcessIngestionBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "process ingestion", err)
+			}
+			return nil, NewProcessIngestionBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("ingestion", "process ingestion", resp.StatusCode, string(body))
@@ -401,10 +449,10 @@ func EncodeDeleteRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // ingestion delete endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeDeleteResponse may return the following errors:
-//	- "bad-request" (type ingestion.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type ingestion.Forbidden): http.StatusForbidden
-//	- "not-found" (type ingestion.NotFound): http.StatusNotFound
-//	- "unauthorized" (type ingestion.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -423,36 +471,6 @@ func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
-		case http.StatusBadRequest:
-			var (
-				body DeleteBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("ingestion", "delete", err)
-			}
-			return nil, NewDeleteBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body DeleteForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("ingestion", "delete", err)
-			}
-			return nil, NewDeleteForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body DeleteNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("ingestion", "delete", err)
-			}
-			return nil, NewDeleteNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body DeleteUnauthorizedResponseBody
@@ -462,7 +480,53 @@ func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("ingestion", "delete", err)
 			}
-			return nil, NewDeleteUnauthorized(body)
+			err = ValidateDeleteUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "delete", err)
+			}
+			return nil, NewDeleteUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body DeleteForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "delete", err)
+			}
+			err = ValidateDeleteForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "delete", err)
+			}
+			return nil, NewDeleteForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body DeleteNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "delete", err)
+			}
+			err = ValidateDeleteNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "delete", err)
+			}
+			return nil, NewDeleteNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body DeleteBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "delete", err)
+			}
+			err = ValidateDeleteBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "delete", err)
+			}
+			return nil, NewDeleteBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("ingestion", "delete", resp.StatusCode, string(body))

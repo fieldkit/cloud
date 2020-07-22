@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -33,13 +34,13 @@ func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*u
 
 	authed, err := s.authenticateOrSpoof(ctx, payload.Login.Email, payload.Login.Password)
 	if err == data.IncorrectPasswordError {
-		return nil, user.Unauthorized("invalid email or password")
+		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
 	}
 	if err != nil {
 		return nil, err
 	}
 	if authed == nil {
-		return nil, user.Unauthorized("invalid email or password")
+		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
 	}
 
 	refreshToken, err := data.NewRefreshToken(authed.ID, 20, now.Add(time.Duration(72)*time.Hour))
@@ -50,7 +51,7 @@ func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*u
 	if _, err := s.options.Database.NamedExecContext(ctx, `
 		INSERT INTO fieldkit.refresh_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
 		`, refreshToken); err != nil {
-		return nil, user.Unauthorized("invalid email or password")
+		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
 	}
 
 	token := authed.NewToken(now, refreshToken)
@@ -97,7 +98,7 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 	if yes, err := s.userExists(ctx, payload.User.Email); err != nil {
 		return nil, err
 	} else if yes {
-		return nil, user.BadRequest("bad request")
+		return nil, user.MakeBadRequest(errors.New("bad request"))
 	}
 
 	user := &data.User{
@@ -181,19 +182,19 @@ func (s *UserService) ChangePassword(ctx context.Context, payload *user.ChangePa
 	updating := &data.User{}
 	err = s.options.Database.GetContext(ctx, updating, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID())
 	if err == sql.ErrNoRows {
-		return nil, user.BadRequest("bad request")
+		return nil, user.MakeBadRequest(errors.New("bad request"))
 	}
 	if err != nil {
 		return nil, err
 	}
 
 	if updating.ID != payload.UserID {
-		return nil, user.Forbidden("forbidden")
+		return nil, user.MakeForbidden(errors.New("forbidden"))
 	}
 
 	err = updating.CheckPassword(payload.Change.OldPassword)
 	if err == data.IncorrectPasswordError {
-		return nil, user.BadRequest("bad request")
+		return nil, user.MakeBadRequest(errors.New("bad request"))
 	}
 	if err != nil {
 		return nil, err
@@ -276,7 +277,7 @@ func (s *UserService) Recovery(ctx context.Context, payload *user.RecoveryPayloa
 	err := s.options.Database.GetContext(ctx, recoveryToken, `SELECT * FROM fieldkit.recovery_token WHERE token = $1`, token)
 	if err == sql.ErrNoRows {
 		log.Infow("recovery, token bad")
-		return user.Unauthorized("unauthorized")
+		return user.MakeUnauthorized(errors.New("unauthorized"))
 	}
 	if err != nil {
 		return err
@@ -285,7 +286,7 @@ func (s *UserService) Recovery(ctx context.Context, payload *user.RecoveryPayloa
 	now := time.Now().UTC()
 	if now.After(recoveryToken.Expires) {
 		log.Infow("recovery, token expired", "token_expires", recoveryToken.Expires, "now", now)
-		return user.Unauthorized("unauthorized")
+		return user.MakeUnauthorized(errors.New("unauthorized"))
 	}
 
 	trying := &data.User{}
@@ -371,7 +372,7 @@ func (s *UserService) Refresh(ctx context.Context, payload *user.RefreshPayload)
 	refreshToken := &data.RefreshToken{}
 	err := s.options.Database.GetContext(ctx, refreshToken, `SELECT * FROM fieldkit.refresh_token WHERE token = $1`, token)
 	if err == sql.ErrNoRows {
-		return nil, user.Unauthorized("unauthorized")
+		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
 	}
 	if err != nil {
 		return nil, err
@@ -379,13 +380,13 @@ func (s *UserService) Refresh(ctx context.Context, payload *user.RefreshPayload)
 
 	now := time.Now().UTC()
 	if now.After(refreshToken.Expires) {
-		return nil, user.Unauthorized("unauthorized")
+		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
 	}
 
 	trying := &data.User{}
 	err = s.options.Database.GetContext(ctx, trying, `SELECT * FROM fieldkit.user WHERE id = $1`, refreshToken.UserID)
 	if err == sql.ErrNoRows {
-		return nil, user.Unauthorized("unauthorized")
+		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
 	}
 
 	if err != nil {
@@ -532,17 +533,17 @@ func (s *UserService) AdminDelete(ctx context.Context, payload *user.AdminDelete
 
 	admin := &data.User{}
 	if err := s.options.Database.GetContext(ctx, admin, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
-		return user.Forbidden("forbidden")
+		return user.MakeForbidden(errors.New("forbidden"))
 	}
 
 	err = admin.CheckPassword(payload.Delete.Password)
 	if err != nil {
-		return user.Forbidden("forbidden")
+		return user.MakeForbidden(errors.New("forbidden"))
 	}
 
 	deleting := &data.User{}
 	if err = s.options.Database.GetContext(ctx, deleting, `SELECT * FROM fieldkit.user WHERE LOWER(email) = LOWER($1)`, payload.Delete.Email); err != nil {
-		return user.Forbidden("forbidden")
+		return user.MakeForbidden(errors.New("forbidden"))
 	}
 
 	log.Infow("deleting", "user_id", deleting.ID)
@@ -638,14 +639,14 @@ func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadP
 	}
 
 	if resource.MediaURL == nil || resource.MediaContentType == nil {
-		return nil, nil, user.NotFound("not found")
+		return nil, nil, user.MakeNotFound(errors.New("not found"))
 	}
 
 	mr := repositories.NewMediaRepository(s.options.MediaFiles)
 
 	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
 	if err != nil {
-		return nil, nil, user.NotFound("not found")
+		return nil, nil, user.MakeNotFound(errors.New("not found"))
 	}
 
 	return &user.DownloadPhotoResult{
@@ -659,9 +660,9 @@ func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *securit
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		NotFound:     func(m string) error { return user.NotFound(m) },
-		Unauthorized: func(m string) error { return user.Unauthorized(m) },
-		Forbidden:    func(m string) error { return user.Forbidden(m) },
+		NotFound:     func(m string) error { return user.MakeNotFound(errors.New(m)) },
+		Unauthorized: func(m string) error { return user.MakeUnauthorized(errors.New(m)) },
+		Forbidden:    func(m string) error { return user.MakeForbidden(errors.New(m)) },
 	})
 }
 

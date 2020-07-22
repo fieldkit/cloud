@@ -36,10 +36,10 @@ func (c *Client) BuildMetaRequest(ctx context.Context, v interface{}) (*http.Req
 // meta endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeMetaResponse may return the following errors:
-//	- "bad-request" (type modules.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type modules.Forbidden): http.StatusForbidden
-//	- "not-found" (type modules.NotFound): http.StatusNotFound
-//	- "unauthorized" (type modules.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeMetaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -67,36 +67,6 @@ func DecodeMetaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 			}
 			res := NewMetaResultOK(body)
 			return res, nil
-		case http.StatusBadRequest:
-			var (
-				body MetaBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("modules", "meta", err)
-			}
-			return nil, NewMetaBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body MetaForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("modules", "meta", err)
-			}
-			return nil, NewMetaForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body MetaNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("modules", "meta", err)
-			}
-			return nil, NewMetaNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body MetaUnauthorizedResponseBody
@@ -106,7 +76,53 @@ func DecodeMetaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("modules", "meta", err)
 			}
-			return nil, NewMetaUnauthorized(body)
+			err = ValidateMetaUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("modules", "meta", err)
+			}
+			return nil, NewMetaUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body MetaForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("modules", "meta", err)
+			}
+			err = ValidateMetaForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("modules", "meta", err)
+			}
+			return nil, NewMetaForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body MetaNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("modules", "meta", err)
+			}
+			err = ValidateMetaNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("modules", "meta", err)
+			}
+			return nil, NewMetaNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body MetaBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("modules", "meta", err)
+			}
+			err = ValidateMetaBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("modules", "meta", err)
+			}
+			return nil, NewMetaBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("modules", "meta", resp.StatusCode, string(body))

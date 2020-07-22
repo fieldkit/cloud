@@ -9,42 +9,106 @@ package server
 
 import (
 	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
+	goa "goa.design/goa/v3/pkg"
 )
-
-// FiveBadRequestResponseBody is the type of the "tasks" service "five"
-// endpoint HTTP response body for the "bad-request" error.
-type FiveBadRequestResponseBody string
 
 // FiveForbiddenResponseBody is the type of the "tasks" service "five" endpoint
 // HTTP response body for the "forbidden" error.
-type FiveForbiddenResponseBody string
+type FiveForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // FiveNotFoundResponseBody is the type of the "tasks" service "five" endpoint
 // HTTP response body for the "not-found" error.
-type FiveNotFoundResponseBody string
+type FiveNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// FiveBadRequestResponseBody is the type of the "tasks" service "five"
+// endpoint HTTP response body for the "bad-request" error.
+type FiveBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // FiveUnauthorizedResponseBody is the type of the "tasks" service "five"
 // endpoint HTTP response body for the "unauthorized" error.
 type FiveUnauthorizedResponseBody string
 
-// NewFiveBadRequestResponseBody builds the HTTP response body from the result
-// of the "five" endpoint of the "tasks" service.
-func NewFiveBadRequestResponseBody(res tasks.BadRequest) FiveBadRequestResponseBody {
-	body := FiveBadRequestResponseBody(res)
-	return body
-}
-
 // NewFiveForbiddenResponseBody builds the HTTP response body from the result
 // of the "five" endpoint of the "tasks" service.
-func NewFiveForbiddenResponseBody(res tasks.Forbidden) FiveForbiddenResponseBody {
-	body := FiveForbiddenResponseBody(res)
+func NewFiveForbiddenResponseBody(res *goa.ServiceError) *FiveForbiddenResponseBody {
+	body := &FiveForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewFiveNotFoundResponseBody builds the HTTP response body from the result of
 // the "five" endpoint of the "tasks" service.
-func NewFiveNotFoundResponseBody(res tasks.NotFound) FiveNotFoundResponseBody {
-	body := FiveNotFoundResponseBody(res)
+func NewFiveNotFoundResponseBody(res *goa.ServiceError) *FiveNotFoundResponseBody {
+	body := &FiveNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewFiveBadRequestResponseBody builds the HTTP response body from the result
+// of the "five" endpoint of the "tasks" service.
+func NewFiveBadRequestResponseBody(res *goa.ServiceError) *FiveBadRequestResponseBody {
+	body := &FiveBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 

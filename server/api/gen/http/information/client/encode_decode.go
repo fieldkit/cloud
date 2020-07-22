@@ -64,10 +64,10 @@ func EncodeDeviceLayoutRequest(encoder func(*http.Request) goahttp.Encoder) func
 // information device layout endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeDeviceLayoutResponse may return the following errors:
-//	- "bad-request" (type information.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type information.Forbidden): http.StatusForbidden
-//	- "not-found" (type information.NotFound): http.StatusNotFound
-//	- "unauthorized" (type information.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeDeviceLayoutResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -101,36 +101,6 @@ func DecodeDeviceLayoutResponse(decoder func(*http.Response) goahttp.Decoder, re
 			}
 			res := information.NewDeviceLayoutResponse(vres)
 			return res, nil
-		case http.StatusBadRequest:
-			var (
-				body DeviceLayoutBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("information", "device layout", err)
-			}
-			return nil, NewDeviceLayoutBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body DeviceLayoutForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("information", "device layout", err)
-			}
-			return nil, NewDeviceLayoutForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body DeviceLayoutNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("information", "device layout", err)
-			}
-			return nil, NewDeviceLayoutNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body DeviceLayoutUnauthorizedResponseBody
@@ -140,7 +110,53 @@ func DecodeDeviceLayoutResponse(decoder func(*http.Response) goahttp.Decoder, re
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("information", "device layout", err)
 			}
-			return nil, NewDeviceLayoutUnauthorized(body)
+			err = ValidateDeviceLayoutUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("information", "device layout", err)
+			}
+			return nil, NewDeviceLayoutUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body DeviceLayoutForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("information", "device layout", err)
+			}
+			err = ValidateDeviceLayoutForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("information", "device layout", err)
+			}
+			return nil, NewDeviceLayoutForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body DeviceLayoutNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("information", "device layout", err)
+			}
+			err = ValidateDeviceLayoutNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("information", "device layout", err)
+			}
+			return nil, NewDeviceLayoutNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body DeviceLayoutBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("information", "device layout", err)
+			}
+			err = ValidateDeviceLayoutBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("information", "device layout", err)
+			}
+			return nil, NewDeviceLayoutBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("information", "device layout", resp.StatusCode, string(body))
@@ -184,10 +200,10 @@ func EncodeFirmwareStatisticsRequest(encoder func(*http.Request) goahttp.Encoder
 // the information firmware statistics endpoint. restoreBody controls whether
 // the response body should be restored after having been read.
 // DecodeFirmwareStatisticsResponse may return the following errors:
-//	- "bad-request" (type information.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type information.Forbidden): http.StatusForbidden
-//	- "not-found" (type information.NotFound): http.StatusNotFound
-//	- "unauthorized" (type information.Unauthorized): http.StatusUnauthorized
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeFirmwareStatisticsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -215,36 +231,6 @@ func DecodeFirmwareStatisticsResponse(decoder func(*http.Response) goahttp.Decod
 			}
 			res := NewFirmwareStatisticsResultOK(body)
 			return res, nil
-		case http.StatusBadRequest:
-			var (
-				body FirmwareStatisticsBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("information", "firmware statistics", err)
-			}
-			return nil, NewFirmwareStatisticsBadRequest(body)
-		case http.StatusForbidden:
-			var (
-				body FirmwareStatisticsForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("information", "firmware statistics", err)
-			}
-			return nil, NewFirmwareStatisticsForbidden(body)
-		case http.StatusNotFound:
-			var (
-				body FirmwareStatisticsNotFoundResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("information", "firmware statistics", err)
-			}
-			return nil, NewFirmwareStatisticsNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body FirmwareStatisticsUnauthorizedResponseBody
@@ -254,7 +240,53 @@ func DecodeFirmwareStatisticsResponse(decoder func(*http.Response) goahttp.Decod
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("information", "firmware statistics", err)
 			}
-			return nil, NewFirmwareStatisticsUnauthorized(body)
+			err = ValidateFirmwareStatisticsUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("information", "firmware statistics", err)
+			}
+			return nil, NewFirmwareStatisticsUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body FirmwareStatisticsForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("information", "firmware statistics", err)
+			}
+			err = ValidateFirmwareStatisticsForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("information", "firmware statistics", err)
+			}
+			return nil, NewFirmwareStatisticsForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body FirmwareStatisticsNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("information", "firmware statistics", err)
+			}
+			err = ValidateFirmwareStatisticsNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("information", "firmware statistics", err)
+			}
+			return nil, NewFirmwareStatisticsNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body FirmwareStatisticsBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("information", "firmware statistics", err)
+			}
+			err = ValidateFirmwareStatisticsBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("information", "firmware statistics", err)
+			}
+			return nil, NewFirmwareStatisticsBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("information", "firmware statistics", resp.StatusCode, string(body))

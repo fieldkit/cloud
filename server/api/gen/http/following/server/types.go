@@ -10,6 +10,7 @@ package server
 import (
 	following "github.com/fieldkit/cloud/server/api/gen/following"
 	followingviews "github.com/fieldkit/cloud/server/api/gen/following/views"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // FollowersResponseBody is the type of the "following" service "followers"
@@ -20,53 +21,221 @@ type FollowersResponseBody struct {
 	Page      int32                          `form:"page" json:"page" xml:"page"`
 }
 
-// FollowBadRequestResponseBody is the type of the "following" service "follow"
-// endpoint HTTP response body for the "bad-request" error.
-type FollowBadRequestResponseBody string
+// FollowUnauthorizedResponseBody is the type of the "following" service
+// "follow" endpoint HTTP response body for the "unauthorized" error.
+type FollowUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // FollowForbiddenResponseBody is the type of the "following" service "follow"
 // endpoint HTTP response body for the "forbidden" error.
-type FollowForbiddenResponseBody string
+type FollowForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // FollowNotFoundResponseBody is the type of the "following" service "follow"
 // endpoint HTTP response body for the "not-found" error.
-type FollowNotFoundResponseBody string
+type FollowNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// FollowUnauthorizedResponseBody is the type of the "following" service
-// "follow" endpoint HTTP response body for the "unauthorized" error.
-type FollowUnauthorizedResponseBody string
-
-// UnfollowBadRequestResponseBody is the type of the "following" service
-// "unfollow" endpoint HTTP response body for the "bad-request" error.
-type UnfollowBadRequestResponseBody string
-
-// UnfollowForbiddenResponseBody is the type of the "following" service
-// "unfollow" endpoint HTTP response body for the "forbidden" error.
-type UnfollowForbiddenResponseBody string
-
-// UnfollowNotFoundResponseBody is the type of the "following" service
-// "unfollow" endpoint HTTP response body for the "not-found" error.
-type UnfollowNotFoundResponseBody string
+// FollowBadRequestResponseBody is the type of the "following" service "follow"
+// endpoint HTTP response body for the "bad-request" error.
+type FollowBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // UnfollowUnauthorizedResponseBody is the type of the "following" service
 // "unfollow" endpoint HTTP response body for the "unauthorized" error.
-type UnfollowUnauthorizedResponseBody string
+type UnfollowUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// FollowersBadRequestResponseBody is the type of the "following" service
-// "followers" endpoint HTTP response body for the "bad-request" error.
-type FollowersBadRequestResponseBody string
+// UnfollowForbiddenResponseBody is the type of the "following" service
+// "unfollow" endpoint HTTP response body for the "forbidden" error.
+type UnfollowForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// FollowersForbiddenResponseBody is the type of the "following" service
-// "followers" endpoint HTTP response body for the "forbidden" error.
-type FollowersForbiddenResponseBody string
+// UnfollowNotFoundResponseBody is the type of the "following" service
+// "unfollow" endpoint HTTP response body for the "not-found" error.
+type UnfollowNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// FollowersNotFoundResponseBody is the type of the "following" service
-// "followers" endpoint HTTP response body for the "not-found" error.
-type FollowersNotFoundResponseBody string
+// UnfollowBadRequestResponseBody is the type of the "following" service
+// "unfollow" endpoint HTTP response body for the "bad-request" error.
+type UnfollowBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // FollowersUnauthorizedResponseBody is the type of the "following" service
 // "followers" endpoint HTTP response body for the "unauthorized" error.
-type FollowersUnauthorizedResponseBody string
+type FollowersUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// FollowersForbiddenResponseBody is the type of the "following" service
+// "followers" endpoint HTTP response body for the "forbidden" error.
+type FollowersForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// FollowersNotFoundResponseBody is the type of the "following" service
+// "followers" endpoint HTTP response body for the "not-found" error.
+type FollowersNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// FollowersBadRequestResponseBody is the type of the "following" service
+// "followers" endpoint HTTP response body for the "bad-request" error.
+type FollowersBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // FollowerResponseBodyCollection is used to define fields on response body
 // types.
@@ -100,87 +269,171 @@ func NewFollowersResponseBody(res *followingviews.FollowersPageView) *FollowersR
 	return body
 }
 
-// NewFollowBadRequestResponseBody builds the HTTP response body from the
+// NewFollowUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "follow" endpoint of the "following" service.
-func NewFollowBadRequestResponseBody(res following.BadRequest) FollowBadRequestResponseBody {
-	body := FollowBadRequestResponseBody(res)
+func NewFollowUnauthorizedResponseBody(res *goa.ServiceError) *FollowUnauthorizedResponseBody {
+	body := &FollowUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewFollowForbiddenResponseBody builds the HTTP response body from the result
 // of the "follow" endpoint of the "following" service.
-func NewFollowForbiddenResponseBody(res following.Forbidden) FollowForbiddenResponseBody {
-	body := FollowForbiddenResponseBody(res)
+func NewFollowForbiddenResponseBody(res *goa.ServiceError) *FollowForbiddenResponseBody {
+	body := &FollowForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewFollowNotFoundResponseBody builds the HTTP response body from the result
 // of the "follow" endpoint of the "following" service.
-func NewFollowNotFoundResponseBody(res following.NotFound) FollowNotFoundResponseBody {
-	body := FollowNotFoundResponseBody(res)
+func NewFollowNotFoundResponseBody(res *goa.ServiceError) *FollowNotFoundResponseBody {
+	body := &FollowNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewFollowUnauthorizedResponseBody builds the HTTP response body from the
+// NewFollowBadRequestResponseBody builds the HTTP response body from the
 // result of the "follow" endpoint of the "following" service.
-func NewFollowUnauthorizedResponseBody(res following.Unauthorized) FollowUnauthorizedResponseBody {
-	body := FollowUnauthorizedResponseBody(res)
-	return body
-}
-
-// NewUnfollowBadRequestResponseBody builds the HTTP response body from the
-// result of the "unfollow" endpoint of the "following" service.
-func NewUnfollowBadRequestResponseBody(res following.BadRequest) UnfollowBadRequestResponseBody {
-	body := UnfollowBadRequestResponseBody(res)
-	return body
-}
-
-// NewUnfollowForbiddenResponseBody builds the HTTP response body from the
-// result of the "unfollow" endpoint of the "following" service.
-func NewUnfollowForbiddenResponseBody(res following.Forbidden) UnfollowForbiddenResponseBody {
-	body := UnfollowForbiddenResponseBody(res)
-	return body
-}
-
-// NewUnfollowNotFoundResponseBody builds the HTTP response body from the
-// result of the "unfollow" endpoint of the "following" service.
-func NewUnfollowNotFoundResponseBody(res following.NotFound) UnfollowNotFoundResponseBody {
-	body := UnfollowNotFoundResponseBody(res)
+func NewFollowBadRequestResponseBody(res *goa.ServiceError) *FollowBadRequestResponseBody {
+	body := &FollowBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewUnfollowUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "unfollow" endpoint of the "following" service.
-func NewUnfollowUnauthorizedResponseBody(res following.Unauthorized) UnfollowUnauthorizedResponseBody {
-	body := UnfollowUnauthorizedResponseBody(res)
+func NewUnfollowUnauthorizedResponseBody(res *goa.ServiceError) *UnfollowUnauthorizedResponseBody {
+	body := &UnfollowUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewFollowersBadRequestResponseBody builds the HTTP response body from the
-// result of the "followers" endpoint of the "following" service.
-func NewFollowersBadRequestResponseBody(res following.BadRequest) FollowersBadRequestResponseBody {
-	body := FollowersBadRequestResponseBody(res)
+// NewUnfollowForbiddenResponseBody builds the HTTP response body from the
+// result of the "unfollow" endpoint of the "following" service.
+func NewUnfollowForbiddenResponseBody(res *goa.ServiceError) *UnfollowForbiddenResponseBody {
+	body := &UnfollowForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewFollowersForbiddenResponseBody builds the HTTP response body from the
-// result of the "followers" endpoint of the "following" service.
-func NewFollowersForbiddenResponseBody(res following.Forbidden) FollowersForbiddenResponseBody {
-	body := FollowersForbiddenResponseBody(res)
+// NewUnfollowNotFoundResponseBody builds the HTTP response body from the
+// result of the "unfollow" endpoint of the "following" service.
+func NewUnfollowNotFoundResponseBody(res *goa.ServiceError) *UnfollowNotFoundResponseBody {
+	body := &UnfollowNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewFollowersNotFoundResponseBody builds the HTTP response body from the
-// result of the "followers" endpoint of the "following" service.
-func NewFollowersNotFoundResponseBody(res following.NotFound) FollowersNotFoundResponseBody {
-	body := FollowersNotFoundResponseBody(res)
+// NewUnfollowBadRequestResponseBody builds the HTTP response body from the
+// result of the "unfollow" endpoint of the "following" service.
+func NewUnfollowBadRequestResponseBody(res *goa.ServiceError) *UnfollowBadRequestResponseBody {
+	body := &UnfollowBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewFollowersUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "followers" endpoint of the "following" service.
-func NewFollowersUnauthorizedResponseBody(res following.Unauthorized) FollowersUnauthorizedResponseBody {
-	body := FollowersUnauthorizedResponseBody(res)
+func NewFollowersUnauthorizedResponseBody(res *goa.ServiceError) *FollowersUnauthorizedResponseBody {
+	body := &FollowersUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewFollowersForbiddenResponseBody builds the HTTP response body from the
+// result of the "followers" endpoint of the "following" service.
+func NewFollowersForbiddenResponseBody(res *goa.ServiceError) *FollowersForbiddenResponseBody {
+	body := &FollowersForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewFollowersNotFoundResponseBody builds the HTTP response body from the
+// result of the "followers" endpoint of the "following" service.
+func NewFollowersNotFoundResponseBody(res *goa.ServiceError) *FollowersNotFoundResponseBody {
+	body := &FollowersNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewFollowersBadRequestResponseBody builds the HTTP response body from the
+// result of the "followers" endpoint of the "following" service.
+func NewFollowersBadRequestResponseBody(res *goa.ServiceError) *FollowersBadRequestResponseBody {
+	body := &FollowersBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 

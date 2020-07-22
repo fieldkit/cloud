@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -248,7 +249,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	log.Infow("query_parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate)
 
 	if len(qp.Stations) == 0 {
-		return nil, sensor.BadRequest("at least one station required")
+		return nil, sensor.MakeBadRequest(errors.New("at least one station required"))
 	}
 
 	if qp.Tail > 0 {
@@ -532,7 +533,7 @@ func (s *SensorService) JWTAuth(ctx context.Context, token string, scheme *secur
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
 		NotFound:     nil,
-		Unauthorized: func(m string) error { return sensor.Unauthorized(m) },
-		Forbidden:    func(m string) error { return sensor.Forbidden(m) },
+		Unauthorized: func(m string) error { return sensor.MakeUnauthorized(errors.New(m)) },
+		Forbidden:    func(m string) error { return sensor.MakeForbidden(errors.New(m)) },
 	})
 }

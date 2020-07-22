@@ -29,69 +29,293 @@ type ListResponseBody struct {
 	Firmwares FirmwareSummaryResponseBodyCollection `form:"firmwares" json:"firmwares" xml:"firmwares"`
 }
 
-// DownloadBadRequestResponseBody is the type of the "firmware" service
-// "download" endpoint HTTP response body for the "bad-request" error.
-type DownloadBadRequestResponseBody string
+// DownloadUnauthorizedResponseBody is the type of the "firmware" service
+// "download" endpoint HTTP response body for the "unauthorized" error.
+type DownloadUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // DownloadForbiddenResponseBody is the type of the "firmware" service
 // "download" endpoint HTTP response body for the "forbidden" error.
-type DownloadForbiddenResponseBody string
+type DownloadForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // DownloadNotFoundResponseBody is the type of the "firmware" service
 // "download" endpoint HTTP response body for the "not-found" error.
-type DownloadNotFoundResponseBody string
+type DownloadNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DownloadUnauthorizedResponseBody is the type of the "firmware" service
-// "download" endpoint HTTP response body for the "unauthorized" error.
-type DownloadUnauthorizedResponseBody string
-
-// AddBadRequestResponseBody is the type of the "firmware" service "add"
-// endpoint HTTP response body for the "bad-request" error.
-type AddBadRequestResponseBody string
-
-// AddForbiddenResponseBody is the type of the "firmware" service "add"
-// endpoint HTTP response body for the "forbidden" error.
-type AddForbiddenResponseBody string
-
-// AddNotFoundResponseBody is the type of the "firmware" service "add" endpoint
-// HTTP response body for the "not-found" error.
-type AddNotFoundResponseBody string
+// DownloadBadRequestResponseBody is the type of the "firmware" service
+// "download" endpoint HTTP response body for the "bad-request" error.
+type DownloadBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // AddUnauthorizedResponseBody is the type of the "firmware" service "add"
 // endpoint HTTP response body for the "unauthorized" error.
-type AddUnauthorizedResponseBody string
+type AddUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ListBadRequestResponseBody is the type of the "firmware" service "list"
-// endpoint HTTP response body for the "bad-request" error.
-type ListBadRequestResponseBody string
-
-// ListForbiddenResponseBody is the type of the "firmware" service "list"
+// AddForbiddenResponseBody is the type of the "firmware" service "add"
 // endpoint HTTP response body for the "forbidden" error.
-type ListForbiddenResponseBody string
+type AddForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ListNotFoundResponseBody is the type of the "firmware" service "list"
-// endpoint HTTP response body for the "not-found" error.
-type ListNotFoundResponseBody string
+// AddNotFoundResponseBody is the type of the "firmware" service "add" endpoint
+// HTTP response body for the "not-found" error.
+type AddNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AddBadRequestResponseBody is the type of the "firmware" service "add"
+// endpoint HTTP response body for the "bad-request" error.
+type AddBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // ListUnauthorizedResponseBody is the type of the "firmware" service "list"
 // endpoint HTTP response body for the "unauthorized" error.
-type ListUnauthorizedResponseBody string
+type ListUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DeleteBadRequestResponseBody is the type of the "firmware" service "delete"
-// endpoint HTTP response body for the "bad-request" error.
-type DeleteBadRequestResponseBody string
-
-// DeleteForbiddenResponseBody is the type of the "firmware" service "delete"
+// ListForbiddenResponseBody is the type of the "firmware" service "list"
 // endpoint HTTP response body for the "forbidden" error.
-type DeleteForbiddenResponseBody string
+type ListForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DeleteNotFoundResponseBody is the type of the "firmware" service "delete"
+// ListNotFoundResponseBody is the type of the "firmware" service "list"
 // endpoint HTTP response body for the "not-found" error.
-type DeleteNotFoundResponseBody string
+type ListNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListBadRequestResponseBody is the type of the "firmware" service "list"
+// endpoint HTTP response body for the "bad-request" error.
+type ListBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // DeleteUnauthorizedResponseBody is the type of the "firmware" service
 // "delete" endpoint HTTP response body for the "unauthorized" error.
-type DeleteUnauthorizedResponseBody string
+type DeleteUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteForbiddenResponseBody is the type of the "firmware" service "delete"
+// endpoint HTTP response body for the "forbidden" error.
+type DeleteForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteNotFoundResponseBody is the type of the "firmware" service "delete"
+// endpoint HTTP response body for the "not-found" error.
+type DeleteNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteBadRequestResponseBody is the type of the "firmware" service "delete"
+// endpoint HTTP response body for the "bad-request" error.
+type DeleteBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // FirmwareSummaryResponseBodyCollection is used to define fields on response
 // body types.
@@ -123,115 +347,227 @@ func NewListResponseBody(res *firmwareviews.FirmwaresView) *ListResponseBody {
 	return body
 }
 
-// NewDownloadBadRequestResponseBody builds the HTTP response body from the
+// NewDownloadUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "download" endpoint of the "firmware" service.
-func NewDownloadBadRequestResponseBody(res firmware.BadRequest) DownloadBadRequestResponseBody {
-	body := DownloadBadRequestResponseBody(res)
+func NewDownloadUnauthorizedResponseBody(res *goa.ServiceError) *DownloadUnauthorizedResponseBody {
+	body := &DownloadUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewDownloadForbiddenResponseBody builds the HTTP response body from the
 // result of the "download" endpoint of the "firmware" service.
-func NewDownloadForbiddenResponseBody(res firmware.Forbidden) DownloadForbiddenResponseBody {
-	body := DownloadForbiddenResponseBody(res)
+func NewDownloadForbiddenResponseBody(res *goa.ServiceError) *DownloadForbiddenResponseBody {
+	body := &DownloadForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewDownloadNotFoundResponseBody builds the HTTP response body from the
 // result of the "download" endpoint of the "firmware" service.
-func NewDownloadNotFoundResponseBody(res firmware.NotFound) DownloadNotFoundResponseBody {
-	body := DownloadNotFoundResponseBody(res)
+func NewDownloadNotFoundResponseBody(res *goa.ServiceError) *DownloadNotFoundResponseBody {
+	body := &DownloadNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDownloadUnauthorizedResponseBody builds the HTTP response body from the
+// NewDownloadBadRequestResponseBody builds the HTTP response body from the
 // result of the "download" endpoint of the "firmware" service.
-func NewDownloadUnauthorizedResponseBody(res firmware.Unauthorized) DownloadUnauthorizedResponseBody {
-	body := DownloadUnauthorizedResponseBody(res)
-	return body
-}
-
-// NewAddBadRequestResponseBody builds the HTTP response body from the result
-// of the "add" endpoint of the "firmware" service.
-func NewAddBadRequestResponseBody(res firmware.BadRequest) AddBadRequestResponseBody {
-	body := AddBadRequestResponseBody(res)
-	return body
-}
-
-// NewAddForbiddenResponseBody builds the HTTP response body from the result of
-// the "add" endpoint of the "firmware" service.
-func NewAddForbiddenResponseBody(res firmware.Forbidden) AddForbiddenResponseBody {
-	body := AddForbiddenResponseBody(res)
-	return body
-}
-
-// NewAddNotFoundResponseBody builds the HTTP response body from the result of
-// the "add" endpoint of the "firmware" service.
-func NewAddNotFoundResponseBody(res firmware.NotFound) AddNotFoundResponseBody {
-	body := AddNotFoundResponseBody(res)
+func NewDownloadBadRequestResponseBody(res *goa.ServiceError) *DownloadBadRequestResponseBody {
+	body := &DownloadBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewAddUnauthorizedResponseBody builds the HTTP response body from the result
 // of the "add" endpoint of the "firmware" service.
-func NewAddUnauthorizedResponseBody(res firmware.Unauthorized) AddUnauthorizedResponseBody {
-	body := AddUnauthorizedResponseBody(res)
+func NewAddUnauthorizedResponseBody(res *goa.ServiceError) *AddUnauthorizedResponseBody {
+	body := &AddUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewListBadRequestResponseBody builds the HTTP response body from the result
-// of the "list" endpoint of the "firmware" service.
-func NewListBadRequestResponseBody(res firmware.BadRequest) ListBadRequestResponseBody {
-	body := ListBadRequestResponseBody(res)
+// NewAddForbiddenResponseBody builds the HTTP response body from the result of
+// the "add" endpoint of the "firmware" service.
+func NewAddForbiddenResponseBody(res *goa.ServiceError) *AddForbiddenResponseBody {
+	body := &AddForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewListForbiddenResponseBody builds the HTTP response body from the result
-// of the "list" endpoint of the "firmware" service.
-func NewListForbiddenResponseBody(res firmware.Forbidden) ListForbiddenResponseBody {
-	body := ListForbiddenResponseBody(res)
+// NewAddNotFoundResponseBody builds the HTTP response body from the result of
+// the "add" endpoint of the "firmware" service.
+func NewAddNotFoundResponseBody(res *goa.ServiceError) *AddNotFoundResponseBody {
+	body := &AddNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewListNotFoundResponseBody builds the HTTP response body from the result of
-// the "list" endpoint of the "firmware" service.
-func NewListNotFoundResponseBody(res firmware.NotFound) ListNotFoundResponseBody {
-	body := ListNotFoundResponseBody(res)
+// NewAddBadRequestResponseBody builds the HTTP response body from the result
+// of the "add" endpoint of the "firmware" service.
+func NewAddBadRequestResponseBody(res *goa.ServiceError) *AddBadRequestResponseBody {
+	body := &AddBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewListUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "list" endpoint of the "firmware" service.
-func NewListUnauthorizedResponseBody(res firmware.Unauthorized) ListUnauthorizedResponseBody {
-	body := ListUnauthorizedResponseBody(res)
+func NewListUnauthorizedResponseBody(res *goa.ServiceError) *ListUnauthorizedResponseBody {
+	body := &ListUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDeleteBadRequestResponseBody builds the HTTP response body from the
-// result of the "delete" endpoint of the "firmware" service.
-func NewDeleteBadRequestResponseBody(res firmware.BadRequest) DeleteBadRequestResponseBody {
-	body := DeleteBadRequestResponseBody(res)
+// NewListForbiddenResponseBody builds the HTTP response body from the result
+// of the "list" endpoint of the "firmware" service.
+func NewListForbiddenResponseBody(res *goa.ServiceError) *ListForbiddenResponseBody {
+	body := &ListForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDeleteForbiddenResponseBody builds the HTTP response body from the result
-// of the "delete" endpoint of the "firmware" service.
-func NewDeleteForbiddenResponseBody(res firmware.Forbidden) DeleteForbiddenResponseBody {
-	body := DeleteForbiddenResponseBody(res)
+// NewListNotFoundResponseBody builds the HTTP response body from the result of
+// the "list" endpoint of the "firmware" service.
+func NewListNotFoundResponseBody(res *goa.ServiceError) *ListNotFoundResponseBody {
+	body := &ListNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDeleteNotFoundResponseBody builds the HTTP response body from the result
-// of the "delete" endpoint of the "firmware" service.
-func NewDeleteNotFoundResponseBody(res firmware.NotFound) DeleteNotFoundResponseBody {
-	body := DeleteNotFoundResponseBody(res)
+// NewListBadRequestResponseBody builds the HTTP response body from the result
+// of the "list" endpoint of the "firmware" service.
+func NewListBadRequestResponseBody(res *goa.ServiceError) *ListBadRequestResponseBody {
+	body := &ListBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewDeleteUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "delete" endpoint of the "firmware" service.
-func NewDeleteUnauthorizedResponseBody(res firmware.Unauthorized) DeleteUnauthorizedResponseBody {
-	body := DeleteUnauthorizedResponseBody(res)
+func NewDeleteUnauthorizedResponseBody(res *goa.ServiceError) *DeleteUnauthorizedResponseBody {
+	body := &DeleteUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteForbiddenResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "firmware" service.
+func NewDeleteForbiddenResponseBody(res *goa.ServiceError) *DeleteForbiddenResponseBody {
+	body := &DeleteForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteNotFoundResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "firmware" service.
+func NewDeleteNotFoundResponseBody(res *goa.ServiceError) *DeleteNotFoundResponseBody {
+	body := &DeleteNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteBadRequestResponseBody builds the HTTP response body from the
+// result of the "delete" endpoint of the "firmware" service.
+func NewDeleteBadRequestResponseBody(res *goa.ServiceError) *DeleteBadRequestResponseBody {
+	body := &DeleteBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 

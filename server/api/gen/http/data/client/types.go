@@ -8,7 +8,6 @@
 package client
 
 import (
-	data "github.com/fieldkit/cloud/server/api/gen/data"
 	dataviews "github.com/fieldkit/cloud/server/api/gen/data/views"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -19,21 +18,77 @@ type DeviceSummaryResponseBody struct {
 	Provisions DeviceProvisionSummaryCollectionResponseBody `form:"provisions,omitempty" json:"provisions,omitempty" xml:"provisions,omitempty"`
 }
 
-// DeviceSummaryBadRequestResponseBody is the type of the "data" service
-// "device summary" endpoint HTTP response body for the "bad-request" error.
-type DeviceSummaryBadRequestResponseBody string
+// DeviceSummaryUnauthorizedResponseBody is the type of the "data" service
+// "device summary" endpoint HTTP response body for the "unauthorized" error.
+type DeviceSummaryUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
 
 // DeviceSummaryForbiddenResponseBody is the type of the "data" service "device
 // summary" endpoint HTTP response body for the "forbidden" error.
-type DeviceSummaryForbiddenResponseBody string
+type DeviceSummaryForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
 
 // DeviceSummaryNotFoundResponseBody is the type of the "data" service "device
 // summary" endpoint HTTP response body for the "not-found" error.
-type DeviceSummaryNotFoundResponseBody string
+type DeviceSummaryNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
 
-// DeviceSummaryUnauthorizedResponseBody is the type of the "data" service
-// "device summary" endpoint HTTP response body for the "unauthorized" error.
-type DeviceSummaryUnauthorizedResponseBody string
+// DeviceSummaryBadRequestResponseBody is the type of the "data" service
+// "device summary" endpoint HTTP response body for the "bad-request" error.
+type DeviceSummaryBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
 
 // DeviceProvisionSummaryCollectionResponseBody is used to define fields on
 // response body types.
@@ -77,32 +132,160 @@ func NewDeviceSummaryDeviceDataSummaryResponseOK(body *DeviceSummaryResponseBody
 	return v
 }
 
-// NewDeviceSummaryBadRequest builds a data service device summary endpoint
-// bad-request error.
-func NewDeviceSummaryBadRequest(body DeviceSummaryBadRequestResponseBody) data.BadRequest {
-	v := data.BadRequest(body)
+// NewDeviceSummaryUnauthorized builds a data service device summary endpoint
+// unauthorized error.
+func NewDeviceSummaryUnauthorized(body *DeviceSummaryUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
 	return v
 }
 
 // NewDeviceSummaryForbidden builds a data service device summary endpoint
 // forbidden error.
-func NewDeviceSummaryForbidden(body DeviceSummaryForbiddenResponseBody) data.Forbidden {
-	v := data.Forbidden(body)
+func NewDeviceSummaryForbidden(body *DeviceSummaryForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
 	return v
 }
 
 // NewDeviceSummaryNotFound builds a data service device summary endpoint
 // not-found error.
-func NewDeviceSummaryNotFound(body DeviceSummaryNotFoundResponseBody) data.NotFound {
-	v := data.NotFound(body)
+func NewDeviceSummaryNotFound(body *DeviceSummaryNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
 	return v
 }
 
-// NewDeviceSummaryUnauthorized builds a data service device summary endpoint
-// unauthorized error.
-func NewDeviceSummaryUnauthorized(body DeviceSummaryUnauthorizedResponseBody) data.Unauthorized {
-	v := data.Unauthorized(body)
+// NewDeviceSummaryBadRequest builds a data service device summary endpoint
+// bad-request error.
+func NewDeviceSummaryBadRequest(body *DeviceSummaryBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
 	return v
+}
+
+// ValidateDeviceSummaryUnauthorizedResponseBody runs the validations defined
+// on device summary_unauthorized_response_body
+func ValidateDeviceSummaryUnauthorizedResponseBody(body *DeviceSummaryUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateDeviceSummaryForbiddenResponseBody runs the validations defined on
+// device summary_forbidden_response_body
+func ValidateDeviceSummaryForbiddenResponseBody(body *DeviceSummaryForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateDeviceSummaryNotFoundResponseBody runs the validations defined on
+// device summary_not-found_response_body
+func ValidateDeviceSummaryNotFoundResponseBody(body *DeviceSummaryNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateDeviceSummaryBadRequestResponseBody runs the validations defined on
+// device summary_bad-request_response_body
+func ValidateDeviceSummaryBadRequestResponseBody(body *DeviceSummaryBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
 }
 
 // ValidateDeviceProvisionSummaryCollectionResponseBody runs the validations

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 
 	"goa.design/goa/v3/security"
 
@@ -28,7 +29,7 @@ func (s *TasksService) JWTAuth(ctx context.Context, token string, scheme *securi
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
 		NotFound:     nil,
-		Unauthorized: func(m string) error { return tasks.Unauthorized(m) },
-		Forbidden:    func(m string) error { return tasks.Forbidden(m) },
+		Unauthorized: func(m string) error { return tasks.MakeUnauthorized(errors.New(m)) },
+		Forbidden:    func(m string) error { return tasks.MakeForbidden(errors.New(m)) },
 	})
 }

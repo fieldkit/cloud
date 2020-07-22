@@ -8,49 +8,133 @@
 package server
 
 import (
-	modules "github.com/fieldkit/cloud/server/api/gen/modules"
+	goa "goa.design/goa/v3/pkg"
 )
-
-// MetaBadRequestResponseBody is the type of the "modules" service "meta"
-// endpoint HTTP response body for the "bad-request" error.
-type MetaBadRequestResponseBody string
-
-// MetaForbiddenResponseBody is the type of the "modules" service "meta"
-// endpoint HTTP response body for the "forbidden" error.
-type MetaForbiddenResponseBody string
-
-// MetaNotFoundResponseBody is the type of the "modules" service "meta"
-// endpoint HTTP response body for the "not-found" error.
-type MetaNotFoundResponseBody string
 
 // MetaUnauthorizedResponseBody is the type of the "modules" service "meta"
 // endpoint HTTP response body for the "unauthorized" error.
-type MetaUnauthorizedResponseBody string
+type MetaUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// NewMetaBadRequestResponseBody builds the HTTP response body from the result
-// of the "meta" endpoint of the "modules" service.
-func NewMetaBadRequestResponseBody(res modules.BadRequest) MetaBadRequestResponseBody {
-	body := MetaBadRequestResponseBody(res)
+// MetaForbiddenResponseBody is the type of the "modules" service "meta"
+// endpoint HTTP response body for the "forbidden" error.
+type MetaForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// MetaNotFoundResponseBody is the type of the "modules" service "meta"
+// endpoint HTTP response body for the "not-found" error.
+type MetaNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// MetaBadRequestResponseBody is the type of the "modules" service "meta"
+// endpoint HTTP response body for the "bad-request" error.
+type MetaBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// NewMetaUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "meta" endpoint of the "modules" service.
+func NewMetaUnauthorizedResponseBody(res *goa.ServiceError) *MetaUnauthorizedResponseBody {
+	body := &MetaUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewMetaForbiddenResponseBody builds the HTTP response body from the result
 // of the "meta" endpoint of the "modules" service.
-func NewMetaForbiddenResponseBody(res modules.Forbidden) MetaForbiddenResponseBody {
-	body := MetaForbiddenResponseBody(res)
+func NewMetaForbiddenResponseBody(res *goa.ServiceError) *MetaForbiddenResponseBody {
+	body := &MetaForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewMetaNotFoundResponseBody builds the HTTP response body from the result of
 // the "meta" endpoint of the "modules" service.
-func NewMetaNotFoundResponseBody(res modules.NotFound) MetaNotFoundResponseBody {
-	body := MetaNotFoundResponseBody(res)
+func NewMetaNotFoundResponseBody(res *goa.ServiceError) *MetaNotFoundResponseBody {
+	body := &MetaNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewMetaUnauthorizedResponseBody builds the HTTP response body from the
-// result of the "meta" endpoint of the "modules" service.
-func NewMetaUnauthorizedResponseBody(res modules.Unauthorized) MetaUnauthorizedResponseBody {
-	body := MetaUnauthorizedResponseBody(res)
+// NewMetaBadRequestResponseBody builds the HTTP response body from the result
+// of the "meta" endpoint of the "modules" service.
+func NewMetaBadRequestResponseBody(res *goa.ServiceError) *MetaBadRequestResponseBody {
+	body := &MetaBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }

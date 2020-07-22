@@ -41,69 +41,293 @@ type UploadMediaResponseBody struct {
 	Key string `form:"key" json:"key" xml:"key"`
 }
 
-// UpdateBadRequestResponseBody is the type of the "notes" service "update"
-// endpoint HTTP response body for the "bad-request" error.
-type UpdateBadRequestResponseBody string
+// UpdateUnauthorizedResponseBody is the type of the "notes" service "update"
+// endpoint HTTP response body for the "unauthorized" error.
+type UpdateUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // UpdateForbiddenResponseBody is the type of the "notes" service "update"
 // endpoint HTTP response body for the "forbidden" error.
-type UpdateForbiddenResponseBody string
+type UpdateForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // UpdateNotFoundResponseBody is the type of the "notes" service "update"
 // endpoint HTTP response body for the "not-found" error.
-type UpdateNotFoundResponseBody string
+type UpdateNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// UpdateUnauthorizedResponseBody is the type of the "notes" service "update"
-// endpoint HTTP response body for the "unauthorized" error.
-type UpdateUnauthorizedResponseBody string
-
-// GetBadRequestResponseBody is the type of the "notes" service "get" endpoint
-// HTTP response body for the "bad-request" error.
-type GetBadRequestResponseBody string
-
-// GetForbiddenResponseBody is the type of the "notes" service "get" endpoint
-// HTTP response body for the "forbidden" error.
-type GetForbiddenResponseBody string
-
-// GetNotFoundResponseBody is the type of the "notes" service "get" endpoint
-// HTTP response body for the "not-found" error.
-type GetNotFoundResponseBody string
+// UpdateBadRequestResponseBody is the type of the "notes" service "update"
+// endpoint HTTP response body for the "bad-request" error.
+type UpdateBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // GetUnauthorizedResponseBody is the type of the "notes" service "get"
 // endpoint HTTP response body for the "unauthorized" error.
-type GetUnauthorizedResponseBody string
+type GetUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DownloadMediaBadRequestResponseBody is the type of the "notes" service
-// "download media" endpoint HTTP response body for the "bad-request" error.
-type DownloadMediaBadRequestResponseBody string
+// GetForbiddenResponseBody is the type of the "notes" service "get" endpoint
+// HTTP response body for the "forbidden" error.
+type GetForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DownloadMediaForbiddenResponseBody is the type of the "notes" service
-// "download media" endpoint HTTP response body for the "forbidden" error.
-type DownloadMediaForbiddenResponseBody string
+// GetNotFoundResponseBody is the type of the "notes" service "get" endpoint
+// HTTP response body for the "not-found" error.
+type GetNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DownloadMediaNotFoundResponseBody is the type of the "notes" service
-// "download media" endpoint HTTP response body for the "not-found" error.
-type DownloadMediaNotFoundResponseBody string
+// GetBadRequestResponseBody is the type of the "notes" service "get" endpoint
+// HTTP response body for the "bad-request" error.
+type GetBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // DownloadMediaUnauthorizedResponseBody is the type of the "notes" service
 // "download media" endpoint HTTP response body for the "unauthorized" error.
-type DownloadMediaUnauthorizedResponseBody string
+type DownloadMediaUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// UploadMediaBadRequestResponseBody is the type of the "notes" service "upload
-// media" endpoint HTTP response body for the "bad-request" error.
-type UploadMediaBadRequestResponseBody string
+// DownloadMediaForbiddenResponseBody is the type of the "notes" service
+// "download media" endpoint HTTP response body for the "forbidden" error.
+type DownloadMediaForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// UploadMediaForbiddenResponseBody is the type of the "notes" service "upload
-// media" endpoint HTTP response body for the "forbidden" error.
-type UploadMediaForbiddenResponseBody string
+// DownloadMediaNotFoundResponseBody is the type of the "notes" service
+// "download media" endpoint HTTP response body for the "not-found" error.
+type DownloadMediaNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// UploadMediaNotFoundResponseBody is the type of the "notes" service "upload
-// media" endpoint HTTP response body for the "not-found" error.
-type UploadMediaNotFoundResponseBody string
+// DownloadMediaBadRequestResponseBody is the type of the "notes" service
+// "download media" endpoint HTTP response body for the "bad-request" error.
+type DownloadMediaBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // UploadMediaUnauthorizedResponseBody is the type of the "notes" service
 // "upload media" endpoint HTTP response body for the "unauthorized" error.
-type UploadMediaUnauthorizedResponseBody string
+type UploadMediaUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UploadMediaForbiddenResponseBody is the type of the "notes" service "upload
+// media" endpoint HTTP response body for the "forbidden" error.
+type UploadMediaForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UploadMediaNotFoundResponseBody is the type of the "notes" service "upload
+// media" endpoint HTTP response body for the "not-found" error.
+type UploadMediaNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UploadMediaBadRequestResponseBody is the type of the "notes" service "upload
+// media" endpoint HTTP response body for the "bad-request" error.
+type UploadMediaBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // FieldNoteResponseBody is used to define fields on response body types.
 type FieldNoteResponseBody struct {
@@ -202,115 +426,227 @@ func NewUploadMediaResponseBody(res *notesviews.NoteMediaView) *UploadMediaRespo
 	return body
 }
 
-// NewUpdateBadRequestResponseBody builds the HTTP response body from the
+// NewUpdateUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "update" endpoint of the "notes" service.
-func NewUpdateBadRequestResponseBody(res notes.BadRequest) UpdateBadRequestResponseBody {
-	body := UpdateBadRequestResponseBody(res)
+func NewUpdateUnauthorizedResponseBody(res *goa.ServiceError) *UpdateUnauthorizedResponseBody {
+	body := &UpdateUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewUpdateForbiddenResponseBody builds the HTTP response body from the result
 // of the "update" endpoint of the "notes" service.
-func NewUpdateForbiddenResponseBody(res notes.Forbidden) UpdateForbiddenResponseBody {
-	body := UpdateForbiddenResponseBody(res)
+func NewUpdateForbiddenResponseBody(res *goa.ServiceError) *UpdateForbiddenResponseBody {
+	body := &UpdateForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewUpdateNotFoundResponseBody builds the HTTP response body from the result
 // of the "update" endpoint of the "notes" service.
-func NewUpdateNotFoundResponseBody(res notes.NotFound) UpdateNotFoundResponseBody {
-	body := UpdateNotFoundResponseBody(res)
+func NewUpdateNotFoundResponseBody(res *goa.ServiceError) *UpdateNotFoundResponseBody {
+	body := &UpdateNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewUpdateUnauthorizedResponseBody builds the HTTP response body from the
+// NewUpdateBadRequestResponseBody builds the HTTP response body from the
 // result of the "update" endpoint of the "notes" service.
-func NewUpdateUnauthorizedResponseBody(res notes.Unauthorized) UpdateUnauthorizedResponseBody {
-	body := UpdateUnauthorizedResponseBody(res)
-	return body
-}
-
-// NewGetBadRequestResponseBody builds the HTTP response body from the result
-// of the "get" endpoint of the "notes" service.
-func NewGetBadRequestResponseBody(res notes.BadRequest) GetBadRequestResponseBody {
-	body := GetBadRequestResponseBody(res)
-	return body
-}
-
-// NewGetForbiddenResponseBody builds the HTTP response body from the result of
-// the "get" endpoint of the "notes" service.
-func NewGetForbiddenResponseBody(res notes.Forbidden) GetForbiddenResponseBody {
-	body := GetForbiddenResponseBody(res)
-	return body
-}
-
-// NewGetNotFoundResponseBody builds the HTTP response body from the result of
-// the "get" endpoint of the "notes" service.
-func NewGetNotFoundResponseBody(res notes.NotFound) GetNotFoundResponseBody {
-	body := GetNotFoundResponseBody(res)
+func NewUpdateBadRequestResponseBody(res *goa.ServiceError) *UpdateBadRequestResponseBody {
+	body := &UpdateBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewGetUnauthorizedResponseBody builds the HTTP response body from the result
 // of the "get" endpoint of the "notes" service.
-func NewGetUnauthorizedResponseBody(res notes.Unauthorized) GetUnauthorizedResponseBody {
-	body := GetUnauthorizedResponseBody(res)
+func NewGetUnauthorizedResponseBody(res *goa.ServiceError) *GetUnauthorizedResponseBody {
+	body := &GetUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDownloadMediaBadRequestResponseBody builds the HTTP response body from
-// the result of the "download media" endpoint of the "notes" service.
-func NewDownloadMediaBadRequestResponseBody(res notes.BadRequest) DownloadMediaBadRequestResponseBody {
-	body := DownloadMediaBadRequestResponseBody(res)
+// NewGetForbiddenResponseBody builds the HTTP response body from the result of
+// the "get" endpoint of the "notes" service.
+func NewGetForbiddenResponseBody(res *goa.ServiceError) *GetForbiddenResponseBody {
+	body := &GetForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDownloadMediaForbiddenResponseBody builds the HTTP response body from the
-// result of the "download media" endpoint of the "notes" service.
-func NewDownloadMediaForbiddenResponseBody(res notes.Forbidden) DownloadMediaForbiddenResponseBody {
-	body := DownloadMediaForbiddenResponseBody(res)
+// NewGetNotFoundResponseBody builds the HTTP response body from the result of
+// the "get" endpoint of the "notes" service.
+func NewGetNotFoundResponseBody(res *goa.ServiceError) *GetNotFoundResponseBody {
+	body := &GetNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDownloadMediaNotFoundResponseBody builds the HTTP response body from the
-// result of the "download media" endpoint of the "notes" service.
-func NewDownloadMediaNotFoundResponseBody(res notes.NotFound) DownloadMediaNotFoundResponseBody {
-	body := DownloadMediaNotFoundResponseBody(res)
+// NewGetBadRequestResponseBody builds the HTTP response body from the result
+// of the "get" endpoint of the "notes" service.
+func NewGetBadRequestResponseBody(res *goa.ServiceError) *GetBadRequestResponseBody {
+	body := &GetBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewDownloadMediaUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "download media" endpoint of the "notes" service.
-func NewDownloadMediaUnauthorizedResponseBody(res notes.Unauthorized) DownloadMediaUnauthorizedResponseBody {
-	body := DownloadMediaUnauthorizedResponseBody(res)
+func NewDownloadMediaUnauthorizedResponseBody(res *goa.ServiceError) *DownloadMediaUnauthorizedResponseBody {
+	body := &DownloadMediaUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewUploadMediaBadRequestResponseBody builds the HTTP response body from the
-// result of the "upload media" endpoint of the "notes" service.
-func NewUploadMediaBadRequestResponseBody(res notes.BadRequest) UploadMediaBadRequestResponseBody {
-	body := UploadMediaBadRequestResponseBody(res)
+// NewDownloadMediaForbiddenResponseBody builds the HTTP response body from the
+// result of the "download media" endpoint of the "notes" service.
+func NewDownloadMediaForbiddenResponseBody(res *goa.ServiceError) *DownloadMediaForbiddenResponseBody {
+	body := &DownloadMediaForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewUploadMediaForbiddenResponseBody builds the HTTP response body from the
-// result of the "upload media" endpoint of the "notes" service.
-func NewUploadMediaForbiddenResponseBody(res notes.Forbidden) UploadMediaForbiddenResponseBody {
-	body := UploadMediaForbiddenResponseBody(res)
+// NewDownloadMediaNotFoundResponseBody builds the HTTP response body from the
+// result of the "download media" endpoint of the "notes" service.
+func NewDownloadMediaNotFoundResponseBody(res *goa.ServiceError) *DownloadMediaNotFoundResponseBody {
+	body := &DownloadMediaNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewUploadMediaNotFoundResponseBody builds the HTTP response body from the
-// result of the "upload media" endpoint of the "notes" service.
-func NewUploadMediaNotFoundResponseBody(res notes.NotFound) UploadMediaNotFoundResponseBody {
-	body := UploadMediaNotFoundResponseBody(res)
+// NewDownloadMediaBadRequestResponseBody builds the HTTP response body from
+// the result of the "download media" endpoint of the "notes" service.
+func NewDownloadMediaBadRequestResponseBody(res *goa.ServiceError) *DownloadMediaBadRequestResponseBody {
+	body := &DownloadMediaBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewUploadMediaUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "upload media" endpoint of the "notes" service.
-func NewUploadMediaUnauthorizedResponseBody(res notes.Unauthorized) UploadMediaUnauthorizedResponseBody {
-	body := UploadMediaUnauthorizedResponseBody(res)
+func NewUploadMediaUnauthorizedResponseBody(res *goa.ServiceError) *UploadMediaUnauthorizedResponseBody {
+	body := &UploadMediaUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUploadMediaForbiddenResponseBody builds the HTTP response body from the
+// result of the "upload media" endpoint of the "notes" service.
+func NewUploadMediaForbiddenResponseBody(res *goa.ServiceError) *UploadMediaForbiddenResponseBody {
+	body := &UploadMediaForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUploadMediaNotFoundResponseBody builds the HTTP response body from the
+// result of the "upload media" endpoint of the "notes" service.
+func NewUploadMediaNotFoundResponseBody(res *goa.ServiceError) *UploadMediaNotFoundResponseBody {
+	body := &UploadMediaNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUploadMediaBadRequestResponseBody builds the HTTP response body from the
+// result of the "upload media" endpoint of the "notes" service.
+func NewUploadMediaBadRequestResponseBody(res *goa.ServiceError) *UploadMediaBadRequestResponseBody {
+	body := &UploadMediaBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 

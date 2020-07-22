@@ -36,9 +36,9 @@ func (c *Client) BuildFiveRequest(ctx context.Context, v interface{}) (*http.Req
 // five endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeFiveResponse may return the following errors:
-//	- "bad-request" (type tasks.BadRequest): http.StatusBadRequest
-//	- "forbidden" (type tasks.Forbidden): http.StatusForbidden
-//	- "not-found" (type tasks.NotFound): http.StatusNotFound
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- "unauthorized" (type tasks.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeFiveResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
@@ -58,16 +58,6 @@ func DecodeFiveResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 		switch resp.StatusCode {
 		case http.StatusNoContent:
 			return nil, nil
-		case http.StatusBadRequest:
-			var (
-				body FiveBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("tasks", "five", err)
-			}
-			return nil, NewFiveBadRequest(body)
 		case http.StatusForbidden:
 			var (
 				body FiveForbiddenResponseBody
@@ -77,7 +67,11 @@ func DecodeFiveResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("tasks", "five", err)
 			}
-			return nil, NewFiveForbidden(body)
+			err = ValidateFiveForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("tasks", "five", err)
+			}
+			return nil, NewFiveForbidden(&body)
 		case http.StatusNotFound:
 			var (
 				body FiveNotFoundResponseBody
@@ -87,7 +81,25 @@ func DecodeFiveResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("tasks", "five", err)
 			}
-			return nil, NewFiveNotFound(body)
+			err = ValidateFiveNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("tasks", "five", err)
+			}
+			return nil, NewFiveNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body FiveBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("tasks", "five", err)
+			}
+			err = ValidateFiveBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("tasks", "five", err)
+			}
+			return nil, NewFiveBadRequest(&body)
 		case http.StatusUnauthorized:
 			var (
 				body FiveUnauthorizedResponseBody

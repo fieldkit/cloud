@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/hex"
+	"errors"
 
 	"goa.design/goa/v3/security"
 
@@ -104,8 +105,8 @@ func (s *DataService) JWTAuth(ctx context.Context, token string, scheme *securit
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		NotFound:     func(m string) error { return datas.NotFound(m) },
-		Unauthorized: func(m string) error { return datas.Unauthorized(m) },
-		Forbidden:    func(m string) error { return datas.Forbidden(m) },
+		NotFound:     func(m string) error { return datas.MakeNotFound(errors.New(m)) },
+		Unauthorized: func(m string) error { return datas.MakeUnauthorized(errors.New(m)) },
+		Forbidden:    func(m string) error { return datas.MakeForbidden(errors.New(m)) },
 	})
 }

@@ -12,6 +12,7 @@ import (
 	"io"
 
 	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
+	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )
 
@@ -289,56 +290,40 @@ type RemoveUserFields struct {
 	Email string
 }
 
-// unauthorized
-type Unauthorized string
-
-// forbidden
-type Forbidden string
-
-// not-found
-type NotFound string
-
-// bad-request
-type BadRequest string
-
-// Error returns an error description.
-func (e Unauthorized) Error() string {
-	return "unauthorized"
+// MakeUnauthorized builds a goa.ServiceError from an error.
+func MakeUnauthorized(err error) *goa.ServiceError {
+	return &goa.ServiceError{
+		Name:    "unauthorized",
+		ID:      goa.NewErrorID(),
+		Message: err.Error(),
+	}
 }
 
-// ErrorName returns "unauthorized".
-func (e Unauthorized) ErrorName() string {
-	return "unauthorized"
+// MakeForbidden builds a goa.ServiceError from an error.
+func MakeForbidden(err error) *goa.ServiceError {
+	return &goa.ServiceError{
+		Name:    "forbidden",
+		ID:      goa.NewErrorID(),
+		Message: err.Error(),
+	}
 }
 
-// Error returns an error description.
-func (e Forbidden) Error() string {
-	return "forbidden"
+// MakeNotFound builds a goa.ServiceError from an error.
+func MakeNotFound(err error) *goa.ServiceError {
+	return &goa.ServiceError{
+		Name:    "not-found",
+		ID:      goa.NewErrorID(),
+		Message: err.Error(),
+	}
 }
 
-// ErrorName returns "forbidden".
-func (e Forbidden) ErrorName() string {
-	return "forbidden"
-}
-
-// Error returns an error description.
-func (e NotFound) Error() string {
-	return "not-found"
-}
-
-// ErrorName returns "not-found".
-func (e NotFound) ErrorName() string {
-	return "not-found"
-}
-
-// Error returns an error description.
-func (e BadRequest) Error() string {
-	return "bad-request"
-}
-
-// ErrorName returns "bad-request".
-func (e BadRequest) ErrorName() string {
-	return "bad-request"
+// MakeBadRequest builds a goa.ServiceError from an error.
+func MakeBadRequest(err error) *goa.ServiceError {
+	return &goa.ServiceError{
+		Name:    "bad-request",
+		ID:      goa.NewErrorID(),
+		Message: err.Error(),
+	}
 }
 
 // NewProjectUpdate initializes result type ProjectUpdate from viewed result

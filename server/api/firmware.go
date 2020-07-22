@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -87,7 +88,7 @@ func (s *FirmwareService) Download(ctx context.Context, payload *firmware.Downlo
 
 	if len(firmwares) == 0 {
 		log.Errorw("firmware missing", "firmware_id", payload.FirmwareID)
-		return nil, nil, firmware.NotFound("not found")
+		return nil, nil, firmware.MakeNotFound(errors.New("not found"))
 	}
 
 	fw := firmwares[0]
@@ -226,7 +227,7 @@ func (s *FirmwareService) Delete(ctx context.Context, payload *firmware.DeletePa
 	}
 
 	if len(firmwares) == 0 {
-		return firmware.NotFound("not found")
+		return firmware.MakeNotFound(errors.New("not found"))
 	}
 
 	svc := s3.New(s.options.Session)
@@ -267,8 +268,8 @@ func (s *FirmwareService) JWTAuth(ctx context.Context, token string, scheme *sec
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		NotFound:     func(m string) error { return firmware.NotFound(m) },
-		Unauthorized: func(m string) error { return firmware.Unauthorized(m) },
-		Forbidden:    func(m string) error { return firmware.Forbidden(m) },
+		NotFound:     func(m string) error { return firmware.MakeNotFound(errors.New(m)) },
+		Unauthorized: func(m string) error { return firmware.MakeUnauthorized(errors.New(m)) },
+		Forbidden:    func(m string) error { return firmware.MakeForbidden(errors.New(m)) },
 	})
 }

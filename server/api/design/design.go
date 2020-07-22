@@ -6,6 +6,11 @@ import (
 	. "goa.design/goa/v3/dsl"
 )
 
+var ServiceError = Type("ServiceError", func() {
+	Attribute("code", String)
+	Attribute("status", Int32)
+})
+
 var JWTAuth = JWTSecurity("jwt", func() {
 	Scope("api:access", "API access")
 	Scope("api:admin", "API admin access")
@@ -30,10 +35,14 @@ func commonOptions() {
 	cors.Origin("/(.+[.])?fieldkit.org:\\d+/", corsRules)    // Dev
 	cors.Origin("/(.+[.])?local.fkdev.org:\\d+/", corsRules) // Dev
 
-	Error("unauthorized", String, "unauthorized")
-	Error("forbidden", String, "forbidden")
-	Error("not-found", String, "not-found")
-	Error("bad-request", String, "bad-request")
+	Error("unauthorized", func() {
+	})
+	Error("forbidden", func() {
+	})
+	Error("not-found", func() {
+	})
+	Error("bad-request", func() {
+	})
 
 	HTTP(func() {
 		Response("unauthorized", StatusUnauthorized)

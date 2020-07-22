@@ -153,309 +153,1373 @@ type ListMineResponseBody struct {
 	Projects ProjectResponseBodyCollection `form:"projects" json:"projects" xml:"projects"`
 }
 
-// AddUpdateBadRequestResponseBody is the type of the "project" service "add
-// update" endpoint HTTP response body for the "bad-request" error.
-type AddUpdateBadRequestResponseBody string
+// AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
+// update" endpoint HTTP response body for the "unauthorized" error.
+type AddUpdateUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // AddUpdateForbiddenResponseBody is the type of the "project" service "add
 // update" endpoint HTTP response body for the "forbidden" error.
-type AddUpdateForbiddenResponseBody string
+type AddUpdateForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // AddUpdateNotFoundResponseBody is the type of the "project" service "add
 // update" endpoint HTTP response body for the "not-found" error.
-type AddUpdateNotFoundResponseBody string
+type AddUpdateNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
-// update" endpoint HTTP response body for the "unauthorized" error.
-type AddUpdateUnauthorizedResponseBody string
-
-// DeleteUpdateBadRequestResponseBody is the type of the "project" service
-// "delete update" endpoint HTTP response body for the "bad-request" error.
-type DeleteUpdateBadRequestResponseBody string
-
-// DeleteUpdateForbiddenResponseBody is the type of the "project" service
-// "delete update" endpoint HTTP response body for the "forbidden" error.
-type DeleteUpdateForbiddenResponseBody string
-
-// DeleteUpdateNotFoundResponseBody is the type of the "project" service
-// "delete update" endpoint HTTP response body for the "not-found" error.
-type DeleteUpdateNotFoundResponseBody string
+// AddUpdateBadRequestResponseBody is the type of the "project" service "add
+// update" endpoint HTTP response body for the "bad-request" error.
+type AddUpdateBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // DeleteUpdateUnauthorizedResponseBody is the type of the "project" service
 // "delete update" endpoint HTTP response body for the "unauthorized" error.
-type DeleteUpdateUnauthorizedResponseBody string
+type DeleteUpdateUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ModifyUpdateBadRequestResponseBody is the type of the "project" service
-// "modify update" endpoint HTTP response body for the "bad-request" error.
-type ModifyUpdateBadRequestResponseBody string
+// DeleteUpdateForbiddenResponseBody is the type of the "project" service
+// "delete update" endpoint HTTP response body for the "forbidden" error.
+type DeleteUpdateForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ModifyUpdateForbiddenResponseBody is the type of the "project" service
-// "modify update" endpoint HTTP response body for the "forbidden" error.
-type ModifyUpdateForbiddenResponseBody string
+// DeleteUpdateNotFoundResponseBody is the type of the "project" service
+// "delete update" endpoint HTTP response body for the "not-found" error.
+type DeleteUpdateNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ModifyUpdateNotFoundResponseBody is the type of the "project" service
-// "modify update" endpoint HTTP response body for the "not-found" error.
-type ModifyUpdateNotFoundResponseBody string
+// DeleteUpdateBadRequestResponseBody is the type of the "project" service
+// "delete update" endpoint HTTP response body for the "bad-request" error.
+type DeleteUpdateBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // ModifyUpdateUnauthorizedResponseBody is the type of the "project" service
 // "modify update" endpoint HTTP response body for the "unauthorized" error.
-type ModifyUpdateUnauthorizedResponseBody string
+type ModifyUpdateUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// InvitesBadRequestResponseBody is the type of the "project" service "invites"
-// endpoint HTTP response body for the "bad-request" error.
-type InvitesBadRequestResponseBody string
+// ModifyUpdateForbiddenResponseBody is the type of the "project" service
+// "modify update" endpoint HTTP response body for the "forbidden" error.
+type ModifyUpdateForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// InvitesForbiddenResponseBody is the type of the "project" service "invites"
-// endpoint HTTP response body for the "forbidden" error.
-type InvitesForbiddenResponseBody string
+// ModifyUpdateNotFoundResponseBody is the type of the "project" service
+// "modify update" endpoint HTTP response body for the "not-found" error.
+type ModifyUpdateNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// InvitesNotFoundResponseBody is the type of the "project" service "invites"
-// endpoint HTTP response body for the "not-found" error.
-type InvitesNotFoundResponseBody string
+// ModifyUpdateBadRequestResponseBody is the type of the "project" service
+// "modify update" endpoint HTTP response body for the "bad-request" error.
+type ModifyUpdateBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // InvitesUnauthorizedResponseBody is the type of the "project" service
 // "invites" endpoint HTTP response body for the "unauthorized" error.
-type InvitesUnauthorizedResponseBody string
+type InvitesUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// LookupInviteBadRequestResponseBody is the type of the "project" service
-// "lookup invite" endpoint HTTP response body for the "bad-request" error.
-type LookupInviteBadRequestResponseBody string
+// InvitesForbiddenResponseBody is the type of the "project" service "invites"
+// endpoint HTTP response body for the "forbidden" error.
+type InvitesForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// LookupInviteForbiddenResponseBody is the type of the "project" service
-// "lookup invite" endpoint HTTP response body for the "forbidden" error.
-type LookupInviteForbiddenResponseBody string
+// InvitesNotFoundResponseBody is the type of the "project" service "invites"
+// endpoint HTTP response body for the "not-found" error.
+type InvitesNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// LookupInviteNotFoundResponseBody is the type of the "project" service
-// "lookup invite" endpoint HTTP response body for the "not-found" error.
-type LookupInviteNotFoundResponseBody string
+// InvitesBadRequestResponseBody is the type of the "project" service "invites"
+// endpoint HTTP response body for the "bad-request" error.
+type InvitesBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // LookupInviteUnauthorizedResponseBody is the type of the "project" service
 // "lookup invite" endpoint HTTP response body for the "unauthorized" error.
-type LookupInviteUnauthorizedResponseBody string
+type LookupInviteUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// AcceptInviteBadRequestResponseBody is the type of the "project" service
-// "accept invite" endpoint HTTP response body for the "bad-request" error.
-type AcceptInviteBadRequestResponseBody string
+// LookupInviteForbiddenResponseBody is the type of the "project" service
+// "lookup invite" endpoint HTTP response body for the "forbidden" error.
+type LookupInviteForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// AcceptInviteForbiddenResponseBody is the type of the "project" service
-// "accept invite" endpoint HTTP response body for the "forbidden" error.
-type AcceptInviteForbiddenResponseBody string
+// LookupInviteNotFoundResponseBody is the type of the "project" service
+// "lookup invite" endpoint HTTP response body for the "not-found" error.
+type LookupInviteNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// AcceptInviteNotFoundResponseBody is the type of the "project" service
-// "accept invite" endpoint HTTP response body for the "not-found" error.
-type AcceptInviteNotFoundResponseBody string
+// LookupInviteBadRequestResponseBody is the type of the "project" service
+// "lookup invite" endpoint HTTP response body for the "bad-request" error.
+type LookupInviteBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // AcceptInviteUnauthorizedResponseBody is the type of the "project" service
 // "accept invite" endpoint HTTP response body for the "unauthorized" error.
-type AcceptInviteUnauthorizedResponseBody string
+type AcceptInviteUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// RejectInviteBadRequestResponseBody is the type of the "project" service
-// "reject invite" endpoint HTTP response body for the "bad-request" error.
-type RejectInviteBadRequestResponseBody string
+// AcceptInviteForbiddenResponseBody is the type of the "project" service
+// "accept invite" endpoint HTTP response body for the "forbidden" error.
+type AcceptInviteForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// RejectInviteForbiddenResponseBody is the type of the "project" service
-// "reject invite" endpoint HTTP response body for the "forbidden" error.
-type RejectInviteForbiddenResponseBody string
+// AcceptInviteNotFoundResponseBody is the type of the "project" service
+// "accept invite" endpoint HTTP response body for the "not-found" error.
+type AcceptInviteNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// RejectInviteNotFoundResponseBody is the type of the "project" service
-// "reject invite" endpoint HTTP response body for the "not-found" error.
-type RejectInviteNotFoundResponseBody string
+// AcceptInviteBadRequestResponseBody is the type of the "project" service
+// "accept invite" endpoint HTTP response body for the "bad-request" error.
+type AcceptInviteBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // RejectInviteUnauthorizedResponseBody is the type of the "project" service
 // "reject invite" endpoint HTTP response body for the "unauthorized" error.
-type RejectInviteUnauthorizedResponseBody string
+type RejectInviteUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// AddBadRequestResponseBody is the type of the "project" service "add"
-// endpoint HTTP response body for the "bad-request" error.
-type AddBadRequestResponseBody string
+// RejectInviteForbiddenResponseBody is the type of the "project" service
+// "reject invite" endpoint HTTP response body for the "forbidden" error.
+type RejectInviteForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// AddForbiddenResponseBody is the type of the "project" service "add" endpoint
-// HTTP response body for the "forbidden" error.
-type AddForbiddenResponseBody string
+// RejectInviteNotFoundResponseBody is the type of the "project" service
+// "reject invite" endpoint HTTP response body for the "not-found" error.
+type RejectInviteNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// AddNotFoundResponseBody is the type of the "project" service "add" endpoint
-// HTTP response body for the "not-found" error.
-type AddNotFoundResponseBody string
+// RejectInviteBadRequestResponseBody is the type of the "project" service
+// "reject invite" endpoint HTTP response body for the "bad-request" error.
+type RejectInviteBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // AddUnauthorizedResponseBody is the type of the "project" service "add"
 // endpoint HTTP response body for the "unauthorized" error.
-type AddUnauthorizedResponseBody string
+type AddUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// UpdateBadRequestResponseBody is the type of the "project" service "update"
+// AddForbiddenResponseBody is the type of the "project" service "add" endpoint
+// HTTP response body for the "forbidden" error.
+type AddForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AddNotFoundResponseBody is the type of the "project" service "add" endpoint
+// HTTP response body for the "not-found" error.
+type AddNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AddBadRequestResponseBody is the type of the "project" service "add"
 // endpoint HTTP response body for the "bad-request" error.
-type UpdateBadRequestResponseBody string
-
-// UpdateForbiddenResponseBody is the type of the "project" service "update"
-// endpoint HTTP response body for the "forbidden" error.
-type UpdateForbiddenResponseBody string
-
-// UpdateNotFoundResponseBody is the type of the "project" service "update"
-// endpoint HTTP response body for the "not-found" error.
-type UpdateNotFoundResponseBody string
+type AddBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // UpdateUnauthorizedResponseBody is the type of the "project" service "update"
 // endpoint HTTP response body for the "unauthorized" error.
-type UpdateUnauthorizedResponseBody string
+type UpdateUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// GetBadRequestResponseBody is the type of the "project" service "get"
+// UpdateForbiddenResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "forbidden" error.
+type UpdateForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateNotFoundResponseBody is the type of the "project" service "update"
+// endpoint HTTP response body for the "not-found" error.
+type UpdateNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateBadRequestResponseBody is the type of the "project" service "update"
 // endpoint HTTP response body for the "bad-request" error.
-type GetBadRequestResponseBody string
-
-// GetForbiddenResponseBody is the type of the "project" service "get" endpoint
-// HTTP response body for the "forbidden" error.
-type GetForbiddenResponseBody string
-
-// GetNotFoundResponseBody is the type of the "project" service "get" endpoint
-// HTTP response body for the "not-found" error.
-type GetNotFoundResponseBody string
+type UpdateBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // GetUnauthorizedResponseBody is the type of the "project" service "get"
 // endpoint HTTP response body for the "unauthorized" error.
-type GetUnauthorizedResponseBody string
+type GetUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ListCommunityBadRequestResponseBody is the type of the "project" service
-// "list community" endpoint HTTP response body for the "bad-request" error.
-type ListCommunityBadRequestResponseBody string
+// GetForbiddenResponseBody is the type of the "project" service "get" endpoint
+// HTTP response body for the "forbidden" error.
+type GetForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ListCommunityForbiddenResponseBody is the type of the "project" service
-// "list community" endpoint HTTP response body for the "forbidden" error.
-type ListCommunityForbiddenResponseBody string
+// GetNotFoundResponseBody is the type of the "project" service "get" endpoint
+// HTTP response body for the "not-found" error.
+type GetNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ListCommunityNotFoundResponseBody is the type of the "project" service "list
-// community" endpoint HTTP response body for the "not-found" error.
-type ListCommunityNotFoundResponseBody string
+// GetBadRequestResponseBody is the type of the "project" service "get"
+// endpoint HTTP response body for the "bad-request" error.
+type GetBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // ListCommunityUnauthorizedResponseBody is the type of the "project" service
 // "list community" endpoint HTTP response body for the "unauthorized" error.
-type ListCommunityUnauthorizedResponseBody string
+type ListCommunityUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ListMineBadRequestResponseBody is the type of the "project" service "list
-// mine" endpoint HTTP response body for the "bad-request" error.
-type ListMineBadRequestResponseBody string
+// ListCommunityForbiddenResponseBody is the type of the "project" service
+// "list community" endpoint HTTP response body for the "forbidden" error.
+type ListCommunityForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ListMineForbiddenResponseBody is the type of the "project" service "list
-// mine" endpoint HTTP response body for the "forbidden" error.
-type ListMineForbiddenResponseBody string
+// ListCommunityNotFoundResponseBody is the type of the "project" service "list
+// community" endpoint HTTP response body for the "not-found" error.
+type ListCommunityNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// ListMineNotFoundResponseBody is the type of the "project" service "list
-// mine" endpoint HTTP response body for the "not-found" error.
-type ListMineNotFoundResponseBody string
+// ListCommunityBadRequestResponseBody is the type of the "project" service
+// "list community" endpoint HTTP response body for the "bad-request" error.
+type ListCommunityBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // ListMineUnauthorizedResponseBody is the type of the "project" service "list
 // mine" endpoint HTTP response body for the "unauthorized" error.
-type ListMineUnauthorizedResponseBody string
+type ListMineUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// InviteBadRequestResponseBody is the type of the "project" service "invite"
-// endpoint HTTP response body for the "bad-request" error.
-type InviteBadRequestResponseBody string
+// ListMineForbiddenResponseBody is the type of the "project" service "list
+// mine" endpoint HTTP response body for the "forbidden" error.
+type ListMineForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// InviteForbiddenResponseBody is the type of the "project" service "invite"
-// endpoint HTTP response body for the "forbidden" error.
-type InviteForbiddenResponseBody string
+// ListMineNotFoundResponseBody is the type of the "project" service "list
+// mine" endpoint HTTP response body for the "not-found" error.
+type ListMineNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// InviteNotFoundResponseBody is the type of the "project" service "invite"
-// endpoint HTTP response body for the "not-found" error.
-type InviteNotFoundResponseBody string
+// ListMineBadRequestResponseBody is the type of the "project" service "list
+// mine" endpoint HTTP response body for the "bad-request" error.
+type ListMineBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // InviteUnauthorizedResponseBody is the type of the "project" service "invite"
 // endpoint HTTP response body for the "unauthorized" error.
-type InviteUnauthorizedResponseBody string
+type InviteUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// RemoveUserBadRequestResponseBody is the type of the "project" service
-// "remove user" endpoint HTTP response body for the "bad-request" error.
-type RemoveUserBadRequestResponseBody string
+// InviteForbiddenResponseBody is the type of the "project" service "invite"
+// endpoint HTTP response body for the "forbidden" error.
+type InviteForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// RemoveUserForbiddenResponseBody is the type of the "project" service "remove
-// user" endpoint HTTP response body for the "forbidden" error.
-type RemoveUserForbiddenResponseBody string
+// InviteNotFoundResponseBody is the type of the "project" service "invite"
+// endpoint HTTP response body for the "not-found" error.
+type InviteNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// RemoveUserNotFoundResponseBody is the type of the "project" service "remove
-// user" endpoint HTTP response body for the "not-found" error.
-type RemoveUserNotFoundResponseBody string
+// InviteBadRequestResponseBody is the type of the "project" service "invite"
+// endpoint HTTP response body for the "bad-request" error.
+type InviteBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // RemoveUserUnauthorizedResponseBody is the type of the "project" service
 // "remove user" endpoint HTTP response body for the "unauthorized" error.
-type RemoveUserUnauthorizedResponseBody string
+type RemoveUserUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// AddStationBadRequestResponseBody is the type of the "project" service "add
-// station" endpoint HTTP response body for the "bad-request" error.
-type AddStationBadRequestResponseBody string
+// RemoveUserForbiddenResponseBody is the type of the "project" service "remove
+// user" endpoint HTTP response body for the "forbidden" error.
+type RemoveUserForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// AddStationForbiddenResponseBody is the type of the "project" service "add
-// station" endpoint HTTP response body for the "forbidden" error.
-type AddStationForbiddenResponseBody string
+// RemoveUserNotFoundResponseBody is the type of the "project" service "remove
+// user" endpoint HTTP response body for the "not-found" error.
+type RemoveUserNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// AddStationNotFoundResponseBody is the type of the "project" service "add
-// station" endpoint HTTP response body for the "not-found" error.
-type AddStationNotFoundResponseBody string
+// RemoveUserBadRequestResponseBody is the type of the "project" service
+// "remove user" endpoint HTTP response body for the "bad-request" error.
+type RemoveUserBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // AddStationUnauthorizedResponseBody is the type of the "project" service "add
 // station" endpoint HTTP response body for the "unauthorized" error.
-type AddStationUnauthorizedResponseBody string
+type AddStationUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// RemoveStationBadRequestResponseBody is the type of the "project" service
-// "remove station" endpoint HTTP response body for the "bad-request" error.
-type RemoveStationBadRequestResponseBody string
+// AddStationForbiddenResponseBody is the type of the "project" service "add
+// station" endpoint HTTP response body for the "forbidden" error.
+type AddStationForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// RemoveStationForbiddenResponseBody is the type of the "project" service
-// "remove station" endpoint HTTP response body for the "forbidden" error.
-type RemoveStationForbiddenResponseBody string
+// AddStationNotFoundResponseBody is the type of the "project" service "add
+// station" endpoint HTTP response body for the "not-found" error.
+type AddStationNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// RemoveStationNotFoundResponseBody is the type of the "project" service
-// "remove station" endpoint HTTP response body for the "not-found" error.
-type RemoveStationNotFoundResponseBody string
+// AddStationBadRequestResponseBody is the type of the "project" service "add
+// station" endpoint HTTP response body for the "bad-request" error.
+type AddStationBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // RemoveStationUnauthorizedResponseBody is the type of the "project" service
 // "remove station" endpoint HTTP response body for the "unauthorized" error.
-type RemoveStationUnauthorizedResponseBody string
+type RemoveStationUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DeleteBadRequestResponseBody is the type of the "project" service "delete"
-// endpoint HTTP response body for the "bad-request" error.
-type DeleteBadRequestResponseBody string
+// RemoveStationForbiddenResponseBody is the type of the "project" service
+// "remove station" endpoint HTTP response body for the "forbidden" error.
+type RemoveStationForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DeleteForbiddenResponseBody is the type of the "project" service "delete"
-// endpoint HTTP response body for the "forbidden" error.
-type DeleteForbiddenResponseBody string
+// RemoveStationNotFoundResponseBody is the type of the "project" service
+// "remove station" endpoint HTTP response body for the "not-found" error.
+type RemoveStationNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DeleteNotFoundResponseBody is the type of the "project" service "delete"
-// endpoint HTTP response body for the "not-found" error.
-type DeleteNotFoundResponseBody string
+// RemoveStationBadRequestResponseBody is the type of the "project" service
+// "remove station" endpoint HTTP response body for the "bad-request" error.
+type RemoveStationBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // DeleteUnauthorizedResponseBody is the type of the "project" service "delete"
 // endpoint HTTP response body for the "unauthorized" error.
-type DeleteUnauthorizedResponseBody string
+type DeleteUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// UploadPhotoBadRequestResponseBody is the type of the "project" service
-// "upload photo" endpoint HTTP response body for the "bad-request" error.
-type UploadPhotoBadRequestResponseBody string
+// DeleteForbiddenResponseBody is the type of the "project" service "delete"
+// endpoint HTTP response body for the "forbidden" error.
+type DeleteForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// UploadPhotoForbiddenResponseBody is the type of the "project" service
-// "upload photo" endpoint HTTP response body for the "forbidden" error.
-type UploadPhotoForbiddenResponseBody string
+// DeleteNotFoundResponseBody is the type of the "project" service "delete"
+// endpoint HTTP response body for the "not-found" error.
+type DeleteNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// UploadPhotoNotFoundResponseBody is the type of the "project" service "upload
-// photo" endpoint HTTP response body for the "not-found" error.
-type UploadPhotoNotFoundResponseBody string
+// DeleteBadRequestResponseBody is the type of the "project" service "delete"
+// endpoint HTTP response body for the "bad-request" error.
+type DeleteBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // UploadPhotoUnauthorizedResponseBody is the type of the "project" service
 // "upload photo" endpoint HTTP response body for the "unauthorized" error.
-type UploadPhotoUnauthorizedResponseBody string
+type UploadPhotoUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DownloadPhotoBadRequestResponseBody is the type of the "project" service
-// "download photo" endpoint HTTP response body for the "bad-request" error.
-type DownloadPhotoBadRequestResponseBody string
+// UploadPhotoForbiddenResponseBody is the type of the "project" service
+// "upload photo" endpoint HTTP response body for the "forbidden" error.
+type UploadPhotoForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DownloadPhotoForbiddenResponseBody is the type of the "project" service
-// "download photo" endpoint HTTP response body for the "forbidden" error.
-type DownloadPhotoForbiddenResponseBody string
+// UploadPhotoNotFoundResponseBody is the type of the "project" service "upload
+// photo" endpoint HTTP response body for the "not-found" error.
+type UploadPhotoNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// DownloadPhotoNotFoundResponseBody is the type of the "project" service
-// "download photo" endpoint HTTP response body for the "not-found" error.
-type DownloadPhotoNotFoundResponseBody string
+// UploadPhotoBadRequestResponseBody is the type of the "project" service
+// "upload photo" endpoint HTTP response body for the "bad-request" error.
+type UploadPhotoBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // DownloadPhotoUnauthorizedResponseBody is the type of the "project" service
 // "download photo" endpoint HTTP response body for the "unauthorized" error.
-type DownloadPhotoUnauthorizedResponseBody string
+type DownloadPhotoUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DownloadPhotoForbiddenResponseBody is the type of the "project" service
+// "download photo" endpoint HTTP response body for the "forbidden" error.
+type DownloadPhotoForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DownloadPhotoNotFoundResponseBody is the type of the "project" service
+// "download photo" endpoint HTTP response body for the "not-found" error.
+type DownloadPhotoNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DownloadPhotoBadRequestResponseBody is the type of the "project" service
+// "download photo" endpoint HTTP response body for the "bad-request" error.
+type DownloadPhotoBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // PendingInviteResponseBody is used to define fields on response body types.
 type PendingInviteResponseBody struct {
@@ -635,535 +1699,1067 @@ func NewListMineResponseBody(res *projectviews.ProjectsView) *ListMineResponseBo
 	return body
 }
 
-// NewAddUpdateBadRequestResponseBody builds the HTTP response body from the
+// NewAddUpdateUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "add update" endpoint of the "project" service.
-func NewAddUpdateBadRequestResponseBody(res project.BadRequest) AddUpdateBadRequestResponseBody {
-	body := AddUpdateBadRequestResponseBody(res)
+func NewAddUpdateUnauthorizedResponseBody(res *goa.ServiceError) *AddUpdateUnauthorizedResponseBody {
+	body := &AddUpdateUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewAddUpdateForbiddenResponseBody builds the HTTP response body from the
 // result of the "add update" endpoint of the "project" service.
-func NewAddUpdateForbiddenResponseBody(res project.Forbidden) AddUpdateForbiddenResponseBody {
-	body := AddUpdateForbiddenResponseBody(res)
+func NewAddUpdateForbiddenResponseBody(res *goa.ServiceError) *AddUpdateForbiddenResponseBody {
+	body := &AddUpdateForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewAddUpdateNotFoundResponseBody builds the HTTP response body from the
 // result of the "add update" endpoint of the "project" service.
-func NewAddUpdateNotFoundResponseBody(res project.NotFound) AddUpdateNotFoundResponseBody {
-	body := AddUpdateNotFoundResponseBody(res)
+func NewAddUpdateNotFoundResponseBody(res *goa.ServiceError) *AddUpdateNotFoundResponseBody {
+	body := &AddUpdateNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewAddUpdateUnauthorizedResponseBody builds the HTTP response body from the
+// NewAddUpdateBadRequestResponseBody builds the HTTP response body from the
 // result of the "add update" endpoint of the "project" service.
-func NewAddUpdateUnauthorizedResponseBody(res project.Unauthorized) AddUpdateUnauthorizedResponseBody {
-	body := AddUpdateUnauthorizedResponseBody(res)
-	return body
-}
-
-// NewDeleteUpdateBadRequestResponseBody builds the HTTP response body from the
-// result of the "delete update" endpoint of the "project" service.
-func NewDeleteUpdateBadRequestResponseBody(res project.BadRequest) DeleteUpdateBadRequestResponseBody {
-	body := DeleteUpdateBadRequestResponseBody(res)
-	return body
-}
-
-// NewDeleteUpdateForbiddenResponseBody builds the HTTP response body from the
-// result of the "delete update" endpoint of the "project" service.
-func NewDeleteUpdateForbiddenResponseBody(res project.Forbidden) DeleteUpdateForbiddenResponseBody {
-	body := DeleteUpdateForbiddenResponseBody(res)
-	return body
-}
-
-// NewDeleteUpdateNotFoundResponseBody builds the HTTP response body from the
-// result of the "delete update" endpoint of the "project" service.
-func NewDeleteUpdateNotFoundResponseBody(res project.NotFound) DeleteUpdateNotFoundResponseBody {
-	body := DeleteUpdateNotFoundResponseBody(res)
+func NewAddUpdateBadRequestResponseBody(res *goa.ServiceError) *AddUpdateBadRequestResponseBody {
+	body := &AddUpdateBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewDeleteUpdateUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "delete update" endpoint of the "project" service.
-func NewDeleteUpdateUnauthorizedResponseBody(res project.Unauthorized) DeleteUpdateUnauthorizedResponseBody {
-	body := DeleteUpdateUnauthorizedResponseBody(res)
+func NewDeleteUpdateUnauthorizedResponseBody(res *goa.ServiceError) *DeleteUpdateUnauthorizedResponseBody {
+	body := &DeleteUpdateUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewModifyUpdateBadRequestResponseBody builds the HTTP response body from the
-// result of the "modify update" endpoint of the "project" service.
-func NewModifyUpdateBadRequestResponseBody(res project.BadRequest) ModifyUpdateBadRequestResponseBody {
-	body := ModifyUpdateBadRequestResponseBody(res)
+// NewDeleteUpdateForbiddenResponseBody builds the HTTP response body from the
+// result of the "delete update" endpoint of the "project" service.
+func NewDeleteUpdateForbiddenResponseBody(res *goa.ServiceError) *DeleteUpdateForbiddenResponseBody {
+	body := &DeleteUpdateForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewModifyUpdateForbiddenResponseBody builds the HTTP response body from the
-// result of the "modify update" endpoint of the "project" service.
-func NewModifyUpdateForbiddenResponseBody(res project.Forbidden) ModifyUpdateForbiddenResponseBody {
-	body := ModifyUpdateForbiddenResponseBody(res)
+// NewDeleteUpdateNotFoundResponseBody builds the HTTP response body from the
+// result of the "delete update" endpoint of the "project" service.
+func NewDeleteUpdateNotFoundResponseBody(res *goa.ServiceError) *DeleteUpdateNotFoundResponseBody {
+	body := &DeleteUpdateNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewModifyUpdateNotFoundResponseBody builds the HTTP response body from the
-// result of the "modify update" endpoint of the "project" service.
-func NewModifyUpdateNotFoundResponseBody(res project.NotFound) ModifyUpdateNotFoundResponseBody {
-	body := ModifyUpdateNotFoundResponseBody(res)
+// NewDeleteUpdateBadRequestResponseBody builds the HTTP response body from the
+// result of the "delete update" endpoint of the "project" service.
+func NewDeleteUpdateBadRequestResponseBody(res *goa.ServiceError) *DeleteUpdateBadRequestResponseBody {
+	body := &DeleteUpdateBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewModifyUpdateUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "modify update" endpoint of the "project" service.
-func NewModifyUpdateUnauthorizedResponseBody(res project.Unauthorized) ModifyUpdateUnauthorizedResponseBody {
-	body := ModifyUpdateUnauthorizedResponseBody(res)
+func NewModifyUpdateUnauthorizedResponseBody(res *goa.ServiceError) *ModifyUpdateUnauthorizedResponseBody {
+	body := &ModifyUpdateUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewInvitesBadRequestResponseBody builds the HTTP response body from the
-// result of the "invites" endpoint of the "project" service.
-func NewInvitesBadRequestResponseBody(res project.BadRequest) InvitesBadRequestResponseBody {
-	body := InvitesBadRequestResponseBody(res)
+// NewModifyUpdateForbiddenResponseBody builds the HTTP response body from the
+// result of the "modify update" endpoint of the "project" service.
+func NewModifyUpdateForbiddenResponseBody(res *goa.ServiceError) *ModifyUpdateForbiddenResponseBody {
+	body := &ModifyUpdateForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewInvitesForbiddenResponseBody builds the HTTP response body from the
-// result of the "invites" endpoint of the "project" service.
-func NewInvitesForbiddenResponseBody(res project.Forbidden) InvitesForbiddenResponseBody {
-	body := InvitesForbiddenResponseBody(res)
+// NewModifyUpdateNotFoundResponseBody builds the HTTP response body from the
+// result of the "modify update" endpoint of the "project" service.
+func NewModifyUpdateNotFoundResponseBody(res *goa.ServiceError) *ModifyUpdateNotFoundResponseBody {
+	body := &ModifyUpdateNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewInvitesNotFoundResponseBody builds the HTTP response body from the result
-// of the "invites" endpoint of the "project" service.
-func NewInvitesNotFoundResponseBody(res project.NotFound) InvitesNotFoundResponseBody {
-	body := InvitesNotFoundResponseBody(res)
+// NewModifyUpdateBadRequestResponseBody builds the HTTP response body from the
+// result of the "modify update" endpoint of the "project" service.
+func NewModifyUpdateBadRequestResponseBody(res *goa.ServiceError) *ModifyUpdateBadRequestResponseBody {
+	body := &ModifyUpdateBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewInvitesUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "invites" endpoint of the "project" service.
-func NewInvitesUnauthorizedResponseBody(res project.Unauthorized) InvitesUnauthorizedResponseBody {
-	body := InvitesUnauthorizedResponseBody(res)
+func NewInvitesUnauthorizedResponseBody(res *goa.ServiceError) *InvitesUnauthorizedResponseBody {
+	body := &InvitesUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewLookupInviteBadRequestResponseBody builds the HTTP response body from the
-// result of the "lookup invite" endpoint of the "project" service.
-func NewLookupInviteBadRequestResponseBody(res project.BadRequest) LookupInviteBadRequestResponseBody {
-	body := LookupInviteBadRequestResponseBody(res)
+// NewInvitesForbiddenResponseBody builds the HTTP response body from the
+// result of the "invites" endpoint of the "project" service.
+func NewInvitesForbiddenResponseBody(res *goa.ServiceError) *InvitesForbiddenResponseBody {
+	body := &InvitesForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewLookupInviteForbiddenResponseBody builds the HTTP response body from the
-// result of the "lookup invite" endpoint of the "project" service.
-func NewLookupInviteForbiddenResponseBody(res project.Forbidden) LookupInviteForbiddenResponseBody {
-	body := LookupInviteForbiddenResponseBody(res)
+// NewInvitesNotFoundResponseBody builds the HTTP response body from the result
+// of the "invites" endpoint of the "project" service.
+func NewInvitesNotFoundResponseBody(res *goa.ServiceError) *InvitesNotFoundResponseBody {
+	body := &InvitesNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewLookupInviteNotFoundResponseBody builds the HTTP response body from the
-// result of the "lookup invite" endpoint of the "project" service.
-func NewLookupInviteNotFoundResponseBody(res project.NotFound) LookupInviteNotFoundResponseBody {
-	body := LookupInviteNotFoundResponseBody(res)
+// NewInvitesBadRequestResponseBody builds the HTTP response body from the
+// result of the "invites" endpoint of the "project" service.
+func NewInvitesBadRequestResponseBody(res *goa.ServiceError) *InvitesBadRequestResponseBody {
+	body := &InvitesBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewLookupInviteUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "lookup invite" endpoint of the "project" service.
-func NewLookupInviteUnauthorizedResponseBody(res project.Unauthorized) LookupInviteUnauthorizedResponseBody {
-	body := LookupInviteUnauthorizedResponseBody(res)
+func NewLookupInviteUnauthorizedResponseBody(res *goa.ServiceError) *LookupInviteUnauthorizedResponseBody {
+	body := &LookupInviteUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewAcceptInviteBadRequestResponseBody builds the HTTP response body from the
-// result of the "accept invite" endpoint of the "project" service.
-func NewAcceptInviteBadRequestResponseBody(res project.BadRequest) AcceptInviteBadRequestResponseBody {
-	body := AcceptInviteBadRequestResponseBody(res)
+// NewLookupInviteForbiddenResponseBody builds the HTTP response body from the
+// result of the "lookup invite" endpoint of the "project" service.
+func NewLookupInviteForbiddenResponseBody(res *goa.ServiceError) *LookupInviteForbiddenResponseBody {
+	body := &LookupInviteForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewAcceptInviteForbiddenResponseBody builds the HTTP response body from the
-// result of the "accept invite" endpoint of the "project" service.
-func NewAcceptInviteForbiddenResponseBody(res project.Forbidden) AcceptInviteForbiddenResponseBody {
-	body := AcceptInviteForbiddenResponseBody(res)
+// NewLookupInviteNotFoundResponseBody builds the HTTP response body from the
+// result of the "lookup invite" endpoint of the "project" service.
+func NewLookupInviteNotFoundResponseBody(res *goa.ServiceError) *LookupInviteNotFoundResponseBody {
+	body := &LookupInviteNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewAcceptInviteNotFoundResponseBody builds the HTTP response body from the
-// result of the "accept invite" endpoint of the "project" service.
-func NewAcceptInviteNotFoundResponseBody(res project.NotFound) AcceptInviteNotFoundResponseBody {
-	body := AcceptInviteNotFoundResponseBody(res)
+// NewLookupInviteBadRequestResponseBody builds the HTTP response body from the
+// result of the "lookup invite" endpoint of the "project" service.
+func NewLookupInviteBadRequestResponseBody(res *goa.ServiceError) *LookupInviteBadRequestResponseBody {
+	body := &LookupInviteBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewAcceptInviteUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "accept invite" endpoint of the "project" service.
-func NewAcceptInviteUnauthorizedResponseBody(res project.Unauthorized) AcceptInviteUnauthorizedResponseBody {
-	body := AcceptInviteUnauthorizedResponseBody(res)
+func NewAcceptInviteUnauthorizedResponseBody(res *goa.ServiceError) *AcceptInviteUnauthorizedResponseBody {
+	body := &AcceptInviteUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewRejectInviteBadRequestResponseBody builds the HTTP response body from the
-// result of the "reject invite" endpoint of the "project" service.
-func NewRejectInviteBadRequestResponseBody(res project.BadRequest) RejectInviteBadRequestResponseBody {
-	body := RejectInviteBadRequestResponseBody(res)
+// NewAcceptInviteForbiddenResponseBody builds the HTTP response body from the
+// result of the "accept invite" endpoint of the "project" service.
+func NewAcceptInviteForbiddenResponseBody(res *goa.ServiceError) *AcceptInviteForbiddenResponseBody {
+	body := &AcceptInviteForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewRejectInviteForbiddenResponseBody builds the HTTP response body from the
-// result of the "reject invite" endpoint of the "project" service.
-func NewRejectInviteForbiddenResponseBody(res project.Forbidden) RejectInviteForbiddenResponseBody {
-	body := RejectInviteForbiddenResponseBody(res)
+// NewAcceptInviteNotFoundResponseBody builds the HTTP response body from the
+// result of the "accept invite" endpoint of the "project" service.
+func NewAcceptInviteNotFoundResponseBody(res *goa.ServiceError) *AcceptInviteNotFoundResponseBody {
+	body := &AcceptInviteNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewRejectInviteNotFoundResponseBody builds the HTTP response body from the
-// result of the "reject invite" endpoint of the "project" service.
-func NewRejectInviteNotFoundResponseBody(res project.NotFound) RejectInviteNotFoundResponseBody {
-	body := RejectInviteNotFoundResponseBody(res)
+// NewAcceptInviteBadRequestResponseBody builds the HTTP response body from the
+// result of the "accept invite" endpoint of the "project" service.
+func NewAcceptInviteBadRequestResponseBody(res *goa.ServiceError) *AcceptInviteBadRequestResponseBody {
+	body := &AcceptInviteBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewRejectInviteUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "reject invite" endpoint of the "project" service.
-func NewRejectInviteUnauthorizedResponseBody(res project.Unauthorized) RejectInviteUnauthorizedResponseBody {
-	body := RejectInviteUnauthorizedResponseBody(res)
+func NewRejectInviteUnauthorizedResponseBody(res *goa.ServiceError) *RejectInviteUnauthorizedResponseBody {
+	body := &RejectInviteUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewAddBadRequestResponseBody builds the HTTP response body from the result
-// of the "add" endpoint of the "project" service.
-func NewAddBadRequestResponseBody(res project.BadRequest) AddBadRequestResponseBody {
-	body := AddBadRequestResponseBody(res)
+// NewRejectInviteForbiddenResponseBody builds the HTTP response body from the
+// result of the "reject invite" endpoint of the "project" service.
+func NewRejectInviteForbiddenResponseBody(res *goa.ServiceError) *RejectInviteForbiddenResponseBody {
+	body := &RejectInviteForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewAddForbiddenResponseBody builds the HTTP response body from the result of
-// the "add" endpoint of the "project" service.
-func NewAddForbiddenResponseBody(res project.Forbidden) AddForbiddenResponseBody {
-	body := AddForbiddenResponseBody(res)
+// NewRejectInviteNotFoundResponseBody builds the HTTP response body from the
+// result of the "reject invite" endpoint of the "project" service.
+func NewRejectInviteNotFoundResponseBody(res *goa.ServiceError) *RejectInviteNotFoundResponseBody {
+	body := &RejectInviteNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewAddNotFoundResponseBody builds the HTTP response body from the result of
-// the "add" endpoint of the "project" service.
-func NewAddNotFoundResponseBody(res project.NotFound) AddNotFoundResponseBody {
-	body := AddNotFoundResponseBody(res)
+// NewRejectInviteBadRequestResponseBody builds the HTTP response body from the
+// result of the "reject invite" endpoint of the "project" service.
+func NewRejectInviteBadRequestResponseBody(res *goa.ServiceError) *RejectInviteBadRequestResponseBody {
+	body := &RejectInviteBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewAddUnauthorizedResponseBody builds the HTTP response body from the result
 // of the "add" endpoint of the "project" service.
-func NewAddUnauthorizedResponseBody(res project.Unauthorized) AddUnauthorizedResponseBody {
-	body := AddUnauthorizedResponseBody(res)
+func NewAddUnauthorizedResponseBody(res *goa.ServiceError) *AddUnauthorizedResponseBody {
+	body := &AddUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewUpdateBadRequestResponseBody builds the HTTP response body from the
-// result of the "update" endpoint of the "project" service.
-func NewUpdateBadRequestResponseBody(res project.BadRequest) UpdateBadRequestResponseBody {
-	body := UpdateBadRequestResponseBody(res)
+// NewAddForbiddenResponseBody builds the HTTP response body from the result of
+// the "add" endpoint of the "project" service.
+func NewAddForbiddenResponseBody(res *goa.ServiceError) *AddForbiddenResponseBody {
+	body := &AddForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewUpdateForbiddenResponseBody builds the HTTP response body from the result
-// of the "update" endpoint of the "project" service.
-func NewUpdateForbiddenResponseBody(res project.Forbidden) UpdateForbiddenResponseBody {
-	body := UpdateForbiddenResponseBody(res)
+// NewAddNotFoundResponseBody builds the HTTP response body from the result of
+// the "add" endpoint of the "project" service.
+func NewAddNotFoundResponseBody(res *goa.ServiceError) *AddNotFoundResponseBody {
+	body := &AddNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewUpdateNotFoundResponseBody builds the HTTP response body from the result
-// of the "update" endpoint of the "project" service.
-func NewUpdateNotFoundResponseBody(res project.NotFound) UpdateNotFoundResponseBody {
-	body := UpdateNotFoundResponseBody(res)
+// NewAddBadRequestResponseBody builds the HTTP response body from the result
+// of the "add" endpoint of the "project" service.
+func NewAddBadRequestResponseBody(res *goa.ServiceError) *AddBadRequestResponseBody {
+	body := &AddBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewUpdateUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "update" endpoint of the "project" service.
-func NewUpdateUnauthorizedResponseBody(res project.Unauthorized) UpdateUnauthorizedResponseBody {
-	body := UpdateUnauthorizedResponseBody(res)
+func NewUpdateUnauthorizedResponseBody(res *goa.ServiceError) *UpdateUnauthorizedResponseBody {
+	body := &UpdateUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewGetBadRequestResponseBody builds the HTTP response body from the result
-// of the "get" endpoint of the "project" service.
-func NewGetBadRequestResponseBody(res project.BadRequest) GetBadRequestResponseBody {
-	body := GetBadRequestResponseBody(res)
+// NewUpdateForbiddenResponseBody builds the HTTP response body from the result
+// of the "update" endpoint of the "project" service.
+func NewUpdateForbiddenResponseBody(res *goa.ServiceError) *UpdateForbiddenResponseBody {
+	body := &UpdateForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewGetForbiddenResponseBody builds the HTTP response body from the result of
-// the "get" endpoint of the "project" service.
-func NewGetForbiddenResponseBody(res project.Forbidden) GetForbiddenResponseBody {
-	body := GetForbiddenResponseBody(res)
+// NewUpdateNotFoundResponseBody builds the HTTP response body from the result
+// of the "update" endpoint of the "project" service.
+func NewUpdateNotFoundResponseBody(res *goa.ServiceError) *UpdateNotFoundResponseBody {
+	body := &UpdateNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewGetNotFoundResponseBody builds the HTTP response body from the result of
-// the "get" endpoint of the "project" service.
-func NewGetNotFoundResponseBody(res project.NotFound) GetNotFoundResponseBody {
-	body := GetNotFoundResponseBody(res)
+// NewUpdateBadRequestResponseBody builds the HTTP response body from the
+// result of the "update" endpoint of the "project" service.
+func NewUpdateBadRequestResponseBody(res *goa.ServiceError) *UpdateBadRequestResponseBody {
+	body := &UpdateBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewGetUnauthorizedResponseBody builds the HTTP response body from the result
 // of the "get" endpoint of the "project" service.
-func NewGetUnauthorizedResponseBody(res project.Unauthorized) GetUnauthorizedResponseBody {
-	body := GetUnauthorizedResponseBody(res)
+func NewGetUnauthorizedResponseBody(res *goa.ServiceError) *GetUnauthorizedResponseBody {
+	body := &GetUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewListCommunityBadRequestResponseBody builds the HTTP response body from
-// the result of the "list community" endpoint of the "project" service.
-func NewListCommunityBadRequestResponseBody(res project.BadRequest) ListCommunityBadRequestResponseBody {
-	body := ListCommunityBadRequestResponseBody(res)
+// NewGetForbiddenResponseBody builds the HTTP response body from the result of
+// the "get" endpoint of the "project" service.
+func NewGetForbiddenResponseBody(res *goa.ServiceError) *GetForbiddenResponseBody {
+	body := &GetForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewListCommunityForbiddenResponseBody builds the HTTP response body from the
-// result of the "list community" endpoint of the "project" service.
-func NewListCommunityForbiddenResponseBody(res project.Forbidden) ListCommunityForbiddenResponseBody {
-	body := ListCommunityForbiddenResponseBody(res)
+// NewGetNotFoundResponseBody builds the HTTP response body from the result of
+// the "get" endpoint of the "project" service.
+func NewGetNotFoundResponseBody(res *goa.ServiceError) *GetNotFoundResponseBody {
+	body := &GetNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewListCommunityNotFoundResponseBody builds the HTTP response body from the
-// result of the "list community" endpoint of the "project" service.
-func NewListCommunityNotFoundResponseBody(res project.NotFound) ListCommunityNotFoundResponseBody {
-	body := ListCommunityNotFoundResponseBody(res)
+// NewGetBadRequestResponseBody builds the HTTP response body from the result
+// of the "get" endpoint of the "project" service.
+func NewGetBadRequestResponseBody(res *goa.ServiceError) *GetBadRequestResponseBody {
+	body := &GetBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewListCommunityUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "list community" endpoint of the "project" service.
-func NewListCommunityUnauthorizedResponseBody(res project.Unauthorized) ListCommunityUnauthorizedResponseBody {
-	body := ListCommunityUnauthorizedResponseBody(res)
+func NewListCommunityUnauthorizedResponseBody(res *goa.ServiceError) *ListCommunityUnauthorizedResponseBody {
+	body := &ListCommunityUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewListMineBadRequestResponseBody builds the HTTP response body from the
-// result of the "list mine" endpoint of the "project" service.
-func NewListMineBadRequestResponseBody(res project.BadRequest) ListMineBadRequestResponseBody {
-	body := ListMineBadRequestResponseBody(res)
+// NewListCommunityForbiddenResponseBody builds the HTTP response body from the
+// result of the "list community" endpoint of the "project" service.
+func NewListCommunityForbiddenResponseBody(res *goa.ServiceError) *ListCommunityForbiddenResponseBody {
+	body := &ListCommunityForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewListMineForbiddenResponseBody builds the HTTP response body from the
-// result of the "list mine" endpoint of the "project" service.
-func NewListMineForbiddenResponseBody(res project.Forbidden) ListMineForbiddenResponseBody {
-	body := ListMineForbiddenResponseBody(res)
+// NewListCommunityNotFoundResponseBody builds the HTTP response body from the
+// result of the "list community" endpoint of the "project" service.
+func NewListCommunityNotFoundResponseBody(res *goa.ServiceError) *ListCommunityNotFoundResponseBody {
+	body := &ListCommunityNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewListMineNotFoundResponseBody builds the HTTP response body from the
-// result of the "list mine" endpoint of the "project" service.
-func NewListMineNotFoundResponseBody(res project.NotFound) ListMineNotFoundResponseBody {
-	body := ListMineNotFoundResponseBody(res)
+// NewListCommunityBadRequestResponseBody builds the HTTP response body from
+// the result of the "list community" endpoint of the "project" service.
+func NewListCommunityBadRequestResponseBody(res *goa.ServiceError) *ListCommunityBadRequestResponseBody {
+	body := &ListCommunityBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewListMineUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "list mine" endpoint of the "project" service.
-func NewListMineUnauthorizedResponseBody(res project.Unauthorized) ListMineUnauthorizedResponseBody {
-	body := ListMineUnauthorizedResponseBody(res)
+func NewListMineUnauthorizedResponseBody(res *goa.ServiceError) *ListMineUnauthorizedResponseBody {
+	body := &ListMineUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewInviteBadRequestResponseBody builds the HTTP response body from the
-// result of the "invite" endpoint of the "project" service.
-func NewInviteBadRequestResponseBody(res project.BadRequest) InviteBadRequestResponseBody {
-	body := InviteBadRequestResponseBody(res)
+// NewListMineForbiddenResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "project" service.
+func NewListMineForbiddenResponseBody(res *goa.ServiceError) *ListMineForbiddenResponseBody {
+	body := &ListMineForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewInviteForbiddenResponseBody builds the HTTP response body from the result
-// of the "invite" endpoint of the "project" service.
-func NewInviteForbiddenResponseBody(res project.Forbidden) InviteForbiddenResponseBody {
-	body := InviteForbiddenResponseBody(res)
+// NewListMineNotFoundResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "project" service.
+func NewListMineNotFoundResponseBody(res *goa.ServiceError) *ListMineNotFoundResponseBody {
+	body := &ListMineNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewInviteNotFoundResponseBody builds the HTTP response body from the result
-// of the "invite" endpoint of the "project" service.
-func NewInviteNotFoundResponseBody(res project.NotFound) InviteNotFoundResponseBody {
-	body := InviteNotFoundResponseBody(res)
+// NewListMineBadRequestResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "project" service.
+func NewListMineBadRequestResponseBody(res *goa.ServiceError) *ListMineBadRequestResponseBody {
+	body := &ListMineBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewInviteUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "invite" endpoint of the "project" service.
-func NewInviteUnauthorizedResponseBody(res project.Unauthorized) InviteUnauthorizedResponseBody {
-	body := InviteUnauthorizedResponseBody(res)
+func NewInviteUnauthorizedResponseBody(res *goa.ServiceError) *InviteUnauthorizedResponseBody {
+	body := &InviteUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewRemoveUserBadRequestResponseBody builds the HTTP response body from the
-// result of the "remove user" endpoint of the "project" service.
-func NewRemoveUserBadRequestResponseBody(res project.BadRequest) RemoveUserBadRequestResponseBody {
-	body := RemoveUserBadRequestResponseBody(res)
+// NewInviteForbiddenResponseBody builds the HTTP response body from the result
+// of the "invite" endpoint of the "project" service.
+func NewInviteForbiddenResponseBody(res *goa.ServiceError) *InviteForbiddenResponseBody {
+	body := &InviteForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewRemoveUserForbiddenResponseBody builds the HTTP response body from the
-// result of the "remove user" endpoint of the "project" service.
-func NewRemoveUserForbiddenResponseBody(res project.Forbidden) RemoveUserForbiddenResponseBody {
-	body := RemoveUserForbiddenResponseBody(res)
+// NewInviteNotFoundResponseBody builds the HTTP response body from the result
+// of the "invite" endpoint of the "project" service.
+func NewInviteNotFoundResponseBody(res *goa.ServiceError) *InviteNotFoundResponseBody {
+	body := &InviteNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewRemoveUserNotFoundResponseBody builds the HTTP response body from the
-// result of the "remove user" endpoint of the "project" service.
-func NewRemoveUserNotFoundResponseBody(res project.NotFound) RemoveUserNotFoundResponseBody {
-	body := RemoveUserNotFoundResponseBody(res)
+// NewInviteBadRequestResponseBody builds the HTTP response body from the
+// result of the "invite" endpoint of the "project" service.
+func NewInviteBadRequestResponseBody(res *goa.ServiceError) *InviteBadRequestResponseBody {
+	body := &InviteBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewRemoveUserUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "remove user" endpoint of the "project" service.
-func NewRemoveUserUnauthorizedResponseBody(res project.Unauthorized) RemoveUserUnauthorizedResponseBody {
-	body := RemoveUserUnauthorizedResponseBody(res)
+func NewRemoveUserUnauthorizedResponseBody(res *goa.ServiceError) *RemoveUserUnauthorizedResponseBody {
+	body := &RemoveUserUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewAddStationBadRequestResponseBody builds the HTTP response body from the
-// result of the "add station" endpoint of the "project" service.
-func NewAddStationBadRequestResponseBody(res project.BadRequest) AddStationBadRequestResponseBody {
-	body := AddStationBadRequestResponseBody(res)
+// NewRemoveUserForbiddenResponseBody builds the HTTP response body from the
+// result of the "remove user" endpoint of the "project" service.
+func NewRemoveUserForbiddenResponseBody(res *goa.ServiceError) *RemoveUserForbiddenResponseBody {
+	body := &RemoveUserForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewAddStationForbiddenResponseBody builds the HTTP response body from the
-// result of the "add station" endpoint of the "project" service.
-func NewAddStationForbiddenResponseBody(res project.Forbidden) AddStationForbiddenResponseBody {
-	body := AddStationForbiddenResponseBody(res)
+// NewRemoveUserNotFoundResponseBody builds the HTTP response body from the
+// result of the "remove user" endpoint of the "project" service.
+func NewRemoveUserNotFoundResponseBody(res *goa.ServiceError) *RemoveUserNotFoundResponseBody {
+	body := &RemoveUserNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewAddStationNotFoundResponseBody builds the HTTP response body from the
-// result of the "add station" endpoint of the "project" service.
-func NewAddStationNotFoundResponseBody(res project.NotFound) AddStationNotFoundResponseBody {
-	body := AddStationNotFoundResponseBody(res)
+// NewRemoveUserBadRequestResponseBody builds the HTTP response body from the
+// result of the "remove user" endpoint of the "project" service.
+func NewRemoveUserBadRequestResponseBody(res *goa.ServiceError) *RemoveUserBadRequestResponseBody {
+	body := &RemoveUserBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewAddStationUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "add station" endpoint of the "project" service.
-func NewAddStationUnauthorizedResponseBody(res project.Unauthorized) AddStationUnauthorizedResponseBody {
-	body := AddStationUnauthorizedResponseBody(res)
+func NewAddStationUnauthorizedResponseBody(res *goa.ServiceError) *AddStationUnauthorizedResponseBody {
+	body := &AddStationUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewRemoveStationBadRequestResponseBody builds the HTTP response body from
-// the result of the "remove station" endpoint of the "project" service.
-func NewRemoveStationBadRequestResponseBody(res project.BadRequest) RemoveStationBadRequestResponseBody {
-	body := RemoveStationBadRequestResponseBody(res)
+// NewAddStationForbiddenResponseBody builds the HTTP response body from the
+// result of the "add station" endpoint of the "project" service.
+func NewAddStationForbiddenResponseBody(res *goa.ServiceError) *AddStationForbiddenResponseBody {
+	body := &AddStationForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewRemoveStationForbiddenResponseBody builds the HTTP response body from the
-// result of the "remove station" endpoint of the "project" service.
-func NewRemoveStationForbiddenResponseBody(res project.Forbidden) RemoveStationForbiddenResponseBody {
-	body := RemoveStationForbiddenResponseBody(res)
+// NewAddStationNotFoundResponseBody builds the HTTP response body from the
+// result of the "add station" endpoint of the "project" service.
+func NewAddStationNotFoundResponseBody(res *goa.ServiceError) *AddStationNotFoundResponseBody {
+	body := &AddStationNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewRemoveStationNotFoundResponseBody builds the HTTP response body from the
-// result of the "remove station" endpoint of the "project" service.
-func NewRemoveStationNotFoundResponseBody(res project.NotFound) RemoveStationNotFoundResponseBody {
-	body := RemoveStationNotFoundResponseBody(res)
+// NewAddStationBadRequestResponseBody builds the HTTP response body from the
+// result of the "add station" endpoint of the "project" service.
+func NewAddStationBadRequestResponseBody(res *goa.ServiceError) *AddStationBadRequestResponseBody {
+	body := &AddStationBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewRemoveStationUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "remove station" endpoint of the "project" service.
-func NewRemoveStationUnauthorizedResponseBody(res project.Unauthorized) RemoveStationUnauthorizedResponseBody {
-	body := RemoveStationUnauthorizedResponseBody(res)
+func NewRemoveStationUnauthorizedResponseBody(res *goa.ServiceError) *RemoveStationUnauthorizedResponseBody {
+	body := &RemoveStationUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDeleteBadRequestResponseBody builds the HTTP response body from the
-// result of the "delete" endpoint of the "project" service.
-func NewDeleteBadRequestResponseBody(res project.BadRequest) DeleteBadRequestResponseBody {
-	body := DeleteBadRequestResponseBody(res)
+// NewRemoveStationForbiddenResponseBody builds the HTTP response body from the
+// result of the "remove station" endpoint of the "project" service.
+func NewRemoveStationForbiddenResponseBody(res *goa.ServiceError) *RemoveStationForbiddenResponseBody {
+	body := &RemoveStationForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDeleteForbiddenResponseBody builds the HTTP response body from the result
-// of the "delete" endpoint of the "project" service.
-func NewDeleteForbiddenResponseBody(res project.Forbidden) DeleteForbiddenResponseBody {
-	body := DeleteForbiddenResponseBody(res)
+// NewRemoveStationNotFoundResponseBody builds the HTTP response body from the
+// result of the "remove station" endpoint of the "project" service.
+func NewRemoveStationNotFoundResponseBody(res *goa.ServiceError) *RemoveStationNotFoundResponseBody {
+	body := &RemoveStationNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDeleteNotFoundResponseBody builds the HTTP response body from the result
-// of the "delete" endpoint of the "project" service.
-func NewDeleteNotFoundResponseBody(res project.NotFound) DeleteNotFoundResponseBody {
-	body := DeleteNotFoundResponseBody(res)
+// NewRemoveStationBadRequestResponseBody builds the HTTP response body from
+// the result of the "remove station" endpoint of the "project" service.
+func NewRemoveStationBadRequestResponseBody(res *goa.ServiceError) *RemoveStationBadRequestResponseBody {
+	body := &RemoveStationBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewDeleteUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "delete" endpoint of the "project" service.
-func NewDeleteUnauthorizedResponseBody(res project.Unauthorized) DeleteUnauthorizedResponseBody {
-	body := DeleteUnauthorizedResponseBody(res)
+func NewDeleteUnauthorizedResponseBody(res *goa.ServiceError) *DeleteUnauthorizedResponseBody {
+	body := &DeleteUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewUploadPhotoBadRequestResponseBody builds the HTTP response body from the
-// result of the "upload photo" endpoint of the "project" service.
-func NewUploadPhotoBadRequestResponseBody(res project.BadRequest) UploadPhotoBadRequestResponseBody {
-	body := UploadPhotoBadRequestResponseBody(res)
+// NewDeleteForbiddenResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "project" service.
+func NewDeleteForbiddenResponseBody(res *goa.ServiceError) *DeleteForbiddenResponseBody {
+	body := &DeleteForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewUploadPhotoForbiddenResponseBody builds the HTTP response body from the
-// result of the "upload photo" endpoint of the "project" service.
-func NewUploadPhotoForbiddenResponseBody(res project.Forbidden) UploadPhotoForbiddenResponseBody {
-	body := UploadPhotoForbiddenResponseBody(res)
+// NewDeleteNotFoundResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "project" service.
+func NewDeleteNotFoundResponseBody(res *goa.ServiceError) *DeleteNotFoundResponseBody {
+	body := &DeleteNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewUploadPhotoNotFoundResponseBody builds the HTTP response body from the
-// result of the "upload photo" endpoint of the "project" service.
-func NewUploadPhotoNotFoundResponseBody(res project.NotFound) UploadPhotoNotFoundResponseBody {
-	body := UploadPhotoNotFoundResponseBody(res)
+// NewDeleteBadRequestResponseBody builds the HTTP response body from the
+// result of the "delete" endpoint of the "project" service.
+func NewDeleteBadRequestResponseBody(res *goa.ServiceError) *DeleteBadRequestResponseBody {
+	body := &DeleteBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewUploadPhotoUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "upload photo" endpoint of the "project" service.
-func NewUploadPhotoUnauthorizedResponseBody(res project.Unauthorized) UploadPhotoUnauthorizedResponseBody {
-	body := UploadPhotoUnauthorizedResponseBody(res)
+func NewUploadPhotoUnauthorizedResponseBody(res *goa.ServiceError) *UploadPhotoUnauthorizedResponseBody {
+	body := &UploadPhotoUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDownloadPhotoBadRequestResponseBody builds the HTTP response body from
-// the result of the "download photo" endpoint of the "project" service.
-func NewDownloadPhotoBadRequestResponseBody(res project.BadRequest) DownloadPhotoBadRequestResponseBody {
-	body := DownloadPhotoBadRequestResponseBody(res)
+// NewUploadPhotoForbiddenResponseBody builds the HTTP response body from the
+// result of the "upload photo" endpoint of the "project" service.
+func NewUploadPhotoForbiddenResponseBody(res *goa.ServiceError) *UploadPhotoForbiddenResponseBody {
+	body := &UploadPhotoForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDownloadPhotoForbiddenResponseBody builds the HTTP response body from the
-// result of the "download photo" endpoint of the "project" service.
-func NewDownloadPhotoForbiddenResponseBody(res project.Forbidden) DownloadPhotoForbiddenResponseBody {
-	body := DownloadPhotoForbiddenResponseBody(res)
+// NewUploadPhotoNotFoundResponseBody builds the HTTP response body from the
+// result of the "upload photo" endpoint of the "project" service.
+func NewUploadPhotoNotFoundResponseBody(res *goa.ServiceError) *UploadPhotoNotFoundResponseBody {
+	body := &UploadPhotoNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewDownloadPhotoNotFoundResponseBody builds the HTTP response body from the
-// result of the "download photo" endpoint of the "project" service.
-func NewDownloadPhotoNotFoundResponseBody(res project.NotFound) DownloadPhotoNotFoundResponseBody {
-	body := DownloadPhotoNotFoundResponseBody(res)
+// NewUploadPhotoBadRequestResponseBody builds the HTTP response body from the
+// result of the "upload photo" endpoint of the "project" service.
+func NewUploadPhotoBadRequestResponseBody(res *goa.ServiceError) *UploadPhotoBadRequestResponseBody {
+	body := &UploadPhotoBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewDownloadPhotoUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "download photo" endpoint of the "project" service.
-func NewDownloadPhotoUnauthorizedResponseBody(res project.Unauthorized) DownloadPhotoUnauthorizedResponseBody {
-	body := DownloadPhotoUnauthorizedResponseBody(res)
+func NewDownloadPhotoUnauthorizedResponseBody(res *goa.ServiceError) *DownloadPhotoUnauthorizedResponseBody {
+	body := &DownloadPhotoUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDownloadPhotoForbiddenResponseBody builds the HTTP response body from the
+// result of the "download photo" endpoint of the "project" service.
+func NewDownloadPhotoForbiddenResponseBody(res *goa.ServiceError) *DownloadPhotoForbiddenResponseBody {
+	body := &DownloadPhotoForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDownloadPhotoNotFoundResponseBody builds the HTTP response body from the
+// result of the "download photo" endpoint of the "project" service.
+func NewDownloadPhotoNotFoundResponseBody(res *goa.ServiceError) *DownloadPhotoNotFoundResponseBody {
+	body := &DownloadPhotoNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDownloadPhotoBadRequestResponseBody builds the HTTP response body from
+// the result of the "download photo" endpoint of the "project" service.
+func NewDownloadPhotoBadRequestResponseBody(res *goa.ServiceError) *DownloadPhotoBadRequestResponseBody {
+	body := &DownloadPhotoBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 

@@ -10,6 +10,7 @@ package server
 import (
 	activity "github.com/fieldkit/cloud/server/api/gen/activity"
 	activityviews "github.com/fieldkit/cloud/server/api/gen/activity/views"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // StationResponseBody is the type of the "activity" service "station" endpoint
@@ -28,37 +29,149 @@ type ProjectResponseBody struct {
 	Page       int32                               `form:"page" json:"page" xml:"page"`
 }
 
-// StationBadRequestResponseBody is the type of the "activity" service
-// "station" endpoint HTTP response body for the "bad-request" error.
-type StationBadRequestResponseBody string
+// StationUnauthorizedResponseBody is the type of the "activity" service
+// "station" endpoint HTTP response body for the "unauthorized" error.
+type StationUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // StationForbiddenResponseBody is the type of the "activity" service "station"
 // endpoint HTTP response body for the "forbidden" error.
-type StationForbiddenResponseBody string
+type StationForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // StationNotFoundResponseBody is the type of the "activity" service "station"
 // endpoint HTTP response body for the "not-found" error.
-type StationNotFoundResponseBody string
+type StationNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
-// StationUnauthorizedResponseBody is the type of the "activity" service
-// "station" endpoint HTTP response body for the "unauthorized" error.
-type StationUnauthorizedResponseBody string
-
-// ProjectBadRequestResponseBody is the type of the "activity" service
-// "project" endpoint HTTP response body for the "bad-request" error.
-type ProjectBadRequestResponseBody string
-
-// ProjectForbiddenResponseBody is the type of the "activity" service "project"
-// endpoint HTTP response body for the "forbidden" error.
-type ProjectForbiddenResponseBody string
-
-// ProjectNotFoundResponseBody is the type of the "activity" service "project"
-// endpoint HTTP response body for the "not-found" error.
-type ProjectNotFoundResponseBody string
+// StationBadRequestResponseBody is the type of the "activity" service
+// "station" endpoint HTTP response body for the "bad-request" error.
+type StationBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // ProjectUnauthorizedResponseBody is the type of the "activity" service
 // "project" endpoint HTTP response body for the "unauthorized" error.
-type ProjectUnauthorizedResponseBody string
+type ProjectUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ProjectForbiddenResponseBody is the type of the "activity" service "project"
+// endpoint HTTP response body for the "forbidden" error.
+type ProjectForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ProjectNotFoundResponseBody is the type of the "activity" service "project"
+// endpoint HTTP response body for the "not-found" error.
+type ProjectNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ProjectBadRequestResponseBody is the type of the "activity" service
+// "project" endpoint HTTP response body for the "bad-request" error.
+type ProjectBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
 
 // ActivityEntryResponseBodyCollection is used to define fields on response
 // body types.
@@ -119,59 +232,115 @@ func NewProjectResponseBody(res *activityviews.ProjectActivityPageView) *Project
 	return body
 }
 
-// NewStationBadRequestResponseBody builds the HTTP response body from the
+// NewStationUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "station" endpoint of the "activity" service.
-func NewStationBadRequestResponseBody(res activity.BadRequest) StationBadRequestResponseBody {
-	body := StationBadRequestResponseBody(res)
+func NewStationUnauthorizedResponseBody(res *goa.ServiceError) *StationUnauthorizedResponseBody {
+	body := &StationUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewStationForbiddenResponseBody builds the HTTP response body from the
 // result of the "station" endpoint of the "activity" service.
-func NewStationForbiddenResponseBody(res activity.Forbidden) StationForbiddenResponseBody {
-	body := StationForbiddenResponseBody(res)
+func NewStationForbiddenResponseBody(res *goa.ServiceError) *StationForbiddenResponseBody {
+	body := &StationForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewStationNotFoundResponseBody builds the HTTP response body from the result
 // of the "station" endpoint of the "activity" service.
-func NewStationNotFoundResponseBody(res activity.NotFound) StationNotFoundResponseBody {
-	body := StationNotFoundResponseBody(res)
+func NewStationNotFoundResponseBody(res *goa.ServiceError) *StationNotFoundResponseBody {
+	body := &StationNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
-// NewStationUnauthorizedResponseBody builds the HTTP response body from the
+// NewStationBadRequestResponseBody builds the HTTP response body from the
 // result of the "station" endpoint of the "activity" service.
-func NewStationUnauthorizedResponseBody(res activity.Unauthorized) StationUnauthorizedResponseBody {
-	body := StationUnauthorizedResponseBody(res)
-	return body
-}
-
-// NewProjectBadRequestResponseBody builds the HTTP response body from the
-// result of the "project" endpoint of the "activity" service.
-func NewProjectBadRequestResponseBody(res activity.BadRequest) ProjectBadRequestResponseBody {
-	body := ProjectBadRequestResponseBody(res)
-	return body
-}
-
-// NewProjectForbiddenResponseBody builds the HTTP response body from the
-// result of the "project" endpoint of the "activity" service.
-func NewProjectForbiddenResponseBody(res activity.Forbidden) ProjectForbiddenResponseBody {
-	body := ProjectForbiddenResponseBody(res)
-	return body
-}
-
-// NewProjectNotFoundResponseBody builds the HTTP response body from the result
-// of the "project" endpoint of the "activity" service.
-func NewProjectNotFoundResponseBody(res activity.NotFound) ProjectNotFoundResponseBody {
-	body := ProjectNotFoundResponseBody(res)
+func NewStationBadRequestResponseBody(res *goa.ServiceError) *StationBadRequestResponseBody {
+	body := &StationBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 
 // NewProjectUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "project" endpoint of the "activity" service.
-func NewProjectUnauthorizedResponseBody(res activity.Unauthorized) ProjectUnauthorizedResponseBody {
-	body := ProjectUnauthorizedResponseBody(res)
+func NewProjectUnauthorizedResponseBody(res *goa.ServiceError) *ProjectUnauthorizedResponseBody {
+	body := &ProjectUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewProjectForbiddenResponseBody builds the HTTP response body from the
+// result of the "project" endpoint of the "activity" service.
+func NewProjectForbiddenResponseBody(res *goa.ServiceError) *ProjectForbiddenResponseBody {
+	body := &ProjectForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewProjectNotFoundResponseBody builds the HTTP response body from the result
+// of the "project" endpoint of the "activity" service.
+func NewProjectNotFoundResponseBody(res *goa.ServiceError) *ProjectNotFoundResponseBody {
+	body := &ProjectNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewProjectBadRequestResponseBody builds the HTTP response body from the
+// result of the "project" endpoint of the "activity" service.
+func NewProjectBadRequestResponseBody(res *goa.ServiceError) *ProjectBadRequestResponseBody {
+	body := &ProjectBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
 	return body
 }
 

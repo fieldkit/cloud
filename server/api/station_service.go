@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -101,7 +102,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 
 		if existing.OwnerID != p.UserID() {
 			log.Infow("station conflict", "device_id", deviceId, "user_id", p.UserID(), "owner_id", existing.OwnerID, "station_id", existing.ID)
-			return nil, station.BadRequest("station already registered to another user")
+			return nil, station.MakeBadRequest(errors.New("station already registered to another user"))
 		}
 
 		if err := c.updateStation(ctx, existing, payload.StatusPb); err != nil {
@@ -179,7 +180,7 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 	updating, err := sr.QueryStationByID(ctx, payload.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, station.NotFound("station not found")
+			return nil, station.MakeNotFound(errors.New("station not found"))
 		}
 		return nil, err
 	}
@@ -396,9 +397,9 @@ func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *secu
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
-		NotFound:     func(m string) error { return station.NotFound(m) },
-		Unauthorized: func(m string) error { return station.Unauthorized(m) },
-		Forbidden:    func(m string) error { return station.Forbidden(m) },
+		NotFound:     func(m string) error { return station.MakeNotFound(errors.New(m)) },
+		Unauthorized: func(m string) error { return station.MakeUnauthorized(errors.New(m)) },
+		Forbidden:    func(m string) error { return station.MakeForbidden(errors.New(m)) },
 	})
 }
 
