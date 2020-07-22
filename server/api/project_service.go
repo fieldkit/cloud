@@ -193,10 +193,13 @@ func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (
 		relationships[payload.ProjectID] = &data.UserProjectRelationship{}
 	}
 
-	project := &data.Project{}
-	if err := c.options.Database.GetContext(ctx, project, `
+	getting := &data.Project{}
+	if err := c.options.Database.GetContext(ctx, getting, `
 		SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1
 		`, payload.ProjectID); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, project.NotFound("not found")
+		}
 		return nil, err
 	}
 
@@ -212,7 +215,7 @@ func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (
 		followers = followerSummaries[0].Followers
 	}
 
-	return ProjectType(project, followers, relationships[project.ID]), nil
+	return ProjectType(getting, followers, relationships[getting.ID]), nil
 }
 
 func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.ListCommunityPayload) (*project.Projects, error) {
