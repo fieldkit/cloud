@@ -615,3 +615,21 @@ func TestGetStationsAll(t *testing.T) {
 		"total": "<<PRESENCE>>"
 	}`)
 }
+
+func TestGetStationsAllNoPermissions(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(5)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", "/admin/stations", nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusUnauthorized, rr.Code)
+}
