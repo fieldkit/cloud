@@ -33,9 +33,9 @@ type GetResponseBody struct {
 	Media []*NoteMediaResponseBody `form:"media,omitempty" json:"media,omitempty" xml:"media,omitempty"`
 }
 
-// UploadResponseBody is the type of the "notes" service "upload" endpoint HTTP
-// response body.
-type UploadResponseBody struct {
+// UploadMediaResponseBody is the type of the "notes" service "upload media"
+// endpoint HTTP response body.
+type UploadMediaResponseBody struct {
 	ID          *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	URL         *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 	Key         *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
@@ -74,37 +74,37 @@ type GetNotFoundResponseBody string
 // endpoint HTTP response body for the "unauthorized" error.
 type GetUnauthorizedResponseBody string
 
-// MediaBadRequestResponseBody is the type of the "notes" service "media"
-// endpoint HTTP response body for the "bad-request" error.
-type MediaBadRequestResponseBody string
+// DownloadMediaBadRequestResponseBody is the type of the "notes" service
+// "download media" endpoint HTTP response body for the "bad-request" error.
+type DownloadMediaBadRequestResponseBody string
 
-// MediaForbiddenResponseBody is the type of the "notes" service "media"
-// endpoint HTTP response body for the "forbidden" error.
-type MediaForbiddenResponseBody string
+// DownloadMediaForbiddenResponseBody is the type of the "notes" service
+// "download media" endpoint HTTP response body for the "forbidden" error.
+type DownloadMediaForbiddenResponseBody string
 
-// MediaNotFoundResponseBody is the type of the "notes" service "media"
-// endpoint HTTP response body for the "not-found" error.
-type MediaNotFoundResponseBody string
+// DownloadMediaNotFoundResponseBody is the type of the "notes" service
+// "download media" endpoint HTTP response body for the "not-found" error.
+type DownloadMediaNotFoundResponseBody string
 
-// MediaUnauthorizedResponseBody is the type of the "notes" service "media"
-// endpoint HTTP response body for the "unauthorized" error.
-type MediaUnauthorizedResponseBody string
+// DownloadMediaUnauthorizedResponseBody is the type of the "notes" service
+// "download media" endpoint HTTP response body for the "unauthorized" error.
+type DownloadMediaUnauthorizedResponseBody string
 
-// UploadBadRequestResponseBody is the type of the "notes" service "upload"
-// endpoint HTTP response body for the "bad-request" error.
-type UploadBadRequestResponseBody string
+// UploadMediaBadRequestResponseBody is the type of the "notes" service "upload
+// media" endpoint HTTP response body for the "bad-request" error.
+type UploadMediaBadRequestResponseBody string
 
-// UploadForbiddenResponseBody is the type of the "notes" service "upload"
-// endpoint HTTP response body for the "forbidden" error.
-type UploadForbiddenResponseBody string
+// UploadMediaForbiddenResponseBody is the type of the "notes" service "upload
+// media" endpoint HTTP response body for the "forbidden" error.
+type UploadMediaForbiddenResponseBody string
 
-// UploadNotFoundResponseBody is the type of the "notes" service "upload"
-// endpoint HTTP response body for the "not-found" error.
-type UploadNotFoundResponseBody string
+// UploadMediaNotFoundResponseBody is the type of the "notes" service "upload
+// media" endpoint HTTP response body for the "not-found" error.
+type UploadMediaNotFoundResponseBody string
 
-// UploadUnauthorizedResponseBody is the type of the "notes" service "upload"
-// endpoint HTTP response body for the "unauthorized" error.
-type UploadUnauthorizedResponseBody string
+// UploadMediaUnauthorizedResponseBody is the type of the "notes" service
+// "upload media" endpoint HTTP response body for the "unauthorized" error.
+type UploadMediaUnauthorizedResponseBody string
 
 // FieldNoteUpdateRequestBody is used to define fields on request body types.
 type FieldNoteUpdateRequestBody struct {
@@ -245,44 +245,47 @@ func NewGetUnauthorized(body GetUnauthorizedResponseBody) notes.Unauthorized {
 	return v
 }
 
-// NewMediaResultOK builds a "notes" service "media" endpoint result from a
-// HTTP "OK" response.
-func NewMediaResultOK(length int64, contentType string) *notes.MediaResult {
-	v := &notes.MediaResult{}
+// NewDownloadMediaResultOK builds a "notes" service "download media" endpoint
+// result from a HTTP "OK" response.
+func NewDownloadMediaResultOK(length int64, contentType string) *notes.DownloadMediaResult {
+	v := &notes.DownloadMediaResult{}
 	v.Length = length
 	v.ContentType = contentType
 
 	return v
 }
 
-// NewMediaBadRequest builds a notes service media endpoint bad-request error.
-func NewMediaBadRequest(body MediaBadRequestResponseBody) notes.BadRequest {
+// NewDownloadMediaBadRequest builds a notes service download media endpoint
+// bad-request error.
+func NewDownloadMediaBadRequest(body DownloadMediaBadRequestResponseBody) notes.BadRequest {
 	v := notes.BadRequest(body)
 	return v
 }
 
-// NewMediaForbidden builds a notes service media endpoint forbidden error.
-func NewMediaForbidden(body MediaForbiddenResponseBody) notes.Forbidden {
+// NewDownloadMediaForbidden builds a notes service download media endpoint
+// forbidden error.
+func NewDownloadMediaForbidden(body DownloadMediaForbiddenResponseBody) notes.Forbidden {
 	v := notes.Forbidden(body)
 	return v
 }
 
-// NewMediaNotFound builds a notes service media endpoint not-found error.
-func NewMediaNotFound(body MediaNotFoundResponseBody) notes.NotFound {
+// NewDownloadMediaNotFound builds a notes service download media endpoint
+// not-found error.
+func NewDownloadMediaNotFound(body DownloadMediaNotFoundResponseBody) notes.NotFound {
 	v := notes.NotFound(body)
 	return v
 }
 
-// NewMediaUnauthorized builds a notes service media endpoint unauthorized
-// error.
-func NewMediaUnauthorized(body MediaUnauthorizedResponseBody) notes.Unauthorized {
+// NewDownloadMediaUnauthorized builds a notes service download media endpoint
+// unauthorized error.
+func NewDownloadMediaUnauthorized(body DownloadMediaUnauthorizedResponseBody) notes.Unauthorized {
 	v := notes.Unauthorized(body)
 	return v
 }
 
-// NewUploadNoteMediaOK builds a "notes" service "upload" endpoint result from
-// a HTTP "OK" response.
-func NewUploadNoteMediaOK(body *UploadResponseBody) *notesviews.NoteMediaView {
+// NewUploadMediaNoteMediaOK builds a "notes" service "upload media" endpoint
+// result from a HTTP "OK" response.
+func NewUploadMediaNoteMediaOK(body *UploadMediaResponseBody) *notesviews.NoteMediaView {
 	v := &notesviews.NoteMediaView{
 		ID:          body.ID,
 		URL:         body.URL,
@@ -293,27 +296,30 @@ func NewUploadNoteMediaOK(body *UploadResponseBody) *notesviews.NoteMediaView {
 	return v
 }
 
-// NewUploadBadRequest builds a notes service upload endpoint bad-request error.
-func NewUploadBadRequest(body UploadBadRequestResponseBody) notes.BadRequest {
+// NewUploadMediaBadRequest builds a notes service upload media endpoint
+// bad-request error.
+func NewUploadMediaBadRequest(body UploadMediaBadRequestResponseBody) notes.BadRequest {
 	v := notes.BadRequest(body)
 	return v
 }
 
-// NewUploadForbidden builds a notes service upload endpoint forbidden error.
-func NewUploadForbidden(body UploadForbiddenResponseBody) notes.Forbidden {
+// NewUploadMediaForbidden builds a notes service upload media endpoint
+// forbidden error.
+func NewUploadMediaForbidden(body UploadMediaForbiddenResponseBody) notes.Forbidden {
 	v := notes.Forbidden(body)
 	return v
 }
 
-// NewUploadNotFound builds a notes service upload endpoint not-found error.
-func NewUploadNotFound(body UploadNotFoundResponseBody) notes.NotFound {
+// NewUploadMediaNotFound builds a notes service upload media endpoint
+// not-found error.
+func NewUploadMediaNotFound(body UploadMediaNotFoundResponseBody) notes.NotFound {
 	v := notes.NotFound(body)
 	return v
 }
 
-// NewUploadUnauthorized builds a notes service upload endpoint unauthorized
-// error.
-func NewUploadUnauthorized(body UploadUnauthorizedResponseBody) notes.Unauthorized {
+// NewUploadMediaUnauthorized builds a notes service upload media endpoint
+// unauthorized error.
+func NewUploadMediaUnauthorized(body UploadMediaUnauthorizedResponseBody) notes.Unauthorized {
 	v := notes.Unauthorized(body)
 	return v
 }

@@ -285,23 +285,23 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 	}
 }
 
-// BuildMediaRequest instantiates a HTTP request object with method and path
-// set to call the "notes" service "media" endpoint
-func (c *Client) BuildMediaRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+// BuildDownloadMediaRequest instantiates a HTTP request object with method and
+// path set to call the "notes" service "download media" endpoint
+func (c *Client) BuildDownloadMediaRequest(ctx context.Context, v interface{}) (*http.Request, error) {
 	var (
 		mediaID int32
 	)
 	{
-		p, ok := v.(*notes.MediaPayload)
+		p, ok := v.(*notes.DownloadMediaPayload)
 		if !ok {
-			return nil, goahttp.ErrInvalidType("notes", "media", "*notes.MediaPayload", v)
+			return nil, goahttp.ErrInvalidType("notes", "download media", "*notes.DownloadMediaPayload", v)
 		}
 		mediaID = p.MediaID
 	}
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: MediaNotesPath(mediaID)}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DownloadMediaNotesPath(mediaID)}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("notes", "media", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("notes", "download media", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -310,13 +310,13 @@ func (c *Client) BuildMediaRequest(ctx context.Context, v interface{}) (*http.Re
 	return req, nil
 }
 
-// EncodeMediaRequest returns an encoder for requests sent to the notes media
-// server.
-func EncodeMediaRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+// EncodeDownloadMediaRequest returns an encoder for requests sent to the notes
+// download media server.
+func EncodeDownloadMediaRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
 	return func(req *http.Request, v interface{}) error {
-		p, ok := v.(*notes.MediaPayload)
+		p, ok := v.(*notes.DownloadMediaPayload)
 		if !ok {
-			return goahttp.ErrInvalidType("notes", "media", "*notes.MediaPayload", v)
+			return goahttp.ErrInvalidType("notes", "download media", "*notes.DownloadMediaPayload", v)
 		}
 		values := req.URL.Query()
 		values.Add("token", p.Auth)
@@ -325,16 +325,16 @@ func EncodeMediaRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.
 	}
 }
 
-// DecodeMediaResponse returns a decoder for responses returned by the notes
-// media endpoint. restoreBody controls whether the response body should be
-// restored after having been read.
-// DecodeMediaResponse may return the following errors:
+// DecodeDownloadMediaResponse returns a decoder for responses returned by the
+// notes download media endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeDownloadMediaResponse may return the following errors:
 //	- "bad-request" (type notes.BadRequest): http.StatusBadRequest
 //	- "forbidden" (type notes.Forbidden): http.StatusForbidden
 //	- "not-found" (type notes.NotFound): http.StatusNotFound
 //	- "unauthorized" (type notes.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
-func DecodeMediaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+func DecodeDownloadMediaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
 			b, err := ioutil.ReadAll(resp.Body)
@@ -356,7 +356,7 @@ func DecodeMediaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 			{
 				lengthRaw := resp.Header.Get("Content-Length")
 				if lengthRaw == "" {
-					return nil, goahttp.ErrValidationError("notes", "media", goa.MissingFieldError("Content-Length", "header"))
+					return nil, goahttp.ErrValidationError("notes", "download media", goa.MissingFieldError("Content-Length", "header"))
 				}
 				v, err2 := strconv.ParseInt(lengthRaw, 10, 64)
 				if err2 != nil {
@@ -370,77 +370,77 @@ func DecodeMediaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 			}
 			contentType = contentTypeRaw
 			if err != nil {
-				return nil, goahttp.ErrValidationError("notes", "media", err)
+				return nil, goahttp.ErrValidationError("notes", "download media", err)
 			}
-			res := NewMediaResultOK(length, contentType)
+			res := NewDownloadMediaResultOK(length, contentType)
 			return res, nil
 		case http.StatusBadRequest:
 			var (
-				body MediaBadRequestResponseBody
+				body DownloadMediaBadRequestResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "media", err)
+				return nil, goahttp.ErrDecodingError("notes", "download media", err)
 			}
-			return nil, NewMediaBadRequest(body)
+			return nil, NewDownloadMediaBadRequest(body)
 		case http.StatusForbidden:
 			var (
-				body MediaForbiddenResponseBody
+				body DownloadMediaForbiddenResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "media", err)
+				return nil, goahttp.ErrDecodingError("notes", "download media", err)
 			}
-			return nil, NewMediaForbidden(body)
+			return nil, NewDownloadMediaForbidden(body)
 		case http.StatusNotFound:
 			var (
-				body MediaNotFoundResponseBody
+				body DownloadMediaNotFoundResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "media", err)
+				return nil, goahttp.ErrDecodingError("notes", "download media", err)
 			}
-			return nil, NewMediaNotFound(body)
+			return nil, NewDownloadMediaNotFound(body)
 		case http.StatusUnauthorized:
 			var (
-				body MediaUnauthorizedResponseBody
+				body DownloadMediaUnauthorizedResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "media", err)
+				return nil, goahttp.ErrDecodingError("notes", "download media", err)
 			}
-			return nil, NewMediaUnauthorized(body)
+			return nil, NewDownloadMediaUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("notes", "media", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("notes", "download media", resp.StatusCode, string(body))
 		}
 	}
 }
 
-// BuildUploadRequest instantiates a HTTP request object with method and path
-// set to call the "notes" service "upload" endpoint
-func (c *Client) BuildUploadRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+// BuildUploadMediaRequest instantiates a HTTP request object with method and
+// path set to call the "notes" service "upload media" endpoint
+func (c *Client) BuildUploadMediaRequest(ctx context.Context, v interface{}) (*http.Request, error) {
 	var (
 		stationID int32
 		body      io.Reader
 	)
 	{
-		rd, ok := v.(*notes.UploadRequestData)
+		rd, ok := v.(*notes.UploadMediaRequestData)
 		if !ok {
-			return nil, goahttp.ErrInvalidType("notes", "upload", "notes.UploadRequestData", v)
+			return nil, goahttp.ErrInvalidType("notes", "upload media", "notes.UploadMediaRequestData", v)
 		}
 		p := rd.Payload
 		body = rd.Body
 		stationID = p.StationID
 	}
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UploadNotesPath(stationID)}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UploadMediaNotesPath(stationID)}
 	req, err := http.NewRequest("POST", u.String(), body)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("notes", "upload", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("notes", "upload media", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -449,13 +449,13 @@ func (c *Client) BuildUploadRequest(ctx context.Context, v interface{}) (*http.R
 	return req, nil
 }
 
-// EncodeUploadRequest returns an encoder for requests sent to the notes upload
-// server.
-func EncodeUploadRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+// EncodeUploadMediaRequest returns an encoder for requests sent to the notes
+// upload media server.
+func EncodeUploadMediaRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
 	return func(req *http.Request, v interface{}) error {
-		data, ok := v.(*notes.UploadRequestData)
+		data, ok := v.(*notes.UploadMediaRequestData)
 		if !ok {
-			return goahttp.ErrInvalidType("notes", "upload", "*notes.UploadRequestData", v)
+			return goahttp.ErrInvalidType("notes", "upload media", "*notes.UploadMediaRequestData", v)
 		}
 		p := data.Payload
 		{
@@ -478,16 +478,16 @@ func EncodeUploadRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 	}
 }
 
-// DecodeUploadResponse returns a decoder for responses returned by the notes
-// upload endpoint. restoreBody controls whether the response body should be
-// restored after having been read.
-// DecodeUploadResponse may return the following errors:
+// DecodeUploadMediaResponse returns a decoder for responses returned by the
+// notes upload media endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeUploadMediaResponse may return the following errors:
 //	- "bad-request" (type notes.BadRequest): http.StatusBadRequest
 //	- "forbidden" (type notes.Forbidden): http.StatusForbidden
 //	- "not-found" (type notes.NotFound): http.StatusNotFound
 //	- "unauthorized" (type notes.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
-func DecodeUploadResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+func DecodeUploadMediaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
 			b, err := ioutil.ReadAll(resp.Body)
@@ -504,77 +504,77 @@ func DecodeUploadResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body UploadResponseBody
+				body UploadMediaResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "upload", err)
+				return nil, goahttp.ErrDecodingError("notes", "upload media", err)
 			}
-			p := NewUploadNoteMediaOK(&body)
+			p := NewUploadMediaNoteMediaOK(&body)
 			view := "default"
 			vres := &notesviews.NoteMedia{Projected: p, View: view}
 			if err = notesviews.ValidateNoteMedia(vres); err != nil {
-				return nil, goahttp.ErrValidationError("notes", "upload", err)
+				return nil, goahttp.ErrValidationError("notes", "upload media", err)
 			}
 			res := notes.NewNoteMedia(vres)
 			return res, nil
 		case http.StatusBadRequest:
 			var (
-				body UploadBadRequestResponseBody
+				body UploadMediaBadRequestResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "upload", err)
+				return nil, goahttp.ErrDecodingError("notes", "upload media", err)
 			}
-			return nil, NewUploadBadRequest(body)
+			return nil, NewUploadMediaBadRequest(body)
 		case http.StatusForbidden:
 			var (
-				body UploadForbiddenResponseBody
+				body UploadMediaForbiddenResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "upload", err)
+				return nil, goahttp.ErrDecodingError("notes", "upload media", err)
 			}
-			return nil, NewUploadForbidden(body)
+			return nil, NewUploadMediaForbidden(body)
 		case http.StatusNotFound:
 			var (
-				body UploadNotFoundResponseBody
+				body UploadMediaNotFoundResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "upload", err)
+				return nil, goahttp.ErrDecodingError("notes", "upload media", err)
 			}
-			return nil, NewUploadNotFound(body)
+			return nil, NewUploadMediaNotFound(body)
 		case http.StatusUnauthorized:
 			var (
-				body UploadUnauthorizedResponseBody
+				body UploadMediaUnauthorizedResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("notes", "upload", err)
+				return nil, goahttp.ErrDecodingError("notes", "upload media", err)
 			}
-			return nil, NewUploadUnauthorized(body)
+			return nil, NewUploadMediaUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("notes", "upload", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("notes", "upload media", resp.StatusCode, string(body))
 		}
 	}
 }
 
-// // BuildUploadStreamPayload creates a streaming endpoint request payload from
-// the method payload and the path to the file to be streamed
-func BuildUploadStreamPayload(payload interface{}, fpath string) (*notes.UploadRequestData, error) {
+// // BuildUploadMediaStreamPayload creates a streaming endpoint request payload
+// from the method payload and the path to the file to be streamed
+func BuildUploadMediaStreamPayload(payload interface{}, fpath string) (*notes.UploadMediaRequestData, error) {
 	f, err := os.Open(fpath)
 	if err != nil {
 		return nil, err
 	}
-	return &notes.UploadRequestData{
-		Payload: payload.(*notes.UploadPayload),
+	return &notes.UploadMediaRequestData{
+		Payload: payload.(*notes.UploadMediaPayload),
 		Body:    f,
 	}, nil
 }

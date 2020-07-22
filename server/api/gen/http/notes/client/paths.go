@@ -21,12 +21,12 @@ func GetNotesPath(stationID int32) string {
 	return fmt.Sprintf("/stations/%v/notes", stationID)
 }
 
-// MediaNotesPath returns the URL path to the notes service media HTTP endpoint.
-func MediaNotesPath(mediaID int32) string {
+// DownloadMediaNotesPath returns the URL path to the notes service download media HTTP endpoint.
+func DownloadMediaNotesPath(mediaID int32) string {
 	return fmt.Sprintf("/notes/media/%v", mediaID)
 }
 
-// UploadNotesPath returns the URL path to the notes service upload HTTP endpoint.
-func UploadNotesPath(stationID int32) string {
+// UploadMediaNotesPath returns the URL path to the notes service upload media HTTP endpoint.
+func UploadMediaNotesPath(stationID int32) string {
 	return fmt.Sprintf("/stations/%v/media", stationID)
 }

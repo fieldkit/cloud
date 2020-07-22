@@ -21,10 +21,10 @@ type Service interface {
 	Update(context.Context, *UpdatePayload) (res *FieldNotes, err error)
 	// Get implements get.
 	Get(context.Context, *GetPayload) (res *FieldNotes, err error)
-	// Media implements media.
-	Media(context.Context, *MediaPayload) (res *MediaResult, body io.ReadCloser, err error)
-	// Upload implements upload.
-	Upload(context.Context, *UploadPayload, io.ReadCloser) (res *NoteMedia, err error)
+	// DownloadMedia implements download media.
+	DownloadMedia(context.Context, *DownloadMediaPayload) (res *DownloadMediaResult, body io.ReadCloser, err error)
+	// UploadMedia implements upload media.
+	UploadMedia(context.Context, *UploadMediaPayload, io.ReadCloser) (res *NoteMedia, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -41,7 +41,7 @@ const ServiceName = "notes"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"update", "get", "media", "upload"}
+var MethodNames = [4]string{"update", "get", "download media", "upload media"}
 
 // UpdatePayload is the payload type of the notes service update method.
 type UpdatePayload struct {
@@ -62,20 +62,23 @@ type GetPayload struct {
 	StationID int32
 }
 
-// MediaPayload is the payload type of the notes service media method.
-type MediaPayload struct {
+// DownloadMediaPayload is the payload type of the notes service download media
+// method.
+type DownloadMediaPayload struct {
 	Auth    string
 	MediaID int32
 }
 
-// MediaResult is the result type of the notes service media method.
-type MediaResult struct {
+// DownloadMediaResult is the result type of the notes service download media
+// method.
+type DownloadMediaResult struct {
 	Length      int64
 	ContentType string
 }
 
-// UploadPayload is the payload type of the notes service upload method.
-type UploadPayload struct {
+// UploadMediaPayload is the payload type of the notes service upload media
+// method.
+type UploadMediaPayload struct {
 	Auth          string
 	ContentLength int64
 	ContentType   string
@@ -83,7 +86,7 @@ type UploadPayload struct {
 	Key           string
 }
 
-// NoteMedia is the result type of the notes service upload method.
+// NoteMedia is the result type of the notes service upload media method.
 type NoteMedia struct {
 	ID          int64
 	URL         string

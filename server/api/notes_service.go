@@ -194,7 +194,7 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 	}, nil
 }
 
-func (s *NotesService) Media(ctx context.Context, payload *notes.MediaPayload) (*notes.MediaResult, io.ReadCloser, error) {
+func (s *NotesService) DownloadMedia(ctx context.Context, payload *notes.DownloadMediaPayload) (*notes.DownloadMediaResult, io.ReadCloser, error) {
 	allMedia := &data.FieldNoteMedia{}
 	if err := s.options.Database.GetContext(ctx, allMedia, `
 		SELECT * FROM fieldkit.notes_media WHERE id = $1
@@ -209,13 +209,13 @@ func (s *NotesService) Media(ctx context.Context, payload *notes.MediaPayload) (
 		return nil, nil, notes.NotFound("not found")
 	}
 
-	return &notes.MediaResult{
+	return &notes.DownloadMediaResult{
 		Length:      int64(lm.Size),
 		ContentType: allMedia.ContentType,
 	}, ioutil.NopCloser(lm.Reader), nil
 }
 
-func (s *NotesService) Upload(ctx context.Context, payload *notes.UploadPayload, body io.ReadCloser) (*notes.NoteMedia, error) {
+func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMediaPayload, body io.ReadCloser) (*notes.NoteMedia, error) {
 	p, err := NewPermissions(ctx, s.options).Unwrap()
 	if err != nil {
 		return nil, err

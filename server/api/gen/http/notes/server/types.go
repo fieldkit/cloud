@@ -33,9 +33,9 @@ type GetResponseBody struct {
 	Media []*NoteMediaResponseBody `form:"media" json:"media" xml:"media"`
 }
 
-// UploadResponseBody is the type of the "notes" service "upload" endpoint HTTP
-// response body.
-type UploadResponseBody struct {
+// UploadMediaResponseBody is the type of the "notes" service "upload media"
+// endpoint HTTP response body.
+type UploadMediaResponseBody struct {
 	ID  int64  `form:"id" json:"id" xml:"id"`
 	URL string `form:"url" json:"url" xml:"url"`
 	Key string `form:"key" json:"key" xml:"key"`
@@ -73,37 +73,37 @@ type GetNotFoundResponseBody string
 // endpoint HTTP response body for the "unauthorized" error.
 type GetUnauthorizedResponseBody string
 
-// MediaBadRequestResponseBody is the type of the "notes" service "media"
-// endpoint HTTP response body for the "bad-request" error.
-type MediaBadRequestResponseBody string
+// DownloadMediaBadRequestResponseBody is the type of the "notes" service
+// "download media" endpoint HTTP response body for the "bad-request" error.
+type DownloadMediaBadRequestResponseBody string
 
-// MediaForbiddenResponseBody is the type of the "notes" service "media"
-// endpoint HTTP response body for the "forbidden" error.
-type MediaForbiddenResponseBody string
+// DownloadMediaForbiddenResponseBody is the type of the "notes" service
+// "download media" endpoint HTTP response body for the "forbidden" error.
+type DownloadMediaForbiddenResponseBody string
 
-// MediaNotFoundResponseBody is the type of the "notes" service "media"
-// endpoint HTTP response body for the "not-found" error.
-type MediaNotFoundResponseBody string
+// DownloadMediaNotFoundResponseBody is the type of the "notes" service
+// "download media" endpoint HTTP response body for the "not-found" error.
+type DownloadMediaNotFoundResponseBody string
 
-// MediaUnauthorizedResponseBody is the type of the "notes" service "media"
-// endpoint HTTP response body for the "unauthorized" error.
-type MediaUnauthorizedResponseBody string
+// DownloadMediaUnauthorizedResponseBody is the type of the "notes" service
+// "download media" endpoint HTTP response body for the "unauthorized" error.
+type DownloadMediaUnauthorizedResponseBody string
 
-// UploadBadRequestResponseBody is the type of the "notes" service "upload"
-// endpoint HTTP response body for the "bad-request" error.
-type UploadBadRequestResponseBody string
+// UploadMediaBadRequestResponseBody is the type of the "notes" service "upload
+// media" endpoint HTTP response body for the "bad-request" error.
+type UploadMediaBadRequestResponseBody string
 
-// UploadForbiddenResponseBody is the type of the "notes" service "upload"
-// endpoint HTTP response body for the "forbidden" error.
-type UploadForbiddenResponseBody string
+// UploadMediaForbiddenResponseBody is the type of the "notes" service "upload
+// media" endpoint HTTP response body for the "forbidden" error.
+type UploadMediaForbiddenResponseBody string
 
-// UploadNotFoundResponseBody is the type of the "notes" service "upload"
-// endpoint HTTP response body for the "not-found" error.
-type UploadNotFoundResponseBody string
+// UploadMediaNotFoundResponseBody is the type of the "notes" service "upload
+// media" endpoint HTTP response body for the "not-found" error.
+type UploadMediaNotFoundResponseBody string
 
-// UploadUnauthorizedResponseBody is the type of the "notes" service "upload"
-// endpoint HTTP response body for the "unauthorized" error.
-type UploadUnauthorizedResponseBody string
+// UploadMediaUnauthorizedResponseBody is the type of the "notes" service
+// "upload media" endpoint HTTP response body for the "unauthorized" error.
+type UploadMediaUnauthorizedResponseBody string
 
 // FieldNoteResponseBody is used to define fields on response body types.
 type FieldNoteResponseBody struct {
@@ -191,10 +191,10 @@ func NewGetResponseBody(res *notesviews.FieldNotesView) *GetResponseBody {
 	return body
 }
 
-// NewUploadResponseBody builds the HTTP response body from the result of the
-// "upload" endpoint of the "notes" service.
-func NewUploadResponseBody(res *notesviews.NoteMediaView) *UploadResponseBody {
-	body := &UploadResponseBody{
+// NewUploadMediaResponseBody builds the HTTP response body from the result of
+// the "upload media" endpoint of the "notes" service.
+func NewUploadMediaResponseBody(res *notesviews.NoteMediaView) *UploadMediaResponseBody {
+	body := &UploadMediaResponseBody{
 		ID:  *res.ID,
 		URL: *res.URL,
 		Key: *res.Key,
@@ -258,59 +258,59 @@ func NewGetUnauthorizedResponseBody(res notes.Unauthorized) GetUnauthorizedRespo
 	return body
 }
 
-// NewMediaBadRequestResponseBody builds the HTTP response body from the result
-// of the "media" endpoint of the "notes" service.
-func NewMediaBadRequestResponseBody(res notes.BadRequest) MediaBadRequestResponseBody {
-	body := MediaBadRequestResponseBody(res)
+// NewDownloadMediaBadRequestResponseBody builds the HTTP response body from
+// the result of the "download media" endpoint of the "notes" service.
+func NewDownloadMediaBadRequestResponseBody(res notes.BadRequest) DownloadMediaBadRequestResponseBody {
+	body := DownloadMediaBadRequestResponseBody(res)
 	return body
 }
 
-// NewMediaForbiddenResponseBody builds the HTTP response body from the result
-// of the "media" endpoint of the "notes" service.
-func NewMediaForbiddenResponseBody(res notes.Forbidden) MediaForbiddenResponseBody {
-	body := MediaForbiddenResponseBody(res)
+// NewDownloadMediaForbiddenResponseBody builds the HTTP response body from the
+// result of the "download media" endpoint of the "notes" service.
+func NewDownloadMediaForbiddenResponseBody(res notes.Forbidden) DownloadMediaForbiddenResponseBody {
+	body := DownloadMediaForbiddenResponseBody(res)
 	return body
 }
 
-// NewMediaNotFoundResponseBody builds the HTTP response body from the result
-// of the "media" endpoint of the "notes" service.
-func NewMediaNotFoundResponseBody(res notes.NotFound) MediaNotFoundResponseBody {
-	body := MediaNotFoundResponseBody(res)
+// NewDownloadMediaNotFoundResponseBody builds the HTTP response body from the
+// result of the "download media" endpoint of the "notes" service.
+func NewDownloadMediaNotFoundResponseBody(res notes.NotFound) DownloadMediaNotFoundResponseBody {
+	body := DownloadMediaNotFoundResponseBody(res)
 	return body
 }
 
-// NewMediaUnauthorizedResponseBody builds the HTTP response body from the
-// result of the "media" endpoint of the "notes" service.
-func NewMediaUnauthorizedResponseBody(res notes.Unauthorized) MediaUnauthorizedResponseBody {
-	body := MediaUnauthorizedResponseBody(res)
+// NewDownloadMediaUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "download media" endpoint of the "notes" service.
+func NewDownloadMediaUnauthorizedResponseBody(res notes.Unauthorized) DownloadMediaUnauthorizedResponseBody {
+	body := DownloadMediaUnauthorizedResponseBody(res)
 	return body
 }
 
-// NewUploadBadRequestResponseBody builds the HTTP response body from the
-// result of the "upload" endpoint of the "notes" service.
-func NewUploadBadRequestResponseBody(res notes.BadRequest) UploadBadRequestResponseBody {
-	body := UploadBadRequestResponseBody(res)
+// NewUploadMediaBadRequestResponseBody builds the HTTP response body from the
+// result of the "upload media" endpoint of the "notes" service.
+func NewUploadMediaBadRequestResponseBody(res notes.BadRequest) UploadMediaBadRequestResponseBody {
+	body := UploadMediaBadRequestResponseBody(res)
 	return body
 }
 
-// NewUploadForbiddenResponseBody builds the HTTP response body from the result
-// of the "upload" endpoint of the "notes" service.
-func NewUploadForbiddenResponseBody(res notes.Forbidden) UploadForbiddenResponseBody {
-	body := UploadForbiddenResponseBody(res)
+// NewUploadMediaForbiddenResponseBody builds the HTTP response body from the
+// result of the "upload media" endpoint of the "notes" service.
+func NewUploadMediaForbiddenResponseBody(res notes.Forbidden) UploadMediaForbiddenResponseBody {
+	body := UploadMediaForbiddenResponseBody(res)
 	return body
 }
 
-// NewUploadNotFoundResponseBody builds the HTTP response body from the result
-// of the "upload" endpoint of the "notes" service.
-func NewUploadNotFoundResponseBody(res notes.NotFound) UploadNotFoundResponseBody {
-	body := UploadNotFoundResponseBody(res)
+// NewUploadMediaNotFoundResponseBody builds the HTTP response body from the
+// result of the "upload media" endpoint of the "notes" service.
+func NewUploadMediaNotFoundResponseBody(res notes.NotFound) UploadMediaNotFoundResponseBody {
+	body := UploadMediaNotFoundResponseBody(res)
 	return body
 }
 
-// NewUploadUnauthorizedResponseBody builds the HTTP response body from the
-// result of the "upload" endpoint of the "notes" service.
-func NewUploadUnauthorizedResponseBody(res notes.Unauthorized) UploadUnauthorizedResponseBody {
-	body := UploadUnauthorizedResponseBody(res)
+// NewUploadMediaUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "upload media" endpoint of the "notes" service.
+func NewUploadMediaUnauthorizedResponseBody(res notes.Unauthorized) UploadMediaUnauthorizedResponseBody {
+	body := UploadMediaUnauthorizedResponseBody(res)
 	return body
 }
 
@@ -333,18 +333,19 @@ func NewGetPayload(stationID int32, auth string) *notes.GetPayload {
 	return v
 }
 
-// NewMediaPayload builds a notes service media endpoint payload.
-func NewMediaPayload(mediaID int32, auth string) *notes.MediaPayload {
-	v := &notes.MediaPayload{}
+// NewDownloadMediaPayload builds a notes service download media endpoint
+// payload.
+func NewDownloadMediaPayload(mediaID int32, auth string) *notes.DownloadMediaPayload {
+	v := &notes.DownloadMediaPayload{}
 	v.MediaID = mediaID
 	v.Auth = auth
 
 	return v
 }
 
-// NewUploadPayload builds a notes service upload endpoint payload.
-func NewUploadPayload(stationID int32, key string, contentType string, contentLength int64, auth string) *notes.UploadPayload {
-	v := &notes.UploadPayload{}
+// NewUploadMediaPayload builds a notes service upload media endpoint payload.
+func NewUploadMediaPayload(stationID int32, key string, contentType string, contentLength int64, auth string) *notes.UploadMediaPayload {
+	v := &notes.UploadMediaPayload{}
 	v.StationID = stationID
 	v.Key = key
 	v.ContentType = contentType

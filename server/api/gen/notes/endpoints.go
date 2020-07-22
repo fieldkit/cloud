@@ -17,26 +17,26 @@ import (
 
 // Endpoints wraps the "notes" service endpoints.
 type Endpoints struct {
-	Update goa.Endpoint
-	Get    goa.Endpoint
-	Media  goa.Endpoint
-	Upload goa.Endpoint
+	Update        goa.Endpoint
+	Get           goa.Endpoint
+	DownloadMedia goa.Endpoint
+	UploadMedia   goa.Endpoint
 }
 
-// MediaResponseData holds both the result and the HTTP response body reader of
-// the "media" method.
-type MediaResponseData struct {
+// DownloadMediaResponseData holds both the result and the HTTP response body
+// reader of the "download media" method.
+type DownloadMediaResponseData struct {
 	// Result is the method result.
-	Result *MediaResult
+	Result *DownloadMediaResult
 	// Body streams the HTTP response body.
 	Body io.ReadCloser
 }
 
-// UploadRequestData holds both the payload and the HTTP request body reader of
-// the "upload" method.
-type UploadRequestData struct {
+// UploadMediaRequestData holds both the payload and the HTTP request body
+// reader of the "upload media" method.
+type UploadMediaRequestData struct {
 	// Payload is the method payload.
-	Payload *UploadPayload
+	Payload *UploadMediaPayload
 	// Body streams the HTTP request body.
 	Body io.ReadCloser
 }
@@ -46,10 +46,10 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Update: NewUpdateEndpoint(s, a.JWTAuth),
-		Get:    NewGetEndpoint(s, a.JWTAuth),
-		Media:  NewMediaEndpoint(s, a.JWTAuth),
-		Upload: NewUploadEndpoint(s, a.JWTAuth),
+		Update:        NewUpdateEndpoint(s, a.JWTAuth),
+		Get:           NewGetEndpoint(s, a.JWTAuth),
+		DownloadMedia: NewDownloadMediaEndpoint(s, a.JWTAuth),
+		UploadMedia:   NewUploadMediaEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -57,8 +57,8 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Update = m(e.Update)
 	e.Get = m(e.Get)
-	e.Media = m(e.Media)
-	e.Upload = m(e.Upload)
+	e.DownloadMedia = m(e.DownloadMedia)
+	e.UploadMedia = m(e.UploadMedia)
 }
 
 // NewUpdateEndpoint returns an endpoint function that calls the method
@@ -109,11 +109,11 @@ func NewGetEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	}
 }
 
-// NewMediaEndpoint returns an endpoint function that calls the method "media"
-// of service "notes".
-func NewMediaEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+// NewDownloadMediaEndpoint returns an endpoint function that calls the method
+// "download media" of service "notes".
+func NewDownloadMediaEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*MediaPayload)
+		p := req.(*DownloadMediaPayload)
 		var err error
 		sc := security.JWTScheme{
 			Name:           "jwt",
@@ -124,19 +124,19 @@ func NewMediaEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		res, body, err := s.Media(ctx, p)
+		res, body, err := s.DownloadMedia(ctx, p)
 		if err != nil {
 			return nil, err
 		}
-		return &MediaResponseData{Result: res, Body: body}, nil
+		return &DownloadMediaResponseData{Result: res, Body: body}, nil
 	}
 }
 
-// NewUploadEndpoint returns an endpoint function that calls the method
-// "upload" of service "notes".
-func NewUploadEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+// NewUploadMediaEndpoint returns an endpoint function that calls the method
+// "upload media" of service "notes".
+func NewUploadMediaEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		ep := req.(*UploadRequestData)
+		ep := req.(*UploadMediaRequestData)
 		var err error
 		sc := security.JWTScheme{
 			Name:           "jwt",
@@ -147,7 +147,7 @@ func NewUploadEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		res, err := s.Upload(ctx, ep.Payload, ep.Body)
+		res, err := s.UploadMedia(ctx, ep.Payload, ep.Body)
 		if err != nil {
 			return nil, err
 		}

@@ -16,19 +16,19 @@ import (
 
 // Client is the "notes" service client.
 type Client struct {
-	UpdateEndpoint goa.Endpoint
-	GetEndpoint    goa.Endpoint
-	MediaEndpoint  goa.Endpoint
-	UploadEndpoint goa.Endpoint
+	UpdateEndpoint        goa.Endpoint
+	GetEndpoint           goa.Endpoint
+	DownloadMediaEndpoint goa.Endpoint
+	UploadMediaEndpoint   goa.Endpoint
 }
 
 // NewClient initializes a "notes" service client given the endpoints.
-func NewClient(update, get, media, upload goa.Endpoint) *Client {
+func NewClient(update, get, downloadMedia, uploadMedia goa.Endpoint) *Client {
 	return &Client{
-		UpdateEndpoint: update,
-		GetEndpoint:    get,
-		MediaEndpoint:  media,
-		UploadEndpoint: upload,
+		UpdateEndpoint:        update,
+		GetEndpoint:           get,
+		DownloadMediaEndpoint: downloadMedia,
+		UploadMediaEndpoint:   uploadMedia,
 	}
 }
 
@@ -52,21 +52,21 @@ func (c *Client) Get(ctx context.Context, p *GetPayload) (res *FieldNotes, err e
 	return ires.(*FieldNotes), nil
 }
 
-// Media calls the "media" endpoint of the "notes" service.
-func (c *Client) Media(ctx context.Context, p *MediaPayload) (res *MediaResult, resp io.ReadCloser, err error) {
+// DownloadMedia calls the "download media" endpoint of the "notes" service.
+func (c *Client) DownloadMedia(ctx context.Context, p *DownloadMediaPayload) (res *DownloadMediaResult, resp io.ReadCloser, err error) {
 	var ires interface{}
-	ires, err = c.MediaEndpoint(ctx, p)
+	ires, err = c.DownloadMediaEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	o := ires.(*MediaResponseData)
+	o := ires.(*DownloadMediaResponseData)
 	return o.Result, o.Body, nil
 }
 
-// Upload calls the "upload" endpoint of the "notes" service.
-func (c *Client) Upload(ctx context.Context, p *UploadPayload, req io.ReadCloser) (res *NoteMedia, err error) {
+// UploadMedia calls the "upload media" endpoint of the "notes" service.
+func (c *Client) UploadMedia(ctx context.Context, p *UploadMediaPayload, req io.ReadCloser) (res *NoteMedia, err error) {
 	var ires interface{}
-	ires, err = c.UploadEndpoint(ctx, &UploadRequestData{Payload: p, Body: req})
+	ires, err = c.UploadMediaEndpoint(ctx, &UploadMediaRequestData{Payload: p, Body: req})
 	if err != nil {
 		return
 	}

@@ -21,12 +21,12 @@ import (
 
 // Server lists the notes service endpoint HTTP handlers.
 type Server struct {
-	Mounts []*MountPoint
-	Update http.Handler
-	Get    http.Handler
-	Media  http.Handler
-	Upload http.Handler
-	CORS   http.Handler
+	Mounts        []*MountPoint
+	Update        http.Handler
+	Get           http.Handler
+	DownloadMedia http.Handler
+	UploadMedia   http.Handler
+	CORS          http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -64,17 +64,17 @@ func New(
 		Mounts: []*MountPoint{
 			{"Update", "PATCH", "/stations/{stationId}/notes"},
 			{"Get", "GET", "/stations/{stationId}/notes"},
-			{"Media", "GET", "/notes/media/{mediaId}"},
-			{"Upload", "POST", "/stations/{stationId}/media"},
+			{"DownloadMedia", "GET", "/notes/media/{mediaId}"},
+			{"UploadMedia", "POST", "/stations/{stationId}/media"},
 			{"CORS", "OPTIONS", "/stations/{stationId}/notes"},
 			{"CORS", "OPTIONS", "/notes/media/{mediaId}"},
 			{"CORS", "OPTIONS", "/stations/{stationId}/media"},
 		},
-		Update: NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
-		Get:    NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
-		Media:  NewMediaHandler(e.Media, mux, decoder, encoder, errhandler, formatter),
-		Upload: NewUploadHandler(e.Upload, mux, decoder, encoder, errhandler, formatter),
-		CORS:   NewCORSHandler(),
+		Update:        NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
+		Get:           NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		DownloadMedia: NewDownloadMediaHandler(e.DownloadMedia, mux, decoder, encoder, errhandler, formatter),
+		UploadMedia:   NewUploadMediaHandler(e.UploadMedia, mux, decoder, encoder, errhandler, formatter),
+		CORS:          NewCORSHandler(),
 	}
 }
 
@@ -85,8 +85,8 @@ func (s *Server) Service() string { return "notes" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Update = m(s.Update)
 	s.Get = m(s.Get)
-	s.Media = m(s.Media)
-	s.Upload = m(s.Upload)
+	s.DownloadMedia = m(s.DownloadMedia)
+	s.UploadMedia = m(s.UploadMedia)
 	s.CORS = m(s.CORS)
 }
 
@@ -94,8 +94,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountUpdateHandler(mux, h.Update)
 	MountGetHandler(mux, h.Get)
-	MountMediaHandler(mux, h.Media)
-	MountUploadHandler(mux, h.Upload)
+	MountDownloadMediaHandler(mux, h.DownloadMedia)
+	MountUploadMediaHandler(mux, h.UploadMedia)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -201,9 +201,9 @@ func NewGetHandler(
 	})
 }
 
-// MountMediaHandler configures the mux to serve the "notes" service "media"
-// endpoint.
-func MountMediaHandler(mux goahttp.Muxer, h http.Handler) {
+// MountDownloadMediaHandler configures the mux to serve the "notes" service
+// "download media" endpoint.
+func MountDownloadMediaHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := handleNotesOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -213,9 +213,9 @@ func MountMediaHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("GET", "/notes/media/{mediaId}", f)
 }
 
-// NewMediaHandler creates a HTTP handler which loads the HTTP request and
-// calls the "notes" service "media" endpoint.
-func NewMediaHandler(
+// NewDownloadMediaHandler creates a HTTP handler which loads the HTTP request
+// and calls the "notes" service "download media" endpoint.
+func NewDownloadMediaHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -224,13 +224,13 @@ func NewMediaHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeMediaRequest(mux, decoder)
-		encodeResponse = EncodeMediaResponse(encoder)
-		encodeError    = EncodeMediaError(encoder, formatter)
+		decodeRequest  = DecodeDownloadMediaRequest(mux, decoder)
+		encodeResponse = EncodeDownloadMediaResponse(encoder)
+		encodeError    = EncodeDownloadMediaError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "media")
+		ctx = context.WithValue(ctx, goa.MethodKey, "download media")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "notes")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -246,7 +246,7 @@ func NewMediaHandler(
 			}
 			return
 		}
-		o := res.(*notes.MediaResponseData)
+		o := res.(*notes.DownloadMediaResponseData)
 		defer o.Body.Close()
 		if err := encodeResponse(ctx, w, o.Result); err != nil {
 			errhandler(ctx, w, err)
@@ -260,9 +260,9 @@ func NewMediaHandler(
 	})
 }
 
-// MountUploadHandler configures the mux to serve the "notes" service "upload"
-// endpoint.
-func MountUploadHandler(mux goahttp.Muxer, h http.Handler) {
+// MountUploadMediaHandler configures the mux to serve the "notes" service
+// "upload media" endpoint.
+func MountUploadMediaHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := handleNotesOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -272,9 +272,9 @@ func MountUploadHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("POST", "/stations/{stationId}/media", f)
 }
 
-// NewUploadHandler creates a HTTP handler which loads the HTTP request and
-// calls the "notes" service "upload" endpoint.
-func NewUploadHandler(
+// NewUploadMediaHandler creates a HTTP handler which loads the HTTP request
+// and calls the "notes" service "upload media" endpoint.
+func NewUploadMediaHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -283,13 +283,13 @@ func NewUploadHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeUploadRequest(mux, decoder)
-		encodeResponse = EncodeUploadResponse(encoder)
-		encodeError    = EncodeUploadError(encoder, formatter)
+		decodeRequest  = DecodeUploadMediaRequest(mux, decoder)
+		encodeResponse = EncodeUploadMediaResponse(encoder)
+		encodeError    = EncodeUploadMediaError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "upload")
+		ctx = context.WithValue(ctx, goa.MethodKey, "upload media")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "notes")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -298,7 +298,7 @@ func NewUploadHandler(
 			}
 			return
 		}
-		data := &notes.UploadRequestData{Payload: payload.(*notes.UploadPayload), Body: r.Body}
+		data := &notes.UploadMediaRequestData{Payload: payload.(*notes.UploadMediaPayload), Body: r.Body}
 		res, err := endpoint(ctx, data)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil {

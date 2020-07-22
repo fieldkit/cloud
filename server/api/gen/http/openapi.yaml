@@ -807,12 +807,12 @@ paths:
     get:
       tags:
       - notes
-      summary: media notes
+      summary: download media notes
       description: |2-
 
         **Required security scopes for jwt**:
           * `api:access`
-      operationId: notes#media
+      operationId: notes#download media
       parameters:
       - name: token
         in: query
@@ -835,19 +835,19 @@ paths:
         "400":
           description: Bad Request response.
           schema:
-            $ref: '#/definitions/NotesMediaBadRequestResponseBody'
+            $ref: '#/definitions/NotesDownloadMediaBadRequestResponseBody'
         "401":
           description: Unauthorized response.
           schema:
-            $ref: '#/definitions/NotesMediaUnauthorizedResponseBody'
+            $ref: '#/definitions/NotesDownloadMediaUnauthorizedResponseBody'
         "403":
           description: Forbidden response.
           schema:
-            $ref: '#/definitions/NotesMediaForbiddenResponseBody'
+            $ref: '#/definitions/NotesDownloadMediaForbiddenResponseBody'
         "404":
           description: Not Found response.
           schema:
-            $ref: '#/definitions/NotesMediaNotFoundResponseBody'
+            $ref: '#/definitions/NotesDownloadMediaNotFoundResponseBody'
       schemes:
       - http
       security:
@@ -2506,12 +2506,12 @@ paths:
     post:
       tags:
       - notes
-      summary: upload notes
+      summary: upload media notes
       description: |2-
 
         **Required security scopes for jwt**:
           * `api:access`
-      operationId: notes#upload
+      operationId: notes#upload media
       parameters:
       - name: key
         in: query
@@ -2541,23 +2541,23 @@ paths:
         "200":
           description: OK response.
           schema:
-            $ref: '#/definitions/NotesUploadResponseBody'
+            $ref: '#/definitions/NotesUploadMediaResponseBody'
         "400":
           description: Bad Request response.
           schema:
-            $ref: '#/definitions/NotesUploadBadRequestResponseBody'
+            $ref: '#/definitions/NotesUploadMediaBadRequestResponseBody'
         "401":
           description: Unauthorized response.
           schema:
-            $ref: '#/definitions/NotesUploadUnauthorizedResponseBody'
+            $ref: '#/definitions/NotesUploadMediaUnauthorizedResponseBody'
         "403":
           description: Forbidden response.
           schema:
-            $ref: '#/definitions/NotesUploadForbiddenResponseBody'
+            $ref: '#/definitions/NotesUploadMediaForbiddenResponseBody'
         "404":
           description: Not Found response.
           schema:
-            $ref: '#/definitions/NotesUploadNotFoundResponseBody'
+            $ref: '#/definitions/NotesUploadMediaNotFoundResponseBody'
       schemes:
       - http
       security:
@@ -5367,6 +5367,26 @@ definitions:
     - id
     - url
     - key
+  NotesDownloadMediaBadRequestResponseBody:
+    title: NotesDownloadMediaBadRequestResponseBody
+    type: string
+    description: bad-request
+    example: Quia autem tenetur.
+  NotesDownloadMediaForbiddenResponseBody:
+    title: NotesDownloadMediaForbiddenResponseBody
+    type: string
+    description: forbidden
+    example: Dolor corporis quasi consectetur nam repellat voluptatibus.
+  NotesDownloadMediaNotFoundResponseBody:
+    title: NotesDownloadMediaNotFoundResponseBody
+    type: string
+    description: not-found
+    example: Iure dolor libero est aperiam dolorum eum.
+  NotesDownloadMediaUnauthorizedResponseBody:
+    title: NotesDownloadMediaUnauthorizedResponseBody
+    type: string
+    description: unauthorized
+    example: Molestiae facilis autem dolor dolorem reiciendis fugiat.
   NotesGetBadRequestResponseBody:
     title: NotesGetBadRequestResponseBody
     type: string
@@ -5541,26 +5561,6 @@ definitions:
     type: string
     description: unauthorized
     example: Doloremque sit eius corrupti.
-  NotesMediaBadRequestResponseBody:
-    title: NotesMediaBadRequestResponseBody
-    type: string
-    description: bad-request
-    example: Quia autem tenetur.
-  NotesMediaForbiddenResponseBody:
-    title: NotesMediaForbiddenResponseBody
-    type: string
-    description: forbidden
-    example: Dolor corporis quasi consectetur nam repellat voluptatibus.
-  NotesMediaNotFoundResponseBody:
-    title: NotesMediaNotFoundResponseBody
-    type: string
-    description: not-found
-    example: Iure dolor libero est aperiam dolorum eum.
-  NotesMediaUnauthorizedResponseBody:
-    title: NotesMediaUnauthorizedResponseBody
-    type: string
-    description: unauthorized
-    example: Molestiae facilis autem dolor dolorem reiciendis fugiat.
   NotesUpdateBadRequestResponseBody:
     title: NotesUpdateBadRequestResponseBody
     type: string
@@ -5790,22 +5790,22 @@ definitions:
     type: string
     description: unauthorized
     example: Mollitia laudantium.
-  NotesUploadBadRequestResponseBody:
-    title: NotesUploadBadRequestResponseBody
+  NotesUploadMediaBadRequestResponseBody:
+    title: NotesUploadMediaBadRequestResponseBody
     type: string
     description: bad-request
     example: Dolor non et vero.
-  NotesUploadForbiddenResponseBody:
-    title: NotesUploadForbiddenResponseBody
+  NotesUploadMediaForbiddenResponseBody:
+    title: NotesUploadMediaForbiddenResponseBody
     type: string
     description: forbidden
     example: Eum consequatur voluptatem facilis.
-  NotesUploadNotFoundResponseBody:
-    title: NotesUploadNotFoundResponseBody
+  NotesUploadMediaNotFoundResponseBody:
+    title: NotesUploadMediaNotFoundResponseBody
     type: string
     description: not-found
     example: Tempora accusamus.
-  NotesUploadResponseBody:
+  NotesUploadMediaResponseBody:
     title: 'Mediatype identifier: application/vnd.app.note.media; view=default'
     type: object
     properties:
@@ -5819,7 +5819,7 @@ definitions:
       url:
         type: string
         example: Et est quo sed ipsam.
-    description: UploadResponseBody result type (default view)
+    description: Upload MediaResponseBody result type (default view)
     example:
       id: 1410337748223983677
       key: Deleniti omnis.
@@ -5828,8 +5828,8 @@ definitions:
     - id
     - url
     - key
-  NotesUploadUnauthorizedResponseBody:
-    title: NotesUploadUnauthorizedResponseBody
+  NotesUploadMediaUnauthorizedResponseBody:
+    title: NotesUploadMediaUnauthorizedResponseBody
     type: string
     description: unauthorized
     example: Incidunt assumenda vel consequatur.

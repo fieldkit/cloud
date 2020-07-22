@@ -43,7 +43,7 @@ firmware (download|add|list|delete)
 following (follow|unfollow|followers)
 ingestion (process- pending|process- station|process- ingestion|delete)
 modules meta
-notes (update|get|media|upload)
+notes (update|get|download- media|upload- media)
 project (add- update|delete- update|modify- update|invites|lookup- invite|accept- invite|reject- invite|add|update|get|list- community|list- mine|invite|remove- user|add- station|remove- station|delete|upload- photo|download- photo)
 records (data|meta|resolved)
 sensor (meta|data)
@@ -160,17 +160,17 @@ func ParseEndpoint(
 		notesGetStationIDFlag = notesGetFlags.String("station-id", "REQUIRED", "")
 		notesGetAuthFlag      = notesGetFlags.String("auth", "REQUIRED", "")
 
-		notesMediaFlags       = flag.NewFlagSet("media", flag.ExitOnError)
-		notesMediaMediaIDFlag = notesMediaFlags.String("media-id", "REQUIRED", "")
-		notesMediaAuthFlag    = notesMediaFlags.String("auth", "REQUIRED", "")
+		notesDownloadMediaFlags       = flag.NewFlagSet("download- media", flag.ExitOnError)
+		notesDownloadMediaMediaIDFlag = notesDownloadMediaFlags.String("media-id", "REQUIRED", "")
+		notesDownloadMediaAuthFlag    = notesDownloadMediaFlags.String("auth", "REQUIRED", "")
 
-		notesUploadFlags             = flag.NewFlagSet("upload", flag.ExitOnError)
-		notesUploadStationIDFlag     = notesUploadFlags.String("station-id", "REQUIRED", "")
-		notesUploadKeyFlag           = notesUploadFlags.String("key", "REQUIRED", "")
-		notesUploadContentTypeFlag   = notesUploadFlags.String("content-type", "REQUIRED", "")
-		notesUploadContentLengthFlag = notesUploadFlags.String("content-length", "REQUIRED", "")
-		notesUploadAuthFlag          = notesUploadFlags.String("auth", "REQUIRED", "")
-		notesUploadStreamFlag        = notesUploadFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
+		notesUploadMediaFlags             = flag.NewFlagSet("upload- media", flag.ExitOnError)
+		notesUploadMediaStationIDFlag     = notesUploadMediaFlags.String("station-id", "REQUIRED", "")
+		notesUploadMediaKeyFlag           = notesUploadMediaFlags.String("key", "REQUIRED", "")
+		notesUploadMediaContentTypeFlag   = notesUploadMediaFlags.String("content-type", "REQUIRED", "")
+		notesUploadMediaContentLengthFlag = notesUploadMediaFlags.String("content-length", "REQUIRED", "")
+		notesUploadMediaAuthFlag          = notesUploadMediaFlags.String("auth", "REQUIRED", "")
+		notesUploadMediaStreamFlag        = notesUploadMediaFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
 
 		projectFlags = flag.NewFlagSet("project", flag.ContinueOnError)
 
@@ -452,8 +452,8 @@ func ParseEndpoint(
 	notesFlags.Usage = notesUsage
 	notesUpdateFlags.Usage = notesUpdateUsage
 	notesGetFlags.Usage = notesGetUsage
-	notesMediaFlags.Usage = notesMediaUsage
-	notesUploadFlags.Usage = notesUploadUsage
+	notesDownloadMediaFlags.Usage = notesDownloadMediaUsage
+	notesUploadMediaFlags.Usage = notesUploadMediaUsage
 
 	projectFlags.Usage = projectUsage
 	projectAddUpdateFlags.Usage = projectAddUpdateUsage
@@ -665,11 +665,11 @@ func ParseEndpoint(
 			case "get":
 				epf = notesGetFlags
 
-			case "media":
-				epf = notesMediaFlags
+			case "download- media":
+				epf = notesDownloadMediaFlags
 
-			case "upload":
-				epf = notesUploadFlags
+			case "upload- media":
+				epf = notesUploadMediaFlags
 
 			}
 
@@ -974,14 +974,14 @@ func ParseEndpoint(
 			case "get":
 				endpoint = c.Get()
 				data, err = notesc.BuildGetPayload(*notesGetStationIDFlag, *notesGetAuthFlag)
-			case "media":
-				endpoint = c.Media()
-				data, err = notesc.BuildMediaPayload(*notesMediaMediaIDFlag, *notesMediaAuthFlag)
-			case "upload":
-				endpoint = c.Upload()
-				data, err = notesc.BuildUploadPayload(*notesUploadStationIDFlag, *notesUploadKeyFlag, *notesUploadContentTypeFlag, *notesUploadContentLengthFlag, *notesUploadAuthFlag)
+			case "download- media":
+				endpoint = c.DownloadMedia()
+				data, err = notesc.BuildDownloadMediaPayload(*notesDownloadMediaMediaIDFlag, *notesDownloadMediaAuthFlag)
+			case "upload- media":
+				endpoint = c.UploadMedia()
+				data, err = notesc.BuildUploadMediaPayload(*notesUploadMediaStationIDFlag, *notesUploadMediaKeyFlag, *notesUploadMediaContentTypeFlag, *notesUploadMediaContentLengthFlag, *notesUploadMediaAuthFlag)
 				if err == nil {
-					data, err = notesc.BuildUploadStreamPayload(data, *notesUploadStreamFlag)
+					data, err = notesc.BuildUploadMediaStreamPayload(data, *notesUploadMediaStreamFlag)
 				}
 			}
 		case "project":
@@ -1488,8 +1488,8 @@ Usage:
 COMMAND:
     update: Update implements update.
     get: Get implements get.
-    media: Media implements media.
-    upload: Upload implements upload.
+    download- media: DownloadMedia implements download media.
+    upload- media: UploadMedia implements upload media.
 
 Additional help:
     %s notes COMMAND --help
@@ -1597,22 +1597,22 @@ Example:
 `, os.Args[0])
 }
 
-func notesMediaUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] notes media -media-id INT32 -auth STRING
+func notesDownloadMediaUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] notes download- media -media-id INT32 -auth STRING
 
-Media implements media.
+DownloadMedia implements download media.
     -media-id INT32: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes media --media-id 2005679885 --auth "Voluptatem nisi vitae non sed."
+    `+os.Args[0]+` notes download- media --media-id 2005679885 --auth "Voluptatem nisi vitae non sed."
 `, os.Args[0])
 }
 
-func notesUploadUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] notes upload -station-id INT32 -key STRING -content-type STRING -content-length INT64 -auth STRING -stream STRING
+func notesUploadMediaUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] notes upload- media -station-id INT32 -key STRING -content-type STRING -content-length INT64 -auth STRING -stream STRING
 
-Upload implements upload.
+UploadMedia implements upload media.
     -station-id INT32: 
     -key STRING: 
     -content-type STRING: 
@@ -1621,7 +1621,7 @@ Upload implements upload.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` notes upload --station-id 908135429 --key "In quia ipsa ex quas alias voluptatem." --content-type "Minima sint ipsa." --content-length 8172360437479470050 --auth "Non voluptas quo." --stream "goa.png"
+    `+os.Args[0]+` notes upload- media --station-id 908135429 --key "In quia ipsa ex quas alias voluptatem." --content-type "Minima sint ipsa." --content-length 8172360437479470050 --auth "Non voluptas quo." --stream "goa.png"
 `, os.Args[0])
 }
 

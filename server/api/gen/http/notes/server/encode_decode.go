@@ -261,11 +261,11 @@ func EncodeGetError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 	}
 }
 
-// EncodeMediaResponse returns an encoder for responses returned by the notes
-// media endpoint.
-func EncodeMediaResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeDownloadMediaResponse returns an encoder for responses returned by the
+// notes download media endpoint.
+func EncodeDownloadMediaResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*notes.MediaResult)
+		res := v.(*notes.DownloadMediaResult)
 		val := res.Length
 		lengths := strconv.FormatInt(val, 10)
 		w.Header().Set("Content-Length", lengths)
@@ -275,9 +275,9 @@ func EncodeMediaResponse(encoder func(context.Context, http.ResponseWriter) goah
 	}
 }
 
-// DecodeMediaRequest returns a decoder for requests sent to the notes media
-// endpoint.
-func DecodeMediaRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+// DecodeDownloadMediaRequest returns a decoder for requests sent to the notes
+// download media endpoint.
+func DecodeDownloadMediaRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			mediaID int32
@@ -301,7 +301,7 @@ func DecodeMediaRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.D
 		if err != nil {
 			return nil, err
 		}
-		payload := NewMediaPayload(mediaID, auth)
+		payload := NewDownloadMediaPayload(mediaID, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
@@ -312,9 +312,9 @@ func DecodeMediaRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.D
 	}
 }
 
-// EncodeMediaError returns an encoder for errors returned by the media notes
-// endpoint.
-func EncodeMediaError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeDownloadMediaError returns an encoder for errors returned by the
+// download media notes endpoint.
+func EncodeDownloadMediaError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		en, ok := v.(ErrorNamer)
@@ -329,7 +329,7 @@ func EncodeMediaError(encoder func(context.Context, http.ResponseWriter) goahttp
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewMediaBadRequestResponseBody(res)
+				body = NewDownloadMediaBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
@@ -341,7 +341,7 @@ func EncodeMediaError(encoder func(context.Context, http.ResponseWriter) goahttp
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewMediaForbiddenResponseBody(res)
+				body = NewDownloadMediaForbiddenResponseBody(res)
 			}
 			w.Header().Set("goa-error", "forbidden")
 			w.WriteHeader(http.StatusForbidden)
@@ -353,7 +353,7 @@ func EncodeMediaError(encoder func(context.Context, http.ResponseWriter) goahttp
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewMediaNotFoundResponseBody(res)
+				body = NewDownloadMediaNotFoundResponseBody(res)
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
@@ -365,7 +365,7 @@ func EncodeMediaError(encoder func(context.Context, http.ResponseWriter) goahttp
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewMediaUnauthorizedResponseBody(res)
+				body = NewDownloadMediaUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", "unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)
@@ -376,21 +376,21 @@ func EncodeMediaError(encoder func(context.Context, http.ResponseWriter) goahttp
 	}
 }
 
-// EncodeUploadResponse returns an encoder for responses returned by the notes
-// upload endpoint.
-func EncodeUploadResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeUploadMediaResponse returns an encoder for responses returned by the
+// notes upload media endpoint.
+func EncodeUploadMediaResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res := v.(*notesviews.NoteMedia)
 		enc := encoder(ctx, w)
-		body := NewUploadResponseBody(res.Projected)
+		body := NewUploadMediaResponseBody(res.Projected)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
 }
 
-// DecodeUploadRequest returns a decoder for requests sent to the notes upload
-// endpoint.
-func DecodeUploadRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+// DecodeUploadMediaRequest returns a decoder for requests sent to the notes
+// upload media endpoint.
+func DecodeUploadMediaRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			stationID     int32
@@ -436,7 +436,7 @@ func DecodeUploadRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 		if err != nil {
 			return nil, err
 		}
-		payload := NewUploadPayload(stationID, key, contentType, contentLength, auth)
+		payload := NewUploadMediaPayload(stationID, key, contentType, contentLength, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
@@ -447,9 +447,9 @@ func DecodeUploadRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 	}
 }
 
-// EncodeUploadError returns an encoder for errors returned by the upload notes
-// endpoint.
-func EncodeUploadError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeUploadMediaError returns an encoder for errors returned by the upload
+// media notes endpoint.
+func EncodeUploadMediaError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		en, ok := v.(ErrorNamer)
@@ -464,7 +464,7 @@ func EncodeUploadError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUploadBadRequestResponseBody(res)
+				body = NewUploadMediaBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
@@ -476,7 +476,7 @@ func EncodeUploadError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUploadForbiddenResponseBody(res)
+				body = NewUploadMediaForbiddenResponseBody(res)
 			}
 			w.Header().Set("goa-error", "forbidden")
 			w.WriteHeader(http.StatusForbidden)
@@ -488,7 +488,7 @@ func EncodeUploadError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUploadNotFoundResponseBody(res)
+				body = NewUploadMediaNotFoundResponseBody(res)
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
@@ -500,7 +500,7 @@ func EncodeUploadError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewUploadUnauthorizedResponseBody(res)
+				body = NewUploadMediaUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", "unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)

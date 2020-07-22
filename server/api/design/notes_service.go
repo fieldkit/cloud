@@ -126,7 +126,7 @@ var _ = Service("notes", func() {
 		})
 	})
 
-	Method("media", func() {
+	Method("download media", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
 		})
@@ -159,7 +159,7 @@ var _ = Service("notes", func() {
 		})
 	})
 
-	Method("upload", func() {
+	Method("upload media", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
 		})

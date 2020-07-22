@@ -24,11 +24,13 @@ type Client struct {
 	// Get Doer is the HTTP client used to make requests to the get endpoint.
 	GetDoer goahttp.Doer
 
-	// Media Doer is the HTTP client used to make requests to the media endpoint.
-	MediaDoer goahttp.Doer
+	// DownloadMedia Doer is the HTTP client used to make requests to the download
+	// media endpoint.
+	DownloadMediaDoer goahttp.Doer
 
-	// Upload Doer is the HTTP client used to make requests to the upload endpoint.
-	UploadDoer goahttp.Doer
+	// UploadMedia Doer is the HTTP client used to make requests to the upload
+	// media endpoint.
+	UploadMediaDoer goahttp.Doer
 
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
@@ -55,8 +57,8 @@ func NewClient(
 	return &Client{
 		UpdateDoer:          doer,
 		GetDoer:             doer,
-		MediaDoer:           doer,
-		UploadDoer:          doer,
+		DownloadMediaDoer:   doer,
+		UploadMediaDoer:     doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -114,15 +116,15 @@ func (c *Client) Get() goa.Endpoint {
 	}
 }
 
-// Media returns an endpoint that makes HTTP requests to the notes service
-// media server.
-func (c *Client) Media() goa.Endpoint {
+// DownloadMedia returns an endpoint that makes HTTP requests to the notes
+// service download media server.
+func (c *Client) DownloadMedia() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeMediaRequest(c.encoder)
-		decodeResponse = DecodeMediaResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeDownloadMediaRequest(c.encoder)
+		decodeResponse = DecodeDownloadMediaResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildMediaRequest(ctx, v)
+		req, err := c.BuildDownloadMediaRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
@@ -130,28 +132,28 @@ func (c *Client) Media() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.MediaDoer.Do(req)
+		resp, err := c.DownloadMediaDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("notes", "media", err)
+			return nil, goahttp.ErrRequestError("notes", "download media", err)
 		}
 		res, err := decodeResponse(resp)
 		if err != nil {
 			resp.Body.Close()
-			return nil, goahttp.ErrDecodingError("notes", "media", err)
+			return nil, goahttp.ErrDecodingError("notes", "download media", err)
 		}
-		return &notes.MediaResponseData{Result: res.(*notes.MediaResult), Body: resp.Body}, nil
+		return &notes.DownloadMediaResponseData{Result: res.(*notes.DownloadMediaResult), Body: resp.Body}, nil
 	}
 }
 
-// Upload returns an endpoint that makes HTTP requests to the notes service
-// upload server.
-func (c *Client) Upload() goa.Endpoint {
+// UploadMedia returns an endpoint that makes HTTP requests to the notes
+// service upload media server.
+func (c *Client) UploadMedia() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeUploadRequest(c.encoder)
-		decodeResponse = DecodeUploadResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeUploadMediaRequest(c.encoder)
+		decodeResponse = DecodeUploadMediaResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildUploadRequest(ctx, v)
+		req, err := c.BuildUploadMediaRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
@@ -159,9 +161,9 @@ func (c *Client) Upload() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.UploadDoer.Do(req)
+		resp, err := c.UploadMediaDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("notes", "upload", err)
+			return nil, goahttp.ErrRequestError("notes", "upload media", err)
 		}
 		return decodeResponse(resp)
 	}
