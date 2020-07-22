@@ -3,8 +3,7 @@
         <div v-for="project in projects" v-bind:key="project.id" class="project-container">
             <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
                 <div class="project-image-container">
-                    <img alt="FieldKit Project" v-if="project.photo" :src="getImageUrl(project)" class="project-image" />
-                    <img alt="FieldKit Project" v-else src="@/assets/fieldkit_project.png" class="project-image" />
+                    <ProjectPhoto :project="project" />
                 </div>
 
                 <img v-if="project.private" alt="Private project" src="@/assets/private.png" class="private-icon" />
@@ -31,10 +30,14 @@
 </template>
 
 <script>
+import CommonComponents from "@/views/shared";
 import FKApi from "@/api/api";
 
 export default {
     name: "ProjectThumbnails",
+    components: {
+        ...CommonComponents,
+    },
     data: () => {
         return {};
     },
@@ -76,7 +79,7 @@ export default {
     text-align: center;
     border-bottom: 1px solid #d8dce0;
 }
-.project-image {
+/deep/ .project-image {
     max-width: 270px;
     max-height: 138px;
 }

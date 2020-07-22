@@ -3,8 +3,7 @@
         <div class="details">
             <div class="left">
                 <div class="photo">
-                    <img alt="FieldKit Project" v-if="project.photo" :src="getImageUrl(project)" class="project-image" />
-                    <img alt="Default FieldKit Project" v-else src="@/assets/fieldkit_project.png" class="project-image" />
+                    <ProjectPhoto :project="project" />
                 </div>
 
                 <FollowPanel :project="project" v-bind:key="project.id" />
@@ -118,9 +117,6 @@ export default {
         },
     },
     methods: {
-        getImageUrl(project) {
-            return this.$config.baseUrl + project.photo;
-        },
         getModuleImg(module) {
             return this.$loadAsset("modules-lg/" + utils.getModuleImg(module));
         },
@@ -235,7 +231,7 @@ export default {
     margin-right: 10px;
 }
 
-.project-image {
+/deep/ .project-image {
     width: 100%;
     height: auto;
 }

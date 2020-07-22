@@ -3,7 +3,7 @@
         <div class="upper-half">
             <div class="row general-row">
                 <div class="image-container">
-                    <img alt="Station Image" :src="photo" class="" v-if="photo" />
+                    <StationPhoto :station="station" />
                 </div>
                 <div class="station-details">
                     <div class="station-name">{{ station.name }}</div>
@@ -88,8 +88,6 @@
 import _ from "lodash";
 import CommonComponents from "@/views/shared";
 import { BookmarkFactory } from "@/views/viz/viz";
-
-import FKApi, { makeAuthenticatedApiUrl } from "@/api/api";
 import * as utils from "@/utilities";
 
 export default {
@@ -100,7 +98,6 @@ export default {
     data: () => {
         return {
             viewingSummary: true,
-            photo: null,
         };
     },
     props: {
@@ -112,11 +109,6 @@ export default {
             type: Boolean,
             default: true,
         },
-    },
-    mounted() {
-        return new FKApi().loadMedia(this.station.photos.small).then((photo) => {
-            this.photo = photo;
-        });
     },
     methods: {
         viewSummary() {

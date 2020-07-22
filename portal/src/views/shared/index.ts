@@ -7,6 +7,8 @@ import DisplayProjectTags from "./DisplayProjectTags.vue";
 import DoubleHeader from "./DoubleHeader.vue";
 import Spinner from "./Spinner.vue";
 import FollowPanel from "./FollowPanel.vue";
+import StationPhoto from "./StationPhoto.vue";
+import ProjectPhoto from "./ProjectPhoto.vue";
 
 export default {
     UserPhoto,
@@ -18,4 +20,6 @@ export default {
     DoubleHeader,
     Spinner,
     FollowPanel,
+    StationPhoto,
+    ProjectPhoto,
 };
