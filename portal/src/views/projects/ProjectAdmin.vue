@@ -78,85 +78,20 @@
             </div>
         </div>
 
-        <div class="row-section manage-team-container">
-            <div class="section-heading">Manage Team</div>
-            <div class="users-container">
-                <div class="user-row">
-                    <div class="cell-heading">Members ({{ displayProject.users.length }})</div>
-                    <div class="cell-heading">Role</div>
-                    <div class="cell-heading"></div>
-                    <div class="cell"></div>
-                </div>
-                <div class="user-row" v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.email">
-                    <div class="cell">
-                        <UserPhoto :user="projectUser.user" />
-                        <div class="invite-name">
-                            <div v-if="projectUser.user.name != projectUser.user.email">{{ projectUser.user.name }}</div>
-                            <div class="email">{{ projectUser.user.email }}</div>
-                        </div>
-                    </div>
-                    <div class="cell">{{ projectUser.role }}</div>
-                    <div class="cell invite-status">Invite {{ projectUser.membership.toLowerCase() }}</div>
-                    <div class="cell">
-                        <img
-                            alt="Remove user"
-                            src="@/assets/close-icon.png"
-                            class="remove-btn"
-                            :data-user="projectUser.user.id"
-                            v-on:click="(ev) => removeUser(ev, projectUser)"
-                        />
-                    </div>
-                </div>
-                <div class="user-row">
-                    <div class="cell">
-                        <input
-                            class="text-input"
-                            placeholder="New member email"
-                            keyboardType="email"
-                            autocorrect="false"
-                            autocapitalizationType="none"
-                            v-model="form.inviteEmail"
-                        />
-                        <div class="validation-errors" v-if="$v.form.inviteEmail.$error || form.inviteDuplicate">
-                            <span class="validation-error" v-if="!$v.form.inviteEmail.required">
-                                Email is a required field.
-                            </span>
-                            <span class="validation-error" v-if="!$v.form.inviteEmail.email">
-                                Must be a valid email address.
-                            </span>
-                            <span class="validation-error" v-if="form.inviteDuplicate">
-                                This user is already invited.
-                            </span>
-                        </div>
-                    </div>
-                    <div class="cell role-dropdown-container">
-                        <select v-model="selectedRole">
-                            <option v-for="role in roleOptions" v-bind:value="role.code" v-bind:key="role.code + role.name">
-                                {{ role.name }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="cell">
-                        <button class="invite-btn" v-on:click="sendInvite">Invite</button>
-                    </div>
-                    <div class="cell"></div>
-                </div>
-            </div>
-        </div>
+        <TeamManager :displayProject="displayProject" v-bind:key="displayProject.id" />
 
         <ProjectActivity :displayProject="displayProject" v-if="false" />
     </div>
 </template>
 
 <script>
-import { required, email } from "vuelidate/lib/validators";
 import CommonComponents from "@/views/shared";
-import ProjectStations from "./ProjectStations";
-import ProjectActivity from "./ProjectActivity";
-import ProjectDataFiles from "./ProjectDataFiles";
+import ProjectStations from "./ProjectStations.vue";
+import ProjectActivity from "./ProjectActivity.vue";
+import ProjectDataFiles from "./ProjectDataFiles.vue";
 import StationsReadings from "./StationsReadings.vue";
+import TeamManager from "./TeamManager.vue";
 
-import * as ActionTypes from "@/store/actions";
 import * as utils from "../../utilities";
 
 export default {
@@ -167,46 +102,22 @@ export default {
         ProjectActivity,
         ProjectDataFiles,
         StationsReadings,
+        TeamManager,
     },
     props: {
         displayProject: {
+            type: Object,
             required: true,
         },
         userStations: {
+            type: Array,
             required: true,
         },
     },
     data: () => {
         return {
-            form: {
-                inviteEmail: "",
-                inviteDuplicate: false,
-            },
             viewingActivityFeed: false,
-            selectedRole: -1,
-            roleOptions: [
-                {
-                    code: -1,
-                    name: "Select Role",
-                },
-                {
-                    code: 0,
-                    name: "Member",
-                },
-                {
-                    code: 1,
-                    name: "Administrator",
-                },
-            ],
         };
-    },
-    validations: {
-        form: {
-            inviteEmail: {
-                required,
-                email,
-            },
-        },
     },
     computed: {
         project() {
@@ -219,11 +130,6 @@ export default {
                     url: this.getModuleImg(m),
                 };
             });
-        },
-    },
-    watch: {
-        project() {
-            this.form.inviteEmail = "";
         },
     },
     methods: {
@@ -250,49 +156,6 @@ export default {
         },
         openActivityFeed() {
             this.viewingActivityFeed = true;
-        },
-        checkEmail() {
-            this.$v.form.$touch();
-            return !(this.$v.form.$pending || this.$v.form.$error);
-        },
-        sendInvite() {
-            if (this.checkEmail()) {
-                if (this.selectedRole == -1) {
-                    this.selectedRole = 0;
-                }
-                const role = this.roleOptions.find((r) => {
-                    return r.code == this.selectedRole;
-                });
-                const payload = {
-                    projectId: this.project.id,
-                    email: this.form.inviteEmail,
-                    role: this.selectedRole,
-                };
-                return this.$store
-                    .dispatch(ActionTypes.PROJECT_INVITE, payload)
-                    .then(() => {
-                        this.$v.form.$reset();
-                        this.form.inviteEmail = "";
-                        this.form.inviteDuplicate = false;
-                    })
-                    .catch(() => {
-                        // TODO: Move this to vuelidate.
-                        this.form.inviteDuplicate = true;
-                    });
-            }
-        },
-        removeUser(ev, projectUser) {
-            const id = event.target.getAttribute("data-user");
-            if (confirm("Are you sure you want to remove this team member?")) {
-                const payload = {
-                    projectId: this.project.id,
-                    email: projectUser.user.email,
-                };
-                return this.$store.dispatch(ActionTypes.PROJECT_REMOVE, payload).then(() => {
-                    this.$v.form.$reset();
-                    this.form.inviteEmail = "";
-                });
-            }
         },
         getModuleImg(module) {
             return this.$loadAsset("modules-lg/" + utils.getModuleImg(module));
@@ -417,6 +280,7 @@ export default {
 .details-bottom .title {
     font-weight: bold;
 }
+
 .row-section.data-readings {
     margin-top: 20px;
     display: flex;
@@ -440,99 +304,14 @@ export default {
 .data-readings .project-readings {
     flex: 1;
 }
-.manage-team-container {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    border: 2px solid #d8dce0;
-    background: white;
-    padding: 20px;
-}
-.manage-team-container .user-row {
-}
 
-.user-row .cell {
-    text-align: left;
-}
-
-.manage-team-container .section-heading {
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 20px;
-}
 .project-container {
     margin-top: 20px;
 }
-.invite-btn {
-    width: 80px;
-    height: 28px;
-    border-radius: 3px;
-    border: 1px solid #cccdcf;
-    font-size: 14px;
-    font-weight: bold;
-    background-color: #ffffff;
-    cursor: pointer;
-}
-.user-row {
-    display: grid;
-    font-size: 13px;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    border-bottom: 1px solid rgb(215, 220, 225);
-    padding: 10px 0;
-    align-items: center;
-}
-.invite-status {
-    color: #0a67aa;
-    font-weight: 600;
-}
-.cell-heading {
-    font-size: 14px;
-    font-weight: bold;
-}
-.users-container .user-icon {
-    float: left;
-}
-.text-input {
-    border: none;
-    border-radius: 5px;
-    font-size: 15px;
-    padding: 4px 0 4px 8px;
-}
-.validation-error {
-    color: #c42c44;
-    display: block;
-}
-.remove-btn {
-    margin: 12px 0 0 0;
-    float: right;
-    cursor: pointer;
-}
-.invite-name {
-    display: inline-block;
-    vertical-align: top;
-    margin-top: 20px;
-}
-.role-dropdown-container select {
-    font-size: 13px;
-    color: #6a6d71;
-    border: none;
-    padding: 2px 10px 2px 0;
-    margin-left: -4px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17.538' height='9.865' viewBox='0 0 4.64 2.61'%3E%3Cpath d='M.493.087a.28.28 0 00-.406 0 .28.28 0 000 .406l2.03 2.03a.28.28 0 00.406 0l2.03-2.03a.28.28 0 000-.406.28.28 0 00-.406 0L2.32 1.914z' fill='%236a6d71'/%3E%3C/svg%3E%0A");
-    background-repeat: no-repeat, repeat;
-    background-position: right 0.7em top 50%, 0 0;
-    background-size: 0.75em auto, 100%;
-    box-sizing: border-box;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    appearance: none;
-}
-
 /deep/ .project-image {
     width: 100%;
     height: auto;
 }
-
 .module-icon {
     width: 35px;
     height: 35px;

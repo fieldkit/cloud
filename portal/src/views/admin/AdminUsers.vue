@@ -77,7 +77,10 @@ export default Vue.extend({
                 required,
                 email,
             },
-            password: { required, min: minLength(10) },
+            password: {
+                required,
+                min: minLength(10),
+            },
         },
     },
     methods: {
