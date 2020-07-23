@@ -82,6 +82,7 @@
 
                     <div class="validation-errors" v-if="$v.form.endTime.$error">
                         <div v-if="!$v.form.endTime.date">Please enter a valid date.</div>
+                        <div v-if="!$v.form.endTime.minValue">Please enter a date after the start date.</div>
                     </div>
                 </div>
             </div>
@@ -119,10 +120,22 @@ import VueTagsInput from "@johmun/vue-tags-input";
 
 import { tryParseTags } from "@/utilities";
 
-import { helpers, required, email, minValue, maxLength, minLength, sameAs } from "vuelidate/lib/validators";
+import { helpers, required, email, minValue, maxLength, minLength } from "vuelidate/lib/validators";
 
 import FKApi from "@/api/api";
 import * as ActionTypes from "@/store/actions";
+
+const afterOtherDate = (afterOtherDate) =>
+    helpers.withParams({ type: "afterOtherDate", after: afterOtherDate }, function (this: any, value, parentVm) {
+        const other = helpers.ref(afterOtherDate, this, parentVm);
+        if (!other || other.length === 0) {
+            return true;
+        }
+        if (!value || value.length == 0) {
+            return true;
+        }
+        return moment(other).isBefore(moment(value));
+    });
 
 export default Vue.extend({
     name: "ProjectForm",
@@ -187,6 +200,7 @@ export default Vue.extend({
                     }
                     return true;
                 },
+                minValue: afterOtherDate("startTime"),
             },
             tags: {
                 maxLength: (value) => {
