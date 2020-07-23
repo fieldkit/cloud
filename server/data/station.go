@@ -63,6 +63,15 @@ func (s *Station) UpdateFromStatus(ctx context.Context, raw string) error {
 
 		status := record.Status
 
+		if status.Identity != nil {
+			if status.Identity.Name != "" {
+				s.Name = status.Identity.Name
+			}
+			if status.Identity.Device != "" {
+				s.Name = status.Identity.Device
+			}
+		}
+
 		if status.Power != nil && status.Power.Battery != nil {
 			battery := float32(status.Power.Battery.Percentage)
 			s.Battery = &battery
