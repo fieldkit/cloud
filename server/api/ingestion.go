@@ -51,6 +51,7 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 		if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
 			QueuedID: q.ID,
 			UserID:   p.UserID(),
+			Verbose:  true,
 		}); err != nil {
 			log.Warnw("publishing", "err", err)
 		}

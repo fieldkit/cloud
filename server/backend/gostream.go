@@ -61,11 +61,13 @@ func ReadLengthPrefixedCollection(ctx context.Context, maximumMessageLength uint
 			return pbs, position, fmt.Errorf("refusing to allocate %d bytes (position = %d)", messageLength, position)
 		}
 
+		beforeRead := position
 		messageBuf := make([]byte, messageLength)
 		newBytesRead, err := io.ReadFull(r, messageBuf)
 		bytesRead += newBytesRead
 		if err != nil {
-			return pbs, position, fmt.Errorf("error reading message (position = %d) (%v)", position, err)
+			return pbs, position, fmt.Errorf("unable to read full message (length = %d) (started = %d) (bytes-read = %d) (position = %d) (read-end = %d) (%v)",
+				messageLength, beforeRead, newBytesRead, position, position+newBytesRead, err)
 		}
 
 		pb, err := f(messageBuf)
