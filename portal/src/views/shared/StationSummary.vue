@@ -29,18 +29,9 @@
                     <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                     <template>{{ station.locationName ? station.locationName : station.placeNameOther }}</template>
                 </div>
-                <div class="location-container" v-else>
-                    <img alt="Location" src="@/assets/icon-location.png" class="icon" />
-                    <template>Awaiting Location</template>
-                </div>
-
                 <div class="location-container" v-if="station.placeNameNative">
                     <img alt="Location" src="@/assets/icon-location.png" class="icon" />
                     <template>Native Lands: {{ station.placeNameNative }}</template>
-                </div>
-                <div class="location-container" v-else>
-                    <img alt="Location" src="@/assets/icon-location.png" class="icon" />
-                    <template>Native Lands: Awaiting Location</template>
                 </div>
 
                 <div class="coordinates-row">
@@ -231,5 +222,8 @@ export default {
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
+}
+.icon {
+    padding-right: 5px;
 }
 </style>
