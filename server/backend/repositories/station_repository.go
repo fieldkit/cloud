@@ -817,7 +817,7 @@ func (sr *StationRepository) QueryEssentialStations(ctx context.Context, qp *Ess
 			FROM fieldkit.station AS s
 			JOIN fieldkit.user AS u ON (s.owner_id = u.id)
         ) AS q
-		ORDER BY CASE WHEN q.last_ingestion_at IS NULL THEN 1 ELSE 0 END, q.last_ingestion_at DESC
+		ORDER BY CASE WHEN q.last_ingestion_at IS NULL THEN q.updated_at ELSE q.last_ingestion_at END DESC, name
 		LIMIT $1 OFFSET $2
 		`, qp.PageSize, qp.PageSize*qp.Page); err != nil {
 		return nil, err
