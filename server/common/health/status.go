@@ -46,8 +46,20 @@ func MakeStatusResponse(ctx context.Context) (sr *StatusResponse, err error) {
 	return
 }
 
+func setupResponse(w *http.ResponseWriter, req *http.Request) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding")
+}
+
 func StatusHandler(ctx context.Context) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		setupResponse(&w, req)
+
+		if (*req).Method == "OPTIONS" {
+			return
+		}
+
 		ctx := req.Context()
 		log := logging.Logger(ctx).Named("status").Sugar()
 

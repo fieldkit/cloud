@@ -1,12 +1,37 @@
 <template>
     <StandardLayout>
         <div class="container">
-            <router-link :to="{ name: 'adminUsers' }" class="link">
-                Users
-            </router-link>
-            <router-link :to="{ name: 'adminStations' }" class="link">
-                Stations
-            </router-link>
+            <div class="menu">
+                <router-link :to="{ name: 'adminUsers' }" class="link">
+                    Users
+                </router-link>
+                <router-link :to="{ name: 'adminStations' }" class="link">
+                    Stations
+                </router-link>
+            </div>
+
+            <div class="status" v-if="status">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>Server</th>
+                            <td>{{ status.serverName }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tag</th>
+                            <td>{{ status.tag }}</td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <td>{{ status.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>GIT</th>
+                            <td>{{ status.git.hash }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </StandardLayout>
 </template>
@@ -15,6 +40,7 @@
 import Vue from "vue";
 import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
+import FKApi from "@/api/api";
 
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
@@ -28,7 +54,15 @@ export default Vue.extend({
     },
     props: {},
     data: () => {
-        return {};
+        return {
+            status: null,
+        };
+    },
+    mounted() {
+        return new FKApi().getStatus().then((status) => {
+            console.log(status);
+            this.status = status;
+        });
     },
     methods: {},
 });

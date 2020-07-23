@@ -875,6 +875,21 @@ class FKApi {
             });
         });
     }
+
+    public getStatus(): Promise<PortalDeployStatus> {
+        return this.invoke({
+            auth: Auth.None,
+            method: "GET",
+            url: this.baseUrl + "/status",
+        });
+    }
+}
+
+export interface PortalDeployStatus {
+    serverName: string;
+    name: string;
+    tag: string;
+    git: { hash: string };
 }
 
 export interface EssentialStation {
