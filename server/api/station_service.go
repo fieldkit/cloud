@@ -65,6 +65,8 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 		}
 	}
 
+	station.UpdatedAt = time.Now()
+
 	if err := sr.Update(ctx, station); err != nil {
 		return err
 	}
@@ -103,6 +105,10 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		if existing.OwnerID != p.UserID() {
 			log.Infow("station conflict", "device_id", deviceId, "user_id", p.UserID(), "owner_id", existing.OwnerID, "station_id", existing.ID)
 			return nil, station.MakeStationOwnerConflict(errors.New("station already registered"))
+		}
+
+		if payload.LocationName != nil {
+			existing.LocationName = payload.LocationName
 		}
 
 		if err := c.updateStation(ctx, existing, payload.StatusPb); err != nil {
@@ -195,7 +201,6 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 	}
 
 	updating.Name = payload.Name
-	updating.UpdatedAt = time.Now()
 	if payload.LocationName != nil {
 		updating.LocationName = payload.LocationName
 	}
