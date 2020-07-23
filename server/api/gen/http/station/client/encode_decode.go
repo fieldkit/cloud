@@ -61,10 +61,11 @@ func EncodeAddRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Re
 // add endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeAddResponse may return the following errors:
+//	- "station-owner-conflict" (type *goa.ServiceError): http.StatusBadRequest
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
 //	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
 //	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -98,6 +99,41 @@ func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			}
 			res := station.NewStationFull(vres)
 			return res, nil
+		case http.StatusBadRequest:
+			en := resp.Header.Get("goa-error")
+			switch en {
+			case "station-owner-conflict":
+				var (
+					body AddStationOwnerConflictResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("station", "add", err)
+				}
+				err = ValidateAddStationOwnerConflictResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("station", "add", err)
+				}
+				return nil, NewAddStationOwnerConflict(&body)
+			case "bad-request":
+				var (
+					body AddBadRequestResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("station", "add", err)
+				}
+				err = ValidateAddBadRequestResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("station", "add", err)
+				}
+				return nil, NewAddBadRequest(&body)
+			default:
+				body, _ := ioutil.ReadAll(resp.Body)
+				return nil, goahttp.ErrInvalidResponse("station", "add", resp.StatusCode, string(body))
+			}
 		case http.StatusUnauthorized:
 			var (
 				body AddUnauthorizedResponseBody
@@ -140,20 +176,6 @@ func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 				return nil, goahttp.ErrValidationError("station", "add", err)
 			}
 			return nil, NewAddNotFound(&body)
-		case http.StatusBadRequest:
-			var (
-				body AddBadRequestResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("station", "add", err)
-			}
-			err = ValidateAddBadRequestResponseBody(&body)
-			if err != nil {
-				return nil, goahttp.ErrValidationError("station", "add", err)
-			}
-			return nil, NewAddBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("station", "add", resp.StatusCode, string(body))

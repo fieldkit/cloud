@@ -190,6 +190,9 @@ var PageOfStations = ResultType("application/vnd.app.stations.essential.page", f
 })
 
 var _ = Service("station", func() {
+	Error("station-owner-conflict", func() {
+	})
+
 	Method("add", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -209,6 +212,8 @@ var _ = Service("station", func() {
 
 		HTTP(func() {
 			POST("stations")
+
+			Response("station-owner-conflict", StatusBadRequest)
 
 			httpAuthentication()
 		})

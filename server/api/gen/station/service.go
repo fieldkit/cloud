@@ -244,6 +244,15 @@ type EssentialStation struct {
 	LastIngestionAt    *int64
 }
 
+// MakeStationOwnerConflict builds a goa.ServiceError from an error.
+func MakeStationOwnerConflict(err error) *goa.ServiceError {
+	return &goa.ServiceError{
+		Name:    "station-owner-conflict",
+		ID:      goa.NewErrorID(),
+		Message: err.Error(),
+	}
+}
+
 // MakeUnauthorized builds a goa.ServiceError from an error.
 func MakeUnauthorized(err error) *goa.ServiceError {
 	return &goa.ServiceError{

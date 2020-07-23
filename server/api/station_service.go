@@ -102,7 +102,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 
 		if existing.OwnerID != p.UserID() {
 			log.Infow("station conflict", "device_id", deviceId, "user_id", p.UserID(), "owner_id", existing.OwnerID, "station_id", existing.ID)
-			return nil, station.MakeBadRequest(errors.New("station already registered to another user"))
+			return nil, station.MakeStationOwnerConflict(errors.New("station already registered"))
 		}
 
 		if err := c.updateStation(ctx, existing, payload.StatusPb); err != nil {

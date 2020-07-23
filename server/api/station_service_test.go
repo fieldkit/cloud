@@ -314,8 +314,8 @@ func TestAddStationAlreadyOthers(t *testing.T) {
 	ja.Assertf(rr.Body.String(), `
 	{
 		"id": "<<PRESENCE>>",
-		"name": "bad-request",
-		"message": "station already registered to another user",
+		"name": "station-owner-conflict",
+		"message": "station already registered",
 		"timeout": false,
 		"fault": false,
 		"temporary": false

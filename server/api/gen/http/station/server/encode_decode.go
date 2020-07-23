@@ -83,6 +83,30 @@ func EncodeAddError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
+		case "station-owner-conflict":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAddStationOwnerConflictResponseBody(res)
+			}
+			w.Header().Set("goa-error", "station-owner-conflict")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAddBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
 		case "unauthorized":
 			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
@@ -118,18 +142,6 @@ func EncodeAddError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
-			return enc.Encode(body)
-		case "bad-request":
-			res := v.(*goa.ServiceError)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewAddBadRequestResponseBody(res)
-			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
