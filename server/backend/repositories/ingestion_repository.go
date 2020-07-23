@@ -57,23 +57,24 @@ func (r *IngestionRepository) QueryByStationID(ctx context.Context, id int64) (a
 	return pending, nil
 }
 
-func (r *IngestionRepository) QueryPending(ctx context.Context) (all []*data.Ingestion, err error) {
-	pending := []*data.Ingestion{}
+func (r *IngestionRepository) QueryPending(ctx context.Context) (all []*data.QueuedIngestion, err error) {
+	pending := []*data.QueuedIngestion{}
 	if err := r.db.SelectContext(ctx, &pending, `
 		SELECT
-			id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags
-		FROM
-		(
-			SELECT
-			*,
-			CASE
-				WHEN type = 'meta' THEN 0
-				ELSE 1
-			END AS type_ordered
-			FROM fieldkit.ingestion
+			id, ingestion_id, queued, attempted, completed,
+			total_records, other_errors, meta_errors, data_errors
+		FROM (
+			SELECT q.*,
+				CASE
+					WHEN i.type = 'meta' THEN 0
+					ELSE 1
+				END AS type_ordered
+			FROM fieldkit.ingestion_queue AS q
+			JOIN fieldkit.ingestion AS i ON (i.id = q.ingestion_id)
+			WHERE q.completed IS NULL
 		) AS q
-        WHERE id IN (SELECT ingestion_id FROM fieldkit.ingestion_queue WHERE completed IS NULL LIMIT 10)
-		ORDER BY q.type_ordered, q.time
+		ORDER BY type_ordered, queued
+		LIMIT 10
 		`); err != nil {
 		return nil, fmt.Errorf("error querying for ingestions: %v", err)
 	}
@@ -115,8 +116,8 @@ func (r *IngestionRepository) Enqueue(ctx context.Context, ingestionID int64) (i
 	}
 
 	if err := r.db.NamedGetContext(ctx, queued, `
-			INSERT INTO fieldkit.ingestion_queue (queued, ingestion_id) VALUES (:queued, :ingestion_id) RETURNING id
-			`, queued); err != nil {
+		INSERT INTO fieldkit.ingestion_queue (queued, ingestion_id) VALUES (:queued, :ingestion_id) RETURNING id
+		`, queued); err != nil {
 		return 0, fmt.Errorf("error inserting queued ingestion: %v", err)
 	}
 

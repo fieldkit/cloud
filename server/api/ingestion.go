@@ -40,21 +40,21 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 		return err
 	}
 
-	ingestions, err := ir.QueryPending(ctx)
+	queued, err := ir.QueryPending(ctx)
 	if err != nil {
 		return err
 	}
 
-	log.Infow("queueing", "ingestions", len(ingestions), "user_id", p.UserID())
+	log.Infow("queued", "queued", len(queued), "user_id", p.UserID())
 
-	c.options.Database.WithNewTransaction(ctx, func(txCtx context.Context) error {
-		for _, i := range ingestions {
-			if _, err := ir.Enqueue(txCtx, i.ID); err != nil {
-				return err
-			}
+	for _, q := range queued {
+		if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
+			QueuedID: q.ID,
+			UserID:   p.UserID(),
+		}); err != nil {
+			log.Warnw("publishing", "err", err)
 		}
-		return nil
-	})
+	}
 
 	return nil
 }
@@ -122,7 +122,7 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 
 	log.Infow("processing", "ingestion_id", payload.IngestionID)
 
-	i, err := ir.QueryByID(ctx, int64(payload.IngestionID))
+	i, err := ir.QueryByID(ctx, payload.IngestionID)
 	if err != nil {
 		return err
 	}
@@ -156,7 +156,7 @@ func (c *IngestionService) Delete(ctx context.Context, payload *ingestion.Delete
 
 	log.Infow("deleting", "ingestion_id", payload.IngestionID)
 
-	i, err := ir.QueryByID(ctx, int64(payload.IngestionID))
+	i, err := ir.QueryByID(ctx, payload.IngestionID)
 	if err != nil {
 		return err
 	}
