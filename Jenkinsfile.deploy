@@ -15,12 +15,10 @@ timestamps {
 				def isDev = params.DeployFrom.indexOf("fkdev.org") >= 0
 				def statusUrl = isDev ? "https://api.fkdev.org/status" : "https://api.fieldkit.org/status"
 
-				if (watchDeployment(url: statusUrl, seconds: 60)) {
-					slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Deployed And Ready (<${env.BUILD_URL}|Open>)"
-				}
-				else {
-					slackSend channel: '#automation', color: 'danger', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Oh, no. Deploy took too long (<${env.BUILD_URL}|Open>)"
-				}
+				def value = watchDeployment(url: statusUrl, seconds: 60)
+
+				println(value)
+				println("done")
             }
         }
         catch (Exception e) {
