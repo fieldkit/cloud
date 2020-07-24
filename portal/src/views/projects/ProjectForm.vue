@@ -52,11 +52,7 @@
                         <div class="outer-input-container">
                             <TextField v-model="form.startTime" label="Start" />
                         </div>
-                        <v-date-picker
-                            :value="form.pickedStart"
-                            @input="updateStart"
-                            :popover="{ placement: 'bottom', visibility: 'click' }"
-                        >
+                        <v-date-picker :value="form.pickedStart" @input="updateStart" :popover="{ placement: 'auto', visibility: 'click' }">
                             <button type="button">
                                 <img alt="Calendar" src="@/assets/calendar.png" />
                             </button>
@@ -73,7 +69,7 @@
                         <div class="outer-input-container">
                             <TextField v-model="form.endTime" label="End" />
                         </div>
-                        <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'bottom', visibility: 'click' }">
+                        <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'auto', visibility: 'click' }">
                             <button type="button">
                                 <img alt="Calendar" src="@/assets/calendar.png" />
                             </button>
