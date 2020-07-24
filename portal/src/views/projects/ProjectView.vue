@@ -9,9 +9,10 @@
                 v-if="displayProject"
             />
 
-            <ProjectAdmin v-if="isAdministrator" :user="user" :displayProject="displayProject" :userStations="stations" />
+            <ProjectAdmin v-if="isAdministrator" :user="user" :displayProject="displayProject" :userStations="stations" v-bind:key="id" />
             <ProjectPublic
                 v-if="!isAdministrator && displayProject"
+                v-bind:key="id"
                 :user="user"
                 :displayProject="displayProject"
                 :userStations="stations"

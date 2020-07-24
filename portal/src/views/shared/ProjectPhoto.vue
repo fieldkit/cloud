@@ -41,6 +41,8 @@ export default Vue.extend({
                 return new FKApi().loadMedia(this.project.photo).then((photo) => {
                     this.photo = photo;
                 });
+            } else {
+                this.photo = null;
             }
         },
     },
