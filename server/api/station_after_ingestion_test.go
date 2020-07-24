@@ -87,7 +87,6 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 		"stations": [
 			{
 				"id": "<<PRESENCE>>",
-				"images": "<<PRESENCE>>",
 				"updated": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",

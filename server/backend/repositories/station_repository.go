@@ -399,13 +399,6 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	media := []*data.FieldNoteMedia{}
-	if err := r.db.SelectContext(ctx, &media, `
-		SELECT * FROM fieldkit.notes_media WHERE station_id = $1 ORDER BY created_at DESC
-		`, stations[0].ID); err != nil {
-		return nil, err
-	}
-
 	provisions := []*data.Provision{}
 	if err := r.db.SelectContext(ctx, &provisions, `
 		SELECT * FROM fieldkit.provision WHERE device_id = $1
@@ -452,7 +445,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	all, err := r.toStationFull(stations, owners, ingestions, media, provisions, configurations, modules, sensors)
+	all, err := r.toStationFull(stations, owners, ingestions, provisions, configurations, modules, sensors)
 	if err != nil {
 		return nil, err
 	}
@@ -490,13 +483,6 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 			fieldkit.ingestion
 			WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1) ORDER BY time DESC
 		) AS ranked WHERE rank < 10;
-		`, id); err != nil {
-		return nil, err
-	}
-
-	media := []*data.FieldNoteMedia{}
-	if err := r.db.SelectContext(ctx, &media, `
-		SELECT * FROM fieldkit.notes_media WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1) ORDER BY created_at DESC
 		`, id); err != nil {
 		return nil, err
 	}
@@ -551,7 +537,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, ingestions, media, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, owners, ingestions, provisions, configurations, modules, sensors)
 }
 
 func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id int32) ([]*data.StationFull, error) {
@@ -586,13 +572,6 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 			fieldkit.ingestion
 			WHERE device_id IN (SELECT s.device_id FROM fieldkit.station AS s JOIN fieldkit.project_station AS ps ON (s.id = ps.station_id) WHERE project_id = $1)
 		) AS ranked WHERE rank < 10;
-		`, id); err != nil {
-		return nil, err
-	}
-
-	media := []*data.FieldNoteMedia{}
-	if err := r.db.SelectContext(ctx, &media, `
-		SELECT * FROM fieldkit.notes_media WHERE station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1) ORDER BY created_at DESC
 		`, id); err != nil {
 		return nil, err
 	}
@@ -666,10 +645,10 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, ingestions, media, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, owners, ingestions, provisions, configurations, modules, sensors)
 }
 
-func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, ingestions []*data.Ingestion, media []*data.FieldNoteMedia,
+func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, ingestions []*data.Ingestion,
 	provisions []*data.Provision, configurations []*data.StationConfiguration,
 	modules []*data.StationModule, sensors []*data.ModuleSensor) ([]*data.StationFull, error) {
 	ownersByID := make(map[int32]*data.User)
@@ -695,10 +674,6 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 	for _, v := range ingestions {
 		key := hex.EncodeToString(v.DeviceID)
 		ingestionsByDeviceID[key] = append(ingestionsByDeviceID[key], v)
-	}
-
-	for _, v := range media {
-		mediaByStationID[v.StationID] = append(mediaByStationID[v.StationID], v)
 	}
 
 	stationIDsByProvisionID := make(map[int64]int32)
@@ -740,7 +715,6 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 			Station:        station,
 			Owner:          ownersByID[station.OwnerID],
 			Ingestions:     ingestionsByDeviceID[station.DeviceIDHex()],
-			Media:          mediaByStationID[station.ID],
 			Configurations: configurationsByStationID[station.ID],
 			Modules:        modulesByStationID[station.ID],
 			Sensors:        sensorsByStationID[station.ID],

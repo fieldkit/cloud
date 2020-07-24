@@ -151,8 +151,6 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 		return nil, err
 	}
 
-	webNotes := make([]*notes.FieldNote, 0)
-
 	stationMedia := make([]*notes.NoteMedia, 0)
 	for _, nm := range allNoteMedias {
 		if nm.NoteID == nil {
@@ -165,6 +163,7 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 		}
 	}
 
+	webNotes := make([]*notes.FieldNote, 0)
 	for _, n := range allNotes {
 		media := make([]*notes.NoteMedia, 0)
 		for _, nm := range allNoteMedias {
