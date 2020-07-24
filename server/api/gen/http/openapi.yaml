@@ -814,16 +814,17 @@ paths:
           * `api:access`
       operationId: notes#download media
       parameters:
-      - name: token
-        in: query
-        description: authentication token
-        required: true
-        type: string
       - name: mediaId
         in: path
         required: true
         type: integer
         format: int32
+      - name: Authorization
+        in: header
+        description: authentication token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
       responses:
         "200":
           description: OK response.
@@ -851,7 +852,7 @@ paths:
       schemes:
       - http
       security:
-      - jwt_query_token: []
+      - jwt_header_Authorization: []
   /projects:
     get:
       tags:
@@ -32641,13 +32642,3 @@ securityDefinitions:
         * `api:ingestion`: Ingestion access
     name: Authorization
     in: header
-  jwt_query_token:
-    type: apiKey
-    description: |2-
-
-      **Security Scopes**:
-        * `api:access`: API access
-        * `api:admin`: API admin access
-        * `api:ingestion`: Ingestion access
-    name: token
-    in: query

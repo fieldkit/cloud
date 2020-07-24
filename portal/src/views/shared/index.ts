@@ -9,6 +9,7 @@ import Spinner from "./Spinner.vue";
 import FollowPanel from "./FollowPanel.vue";
 import StationPhoto from "./StationPhoto.vue";
 import ProjectPhoto from "./ProjectPhoto.vue";
+import AuthenticatedPhoto from "./AuthenticatedPhoto.vue";
 
 export default {
     UserPhoto,
@@ -22,4 +23,5 @@ export default {
     FollowPanel,
     StationPhoto,
     ProjectPhoto,
+    AuthenticatedPhoto,
 };

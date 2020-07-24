@@ -155,7 +155,7 @@ var _ = Service("notes", func() {
 				Header("contentType:Content-Type")
 			})
 
-			httpAuthenticationQueryString()
+			httpAuthentication()
 		})
 	})
 

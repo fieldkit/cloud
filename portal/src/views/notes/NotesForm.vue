@@ -18,7 +18,7 @@
             </div>
             <div class="photos">
                 <div class="photo" v-for="photo in photos" v-bind:key="photo.key">
-                    <img :src="makePhotoUrl(photo)" />
+                    <AuthenticatedPhoto :url="photo.url" />
                 </div>
                 <div class="photo" v-for="photo in form.addedPhotos" v-bind:key="photo.key">
                     <img :src="photo.image" />
@@ -39,8 +39,6 @@ import NewPhoto from "../../assets/placeholder_station_thumbnail.png";
 import { required } from "vuelidate/lib/validators";
 
 import { Notes, AddedPhoto, NoteMedia } from "./model";
-
-import { makeAuthenticatedApiUrl } from "@/api/api";
 
 export default Vue.extend({
     name: "NotesForm",
@@ -87,9 +85,6 @@ export default Vue.extend({
         this.form = Notes.createFrom(this.notes);
     },
     methods: {
-        makePhotoUrl(photo) {
-            return makeAuthenticatedApiUrl(photo.url);
-        },
         onSave(this: any) {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {

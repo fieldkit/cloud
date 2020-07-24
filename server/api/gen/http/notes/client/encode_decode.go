@@ -350,9 +350,10 @@ func EncodeDownloadMediaRequest(encoder func(*http.Request) goahttp.Encoder) fun
 		if !ok {
 			return goahttp.ErrInvalidType("notes", "download media", "*notes.DownloadMediaPayload", v)
 		}
-		values := req.URL.Query()
-		values.Add("token", p.Auth)
-		req.URL.RawQuery = values.Encode()
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
 		return nil
 	}
 }
