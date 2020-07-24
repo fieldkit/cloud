@@ -68,7 +68,6 @@ type StationFull struct {
 	Owner              *StationOwner
 	DeviceID           string
 	Uploads            []*StationUpload
-	Images             []*ImageRef
 	Photos             *StationPhotos
 	ReadOnly           bool
 	Battery            *float32
@@ -167,10 +166,6 @@ type StationUpload struct {
 	URL      string
 	Type     string
 	Blocks   []int64
-}
-
-type ImageRef struct {
-	URL string
 }
 
 type StationPhotos struct {
@@ -366,12 +361,6 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 			res.Uploads[i] = transformStationviewsStationUploadViewToStationUpload(val)
 		}
 	}
-	if vres.Images != nil {
-		res.Images = make([]*ImageRef, len(vres.Images))
-		for i, val := range vres.Images {
-			res.Images[i] = transformStationviewsImageRefViewToImageRef(val)
-		}
-	}
 	if vres.Photos != nil {
 		res.Photos = transformStationviewsStationPhotosViewToStationPhotos(vres.Photos)
 	}
@@ -410,12 +399,6 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		vres.Uploads = make([]*stationviews.StationUploadView, len(res.Uploads))
 		for i, val := range res.Uploads {
 			vres.Uploads[i] = transformStationUploadToStationviewsStationUploadView(val)
-		}
-	}
-	if res.Images != nil {
-		vres.Images = make([]*stationviews.ImageRefView, len(res.Images))
-		for i, val := range res.Images {
-			vres.Images[i] = transformImageRefToStationviewsImageRefView(val)
 		}
 	}
 	if res.Photos != nil {
@@ -534,19 +517,6 @@ func transformStationviewsStationUploadViewToStationUpload(v *stationviews.Stati
 		for i, val := range v.Blocks {
 			res.Blocks[i] = val
 		}
-	}
-
-	return res
-}
-
-// transformStationviewsImageRefViewToImageRef builds a value of type *ImageRef
-// from a value of type *stationviews.ImageRefView.
-func transformStationviewsImageRefViewToImageRef(v *stationviews.ImageRefView) *ImageRef {
-	if v == nil {
-		return nil
-	}
-	res := &ImageRef{
-		URL: *v.URL,
 	}
 
 	return res
@@ -715,16 +685,6 @@ func transformStationUploadToStationviewsStationUploadView(v *StationUpload) *st
 		for i, val := range v.Blocks {
 			res.Blocks[i] = val
 		}
-	}
-
-	return res
-}
-
-// transformImageRefToStationviewsImageRefView builds a value of type
-// *stationviews.ImageRefView from a value of type *ImageRef.
-func transformImageRefToStationviewsImageRefView(v *ImageRef) *stationviews.ImageRefView {
-	res := &stationviews.ImageRefView{
-		URL: &v.URL,
 	}
 
 	return res

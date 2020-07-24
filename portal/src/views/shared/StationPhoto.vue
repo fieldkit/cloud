@@ -29,7 +29,7 @@ export default Vue.extend({
     },
     methods: {
         refresh(this: any) {
-            return new FKApi().loadMedia("/stations/" + this.station.id + "/photo").then((photo) => {
+            return new FKApi().loadMedia(this.station.photos.small).then((photo) => {
                 this.photo = photo;
             });
         },

@@ -677,7 +677,7 @@ func UserType(dm *data.User) *user.User {
 
 	if dm.MediaURL != nil {
 		userType.Photo = &user.UserPhoto{
-			URL: makePhotoURL(fmt.Sprintf("/user/%d/media", dm.ID), dm.MediaURL),
+			URL: makeAssetURL(fmt.Sprintf("/user/%d/media", dm.ID), dm.MediaURL),
 		}
 	}
 

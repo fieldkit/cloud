@@ -38,7 +38,6 @@ type AddResponseBody struct {
 	Owner              *StationOwnerResponseBody          `form:"owner" json:"owner" xml:"owner"`
 	DeviceID           string                             `form:"deviceId" json:"deviceId" xml:"deviceId"`
 	Uploads            []*StationUploadResponseBody       `form:"uploads" json:"uploads" xml:"uploads"`
-	Images             []*ImageRefResponseBody            `form:"images" json:"images" xml:"images"`
 	Photos             *StationPhotosResponseBody         `form:"photos" json:"photos" xml:"photos"`
 	ReadOnly           bool                               `form:"readOnly" json:"readOnly" xml:"readOnly"`
 	Battery            *float32                           `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
@@ -63,7 +62,6 @@ type GetResponseBody struct {
 	Owner              *StationOwnerResponseBody          `form:"owner" json:"owner" xml:"owner"`
 	DeviceID           string                             `form:"deviceId" json:"deviceId" xml:"deviceId"`
 	Uploads            []*StationUploadResponseBody       `form:"uploads" json:"uploads" xml:"uploads"`
-	Images             []*ImageRefResponseBody            `form:"images" json:"images" xml:"images"`
 	Photos             *StationPhotosResponseBody         `form:"photos" json:"photos" xml:"photos"`
 	ReadOnly           bool                               `form:"readOnly" json:"readOnly" xml:"readOnly"`
 	Battery            *float32                           `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
@@ -88,7 +86,6 @@ type UpdateResponseBody struct {
 	Owner              *StationOwnerResponseBody          `form:"owner" json:"owner" xml:"owner"`
 	DeviceID           string                             `form:"deviceId" json:"deviceId" xml:"deviceId"`
 	Uploads            []*StationUploadResponseBody       `form:"uploads" json:"uploads" xml:"uploads"`
-	Images             []*ImageRefResponseBody            `form:"images" json:"images" xml:"images"`
 	Photos             *StationPhotosResponseBody         `form:"photos" json:"photos" xml:"photos"`
 	ReadOnly           bool                               `form:"readOnly" json:"readOnly" xml:"readOnly"`
 	Battery            *float32                           `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
@@ -735,11 +732,6 @@ type StationUploadResponseBody struct {
 	Blocks   []int64 `form:"blocks" json:"blocks" xml:"blocks"`
 }
 
-// ImageRefResponseBody is used to define fields on response body types.
-type ImageRefResponseBody struct {
-	URL string `form:"url" json:"url" xml:"url"`
-}
-
 // StationPhotosResponseBody is used to define fields on response body types.
 type StationPhotosResponseBody struct {
 	Small string `form:"small" json:"small" xml:"small"`
@@ -814,7 +806,6 @@ type StationFullResponseBody struct {
 	Owner              *StationOwnerResponseBody          `form:"owner" json:"owner" xml:"owner"`
 	DeviceID           string                             `form:"deviceId" json:"deviceId" xml:"deviceId"`
 	Uploads            []*StationUploadResponseBody       `form:"uploads" json:"uploads" xml:"uploads"`
-	Images             []*ImageRefResponseBody            `form:"images" json:"images" xml:"images"`
 	Photos             *StationPhotosResponseBody         `form:"photos" json:"photos" xml:"photos"`
 	ReadOnly           bool                               `form:"readOnly" json:"readOnly" xml:"readOnly"`
 	Battery            *float32                           `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
@@ -876,12 +867,6 @@ func NewAddResponseBody(res *stationviews.StationFullView) *AddResponseBody {
 			body.Uploads[i] = marshalStationviewsStationUploadViewToStationUploadResponseBody(val)
 		}
 	}
-	if res.Images != nil {
-		body.Images = make([]*ImageRefResponseBody, len(res.Images))
-		for i, val := range res.Images {
-			body.Images[i] = marshalStationviewsImageRefViewToImageRefResponseBody(val)
-		}
-	}
 	if res.Photos != nil {
 		body.Photos = marshalStationviewsStationPhotosViewToStationPhotosResponseBody(res.Photos)
 	}
@@ -922,12 +907,6 @@ func NewGetResponseBody(res *stationviews.StationFullView) *GetResponseBody {
 			body.Uploads[i] = marshalStationviewsStationUploadViewToStationUploadResponseBody(val)
 		}
 	}
-	if res.Images != nil {
-		body.Images = make([]*ImageRefResponseBody, len(res.Images))
-		for i, val := range res.Images {
-			body.Images[i] = marshalStationviewsImageRefViewToImageRefResponseBody(val)
-		}
-	}
 	if res.Photos != nil {
 		body.Photos = marshalStationviewsStationPhotosViewToStationPhotosResponseBody(res.Photos)
 	}
@@ -966,12 +945,6 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 		body.Uploads = make([]*StationUploadResponseBody, len(res.Uploads))
 		for i, val := range res.Uploads {
 			body.Uploads[i] = marshalStationviewsStationUploadViewToStationUploadResponseBody(val)
-		}
-	}
-	if res.Images != nil {
-		body.Images = make([]*ImageRefResponseBody, len(res.Images))
-		for i, val := range res.Images {
-			body.Images[i] = marshalStationviewsImageRefViewToImageRefResponseBody(val)
 		}
 	}
 	if res.Photos != nil {

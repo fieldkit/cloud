@@ -42,7 +42,6 @@ type StationFullView struct {
 	Owner              *StationOwnerView
 	DeviceID           *string
 	Uploads            []*StationUploadView
-	Images             []*ImageRefView
 	Photos             *StationPhotosView
 	ReadOnly           *bool
 	Battery            *float32
@@ -74,11 +73,6 @@ type StationUploadView struct {
 	URL      *string
 	Type     *string
 	Blocks   []int64
-}
-
-// ImageRefView is a type that runs validations on a projected type.
-type ImageRefView struct {
-	URL *string
 }
 
 // StationPhotosView is a type that runs validations on a projected type.
@@ -185,7 +179,6 @@ var (
 			"owner",
 			"deviceId",
 			"uploads",
-			"images",
 			"photos",
 			"readOnly",
 			"battery",
@@ -226,7 +219,6 @@ var (
 			"owner",
 			"deviceId",
 			"uploads",
-			"images",
 			"photos",
 			"readOnly",
 			"battery",
@@ -299,9 +291,6 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	if result.Uploads == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("uploads", "result"))
 	}
-	if result.Images == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("images", "result"))
-	}
 	if result.Photos == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("photos", "result"))
 	}
@@ -322,13 +311,6 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	for _, e := range result.Uploads {
 		if e != nil {
 			if err2 := ValidateStationUploadView(e); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	for _, e := range result.Images {
-		if e != nil {
-			if err2 := ValidateImageRefView(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
 		}
@@ -384,14 +366,6 @@ func ValidateStationUploadView(result *StationUploadView) (err error) {
 	}
 	if result.Blocks == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("blocks", "result"))
-	}
-	return
-}
-
-// ValidateImageRefView runs the validations defined on ImageRefView.
-func ValidateImageRefView(result *ImageRefView) (err error) {
-	if result.URL == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("url", "result"))
 	}
 	return
 }

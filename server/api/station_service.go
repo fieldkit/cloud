@@ -408,16 +408,6 @@ func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *secu
 	})
 }
 
-func transformImages(id int32, from []*data.FieldNoteMedia) (to []*station.ImageRef) {
-	to = make([]*station.ImageRef, 0, len(from))
-	for _, v := range from {
-		to = append(to, &station.ImageRef{
-			URL: fmt.Sprintf("/stations/%d/field-note-media/%d", id, v.ID),
-		})
-	}
-	return to
-}
-
 func transformUploads(from []*data.Ingestion) (to []*station.StationUpload) {
 	to = make([]*station.StationUpload, 0, len(from))
 	for _, v := range from {
@@ -560,13 +550,14 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 
 	configurations := transformConfigurations(sf)
 
+	url := makeSimpleAssetURL(fmt.Sprintf("/stations/%d/photo", sf.Station.ID))
+
 	return &station.StationFull{
 		ID:       sf.Station.ID,
 		Name:     sf.Station.Name,
 		ReadOnly: sp.IsReadOnly(),
 		DeviceID: hex.EncodeToString(sf.Station.DeviceID),
 		Uploads:  transformUploads(sf.Ingestions),
-		Images:   transformImages(sf.Station.ID, sf.Media),
 		Configurations: &station.StationConfigurations{
 			All: configurations,
 		},
@@ -585,7 +576,7 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 			Name: sf.Owner.Name,
 		},
 		Photos: &station.StationPhotos{
-			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
+			Small: url,
 		},
 	}, nil
 }

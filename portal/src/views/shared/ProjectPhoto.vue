@@ -38,7 +38,7 @@ export default Vue.extend({
     methods: {
         refresh(this: any) {
             if (this.project.photo) {
-                return new FKApi().loadMedia("/projects/" + this.project.id + "/media").then((photo) => {
+                return new FKApi().loadMedia(this.project.photo).then((photo) => {
                     this.photo = photo;
                 });
             }

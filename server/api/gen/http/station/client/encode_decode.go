@@ -1229,16 +1229,6 @@ func unmarshalStationUploadResponseBodyToStationviewsStationUploadView(v *Statio
 	return res
 }
 
-// unmarshalImageRefResponseBodyToStationviewsImageRefView builds a value of
-// type *stationviews.ImageRefView from a value of type *ImageRefResponseBody.
-func unmarshalImageRefResponseBodyToStationviewsImageRefView(v *ImageRefResponseBody) *stationviews.ImageRefView {
-	res := &stationviews.ImageRefView{
-		URL: v.URL,
-	}
-
-	return res
-}
-
 // unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView builds a
 // value of type *stationviews.StationPhotosView from a value of type
 // *StationPhotosResponseBody.
@@ -1391,10 +1381,6 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 	res.Uploads = make([]*stationviews.StationUploadView, len(v.Uploads))
 	for i, val := range v.Uploads {
 		res.Uploads[i] = unmarshalStationUploadResponseBodyToStationviewsStationUploadView(val)
-	}
-	res.Images = make([]*stationviews.ImageRefView, len(v.Images))
-	for i, val := range v.Images {
-		res.Images[i] = unmarshalImageRefResponseBodyToStationviewsImageRefView(val)
 	}
 	res.Photos = unmarshalStationPhotosResponseBodyToStationviewsStationPhotosView(v.Photos)
 	res.Configurations = unmarshalStationConfigurationsResponseBodyToStationviewsStationConfigurationsView(v.Configurations)

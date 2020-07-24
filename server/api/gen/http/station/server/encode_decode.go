@@ -1024,16 +1024,6 @@ func marshalStationviewsStationUploadViewToStationUploadResponseBody(v *stationv
 	return res
 }
 
-// marshalStationviewsImageRefViewToImageRefResponseBody builds a value of type
-// *ImageRefResponseBody from a value of type *stationviews.ImageRefView.
-func marshalStationviewsImageRefViewToImageRefResponseBody(v *stationviews.ImageRefView) *ImageRefResponseBody {
-	res := &ImageRefResponseBody{
-		URL: *v.URL,
-	}
-
-	return res
-}
-
 // marshalStationviewsStationPhotosViewToStationPhotosResponseBody builds a
 // value of type *StationPhotosResponseBody from a value of type
 // *stationviews.StationPhotosView.
@@ -1197,12 +1187,6 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 		res.Uploads = make([]*StationUploadResponseBody, len(v.Uploads))
 		for i, val := range v.Uploads {
 			res.Uploads[i] = marshalStationviewsStationUploadViewToStationUploadResponseBody(val)
-		}
-	}
-	if v.Images != nil {
-		res.Images = make([]*ImageRefResponseBody, len(v.Images))
-		for i, val := range v.Images {
-			res.Images[i] = marshalStationviewsImageRefViewToImageRefResponseBody(val)
 		}
 	}
 	if v.Photos != nil {

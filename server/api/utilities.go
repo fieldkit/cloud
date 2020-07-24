@@ -24,7 +24,11 @@ func smartCrop(original image.Image, cropX, cropY uint) (i image.Image, err erro
 	return thumb, nil
 }
 
-func makePhotoURL(url string, actual *string) *string {
+func makeSimpleAssetURL(url string) string {
+	return fmt.Sprintf("%s", url)
+}
+
+func makeAssetURL(url string, actual *string) *string {
 	if actual == nil {
 		return nil
 	}

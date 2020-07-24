@@ -98,10 +98,9 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("owner", Owner)
 		Attribute("deviceId", String)
 		Attribute("uploads", ArrayOf(StationUpload))
-		Attribute("images", ArrayOf(StationFullImageRef))
 		Attribute("photos", StationFullPhotos)
 		Attribute("readOnly", Boolean)
-		Required("id", "name", "owner", "deviceId", "uploads", "images", "photos", "readOnly")
+		Required("id", "name", "owner", "deviceId", "uploads", "photos", "readOnly")
 
 		Attribute("battery", Float32)
 		Attribute("recordingStartedAt", Int64)
@@ -125,7 +124,6 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("owner")
 		Attribute("deviceId")
 		Attribute("uploads")
-		Attribute("images")
 		Attribute("photos")
 		Attribute("readOnly")
 

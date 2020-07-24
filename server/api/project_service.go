@@ -757,7 +757,7 @@ func ProjectType(dm *data.Project, numberOfFollowers int32, userRelationship *da
 		Location:    dm.Location,
 		Tags:        dm.Tags,
 		Private:     dm.Private,
-		Photo:       makePhotoURL(fmt.Sprintf("/projects/%d/media", dm.ID), dm.MediaURL),
+		Photo:       makeAssetURL(fmt.Sprintf("/projects/%d/media", dm.ID), dm.MediaURL),
 		ReadOnly:    role.IsProjectReadOnly(),
 		Following: &project.ProjectFollowing{
 			Total:     numberOfFollowers,
