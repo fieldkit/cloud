@@ -210,8 +210,8 @@ const getters = {
             .keyBy((p) => p.project.id)
             .value();
     },
-    stationsById(state: StationsState): { [index: number]: Station } {
-        return _.keyBy(state.stations, (p) => p.id);
+    stationsById(state: StationsState): { [index: number]: DisplayStation } {
+        return { ...state.stations, ...state.user.stations };
     },
     mapped(state: StationsState): MappedStations {
         return new MappedStations(Object.values(state.stations));
@@ -398,11 +398,9 @@ const mutations = {
         Vue.set(state.projectFollowers, payload.projectId, payload.followers);
     },
     [PROJECT_STATIONS]: (state: StationsState, payload: { projectId: number; stations: Station[] }) => {
-        Vue.set(
-            state.projectStations,
-            payload.projectId,
-            payload.stations.map((s) => new DisplayStation(s))
-        );
+        const projectStations = payload.stations.map((s) => new DisplayStation(s));
+        state.stations = { ...state.stations, ..._.keyBy(projectStations, (s) => s.id) };
+        Vue.set(state.projectStations, payload.projectId, projectStations);
     },
     [PROJECT_ACTIVITY]: (state: StationsState, payload: { projectId: number; activities: Activity[] }) => {
         Vue.set(state.projectActivities, payload.projectId, payload.activities);
