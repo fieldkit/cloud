@@ -174,7 +174,7 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 		return nil, err
 	}
 
-	return transformStationFull(p, sf)
+	return transformStationFull(c.options.signer, p, sf)
 }
 
 func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
@@ -231,7 +231,7 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(p, sfs)
+	stations, err := transformAllStationFull(c.options.signer, p, sfs)
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +259,7 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(p, sfs)
+	stations, err := transformAllStationFull(c.options.signer, p, sfs)
 	if err != nil {
 		return nil, err
 	}
@@ -542,7 +542,7 @@ func transformLocation(sf *data.StationFull) *station.StationLocation {
 	return nil
 }
 
-func transformStationFull(p Permissions, sf *data.StationFull) (*station.StationFull, error) {
+func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull) (*station.StationFull, error) {
 	sp, err := p.ForStation(sf.Station)
 	if err != nil {
 		return nil, err
@@ -550,7 +550,7 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 
 	configurations := transformConfigurations(sf)
 
-	url := makeSimpleAssetURL(fmt.Sprintf("/stations/%d/photo", sf.Station.ID))
+	url := signer.SignURL(fmt.Sprintf("/stations/%d/photo", sf.Station.ID))
 
 	return &station.StationFull{
 		ID:       sf.Station.ID,
@@ -581,11 +581,11 @@ func transformStationFull(p Permissions, sf *data.StationFull) (*station.Station
 	}, nil
 }
 
-func transformAllStationFull(p Permissions, sfs []*data.StationFull) ([]*station.StationFull, error) {
+func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull) ([]*station.StationFull, error) {
 	stations := make([]*station.StationFull, 0)
 
 	for _, sf := range sfs {
-		after, err := transformStationFull(p, sf)
+		after, err := transformStationFull(signer, p, sf)
 		if err != nil {
 			return nil, err
 		}

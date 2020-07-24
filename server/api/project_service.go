@@ -80,7 +80,7 @@ func (c *ProjectService) Add(ctx context.Context, payload *project.AddPayload) (
 		MemberRole: data.AdministratorRole.ID,
 	}
 
-	return ProjectType(newProject, 0, relationship), nil
+	return ProjectType(c.options.signer, newProject, 0, relationship), nil
 }
 
 func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayload) (*project.Project, error) {
@@ -140,7 +140,7 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 		MemberRole: data.AdministratorRole.ID,
 	}
 
-	return ProjectType(updating, 0, relationship), nil
+	return ProjectType(c.options.signer, updating, 0, relationship), nil
 }
 
 func (c *ProjectService) AddStation(ctx context.Context, payload *project.AddStationPayload) error {
@@ -216,7 +216,7 @@ func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (
 		followers = followerSummaries[0].Followers
 	}
 
-	return ProjectType(getting, followers, relationships[getting.ID]), nil
+	return ProjectType(c.options.signer, getting, followers, relationships[getting.ID]), nil
 }
 
 func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.ListCommunityPayload) (*project.Projects, error) {
@@ -246,7 +246,7 @@ func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.Lis
 		return nil, err
 	}
 
-	return ProjectsType(projects, followers, relationships), nil
+	return ProjectsType(c.options.signer, projects, followers, relationships), nil
 }
 
 func (c *ProjectService) ListMine(ctx context.Context, payload *project.ListMinePayload) (*project.Projects, error) {
@@ -276,7 +276,7 @@ func (c *ProjectService) ListMine(ctx context.Context, payload *project.ListMine
 		return nil, err
 	}
 
-	return ProjectsType(projects, followers, relationships), nil
+	return ProjectsType(c.options.signer, projects, followers, relationships), nil
 }
 
 func (c *ProjectService) Invite(ctx context.Context, payload *project.InvitePayload) error {
@@ -746,9 +746,10 @@ func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *secu
 	})
 }
 
-func ProjectType(dm *data.Project, numberOfFollowers int32, userRelationship *data.UserProjectRelationship) *project.Project {
+func ProjectType(signer *Signer, dm *data.Project, numberOfFollowers int32, userRelationship *data.UserProjectRelationship) *project.Project {
 	role := userRelationship.LookupRole()
 
+	photo := signer.SignAndBustURL(fmt.Sprintf("/projects/%d/media", dm.ID), dm.MediaURL)
 	wm := &project.Project{
 		ID:          dm.ID,
 		Name:        dm.Name,
@@ -757,7 +758,7 @@ func ProjectType(dm *data.Project, numberOfFollowers int32, userRelationship *da
 		Location:    dm.Location,
 		Tags:        dm.Tags,
 		Private:     dm.Private,
-		Photo:       makeAssetURL(fmt.Sprintf("/projects/%d/media", dm.ID), dm.MediaURL),
+		Photo:       photo,
 		ReadOnly:    role.IsProjectReadOnly(),
 		Following: &project.ProjectFollowing{
 			Total:     numberOfFollowers,
@@ -787,14 +788,14 @@ func findNumberOfFollowers(followers []*data.FollowersSummary, id int32) int32 {
 	return 0
 }
 
-func ProjectsType(projects []*data.Project, followers []*data.FollowersSummary, relationships map[int32]*data.UserProjectRelationship) *project.Projects {
+func ProjectsType(signer *Signer, projects []*data.Project, followers []*data.FollowersSummary, relationships map[int32]*data.UserProjectRelationship) *project.Projects {
 	projectsCollection := make([]*project.Project, len(projects))
 	for i, project := range projects {
 		numberOfFollowers := findNumberOfFollowers(followers, project.ID)
 		if rel, ok := relationships[project.ID]; ok {
-			projectsCollection[i] = ProjectType(project, numberOfFollowers, rel)
+			projectsCollection[i] = ProjectType(signer, project, numberOfFollowers, rel)
 		} else {
-			projectsCollection[i] = ProjectType(project, numberOfFollowers, &data.UserProjectRelationship{})
+			projectsCollection[i] = ProjectType(signer, project, numberOfFollowers, &data.UserProjectRelationship{})
 		}
 	}
 

@@ -53,3 +53,24 @@ func tryParseDate(s *string) (time.Time, error) {
 	}
 	return time.Time{}, fmt.Errorf("parsing failed")
 }
+
+type Signer struct {
+	key []byte
+}
+
+func NewSigner(key []byte) (s *Signer) {
+	return &Signer{
+		key: key,
+	}
+}
+
+func (s *Signer) SignURL(url string) string {
+	return url
+}
+
+func (s *Signer) SignAndBustURL(url string, key *string) *string {
+	if key == nil {
+		return nil
+	}
+	return &url
+}

@@ -130,7 +130,7 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 		byID[user.ID] = &notes.FieldNoteAuthor{
 			ID:       user.ID,
 			Name:     user.Name,
-			MediaURL: makeSimpleAssetURL(fmt.Sprintf("/user/%d/media", user.ID)),
+			MediaURL: s.options.signer.SignURL(fmt.Sprintf("/user/%d/media", user.ID)),
 		}
 	}
 
@@ -157,7 +157,7 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 			stationMedia = append(stationMedia, &notes.NoteMedia{
 				ID:          nm.ID,
 				ContentType: nm.ContentType,
-				URL:         *makeAssetURL(fmt.Sprintf("/notes/media/%d", nm.ID), &nm.URL),
+				URL:         s.options.signer.SignURL(fmt.Sprintf("/notes/media/%d", nm.ID)),
 				Key:         nm.Key,
 			})
 		}
@@ -171,7 +171,7 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 				media = append(media, &notes.NoteMedia{
 					ID:          nm.ID,
 					ContentType: nm.ContentType,
-					URL:         *makeAssetURL(fmt.Sprintf("/notes/media/%d", nm.ID), &nm.URL),
+					URL:         s.options.signer.SignURL(fmt.Sprintf("/notes/media/%d", nm.ID)),
 					Key:         nm.Key,
 				})
 			}
@@ -251,7 +251,7 @@ func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMed
 		ID:          media.ID,
 		Key:         media.Key,
 		ContentType: media.ContentType,
-		URL:         *makeAssetURL(fmt.Sprintf("/notes/media/%d", media.ID), &media.URL),
+		URL:         s.options.signer.SignURL(fmt.Sprintf("/notes/media/%d", media.ID)),
 	}, nil
 }
 

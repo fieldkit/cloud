@@ -36,6 +36,7 @@ type ControllerOptions struct {
 	ConsumerSecret string
 
 	// Services
+	signer    *Signer
 	locations *data.DescribeLocations
 }
 
@@ -65,8 +66,8 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 		Config:       config,
 		Publisher:    publisher,
 		MediaFiles:   mediaFiles,
-
-		locations: locations,
+		signer:       NewSigner(jwtHMACKey),
+		locations:    locations,
 	}
 
 	return
