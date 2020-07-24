@@ -28,7 +28,14 @@
                                     Saved.
                                 </div>
                             </div>
+                            <NotesViewer
+                                :station="selectedStation"
+                                :notes="selectedNotes"
+                                v-bind:key="stationId"
+                                v-if="project.project.readOnly"
+                            />
                             <NotesForm
+                                v-else
                                 :station="selectedStation"
                                 :notes="selectedNotes"
                                 @save="saveForm"
@@ -54,6 +61,7 @@ import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 import StationTabs from "./StationTabs.vue";
 import NotesForm from "./NotesForm.vue";
+import NotesViewer from "./NotesViewer.vue";
 
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
@@ -72,6 +80,7 @@ export default Vue.extend({
         StandardLayout,
         StationTabs,
         NotesForm,
+        NotesViewer,
     },
     props: {
         projectId: {
