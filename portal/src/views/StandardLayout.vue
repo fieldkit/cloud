@@ -4,6 +4,7 @@
             <SidebarNav
                 :viewingStations="viewingStations"
                 :viewingProjects="viewingProjects"
+                :viewingProject="viewingProject"
                 :isAuthenticated="isAuthenticated"
                 :stations="stations"
                 :projects="userProjects"
@@ -40,6 +41,10 @@ export default Vue.extend({
         viewingProjects: {
             type: Boolean,
             default: false,
+        },
+        viewingProject: {
+            type: Object,
+            default: null,
         },
         viewingStations: {
             type: Boolean,

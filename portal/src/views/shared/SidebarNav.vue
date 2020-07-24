@@ -11,13 +11,17 @@
                     <router-link :to="{ name: 'projects' }">
                         <div class="nav-label">
                             <img alt="Projects" src="@/assets/Icon_Projects_blue.png" />
-                            <span :class="viewingProjects ? 'selected' : 'unselected'">
+                            <span v-bind:class="{ selected: viewingProjects }">
                                 Projects
                             </span>
                         </div>
                     </router-link>
                     <div v-for="project in projects" v-bind:key="project.id">
-                        <router-link :to="{ name: 'viewProject', params: { id: project.id } }" class="project-link">
+                        <router-link
+                            :to="{ name: 'viewProject', params: { id: project.id } }"
+                            class="project-link"
+                            v-bind:class="{ selected: viewingProject && viewingProject.id === project.id }"
+                        >
                             {{ project.name }}
                         </router-link>
                     </div>
@@ -27,7 +31,7 @@
                     <router-link :to="{ name: 'stations' }">
                         <div class="nav-label">
                             <img alt="Stations" src="@/assets/Icon_Station_blue.png" />
-                            <span :class="viewingStations ? 'selected' : 'unselected'">
+                            <span v-bind:class="{ selected: viewingStations }">
                                 Stations
                             </span>
                         </div>
@@ -55,6 +59,7 @@
 export default {
     name: "SidebarNav",
     props: {
+        viewingProject: { type: Object, default: null },
         viewingProjects: { default: false },
         viewingStations: { default: false },
         isAuthenticated: { required: true },

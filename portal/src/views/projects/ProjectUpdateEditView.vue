@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout :viewingProjects="true">
+    <StandardLayout :viewingProjects="true" :viewingProject="project">
         <div class="main-panel" v-show="!loading && isAuthenticated">
             <router-link :to="{ name: 'viewProject', params: { id: project.id } }" v-if="project">
                 <div class="projects-link">

@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout :viewingProjects="true">
+    <StandardLayout :viewingProjects="true" :viewingProject="activeProject">
         <div class="main-panel" v-if="!loading">
             <ProjectForm :project="activeProject" @updating="onProjectUpdate" />
         </div>

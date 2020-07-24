@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout :viewingProjects="true">
+    <StandardLayout :viewingProjects="true" :viewingProject="displayProject">
         <div class="project-view" v-if="displayProject">
             <DoubleHeader
                 :title="displayProject.name"
