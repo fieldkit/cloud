@@ -303,7 +303,7 @@ class FKApi {
                 if (response.status === 401) {
                     if (params.refreshed !== true) {
                         // NOTE I'd like a better way to test for this.
-                        if (response.data && response.data.detail && response.data.detail.indexOf("expired") >= 0) {
+                        if (response.data && response.data.message && response.data.message.indexOf("token") >= 0) {
                             console.log("api: token expired");
                             return this.refreshExpiredToken(params);
                         }
@@ -336,7 +336,7 @@ class FKApi {
     private refreshExpiredToken(original) {
         const parsed = this.parseToken(this.token.getHeader());
         const requestBody = {
-            refresh_token: parsed.refresh_token, // eslint-disable-line
+            refreshToken: parsed.refresh_token, // eslint-disable-line
         };
 
         console.log("api: refreshing");
@@ -348,7 +348,6 @@ class FKApi {
             (response) => {
                 return this.handleLogin(response).then(() => {
                     console.log("api: retry original");
-                    original.headers.Authorization = this.token.getHeader();
                     return this.invoke(_.extend({ refreshed: true }, original));
                 });
             },
