@@ -149,7 +149,7 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 		return nil, err
 	}
 
-	return UserType(s.options.signer, user), nil
+	return UserType(s.options.signer, user)
 }
 
 func (s *UserService) Update(ctx context.Context, payload *user.UpdatePayload) (*user.User, error) {
@@ -166,7 +166,7 @@ func (s *UserService) Update(ctx context.Context, payload *user.UpdatePayload) (
 		return nil, err
 	}
 
-	return UserType(s.options.signer, user), nil
+	return UserType(s.options.signer, user)
 }
 
 func (s *UserService) ChangePassword(ctx context.Context, payload *user.ChangePasswordPayload) (*user.User, error) {
@@ -210,7 +210,7 @@ func (s *UserService) ChangePassword(ctx context.Context, payload *user.ChangePa
 		return nil, err
 	}
 
-	return UserType(s.options.signer, updating), nil
+	return UserType(s.options.signer, updating)
 }
 
 func (s *UserService) GetCurrent(ctx context.Context, payload *user.GetCurrentPayload) (*user.User, error) {
@@ -231,7 +231,7 @@ func (s *UserService) GetCurrent(ctx context.Context, payload *user.GetCurrentPa
 
 	log.Infow("user", "user_id", p.UserID(), "email", currentUser.Email)
 
-	return UserType(s.options.signer, currentUser), nil
+	return UserType(s.options.signer, currentUser)
 }
 
 func (s *UserService) ListByProject(ctx context.Context, payload *user.ListByProjectPayload) (*user.ProjectUsers, error) {
@@ -249,7 +249,7 @@ func (s *UserService) ListByProject(ctx context.Context, payload *user.ListByPro
 		return nil, err
 	}
 
-	return ProjectUsersType(s.options.signer, users, invites), nil
+	return ProjectUsersType(s.options.signer, users, invites)
 }
 
 func (s *UserService) ProjectRoles(ctx context.Context) (user.ProjectRoleCollection, error) {
@@ -666,7 +666,7 @@ func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *securit
 	})
 }
 
-func UserType(signer *Signer, dm *data.User) *user.User {
+func UserType(signer *Signer, dm *data.User) (*user.User, error) {
 	userType := &user.User{
 		ID:    dm.ID,
 		Name:  dm.Name,
@@ -676,27 +676,38 @@ func UserType(signer *Signer, dm *data.User) *user.User {
 	}
 
 	if dm.MediaURL != nil {
-		url := signer.SignAndBustURL(fmt.Sprintf("/user/%d/media", dm.ID), dm.MediaURL)
+		url, err := signer.SignAndBustURL(fmt.Sprintf("/user/%d/media", dm.ID), dm.MediaURL)
+		if err != nil {
+			return nil, err
+		}
 		userType.Photo = &user.UserPhoto{
 			URL: url,
 		}
 	}
 
-	return userType
+	return userType, nil
 }
 
-func ProjectUserType(signer *Signer, dm *data.ProjectUserAndUser) *user.ProjectUser {
+func ProjectUserType(signer *Signer, dm *data.ProjectUserAndUser) (*user.ProjectUser, error) {
+	userWm, err := UserType(signer, &dm.User)
+	if err != nil {
+		return nil, err
+	}
 	return &user.ProjectUser{
-		User:       UserType(signer, &dm.User),
+		User:       userWm,
 		Role:       dm.RoleName(),
 		Membership: data.MembershipAccepted,
-	}
+	}, nil
 }
 
-func ProjectUsersType(signer *Signer, users []*data.ProjectUserAndUser, invites []*data.ProjectInvite) *user.ProjectUsers {
+func ProjectUsersType(signer *Signer, users []*data.ProjectUserAndUser, invites []*data.ProjectInvite) (*user.ProjectUsers, error) {
 	usersCollection := make([]*user.ProjectUser, 0, len(users)+len(invites))
 	for _, dm := range users {
-		usersCollection = append(usersCollection, ProjectUserType(signer, dm))
+		pu, err := ProjectUserType(signer, dm)
+		if err != nil {
+			return nil, err
+		}
+		usersCollection = append(usersCollection, pu)
 	}
 	for _, invite := range invites {
 		membership := data.MembershipPending
@@ -715,7 +726,7 @@ func ProjectUsersType(signer *Signer, users []*data.ProjectUserAndUser, invites 
 
 	return &user.ProjectUsers{
 		Users: usersCollection,
-	}
+	}, nil
 }
 
 func (s *UserService) userExists(ctx context.Context, email string) (bool, error) {

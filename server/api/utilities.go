@@ -8,6 +8,8 @@ import (
 
 	"image"
 
+	jwtgo "github.com/dgrijalva/jwt-go"
+
 	"github.com/muesli/smartcrop"
 	"github.com/muesli/smartcrop/nfnt"
 )
@@ -64,13 +66,33 @@ func NewSigner(key []byte) (s *Signer) {
 	}
 }
 
-func (s *Signer) SignURL(url string) string {
-	return url
+func (s *Signer) SignURL(url string) (string, error) {
+	if true {
+		return url, nil
+	}
+	now := time.Now()
+	token := jwtgo.New(jwtgo.SigningMethodHS512)
+	token.Claims = jwtgo.MapClaims{
+		"exp": now.Add(time.Hour * 1).Unix(),
+	}
+
+	signed, err := token.SignedString(s.key)
+	if err != nil {
+		return "", err
+	}
+
+	return url + "?token=" + signed, nil
 }
 
-func (s *Signer) SignAndBustURL(url string, key *string) *string {
+func (s *Signer) SignAndBustURL(url string, key *string) (*string, error) {
 	if key == nil {
-		return nil
+		return nil, nil
 	}
-	return &url
+
+	signed, err := s.SignURL(url)
+	if err != nil {
+		return nil, err
+	}
+
+	return &signed, nil
 }

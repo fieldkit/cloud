@@ -550,7 +550,10 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull) (
 
 	configurations := transformConfigurations(sf)
 
-	url := signer.SignURL(fmt.Sprintf("/stations/%d/photo", sf.Station.ID))
+	url, err := signer.SignURL(fmt.Sprintf("/stations/%d/photo", sf.Station.ID))
+	if err != nil {
+		return nil, err
+	}
 
 	return &station.StationFull{
 		ID:       sf.Station.ID,
