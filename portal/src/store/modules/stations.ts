@@ -287,7 +287,7 @@ const actions = {
     ) => {
         commit(MutationTypes.LOADING, { stations: true });
 
-        const [station] = await Promise.all([new FKApi().getStationFromVuex(payload.id)]);
+        const [station] = await Promise.all([new FKApi().getStation(payload.id)]);
 
         commit(STATION_UPDATE, station);
 

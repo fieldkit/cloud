@@ -5,13 +5,21 @@
 </template>
 
 <script>
-import * as ActionTypes from "./store/actions";
+import * as ActionTypes from "@/store/actions";
+import { AuthenticationRequiredError } from "@/api/api";
 
 export default {
     mounted() {
         return this.$store.dispatch(ActionTypes.INITIALIZE).catch((err) => {
             console.log("initialize error", err, err.stack);
         });
+    },
+    errorCaptured(err, vm, info) {
+        if (err instanceof AuthenticationRequiredError) {
+            this.$router.push({ name: "login", query: { after: this.$route.path } });
+            return false;
+        }
+        return true;
     },
 };
 </script>

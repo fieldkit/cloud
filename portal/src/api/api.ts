@@ -19,17 +19,23 @@ export class ApiUnexpectedStatus extends ApiError {
 }
 
 export class TokenError extends ApiError {
-    authenticated: boolean;
-
     constructor(message) {
         super(message);
         this.name = "TokenError";
     }
 }
 
+export class AuthenticationRequiredError extends TokenError {
+    constructor() {
+        super("authentication required");
+        this.name = "AuthenticationRequiredError";
+    }
+}
+
 export class MissingTokenError extends TokenError {
     constructor() {
         super("missing token");
+        this.name = "MissingTokenError";
     }
 }
 
@@ -267,15 +273,15 @@ class FKApi {
         const headers = {
             "Content-Type": "application/json",
         };
-        if (params.auth == Auth.Optional) {
-            if (this.token.authenticated) {
+        if (params.auth === Auth.Optional) {
+            if (this.token.authenticated()) {
                 const token = this.token.getHeader();
                 headers["Authorization"] = token;
             }
         }
-        if (params.auth == Auth.Required) {
-            if (!this.token.authenticated) {
-                throw new TokenError("no token");
+        if (params.auth === Auth.Required) {
+            if (!this.token.authenticated()) {
+                throw new AuthenticationRequiredError();
             }
             const token = this.token.getHeader();
             headers["Authorization"] = token;
@@ -335,6 +341,10 @@ class FKApi {
 
     private refreshExpiredToken(original) {
         const parsed = this.parseToken(this.token.getHeader());
+        if (!parsed) {
+            return this.logout().then(() => Promise.reject(new AuthenticationRequiredError()));
+        }
+
         const requestBody = {
             refreshToken: parsed.refresh_token, // eslint-disable-line
         };
@@ -443,19 +453,11 @@ class FKApi {
         });
     }
 
-    getStationFromVuex(id): Promise<Station> {
-        return this.invoke({
-            auth: Auth.Required,
-            method: "GET",
-            url: this.baseUrl + "/stations/" + id,
-        });
-    }
-
     getStation(id): Promise<Station> {
         return this.invoke({
             auth: Auth.Required,
             method: "GET",
-            url: this.baseUrl + "/stations/@/" + id,
+            url: this.baseUrl + "/stations/" + id,
         });
     }
 
