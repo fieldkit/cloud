@@ -729,6 +729,17 @@ func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.Dow
 		return nil, nil, project.MakeNotFound(errors.New("not found"))
 	}
 
+	if payload.Size != nil {
+		resized, err := resizeLoadedMedia(ctx, lm, uint(*payload.Size), 0)
+		if err != nil {
+			return nil, nil, err
+		}
+		return &project.DownloadPhotoResult{
+			Length:      resized.Size,
+			ContentType: resized.ContentType,
+		}, ioutil.NopCloser(resized.Body), nil
+	}
+
 	return &project.DownloadPhotoResult{
 		Length:      int64(lm.Size),
 		ContentType: *resource.MediaContentType,

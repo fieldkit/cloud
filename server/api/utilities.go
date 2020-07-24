@@ -1,18 +1,56 @@
 package api
 
 import (
+	"bytes"
+	"context"
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"time"
 
 	"image"
+	"image/jpeg"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
 
 	"github.com/muesli/smartcrop"
 	"github.com/muesli/smartcrop/nfnt"
+
+	"github.com/fieldkit/cloud/server/backend/repositories"
 )
+
+type ResizedImage struct {
+	Size        int64
+	ContentType string
+	Body        io.Reader
+	Data        []byte
+}
+
+func resizeLoadedMedia(ctx context.Context, lm *repositories.LoadedMedia, newWidth, newHeight uint) (resized *ResizedImage, err error) {
+	original, _, err := image.Decode(lm.Reader)
+	if err != nil {
+		return nil, err
+	}
+
+	resizer := nfnt.NewDefaultResizer()
+	smaller := resizer.Resize(original, newWidth, newHeight)
+
+	var buff bytes.Buffer
+
+	jpeg.Encode(&buff, smaller, &jpeg.Options{
+		Quality: 90,
+	})
+
+	resized = &ResizedImage{
+		ContentType: "image/jpg",
+		Size:        int64(buff.Len()),
+		Body:        bytes.NewReader(buff.Bytes()),
+		Data:        buff.Bytes(),
+	}
+
+	return
+}
 
 func smartCrop(original image.Image, cropX, cropY uint) (i image.Image, err error) {
 	resizer := nfnt.NewDefaultResizer()
