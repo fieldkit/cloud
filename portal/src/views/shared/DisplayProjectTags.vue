@@ -33,18 +33,12 @@ export default Vue.extend({
     align-items: baseline;
 }
 .project-tag {
-    /*
-    color: white;
-    padding: 5px;
-    margin-right: 5px;
-	margin-bottom: 5px;
-	*/
-    background-color: #0a67aa;
-    color: #fff;
-    border-radius: 2px;
+    background-color: #f4f5f7;
+    color: #2c3e50;
+    font-size: 13px;
+    border-radius: 10px;
     display: flex;
-    padding: 3px 5px;
+    padding: 6px 10px;
     margin: 2px;
-    font-size: 0.85em;
 }
 </style>
