@@ -235,7 +235,7 @@ func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMed
 	}
 
 	mr := repositories.NewMediaRepository(s.options.MediaFiles)
-	saved, err := mr.SaveFromService(ctx, body, payload.ContentLength)
+	saved, err := mr.Save(ctx, body, payload.ContentLength)
 	if err != nil {
 		return nil, err
 	}
