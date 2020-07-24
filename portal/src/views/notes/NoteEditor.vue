@@ -11,7 +11,7 @@
             <div class="audio-title">
                 {{ audio.key }}
             </div>
-            <VueAudio :file="makeAudioUrl(audio)" />
+            <AudioPlayer :url="audio.url" />
         </div>
     </div>
 </template>
@@ -19,11 +19,7 @@
 <script lang="ts">
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
-import VueAudio from "vue-audio";
-
-import { required } from "vuelidate/lib/validators";
-
-import FKApi, { makeAuthenticatedApiUrl } from "@/api/api";
+import AudioPlayer from "./AudioPlayer.vue";
 
 export default Vue.extend({
     model: {
@@ -33,7 +29,7 @@ export default Vue.extend({
     name: "NoteEditor",
     components: {
         ...CommonComponents,
-        VueAudio,
+        AudioPlayer,
     },
     props: {
         readOnly: {
@@ -57,11 +53,6 @@ export default Vue.extend({
             set(this: any, value) {
                 this.$emit("change", this.note.withBody(value));
             },
-        },
-    },
-    methods: {
-        makeAudioUrl(audio) {
-            return makeAuthenticatedApiUrl(audio.url);
         },
     },
 });
