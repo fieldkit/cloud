@@ -1,7 +1,7 @@
 <template>
     <StandardLayout @sidebar-toggle="onSidebarToggle" :viewingStations="true">
         <div class="container-map">
-            <StationsMap @show-summary="showSummary" :mapped="mapped" :layoutChanges="layoutChanges" />
+            <StationsMap @show-summary="showSummary" :mapped="mapped" :layoutChanges="layoutChanges" v-if="mapped" />
             <StationSummary
                 v-if="activeStation"
                 class="summary-container"

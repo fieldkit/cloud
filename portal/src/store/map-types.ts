@@ -32,17 +32,17 @@ export class Location implements HasLocation {
 export class BoundingRectangle {
     constructor(public min: Location | null = null, public max: Location | null = null) {}
 
-    empty(): boolean {
+    public empty(): boolean {
         return this.min == null || this.max == null;
     }
 
-    include(l: Location): BoundingRectangle {
+    public include(l: Location): BoundingRectangle {
         this.min = this.min == null ? l.clone() : this.min.minimum(l);
         this.max = this.max == null ? l.clone() : this.max.maximum(l);
         return this;
     }
 
-    contains(l: Location): boolean {
+    public contains(l: Location): boolean {
         if (this.min == null || this.max == null) {
             return false;
         }
@@ -54,25 +54,21 @@ export class BoundingRectangle {
         );
     }
 
-    isEmpty(): boolean {
+    public isEmpty(): boolean {
         return this.min == null || this.max == null;
     }
 
-    expandIfSingleCoordinate(defaultCenter: Location, margin: number): BoundingRectangle {
+    public zoomOutOrAround(defaultCenter: Location, margin: number): BoundingRectangle {
         if (this.isEmpty()) {
             return BoundingRectangle.around(defaultCenter, margin);
         }
         if (this.isSingleCoordinate()) {
             return BoundingRectangle.around(this.min, margin);
         }
-        return this;
+        return this.zoomOut(margin);
     }
 
-    isSingleCoordinate(): boolean {
-        return this.min.latitude == this.max.latitude || this.max.longitude == this.max.longitude;
-    }
-
-    static around(center: Location, margin: number) {
+    public zoomOut(margin: number): BoundingRectangle {
         /*
 		At 38 degrees North latitude:
 		One degree of latitude equals approximately 364,000 feet (69
@@ -87,9 +83,27 @@ export class BoundingRectangle {
         const FeetPerLongitude = 288200; /* ft per degree */
         const latitudeMargin = margin / FeetPerLatitude;
         const longitudeMargin = margin / FeetPerLongitude;
-        const min = new Location(center.latitude - latitudeMargin, center.longitude - longitudeMargin);
-        const max = new Location(center.latitude + latitudeMargin, center.longitude + longitudeMargin);
+        const min = new Location(this.min.latitude - latitudeMargin, this.min.longitude - longitudeMargin);
+        const max = new Location(this.max.latitude + latitudeMargin, this.max.longitude + longitudeMargin);
         return new BoundingRectangle(min, max);
+    }
+
+    public expandIfSingleCoordinate(defaultCenter: Location, margin: number): BoundingRectangle {
+        if (this.isEmpty()) {
+            return BoundingRectangle.around(defaultCenter, margin);
+        }
+        if (this.isSingleCoordinate()) {
+            return BoundingRectangle.around(this.min, margin);
+        }
+        return this;
+    }
+
+    public isSingleCoordinate(): boolean {
+        return this.min.latitude === this.max.latitude || this.min.longitude === this.max.longitude;
+    }
+
+    public static around(center: Location, margin: number) {
+        return new BoundingRectangle(center, center).zoomOut(margin);
     }
 }
 

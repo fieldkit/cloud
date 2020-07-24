@@ -48,6 +48,7 @@ export class StationsState {
     } = {
         projects: {},
     };
+    mapped: MappedStations | null = null;
 }
 
 export function whenWasStationUpdated(station: Station): Date {
@@ -146,8 +147,14 @@ export class MappedStations {
         const around = located.reduce((bb, station) => bb.include(station.location), new BoundingRectangle());
         const feetAround = located.length > 0 ? 1000 : 100000;
 
-        this.bounds = around.expandIfSingleCoordinate(DefaultLocation, feetAround);
+        this.bounds = around.zoomOutOrAround(DefaultLocation, feetAround);
         this.features = located.map((ds) => new MapFeature(ds));
+
+        console.log(
+            "map: stations",
+            located.map((s) => s.location)
+        );
+        console.log("map: bounds", this.bounds);
     }
 
     get valid(): boolean {
@@ -213,8 +220,8 @@ const getters = {
     stationsById(state: StationsState): { [index: number]: DisplayStation } {
         return { ...state.stations, ...state.user.stations };
     },
-    mapped(state: StationsState): MappedStations {
-        return new MappedStations(Object.values(state.stations));
+    mapped(state: StationsState): MappedStations | null {
+        return state.mapped;
     },
 };
 
@@ -390,6 +397,7 @@ const mutations = {
         );
         Vue.set(state, "stations", { ...state.stations, ..._.keyBy(stations, (s) => s.id) });
         Vue.set(state, "hasNoStations", stations.length == 0);
+        Vue.set(state, "mapped", new MappedStations(stations));
     },
     [PROJECT_USERS]: (state: StationsState, payload: { projectId: number; users: ProjectUser[] }) => {
         Vue.set(state.projectUsers, payload.projectId, payload.users);

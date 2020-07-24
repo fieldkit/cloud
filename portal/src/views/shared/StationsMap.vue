@@ -1,5 +1,5 @@
 <template>
-    <div v-if="mapped && mapped.valid" class="ignored" style="height: 100%; width: 100%;">
+    <div v-if="mapped.valid" class="ignored" style="height: 100%; width: 100%;">
         <mapbox
             class="stations-map"
             :access-token="mapboxToken"
