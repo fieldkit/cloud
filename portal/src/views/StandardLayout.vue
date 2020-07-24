@@ -107,10 +107,4 @@ export default Vue.extend({
 .container-header {
     height: 70px;
 }
-
-/*
-.container-map {
-    flex-grow: 1;
-}
-*/
 </style>

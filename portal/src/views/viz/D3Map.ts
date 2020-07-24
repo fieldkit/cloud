@@ -7,8 +7,11 @@ import * as d3 from "d3";
 
 import { Time, TimeRange, Margins, ChartLayout } from "./common";
 import { Graph, QueriedData, Workspace, GeoZoom } from "./viz";
+import { MapStore, Map } from "./MapStore";
 
 import Config from "@/secrets";
+
+const mapStore = new MapStore();
 
 export const D3Map = Vue.extend({
     name: "D3Map",
@@ -18,7 +21,6 @@ export const D3Map = Vue.extend({
     data() {
         return {
             mapboxToken: Config.MAPBOX_ACCESS_TOKEN,
-            map: null,
             refreshed: false,
         };
     },
@@ -50,15 +52,21 @@ export const D3Map = Vue.extend({
         this.viz.log("mounted");
         this.refresh();
     },
+    destroyed() {
+        mapStore.remove(this.viz.id);
+    },
     updated() {
         this.viz.log("updated");
     },
     methods: {
+        getMap(): Map {
+            return mapStore.get(this.viz.id);
+        },
         ready() {
             if (!this.data) {
                 return false;
             }
-            if (!this.map) {
+            if (!this.getMap()) {
                 return false;
             }
 
@@ -74,29 +82,33 @@ export const D3Map = Vue.extend({
             if (!this.ready()) {
                 return;
             }
+            const map = this.getMap();
             const data = this.data.data;
-            const located = data.filter((d) => d.location && d.location.length);
+            const located = data.filter((row) => row.location && row.location.length);
             const vizInfo = this.workspace.vizInfo(this.viz);
             const colors = vizInfo.colorScale;
+            const enabled = true;
 
+            this.viz.log("map", map);
             this.viz.log("map-refresh: data", located.length);
-
-            // I wonder if there's a more d3 way to do this.
-            this.removePreviousMapped();
 
             const geojson = {
                 type: "Feature",
                 properties: {},
                 geometry: {
                     type: "LineString",
-                    coordinates: located.map((dr) => dr.location),
+                    coordinates: located.map((row) => row.location),
                 },
             };
-            this.map.addSource("route", {
+
+            // I wonder if there's a more d3 way to do this.
+            this.removePreviousMapped(map);
+
+            map.addSource("route", {
                 type: "geojson",
                 data: geojson,
             });
-            this.map.addLayer({
+            map.addLayer({
                 id: "route",
                 type: "line",
                 source: "route",
@@ -109,26 +121,26 @@ export const D3Map = Vue.extend({
                     "line-width": 3,
                 },
             });
-            const geoDots = data.map((dr) => {
+            const geoDots = located.map((row) => {
                 return {
                     type: "Feature",
                     properties: {
-                        color: colors(dr.value),
+                        color: colors(row.value),
                     },
                     geometry: {
                         type: "Point",
-                        coordinates: dr.location,
+                        coordinates: row.location,
                     },
                 };
             });
-            this.map.addSource("points", {
+            map.addSource("points", {
                 type: "geojson",
                 data: {
                     type: "FeatureCollection",
                     features: geoDots,
                 },
             });
-            this.map.addLayer({
+            map.addLayer({
                 id: "station-markers",
                 type: "circle",
                 source: "points",
@@ -144,7 +156,7 @@ export const D3Map = Vue.extend({
                     "circle-color": ["get", "color"],
                 },
             });
-            this.map.addLayer({
+            map.addLayer({
                 id: "arrow-layer",
                 type: "symbol",
                 source: "route",
@@ -165,7 +177,7 @@ export const D3Map = Vue.extend({
 
                 this.viz.log("map-refresh: bounds(viz)", bounds);
 
-                this.map.fitBounds(bounds, {
+                map.fitBounds(bounds, {
                     padding: 20,
                     duration: 0,
                 });
@@ -175,48 +187,54 @@ export const D3Map = Vue.extend({
 
                 this.viz.log("map-refresh: bounds(data)", bounds.toArray());
 
-                this.map.fitBounds(bounds.toArray(), {
+                map.fitBounds(bounds.toArray(), {
                     padding: 20,
                     duration: 0,
                 });
             }
 
-            const z = this.map.getZoom();
+            const z = map.getZoom();
             if (z > 19) {
-                this.map.setZoom(19);
+                map.setZoom(19);
             }
 
             this.viz.log("map-refresh: done");
 
             this.refreshed = true;
         },
-        removePreviousMapped() {
-            if (this.map.getLayer("arrow-layer")) {
-                this.map.removeLayer("arrow-layer");
+        removePreviousMapped(map) {
+            if (map.getLayer("arrow-layer")) {
+                map.removeLayer("arrow-layer");
             }
-            if (this.map.getLayer("station-markers")) {
-                this.map.removeLayer("station-markers");
+            if (map.getLayer("station-markers")) {
+                map.removeLayer("station-markers");
             }
-            if (this.map.getSource("points")) {
-                this.map.removeSource("points");
+            if (map.getSource("points")) {
+                map.removeSource("points");
             }
-            if (this.map.getLayer("route")) {
-                this.map.removeLayer("route");
+            if (map.getLayer("route")) {
+                map.removeLayer("route");
             }
-            if (this.map.getSource("route")) {
-                this.map.removeSource("route");
+            if (map.getSource("route")) {
+                map.removeSource("route");
             }
         },
         mapLoaded(map) {
             this.viz.log("map: ready");
-            this.map = map;
-            this.map.resize();
+            mapStore.set(this.viz.id, map).resize();
             this.refresh();
         },
         mapMoveEnd(...args) {
             if (this.ready() && this.refreshed) {
                 this.viz.log("map-move-end");
-                this.$emit("viz-geo-zoomed", new GeoZoom(this.map.getBounds().toArray()));
+                this.$emit(
+                    "viz-geo-zoomed",
+                    new GeoZoom(
+                        this.getMap()
+                            .getBounds()
+                            .toArray()
+                    )
+                );
             } else {
                 this.viz.log("map-move-end(ignored)");
             }
@@ -226,7 +244,7 @@ export const D3Map = Vue.extend({
             /*
             if (this.ready() && this.refreshed) {
                 this.viz.log("map-zoom-end");
-                this.$emit("viz-geo-zoomed", new GeoZoom(this.map.getBounds().toArray()));
+                this.$emit("viz-geo-zoomed", new GeoZoom(this.getMap().getBounds().toArray()));
             } else {
                 this.viz.log("map-zoom-end(ignored)");
             }

@@ -350,7 +350,7 @@ export default Vue.extend({
 }
 
 .viz.map .viz-map {
-    height: 350px;
+    height: 400px;
     margin-bottom: 20px;
 }
 </style>
