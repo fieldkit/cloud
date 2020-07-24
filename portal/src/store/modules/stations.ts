@@ -149,12 +149,6 @@ export class MappedStations {
 
         this.bounds = around.zoomOutOrAround(DefaultLocation, feetAround);
         this.features = located.map((ds) => new MapFeature(ds));
-
-        console.log(
-            "map: stations",
-            located.map((s) => s.location)
-        );
-        console.log("map: bounds", this.bounds);
     }
 
     get valid(): boolean {
