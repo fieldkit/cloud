@@ -11,7 +11,6 @@ import (
 	"context"
 	"net/http"
 
-	station "github.com/fieldkit/cloud/server/api/gen/station"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -226,12 +225,7 @@ func (c *Client) DownloadPhoto() goa.Endpoint {
 		if err != nil {
 			return nil, goahttp.ErrRequestError("station", "download photo", err)
 		}
-		res, err := decodeResponse(resp)
-		if err != nil {
-			resp.Body.Close()
-			return nil, goahttp.ErrDecodingError("station", "download photo", err)
-		}
-		return &station.DownloadPhotoResponseData{Result: res.(*station.DownloadPhotoResult), Body: resp.Body}, nil
+		return decodeResponse(resp)
 	}
 }
 

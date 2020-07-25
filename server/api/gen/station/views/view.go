@@ -27,6 +27,14 @@ type StationsFull struct {
 	View string
 }
 
+// DownloadedPhoto is the viewed result type that is projected based on a view.
+type DownloadedPhoto struct {
+	// Type to project
+	Projected *DownloadedPhotoView
+	// View to render
+	View string
+}
+
 // PageOfStations is the viewed result type that is projected based on a view.
 type PageOfStations struct {
 	// Type to project
@@ -146,6 +154,14 @@ type StationsFullView struct {
 // type.
 type StationFullCollectionView []*StationFullView
 
+// DownloadedPhotoView is a type that runs validations on a projected type.
+type DownloadedPhotoView struct {
+	Length      *int64
+	ContentType *string
+	Etag        *string
+	Body        []byte
+}
+
 // PageOfStationsView is a type that runs validations on a projected type.
 type PageOfStationsView struct {
 	Stations []*EssentialStationView
@@ -202,6 +218,16 @@ var (
 			"stations",
 		},
 	}
+	// DownloadedPhotoMap is a map of attribute names in result type
+	// DownloadedPhoto indexed by view name.
+	DownloadedPhotoMap = map[string][]string{
+		"default": []string{
+			"length",
+			"body",
+			"contentType",
+			"etag",
+		},
+	}
 	// PageOfStationsMap is a map of attribute names in result type PageOfStations
 	// indexed by view name.
 	PageOfStationsMap = map[string][]string{
@@ -255,6 +281,18 @@ func ValidateStationsFull(result *StationsFull) (err error) {
 	switch result.View {
 	case "default", "":
 		err = ValidateStationsFullView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateDownloadedPhoto runs the validations defined on the viewed result
+// type DownloadedPhoto.
+func ValidateDownloadedPhoto(result *DownloadedPhoto) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateDownloadedPhotoView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
 	}
@@ -537,6 +575,21 @@ func ValidateStationFullCollectionView(result StationFullCollectionView) (err er
 		if err2 := ValidateStationFullView(item); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateDownloadedPhotoView runs the validations defined on
+// DownloadedPhotoView using the "default" view.
+func ValidateDownloadedPhotoView(result *DownloadedPhotoView) (err error) {
+	if result.Length == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("length", "result"))
+	}
+	if result.ContentType == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("contentType", "result"))
+	}
+	if result.Etag == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("etag", "result"))
 	}
 	return
 }

@@ -9,7 +9,6 @@ package station
 
 import (
 	"context"
-	"io"
 
 	stationviews "github.com/fieldkit/cloud/server/api/gen/station/views"
 	goa "goa.design/goa/v3/pkg"
@@ -29,7 +28,7 @@ type Service interface {
 	// ListProject implements list project.
 	ListProject(context.Context, *ListProjectPayload) (res *StationsFull, err error)
 	// DownloadPhoto implements download photo.
-	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadPhotoResult, body io.ReadCloser, err error)
+	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadedPhoto, err error)
 	// ListAll implements list all.
 	ListAll(context.Context, *ListAllPayload) (res *PageOfStations, err error)
 	// Delete implements delete.
@@ -119,16 +118,19 @@ type ListProjectPayload struct {
 // DownloadPhotoPayload is the payload type of the station service download
 // photo method.
 type DownloadPhotoPayload struct {
-	Auth      string
-	StationID int32
-	Size      *int32
+	Auth        string
+	StationID   int32
+	Size        *int32
+	IfNoneMatch *string
 }
 
-// DownloadPhotoResult is the result type of the station service download photo
+// DownloadedPhoto is the result type of the station service download photo
 // method.
-type DownloadPhotoResult struct {
+type DownloadedPhoto struct {
 	Length      int64
 	ContentType string
+	Etag        string
+	Body        []byte
 }
 
 // ListAllPayload is the payload type of the station service list all method.
@@ -310,6 +312,19 @@ func NewViewedStationsFull(res *StationsFull, view string) *stationviews.Station
 	return &stationviews.StationsFull{Projected: p, View: "default"}
 }
 
+// NewDownloadedPhoto initializes result type DownloadedPhoto from viewed
+// result type DownloadedPhoto.
+func NewDownloadedPhoto(vres *stationviews.DownloadedPhoto) *DownloadedPhoto {
+	return newDownloadedPhoto(vres.Projected)
+}
+
+// NewViewedDownloadedPhoto initializes viewed result type DownloadedPhoto from
+// result type DownloadedPhoto using the given view.
+func NewViewedDownloadedPhoto(res *DownloadedPhoto, view string) *stationviews.DownloadedPhoto {
+	p := newDownloadedPhotoView(res)
+	return &stationviews.DownloadedPhoto{Projected: p, View: "default"}
+}
+
 // NewPageOfStations initializes result type PageOfStations from viewed result
 // type PageOfStations.
 func NewPageOfStations(vres *stationviews.PageOfStations) *PageOfStations {
@@ -449,6 +464,36 @@ func newStationFullCollectionView(res StationFullCollection) stationviews.Statio
 	vres := make(stationviews.StationFullCollectionView, len(res))
 	for i, n := range res {
 		vres[i] = newStationFullView(n)
+	}
+	return vres
+}
+
+// newDownloadedPhoto converts projected type DownloadedPhoto to service type
+// DownloadedPhoto.
+func newDownloadedPhoto(vres *stationviews.DownloadedPhotoView) *DownloadedPhoto {
+	res := &DownloadedPhoto{
+		Body: vres.Body,
+	}
+	if vres.Length != nil {
+		res.Length = *vres.Length
+	}
+	if vres.ContentType != nil {
+		res.ContentType = *vres.ContentType
+	}
+	if vres.Etag != nil {
+		res.Etag = *vres.Etag
+	}
+	return res
+}
+
+// newDownloadedPhotoView projects result type DownloadedPhoto to projected
+// type DownloadedPhotoView using the "default" view.
+func newDownloadedPhotoView(res *DownloadedPhoto) *stationviews.DownloadedPhotoView {
+	vres := &stationviews.DownloadedPhotoView{
+		Length:      &res.Length,
+		ContentType: &res.ContentType,
+		Etag:        &res.Etag,
+		Body:        res.Body,
 	}
 	return vres
 }

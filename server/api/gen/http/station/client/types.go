@@ -114,6 +114,15 @@ type ListProjectResponseBody struct {
 	Stations StationFullCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
 }
 
+// DownloadPhotoResponseBody is the type of the "station" service "download
+// photo" endpoint HTTP response body.
+type DownloadPhotoResponseBody struct {
+	Length      *int64  `form:"length,omitempty" json:"length,omitempty" xml:"length,omitempty"`
+	ContentType *string `form:"contentType,omitempty" json:"contentType,omitempty" xml:"contentType,omitempty"`
+	Etag        *string `form:"etag,omitempty" json:"etag,omitempty" xml:"etag,omitempty"`
+	Body        []byte  `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+}
+
 // ListAllResponseBody is the type of the "station" service "list all" endpoint
 // HTTP response body.
 type ListAllResponseBody struct {
@@ -1290,12 +1299,15 @@ func NewListProjectBadRequest(body *ListProjectBadRequestResponseBody) *goa.Serv
 	return v
 }
 
-// NewDownloadPhotoResultOK builds a "station" service "download photo"
-// endpoint result from a HTTP "OK" response.
-func NewDownloadPhotoResultOK(length int64, contentType string) *station.DownloadPhotoResult {
-	v := &station.DownloadPhotoResult{}
-	v.Length = length
-	v.ContentType = contentType
+// NewDownloadPhotoDownloadedPhotoOK builds a "station" service "download
+// photo" endpoint result from a HTTP "OK" response.
+func NewDownloadPhotoDownloadedPhotoOK(body *DownloadPhotoResponseBody) *stationviews.DownloadedPhotoView {
+	v := &stationviews.DownloadedPhotoView{
+		Length:      body.Length,
+		ContentType: body.ContentType,
+		Etag:        body.Etag,
+		Body:        body.Body,
+	}
 
 	return v
 }

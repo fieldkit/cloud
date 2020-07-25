@@ -722,7 +722,7 @@ func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.Dow
 		return nil, project.MakeNotFound(errors.New("not found"))
 	}
 
-	etag := quickHash(*resource.MediaURL) + ""
+	etag := quickHash(*resource.MediaURL)
 	if payload.Size != nil {
 		etag += fmt.Sprintf(":%d", *payload.Size)
 	}

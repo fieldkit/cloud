@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"io"
 	"io/ioutil"
 	"strings"
 	"time"
@@ -350,7 +349,7 @@ func (c *StationService) Delete(ctx context.Context, payload *station.DeletePayl
 	return sr.Delete(ctx, payload.StationID)
 }
 
-func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.DownloadPhotoPayload) (*station.DownloadPhotoResult, io.ReadCloser, error) {
+func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.DownloadPhotoPayload) (*station.DownloadedPhoto, error) {
 	x := uint(124)
 	y := uint(100)
 
@@ -365,8 +364,21 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 		return defaultPhoto(payload.StationID)
 	}
 
-	mr := repositories.NewMediaRepository(c.options.MediaFiles)
+	etag := quickHash(allMedia[0].URL)
+	if payload.Size != nil {
+		etag += fmt.Sprintf(":%d", *payload.Size)
+	}
 
+	if payload.IfNoneMatch != nil {
+		if *payload.IfNoneMatch == fmt.Sprintf(`"%s"`, etag) {
+			return &station.DownloadedPhoto{
+				Etag: etag,
+				Body: []byte{},
+			}, nil
+		}
+	}
+
+	mr := repositories.NewMediaRepository(c.options.MediaFiles)
 	lm, err := mr.LoadByURL(ctx, allMedia[0].URL)
 	if err != nil {
 		return defaultPhoto(payload.StationID)
@@ -388,13 +400,20 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 
 	buf := new(bytes.Buffer)
 	if err := jpeg.Encode(buf, cropped, &options); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return &station.DownloadPhotoResult{
+	data, err := ioutil.ReadAll(lm.Reader)
+	if err != nil {
+		return nil, err
+	}
+
+	return &station.DownloadedPhoto{
 		Length:      int64(len(buf.Bytes())),
 		ContentType: "image/jpg",
-	}, ioutil.NopCloser(buf), nil
+		Etag:        etag,
+		Body:        data,
+	}, nil
 }
 
 func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
@@ -599,16 +618,17 @@ func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationF
 	return stations, nil
 }
 
-func defaultPhoto(id int32) (*station.DownloadPhotoResult, io.ReadCloser, error) {
+func defaultPhoto(id int32) (*station.DownloadedPhoto, error) {
 	defaultPhotoContentType := "image/png"
 	defaultPhoto, err := StationDefaultPicture(int64(id))
 	if err != nil {
 		// NOTE This, hopefully never happens because we've got no image to send back.
-		return nil, nil, err
+		return nil, err
 	}
 
-	return &station.DownloadPhotoResult{
+	return &station.DownloadedPhoto{
 		ContentType: defaultPhotoContentType,
 		Length:      int64(len(defaultPhoto)),
-	}, ioutil.NopCloser(bytes.NewBuffer(defaultPhoto)), nil
+		Body:        defaultPhoto,
+	}, nil
 }

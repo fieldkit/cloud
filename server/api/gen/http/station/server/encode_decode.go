@@ -14,7 +14,6 @@ import (
 	"strconv"
 	"strings"
 
-	station "github.com/fieldkit/cloud/server/api/gen/station"
 	stationviews "github.com/fieldkit/cloud/server/api/gen/station/views"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -609,13 +608,11 @@ func EncodeListProjectError(encoder func(context.Context, http.ResponseWriter) g
 // station download photo endpoint.
 func EncodeDownloadPhotoResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*station.DownloadPhotoResult)
-		val := res.Length
-		lengths := strconv.FormatInt(val, 10)
-		w.Header().Set("Content-Length", lengths)
-		w.Header().Set("Content-Type", res.ContentType)
+		res := v.(*stationviews.DownloadedPhoto)
+		enc := encoder(ctx, w)
+		body := NewDownloadPhotoResponseBody(res.Projected)
 		w.WriteHeader(http.StatusOK)
-		return nil
+		return enc.Encode(body)
 	}
 }
 
@@ -624,10 +621,11 @@ func EncodeDownloadPhotoResponse(encoder func(context.Context, http.ResponseWrit
 func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			stationID int32
-			size      *int32
-			auth      string
-			err       error
+			stationID   int32
+			size        *int32
+			ifNoneMatch *string
+			auth        string
+			err         error
 
 			params = mux.Vars(r)
 		)
@@ -650,6 +648,10 @@ func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) g
 				size = &pv
 			}
 		}
+		ifNoneMatchRaw := r.Header.Get("If-None-Match")
+		if ifNoneMatchRaw != "" {
+			ifNoneMatch = &ifNoneMatchRaw
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -657,7 +659,7 @@ func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) g
 		if err != nil {
 			return nil, err
 		}
-		payload := NewDownloadPhotoPayload(stationID, size, auth)
+		payload := NewDownloadPhotoPayload(stationID, size, ifNoneMatch, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]

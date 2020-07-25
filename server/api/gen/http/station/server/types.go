@@ -114,6 +114,15 @@ type ListProjectResponseBody struct {
 	Stations StationFullResponseBodyCollection `form:"stations" json:"stations" xml:"stations"`
 }
 
+// DownloadPhotoResponseBody is the type of the "station" service "download
+// photo" endpoint HTTP response body.
+type DownloadPhotoResponseBody struct {
+	Length      int64  `form:"length" json:"length" xml:"length"`
+	Body        []byte `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	ContentType string `form:"contentType" json:"contentType" xml:"contentType"`
+	Etag        string `form:"etag" json:"etag" xml:"etag"`
+}
+
 // ListAllResponseBody is the type of the "station" service "list all" endpoint
 // HTTP response body.
 type ListAllResponseBody struct {
@@ -985,6 +994,18 @@ func NewListProjectResponseBody(res *stationviews.StationsFullView) *ListProject
 	return body
 }
 
+// NewDownloadPhotoResponseBody builds the HTTP response body from the result
+// of the "download photo" endpoint of the "station" service.
+func NewDownloadPhotoResponseBody(res *stationviews.DownloadedPhotoView) *DownloadPhotoResponseBody {
+	body := &DownloadPhotoResponseBody{
+		Length:      *res.Length,
+		ContentType: *res.ContentType,
+		Etag:        *res.Etag,
+		Body:        res.Body,
+	}
+	return body
+}
+
 // NewListAllResponseBody builds the HTTP response body from the result of the
 // "list all" endpoint of the "station" service.
 func NewListAllResponseBody(res *stationviews.PageOfStationsView) *ListAllResponseBody {
@@ -1516,10 +1537,11 @@ func NewListProjectPayload(id int32, auth string) *station.ListProjectPayload {
 
 // NewDownloadPhotoPayload builds a station service download photo endpoint
 // payload.
-func NewDownloadPhotoPayload(stationID int32, size *int32, auth string) *station.DownloadPhotoPayload {
+func NewDownloadPhotoPayload(stationID int32, size *int32, ifNoneMatch *string, auth string) *station.DownloadPhotoPayload {
 	v := &station.DownloadPhotoPayload{}
 	v.StationID = stationID
 	v.Size = size
+	v.IfNoneMatch = ifNoneMatch
 	v.Auth = auth
 
 	return v

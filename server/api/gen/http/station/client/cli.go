@@ -139,7 +139,7 @@ func BuildListProjectPayload(stationListProjectID string, stationListProjectAuth
 
 // BuildDownloadPhotoPayload builds the payload for the station download photo
 // endpoint from CLI flags.
-func BuildDownloadPhotoPayload(stationDownloadPhotoStationID string, stationDownloadPhotoSize string, stationDownloadPhotoAuth string) (*station.DownloadPhotoPayload, error) {
+func BuildDownloadPhotoPayload(stationDownloadPhotoStationID string, stationDownloadPhotoSize string, stationDownloadPhotoIfNoneMatch string, stationDownloadPhotoAuth string) (*station.DownloadPhotoPayload, error) {
 	var err error
 	var stationID int32
 	{
@@ -162,6 +162,12 @@ func BuildDownloadPhotoPayload(stationDownloadPhotoStationID string, stationDown
 			}
 		}
 	}
+	var ifNoneMatch *string
+	{
+		if stationDownloadPhotoIfNoneMatch != "" {
+			ifNoneMatch = &stationDownloadPhotoIfNoneMatch
+		}
+	}
 	var auth string
 	{
 		auth = stationDownloadPhotoAuth
@@ -169,6 +175,7 @@ func BuildDownloadPhotoPayload(stationDownloadPhotoStationID string, stationDown
 	v := &station.DownloadPhotoPayload{}
 	v.StationID = stationID
 	v.Size = size
+	v.IfNoneMatch = ifNoneMatch
 	v.Auth = auth
 
 	return v, nil

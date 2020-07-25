@@ -9,7 +9,6 @@ package station
 
 import (
 	"context"
-	"io"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -91,14 +90,13 @@ func (c *Client) ListProject(ctx context.Context, p *ListProjectPayload) (res *S
 }
 
 // DownloadPhoto calls the "download photo" endpoint of the "station" service.
-func (c *Client) DownloadPhoto(ctx context.Context, p *DownloadPhotoPayload) (res *DownloadPhotoResult, resp io.ReadCloser, err error) {
+func (c *Client) DownloadPhoto(ctx context.Context, p *DownloadPhotoPayload) (res *DownloadedPhoto, err error) {
 	var ires interface{}
 	ires, err = c.DownloadPhotoEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	o := ires.(*DownloadPhotoResponseData)
-	return o.Result, o.Body, nil
+	return ires.(*DownloadedPhoto), nil
 }
 
 // ListAll calls the "list all" endpoint of the "station" service.
