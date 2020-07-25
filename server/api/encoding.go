@@ -28,47 +28,51 @@ func NewStreamAndCacheFriendlyEncoder(ctx context.Context, defaultEncoder func(c
 	}
 }
 
+type DownloadResponseBody struct {
+	Length      int64
+	ContentType string
+	Body        []byte
+	Etag        string
+}
+
+func (e *StreamAndCacheFriendlyEncoder) EncodeDownload(body *DownloadResponseBody) error {
+	e.rw.Header().Set("Content-Length", fmt.Sprintf("%v", body.Length))
+	if body.ContentType != "" {
+		e.rw.Header().Set("Content-Type", body.ContentType)
+	}
+	e.rw.Header().Set("ETag", fmt.Sprintf(`"%v"`, body.Etag))
+	if len(body.Body) > 0 {
+		e.rw.WriteHeader(http.StatusOK)
+		e.rw.Write(body.Body)
+	} else {
+		e.rw.WriteHeader(http.StatusNotModified)
+	}
+	return nil
+}
+
 func (e *StreamAndCacheFriendlyEncoder) Encode(v interface{}) error {
 	switch v := v.(type) {
 	case *projectSvr.DownloadPhotoResponseBody:
-		e.rw.Header().Set("Content-Length", fmt.Sprintf("%v", v.Length))
-		if v.ContentType != "" {
-			e.rw.Header().Set("Content-Type", v.ContentType)
-		}
-		e.rw.Header().Set("ETag", fmt.Sprintf(`"%v"`, v.Etag))
-		if len(v.Body) > 0 {
-			e.rw.WriteHeader(http.StatusOK)
-			e.rw.Write(v.Body)
-		} else {
-			e.rw.WriteHeader(http.StatusNotModified)
-		}
-		return nil
+		return e.EncodeDownload(&DownloadResponseBody{
+			Length:      v.Length,
+			ContentType: v.ContentType,
+			Etag:        v.Etag,
+			Body:        v.Body,
+		})
 	case *userSvr.DownloadPhotoResponseBody:
-		e.rw.Header().Set("Content-Length", fmt.Sprintf("%v", v.Length))
-		if v.ContentType != "" {
-			e.rw.Header().Set("Content-Type", v.ContentType)
-		}
-		e.rw.Header().Set("ETag", fmt.Sprintf(`"%v"`, v.Etag))
-		if len(v.Body) > 0 {
-			e.rw.WriteHeader(http.StatusOK)
-			e.rw.Write(v.Body)
-		} else {
-			e.rw.WriteHeader(http.StatusNotModified)
-		}
-		return nil
+		return e.EncodeDownload(&DownloadResponseBody{
+			Length:      v.Length,
+			ContentType: v.ContentType,
+			Etag:        v.Etag,
+			Body:        v.Body,
+		})
 	case *stationSvr.DownloadPhotoResponseBody:
-		e.rw.Header().Set("Content-Length", fmt.Sprintf("%v", v.Length))
-		if v.ContentType != "" {
-			e.rw.Header().Set("Content-Type", v.ContentType)
-		}
-		e.rw.Header().Set("ETag", fmt.Sprintf(`"%v"`, v.Etag))
-		if len(v.Body) > 0 {
-			e.rw.WriteHeader(http.StatusOK)
-			e.rw.Write(v.Body)
-		} else {
-			e.rw.WriteHeader(http.StatusNotModified)
-		}
-		return nil
+		return e.EncodeDownload(&DownloadResponseBody{
+			Length:      v.Length,
+			ContentType: v.ContentType,
+			Etag:        v.Etag,
+			Body:        v.Body,
+		})
 	default:
 		psr := e.rw.(*logging.PreventableStatusResponse)
 		psr.FineWriteHeader()

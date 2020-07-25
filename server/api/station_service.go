@@ -357,7 +357,7 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 	if err := c.options.Database.SelectContext(ctx, &allMedia, `
 		SELECT * FROM fieldkit.notes_media WHERE station_id = $1 ORDER BY created_at DESC
 		`, payload.StationID); err != nil {
-		return defaultPhoto(payload.StationID)
+		return nil, err
 	}
 
 	if len(allMedia) == 0 {
@@ -381,17 +381,17 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 	mr := repositories.NewMediaRepository(c.options.MediaFiles)
 	lm, err := mr.LoadByURL(ctx, allMedia[0].URL)
 	if err != nil {
-		return defaultPhoto(payload.StationID)
+		return nil, err
 	}
 
 	original, _, err := image.Decode(lm.Reader)
 	if err != nil {
-		return defaultPhoto(payload.StationID)
+		return nil, err
 	}
 
 	cropped, err := smartCrop(original, x, y)
 	if err != nil {
-		return defaultPhoto(payload.StationID)
+		return nil, err
 	}
 
 	options := jpeg.Options{
