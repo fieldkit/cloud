@@ -205,8 +205,7 @@ const getters = {
             .map((p) => {
                 const users = state.projectUsers[p.id] || [];
                 const stations = state.projectStations[p.id] || [];
-                const activities = state.projectActivities[p.id] || [];
-                return new DisplayProject(p, users, stations, activities);
+                return new DisplayProject(p, users, stations);
             })
             .keyBy((p) => p.project.id)
             .value();

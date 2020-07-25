@@ -139,24 +139,6 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 									]
 								}
 							]
-						},
-						{
-							"id": "<<PRESENCE>>",
-							"provisionId": "<<PRESENCE>>",
-							"time": "<<PRESENCE>>",
-							"modules": [ "<<PRESENCE>>", "<<PRESENCE>>" ]
-						},
-						{
-							"id": "<<PRESENCE>>",
-							"provisionId": "<<PRESENCE>>",
-							"time": "<<PRESENCE>>",
-							"modules": [ "<<PRESENCE>>", "<<PRESENCE>>" ]
-						},
-						{
-							"id": "<<PRESENCE>>",
-							"provisionId": "<<PRESENCE>>",
-							"time": "<<PRESENCE>>",
-							"modules": [ "<<PRESENCE>>", "<<PRESENCE>>" ]
 						}
 					]
 				}

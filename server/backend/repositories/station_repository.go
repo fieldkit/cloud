@@ -502,7 +502,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		WHERE sc.provision_id IN (
 			SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1)
 		)
-		ORDER BY sc.updated_at DESC
+		ORDER BY sc.updated_at DESC LIMIT 1
 		`, id); err != nil {
 		return nil, err
 	}
@@ -602,7 +602,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 				)
 			)
 		)
-		ORDER BY sc.updated_at DESC
+		ORDER BY sc.updated_at DESC LIMIT 1
 		`, id); err != nil {
 		return nil, err
 	}
