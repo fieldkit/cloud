@@ -27,7 +27,6 @@ func NewStreamAndCacheFriendlyEncoder(ctx context.Context, rw http.ResponseWrite
 func (e *StreamAndCacheFriendlyEncoder) Encode(v interface{}) error {
 	switch v := v.(type) {
 	case *projectSvr.DownloadPhotoResponseBody:
-		fmt.Printf("\nBODY: %v %v %d\n", v.Etag, v.ContentType, len(v.Body))
 		e.rw.Header().Set("Content-Length", fmt.Sprintf("%v", v.Length))
 		if v.ContentType != "" {
 			e.rw.Header().Set("Content-Type", v.ContentType)
@@ -39,7 +38,6 @@ func (e *StreamAndCacheFriendlyEncoder) Encode(v interface{}) error {
 		} else {
 			e.rw.WriteHeader(http.StatusNotModified)
 		}
-		fmt.Printf("\nDONE: %v %v\n", v.Etag, v.ContentType)
 		return nil
 	default:
 		psr := e.rw.(*logging.PreventableStatusResponse)
