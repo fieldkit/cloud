@@ -372,8 +372,9 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 	if payload.IfNoneMatch != nil {
 		if *payload.IfNoneMatch == fmt.Sprintf(`"%s"`, etag) {
 			return &station.DownloadedPhoto{
-				Etag: etag,
-				Body: []byte{},
+				ContentType: "image/jpeg",
+				Etag:        etag,
+				Body:        []byte{},
 			}, nil
 		}
 	}
@@ -386,7 +387,9 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 
 	original, _, err := image.Decode(lm.Reader)
 	if err != nil {
-		return nil, err
+		log := Logger(ctx).Sugar()
+		log.Warnw("image-error", "error", err, "station_id", payload.StationID)
+		return defaultPhoto(payload.StationID)
 	}
 
 	cropped, err := smartCrop(original, x, y)
@@ -408,9 +411,15 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 		return nil, err
 	}
 
+	if len(data) == 0 {
+		log := Logger(ctx).Sugar()
+		log.Warnw("empty-image", "station_id", payload.StationID)
+		return defaultPhoto(payload.StationID)
+	}
+
 	return &station.DownloadedPhoto{
 		Length:      int64(len(buf.Bytes())),
-		ContentType: "image/jpg",
+		ContentType: "image/jpeg",
 		Etag:        etag,
 		Body:        data,
 	}, nil
