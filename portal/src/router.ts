@@ -128,6 +128,22 @@ const routes = [
         },
     },
     {
+        path: "/dashboard/projects/:id/activity",
+        name: "viewProjectActivity",
+        component: ProjectView,
+        props: (route) => {
+            return {
+                id: Number(route.params.id),
+                forcePublic: false,
+                activityVisible: true,
+            };
+        },
+        meta: {
+            bodyClass: "disable-scrolling",
+            secured: true,
+        },
+    },
+    {
         path: "/dashboard/projects/:id/public",
         name: "viewProjectPublic",
         component: ProjectView,

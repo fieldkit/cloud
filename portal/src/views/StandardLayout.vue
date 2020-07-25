@@ -1,5 +1,5 @@
 <template>
-    <div class="container-ignored">
+    <div class="container-ignored" v-bind:class="{ 'scrolling-disabled': disableScrolling }">
         <div class="container-top">
             <SidebarNav
                 :viewingStations="viewingStations"
@@ -54,6 +54,10 @@ export default Vue.extend({
             type: Boolean,
             default: true,
         },
+        disableScrolling: {
+            type: Boolean,
+            default: false,
+        },
     },
     data: () => {
         return {
@@ -106,5 +110,8 @@ export default Vue.extend({
 }
 .container-header {
     height: 70px;
+}
+.scrolling-disabled {
+    overflow-y: hidden;
 }
 </style>

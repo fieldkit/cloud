@@ -25,7 +25,6 @@ export default {
 </script>
 <style>
 html {
-    overflow-y: scroll;
 }
 html,
 body,
@@ -34,6 +33,11 @@ body,
     height: 100%;
     display: flex;
     flex-direction: column;
+}
+body:not(.disable-scrolling) {
+    overflow-y: scroll;
+}
+body {
 }
 body {
     font-family: "Avenir", Helvetica, Arial, sans-serif;
@@ -71,47 +75,4 @@ button {
     font-size: 36px;
     margin-top: 40px;
 }
-
-/* Deprecated in favor of TextField */
-
-input:focus ~ .floating-label,
-input:not(:focus):valid ~ .floating-label {
-    top: -48px;
-    font-size: 12px;
-    opacity: 1;
-}
-input:invalid {
-    box-shadow: none;
-}
-.inputText {
-    outline: 0;
-    color: #2c3e50;
-    font-size: 16px;
-    width: inherit;
-    border: none;
-    text-align: left;
-    border-bottom: 2px solid #d8dce0;
-    padding-bottom: 4px;
-}
-.inputText:focus {
-    border-bottom: 2px solid #52b5e4;
-}
-.floating-label {
-    color: #6a6d71;
-    position: relative;
-    top: -24px;
-    pointer-events: none;
-    text-align: left;
-    transition: 0.2s ease all;
-}
-/*
-.disabled {
-    background-color: rgb(210, 210, 210);
-    cursor: not-allowed;
-    border: none;
-    color: white;
-    font-size: 18px;
-    border-radius: 5px;
-}
-*/
 </style>

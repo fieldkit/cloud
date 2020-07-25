@@ -107,8 +107,8 @@ export const ViewingControls = Vue.extend({
 		<div class="controls-container">
 			<div class="row row-1">
 				<div class="left buttons">
-					<div class="btn" @click="raiseCompare">Compare</div>
-					<div class="btn" @click="raiseRemove" v-if="false">Remove</div>
+					<div class="button" @click="raiseCompare">Compare</div>
+					<div class="button" @click="raiseRemove" v-if="false">Remove</div>
 					<div class="busy" v-if="viz.busy"><Spinner /></div>
 				</div>
 				<div class="right time">

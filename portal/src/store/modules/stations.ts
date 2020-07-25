@@ -169,12 +169,7 @@ export class DisplayProject {
     mapped: MappedStations;
     places: { native: string | null } = { native: null };
 
-    constructor(
-        public readonly project: Project,
-        public readonly users: ProjectUser[],
-        public readonly stations: DisplayStation[],
-        public readonly activities: Activity[]
-    ) {
+    constructor(public readonly project: Project, public readonly users: ProjectUser[], public readonly stations: DisplayStation[]) {
         this.id = project.id;
         this.name = project.name;
         this.modules = _(stations)

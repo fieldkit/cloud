@@ -1,11 +1,16 @@
 <template>
     <div class="double-header">
-        <div class="back" v-on:click="onBack" v-if="backTitle && backRoute">
-            <span class="small-arrow">&lt;</span>
-            {{ backTitle }}
+        <div class="heading">
+            <div class="back" v-on:click="onBack" v-if="backTitle && backRoute">
+                <span class="small-arrow">&lt;</span>
+                {{ backTitle }}
+            </div>
+            <div class="one">{{ title }}</div>
+            <div class="two" v-if="subtitle">{{ subtitle }}</div>
         </div>
-        <div class="one">{{ title }}</div>
-        <div class="two" v-if="subtitle">{{ subtitle }}</div>
+        <div class="actions">
+            <slot></slot>
+        </div>
     </div>
 </template>
 
@@ -43,6 +48,13 @@ export default Vue.extend({
 <style>
 .double-header {
     text-align: left;
+}
+.double-header {
+    display: flex;
+}
+.double-header .actions {
+    margin-left: auto;
+    margin-top: auto;
 }
 .double-header > div {
 }

@@ -154,7 +154,7 @@ export default Vue.extend({
 .explore-header .right {
     display: flex;
 }
-.explore-header .btn {
+.explore-header .button {
     margin-left: 20px;
     font-size: 12px;
     padding: 5px 10px;
@@ -308,7 +308,7 @@ export default Vue.extend({
     font-weight: bold;
 }
 
-.controls-container .left .btn {
+.controls-container .left .button {
     margin-right: 20px;
     font-size: 12px;
     padding: 5px 10px;

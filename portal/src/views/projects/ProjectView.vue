@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout :viewingProjects="true" :viewingProject="displayProject">
+    <StandardLayout :viewingProjects="true" :viewingProject="displayProject" :disableScrolling="activityVisible">
         <div class="project-view" v-if="displayProject">
             <DoubleHeader
                 :title="displayProject.name"
@@ -7,16 +7,30 @@
                 backTitle="Back to Dashboard"
                 backRoute="projects"
                 v-if="displayProject"
-            />
+            >
+                <div class="activity-button" v-on:click="onActivityToggle">
+                    Activity
+                </div>
+            </DoubleHeader>
 
-            <ProjectAdmin v-if="isAdministrator" :user="user" :displayProject="displayProject" :userStations="stations" v-bind:key="id" />
-            <ProjectPublic
-                v-if="!isAdministrator && displayProject"
-                v-bind:key="id"
-                :user="user"
-                :displayProject="displayProject"
-                :userStations="stations"
-            />
+            <div v-bind:key="id">
+                <ProjectActivity
+                    v-if="activityVisible"
+                    :user="user"
+                    :displayProject="displayProject"
+                    containerClass="project-activity-floating"
+                    @close="closeActivity"
+                />
+                <div class="">
+                    <ProjectAdmin v-if="isAdministrator" :user="user" :displayProject="displayProject" :userStations="stations" />
+                    <ProjectPublic
+                        v-if="!isAdministrator && displayProject"
+                        :user="user"
+                        :displayProject="displayProject"
+                        :userStations="stations"
+                    />
+                </div>
+            </div>
         </div>
     </StandardLayout>
 </template>
@@ -27,6 +41,7 @@ import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 import ProjectPublic from "./ProjectPublic.vue";
 import ProjectAdmin from "./ProjectAdmin.vue";
+import ProjectActivity from "./ProjectActivity.vue";
 
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
@@ -39,6 +54,7 @@ export default Vue.extend({
         StandardLayout,
         ProjectPublic,
         ProjectAdmin,
+        ProjectActivity,
     },
     props: {
         id: {
@@ -48,6 +64,10 @@ export default Vue.extend({
         forcePublic: {
             required: true,
             type: Boolean,
+        },
+        activityVisible: {
+            type: Boolean,
+            default: false,
         },
     },
     data: () => {
@@ -90,7 +110,17 @@ export default Vue.extend({
             }
         },
         showStation(station) {
-            this.$router.push({ name: "viewStation", params: { id: station.id } });
+            return this.$router.push({ name: "viewStation", params: { id: station.id } });
+        },
+        onActivityToggle(this: any) {
+            if (this.activityVisible) {
+                return this.$router.push({ name: "viewProject", params: { id: this.id } });
+            } else {
+                return this.$router.push({ name: "viewProjectActivity", params: { id: this.id } });
+            }
+        },
+        closeActivity(this: any) {
+            return this.$router.push({ name: "viewProject", params: { id: this.id } });
         },
     },
 });
@@ -140,5 +170,23 @@ export default Vue.extend({
 }
 .container {
     float: left;
+}
+.activity-button {
+    background-color: #ffffff;
+    border: 1px solid rgb(215, 220, 225);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0.5em;
+}
+.project-activity-floating {
+    position: absolute;
+    right: 0;
+    top: 70px;
+    bottom: 0;
+    background-color: #fcfcfc;
+    border-left: 2px solid #d8dce0;
+    z-index: 10;
+    overflow-y: scroll;
+    width: 30em;
 }
 </style>
