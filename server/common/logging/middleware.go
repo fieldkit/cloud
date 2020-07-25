@@ -11,9 +11,9 @@ var (
 	ids = NewIdGenerator()
 )
 
-func Monitoring(m *Metrics) func(h http.Handler) http.Handler {
+func LoggingAndInfrastructure() func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
-		return m.GatherMetrics(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			started := time.Now()
 
 			newCtx := WithNewTaskID(r.Context(), ids)
@@ -29,7 +29,13 @@ func Monitoring(m *Metrics) func(h http.Handler) http.Handler {
 			elapsed := time.Since(started)
 
 			log.Infow("done", "status", cw.StatusCode, "bytes", cw.ContentLength, "time", fmt.Sprintf("%vns", elapsed.Nanoseconds()), "time_human", elapsed.String())
-		}))
+		})
+	}
+}
+
+func Monitoring(m *Metrics) func(h http.Handler) http.Handler {
+	return func(h http.Handler) http.Handler {
+		return m.GatherMetrics(LoggingAndInfrastructure()(h))
 	}
 }
 
