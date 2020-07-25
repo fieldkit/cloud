@@ -155,6 +155,15 @@ type ListMineResponseBody struct {
 	Projects ProjectCollectionResponseBody `form:"projects,omitempty" json:"projects,omitempty" xml:"projects,omitempty"`
 }
 
+// DownloadPhotoResponseBody is the type of the "project" service "download
+// photo" endpoint HTTP response body.
+type DownloadPhotoResponseBody struct {
+	Length      *int64  `form:"length,omitempty" json:"length,omitempty" xml:"length,omitempty"`
+	ContentType *string `form:"contentType,omitempty" json:"contentType,omitempty" xml:"contentType,omitempty"`
+	Etag        *string `form:"etag,omitempty" json:"etag,omitempty" xml:"etag,omitempty"`
+	Body        []byte  `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+}
+
 // AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
 // update" endpoint HTTP response body for the "unauthorized" error.
 type AddUpdateUnauthorizedResponseBody struct {
@@ -2832,12 +2841,15 @@ func NewUploadPhotoBadRequest(body *UploadPhotoBadRequestResponseBody) *goa.Serv
 	return v
 }
 
-// NewDownloadPhotoResultOK builds a "project" service "download photo"
-// endpoint result from a HTTP "OK" response.
-func NewDownloadPhotoResultOK(length int64, contentType string) *project.DownloadPhotoResult {
-	v := &project.DownloadPhotoResult{}
-	v.Length = length
-	v.ContentType = contentType
+// NewDownloadPhotoDownloadedPhotoOK builds a "project" service "download
+// photo" endpoint result from a HTTP "OK" response.
+func NewDownloadPhotoDownloadedPhotoOK(body *DownloadPhotoResponseBody) *projectviews.DownloadedPhotoView {
+	v := &projectviews.DownloadedPhotoView{
+		Length:      body.Length,
+		ContentType: body.ContentType,
+		Etag:        body.Etag,
+		Body:        body.Body,
+	}
 
 	return v
 }

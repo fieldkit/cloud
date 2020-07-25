@@ -710,40 +710,62 @@ func (s *ProjectService) UploadPhoto(ctx context.Context, payload *project.Uploa
 	return nil
 }
 
-func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.DownloadPhotoPayload) (*project.DownloadPhotoResult, io.ReadCloser, error) {
+func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.DownloadPhotoPayload) (*project.DownloadedPhoto, error) {
 	resource := &data.Project{}
 	if err := s.options.Database.GetContext(ctx, resource, `
 		SELECT media_url, media_content_type FROM fieldkit.project WHERE id = $1
 		`, payload.ProjectID); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	if resource.MediaURL == nil || resource.MediaContentType == nil {
-		return nil, nil, project.MakeNotFound(errors.New("not found"))
+		return nil, project.MakeNotFound(errors.New("not found"))
+	}
+
+	etag := quickHash(*resource.MediaURL) + ""
+	if payload.Size != nil {
+		etag += fmt.Sprintf(":%d", *payload.Size)
+	}
+
+	if payload.IfNoneMatch != nil {
+		if *payload.IfNoneMatch == fmt.Sprintf(`"%s"`, etag) {
+			return &project.DownloadedPhoto{
+				Etag: etag,
+				Body: []byte{},
+			}, nil
+		}
 	}
 
 	mr := repositories.NewMediaRepository(s.options.MediaFiles)
-
 	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
 	if err != nil {
-		return nil, nil, project.MakeNotFound(errors.New("not found"))
+		return nil, project.MakeNotFound(errors.New("not found"))
 	}
 
 	if payload.Size != nil {
 		resized, err := resizeLoadedMedia(ctx, lm, uint(*payload.Size), 0)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
-		return &project.DownloadPhotoResult{
+		return &project.DownloadedPhoto{
 			Length:      resized.Size,
 			ContentType: resized.ContentType,
-		}, ioutil.NopCloser(resized.Body), nil
+			Etag:        etag,
+			Body:        resized.Data,
+		}, nil
 	}
 
-	return &project.DownloadPhotoResult{
+	data, err := ioutil.ReadAll(lm.Reader)
+	if err != nil {
+		return nil, err
+	}
+
+	return &project.DownloadedPhoto{
 		Length:      int64(lm.Size),
 		ContentType: *resource.MediaContentType,
-	}, ioutil.NopCloser(lm.Reader), nil
+		Etag:        etag,
+		Body:        data,
+	}, nil
 }
 
 func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {

@@ -544,7 +544,7 @@ func BuildUploadPhotoPayload(projectUploadPhotoProjectID string, projectUploadPh
 
 // BuildDownloadPhotoPayload builds the payload for the project download photo
 // endpoint from CLI flags.
-func BuildDownloadPhotoPayload(projectDownloadPhotoProjectID string, projectDownloadPhotoSize string, projectDownloadPhotoAuth string) (*project.DownloadPhotoPayload, error) {
+func BuildDownloadPhotoPayload(projectDownloadPhotoProjectID string, projectDownloadPhotoSize string, projectDownloadPhotoIfNoneMatch string, projectDownloadPhotoAuth string) (*project.DownloadPhotoPayload, error) {
 	var err error
 	var projectID int32
 	{
@@ -567,6 +567,12 @@ func BuildDownloadPhotoPayload(projectDownloadPhotoProjectID string, projectDown
 			}
 		}
 	}
+	var ifNoneMatch *string
+	{
+		if projectDownloadPhotoIfNoneMatch != "" {
+			ifNoneMatch = &projectDownloadPhotoIfNoneMatch
+		}
+	}
 	var auth string
 	{
 		auth = projectDownloadPhotoAuth
@@ -574,6 +580,7 @@ func BuildDownloadPhotoPayload(projectDownloadPhotoProjectID string, projectDown
 	v := &project.DownloadPhotoPayload{}
 	v.ProjectID = projectID
 	v.Size = size
+	v.IfNoneMatch = ifNoneMatch
 	v.Auth = auth
 
 	return v, nil

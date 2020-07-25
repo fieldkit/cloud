@@ -21,7 +21,6 @@ import (
 	project "github.com/fieldkit/cloud/server/api/gen/project"
 	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
 	goahttp "goa.design/goa/v3/http"
-	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildAddUpdateRequest instantiates a HTTP request object with method and
@@ -2560,6 +2559,10 @@ func EncodeDownloadPhotoRequest(encoder func(*http.Request) goahttp.Encoder) fun
 		if !ok {
 			return goahttp.ErrInvalidType("project", "download photo", "*project.DownloadPhotoPayload", v)
 		}
+		if p.IfNoneMatch != nil {
+			head := *p.IfNoneMatch
+			req.Header.Set("If-None-Match", head)
+		}
 		{
 			head := p.Auth
 			req.Header.Set("Authorization", head)
@@ -2593,34 +2596,26 @@ func DecodeDownloadPhotoResponse(decoder func(*http.Response) goahttp.Decoder, r
 			defer func() {
 				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
 			}()
+		} else {
+			defer resp.Body.Close()
 		}
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				length      int64
-				contentType string
-				err         error
+				body DownloadPhotoResponseBody
+				err  error
 			)
-			{
-				lengthRaw := resp.Header.Get("Content-Length")
-				if lengthRaw == "" {
-					return nil, goahttp.ErrValidationError("project", "download photo", goa.MissingFieldError("Content-Length", "header"))
-				}
-				v, err2 := strconv.ParseInt(lengthRaw, 10, 64)
-				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("length", lengthRaw, "integer"))
-				}
-				length = v
-			}
-			contentTypeRaw := resp.Header.Get("Content-Type")
-			if contentTypeRaw == "" {
-				err = goa.MergeErrors(err, goa.MissingFieldError("Content-Type", "header"))
-			}
-			contentType = contentTypeRaw
+			err = decoder(resp).Decode(&body)
 			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "download photo", err)
+			}
+			p := NewDownloadPhotoDownloadedPhotoOK(&body)
+			view := "default"
+			vres := &projectviews.DownloadedPhoto{Projected: p, View: view}
+			if err = projectviews.ValidateDownloadedPhoto(vres); err != nil {
 				return nil, goahttp.ErrValidationError("project", "download photo", err)
 			}
-			res := NewDownloadPhotoResultOK(length, contentType)
+			res := project.NewDownloadedPhoto(vres)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (

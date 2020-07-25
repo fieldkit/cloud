@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"bufio"
 	"fmt"
 	"net"
 	"net/http"
@@ -24,12 +23,12 @@ func Monitoring(m *Metrics) func(h http.Handler) http.Handler {
 
 			log.Infow("started", "req", r.Method+" "+r.URL.String(), "from", from(r))
 
-			rw := CaptureResponse(w)
-			h.ServeHTTP(rw, withCtx)
+			cw := CaptureResponse(w)
+			h.ServeHTTP(AllowWriteHeaderPrevention(cw), withCtx)
 
 			elapsed := time.Since(started)
 
-			log.Infow("done", "status", rw.StatusCode, "bytes", rw.ContentLength, "time", fmt.Sprintf("%vns", elapsed.Nanoseconds()), "time_human", elapsed.String())
+			log.Infow("done", "status", cw.StatusCode, "bytes", cw.ContentLength, "time", fmt.Sprintf("%vns", elapsed.Nanoseconds()), "time_human", elapsed.String())
 		}))
 	}
 }
@@ -45,34 +44,4 @@ func from(req *http.Request) string {
 		return f
 	}
 	return ip
-}
-
-// ResponseCapture is a http.ResponseWriter which captures the response status
-// code and content length.
-type ResponseCapture struct {
-	http.ResponseWriter
-	StatusCode    int
-	ContentLength int
-}
-
-func CaptureResponse(w http.ResponseWriter) *ResponseCapture {
-	return &ResponseCapture{ResponseWriter: w}
-}
-
-func (w *ResponseCapture) WriteHeader(code int) {
-	w.StatusCode = code
-	w.ResponseWriter.WriteHeader(code)
-}
-
-func (w *ResponseCapture) Write(b []byte) (int, error) {
-	n, err := w.ResponseWriter.Write(b)
-	w.ContentLength += n
-	return n, err
-}
-
-func (w *ResponseCapture) Hijack() (net.Conn, *bufio.ReadWriter, error) {
-	if h, ok := w.ResponseWriter.(http.Hijacker); ok {
-		return h.Hijack()
-	}
-	return nil, nil, fmt.Errorf("response writer does not support hijacking: %T", w.ResponseWriter)
 }

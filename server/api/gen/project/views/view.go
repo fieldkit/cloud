@@ -43,6 +43,14 @@ type Projects struct {
 	View string
 }
 
+// DownloadedPhoto is the viewed result type that is projected based on a view.
+type DownloadedPhoto struct {
+	// Type to project
+	Projected *DownloadedPhotoView
+	// View to render
+	View string
+}
+
 // ProjectUpdateView is a type that runs validations on a projected type.
 type ProjectUpdateView struct {
 	ID        *int64
@@ -99,6 +107,14 @@ type ProjectsView struct {
 // ProjectCollectionView is a type that runs validations on a projected type.
 type ProjectCollectionView []*ProjectView
 
+// DownloadedPhotoView is a type that runs validations on a projected type.
+type DownloadedPhotoView struct {
+	Length      *int64
+	ContentType *string
+	Etag        *string
+	Body        []byte
+}
+
 var (
 	// ProjectUpdateMap is a map of attribute names in result type ProjectUpdate
 	// indexed by view name.
@@ -138,6 +154,16 @@ var (
 	ProjectsMap = map[string][]string{
 		"default": []string{
 			"projects",
+		},
+	}
+	// DownloadedPhotoMap is a map of attribute names in result type
+	// DownloadedPhoto indexed by view name.
+	DownloadedPhotoMap = map[string][]string{
+		"default": []string{
+			"length",
+			"body",
+			"contentType",
+			"etag",
 		},
 	}
 	// ProjectCollectionMap is a map of attribute names in result type
@@ -202,6 +228,18 @@ func ValidateProjects(result *Projects) (err error) {
 	switch result.View {
 	case "default", "":
 		err = ValidateProjectsView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateDownloadedPhoto runs the validations defined on the viewed result
+// type DownloadedPhoto.
+func ValidateDownloadedPhoto(result *DownloadedPhoto) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateDownloadedPhotoView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
 	}
@@ -339,6 +377,21 @@ func ValidateProjectCollectionView(result ProjectCollectionView) (err error) {
 		if err2 := ValidateProjectView(item); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateDownloadedPhotoView runs the validations defined on
+// DownloadedPhotoView using the "default" view.
+func ValidateDownloadedPhotoView(result *DownloadedPhotoView) (err error) {
+	if result.Length == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("length", "result"))
+	}
+	if result.ContentType == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("contentType", "result"))
+	}
+	if result.Etag == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("etag", "result"))
 	}
 	return
 }

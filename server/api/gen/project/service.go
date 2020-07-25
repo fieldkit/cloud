@@ -55,7 +55,7 @@ type Service interface {
 	// UploadPhoto implements upload photo.
 	UploadPhoto(context.Context, *UploadPhotoPayload, io.ReadCloser) (err error)
 	// DownloadPhoto implements download photo.
-	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadPhotoResult, body io.ReadCloser, err error)
+	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadedPhoto, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -239,16 +239,19 @@ type UploadPhotoPayload struct {
 // DownloadPhotoPayload is the payload type of the project service download
 // photo method.
 type DownloadPhotoPayload struct {
-	Auth      string
-	ProjectID int32
-	Size      *int32
+	Auth        string
+	ProjectID   int32
+	Size        *int32
+	IfNoneMatch *string
 }
 
-// DownloadPhotoResult is the result type of the project service download photo
+// DownloadedPhoto is the result type of the project service download photo
 // method.
-type DownloadPhotoResult struct {
+type DownloadedPhoto struct {
 	Length      int64
 	ContentType string
+	Etag        string
+	Body        []byte
 }
 
 type PendingInvite struct {
@@ -375,6 +378,19 @@ func NewProjects(vres *projectviews.Projects) *Projects {
 func NewViewedProjects(res *Projects, view string) *projectviews.Projects {
 	p := newProjectsView(res)
 	return &projectviews.Projects{Projected: p, View: "default"}
+}
+
+// NewDownloadedPhoto initializes result type DownloadedPhoto from viewed
+// result type DownloadedPhoto.
+func NewDownloadedPhoto(vres *projectviews.DownloadedPhoto) *DownloadedPhoto {
+	return newDownloadedPhoto(vres.Projected)
+}
+
+// NewViewedDownloadedPhoto initializes viewed result type DownloadedPhoto from
+// result type DownloadedPhoto using the given view.
+func NewViewedDownloadedPhoto(res *DownloadedPhoto, view string) *projectviews.DownloadedPhoto {
+	p := newDownloadedPhotoView(res)
+	return &projectviews.DownloadedPhoto{Projected: p, View: "default"}
 }
 
 // newProjectUpdate converts projected type ProjectUpdate to service type
@@ -520,6 +536,36 @@ func newProjectCollectionView(res ProjectCollection) projectviews.ProjectCollect
 	vres := make(projectviews.ProjectCollectionView, len(res))
 	for i, n := range res {
 		vres[i] = newProjectView(n)
+	}
+	return vres
+}
+
+// newDownloadedPhoto converts projected type DownloadedPhoto to service type
+// DownloadedPhoto.
+func newDownloadedPhoto(vres *projectviews.DownloadedPhotoView) *DownloadedPhoto {
+	res := &DownloadedPhoto{
+		Body: vres.Body,
+	}
+	if vres.Length != nil {
+		res.Length = *vres.Length
+	}
+	if vres.ContentType != nil {
+		res.ContentType = *vres.ContentType
+	}
+	if vres.Etag != nil {
+		res.Etag = *vres.Etag
+	}
+	return res
+}
+
+// newDownloadedPhotoView projects result type DownloadedPhoto to projected
+// type DownloadedPhotoView using the "default" view.
+func newDownloadedPhotoView(res *DownloadedPhoto) *projectviews.DownloadedPhotoView {
+	vres := &projectviews.DownloadedPhotoView{
+		Length:      &res.Length,
+		ContentType: &res.ContentType,
+		Etag:        &res.Etag,
+		Body:        res.Body,
 	}
 	return vres
 }

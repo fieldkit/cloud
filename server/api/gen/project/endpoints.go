@@ -47,15 +47,6 @@ type UploadPhotoRequestData struct {
 	Body io.ReadCloser
 }
 
-// DownloadPhotoResponseData holds both the result and the HTTP response body
-// reader of the "download photo" method.
-type DownloadPhotoResponseData struct {
-	// Result is the method result.
-	Result *DownloadPhotoResult
-	// Body streams the HTTP response body.
-	Body io.ReadCloser
-}
-
 // NewEndpoints wraps the methods of the "project" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
@@ -516,10 +507,11 @@ func NewDownloadPhotoEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.End
 		if err != nil {
 			return nil, err
 		}
-		res, body, err := s.DownloadPhoto(ctx, p)
+		res, err := s.DownloadPhoto(ctx, p)
 		if err != nil {
 			return nil, err
 		}
-		return &DownloadPhotoResponseData{Result: res, Body: body}, nil
+		vres := NewViewedDownloadedPhoto(res, "default")
+		return vres, nil
 	}
 }

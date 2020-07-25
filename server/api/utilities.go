@@ -72,11 +72,15 @@ func makeAssetURL(url string, actual *string) *string {
 	if actual == nil {
 		return nil
 	}
-	h := sha1.New()
-	h.Write([]byte(*actual))
-	hash := hex.EncodeToString(h.Sum(nil))
+	hash := quickHash(*actual)
 	final := fmt.Sprintf("%s?%s", url, hash)
 	return &final
+}
+
+func quickHash(value string) string {
+	h := sha1.New()
+	h.Write([]byte(value))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 const ISO8601 = "2006-01-02T15:04:05-0700"

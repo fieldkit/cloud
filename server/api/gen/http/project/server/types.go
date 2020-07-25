@@ -153,6 +153,15 @@ type ListMineResponseBody struct {
 	Projects ProjectResponseBodyCollection `form:"projects" json:"projects" xml:"projects"`
 }
 
+// DownloadPhotoResponseBody is the type of the "project" service "download
+// photo" endpoint HTTP response body.
+type DownloadPhotoResponseBody struct {
+	Length      int64  `form:"length" json:"length" xml:"length"`
+	Body        []byte `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	ContentType string `form:"contentType" json:"contentType" xml:"contentType"`
+	Etag        string `form:"etag" json:"etag" xml:"etag"`
+}
+
 // AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
 // update" endpoint HTTP response body for the "unauthorized" error.
 type AddUpdateUnauthorizedResponseBody struct {
@@ -1699,6 +1708,18 @@ func NewListMineResponseBody(res *projectviews.ProjectsView) *ListMineResponseBo
 	return body
 }
 
+// NewDownloadPhotoResponseBody builds the HTTP response body from the result
+// of the "download photo" endpoint of the "project" service.
+func NewDownloadPhotoResponseBody(res *projectviews.DownloadedPhotoView) *DownloadPhotoResponseBody {
+	body := &DownloadPhotoResponseBody{
+		Length:      *res.Length,
+		ContentType: *res.ContentType,
+		Etag:        *res.Etag,
+		Body:        res.Body,
+	}
+	return body
+}
+
 // NewAddUpdateUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "add update" endpoint of the "project" service.
 func NewAddUpdateUnauthorizedResponseBody(res *goa.ServiceError) *AddUpdateUnauthorizedResponseBody {
@@ -2977,10 +2998,11 @@ func NewUploadPhotoPayload(projectID int32, contentType string, contentLength in
 
 // NewDownloadPhotoPayload builds a project service download photo endpoint
 // payload.
-func NewDownloadPhotoPayload(projectID int32, size *int32, auth string) *project.DownloadPhotoPayload {
+func NewDownloadPhotoPayload(projectID int32, size *int32, ifNoneMatch *string, auth string) *project.DownloadPhotoPayload {
 	v := &project.DownloadPhotoPayload{}
 	v.ProjectID = projectID
 	v.Size = size
+	v.IfNoneMatch = ifNoneMatch
 	v.Auth = auth
 
 	return v

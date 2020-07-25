@@ -35,14 +35,10 @@ func commonOptions() {
 	cors.Origin("/(.+[.])?fieldkit.org:\\d+/", corsRules)    // Dev
 	cors.Origin("/(.+[.])?local.fkdev.org:\\d+/", corsRules) // Dev
 
-	Error("unauthorized", func() {
-	})
-	Error("forbidden", func() {
-	})
-	Error("not-found", func() {
-	})
-	Error("bad-request", func() {
-	})
+	Error("unauthorized", func() {})
+	Error("forbidden", func() {})
+	Error("not-found", func() {})
+	Error("bad-request", func() {})
 
 	HTTP(func() {
 		Response("unauthorized", StatusUnauthorized)
@@ -65,3 +61,22 @@ func httpAuthenticationQueryString() {
 func DateTimeFormatting() {
 	Format(FormatDateTime)
 }
+
+var DownloadedPhoto = ResultType("application/vnd.app.photo+json", func() {
+	TypeName("DownloadedPhoto")
+	Attributes(func() {
+		Attribute("length", Int64)
+		Required("length")
+		Attribute("contentType", String)
+		Required("contentType")
+		Attribute("etag", String)
+		Required("etag")
+		Attribute("body", Bytes)
+	})
+	View("default", func() {
+		Attribute("length")
+		Attribute("body")
+		Attribute("contentType")
+		Attribute("etag")
+	})
+})
