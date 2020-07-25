@@ -6,59 +6,44 @@
                     <ProjectPhoto :project="project" />
                 </div>
 
-                <FollowPanel :project="project" v-bind:key="project.id" />
+                <div class="below-photo">
+                    <DisplayProjectTags :tags="project.tags" />
+                    <FollowPanel :project="project" v-bind:key="project.id" />
+                </div>
             </div>
 
             <div class="right">
                 <div class="details-heading">
-                    Project Details
+                    {{ project.name }}
                 </div>
                 <div class="details-top">
-                    <div class="details-left">
-                        <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
-                        <div class="project-detail">{{ project.description }}</div>
-                        <DisplayProjectTags :tags="project.tags" />
+                    <div class="time-container" v-if="project.startTime">
+                        <img alt="Location" src="@/assets/icon-calendar.png" class="icon" />
+                        <template>Started: {{ project.startTime | prettyDate }}</template>
                     </div>
-                    <div class="details-right">
-                        <div class="time-container" v-if="project.startTime">
-                            <img alt="Location" src="@/assets/icon-calendar.png" class="icon" />
-                            <template>Started: {{ project.startTime | prettyDate }}</template>
-                        </div>
-                        <div class="duration-container" v-if="displayProject.duration">
-                            <img alt="Location" src="@/assets/icon-time.png" class="icon" />
-                            <template>{{ displayProject.duration | prettyDuration }}</template>
-                        </div>
-                        <div class="location-container" v-if="project.location">
-                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
-                            <template>{{ project.location }}</template>
-                        </div>
-                        <div class="location-container" v-if="displayProject.places.native">
-                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
-                            <template>Native Lands: {{ displayProject.places.native }}</template>
-                        </div>
+                    <div class="duration-container" v-if="displayProject.duration">
+                        <img alt="Location" src="@/assets/icon-time.png" class="icon" />
+                        <template>{{ displayProject.duration | prettyDuration }}</template>
+                    </div>
+                    <div class="location-container" v-if="project.location">
+                        <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                        <template>{{ project.location }}</template>
+                    </div>
+                    <div class="location-container" v-if="displayProject.places.native">
+                        <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                        <template>Native Lands: {{ displayProject.places.native }}</template>
                     </div>
                 </div>
-
-                <div class="details-bottom">
-                    <div class="details-team">
-                        <div class="title">Team</div>
-                        <UserPhoto
-                            v-for="projectUser in displayProject.users"
-                            v-bind:key="projectUser.user.email"
-                            :user="projectUser.user"
-                        />
-                    </div>
-                    <div class="details-modules">
-                        <div class="title">Modules</div>
-
-                        <img
-                            v-for="module in projectModules"
-                            v-bind:key="module.name"
-                            alt="Module icon"
-                            class="module-icon"
-                            :src="module.url"
-                        />
-                    </div>
+                <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
+                <div class="project-detail">{{ project.description }}</div>
+                <div class="details-modules">
+                    <img
+                        v-for="module in projectModules"
+                        v-bind:key="module.name"
+                        alt="Module icon"
+                        class="module-icon"
+                        :src="module.url"
+                    />
                 </div>
             </div>
         </div>
@@ -164,23 +149,28 @@ export default {
 .details {
     display: flex;
     flex-direction: row;
-}
-.details > .left {
-    flex: 1;
     border: 2px solid #d8dce0;
     border-radius: 2px;
-    margin-right: 20px;
     background-color: white;
+}
+.details > .left {
+    max-width: 400px;
+    min-height: 335px;
+    flex: 1;
     padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
 }
+.details .project-detail {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.details .below-photo {
+    margin-top: auto;
+}
 .details > .right {
     flex: 2;
-    border: 2px solid #d8dce0;
-    border-radius: 2px;
-    background-color: white;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -189,24 +179,16 @@ export default {
 }
 
 .details .details-heading {
-    font-weight: bold;
+    font-weight: 900;
     padding-bottom: 20px;
+    font-size: 24px;
+    color: #2c3e50;
 }
 .details .details-top {
     display: flex;
-    flex-direction: row;
-    padding-bottom: 20px;
+    flex-direction: column;
 }
-.details .details-left {
-    padding-right: 20px;
-    flex-grow: 1;
-    flex: 2;
-}
-.details .details-right {
-    flex-grow: 1;
-    flex: 1;
-}
-.details .details-right .icon {
+.details .icon {
     padding-right: 0.2em;
 }
 .details .details-bottom {

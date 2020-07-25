@@ -6,9 +6,10 @@
                     <ProjectPhoto :project="project" />
                 </div>
 
-                <DisplayProjectTags :tags="project.tags" />
-
-                <FollowPanel :project="project" v-bind:key="project.id" />
+                <div class="below-photo">
+                    <DisplayProjectTags :tags="project.tags" />
+                    <FollowPanel :project="project" v-bind:key="project.id" />
+                </div>
             </div>
 
             <div class="right">
@@ -202,6 +203,8 @@ export default {
     flex-direction: row;
 }
 .details > .left {
+    max-width: 400px;
+    min-height: 335px;
     flex: 1;
     border: 2px solid #d8dce0;
     border-radius: 2px;
@@ -215,6 +218,9 @@ export default {
 .details .photo {
     display: flex;
     flex-direction: column;
+}
+.details .below-photo {
+    margin-top: auto;
 }
 .details > .right {
     flex: 2;
