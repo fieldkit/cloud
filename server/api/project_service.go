@@ -743,16 +743,18 @@ func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.Dow
 	}
 
 	if payload.Size != nil {
-		resized, err := resizeLoadedMedia(ctx, lm, uint(*payload.Size), 0)
-		if err != nil {
-			return nil, err
+		if *resource.MediaContentType == "image/jpeg" || *resource.MediaContentType == "image/png" {
+			resized, err := resizeLoadedMedia(ctx, lm, uint(*payload.Size), 0)
+			if err != nil {
+				return nil, err
+			}
+			return &project.DownloadedPhoto{
+				Length:      resized.Size,
+				ContentType: resized.ContentType,
+				Etag:        etag,
+				Body:        resized.Data,
+			}, nil
 		}
-		return &project.DownloadedPhoto{
-			Length:      resized.Size,
-			ContentType: resized.ContentType,
-			Etag:        etag,
-			Body:        resized.Data,
-		}, nil
 	}
 
 	data, err := ioutil.ReadAll(lm.Reader)
