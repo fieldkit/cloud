@@ -192,9 +192,9 @@ export default Vue.extend({
 .section-heading {
     font-size: 20px;
     font-weight: 600;
-    padding-top: 15px;
-    padding-bottom: 15px;
-    padding-left: 35px;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 1em;
     border-bottom: 1px solid lightgray;
 }
 .stations-heading {
@@ -204,7 +204,7 @@ export default Vue.extend({
 .section-body {
     display: flex;
     flex-direction: row;
-    height: 342px;
+    height: 352px;
 }
 .stations-container {
     display: flex;
@@ -218,7 +218,7 @@ export default Vue.extend({
 .add-station {
     margin-left: auto;
     font-size: 14px;
-    margin-right: 10px;
+    margin-right: 1em;
     cursor: pointer;
 }
 .add-station-btn {
@@ -242,10 +242,12 @@ export default Vue.extend({
     flex-direction: column;
 }
 .stations-panel .stations {
-    padding: 10px;
+    padding-top: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
 }
 .stations-panel .stations > * {
-    margin-bottom: 10px;
+    margin-bottom: 1em;
 }
 .project-stations-map-container {
     transition: width 0.5s;
@@ -255,7 +257,7 @@ export default Vue.extend({
 .station-box {
     height: 38px;
     margin: 20px auto;
-    padding: 10px;
+    padding: 1em;
     border: 1px solid #d8dce0;
     transition: opacity 0.25s;
 }
@@ -277,7 +279,7 @@ export default Vue.extend({
     flex-direction: column;
     justify-content: space-evenly;
     border-left: 1px solid #d8dce0;
-    padding-left: 10px;
+    padding-left: 1em;
     text-align: center;
 }
 
@@ -293,7 +295,7 @@ export default Vue.extend({
 
 .pagination {
     margin-top: auto;
-    padding: 5px;
+    padding-bottom: 1em;
 }
 
 /deep/ .station-hover-summary {
