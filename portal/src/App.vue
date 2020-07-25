@@ -29,15 +29,9 @@ html {
 html,
 body,
 #app {
-    min-width: 1100px;
     height: 100%;
     display: flex;
     flex-direction: column;
-}
-body:not(.disable-scrolling) {
-    overflow-y: scroll;
-}
-body {
 }
 body {
     font-family: "Avenir", Helvetica, Arial, sans-serif;
@@ -49,6 +43,12 @@ body {
     padding: 0;
 
     flex-shrink: 0;
+}
+body:not(.disable-scrolling) {
+    overflow-y: scroll;
+}
+body.disable-scrolling {
+    margin-right: 14px; /* We need width of the scrollbars! */
 }
 body.blue-background {
     background-color: #1b80c9;
