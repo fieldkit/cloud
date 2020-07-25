@@ -862,12 +862,20 @@ class FKApi {
         });
     }
 
-    public loadMedia(url: string): Promise<any> {
+    public loadMedia(url: string, params: { size: number } | null = null): Promise<any> {
+        const getUrl = () => {
+            if (params) {
+                const qp = new URLSearchParams();
+                qp.append("size", params.size.toString());
+                return this.baseUrl + url + "?" + qp.toString();
+            }
+            return this.baseUrl + url;
+        };
         return this.invoke({
             auth: Auth.Required,
             method: "GET",
             blob: true,
-            url: this.baseUrl + url,
+            url: getUrl(),
         }).then((blob) => {
             const reader = new FileReader();
             return new Promise((resolve, reject) => {
