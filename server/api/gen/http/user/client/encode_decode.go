@@ -10,6 +10,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -464,6 +465,27 @@ func (c *Client) BuildDownloadPhotoRequest(ctx context.Context, v interface{}) (
 	return req, nil
 }
 
+// EncodeDownloadPhotoRequest returns an encoder for requests sent to the user
+// download photo server.
+func EncodeDownloadPhotoRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*user.DownloadPhotoPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("user", "download photo", "*user.DownloadPhotoPayload", v)
+		}
+		if p.IfNoneMatch != nil {
+			head := *p.IfNoneMatch
+			req.Header.Set("If-None-Match", head)
+		}
+		values := req.URL.Query()
+		if p.Size != nil {
+			values.Add("size", fmt.Sprintf("%v", *p.Size))
+		}
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
 // DecodeDownloadPhotoResponse returns a decoder for responses returned by the
 // user download photo endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
@@ -484,34 +506,26 @@ func DecodeDownloadPhotoResponse(decoder func(*http.Response) goahttp.Decoder, r
 			defer func() {
 				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
 			}()
+		} else {
+			defer resp.Body.Close()
 		}
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				length      int64
-				contentType string
-				err         error
+				body DownloadPhotoResponseBody
+				err  error
 			)
-			{
-				lengthRaw := resp.Header.Get("Content-Length")
-				if lengthRaw == "" {
-					return nil, goahttp.ErrValidationError("user", "download photo", goa.MissingFieldError("Content-Length", "header"))
-				}
-				v, err2 := strconv.ParseInt(lengthRaw, 10, 64)
-				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("length", lengthRaw, "integer"))
-				}
-				length = v
-			}
-			contentTypeRaw := resp.Header.Get("Content-Type")
-			if contentTypeRaw == "" {
-				err = goa.MergeErrors(err, goa.MissingFieldError("Content-Type", "header"))
-			}
-			contentType = contentTypeRaw
+			err = decoder(resp).Decode(&body)
 			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "download photo", err)
+			}
+			p := NewDownloadPhotoDownloadedPhotoOK(&body)
+			view := "default"
+			vres := &userviews.DownloadedPhoto{Projected: p, View: view}
+			if err = userviews.ValidateDownloadedPhoto(vres); err != nil {
 				return nil, goahttp.ErrValidationError("user", "download photo", err)
 			}
-			res := NewDownloadPhotoResultOK(length, contentType)
+			res := user.NewDownloadedPhoto(vres)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (

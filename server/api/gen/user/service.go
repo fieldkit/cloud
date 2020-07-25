@@ -25,7 +25,7 @@ type Service interface {
 	// UploadPhoto implements upload photo.
 	UploadPhoto(context.Context, *UploadPhotoPayload, io.ReadCloser) (err error)
 	// DownloadPhoto implements download photo.
-	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadPhotoResult, body io.ReadCloser, err error)
+	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadedPhoto, err error)
 	// Login implements login.
 	Login(context.Context, *LoginPayload) (res *LoginResult, err error)
 	// RecoveryLookup implements recovery lookup.
@@ -101,14 +101,17 @@ type UploadPhotoPayload struct {
 // DownloadPhotoPayload is the payload type of the user service download photo
 // method.
 type DownloadPhotoPayload struct {
-	UserID int32
+	UserID      int32
+	Size        *int32
+	IfNoneMatch *string
 }
 
-// DownloadPhotoResult is the result type of the user service download photo
-// method.
-type DownloadPhotoResult struct {
+// DownloadedPhoto is the result type of the user service download photo method.
+type DownloadedPhoto struct {
 	Length      int64
 	ContentType string
+	Etag        string
+	Body        []byte
 }
 
 // LoginPayload is the payload type of the user service login method.
@@ -341,6 +344,19 @@ func NewViewedAvailableRoles(res *AvailableRoles, view string) *userviews.Availa
 	return &userviews.AvailableRoles{Projected: p, View: "default"}
 }
 
+// NewDownloadedPhoto initializes result type DownloadedPhoto from viewed
+// result type DownloadedPhoto.
+func NewDownloadedPhoto(vres *userviews.DownloadedPhoto) *DownloadedPhoto {
+	return newDownloadedPhoto(vres.Projected)
+}
+
+// NewViewedDownloadedPhoto initializes viewed result type DownloadedPhoto from
+// result type DownloadedPhoto using the given view.
+func NewViewedDownloadedPhoto(res *DownloadedPhoto, view string) *userviews.DownloadedPhoto {
+	p := newDownloadedPhotoView(res)
+	return &userviews.DownloadedPhoto{Projected: p, View: "default"}
+}
+
 // NewUser initializes result type User from viewed result type User.
 func NewUser(vres *userviews.User) *User {
 	return newUser(vres.Projected)
@@ -415,6 +431,36 @@ func newAvailableRolesView(res *AvailableRoles) *userviews.AvailableRolesView {
 		for i, val := range res.Roles {
 			vres.Roles[i] = transformAvailableRoleToUserviewsAvailableRoleView(val)
 		}
+	}
+	return vres
+}
+
+// newDownloadedPhoto converts projected type DownloadedPhoto to service type
+// DownloadedPhoto.
+func newDownloadedPhoto(vres *userviews.DownloadedPhotoView) *DownloadedPhoto {
+	res := &DownloadedPhoto{
+		Body: vres.Body,
+	}
+	if vres.Length != nil {
+		res.Length = *vres.Length
+	}
+	if vres.ContentType != nil {
+		res.ContentType = *vres.ContentType
+	}
+	if vres.Etag != nil {
+		res.Etag = *vres.Etag
+	}
+	return res
+}
+
+// newDownloadedPhotoView projects result type DownloadedPhoto to projected
+// type DownloadedPhotoView using the "default" view.
+func newDownloadedPhotoView(res *DownloadedPhoto) *userviews.DownloadedPhotoView {
+	vres := &userviews.DownloadedPhotoView{
+		Length:      &res.Length,
+		ContentType: &res.ContentType,
+		Etag:        &res.Etag,
+		Body:        res.Body,
 	}
 	return vres
 }

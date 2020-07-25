@@ -632,27 +632,47 @@ func (s *UserService) UploadPhoto(ctx context.Context, payload *user.UploadPhoto
 	return nil
 }
 
-func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadPhotoPayload) (*user.DownloadPhotoResult, io.ReadCloser, error) {
+func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadPhotoPayload) (*user.DownloadedPhoto, error) {
 	resource := &data.User{}
 	if err := s.options.Database.GetContext(ctx, resource, `SELECT * FROM fieldkit.user WHERE id = $1`, payload.UserID); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	if resource.MediaURL == nil || resource.MediaContentType == nil {
-		return nil, nil, user.MakeNotFound(errors.New("not found"))
+		return nil, user.MakeNotFound(errors.New("not found"))
+	}
+
+	etag := quickHash(*resource.MediaURL) + ""
+	if payload.Size != nil {
+		etag += fmt.Sprintf(":%d", *payload.Size)
+	}
+
+	if payload.IfNoneMatch != nil {
+		if *payload.IfNoneMatch == fmt.Sprintf(`"%s"`, etag) {
+			return &user.DownloadedPhoto{
+				Etag: etag,
+				Body: []byte{},
+			}, nil
+		}
 	}
 
 	mr := repositories.NewMediaRepository(s.options.MediaFiles)
-
 	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
 	if err != nil {
-		return nil, nil, user.MakeNotFound(errors.New("not found"))
+		return nil, user.MakeNotFound(errors.New("not found"))
 	}
 
-	return &user.DownloadPhotoResult{
+	data, err := ioutil.ReadAll(lm.Reader)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user.DownloadedPhoto{
 		Length:      int64(lm.Size),
 		ContentType: *resource.MediaContentType,
-	}, ioutil.NopCloser(lm.Reader), nil
+		Etag:        etag,
+		Body:        data,
+	}, nil
 }
 
 func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {

@@ -85,14 +85,13 @@ func (c *Client) UploadPhoto(ctx context.Context, p *UploadPhotoPayload, req io.
 }
 
 // DownloadPhoto calls the "download photo" endpoint of the "user" service.
-func (c *Client) DownloadPhoto(ctx context.Context, p *DownloadPhotoPayload) (res *DownloadPhotoResult, resp io.ReadCloser, err error) {
+func (c *Client) DownloadPhoto(ctx context.Context, p *DownloadPhotoPayload) (res *DownloadedPhoto, err error) {
 	var ires interface{}
 	ires, err = c.DownloadPhotoEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	o := ires.(*DownloadPhotoResponseData)
-	return o.Result, o.Body, nil
+	return ires.(*DownloadedPhoto), nil
 }
 
 // Login calls the "login" endpoint of the "user" service.

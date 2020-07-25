@@ -9,7 +9,6 @@ package server
 
 import (
 	"context"
-	"io"
 	"net/http"
 	"regexp"
 
@@ -389,16 +388,8 @@ func NewDownloadPhotoHandler(
 			}
 			return
 		}
-		o := res.(*user.DownloadPhotoResponseData)
-		defer o.Body.Close()
-		if err := encodeResponse(ctx, w, o.Result); err != nil {
+		if err := encodeResponse(ctx, w, res); err != nil {
 			errhandler(ctx, w, err)
-			return
-		}
-		if _, err := io.Copy(w, o.Body); err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
 		}
 	})
 }

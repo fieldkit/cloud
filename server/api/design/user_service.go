@@ -87,37 +87,23 @@ var _ = Service("user", func() {
 	})
 
 	Method("download photo", func() {
-		/*
-			Security(JWTAuth, func() {
-				Scope("api:access")
-			})
-		*/
-
 		Payload(func() {
-			// Token("auth")
-			// Required("auth")
 			Attribute("userId", Int32)
 			Required("userId")
+			Attribute("size", Int32)
+			Attribute("ifNoneMatch", String)
 		})
 
-		Result(func() {
-			Attribute("length", Int64)
-			Required("length")
-			Attribute("contentType", String)
-			Required("contentType")
-		})
+		Result(DownloadedPhoto)
 
 		HTTP(func() {
 			GET("user/{userId}/media")
 
-			SkipResponseBodyEncodeDecode()
+			Header("ifNoneMatch:If-None-Match")
 
-			Response(func() {
-				Header("length:Content-Length")
-				Header("contentType:Content-Type")
+			Params(func() {
+				Param("size")
 			})
-
-			// httpAuthenticationQueryString()
 		})
 	})
 

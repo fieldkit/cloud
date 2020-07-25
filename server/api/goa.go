@@ -145,7 +145,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	activityServer := activitySvr.New(activityEndpoints, mux, dec, enc, eh, nil)
 	projectServer := projectSvr.New(projectEndpoints, mux, dec, InterceptDownloadResponses(), eh, nil)
 	stationServer := stationSvr.New(stationEndpoints, mux, dec, enc, eh, nil)
-	userServer := userSvr.New(userEndpoints, mux, dec, enc, eh, nil)
+	userServer := userSvr.New(userEndpoints, mux, dec, InterceptDownloadResponses(), eh, nil)
 	ingestionServer := ingestionSvr.New(ingestionEndpoints, mux, dec, enc, eh, nil)
 	informationServer := informationSvr.New(informationEndpoints, mux, dec, enc, eh, nil)
 	sensorServer := sensorSvr.New(sensorEndpoints, mux, dec, enc, eh, nil)

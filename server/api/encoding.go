@@ -8,6 +8,7 @@ import (
 	goahttp "goa.design/goa/v3/http"
 
 	projectSvr "github.com/fieldkit/cloud/server/api/gen/http/project/server"
+	userSvr "github.com/fieldkit/cloud/server/api/gen/http/user/server"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 )
@@ -27,6 +28,19 @@ func NewStreamAndCacheFriendlyEncoder(ctx context.Context, rw http.ResponseWrite
 func (e *StreamAndCacheFriendlyEncoder) Encode(v interface{}) error {
 	switch v := v.(type) {
 	case *projectSvr.DownloadPhotoResponseBody:
+		e.rw.Header().Set("Content-Length", fmt.Sprintf("%v", v.Length))
+		if v.ContentType != "" {
+			e.rw.Header().Set("Content-Type", v.ContentType)
+		}
+		e.rw.Header().Set("ETag", fmt.Sprintf(`"%v"`, v.Etag))
+		if len(v.Body) > 0 {
+			e.rw.WriteHeader(http.StatusOK)
+			e.rw.Write(v.Body)
+		} else {
+			e.rw.WriteHeader(http.StatusNotModified)
+		}
+		return nil
+	case *userSvr.DownloadPhotoResponseBody:
 		e.rw.Header().Set("Content-Length", fmt.Sprintf("%v", v.Length))
 		if v.ContentType != "" {
 			e.rw.Header().Set("Content-Type", v.ContentType)

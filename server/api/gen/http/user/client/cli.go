@@ -83,7 +83,7 @@ func BuildUploadPhotoPayload(userUploadPhotoContentType string, userUploadPhotoC
 
 // BuildDownloadPhotoPayload builds the payload for the user download photo
 // endpoint from CLI flags.
-func BuildDownloadPhotoPayload(userDownloadPhotoUserID string) (*user.DownloadPhotoPayload, error) {
+func BuildDownloadPhotoPayload(userDownloadPhotoUserID string, userDownloadPhotoSize string, userDownloadPhotoIfNoneMatch string) (*user.DownloadPhotoPayload, error) {
 	var err error
 	var userID int32
 	{
@@ -94,8 +94,28 @@ func BuildDownloadPhotoPayload(userDownloadPhotoUserID string) (*user.DownloadPh
 			return nil, fmt.Errorf("invalid value for userID, must be INT32")
 		}
 	}
+	var size *int32
+	{
+		if userDownloadPhotoSize != "" {
+			var v int64
+			v, err = strconv.ParseInt(userDownloadPhotoSize, 10, 32)
+			val := int32(v)
+			size = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for size, must be INT32")
+			}
+		}
+	}
+	var ifNoneMatch *string
+	{
+		if userDownloadPhotoIfNoneMatch != "" {
+			ifNoneMatch = &userDownloadPhotoIfNoneMatch
+		}
+	}
 	v := &user.DownloadPhotoPayload{}
 	v.UserID = userID
+	v.Size = size
+	v.IfNoneMatch = ifNoneMatch
 
 	return v, nil
 }
@@ -108,7 +128,7 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userLoginBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"effie@lueilwitz.com\",\n      \"password\": \"fif\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"jamison@frami.name\",\n      \"password\": \"btx\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
@@ -138,7 +158,7 @@ func BuildRecoveryLookupPayload(userRecoveryLookupBody string) (*user.RecoveryLo
 	{
 		err = json.Unmarshal([]byte(userRecoveryLookupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Unde consequatur pariatur accusantium autem pariatur.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Nulla et.\"\n   }'")
 		}
 	}
 	v := &user.RecoveryLookupFields{
@@ -159,7 +179,7 @@ func BuildRecoveryPayload(userRecoveryBody string) (*user.RecoveryPayload, error
 	{
 		err = json.Unmarshal([]byte(userRecoveryBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"password\": \"m3f\",\n      \"token\": \"Et tempore voluptatum nostrum quaerat.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"password\": \"jya\",\n      \"token\": \"Eaque adipisci et.\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Password) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 10, true))
@@ -200,7 +220,7 @@ func BuildRefreshPayload(userRefreshBody string) (*user.RefreshPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userRefreshBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"refreshToken\": \"Rerum alias repellendus porro sequi.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"refreshToken\": \"Perspiciatis a assumenda natus accusamus doloremque ullam.\"\n   }'")
 		}
 	}
 	v := &user.RefreshPayload{
@@ -332,7 +352,7 @@ func BuildChangePasswordPayload(userChangePasswordBody string, userChangePasswor
 	{
 		err = json.Unmarshal([]byte(userChangePasswordBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"newPassword\": \"xmk\",\n      \"oldPassword\": \"oad\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"newPassword\": \"06j\",\n      \"oldPassword\": \"tso\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.OldPassword) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.oldPassword", body.OldPassword, utf8.RuneCountInString(body.OldPassword), 10, true))

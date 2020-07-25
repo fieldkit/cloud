@@ -352,13 +352,11 @@ func EncodeUploadPhotoError(encoder func(context.Context, http.ResponseWriter) g
 // user download photo endpoint.
 func EncodeDownloadPhotoResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*user.DownloadPhotoResult)
-		val := res.Length
-		lengths := strconv.FormatInt(val, 10)
-		w.Header().Set("Content-Length", lengths)
-		w.Header().Set("Content-Type", res.ContentType)
+		res := v.(*userviews.DownloadedPhoto)
+		enc := encoder(ctx, w)
+		body := NewDownloadPhotoResponseBody(res.Projected)
 		w.WriteHeader(http.StatusOK)
-		return nil
+		return enc.Encode(body)
 	}
 }
 
@@ -367,8 +365,10 @@ func EncodeDownloadPhotoResponse(encoder func(context.Context, http.ResponseWrit
 func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			userID int32
-			err    error
+			userID      int32
+			size        *int32
+			ifNoneMatch *string
+			err         error
 
 			params = mux.Vars(r)
 		)
@@ -380,10 +380,25 @@ func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) g
 			}
 			userID = int32(v)
 		}
+		{
+			sizeRaw := r.URL.Query().Get("size")
+			if sizeRaw != "" {
+				v, err2 := strconv.ParseInt(sizeRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("size", sizeRaw, "integer"))
+				}
+				pv := int32(v)
+				size = &pv
+			}
+		}
+		ifNoneMatchRaw := r.Header.Get("If-None-Match")
+		if ifNoneMatchRaw != "" {
+			ifNoneMatch = &ifNoneMatchRaw
+		}
 		if err != nil {
 			return nil, err
 		}
-		payload := NewDownloadPhotoPayload(userID)
+		payload := NewDownloadPhotoPayload(userID, size, ifNoneMatch)
 
 		return payload, nil
 	}

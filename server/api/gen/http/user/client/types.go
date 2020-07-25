@@ -78,6 +78,15 @@ type RolesResponseBody struct {
 	Roles []*AvailableRoleResponseBody `form:"roles,omitempty" json:"roles,omitempty" xml:"roles,omitempty"`
 }
 
+// DownloadPhotoResponseBody is the type of the "user" service "download photo"
+// endpoint HTTP response body.
+type DownloadPhotoResponseBody struct {
+	Length      *int64  `form:"length,omitempty" json:"length,omitempty" xml:"length,omitempty"`
+	ContentType *string `form:"contentType,omitempty" json:"contentType,omitempty" xml:"contentType,omitempty"`
+	Etag        *string `form:"etag,omitempty" json:"etag,omitempty" xml:"etag,omitempty"`
+	Body        []byte  `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+}
+
 // AddResponseBody is the type of the "user" service "add" endpoint HTTP
 // response body.
 type AddResponseBody struct {
@@ -1814,12 +1823,15 @@ func NewUploadPhotoBadRequest(body *UploadPhotoBadRequestResponseBody) *goa.Serv
 	return v
 }
 
-// NewDownloadPhotoResultOK builds a "user" service "download photo" endpoint
-// result from a HTTP "OK" response.
-func NewDownloadPhotoResultOK(length int64, contentType string) *user.DownloadPhotoResult {
-	v := &user.DownloadPhotoResult{}
-	v.Length = length
-	v.ContentType = contentType
+// NewDownloadPhotoDownloadedPhotoOK builds a "user" service "download photo"
+// endpoint result from a HTTP "OK" response.
+func NewDownloadPhotoDownloadedPhotoOK(body *DownloadPhotoResponseBody) *userviews.DownloadedPhotoView {
+	v := &userviews.DownloadedPhotoView{
+		Length:      body.Length,
+		ContentType: body.ContentType,
+		Etag:        body.Etag,
+		Body:        body.Body,
+	}
 
 	return v
 }

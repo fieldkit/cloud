@@ -11,7 +11,6 @@ import (
 	"context"
 	"net/http"
 
-	user "github.com/fieldkit/cloud/server/api/gen/user"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -215,6 +214,7 @@ func (c *Client) UploadPhoto() goa.Endpoint {
 // service download photo server.
 func (c *Client) DownloadPhoto() goa.Endpoint {
 	var (
+		encodeRequest  = EncodeDownloadPhotoRequest(c.encoder)
 		decodeResponse = DecodeDownloadPhotoResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
@@ -222,16 +222,15 @@ func (c *Client) DownloadPhoto() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
 		resp, err := c.DownloadPhotoDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("user", "download photo", err)
 		}
-		res, err := decodeResponse(resp)
-		if err != nil {
-			resp.Body.Close()
-			return nil, goahttp.ErrDecodingError("user", "download photo", err)
-		}
-		return &user.DownloadPhotoResponseData{Result: res.(*user.DownloadPhotoResult), Body: resp.Body}, nil
+		return decodeResponse(resp)
 	}
 }
 

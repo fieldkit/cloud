@@ -78,6 +78,15 @@ type RolesResponseBody struct {
 	Roles []*AvailableRoleResponseBody `form:"roles" json:"roles" xml:"roles"`
 }
 
+// DownloadPhotoResponseBody is the type of the "user" service "download photo"
+// endpoint HTTP response body.
+type DownloadPhotoResponseBody struct {
+	Length      int64  `form:"length" json:"length" xml:"length"`
+	Body        []byte `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	ContentType string `form:"contentType" json:"contentType" xml:"contentType"`
+	Etag        string `form:"etag" json:"etag" xml:"etag"`
+}
+
 // AddResponseBody is the type of the "user" service "add" endpoint HTTP
 // response body.
 type AddResponseBody struct {
@@ -1561,6 +1570,18 @@ func NewRolesResponseBody(res *userviews.AvailableRolesView) *RolesResponseBody 
 	return body
 }
 
+// NewDownloadPhotoResponseBody builds the HTTP response body from the result
+// of the "download photo" endpoint of the "user" service.
+func NewDownloadPhotoResponseBody(res *userviews.DownloadedPhotoView) *DownloadPhotoResponseBody {
+	body := &DownloadPhotoResponseBody{
+		Length:      *res.Length,
+		ContentType: *res.ContentType,
+		Etag:        *res.Etag,
+		Body:        res.Body,
+	}
+	return body
+}
+
 // NewAddResponseBody builds the HTTP response body from the result of the
 // "add" endpoint of the "user" service.
 func NewAddResponseBody(res *userviews.UserView) *AddResponseBody {
@@ -2754,9 +2775,11 @@ func NewUploadPhotoPayload(contentType string, contentLength int64, auth string)
 
 // NewDownloadPhotoPayload builds a user service download photo endpoint
 // payload.
-func NewDownloadPhotoPayload(userID int32) *user.DownloadPhotoPayload {
+func NewDownloadPhotoPayload(userID int32, size *int32, ifNoneMatch *string) *user.DownloadPhotoPayload {
 	v := &user.DownloadPhotoPayload{}
 	v.UserID = userID
+	v.Size = size
+	v.IfNoneMatch = ifNoneMatch
 
 	return v
 }
