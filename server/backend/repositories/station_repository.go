@@ -30,8 +30,10 @@ func NewStationRepository(db *sqlxcache.DB) (rr *StationRepository, err error) {
 func (r *StationRepository) Add(ctx context.Context, adding *data.Station) (station *data.Station, err error) {
 	if err := r.db.NamedGetContext(ctx, adding, `
 		INSERT INTO fieldkit.station
-		(name, device_id, owner_id, created_at, updated_at, location, location_name, place_other, place_native, battery, memory_used, memory_available, firmware_number, firmware_time, recording_started_at) VALUES
-		(:name, :device_id, :owner_id, :created_at, :updated_at, ST_SetSRID(ST_GeomFromText(:location), 4326), :location_name, :place_other, :place_native, :battery, :memory_used, :memory_available, :firmware_number, :firmware_time, :recording_started_at)
+		(name, device_id, owner_id, created_at, updated_at, location, location_name, place_other, place_native,
+		 battery, memory_used, memory_available, firmware_number, firmware_time, recording_started_at) VALUES
+		(:name, :device_id, :owner_id, :created_at, :updated_at, ST_SetSRID(ST_GeomFromText(:location), 4326), :location_name, :place_other, :place_native,
+         :battery, :memory_used, :memory_available, :firmware_number, :firmware_time, :recording_started_at)
 		RETURNING id
 		`, adding); err != nil {
 		return nil, err

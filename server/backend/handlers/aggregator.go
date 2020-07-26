@@ -56,9 +56,10 @@ type aggregation struct {
 }
 
 type Aggregated struct {
-	Time     time.Time
-	Location []float64
-	Values   map[string]float64
+	Time          time.Time
+	Location      []float64
+	Values        map[string]float64
+	NumberSamples int32
 }
 
 func (a *aggregation) getTime(original time.Time) time.Time {
@@ -93,6 +94,8 @@ func (a *aggregation) add(t time.Time, key string, location []float64, value flo
 func (a *aggregation) close() (*Aggregated, error) {
 	agg := make(map[string]float64)
 
+	nsamples := 0
+
 	for key, values := range a.values {
 		if len(values) > 0 {
 			mean, err := stats.Mean(values)
@@ -102,14 +105,19 @@ func (a *aggregation) close() (*Aggregated, error) {
 
 			agg[key] = mean
 
+			if len(values) > nsamples {
+				nsamples = len(values)
+			}
+
 			a.values[key] = a.values[key][:0]
 		}
 	}
 
 	aggregated := &Aggregated{
-		Time:     a.opened,
-		Location: a.location,
-		Values:   agg,
+		Time:          a.opened,
+		Location:      a.location,
+		Values:        agg,
+		NumberSamples: int32(nsamples),
 	}
 
 	a.opened = time.Time{}
@@ -222,17 +230,20 @@ func (v *Aggregator) upsertSingle(ctx context.Context, a *aggregation, d *Aggreg
 		}
 
 		row := &data.AggregatedReading{
-			StationID: v.stationID,
-			SensorID:  v.sensors[key].ID,
-			Time:      data.NumericWireTime(d.Time),
-			Location:  location,
-			Value:     value,
+			StationID:     v.stationID,
+			SensorID:      v.sensors[key].ID,
+			Time:          data.NumericWireTime(d.Time),
+			Location:      location,
+			Value:         value,
+			NumberSamples: d.NumberSamples,
 		}
 
 		if err := v.db.NamedGetContext(ctx, row, fmt.Sprintf(`
-			INSERT INTO %s (station_id, sensor_id, time, location, value)
-			VALUES (:station_id, :sensor_id, :time, ST_SetSRID(ST_GeomFromText(:location), 4326), :value)
-			ON CONFLICT (time, station_id, sensor_id) DO UPDATE SET value = EXCLUDED.value, location = EXCLUDED.location
+			INSERT INTO %s (station_id, sensor_id, time, location, value, nsamples)
+			VALUES (:station_id, :sensor_id, :time, ST_SetSRID(ST_GeomFromText(:location), 4326), :value, :nsamples)
+			ON CONFLICT (time, station_id, sensor_id)
+				DO UPDATE SET value = EXCLUDED.value, location = EXCLUDED.location,
+							  nsamples = EXCLUDED.nsamples
 			RETURNING id
 			`, a.table), row); err != nil {
 			return fmt.Errorf("error upserting sensor reading: %v", err)
