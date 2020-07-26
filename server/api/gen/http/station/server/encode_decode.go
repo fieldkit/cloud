@@ -1162,6 +1162,22 @@ func marshalStationviewsStationLocationViewToStationLocationResponseBody(v *stat
 	return res
 }
 
+// marshalStationviewsStationDataSummaryViewToStationDataSummaryResponseBody
+// builds a value of type *StationDataSummaryResponseBody from a value of type
+// *stationviews.StationDataSummaryView.
+func marshalStationviewsStationDataSummaryViewToStationDataSummaryResponseBody(v *stationviews.StationDataSummaryView) *StationDataSummaryResponseBody {
+	if v == nil {
+		return nil
+	}
+	res := &StationDataSummaryResponseBody{
+		Start:           *v.Start,
+		End:             *v.End,
+		NumberOfSamples: *v.NumberOfSamples,
+	}
+
+	return res
+}
+
 // marshalStationviewsStationFullViewToStationFullResponseBody builds a value
 // of type *StationFullResponseBody from a value of type
 // *stationviews.StationFullView.
@@ -1199,6 +1215,9 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 	}
 	if v.Location != nil {
 		res.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(v.Location)
+	}
+	if v.Data != nil {
+		res.Data = marshalStationviewsStationDataSummaryViewToStationDataSummaryResponseBody(v.Data)
 	}
 
 	return res

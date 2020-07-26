@@ -15881,6 +15881,8 @@ definitions:
         format: float
       configurations:
         $ref: '#/definitions/StationConfigurationsResponseBody'
+      data:
+        $ref: '#/definitions/StationDataSummaryResponseBody'
       deviceId:
         type: string
         example: Et accusantium.
@@ -15980,7 +15982,7 @@ definitions:
           url: Ab error sed quibusdam.
     description: AddResponseBody result type (default view)
     example:
-      battery: 0.4461878
+      battery: 0.93973595
       configurations:
         all:
         - id: 4626303392124417979
@@ -16579,27 +16581,31 @@ definitions:
           provisionId: 2576989181459413634
           sourceId: 909523460
           time: 2972556332744009553
-      deviceId: Beatae autem quaerat iusto tempore cumque ut.
-      firmwareNumber: 278110328
-      firmwareTime: 1811515570009234105
-      id: 93333215
+      data:
+        end: 9137783270583459541
+        numberOfSamples: 412261433489182563
+        start: 3044072331501676612
+      deviceId: Ex tempore sed.
+      firmwareNumber: 466173994
+      firmwareTime: 7355391017693429094
+      id: 785170589
       location:
         latitude: 0.2788710947558846
         longitude: 0.9609414762697199
-      locationName: Impedit repellendus laboriosam modi et rerum.
-      memoryAvailable: 2018067582
-      memoryUsed: 312178559
-      name: Quia et eligendi est ut aut.
+      locationName: Modi et.
+      memoryAvailable: 2108504704
+      memoryUsed: 421776336
+      name: Suscipit beatae autem quaerat iusto tempore cumque.
       owner:
         id: 1383747607
         name: Natus eum.
       photos:
         small: Dolore eveniet pariatur et.
       placeNameNative: Est quas non.
-      placeNameOther: Asperiores voluptas libero aspernatur molestiae.
+      placeNameOther: Vero asperiores voluptas libero aspernatur molestiae.
       readOnly: true
-      recordingStartedAt: 6121730533086361330
-      updated: 9055958748585066525
+      recordingStartedAt: 1194474767486895105
+      updated: 316660845468102590
       uploads:
       - blocks:
         - 6666384612210717677
@@ -19236,6 +19242,30 @@ definitions:
         time: 2972556332744009553
     required:
     - all
+  StationDataSummaryResponseBody:
+    title: StationDataSummaryResponseBody
+    type: object
+    properties:
+      end:
+        type: integer
+        example: 4000083227135905011
+        format: int64
+      numberOfSamples:
+        type: integer
+        example: 2063748305781143859
+        format: int64
+      start:
+        type: integer
+        example: 400863106395464220
+        format: int64
+    example:
+      end: 7433037118255696751
+      numberOfSamples: 1925573043651016547
+      start: 9120591022908084106
+    required:
+    - start
+    - end
+    - numberOfSamples
   StationDeleteBadRequestResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -19694,6 +19724,8 @@ definitions:
         format: float
       configurations:
         $ref: '#/definitions/StationConfigurationsResponseBody'
+      data:
+        $ref: '#/definitions/StationDataSummaryResponseBody'
       deviceId:
         type: string
         example: Et quia quaerat magnam aut magni.
@@ -20392,6 +20424,10 @@ definitions:
           provisionId: 2576989181459413634
           sourceId: 909523460
           time: 2972556332744009553
+      data:
+        end: 9137783270583459541
+        numberOfSamples: 412261433489182563
+        start: 3044072331501676612
       deviceId: Eum eius labore vitae delectus nesciunt.
       firmwareNumber: 1375780009
       firmwareTime: 7258879264682282873
@@ -20453,7 +20489,7 @@ definitions:
     description: StationFullCollectionResponseBody is the result type for an array
       of StationFullResponseBody (default view)
     example:
-    - battery: 0.46210438
+    - battery: 0.50948477
       configurations:
         all:
         - id: 4626303392124417979
@@ -21052,27 +21088,31 @@ definitions:
           provisionId: 2576989181459413634
           sourceId: 909523460
           time: 2972556332744009553
-      deviceId: Qui dolorem.
-      firmwareNumber: 1094110192
-      firmwareTime: 7508504280437777104
-      id: 708753320
+      data:
+        end: 9137783270583459541
+        numberOfSamples: 412261433489182563
+        start: 3044072331501676612
+      deviceId: Et doloremque labore.
+      firmwareNumber: 1994792261
+      firmwareTime: 4262884935822732800
+      id: 776498766
       location:
         latitude: 0.2788710947558846
         longitude: 0.9609414762697199
-      locationName: Ut ut et eos dolor error.
-      memoryAvailable: 1484068452
-      memoryUsed: 1091978678
-      name: Laboriosam earum.
+      locationName: Dolor error harum sint ut qui.
+      memoryAvailable: 404233732
+      memoryUsed: 1783803579
+      name: Qui dolorem.
       owner:
         id: 1383747607
         name: Natus eum.
       photos:
         small: Dolore eveniet pariatur et.
-      placeNameNative: Itaque natus sapiente.
-      placeNameOther: Sint ut qui facere magnam hic.
-      readOnly: true
-      recordingStartedAt: 2430959905657236107
-      updated: 7661378038436230713
+      placeNameNative: Odit molestiae nostrum et veniam.
+      placeNameOther: Magnam hic et itaque natus sapiente.
+      readOnly: false
+      recordingStartedAt: 7508504280437777104
+      updated: 4068806280782171607
       uploads:
       - blocks:
         - 6666384612210717677
@@ -21104,7 +21144,7 @@ definitions:
         type: Quam ut officiis et.
         uploadId: Reprehenderit quod.
         url: Ab error sed quibusdam.
-    - battery: 0.46210438
+    - battery: 0.50948477
       configurations:
         all:
         - id: 4626303392124417979
@@ -21703,27 +21743,31 @@ definitions:
           provisionId: 2576989181459413634
           sourceId: 909523460
           time: 2972556332744009553
-      deviceId: Qui dolorem.
-      firmwareNumber: 1094110192
-      firmwareTime: 7508504280437777104
-      id: 708753320
+      data:
+        end: 9137783270583459541
+        numberOfSamples: 412261433489182563
+        start: 3044072331501676612
+      deviceId: Et doloremque labore.
+      firmwareNumber: 1994792261
+      firmwareTime: 4262884935822732800
+      id: 776498766
       location:
         latitude: 0.2788710947558846
         longitude: 0.9609414762697199
-      locationName: Ut ut et eos dolor error.
-      memoryAvailable: 1484068452
-      memoryUsed: 1091978678
-      name: Laboriosam earum.
+      locationName: Dolor error harum sint ut qui.
+      memoryAvailable: 404233732
+      memoryUsed: 1783803579
+      name: Qui dolorem.
       owner:
         id: 1383747607
         name: Natus eum.
       photos:
         small: Dolore eveniet pariatur et.
-      placeNameNative: Itaque natus sapiente.
-      placeNameOther: Sint ut qui facere magnam hic.
-      readOnly: true
-      recordingStartedAt: 2430959905657236107
-      updated: 7661378038436230713
+      placeNameNative: Odit molestiae nostrum et veniam.
+      placeNameOther: Magnam hic et itaque natus sapiente.
+      readOnly: false
+      recordingStartedAt: 7508504280437777104
+      updated: 4068806280782171607
       uploads:
       - blocks:
         - 6666384612210717677
@@ -21755,7 +21799,7 @@ definitions:
         type: Quam ut officiis et.
         uploadId: Reprehenderit quod.
         url: Ab error sed quibusdam.
-    - battery: 0.46210438
+    - battery: 0.50948477
       configurations:
         all:
         - id: 4626303392124417979
@@ -22354,27 +22398,31 @@ definitions:
           provisionId: 2576989181459413634
           sourceId: 909523460
           time: 2972556332744009553
-      deviceId: Qui dolorem.
-      firmwareNumber: 1094110192
-      firmwareTime: 7508504280437777104
-      id: 708753320
+      data:
+        end: 9137783270583459541
+        numberOfSamples: 412261433489182563
+        start: 3044072331501676612
+      deviceId: Et doloremque labore.
+      firmwareNumber: 1994792261
+      firmwareTime: 4262884935822732800
+      id: 776498766
       location:
         latitude: 0.2788710947558846
         longitude: 0.9609414762697199
-      locationName: Ut ut et eos dolor error.
-      memoryAvailable: 1484068452
-      memoryUsed: 1091978678
-      name: Laboriosam earum.
+      locationName: Dolor error harum sint ut qui.
+      memoryAvailable: 404233732
+      memoryUsed: 1783803579
+      name: Qui dolorem.
       owner:
         id: 1383747607
         name: Natus eum.
       photos:
         small: Dolore eveniet pariatur et.
-      placeNameNative: Itaque natus sapiente.
-      placeNameOther: Sint ut qui facere magnam hic.
-      readOnly: true
-      recordingStartedAt: 2430959905657236107
-      updated: 7661378038436230713
+      placeNameNative: Odit molestiae nostrum et veniam.
+      placeNameOther: Magnam hic et itaque natus sapiente.
+      readOnly: false
+      recordingStartedAt: 7508504280437777104
+      updated: 4068806280782171607
       uploads:
       - blocks:
         - 6666384612210717677
@@ -22551,6 +22599,8 @@ definitions:
         format: float
       configurations:
         $ref: '#/definitions/StationConfigurationsResponseBody'
+      data:
+        $ref: '#/definitions/StationDataSummaryResponseBody'
       deviceId:
         type: string
         example: Cumque et.
@@ -23249,6 +23299,10 @@ definitions:
           provisionId: 2576989181459413634
           sourceId: 909523460
           time: 2972556332744009553
+      data:
+        end: 9137783270583459541
+        numberOfSamples: 412261433489182563
+        start: 3044072331501676612
       deviceId: Voluptate iure sunt.
       firmwareNumber: 1925273987
       firmwareTime: 8954580998746892197
@@ -23809,7 +23863,7 @@ definitions:
     description: List MineResponseBody result type (default view)
     example:
       stations:
-      - battery: 0.46210438
+      - battery: 0.50948477
         configurations:
           all:
           - id: 4626303392124417979
@@ -24408,27 +24462,31 @@ definitions:
             provisionId: 2576989181459413634
             sourceId: 909523460
             time: 2972556332744009553
-        deviceId: Qui dolorem.
-        firmwareNumber: 1094110192
-        firmwareTime: 7508504280437777104
-        id: 708753320
+        data:
+          end: 9137783270583459541
+          numberOfSamples: 412261433489182563
+          start: 3044072331501676612
+        deviceId: Et doloremque labore.
+        firmwareNumber: 1994792261
+        firmwareTime: 4262884935822732800
+        id: 776498766
         location:
           latitude: 0.2788710947558846
           longitude: 0.9609414762697199
-        locationName: Ut ut et eos dolor error.
-        memoryAvailable: 1484068452
-        memoryUsed: 1091978678
-        name: Laboriosam earum.
+        locationName: Dolor error harum sint ut qui.
+        memoryAvailable: 404233732
+        memoryUsed: 1783803579
+        name: Qui dolorem.
         owner:
           id: 1383747607
           name: Natus eum.
         photos:
           small: Dolore eveniet pariatur et.
-        placeNameNative: Itaque natus sapiente.
-        placeNameOther: Sint ut qui facere magnam hic.
-        readOnly: true
-        recordingStartedAt: 2430959905657236107
-        updated: 7661378038436230713
+        placeNameNative: Odit molestiae nostrum et veniam.
+        placeNameOther: Magnam hic et itaque natus sapiente.
+        readOnly: false
+        recordingStartedAt: 7508504280437777104
+        updated: 4068806280782171607
         uploads:
         - blocks:
           - 6666384612210717677
@@ -24460,7 +24518,7 @@ definitions:
           type: Quam ut officiis et.
           uploadId: Reprehenderit quod.
           url: Ab error sed quibusdam.
-      - battery: 0.46210438
+      - battery: 0.50948477
         configurations:
           all:
           - id: 4626303392124417979
@@ -25059,27 +25117,31 @@ definitions:
             provisionId: 2576989181459413634
             sourceId: 909523460
             time: 2972556332744009553
-        deviceId: Qui dolorem.
-        firmwareNumber: 1094110192
-        firmwareTime: 7508504280437777104
-        id: 708753320
+        data:
+          end: 9137783270583459541
+          numberOfSamples: 412261433489182563
+          start: 3044072331501676612
+        deviceId: Et doloremque labore.
+        firmwareNumber: 1994792261
+        firmwareTime: 4262884935822732800
+        id: 776498766
         location:
           latitude: 0.2788710947558846
           longitude: 0.9609414762697199
-        locationName: Ut ut et eos dolor error.
-        memoryAvailable: 1484068452
-        memoryUsed: 1091978678
-        name: Laboriosam earum.
+        locationName: Dolor error harum sint ut qui.
+        memoryAvailable: 404233732
+        memoryUsed: 1783803579
+        name: Qui dolorem.
         owner:
           id: 1383747607
           name: Natus eum.
         photos:
           small: Dolore eveniet pariatur et.
-        placeNameNative: Itaque natus sapiente.
-        placeNameOther: Sint ut qui facere magnam hic.
-        readOnly: true
-        recordingStartedAt: 2430959905657236107
-        updated: 7661378038436230713
+        placeNameNative: Odit molestiae nostrum et veniam.
+        placeNameOther: Magnam hic et itaque natus sapiente.
+        readOnly: false
+        recordingStartedAt: 7508504280437777104
+        updated: 4068806280782171607
         uploads:
         - blocks:
           - 6666384612210717677
@@ -25111,7 +25173,7 @@ definitions:
           type: Quam ut officiis et.
           uploadId: Reprehenderit quod.
           url: Ab error sed quibusdam.
-      - battery: 0.46210438
+      - battery: 0.50948477
         configurations:
           all:
           - id: 4626303392124417979
@@ -25710,27 +25772,31 @@ definitions:
             provisionId: 2576989181459413634
             sourceId: 909523460
             time: 2972556332744009553
-        deviceId: Qui dolorem.
-        firmwareNumber: 1094110192
-        firmwareTime: 7508504280437777104
-        id: 708753320
+        data:
+          end: 9137783270583459541
+          numberOfSamples: 412261433489182563
+          start: 3044072331501676612
+        deviceId: Et doloremque labore.
+        firmwareNumber: 1994792261
+        firmwareTime: 4262884935822732800
+        id: 776498766
         location:
           latitude: 0.2788710947558846
           longitude: 0.9609414762697199
-        locationName: Ut ut et eos dolor error.
-        memoryAvailable: 1484068452
-        memoryUsed: 1091978678
-        name: Laboriosam earum.
+        locationName: Dolor error harum sint ut qui.
+        memoryAvailable: 404233732
+        memoryUsed: 1783803579
+        name: Qui dolorem.
         owner:
           id: 1383747607
           name: Natus eum.
         photos:
           small: Dolore eveniet pariatur et.
-        placeNameNative: Itaque natus sapiente.
-        placeNameOther: Sint ut qui facere magnam hic.
-        readOnly: true
-        recordingStartedAt: 2430959905657236107
-        updated: 7661378038436230713
+        placeNameNative: Odit molestiae nostrum et veniam.
+        placeNameOther: Magnam hic et itaque natus sapiente.
+        readOnly: false
+        recordingStartedAt: 7508504280437777104
+        updated: 4068806280782171607
         uploads:
         - blocks:
           - 6666384612210717677
@@ -25953,7 +26019,7 @@ definitions:
     description: List ProjectResponseBody result type (default view)
     example:
       stations:
-      - battery: 0.46210438
+      - battery: 0.50948477
         configurations:
           all:
           - id: 4626303392124417979
@@ -26552,27 +26618,31 @@ definitions:
             provisionId: 2576989181459413634
             sourceId: 909523460
             time: 2972556332744009553
-        deviceId: Qui dolorem.
-        firmwareNumber: 1094110192
-        firmwareTime: 7508504280437777104
-        id: 708753320
+        data:
+          end: 9137783270583459541
+          numberOfSamples: 412261433489182563
+          start: 3044072331501676612
+        deviceId: Et doloremque labore.
+        firmwareNumber: 1994792261
+        firmwareTime: 4262884935822732800
+        id: 776498766
         location:
           latitude: 0.2788710947558846
           longitude: 0.9609414762697199
-        locationName: Ut ut et eos dolor error.
-        memoryAvailable: 1484068452
-        memoryUsed: 1091978678
-        name: Laboriosam earum.
+        locationName: Dolor error harum sint ut qui.
+        memoryAvailable: 404233732
+        memoryUsed: 1783803579
+        name: Qui dolorem.
         owner:
           id: 1383747607
           name: Natus eum.
         photos:
           small: Dolore eveniet pariatur et.
-        placeNameNative: Itaque natus sapiente.
-        placeNameOther: Sint ut qui facere magnam hic.
-        readOnly: true
-        recordingStartedAt: 2430959905657236107
-        updated: 7661378038436230713
+        placeNameNative: Odit molestiae nostrum et veniam.
+        placeNameOther: Magnam hic et itaque natus sapiente.
+        readOnly: false
+        recordingStartedAt: 7508504280437777104
+        updated: 4068806280782171607
         uploads:
         - blocks:
           - 6666384612210717677
@@ -26604,7 +26674,7 @@ definitions:
           type: Quam ut officiis et.
           uploadId: Reprehenderit quod.
           url: Ab error sed quibusdam.
-      - battery: 0.46210438
+      - battery: 0.50948477
         configurations:
           all:
           - id: 4626303392124417979
@@ -27203,27 +27273,31 @@ definitions:
             provisionId: 2576989181459413634
             sourceId: 909523460
             time: 2972556332744009553
-        deviceId: Qui dolorem.
-        firmwareNumber: 1094110192
-        firmwareTime: 7508504280437777104
-        id: 708753320
+        data:
+          end: 9137783270583459541
+          numberOfSamples: 412261433489182563
+          start: 3044072331501676612
+        deviceId: Et doloremque labore.
+        firmwareNumber: 1994792261
+        firmwareTime: 4262884935822732800
+        id: 776498766
         location:
           latitude: 0.2788710947558846
           longitude: 0.9609414762697199
-        locationName: Ut ut et eos dolor error.
-        memoryAvailable: 1484068452
-        memoryUsed: 1091978678
-        name: Laboriosam earum.
+        locationName: Dolor error harum sint ut qui.
+        memoryAvailable: 404233732
+        memoryUsed: 1783803579
+        name: Qui dolorem.
         owner:
           id: 1383747607
           name: Natus eum.
         photos:
           small: Dolore eveniet pariatur et.
-        placeNameNative: Itaque natus sapiente.
-        placeNameOther: Sint ut qui facere magnam hic.
-        readOnly: true
-        recordingStartedAt: 2430959905657236107
-        updated: 7661378038436230713
+        placeNameNative: Odit molestiae nostrum et veniam.
+        placeNameOther: Magnam hic et itaque natus sapiente.
+        readOnly: false
+        recordingStartedAt: 7508504280437777104
+        updated: 4068806280782171607
         uploads:
         - blocks:
           - 6666384612210717677
@@ -27255,7 +27329,7 @@ definitions:
           type: Quam ut officiis et.
           uploadId: Reprehenderit quod.
           url: Ab error sed quibusdam.
-      - battery: 0.46210438
+      - battery: 0.50948477
         configurations:
           all:
           - id: 4626303392124417979
@@ -27854,27 +27928,31 @@ definitions:
             provisionId: 2576989181459413634
             sourceId: 909523460
             time: 2972556332744009553
-        deviceId: Qui dolorem.
-        firmwareNumber: 1094110192
-        firmwareTime: 7508504280437777104
-        id: 708753320
+        data:
+          end: 9137783270583459541
+          numberOfSamples: 412261433489182563
+          start: 3044072331501676612
+        deviceId: Et doloremque labore.
+        firmwareNumber: 1994792261
+        firmwareTime: 4262884935822732800
+        id: 776498766
         location:
           latitude: 0.2788710947558846
           longitude: 0.9609414762697199
-        locationName: Ut ut et eos dolor error.
-        memoryAvailable: 1484068452
-        memoryUsed: 1091978678
-        name: Laboriosam earum.
+        locationName: Dolor error harum sint ut qui.
+        memoryAvailable: 404233732
+        memoryUsed: 1783803579
+        name: Qui dolorem.
         owner:
           id: 1383747607
           name: Natus eum.
         photos:
           small: Dolore eveniet pariatur et.
-        placeNameNative: Itaque natus sapiente.
-        placeNameOther: Sint ut qui facere magnam hic.
-        readOnly: true
-        recordingStartedAt: 2430959905657236107
-        updated: 7661378038436230713
+        placeNameNative: Odit molestiae nostrum et veniam.
+        placeNameOther: Magnam hic et itaque natus sapiente.
+        readOnly: false
+        recordingStartedAt: 7508504280437777104
+        updated: 4068806280782171607
         uploads:
         - blocks:
           - 6666384612210717677
@@ -28379,6 +28457,8 @@ definitions:
         format: float
       configurations:
         $ref: '#/definitions/StationConfigurationsResponseBody'
+      data:
+        $ref: '#/definitions/StationDataSummaryResponseBody'
       deviceId:
         type: string
         example: Rem quo.
@@ -29067,6 +29147,10 @@ definitions:
           provisionId: 2576989181459413634
           sourceId: 909523460
           time: 2972556332744009553
+      data:
+        end: 9137783270583459541
+        numberOfSamples: 412261433489182563
+        start: 3044072331501676612
       deviceId: Velit rerum et praesentium amet consequatur praesentium.
       firmwareNumber: 468373044
       firmwareTime: 7589463056597834937

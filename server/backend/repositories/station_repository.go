@@ -393,6 +393,17 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
+	dataSummaries := []*data.AggregatedDataSummary{}
+	if err := r.db.SelectContext(ctx, &dataSummaries, `
+		SELECT
+			a.station_id, MIN(a.time) AS start, MAX(a.time) AS end, SUM(a.nsamples) AS number_samples
+		FROM fieldkit.aggregated_24h AS a
+		WHERE station_id IN ($1)
+		GROUP BY a.station_id
+	`, stations[0].ID); err != nil {
+		return nil, err
+	}
+
 	ingestions := []*data.Ingestion{}
 	if err := r.db.SelectContext(ctx, &ingestions, `
 		SELECT id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags
@@ -447,7 +458,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	all, err := r.toStationFull(stations, owners, ingestions, provisions, configurations, modules, sensors)
+	all, err := r.toStationFull(stations, owners, dataSummaries, ingestions, provisions, configurations, modules, sensors)
 	if err != nil {
 		return nil, err
 	}
@@ -470,6 +481,17 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	if err := r.db.SelectContext(ctx, &owners, `
 		SELECT * FROM fieldkit.user WHERE id = $1
 		`, id); err != nil {
+		return nil, err
+	}
+
+	dataSummaries := []*data.AggregatedDataSummary{}
+	if err := r.db.SelectContext(ctx, &dataSummaries, `
+		SELECT
+			a.station_id, MIN(a.time) AS start, MAX(a.time) AS end, SUM(a.nsamples) AS number_samples
+		FROM fieldkit.aggregated_24h AS a
+		WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)
+		GROUP BY a.station_id
+	`, id); err != nil {
 		return nil, err
 	}
 
@@ -539,7 +561,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, ingestions, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, owners, dataSummaries, ingestions, provisions, configurations, modules, sensors)
 }
 
 func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id int32) ([]*data.StationFull, error) {
@@ -559,6 +581,17 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		FROM fieldkit.user
 		WHERE id IN (SELECT owner_id FROM fieldkit.station WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1))
 		`, id); err != nil {
+		return nil, err
+	}
+
+	dataSummaries := []*data.AggregatedDataSummary{}
+	if err := r.db.SelectContext(ctx, &dataSummaries, `
+		SELECT
+			a.station_id, MIN(a.time) AS start, MAX(a.time) AS end, SUM(a.nsamples) AS number_samples
+		FROM fieldkit.aggregated_24h AS a
+		WHERE station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
+		GROUP BY a.station_id
+	`, id); err != nil {
 		return nil, err
 	}
 
@@ -647,14 +680,15 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, ingestions, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, owners, dataSummaries, ingestions, provisions, configurations, modules, sensors)
 }
 
-func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, ingestions []*data.Ingestion,
+func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, dataSummaries []*data.AggregatedDataSummary, ingestions []*data.Ingestion,
 	provisions []*data.Provision, configurations []*data.StationConfiguration,
 	modules []*data.StationModule, sensors []*data.ModuleSensor) ([]*data.StationFull, error) {
 	ownersByID := make(map[int32]*data.User)
 	ingestionsByDeviceID := make(map[string][]*data.Ingestion)
+	summariesByStationID := make(map[int32]*data.AggregatedDataSummary)
 	mediaByStationID := make(map[int32][]*data.FieldNoteMedia)
 	modulesByStationID := make(map[int32][]*data.StationModule)
 	sensorsByStationID := make(map[int32][]*data.ModuleSensor)
@@ -671,6 +705,10 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 
 	for _, v := range owners {
 		ownersByID[v.ID] = v
+	}
+
+	for _, v := range dataSummaries {
+		summariesByStationID[v.StationID] = v
 	}
 
 	for _, v := range ingestions {
@@ -720,6 +758,7 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 			Configurations: configurationsByStationID[station.ID],
 			Modules:        modulesByStationID[station.ID],
 			Sensors:        sensorsByStationID[station.ID],
+			DataSummary:    summariesByStationID[station.ID],
 		})
 	}
 

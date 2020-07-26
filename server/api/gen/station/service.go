@@ -81,6 +81,7 @@ type StationFull struct {
 	PlaceNameOther     *string
 	PlaceNameNative    *string
 	Location           *StationLocation
+	Data               *StationDataSummary
 }
 
 // GetPayload is the payload type of the station service get method.
@@ -221,6 +222,12 @@ type SensorRange struct {
 type StationLocation struct {
 	Latitude  float64
 	Longitude float64
+}
+
+type StationDataSummary struct {
+	Start           int64
+	End             int64
+	NumberOfSamples int64
 }
 
 type StationFullCollection []*StationFull
@@ -385,6 +392,9 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	if vres.Location != nil {
 		res.Location = transformStationviewsStationLocationViewToStationLocation(vres.Location)
 	}
+	if vres.Data != nil {
+		res.Data = transformStationviewsStationDataSummaryViewToStationDataSummary(vres.Data)
+	}
 	return res
 }
 
@@ -424,6 +434,9 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 	}
 	if res.Location != nil {
 		vres.Location = transformStationLocationToStationviewsStationLocationView(res.Location)
+	}
+	if res.Data != nil {
+		vres.Data = transformStationDataSummaryToStationviewsStationDataSummaryView(res.Data)
 	}
 	return vres
 }
@@ -703,6 +716,22 @@ func transformStationviewsStationLocationViewToStationLocation(v *stationviews.S
 	return res
 }
 
+// transformStationviewsStationDataSummaryViewToStationDataSummary builds a
+// value of type *StationDataSummary from a value of type
+// *stationviews.StationDataSummaryView.
+func transformStationviewsStationDataSummaryViewToStationDataSummary(v *stationviews.StationDataSummaryView) *StationDataSummary {
+	if v == nil {
+		return nil
+	}
+	res := &StationDataSummary{
+		Start:           *v.Start,
+		End:             *v.End,
+		NumberOfSamples: *v.NumberOfSamples,
+	}
+
+	return res
+}
+
 // transformStationOwnerToStationviewsStationOwnerView builds a value of type
 // *stationviews.StationOwnerView from a value of type *StationOwner.
 func transformStationOwnerToStationviewsStationOwnerView(v *StationOwner) *stationviews.StationOwnerView {
@@ -860,6 +889,22 @@ func transformStationLocationToStationviewsStationLocationView(v *StationLocatio
 	res := &stationviews.StationLocationView{
 		Latitude:  &v.Latitude,
 		Longitude: &v.Longitude,
+	}
+
+	return res
+}
+
+// transformStationDataSummaryToStationviewsStationDataSummaryView builds a
+// value of type *stationviews.StationDataSummaryView from a value of type
+// *StationDataSummary.
+func transformStationDataSummaryToStationviewsStationDataSummaryView(v *StationDataSummary) *stationviews.StationDataSummaryView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.StationDataSummaryView{
+		Start:           &v.Start,
+		End:             &v.End,
+		NumberOfSamples: &v.NumberOfSamples,
 	}
 
 	return res

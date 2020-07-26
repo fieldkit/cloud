@@ -52,6 +52,7 @@ type AddResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
 // GetResponseBody is the type of the "station" service "get" endpoint HTTP
@@ -76,6 +77,7 @@ type GetResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
 // UpdateResponseBody is the type of the "station" service "update" endpoint
@@ -100,6 +102,7 @@ type UpdateResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
 // ListMineResponseBody is the type of the "station" service "list mine"
@@ -804,6 +807,14 @@ type StationLocationResponseBody struct {
 	Longitude *float64 `form:"longitude,omitempty" json:"longitude,omitempty" xml:"longitude,omitempty"`
 }
 
+// StationDataSummaryResponseBody is used to define fields on response body
+// types.
+type StationDataSummaryResponseBody struct {
+	Start           *int64 `form:"start,omitempty" json:"start,omitempty" xml:"start,omitempty"`
+	End             *int64 `form:"end,omitempty" json:"end,omitempty" xml:"end,omitempty"`
+	NumberOfSamples *int64 `form:"numberOfSamples,omitempty" json:"numberOfSamples,omitempty" xml:"numberOfSamples,omitempty"`
+}
+
 // StationFullCollectionResponseBody is used to define fields on response body
 // types.
 type StationFullCollectionResponseBody []*StationFullResponseBody
@@ -829,6 +840,7 @@ type StationFullResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
 // EssentialStationResponseBody is used to define fields on response body types.
@@ -899,6 +911,9 @@ func NewAddStationFullOK(body *AddResponseBody) *stationviews.StationFullView {
 	v.Configurations = unmarshalStationConfigurationsResponseBodyToStationviewsStationConfigurationsView(body.Configurations)
 	if body.Location != nil {
 		v.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(body.Location)
+	}
+	if body.Data != nil {
+		v.Data = unmarshalStationDataSummaryResponseBodyToStationviewsStationDataSummaryView(body.Data)
 	}
 
 	return v
@@ -1004,6 +1019,9 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 	if body.Location != nil {
 		v.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(body.Location)
 	}
+	if body.Data != nil {
+		v.Data = unmarshalStationDataSummaryResponseBodyToStationviewsStationDataSummaryView(body.Data)
+	}
 
 	return v
 }
@@ -1092,6 +1110,9 @@ func NewUpdateStationFullOK(body *UpdateResponseBody) *stationviews.StationFullV
 	v.Configurations = unmarshalStationConfigurationsResponseBodyToStationviewsStationConfigurationsView(body.Configurations)
 	if body.Location != nil {
 		v.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(body.Location)
+	}
+	if body.Data != nil {
+		v.Data = unmarshalStationDataSummaryResponseBodyToStationviewsStationDataSummaryView(body.Data)
 	}
 
 	return v
@@ -2488,6 +2509,21 @@ func ValidateStationLocationResponseBody(body *StationLocationResponseBody) (err
 	return
 }
 
+// ValidateStationDataSummaryResponseBody runs the validations defined on
+// StationDataSummaryResponseBody
+func ValidateStationDataSummaryResponseBody(body *StationDataSummaryResponseBody) (err error) {
+	if body.Start == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("start", "body"))
+	}
+	if body.End == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("end", "body"))
+	}
+	if body.NumberOfSamples == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("numberOfSamples", "body"))
+	}
+	return
+}
+
 // ValidateStationFullCollectionResponseBody runs the validations defined on
 // StationFullCollectionResponseBody
 func ValidateStationFullCollectionResponseBody(body StationFullCollectionResponseBody) (err error) {
@@ -2555,6 +2591,11 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 	}
 	if body.Location != nil {
 		if err2 := ValidateStationLocationResponseBody(body.Location); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if body.Data != nil {
+		if err2 := ValidateStationDataSummaryResponseBody(body.Data); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}

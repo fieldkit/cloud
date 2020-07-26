@@ -135,6 +135,13 @@ func (s *Station) DeviceIDHex() string {
 	return hex.EncodeToString(s.DeviceID)
 }
 
+type AggregatedDataSummary struct {
+	StationID     int32      `db:"station_id"`
+	Start         *time.Time `db:"start"`
+	End           *time.Time `db:"end"`
+	NumberSamples *int64     `db:"number_samples"`
+}
+
 type StationFull struct {
 	Station        *Station
 	Owner          *User
@@ -142,6 +149,7 @@ type StationFull struct {
 	Configurations []*StationConfiguration
 	Modules        []*StationModule
 	Sensors        []*ModuleSensor
+	DataSummary    *AggregatedDataSummary
 }
 
 type EssentialStation struct {

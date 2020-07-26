@@ -2102,7 +2102,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 1616609323 --auth "Quidem optio dicta maxime."
+    `+os.Args[0]+` station get --id 1206793376 --auth "Ut dolore sequi earum rerum."
 `, os.Args[0])
 }
 

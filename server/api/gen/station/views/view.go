@@ -64,6 +64,7 @@ type StationFullView struct {
 	PlaceNameOther     *string
 	PlaceNameNative    *string
 	Location           *StationLocationView
+	Data               *StationDataSummaryView
 }
 
 // StationOwnerView is a type that runs validations on a projected type.
@@ -145,6 +146,13 @@ type StationLocationView struct {
 	Longitude *float64
 }
 
+// StationDataSummaryView is a type that runs validations on a projected type.
+type StationDataSummaryView struct {
+	Start           *int64
+	End             *int64
+	NumberOfSamples *int64
+}
+
 // StationsFullView is a type that runs validations on a projected type.
 type StationsFullView struct {
 	Stations StationFullCollectionView
@@ -209,6 +217,7 @@ var (
 			"locationName",
 			"placeNameOther",
 			"placeNameNative",
+			"data",
 		},
 	}
 	// StationsFullMap is a map of attribute names in result type StationsFull
@@ -259,6 +268,7 @@ var (
 			"locationName",
 			"placeNameOther",
 			"placeNameNative",
+			"data",
 		},
 	}
 )
@@ -365,6 +375,11 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	}
 	if result.Location != nil {
 		if err2 := ValidateStationLocationView(result.Location); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if result.Data != nil {
+		if err2 := ValidateStationDataSummaryView(result.Data); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
@@ -552,6 +567,21 @@ func ValidateStationLocationView(result *StationLocationView) (err error) {
 	}
 	if result.Longitude == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("longitude", "result"))
+	}
+	return
+}
+
+// ValidateStationDataSummaryView runs the validations defined on
+// StationDataSummaryView.
+func ValidateStationDataSummaryView(result *StationDataSummaryView) (err error) {
+	if result.Start == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("start", "result"))
+	}
+	if result.End == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("end", "result"))
+	}
+	if result.NumberOfSamples == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("numberOfSamples", "result"))
 	}
 	return
 }

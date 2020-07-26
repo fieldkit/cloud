@@ -52,6 +52,7 @@ type AddResponseBody struct {
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
+	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
 // GetResponseBody is the type of the "station" service "get" endpoint HTTP
@@ -76,6 +77,7 @@ type GetResponseBody struct {
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
+	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
 // UpdateResponseBody is the type of the "station" service "update" endpoint
@@ -100,6 +102,7 @@ type UpdateResponseBody struct {
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
+	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
 // ListMineResponseBody is the type of the "station" service "list mine"
@@ -804,6 +807,14 @@ type StationLocationResponseBody struct {
 	Longitude float64 `form:"longitude" json:"longitude" xml:"longitude"`
 }
 
+// StationDataSummaryResponseBody is used to define fields on response body
+// types.
+type StationDataSummaryResponseBody struct {
+	Start           int64 `form:"start" json:"start" xml:"start"`
+	End             int64 `form:"end" json:"end" xml:"end"`
+	NumberOfSamples int64 `form:"numberOfSamples" json:"numberOfSamples" xml:"numberOfSamples"`
+}
+
 // StationFullResponseBodyCollection is used to define fields on response body
 // types.
 type StationFullResponseBodyCollection []*StationFullResponseBody
@@ -829,6 +840,7 @@ type StationFullResponseBody struct {
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
+	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
 // EssentialStationResponseBody is used to define fields on response body types.
@@ -885,6 +897,9 @@ func NewAddResponseBody(res *stationviews.StationFullView) *AddResponseBody {
 	if res.Location != nil {
 		body.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(res.Location)
 	}
+	if res.Data != nil {
+		body.Data = marshalStationviewsStationDataSummaryViewToStationDataSummaryResponseBody(res.Data)
+	}
 	return body
 }
 
@@ -925,6 +940,9 @@ func NewGetResponseBody(res *stationviews.StationFullView) *GetResponseBody {
 	if res.Location != nil {
 		body.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(res.Location)
 	}
+	if res.Data != nil {
+		body.Data = marshalStationviewsStationDataSummaryViewToStationDataSummaryResponseBody(res.Data)
+	}
 	return body
 }
 
@@ -964,6 +982,9 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 	}
 	if res.Location != nil {
 		body.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(res.Location)
+	}
+	if res.Data != nil {
+		body.Data = marshalStationviewsStationDataSummaryViewToStationDataSummaryResponseBody(res.Data)
 	}
 	return body
 }

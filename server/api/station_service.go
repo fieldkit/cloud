@@ -583,6 +583,10 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull) (
 		return nil, err
 	}
 
+	fmt.Printf("\n%v\n\n", sf.DataSummary)
+	dataSummary := transformDataSummary(sf.DataSummary)
+	fmt.Printf("\n%v\n\n", dataSummary)
+
 	return &station.StationFull{
 		ID:       sf.Station.ID,
 		Name:     sf.Station.Name,
@@ -602,6 +606,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull) (
 		PlaceNameOther:  sf.Station.PlaceOther,
 		PlaceNameNative: sf.Station.PlaceNative,
 		Location:        transformLocation(sf),
+		Data:            dataSummary,
 		Owner: &station.StationOwner{
 			ID:   sf.Owner.ID,
 			Name: sf.Owner.Name,
@@ -610,6 +615,20 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull) (
 			Small: url,
 		},
 	}, nil
+}
+
+func transformDataSummary(ads *data.AggregatedDataSummary) *station.StationDataSummary {
+	if ads == nil {
+		return nil
+	}
+	if ads.Start == nil || ads.End == nil || ads.NumberSamples == nil {
+		return nil
+	}
+	return &station.StationDataSummary{
+		Start:           (*ads.Start).Unix() * 1000,
+		End:             (*ads.End).Unix() * 1000,
+		NumberOfSamples: *ads.NumberSamples,
+	}
 }
 
 func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull) ([]*station.StationFull, error) {

@@ -1351,6 +1351,22 @@ func unmarshalStationLocationResponseBodyToStationviewsStationLocationView(v *St
 	return res
 }
 
+// unmarshalStationDataSummaryResponseBodyToStationviewsStationDataSummaryView
+// builds a value of type *stationviews.StationDataSummaryView from a value of
+// type *StationDataSummaryResponseBody.
+func unmarshalStationDataSummaryResponseBodyToStationviewsStationDataSummaryView(v *StationDataSummaryResponseBody) *stationviews.StationDataSummaryView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.StationDataSummaryView{
+		Start:           v.Start,
+		End:             v.End,
+		NumberOfSamples: v.NumberOfSamples,
+	}
+
+	return res
+}
+
 // unmarshalStationFullResponseBodyToStationviewsStationFullView builds a value
 // of type *stationviews.StationFullView from a value of type
 // *StationFullResponseBody.
@@ -1380,6 +1396,9 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 	res.Configurations = unmarshalStationConfigurationsResponseBodyToStationviewsStationConfigurationsView(v.Configurations)
 	if v.Location != nil {
 		res.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(v.Location)
+	}
+	if v.Data != nil {
+		res.Data = unmarshalStationDataSummaryResponseBodyToStationviewsStationDataSummaryView(v.Data)
 	}
 
 	return res

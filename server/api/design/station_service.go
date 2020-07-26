@@ -90,6 +90,13 @@ var StationLocation = Type("StationLocation", func() {
 	Required("latitude", "longitude")
 })
 
+var StationDataSummary = Type("StationDataSummary", func() {
+	Attribute("start", Int64)
+	Attribute("end", Int64)
+	Attribute("numberOfSamples", Int64)
+	Required("start", "end", "numberOfSamples")
+})
+
 var StationFull = ResultType("application/vnd.app.station.full", func() {
 	TypeName("StationFull")
 	Attributes(func() {
@@ -117,6 +124,8 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("placeNameNative", String)
 		Attribute("location", StationLocation)
 		Required("updated")
+
+		Attribute("data", StationDataSummary)
 	})
 	View("default", func() {
 		Attribute("id")
@@ -140,6 +149,8 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("locationName")
 		Attribute("placeNameOther")
 		Attribute("placeNameNative")
+
+		Attribute("data")
 	})
 })
 
