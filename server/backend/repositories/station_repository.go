@@ -48,6 +48,7 @@ func (r *StationRepository) Update(ctx context.Context, station *data.Station) (
 			   name = :name,
 			   battery = :battery,
 			   location = ST_SetSRID(ST_GeomFromText(:location), 4326),
+			   recording_started_at = :recording_started_at,
 			   location_name = :location_name,
                place_other = :place_other,
                place_native = :place_native,

@@ -583,9 +583,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull) (
 		return nil, err
 	}
 
-	fmt.Printf("\n%v\n\n", sf.DataSummary)
 	dataSummary := transformDataSummary(sf.DataSummary)
-	fmt.Printf("\n%v\n\n", dataSummary)
 
 	return &station.StationFull{
 		ID:       sf.Station.ID,
