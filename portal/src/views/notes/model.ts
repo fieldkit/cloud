@@ -84,11 +84,36 @@ export class NoteForm {
     }
 }
 
+function getPathTimestamp(ts): string {
+    return moment(ts)
+        .utc()
+        .format("YYYYMMDD_hhmmss");
+}
+
+function getExtension(fn: string, type: string): string {
+    const parts = fn.split(".");
+    if (parts.length < 2) {
+        console.warn("unable to get extension:", fn, parts);
+        if (/jpeg/.test(type) || /jpg/.test(type)) {
+            return "jpg";
+        }
+        if (/png/.test(type)) {
+            return "png";
+        }
+        if (/gif/.test(type)) {
+            return "gif";
+        }
+        throw new Error(`unable to get extension: ${fn} ${type}`);
+    }
+    return parts[parts.length - 1];
+}
+
 export class AddedPhoto {
     public readonly key: string;
 
     constructor(public readonly type: any, public readonly file: any, public readonly image: any) {
-        this.key = moment.utc().toISOString();
+        const extension = getExtension(this.file.name, this.file.type);
+        this.key = getPathTimestamp(new Date()) + "." + extension;
     }
 }
 
