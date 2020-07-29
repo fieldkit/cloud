@@ -13,7 +13,7 @@
                     </div>
                     <div class="station-battery">
                         <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
-                        <span class="small-light">{{ station.battery }}</span>
+                        <span class="small-light" v-if="false">{{ station.battery }}</span>
                     </div>
                     <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
                         <img v-if="!module.internal" alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
@@ -155,6 +155,7 @@ export default {
 .battery {
     width: 20px;
     height: 11px;
+    padding-right: 5px;
 }
 .module-icon-container {
     float: left;
@@ -225,5 +226,9 @@ export default {
 }
 .icon {
     padding-right: 5px;
+}
+.small-light {
+    font-size: 12px;
+    color: #6a6d71;
 }
 </style>

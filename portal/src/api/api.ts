@@ -222,6 +222,7 @@ export interface Station {
     readOnly: boolean;
     configurations: Configurations;
     updated: number;
+    battery: number | null;
     location: HasLocation | null;
     placeNameOther: string | null;
     placeNameNative: string | null;

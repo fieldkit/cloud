@@ -94,6 +94,7 @@ export class DisplayStation {
     modules: DisplayModule[] = [];
     placeNameOther: string | null;
     placeNameNative: string | null;
+    battery: number | null;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -101,6 +102,7 @@ export class DisplayStation {
         this.updated = whenWasStationUpdated(station);
         this.configurations = station.configurations;
         this.photos = station.photos;
+        this.battery = station.battery;
         this.placeNameOther = station.placeNameOther;
         this.placeNameNative = station.placeNameNative;
         this.deployedAt = station.recordingStartedAt;
