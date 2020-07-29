@@ -130,7 +130,7 @@ const afterOtherDate = (afterOtherDate) =>
         if (!value || value.length == 0) {
             return true;
         }
-        return moment(other).isBefore(moment(value));
+        return moment(other).isSameOrBefore(moment(value));
     });
 
 export default Vue.extend({
