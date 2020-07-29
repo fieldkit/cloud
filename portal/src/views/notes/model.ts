@@ -127,9 +127,13 @@ export class Notes {
 
     constructor(public readonly addedPhotos: AddedPhoto[] = []) {}
 
+    private isNoteCompleted(note: NoteForm): boolean {
+        return note.body.length > 0 || note.photos.length > 0 || note.audio.length > 0;
+    }
+
     public get progress(): { total: number; completed: number } {
         const progress = _.map(Notes.Keys, (key) => {
-            return this[key].body.length > 0 ? 1 : 0;
+            return this.isNoteCompleted(this[key]) ? 1 : 0;
         });
         const done = _.sum(progress);
         return {
