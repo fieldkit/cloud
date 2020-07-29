@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"io/ioutil"
 	"strings"
 	"time"
 
@@ -364,7 +363,9 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 		return defaultPhoto(payload.StationID)
 	}
 
-	etag := quickHash(allMedia[0].URL)
+	media := allMedia[0]
+
+	etag := quickHash(media.URL)
 	if payload.Size != nil {
 		etag += fmt.Sprintf(":%d", *payload.Size)
 	}
@@ -380,7 +381,7 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 	}
 
 	mr := repositories.NewMediaRepository(c.options.MediaFiles)
-	lm, err := mr.LoadByURL(ctx, allMedia[0].URL)
+	lm, err := mr.LoadByURL(ctx, media.URL)
 	if err != nil {
 		return nil, err
 	}
@@ -392,23 +393,37 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 		return defaultPhoto(payload.StationID)
 	}
 
-	cropped, err := smartCrop(original, x, y)
-	if err != nil {
-		return nil, err
-	}
+	data := []byte{}
 
-	options := jpeg.Options{
-		Quality: 80,
-	}
+	if payload.Size != nil {
+		if media.ContentType == "image/jpeg" || media.ContentType == "image/png" {
+			resized, err := resizeLoadedMedia(ctx, lm, uint(*payload.Size), 0)
+			if err != nil {
+				return nil, err
+			}
+			return &station.DownloadedPhoto{
+				Length:      resized.Size,
+				ContentType: resized.ContentType,
+				Etag:        etag,
+				Body:        resized.Data,
+			}, nil
+		}
+	} else {
+		cropped, err := smartCrop(original, x, y)
+		if err != nil {
+			return nil, err
+		}
 
-	buf := new(bytes.Buffer)
-	if err := jpeg.Encode(buf, cropped, &options); err != nil {
-		return nil, err
-	}
+		options := jpeg.Options{
+			Quality: 80,
+		}
 
-	data, err := ioutil.ReadAll(lm.Reader)
-	if err != nil {
-		return nil, err
+		buf := new(bytes.Buffer)
+		if err := jpeg.Encode(buf, cropped, &options); err != nil {
+			return nil, err
+		}
+
+		data = buf.Bytes()
 	}
 
 	if len(data) == 0 {
@@ -418,7 +433,7 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 	}
 
 	return &station.DownloadedPhoto{
-		Length:      int64(len(buf.Bytes())),
+		Length:      int64(len(data)),
 		ContentType: "image/jpeg",
 		Etag:        etag,
 		Body:        data,
