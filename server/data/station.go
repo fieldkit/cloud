@@ -73,11 +73,15 @@ func (s *Station) UpdateFromStatus(ctx context.Context, raw string) error {
 		}
 
 		if status.Power != nil && status.Power.Battery != nil {
+			log.Infow("battery", "device_id", s.DeviceID, "station_id", s.ID, "battery", status.Power)
+
 			battery := float32(status.Power.Battery.Percentage)
 			s.Battery = &battery
 		}
 
 		if status.Memory != nil {
+			log.Infow("memory", "device_id", s.DeviceID, "station_id", s.ID, "memory", status.Memory)
+
 			memoryUsed := int32(status.Memory.DataMemoryUsed)
 			memoryInstalled := int32(status.Memory.DataMemoryInstalled)
 			s.MemoryUsed = &memoryUsed
