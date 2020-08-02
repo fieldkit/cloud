@@ -495,6 +495,20 @@ func (c *ProjectService) Invites(ctx context.Context, payload *project.InvitesPa
 		return nil, err
 	}
 
+	relationships, err := c.projects.QueryUserProjectRelationships(ctx, p.UserID())
+	if err != nil {
+		return nil, err
+	}
+
+	followers := []*data.FollowersSummary{}
+	if err := c.options.Database.SelectContext(ctx, &followers, `
+		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (
+			SELECT project_id FROM fieldkit.project_user WHERE user_id = $1
+		) GROUP BY f.project_id
+		`, p.UserID()); err != nil {
+		return nil, err
+	}
+
 	projects := []*data.Project{}
 	if err := c.options.Database.SelectContext(ctx, &projects, `
 		SELECT * FROM fieldkit.project WHERE id IN (
@@ -530,8 +544,14 @@ func (c *ProjectService) Invites(ctx context.Context, payload *project.InvitesPa
 		})
 	}
 
+	projectsWeb, err := ProjectsType(c.options.signer, projects, followers, relationships)
+	if err != nil {
+		return nil, err
+	}
+
 	invites = &project.PendingInvites{
-		Pending: pending,
+		Pending:  pending,
+		Projects: projectsWeb.Projects,
 	}
 
 	return

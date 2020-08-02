@@ -113,7 +113,8 @@ type InvitesPayload struct {
 
 // PendingInvites is the result type of the project service invites method.
 type PendingInvites struct {
-	Pending []*PendingInvite
+	Pending  []*PendingInvite
+	Projects ProjectCollection
 }
 
 // LookupInvitePayload is the payload type of the project service lookup invite
@@ -266,6 +267,8 @@ type ProjectSummary struct {
 	Name string
 }
 
+type ProjectCollection []*Project
+
 type AddProjectFields struct {
 	Name        string
 	Description string
@@ -281,8 +284,6 @@ type ProjectFollowing struct {
 	Total     int32
 	Following bool
 }
-
-type ProjectCollection []*Project
 
 type InviteUserFields struct {
 	Email string
@@ -426,6 +427,9 @@ func newPendingInvites(vres *projectviews.PendingInvitesView) *PendingInvites {
 			res.Pending[i] = transformProjectviewsPendingInviteViewToPendingInvite(val)
 		}
 	}
+	if vres.Projects != nil {
+		res.Projects = newProjectCollection(vres.Projects)
+	}
 	return res
 }
 
@@ -438,6 +442,29 @@ func newPendingInvitesView(res *PendingInvites) *projectviews.PendingInvitesView
 		for i, val := range res.Pending {
 			vres.Pending[i] = transformPendingInviteToProjectviewsPendingInviteView(val)
 		}
+	}
+	if res.Projects != nil {
+		vres.Projects = newProjectCollectionView(res.Projects)
+	}
+	return vres
+}
+
+// newProjectCollection converts projected type ProjectCollection to service
+// type ProjectCollection.
+func newProjectCollection(vres projectviews.ProjectCollectionView) ProjectCollection {
+	res := make(ProjectCollection, len(vres))
+	for i, n := range vres {
+		res[i] = newProject(n)
+	}
+	return res
+}
+
+// newProjectCollectionView projects result type ProjectCollection to projected
+// type ProjectCollectionView using the "default" view.
+func newProjectCollectionView(res ProjectCollection) projectviews.ProjectCollectionView {
+	vres := make(projectviews.ProjectCollectionView, len(res))
+	for i, n := range res {
+		vres[i] = newProjectView(n)
 	}
 	return vres
 }
@@ -516,26 +543,6 @@ func newProjectsView(res *Projects) *projectviews.ProjectsView {
 	vres := &projectviews.ProjectsView{}
 	if res.Projects != nil {
 		vres.Projects = newProjectCollectionView(res.Projects)
-	}
-	return vres
-}
-
-// newProjectCollection converts projected type ProjectCollection to service
-// type ProjectCollection.
-func newProjectCollection(vres projectviews.ProjectCollectionView) ProjectCollection {
-	res := make(ProjectCollection, len(vres))
-	for i, n := range vres {
-		res[i] = newProject(n)
-	}
-	return res
-}
-
-// newProjectCollectionView projects result type ProjectCollection to projected
-// type ProjectCollectionView using the "default" view.
-func newProjectCollectionView(res ProjectCollection) projectviews.ProjectCollectionView {
-	vres := make(projectviews.ProjectCollectionView, len(res))
-	for i, n := range res {
-		vres[i] = newProjectView(n)
 	}
 	return vres
 }

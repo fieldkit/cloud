@@ -2286,18 +2286,6 @@ func marshalProjectviewsProjectSummaryViewToProjectSummaryResponseBody(v *projec
 	return res
 }
 
-// marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody builds
-// a value of type *ProjectFollowingResponseBody from a value of type
-// *projectviews.ProjectFollowingView.
-func marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(v *projectviews.ProjectFollowingView) *ProjectFollowingResponseBody {
-	res := &ProjectFollowingResponseBody{
-		Total:     *v.Total,
-		Following: *v.Following,
-	}
-
-	return res
-}
-
 // marshalProjectviewsProjectViewToProjectResponseBody builds a value of type
 // *ProjectResponseBody from a value of type *projectviews.ProjectView.
 func marshalProjectviewsProjectViewToProjectResponseBody(v *projectviews.ProjectView) *ProjectResponseBody {
@@ -2316,6 +2304,18 @@ func marshalProjectviewsProjectViewToProjectResponseBody(v *projectviews.Project
 	}
 	if v.Following != nil {
 		res.Following = marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(v.Following)
+	}
+
+	return res
+}
+
+// marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody builds
+// a value of type *ProjectFollowingResponseBody from a value of type
+// *projectviews.ProjectFollowingView.
+func marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(v *projectviews.ProjectFollowingView) *ProjectFollowingResponseBody {
+	res := &ProjectFollowingResponseBody{
+		Total:     *v.Total,
+		Following: *v.Following,
 	}
 
 	return res

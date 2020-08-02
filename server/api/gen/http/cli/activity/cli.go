@@ -1723,7 +1723,7 @@ LookupInvite implements lookup invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project lookup- invite --token "Consequatur minima sint ipsa." --auth "Eos non voluptas quo."
+    `+os.Args[0]+` project lookup- invite --token "Nemo dolor consequuntur autem dolorem cupiditate." --auth "Sint consectetur nemo provident blanditiis odio temporibus."
 `, os.Args[0])
 }
 
@@ -1736,7 +1736,7 @@ AcceptInvite implements accept invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project accept- invite --id 1315896503655947493 --token "Quo quis est in consequatur occaecati." --auth "Fuga maiores eveniet dolorem est."
+    `+os.Args[0]+` project accept- invite --id 5382578478347077834 --token "Iste nisi veniam." --auth "Reprehenderit non laborum."
 `, os.Args[0])
 }
 
@@ -1749,7 +1749,7 @@ RejectInvite implements reject invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project reject- invite --id 820769852907921134 --token "Nemo dolor consequuntur autem dolorem cupiditate." --auth "Sint consectetur nemo provident blanditiis odio temporibus."
+    `+os.Args[0]+` project reject- invite --id 4961414683577602269 --token "Quia optio." --auth "Fuga sunt enim aperiam ut."
 `, os.Args[0])
 }
 
@@ -1767,7 +1767,7 @@ Example:
       "module": "Sint tempore nesciunt error.",
       "profile": "Nostrum occaecati facilis placeat dolorem.",
       "url": "Minima rerum vel."
-   }' --auth "Necessitatibus ipsa qui iste nisi."
+   }' --auth "Distinctio tempore occaecati eos sunt aut adipisci."
 `, os.Args[0])
 }
 
@@ -1823,7 +1823,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project list- mine --auth "Ullam voluptatem magnam odit ratione expedita numquam."
+    `+os.Args[0]+` project list- mine --auth "Maiores ullam voluptatem magnam odit ratione expedita."
 `, os.Args[0])
 }
 
@@ -1837,9 +1837,9 @@ Invite implements invite.
 
 Example:
     `+os.Args[0]+` project invite --body '{
-      "email": "Quis asperiores consequatur dolorum et perferendis.",
-      "role": 1234150519
-   }' --project-id 1385322552 --auth "Veritatis est et ipsum magnam et."
+      "email": "Sit quis asperiores consequatur dolorum et.",
+      "role": 366988404
+   }' --project-id 1234150519 --auth "Eligendi veritatis."
 `, os.Args[0])
 }
 
@@ -1853,8 +1853,8 @@ RemoveUser implements remove user.
 
 Example:
     `+os.Args[0]+` project remove- user --body '{
-      "email": "Et sequi fugiat nemo non."
-   }' --project-id 1680882165 --auth "Aut non quidem harum adipisci quas."
+      "email": "In expedita aliquid illo id et sequi."
+   }' --project-id 1594120617 --auth "Non repellendus porro aut non quidem."
 `, os.Args[0])
 }
 
@@ -1867,7 +1867,7 @@ AddStation implements add station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project add- station --project-id 786121776 --station-id 24348406 --auth "Voluptatum id."
+    `+os.Args[0]+` project add- station --project-id 929758629 --station-id 1116417021 --auth "Similique voluptas culpa voluptatum id."
 `, os.Args[0])
 }
 

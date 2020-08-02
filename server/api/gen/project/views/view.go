@@ -60,7 +60,8 @@ type ProjectUpdateView struct {
 
 // PendingInvitesView is a type that runs validations on a projected type.
 type PendingInvitesView struct {
-	Pending []*PendingInviteView
+	Pending  []*PendingInviteView
+	Projects ProjectCollectionView
 }
 
 // PendingInviteView is a type that runs validations on a projected type.
@@ -76,6 +77,9 @@ type ProjectSummaryView struct {
 	ID   *int64
 	Name *string
 }
+
+// ProjectCollectionView is a type that runs validations on a projected type.
+type ProjectCollectionView []*ProjectView
 
 // ProjectView is a type that runs validations on a projected type.
 type ProjectView struct {
@@ -104,9 +108,6 @@ type ProjectsView struct {
 	Projects ProjectCollectionView
 }
 
-// ProjectCollectionView is a type that runs validations on a projected type.
-type ProjectCollectionView []*ProjectView
-
 // DownloadedPhotoView is a type that runs validations on a projected type.
 type DownloadedPhotoView struct {
 	Length      *int64
@@ -129,6 +130,7 @@ var (
 	PendingInvitesMap = map[string][]string{
 		"default": []string{
 			"pending",
+			"projects",
 		},
 	}
 	// ProjectMap is a map of attribute names in result type Project indexed by
@@ -271,6 +273,11 @@ func ValidatePendingInvitesView(result *PendingInvitesView) (err error) {
 			}
 		}
 	}
+	if result.Projects != nil {
+		if err2 := ValidateProjectCollectionView(result.Projects); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
 	return
 }
 
@@ -304,6 +311,17 @@ func ValidateProjectSummaryView(result *ProjectSummaryView) (err error) {
 	}
 	if result.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	return
+}
+
+// ValidateProjectCollectionView runs the validations defined on
+// ProjectCollectionView using the "default" view.
+func ValidateProjectCollectionView(result ProjectCollectionView) (err error) {
+	for _, item := range result {
+		if err2 := ValidateProjectView(item); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }
@@ -364,17 +382,6 @@ func ValidateProjectsView(result *ProjectsView) (err error) {
 
 	if result.Projects != nil {
 		if err2 := ValidateProjectCollectionView(result.Projects); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
-// ValidateProjectCollectionView runs the validations defined on
-// ProjectCollectionView using the "default" view.
-func ValidateProjectCollectionView(result ProjectCollectionView) (err error) {
-	for _, item := range result {
-		if err2 := ValidateProjectView(item); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}

@@ -83,13 +83,15 @@ type ModifyUpdateResponseBody struct {
 // InvitesResponseBody is the type of the "project" service "invites" endpoint
 // HTTP response body.
 type InvitesResponseBody struct {
-	Pending []*PendingInviteResponseBody `form:"pending,omitempty" json:"pending,omitempty" xml:"pending,omitempty"`
+	Pending  []*PendingInviteResponseBody  `form:"pending,omitempty" json:"pending,omitempty" xml:"pending,omitempty"`
+	Projects ProjectCollectionResponseBody `form:"projects,omitempty" json:"projects,omitempty" xml:"projects,omitempty"`
 }
 
 // LookupInviteResponseBody is the type of the "project" service "lookup
 // invite" endpoint HTTP response body.
 type LookupInviteResponseBody struct {
-	Pending []*PendingInviteResponseBody `form:"pending,omitempty" json:"pending,omitempty" xml:"pending,omitempty"`
+	Pending  []*PendingInviteResponseBody  `form:"pending,omitempty" json:"pending,omitempty" xml:"pending,omitempty"`
+	Projects ProjectCollectionResponseBody `form:"projects,omitempty" json:"projects,omitempty" xml:"projects,omitempty"`
 }
 
 // AddResponseBody is the type of the "project" service "add" endpoint HTTP
@@ -1546,12 +1548,6 @@ type ProjectSummaryResponseBody struct {
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 }
 
-// ProjectFollowingResponseBody is used to define fields on response body types.
-type ProjectFollowingResponseBody struct {
-	Total     *int32 `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
-	Following *bool  `form:"following,omitempty" json:"following,omitempty" xml:"following,omitempty"`
-}
-
 // ProjectCollectionResponseBody is used to define fields on response body
 // types.
 type ProjectCollectionResponseBody []*ProjectResponseBody
@@ -1570,6 +1566,12 @@ type ProjectResponseBody struct {
 	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	ReadOnly    *bool                         `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
 	Following   *ProjectFollowingResponseBody `form:"following,omitempty" json:"following,omitempty" xml:"following,omitempty"`
+}
+
+// ProjectFollowingResponseBody is used to define fields on response body types.
+type ProjectFollowingResponseBody struct {
+	Total     *int32 `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
+	Following *bool  `form:"following,omitempty" json:"following,omitempty" xml:"following,omitempty"`
 }
 
 // NewAddUpdateRequestBody builds the HTTP request body from the payload of the
@@ -1853,6 +1855,10 @@ func NewInvitesPendingInvitesOK(body *InvitesResponseBody) *projectviews.Pending
 	for i, val := range body.Pending {
 		v.Pending[i] = unmarshalPendingInviteResponseBodyToProjectviewsPendingInviteView(val)
 	}
+	v.Projects = make([]*projectviews.ProjectView, len(body.Projects))
+	for i, val := range body.Projects {
+		v.Projects[i] = unmarshalProjectResponseBodyToProjectviewsProjectView(val)
+	}
 
 	return v
 }
@@ -1923,6 +1929,10 @@ func NewLookupInvitePendingInvitesOK(body *LookupInviteResponseBody) *projectvie
 	v.Pending = make([]*projectviews.PendingInviteView, len(body.Pending))
 	for i, val := range body.Pending {
 		v.Pending[i] = unmarshalPendingInviteResponseBodyToProjectviewsPendingInviteView(val)
+	}
+	v.Projects = make([]*projectviews.ProjectView, len(body.Projects))
+	for i, val := range body.Projects {
+		v.Projects[i] = unmarshalProjectResponseBodyToProjectviewsProjectView(val)
 	}
 
 	return v
@@ -4773,18 +4783,6 @@ func ValidateProjectSummaryResponseBody(body *ProjectSummaryResponseBody) (err e
 	return
 }
 
-// ValidateProjectFollowingResponseBody runs the validations defined on
-// ProjectFollowingResponseBody
-func ValidateProjectFollowingResponseBody(body *ProjectFollowingResponseBody) (err error) {
-	if body.Total == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("total", "body"))
-	}
-	if body.Following == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("following", "body"))
-	}
-	return
-}
-
 // ValidateProjectCollectionResponseBody runs the validations defined on
 // ProjectCollectionResponseBody
 func ValidateProjectCollectionResponseBody(body ProjectCollectionResponseBody) (err error) {
@@ -4832,6 +4830,18 @@ func ValidateProjectResponseBody(body *ProjectResponseBody) (err error) {
 		if err2 := ValidateProjectFollowingResponseBody(body.Following); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateProjectFollowingResponseBody runs the validations defined on
+// ProjectFollowingResponseBody
+func ValidateProjectFollowingResponseBody(body *ProjectFollowingResponseBody) (err error) {
+	if body.Total == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("total", "body"))
+	}
+	if body.Following == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("following", "body"))
 	}
 	return
 }

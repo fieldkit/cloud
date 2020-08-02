@@ -96,9 +96,12 @@ var PendingInvites = ResultType("application/vnd.app.invites.pending", func() {
 	Attributes(func() {
 		Attribute("pending", ArrayOf(PendingInvite))
 		Required("pending")
+		Attribute("projects", CollectionOf(Project))
+		Required("projects")
 	})
 	View("default", func() {
 		Attribute("pending")
+		Attribute("projects")
 	})
 })
 

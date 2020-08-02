@@ -81,13 +81,15 @@ type ModifyUpdateResponseBody struct {
 // InvitesResponseBody is the type of the "project" service "invites" endpoint
 // HTTP response body.
 type InvitesResponseBody struct {
-	Pending []*PendingInviteResponseBody `form:"pending" json:"pending" xml:"pending"`
+	Pending  []*PendingInviteResponseBody  `form:"pending" json:"pending" xml:"pending"`
+	Projects ProjectResponseBodyCollection `form:"projects" json:"projects" xml:"projects"`
 }
 
 // LookupInviteResponseBody is the type of the "project" service "lookup
 // invite" endpoint HTTP response body.
 type LookupInviteResponseBody struct {
-	Pending []*PendingInviteResponseBody `form:"pending" json:"pending" xml:"pending"`
+	Pending  []*PendingInviteResponseBody  `form:"pending" json:"pending" xml:"pending"`
+	Projects ProjectResponseBodyCollection `form:"projects" json:"projects" xml:"projects"`
 }
 
 // AddResponseBody is the type of the "project" service "add" endpoint HTTP
@@ -1544,12 +1546,6 @@ type ProjectSummaryResponseBody struct {
 	Name string `form:"name" json:"name" xml:"name"`
 }
 
-// ProjectFollowingResponseBody is used to define fields on response body types.
-type ProjectFollowingResponseBody struct {
-	Total     int32 `form:"total" json:"total" xml:"total"`
-	Following bool  `form:"following" json:"following" xml:"following"`
-}
-
 // ProjectResponseBodyCollection is used to define fields on response body
 // types.
 type ProjectResponseBodyCollection []*ProjectResponseBody
@@ -1568,6 +1564,12 @@ type ProjectResponseBody struct {
 	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	ReadOnly    bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
 	Following   *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
+}
+
+// ProjectFollowingResponseBody is used to define fields on response body types.
+type ProjectFollowingResponseBody struct {
+	Total     int32 `form:"total" json:"total" xml:"total"`
+	Following bool  `form:"following" json:"following" xml:"following"`
 }
 
 // NewAddUpdateResponseBody builds the HTTP response body from the result of
@@ -1600,6 +1602,12 @@ func NewInvitesResponseBody(res *projectviews.PendingInvitesView) *InvitesRespon
 			body.Pending[i] = marshalProjectviewsPendingInviteViewToPendingInviteResponseBody(val)
 		}
 	}
+	if res.Projects != nil {
+		body.Projects = make([]*ProjectResponseBody, len(res.Projects))
+		for i, val := range res.Projects {
+			body.Projects[i] = marshalProjectviewsProjectViewToProjectResponseBody(val)
+		}
+	}
 	return body
 }
 
@@ -1611,6 +1619,12 @@ func NewLookupInviteResponseBody(res *projectviews.PendingInvitesView) *LookupIn
 		body.Pending = make([]*PendingInviteResponseBody, len(res.Pending))
 		for i, val := range res.Pending {
 			body.Pending[i] = marshalProjectviewsPendingInviteViewToPendingInviteResponseBody(val)
+		}
+	}
+	if res.Projects != nil {
+		body.Projects = make([]*ProjectResponseBody, len(res.Projects))
+		for i, val := range res.Projects {
+			body.Projects[i] = marshalProjectviewsProjectViewToProjectResponseBody(val)
 		}
 	}
 	return body
