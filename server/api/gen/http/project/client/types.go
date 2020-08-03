@@ -33,7 +33,7 @@ type AddRequestBody struct {
 	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location    *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	Tags        *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Private     *bool   `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	Privacy     *int32  `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
 	StartTime   *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime     *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 }
@@ -46,7 +46,7 @@ type UpdateRequestBody struct {
 	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location    *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	Tags        *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Private     *bool   `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	Privacy     *int32  `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
 	StartTime   *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime     *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 }
@@ -103,7 +103,7 @@ type AddResponseBody struct {
 	Goal        *string                       `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location    *string                       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	Tags        *string                       `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Private     *bool                         `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	Privacy     *int32                        `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
 	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
@@ -120,7 +120,7 @@ type UpdateResponseBody struct {
 	Goal        *string                       `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location    *string                       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	Tags        *string                       `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Private     *bool                         `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	Privacy     *int32                        `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
 	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
@@ -137,7 +137,7 @@ type GetResponseBody struct {
 	Goal        *string                       `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location    *string                       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	Tags        *string                       `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Private     *bool                         `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	Privacy     *int32                        `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
 	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
@@ -1712,7 +1712,7 @@ type ProjectResponseBody struct {
 	Goal        *string                       `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location    *string                       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	Tags        *string                       `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Private     *bool                         `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	Privacy     *int32                        `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
 	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
@@ -1753,7 +1753,7 @@ func NewAddRequestBody(p *project.AddPayload) *AddRequestBody {
 		Goal:        p.Project.Goal,
 		Location:    p.Project.Location,
 		Tags:        p.Project.Tags,
-		Private:     p.Project.Private,
+		Privacy:     p.Project.Privacy,
 		StartTime:   p.Project.StartTime,
 		EndTime:     p.Project.EndTime,
 	}
@@ -1769,7 +1769,7 @@ func NewUpdateRequestBody(p *project.UpdatePayload) *UpdateRequestBody {
 		Goal:        p.Project.Goal,
 		Location:    p.Project.Location,
 		Tags:        p.Project.Tags,
-		Private:     p.Project.Private,
+		Privacy:     p.Project.Privacy,
 		StartTime:   p.Project.StartTime,
 		EndTime:     p.Project.EndTime,
 	}
@@ -2400,7 +2400,7 @@ func NewAddProjectOK(body *AddResponseBody) *projectviews.ProjectView {
 		Goal:        body.Goal,
 		Location:    body.Location,
 		Tags:        body.Tags,
-		Private:     body.Private,
+		Privacy:     body.Privacy,
 		StartTime:   body.StartTime,
 		EndTime:     body.EndTime,
 		Photo:       body.Photo,
@@ -2477,7 +2477,7 @@ func NewUpdateProjectOK(body *UpdateResponseBody) *projectviews.ProjectView {
 		Goal:        body.Goal,
 		Location:    body.Location,
 		Tags:        body.Tags,
-		Private:     body.Private,
+		Privacy:     body.Privacy,
 		StartTime:   body.StartTime,
 		EndTime:     body.EndTime,
 		Photo:       body.Photo,
@@ -2556,7 +2556,7 @@ func NewGetProjectOK(body *GetResponseBody) *projectviews.ProjectView {
 		Goal:        body.Goal,
 		Location:    body.Location,
 		Tags:        body.Tags,
-		Private:     body.Private,
+		Privacy:     body.Privacy,
 		StartTime:   body.StartTime,
 		EndTime:     body.EndTime,
 		Photo:       body.Photo,
@@ -5278,8 +5278,8 @@ func ValidateProjectResponseBody(body *ProjectResponseBody) (err error) {
 	if body.Location == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("location", "body"))
 	}
-	if body.Private == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("private", "body"))
+	if body.Privacy == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("privacy", "body"))
 	}
 	if body.Tags == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("tags", "body"))

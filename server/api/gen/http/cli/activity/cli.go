@@ -1834,7 +1834,7 @@ Example:
       "goal": "Ut blanditiis rerum ea id distinctio.",
       "location": "Quaerat dolorem modi occaecati quisquam quidem.",
       "name": "Vero et illum.",
-      "private": true,
+      "privacy": 1919850194,
       "startTime": "Totam aliquid.",
       "tags": "Et dolorem et repudiandae asperiores ut."
    }' --project-id 1960918825 --auth "Non dolorem."
@@ -2507,7 +2507,7 @@ Example:
       "goal": "Ut blanditiis rerum ea id distinctio.",
       "location": "Quaerat dolorem modi occaecati quisquam quidem.",
       "name": "Vero et illum.",
-      "private": true,
+      "privacy": 1919850194,
       "startTime": "Totam aliquid.",
       "tags": "Et dolorem et repudiandae asperiores ut."
    }' --user-id 1146285121 --auth "Commodi omnis nihil fugiat dolor."

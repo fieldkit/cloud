@@ -279,7 +279,7 @@ func BuildAddPayload(projectAddBody string, projectAddAuth string) (*project.Add
 		Goal:        body.Goal,
 		Location:    body.Location,
 		Tags:        body.Tags,
-		Private:     body.Private,
+		Privacy:     body.Privacy,
 		StartTime:   body.StartTime,
 		EndTime:     body.EndTime,
 	}
@@ -299,7 +299,7 @@ func BuildUpdatePayload(projectUpdateBody string, projectUpdateProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Commodi voluptatem.\",\n      \"endTime\": \"Laudantium voluptate nulla.\",\n      \"goal\": \"Ut blanditiis rerum ea id distinctio.\",\n      \"location\": \"Quaerat dolorem modi occaecati quisquam quidem.\",\n      \"name\": \"Vero et illum.\",\n      \"private\": true,\n      \"startTime\": \"Totam aliquid.\",\n      \"tags\": \"Et dolorem et repudiandae asperiores ut.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Commodi voluptatem.\",\n      \"endTime\": \"Laudantium voluptate nulla.\",\n      \"goal\": \"Ut blanditiis rerum ea id distinctio.\",\n      \"location\": \"Quaerat dolorem modi occaecati quisquam quidem.\",\n      \"name\": \"Vero et illum.\",\n      \"privacy\": 1919850194,\n      \"startTime\": \"Totam aliquid.\",\n      \"tags\": \"Et dolorem et repudiandae asperiores ut.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -321,7 +321,7 @@ func BuildUpdatePayload(projectUpdateBody string, projectUpdateProjectID string,
 		Goal:        body.Goal,
 		Location:    body.Location,
 		Tags:        body.Tags,
-		Private:     body.Private,
+		Privacy:     body.Privacy,
 		StartTime:   body.StartTime,
 		EndTime:     body.EndTime,
 	}

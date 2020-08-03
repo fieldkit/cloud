@@ -50,9 +50,9 @@ func (c *ProjectService) Add(ctx context.Context, payload *project.AddPayload) (
 		tags = *payload.Project.Tags
 	}
 
-	private := true
-	if payload.Project.Private != nil {
-		private = *payload.Project.Private
+	privacy := data.Private
+	if payload.Project.Privacy != nil {
+		privacy = data.PrivacyType(*payload.Project.Privacy)
 	}
 
 	newProject := &data.Project{
@@ -61,7 +61,7 @@ func (c *ProjectService) Add(ctx context.Context, payload *project.AddPayload) (
 		Goal:        goal,
 		Location:    location,
 		Tags:        tags,
-		Private:     private,
+		Privacy:     privacy,
 	}
 
 	if start, err := tryParseDate(payload.Project.StartTime); err == nil {
@@ -108,9 +108,9 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 		tags = *payload.Project.Tags
 	}
 
-	private := true
-	if payload.Project.Private != nil {
-		private = *payload.Project.Private
+	privacy := data.Private
+	if payload.Project.Privacy != nil {
+		privacy = data.PrivacyType(*payload.Project.Privacy)
 	}
 
 	updating := &data.Project{
@@ -120,7 +120,7 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 		Goal:        goal,
 		Location:    location,
 		Tags:        tags,
-		Private:     private,
+		Privacy:     privacy,
 	}
 
 	if start, err := tryParseDate(payload.Project.StartTime); err == nil {
@@ -132,7 +132,7 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 
 	if err := c.options.Database.NamedGetContext(ctx, updating, `
 		UPDATE fieldkit.project SET name = :name, description = :description, goal = :goal, location = :location,
-		tags = :tags, private = :private, start_time = :start_time, end_time = :end_time WHERE id = :id RETURNING *`, updating); err != nil {
+		tags = :tags, privacy = :privacy, start_time = :start_time, end_time = :end_time WHERE id = :id RETURNING *`, updating); err != nil {
 		return nil, err
 	}
 
@@ -232,8 +232,8 @@ func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.Lis
 
 	projects := []*data.Project{}
 	if err := c.options.Database.SelectContext(ctx, &projects, `
-		SELECT p.* FROM fieldkit.project AS p WHERE NOT p.private ORDER BY p.name LIMIT 10
-		`); err != nil {
+		SELECT p.* FROM fieldkit.project AS p WHERE p.privacy = $1 ORDER BY p.name LIMIT 10
+		`, data.Public); err != nil {
 		return nil, err
 	}
 
@@ -895,7 +895,7 @@ func ProjectType(signer *Signer, dm *data.Project, numberOfFollowers int32, user
 		Goal:        dm.Goal,
 		Location:    dm.Location,
 		Tags:        dm.Tags,
-		Private:     dm.Private,
+		Privacy:     int32(dm.Privacy),
 		Photo:       photo,
 		ReadOnly:    role.IsProjectReadOnly(),
 		Following: &project.ProjectFollowing{

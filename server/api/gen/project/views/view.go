@@ -89,7 +89,7 @@ type ProjectView struct {
 	Goal        *string
 	Location    *string
 	Tags        *string
-	Private     *bool
+	Privacy     *int32
 	StartTime   *string
 	EndTime     *string
 	Photo       *string
@@ -143,7 +143,7 @@ var (
 			"goal",
 			"location",
 			"tags",
-			"private",
+			"privacy",
 			"startTime",
 			"endTime",
 			"photo",
@@ -178,7 +178,7 @@ var (
 			"goal",
 			"location",
 			"tags",
-			"private",
+			"privacy",
 			"startTime",
 			"endTime",
 			"photo",
@@ -344,8 +344,8 @@ func ValidateProjectView(result *ProjectView) (err error) {
 	if result.Location == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("location", "result"))
 	}
-	if result.Private == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("private", "result"))
+	if result.Privacy == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("privacy", "result"))
 	}
 	if result.Tags == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("tags", "result"))

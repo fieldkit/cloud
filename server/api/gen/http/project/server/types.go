@@ -33,7 +33,7 @@ type AddRequestBody struct {
 	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location    *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	Tags        *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Private     *bool   `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	Privacy     *int32  `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
 	StartTime   *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime     *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 }
@@ -46,7 +46,7 @@ type UpdateRequestBody struct {
 	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
 	Location    *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	Tags        *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Private     *bool   `form:"private,omitempty" json:"private,omitempty" xml:"private,omitempty"`
+	Privacy     *int32  `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
 	StartTime   *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime     *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 }
@@ -101,7 +101,7 @@ type AddResponseBody struct {
 	Goal        string                        `form:"goal" json:"goal" xml:"goal"`
 	Location    string                        `form:"location" json:"location" xml:"location"`
 	Tags        string                        `form:"tags" json:"tags" xml:"tags"`
-	Private     bool                          `form:"private" json:"private" xml:"private"`
+	Privacy     int32                         `form:"privacy" json:"privacy" xml:"privacy"`
 	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
@@ -118,7 +118,7 @@ type UpdateResponseBody struct {
 	Goal        string                        `form:"goal" json:"goal" xml:"goal"`
 	Location    string                        `form:"location" json:"location" xml:"location"`
 	Tags        string                        `form:"tags" json:"tags" xml:"tags"`
-	Private     bool                          `form:"private" json:"private" xml:"private"`
+	Privacy     int32                         `form:"privacy" json:"privacy" xml:"privacy"`
 	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
@@ -135,7 +135,7 @@ type GetResponseBody struct {
 	Goal        string                        `form:"goal" json:"goal" xml:"goal"`
 	Location    string                        `form:"location" json:"location" xml:"location"`
 	Tags        string                        `form:"tags" json:"tags" xml:"tags"`
-	Private     bool                          `form:"private" json:"private" xml:"private"`
+	Privacy     int32                         `form:"privacy" json:"privacy" xml:"privacy"`
 	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
@@ -1710,7 +1710,7 @@ type ProjectResponseBody struct {
 	Goal        string                        `form:"goal" json:"goal" xml:"goal"`
 	Location    string                        `form:"location" json:"location" xml:"location"`
 	Tags        string                        `form:"tags" json:"tags" xml:"tags"`
-	Private     bool                          `form:"private" json:"private" xml:"private"`
+	Privacy     int32                         `form:"privacy" json:"privacy" xml:"privacy"`
 	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
@@ -1792,7 +1792,7 @@ func NewAddResponseBody(res *projectviews.ProjectView) *AddResponseBody {
 		Goal:        *res.Goal,
 		Location:    *res.Location,
 		Tags:        *res.Tags,
-		Private:     *res.Private,
+		Privacy:     *res.Privacy,
 		StartTime:   res.StartTime,
 		EndTime:     res.EndTime,
 		Photo:       res.Photo,
@@ -1814,7 +1814,7 @@ func NewUpdateResponseBody(res *projectviews.ProjectView) *UpdateResponseBody {
 		Goal:        *res.Goal,
 		Location:    *res.Location,
 		Tags:        *res.Tags,
-		Private:     *res.Private,
+		Privacy:     *res.Privacy,
 		StartTime:   res.StartTime,
 		EndTime:     res.EndTime,
 		Photo:       res.Photo,
@@ -1836,7 +1836,7 @@ func NewGetResponseBody(res *projectviews.ProjectView) *GetResponseBody {
 		Goal:        *res.Goal,
 		Location:    *res.Location,
 		Tags:        *res.Tags,
-		Private:     *res.Private,
+		Privacy:     *res.Privacy,
 		StartTime:   res.StartTime,
 		EndTime:     res.EndTime,
 		Photo:       res.Photo,
@@ -3173,7 +3173,7 @@ func NewAddPayload(body *AddRequestBody, auth string) *project.AddPayload {
 		Goal:        body.Goal,
 		Location:    body.Location,
 		Tags:        body.Tags,
-		Private:     body.Private,
+		Privacy:     body.Privacy,
 		StartTime:   body.StartTime,
 		EndTime:     body.EndTime,
 	}
@@ -3193,7 +3193,7 @@ func NewUpdatePayload(body *UpdateRequestBody, projectID int32, auth string) *pr
 		Goal:        body.Goal,
 		Location:    body.Location,
 		Tags:        body.Tags,
-		Private:     body.Private,
+		Privacy:     body.Privacy,
 		StartTime:   body.StartTime,
 		EndTime:     body.EndTime,
 	}

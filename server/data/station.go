@@ -18,7 +18,6 @@ type Station struct {
 	OwnerID            int32     `db:"owner_id,omitempty"`
 	CreatedAt          time.Time `db:"created_at,omitempty"`
 	UpdatedAt          time.Time `db:"updated_at,omitempty"`
-	Private            bool      `db:"private"`
 	Battery            *float32  `db:"battery"`
 	Location           *Location `db:"location"`
 	LocationName       *string   `db:"location_name"`

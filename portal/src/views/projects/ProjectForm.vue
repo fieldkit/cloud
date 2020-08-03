@@ -91,8 +91,21 @@
                 </div>
             </div>
             <div id="public-checkbox-container">
-                <input type="checkbox" id="checkbox" v-model="form.publicProject" />
-                <label for="checkbox">Make this project public</label>
+                <div class="privacy-field">
+                    <input type="checkbox" id="checkbox" v-model="form.public" />
+                    <label for="checkbox">Make this project public</label>
+                </div>
+
+                <div v-if="form.public" class="public-options">
+                    <div class="privacy-field">
+                        <input type="radio" id="privacy" value="1" v-model="form.privacy" />
+                        Show exact location of stations.
+                    </div>
+                    <div class="privacy-field">
+                        <input type="radio" id="privacy" value="2" v-model="form.privacy" />
+                        Show general location of stations.
+                    </div>
+                </div>
             </div>
             <div class="action-container">
                 <button class="save-button" v-if="!project" type="submit">Add</button>
@@ -157,7 +170,8 @@ export default Vue.extend({
                 endTime: "",
                 tags: [],
                 tag: "",
-                publicProject: false,
+                public: false,
+                privacy: 1,
                 pickedStart: null,
                 pickedEnd: null,
             },
@@ -216,7 +230,8 @@ export default Vue.extend({
                 startTime: this.prettyDate(this.project.startTime),
                 endTime: this.prettyDate(this.project.endTime),
                 tags: tryParseTags(this.project.tags),
-                publicProject: !this.project.private,
+                public: this.project.privacy > 0,
+                privacy: this.project.privacy == 0 ? 1 : this.project.privacy,
             };
         }
     },
@@ -253,7 +268,7 @@ export default Vue.extend({
             };
             return _.extend({}, this.form, {
                 id: this.project?.id || null,
-                private: !this.form.publicProject,
+                privacy: this.form.public ? Number(this.form.privacy || 0) : 0,
                 startTime: makeLocalTime(this.form.startTime),
                 endTime: makeLocalTime(this.form.endTime),
                 tags: JSON.stringify(this.form.tags.map((tag) => tag.text)),
@@ -416,6 +431,16 @@ form > div {
 #public-checkbox-container img {
     float: left;
     margin: 2px 5px;
+}
+
+#public-checkbox-container .privacy-field {
+    display: flex;
+}
+
+#public-checkbox-container .public-options {
+    display: flex;
+    flex-direction: column;
+    margin-left: 1em;
 }
 
 .outer-date-container {

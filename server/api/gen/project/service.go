@@ -172,7 +172,7 @@ type Project struct {
 	Goal        string
 	Location    string
 	Tags        string
-	Private     bool
+	Privacy     int32
 	StartTime   *string
 	EndTime     *string
 	Photo       *string
@@ -293,7 +293,7 @@ type AddProjectFields struct {
 	Goal        *string
 	Location    *string
 	Tags        *string
-	Private     *bool
+	Privacy     *int32
 	StartTime   *string
 	EndTime     *string
 }
@@ -512,8 +512,8 @@ func newProject(vres *projectviews.ProjectView) *Project {
 	if vres.Tags != nil {
 		res.Tags = *vres.Tags
 	}
-	if vres.Private != nil {
-		res.Private = *vres.Private
+	if vres.Privacy != nil {
+		res.Privacy = *vres.Privacy
 	}
 	if vres.ReadOnly != nil {
 		res.ReadOnly = *vres.ReadOnly
@@ -534,7 +534,7 @@ func newProjectView(res *Project) *projectviews.ProjectView {
 		Goal:        &res.Goal,
 		Location:    &res.Location,
 		Tags:        &res.Tags,
-		Private:     &res.Private,
+		Privacy:     &res.Privacy,
 		StartTime:   res.StartTime,
 		EndTime:     res.EndTime,
 		Photo:       res.Photo,

@@ -2978,7 +2978,7 @@ func unmarshalProjectResponseBodyToProjectviewsProjectView(v *ProjectResponseBod
 		Goal:        v.Goal,
 		Location:    v.Location,
 		Tags:        v.Tags,
-		Private:     v.Private,
+		Privacy:     v.Privacy,
 		StartTime:   v.StartTime,
 		EndTime:     v.EndTime,
 		Photo:       v.Photo,

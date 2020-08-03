@@ -9958,9 +9958,10 @@ definitions:
       name:
         type: string
         example: Quia error.
-      private:
-        type: boolean
-        example: true
+      privacy:
+        type: integer
+        example: 1759247125
+        format: int32
       startTime:
         type: string
         example: Consequatur minus.
@@ -9973,7 +9974,7 @@ definitions:
       goal: Voluptas veniam dicta at iure veniam.
       location: Fugit est sit.
       name: Ipsam vero.
-      private: true
+      privacy: 633843125
       startTime: At neque atque.
       tags: Inventore laborum blanditiis eum asperiores.
     required:
@@ -10007,9 +10008,10 @@ definitions:
       photo:
         type: string
         example: Odit autem.
-      private:
-        type: boolean
-        example: true
+      privacy:
+        type: integer
+        example: 303196356
+        format: int32
       readOnly:
         type: boolean
         example: false
@@ -10031,7 +10033,7 @@ definitions:
       location: Eveniet ad.
       name: Et velit quas et doloremque nihil nihil.
       photo: Dolor qui nulla et sit.
-      private: false
+      privacy: 1681147898
       readOnly: true
       startTime: Omnis ut minus voluptatibus voluptas voluptatibus.
       tags: Perspiciatis accusamus voluptatem ea similique at quae.
@@ -10041,7 +10043,7 @@ definitions:
     - description
     - goal
     - location
-    - private
+    - privacy
     - tags
     - readOnly
     - following
@@ -11272,9 +11274,10 @@ definitions:
       photo:
         type: string
         example: Dolor magni.
-      private:
-        type: boolean
-        example: true
+      privacy:
+        type: integer
+        example: 1304201519
+        format: int32
       readOnly:
         type: boolean
         example: true
@@ -11296,7 +11299,7 @@ definitions:
       location: A culpa.
       name: Commodi dolorum iure optio eum nostrum.
       photo: Magnam et exercitationem fugiat.
-      private: true
+      privacy: 647454699
       readOnly: true
       startTime: Qui illum at repellat.
       tags: Distinctio et est.
@@ -11306,7 +11309,7 @@ definitions:
     - description
     - goal
     - location
-    - private
+    - privacy
     - tags
     - readOnly
     - following
@@ -11748,7 +11751,7 @@ definitions:
         location: Quis est in.
         name: Quo repudiandae nostrum aut assumenda necessitatibus.
         photo: Sunt similique aspernatur laudantium commodi magni.
-        private: true
+        privacy: 724465994
         readOnly: true
         startTime: Dolorem est vel.
         tags: Occaecati aut fuga.
@@ -11762,7 +11765,7 @@ definitions:
         location: Quis est in.
         name: Quo repudiandae nostrum aut assumenda necessitatibus.
         photo: Sunt similique aspernatur laudantium commodi magni.
-        private: true
+        privacy: 724465994
         readOnly: true
         startTime: Dolorem est vel.
         tags: Occaecati aut fuga.
@@ -11776,7 +11779,7 @@ definitions:
         location: Quis est in.
         name: Quo repudiandae nostrum aut assumenda necessitatibus.
         photo: Sunt similique aspernatur laudantium commodi magni.
-        private: true
+        privacy: 724465994
         readOnly: true
         startTime: Dolorem est vel.
         tags: Occaecati aut fuga.
@@ -11982,7 +11985,7 @@ definitions:
         location: Quis est in.
         name: Quo repudiandae nostrum aut assumenda necessitatibus.
         photo: Sunt similique aspernatur laudantium commodi magni.
-        private: true
+        privacy: 724465994
         readOnly: true
         startTime: Dolorem est vel.
         tags: Occaecati aut fuga.
@@ -11996,7 +11999,7 @@ definitions:
         location: Quis est in.
         name: Quo repudiandae nostrum aut assumenda necessitatibus.
         photo: Sunt similique aspernatur laudantium commodi magni.
-        private: true
+        privacy: 724465994
         readOnly: true
         startTime: Dolorem est vel.
         tags: Occaecati aut fuga.
@@ -12010,7 +12013,7 @@ definitions:
         location: Quis est in.
         name: Quo repudiandae nostrum aut assumenda necessitatibus.
         photo: Sunt similique aspernatur laudantium commodi magni.
-        private: true
+        privacy: 724465994
         readOnly: true
         startTime: Dolorem est vel.
         tags: Occaecati aut fuga.
@@ -12215,7 +12218,7 @@ definitions:
         location: Quis est in.
         name: Quo repudiandae nostrum aut assumenda necessitatibus.
         photo: Sunt similique aspernatur laudantium commodi magni.
-        private: true
+        privacy: 724465994
         readOnly: true
         startTime: Dolorem est vel.
         tags: Occaecati aut fuga.
@@ -12229,7 +12232,7 @@ definitions:
         location: Quis est in.
         name: Quo repudiandae nostrum aut assumenda necessitatibus.
         photo: Sunt similique aspernatur laudantium commodi magni.
-        private: true
+        privacy: 724465994
         readOnly: true
         startTime: Dolorem est vel.
         tags: Occaecati aut fuga.
@@ -12243,7 +12246,7 @@ definitions:
         location: Quis est in.
         name: Quo repudiandae nostrum aut assumenda necessitatibus.
         photo: Sunt similique aspernatur laudantium commodi magni.
-        private: true
+        privacy: 724465994
         readOnly: true
         startTime: Dolorem est vel.
         tags: Occaecati aut fuga.
@@ -12502,7 +12505,7 @@ definitions:
         location: Quis est in.
         name: Quo repudiandae nostrum aut assumenda necessitatibus.
         photo: Sunt similique aspernatur laudantium commodi magni.
-        private: true
+        privacy: 724465994
         readOnly: true
         startTime: Dolorem est vel.
         tags: Occaecati aut fuga.
@@ -12516,7 +12519,7 @@ definitions:
         location: Quis est in.
         name: Quo repudiandae nostrum aut assumenda necessitatibus.
         photo: Sunt similique aspernatur laudantium commodi magni.
-        private: true
+        privacy: 724465994
         readOnly: true
         startTime: Dolorem est vel.
         tags: Occaecati aut fuga.
@@ -12530,7 +12533,7 @@ definitions:
         location: Quis est in.
         name: Quo repudiandae nostrum aut assumenda necessitatibus.
         photo: Sunt similique aspernatur laudantium commodi magni.
-        private: true
+        privacy: 724465994
         readOnly: true
         startTime: Dolorem est vel.
         tags: Occaecati aut fuga.
@@ -13554,9 +13557,10 @@ definitions:
       photo:
         type: string
         example: Assumenda inventore atque ratione et reprehenderit quaerat.
-      private:
-        type: boolean
-        example: false
+      privacy:
+        type: integer
+        example: 181162361
+        format: int32
       readOnly:
         type: boolean
         example: false
@@ -13578,7 +13582,7 @@ definitions:
       location: Maxime ut magnam sunt ullam velit architecto.
       name: Est dolorem consequatur harum dicta.
       photo: Laboriosam quidem.
-      private: false
+      privacy: 1030363735
       readOnly: false
       startTime: Sint rerum quo accusamus et.
       tags: Tempora corporis.
@@ -13588,7 +13592,7 @@ definitions:
     - description
     - goal
     - location
-    - private
+    - privacy
     - tags
     - readOnly
     - following
@@ -13611,7 +13615,7 @@ definitions:
       location: Quis est in.
       name: Quo repudiandae nostrum aut assumenda necessitatibus.
       photo: Sunt similique aspernatur laudantium commodi magni.
-      private: true
+      privacy: 724465994
       readOnly: true
       startTime: Dolorem est vel.
       tags: Occaecati aut fuga.
@@ -13625,7 +13629,7 @@ definitions:
       location: Quis est in.
       name: Quo repudiandae nostrum aut assumenda necessitatibus.
       photo: Sunt similique aspernatur laudantium commodi magni.
-      private: true
+      privacy: 724465994
       readOnly: true
       startTime: Dolorem est vel.
       tags: Occaecati aut fuga.
@@ -13818,9 +13822,10 @@ definitions:
       name:
         type: string
         example: Illum repellat.
-      private:
-        type: boolean
-        example: true
+      privacy:
+        type: integer
+        example: 1868507261
+        format: int32
       startTime:
         type: string
         example: Sapiente et expedita.
@@ -13833,7 +13838,7 @@ definitions:
       goal: Sunt vitae sint commodi dolores.
       location: Harum rem rem quis rem rerum nobis.
       name: Veniam error hic non placeat.
-      private: false
+      privacy: 224053402
       startTime: Repellendus beatae et omnis dicta eum.
       tags: Non ipsam.
     required:
@@ -13867,9 +13872,10 @@ definitions:
       photo:
         type: string
         example: Perferendis delectus aspernatur expedita ut odio error.
-      private:
-        type: boolean
-        example: false
+      privacy:
+        type: integer
+        example: 1401140012
+        format: int32
       readOnly:
         type: boolean
         example: false
@@ -13891,7 +13897,7 @@ definitions:
       location: Repudiandae nulla modi quod.
       name: Perferendis necessitatibus eum odit ut ut.
       photo: Ipsa occaecati cum.
-      private: false
+      privacy: 2125151416
       readOnly: true
       startTime: Est exercitationem.
       tags: Consequatur explicabo eos quia magni at.
@@ -13901,7 +13907,7 @@ definitions:
     - description
     - goal
     - location
-    - private
+    - privacy
     - tags
     - readOnly
     - following

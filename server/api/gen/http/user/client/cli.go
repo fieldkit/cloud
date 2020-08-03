@@ -305,7 +305,7 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateUserID string, userUpda
 	{
 		err = json.Unmarshal([]byte(userUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Commodi voluptatem.\",\n      \"endTime\": \"Laudantium voluptate nulla.\",\n      \"goal\": \"Ut blanditiis rerum ea id distinctio.\",\n      \"location\": \"Quaerat dolorem modi occaecati quisquam quidem.\",\n      \"name\": \"Vero et illum.\",\n      \"private\": true,\n      \"startTime\": \"Totam aliquid.\",\n      \"tags\": \"Et dolorem et repudiandae asperiores ut.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Commodi voluptatem.\",\n      \"endTime\": \"Laudantium voluptate nulla.\",\n      \"goal\": \"Ut blanditiis rerum ea id distinctio.\",\n      \"location\": \"Quaerat dolorem modi occaecati quisquam quidem.\",\n      \"name\": \"Vero et illum.\",\n      \"privacy\": 1919850194,\n      \"startTime\": \"Totam aliquid.\",\n      \"tags\": \"Et dolorem et repudiandae asperiores ut.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
