@@ -8,8 +8,6 @@ import RecoverAccountView from "./views/auth/RecoverAccountView.vue";
 import ResetPasswordView from "./views/auth/ResetPasswordView.vue";
 import UserView from "./views/auth/UserView.vue";
 
-import InvitesView from "./views/InvitesView.vue";
-
 import ProjectsView from "./views/projects/ProjectsView.vue";
 import ProjectEditView from "./views/projects/ProjectEditView.vue";
 import ProjectUpdateEditView from "./views/projects/ProjectUpdateEditView.vue";
@@ -83,8 +81,7 @@ const routes = [
     {
         path: "/projects/invitation",
         name: "viewInvites",
-        component: InvitesView,
-        props: true,
+        component: ProjectsView,
         meta: {
             secured: true,
         },
