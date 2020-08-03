@@ -60,8 +60,6 @@ func TestGetSensorsData(t *testing.T) {
 
 	assert.Equal(http.StatusOK, rr.Code)
 
-	fmt.Println(rr.Body.String())
-
 	ja := jsonassert.New(t)
 	ja.Assertf(rr.Body.String(), `
 	{
@@ -87,8 +85,6 @@ func TestGetStationSensors(t *testing.T) {
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusOK, rr.Code)
-
-	fmt.Println(rr.Body.String())
 
 	ja := jsonassert.New(t)
 	ja.Assertf(rr.Body.String(), `

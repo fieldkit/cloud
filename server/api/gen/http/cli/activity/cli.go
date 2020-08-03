@@ -329,7 +329,7 @@ func ParseEndpoint(
 
 		stationListProjectFlags    = flag.NewFlagSet("list- project", flag.ExitOnError)
 		stationListProjectIDFlag   = stationListProjectFlags.String("id", "REQUIRED", "")
-		stationListProjectAuthFlag = stationListProjectFlags.String("auth", "REQUIRED", "")
+		stationListProjectAuthFlag = stationListProjectFlags.String("auth", "", "")
 
 		stationDownloadPhotoFlags           = flag.NewFlagSet("download- photo", flag.ExitOnError)
 		stationDownloadPhotoStationIDFlag   = stationDownloadPhotoFlags.String("station-id", "REQUIRED", "")

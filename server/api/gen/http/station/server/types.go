@@ -1548,7 +1548,7 @@ func NewListMinePayload(auth string) *station.ListMinePayload {
 }
 
 // NewListProjectPayload builds a station service list project endpoint payload.
-func NewListProjectPayload(id int32, auth string) *station.ListProjectPayload {
+func NewListProjectPayload(id int32, auth *string) *station.ListProjectPayload {
 	v := &station.ListProjectPayload{}
 	v.ID = id
 	v.Auth = auth

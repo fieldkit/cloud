@@ -156,12 +156,13 @@ func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
 			DeviceID:  deviceID,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
+			Location:  data.NewLocation([]float64{36.9053064, -117.5297165}),
 		}
 
 		if err := e.DB.NamedGetContext(e.Ctx, station, `
-			INSERT INTO fieldkit.station (name, device_id, owner_id, created_at, updated_at)
-			VALUES (:name, :device_id, :owner_id, :created_at, :updated_at)
-			RETURNING *
+			INSERT INTO fieldkit.station (name, device_id, owner_id, created_at, updated_at, location)
+			VALUES (:name, :device_id, :owner_id, :created_at, :updated_at, ST_SetSRID(ST_GeomFromText(:location), 4326))
+			RETURNING id
 		`, station); err != nil {
 			return nil, err
 		}

@@ -294,12 +294,11 @@ var _ = Service("station", func() {
 
 	Method("list project", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
+			// Required("auth")
 			Attribute("id", Int32)
 			Required("id")
 		})

@@ -643,8 +643,8 @@ func EncodeListProjectRequest(encoder func(*http.Request) goahttp.Encoder) func(
 		if !ok {
 			return goahttp.ErrInvalidType("station", "list project", "*station.ListProjectPayload", v)
 		}
-		{
-			head := p.Auth
+		if p.Auth != nil {
+			head := *p.Auth
 			req.Header.Set("Authorization", head)
 		}
 		return nil

@@ -172,7 +172,9 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 		return nil, err
 	}
 
-	return transformStationFull(c.options.signer, p, sf)
+	preciseLocation := p.UserID() == sf.Owner.ID
+
+	return transformStationFull(c.options.signer, p, sf, preciseLocation)
 }
 
 func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
@@ -229,7 +231,7 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(c.options.signer, p, sfs)
+	stations, err := transformAllStationFull(c.options.signer, p, sfs, true)
 	if err != nil {
 		return nil, err
 	}
@@ -242,9 +244,23 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 }
 
 func (c *StationService) ListProject(ctx context.Context, payload *station.ListProjectPayload) (response *station.StationsFull, err error) {
-	p, err := NewPermissions(ctx, c.options).Unwrap()
+	pr := repositories.NewProjectRepository(c.options.Database)
+
+	project, err := pr.QueryByID(ctx, payload.ID)
 	if err != nil {
 		return nil, err
+	}
+
+	preciseLocation := project.Privacy == data.Public
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err == nil {
+		relationships, err := pr.QueryUserProjectRelationships(ctx, p.UserID())
+		if err != nil {
+			return nil, err
+		}
+		if _, ok := relationships[payload.ID]; ok {
+			preciseLocation = true
+		}
 	}
 
 	r, err := repositories.NewStationRepository(c.options.Database)
@@ -257,7 +273,7 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(c.options.signer, p, sfs)
+	stations, err := transformAllStationFull(c.options.signer, p, sfs, preciseLocation)
 	if err != nil {
 		return nil, err
 	}
@@ -574,19 +590,26 @@ func translateModuleKey(name string) string {
 	return strings.Replace(name, "modules.", "fk.", 1)
 }
 
-func transformLocation(sf *data.StationFull) *station.StationLocation {
+func transformLocation(sf *data.StationFull, preciseLocation bool) *station.StationLocation {
 	if l := sf.Station.Location; l != nil {
-		return &station.StationLocation{
-			Precise: []float64{l.Longitude(), l.Latitude()},
+		if preciseLocation {
+			return &station.StationLocation{
+				Precise: []float64{l.Longitude(), l.Latitude()},
+			}
 		}
 	}
 	return nil
 }
 
-func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull) (*station.StationFull, error) {
-	sp, err := p.ForStation(sf.Station)
-	if err != nil {
-		return nil, err
+func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, preciseLocation bool) (*station.StationFull, error) {
+	readOnly := true
+	if p != nil {
+		sp, err := p.ForStation(sf.Station)
+		if err != nil {
+			return nil, err
+		}
+
+		readOnly = sp.IsReadOnly()
 	}
 
 	configurations := transformConfigurations(sf)
@@ -598,10 +621,12 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull) (
 
 	dataSummary := transformDataSummary(sf.DataSummary)
 
+	location := transformLocation(sf, preciseLocation)
+
 	return &station.StationFull{
 		ID:       sf.Station.ID,
 		Name:     sf.Station.Name,
-		ReadOnly: sp.IsReadOnly(),
+		ReadOnly: readOnly,
 		DeviceID: hex.EncodeToString(sf.Station.DeviceID),
 		Uploads:  transformUploads(sf.Ingestions),
 		Configurations: &station.StationConfigurations{
@@ -616,7 +641,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull) (
 		LocationName:    sf.Station.LocationName,
 		PlaceNameOther:  sf.Station.PlaceOther,
 		PlaceNameNative: sf.Station.PlaceNative,
-		Location:        transformLocation(sf),
+		Location:        location,
 		Data:            dataSummary,
 		Owner: &station.StationOwner{
 			ID:   sf.Owner.ID,
@@ -642,11 +667,11 @@ func transformDataSummary(ads *data.AggregatedDataSummary) *station.StationDataS
 	}
 }
 
-func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull) ([]*station.StationFull, error) {
+func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool) ([]*station.StationFull, error) {
 	stations := make([]*station.StationFull, 0)
 
 	for _, sf := range sfs {
-		after, err := transformStationFull(signer, p, sf)
+		after, err := transformStationFull(signer, p, sf, preciseLocation)
 		if err != nil {
 			return nil, err
 		}

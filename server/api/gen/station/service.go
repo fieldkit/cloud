@@ -112,7 +112,7 @@ type StationsFull struct {
 // ListProjectPayload is the payload type of the station service list project
 // method.
 type ListProjectPayload struct {
-	Auth string
+	Auth *string
 	ID   int32
 }
 

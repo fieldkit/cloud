@@ -1079,10 +1079,6 @@ paths:
       tags:
       - station
       summary: list project station
-      description: |2-
-
-        **Required security scopes for jwt**:
-          * `api:access`
       operationId: station#list project
       parameters:
       - name: id
@@ -1093,7 +1089,7 @@ paths:
       - name: Authorization
         in: header
         description: authentication token
-        required: true
+        required: false
         type: string
         pattern: ^Bearer [^ ]+$
       responses:

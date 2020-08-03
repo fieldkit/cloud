@@ -68,6 +68,16 @@ func (pr *ProjectRepository) AddStationToDefaultProjectMaybe(ctx context.Context
 	return pr.AddStationToProjectByID(ctx, projectIDs[0], station.ID)
 }
 
+func (pr *ProjectRepository) QueryByID(ctx context.Context, projectID int32) (*data.Project, error) {
+	getting := &data.Project{}
+	if err := pr.db.GetContext(ctx, getting, `
+		SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1
+		`, projectID); err != nil {
+		return nil, err
+	}
+	return getting, nil
+}
+
 func (pr *ProjectRepository) QueryUserProjectRelationships(ctx context.Context, userID int32) (map[int32]*data.UserProjectRelationship, error) {
 	all := []*data.UserProjectRelationship{}
 	if err := pr.db.SelectContext(ctx, &all, `

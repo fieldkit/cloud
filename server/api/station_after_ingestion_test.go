@@ -94,6 +94,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"readOnly": "<<PRESENCE>>",
+				"location": "<<PRESENCE>>",
 				"configurations": {
 					"all": [
 						{
