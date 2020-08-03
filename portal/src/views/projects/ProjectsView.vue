@@ -12,6 +12,7 @@
                 </div>
 
                 <ProjectThumbnails :projects="userProjects" />
+                <ProjectThumbnails :projects="invites.projects" :invited="true" v-if="invites" />
             </div>
             <div class="container community">
                 <div class="header">
@@ -24,10 +25,11 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout";
 import ProjectThumbnails from "./ProjectThumbnails";
-import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
+import FKApi from "@/api/api";
 
 export default {
     name: "ProjectsView",
@@ -36,16 +38,21 @@ export default {
         ProjectThumbnails,
     },
     data() {
-        return {};
+        return {
+            invites: null,
+        };
     },
     computed: {
-        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
+        ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({
-            user: (s) => s.user.user,
-            stations: (s) => s.stations.user.stations,
-            userProjects: (s) => s.stations.user.projects,
-            publicProjects: (s) => s.stations.community.projects,
+            userProjects: (s) => Object.values(s.stations.user.projects),
+            publicProjects: (s) => Object.values(s.stations.community.projects),
         }),
+    },
+    mounted() {
+        return new FKApi().getInvitesByUser().then((invites) => {
+            this.invites = invites;
+        });
     },
     methods: {
         goBack() {

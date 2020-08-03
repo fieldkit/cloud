@@ -514,6 +514,22 @@ class FKApi {
         });
     }
 
+    acceptProjectInvite(payload: { projectId: number }) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/projects/" + payload.projectId + "/invites/accept",
+        });
+    }
+
+    declineProjectInvite(payload: { projectId: number }) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/projects/" + payload.projectId + "/invites/reject",
+        });
+    }
+
     acceptInvite(payload: { id: number; token: string }) {
         return this.invoke({
             auth: Auth.Required,

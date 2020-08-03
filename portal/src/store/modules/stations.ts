@@ -323,6 +323,15 @@ const actions = {
         const usersReply = await new FKApi().getUsersByProject(payload.projectId);
         commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
     },
+    [ActionTypes.ACCEPT_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+        await new FKApi().acceptProjectInvite(payload);
+
+        const userProjects = await new FKApi().getUserProjects(OnNoReject);
+        commit(HAVE_USER_PROJECTS, userProjects.projects);
+    },
+    [ActionTypes.DECLINE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+        await new FKApi().declineProjectInvite(payload);
+    },
     [ActionTypes.ACCEPT_PROJECT_INVITE]: async (
         { commit, dispatch }: { commit: any; dispatch: any },
         payload: { id: number; token: string }

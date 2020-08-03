@@ -1,6 +1,6 @@
 <template>
     <div class="project-thumbnails">
-        <ProjectThumbnail v-for="project in projects" v-bind:key="project.id" :project="project" />
+        <ProjectThumbnail v-for="project in projects" v-bind:key="project.id" :project="project" :invited="invited" />
     </div>
 </template>
 
@@ -12,7 +12,16 @@ export default {
     components: {
         ProjectThumbnail,
     },
-    props: { projects: { required: true } },
+    props: {
+        projects: {
+            type: Array,
+            required: true,
+        },
+        invited: {
+            type: Boolean,
+            default: false,
+        },
+    },
 };
 </script>
 
