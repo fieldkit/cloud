@@ -142,8 +142,8 @@ type SensorRangeView struct {
 
 // StationLocationView is a type that runs validations on a projected type.
 type StationLocationView struct {
-	Latitude  *float64
-	Longitude *float64
+	Precise []float64
+	Region  []float64
 }
 
 // StationDataSummaryView is a type that runs validations on a projected type.
@@ -373,11 +373,6 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
-	if result.Location != nil {
-		if err2 := ValidateStationLocationView(result.Location); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
 	if result.Data != nil {
 		if err2 := ValidateStationDataSummaryView(result.Data); err2 != nil {
 			err = goa.MergeErrors(err, err2)
@@ -562,12 +557,7 @@ func ValidateSensorRangeView(result *SensorRangeView) (err error) {
 // ValidateStationLocationView runs the validations defined on
 // StationLocationView.
 func ValidateStationLocationView(result *StationLocationView) (err error) {
-	if result.Latitude == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("latitude", "result"))
-	}
-	if result.Longitude == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("longitude", "result"))
-	}
+
 	return
 }
 
@@ -666,11 +656,6 @@ func ValidateEssentialStationView(result *EssentialStationView) (err error) {
 	}
 	if result.Owner != nil {
 		if err2 := ValidateStationOwnerView(result.Owner); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	if result.Location != nil {
-		if err2 := ValidateStationLocationView(result.Location); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}

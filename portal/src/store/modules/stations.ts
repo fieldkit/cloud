@@ -110,8 +110,8 @@ export class DisplayStation {
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))
                 .head() || [];
-        if (station.location) {
-            this.location = new Location(station.location.latitude, station.location.longitude);
+        if (station.location?.precise) {
+            this.location = new Location(station.location.precise[1], station.location.precise[0]);
         }
     }
 }

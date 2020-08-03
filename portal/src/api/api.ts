@@ -206,9 +206,9 @@ export interface Configurations {
     all: StationConfiguration[];
 }
 
-export interface HasLocation {
-    readonly latitude: number | null;
-    readonly longitude: number | null;
+export interface StationLocation {
+    readonly precise: number[] | null;
+    readonly region: number[] | null;
 }
 
 export interface Station {
@@ -223,7 +223,7 @@ export interface Station {
     configurations: Configurations;
     updated: number;
     battery: number | null;
-    location: HasLocation | null;
+    location: StationLocation | null;
     placeNameOther: string | null;
     placeNameNative: string | null;
     recordingStartedAt: Date | null;

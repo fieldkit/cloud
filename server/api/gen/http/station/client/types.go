@@ -803,8 +803,8 @@ type SensorRangeResponseBody struct {
 
 // StationLocationResponseBody is used to define fields on response body types.
 type StationLocationResponseBody struct {
-	Latitude  *float64 `form:"latitude,omitempty" json:"latitude,omitempty" xml:"latitude,omitempty"`
-	Longitude *float64 `form:"longitude,omitempty" json:"longitude,omitempty" xml:"longitude,omitempty"`
+	Precise []float64 `form:"precise,omitempty" json:"precise,omitempty" xml:"precise,omitempty"`
+	Region  []float64 `form:"region,omitempty" json:"region,omitempty" xml:"region,omitempty"`
 }
 
 // StationDataSummaryResponseBody is used to define fields on response body
@@ -2497,18 +2497,6 @@ func ValidateSensorRangeResponseBody(body *SensorRangeResponseBody) (err error) 
 	return
 }
 
-// ValidateStationLocationResponseBody runs the validations defined on
-// StationLocationResponseBody
-func ValidateStationLocationResponseBody(body *StationLocationResponseBody) (err error) {
-	if body.Latitude == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("latitude", "body"))
-	}
-	if body.Longitude == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("longitude", "body"))
-	}
-	return
-}
-
 // ValidateStationDataSummaryResponseBody runs the validations defined on
 // StationDataSummaryResponseBody
 func ValidateStationDataSummaryResponseBody(body *StationDataSummaryResponseBody) (err error) {
@@ -2589,11 +2577,6 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 			err = goa.MergeErrors(err, err2)
 		}
 	}
-	if body.Location != nil {
-		if err2 := ValidateStationLocationResponseBody(body.Location); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
 	if body.Data != nil {
 		if err2 := ValidateStationDataSummaryResponseBody(body.Data); err2 != nil {
 			err = goa.MergeErrors(err, err2)
@@ -2625,11 +2608,6 @@ func ValidateEssentialStationResponseBody(body *EssentialStationResponseBody) (e
 	}
 	if body.Owner != nil {
 		if err2 := ValidateStationOwnerResponseBody(body.Owner); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	if body.Location != nil {
-		if err2 := ValidateStationLocationResponseBody(body.Location); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}

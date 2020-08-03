@@ -1343,9 +1343,18 @@ func unmarshalStationLocationResponseBodyToStationviewsStationLocationView(v *St
 	if v == nil {
 		return nil
 	}
-	res := &stationviews.StationLocationView{
-		Latitude:  v.Latitude,
-		Longitude: v.Longitude,
+	res := &stationviews.StationLocationView{}
+	if v.Precise != nil {
+		res.Precise = make([]float64, len(v.Precise))
+		for i, val := range v.Precise {
+			res.Precise[i] = val
+		}
+	}
+	if v.Region != nil {
+		res.Region = make([]float64, len(v.Region))
+		for i, val := range v.Region {
+			res.Region[i] = val
+		}
 	}
 
 	return res

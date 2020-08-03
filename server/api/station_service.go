@@ -306,8 +306,7 @@ func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPa
 		var location *station.StationLocation = nil
 		if es.Location != nil {
 			location = &station.StationLocation{
-				Latitude:  es.Location.Latitude(),
-				Longitude: es.Location.Longitude(),
+				Precise: []float64{es.Location.Longitude(), es.Location.Latitude()},
 			}
 		}
 
@@ -578,8 +577,7 @@ func translateModuleKey(name string) string {
 func transformLocation(sf *data.StationFull) *station.StationLocation {
 	if l := sf.Station.Location; l != nil {
 		return &station.StationLocation{
-			Latitude:  l.Latitude(),
-			Longitude: l.Longitude(),
+			Precise: []float64{l.Longitude(), l.Latitude()},
 		}
 	}
 	return nil
