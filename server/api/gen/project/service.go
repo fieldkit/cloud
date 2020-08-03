@@ -28,6 +28,10 @@ type Service interface {
 	Invites(context.Context, *InvitesPayload) (res *PendingInvites, err error)
 	// LookupInvite implements lookup invite.
 	LookupInvite(context.Context, *LookupInvitePayload) (res *PendingInvites, err error)
+	// AcceptProjectInvite implements accept project invite.
+	AcceptProjectInvite(context.Context, *AcceptProjectInvitePayload) (err error)
+	// RejectProjectInvite implements reject project invite.
+	RejectProjectInvite(context.Context, *RejectProjectInvitePayload) (err error)
 	// AcceptInvite implements accept invite.
 	AcceptInvite(context.Context, *AcceptInvitePayload) (err error)
 	// RejectInvite implements reject invite.
@@ -72,7 +76,7 @@ const ServiceName = "project"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [19]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept invite", "reject invite", "add", "update", "get", "list community", "list mine", "invite", "remove user", "add station", "remove station", "delete", "upload photo", "download photo"}
+var MethodNames = [21]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept project invite", "reject project invite", "accept invite", "reject invite", "add", "update", "get", "list community", "list mine", "invite", "remove user", "add station", "remove station", "delete", "upload photo", "download photo"}
 
 // AddUpdatePayload is the payload type of the project service add update
 // method.
@@ -122,6 +126,20 @@ type PendingInvites struct {
 type LookupInvitePayload struct {
 	Auth  string
 	Token string
+}
+
+// AcceptProjectInvitePayload is the payload type of the project service accept
+// project invite method.
+type AcceptProjectInvitePayload struct {
+	Auth      string
+	ProjectID int32
+}
+
+// RejectProjectInvitePayload is the payload type of the project service reject
+// project invite method.
+type RejectProjectInvitePayload struct {
+	Auth      string
+	ProjectID int32
 }
 
 // AcceptInvitePayload is the payload type of the project service accept invite

@@ -735,6 +735,268 @@ func DecodeLookupInviteResponse(decoder func(*http.Response) goahttp.Decoder, re
 	}
 }
 
+// BuildAcceptProjectInviteRequest instantiates a HTTP request object with
+// method and path set to call the "project" service "accept project invite"
+// endpoint
+func (c *Client) BuildAcceptProjectInviteRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		projectID int32
+	)
+	{
+		p, ok := v.(*project.AcceptProjectInvitePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("project", "accept project invite", "*project.AcceptProjectInvitePayload", v)
+		}
+		projectID = p.ProjectID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AcceptProjectInviteProjectPath(projectID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "accept project invite", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeAcceptProjectInviteRequest returns an encoder for requests sent to the
+// project accept project invite server.
+func EncodeAcceptProjectInviteRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.AcceptProjectInvitePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "accept project invite", "*project.AcceptProjectInvitePayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeAcceptProjectInviteResponse returns a decoder for responses returned
+// by the project accept project invite endpoint. restoreBody controls whether
+// the response body should be restored after having been read.
+// DecodeAcceptProjectInviteResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeAcceptProjectInviteResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body AcceptProjectInviteUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "accept project invite", err)
+			}
+			err = ValidateAcceptProjectInviteUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("project", "accept project invite", err)
+			}
+			return nil, NewAcceptProjectInviteUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body AcceptProjectInviteForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "accept project invite", err)
+			}
+			err = ValidateAcceptProjectInviteForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("project", "accept project invite", err)
+			}
+			return nil, NewAcceptProjectInviteForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body AcceptProjectInviteNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "accept project invite", err)
+			}
+			err = ValidateAcceptProjectInviteNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("project", "accept project invite", err)
+			}
+			return nil, NewAcceptProjectInviteNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body AcceptProjectInviteBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "accept project invite", err)
+			}
+			err = ValidateAcceptProjectInviteBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("project", "accept project invite", err)
+			}
+			return nil, NewAcceptProjectInviteBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "accept project invite", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildRejectProjectInviteRequest instantiates a HTTP request object with
+// method and path set to call the "project" service "reject project invite"
+// endpoint
+func (c *Client) BuildRejectProjectInviteRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		projectID int32
+	)
+	{
+		p, ok := v.(*project.RejectProjectInvitePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("project", "reject project invite", "*project.RejectProjectInvitePayload", v)
+		}
+		projectID = p.ProjectID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: RejectProjectInviteProjectPath(projectID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "reject project invite", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeRejectProjectInviteRequest returns an encoder for requests sent to the
+// project reject project invite server.
+func EncodeRejectProjectInviteRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.RejectProjectInvitePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "reject project invite", "*project.RejectProjectInvitePayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeRejectProjectInviteResponse returns a decoder for responses returned
+// by the project reject project invite endpoint. restoreBody controls whether
+// the response body should be restored after having been read.
+// DecodeRejectProjectInviteResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeRejectProjectInviteResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body RejectProjectInviteUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "reject project invite", err)
+			}
+			err = ValidateRejectProjectInviteUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("project", "reject project invite", err)
+			}
+			return nil, NewRejectProjectInviteUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body RejectProjectInviteForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "reject project invite", err)
+			}
+			err = ValidateRejectProjectInviteForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("project", "reject project invite", err)
+			}
+			return nil, NewRejectProjectInviteForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body RejectProjectInviteNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "reject project invite", err)
+			}
+			err = ValidateRejectProjectInviteNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("project", "reject project invite", err)
+			}
+			return nil, NewRejectProjectInviteNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body RejectProjectInviteBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "reject project invite", err)
+			}
+			err = ValidateRejectProjectInviteBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("project", "reject project invite", err)
+			}
+			return nil, NewRejectProjectInviteBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "reject project invite", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildAcceptInviteRequest instantiates a HTTP request object with method and
 // path set to call the "project" service "accept invite" endpoint
 func (c *Client) BuildAcceptInviteRequest(ctx context.Context, v interface{}) (*http.Request, error) {

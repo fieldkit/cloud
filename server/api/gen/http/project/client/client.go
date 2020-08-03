@@ -37,6 +37,14 @@ type Client struct {
 	// invite endpoint.
 	LookupInviteDoer goahttp.Doer
 
+	// AcceptProjectInvite Doer is the HTTP client used to make requests to the
+	// accept project invite endpoint.
+	AcceptProjectInviteDoer goahttp.Doer
+
+	// RejectProjectInvite Doer is the HTTP client used to make requests to the
+	// reject project invite endpoint.
+	RejectProjectInviteDoer goahttp.Doer
+
 	// AcceptInvite Doer is the HTTP client used to make requests to the accept
 	// invite endpoint.
 	AcceptInviteDoer goahttp.Doer
@@ -111,31 +119,33 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		AddUpdateDoer:       doer,
-		DeleteUpdateDoer:    doer,
-		ModifyUpdateDoer:    doer,
-		InvitesDoer:         doer,
-		LookupInviteDoer:    doer,
-		AcceptInviteDoer:    doer,
-		RejectInviteDoer:    doer,
-		AddDoer:             doer,
-		UpdateDoer:          doer,
-		GetDoer:             doer,
-		ListCommunityDoer:   doer,
-		ListMineDoer:        doer,
-		InviteDoer:          doer,
-		RemoveUserDoer:      doer,
-		AddStationDoer:      doer,
-		RemoveStationDoer:   doer,
-		DeleteDoer:          doer,
-		UploadPhotoDoer:     doer,
-		DownloadPhotoDoer:   doer,
-		CORSDoer:            doer,
-		RestoreResponseBody: restoreBody,
-		scheme:              scheme,
-		host:                host,
-		decoder:             dec,
-		encoder:             enc,
+		AddUpdateDoer:           doer,
+		DeleteUpdateDoer:        doer,
+		ModifyUpdateDoer:        doer,
+		InvitesDoer:             doer,
+		LookupInviteDoer:        doer,
+		AcceptProjectInviteDoer: doer,
+		RejectProjectInviteDoer: doer,
+		AcceptInviteDoer:        doer,
+		RejectInviteDoer:        doer,
+		AddDoer:                 doer,
+		UpdateDoer:              doer,
+		GetDoer:                 doer,
+		ListCommunityDoer:       doer,
+		ListMineDoer:            doer,
+		InviteDoer:              doer,
+		RemoveUserDoer:          doer,
+		AddStationDoer:          doer,
+		RemoveStationDoer:       doer,
+		DeleteDoer:              doer,
+		UploadPhotoDoer:         doer,
+		DownloadPhotoDoer:       doer,
+		CORSDoer:                doer,
+		RestoreResponseBody:     restoreBody,
+		scheme:                  scheme,
+		host:                    host,
+		decoder:                 dec,
+		encoder:                 enc,
 	}
 }
 
@@ -254,6 +264,54 @@ func (c *Client) LookupInvite() goa.Endpoint {
 		resp, err := c.LookupInviteDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("project", "lookup invite", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// AcceptProjectInvite returns an endpoint that makes HTTP requests to the
+// project service accept project invite server.
+func (c *Client) AcceptProjectInvite() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAcceptProjectInviteRequest(c.encoder)
+		decodeResponse = DecodeAcceptProjectInviteResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildAcceptProjectInviteRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AcceptProjectInviteDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "accept project invite", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// RejectProjectInvite returns an endpoint that makes HTTP requests to the
+// project service reject project invite server.
+func (c *Client) RejectProjectInvite() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeRejectProjectInviteRequest(c.encoder)
+		decodeResponse = DecodeRejectProjectInviteResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildRejectProjectInviteRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.RejectProjectInviteDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "reject project invite", err)
 		}
 		return decodeResponse(resp)
 	}

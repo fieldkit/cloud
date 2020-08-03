@@ -23,7 +23,7 @@ func BuildAddUpdatePayload(projectAddUpdateBody string, projectAddUpdateProjectI
 	{
 		err = json.Unmarshal([]byte(projectAddUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Enim sit qui occaecati aut quidem libero.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Dolor est temporibus.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -88,7 +88,7 @@ func BuildModifyUpdatePayload(projectModifyUpdateBody string, projectModifyUpdat
 	{
 		err = json.Unmarshal([]byte(projectModifyUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Distinctio nobis earum fugiat expedita ducimus.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Nobis aut minus aut sunt.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -147,6 +147,54 @@ func BuildLookupInvitePayload(projectLookupInviteToken string, projectLookupInvi
 	}
 	v := &project.LookupInvitePayload{}
 	v.Token = token
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildAcceptProjectInvitePayload builds the payload for the project accept
+// project invite endpoint from CLI flags.
+func BuildAcceptProjectInvitePayload(projectAcceptProjectInviteProjectID string, projectAcceptProjectInviteAuth string) (*project.AcceptProjectInvitePayload, error) {
+	var err error
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectAcceptProjectInviteProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = projectAcceptProjectInviteAuth
+	}
+	v := &project.AcceptProjectInvitePayload{}
+	v.ProjectID = projectID
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildRejectProjectInvitePayload builds the payload for the project reject
+// project invite endpoint from CLI flags.
+func BuildRejectProjectInvitePayload(projectRejectProjectInviteProjectID string, projectRejectProjectInviteAuth string) (*project.RejectProjectInvitePayload, error) {
+	var err error
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectRejectProjectInviteProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = projectRejectProjectInviteAuth
+	}
+	v := &project.RejectProjectInvitePayload{}
+	v.ProjectID = projectID
 	v.Auth = auth
 
 	return v, nil
@@ -218,7 +266,7 @@ func BuildAddPayload(projectAddBody string, projectAddAuth string) (*project.Add
 	{
 		err = json.Unmarshal([]byte(projectAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Laborum quasi corrupti consequuntur in voluptatem.\",\n      \"meta\": \"Tenetur laudantium.\",\n      \"module\": \"Sint tempore nesciunt error.\",\n      \"profile\": \"Nostrum occaecati facilis placeat dolorem.\",\n      \"url\": \"Minima rerum vel.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Dolor nisi quo ea.\",\n      \"meta\": \"Aliquam vel praesentium ex.\",\n      \"module\": \"Perferendis quis voluptas est.\",\n      \"profile\": \"Explicabo nulla harum aut minima.\",\n      \"url\": \"Voluptates iusto totam sit.\"\n   }'")
 		}
 	}
 	var auth string
@@ -251,7 +299,7 @@ func BuildUpdatePayload(projectUpdateBody string, projectUpdateProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Aperiam saepe sint.\",\n      \"endTime\": \"Eos sed occaecati porro quisquam.\",\n      \"goal\": \"Ullam et.\",\n      \"location\": \"Sit omnis voluptate.\",\n      \"name\": \"Saepe aut ut iure reprehenderit accusamus architecto.\",\n      \"private\": true,\n      \"startTime\": \"Aut dolores quasi aut.\",\n      \"tags\": \"Et vero suscipit quia rerum dolorem voluptates.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Commodi voluptatem.\",\n      \"endTime\": \"Laudantium voluptate nulla.\",\n      \"goal\": \"Ut blanditiis rerum ea id distinctio.\",\n      \"location\": \"Quaerat dolorem modi occaecati quisquam quidem.\",\n      \"name\": \"Vero et illum.\",\n      \"private\": true,\n      \"startTime\": \"Totam aliquid.\",\n      \"tags\": \"Et dolorem et repudiandae asperiores ut.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -348,7 +396,7 @@ func BuildInvitePayload(projectInviteBody string, projectInviteProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectInviteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Sit quis asperiores consequatur dolorum et.\",\n      \"role\": 366988404\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Quo dignissimos ut blanditiis temporibus.\",\n      \"role\": 929758629\n   }'")
 		}
 	}
 	var projectID int32
@@ -385,7 +433,7 @@ func BuildRemoveUserPayload(projectRemoveUserBody string, projectRemoveUserProje
 	{
 		err = json.Unmarshal([]byte(projectRemoveUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"In expedita aliquid illo id et sequi.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Architecto est voluptatibus.\"\n   }'")
 		}
 	}
 	var projectID int32

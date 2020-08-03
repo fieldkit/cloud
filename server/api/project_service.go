@@ -512,7 +512,7 @@ func (c *ProjectService) Invites(ctx context.Context, payload *project.InvitesPa
 	projects := []*data.Project{}
 	if err := c.options.Database.SelectContext(ctx, &projects, `
 		SELECT * FROM fieldkit.project WHERE id IN (
-			SELECT pi.project_id FROM fieldkit.project_invite AS pi JOIN fieldkit.user AS u ON (pi.invited_email = u.email) WHERE u.id = $1
+			SELECT pi.project_id FROM fieldkit.project_invite AS pi JOIN fieldkit.user AS u ON (pi.invited_email = u.email) WHERE u.id = $1 AND (pi.rejected_time IS NULL AND pi.accepted_time IS NULL)
 		)
 		`, p.UserID()); err != nil {
 		return nil, err
@@ -611,6 +611,83 @@ func (c *ProjectService) LookupInvite(ctx context.Context, payload *project.Look
 	return
 }
 
+func (c *ProjectService) AcceptProjectInvite(ctx context.Context, payload *project.AcceptProjectInvitePayload) (err error) {
+	log := Logger(ctx).Sugar()
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	user := &data.User{}
+	if err := c.options.Database.GetContext(ctx, user, `
+		SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1
+		`, p.UserID()); err != nil {
+		return err
+	}
+
+	invite := &data.ProjectInvite{}
+	if err := c.options.Database.GetContext(ctx, invite, `
+		SELECT pi.* FROM fieldkit.project_invite AS pi WHERE pi.project_id = $1 AND pi.invited_email = $2
+		`, payload.ProjectID, user.Email); err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, `
+		UPDATE fieldkit.project_invite SET accepted_time = NOW() WHERE id = $1
+		`, invite.ID); err != nil {
+		return err
+	}
+
+	role := data.LookupRole(invite.RoleID)
+	if role == nil {
+		role = data.MemberRole
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, `
+		INSERT INTO fieldkit.project_user (project_id, user_id, role) VALUES ($1, $2, $3)
+		`, invite.ProjectID, p.UserID(), role.ID); err != nil {
+		return err
+	}
+
+	log.Infow("accepting", "invite_id", invite.ID)
+
+	return nil
+}
+
+func (c *ProjectService) RejectProjectInvite(ctx context.Context, payload *project.RejectProjectInvitePayload) (err error) {
+	log := Logger(ctx).Sugar()
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	user := &data.User{}
+	if err := c.options.Database.GetContext(ctx, user, `
+		SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1
+		`, p.UserID()); err != nil {
+		return err
+	}
+
+	invite := &data.ProjectInvite{}
+	if err := c.options.Database.GetContext(ctx, invite, `
+		SELECT pi.* FROM fieldkit.project_invite AS pi WHERE pi.project_id = $1 AND pi.invited_email = $2
+		`, payload.ProjectID, user.Email); err != nil {
+		return err
+	}
+
+	if _, err := c.options.Database.ExecContext(ctx, `
+		UPDATE fieldkit.project_invite SET rejected_time = NOW() WHERE id = $1
+		`, invite.ID); err != nil {
+		return err
+	}
+
+	log.Infow("rejecting", "invite_id", invite.ID)
+
+	return nil
+}
+
 func (c *ProjectService) AcceptInvite(ctx context.Context, payload *project.AcceptInvitePayload) (err error) {
 	log := Logger(ctx).Sugar()
 
@@ -695,7 +772,9 @@ func (c *ProjectService) RejectInvite(ctx context.Context, payload *project.Reje
 		}
 	}
 
-	if _, err := c.options.Database.ExecContext(ctx, `UPDATE fieldkit.project_invite SET rejected_time = NOW() WHERE id = $1`, payload.ID); err != nil {
+	if _, err := c.options.Database.ExecContext(ctx, `
+		UPDATE fieldkit.project_invite SET rejected_time = NOW() WHERE id = $1
+		`, payload.ID); err != nil {
 		return err
 	}
 

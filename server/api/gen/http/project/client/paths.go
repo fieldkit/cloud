@@ -36,6 +36,16 @@ func LookupInviteProjectPath(token string) string {
 	return fmt.Sprintf("/projects/invites/%v", token)
 }
 
+// AcceptProjectInviteProjectPath returns the URL path to the project service accept project invite HTTP endpoint.
+func AcceptProjectInviteProjectPath(projectID int32) string {
+	return fmt.Sprintf("/projects/%v/invites/accept", projectID)
+}
+
+// RejectProjectInviteProjectPath returns the URL path to the project service reject project invite HTTP endpoint.
+func RejectProjectInviteProjectPath(projectID int32) string {
+	return fmt.Sprintf("/projects/%v/invites/reject", projectID)
+}
+
 // AcceptInviteProjectPath returns the URL path to the project service accept invite HTTP endpoint.
 func AcceptInviteProjectPath(id int64) string {
 	return fmt.Sprintf("/projects/invites/%v/accept", id)

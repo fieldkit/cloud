@@ -16,49 +16,53 @@ import (
 
 // Client is the "project" service client.
 type Client struct {
-	AddUpdateEndpoint     goa.Endpoint
-	DeleteUpdateEndpoint  goa.Endpoint
-	ModifyUpdateEndpoint  goa.Endpoint
-	InvitesEndpoint       goa.Endpoint
-	LookupInviteEndpoint  goa.Endpoint
-	AcceptInviteEndpoint  goa.Endpoint
-	RejectInviteEndpoint  goa.Endpoint
-	AddEndpoint           goa.Endpoint
-	UpdateEndpoint        goa.Endpoint
-	GetEndpoint           goa.Endpoint
-	ListCommunityEndpoint goa.Endpoint
-	ListMineEndpoint      goa.Endpoint
-	InviteEndpoint        goa.Endpoint
-	RemoveUserEndpoint    goa.Endpoint
-	AddStationEndpoint    goa.Endpoint
-	RemoveStationEndpoint goa.Endpoint
-	DeleteEndpoint        goa.Endpoint
-	UploadPhotoEndpoint   goa.Endpoint
-	DownloadPhotoEndpoint goa.Endpoint
+	AddUpdateEndpoint           goa.Endpoint
+	DeleteUpdateEndpoint        goa.Endpoint
+	ModifyUpdateEndpoint        goa.Endpoint
+	InvitesEndpoint             goa.Endpoint
+	LookupInviteEndpoint        goa.Endpoint
+	AcceptProjectInviteEndpoint goa.Endpoint
+	RejectProjectInviteEndpoint goa.Endpoint
+	AcceptInviteEndpoint        goa.Endpoint
+	RejectInviteEndpoint        goa.Endpoint
+	AddEndpoint                 goa.Endpoint
+	UpdateEndpoint              goa.Endpoint
+	GetEndpoint                 goa.Endpoint
+	ListCommunityEndpoint       goa.Endpoint
+	ListMineEndpoint            goa.Endpoint
+	InviteEndpoint              goa.Endpoint
+	RemoveUserEndpoint          goa.Endpoint
+	AddStationEndpoint          goa.Endpoint
+	RemoveStationEndpoint       goa.Endpoint
+	DeleteEndpoint              goa.Endpoint
+	UploadPhotoEndpoint         goa.Endpoint
+	DownloadPhotoEndpoint       goa.Endpoint
 }
 
 // NewClient initializes a "project" service client given the endpoints.
-func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptInvite, rejectInvite, add, update, get, listCommunity, listMine, invite, removeUser, addStation, removeStation, delete_, uploadPhoto, downloadPhoto goa.Endpoint) *Client {
+func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptProjectInvite, rejectProjectInvite, acceptInvite, rejectInvite, add, update, get, listCommunity, listMine, invite, removeUser, addStation, removeStation, delete_, uploadPhoto, downloadPhoto goa.Endpoint) *Client {
 	return &Client{
-		AddUpdateEndpoint:     addUpdate,
-		DeleteUpdateEndpoint:  deleteUpdate,
-		ModifyUpdateEndpoint:  modifyUpdate,
-		InvitesEndpoint:       invites,
-		LookupInviteEndpoint:  lookupInvite,
-		AcceptInviteEndpoint:  acceptInvite,
-		RejectInviteEndpoint:  rejectInvite,
-		AddEndpoint:           add,
-		UpdateEndpoint:        update,
-		GetEndpoint:           get,
-		ListCommunityEndpoint: listCommunity,
-		ListMineEndpoint:      listMine,
-		InviteEndpoint:        invite,
-		RemoveUserEndpoint:    removeUser,
-		AddStationEndpoint:    addStation,
-		RemoveStationEndpoint: removeStation,
-		DeleteEndpoint:        delete_,
-		UploadPhotoEndpoint:   uploadPhoto,
-		DownloadPhotoEndpoint: downloadPhoto,
+		AddUpdateEndpoint:           addUpdate,
+		DeleteUpdateEndpoint:        deleteUpdate,
+		ModifyUpdateEndpoint:        modifyUpdate,
+		InvitesEndpoint:             invites,
+		LookupInviteEndpoint:        lookupInvite,
+		AcceptProjectInviteEndpoint: acceptProjectInvite,
+		RejectProjectInviteEndpoint: rejectProjectInvite,
+		AcceptInviteEndpoint:        acceptInvite,
+		RejectInviteEndpoint:        rejectInvite,
+		AddEndpoint:                 add,
+		UpdateEndpoint:              update,
+		GetEndpoint:                 get,
+		ListCommunityEndpoint:       listCommunity,
+		ListMineEndpoint:            listMine,
+		InviteEndpoint:              invite,
+		RemoveUserEndpoint:          removeUser,
+		AddStationEndpoint:          addStation,
+		RemoveStationEndpoint:       removeStation,
+		DeleteEndpoint:              delete_,
+		UploadPhotoEndpoint:         uploadPhoto,
+		DownloadPhotoEndpoint:       downloadPhoto,
 	}
 }
 
@@ -106,6 +110,20 @@ func (c *Client) LookupInvite(ctx context.Context, p *LookupInvitePayload) (res 
 		return
 	}
 	return ires.(*PendingInvites), nil
+}
+
+// AcceptProjectInvite calls the "accept project invite" endpoint of the
+// "project" service.
+func (c *Client) AcceptProjectInvite(ctx context.Context, p *AcceptProjectInvitePayload) (err error) {
+	_, err = c.AcceptProjectInviteEndpoint(ctx, p)
+	return
+}
+
+// RejectProjectInvite calls the "reject project invite" endpoint of the
+// "project" service.
+func (c *Client) RejectProjectInvite(ctx context.Context, p *RejectProjectInvitePayload) (err error) {
+	_, err = c.RejectProjectInviteEndpoint(ctx, p)
+	return
 }
 
 // AcceptInvite calls the "accept invite" endpoint of the "project" service.

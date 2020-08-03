@@ -524,6 +524,158 @@ type LookupInviteBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// AcceptProjectInviteUnauthorizedResponseBody is the type of the "project"
+// service "accept project invite" endpoint HTTP response body for the
+// "unauthorized" error.
+type AcceptProjectInviteUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AcceptProjectInviteForbiddenResponseBody is the type of the "project"
+// service "accept project invite" endpoint HTTP response body for the
+// "forbidden" error.
+type AcceptProjectInviteForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AcceptProjectInviteNotFoundResponseBody is the type of the "project" service
+// "accept project invite" endpoint HTTP response body for the "not-found"
+// error.
+type AcceptProjectInviteNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AcceptProjectInviteBadRequestResponseBody is the type of the "project"
+// service "accept project invite" endpoint HTTP response body for the
+// "bad-request" error.
+type AcceptProjectInviteBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// RejectProjectInviteUnauthorizedResponseBody is the type of the "project"
+// service "reject project invite" endpoint HTTP response body for the
+// "unauthorized" error.
+type RejectProjectInviteUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// RejectProjectInviteForbiddenResponseBody is the type of the "project"
+// service "reject project invite" endpoint HTTP response body for the
+// "forbidden" error.
+type RejectProjectInviteForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// RejectProjectInviteNotFoundResponseBody is the type of the "project" service
+// "reject project invite" endpoint HTTP response body for the "not-found"
+// error.
+type RejectProjectInviteNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// RejectProjectInviteBadRequestResponseBody is the type of the "project"
+// service "reject project invite" endpoint HTTP response body for the
+// "bad-request" error.
+type RejectProjectInviteBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // AcceptInviteUnauthorizedResponseBody is the type of the "project" service
 // "accept invite" endpoint HTTP response body for the "unauthorized" error.
 type AcceptInviteUnauthorizedResponseBody struct {
@@ -2014,6 +2166,126 @@ func NewLookupInviteBadRequestResponseBody(res *goa.ServiceError) *LookupInviteB
 	return body
 }
 
+// NewAcceptProjectInviteUnauthorizedResponseBody builds the HTTP response body
+// from the result of the "accept project invite" endpoint of the "project"
+// service.
+func NewAcceptProjectInviteUnauthorizedResponseBody(res *goa.ServiceError) *AcceptProjectInviteUnauthorizedResponseBody {
+	body := &AcceptProjectInviteUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAcceptProjectInviteForbiddenResponseBody builds the HTTP response body
+// from the result of the "accept project invite" endpoint of the "project"
+// service.
+func NewAcceptProjectInviteForbiddenResponseBody(res *goa.ServiceError) *AcceptProjectInviteForbiddenResponseBody {
+	body := &AcceptProjectInviteForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAcceptProjectInviteNotFoundResponseBody builds the HTTP response body
+// from the result of the "accept project invite" endpoint of the "project"
+// service.
+func NewAcceptProjectInviteNotFoundResponseBody(res *goa.ServiceError) *AcceptProjectInviteNotFoundResponseBody {
+	body := &AcceptProjectInviteNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAcceptProjectInviteBadRequestResponseBody builds the HTTP response body
+// from the result of the "accept project invite" endpoint of the "project"
+// service.
+func NewAcceptProjectInviteBadRequestResponseBody(res *goa.ServiceError) *AcceptProjectInviteBadRequestResponseBody {
+	body := &AcceptProjectInviteBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewRejectProjectInviteUnauthorizedResponseBody builds the HTTP response body
+// from the result of the "reject project invite" endpoint of the "project"
+// service.
+func NewRejectProjectInviteUnauthorizedResponseBody(res *goa.ServiceError) *RejectProjectInviteUnauthorizedResponseBody {
+	body := &RejectProjectInviteUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewRejectProjectInviteForbiddenResponseBody builds the HTTP response body
+// from the result of the "reject project invite" endpoint of the "project"
+// service.
+func NewRejectProjectInviteForbiddenResponseBody(res *goa.ServiceError) *RejectProjectInviteForbiddenResponseBody {
+	body := &RejectProjectInviteForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewRejectProjectInviteNotFoundResponseBody builds the HTTP response body
+// from the result of the "reject project invite" endpoint of the "project"
+// service.
+func NewRejectProjectInviteNotFoundResponseBody(res *goa.ServiceError) *RejectProjectInviteNotFoundResponseBody {
+	body := &RejectProjectInviteNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewRejectProjectInviteBadRequestResponseBody builds the HTTP response body
+// from the result of the "reject project invite" endpoint of the "project"
+// service.
+func NewRejectProjectInviteBadRequestResponseBody(res *goa.ServiceError) *RejectProjectInviteBadRequestResponseBody {
+	body := &RejectProjectInviteBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewAcceptInviteUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "accept invite" endpoint of the "project" service.
 func NewAcceptInviteUnauthorizedResponseBody(res *goa.ServiceError) *AcceptInviteUnauthorizedResponseBody {
@@ -2846,6 +3118,26 @@ func NewInvitesPayload(auth string) *project.InvitesPayload {
 func NewLookupInvitePayload(token string, auth string) *project.LookupInvitePayload {
 	v := &project.LookupInvitePayload{}
 	v.Token = token
+	v.Auth = auth
+
+	return v
+}
+
+// NewAcceptProjectInvitePayload builds a project service accept project invite
+// endpoint payload.
+func NewAcceptProjectInvitePayload(projectID int32, auth string) *project.AcceptProjectInvitePayload {
+	v := &project.AcceptProjectInvitePayload{}
+	v.ProjectID = projectID
+	v.Auth = auth
+
+	return v
+}
+
+// NewRejectProjectInvitePayload builds a project service reject project invite
+// endpoint payload.
+func NewRejectProjectInvitePayload(projectID int32, auth string) *project.RejectProjectInvitePayload {
+	v := &project.RejectProjectInvitePayload{}
+	v.ProjectID = projectID
 	v.Auth = auth
 
 	return v

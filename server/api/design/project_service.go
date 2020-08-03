@@ -233,6 +233,44 @@ var _ = Service("project", func() {
 		})
 	})
 
+	Method("accept project invite", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("projectId", Int32)
+			Required("projectId")
+		})
+
+		HTTP(func() {
+			POST("projects/{projectId}/invites/accept")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("reject project invite", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("projectId", Int32)
+			Required("projectId")
+		})
+
+		HTTP(func() {
+			POST("projects/{projectId}/invites/reject")
+
+			httpAuthentication()
+		})
+	})
+
 	Method("accept invite", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")

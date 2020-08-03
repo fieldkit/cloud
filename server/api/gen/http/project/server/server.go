@@ -20,27 +20,29 @@ import (
 
 // Server lists the project service endpoint HTTP handlers.
 type Server struct {
-	Mounts        []*MountPoint
-	AddUpdate     http.Handler
-	DeleteUpdate  http.Handler
-	ModifyUpdate  http.Handler
-	Invites       http.Handler
-	LookupInvite  http.Handler
-	AcceptInvite  http.Handler
-	RejectInvite  http.Handler
-	Add           http.Handler
-	Update        http.Handler
-	Get           http.Handler
-	ListCommunity http.Handler
-	ListMine      http.Handler
-	Invite        http.Handler
-	RemoveUser    http.Handler
-	AddStation    http.Handler
-	RemoveStation http.Handler
-	Delete        http.Handler
-	UploadPhoto   http.Handler
-	DownloadPhoto http.Handler
-	CORS          http.Handler
+	Mounts              []*MountPoint
+	AddUpdate           http.Handler
+	DeleteUpdate        http.Handler
+	ModifyUpdate        http.Handler
+	Invites             http.Handler
+	LookupInvite        http.Handler
+	AcceptProjectInvite http.Handler
+	RejectProjectInvite http.Handler
+	AcceptInvite        http.Handler
+	RejectInvite        http.Handler
+	Add                 http.Handler
+	Update              http.Handler
+	Get                 http.Handler
+	ListCommunity       http.Handler
+	ListMine            http.Handler
+	Invite              http.Handler
+	RemoveUser          http.Handler
+	AddStation          http.Handler
+	RemoveStation       http.Handler
+	Delete              http.Handler
+	UploadPhoto         http.Handler
+	DownloadPhoto       http.Handler
+	CORS                http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -81,6 +83,8 @@ func New(
 			{"ModifyUpdate", "POST", "/projects/{projectId}/updates/{updateId}"},
 			{"Invites", "GET", "/projects/invites/pending"},
 			{"LookupInvite", "GET", "/projects/invites/{token}"},
+			{"AcceptProjectInvite", "POST", "/projects/{projectId}/invites/accept"},
+			{"RejectProjectInvite", "POST", "/projects/{projectId}/invites/reject"},
 			{"AcceptInvite", "POST", "/projects/invites/{id}/accept"},
 			{"RejectInvite", "POST", "/projects/invites/{id}/reject"},
 			{"Add", "POST", "/projects"},
@@ -99,6 +103,8 @@ func New(
 			{"CORS", "OPTIONS", "/projects/{projectId}/updates/{updateId}"},
 			{"CORS", "OPTIONS", "/projects/invites/pending"},
 			{"CORS", "OPTIONS", "/projects/invites/{token}"},
+			{"CORS", "OPTIONS", "/projects/{projectId}/invites/accept"},
+			{"CORS", "OPTIONS", "/projects/{projectId}/invites/reject"},
 			{"CORS", "OPTIONS", "/projects/invites/{id}/accept"},
 			{"CORS", "OPTIONS", "/projects/invites/{id}/reject"},
 			{"CORS", "OPTIONS", "/projects"},
@@ -109,26 +115,28 @@ func New(
 			{"CORS", "OPTIONS", "/projects/{projectId}/stations/{stationId}"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/media"},
 		},
-		AddUpdate:     NewAddUpdateHandler(e.AddUpdate, mux, decoder, encoder, errhandler, formatter),
-		DeleteUpdate:  NewDeleteUpdateHandler(e.DeleteUpdate, mux, decoder, encoder, errhandler, formatter),
-		ModifyUpdate:  NewModifyUpdateHandler(e.ModifyUpdate, mux, decoder, encoder, errhandler, formatter),
-		Invites:       NewInvitesHandler(e.Invites, mux, decoder, encoder, errhandler, formatter),
-		LookupInvite:  NewLookupInviteHandler(e.LookupInvite, mux, decoder, encoder, errhandler, formatter),
-		AcceptInvite:  NewAcceptInviteHandler(e.AcceptInvite, mux, decoder, encoder, errhandler, formatter),
-		RejectInvite:  NewRejectInviteHandler(e.RejectInvite, mux, decoder, encoder, errhandler, formatter),
-		Add:           NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
-		Update:        NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
-		Get:           NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
-		ListCommunity: NewListCommunityHandler(e.ListCommunity, mux, decoder, encoder, errhandler, formatter),
-		ListMine:      NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
-		Invite:        NewInviteHandler(e.Invite, mux, decoder, encoder, errhandler, formatter),
-		RemoveUser:    NewRemoveUserHandler(e.RemoveUser, mux, decoder, encoder, errhandler, formatter),
-		AddStation:    NewAddStationHandler(e.AddStation, mux, decoder, encoder, errhandler, formatter),
-		RemoveStation: NewRemoveStationHandler(e.RemoveStation, mux, decoder, encoder, errhandler, formatter),
-		Delete:        NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
-		UploadPhoto:   NewUploadPhotoHandler(e.UploadPhoto, mux, decoder, encoder, errhandler, formatter),
-		DownloadPhoto: NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
-		CORS:          NewCORSHandler(),
+		AddUpdate:           NewAddUpdateHandler(e.AddUpdate, mux, decoder, encoder, errhandler, formatter),
+		DeleteUpdate:        NewDeleteUpdateHandler(e.DeleteUpdate, mux, decoder, encoder, errhandler, formatter),
+		ModifyUpdate:        NewModifyUpdateHandler(e.ModifyUpdate, mux, decoder, encoder, errhandler, formatter),
+		Invites:             NewInvitesHandler(e.Invites, mux, decoder, encoder, errhandler, formatter),
+		LookupInvite:        NewLookupInviteHandler(e.LookupInvite, mux, decoder, encoder, errhandler, formatter),
+		AcceptProjectInvite: NewAcceptProjectInviteHandler(e.AcceptProjectInvite, mux, decoder, encoder, errhandler, formatter),
+		RejectProjectInvite: NewRejectProjectInviteHandler(e.RejectProjectInvite, mux, decoder, encoder, errhandler, formatter),
+		AcceptInvite:        NewAcceptInviteHandler(e.AcceptInvite, mux, decoder, encoder, errhandler, formatter),
+		RejectInvite:        NewRejectInviteHandler(e.RejectInvite, mux, decoder, encoder, errhandler, formatter),
+		Add:                 NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
+		Update:              NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
+		Get:                 NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		ListCommunity:       NewListCommunityHandler(e.ListCommunity, mux, decoder, encoder, errhandler, formatter),
+		ListMine:            NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
+		Invite:              NewInviteHandler(e.Invite, mux, decoder, encoder, errhandler, formatter),
+		RemoveUser:          NewRemoveUserHandler(e.RemoveUser, mux, decoder, encoder, errhandler, formatter),
+		AddStation:          NewAddStationHandler(e.AddStation, mux, decoder, encoder, errhandler, formatter),
+		RemoveStation:       NewRemoveStationHandler(e.RemoveStation, mux, decoder, encoder, errhandler, formatter),
+		Delete:              NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
+		UploadPhoto:         NewUploadPhotoHandler(e.UploadPhoto, mux, decoder, encoder, errhandler, formatter),
+		DownloadPhoto:       NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
+		CORS:                NewCORSHandler(),
 	}
 }
 
@@ -142,6 +150,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.ModifyUpdate = m(s.ModifyUpdate)
 	s.Invites = m(s.Invites)
 	s.LookupInvite = m(s.LookupInvite)
+	s.AcceptProjectInvite = m(s.AcceptProjectInvite)
+	s.RejectProjectInvite = m(s.RejectProjectInvite)
 	s.AcceptInvite = m(s.AcceptInvite)
 	s.RejectInvite = m(s.RejectInvite)
 	s.Add = m(s.Add)
@@ -166,6 +176,8 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountModifyUpdateHandler(mux, h.ModifyUpdate)
 	MountInvitesHandler(mux, h.Invites)
 	MountLookupInviteHandler(mux, h.LookupInvite)
+	MountAcceptProjectInviteHandler(mux, h.AcceptProjectInvite)
+	MountRejectProjectInviteHandler(mux, h.RejectProjectInvite)
 	MountAcceptInviteHandler(mux, h.AcceptInvite)
 	MountRejectInviteHandler(mux, h.RejectInvite)
 	MountAddHandler(mux, h.Add)
@@ -417,6 +429,108 @@ func NewLookupInviteHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "lookup invite")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountAcceptProjectInviteHandler configures the mux to serve the "project"
+// service "accept project invite" endpoint.
+func MountAcceptProjectInviteHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/projects/{projectId}/invites/accept", f)
+}
+
+// NewAcceptProjectInviteHandler creates a HTTP handler which loads the HTTP
+// request and calls the "project" service "accept project invite" endpoint.
+func NewAcceptProjectInviteHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeAcceptProjectInviteRequest(mux, decoder)
+		encodeResponse = EncodeAcceptProjectInviteResponse(encoder)
+		encodeError    = EncodeAcceptProjectInviteError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "accept project invite")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountRejectProjectInviteHandler configures the mux to serve the "project"
+// service "reject project invite" endpoint.
+func MountRejectProjectInviteHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/projects/{projectId}/invites/reject", f)
+}
+
+// NewRejectProjectInviteHandler creates a HTTP handler which loads the HTTP
+// request and calls the "project" service "reject project invite" endpoint.
+func NewRejectProjectInviteHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeRejectProjectInviteRequest(mux, decoder)
+		encodeResponse = EncodeRejectProjectInviteResponse(encoder)
+		encodeError    = EncodeRejectProjectInviteError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "reject project invite")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -1167,6 +1281,8 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/projects/{projectId}/updates/{updateId}", f)
 	mux.Handle("OPTIONS", "/projects/invites/pending", f)
 	mux.Handle("OPTIONS", "/projects/invites/{token}", f)
+	mux.Handle("OPTIONS", "/projects/{projectId}/invites/accept", f)
+	mux.Handle("OPTIONS", "/projects/{projectId}/invites/reject", f)
 	mux.Handle("OPTIONS", "/projects/invites/{id}/accept", f)
 	mux.Handle("OPTIONS", "/projects/invites/{id}/reject", f)
 	mux.Handle("OPTIONS", "/projects", f)
