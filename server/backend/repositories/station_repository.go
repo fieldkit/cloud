@@ -549,13 +549,18 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 
 	configurations := []*data.StationConfiguration{}
 	if err := r.db.SelectContext(ctx, &configurations, `
-		SELECT
-			sc.*
-		FROM fieldkit.station_configuration AS sc
-		WHERE sc.provision_id IN (
-			SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1)
-		)
-		ORDER BY sc.updated_at DESC LIMIT 1
+		SELECT id, provision_id, meta_record_id, source_id, updated_at FROM (
+			SELECT
+				sc.*,
+				rank() OVER (PARTITION BY provision_id ORDER BY updated_at DESC) AS rank
+			FROM fieldkit.station_configuration AS sc
+			WHERE sc.provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id IN (
+					SELECT device_id FROM fieldkit.station WHERE owner_id = $1
+				)
+			)
+		) AS q
+		WHERE rank <= 1
 		`, id); err != nil {
 		return nil, err
 	}
@@ -670,17 +675,20 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 
 	configurations := []*data.StationConfiguration{}
 	if err := r.db.SelectContext(ctx, &configurations, `
-		SELECT
-			sc.*
-		FROM fieldkit.station_configuration AS sc
-		WHERE sc.provision_id IN (
-			SELECT id FROM fieldkit.provision WHERE device_id IN (
-				SELECT device_id FROM fieldkit.station WHERE id IN (
-					SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+		SELECT id, provision_id, meta_record_id, source_id, updated_at FROM (
+			SELECT
+				sc.*,
+				rank() OVER (PARTITION BY provision_id ORDER BY updated_at DESC) AS rank
+			FROM fieldkit.station_configuration AS sc
+			WHERE sc.provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id IN (
+					SELECT device_id FROM fieldkit.station WHERE id IN (
+						SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+					)
 				)
 			)
-		)
-		ORDER BY sc.updated_at DESC LIMIT 1
+		) AS q
+		WHERE rank <= 1
 		`, id); err != nil {
 		return nil, err
 	}
