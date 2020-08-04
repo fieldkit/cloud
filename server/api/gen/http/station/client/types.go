@@ -803,8 +803,8 @@ type SensorRangeResponseBody struct {
 
 // StationLocationResponseBody is used to define fields on response body types.
 type StationLocationResponseBody struct {
-	Precise []float64 `form:"precise,omitempty" json:"precise,omitempty" xml:"precise,omitempty"`
-	Region  []float64 `form:"region,omitempty" json:"region,omitempty" xml:"region,omitempty"`
+	Precise []float64     `form:"precise,omitempty" json:"precise,omitempty" xml:"precise,omitempty"`
+	Region  [][][]float64 `form:"region,omitempty" json:"region,omitempty" xml:"region,omitempty"`
 }
 
 // StationDataSummaryResponseBody is used to define fields on response body

@@ -143,7 +143,7 @@ type SensorRangeView struct {
 // StationLocationView is a type that runs validations on a projected type.
 type StationLocationView struct {
 	Precise []float64
-	Region  []float64
+	Region  [][][]float64
 }
 
 // StationDataSummaryView is a type that runs validations on a projected type.

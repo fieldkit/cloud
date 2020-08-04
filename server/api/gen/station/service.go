@@ -221,7 +221,7 @@ type SensorRange struct {
 
 type StationLocation struct {
 	Precise []float64
-	Region  []float64
+	Region  [][][]float64
 }
 
 type StationDataSummary struct {
@@ -716,9 +716,15 @@ func transformStationviewsStationLocationViewToStationLocation(v *stationviews.S
 		}
 	}
 	if v.Region != nil {
-		res.Region = make([]float64, len(v.Region))
+		res.Region = make([][][]float64, len(v.Region))
 		for i, val := range v.Region {
-			res.Region[i] = val
+			res.Region[i] = make([][]float64, len(val))
+			for j, val := range val {
+				res.Region[i][j] = make([]float64, len(val))
+				for k, val := range val {
+					res.Region[i][j][k] = val
+				}
+			}
 		}
 	}
 
@@ -903,9 +909,15 @@ func transformStationLocationToStationviewsStationLocationView(v *StationLocatio
 		}
 	}
 	if v.Region != nil {
-		res.Region = make([]float64, len(v.Region))
+		res.Region = make([][][]float64, len(v.Region))
 		for i, val := range v.Region {
-			res.Region[i] = val
+			res.Region[i] = make([][]float64, len(val))
+			for j, val := range val {
+				res.Region[i][j] = make([]float64, len(val))
+				for k, val := range val {
+					res.Region[i][j][k] = val
+				}
+			}
 		}
 	}
 

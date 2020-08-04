@@ -86,7 +86,7 @@ var StationConfigurations = Type("StationConfigurations", func() {
 
 var StationLocation = Type("StationLocation", func() {
 	Attribute("precise", ArrayOf(Float64))
-	Attribute("region", ArrayOf(Float64))
+	Attribute("region", ArrayOf(ArrayOf(ArrayOf(Float64))))
 })
 
 var StationDataSummary = Type("StationDataSummary", func() {
