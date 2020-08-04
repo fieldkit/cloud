@@ -561,6 +561,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 			)
 		) AS q
 		WHERE rank <= 1
+		ORDER BY updated_at DESC
 		`, id); err != nil {
 		return nil, err
 	}
@@ -689,6 +690,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 			)
 		) AS q
 		WHERE rank <= 1
+		ORDER BY updated_at DESC
 		`, id); err != nil {
 		return nil, err
 	}
