@@ -592,11 +592,17 @@ func translateModuleKey(name string) string {
 
 func transformLocation(sf *data.StationFull, preciseLocation bool) *station.StationLocation {
 	if l := sf.Station.Location; l != nil {
+		sl := &station.StationLocation{}
+
 		if preciseLocation {
-			return &station.StationLocation{
-				Precise: []float64{l.Longitude(), l.Latitude()},
+			sl.Precise = []float64{l.Longitude(), l.Latitude()}
+		} else {
+			if len(sf.Areas) > 0 {
+				sl.Region = sf.Areas[0].Geometry.Coordinates()
 			}
 		}
+
+		return sl
 	}
 	return nil
 }

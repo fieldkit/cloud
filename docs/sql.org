@@ -1,5 +1,32 @@
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
+SELECT
+	s.id, s.name, ST_AsText(s.location),
+	c.name AS area_name
+FROM fieldkit.station AS s
+JOIN fieldkit.counties AS c ON (ST_Contains(c.geom, s.location))
+WHERE s.location
+IS NOT NULL;
+
+#+END_SRC
+
+#+RESULTS:
+| id | name                | st_astext                                 | area_name   |
+|----+---------------------+-------------------------------------------+-------------|
+| 15 | Massive Panda 0     | POINT(-80.244873046875 25.7312431335449)  | Miami-Dade  |
+| 14 | Loud Dog 19         | POINT(-80.2448577880859 25.7313613891602) | Miami-Dade  |
+| 25 | Yucky Sloth         | POINT(-118.765960693359 34.1820907592773) | Ventura     |
+| 30 | Spiffy Fox 37       | POINT(-118.293792724609 34.064697265625)  | Los Angeles |
+| 11 | Fuzzy Chicken 8     | POINT(-118.332107543945 34.0935745239258) | Los Angeles |
+| 26 | Rural Sloff         | POINT(-118.270919799805 34.0318031311035) | Los Angeles |
+| 20 | Highland Park Selbe | POINT(-118.201461791992 34.1065063476562) | Los Angeles |
+| 16 | Formal Mayfly 65    | POINT(-118.201728820801 34.1066474914551) | Los Angeles |
+| 24 | Yellow Eagle 47     | POINT(-118.201461791992 34.1065063476562) | Los Angeles |
+| 29 | test0               | POINT(-118.270919799805 34.0318031311035) | Los Angeles |
+| 28 | fake0               | POINT(-118.293746948242 34.0647010803223) | Los Angeles |
+
+#+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
+
 SELECT * FROM
 (
 	SELECT
@@ -673,7 +700,6 @@ SELECT s.id AS station_id, s.name AS station_name, o.id AS owner_id, o.name AS o
 |        180 | Lucky Sloth 2          |        5 | Shah Selbe       |            |                          |
 |        181 | Highland Park Selbe    |        5 | Shah Selbe       |            |                          |
 
-
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 
 UPDATE fieldkit.project SET name = 'Demo Project' WHERE id = 1;
@@ -696,7 +722,6 @@ SELECT ST_Buffer(ST_GeomFromText('POINT(1 1)'), 10) ~ ST_MakeBox2D(ST_MakePoint(
 | contains |
 |----------|
 | t        |
-
 
 #+BEGIN_SRC sql :engine postgresql :exports results :cmdline -h 127.0.0.1 -U fieldkit
 

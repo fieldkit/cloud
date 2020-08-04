@@ -394,6 +394,20 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
+	areas := []*data.StationArea{}
+	if err := r.db.SelectContext(ctx, &areas, `
+		SELECT
+			s.id,
+			c.name AS name,
+			ST_AsBinary(c.geom) AS geometry
+		FROM fieldkit.station AS s
+		JOIN fieldkit.counties AS c ON (ST_Contains(c.geom, s.location))
+		WHERE s.id = $1
+		  AND s.location IS NOT NULL
+		`, id); err != nil {
+		return nil, err
+	}
+
 	dataSummaries := []*data.AggregatedDataSummary{}
 	if err := r.db.SelectContext(ctx, &dataSummaries, `
 		SELECT
@@ -459,7 +473,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	all, err := r.toStationFull(stations, owners, dataSummaries, ingestions, provisions, configurations, modules, sensors)
+	all, err := r.toStationFull(stations, owners, areas, dataSummaries, ingestions, provisions, configurations, modules, sensors)
 	if err != nil {
 		return nil, err
 	}
@@ -481,6 +495,20 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	owners := []*data.User{}
 	if err := r.db.SelectContext(ctx, &owners, `
 		SELECT * FROM fieldkit.user WHERE id = $1
+		`, id); err != nil {
+		return nil, err
+	}
+
+	areas := []*data.StationArea{}
+	if err := r.db.SelectContext(ctx, &areas, `
+		SELECT
+			s.id,
+			c.name AS name,
+			ST_AsBinary(c.geom) AS geometry
+		FROM fieldkit.station AS s
+		JOIN fieldkit.counties AS c ON (ST_Contains(c.geom, s.location))
+		WHERE s.owner_id = $1
+		  AND s.location IS NOT NULL
 		`, id); err != nil {
 		return nil, err
 	}
@@ -562,7 +590,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, dataSummaries, ingestions, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, owners, areas, dataSummaries, ingestions, provisions, configurations, modules, sensors)
 }
 
 func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id int32) ([]*data.StationFull, error) {
@@ -581,6 +609,20 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		SELECT *
 		FROM fieldkit.user
 		WHERE id IN (SELECT owner_id FROM fieldkit.station WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1))
+		`, id); err != nil {
+		return nil, err
+	}
+
+	areas := []*data.StationArea{}
+	if err := r.db.SelectContext(ctx, &areas, `
+		SELECT
+			s.id,
+			c.name AS name,
+			ST_AsBinary(c.geom) AS geometry
+		FROM fieldkit.station AS s
+		JOIN fieldkit.counties AS c ON (ST_Contains(c.geom, s.location))
+		WHERE s.id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
+		  AND s.location IS NOT NULL
 		`, id); err != nil {
 		return nil, err
 	}
@@ -681,10 +723,10 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, dataSummaries, ingestions, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, owners, areas, dataSummaries, ingestions, provisions, configurations, modules, sensors)
 }
 
-func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, dataSummaries []*data.AggregatedDataSummary, ingestions []*data.Ingestion,
+func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, areas []*data.StationArea, dataSummaries []*data.AggregatedDataSummary, ingestions []*data.Ingestion,
 	provisions []*data.Provision, configurations []*data.StationConfiguration,
 	modules []*data.StationModule, sensors []*data.ModuleSensor) ([]*data.StationFull, error) {
 	ownersByID := make(map[int32]*data.User)
@@ -694,6 +736,7 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 	modulesByStationID := make(map[int32][]*data.StationModule)
 	sensorsByStationID := make(map[int32][]*data.ModuleSensor)
 	stationIDsByDeviceID := make(map[string]int32)
+	areasByStationID := make(map[int32][]*data.StationArea)
 
 	for _, station := range stations {
 		key := hex.EncodeToString(station.DeviceID)
@@ -701,11 +744,16 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 		mediaByStationID[station.ID] = make([]*data.FieldNoteMedia, 0)
 		modulesByStationID[station.ID] = make([]*data.StationModule, 0)
 		sensorsByStationID[station.ID] = make([]*data.ModuleSensor, 0)
+		areasByStationID[station.ID] = make([]*data.StationArea, 0)
 		stationIDsByDeviceID[key] = station.ID
 	}
 
 	for _, v := range owners {
 		ownersByID[v.ID] = v
+	}
+
+	for _, v := range areas {
+		areasByStationID[v.ID] = append(areasByStationID[v.ID], v)
 	}
 
 	for _, v := range dataSummaries {
@@ -755,6 +803,7 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 		all = append(all, &data.StationFull{
 			Station:        station,
 			Owner:          ownersByID[station.OwnerID],
+			Areas:          areasByStationID[station.ID],
 			Ingestions:     ingestionsByDeviceID[station.DeviceIDHex()],
 			Configurations: configurationsByStationID[station.ID],
 			Modules:        modulesByStationID[station.ID],

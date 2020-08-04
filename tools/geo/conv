@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ -f tl_2019_us_county.shp ]; then
+	docker build -t jlewallen/shp2pgsql .
+	docker run --rm -v `pwd`:/temp jlewallen/shp2pgsql -s 4326 -d /temp/tl_2019_us_county.shp fieldkit.counties > tl_2019_us_county.sql
+else
+	echo Visit this site and download `tl_2019_us_county.zip`
+	echo https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html
+fi

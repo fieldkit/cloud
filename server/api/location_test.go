@@ -119,6 +119,7 @@ func TestLocation_PrivateProject_AnonymousGet(t *testing.T) {
 				"name": "<<PRESENCE>>",
 				"photos": "<<PRESENCE>>",
 				"readOnly": "<<PRESENCE>>",
+				"location": {},
 				"configurations": { "all": [] }
 			}
 		]

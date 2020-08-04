@@ -8,8 +8,48 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
+	"github.com/paulmach/orb"
+	"github.com/paulmach/orb/encoding/wkb"
+
 	pb "github.com/fieldkit/app-protocol"
 )
+
+type StationArea struct {
+	ID       int32        `db:"id,omitempty"`
+	Names    string       `db:"name"`
+	Geometry MultiPolygon `db:"geometry"`
+}
+
+type MultiPolygon struct {
+	g *orb.MultiPolygon
+}
+
+func (l *MultiPolygon) Coordinates() [][][]float64 {
+	c := make([][][]float64, 0)
+	for _, polygon := range *l.g {
+		newPoly := make([][]float64, 0)
+		for _, ring := range polygon {
+			for _, c := range ring {
+				newPoly = append(newPoly, c[:])
+			}
+		}
+		c = append(c, newPoly)
+	}
+	return c
+}
+
+func (l *MultiPolygon) Scan(data interface{}) error {
+	mp := &orb.MultiPolygon{}
+
+	s := wkb.Scanner(mp)
+	if err := s.Scan(data); err != nil {
+		return err
+	}
+
+	l.g = mp
+
+	return nil
+}
 
 type Station struct {
 	ID                 int32     `db:"id,omitempty"`
@@ -148,6 +188,7 @@ type AggregatedDataSummary struct {
 type StationFull struct {
 	Station        *Station
 	Owner          *User
+	Areas          []*StationArea
 	Ingestions     []*Ingestion
 	Configurations []*StationConfiguration
 	Modules        []*StationModule
