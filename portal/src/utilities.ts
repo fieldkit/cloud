@@ -175,21 +175,24 @@ export function getRunTime(project) {
 }
 
 export function tryParseTags(rawTags: string) {
-    if (rawTags.length == 0) {
+    const sanitized = rawTags.trim();
+    if (sanitized.length == 0) {
         return [];
     }
-    try {
-        const hopefullyArray = JSON.parse(rawTags);
-        const array = _.isArray(hopefullyArray) ? hopefullyArray : [hopefullyArray];
-        return array.map((text) => {
-            return {
-                text: text,
-            };
-        });
-    } catch (error) {
-        console.log("invalid tags field", error);
+    if (sanitized[0] == "[" || sanitized[0] == "{") {
+        try {
+            const hopefullyArray = JSON.parse(sanitized);
+            const array = _.isArray(hopefullyArray) ? hopefullyArray : [hopefullyArray];
+            return array.map((text) => {
+                return {
+                    text: text,
+                };
+            });
+        } catch (error) {
+            console.log(`invalid tags field: '${sanitized}'`);
+        }
     }
-    return rawTags.split(" ").map((text) => {
+    return sanitized.split(" ").map((text) => {
         return {
             text: text,
         };
