@@ -1,26 +1,5 @@
 import _ from "lodash";
 
-export function getUpdatedDate(station) {
-    let date = null;
-    // try more accurate first: lastUploads
-    if (station.lastUploads) {
-        const dataUploads = station.lastUploads.filter((u) => {
-            return u.type == "data";
-        });
-        date = dataUploads[0].time;
-    } else {
-        if (!station.updated) {
-            return "N/A";
-        }
-        date = station.updated;
-    }
-    if (!date) {
-        return "N/A";
-    }
-    const d = new Date(date);
-    return d.toLocaleDateString("en-US");
-}
-
 export function serializePromiseChain(all, fn) {
     return all.reduce((accum, value, index) => {
         return accum.then((allValues) => {

@@ -59,7 +59,7 @@ type StationFullView struct {
 	FirmwareNumber     *int32
 	FirmwareTime       *int64
 	Configurations     *StationConfigurationsView
-	Updated            *int64
+	UpdatedAt          *int64
 	LocationName       *string
 	PlaceNameOther     *string
 	PlaceNameNative    *string
@@ -212,7 +212,7 @@ var (
 			"firmwareNumber",
 			"firmwareTime",
 			"configurations",
-			"updated",
+			"updatedAt",
 			"location",
 			"locationName",
 			"placeNameOther",
@@ -263,7 +263,7 @@ var (
 			"firmwareNumber",
 			"firmwareTime",
 			"configurations",
-			"updated",
+			"updatedAt",
 			"location",
 			"locationName",
 			"placeNameOther",
@@ -348,8 +348,8 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	if result.Configurations == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("configurations", "result"))
 	}
-	if result.Updated == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("updated", "result"))
+	if result.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "result"))
 	}
 	if result.Owner != nil {
 		if err2 := ValidateStationOwnerView(result.Owner); err2 != nil {

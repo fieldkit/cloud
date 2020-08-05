@@ -55,7 +55,7 @@ func TestLocation_PublicProject(t *testing.T) {
 		"stations": [
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
@@ -112,7 +112,7 @@ func TestLocation_PrivateProject_AnonymousGet(t *testing.T) {
 		"stations": [
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
@@ -168,7 +168,7 @@ func TestLocation_PrivateProject_MemberGet(t *testing.T) {
 		"stations": [
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",

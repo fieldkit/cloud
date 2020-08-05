@@ -8,8 +8,12 @@
                 <div class="station-details">
                     <div class="station-name">{{ station.name }}</div>
                     <div class="station-synced">
+                        Last Upload
+                        <span class="small-light">{{ station.uploadedAt | prettyDate }}</span>
+                    </div>
+                    <div class="station-synced">
                         Last Synced
-                        <span class="small-light">{{ getSyncedDate() }}</span>
+                        <span class="small-light">{{ station.updatedAt | prettyDate }}</span>
                     </div>
                     <div class="station-battery">
                         <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
@@ -75,13 +79,14 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import _ from "lodash";
+import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import { BookmarkFactory } from "@/views/viz/viz";
 import * as utils from "@/utilities";
 
-export default {
+export default Vue.extend({
     name: "StationSummary",
     components: {
         ...CommonComponents,
@@ -109,9 +114,6 @@ export default {
             const bm = BookmarkFactory.forStation(this.station.id);
             return this.$router.push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bm) } });
         },
-        getSyncedDate() {
-            return utils.getUpdatedDate(this.station);
-        },
         getBatteryIcon() {
             return this.$loadAsset(utils.getBatteryIcon(this.station.battery));
         },
@@ -122,7 +124,7 @@ export default {
             this.$emit("close");
         },
     },
-};
+});
 </script>
 
 <style scoped>

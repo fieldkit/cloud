@@ -7,7 +7,7 @@ declare module "vue/types/vue" {
         $config: {
             baseUrl: string;
         };
-        $loadAssets(path: string);
+        $loadAsset(path: string);
         $getters: GlobalGetters;
         $state: GlobalState;
         $seriousError: (error: Error) => void;

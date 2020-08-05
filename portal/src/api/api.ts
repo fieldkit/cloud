@@ -221,7 +221,7 @@ export interface Station {
     photos: Photos;
     readOnly: boolean;
     configurations: Configurations;
-    updated: number;
+    updatedAt: number;
     battery: number | null;
     location: StationLocation | null;
     placeNameOther: string | null;

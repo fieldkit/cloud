@@ -56,7 +56,7 @@ export function whenWasStationUpdated(station: Station): Date {
     if (uploads.length > 0) {
         return new Date(uploads[0]);
     }
-    return new Date(station.updated);
+    return new Date(station.updatedAt);
 }
 
 export class DisplaySensor {
@@ -84,9 +84,9 @@ export class DisplayModule {
 export class DisplayStation {
     id: number;
     name: string;
-    updated: Date;
     configurations: Configurations;
-    receivedAt: Date | null = null;
+    updatedAt: Date;
+    uploadedAt: Date | null = null;
     deployedAt: Date | null = null;
     totalReadings = 0;
     location: Location | null = null;
@@ -99,13 +99,15 @@ export class DisplayStation {
     constructor(station: Station) {
         this.id = station.id;
         this.name = station.name;
-        this.updated = whenWasStationUpdated(station);
         this.configurations = station.configurations;
         this.photos = station.photos;
         this.battery = station.battery;
         this.placeNameOther = station.placeNameOther;
         this.placeNameNative = station.placeNameNative;
         this.deployedAt = station.recordingStartedAt;
+        this.updatedAt = station.updatedAt ? new Date(station.updatedAt) : null;
+        this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => u.time));
+        console.log("STATION", station);
         this.modules =
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))

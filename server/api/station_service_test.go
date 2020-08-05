@@ -39,7 +39,7 @@ func TestGetStationsMine(t *testing.T) {
 		"stations": [
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
@@ -51,7 +51,7 @@ func TestGetStationsMine(t *testing.T) {
 			},
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
@@ -63,7 +63,7 @@ func TestGetStationsMine(t *testing.T) {
 			},
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
@@ -75,7 +75,7 @@ func TestGetStationsMine(t *testing.T) {
 			},
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
@@ -87,7 +87,7 @@ func TestGetStationsMine(t *testing.T) {
 			},
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
@@ -122,7 +122,7 @@ func TestGetStation(t *testing.T) {
 	ja.Assertf(rr.Body.String(), `
 	{
 		"id": "<<PRESENCE>>",
-		"updated": "<<PRESENCE>>",
+		"updatedAt": "<<PRESENCE>>",
 		"owner": "<<PRESENCE>>",
 		"deviceId": "<<PRESENCE>>",
 		"uploads": "<<PRESENCE>>",
@@ -157,7 +157,7 @@ func TestGetStationsProject(t *testing.T) {
 		"stations": [
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
@@ -169,7 +169,7 @@ func TestGetStationsProject(t *testing.T) {
 			},
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
@@ -181,7 +181,7 @@ func TestGetStationsProject(t *testing.T) {
 			},
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
@@ -193,7 +193,7 @@ func TestGetStationsProject(t *testing.T) {
 			},
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
@@ -205,7 +205,7 @@ func TestGetStationsProject(t *testing.T) {
 			},
 			{
 				"id": "<<PRESENCE>>",
-				"updated": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
@@ -481,7 +481,7 @@ func TestGetStationUpdatedWithProtobufStatus(t *testing.T) {
 	ja.Assertf(rr.Body.String(), `
 	{
 		"id": "<<PRESENCE>>",
-		"updated": "<<PRESENCE>>",
+		"updatedAt": "<<PRESENCE>>",
 		"owner": "<<PRESENCE>>",
 		"deviceId": "<<PRESENCE>>",
 		"uploads": "<<PRESENCE>>",

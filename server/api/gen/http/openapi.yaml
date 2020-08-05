@@ -16363,7 +16363,7 @@ definitions:
         type: integer
         example: 2850645254533949557
         format: int64
-      updated:
+      updatedAt:
         type: integer
         example: 5763039427225860715
         format: int64
@@ -17395,7 +17395,7 @@ definitions:
       placeNameOther: Quaerat magnam aut magni autem cum iusto.
       readOnly: true
       recordingStartedAt: 902400663755551084
-      updated: 966989716172501709
+      updatedAt: 966989716172501709
       uploads:
       - blocks:
         - 6320657153677977644
@@ -17446,7 +17446,7 @@ definitions:
     - photos
     - readOnly
     - configurations
-    - updated
+    - updatedAt
   StationAddStationOwnerConflictResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -19846,7 +19846,7 @@ definitions:
         type: integer
         example: 6268680092954878274
         format: int64
-      updated:
+      updatedAt:
         type: integer
         example: 5809987805643129118
         format: int64
@@ -20898,7 +20898,7 @@ definitions:
       placeNameOther: Nam quos voluptatem qui fugiat omnis.
       readOnly: true
       recordingStartedAt: 3568902557047128121
-      updated: 9085651086279873207
+      updatedAt: 9085651086279873207
       uploads:
       - blocks:
         - 6320657153677977644
@@ -20939,7 +20939,7 @@ definitions:
     - photos
     - readOnly
     - configurations
-    - updated
+    - updatedAt
   StationFullResponseBodyCollection:
     title: 'Mediatype identifier: application/vnd.app.station.full; type=collection;
       view=default'
@@ -21950,7 +21950,7 @@ definitions:
       placeNameOther: Harum consequatur ullam omnis enim.
       readOnly: true
       recordingStartedAt: 8087268570844230023
-      updated: 9080093369391578381
+      updatedAt: 9080093369391578381
       uploads:
       - blocks:
         - 6320657153677977644
@@ -22993,7 +22993,7 @@ definitions:
       placeNameOther: Harum consequatur ullam omnis enim.
       readOnly: true
       recordingStartedAt: 8087268570844230023
-      updated: 9080093369391578381
+      updatedAt: 9080093369391578381
       uploads:
       - blocks:
         - 6320657153677977644
@@ -24036,7 +24036,7 @@ definitions:
       placeNameOther: Harum consequatur ullam omnis enim.
       readOnly: true
       recordingStartedAt: 8087268570844230023
-      updated: 9080093369391578381
+      updatedAt: 9080093369391578381
       uploads:
       - blocks:
         - 6320657153677977644
@@ -25079,7 +25079,7 @@ definitions:
       placeNameOther: Harum consequatur ullam omnis enim.
       readOnly: true
       recordingStartedAt: 8087268570844230023
-      updated: 9080093369391578381
+      updatedAt: 9080093369391578381
       uploads:
       - blocks:
         - 6320657153677977644
@@ -25316,7 +25316,7 @@ definitions:
         type: integer
         example: 5334231318252264574
         format: int64
-      updated:
+      updatedAt:
         type: integer
         example: 3965817925611222744
         format: int64
@@ -26348,7 +26348,7 @@ definitions:
       placeNameOther: Consequuntur minus aliquam.
       readOnly: true
       recordingStartedAt: 3632426198051232719
-      updated: 424156844883621028
+      updatedAt: 424156844883621028
       uploads:
       - blocks:
         - 6320657153677977644
@@ -26389,7 +26389,7 @@ definitions:
     - photos
     - readOnly
     - configurations
-    - updated
+    - updatedAt
   StationGetUnauthorizedResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -28110,7 +28110,7 @@ definitions:
         placeNameOther: Harum consequatur ullam omnis enim.
         readOnly: true
         recordingStartedAt: 8087268570844230023
-        updated: 9080093369391578381
+        updatedAt: 9080093369391578381
         uploads:
         - blocks:
           - 6320657153677977644
@@ -29153,7 +29153,7 @@ definitions:
         placeNameOther: Harum consequatur ullam omnis enim.
         readOnly: true
         recordingStartedAt: 8087268570844230023
-        updated: 9080093369391578381
+        updatedAt: 9080093369391578381
         uploads:
         - blocks:
           - 6320657153677977644
@@ -30196,7 +30196,7 @@ definitions:
         placeNameOther: Harum consequatur ullam omnis enim.
         readOnly: true
         recordingStartedAt: 8087268570844230023
-        updated: 9080093369391578381
+        updatedAt: 9080093369391578381
         uploads:
         - blocks:
           - 6320657153677977644
@@ -31430,7 +31430,7 @@ definitions:
         placeNameOther: Harum consequatur ullam omnis enim.
         readOnly: true
         recordingStartedAt: 8087268570844230023
-        updated: 9080093369391578381
+        updatedAt: 9080093369391578381
         uploads:
         - blocks:
           - 6320657153677977644
@@ -32473,7 +32473,7 @@ definitions:
         placeNameOther: Harum consequatur ullam omnis enim.
         readOnly: true
         recordingStartedAt: 8087268570844230023
-        updated: 9080093369391578381
+        updatedAt: 9080093369391578381
         uploads:
         - blocks:
           - 6320657153677977644
@@ -33516,7 +33516,7 @@ definitions:
         placeNameOther: Harum consequatur ullam omnis enim.
         readOnly: true
         recordingStartedAt: 8087268570844230023
-        updated: 9080093369391578381
+        updatedAt: 9080093369391578381
         uploads:
         - blocks:
           - 6320657153677977644
@@ -34154,7 +34154,7 @@ definitions:
         type: integer
         example: 5482267380374909300
         format: int64
-      updated:
+      updatedAt:
         type: integer
         example: 4827494132478123673
         format: int64
@@ -35206,7 +35206,7 @@ definitions:
       placeNameOther: Praesentium et sed quidem delectus.
       readOnly: false
       recordingStartedAt: 7777099993753130826
-      updated: 6203644555241614638
+      updatedAt: 6203644555241614638
       uploads:
       - blocks:
         - 6320657153677977644
@@ -35257,7 +35257,7 @@ definitions:
     - photos
     - readOnly
     - configurations
-    - updated
+    - updatedAt
   StationUpdateUnauthorizedResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object

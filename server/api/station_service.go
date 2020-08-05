@@ -643,7 +643,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		MemoryAvailable: sf.Station.MemoryAvailable,
 		FirmwareNumber:  sf.Station.FirmwareNumber,
 		FirmwareTime:    sf.Station.FirmwareTime,
-		Updated:         sf.Station.UpdatedAt.Unix() * 1000,
+		UpdatedAt:       sf.Station.UpdatedAt.Unix() * 1000,
 		LocationName:    sf.Station.LocationName,
 		PlaceNameOther:  sf.Station.PlaceOther,
 		PlaceNameNative: sf.Station.PlaceNative,
