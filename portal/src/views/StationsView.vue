@@ -88,8 +88,10 @@ export default Vue.extend({
                 return this.$router.push("/");
             }
         },
-        showSummary(params, preserveRoute) {
-            return this.$router.push({ name: "viewStation", params: params });
+        showSummary(params: { id: number }) {
+            if (this.id != params.id) {
+                return this.$router.push({ name: "viewStation", params: params as any });
+            }
         },
         closeSummary() {
             return this.$router.push({ name: "stations" });
