@@ -107,7 +107,6 @@ export class DisplayStation {
         this.deployedAt = station.recordingStartedAt;
         this.updatedAt = station.updatedAt ? new Date(station.updatedAt) : null;
         this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => u.time));
-        console.log("STATION", station);
         this.modules =
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))

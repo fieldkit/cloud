@@ -634,6 +634,12 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 
 	location := transformLocation(sf, preciseLocation)
 
+	var recordingStartedAt *int64
+	if sf.Station.RecordingStartedAt != nil {
+		unix := sf.Station.RecordingStartedAt.Unix() * 1000
+		recordingStartedAt = &unix
+	}
+
 	return &station.StationFull{
 		ID:       sf.Station.ID,
 		Name:     sf.Station.Name,
@@ -643,17 +649,18 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		Configurations: &station.StationConfigurations{
 			All: configurations,
 		},
-		Battery:         sf.Station.Battery,
-		MemoryUsed:      sf.Station.MemoryUsed,
-		MemoryAvailable: sf.Station.MemoryAvailable,
-		FirmwareNumber:  sf.Station.FirmwareNumber,
-		FirmwareTime:    sf.Station.FirmwareTime,
-		UpdatedAt:       sf.Station.UpdatedAt.Unix() * 1000,
-		LocationName:    sf.Station.LocationName,
-		PlaceNameOther:  sf.Station.PlaceOther,
-		PlaceNameNative: sf.Station.PlaceNative,
-		Location:        location,
-		Data:            dataSummary,
+		RecordingStartedAt: recordingStartedAt,
+		Battery:            sf.Station.Battery,
+		MemoryUsed:         sf.Station.MemoryUsed,
+		MemoryAvailable:    sf.Station.MemoryAvailable,
+		FirmwareNumber:     sf.Station.FirmwareNumber,
+		FirmwareTime:       sf.Station.FirmwareTime,
+		UpdatedAt:          sf.Station.UpdatedAt.Unix() * 1000,
+		LocationName:       sf.Station.LocationName,
+		PlaceNameOther:     sf.Station.PlaceOther,
+		PlaceNameNative:    sf.Station.PlaceNative,
+		Location:           location,
+		Data:               dataSummary,
 		Owner: &station.StationOwner{
 			ID:   sf.Owner.ID,
 			Name: sf.Owner.Name,
