@@ -14,6 +14,7 @@
                         <th>Name</th>
                         <th>Device ID</th>
                         <th>Owner</th>
+                        <th>Recording</th>
                         <th>Last Ingestion</th>
                         <th>Created</th>
                         <th>Updated</th>
@@ -28,6 +29,7 @@
                         <td class="name">{{ station.name }}</td>
                         <td class="device-id">{{ station.deviceId }}</td>
                         <td class="owner">{{ station.owner.name }}</td>
+                        <td class="date recording">{{ station.recordingStartedAt | prettyTime }}</td>
                         <td class="date ingestion">{{ station.lastIngestionAt | prettyTime }}</td>
                         <td class="date created">{{ station.createdAt | prettyDate }}</td>
                         <td class="date updated">{{ station.updatedAt | prettyTime }}</td>

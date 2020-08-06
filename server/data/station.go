@@ -204,7 +204,7 @@ type EssentialStation struct {
 	OwnerName          string     `db:"owner_name"`
 	CreatedAt          time.Time  `db:"created_at,omitempty"`
 	UpdatedAt          time.Time  `db:"updated_at,omitempty"`
-	RecordingStartedAt *int64     `db:"recording_started_at"`
+	RecordingStartedAt *time.Time `db:"recording_started_at"`
 	MemoryUsed         *int32     `db:"memory_used"`
 	MemoryAvailable    *int32     `db:"memory_available"`
 	FirmwareNumber     *int32     `db:"firmware_number"`

@@ -311,7 +311,6 @@ func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPa
 	stationsWm := make([]*station.EssentialStation, 0)
 
 	for _, es := range queried.Stations {
-		recordingStartedAt := es.RecordingStartedAt
 		var lastIngestionAt *int64
 
 		if es.LastIngestionAt != nil {
@@ -324,6 +323,12 @@ func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPa
 			location = &station.StationLocation{
 				Precise: []float64{es.Location.Longitude(), es.Location.Latitude()},
 			}
+		}
+
+		var recordingStartedAt *int64
+		if es.RecordingStartedAt != nil {
+			unix := es.RecordingStartedAt.Unix() * 1000
+			recordingStartedAt = &unix
 		}
 
 		stationsWm = append(stationsWm, &station.EssentialStation{
