@@ -318,8 +318,6 @@ func (r *StationRepository) updateDeployedActivityFromStatus(ctx context.Context
 		return nil
 	}
 
-	deployedAt := time.Unix(*station.RecordingStartedAt, 0)
-
 	if _, err := r.db.ExecContext(ctx, `
 		INSERT INTO fieldkit.station_deployed AS sd
 			(created_at, station_id, deployed_at, location) VALUES
@@ -327,7 +325,7 @@ func (r *StationRepository) updateDeployedActivityFromStatus(ctx context.Context
 		ON CONFLICT (station_id, deployed_at)
 		DO UPDATE SET location = EXCLUDED.location
 		RETURNING id
-		`, station.ID, deployedAt, station.Location); err != nil {
+		`, station.ID, station.RecordingStartedAt, station.Location); err != nil {
 		return err
 	}
 

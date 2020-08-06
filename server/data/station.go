@@ -52,23 +52,23 @@ func (l *MultiPolygon) Scan(data interface{}) error {
 }
 
 type Station struct {
-	ID                 int32     `db:"id,omitempty"`
-	Name               string    `db:"name"`
-	DeviceID           []byte    `db:"device_id"`
-	OwnerID            int32     `db:"owner_id,omitempty"`
-	CreatedAt          time.Time `db:"created_at,omitempty"`
-	UpdatedAt          time.Time `db:"updated_at,omitempty"`
-	Battery            *float32  `db:"battery"`
-	Location           *Location `db:"location"`
-	LocationName       *string   `db:"location_name"`
-	RecordingStartedAt *int64    `db:"recording_started_at"`
-	MemoryUsed         *int32    `db:"memory_used"`
-	MemoryAvailable    *int32    `db:"memory_available"`
-	FirmwareNumber     *int32    `db:"firmware_number"`
-	FirmwareTime       *int64    `db:"firmware_time"`
-	PlaceOther         *string   `db:"place_other"`
-	PlaceNative        *string   `db:"place_native"`
-	PhotoID            *int64    `db:"photo_id"`
+	ID                 int32      `db:"id,omitempty"`
+	Name               string     `db:"name"`
+	DeviceID           []byte     `db:"device_id"`
+	OwnerID            int32      `db:"owner_id,omitempty"`
+	CreatedAt          time.Time  `db:"created_at,omitempty"`
+	UpdatedAt          time.Time  `db:"updated_at,omitempty"`
+	Battery            *float32   `db:"battery"`
+	Location           *Location  `db:"location"`
+	LocationName       *string    `db:"location_name"`
+	RecordingStartedAt *time.Time `db:"recording_started_at"`
+	MemoryUsed         *int32     `db:"memory_used"`
+	MemoryAvailable    *int32     `db:"memory_available"`
+	FirmwareNumber     *int32     `db:"firmware_number"`
+	FirmwareTime       *int64     `db:"firmware_time"`
+	PlaceOther         *string    `db:"place_other"`
+	PlaceNative        *string    `db:"place_native"`
+	PhotoID            *int64     `db:"photo_id"`
 }
 
 func (s *Station) ParseHttpReply(raw string) (*pb.HttpReply, error) {
@@ -152,8 +152,8 @@ func (s *Station) UpdateFromStatus(ctx context.Context, raw string) error {
 		if status.Recording != nil {
 			log.Infow("recording", "device_id", s.DeviceID, "station_id", s.ID, "recording", status.Recording)
 
-			recordingStartedAt := int64(status.Recording.StartedTime)
-			if recordingStartedAt > 0 {
+			if status.Recording.StartedTime > 0 {
+				recordingStartedAt := time.Unix(int64(status.Recording.StartedTime), 0)
 				s.RecordingStartedAt = &recordingStartedAt
 			}
 		}
