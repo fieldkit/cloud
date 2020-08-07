@@ -11,7 +11,7 @@
                 <div class="name">
                     {{ station.name }}
                 </div>
-                <div v-if="station.deployedAt" class="deployed">Deployed {{ station }}</div>
+                <div v-if="station.deployedAt" class="deployed">Deployed</div>
                 <div v-else class="undeployed">Not Deployed</div>
             </div>
         </div>
