@@ -86,7 +86,7 @@ func (r *MediaRepository) Save(ctx context.Context, reader io.ReadCloser, conten
 		Key:      af.Key,
 		URL:      af.URL,
 		Size:     cr.BytesRead,
-		MimeType: kind.MIME.Value,
+		MimeType: contentType,
 	}
 
 	return
