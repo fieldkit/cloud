@@ -40,7 +40,7 @@ func NewMediaRepository(files files.FileArchive) (r *MediaRepository) {
 	}
 }
 
-func (r *MediaRepository) Save(ctx context.Context, reader io.ReadCloser, contentLength int64) (sm *SavedMedia, err error) {
+func (r *MediaRepository) Save(ctx context.Context, reader io.ReadCloser, contentLength int64, givenContentType string) (sm *SavedMedia, err error) {
 	log := Logger(ctx).Sugar()
 
 	if contentLength == 0 {
@@ -61,12 +61,17 @@ func (r *MediaRepository) Save(ctx context.Context, reader io.ReadCloser, conten
 		return nil, err
 	}
 
+	contentType := givenContentType
 	kind, _ := filetype.Match(header)
 	if kind == filetype.Unknown {
-		return nil, fmt.Errorf("unknown file type: %v", kind)
+		log.Warnw("detect file type failed", "given_content_type", givenContentType)
+	} else {
+		contentType = kind.MIME.Value
+	}
+	if contentType == "application/octet-stream" {
+		return nil, fmt.Errorf("invalid content type")
 	}
 
-	contentType := kind.MIME.Value
 	objReader := io.MultiReader(bytes.NewReader(buf.Bytes()), reader)
 	cr := NewCountingReader(objReader)
 	metadata := make(map[string]string)

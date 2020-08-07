@@ -790,7 +790,7 @@ func (s *ProjectService) UploadPhoto(ctx context.Context, payload *project.Uploa
 	}
 
 	mr := repositories.NewMediaRepository(s.options.MediaFiles)
-	saved, err := mr.Save(ctx, body, payload.ContentLength)
+	saved, err := mr.Save(ctx, body, payload.ContentLength, payload.ContentType)
 	if err != nil {
 		return err
 	}
