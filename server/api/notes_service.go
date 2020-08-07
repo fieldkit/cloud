@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	"goa.design/goa/v3/security"
@@ -228,10 +229,28 @@ func (s *NotesService) DownloadMedia(ctx context.Context, payload *notes.Downloa
 	}, ioutil.NopCloser(lm.Reader), nil
 }
 
+func validateKey(key string) error {
+	parts := strings.Split(key, ".")
+	if len(parts) != 2 {
+		return fmt.Errorf("malformed key: %v", key)
+	}
+	timePart := parts[0]
+	_, err := time.Parse("20060102_150405", timePart)
+	if err != nil {
+		return fmt.Errorf("malformed key: %v", key)
+	}
+
+	return nil
+}
+
 func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMediaPayload, body io.ReadCloser) (*notes.NoteMedia, error) {
 	p, err := NewPermissions(ctx, s.options).Unwrap()
 	if err != nil {
 		return nil, err
+	}
+
+	if err := validateKey(payload.Key); err != nil {
+		return nil, notes.MakeBadRequest(err)
 	}
 
 	existing := []*data.FieldNoteMedia{}
