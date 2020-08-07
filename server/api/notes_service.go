@@ -234,6 +234,17 @@ func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMed
 		return nil, err
 	}
 
+	existing := []*data.FieldNoteMedia{}
+	if err := s.options.Database.SelectContext(ctx, &existing, `
+		SELECT * FROM fieldkit.notes_media WHERE station_id = $1 AND key = $2
+		`, payload.StationID, payload.Key); err != nil {
+		return nil, err
+	}
+
+	if len(existing) > 0 {
+		return nil, notes.MakeBadRequest(fmt.Errorf("duplicate key"))
+	}
+
 	mr := repositories.NewMediaRepository(s.options.MediaFiles)
 	saved, err := mr.Save(ctx, body, payload.ContentLength, payload.ContentType)
 	if err != nil {
@@ -255,7 +266,8 @@ func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMed
 
 	if err := s.options.Database.NamedGetContext(ctx, media, `
 		INSERT INTO fieldkit.notes_media (user_id, station_id, content_type, created_at, url, key)
-		VALUES (:user_id, :station_id, :content_type, :created_at, :url, :key) RETURNING *
+		VALUES (:user_id, :station_id, :content_type, :created_at, :url, :key)
+		RETURNING id
 		`, media); err != nil {
 		return nil, err
 	}
