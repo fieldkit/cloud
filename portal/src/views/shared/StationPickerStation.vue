@@ -4,7 +4,7 @@
             <div class="name">{{ station.name }}</div>
             <div class="status">{{ status }}</div>
             <div class="location" v-if="!narrow">{{ location }}</div>
-            <div class="seen" v-if="!narrow">{{ station.updated | prettyDate }}</div>
+            <div class="seen" v-if="!narrow">{{ station.updatedAt | prettyDate }}</div>
         </div>
         <slot></slot>
     </div>
