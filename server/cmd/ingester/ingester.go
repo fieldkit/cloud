@@ -32,22 +32,25 @@ func main() {
 		panic(err)
 	}
 
-	notFoundHandler := http.NotFoundHandler()
+	notFoundFinal := logging.Monitoring("error", ingesterOptions.Metrics)(http.NotFoundHandler())
+
 	statusHandler := health.StatusHandler(ctx)
-	monitoringMiddleware := logging.Monitoring(ingesterOptions.Metrics)
-	coreHandler := monitoringMiddleware(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	statusFinal := logging.Monitoring("status", ingesterOptions.Metrics)(statusHandler)
+	ingesterFinal := logging.Monitoring("status", ingesterOptions.Metrics)(ingesterHandler)
+
+	coreHandler := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
-			statusHandler.ServeHTTP(w, req)
+			statusFinal.ServeHTTP(w, req)
 			return
 		}
 
 		if req.URL.Path == "/ingestion" {
-			ingesterHandler.ServeHTTP(w, req)
+			ingesterFinal.ServeHTTP(w, req)
 			return
 		}
 
-		notFoundHandler.ServeHTTP(w, req)
-	}))
+		notFoundFinal.ServeHTTP(w, req)
+	})
 
 	server := &http.Server{
 		Addr:    config.Addr,

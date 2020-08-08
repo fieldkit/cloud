@@ -231,7 +231,7 @@ func main() {
 		defer profile.Start(profile.MemProfile).Stop()
 	}
 
-	logging.Configure(config.LoggingFull, "service")
+	logging.Configure(config.LoggingFull, "service.http")
 
 	log := logging.Logger(ctx).Sugar()
 
@@ -268,40 +268,38 @@ func main() {
 		portalServer = singlePageApplication
 	}
 
+	statusHandler := health.StatusHandler(ctx)
+
+	statusFinal := logging.Monitoring("status", services.Metrics)(statusHandler)
+	ingesterFinal := logging.Monitoring("ingester", services.Metrics)(ingesterHandler)
+	apiFinal := logging.Monitoring("api", services.Metrics)(apiHandler)
+	staticFinal := logging.Monitoring("static", services.Metrics)(portalServer)
+
 	serveApi := func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/ingestion" {
-			ingesterHandler.ServeHTTP(w, req)
+			ingesterFinal.ServeHTTP(w, req)
 		} else {
-			apiHandler.ServeHTTP(w, req)
+			apiFinal.ServeHTTP(w, req)
 		}
 	}
 
-	staticLog := log.Named("http").Named("static")
-	statusHandler := health.StatusHandler(ctx)
-	monitoringMiddleware := logging.Monitoring(services.Metrics)
-	coreHandler := monitoringMiddleware(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	finalHandler := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {
-			statusHandler.ServeHTTP(w, req)
-			return
-		}
-
-		if req.Host == config.ApiDomain {
-			serveApi(w, req)
+			statusFinal.ServeHTTP(w, req)
 			return
 		}
 
 		if req.Host == config.PortalDomain {
-			staticLog.Infow("portal", "url", req.URL)
-			portalServer.ServeHTTP(w, req)
+			staticFinal.ServeHTTP(w, req)
 			return
 		}
 
 		serveApi(w, req)
-	}))
+	})
 
 	server := &http.Server{
 		Addr:    config.Addr,
-		Handler: coreHandler,
+		Handler: finalHandler,
 	}
 
 	if err := server.ListenAndServe(); err != nil {

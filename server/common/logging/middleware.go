@@ -11,7 +11,7 @@ var (
 	ids = NewIdGenerator()
 )
 
-func LoggingAndInfrastructure() func(h http.Handler) http.Handler {
+func LoggingAndInfrastructure(name string) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			started := time.Now()
@@ -19,23 +19,23 @@ func LoggingAndInfrastructure() func(h http.Handler) http.Handler {
 			newCtx := WithNewTaskID(r.Context(), ids)
 			withCtx := r.WithContext(newCtx)
 
-			log := Logger(newCtx).Named("http").Sugar()
+			log := Logger(newCtx).Named(name).Sugar()
 
-			log.Infow("started", "req", r.Method+" "+r.URL.String(), "from", from(r))
+			log.Infow("req:begin", "req", r.Method+" "+r.URL.String(), "from", from(r))
 
 			cw := CaptureResponse(w)
 			h.ServeHTTP(AllowWriteHeaderPrevention(cw), withCtx)
 
 			elapsed := time.Since(started)
 
-			log.Infow("done", "status", cw.StatusCode, "bytes", cw.ContentLength, "time", fmt.Sprintf("%vns", elapsed.Nanoseconds()), "time_human", elapsed.String())
+			log.Infow("req:done", "status", cw.StatusCode, "bytes", cw.ContentLength, "time", fmt.Sprintf("%vns", elapsed.Nanoseconds()), "time_human", elapsed.String(), "req", r.Method+" "+r.URL.String(), "from", from(r))
 		})
 	}
 }
 
-func Monitoring(m *Metrics) func(h http.Handler) http.Handler {
+func Monitoring(name string, m *Metrics) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
-		return m.GatherMetrics(LoggingAndInfrastructure()(h))
+		return m.GatherMetrics(LoggingAndInfrastructure(name)(h))
 	}
 }
 

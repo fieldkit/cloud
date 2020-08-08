@@ -59,7 +59,7 @@ func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
 		return nil, err
 	}
 
-	testHandler = logging.LoggingAndInfrastructure()(apiHandler)
+	testHandler = logging.LoggingAndInfrastructure("tests")(apiHandler)
 
 	return apiHandler, nil
 }
