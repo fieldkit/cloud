@@ -62,6 +62,9 @@ import (
 
 	datas "github.com/fieldkit/cloud/server/api/gen/data"
 	datasSvr "github.com/fieldkit/cloud/server/api/gen/http/data/server"
+
+	csvService "github.com/fieldkit/cloud/server/api/gen/csv"
+	csvServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/csv/server"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -110,6 +113,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	dataSvc := NewDataService(ctx, options)
 	dataEndpoints := datas.NewEndpoints(dataSvc)
 
+	csvSvc := NewCsvService(ctx, options)
+	csvEndpoints := csvService.NewEndpoints(csvSvc)
+
 	for _, mw := range []func(goa.Endpoint) goa.Endpoint{logErrors()} {
 		modulesEndpoints.Use(mw)
 		tasksEndpoints.Use(mw)
@@ -126,6 +132,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		recordsEndpoints.Use(mw)
 		firmwareEndpoints.Use(mw)
 		dataEndpoints.Use(mw)
+		csvEndpoints.Use(mw)
 	}
 
 	// Provide the transport specific request decoder and response encoder.
@@ -153,6 +160,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	recordsServer := recordsSvr.New(recordsEndpoints, mux, dec, enc, eh, nil)
 	firmwareServer := firmwareSvr.New(firmwareEndpoints, mux, dec, enc, eh, nil)
 	dataServer := datasSvr.New(dataEndpoints, mux, dec, enc, eh, nil)
+	csvServer := csvServiceSvr.New(csvEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
@@ -169,6 +177,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	recordsSvr.Mount(mux, recordsServer)
 	firmwareSvr.Mount(mux, firmwareServer)
 	datasSvr.Mount(mux, dataServer)
+	csvServiceSvr.Mount(mux, csvServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -215,6 +224,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range dataServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range csvServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 
