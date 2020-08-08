@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -116,7 +115,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	csvSvc := NewCsvService(ctx, options)
 	csvEndpoints := csvService.NewEndpoints(csvSvc)
 
-	for _, mw := range []func(goa.Endpoint) goa.Endpoint{logErrors()} {
+	for _, mw := range []func(goa.Endpoint) goa.Endpoint{jwtContext(), logErrors()} {
 		modulesEndpoints.Use(mw)
 		tasksEndpoints.Use(mw)
 		testEndpoints.Use(mw)
@@ -274,6 +273,15 @@ func logErrors() func(goa.Endpoint) goa.Endpoint {
 	}
 }
 
+func jwtContext() func(goa.Endpoint) goa.Endpoint {
+	return func(e goa.Endpoint) goa.Endpoint {
+		return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+			// TODO Placeholder for something later.
+			return e(ctx, request)
+		}
+	}
+}
+
 type GenerateError func(string) error
 
 type AuthAttempt struct {
@@ -306,6 +314,12 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 	if !ok {
 		return ctx, a.Unauthorized("invalid scopes")
 	}
+
+	if false {
+		log := Logger(ctx).Sugar()
+		log.Infow("auth", "user_id", claims["sub"])
+	}
+
 	scopesInToken := make([]string, len(scopes))
 	for _, scp := range scopes {
 		scopesInToken = append(scopesInToken, scp.(string))

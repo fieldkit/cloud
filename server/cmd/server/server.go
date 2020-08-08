@@ -270,6 +270,11 @@ func main() {
 
 	statusHandler := health.StatusHandler(ctx)
 
+	_, err = api.AuthorizationHeaderMiddleware(config.SessionKey)
+	if err != nil {
+		panic(err)
+	}
+
 	statusFinal := logging.Monitoring("status", services.Metrics)(statusHandler)
 	ingesterFinal := logging.Monitoring("ingester", services.Metrics)(ingesterHandler)
 	apiFinal := logging.Monitoring("api", services.Metrics)(apiHandler)
