@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -23,6 +21,19 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*RawQueryParams, error) {
+	return &RawQueryParams{
+		Start:      payload.Start,
+		End:        payload.End,
+		Resolution: payload.Resolution,
+		Stations:   payload.Stations,
+		Sensors:    payload.Sensors,
+		Aggregate:  payload.Aggregate,
+		Tail:       payload.Tail,
+		Complete:   payload.Complete,
+	}, nil
+}
+
 type SensorService struct {
 	options *ControllerOptions
 	db      *sqlxcache.DB
@@ -33,90 +44,6 @@ func NewSensorService(ctx context.Context, options *ControllerOptions) *SensorSe
 		options: options,
 		db:      options.Database,
 	}
-}
-
-type QueryParams struct {
-	Start      time.Time `json:"start"`
-	End        time.Time `json:"end"`
-	Sensors    []int64   `json:"sensors"`
-	Stations   []int64   `json:"stations"`
-	Resolution int32     `json:"resolution"`
-	Aggregate  string    `json:"aggregate"`
-	Tail       int32     `json:"tail"`
-	Complete   bool      `json:"complete"`
-}
-
-func buildQueryParams(payload *sensor.DataPayload) (qp *QueryParams, err error) {
-	start := time.Time{}
-	if payload.Start != nil {
-		start = time.Unix(0, *payload.Start*int64(time.Millisecond))
-	}
-
-	end := time.Now()
-	if payload.End != nil {
-		end = time.Unix(0, *payload.End*int64(time.Millisecond))
-	}
-
-	resolution := int32(0)
-	if payload.Resolution != nil {
-		resolution = *payload.Resolution
-	}
-
-	stations := make([]int64, 0)
-	if payload.Stations != nil {
-		parts := strings.Split(*payload.Stations, ",")
-		for _, p := range parts {
-			if i, err := strconv.Atoi(p); err == nil {
-				stations = append(stations, int64(i))
-			}
-		}
-	}
-
-	sensors := make([]int64, 0)
-	if payload.Sensors != nil {
-		parts := strings.Split(*payload.Sensors, ",")
-		for _, p := range parts {
-			if i, err := strconv.Atoi(p); err == nil {
-				sensors = append(sensors, int64(i))
-			}
-		}
-	}
-
-	aggregate := handlers.AggregateNames[0]
-	if payload.Aggregate != nil {
-		found := false
-		for _, name := range handlers.AggregateNames {
-			if name == *payload.Aggregate {
-				found = true
-			}
-		}
-
-		if !found {
-			return nil, fmt.Errorf("invalid aggregate: %v", *payload.Aggregate)
-		}
-
-		aggregate = *payload.Aggregate
-	}
-
-	tail := int32(0)
-	if payload.Tail != nil {
-		tail = *payload.Tail
-	}
-
-	complete := payload.Complete != nil && *payload.Complete
-
-	qp = &QueryParams{
-		Start:      start,
-		End:        end,
-		Resolution: resolution,
-		Stations:   stations,
-		Sensors:    sensors,
-		Aggregate:  aggregate,
-		Tail:       tail,
-		Complete:   complete,
-	}
-
-	return
 }
 
 type AggregateSummary struct {
@@ -241,7 +168,12 @@ type AggregateInfo struct {
 func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (*sensor.DataResult, error) {
 	log := Logger(ctx).Sugar()
 
-	qp, err := buildQueryParams(payload)
+	rawParams, err := NewRawQueryParamsFromSensorData(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	qp, err := rawParams.BuildQueryParams()
 	if err != nil {
 		return nil, err
 	}
@@ -249,7 +181,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	log.Infow("query_parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate)
 
 	if len(qp.Stations) == 0 {
-		return nil, sensor.MakeBadRequest(errors.New("at least one station required"))
+		return nil, sensor.MakeBadRequest(errors.New("stations is required"))
 	}
 
 	if qp.Tail > 0 {
