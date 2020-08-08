@@ -343,30 +343,6 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	}
 	log.Infow(message, "aggregate", selectedAggregateName, "number_records", summary.NumberRecords, "start", queryStart, "end", queryEnd, "interval", interval, "tgs", timeGroupThreshold)
 
-	if false {
-		query, args, err := sqlx.In(`SELECT dd AS time FROM generate_series($1::timestamp, $2::timestamp, $3 * interval '1 sec') AS dd`, queryStart, queryEnd, interval)
-		if err != nil {
-			return nil, err
-		}
-
-		queried, err := c.db.QueryxContext(ctx, c.db.Rebind(query), args...)
-		if err != nil {
-			return nil, err
-		}
-
-		defer queried.Close()
-
-		type TestingRow struct {
-			Time time.Time `db:"time"`
-		}
-		for queried.Next() {
-			row := &TestingRow{}
-			if err = queried.StructScan(row); err != nil {
-				return nil, err
-			}
-		}
-	}
-
 	rows := make([]*DataRow, 0)
 
 	if summary.NumberRecords > 0 {
