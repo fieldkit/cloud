@@ -16,7 +16,6 @@ import (
 
 	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
 
-	"github.com/fieldkit/cloud/server/backend/handlers"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -175,14 +174,10 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 
 	qp, err := rawParams.BuildQueryParams()
 	if err != nil {
-		return nil, err
+		return nil, sensor.MakeBadRequest(err)
 	}
 
-	log.Infow("query_parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate)
-
-	if len(qp.Stations) == 0 {
-		return nil, sensor.MakeBadRequest(errors.New("stations is required"))
-	}
+	log.Infow("query_parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate, "tail", qp.Tail)
 
 	if qp.Tail > 0 {
 		return c.tail(ctx, qp)
@@ -190,175 +185,21 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return c.stationsMeta(ctx, qp.Stations)
 	}
 
-	selectedAggregateName := qp.Aggregate
-	summaries := make(map[string]*AggregateSummary)
+	dq := NewDataQuerier(c.db)
 
-	for _, name := range handlers.AggregateNames {
-		table := handlers.AggregateTableNames[name]
-
-		query, args, err := sqlx.In(fmt.Sprintf(`
-			SELECT
-			MIN(time) AS start,
-			MAX(time) AS end,
-			COUNT(*) AS number_records
-			FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?);
-			`, table), qp.Start, qp.End, qp.Stations, qp.Sensors)
-		if err != nil {
-			return nil, err
-		}
-
-		summary := &AggregateSummary{}
-		if err := c.db.GetContext(ctx, summary, c.db.Rebind(query), args...); err != nil {
-			return nil, err
-		}
-
-		summaries[name] = summary
-
-		if qp.Resolution > 0 {
-			if summary.NumberRecords < int64(qp.Resolution) {
-				selectedAggregateName = name
-			}
-		}
+	summaries, selectedAggregateName, err := dq.SelectAggregate(ctx, qp)
+	if err != nil {
+		return nil, err
 	}
 
-	tableName := handlers.AggregateTableNames[selectedAggregateName]
-	sqlQueryIncomplete := fmt.Sprintf(`
-		WITH
-		with_timestamp_differences AS (
-			SELECT
-				*,
-										   LAG(time) OVER (ORDER BY time) AS previous_timestamp,
-				EXTRACT(epoch FROM (time - LAG(time) OVER (ORDER BY time))) AS time_difference
-			FROM %s
-			WHERE time >= ? AND time <= ? AND station_id IN (?) AND sensor_id IN (?)
-			ORDER BY time
-		),
-		with_temporal_clustering AS (
-			SELECT
-				*,
-				CASE WHEN s.time_difference > ?
-					OR s.time_difference IS NULL THEN true
-					ELSE NULL
-				END AS new_temporal_cluster
-			FROM with_timestamp_differences AS s
-		),
-		time_grouped AS (
-			SELECT
-				*,
-				COUNT(new_temporal_cluster) OVER (
-					ORDER BY s.time
-					ROWS UNBOUNDED PRECEDING
-				) AS time_group
-			FROM with_temporal_clustering s
-		)
-		SELECT
-			id,
-			time,
-			station_id,
-			sensor_id,
-			ST_AsBinary(location) AS location,
-			value,
-			time_group
-		FROM time_grouped
-		`, tableName)
-
-	sqlQueryComplete := fmt.Sprintf(`
-		WITH
-		expected_samples AS (
-			SELECT dd AS time
-			FROM generate_series(?::timestamp, ?::timestamp, ? * interval '1 sec') AS dd
-		),
-		with_timestamp_differences AS (
-			SELECT
-				*,
-										   LAG(time) OVER (ORDER BY time) AS previous_timestamp,
-				EXTRACT(epoch FROM (time - LAG(time) OVER (ORDER BY time))) AS time_difference
-			FROM %s
-			WHERE time >= ? AND time <= ? AND station_id IN (?) AND sensor_id IN (?)
-			ORDER BY time
-		),
-		with_temporal_clustering AS (
-			SELECT
-				*,
-				CASE WHEN s.time_difference > ?
-					OR s.time_difference IS NULL THEN true
-					ELSE NULL
-				END AS new_temporal_cluster
-			FROM with_timestamp_differences AS s
-		),
-		time_grouped AS (
-			SELECT
-				*,
-				COUNT(new_temporal_cluster) OVER (
-					ORDER BY s.time
-					ROWS UNBOUNDED PRECEDING
-				) AS time_group
-			FROM with_temporal_clustering s
-		),
-		complete AS (
-			SELECT
-				id,
-				es.time AS time,
-				station_id,
-				sensor_id,
-				location,
-				value,
-				time_group
-			FROM expected_samples AS es
-			LEFT JOIN time_grouped AS samples ON (es.time = samples.time)
-		)
-		SELECT
-			id,
-			time,
-			station_id,
-			sensor_id,
-			ST_AsBinary(location) AS location,
-			value,
-			time_group
-		FROM complete
-		`, tableName)
-
-	summary := summaries[selectedAggregateName]
-	interval := handlers.AggregateIntervals[selectedAggregateName]
-	timeGroupThreshold := handlers.AggregateTimeGroupThresholds[selectedAggregateName]
-
-	queryStart := qp.Start
-	queryEnd := qp.End
-
-	if qp.Complete {
-		if summary.Start != nil && queryStart.Before(summary.Start.Time()) {
-			queryStart = summary.Start.Time()
-		}
-		if summary.End != nil && queryEnd.After(summary.End.Time()) {
-			queryEnd = summary.End.Time()
-		}
-
-		queryStart = queryStart.UTC().Truncate(time.Duration(interval) * time.Second)
-		queryEnd = queryEnd.UTC().Truncate(time.Duration(interval) * time.Second)
+	aqp, err := NewAggregateQueryParams(qp, selectedAggregateName, summaries[selectedAggregateName])
+	if err != nil {
+		return nil, err
 	}
-
-	message := "querying"
-	if selectedAggregateName != qp.Aggregate {
-		message = "selected"
-	}
-	log.Infow(message, "aggregate", selectedAggregateName, "number_records", summary.NumberRecords, "start", queryStart, "end", queryEnd, "interval", interval, "tgs", timeGroupThreshold)
 
 	rows := make([]*DataRow, 0)
-
-	if summary.NumberRecords > 0 {
-		buildQuery := func() (query string, args []interface{}, err error) {
-			if qp.Complete {
-				return sqlx.In(sqlQueryComplete, queryStart, queryEnd, interval, queryStart, queryEnd, qp.Stations, qp.Sensors, timeGroupThreshold)
-			}
-			return sqlx.In(sqlQueryIncomplete, queryStart, queryEnd, qp.Stations, qp.Sensors, timeGroupThreshold)
-		}
-
-		query, args, err := buildQuery()
-		if err != nil {
-			return nil, err
-		}
-
-		queried, err := c.db.QueryxContext(ctx, c.db.Rebind(query), args...)
+	if aqp.ExpectedRecords > 0 {
+		queried, err := dq.QueryAggregate(ctx, aqp)
 		if err != nil {
 			return nil, err
 		}
@@ -373,6 +214,8 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 
 			rows = append(rows, row)
 		}
+	} else {
+		log.Infow("empty summary")
 	}
 
 	data := struct {
@@ -382,11 +225,11 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	}{
 		summaries,
 		AggregateInfo{
-			Name:     selectedAggregateName,
-			Interval: interval,
-			Complete: payload.Complete != nil && *payload.Complete,
-			Start:    queryStart,
-			End:      queryEnd,
+			Name:     aqp.AggregateName,
+			Interval: aqp.Interval,
+			Complete: aqp.Complete,
+			Start:    aqp.Start,
+			End:      aqp.End,
 		},
 		rows,
 	}
