@@ -319,29 +319,28 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		`, tableName)
 
 	summary := summaries[selectedAggregateName]
-
-	queryStart := qp.Start
-	if summary.Start != nil && queryStart.Before(summary.Start.Time()) {
-		queryStart = summary.Start.Time()
-	}
-	queryEnd := qp.End
-	if summary.End != nil && queryEnd.After(summary.End.Time()) {
-		queryEnd = summary.End.Time()
-	}
-
 	interval := handlers.AggregateIntervals[selectedAggregateName]
 	timeGroupThreshold := handlers.AggregateTimeGroupThresholds[selectedAggregateName]
+
+	queryStart := qp.Start
+	queryEnd := qp.End
+
+	if qp.Complete {
+		if summary.Start != nil && queryStart.Before(summary.Start.Time()) {
+			queryStart = summary.Start.Time()
+		}
+		if summary.End != nil && queryEnd.After(summary.End.Time()) {
+			queryEnd = summary.End.Time()
+		}
+
+		queryStart = queryStart.UTC().Truncate(time.Duration(interval) * time.Second)
+		queryEnd = queryEnd.UTC().Truncate(time.Duration(interval) * time.Second)
+	}
 
 	message := "querying"
 	if selectedAggregateName != qp.Aggregate {
 		message = "selected"
 	}
-
-	if qp.Complete {
-		queryStart = queryStart.UTC().Truncate(time.Duration(interval) * time.Second)
-		queryEnd = queryEnd.UTC().Truncate(time.Duration(interval) * time.Second)
-	}
-
 	log.Infow(message, "aggregate", selectedAggregateName, "number_records", summary.NumberRecords, "start", queryStart, "end", queryEnd, "interval", interval, "tgs", timeGroupThreshold)
 
 	if false {
