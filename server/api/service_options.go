@@ -40,7 +40,8 @@ type ControllerOptions struct {
 	locations *data.DescribeLocations
 }
 
-func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, mediaFiles files.FileArchive, awsSession *session.Session, metrics *logging.Metrics) (controllerOptions *ControllerOptions, err error) {
+func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
+	awsSession *session.Session, metrics *logging.Metrics) (controllerOptions *ControllerOptions, err error) {
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {
 		return nil, err

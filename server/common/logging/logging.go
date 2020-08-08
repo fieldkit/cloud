@@ -47,8 +47,8 @@ func WithNewTaskID(ctx context.Context, g *IdGenerator) context.Context {
 	return PushServiceTrace(context.WithValue(ctx, taskIDKey, taskID), taskID)
 }
 
-func WithUserID(ctx context.Context, userID string) context.Context {
-	return PushServiceTrace(context.WithValue(ctx, userIDKey, userID), userID)
+func WithUserID(ctx context.Context, userID int32) context.Context {
+	return context.WithValue(ctx, userIDKey, userID)
 }
 
 func Logger(ctx context.Context) *zap.Logger {

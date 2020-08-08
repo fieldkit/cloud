@@ -317,9 +317,11 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 		return ctx, a.Unauthorized("invalid scopes")
 	}
 
+	userID := int32(claims["sub"].(float64))
+
 	withClaims := addClaimsToContext(ctx, claims)
 	withAttempt := addAuthAttemptToContext(withClaims, &a)
-	withLogging := logging.WithUserID(withAttempt, fmt.Sprintf("%v", claims["sub"]))
+	withLogging := logging.WithUserID(withAttempt, userID)
 
 	return withLogging, nil
 }
