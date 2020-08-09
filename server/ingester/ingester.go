@@ -45,7 +45,7 @@ type IngesterOptions struct {
 	JwtHMACKey []byte
 }
 
-func Ingester(ctx context.Context, o *IngesterOptions) http.Handler {
+func NewIngesterHandler(ctx context.Context, o *IngesterOptions) http.Handler {
 	errorHandler := goahelpers.ErrorHandler(true)
 
 	handler := useMiddleware(errorHandler, func(ctx context.Context, w http.ResponseWriter, req *http.Request) error {

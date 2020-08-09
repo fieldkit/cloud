@@ -16,17 +16,27 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 
 	"github.com/fieldkit/cloud/server/files"
+
+	// "github.com/bgentry/que-go"
+	"github.com/govau/que-go"
+	"github.com/jackc/pgx"
 )
 
-func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOptions, error) {
+type Ingester struct {
+	Handler http.Handler
+	Options *IngesterOptions
+	pgxpool *pgx.ConnPool
+}
+
+func NewIngester(ctx context.Context, config *Config) (*Ingester, error) {
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	awsSession, err := session.NewSessionWithOptions(getAwsSessionOptions(config))
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
@@ -36,18 +46,29 @@ func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOp
 
 	files, err := createFileArchive(ctx, config, awsSession, metrics)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	jwtHMACKey, err := base64.StdEncoding.DecodeString(config.SessionKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	publisher, err := jobs.NewPqJobQueue(ctx, database, metrics, config.PostgresURL, "messages")
+	pgxcfg, err := pgx.ParseURI(config.PostgresURL)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+
+	pgxpool, err := pgx.NewConnPool(pgx.ConnPoolConfig{
+		ConnConfig:   pgxcfg,
+		AfterConnect: que.PrepareStatements,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	qc := que.NewClient(pgxpool)
+	publisher := jobs.NewQueMessagePublisher(metrics, qc)
 
 	options := &IngesterOptions{
 		Database:   database,
@@ -57,9 +78,18 @@ func NewIngester(ctx context.Context, config *Config) (http.Handler, *IngesterOp
 		JwtHMACKey: jwtHMACKey,
 	}
 
-	handler := Ingester(ctx, options)
+	handler := NewIngesterHandler(ctx, options)
 
-	return handler, options, nil
+	return &Ingester{
+		Handler: handler,
+		Options: options,
+		pgxpool: pgxpool,
+	}, nil
+}
+
+func (i *Ingester) Close() error {
+	i.pgxpool.Close()
+	return nil
 }
 
 func getAwsSessionOptions(config *Config) session.Options {

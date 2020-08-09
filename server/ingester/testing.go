@@ -29,9 +29,9 @@ func NewTestableIngester(e *tests.TestEnv) (http.Handler, *data.User, error) {
 		PostgresURL: e.PostgresURL,
 	}
 
-	handler, _, err := NewIngester(e.Ctx, config)
+	ingester, err := NewIngester(e.Ctx, config)
 
-	testHandler = handler
+	testHandler = ingester.Handler
 
-	return handler, user, err
+	return ingester.Handler, user, err
 }

@@ -130,15 +130,9 @@ func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
 }
 
 type Api struct {
-	options *api.ControllerOptions
-	handler http.Handler
-	pgxpool *pgx.ConnPool
-}
-
-func (a *Api) Close() error {
-	defer a.pgxpool.Close()
-	defer a.options.Close()
-	return nil
+	services *api.ControllerOptions
+	handler  http.Handler
+	pgxpool  *pgx.ConnPool
 }
 
 func createApi(ctx context.Context, config *Config) (*Api, error) {
@@ -174,13 +168,6 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		return nil, err
 	}
 
-	/*
-		jq, err := jobs.NewPqJobQueue(ctx, database, metrics, config.PostgresURL, "messages")
-		if err != nil {
-			return nil, err
-		}
-	*/
-
 	pgxcfg, err := pgx.ParseURI(config.PostgresURL)
 	if err != nil {
 		return nil, err
@@ -196,8 +183,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 
 	qc := que.NewClient(pgxpool)
 	publisher := jobs.NewQueMessagePublisher(metrics, qc)
-	services := backend.NewBackgroundServices(database, metrics, ingestionFiles, qc)
-	workMap := backend.CreateMap(services)
+	workMap := backend.CreateMap(backend.NewBackgroundServices(database, metrics, ingestionFiles, qc))
 	workers := que.NewWorkerPool(qc, workMap, 2)
 
 	go workers.Start()
@@ -217,35 +203,41 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		},
 	}
 
-	controllerOptions, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc)
+	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc)
 	if err != nil {
 		return nil, err
 	}
 
-	apiHandler, err := api.CreateApi(ctx, controllerOptions)
+	apiHandler, err := api.CreateApi(ctx, services)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Api{
-		options: controllerOptions,
-		handler: apiHandler,
-		pgxpool: pgxpool,
+		services: services,
+		handler:  apiHandler,
+		pgxpool:  pgxpool,
 	}, nil
 }
 
-func createIngester(ctx context.Context) (http.Handler, error) {
+func (a *Api) Close() error {
+	defer a.pgxpool.Close()
+	defer a.services.Close()
+	return nil
+}
+
+func createIngester(ctx context.Context) (*ingester.Ingester, error) {
 	ingesterConfig, err := getIngesterConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	ingesterHandler, _, err := ingester.NewIngester(ctx, ingesterConfig)
+	ingester, err := ingester.NewIngester(ctx, ingesterConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	return ingesterHandler, nil
+	return ingester, nil
 }
 
 func main() {
@@ -276,7 +268,7 @@ func main() {
 		log.Infow("have mapbox token")
 	}
 
-	ingesterHandler, err := createIngester(ctx)
+	ingester, err := createIngester(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -309,9 +301,9 @@ func main() {
 		panic(err)
 	}
 
-	services := theApi.options
+	services := theApi.services
 	statusFinal := logging.Monitoring("status", services.Metrics)(statusHandler)
-	ingesterFinal := logging.Monitoring("ingester", services.Metrics)(ingesterHandler)
+	ingesterFinal := logging.Monitoring("ingester", services.Metrics)(ingester.Handler)
 	apiFinal := logging.Monitoring("api", services.Metrics)(theApi.handler)
 	staticFinal := logging.Monitoring("static", services.Metrics)(portalServer)
 

@@ -27,16 +27,17 @@ func main() {
 
 	log.With("streams_bucket_name", config.StreamsBucketName).Info("config")
 
-	ingesterHandler, ingesterOptions, err := ingester.NewIngester(ctx, config)
+	ingester, err := ingester.NewIngester(ctx, config)
 	if err != nil {
 		panic(err)
 	}
 
-	notFoundFinal := logging.Monitoring("error", ingesterOptions.Metrics)(http.NotFoundHandler())
+	defer ingester.Close()
 
+	notFoundFinal := logging.Monitoring("error", ingester.Options.Metrics)(http.NotFoundHandler())
 	statusHandler := health.StatusHandler(ctx)
-	statusFinal := logging.Monitoring("status", ingesterOptions.Metrics)(statusHandler)
-	ingesterFinal := logging.Monitoring("status", ingesterOptions.Metrics)(ingesterHandler)
+	statusFinal := logging.Monitoring("status", ingester.Options.Metrics)(statusHandler)
+	ingesterFinal := logging.Monitoring("ingester", ingester.Options.Metrics)(ingester.Handler)
 
 	coreHandler := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/status" {

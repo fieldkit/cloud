@@ -34,10 +34,7 @@ func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
 		return nil, err
 	}
 
-	jq, err := jobs.NewPqJobQueue(e.Ctx, database, metrics, e.PostgresURL, "messages")
-	if err != nil {
-		return nil, err
-	}
+	jq := jobs.NewDevNullMessagePublisher()
 
 	be, err := backend.New(e.PostgresURL)
 	if err != nil {
@@ -49,17 +46,17 @@ func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
 		Emailer:    "default",
 	}
 
-	controllerOptions, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, nil, metrics, nil)
+	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, nil, metrics, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	apiHandler, err := CreateApi(e.Ctx, controllerOptions)
+	handler, err := CreateApi(e.Ctx, services)
 	if err != nil {
 		return nil, err
 	}
 
-	testHandler = logging.LoggingAndInfrastructure("tests")(apiHandler)
+	testHandler = logging.LoggingAndInfrastructure("tests")(handler)
 
-	return apiHandler, nil
+	return handler, nil
 }
