@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/conservify/sqlxcache"
 
@@ -11,7 +12,8 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/files"
 
-	_ "github.com/fieldkit/cloud/server/messages"
+	"github.com/fieldkit/cloud/server/common/jobs"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 type OurWorkFunc func(ctx context.Context, j *que.Job) error
@@ -26,12 +28,23 @@ func prepare(h OurWorkFunc) que.WorkFunc {
 func CreateMap(services *BackgroundServices) que.WorkMap {
 	return que.WorkMap{
 		"example": prepare(exampleJob),
-		"IngestionReceived": func(j *que.Job) error {
-			return nil
-		},
-		"RefreshStation": func(j *que.Job) error {
-			return nil
-		},
+		"IngestionReceived": prepare(func(ctx context.Context, j *que.Job) error {
+			message := &messages.IngestionReceived{}
+			if err := json.Unmarshal(j.Args, message); err != nil {
+				return nil
+			}
+			publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
+			handler := NewIngestionReceivedHandler(services.database, services.ingestionFiles, services.metrics, publisher)
+			return handler.Handle(ctx, message)
+		}),
+		"RefreshStation": prepare(func(ctx context.Context, j *que.Job) error {
+			message := &messages.RefreshStation{}
+			if err := json.Unmarshal(j.Args, message); err != nil {
+				return nil
+			}
+			handler := NewRefreshStationHandler(services.database)
+			return handler.Handle(ctx, message)
+		}),
 	}
 }
 

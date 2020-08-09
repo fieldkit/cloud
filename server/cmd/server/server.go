@@ -31,7 +31,7 @@ import (
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/ingester"
-	"github.com/fieldkit/cloud/server/messages"
+	_ "github.com/fieldkit/cloud/server/messages"
 
 	// "github.com/bgentry/que-go"
 	"github.com/govau/que-go"
@@ -174,10 +174,12 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		return nil, err
 	}
 
-	jq, err := jobs.NewPqJobQueue(ctx, database, metrics, config.PostgresURL, "messages")
-	if err != nil {
-		return nil, err
-	}
+	/*
+		jq, err := jobs.NewPqJobQueue(ctx, database, metrics, config.PostgresURL, "messages")
+		if err != nil {
+			return nil, err
+		}
+	*/
 
 	pgxcfg, err := pgx.ParseURI(config.PostgresURL)
 	if err != nil {
@@ -193,18 +195,12 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 	}
 
 	qc := que.NewClient(pgxpool)
-
+	publisher := jobs.NewQueMessagePublisher(metrics, qc)
 	services := backend.NewBackgroundServices(database, metrics, ingestionFiles, qc)
 	workMap := backend.CreateMap(services)
 	workers := que.NewWorkerPool(qc, workMap, 2)
 
 	go workers.Start()
-
-	ingestionReceivedHandler := backend.NewIngestionReceivedHandler(database, ingestionFiles, metrics, jq)
-	jq.Register(messages.IngestionReceived{}, ingestionReceivedHandler)
-
-	refreshStationHandler := backend.NewRefreshStationHandler(database)
-	jq.Register(messages.RefreshStation{}, refreshStationHandler)
 
 	apiConfig := &api.ApiConfiguration{
 		ApiHost:       config.ApiHost,
@@ -221,12 +217,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		},
 	}
 
-	err = jq.Listen(ctx, 1)
-	if err != nil {
-		return nil, err
-	}
-
-	controllerOptions, err := api.CreateServiceOptions(ctx, apiConfig, database, be, jq, mediaFiles, awsSession, metrics, qc)
+	controllerOptions, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc)
 	if err != nil {
 		return nil, err
 	}
