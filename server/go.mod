@@ -10,6 +10,7 @@ require (
 	github.com/armon/go-metrics v0.0.0-20180713145231-3c58d8115a78
 	github.com/aws/aws-lambda-go v0.0.0-20180413184133-ea03c2814414
 	github.com/aws/aws-sdk-go v1.29.20
+	github.com/bgentry/que-go v1.0.1
 	github.com/bxcodec/faker/v3 v3.3.1
 	github.com/cavaliercoder/grab v2.0.0+incompatible
 	github.com/cenkalti/backoff v0.0.0-20170309153948-3db60c813733
@@ -39,6 +40,7 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-querystring v1.0.0
 	github.com/google/uuid v1.1.1
+	github.com/govau/que-go v1.0.1
 	github.com/h2non/filetype v1.0.10
 	github.com/hashicorp/go-immutable-radix v0.0.0-20180129170900-7f3cd4390caa
 	github.com/hashicorp/go-multierror v1.1.0
@@ -48,6 +50,7 @@ require (
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/inconshreveable/log15 v0.0.0-20180818164646-67afb5ed74ec
 	github.com/inconshreveable/mousetrap v1.0.0
+	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/kelseyhightower/envconfig v0.0.0-20170206223400-8bf4bbfc795e
@@ -90,11 +93,12 @@ require (
 	go.uber.org/zap v1.10.0
 	goa.design/goa/v3 v3.1.2
 	goa.design/plugins/v3 v3.1.1
-	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
+	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sys v0.0.0-20200212091648-12a6c2dcc1e4
+	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
 	google.golang.org/appengine v1.6.5
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0

@@ -32,6 +32,10 @@ import (
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/ingester"
 	"github.com/fieldkit/cloud/server/messages"
+
+	// "github.com/bgentry/que-go"
+	"github.com/govau/que-go"
+	"github.com/jackc/pgx"
 )
 
 type Options struct {
@@ -125,7 +129,19 @@ func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
 	}
 }
 
-func createApi(ctx context.Context, config *Config) (http.Handler, *api.ControllerOptions, error) {
+type Api struct {
+	options *api.ControllerOptions
+	handler http.Handler
+	pgxpool *pgx.ConnPool
+}
+
+func (a *Api) Close() error {
+	defer a.pgxpool.Close()
+	defer a.options.Close()
+	return nil
+}
+
+func createApi(ctx context.Context, config *Config) (*Api, error) {
 	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
 		Prefix:  "fk.service",
 		Address: config.StatsdAddress,
@@ -133,35 +149,56 @@ func createApi(ctx context.Context, config *Config) (http.Handler, *api.Controll
 
 	database, err := sqlxcache.Open("postgres", config.PostgresURL)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	be, err := backend.New(config.PostgresURL)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	awsSessionOptions := getAwsSessionOptions(ctx, config)
 
 	awsSession, err := session.NewSessionWithOptions(awsSessionOptions)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	ingestionFiles, err := createFileArchive(ctx, config.Archiver, config.StreamsBucketName, awsSession, metrics)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	mediaFiles, err := createFileArchive(ctx, config.Archiver, config.MediaBucketName, awsSession, metrics)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	jq, err := jobs.NewPqJobQueue(ctx, database, metrics, config.PostgresURL, "messages")
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+
+	pgxcfg, err := pgx.ParseURI(config.PostgresURL)
+	if err != nil {
+		return nil, err
+	}
+
+	pgxpool, err := pgx.NewConnPool(pgx.ConnPoolConfig{
+		ConnConfig:   pgxcfg,
+		AfterConnect: que.PrepareStatements,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	qc := que.NewClient(pgxpool)
+
+	services := backend.NewBackgroundServices(database, metrics, ingestionFiles, qc)
+	workMap := backend.CreateMap(services)
+	workers := que.NewWorkerPool(qc, workMap, 2)
+
+	go workers.Start()
 
 	ingestionReceivedHandler := backend.NewIngestionReceivedHandler(database, ingestionFiles, metrics, jq)
 	jq.Register(messages.IngestionReceived{}, ingestionReceivedHandler)
@@ -186,20 +223,24 @@ func createApi(ctx context.Context, config *Config) (http.Handler, *api.Controll
 
 	err = jq.Listen(ctx, 1)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	controllerOptions, err := api.CreateServiceOptions(ctx, apiConfig, database, be, jq, mediaFiles, awsSession, metrics)
+	controllerOptions, err := api.CreateServiceOptions(ctx, apiConfig, database, be, jq, mediaFiles, awsSession, metrics, qc)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	apiHandler, err := api.CreateApi(ctx, controllerOptions)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return apiHandler, controllerOptions, nil
+	return &Api{
+		options: controllerOptions,
+		handler: apiHandler,
+		pgxpool: pgxpool,
+	}, nil
 }
 
 func createIngester(ctx context.Context) (http.Handler, error) {
@@ -249,10 +290,12 @@ func main() {
 		panic(err)
 	}
 
-	apiHandler, services, err := createApi(ctx, config)
+	theApi, err := createApi(ctx, config)
 	if err != nil {
 		panic(err)
 	}
+
+	defer theApi.Close()
 
 	notFoundHandler := http.NotFoundHandler()
 
@@ -275,9 +318,10 @@ func main() {
 		panic(err)
 	}
 
+	services := theApi.options
 	statusFinal := logging.Monitoring("status", services.Metrics)(statusHandler)
 	ingesterFinal := logging.Monitoring("ingester", services.Metrics)(ingesterHandler)
-	apiFinal := logging.Monitoring("api", services.Metrics)(apiHandler)
+	apiFinal := logging.Monitoring("api", services.Metrics)(theApi.handler)
 	staticFinal := logging.Monitoring("static", services.Metrics)(portalServer)
 
 	serveApi := func(w http.ResponseWriter, req *http.Request) {

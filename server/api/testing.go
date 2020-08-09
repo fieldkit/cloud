@@ -49,7 +49,7 @@ func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
 		Emailer:    "default",
 	}
 
-	controllerOptions, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, nil, metrics)
+	controllerOptions, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, nil, metrics, nil)
 	if err != nil {
 		return nil, err
 	}
