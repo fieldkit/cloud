@@ -135,6 +135,10 @@ func NewAggregateQueryParams(qp *QueryParams, selectedAggregateName string, summ
 	queryEnd := qp.End
 
 	if qp.Complete {
+		if summary == nil {
+			return nil, fmt.Errorf("summary required for complete queries")
+		}
+
 		if summary.Start != nil && queryStart.Before(summary.Start.Time()) {
 			queryStart = summary.Start.Time()
 		}
@@ -146,6 +150,11 @@ func NewAggregateQueryParams(qp *QueryParams, selectedAggregateName string, summ
 		queryEnd = queryEnd.UTC().Truncate(time.Duration(interval) * time.Second)
 	}
 
+	expected := int64(0)
+	if summary != nil {
+		expected = summary.NumberRecords
+	}
+
 	return &AggregateQueryParams{
 		Start:              queryStart,
 		End:                queryEnd,
@@ -155,7 +164,7 @@ func NewAggregateQueryParams(qp *QueryParams, selectedAggregateName string, summ
 		Interval:           interval,
 		TimeGroupThreshold: int32(timeGroupThreshold),
 		AggregateName:      selectedAggregateName,
-		ExpectedRecords:    summary.NumberRecords,
+		ExpectedRecords:    expected,
 		Summary:            summary,
 	}, nil
 }
@@ -306,7 +315,7 @@ func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryPa
 		FROM complete
 		`, tableName)
 
-	log.Infow("querying", "aggregate", aqp.AggregateName, "number_records", aqp.Summary.NumberRecords, "start", aqp.Start, "end", aqp.End, "interval", aqp.Interval, "tgs", aqp.TimeGroupThreshold)
+	log.Infow("querying", "aggregate", aqp.AggregateName, "expected_records", aqp.ExpectedRecords, "start", aqp.Start, "end", aqp.End, "interval", aqp.Interval, "tgs", aqp.TimeGroupThreshold)
 
 	buildQuery := func() (query string, args []interface{}, err error) {
 		if aqp.Complete {
