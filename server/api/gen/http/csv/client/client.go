@@ -20,6 +20,10 @@ type Client struct {
 	// Export Doer is the HTTP client used to make requests to the export endpoint.
 	ExportDoer goahttp.Doer
 
+	// Download Doer is the HTTP client used to make requests to the download
+	// endpoint.
+	DownloadDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -44,6 +48,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		ExportDoer:          doer,
+		DownloadDoer:        doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -72,6 +77,30 @@ func (c *Client) Export() goa.Endpoint {
 		resp, err := c.ExportDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("csv", "export", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Download returns an endpoint that makes HTTP requests to the csv service
+// download server.
+func (c *Client) Download() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDownloadRequest(c.encoder)
+		decodeResponse = DecodeDownloadResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDownloadRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DownloadDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("csv", "download", err)
 		}
 		return decodeResponse(resp)
 	}

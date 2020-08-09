@@ -24,9 +24,8 @@ var _ = Service("csv", func() {
 		})
 
 		Result(func() {
-			Attribute("object", Any)
-			Required("object")
 			Attribute("location", String)
+			Required("location")
 		})
 
 		HTTP(func() {
@@ -43,15 +42,42 @@ var _ = Service("csv", func() {
 				Param("tail")
 			})
 
-			Response(func() {
-				Body("object")
-			})
-
 			Response(StatusFound, func() {
 				Headers(func() {
 					Header("location:Location")
 				})
 			})
+
+			httpAuthentication()
+		})
+	})
+
+	Method("download", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("id", String)
+			Required("id")
+		})
+
+		Result(func() {
+			Attribute("object", Any)
+		})
+
+		Error("busy", func() {})
+
+		HTTP(func() {
+			GET("sensors/data/export/csv/{id}")
+
+			Response(StatusOK, func() {
+				Body("object")
+			})
+
+			Response("busy", StatusNotFound)
 
 			httpAuthentication()
 		})

@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	"errors"
-	_ "fmt"
+	"fmt"
 	_ "strconv"
 	_ "strings"
 	_ "time"
@@ -58,7 +58,7 @@ func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPaylo
 
 	qp, err := rawParams.BuildQueryParams()
 	if err != nil {
-		return nil, err
+		return nil, csvService.MakeBadRequest(err)
 	}
 
 	if len(qp.Sensors) == 0 {
@@ -90,6 +90,20 @@ func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPaylo
 	}
 
 	return &csvService.ExportResult{
+		Location: fmt.Sprintf("/sensors/data/export/csv/%v", "1"),
+	}, nil
+}
+
+func (c *CsvService) Download(ctx context.Context, payload *csvService.DownloadPayload) (*csvService.DownloadResult, error) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("download")
+
+	if true {
+		return nil, csvService.MakeBusy(errors.New("busy"))
+	}
+
+	return &csvService.DownloadResult{
 		Object: nil,
 	}, nil
 }

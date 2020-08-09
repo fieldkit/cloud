@@ -84,6 +84,96 @@ type ExportBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// DownloadBusyResponseBody is the type of the "csv" service "download"
+// endpoint HTTP response body for the "busy" error.
+type DownloadBusyResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DownloadNotFoundResponseBody is the type of the "csv" service "download"
+// endpoint HTTP response body for the "not-found" error.
+type DownloadNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DownloadUnauthorizedResponseBody is the type of the "csv" service "download"
+// endpoint HTTP response body for the "unauthorized" error.
+type DownloadUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DownloadForbiddenResponseBody is the type of the "csv" service "download"
+// endpoint HTTP response body for the "forbidden" error.
+type DownloadForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DownloadBadRequestResponseBody is the type of the "csv" service "download"
+// endpoint HTTP response body for the "bad-request" error.
+type DownloadBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // NewExportUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "export" endpoint of the "csv" service.
 func NewExportUnauthorizedResponseBody(res *goa.ServiceError) *ExportUnauthorizedResponseBody {
@@ -140,6 +230,76 @@ func NewExportBadRequestResponseBody(res *goa.ServiceError) *ExportBadRequestRes
 	return body
 }
 
+// NewDownloadBusyResponseBody builds the HTTP response body from the result of
+// the "download" endpoint of the "csv" service.
+func NewDownloadBusyResponseBody(res *goa.ServiceError) *DownloadBusyResponseBody {
+	body := &DownloadBusyResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDownloadNotFoundResponseBody builds the HTTP response body from the
+// result of the "download" endpoint of the "csv" service.
+func NewDownloadNotFoundResponseBody(res *goa.ServiceError) *DownloadNotFoundResponseBody {
+	body := &DownloadNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDownloadUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "download" endpoint of the "csv" service.
+func NewDownloadUnauthorizedResponseBody(res *goa.ServiceError) *DownloadUnauthorizedResponseBody {
+	body := &DownloadUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDownloadForbiddenResponseBody builds the HTTP response body from the
+// result of the "download" endpoint of the "csv" service.
+func NewDownloadForbiddenResponseBody(res *goa.ServiceError) *DownloadForbiddenResponseBody {
+	body := &DownloadForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDownloadBadRequestResponseBody builds the HTTP response body from the
+// result of the "download" endpoint of the "csv" service.
+func NewDownloadBadRequestResponseBody(res *goa.ServiceError) *DownloadBadRequestResponseBody {
+	body := &DownloadBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewExportPayload builds a csv service export endpoint payload.
 func NewExportPayload(start *int64, end *int64, stations *string, sensors *string, resolution *int32, aggregate *string, complete *bool, tail *int32, auth string) *csv.ExportPayload {
 	v := &csv.ExportPayload{}
@@ -151,6 +311,15 @@ func NewExportPayload(start *int64, end *int64, stations *string, sensors *strin
 	v.Aggregate = aggregate
 	v.Complete = complete
 	v.Tail = tail
+	v.Auth = auth
+
+	return v
+}
+
+// NewDownloadPayload builds a csv service download endpoint payload.
+func NewDownloadPayload(id string, auth string) *csv.DownloadPayload {
+	v := &csv.DownloadPayload{}
+	v.ID = id
 	v.Auth = auth
 
 	return v

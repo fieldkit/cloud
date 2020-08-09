@@ -23,10 +23,9 @@ import (
 func EncodeExportResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res := v.(*csv.ExportResult)
-		enc := encoder(ctx, w)
-		body := res.Object
-		w.WriteHeader(http.StatusOK)
-		return enc.Encode(body)
+		w.Header().Set("Location", res.Location)
+		w.WriteHeader(http.StatusFound)
+		return nil
 	}
 }
 
@@ -182,6 +181,124 @@ func EncodeExportError(encoder func(context.Context, http.ResponseWriter) goahtt
 				body = formatter(res)
 			} else {
 				body = NewExportBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeDownloadResponse returns an encoder for responses returned by the csv
+// download endpoint.
+func EncodeDownloadResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*csv.DownloadResult)
+		enc := encoder(ctx, w)
+		body := res.Object
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeDownloadRequest returns a decoder for requests sent to the csv
+// download endpoint.
+func DecodeDownloadRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			id   string
+			auth string
+			err  error
+
+			params = mux.Vars(r)
+		)
+		id = params["id"]
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewDownloadPayload(id, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeDownloadError returns an encoder for errors returned by the download
+// csv endpoint.
+func EncodeDownloadError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "busy":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDownloadBusyResponseBody(res)
+			}
+			w.Header().Set("goa-error", "busy")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDownloadNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDownloadUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDownloadForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDownloadBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)

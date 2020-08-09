@@ -108,3 +108,21 @@ func BuildExportPayload(csvExportStart string, csvExportEnd string, csvExportSta
 
 	return v, nil
 }
+
+// BuildDownloadPayload builds the payload for the csv download endpoint from
+// CLI flags.
+func BuildDownloadPayload(csvDownloadID string, csvDownloadAuth string) (*csv.DownloadPayload, error) {
+	var id string
+	{
+		id = csvDownloadID
+	}
+	var auth string
+	{
+		auth = csvDownloadAuth
+	}
+	v := &csv.DownloadPayload{}
+	v.ID = id
+	v.Auth = auth
+
+	return v, nil
+}

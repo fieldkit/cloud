@@ -18,6 +18,8 @@ import (
 type Service interface {
 	// Export implements export.
 	Export(context.Context, *ExportPayload) (res *ExportResult, err error)
+	// Download implements download.
+	Download(context.Context, *DownloadPayload) (res *DownloadResult, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -34,7 +36,7 @@ const ServiceName = "csv"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"export"}
+var MethodNames = [2]string{"export", "download"}
 
 // ExportPayload is the payload type of the csv service export method.
 type ExportPayload struct {
@@ -51,8 +53,18 @@ type ExportPayload struct {
 
 // ExportResult is the result type of the csv service export method.
 type ExportResult struct {
-	Object   interface{}
-	Location *string
+	Location string
+}
+
+// DownloadPayload is the payload type of the csv service download method.
+type DownloadPayload struct {
+	Auth string
+	ID   string
+}
+
+// DownloadResult is the result type of the csv service download method.
+type DownloadResult struct {
+	Object interface{}
 }
 
 // MakeUnauthorized builds a goa.ServiceError from an error.
@@ -86,6 +98,15 @@ func MakeNotFound(err error) *goa.ServiceError {
 func MakeBadRequest(err error) *goa.ServiceError {
 	return &goa.ServiceError{
 		Name:    "bad-request",
+		ID:      goa.NewErrorID(),
+		Message: err.Error(),
+	}
+}
+
+// MakeBusy builds a goa.ServiceError from an error.
+func MakeBusy(err error) *goa.ServiceError {
+	return &goa.ServiceError{
+		Name:    "busy",
 		ID:      goa.NewErrorID(),
 		Message: err.Error(),
 	}
