@@ -75,13 +75,19 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 	info, err := recordAdder.WriteRecords(ctx, i)
 	if err != nil {
 		log.Errorw("ingestion", "error", err)
-		hasOtherErrors = true
+		if err := ir.MarkProcessedHasOtherErrors(ctx, queued.ID); err != nil {
+			return err
+		}
+		return err
 	}
 
 	if info != nil {
 		if err := recordIngestionActivity(ctx, log, h.db, m, info); err != nil {
 			log.Errorw("ingestion", "error", err)
-			hasOtherErrors = true
+			if err := ir.MarkProcessedHasOtherErrors(ctx, queued.ID); err != nil {
+				return err
+			}
+			return err
 		}
 
 		if info.StationID != nil {
