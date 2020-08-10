@@ -9,42 +9,59 @@ import (
 	// "github.com/bgentry/que-go"
 	"github.com/govau/que-go"
 
+	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/files"
-
-	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/messages"
 )
 
 type OurWorkFunc func(ctx context.Context, j *que.Job) error
+type OurTransportMessageFunc func(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error
 
-func prepare(h OurWorkFunc) que.WorkFunc {
+func wrapContext(h OurWorkFunc) que.WorkFunc {
 	return func(j *que.Job) error {
 		ctx := context.Background()
 		return h(ctx, j)
 	}
 }
 
+func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFunc) OurWorkFunc {
+	return func(ctx context.Context, j *que.Job) error {
+		transport := &jobs.TransportMessage{}
+		if err := json.Unmarshal([]byte(j.Args), transport); err != nil {
+			return err
+		}
+
+		messageCtx := logging.WithTaskID(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
+
+		return h(messageCtx, j, services, transport)
+	}
+}
+
+func ingestionReceived(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+	message := &messages.IngestionReceived{}
+	if err := json.Unmarshal(tm.Body, message); err != nil {
+		return err
+	}
+	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
+	handler := NewIngestionReceivedHandler(services.database, services.ingestionFiles, services.metrics, publisher)
+	return handler.Handle(ctx, message)
+}
+
+func refreshStation(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+	message := &messages.RefreshStation{}
+	if err := json.Unmarshal(tm.Body, message); err != nil {
+		return err
+	}
+	handler := NewRefreshStationHandler(services.database)
+	return handler.Handle(ctx, message)
+}
+
 func CreateMap(services *BackgroundServices) que.WorkMap {
 	return que.WorkMap{
-		"example": prepare(exampleJob),
-		"IngestionReceived": prepare(func(ctx context.Context, j *que.Job) error {
-			message := &messages.IngestionReceived{}
-			if err := json.Unmarshal(j.Args, message); err != nil {
-				return nil
-			}
-			publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-			handler := NewIngestionReceivedHandler(services.database, services.ingestionFiles, services.metrics, publisher)
-			return handler.Handle(ctx, message)
-		}),
-		"RefreshStation": prepare(func(ctx context.Context, j *que.Job) error {
-			message := &messages.RefreshStation{}
-			if err := json.Unmarshal(j.Args, message); err != nil {
-				return nil
-			}
-			handler := NewRefreshStationHandler(services.database)
-			return handler.Handle(ctx, message)
-		}),
+		"Example":           wrapContext(wrapTransportMessage(services, exampleJob)),
+		"IngestionReceived": wrapContext(wrapTransportMessage(services, ingestionReceived)),
+		"RefreshStation":    wrapContext(wrapTransportMessage(services, refreshStation)),
 	}
 }
 

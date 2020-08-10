@@ -2,17 +2,15 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
 	"goa.design/goa/v3/security"
 
-	"github.com/govau/que-go"
-
 	test "github.com/fieldkit/cloud/server/api/gen/test"
 
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 type TestService struct {
@@ -25,24 +23,13 @@ func NewTestSevice(ctx context.Context, options *ControllerOptions) *TestService
 	}
 }
 
-type printNameArgs struct {
-	Name string
-}
-
 func (sc *TestService) Get(ctx context.Context, payload *test.GetPayload) error {
-	args, err := json.Marshal(printNameArgs{Name: "jacob"})
-	if err != nil {
-		return err
+	example := messages.Example{
+		Name: "Jacob",
 	}
-
-	j1 := &que.Job{
-		Type: "example",
-		Args: args,
+	if err := sc.options.Publisher.Publish(ctx, &example); err != nil {
+		return nil
 	}
-	if err := sc.options.que.Enqueue(j1); err != nil {
-		return err
-	}
-
 	return nil
 }
 

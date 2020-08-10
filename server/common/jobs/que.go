@@ -37,9 +37,22 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}) 
 		messageType = messageType.Elem()
 	}
 
+	transport := TransportMessage{
+		Id:      ids.Generate(),
+		Package: messageType.PkgPath(),
+		Type:    messageType.Name(),
+		Trace:   logging.ServiceTrace(ctx),
+		Body:    body,
+	}
+
+	bytes, err := json.Marshal(transport)
+	if err != nil {
+		return fmt.Errorf("json marshal: %v", err)
+	}
+
 	j := &que.Job{
 		Type: messageType.Name(),
-		Args: body,
+		Args: bytes,
 	}
 	if err := p.que.Enqueue(j); err != nil {
 		return err
