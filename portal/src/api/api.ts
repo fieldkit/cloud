@@ -447,7 +447,7 @@ class FKApi {
 
     resetPassword(data) {
         return this.invoke({
-            auth: Auth.Required,
+            auth: Auth.None,
             method: "POST",
             url: this.baseUrl + "/user/recovery",
             data: { password: data.password, token: data.token },

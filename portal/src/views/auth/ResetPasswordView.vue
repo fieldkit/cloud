@@ -9,8 +9,7 @@
 
                         <div class="outer-input-container">
                             <div class="input-container">
-                                <input secure="true" type="password" class="inputText" required="" v-model="form.password" />
-                                <span class="floating-label">New password</span>
+                                <TextField v-model="form.password" label="Password" type="password" />
 
                                 <div class="validation-errors" v-if="$v.form.password.$error">
                                     <div v-if="!$v.form.password.required">This is a required field.</div>
@@ -21,8 +20,7 @@
 
                         <div class="outer-input-container">
                             <div class="input-container middle-container">
-                                <input secure="true" type="password" class="inputText" required="" v-model="form.passwordConfirmation" />
-                                <span class="floating-label">Confirm new password</span>
+                                <TextField v-model="form.passwordConfirmation" label="Confirm Password" type="password" />
 
                                 <div class="validation-errors" v-if="$v.form.passwordConfirmation.$error">
                                     <div v-if="!$v.form.passwordConfirmation.required">Confirmation is a required field.</div>
@@ -61,12 +59,17 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue";
+import CommonComponents from "@/views/shared";
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
 import FKApi from "@/api/api";
 
-export default {
+export default Vue.extend({
     name: "ResetPasswordView",
+    components: {
+        ...CommonComponents,
+    },
     data: () => {
         return {
             form: {
@@ -85,7 +88,7 @@ export default {
         },
     },
     methods: {
-        save() {
+        save(this: any) {
             console.log("save");
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
@@ -112,7 +115,7 @@ export default {
                 });
         },
     },
-};
+});
 </script>
 
 <style scoped>
