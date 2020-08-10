@@ -37,13 +37,11 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}) 
 		messageType = messageType.Elem()
 	}
 
-	fmt.Printf("!! Message: %v %v\n", messageType, messageType.Name())
-
-	j1 := &que.Job{
+	j := &que.Job{
 		Type: messageType.Name(),
 		Args: body,
 	}
-	if err := p.que.Enqueue(j1); err != nil {
+	if err := p.que.Enqueue(j); err != nil {
 		return err
 	}
 

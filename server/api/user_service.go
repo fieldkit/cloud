@@ -219,17 +219,14 @@ func (s *UserService) GetCurrent(ctx context.Context, payload *user.GetCurrentPa
 		return nil, err
 	}
 
-	log := Logger(ctx).Sugar()
-
 	currentUser := &data.User{}
 	if err := s.options.Database.GetContext(ctx, currentUser, `
 		SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1
 		`, p.UserID()); err != nil {
-		log.Infow("user", "user_id", p.UserID())
+		log := Logger(ctx).Sugar()
+		log.Warnw("missing", "user_id", p.UserID())
 		return nil, err
 	}
-
-	log.Infow("user", "user_id", p.UserID(), "email", currentUser.Email)
 
 	return UserType(s.options.signer, currentUser)
 }
