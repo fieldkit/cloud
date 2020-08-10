@@ -103,6 +103,8 @@ func (s *Station) UpdateFromStatus(ctx context.Context, raw string) error {
 		status := record.Status
 
 		if status.Identity != nil {
+			log.Infow("identity", "identity", status.Identity)
+
 			if status.Identity.Name != "" {
 				s.Name = status.Identity.Name
 			}
