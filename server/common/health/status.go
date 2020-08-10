@@ -63,6 +63,8 @@ func StatusHandler(ctx context.Context) http.Handler {
 		ctx := req.Context()
 		log := logging.Logger(ctx).Named("status").Sugar()
 
+		req.Header.Del("Authorization")
+
 		log.Infow("status", "headers", req.Header)
 
 		sr, err := MakeStatusResponse(ctx)
