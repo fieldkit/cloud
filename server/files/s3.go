@@ -13,7 +13,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
 	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/common/errors"
 	"github.com/fieldkit/cloud/server/common/logging"
 )
 
@@ -69,7 +68,7 @@ func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta ma
 		Tagging:     nil,
 	})
 	if err != nil {
-		return nil, errors.Structured("aws error", "error", err)
+		return nil, err
 	}
 
 	log.Infow("saved", "url", r.Location, "bytes_read", cr.bytesRead)
