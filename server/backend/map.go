@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 
@@ -27,14 +28,25 @@ func wrapContext(h OurWorkFunc) que.WorkFunc {
 
 func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFunc) OurWorkFunc {
 	return func(ctx context.Context, j *que.Job) error {
+		timer := services.metrics.HandleMessage()
+
+		defer timer.Send()
+
+		startedAt := time.Now()
+
 		transport := &jobs.TransportMessage{}
 		if err := json.Unmarshal([]byte(j.Args), transport); err != nil {
 			return err
 		}
 
 		messageCtx := logging.WithTaskID(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
+		messageLog := Logger(messageCtx).Sugar()
 
-		return h(messageCtx, j, services, transport)
+		err := h(messageCtx, j, services, transport)
+
+		messageLog.Infow("completed", "message_type", transport.Package+"."+transport.Type, "time", time.Since(startedAt).String())
+
+		return err
 	}
 }
 
