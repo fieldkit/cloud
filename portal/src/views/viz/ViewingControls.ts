@@ -96,7 +96,7 @@ export const ViewingControls = Vue.extend({
                 const rangePicker = new TimeRange(fromPicker.start.getTime(), fromPicker.end.getTime());
                 if (rangeViz.start != rangePicker.start || rangeViz.end != rangePicker.end) {
                     console.log("raising viz-time-zoomed");
-                    return this.$emit("viz-time-zoomed", rangePicker);
+                    return this.$emit("viz-time-zoomed", new TimeZoom(null, rangePicker));
                 } else {
                     console.log("swallowing viz-time-zoomed");
                 }
