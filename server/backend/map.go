@@ -74,9 +74,8 @@ func exportCsv(ctx context.Context, j *que.Job, services *BackgroundServices, tm
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
-	// handler := NewRefreshStationHandler(services.database)
-	// return handler.Handle(ctx, message)
-	return nil
+	handler := NewExportCsvHandler(services.database, services.ingestionFiles, services.metrics)
+	return handler.Handle(ctx, message)
 }
 
 func CreateMap(services *BackgroundServices) que.WorkMap {

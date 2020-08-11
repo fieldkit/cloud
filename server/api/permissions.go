@@ -214,7 +214,7 @@ func (p *defaultPermissions) ForStationByID(id int) (permissions StationPermissi
 
 	station, err := r.QueryStationByID(p.context, int32(id))
 	if err != nil {
-		return nil, p.notFound(fmt.Sprintf("station not found: %v", err))
+		return nil, p.notFound(fmt.Sprintf("station not found"))
 	}
 
 	permissions = &stationPermissions{
@@ -237,7 +237,7 @@ func (p *defaultPermissions) ForStationByDeviceID(id []byte) (permissions Statio
 
 	station, err := r.QueryStationByDeviceID(p.context, id)
 	if err != nil {
-		return nil, p.notFound(fmt.Sprintf("station not found: %v", err))
+		return nil, p.notFound(fmt.Sprintf("station not found"))
 	}
 
 	permissions = &stationPermissions{
