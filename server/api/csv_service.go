@@ -15,13 +15,14 @@ import (
 
 	csvService "github.com/fieldkit/cloud/server/api/gen/csv"
 
+	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/messages"
 )
 
-func NewRawQueryParamsFromCsvExport(payload *csvService.ExportPayload) (*RawQueryParams, error) {
-	return &RawQueryParams{
+func NewRawQueryParamsFromCsvExport(payload *csvService.ExportPayload) (*backend.RawQueryParams, error) {
+	return &backend.RawQueryParams{
 		Start:      payload.Start,
 		End:        payload.End,
 		Resolution: payload.Resolution,

@@ -16,12 +16,13 @@ import (
 
 	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
 
+	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
 
-func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*RawQueryParams, error) {
-	return &RawQueryParams{
+func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQueryParams, error) {
+	return &backend.RawQueryParams{
 		Start:      payload.Start,
 		End:        payload.End,
 		Resolution: payload.Resolution,
@@ -45,12 +46,6 @@ func NewSensorService(ctx context.Context, options *ControllerOptions) *SensorSe
 	}
 }
 
-type AggregateSummary struct {
-	NumberRecords int64                 `db:"number_records" json:"numberRecords"`
-	Start         *data.NumericWireTime `db:"start" json:"start"`
-	End           *data.NumericWireTime `db:"end" json:"end"`
-}
-
 type StationSensor struct {
 	SensorID    int64  `db:"sensor_id" json:"sensorId"`
 	StationID   int32  `db:"station_id" json:"-"`
@@ -68,7 +63,7 @@ type DataRow struct {
 	TimeGroup *int32               `db:"time_group" json:"tg,omitempty"`
 }
 
-func (c *SensorService) tail(ctx context.Context, qp *QueryParams) (*sensor.DataResult, error) {
+func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sensor.DataResult, error) {
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT
 		id,
@@ -185,14 +180,14 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return c.stationsMeta(ctx, qp.Stations)
 	}
 
-	dq := NewDataQuerier(c.db)
+	dq := backend.NewDataQuerier(c.db)
 
 	summaries, selectedAggregateName, err := dq.SelectAggregate(ctx, qp)
 	if err != nil {
 		return nil, err
 	}
 
-	aqp, err := NewAggregateQueryParams(qp, selectedAggregateName, summaries[selectedAggregateName])
+	aqp, err := backend.NewAggregateQueryParams(qp, selectedAggregateName, summaries[selectedAggregateName])
 	if err != nil {
 		return nil, err
 	}
@@ -219,9 +214,9 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	}
 
 	data := struct {
-		Summaries map[string]*AggregateSummary `json:"summaries"`
-		Aggregate AggregateInfo                `json:"aggregate"`
-		Data      interface{}                  `json:"data"`
+		Summaries map[string]*backend.AggregateSummary `json:"summaries"`
+		Aggregate AggregateInfo                        `json:"aggregate"`
+		Data      interface{}                          `json:"data"`
 	}{
 		summaries,
 		AggregateInfo{

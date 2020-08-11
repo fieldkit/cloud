@@ -1,4 +1,4 @@
-package api
+package backend
 
 import (
 	"context"
@@ -13,7 +13,14 @@ import (
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/handlers"
+	"github.com/fieldkit/cloud/server/data"
 )
+
+type AggregateSummary struct {
+	NumberRecords int64                 `db:"number_records" json:"numberRecords"`
+	Start         *data.NumericWireTime `db:"start" json:"start"`
+	End           *data.NumericWireTime `db:"end" json:"end"`
+}
 
 type RawQueryParams struct {
 	Start      *int64  `json:"start"`
