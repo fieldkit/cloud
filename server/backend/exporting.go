@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"sync"
 
 	"github.com/conservify/sqlxcache"
 
@@ -29,7 +31,7 @@ func NewExportCsvHandler(db *sqlxcache.DB, files files.FileArchive, metrics *log
 }
 
 func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) error {
-	log := Logger(ctx).Sugar().With("data_export_id", m.ID).With("user_id", m.UserID)
+	log := Logger(ctx).Sugar().Named("exporting").With("data_export_id", m.ID).With("user_id", m.UserID)
 
 	log.Infow("processing")
 
@@ -72,14 +74,48 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 
 	defer queried.Close()
 
+	reader, writer := io.Pipe()
+
+	var wg sync.WaitGroup
+	var archiveError error
+
+	wg.Add(1)
+
+	go func() {
+		log.Infow("archiver:ready")
+
+		metadata := make(map[string]string)
+		contentType := "text/csv"
+		af, err := h.files.Archive(ctx, contentType, metadata, reader)
+		if err != nil {
+			log.Errorw("archiver:error", "error", err)
+			archiveError = err
+		} else {
+			log.Infow("archiver:done", "key", af.Key)
+		}
+
+		wg.Done()
+	}()
+
 	for queried.Next() {
 		row := &DataRow{}
 		if err = queried.StructScan(row); err != nil {
 			return err
 		}
+		fmt.Fprintf(writer, "%v\n", row)
 	}
 
-	log.Infow("exporting:done")
+	writer.Close()
+
+	log.Infow("waiting")
+
+	wg.Wait()
+
+	log.Infow("done")
+
+	if archiveError != nil {
+		return archiveError
+	}
 
 	return nil
 }
