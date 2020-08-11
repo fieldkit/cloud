@@ -56,7 +56,7 @@ func ingestionReceived(ctx context.Context, j *que.Job, services *BackgroundServ
 		return err
 	}
 	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := NewIngestionReceivedHandler(services.database, services.ingestionFiles, services.metrics, publisher)
+	handler := NewIngestionReceivedHandler(services.database, services.fileArchives.Ingestion, services.metrics, publisher)
 	return handler.Handle(ctx, message)
 }
 
@@ -74,7 +74,7 @@ func exportCsv(ctx context.Context, j *que.Job, services *BackgroundServices, tm
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
-	handler := NewExportCsvHandler(services.database, services.ingestionFiles, services.metrics)
+	handler := NewExportCsvHandler(services.database, services.fileArchives.Exported, services.metrics)
 	return handler.Handle(ctx, message)
 }
 
@@ -87,18 +87,24 @@ func CreateMap(services *BackgroundServices) que.WorkMap {
 	}
 }
 
-type BackgroundServices struct {
-	database       *sqlxcache.DB
-	ingestionFiles files.FileArchive
-	metrics        *logging.Metrics
-	que            *que.Client
+type FileArchives struct {
+	Ingestion files.FileArchive
+	Media     files.FileArchive
+	Exported  files.FileArchive
 }
 
-func NewBackgroundServices(database *sqlxcache.DB, metrics *logging.Metrics, ingestionFiles files.FileArchive, que *que.Client) *BackgroundServices {
+type BackgroundServices struct {
+	database     *sqlxcache.DB
+	metrics      *logging.Metrics
+	fileArchives *FileArchives
+	que          *que.Client
+}
+
+func NewBackgroundServices(database *sqlxcache.DB, metrics *logging.Metrics, fileArchives *FileArchives, que *que.Client) *BackgroundServices {
 	return &BackgroundServices{
-		database:       database,
-		ingestionFiles: ingestionFiles,
-		metrics:        metrics,
-		que:            que,
+		database:     database,
+		fileArchives: fileArchives,
+		metrics:      metrics,
+		que:          que,
 	}
 }

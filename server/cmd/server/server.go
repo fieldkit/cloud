@@ -158,12 +158,17 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		return nil, err
 	}
 
-	ingestionFiles, err := createFileArchive(ctx, config.Archiver, config.StreamsBucketName, awsSession, metrics)
+	ingestionFiles, err := createFileArchive(ctx, config.Archiver, config.StreamsBucketName, awsSession, metrics, files.NoPrefix)
 	if err != nil {
 		return nil, err
 	}
 
-	mediaFiles, err := createFileArchive(ctx, config.Archiver, config.MediaBucketName, awsSession, metrics)
+	mediaFiles, err := createFileArchive(ctx, config.Archiver, config.MediaBucketName, awsSession, metrics, files.NoPrefix)
+	if err != nil {
+		return nil, err
+	}
+
+	exportedFiles, err := createFileArchive(ctx, config.Archiver, config.MediaBucketName, awsSession, metrics, "exported/")
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +188,11 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 
 	qc := que.NewClient(pgxpool)
 	publisher := jobs.NewQueMessagePublisher(metrics, qc)
-	workMap := backend.CreateMap(backend.NewBackgroundServices(database, metrics, ingestionFiles, qc))
+	workMap := backend.CreateMap(backend.NewBackgroundServices(database, metrics, &backend.FileArchives{
+		Ingestion: ingestionFiles,
+		Media:     mediaFiles,
+		Exported:  exportedFiles,
+	}, qc))
 	workers := que.NewWorkerPool(qc, workMap, 2)
 
 	go workers.Start()
@@ -339,7 +348,7 @@ func main() {
 	}
 }
 
-func createFileArchive(ctx context.Context, archiver, bucketName string, awsSession *session.Session, metrics *logging.Metrics) (files.FileArchive, error) {
+func createFileArchive(ctx context.Context, archiver, bucketName string, awsSession *session.Session, metrics *logging.Metrics, prefix string) (files.FileArchive, error) {
 	log := logging.Logger(ctx).Sugar()
 
 	reading := make([]files.FileArchive, 0)
@@ -348,7 +357,7 @@ func createFileArchive(ctx context.Context, archiver, bucketName string, awsSess
 	switch archiver {
 	case "default":
 		if bucketName != "" {
-			s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, files.NoPrefix)
+			s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, prefix)
 			if err != nil {
 				return nil, err
 			}
@@ -360,7 +369,7 @@ func createFileArchive(ctx context.Context, archiver, bucketName string, awsSess
 		writing = append(writing, fs)
 		break
 	case "aws":
-		s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, files.NoPrefix)
+		s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, prefix)
 		if err != nil {
 			return nil, err
 		}
