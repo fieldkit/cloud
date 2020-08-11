@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -58,7 +59,8 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 	aggregateName := "1m"
 	qp.Aggregate = aggregateName
 
-	log.Infow("query_parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate, "complete", qp.Complete)
+	log.Infow("query_parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations,
+		"resolution", qp.Resolution, "aggregate", qp.Aggregate, "complete", qp.Complete)
 
 	aqp, err := NewAggregateQueryParams(qp, aggregateName, nil)
 	if err != nil {
@@ -74,8 +76,12 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 
 	defer queried.Close()
 
-	reader, writer := io.Pipe()
+	// One end we write to and the reading ends ends up in S3.
+	pipeReader, pipeWriter := io.Pipe()
 
+	// Spawn a go routine that will read the other end of the pip and
+	// archive the file to S3. We also wait on this goroutine to
+	// finish, and then propagate any error upwards.
 	var wg sync.WaitGroup
 	var archiveError error
 
@@ -86,7 +92,7 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 
 		metadata := make(map[string]string)
 		contentType := "text/csv"
-		af, err := h.files.Archive(ctx, contentType, metadata, reader)
+		af, err := h.files.Archive(ctx, contentType, metadata, pipeReader)
 		if err != nil {
 			log.Errorw("archiver:error", "error", err)
 			archiveError = err
@@ -97,15 +103,18 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 		wg.Done()
 	}()
 
+	// Walk the rows and dump their CSV representation.
+	writer := csv.NewWriter(pipeWriter)
+
 	for queried.Next() {
 		row := &DataRow{}
 		if err = queried.StructScan(row); err != nil {
 			return err
 		}
-		fmt.Fprintf(writer, "%v\n", row)
+		writer.Write(makeRow(row))
 	}
 
-	writer.Close()
+	pipeWriter.Close()
 
 	log.Infow("waiting")
 
@@ -118,6 +127,28 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 	}
 
 	return nil
+}
+
+func makeRow(row *DataRow) []string {
+	cols := make([]string, 7)
+	cols[0] = fmt.Sprintf("%v", row.Time.Time().Unix()*1000)
+	if row.StationID != nil {
+		cols[1] = fmt.Sprintf("%v", *row.StationID)
+	}
+	if row.SensorID != nil {
+		cols[2] = fmt.Sprintf("%v", *row.SensorID)
+	}
+	if row.Location != nil {
+		cols[3] = fmt.Sprintf("%v", row.Location.Latitude())
+		cols[4] = fmt.Sprintf("%v", row.Location.Longitude())
+	}
+	if row.Value != nil {
+		cols[5] = fmt.Sprintf("%v", *row.Value)
+	}
+	if row.TimeGroup != nil {
+		cols[6] = fmt.Sprintf("%v", *row.TimeGroup)
+	}
+	return cols
 }
 
 type DataRow struct {
