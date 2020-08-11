@@ -16,21 +16,27 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 )
 
+const (
+	NoPrefix = ""
+)
+
 type S3FileArchive struct {
-	session    *session.Session
-	metrics    *logging.Metrics
-	bucketName string
+	session *session.Session
+	metrics *logging.Metrics
+	bucket  string
+	prefix  string
 }
 
-func NewS3FileArchive(session *session.Session, metrics *logging.Metrics, bucketName string) (files *S3FileArchive, err error) {
-	if bucketName == "" {
+func NewS3FileArchive(session *session.Session, metrics *logging.Metrics, bucket string, prefix string) (files *S3FileArchive, err error) {
+	if bucket == "" {
 		return nil, fmt.Errorf("bucket name is required")
 	}
 
 	files = &S3FileArchive{
-		session:    session,
-		metrics:    metrics,
-		bucketName: bucketName,
+		session: session,
+		metrics: metrics,
+		bucket:  bucket,
+		prefix:  prefix,
 	}
 
 	return
@@ -42,6 +48,11 @@ func (a *S3FileArchive) String() string {
 
 func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta map[string]string, reader io.Reader) (*ArchivedFile, error) {
 	id := uuid.Must(uuid.NewRandom())
+
+	key := id.String()
+	if a.prefix != NoPrefix {
+		key = a.prefix + id.String()
+	}
 
 	log := Logger(ctx).Sugar()
 
@@ -61,8 +72,8 @@ func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta ma
 	r, err := uploader.Upload(&s3manager.UploadInput{
 		ACL:         nil,
 		ContentType: aws.String(contentType),
-		Bucket:      aws.String(a.bucketName),
-		Key:         aws.String(id.String()),
+		Bucket:      aws.String(a.bucket),
+		Key:         aws.String(key),
 		Body:        cr,
 		Metadata:    metadata,
 		Tagging:     nil,
@@ -71,10 +82,10 @@ func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta ma
 		return nil, err
 	}
 
-	log.Infow("saved", "url", r.Location, "bytes_read", cr.bytesRead)
+	log.Infow("saved", "url", r.Location, "bytes_read", cr.bytesRead, "key", key)
 
 	ss := &ArchivedFile{
-		Key:       id.String(),
+		Key:       key,
 		URL:       r.Location,
 		BytesRead: cr.bytesRead,
 	}
@@ -83,7 +94,7 @@ func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta ma
 }
 
 func (a *S3FileArchive) OpenByKey(ctx context.Context, key string) (of *OpenedFile, err error) {
-	return a.open(ctx, a.bucketName, key)
+	return a.open(ctx, a.bucket, key)
 }
 
 func (a *S3FileArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFile, err error) {
@@ -102,13 +113,13 @@ func (a *S3FileArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFi
 func (a *S3FileArchive) DeleteByKey(ctx context.Context, key string) (err error) {
 	svc := s3.New(a.session)
 
-	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(a.bucketName), Key: aws.String(key)})
+	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(a.bucket), Key: aws.String(key)})
 	if err != nil {
-		return fmt.Errorf("unable to delete object %q from bucket %q, %v", key, a.bucketName, err)
+		return fmt.Errorf("unable to delete object %q from bucket %q, %v", key, a.bucket, err)
 	}
 
 	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
-		Bucket: aws.String(a.bucketName),
+		Bucket: aws.String(a.bucket),
 		Key:    aws.String(key),
 	})
 
@@ -166,7 +177,7 @@ func (a *S3FileArchive) open(ctx context.Context, bucket, key string) (of *Opene
 
 func (a *S3FileArchive) Info(ctx context.Context, key string) (info *FileInfo, err error) {
 	hoi := &s3.HeadObjectInput{
-		Bucket: aws.String(a.bucketName),
+		Bucket: aws.String(a.bucket),
 		Key:    aws.String(key),
 	}
 
