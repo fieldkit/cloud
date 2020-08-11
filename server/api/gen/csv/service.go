@@ -9,6 +9,7 @@ package csv
 
 import (
 	"context"
+	"io"
 
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
@@ -19,7 +20,7 @@ type Service interface {
 	// Export implements export.
 	Export(context.Context, *ExportPayload) (res *ExportResult, err error)
 	// Download implements download.
-	Download(context.Context, *DownloadPayload) (res *DownloadResult, err error)
+	Download(context.Context, *DownloadPayload) (res *DownloadResult, body io.ReadCloser, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -64,7 +65,8 @@ type DownloadPayload struct {
 
 // DownloadResult is the result type of the csv service download method.
 type DownloadResult struct {
-	Object interface{}
+	Length      int64
+	ContentType string
 }
 
 // MakeUnauthorized builds a goa.ServiceError from an error.

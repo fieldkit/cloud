@@ -9,6 +9,7 @@ package csv
 
 import (
 	"context"
+	"io"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -41,11 +42,12 @@ func (c *Client) Export(ctx context.Context, p *ExportPayload) (res *ExportResul
 // Download may return the following errors:
 //	- "busy" (type *goa.ServiceError)
 //	- error: internal error
-func (c *Client) Download(ctx context.Context, p *DownloadPayload) (res *DownloadResult, err error) {
+func (c *Client) Download(ctx context.Context, p *DownloadPayload) (res *DownloadResult, resp io.ReadCloser, err error) {
 	var ires interface{}
 	ires, err = c.DownloadEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*DownloadResult), nil
+	o := ires.(*DownloadResponseData)
+	return o.Result, o.Body, nil
 }

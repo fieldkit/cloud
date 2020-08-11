@@ -196,10 +196,12 @@ func EncodeExportError(encoder func(context.Context, http.ResponseWriter) goahtt
 func EncodeDownloadResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res := v.(*csv.DownloadResult)
-		enc := encoder(ctx, w)
-		body := res.Object
+		val := res.Length
+		lengths := strconv.FormatInt(val, 10)
+		w.Header().Set("Content-Length", lengths)
+		w.Header().Set("Content-Type", res.ContentType)
 		w.WriteHeader(http.StatusOK)
-		return enc.Encode(body)
+		return nil
 	}
 }
 

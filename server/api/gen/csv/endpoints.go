@@ -9,6 +9,7 @@ package csv
 
 import (
 	"context"
+	"io"
 
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
@@ -18,6 +19,15 @@ import (
 type Endpoints struct {
 	Export   goa.Endpoint
 	Download goa.Endpoint
+}
+
+// DownloadResponseData holds both the result and the HTTP response body reader
+// of the "download" method.
+type DownloadResponseData struct {
+	// Result is the method result.
+	Result *DownloadResult
+	// Body streams the HTTP response body.
+	Body io.ReadCloser
 }
 
 // NewEndpoints wraps the methods of the "csv" service with endpoints.
@@ -70,6 +80,10 @@ func NewDownloadEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint
 		if err != nil {
 			return nil, err
 		}
-		return s.Download(ctx, p)
+		res, body, err := s.Download(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		return &DownloadResponseData{Result: res, Body: body}, nil
 	}
 }

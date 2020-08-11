@@ -242,13 +242,12 @@ func NewExportBadRequest(body *ExportBadRequestResponseBody) *goa.ServiceError {
 
 // NewDownloadResultOK builds a "csv" service "download" endpoint result from a
 // HTTP "OK" response.
-func NewDownloadResultOK(body interface{}) *csv.DownloadResult {
-	v := body
-	res := &csv.DownloadResult{
-		Object: v,
-	}
+func NewDownloadResultOK(length int64, contentType string) *csv.DownloadResult {
+	v := &csv.DownloadResult{}
+	v.Length = length
+	v.ContentType = contentType
 
-	return res
+	return v
 }
 
 // NewDownloadBusy builds a csv service download endpoint busy error.

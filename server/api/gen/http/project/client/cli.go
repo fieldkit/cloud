@@ -23,7 +23,7 @@ func BuildAddUpdatePayload(projectAddUpdateBody string, projectAddUpdateProjectI
 	{
 		err = json.Unmarshal([]byte(projectAddUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Corrupti maxime distinctio tempore occaecati.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Laborum nobis quia.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -88,7 +88,7 @@ func BuildModifyUpdatePayload(projectModifyUpdateBody string, projectModifyUpdat
 	{
 		err = json.Unmarshal([]byte(projectModifyUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Quo fuga.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Sint porro.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -266,7 +266,7 @@ func BuildAddPayload(projectAddBody string, projectAddAuth string) (*project.Add
 	{
 		err = json.Unmarshal([]byte(projectAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Eum dolorum cumque quaerat fuga quia ipsum.\",\n      \"meta\": \"Et fugiat.\",\n      \"module\": \"Unde eos quis saepe vel soluta.\",\n      \"profile\": \"Quia iure enim quia magni debitis voluptatem.\",\n      \"url\": \"Nesciunt aperiam et velit dignissimos.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Similique laudantium eveniet voluptatibus tempora eum dolorum.\",\n      \"meta\": \"Quia magni debitis.\",\n      \"module\": \"Quaerat fuga.\",\n      \"profile\": \"Ipsum sunt unde eos quis saepe vel.\",\n      \"url\": \"Animi quia iure.\"\n   }'")
 		}
 	}
 	var auth string
@@ -299,7 +299,7 @@ func BuildUpdatePayload(projectUpdateBody string, projectUpdateProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Sunt qui sit.\",\n      \"endTime\": \"Repellat neque eum voluptatem rem.\",\n      \"goal\": \"Cum eius reprehenderit.\",\n      \"location\": \"Eos sint officia dicta necessitatibus.\",\n      \"name\": \"Consequatur consectetur eveniet animi impedit laborum.\",\n      \"privacy\": 444784787,\n      \"startTime\": \"Non vitae non a quia alias.\",\n      \"tags\": \"Quod sit voluptatem consequatur reprehenderit voluptas et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Voluptate dolorem ratione quo dignissimos ut blanditiis.\",\n      \"endTime\": \"Architecto est voluptatibus.\",\n      \"goal\": \"In dolores aut similique voluptas culpa.\",\n      \"location\": \"Id quod laborum dolores ullam ipsum.\",\n      \"name\": \"Non quidem harum adipisci quas labore aut.\",\n      \"privacy\": 1096380436,\n      \"startTime\": \"Eos maiores consequatur.\",\n      \"tags\": \"Eaque ut.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -396,7 +396,7 @@ func BuildInvitePayload(projectInviteBody string, projectInviteProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectInviteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Consequatur quasi officia facere ut placeat.\",\n      \"role\": 1324071430\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Numquam eum qui deserunt et repellat velit.\",\n      \"role\": 363594891\n   }'")
 		}
 	}
 	var projectID int32
@@ -433,7 +433,7 @@ func BuildRemoveUserPayload(projectRemoveUserBody string, projectRemoveUserProje
 	{
 		err = json.Unmarshal([]byte(projectRemoveUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Maxime quia ea recusandae voluptatem similique reiciendis.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Eos quod aut minima harum.\"\n   }'")
 		}
 	}
 	var projectID int32

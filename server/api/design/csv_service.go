@@ -65,7 +65,10 @@ var _ = Service("csv", func() {
 		})
 
 		Result(func() {
-			Attribute("object", Any)
+			Attribute("length", Int64)
+			Required("length")
+			Attribute("contentType", String)
+			Required("contentType")
 		})
 
 		Error("busy", func() {})
@@ -73,11 +76,14 @@ var _ = Service("csv", func() {
 		HTTP(func() {
 			GET("sensors/data/export/csv/{id}")
 
-			Response(StatusOK, func() {
-				Body("object")
+			Response(func() {
+				Header("length:Content-Length")
+				Header("contentType:Content-Type")
 			})
 
 			Response("busy", StatusNotFound)
+
+			SkipResponseBodyEncodeDecode()
 
 			httpAuthentication()
 		})

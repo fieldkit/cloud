@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	csv "github.com/fieldkit/cloud/server/api/gen/csv"
 	goahttp "goa.design/goa/v3/http"
@@ -241,20 +242,34 @@ func DecodeDownloadResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			defer func() {
 				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
 			}()
-		} else {
-			defer resp.Body.Close()
 		}
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body interface{}
-				err  error
+				length      int64
+				contentType string
+				err         error
 			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("csv", "download", err)
+			{
+				lengthRaw := resp.Header.Get("Content-Length")
+				if lengthRaw == "" {
+					return nil, goahttp.ErrValidationError("csv", "download", goa.MissingFieldError("Content-Length", "header"))
+				}
+				v, err2 := strconv.ParseInt(lengthRaw, 10, 64)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("length", lengthRaw, "integer"))
+				}
+				length = v
 			}
-			res := NewDownloadResultOK(body)
+			contentTypeRaw := resp.Header.Get("Content-Type")
+			if contentTypeRaw == "" {
+				err = goa.MergeErrors(err, goa.MissingFieldError("Content-Type", "header"))
+			}
+			contentType = contentTypeRaw
+			if err != nil {
+				return nil, goahttp.ErrValidationError("csv", "download", err)
+			}
+			res := NewDownloadResultOK(length, contentType)
 			return res, nil
 		case http.StatusNotFound:
 			en := resp.Header.Get("goa-error")

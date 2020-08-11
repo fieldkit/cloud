@@ -9,6 +9,7 @@ package server
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"regexp"
 
@@ -183,8 +184,16 @@ func NewDownloadHandler(
 			}
 			return
 		}
-		if err := encodeResponse(ctx, w, res); err != nil {
+		o := res.(*csv.DownloadResponseData)
+		defer o.Body.Close()
+		if err := encodeResponse(ctx, w, o.Result); err != nil {
 			errhandler(ctx, w, err)
+			return
+		}
+		if _, err := io.Copy(w, o.Body); err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
 		}
 	})
 }

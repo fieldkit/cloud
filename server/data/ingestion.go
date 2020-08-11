@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/jmoiron/sqlx/types"
 
 	"github.com/lib/pq"
@@ -238,6 +240,13 @@ func (d *MetaRecord) Unmarshal(r *pb.DataRecord) error {
 }
 
 func DecodeBinaryString(s string) ([]byte, error) {
+	if s[8] == '-' {
+		uid, err := uuid.Parse(s)
+		if err == nil {
+			return uid[:], nil
+		}
+	}
+
 	bytes, err := hex.DecodeString(s)
 	if err == nil {
 		return bytes, nil

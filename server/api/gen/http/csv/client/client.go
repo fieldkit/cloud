@@ -11,6 +11,7 @@ import (
 	"context"
 	"net/http"
 
+	csv "github.com/fieldkit/cloud/server/api/gen/csv"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -102,6 +103,11 @@ func (c *Client) Download() goa.Endpoint {
 		if err != nil {
 			return nil, goahttp.ErrRequestError("csv", "download", err)
 		}
-		return decodeResponse(resp)
+		res, err := decodeResponse(resp)
+		if err != nil {
+			resp.Body.Close()
+			return nil, goahttp.ErrDecodingError("csv", "download", err)
+		}
+		return &csv.DownloadResponseData{Result: res.(*csv.DownloadResult), Body: resp.Body}, nil
 	}
 }

@@ -118,8 +118,11 @@ func (c *CsvService) Download(ctx context.Context, payload *csvService.DownloadP
 	}
 
 	de, err := r.QueryByToken(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
 
-	if de.CompletedAt == nil {
+	if de.DownloadURL == nil {
 		return nil, csvService.MakeBusy(errors.New("busy"))
 	}
 
