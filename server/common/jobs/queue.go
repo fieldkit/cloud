@@ -10,11 +10,11 @@ type MessageHandler interface {
 }
 
 type TransportMessage struct {
-	Id      string
-	Package string
-	Type    string
-	Body    []byte
-	Trace   []string
+	Id      string   `json:"id"`
+	Package string   `json:"package"`
+	Type    string   `json:"type"`
+	Body    []byte   `json:"body"`
+	Trace   []string `json:"trace"`
 }
 
 type HandlerRegistration struct {

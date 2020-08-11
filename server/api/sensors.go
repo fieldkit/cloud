@@ -27,14 +27,14 @@ type QueryParams struct {
 }
 
 type RawQueryParams struct {
-	Start      *int64
-	End        *int64
-	Resolution *int32
-	Stations   *string
-	Sensors    *string
-	Aggregate  *string
-	Tail       *int32
-	Complete   *bool
+	Start      *int64  `json:"start"`
+	End        *int64  `json:"end"`
+	Resolution *int32  `json:"resolution"`
+	Stations   *string `json:"stations"`
+	Sensors    *string `json:"sensors"`
+	Aggregate  *string `json:"aggregate"`
+	Tail       *int32  `json:"tail"`
+	Complete   *bool   `json:"complete"`
 }
 
 func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
