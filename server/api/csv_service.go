@@ -2,15 +2,12 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
-	_ "strconv"
-	_ "strings"
-	_ "time"
+	"time"
 
-	_ "github.com/lib/pq"
-
-	_ "github.com/jmoiron/sqlx"
+	"github.com/google/uuid"
 
 	"github.com/conservify/sqlxcache"
 
@@ -18,9 +15,9 @@ import (
 
 	csvService "github.com/fieldkit/cloud/server/api/gen/csv"
 
-	_ "github.com/fieldkit/cloud/server/backend/handlers"
-	_ "github.com/fieldkit/cloud/server/backend/repositories"
-	_ "github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 func NewRawQueryParamsFromCsvExport(payload *csvService.ExportPayload) (*RawQueryParams, error) {
@@ -49,7 +46,12 @@ func NewCsvService(ctx context.Context, options *ControllerOptions) *CsvService 
 }
 
 func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPayload) (*csvService.ExportResult, error) {
-	log := Logger(ctx).Sugar()
+	// log := Logger(ctx).Sugar()
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
 
 	rawParams, err := NewRawQueryParamsFromCsvExport(payload)
 	if err != nil {
@@ -65,41 +67,58 @@ func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPaylo
 		return nil, errors.New("sensors is required")
 	}
 
-	log.Infow("query_parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate)
-
-	aggregateName := "1m"
-	aqp, err := NewAggregateQueryParams(qp, aggregateName, nil)
+	serializedArgs, err := json.Marshal(rawParams)
 	if err != nil {
 		return nil, err
 	}
 
-	dq := NewDataQuerier(c.db)
+	token := uuid.Must(uuid.NewRandom())
 
-	queried, err := dq.QueryAggregate(ctx, aqp)
+	r, err := repositories.NewExportRepository(c.options.Database)
 	if err != nil {
 		return nil, err
 	}
 
-	defer queried.Close()
-
-	for queried.Next() {
-		row := &DataRow{}
-		if err = queried.StructScan(row); err != nil {
-			return nil, err
-		}
+	de := data.DataExport{
+		Token:     token[:],
+		UserID:    p.UserID(),
+		CreatedAt: time.Now(),
+		Progress:  0,
+		Args:      serializedArgs,
 	}
+	if _, err := r.AddDataExport(ctx, &de); err != nil {
+		return nil, err
+	}
+
+	exportMessage := messages.ExportCsv{
+		ID:     de.ID,
+		UserID: p.UserID(),
+		Token:  token.String(),
+	}
+	if err := c.options.Publisher.Publish(ctx, &exportMessage); err != nil {
+		return nil, nil
+	}
+
+	url := fmt.Sprintf("/sensors/data/export/csv/%v", token.String())
 
 	return &csvService.ExportResult{
-		Location: fmt.Sprintf("/sensors/data/export/csv/%v", "1"),
+		Location: url,
 	}, nil
 }
 
 func (c *CsvService) Download(ctx context.Context, payload *csvService.DownloadPayload) (*csvService.DownloadResult, error) {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("download")
+	log.Infow("download", "token", payload.ID)
 
-	if true {
+	r, err := repositories.NewExportRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	de, err := r.QueryByToken(ctx, payload.ID)
+
+	if de.CompletedAt == nil {
 		return nil, csvService.MakeBusy(errors.New("busy"))
 	}
 

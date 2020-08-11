@@ -69,11 +69,22 @@ func refreshStation(ctx context.Context, j *que.Job, services *BackgroundService
 	return handler.Handle(ctx, message)
 }
 
+func exportCsv(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+	message := &messages.ExportCsv{}
+	if err := json.Unmarshal(tm.Body, message); err != nil {
+		return err
+	}
+	// handler := NewRefreshStationHandler(services.database)
+	// return handler.Handle(ctx, message)
+	return nil
+}
+
 func CreateMap(services *BackgroundServices) que.WorkMap {
 	return que.WorkMap{
 		"Example":           wrapContext(wrapTransportMessage(services, exampleJob)),
 		"IngestionReceived": wrapContext(wrapTransportMessage(services, ingestionReceived)),
 		"RefreshStation":    wrapContext(wrapTransportMessage(services, refreshStation)),
+		"ExportCsv":         wrapContext(wrapTransportMessage(services, exportCsv)),
 	}
 }
 

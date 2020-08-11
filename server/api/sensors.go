@@ -15,17 +15,6 @@ import (
 	"github.com/fieldkit/cloud/server/backend/handlers"
 )
 
-type QueryParams struct {
-	Start      time.Time `json:"start"`
-	End        time.Time `json:"end"`
-	Sensors    []int64   `json:"sensors"`
-	Stations   []int64   `json:"stations"`
-	Resolution int32     `json:"resolution"`
-	Aggregate  string    `json:"aggregate"`
-	Tail       int32     `json:"tail"`
-	Complete   bool      `json:"complete"`
-}
-
 type RawQueryParams struct {
 	Start      *int64  `json:"start"`
 	End        *int64  `json:"end"`
@@ -35,6 +24,17 @@ type RawQueryParams struct {
 	Aggregate  *string `json:"aggregate"`
 	Tail       *int32  `json:"tail"`
 	Complete   *bool   `json:"complete"`
+}
+
+type QueryParams struct {
+	Start      time.Time `json:"start"`
+	End        time.Time `json:"end"`
+	Sensors    []int64   `json:"sensors"`
+	Stations   []int64   `json:"stations"`
+	Resolution int32     `json:"resolution"`
+	Aggregate  string    `json:"aggregate"`
+	Tail       int32     `json:"tail"`
+	Complete   bool      `json:"complete"`
 }
 
 func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
