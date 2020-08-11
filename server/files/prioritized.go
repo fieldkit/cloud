@@ -2,6 +2,7 @@ package files
 
 import (
 	"context"
+	"errors"
 	"io"
 
 	"github.com/hashicorp/go-multierror"
@@ -24,39 +25,60 @@ func (a *prioritizedFilesArchive) String() string {
 }
 
 func (a *prioritizedFilesArchive) Archive(ctx context.Context, contentType string, meta map[string]string, reader io.Reader) (*ArchivedFile, error) {
-	var errors *multierror.Error
+	var errs *multierror.Error
 	for _, a := range a.writing {
 		file, err := a.Archive(ctx, contentType, meta, reader)
 		if err == nil {
 			return file, nil
 		}
-		errors = multierror.Append(err)
+		errs = multierror.Append(errs, err)
 	}
-	return nil, errors.ErrorOrNil()
+
+	err := errs.ErrorOrNil()
+
+	if err == nil {
+		return nil, errors.New("fatal file archive error")
+	}
+
+	return nil, err
 }
 
 func (a *prioritizedFilesArchive) OpenByKey(ctx context.Context, key string) (of *OpenedFile, err error) {
-	var errors *multierror.Error
+	var errs *multierror.Error
 	for _, a := range a.reading {
 		reader, err := a.OpenByKey(ctx, key)
 		if err == nil {
 			return reader, nil
 		}
-		errors = multierror.Append(err)
+		errs = multierror.Append(errs, err)
 	}
-	return nil, errors.ErrorOrNil()
+
+	err = errs.ErrorOrNil()
+
+	if err == nil {
+		return nil, errors.New("fatal file archive error")
+	}
+
+	return nil, err
 }
 
 func (a *prioritizedFilesArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFile, err error) {
-	var errors *multierror.Error
+	var errs *multierror.Error
 	for _, a := range a.reading {
 		reader, err := a.OpenByURL(ctx, url)
 		if err == nil {
 			return reader, nil
 		}
-		errors = multierror.Append(err)
+		errs = multierror.Append(errs, err)
 	}
-	return nil, errors.ErrorOrNil()
+
+	err = errs.ErrorOrNil()
+
+	if err == nil {
+		return nil, errors.New("fatal file archive error")
+	}
+
+	return nil, err
 }
 
 func (a *prioritizedFilesArchive) DeleteByKey(ctx context.Context, key string) error {
