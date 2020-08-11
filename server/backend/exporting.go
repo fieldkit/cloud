@@ -100,6 +100,12 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 			log.Infow("archiver:done", "key", af.Key)
 		}
 
+		de.DownloadURL = &af.URL
+
+		if _, err := r.UpdateDataExport(ctx, de); err != nil {
+			archiveError = err
+		}
+
 		wg.Done()
 	}()
 
@@ -113,6 +119,8 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 		}
 		writer.Write(makeRow(row))
 	}
+
+	writer.Flush()
 
 	pipeWriter.Close()
 

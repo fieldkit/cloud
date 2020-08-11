@@ -187,7 +187,7 @@ func NewCopierTool(ctx context.Context, o *options) (copier *CopierTool, err err
 
 	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{})
 
-	sourceFiles, err := files.NewS3FileArchive(session, metrics, "fk-streams")
+	sourceFiles, err := files.NewS3FileArchive(session, metrics, "fk-streams", files.NoPrefix)
 	if err != nil {
 		panic(err)
 	}
@@ -197,7 +197,7 @@ func NewCopierTool(ctx context.Context, o *options) (copier *CopierTool, err err
 		panic(err)
 	}
 
-	destinyFiles, err := files.NewS3FileArchive(session, metrics, "fkprod-streams")
+	destinyFiles, err := files.NewS3FileArchive(session, metrics, "fkprod-streams", files.NoPrefix)
 	if err != nil {
 		panic(err)
 	}

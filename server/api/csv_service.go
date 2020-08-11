@@ -2,9 +2,9 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/google/uuid"
@@ -47,19 +47,19 @@ func NewCsvService(ctx context.Context, options *ControllerOptions) *CsvService 
 }
 
 func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPayload) (*csvService.ExportResult, error) {
-	// log := Logger(ctx).Sugar()
-
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
 		return nil, err
 	}
 
-	rawParams, err := NewRawQueryParamsFromCsvExport(payload)
+	args, err := NewRawQueryParamsFromCsvExport(payload)
 	if err != nil {
 		return nil, err
 	}
 
-	qp, err := rawParams.BuildQueryParams()
+	// We do some quick validation on the parameters before we
+	// continue, just to avoid unnecessary work.
+	qp, err := args.BuildQueryParams()
 	if err != nil {
 		return nil, csvService.MakeBadRequest(err)
 	}
@@ -68,26 +68,19 @@ func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPaylo
 		return nil, errors.New("sensors is required")
 	}
 
-	serializedArgs, err := json.Marshal(rawParams)
-	if err != nil {
-		return nil, err
-	}
-
-	token := uuid.Must(uuid.NewRandom())
-
 	r, err := repositories.NewExportRepository(c.options.Database)
 	if err != nil {
 		return nil, err
 	}
 
+	token := uuid.Must(uuid.NewRandom())
 	de := data.DataExport{
 		Token:     token[:],
 		UserID:    p.UserID(),
 		CreatedAt: time.Now(),
 		Progress:  0,
-		Args:      serializedArgs,
 	}
-	if _, err := r.AddDataExport(ctx, &de); err != nil {
+	if _, err := r.AddDataExportWithArgs(ctx, &de, args); err != nil {
 		return nil, err
 	}
 
@@ -107,28 +100,43 @@ func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPaylo
 	}, nil
 }
 
-func (c *CsvService) Download(ctx context.Context, payload *csvService.DownloadPayload) (*csvService.DownloadResult, error) {
+func (c *CsvService) Download(ctx context.Context, payload *csvService.DownloadPayload) (*csvService.DownloadResult, io.ReadCloser, error) {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("download", "token", payload.ID)
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	log.Infow("download", "token", payload.ID, "user_id", p.UserID())
 
 	r, err := repositories.NewExportRepository(c.options.Database)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	de, err := r.QueryByToken(ctx, payload.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+
+	if p.UserID() != de.UserID {
+		return nil, nil, csvService.MakeForbidden(errors.New("forbidden"))
 	}
 
 	if de.DownloadURL == nil {
-		return nil, csvService.MakeBusy(errors.New("busy"))
+		return nil, nil, csvService.MakeBusy(errors.New("busy"))
+	}
+
+	opened, err := c.options.MediaFiles.OpenByURL(ctx, *de.DownloadURL)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	return &csvService.DownloadResult{
-		Object: nil,
-	}, nil
+		Length:      opened.Size,
+		ContentType: opened.ContentType,
+	}, opened.Body, nil
 }
 
 func (s *CsvService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/conservify/sqlxcache"
@@ -20,7 +21,7 @@ func NewExportRepository(db *sqlxcache.DB) (*ExportRepository, error) {
 func (r *ExportRepository) QueryByID(ctx context.Context, id int64) (i *data.DataExport, err error) {
 	found := []*data.DataExport{}
 	if err := r.db.SelectContext(ctx, &found, `
-		SELECT id, token, user_id, created_at, completed_at, progress, args
+		SELECT id, token, user_id, created_at, completed_at, download_url, progress, args
 		FROM fieldkit.data_export
 		WHERE id = $1
 		`, id); err != nil {
@@ -41,7 +42,7 @@ func (r *ExportRepository) QueryByToken(ctx context.Context, token string) (i *d
 
 	found := []*data.DataExport{}
 	if err := r.db.SelectContext(ctx, &found, `
-		SELECT id, token, user_id, created_at, completed_at, progress, args
+		SELECT id, token, user_id, created_at, completed_at, download_url, progress, args
 		FROM fieldkit.data_export
 		WHERE token = $1
 		`, tokenBytes); err != nil {
@@ -56,8 +57,26 @@ func (r *ExportRepository) QueryByToken(ctx context.Context, token string) (i *d
 
 func (r *ExportRepository) AddDataExport(ctx context.Context, de *data.DataExport) (i *data.DataExport, err error) {
 	if err := r.db.NamedGetContext(ctx, de, `
-		INSERT INTO fieldkit.data_export (token, user_id, created_at, completed_at, progress, args)
-		VALUES (:token, :user_id, :created_at, :completed_at, :progress, :args)
+		INSERT INTO fieldkit.data_export (token, user_id, created_at, completed_at, download_url, progress, args)
+		VALUES (:token, :user_id, :created_at, :completed_at, :download_url, :progress, :args)
+		RETURNING *
+		`, de); err != nil {
+		return nil, fmt.Errorf("error inserting export: %v", err)
+	}
+	return de, nil
+}
+
+func (r *ExportRepository) AddDataExportWithArgs(ctx context.Context, de *data.DataExport, args interface{}) (i *data.DataExport, err error) {
+	serializedArgs, err := json.Marshal(args)
+	if err != nil {
+		return nil, err
+	}
+
+	de.Args = serializedArgs
+
+	if err := r.db.NamedGetContext(ctx, de, `
+		INSERT INTO fieldkit.data_export (token, user_id, created_at, completed_at, download_url, progress, args)
+		VALUES (:token, :user_id, :created_at, :completed_at, :download_url, :progress, :args)
 		RETURNING *
 		`, de); err != nil {
 		return nil, fmt.Errorf("error inserting export: %v", err)
@@ -67,7 +86,7 @@ func (r *ExportRepository) AddDataExport(ctx context.Context, de *data.DataExpor
 
 func (r *ExportRepository) UpdateDataExport(ctx context.Context, de *data.DataExport) (i *data.DataExport, err error) {
 	if err := r.db.NamedGetContext(ctx, de, `
-		UPDATE fieldkit.data_export SET progress = :progress, completed_at = :completed_at WHERE id = :id
+		UPDATE fieldkit.data_export SET progress = :progress, completed_at = :completed_at, download_url = :download_url WHERE id = :id RETURNING *
 		`, de); err != nil {
 		return nil, fmt.Errorf("error updating export: %v", err)
 	}
