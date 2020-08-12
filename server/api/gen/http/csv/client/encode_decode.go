@@ -25,7 +25,7 @@ import (
 // set to call the "csv" service "export" endpoint
 func (c *Client) BuildExportRequest(ctx context.Context, v interface{}) (*http.Request, error) {
 	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ExportCsvPath()}
-	req, err := http.NewRequest("GET", u.String(), nil)
+	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("csv", "export", u.String(), err)
 	}

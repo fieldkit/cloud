@@ -29,7 +29,7 @@ var _ = Service("csv", func() {
 		})
 
 		HTTP(func() {
-			GET("sensors/data/export/csv")
+			POST("sensors/data/export/csv")
 
 			Params(func() {
 				Param("start")

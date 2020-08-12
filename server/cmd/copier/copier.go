@@ -163,10 +163,9 @@ func (c *CopierTool) copyIngestion(ctx context.Context, id int64, force bool) (e
 		}
 
 		if err := c.Destiny.Database.NamedGetContext(ctx, newIngestion, `
-					INSERT INTO fieldkit.ingestion
-					(time, upload_id, user_id, device_id, generation, type, size, url, blocks, flags) VALUES
-					(NOW(), :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
-					RETURNING *`, newIngestion); err != nil {
+			INSERT INTO fieldkit.ingestion (time, upload_id, user_id, device_id, generation, type, size, url, blocks, flags)
+			VALUES (NOW(), :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
+			RETURNING *`, newIngestion); err != nil {
 			return err
 		}
 	}

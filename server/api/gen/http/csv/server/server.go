@@ -60,7 +60,7 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"Export", "GET", "/sensors/data/export/csv"},
+			{"Export", "POST", "/sensors/data/export/csv"},
 			{"Download", "GET", "/sensors/data/export/csv/{id}"},
 			{"CORS", "OPTIONS", "/sensors/data/export/csv"},
 			{"CORS", "OPTIONS", "/sensors/data/export/csv/{id}"},
@@ -97,7 +97,7 @@ func MountExportHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/sensors/data/export/csv", f)
+	mux.Handle("POST", "/sensors/data/export/csv", f)
 }
 
 // NewExportHandler creates a HTTP handler which loads the HTTP request and
