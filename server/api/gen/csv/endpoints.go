@@ -9,7 +9,6 @@ package csv
 
 import (
 	"context"
-	"io"
 
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
@@ -17,19 +16,7 @@ import (
 
 // Endpoints wraps the "csv" service endpoints.
 type Endpoints struct {
-	Export   goa.Endpoint
-	ListMine goa.Endpoint
-	Status   goa.Endpoint
-	Download goa.Endpoint
-}
-
-// DownloadResponseData holds both the result and the HTTP response body reader
-// of the "download" method.
-type DownloadResponseData struct {
-	// Result is the method result.
-	Result *DownloadResult
-	// Body streams the HTTP response body.
-	Body io.ReadCloser
+	Export goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "csv" service with endpoints.
@@ -37,19 +24,13 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Export:   NewExportEndpoint(s, a.JWTAuth),
-		ListMine: NewListMineEndpoint(s, a.JWTAuth),
-		Status:   NewStatusEndpoint(s, a.JWTAuth),
-		Download: NewDownloadEndpoint(s, a.JWTAuth),
+		Export: NewExportEndpoint(s, a.JWTAuth),
 	}
 }
 
 // Use applies the given middleware to all the "csv" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Export = m(e.Export)
-	e.ListMine = m(e.ListMine)
-	e.Status = m(e.Status)
-	e.Download = m(e.Download)
 }
 
 // NewExportEndpoint returns an endpoint function that calls the method
@@ -68,76 +49,5 @@ func NewExportEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 			return nil, err
 		}
 		return s.Export(ctx, p)
-	}
-}
-
-// NewListMineEndpoint returns an endpoint function that calls the method "list
-// mine" of service "csv".
-func NewListMineEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
-	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*ListMinePayload)
-		var err error
-		sc := security.JWTScheme{
-			Name:           "jwt",
-			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
-		}
-		ctx, err = authJWTFn(ctx, p.Auth, &sc)
-		if err != nil {
-			return nil, err
-		}
-		res, err := s.ListMine(ctx, p)
-		if err != nil {
-			return nil, err
-		}
-		vres := NewViewedUserExports(res, "default")
-		return vres, nil
-	}
-}
-
-// NewStatusEndpoint returns an endpoint function that calls the method
-// "status" of service "csv".
-func NewStatusEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
-	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*StatusPayload)
-		var err error
-		sc := security.JWTScheme{
-			Name:           "jwt",
-			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
-		}
-		ctx, err = authJWTFn(ctx, p.Auth, &sc)
-		if err != nil {
-			return nil, err
-		}
-		res, err := s.Status(ctx, p)
-		if err != nil {
-			return nil, err
-		}
-		vres := NewViewedExportStatus(res, "default")
-		return vres, nil
-	}
-}
-
-// NewDownloadEndpoint returns an endpoint function that calls the method
-// "download" of service "csv".
-func NewDownloadEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
-	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*DownloadPayload)
-		var err error
-		sc := security.JWTScheme{
-			Name:           "jwt",
-			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
-		}
-		ctx, err = authJWTFn(ctx, p.Auth, &sc)
-		if err != nil {
-			return nil, err
-		}
-		res, body, err := s.Download(ctx, p)
-		if err != nil {
-			return nil, err
-		}
-		return &DownloadResponseData{Result: res, Body: body}, nil
 	}
 }

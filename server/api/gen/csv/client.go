@@ -9,26 +9,19 @@ package csv
 
 import (
 	"context"
-	"io"
 
 	goa "goa.design/goa/v3/pkg"
 )
 
 // Client is the "csv" service client.
 type Client struct {
-	ExportEndpoint   goa.Endpoint
-	ListMineEndpoint goa.Endpoint
-	StatusEndpoint   goa.Endpoint
-	DownloadEndpoint goa.Endpoint
+	ExportEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "csv" service client given the endpoints.
-func NewClient(export, listMine, status, download goa.Endpoint) *Client {
+func NewClient(export goa.Endpoint) *Client {
 	return &Client{
-		ExportEndpoint:   export,
-		ListMineEndpoint: listMine,
-		StatusEndpoint:   status,
-		DownloadEndpoint: download,
+		ExportEndpoint: export,
 	}
 }
 
@@ -40,35 +33,4 @@ func (c *Client) Export(ctx context.Context, p *ExportPayload) (res *ExportResul
 		return
 	}
 	return ires.(*ExportResult), nil
-}
-
-// ListMine calls the "list mine" endpoint of the "csv" service.
-func (c *Client) ListMine(ctx context.Context, p *ListMinePayload) (res *UserExports, err error) {
-	var ires interface{}
-	ires, err = c.ListMineEndpoint(ctx, p)
-	if err != nil {
-		return
-	}
-	return ires.(*UserExports), nil
-}
-
-// Status calls the "status" endpoint of the "csv" service.
-func (c *Client) Status(ctx context.Context, p *StatusPayload) (res *ExportStatus, err error) {
-	var ires interface{}
-	ires, err = c.StatusEndpoint(ctx, p)
-	if err != nil {
-		return
-	}
-	return ires.(*ExportStatus), nil
-}
-
-// Download calls the "download" endpoint of the "csv" service.
-func (c *Client) Download(ctx context.Context, p *DownloadPayload) (res *DownloadResult, resp io.ReadCloser, err error) {
-	var ires interface{}
-	ires, err = c.DownloadEndpoint(ctx, p)
-	if err != nil {
-		return
-	}
-	o := ires.(*DownloadResponseData)
-	return o.Result, o.Body, nil
 }

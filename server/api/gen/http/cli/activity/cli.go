@@ -16,6 +16,7 @@ import (
 	activityc "github.com/fieldkit/cloud/server/api/gen/http/activity/client"
 	csvc "github.com/fieldkit/cloud/server/api/gen/http/csv/client"
 	datac "github.com/fieldkit/cloud/server/api/gen/http/data/client"
+	exportc "github.com/fieldkit/cloud/server/api/gen/http/export/client"
 	firmwarec "github.com/fieldkit/cloud/server/api/gen/http/firmware/client"
 	followingc "github.com/fieldkit/cloud/server/api/gen/http/following/client"
 	informationc "github.com/fieldkit/cloud/server/api/gen/http/information/client"
@@ -39,8 +40,9 @@ import (
 //
 func UsageCommands() string {
 	return `activity (station|project)
-csv (export|list- mine|status|download)
+csv export
 data device- summary
+export (list- mine|status|download)
 firmware (download|add|list|delete)
 following (follow|unfollow|followers)
 ingestion (process- pending|process- station|process- ingestion|delete)
@@ -61,9 +63,9 @@ user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery
 func UsageExamples() string {
 	return os.Args[0] + ` activity station --id 5437213399831401712 --page 1313415781029356653 --auth "Dolor nisi quo ea."` + "\n" +
 		os.Args[0] + ` csv export --start 2515965174130618354 --end 4004482640303789866 --stations "Sed sunt ab voluptatem quibusdam iusto." --sensors "Ducimus omnis sit et." --resolution 1373965068 --aggregate "Illum sint dolore consequatur tenetur aut." --complete false --tail 62904690 --auth "Sapiente adipisci recusandae enim numquam quae."` + "\n" +
-		os.Args[0] + ` data device- summary --device-id "Consequuntur nostrum tempora placeat fuga numquam." --auth "Voluptatem cum."` + "\n" +
-		os.Args[0] + ` firmware download --firmware-id 1606474405` + "\n" +
-		os.Args[0] + ` following follow --id 1907134565584072466 --auth "Rerum est consequatur."` + "\n" +
+		os.Args[0] + ` data device- summary --device-id "Et nam." --auth "Ea modi."` + "\n" +
+		os.Args[0] + ` export list- mine --auth "Accusamus laborum est atque blanditiis ipsa."` + "\n" +
+		os.Args[0] + ` firmware download --firmware-id 1744897177` + "\n" +
 		""
 }
 
@@ -102,22 +104,24 @@ func ParseEndpoint(
 		csvExportTailFlag       = csvExportFlags.String("tail", "", "")
 		csvExportAuthFlag       = csvExportFlags.String("auth", "REQUIRED", "")
 
-		csvListMineFlags    = flag.NewFlagSet("list- mine", flag.ExitOnError)
-		csvListMineAuthFlag = csvListMineFlags.String("auth", "REQUIRED", "")
-
-		csvStatusFlags    = flag.NewFlagSet("status", flag.ExitOnError)
-		csvStatusIDFlag   = csvStatusFlags.String("id", "REQUIRED", "")
-		csvStatusAuthFlag = csvStatusFlags.String("auth", "REQUIRED", "")
-
-		csvDownloadFlags    = flag.NewFlagSet("download", flag.ExitOnError)
-		csvDownloadIDFlag   = csvDownloadFlags.String("id", "REQUIRED", "")
-		csvDownloadAuthFlag = csvDownloadFlags.String("auth", "REQUIRED", "")
-
 		dataFlags = flag.NewFlagSet("data", flag.ContinueOnError)
 
 		dataDeviceSummaryFlags        = flag.NewFlagSet("device- summary", flag.ExitOnError)
 		dataDeviceSummaryDeviceIDFlag = dataDeviceSummaryFlags.String("device-id", "REQUIRED", "")
 		dataDeviceSummaryAuthFlag     = dataDeviceSummaryFlags.String("auth", "", "")
+
+		exportFlags = flag.NewFlagSet("export", flag.ContinueOnError)
+
+		exportListMineFlags    = flag.NewFlagSet("list- mine", flag.ExitOnError)
+		exportListMineAuthFlag = exportListMineFlags.String("auth", "REQUIRED", "")
+
+		exportStatusFlags    = flag.NewFlagSet("status", flag.ExitOnError)
+		exportStatusIDFlag   = exportStatusFlags.String("id", "REQUIRED", "")
+		exportStatusAuthFlag = exportStatusFlags.String("auth", "REQUIRED", "")
+
+		exportDownloadFlags    = flag.NewFlagSet("download", flag.ExitOnError)
+		exportDownloadIDFlag   = exportDownloadFlags.String("id", "REQUIRED", "")
+		exportDownloadAuthFlag = exportDownloadFlags.String("auth", "REQUIRED", "")
 
 		firmwareFlags = flag.NewFlagSet("firmware", flag.ContinueOnError)
 
@@ -466,12 +470,14 @@ func ParseEndpoint(
 
 	csvFlags.Usage = csvUsage
 	csvExportFlags.Usage = csvExportUsage
-	csvListMineFlags.Usage = csvListMineUsage
-	csvStatusFlags.Usage = csvStatusUsage
-	csvDownloadFlags.Usage = csvDownloadUsage
 
 	dataFlags.Usage = dataUsage
 	dataDeviceSummaryFlags.Usage = dataDeviceSummaryUsage
+
+	exportFlags.Usage = exportUsage
+	exportListMineFlags.Usage = exportListMineUsage
+	exportStatusFlags.Usage = exportStatusUsage
+	exportDownloadFlags.Usage = exportDownloadUsage
 
 	firmwareFlags.Usage = firmwareUsage
 	firmwareDownloadFlags.Usage = firmwareDownloadUsage
@@ -595,6 +601,8 @@ func ParseEndpoint(
 			svcf = csvFlags
 		case "data":
 			svcf = dataFlags
+		case "export":
+			svcf = exportFlags
 		case "firmware":
 			svcf = firmwareFlags
 		case "following":
@@ -651,21 +659,25 @@ func ParseEndpoint(
 			case "export":
 				epf = csvExportFlags
 
-			case "list- mine":
-				epf = csvListMineFlags
-
-			case "status":
-				epf = csvStatusFlags
-
-			case "download":
-				epf = csvDownloadFlags
-
 			}
 
 		case "data":
 			switch epn {
 			case "device- summary":
 				epf = dataDeviceSummaryFlags
+
+			}
+
+		case "export":
+			switch epn {
+			case "list- mine":
+				epf = exportListMineFlags
+
+			case "status":
+				epf = exportStatusFlags
+
+			case "download":
+				epf = exportDownloadFlags
 
 			}
 
@@ -982,15 +994,6 @@ func ParseEndpoint(
 			case "export":
 				endpoint = c.Export()
 				data, err = csvc.BuildExportPayload(*csvExportStartFlag, *csvExportEndFlag, *csvExportStationsFlag, *csvExportSensorsFlag, *csvExportResolutionFlag, *csvExportAggregateFlag, *csvExportCompleteFlag, *csvExportTailFlag, *csvExportAuthFlag)
-			case "list- mine":
-				endpoint = c.ListMine()
-				data, err = csvc.BuildListMinePayload(*csvListMineAuthFlag)
-			case "status":
-				endpoint = c.Status()
-				data, err = csvc.BuildStatusPayload(*csvStatusIDFlag, *csvStatusAuthFlag)
-			case "download":
-				endpoint = c.Download()
-				data, err = csvc.BuildDownloadPayload(*csvDownloadIDFlag, *csvDownloadAuthFlag)
 			}
 		case "data":
 			c := datac.NewClient(scheme, host, doer, enc, dec, restore)
@@ -998,6 +1001,19 @@ func ParseEndpoint(
 			case "device- summary":
 				endpoint = c.DeviceSummary()
 				data, err = datac.BuildDeviceSummaryPayload(*dataDeviceSummaryDeviceIDFlag, *dataDeviceSummaryAuthFlag)
+			}
+		case "export":
+			c := exportc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "list- mine":
+				endpoint = c.ListMine()
+				data, err = exportc.BuildListMinePayload(*exportListMineAuthFlag)
+			case "status":
+				endpoint = c.Status()
+				data, err = exportc.BuildStatusPayload(*exportStatusIDFlag, *exportStatusAuthFlag)
+			case "download":
+				endpoint = c.Download()
+				data, err = exportc.BuildDownloadPayload(*exportDownloadIDFlag, *exportDownloadAuthFlag)
 			}
 		case "firmware":
 			c := firmwarec.NewClient(scheme, host, doer, enc, dec, restore)
@@ -1342,9 +1358,6 @@ Usage:
 
 COMMAND:
     export: Export implements export.
-    list- mine: ListMine implements list mine.
-    status: Status implements status.
-    download: Download implements download.
 
 Additional help:
     %s csv COMMAND --help
@@ -1369,41 +1382,6 @@ Example:
 `, os.Args[0])
 }
 
-func csvListMineUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] csv list- mine -auth STRING
-
-ListMine implements list mine.
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` csv list- mine --auth "Iure atque porro eius eum."
-`, os.Args[0])
-}
-
-func csvStatusUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] csv status -id STRING -auth STRING
-
-Status implements status.
-    -id STRING: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` csv status --id "In quo qui aliquid occaecati." --auth "Sit provident nam molestiae similique laudantium."
-`, os.Args[0])
-}
-
-func csvDownloadUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] csv download -id STRING -auth STRING
-
-Download implements download.
-    -id STRING: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` csv download --id "Ipsum necessitatibus ea placeat autem." --auth "Delectus aut non tenetur et et."
-`, os.Args[0])
-}
-
 // dataUsage displays the usage of the data command and its subcommands.
 func dataUsage() {
 	fmt.Fprintf(os.Stderr, `Service is the data service interface.
@@ -1425,7 +1403,57 @@ DeviceSummary implements device summary.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` data device- summary --device-id "Consequuntur nostrum tempora placeat fuga numquam." --auth "Voluptatem cum."
+    `+os.Args[0]+` data device- summary --device-id "Et nam." --auth "Ea modi."
+`, os.Args[0])
+}
+
+// exportUsage displays the usage of the export command and its subcommands.
+func exportUsage() {
+	fmt.Fprintf(os.Stderr, `Service is the export service interface.
+Usage:
+    %s [globalflags] export COMMAND [flags]
+
+COMMAND:
+    list- mine: ListMine implements list mine.
+    status: Status implements status.
+    download: Download implements download.
+
+Additional help:
+    %s export COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func exportListMineUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] export list- mine -auth STRING
+
+ListMine implements list mine.
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` export list- mine --auth "Accusamus laborum est atque blanditiis ipsa."
+`, os.Args[0])
+}
+
+func exportStatusUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] export status -id STRING -auth STRING
+
+Status implements status.
+    -id STRING: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` export status --id "Dolor adipisci ipsum necessitatibus." --auth "Placeat autem voluptates delectus aut non."
+`, os.Args[0])
+}
+
+func exportDownloadUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] export download -id STRING -auth STRING
+
+Download implements download.
+    -id STRING: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` export download --id "Ducimus excepturi consectetur expedita ipsa." --auth "Praesentium minima magni non corporis."
 `, os.Args[0])
 }
 
@@ -1452,7 +1480,7 @@ Download implements download.
     -firmware-id INT32: 
 
 Example:
-    `+os.Args[0]+` firmware download --firmware-id 1606474405
+    `+os.Args[0]+` firmware download --firmware-id 1744897177
 `, os.Args[0])
 }
 
@@ -1465,12 +1493,12 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` firmware add --body '{
-      "etag": "Adipisci mollitia cupiditate laudantium eligendi.",
-      "meta": "Rerum quaerat eius quibusdam.",
-      "module": "Neque rerum sunt consequatur nisi eum.",
-      "profile": "Amet quam quia sit sunt voluptatum distinctio.",
-      "url": "Harum non."
-   }' --auth "Qui vero laboriosam et illo molestiae."
+      "etag": "Laudantium eligendi cupiditate neque rerum sunt.",
+      "meta": "Dolorem qui.",
+      "module": "Nisi eum ad amet quam quia.",
+      "profile": "Sunt voluptatum.",
+      "url": "Commodi harum non distinctio rerum quaerat eius."
+   }' --auth "Laboriosam et illo molestiae sit."
 `, os.Args[0])
 }
 
@@ -1485,7 +1513,7 @@ List implements list.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` firmware list --module "Sint labore aut ab animi." --profile "Omnis assumenda unde." --page-size 133288098 --page 978242920 --auth "Neque et sit dolores."
+    `+os.Args[0]+` firmware list --module "Labore aut." --profile "Animi nisi omnis assumenda unde." --page-size 133288098 --page 978242920 --auth "Neque et sit dolores."
 `, os.Args[0])
 }
 
@@ -1946,11 +1974,11 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` project add --body '{
-      "etag": "Adipisci mollitia cupiditate laudantium eligendi.",
-      "meta": "Rerum quaerat eius quibusdam.",
-      "module": "Neque rerum sunt consequatur nisi eum.",
-      "profile": "Amet quam quia sit sunt voluptatum distinctio.",
-      "url": "Harum non."
+      "etag": "Laudantium eligendi cupiditate neque rerum sunt.",
+      "meta": "Dolorem qui.",
+      "module": "Nisi eum ad amet quam quia.",
+      "profile": "Sunt voluptatum.",
+      "url": "Commodi harum non distinctio rerum quaerat eius."
    }' --auth "Ipsam reiciendis."
 `, os.Args[0])
 }
@@ -2619,11 +2647,11 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` user add --body '{
-      "etag": "Adipisci mollitia cupiditate laudantium eligendi.",
-      "meta": "Rerum quaerat eius quibusdam.",
-      "module": "Neque rerum sunt consequatur nisi eum.",
-      "profile": "Amet quam quia sit sunt voluptatum distinctio.",
-      "url": "Harum non."
+      "etag": "Laudantium eligendi cupiditate neque rerum sunt.",
+      "meta": "Dolorem qui.",
+      "module": "Nisi eum ad amet quam quia.",
+      "profile": "Sunt voluptatum.",
+      "url": "Commodi harum non distinctio rerum quaerat eius."
    }'
 `, os.Args[0])
 }

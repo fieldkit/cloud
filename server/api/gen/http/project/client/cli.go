@@ -266,7 +266,7 @@ func BuildAddPayload(projectAddBody string, projectAddAuth string) (*project.Add
 	{
 		err = json.Unmarshal([]byte(projectAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Adipisci mollitia cupiditate laudantium eligendi.\",\n      \"meta\": \"Rerum quaerat eius quibusdam.\",\n      \"module\": \"Neque rerum sunt consequatur nisi eum.\",\n      \"profile\": \"Amet quam quia sit sunt voluptatum distinctio.\",\n      \"url\": \"Harum non.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Laudantium eligendi cupiditate neque rerum sunt.\",\n      \"meta\": \"Dolorem qui.\",\n      \"module\": \"Nisi eum ad amet quam quia.\",\n      \"profile\": \"Sunt voluptatum.\",\n      \"url\": \"Commodi harum non distinctio rerum quaerat eius.\"\n   }'")
 		}
 	}
 	var auth string
