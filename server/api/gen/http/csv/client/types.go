@@ -9,6 +9,7 @@ package client
 
 import (
 	csv "github.com/fieldkit/cloud/server/api/gen/csv"
+	csvviews "github.com/fieldkit/cloud/server/api/gen/csv/views"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -16,6 +17,14 @@ import (
 // response body.
 type ExportResponseBody struct {
 	Location *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+}
+
+// StatusResponseBody is the type of the "csv" service "status" endpoint HTTP
+// response body.
+type StatusResponseBody struct {
+	ID       *int64   `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Progress *float32 `form:"progress,omitempty" json:"progress,omitempty" xml:"progress,omitempty"`
+	URL      *string  `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 }
 
 // ExportUnauthorizedResponseBody is the type of the "csv" service "export"
@@ -90,9 +99,9 @@ type ExportBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// DownloadBusyResponseBody is the type of the "csv" service "download"
-// endpoint HTTP response body for the "busy" error.
-type DownloadBusyResponseBody struct {
+// StatusUnauthorizedResponseBody is the type of the "csv" service "status"
+// endpoint HTTP response body for the "unauthorized" error.
+type StatusUnauthorizedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -108,9 +117,45 @@ type DownloadBusyResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// DownloadNotFoundResponseBody is the type of the "csv" service "download"
+// StatusForbiddenResponseBody is the type of the "csv" service "status"
+// endpoint HTTP response body for the "forbidden" error.
+type StatusForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// StatusNotFoundResponseBody is the type of the "csv" service "status"
 // endpoint HTTP response body for the "not-found" error.
-type DownloadNotFoundResponseBody struct {
+type StatusNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// StatusBadRequestResponseBody is the type of the "csv" service "status"
+// endpoint HTTP response body for the "bad-request" error.
+type StatusBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -147,6 +192,24 @@ type DownloadUnauthorizedResponseBody struct {
 // DownloadForbiddenResponseBody is the type of the "csv" service "download"
 // endpoint HTTP response body for the "forbidden" error.
 type DownloadForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// DownloadNotFoundResponseBody is the type of the "csv" service "download"
+// endpoint HTTP response body for the "not-found" error.
+type DownloadNotFoundResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -247,40 +310,81 @@ func NewExportBadRequest(body *ExportBadRequestResponseBody) *goa.ServiceError {
 	return v
 }
 
+// NewStatusExportStatusOK builds a "csv" service "status" endpoint result from
+// a HTTP "OK" response.
+func NewStatusExportStatusOK(body *StatusResponseBody) *csvviews.ExportStatusView {
+	v := &csvviews.ExportStatusView{
+		ID:       body.ID,
+		Progress: body.Progress,
+		URL:      body.URL,
+	}
+
+	return v
+}
+
+// NewStatusUnauthorized builds a csv service status endpoint unauthorized
+// error.
+func NewStatusUnauthorized(body *StatusUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewStatusForbidden builds a csv service status endpoint forbidden error.
+func NewStatusForbidden(body *StatusForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewStatusNotFound builds a csv service status endpoint not-found error.
+func NewStatusNotFound(body *StatusNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewStatusBadRequest builds a csv service status endpoint bad-request error.
+func NewStatusBadRequest(body *StatusBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
 // NewDownloadResultOK builds a "csv" service "download" endpoint result from a
 // HTTP "OK" response.
 func NewDownloadResultOK(length int64, contentType string) *csv.DownloadResult {
 	v := &csv.DownloadResult{}
 	v.Length = length
 	v.ContentType = contentType
-
-	return v
-}
-
-// NewDownloadBusy builds a csv service download endpoint busy error.
-func NewDownloadBusy(body *DownloadBusyResponseBody) *goa.ServiceError {
-	v := &goa.ServiceError{
-		Name:      *body.Name,
-		ID:        *body.ID,
-		Message:   *body.Message,
-		Temporary: *body.Temporary,
-		Timeout:   *body.Timeout,
-		Fault:     *body.Fault,
-	}
-
-	return v
-}
-
-// NewDownloadNotFound builds a csv service download endpoint not-found error.
-func NewDownloadNotFound(body *DownloadNotFoundResponseBody) *goa.ServiceError {
-	v := &goa.ServiceError{
-		Name:      *body.Name,
-		ID:        *body.ID,
-		Message:   *body.Message,
-		Temporary: *body.Temporary,
-		Timeout:   *body.Timeout,
-		Fault:     *body.Fault,
-	}
 
 	return v
 }
@@ -302,6 +406,20 @@ func NewDownloadUnauthorized(body *DownloadUnauthorizedResponseBody) *goa.Servic
 
 // NewDownloadForbidden builds a csv service download endpoint forbidden error.
 func NewDownloadForbidden(body *DownloadForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewDownloadNotFound builds a csv service download endpoint not-found error.
+func NewDownloadNotFound(body *DownloadNotFoundResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -433,9 +551,9 @@ func ValidateExportBadRequestResponseBody(body *ExportBadRequestResponseBody) (e
 	return
 }
 
-// ValidateDownloadBusyResponseBody runs the validations defined on
-// download_busy_response_body
-func ValidateDownloadBusyResponseBody(body *DownloadBusyResponseBody) (err error) {
+// ValidateStatusUnauthorizedResponseBody runs the validations defined on
+// status_unauthorized_response_body
+func ValidateStatusUnauthorizedResponseBody(body *StatusUnauthorizedResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -457,9 +575,57 @@ func ValidateDownloadBusyResponseBody(body *DownloadBusyResponseBody) (err error
 	return
 }
 
-// ValidateDownloadNotFoundResponseBody runs the validations defined on
-// download_not-found_response_body
-func ValidateDownloadNotFoundResponseBody(body *DownloadNotFoundResponseBody) (err error) {
+// ValidateStatusForbiddenResponseBody runs the validations defined on
+// status_forbidden_response_body
+func ValidateStatusForbiddenResponseBody(body *StatusForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateStatusNotFoundResponseBody runs the validations defined on
+// status_not-found_response_body
+func ValidateStatusNotFoundResponseBody(body *StatusNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateStatusBadRequestResponseBody runs the validations defined on
+// status_bad-request_response_body
+func ValidateStatusBadRequestResponseBody(body *StatusBadRequestResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -508,6 +674,30 @@ func ValidateDownloadUnauthorizedResponseBody(body *DownloadUnauthorizedResponse
 // ValidateDownloadForbiddenResponseBody runs the validations defined on
 // download_forbidden_response_body
 func ValidateDownloadForbiddenResponseBody(body *DownloadForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateDownloadNotFoundResponseBody runs the validations defined on
+// download_not-found_response_body
+func ValidateDownloadNotFoundResponseBody(body *DownloadNotFoundResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}

@@ -93,10 +93,48 @@ func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPaylo
 		return nil, nil
 	}
 
-	url := fmt.Sprintf("/sensors/data/export/csv/%v", token.String())
+	url := fmt.Sprintf("/export/%v", token.String())
 
 	return &csvService.ExportResult{
 		Location: url,
+	}, nil
+}
+
+func (c *CsvService) Status(ctx context.Context, payload *csvService.StatusPayload) (*csvService.ExportStatus, error) {
+	log := Logger(ctx).Sugar()
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	log.Infow("download", "token", payload.ID, "user_id", p.UserID())
+
+	r, err := repositories.NewExportRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	de, err := r.QueryByToken(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if p.UserID() != de.UserID {
+		return nil, csvService.MakeForbidden(errors.New("forbidden"))
+	}
+
+	var url *string
+
+	if de.DownloadURL != nil {
+		downloadAt := fmt.Sprintf("/export/%v/download", payload.ID)
+		url = &downloadAt
+	}
+
+	return &csvService.ExportStatus{
+		ID:       de.ID,
+		URL:      url,
+		Progress: de.Progress,
 	}, nil
 }
 
@@ -125,7 +163,7 @@ func (c *CsvService) Download(ctx context.Context, payload *csvService.DownloadP
 	}
 
 	if de.DownloadURL == nil {
-		return nil, nil, csvService.MakeBusy(errors.New("busy"))
+		return nil, nil, csvService.MakeNotFound(errors.New("not found"))
 	}
 
 	opened, err := c.options.MediaFiles.OpenByURL(ctx, *de.DownloadURL)

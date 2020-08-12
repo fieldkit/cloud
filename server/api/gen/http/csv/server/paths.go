@@ -13,10 +13,15 @@ import (
 
 // ExportCsvPath returns the URL path to the csv service export HTTP endpoint.
 func ExportCsvPath() string {
-	return "/sensors/data/export/csv"
+	return "/export/csv"
+}
+
+// StatusCsvPath returns the URL path to the csv service status HTTP endpoint.
+func StatusCsvPath(id string) string {
+	return fmt.Sprintf("/export/%v", id)
 }
 
 // DownloadCsvPath returns the URL path to the csv service download HTTP endpoint.
 func DownloadCsvPath(id string) string {
-	return fmt.Sprintf("/sensors/data/export/csv/%v", id)
+	return fmt.Sprintf("/export/%v/download", id)
 }

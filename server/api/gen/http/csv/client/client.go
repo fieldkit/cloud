@@ -21,6 +21,9 @@ type Client struct {
 	// Export Doer is the HTTP client used to make requests to the export endpoint.
 	ExportDoer goahttp.Doer
 
+	// Status Doer is the HTTP client used to make requests to the status endpoint.
+	StatusDoer goahttp.Doer
+
 	// Download Doer is the HTTP client used to make requests to the download
 	// endpoint.
 	DownloadDoer goahttp.Doer
@@ -49,6 +52,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		ExportDoer:          doer,
+		StatusDoer:          doer,
 		DownloadDoer:        doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
@@ -78,6 +82,30 @@ func (c *Client) Export() goa.Endpoint {
 		resp, err := c.ExportDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("csv", "export", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Status returns an endpoint that makes HTTP requests to the csv service
+// status server.
+func (c *Client) Status() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeStatusRequest(c.encoder)
+		decodeResponse = DecodeStatusResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildStatusRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.StatusDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("csv", "status", err)
 		}
 		return decodeResponse(resp)
 	}

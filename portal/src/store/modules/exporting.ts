@@ -10,6 +10,7 @@ const EXPORT_START = "EXPORT_START";
 const EXPORT_PROGRESS = "EXPORT_PROGRESS";
 const EXPORT_DONE = "EXPORT_DONE";
 const EXPORT_ERROR = "EXPORT_ERROR";
+const EXPORT_CHECK = "EXPORT_CHECK";
 
 export class ActiveExport {
     constructor(public readonly bookmark: Bookmark, public readonly params: ExportParams) {}
@@ -28,17 +29,15 @@ export interface CheckPayload {
 }
 
 const actions = {
-    ["EXPORT_CHECK"]: async ({ dispatch, commit }: ActionParameters, payload: CheckPayload) => {
-        return new FKApi()
-            .exportStatus(payload.statusUrl)
-            .then((de) => {
-                console.log(de);
-            })
-            .catch(() => {
+    [EXPORT_CHECK]: async ({ dispatch, commit }: ActionParameters, payload: CheckPayload) => {
+        return new FKApi().exportStatus(payload.statusUrl).then((de) => {
+            console.log(de);
+            if (!de.url) {
                 return Promise.delay(1000).then(() => {
-                    return dispatch("EXPORT_CHECK", payload);
+                    return dispatch(EXPORT_CHECK, payload);
                 });
-            });
+            }
+        });
     },
     [ActionTypes.BEGIN_EXPORT]: async ({ dispatch, commit }: ActionParameters, payload: ExportDataAction) => {
         commit(EXPORT_START, {});

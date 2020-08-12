@@ -11,6 +11,7 @@ import (
 	"context"
 	"io"
 
+	csvviews "github.com/fieldkit/cloud/server/api/gen/csv/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )
@@ -19,6 +20,8 @@ import (
 type Service interface {
 	// Export implements export.
 	Export(context.Context, *ExportPayload) (res *ExportResult, err error)
+	// Status implements status.
+	Status(context.Context, *StatusPayload) (res *ExportStatus, err error)
 	// Download implements download.
 	Download(context.Context, *DownloadPayload) (res *DownloadResult, body io.ReadCloser, err error)
 }
@@ -37,7 +40,7 @@ const ServiceName = "csv"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [2]string{"export", "download"}
+var MethodNames = [3]string{"export", "status", "download"}
 
 // ExportPayload is the payload type of the csv service export method.
 type ExportPayload struct {
@@ -55,6 +58,19 @@ type ExportPayload struct {
 // ExportResult is the result type of the csv service export method.
 type ExportResult struct {
 	Location string
+}
+
+// StatusPayload is the payload type of the csv service status method.
+type StatusPayload struct {
+	Auth string
+	ID   string
+}
+
+// ExportStatus is the result type of the csv service status method.
+type ExportStatus struct {
+	ID       int64
+	Progress float32
+	URL      *string
 }
 
 // DownloadPayload is the payload type of the csv service download method.
@@ -105,11 +121,41 @@ func MakeBadRequest(err error) *goa.ServiceError {
 	}
 }
 
-// MakeBusy builds a goa.ServiceError from an error.
-func MakeBusy(err error) *goa.ServiceError {
-	return &goa.ServiceError{
-		Name:    "busy",
-		ID:      goa.NewErrorID(),
-		Message: err.Error(),
+// NewExportStatus initializes result type ExportStatus from viewed result type
+// ExportStatus.
+func NewExportStatus(vres *csvviews.ExportStatus) *ExportStatus {
+	return newExportStatus(vres.Projected)
+}
+
+// NewViewedExportStatus initializes viewed result type ExportStatus from
+// result type ExportStatus using the given view.
+func NewViewedExportStatus(res *ExportStatus, view string) *csvviews.ExportStatus {
+	p := newExportStatusView(res)
+	return &csvviews.ExportStatus{Projected: p, View: "default"}
+}
+
+// newExportStatus converts projected type ExportStatus to service type
+// ExportStatus.
+func newExportStatus(vres *csvviews.ExportStatusView) *ExportStatus {
+	res := &ExportStatus{
+		URL: vres.URL,
 	}
+	if vres.ID != nil {
+		res.ID = *vres.ID
+	}
+	if vres.Progress != nil {
+		res.Progress = *vres.Progress
+	}
+	return res
+}
+
+// newExportStatusView projects result type ExportStatus to projected type
+// ExportStatusView using the "default" view.
+func newExportStatusView(res *ExportStatus) *csvviews.ExportStatusView {
+	vres := &csvviews.ExportStatusView{
+		ID:       &res.ID,
+		Progress: &res.Progress,
+		URL:      res.URL,
+	}
+	return vres
 }

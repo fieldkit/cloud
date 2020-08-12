@@ -23,6 +23,7 @@ import (
 type Server struct {
 	Mounts   []*MountPoint
 	Export   http.Handler
+	Status   http.Handler
 	Download http.Handler
 	CORS     http.Handler
 }
@@ -60,12 +61,15 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"Export", "POST", "/sensors/data/export/csv"},
-			{"Download", "GET", "/sensors/data/export/csv/{id}"},
-			{"CORS", "OPTIONS", "/sensors/data/export/csv"},
-			{"CORS", "OPTIONS", "/sensors/data/export/csv/{id}"},
+			{"Export", "POST", "/export/csv"},
+			{"Status", "GET", "/export/{id}"},
+			{"Download", "GET", "/export/{id}/download"},
+			{"CORS", "OPTIONS", "/export/csv"},
+			{"CORS", "OPTIONS", "/export/{id}"},
+			{"CORS", "OPTIONS", "/export/{id}/download"},
 		},
 		Export:   NewExportHandler(e.Export, mux, decoder, encoder, errhandler, formatter),
+		Status:   NewStatusHandler(e.Status, mux, decoder, encoder, errhandler, formatter),
 		Download: NewDownloadHandler(e.Download, mux, decoder, encoder, errhandler, formatter),
 		CORS:     NewCORSHandler(),
 	}
@@ -77,6 +81,7 @@ func (s *Server) Service() string { return "csv" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Export = m(s.Export)
+	s.Status = m(s.Status)
 	s.Download = m(s.Download)
 	s.CORS = m(s.CORS)
 }
@@ -84,6 +89,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 // Mount configures the mux to serve the csv endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountExportHandler(mux, h.Export)
+	MountStatusHandler(mux, h.Status)
 	MountDownloadHandler(mux, h.Download)
 	MountCORSHandler(mux, h.CORS)
 }
@@ -97,7 +103,7 @@ func MountExportHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/sensors/data/export/csv", f)
+	mux.Handle("POST", "/export/csv", f)
 }
 
 // NewExportHandler creates a HTTP handler which loads the HTTP request and
@@ -139,6 +145,57 @@ func NewExportHandler(
 	})
 }
 
+// MountStatusHandler configures the mux to serve the "csv" service "status"
+// endpoint.
+func MountStatusHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleCsvOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/export/{id}", f)
+}
+
+// NewStatusHandler creates a HTTP handler which loads the HTTP request and
+// calls the "csv" service "status" endpoint.
+func NewStatusHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeStatusRequest(mux, decoder)
+		encodeResponse = EncodeStatusResponse(encoder)
+		encodeError    = EncodeStatusError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "status")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "csv")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountDownloadHandler configures the mux to serve the "csv" service
 // "download" endpoint.
 func MountDownloadHandler(mux goahttp.Muxer, h http.Handler) {
@@ -148,7 +205,7 @@ func MountDownloadHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/sensors/data/export/csv/{id}", f)
+	mux.Handle("GET", "/export/{id}/download", f)
 }
 
 // NewDownloadHandler creates a HTTP handler which loads the HTTP request and
@@ -208,8 +265,9 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("OPTIONS", "/sensors/data/export/csv", f)
-	mux.Handle("OPTIONS", "/sensors/data/export/csv/{id}", f)
+	mux.Handle("OPTIONS", "/export/csv", f)
+	mux.Handle("OPTIONS", "/export/{id}", f)
+	mux.Handle("OPTIONS", "/export/{id}/download", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

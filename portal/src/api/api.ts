@@ -801,7 +801,7 @@ class FKApi {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
-            url: this.baseUrl + "/sensors/data/export/csv?" + params.toString(),
+            url: this.baseUrl + "/export/csv?" + params.toString(),
         });
     }
 

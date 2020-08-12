@@ -18,6 +18,7 @@ import (
 // Endpoints wraps the "csv" service endpoints.
 type Endpoints struct {
 	Export   goa.Endpoint
+	Status   goa.Endpoint
 	Download goa.Endpoint
 }
 
@@ -36,6 +37,7 @@ func NewEndpoints(s Service) *Endpoints {
 	a := s.(Auther)
 	return &Endpoints{
 		Export:   NewExportEndpoint(s, a.JWTAuth),
+		Status:   NewStatusEndpoint(s, a.JWTAuth),
 		Download: NewDownloadEndpoint(s, a.JWTAuth),
 	}
 }
@@ -43,6 +45,7 @@ func NewEndpoints(s Service) *Endpoints {
 // Use applies the given middleware to all the "csv" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Export = m(e.Export)
+	e.Status = m(e.Status)
 	e.Download = m(e.Download)
 }
 
@@ -62,6 +65,30 @@ func NewExportEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 			return nil, err
 		}
 		return s.Export(ctx, p)
+	}
+}
+
+// NewStatusEndpoint returns an endpoint function that calls the method
+// "status" of service "csv".
+func NewStatusEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*StatusPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.Status(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedExportStatus(res, "default")
+		return vres, nil
 	}
 }
 

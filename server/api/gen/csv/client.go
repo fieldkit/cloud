@@ -17,13 +17,15 @@ import (
 // Client is the "csv" service client.
 type Client struct {
 	ExportEndpoint   goa.Endpoint
+	StatusEndpoint   goa.Endpoint
 	DownloadEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "csv" service client given the endpoints.
-func NewClient(export, download goa.Endpoint) *Client {
+func NewClient(export, status, download goa.Endpoint) *Client {
 	return &Client{
 		ExportEndpoint:   export,
+		StatusEndpoint:   status,
 		DownloadEndpoint: download,
 	}
 }
@@ -38,10 +40,17 @@ func (c *Client) Export(ctx context.Context, p *ExportPayload) (res *ExportResul
 	return ires.(*ExportResult), nil
 }
 
+// Status calls the "status" endpoint of the "csv" service.
+func (c *Client) Status(ctx context.Context, p *StatusPayload) (res *ExportStatus, err error) {
+	var ires interface{}
+	ires, err = c.StatusEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*ExportStatus), nil
+}
+
 // Download calls the "download" endpoint of the "csv" service.
-// Download may return the following errors:
-//	- "busy" (type *goa.ServiceError)
-//	- error: internal error
 func (c *Client) Download(ctx context.Context, p *DownloadPayload) (res *DownloadResult, resp io.ReadCloser, err error) {
 	var ires interface{}
 	ires, err = c.DownloadEndpoint(ctx, p)

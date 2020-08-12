@@ -17,6 +17,7 @@ import (
 	"strconv"
 
 	csv "github.com/fieldkit/cloud/server/api/gen/csv"
+	csvviews "github.com/fieldkit/cloud/server/api/gen/csv/views"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -180,6 +181,151 @@ func DecodeExportResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 	}
 }
 
+// BuildStatusRequest instantiates a HTTP request object with method and path
+// set to call the "csv" service "status" endpoint
+func (c *Client) BuildStatusRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id string
+	)
+	{
+		p, ok := v.(*csv.StatusPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("csv", "status", "*csv.StatusPayload", v)
+		}
+		id = p.ID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: StatusCsvPath(id)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("csv", "status", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeStatusRequest returns an encoder for requests sent to the csv status
+// server.
+func EncodeStatusRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*csv.StatusPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("csv", "status", "*csv.StatusPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeStatusResponse returns a decoder for responses returned by the csv
+// status endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeStatusResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeStatusResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body StatusResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("csv", "status", err)
+			}
+			p := NewStatusExportStatusOK(&body)
+			view := "default"
+			vres := &csvviews.ExportStatus{Projected: p, View: view}
+			if err = csvviews.ValidateExportStatus(vres); err != nil {
+				return nil, goahttp.ErrValidationError("csv", "status", err)
+			}
+			res := csv.NewExportStatus(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body StatusUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("csv", "status", err)
+			}
+			err = ValidateStatusUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("csv", "status", err)
+			}
+			return nil, NewStatusUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body StatusForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("csv", "status", err)
+			}
+			err = ValidateStatusForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("csv", "status", err)
+			}
+			return nil, NewStatusForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body StatusNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("csv", "status", err)
+			}
+			err = ValidateStatusNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("csv", "status", err)
+			}
+			return nil, NewStatusNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body StatusBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("csv", "status", err)
+			}
+			err = ValidateStatusBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("csv", "status", err)
+			}
+			return nil, NewStatusBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("csv", "status", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildDownloadRequest instantiates a HTTP request object with method and path
 // set to call the "csv" service "download" endpoint
 func (c *Client) BuildDownloadRequest(ctx context.Context, v interface{}) (*http.Request, error) {
@@ -225,10 +371,9 @@ func EncodeDownloadRequest(encoder func(*http.Request) goahttp.Encoder) func(*ht
 // download endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeDownloadResponse may return the following errors:
-//	- "busy" (type *goa.ServiceError): http.StatusNotFound
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
 //	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
 //	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
 //	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
 func DecodeDownloadResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
@@ -271,41 +416,6 @@ func DecodeDownloadResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			}
 			res := NewDownloadResultOK(length, contentType)
 			return res, nil
-		case http.StatusNotFound:
-			en := resp.Header.Get("goa-error")
-			switch en {
-			case "busy":
-				var (
-					body DownloadBusyResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("csv", "download", err)
-				}
-				err = ValidateDownloadBusyResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("csv", "download", err)
-				}
-				return nil, NewDownloadBusy(&body)
-			case "not-found":
-				var (
-					body DownloadNotFoundResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("csv", "download", err)
-				}
-				err = ValidateDownloadNotFoundResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("csv", "download", err)
-				}
-				return nil, NewDownloadNotFound(&body)
-			default:
-				body, _ := ioutil.ReadAll(resp.Body)
-				return nil, goahttp.ErrInvalidResponse("csv", "download", resp.StatusCode, string(body))
-			}
 		case http.StatusUnauthorized:
 			var (
 				body DownloadUnauthorizedResponseBody
@@ -334,6 +444,20 @@ func DecodeDownloadResponse(decoder func(*http.Response) goahttp.Decoder, restor
 				return nil, goahttp.ErrValidationError("csv", "download", err)
 			}
 			return nil, NewDownloadForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body DownloadNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("csv", "download", err)
+			}
+			err = ValidateDownloadNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("csv", "download", err)
+			}
+			return nil, NewDownloadNotFound(&body)
 		case http.StatusBadRequest:
 			var (
 				body DownloadBadRequestResponseBody

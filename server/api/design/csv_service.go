@@ -4,6 +4,21 @@ import (
 	. "goa.design/goa/v3/dsl"
 )
 
+var ExportStatus = ResultType("application/vnd.app.export.status", func() {
+	TypeName("ExportStatus")
+	Attributes(func() {
+		Attribute("id", Int64)
+		Attribute("progress", Float32)
+		Attribute("url", String)
+		Required("id", "progress")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("progress")
+		Attribute("url")
+	})
+})
+
 var _ = Service("csv", func() {
 	Method("export", func() {
 		Security(JWTAuth, func() {
@@ -29,7 +44,7 @@ var _ = Service("csv", func() {
 		})
 
 		HTTP(func() {
-			POST("sensors/data/export/csv")
+			POST("export/csv")
 
 			Params(func() {
 				Param("start")
@@ -47,6 +62,27 @@ var _ = Service("csv", func() {
 					Attribute("location")
 				})
 			})
+
+			httpAuthentication()
+		})
+	})
+
+	Method("status", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("id", String)
+			Required("id")
+		})
+
+		Result(ExportStatus)
+
+		HTTP(func() {
+			GET("export/{id}")
 
 			httpAuthentication()
 		})
@@ -71,17 +107,13 @@ var _ = Service("csv", func() {
 			Required("contentType")
 		})
 
-		Error("busy", func() {})
-
 		HTTP(func() {
-			GET("sensors/data/export/csv/{id}")
+			GET("export/{id}/download")
 
 			Response(func() {
 				Header("length:Content-Length")
 				Header("contentType:Content-Type")
 			})
-
-			Response("busy", StatusNotFound)
 
 			SkipResponseBodyEncodeDecode()
 
