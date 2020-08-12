@@ -51,6 +51,22 @@ export class LoginResponse {
     constructor(public readonly token: string | null) {}
 }
 
+export interface ExportStatus {
+    id: number;
+    token: string;
+    createdAt: number;
+    completedAt: number | null;
+    kind: string;
+    statusUrl: string;
+    downloadUrl: string | null;
+    progress: number;
+    args: any;
+}
+
+export interface UserExports {
+    exports: ExportStatus[];
+}
+
 export interface ProjectRef {
     id: number;
     name: string;
@@ -797,7 +813,7 @@ class FKApi {
         });
     }
 
-    public exportCsv(params: URLSearchParams): Promise<{ location: string }> {
+    public exportCsv(params: URLSearchParams): Promise<ExportStatus> {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
@@ -805,11 +821,19 @@ class FKApi {
         });
     }
 
-    public exportStatus(url: string): Promise<any> {
+    public exportStatus(url: string): Promise<ExportStatus> {
         return this.invoke({
             auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + url,
+        });
+    }
+
+    public getUserExports(): Promise<UserExports> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + "/export",
         });
     }
 

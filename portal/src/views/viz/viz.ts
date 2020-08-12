@@ -125,6 +125,24 @@ export class Bookmark {
     static Version = 1;
 
     constructor(public readonly v: number, public readonly g: GroupBookmark[], public readonly s: number[] = []) {}
+
+    private get allVizes(): VizBookmark[] {
+        return _.flatten(_.flatten(this.g.map((group) => group.map((vizes) => vizes))));
+    }
+
+    public get allTimeRange(): TimeRange {
+        const start = _.min(_.flatten(this.allVizes.map((viz) => viz[2][0])));
+        const end = _.max(_.flatten(this.allVizes.map((viz) => viz[2][1])));
+        return new TimeRange(start, end);
+    }
+
+    public get allStations(): number[] {
+        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[0])));
+    }
+
+    public get allSensors(): number[] {
+        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1])));
+    }
 }
 
 export class GeoZoom {

@@ -3,6 +3,7 @@ import { ClockState } from "./clock";
 import { MapState } from "./map";
 import { UserState } from "./user";
 import { LayoutState } from "./layout";
+import { ExportingState } from "./exporting";
 import { Station } from "@/api/api";
 
 export interface RouteState {
@@ -22,6 +23,7 @@ export interface GlobalState {
     readonly map: MapState;
     readonly route: RouteState;
     readonly user: UserState;
+    readonly exporting: ExportingState;
 }
 
 export interface GlobalGetters {

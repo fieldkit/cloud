@@ -82,6 +82,10 @@ Vue.filter("prettyDuration", (value) => {
     return _.capitalize(moment.duration(value / 1000, "seconds").humanize());
 });
 
+Vue.filter("prettyBytes", (value) => {
+    return value;
+});
+
 const store = storeFactory();
 store.commit(MutationTypes.INITIALIZE);
 

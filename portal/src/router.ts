@@ -245,6 +245,21 @@ const routes = [
         },
     },
     {
+        path: "/dashboard/export/:bookmark",
+        name: "exportBookmark",
+        component: ExploreView,
+        props: (route) => {
+            return {
+                bookmark: Object.assign(new Bookmark(1, []), JSON.parse(route.params.bookmark)),
+                exportsVisible: true,
+            };
+        },
+        meta: {
+            bodyClass: "disable-scrolling",
+            secured: true,
+        },
+    },
+    {
         path: "/dashboard/projects/:projectId/notes",
         name: "viewProjectNotes",
         component: NotesView,

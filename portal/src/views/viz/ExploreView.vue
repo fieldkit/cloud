@@ -1,9 +1,10 @@
 <template>
-    <StandardLayout @show-station="showStation" :defaultShowStation="false">
+    <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible">
+        <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closeExports" />
         <div class="explore-view">
             <div class="explore-header">
                 <DoubleHeader title="Data View">
-                    <div class="button" @click="onExport">Export</div>
+                    <div class="button" @click="openExports">Export</div>
                 </DoubleHeader>
             </div>
 
@@ -25,6 +26,7 @@ import Vue from "vue";
 import Promise from "bluebird";
 import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
+import ExportPanel from "./ExportPanel.vue";
 
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
@@ -42,11 +44,16 @@ export default Vue.extend({
         ...CommonComponents,
         StandardLayout,
         VizWorkspace,
+        ExportPanel,
     },
     props: {
         bookmark: {
             type: Bookmark,
             required: false,
+        },
+        exportsVisible: {
+            type: Boolean,
+            default: false,
         },
     },
     data: () => {
@@ -94,9 +101,13 @@ export default Vue.extend({
 
             return this.$router.push({ name: "exploreBookmark", params: { bookmark: newEncoded } }).then(() => this.workspace);
         },
-        onExport() {
-            console.log("viz: exporting");
-            return this.$store.dispatch(new ExportDataAction(this.bookmark));
+        openExports() {
+            const encoded = JSON.stringify(this.bookmark);
+            return this.$router.push({ name: "exportBookmark", params: { bookmark: encoded } });
+        },
+        closeExports() {
+            const encoded = JSON.stringify(this.bookmark);
+            return this.$router.push({ name: "exploreBookmark", params: { bookmark: encoded } });
         },
         createWorkspaceIfNecessary() {
             if (this.workspace) {
@@ -353,5 +364,17 @@ export default Vue.extend({
 .viz.map .viz-map {
     height: 400px;
     margin-bottom: 20px;
+}
+
+.exports-floating {
+    position: absolute;
+    right: 0;
+    top: 70px;
+    bottom: 0;
+    background-color: #fcfcfc;
+    border-left: 2px solid #d8dce0;
+    z-index: 10;
+    overflow-y: scroll;
+    width: 30em;
 }
 </style>

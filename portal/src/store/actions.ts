@@ -32,4 +32,7 @@ export const ADD_PROJECT = "ADD_PROJECT";
 export const SAVE_PROJECT = "SAVE_PROJECT";
 export const DELETE_PROJECT = "DELETE_PROJECT";
 
+// Exports
+
+export const NEED_EXPORTS = "NEED_EXPORTS";
 export const BEGIN_EXPORT = "BEGIN_EXPORT";
