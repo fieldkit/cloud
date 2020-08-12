@@ -1,7 +1,11 @@
 <template>
     <StandardLayout @show-station="showStation" :defaultShowStation="false">
         <div class="explore-view">
-            <DoubleHeader title="Data View" />
+            <div class="explore-header">
+                <DoubleHeader title="Data View">
+                    <div class="button" @click="onExport">Export</div>
+                </DoubleHeader>
+            </div>
 
             <div v-if="showNoSensors" class="notification">
                 Oh snap, this station doesn't appear to have any sensors to show you.
@@ -24,6 +28,7 @@ import StandardLayout from "../StandardLayout.vue";
 
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
+import { ExportDataAction } from "@/store/typed-actions";
 import { GlobalState } from "@/store/modules/global";
 
 import FKApi from "@/api/api";
@@ -89,6 +94,10 @@ export default Vue.extend({
 
             return this.$router.push({ name: "exploreBookmark", params: { bookmark: newEncoded } }).then(() => this.workspace);
         },
+        onExport() {
+            console.log("viz: exporting");
+            return this.$store.dispatch(new ExportDataAction(this.bookmark));
+        },
         createWorkspaceIfNecessary() {
             if (this.workspace) {
                 return Promise.resolve(this.workspace);
@@ -144,15 +153,7 @@ export default Vue.extend({
     flex-grow: 1;
 }
 .explore-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-}
-.explore-header .left {
-    display: flex;
-}
-.explore-header .right {
-    display: flex;
+    margin-bottom: 1em;
 }
 .explore-header .button {
     margin-left: 20px;

@@ -7,6 +7,8 @@ import { stations } from "./modules/stations";
 import { map } from "./modules/map";
 import { progress } from "./modules/progress";
 import { layout } from "./modules/layout";
+import { exporting } from "./modules/exporting";
+
 // import * as MutationTypes from "./mutations";
 // import * as ActionTypes from "./actions";
 
@@ -44,6 +46,7 @@ export default function() {
         plugins: [customizeLogger()],
         modules: {
             clock,
+            exporting,
             user,
             stations,
             map,

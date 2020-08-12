@@ -797,7 +797,23 @@ class FKApi {
         });
     }
 
-    sensorData(params: URLSearchParams): Promise<any> {
+    public exportCsv(params: URLSearchParams): Promise<{ location: string }> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/sensors/data/export/csv?" + params.toString(),
+        });
+    }
+
+    public exportStatus(url: string): Promise<any> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + url,
+        });
+    }
+
+    public sensorData(params: URLSearchParams): Promise<any> {
         return this.invoke({
             auth: Auth.Required,
             method: "GET",
@@ -805,7 +821,7 @@ class FKApi {
         });
     }
 
-    tailSensorData(params: URLSearchParams): Promise<any> {
+    public tailSensorData(params: URLSearchParams): Promise<any> {
         return this.invoke({
             auth: Auth.Required,
             method: "GET",
@@ -813,7 +829,7 @@ class FKApi {
         });
     }
 
-    getQuickSensors(stations: number[]) {
+    public getQuickSensors(stations: number[]) {
         const qp = new URLSearchParams();
         qp.append("stations", stations.join(","));
         return this.invoke({
@@ -823,7 +839,7 @@ class FKApi {
         });
     }
 
-    adminDeleteUser(payload) {
+    public adminDeleteUser(payload) {
         return this.invoke({
             auth: Auth.Required,
             method: "DELETE",
