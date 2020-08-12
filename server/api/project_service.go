@@ -883,9 +883,10 @@ func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *secu
 func ProjectType(signer *Signer, dm *data.Project, numberOfFollowers int32, userRelationship *data.UserProjectRelationship) (*project.Project, error) {
 	role := userRelationship.LookupRole()
 
-	photo, err := signer.SignAndBustURL(fmt.Sprintf("/projects/%d/media", dm.ID), dm.MediaURL)
-	if err != nil {
-		return nil, err
+	var photoUrl *string
+	if dm.MediaURL != nil {
+		url := fmt.Sprintf("/projects/%d/media", dm.ID)
+		photoUrl = &url
 	}
 
 	wm := &project.Project{
@@ -896,7 +897,7 @@ func ProjectType(signer *Signer, dm *data.Project, numberOfFollowers int32, user
 		Location:    dm.Location,
 		Tags:        dm.Tags,
 		Privacy:     int32(dm.Privacy),
-		Photo:       photo,
+		Photo:       photoUrl,
 		ReadOnly:    role.IsProjectReadOnly(),
 		Following: &project.ProjectFollowing{
 			Total:     numberOfFollowers,

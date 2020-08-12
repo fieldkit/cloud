@@ -625,11 +625,6 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 
 	configurations := transformConfigurations(sf)
 
-	url, err := signer.SignURL(fmt.Sprintf("/stations/%d/photo", sf.Station.ID))
-	if err != nil {
-		return nil, err
-	}
-
 	dataSummary := transformDataSummary(sf.DataSummary)
 
 	location := transformLocation(sf, preciseLocation)
@@ -666,7 +661,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			Name: sf.Owner.Name,
 		},
 		Photos: &station.StationPhotos{
-			Small: url,
+			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
 		},
 	}, nil
 }

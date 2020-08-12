@@ -128,15 +128,10 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 
 	byID := make(map[int32]*notes.FieldNoteAuthor)
 	for _, user := range allAuthors {
-		url, err := s.options.signer.SignURL(fmt.Sprintf("/user/%d/media", user.ID))
-		if err != nil {
-			return nil, err
-		}
-
 		byID[user.ID] = &notes.FieldNoteAuthor{
 			ID:       user.ID,
 			Name:     user.Name,
-			MediaURL: url,
+			MediaURL: fmt.Sprintf("/user/%d/media", user.ID),
 		}
 	}
 
@@ -160,14 +155,10 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 	stationMedia := make([]*notes.NoteMedia, 0)
 	for _, nm := range allNoteMedias {
 		if nm.NoteID == nil {
-			url, err := s.options.signer.SignURL(fmt.Sprintf("/notes/media/%d", nm.ID))
-			if err != nil {
-				return nil, err
-			}
 			stationMedia = append(stationMedia, &notes.NoteMedia{
 				ID:          nm.ID,
 				ContentType: nm.ContentType,
-				URL:         url,
+				URL:         fmt.Sprintf("/notes/media/%d", nm.ID),
 				Key:         nm.Key,
 			})
 		}
@@ -178,14 +169,10 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 		media := make([]*notes.NoteMedia, 0)
 		for _, nm := range allNoteMedias {
 			if nm.NoteID != nil && *nm.NoteID == n.ID {
-				url, err := s.options.signer.SignURL(fmt.Sprintf("/notes/media/%d", nm.ID))
-				if err != nil {
-					return nil, err
-				}
 				media = append(media, &notes.NoteMedia{
 					ID:          nm.ID,
 					ContentType: nm.ContentType,
-					URL:         url,
+					URL:         fmt.Sprintf("/notes/media/%d", nm.ID),
 					Key:         nm.Key,
 				})
 			}
@@ -291,16 +278,11 @@ func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMed
 		return nil, err
 	}
 
-	url, err := s.options.signer.SignURL(fmt.Sprintf("/notes/media/%d", media.ID))
-	if err != nil {
-		return nil, err
-	}
-
 	return &notes.NoteMedia{
 		ID:          media.ID,
 		Key:         media.Key,
 		ContentType: media.ContentType,
-		URL:         url,
+		URL:         fmt.Sprintf("/notes/media/%d", media.ID),
 	}, nil
 }
 

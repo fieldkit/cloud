@@ -109,9 +109,6 @@ func NewSigner(key []byte) (s *Signer) {
 }
 
 func (s *Signer) SignURL(url string) (string, error) {
-	if true {
-		return url, nil
-	}
 	now := time.Now()
 	token := jwtgo.New(jwtgo.SigningMethodHS512)
 	token.Claims = jwtgo.MapClaims{
@@ -123,7 +120,7 @@ func (s *Signer) SignURL(url string) (string, error) {
 		return "", err
 	}
 
-	return url + "?token=" + signed, nil
+	return url + "?auth=" + signed, nil
 }
 
 func (s *Signer) SignAndBustURL(url string, key *string) (*string, error) {

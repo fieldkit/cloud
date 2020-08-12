@@ -693,12 +693,9 @@ func UserType(signer *Signer, dm *data.User) (*user.User, error) {
 	}
 
 	if dm.MediaURL != nil {
-		url, err := signer.SignAndBustURL(fmt.Sprintf("/user/%d/media", dm.ID), dm.MediaURL)
-		if err != nil {
-			return nil, err
-		}
+		url := fmt.Sprintf("/user/%d/media", dm.ID)
 		userType.Photo = &user.UserPhoto{
-			URL: url,
+			URL: &url,
 		}
 	}
 
