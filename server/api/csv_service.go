@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"reflect"
 	"time"
 
 	"github.com/google/uuid"
@@ -78,6 +79,7 @@ func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPaylo
 	de := data.DataExport{
 		Token:     token[:],
 		UserID:    p.UserID(),
+		Kind:      reflect.TypeOf(messages.ExportCsv{}).Name(),
 		CreatedAt: time.Now(),
 		Progress:  0,
 	}
@@ -90,6 +92,7 @@ func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPaylo
 		UserID: p.UserID(),
 		Token:  token.String(),
 	}
+
 	if err := c.options.Publisher.Publish(ctx, &exportMessage); err != nil {
 		return nil, nil
 	}
@@ -146,6 +149,7 @@ func (c *CsvService) Status(ctx context.Context, payload *csvService.StatusPaylo
 		URL:         url,
 		CreatedAt:   de.CreatedAt.Unix() * 1000,
 		CompletedAt: &completedAt,
+		Kind:        de.Kind,
 		Progress:    de.Progress,
 		Args:        args,
 	}, nil

@@ -10,6 +10,7 @@ type DataExport struct {
 	ID          int64          `db:"id"`
 	Token       []byte         `db:"token"`
 	UserID      int32          `db:"user_id"`
+	Kind        string         `db:"kind"`
 	CreatedAt   time.Time      `db:"created_at"`
 	CompletedAt *time.Time     `db:"completed_at"`
 	DownloadURL *string        `db:"download_url"`

@@ -26,6 +26,7 @@ type ExportStatusView struct {
 	CompletedAt *int64
 	Progress    *float32
 	URL         *string
+	Kind        *string
 	Args        interface{}
 }
 
@@ -35,11 +36,12 @@ var (
 	ExportStatusMap = map[string][]string{
 		"default": []string{
 			"id",
+			"createdAt",
+			"completedAt",
+			"kind",
 			"progress",
 			"url",
 			"args",
-			"createdAt",
-			"completedAt",
 		},
 	}
 )
@@ -67,6 +69,9 @@ func ValidateExportStatusView(result *ExportStatusView) (err error) {
 	}
 	if result.Progress == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("progress", "result"))
+	}
+	if result.Kind == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("kind", "result"))
 	}
 	if result.Args == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("args", "result"))

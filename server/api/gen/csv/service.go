@@ -73,6 +73,7 @@ type ExportStatus struct {
 	CompletedAt *int64
 	Progress    float32
 	URL         *string
+	Kind        string
 	Args        interface{}
 }
 
@@ -141,18 +142,21 @@ func NewViewedExportStatus(res *ExportStatus, view string) *csvviews.ExportStatu
 // ExportStatus.
 func newExportStatus(vres *csvviews.ExportStatusView) *ExportStatus {
 	res := &ExportStatus{
+		CompletedAt: vres.CompletedAt,
 		URL:         vres.URL,
 		Args:        vres.Args,
-		CompletedAt: vres.CompletedAt,
 	}
 	if vres.ID != nil {
 		res.ID = *vres.ID
 	}
-	if vres.Progress != nil {
-		res.Progress = *vres.Progress
-	}
 	if vres.CreatedAt != nil {
 		res.CreatedAt = *vres.CreatedAt
+	}
+	if vres.Kind != nil {
+		res.Kind = *vres.Kind
+	}
+	if vres.Progress != nil {
+		res.Progress = *vres.Progress
 	}
 	return res
 }
@@ -166,6 +170,7 @@ func newExportStatusView(res *ExportStatus) *csvviews.ExportStatusView {
 		CompletedAt: res.CompletedAt,
 		Progress:    &res.Progress,
 		URL:         res.URL,
+		Kind:        &res.Kind,
 		Args:        res.Args,
 	}
 	return vres

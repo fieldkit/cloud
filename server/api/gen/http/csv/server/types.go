@@ -23,11 +23,12 @@ type ExportResponseBody struct {
 // response body.
 type StatusResponseBody struct {
 	ID          int64       `form:"id" json:"id" xml:"id"`
+	CreatedAt   int64       `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
+	Kind        string      `form:"kind" json:"kind" xml:"kind"`
 	Progress    float32     `form:"progress" json:"progress" xml:"progress"`
 	URL         *string     `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 	Args        interface{} `form:"args" json:"args" xml:"args"`
-	CreatedAt   int64       `form:"createdAt" json:"createdAt" xml:"createdAt"`
-	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
 }
 
 // ExportUnauthorizedResponseBody is the type of the "csv" service "export"
@@ -264,6 +265,7 @@ func NewStatusResponseBody(res *csvviews.ExportStatusView) *StatusResponseBody {
 		CompletedAt: res.CompletedAt,
 		Progress:    *res.Progress,
 		URL:         res.URL,
+		Kind:        *res.Kind,
 		Args:        res.Args,
 	}
 	return body

@@ -27,6 +27,7 @@ type StatusResponseBody struct {
 	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
 	Progress    *float32    `form:"progress,omitempty" json:"progress,omitempty" xml:"progress,omitempty"`
 	URL         *string     `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	Kind        *string     `form:"kind,omitempty" json:"kind,omitempty" xml:"kind,omitempty"`
 	Args        interface{} `form:"args,omitempty" json:"args,omitempty" xml:"args,omitempty"`
 }
 
@@ -322,6 +323,7 @@ func NewStatusExportStatusOK(body *StatusResponseBody) *csvviews.ExportStatusVie
 		CompletedAt: body.CompletedAt,
 		Progress:    body.Progress,
 		URL:         body.URL,
+		Kind:        body.Kind,
 		Args:        body.Args,
 	}
 
