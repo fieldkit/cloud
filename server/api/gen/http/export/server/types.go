@@ -30,6 +30,7 @@ type StatusResponseBody struct {
 	Progress    float32     `form:"progress" json:"progress" xml:"progress"`
 	StatusURL   string      `form:"statusUrl" json:"statusUrl" xml:"statusUrl"`
 	DownloadURL *string     `form:"downloadUrl,omitempty" json:"downloadUrl,omitempty" xml:"downloadUrl,omitempty"`
+	Size        *int32      `form:"size,omitempty" json:"size,omitempty" xml:"size,omitempty"`
 	Args        interface{} `form:"args" json:"args" xml:"args"`
 }
 
@@ -259,6 +260,7 @@ type ExportStatusResponseBody struct {
 	Progress    float32     `form:"progress" json:"progress" xml:"progress"`
 	StatusURL   string      `form:"statusUrl" json:"statusUrl" xml:"statusUrl"`
 	DownloadURL *string     `form:"downloadUrl,omitempty" json:"downloadUrl,omitempty" xml:"downloadUrl,omitempty"`
+	Size        *int32      `form:"size,omitempty" json:"size,omitempty" xml:"size,omitempty"`
 	Args        interface{} `form:"args" json:"args" xml:"args"`
 }
 
@@ -283,10 +285,11 @@ func NewStatusResponseBody(res *exportviews.ExportStatusView) *StatusResponseBod
 		Token:       *res.Token,
 		CreatedAt:   *res.CreatedAt,
 		CompletedAt: res.CompletedAt,
+		Kind:        *res.Kind,
 		Progress:    *res.Progress,
 		StatusURL:   *res.StatusURL,
 		DownloadURL: res.DownloadURL,
-		Kind:        *res.Kind,
+		Size:        res.Size,
 		Args:        res.Args,
 	}
 	return body

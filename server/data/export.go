@@ -14,6 +14,7 @@ type DataExport struct {
 	CreatedAt   time.Time      `db:"created_at"`
 	CompletedAt *time.Time     `db:"completed_at"`
 	DownloadURL *string        `db:"download_url"`
+	Size        *int32         `db:"size"`
 	Progress    float32        `db:"progress"`
 	Args        types.JSONText `db:"args"`
 }

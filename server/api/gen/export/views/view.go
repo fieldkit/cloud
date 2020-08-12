@@ -38,10 +38,11 @@ type ExportStatusView struct {
 	Token       *string
 	CreatedAt   *int64
 	CompletedAt *int64
+	Kind        *string
 	Progress    *float32
 	StatusURL   *string
 	DownloadURL *string
-	Kind        *string
+	Size        *int32
 	Args        interface{}
 }
 
@@ -65,6 +66,7 @@ var (
 			"progress",
 			"statusUrl",
 			"downloadUrl",
+			"size",
 			"args",
 		},
 	}
@@ -122,14 +124,14 @@ func ValidateExportStatusView(result *ExportStatusView) (err error) {
 	if result.CreatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("createdAt", "result"))
 	}
+	if result.Kind == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("kind", "result"))
+	}
 	if result.StatusURL == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("statusUrl", "result"))
 	}
 	if result.Progress == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("progress", "result"))
-	}
-	if result.Kind == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("kind", "result"))
 	}
 	if result.Args == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("args", "result"))

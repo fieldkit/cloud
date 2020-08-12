@@ -172,6 +172,7 @@ func MakeExportStatus(de *data.DataExport) (*exportService.ExportStatus, error) 
 		CreatedAt:   de.CreatedAt.Unix() * 1000,
 		CompletedAt: &completedAt,
 		Kind:        de.Kind,
+		Size:        de.Size,
 		Progress:    de.Progress,
 		Args:        args,
 	}, nil

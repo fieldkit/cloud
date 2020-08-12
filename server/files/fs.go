@@ -51,12 +51,17 @@ func (a *localFilesArchive) Archive(ctx context.Context, contentType string, met
 
 	defer file.Close()
 
-	io.Copy(file, cr)
+	copied, err := io.Copy(file, cr)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Infow("saved", "bytes_read", copied, "key", id.String())
 
 	ss := &ArchivedFile{
 		Key:       id.String(),
 		URL:       fn,
-		BytesRead: cr.bytesRead,
+		BytesRead: int(copied),
 	}
 
 	return ss, nil

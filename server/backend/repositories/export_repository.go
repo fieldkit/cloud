@@ -21,7 +21,7 @@ func NewExportRepository(db *sqlxcache.DB) (*ExportRepository, error) {
 func (r *ExportRepository) QueryByUserID(ctx context.Context, userID int32) (i []*data.DataExport, err error) {
 	found := []*data.DataExport{}
 	if err := r.db.SelectContext(ctx, &found, `
-		SELECT id, token, user_id, created_at, completed_at, download_url, progress, kind, args FROM fieldkit.data_export WHERE user_id = $1 ORDER BY completed_at DESC
+		SELECT id, token, user_id, created_at, completed_at, download_url, size, progress, kind, args FROM fieldkit.data_export WHERE user_id = $1 ORDER BY completed_at DESC
 		`, userID); err != nil {
 		return nil, fmt.Errorf("error querying for export: %v", err)
 	}
@@ -32,7 +32,7 @@ func (r *ExportRepository) QueryByUserID(ctx context.Context, userID int32) (i [
 func (r *ExportRepository) QueryByID(ctx context.Context, id int64) (i *data.DataExport, err error) {
 	found := []*data.DataExport{}
 	if err := r.db.SelectContext(ctx, &found, `
-		SELECT id, token, user_id, created_at, completed_at, download_url, progress, kind, args FROM fieldkit.data_export WHERE id = $1
+		SELECT id, token, user_id, created_at, completed_at, download_url, size, progress, kind, args FROM fieldkit.data_export WHERE id = $1
 		`, id); err != nil {
 		return nil, fmt.Errorf("error querying for export: %v", err)
 	}
@@ -51,7 +51,7 @@ func (r *ExportRepository) QueryByToken(ctx context.Context, token string) (i *d
 
 	found := []*data.DataExport{}
 	if err := r.db.SelectContext(ctx, &found, `
-		SELECT id, token, user_id, created_at, completed_at, download_url, progress, kind, args FROM fieldkit.data_export WHERE token = $1
+		SELECT id, token, user_id, created_at, completed_at, download_url, size, progress, kind, args FROM fieldkit.data_export WHERE token = $1
 		`, tokenBytes); err != nil {
 		return nil, fmt.Errorf("error querying for export: %v", err)
 	}
@@ -64,8 +64,8 @@ func (r *ExportRepository) QueryByToken(ctx context.Context, token string) (i *d
 
 func (r *ExportRepository) AddDataExport(ctx context.Context, de *data.DataExport) (i *data.DataExport, err error) {
 	if err := r.db.NamedGetContext(ctx, de, `
-		INSERT INTO fieldkit.data_export (token, user_id, created_at, completed_at, download_url, progress, kind, args)
-		VALUES (:token, :user_id, :created_at, :completed_at, :download_url, :progress, :kind, :args)
+		INSERT INTO fieldkit.data_export (token, user_id, created_at, completed_at, download_url, size, progress, kind, args)
+		VALUES (:token, :user_id, :created_at, :completed_at, :download_url, :size, :progress, :kind, :args)
 		RETURNING *
 		`, de); err != nil {
 		return nil, fmt.Errorf("error inserting export: %v", err)
@@ -82,8 +82,8 @@ func (r *ExportRepository) AddDataExportWithArgs(ctx context.Context, de *data.D
 	de.Args = serializedArgs
 
 	if err := r.db.NamedGetContext(ctx, de, `
-		INSERT INTO fieldkit.data_export (token, user_id, created_at, completed_at, download_url, progress, kind, args)
-		VALUES (:token, :user_id, :created_at, :completed_at, :download_url, :progress, :kind, :args)
+		INSERT INTO fieldkit.data_export (token, user_id, created_at, completed_at, download_url, size, progress, kind, args)
+		VALUES (:token, :user_id, :created_at, :completed_at, :download_url, :size, :progress, :kind, :args)
 		RETURNING *
 		`, de); err != nil {
 		return nil, fmt.Errorf("error inserting export: %v", err)
@@ -93,7 +93,7 @@ func (r *ExportRepository) AddDataExportWithArgs(ctx context.Context, de *data.D
 
 func (r *ExportRepository) UpdateDataExport(ctx context.Context, de *data.DataExport) (i *data.DataExport, err error) {
 	if err := r.db.NamedGetContext(ctx, de, `
-		UPDATE fieldkit.data_export SET progress = :progress, completed_at = :completed_at, download_url = :download_url WHERE id = :id RETURNING *
+		UPDATE fieldkit.data_export SET progress = :progress, completed_at = :completed_at, download_url = :download_url, size = :size WHERE id = :id RETURNING *
 		`, de); err != nil {
 		return nil, fmt.Errorf("error updating export: %v", err)
 	}

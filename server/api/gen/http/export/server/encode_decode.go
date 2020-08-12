@@ -344,10 +344,11 @@ func marshalExportviewsExportStatusViewToExportStatusResponseBody(v *exportviews
 		Token:       *v.Token,
 		CreatedAt:   *v.CreatedAt,
 		CompletedAt: v.CompletedAt,
+		Kind:        *v.Kind,
 		Progress:    *v.Progress,
 		StatusURL:   *v.StatusURL,
 		DownloadURL: v.DownloadURL,
-		Kind:        *v.Kind,
+		Size:        v.Size,
 		Args:        v.Args,
 	}
 

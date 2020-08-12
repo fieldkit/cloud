@@ -26,10 +26,11 @@ type StatusResponseBody struct {
 	Token       *string     `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
 	CreatedAt   *int64      `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
 	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
+	Kind        *string     `form:"kind,omitempty" json:"kind,omitempty" xml:"kind,omitempty"`
 	Progress    *float32    `form:"progress,omitempty" json:"progress,omitempty" xml:"progress,omitempty"`
 	StatusURL   *string     `form:"statusUrl,omitempty" json:"statusUrl,omitempty" xml:"statusUrl,omitempty"`
 	DownloadURL *string     `form:"downloadUrl,omitempty" json:"downloadUrl,omitempty" xml:"downloadUrl,omitempty"`
-	Kind        *string     `form:"kind,omitempty" json:"kind,omitempty" xml:"kind,omitempty"`
+	Size        *int32      `form:"size,omitempty" json:"size,omitempty" xml:"size,omitempty"`
 	Args        interface{} `form:"args,omitempty" json:"args,omitempty" xml:"args,omitempty"`
 }
 
@@ -255,10 +256,11 @@ type ExportStatusResponseBody struct {
 	Token       *string     `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
 	CreatedAt   *int64      `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
 	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
+	Kind        *string     `form:"kind,omitempty" json:"kind,omitempty" xml:"kind,omitempty"`
 	Progress    *float32    `form:"progress,omitempty" json:"progress,omitempty" xml:"progress,omitempty"`
 	StatusURL   *string     `form:"statusUrl,omitempty" json:"statusUrl,omitempty" xml:"statusUrl,omitempty"`
 	DownloadURL *string     `form:"downloadUrl,omitempty" json:"downloadUrl,omitempty" xml:"downloadUrl,omitempty"`
-	Kind        *string     `form:"kind,omitempty" json:"kind,omitempty" xml:"kind,omitempty"`
+	Size        *int32      `form:"size,omitempty" json:"size,omitempty" xml:"size,omitempty"`
 	Args        interface{} `form:"args,omitempty" json:"args,omitempty" xml:"args,omitempty"`
 }
 
@@ -342,10 +344,11 @@ func NewStatusExportStatusOK(body *StatusResponseBody) *exportviews.ExportStatus
 		Token:       body.Token,
 		CreatedAt:   body.CreatedAt,
 		CompletedAt: body.CompletedAt,
+		Kind:        body.Kind,
 		Progress:    body.Progress,
 		StatusURL:   body.StatusURL,
 		DownloadURL: body.DownloadURL,
-		Kind:        body.Kind,
+		Size:        body.Size,
 		Args:        body.Args,
 	}
 
@@ -780,14 +783,14 @@ func ValidateExportStatusResponseBody(body *ExportStatusResponseBody) (err error
 	if body.CreatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("createdAt", "body"))
 	}
+	if body.Kind == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("kind", "body"))
+	}
 	if body.StatusURL == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("statusUrl", "body"))
 	}
 	if body.Progress == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("progress", "body"))
-	}
-	if body.Kind == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("kind", "body"))
 	}
 	if body.Args == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("args", "body"))

@@ -64,10 +64,11 @@ type ExportStatus struct {
 	Token       string
 	CreatedAt   int64
 	CompletedAt *int64
+	Kind        string
 	Progress    float32
 	StatusURL   string
 	DownloadURL *string
-	Kind        string
+	Size        *int32
 	Args        interface{}
 }
 
@@ -177,6 +178,7 @@ func newExportStatus(vres *exportviews.ExportStatusView) *ExportStatus {
 	res := &ExportStatus{
 		CompletedAt: vres.CompletedAt,
 		DownloadURL: vres.DownloadURL,
+		Size:        vres.Size,
 		Args:        vres.Args,
 	}
 	if vres.ID != nil {
@@ -208,10 +210,11 @@ func newExportStatusView(res *ExportStatus) *exportviews.ExportStatusView {
 		Token:       &res.Token,
 		CreatedAt:   &res.CreatedAt,
 		CompletedAt: res.CompletedAt,
+		Kind:        &res.Kind,
 		Progress:    &res.Progress,
 		StatusURL:   &res.StatusURL,
 		DownloadURL: res.DownloadURL,
-		Kind:        &res.Kind,
+		Size:        res.Size,
 		Args:        res.Args,
 	}
 	return vres
@@ -228,10 +231,11 @@ func transformExportviewsExportStatusViewToExportStatus(v *exportviews.ExportSta
 		Token:       *v.Token,
 		CreatedAt:   *v.CreatedAt,
 		CompletedAt: v.CompletedAt,
+		Kind:        *v.Kind,
 		Progress:    *v.Progress,
 		StatusURL:   *v.StatusURL,
 		DownloadURL: v.DownloadURL,
-		Kind:        *v.Kind,
+		Size:        v.Size,
 		Args:        v.Args,
 	}
 
@@ -246,10 +250,11 @@ func transformExportStatusToExportviewsExportStatusView(v *ExportStatus) *export
 		Token:       &v.Token,
 		CreatedAt:   &v.CreatedAt,
 		CompletedAt: v.CompletedAt,
+		Kind:        &v.Kind,
 		Progress:    &v.Progress,
 		StatusURL:   &v.StatusURL,
 		DownloadURL: v.DownloadURL,
-		Kind:        &v.Kind,
+		Size:        v.Size,
 		Args:        v.Args,
 	}
 

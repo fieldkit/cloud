@@ -102,10 +102,14 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 		}
 
 		now := time.Now()
+		size := int32(af.BytesRead)
 
 		de.DownloadURL = &af.URL
 		de.CompletedAt = &now
 		de.Progress = 100
+		de.Size = &size
+
+		log.Infow("done", "bytes", size)
 
 		if _, err := r.UpdateDataExport(ctx, de); err != nil {
 			archiveError = err
@@ -116,6 +120,7 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 
 	// Walk the rows and dump their CSV representation.
 	writer := csv.NewWriter(pipeWriter)
+	records := 0
 
 	for queried.Next() {
 		row := &DataRow{}
@@ -123,6 +128,7 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 			return err
 		}
 		writer.Write(makeRow(row))
+		records += 1
 	}
 
 	writer.Flush()
@@ -133,7 +139,7 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 
 	wg.Wait()
 
-	log.Infow("done")
+	log.Infow("done", "records", records)
 
 	if archiveError != nil {
 		return archiveError
