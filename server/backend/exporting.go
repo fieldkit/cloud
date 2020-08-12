@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"sync"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 
@@ -100,7 +101,10 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 			log.Infow("archiver:done", "key", af.Key)
 		}
 
+		now := time.Now()
+
 		de.DownloadURL = &af.URL
+		de.CompletedAt = &now
 
 		if _, err := r.UpdateDataExport(ctx, de); err != nil {
 			archiveError = err

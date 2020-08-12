@@ -22,9 +22,12 @@ type ExportResponseBody struct {
 // StatusResponseBody is the type of the "csv" service "status" endpoint HTTP
 // response body.
 type StatusResponseBody struct {
-	ID       *int64   `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Progress *float32 `form:"progress,omitempty" json:"progress,omitempty" xml:"progress,omitempty"`
-	URL      *string  `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	ID          *int64      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	CreatedAt   *int64      `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
+	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
+	Progress    *float32    `form:"progress,omitempty" json:"progress,omitempty" xml:"progress,omitempty"`
+	URL         *string     `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	Args        interface{} `form:"args,omitempty" json:"args,omitempty" xml:"args,omitempty"`
 }
 
 // ExportUnauthorizedResponseBody is the type of the "csv" service "export"
@@ -314,9 +317,12 @@ func NewExportBadRequest(body *ExportBadRequestResponseBody) *goa.ServiceError {
 // a HTTP "OK" response.
 func NewStatusExportStatusOK(body *StatusResponseBody) *csvviews.ExportStatusView {
 	v := &csvviews.ExportStatusView{
-		ID:       body.ID,
-		Progress: body.Progress,
-		URL:      body.URL,
+		ID:          body.ID,
+		CreatedAt:   body.CreatedAt,
+		CompletedAt: body.CompletedAt,
+		Progress:    body.Progress,
+		URL:         body.URL,
+		Args:        body.Args,
 	}
 
 	return v

@@ -68,9 +68,12 @@ type StatusPayload struct {
 
 // ExportStatus is the result type of the csv service status method.
 type ExportStatus struct {
-	ID       int64
-	Progress float32
-	URL      *string
+	ID          int64
+	CreatedAt   int64
+	CompletedAt *int64
+	Progress    float32
+	URL         *string
+	Args        interface{}
 }
 
 // DownloadPayload is the payload type of the csv service download method.
@@ -138,13 +141,18 @@ func NewViewedExportStatus(res *ExportStatus, view string) *csvviews.ExportStatu
 // ExportStatus.
 func newExportStatus(vres *csvviews.ExportStatusView) *ExportStatus {
 	res := &ExportStatus{
-		URL: vres.URL,
+		URL:         vres.URL,
+		Args:        vres.Args,
+		CompletedAt: vres.CompletedAt,
 	}
 	if vres.ID != nil {
 		res.ID = *vres.ID
 	}
 	if vres.Progress != nil {
 		res.Progress = *vres.Progress
+	}
+	if vres.CreatedAt != nil {
+		res.CreatedAt = *vres.CreatedAt
 	}
 	return res
 }
@@ -153,9 +161,12 @@ func newExportStatus(vres *csvviews.ExportStatusView) *ExportStatus {
 // ExportStatusView using the "default" view.
 func newExportStatusView(res *ExportStatus) *csvviews.ExportStatusView {
 	vres := &csvviews.ExportStatusView{
-		ID:       &res.ID,
-		Progress: &res.Progress,
-		URL:      res.URL,
+		ID:          &res.ID,
+		CreatedAt:   &res.CreatedAt,
+		CompletedAt: res.CompletedAt,
+		Progress:    &res.Progress,
+		URL:         res.URL,
+		Args:        res.Args,
 	}
 	return vres
 }

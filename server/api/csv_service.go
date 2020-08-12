@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -125,16 +126,28 @@ func (c *CsvService) Status(ctx context.Context, payload *csvService.StatusPaylo
 	}
 
 	var url *string
-
 	if de.DownloadURL != nil {
 		downloadAt := fmt.Sprintf("/export/%v/download", payload.ID)
 		url = &downloadAt
 	}
 
+	completedAt := int64(0)
+	if de.CompletedAt != nil {
+		completedAt = de.CompletedAt.Unix() * 1000
+	}
+
+	args := make(map[string]interface{})
+	if err := json.Unmarshal(de.Args, &args); err != nil {
+		return nil, err
+	}
+
 	return &csvService.ExportStatus{
-		ID:       de.ID,
-		URL:      url,
-		Progress: de.Progress,
+		ID:          de.ID,
+		URL:         url,
+		CreatedAt:   de.CreatedAt.Unix() * 1000,
+		CompletedAt: &completedAt,
+		Progress:    de.Progress,
+		Args:        args,
 	}, nil
 }
 

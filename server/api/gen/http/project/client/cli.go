@@ -23,7 +23,7 @@ func BuildAddUpdatePayload(projectAddUpdateBody string, projectAddUpdateProjectI
 	{
 		err = json.Unmarshal([]byte(projectAddUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Iure reprehenderit accusamus architecto est aperiam saepe.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Molestiae qui repellat maxime nostrum et.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -88,7 +88,7 @@ func BuildModifyUpdatePayload(projectModifyUpdateBody string, projectModifyUpdat
 	{
 		err = json.Unmarshal([]byte(projectModifyUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Nisi et dolorem et repudiandae asperiores ut.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Quia rerum dolorem voluptates.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -266,7 +266,7 @@ func BuildAddPayload(projectAddBody string, projectAddAuth string) (*project.Add
 	{
 		err = json.Unmarshal([]byte(projectAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Voluptatem cum.\",\n      \"meta\": \"Aut sed hic est adipisci.\",\n      \"module\": \"Ducimus excepturi consectetur expedita ipsa.\",\n      \"profile\": \"Praesentium minima magni non corporis.\",\n      \"url\": \"Corrupti laboriosam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"In enim dolor adipisci ipsum.\",\n      \"meta\": \"Nostrum est quidem.\",\n      \"module\": \"Ea placeat autem voluptates delectus aut non.\",\n      \"profile\": \"Et et.\",\n      \"url\": \"Sed et animi aut possimus.\"\n   }'")
 		}
 	}
 	var auth string
@@ -299,7 +299,7 @@ func BuildUpdatePayload(projectUpdateBody string, projectUpdateProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Laborum nesciunt debitis dolores.\",\n      \"endTime\": \"Quia illo reiciendis excepturi doloremque maxime eos.\",\n      \"goal\": \"Fuga autem similique.\",\n      \"location\": \"Omnis ducimus dolor pariatur qui et.\",\n      \"name\": \"Est animi.\",\n      \"privacy\": 1119619863,\n      \"startTime\": \"Repellendus explicabo.\",\n      \"tags\": \"Totam enim qui nam rerum voluptatem.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Incidunt non quo.\",\n      \"endTime\": \"Eligendi aliquid voluptas.\",\n      \"goal\": \"Ipsa earum voluptate.\",\n      \"location\": \"Alias ipsam reiciendis aliquam impedit omnis.\",\n      \"name\": \"Laboriosam harum.\",\n      \"privacy\": 1543425890,\n      \"startTime\": \"Autem voluptate nemo cupiditate.\",\n      \"tags\": \"Numquam error.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -396,7 +396,7 @@ func BuildInvitePayload(projectInviteBody string, projectInviteProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectInviteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Non accusamus et.\",\n      \"role\": 1481626704\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Et soluta.\",\n      \"role\": 120394322\n   }'")
 		}
 	}
 	var projectID int32
@@ -433,7 +433,7 @@ func BuildRemoveUserPayload(projectRemoveUserBody string, projectRemoveUserProje
 	{
 		err = json.Unmarshal([]byte(projectRemoveUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Natus cum ut dolore et eaque aliquam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Perferendis esse.\"\n   }'")
 		}
 	}
 	var projectID int32

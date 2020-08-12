@@ -8,14 +8,20 @@ var ExportStatus = ResultType("application/vnd.app.export.status", func() {
 	TypeName("ExportStatus")
 	Attributes(func() {
 		Attribute("id", Int64)
+		Attribute("createdAt", Int64)
+		Attribute("completedAt", Int64)
 		Attribute("progress", Float32)
 		Attribute("url", String)
-		Required("id", "progress")
+		Attribute("args", Any)
+		Required("id", "createdAt", "progress", "args")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("progress")
 		Attribute("url")
+		Attribute("args")
+		Attribute("createdAt")
+		Attribute("completedAt")
 	})
 })
 
