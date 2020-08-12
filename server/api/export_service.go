@@ -146,12 +146,6 @@ func MakeExportStatuses(all []*data.DataExport) ([]*exportService.ExportStatus, 
 }
 
 func MakeExportStatus(de *data.DataExport) (*exportService.ExportStatus, error) {
-	var url *string
-	if de.DownloadURL != nil {
-		downloadAt := fmt.Sprintf("/export/%v/download", hex.EncodeToString(de.Token))
-		url = &downloadAt
-	}
-
 	completedAt := int64(0)
 	if de.CompletedAt != nil {
 		completedAt = de.CompletedAt.Unix() * 1000
@@ -162,9 +156,19 @@ func MakeExportStatus(de *data.DataExport) (*exportService.ExportStatus, error) 
 		return nil, err
 	}
 
+	var downloadURL *string
+	if de.DownloadURL != nil {
+		downloadAt := fmt.Sprintf("/export/%v/download", hex.EncodeToString(de.Token))
+		downloadURL = &downloadAt
+	}
+
+	statusURL := fmt.Sprintf("/export/%v", hex.EncodeToString(de.Token))
+
 	return &exportService.ExportStatus{
 		ID:          de.ID,
-		URL:         url,
+		Token:       hex.EncodeToString(de.Token),
+		StatusURL:   statusURL,
+		DownloadURL: downloadURL,
 		CreatedAt:   de.CreatedAt.Unix() * 1000,
 		CompletedAt: &completedAt,
 		Kind:        de.Kind,

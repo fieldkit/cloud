@@ -341,10 +341,12 @@ func EncodeDownloadError(encoder func(context.Context, http.ResponseWriter) goah
 func marshalExportviewsExportStatusViewToExportStatusResponseBody(v *exportviews.ExportStatusView) *ExportStatusResponseBody {
 	res := &ExportStatusResponseBody{
 		ID:          *v.ID,
+		Token:       *v.Token,
 		CreatedAt:   *v.CreatedAt,
 		CompletedAt: v.CompletedAt,
 		Progress:    *v.Progress,
-		URL:         v.URL,
+		StatusURL:   *v.StatusURL,
+		DownloadURL: v.DownloadURL,
 		Kind:        *v.Kind,
 		Args:        v.Args,
 	}

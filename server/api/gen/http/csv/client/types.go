@@ -12,12 +12,6 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// ExportResponseBody is the type of the "csv" service "export" endpoint HTTP
-// response body.
-type ExportResponseBody struct {
-	Location *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-}
-
 // ExportUnauthorizedResponseBody is the type of the "csv" service "export"
 // endpoint HTTP response body for the "unauthorized" error.
 type ExportUnauthorizedResponseBody struct {
@@ -90,12 +84,11 @@ type ExportBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// NewExportResultOK builds a "csv" service "export" endpoint result from a
-// HTTP "OK" response.
-func NewExportResultOK(body *ExportResponseBody) *csv.ExportResult {
-	v := &csv.ExportResult{
-		Location: *body.Location,
-	}
+// NewExportResultFound builds a "csv" service "export" endpoint result from a
+// HTTP "Found" response.
+func NewExportResultFound(location string) *csv.ExportResult {
+	v := &csv.ExportResult{}
+	v.Location = location
 
 	return v
 }
@@ -155,14 +148,6 @@ func NewExportBadRequest(body *ExportBadRequestResponseBody) *goa.ServiceError {
 	}
 
 	return v
-}
-
-// ValidateExportResponseBody runs the validations defined on ExportResponseBody
-func ValidateExportResponseBody(body *ExportResponseBody) (err error) {
-	if body.Location == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("location", "body"))
-	}
-	return
 }
 
 // ValidateExportUnauthorizedResponseBody runs the validations defined on

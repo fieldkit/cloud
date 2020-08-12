@@ -42,9 +42,9 @@ var _ = Service("csv", func() {
 				Param("tail")
 			})
 
-			Response(func() {
-				Body(func() {
-					Attribute("location")
+			Response(StatusFound, func() {
+				Headers(func() {
+					Header("location:Location")
 				})
 			})
 

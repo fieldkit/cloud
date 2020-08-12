@@ -23,11 +23,13 @@ type ListMineResponseBody struct {
 // HTTP response body.
 type StatusResponseBody struct {
 	ID          int64       `form:"id" json:"id" xml:"id"`
+	Token       string      `form:"token" json:"token" xml:"token"`
 	CreatedAt   int64       `form:"createdAt" json:"createdAt" xml:"createdAt"`
 	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
 	Kind        string      `form:"kind" json:"kind" xml:"kind"`
 	Progress    float32     `form:"progress" json:"progress" xml:"progress"`
-	URL         *string     `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	StatusURL   string      `form:"statusUrl" json:"statusUrl" xml:"statusUrl"`
+	DownloadURL *string     `form:"downloadUrl,omitempty" json:"downloadUrl,omitempty" xml:"downloadUrl,omitempty"`
 	Args        interface{} `form:"args" json:"args" xml:"args"`
 }
 
@@ -250,11 +252,13 @@ type DownloadBadRequestResponseBody struct {
 // ExportStatusResponseBody is used to define fields on response body types.
 type ExportStatusResponseBody struct {
 	ID          int64       `form:"id" json:"id" xml:"id"`
+	Token       string      `form:"token" json:"token" xml:"token"`
 	CreatedAt   int64       `form:"createdAt" json:"createdAt" xml:"createdAt"`
 	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
 	Kind        string      `form:"kind" json:"kind" xml:"kind"`
 	Progress    float32     `form:"progress" json:"progress" xml:"progress"`
-	URL         *string     `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	StatusURL   string      `form:"statusUrl" json:"statusUrl" xml:"statusUrl"`
+	DownloadURL *string     `form:"downloadUrl,omitempty" json:"downloadUrl,omitempty" xml:"downloadUrl,omitempty"`
 	Args        interface{} `form:"args" json:"args" xml:"args"`
 }
 
@@ -276,10 +280,12 @@ func NewListMineResponseBody(res *exportviews.UserExportsView) *ListMineResponse
 func NewStatusResponseBody(res *exportviews.ExportStatusView) *StatusResponseBody {
 	body := &StatusResponseBody{
 		ID:          *res.ID,
+		Token:       *res.Token,
 		CreatedAt:   *res.CreatedAt,
 		CompletedAt: res.CompletedAt,
 		Progress:    *res.Progress,
-		URL:         res.URL,
+		StatusURL:   *res.StatusURL,
+		DownloadURL: res.DownloadURL,
 		Kind:        *res.Kind,
 		Args:        res.Args,
 	}

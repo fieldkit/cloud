@@ -23,10 +23,9 @@ import (
 func EncodeExportResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res := v.(*csv.ExportResult)
-		enc := encoder(ctx, w)
-		body := NewExportResponseBody(res)
-		w.WriteHeader(http.StatusOK)
-		return enc.Encode(body)
+		w.Header().Set("Location", res.Location)
+		w.WriteHeader(http.StatusFound)
+		return nil
 	}
 }
 

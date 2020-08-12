@@ -460,10 +460,12 @@ func DecodeDownloadResponse(decoder func(*http.Response) goahttp.Decoder, restor
 func unmarshalExportStatusResponseBodyToExportviewsExportStatusView(v *ExportStatusResponseBody) *exportviews.ExportStatusView {
 	res := &exportviews.ExportStatusView{
 		ID:          v.ID,
+		Token:       v.Token,
 		CreatedAt:   v.CreatedAt,
 		CompletedAt: v.CompletedAt,
 		Progress:    v.Progress,
-		URL:         v.URL,
+		StatusURL:   v.StatusURL,
+		DownloadURL: v.DownloadURL,
 		Kind:        v.Kind,
 		Args:        v.Args,
 	}

@@ -12,12 +12,6 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// ExportResponseBody is the type of the "csv" service "export" endpoint HTTP
-// response body.
-type ExportResponseBody struct {
-	Location string `form:"location" json:"location" xml:"location"`
-}
-
 // ExportUnauthorizedResponseBody is the type of the "csv" service "export"
 // endpoint HTTP response body for the "unauthorized" error.
 type ExportUnauthorizedResponseBody struct {
@@ -88,15 +82,6 @@ type ExportBadRequestResponseBody struct {
 	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
 	// Is the error a server-side fault?
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// NewExportResponseBody builds the HTTP response body from the result of the
-// "export" endpoint of the "csv" service.
-func NewExportResponseBody(res *csv.ExportResult) *ExportResponseBody {
-	body := &ExportResponseBody{
-		Location: res.Location,
-	}
-	return body
 }
 
 // NewExportUnauthorizedResponseBody builds the HTTP response body from the

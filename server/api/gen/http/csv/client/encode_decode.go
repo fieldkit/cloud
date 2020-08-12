@@ -17,6 +17,7 @@ import (
 
 	csv "github.com/fieldkit/cloud/server/api/gen/csv"
 	goahttp "goa.design/goa/v3/http"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildExportRequest instantiates a HTTP request object with method and path
@@ -100,20 +101,20 @@ func DecodeExportResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			defer resp.Body.Close()
 		}
 		switch resp.StatusCode {
-		case http.StatusOK:
+		case http.StatusFound:
 			var (
-				body ExportResponseBody
-				err  error
+				location string
+				err      error
 			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("csv", "export", err)
+			locationRaw := resp.Header.Get("Location")
+			if locationRaw == "" {
+				err = goa.MergeErrors(err, goa.MissingFieldError("Location", "header"))
 			}
-			err = ValidateExportResponseBody(&body)
+			location = locationRaw
 			if err != nil {
 				return nil, goahttp.ErrValidationError("csv", "export", err)
 			}
-			res := NewExportResultOK(&body)
+			res := NewExportResultFound(location)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (

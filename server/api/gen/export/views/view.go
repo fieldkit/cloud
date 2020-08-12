@@ -35,10 +35,12 @@ type UserExportsView struct {
 // ExportStatusView is a type that runs validations on a projected type.
 type ExportStatusView struct {
 	ID          *int64
+	Token       *string
 	CreatedAt   *int64
 	CompletedAt *int64
 	Progress    *float32
-	URL         *string
+	StatusURL   *string
+	DownloadURL *string
 	Kind        *string
 	Args        interface{}
 }
@@ -56,11 +58,13 @@ var (
 	ExportStatusMap = map[string][]string{
 		"default": []string{
 			"id",
+			"token",
 			"createdAt",
 			"completedAt",
 			"kind",
 			"progress",
-			"url",
+			"statusUrl",
+			"downloadUrl",
 			"args",
 		},
 	}
@@ -112,8 +116,14 @@ func ValidateExportStatusView(result *ExportStatusView) (err error) {
 	if result.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
 	}
+	if result.Token == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("token", "result"))
+	}
 	if result.CreatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("createdAt", "result"))
+	}
+	if result.StatusURL == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("statusUrl", "result"))
 	}
 	if result.Progress == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("progress", "result"))

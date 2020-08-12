@@ -61,10 +61,12 @@ type StatusPayload struct {
 // ExportStatus is the result type of the export service status method.
 type ExportStatus struct {
 	ID          int64
+	Token       string
 	CreatedAt   int64
 	CompletedAt *int64
 	Progress    float32
-	URL         *string
+	StatusURL   string
+	DownloadURL *string
 	Kind        string
 	Args        interface{}
 }
@@ -174,11 +176,14 @@ func newUserExportsView(res *UserExports) *exportviews.UserExportsView {
 func newExportStatus(vres *exportviews.ExportStatusView) *ExportStatus {
 	res := &ExportStatus{
 		CompletedAt: vres.CompletedAt,
-		URL:         vres.URL,
+		DownloadURL: vres.DownloadURL,
 		Args:        vres.Args,
 	}
 	if vres.ID != nil {
 		res.ID = *vres.ID
+	}
+	if vres.Token != nil {
+		res.Token = *vres.Token
 	}
 	if vres.CreatedAt != nil {
 		res.CreatedAt = *vres.CreatedAt
@@ -189,6 +194,9 @@ func newExportStatus(vres *exportviews.ExportStatusView) *ExportStatus {
 	if vres.Progress != nil {
 		res.Progress = *vres.Progress
 	}
+	if vres.StatusURL != nil {
+		res.StatusURL = *vres.StatusURL
+	}
 	return res
 }
 
@@ -197,10 +205,12 @@ func newExportStatus(vres *exportviews.ExportStatusView) *ExportStatus {
 func newExportStatusView(res *ExportStatus) *exportviews.ExportStatusView {
 	vres := &exportviews.ExportStatusView{
 		ID:          &res.ID,
+		Token:       &res.Token,
 		CreatedAt:   &res.CreatedAt,
 		CompletedAt: res.CompletedAt,
 		Progress:    &res.Progress,
-		URL:         res.URL,
+		StatusURL:   &res.StatusURL,
+		DownloadURL: res.DownloadURL,
 		Kind:        &res.Kind,
 		Args:        res.Args,
 	}
@@ -215,10 +225,12 @@ func transformExportviewsExportStatusViewToExportStatus(v *exportviews.ExportSta
 	}
 	res := &ExportStatus{
 		ID:          *v.ID,
+		Token:       *v.Token,
 		CreatedAt:   *v.CreatedAt,
 		CompletedAt: v.CompletedAt,
 		Progress:    *v.Progress,
-		URL:         v.URL,
+		StatusURL:   *v.StatusURL,
+		DownloadURL: v.DownloadURL,
 		Kind:        *v.Kind,
 		Args:        v.Args,
 	}
@@ -231,10 +243,12 @@ func transformExportviewsExportStatusViewToExportStatus(v *exportviews.ExportSta
 func transformExportStatusToExportviewsExportStatusView(v *ExportStatus) *exportviews.ExportStatusView {
 	res := &exportviews.ExportStatusView{
 		ID:          &v.ID,
+		Token:       &v.Token,
 		CreatedAt:   &v.CreatedAt,
 		CompletedAt: v.CompletedAt,
 		Progress:    &v.Progress,
-		URL:         v.URL,
+		StatusURL:   &v.StatusURL,
+		DownloadURL: v.DownloadURL,
 		Kind:        &v.Kind,
 		Args:        v.Args,
 	}

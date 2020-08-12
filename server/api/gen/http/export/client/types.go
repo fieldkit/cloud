@@ -23,10 +23,12 @@ type ListMineResponseBody struct {
 // HTTP response body.
 type StatusResponseBody struct {
 	ID          *int64      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Token       *string     `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
 	CreatedAt   *int64      `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
 	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
 	Progress    *float32    `form:"progress,omitempty" json:"progress,omitempty" xml:"progress,omitempty"`
-	URL         *string     `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	StatusURL   *string     `form:"statusUrl,omitempty" json:"statusUrl,omitempty" xml:"statusUrl,omitempty"`
+	DownloadURL *string     `form:"downloadUrl,omitempty" json:"downloadUrl,omitempty" xml:"downloadUrl,omitempty"`
 	Kind        *string     `form:"kind,omitempty" json:"kind,omitempty" xml:"kind,omitempty"`
 	Args        interface{} `form:"args,omitempty" json:"args,omitempty" xml:"args,omitempty"`
 }
@@ -250,10 +252,12 @@ type DownloadBadRequestResponseBody struct {
 // ExportStatusResponseBody is used to define fields on response body types.
 type ExportStatusResponseBody struct {
 	ID          *int64      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Token       *string     `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
 	CreatedAt   *int64      `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
 	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
 	Progress    *float32    `form:"progress,omitempty" json:"progress,omitempty" xml:"progress,omitempty"`
-	URL         *string     `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	StatusURL   *string     `form:"statusUrl,omitempty" json:"statusUrl,omitempty" xml:"statusUrl,omitempty"`
+	DownloadURL *string     `form:"downloadUrl,omitempty" json:"downloadUrl,omitempty" xml:"downloadUrl,omitempty"`
 	Kind        *string     `form:"kind,omitempty" json:"kind,omitempty" xml:"kind,omitempty"`
 	Args        interface{} `form:"args,omitempty" json:"args,omitempty" xml:"args,omitempty"`
 }
@@ -335,10 +339,12 @@ func NewListMineBadRequest(body *ListMineBadRequestResponseBody) *goa.ServiceErr
 func NewStatusExportStatusOK(body *StatusResponseBody) *exportviews.ExportStatusView {
 	v := &exportviews.ExportStatusView{
 		ID:          body.ID,
+		Token:       body.Token,
 		CreatedAt:   body.CreatedAt,
 		CompletedAt: body.CompletedAt,
 		Progress:    body.Progress,
-		URL:         body.URL,
+		StatusURL:   body.StatusURL,
+		DownloadURL: body.DownloadURL,
 		Kind:        body.Kind,
 		Args:        body.Args,
 	}
@@ -768,8 +774,14 @@ func ValidateExportStatusResponseBody(body *ExportStatusResponseBody) (err error
 	if body.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
 	}
+	if body.Token == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("token", "body"))
+	}
 	if body.CreatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("createdAt", "body"))
+	}
+	if body.StatusURL == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("statusUrl", "body"))
 	}
 	if body.Progress == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("progress", "body"))
