@@ -105,6 +105,7 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 
 		de.DownloadURL = &af.URL
 		de.CompletedAt = &now
+		de.Progress = 100
 
 		if _, err := r.UpdateDataExport(ctx, de); err != nil {
 			archiveError = err
