@@ -102,20 +102,20 @@ func DecodeExportResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			defer resp.Body.Close()
 		}
 		switch resp.StatusCode {
-		case http.StatusFound:
+		case http.StatusOK:
 			var (
-				location string
-				err      error
+				body ExportResponseBody
+				err  error
 			)
-			locationRaw := resp.Header.Get("Location")
-			if locationRaw == "" {
-				err = goa.MergeErrors(err, goa.MissingFieldError("Location", "header"))
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("csv", "export", err)
 			}
-			location = locationRaw
+			err = ValidateExportResponseBody(&body)
 			if err != nil {
 				return nil, goahttp.ErrValidationError("csv", "export", err)
 			}
-			res := NewExportResultFound(location)
+			res := NewExportResultOK(&body)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (
