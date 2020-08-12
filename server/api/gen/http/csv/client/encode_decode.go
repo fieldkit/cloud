@@ -181,6 +181,141 @@ func DecodeExportResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 	}
 }
 
+// BuildListMineRequest instantiates a HTTP request object with method and path
+// set to call the "csv" service "list mine" endpoint
+func (c *Client) BuildListMineRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListMineCsvPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("csv", "list mine", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeListMineRequest returns an encoder for requests sent to the csv list
+// mine server.
+func EncodeListMineRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*csv.ListMinePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("csv", "list mine", "*csv.ListMinePayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeListMineResponse returns a decoder for responses returned by the csv
+// list mine endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeListMineResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeListMineResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ListMineResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("csv", "list mine", err)
+			}
+			p := NewListMineUserExportsOK(&body)
+			view := "default"
+			vres := &csvviews.UserExports{Projected: p, View: view}
+			if err = csvviews.ValidateUserExports(vres); err != nil {
+				return nil, goahttp.ErrValidationError("csv", "list mine", err)
+			}
+			res := csv.NewUserExports(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body ListMineUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("csv", "list mine", err)
+			}
+			err = ValidateListMineUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("csv", "list mine", err)
+			}
+			return nil, NewListMineUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ListMineForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("csv", "list mine", err)
+			}
+			err = ValidateListMineForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("csv", "list mine", err)
+			}
+			return nil, NewListMineForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ListMineNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("csv", "list mine", err)
+			}
+			err = ValidateListMineNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("csv", "list mine", err)
+			}
+			return nil, NewListMineNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ListMineBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("csv", "list mine", err)
+			}
+			err = ValidateListMineBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("csv", "list mine", err)
+			}
+			return nil, NewListMineBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("csv", "list mine", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildStatusRequest instantiates a HTTP request object with method and path
 // set to call the "csv" service "status" endpoint
 func (c *Client) BuildStatusRequest(ctx context.Context, v interface{}) (*http.Request, error) {
@@ -477,4 +612,21 @@ func DecodeDownloadResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			return nil, goahttp.ErrInvalidResponse("csv", "download", resp.StatusCode, string(body))
 		}
 	}
+}
+
+// unmarshalExportStatusResponseBodyToCsvviewsExportStatusView builds a value
+// of type *csvviews.ExportStatusView from a value of type
+// *ExportStatusResponseBody.
+func unmarshalExportStatusResponseBodyToCsvviewsExportStatusView(v *ExportStatusResponseBody) *csvviews.ExportStatusView {
+	res := &csvviews.ExportStatusView{
+		ID:          v.ID,
+		CreatedAt:   v.CreatedAt,
+		CompletedAt: v.CompletedAt,
+		Progress:    v.Progress,
+		URL:         v.URL,
+		Kind:        v.Kind,
+		Args:        v.Args,
+	}
+
+	return res
 }

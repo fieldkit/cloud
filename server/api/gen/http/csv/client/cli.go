@@ -109,6 +109,19 @@ func BuildExportPayload(csvExportStart string, csvExportEnd string, csvExportSta
 	return v, nil
 }
 
+// BuildListMinePayload builds the payload for the csv list mine endpoint from
+// CLI flags.
+func BuildListMinePayload(csvListMineAuth string) (*csv.ListMinePayload, error) {
+	var auth string
+	{
+		auth = csvListMineAuth
+	}
+	v := &csv.ListMinePayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
 // BuildStatusPayload builds the payload for the csv status endpoint from CLI
 // flags.
 func BuildStatusPayload(csvStatusID string, csvStatusAuth string) (*csv.StatusPayload, error) {

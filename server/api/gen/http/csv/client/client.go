@@ -21,6 +21,10 @@ type Client struct {
 	// Export Doer is the HTTP client used to make requests to the export endpoint.
 	ExportDoer goahttp.Doer
 
+	// ListMine Doer is the HTTP client used to make requests to the list mine
+	// endpoint.
+	ListMineDoer goahttp.Doer
+
 	// Status Doer is the HTTP client used to make requests to the status endpoint.
 	StatusDoer goahttp.Doer
 
@@ -52,6 +56,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		ExportDoer:          doer,
+		ListMineDoer:        doer,
 		StatusDoer:          doer,
 		DownloadDoer:        doer,
 		CORSDoer:            doer,
@@ -82,6 +87,30 @@ func (c *Client) Export() goa.Endpoint {
 		resp, err := c.ExportDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("csv", "export", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// ListMine returns an endpoint that makes HTTP requests to the csv service
+// list mine server.
+func (c *Client) ListMine() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeListMineRequest(c.encoder)
+		decodeResponse = DecodeListMineResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildListMineRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ListMineDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("csv", "list mine", err)
 		}
 		return decodeResponse(resp)
 	}

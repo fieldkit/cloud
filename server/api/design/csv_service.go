@@ -27,6 +27,17 @@ var ExportStatus = ResultType("application/vnd.app.export.status", func() {
 	})
 })
 
+var UserExports = ResultType("application/vnd.app.exports", func() {
+	TypeName("UserExports")
+	Attributes(func() {
+		Attribute("exports", ArrayOf(ExportStatus))
+		Required("exports")
+	})
+	View("default", func() {
+		Attribute("exports")
+	})
+})
+
 var _ = Service("csv", func() {
 	Method("export", func() {
 		Security(JWTAuth, func() {
@@ -70,6 +81,25 @@ var _ = Service("csv", func() {
 					Attribute("location")
 				})
 			})
+
+			httpAuthentication()
+		})
+	})
+
+	Method("list mine", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+		})
+
+		Result(UserExports)
+
+		HTTP(func() {
+			GET("export")
 
 			httpAuthentication()
 		})

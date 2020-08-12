@@ -20,6 +20,8 @@ import (
 type Service interface {
 	// Export implements export.
 	Export(context.Context, *ExportPayload) (res *ExportResult, err error)
+	// ListMine implements list mine.
+	ListMine(context.Context, *ListMinePayload) (res *UserExports, err error)
 	// Status implements status.
 	Status(context.Context, *StatusPayload) (res *ExportStatus, err error)
 	// Download implements download.
@@ -40,7 +42,7 @@ const ServiceName = "csv"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [3]string{"export", "status", "download"}
+var MethodNames = [4]string{"export", "list mine", "status", "download"}
 
 // ExportPayload is the payload type of the csv service export method.
 type ExportPayload struct {
@@ -58,6 +60,16 @@ type ExportPayload struct {
 // ExportResult is the result type of the csv service export method.
 type ExportResult struct {
 	Location string
+}
+
+// ListMinePayload is the payload type of the csv service list mine method.
+type ListMinePayload struct {
+	Auth string
+}
+
+// UserExports is the result type of the csv service list mine method.
+type UserExports struct {
+	Exports []*ExportStatus
 }
 
 // StatusPayload is the payload type of the csv service status method.
@@ -125,6 +137,19 @@ func MakeBadRequest(err error) *goa.ServiceError {
 	}
 }
 
+// NewUserExports initializes result type UserExports from viewed result type
+// UserExports.
+func NewUserExports(vres *csvviews.UserExports) *UserExports {
+	return newUserExports(vres.Projected)
+}
+
+// NewViewedUserExports initializes viewed result type UserExports from result
+// type UserExports using the given view.
+func NewViewedUserExports(res *UserExports, view string) *csvviews.UserExports {
+	p := newUserExportsView(res)
+	return &csvviews.UserExports{Projected: p, View: "default"}
+}
+
 // NewExportStatus initializes result type ExportStatus from viewed result type
 // ExportStatus.
 func NewExportStatus(vres *csvviews.ExportStatus) *ExportStatus {
@@ -136,6 +161,32 @@ func NewExportStatus(vres *csvviews.ExportStatus) *ExportStatus {
 func NewViewedExportStatus(res *ExportStatus, view string) *csvviews.ExportStatus {
 	p := newExportStatusView(res)
 	return &csvviews.ExportStatus{Projected: p, View: "default"}
+}
+
+// newUserExports converts projected type UserExports to service type
+// UserExports.
+func newUserExports(vres *csvviews.UserExportsView) *UserExports {
+	res := &UserExports{}
+	if vres.Exports != nil {
+		res.Exports = make([]*ExportStatus, len(vres.Exports))
+		for i, val := range vres.Exports {
+			res.Exports[i] = transformCsvviewsExportStatusViewToExportStatus(val)
+		}
+	}
+	return res
+}
+
+// newUserExportsView projects result type UserExports to projected type
+// UserExportsView using the "default" view.
+func newUserExportsView(res *UserExports) *csvviews.UserExportsView {
+	vres := &csvviews.UserExportsView{}
+	if res.Exports != nil {
+		vres.Exports = make([]*csvviews.ExportStatusView, len(res.Exports))
+		for i, val := range res.Exports {
+			vres.Exports[i] = transformExportStatusToCsvviewsExportStatusView(val)
+		}
+	}
+	return vres
 }
 
 // newExportStatus converts projected type ExportStatus to service type
@@ -174,4 +225,39 @@ func newExportStatusView(res *ExportStatus) *csvviews.ExportStatusView {
 		Args:        res.Args,
 	}
 	return vres
+}
+
+// transformCsvviewsExportStatusViewToExportStatus builds a value of type
+// *ExportStatus from a value of type *csvviews.ExportStatusView.
+func transformCsvviewsExportStatusViewToExportStatus(v *csvviews.ExportStatusView) *ExportStatus {
+	if v == nil {
+		return nil
+	}
+	res := &ExportStatus{
+		ID:          *v.ID,
+		CreatedAt:   *v.CreatedAt,
+		CompletedAt: v.CompletedAt,
+		Progress:    *v.Progress,
+		URL:         v.URL,
+		Kind:        *v.Kind,
+		Args:        v.Args,
+	}
+
+	return res
+}
+
+// transformExportStatusToCsvviewsExportStatusView builds a value of type
+// *csvviews.ExportStatusView from a value of type *ExportStatus.
+func transformExportStatusToCsvviewsExportStatusView(v *ExportStatus) *csvviews.ExportStatusView {
+	res := &csvviews.ExportStatusView{
+		ID:          &v.ID,
+		CreatedAt:   &v.CreatedAt,
+		CompletedAt: v.CompletedAt,
+		Progress:    &v.Progress,
+		URL:         v.URL,
+		Kind:        &v.Kind,
+		Args:        v.Args,
+	}
+
+	return res
 }

@@ -19,6 +19,12 @@ type ExportResponseBody struct {
 	Location string `form:"location" json:"location" xml:"location"`
 }
 
+// ListMineResponseBody is the type of the "csv" service "list mine" endpoint
+// HTTP response body.
+type ListMineResponseBody struct {
+	Exports []*ExportStatusResponseBody `form:"exports" json:"exports" xml:"exports"`
+}
+
 // StatusResponseBody is the type of the "csv" service "status" endpoint HTTP
 // response body.
 type StatusResponseBody struct {
@@ -88,6 +94,78 @@ type ExportNotFoundResponseBody struct {
 // ExportBadRequestResponseBody is the type of the "csv" service "export"
 // endpoint HTTP response body for the "bad-request" error.
 type ExportBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListMineUnauthorizedResponseBody is the type of the "csv" service "list
+// mine" endpoint HTTP response body for the "unauthorized" error.
+type ListMineUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListMineForbiddenResponseBody is the type of the "csv" service "list mine"
+// endpoint HTTP response body for the "forbidden" error.
+type ListMineForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListMineNotFoundResponseBody is the type of the "csv" service "list mine"
+// endpoint HTTP response body for the "not-found" error.
+type ListMineNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListMineBadRequestResponseBody is the type of the "csv" service "list mine"
+// endpoint HTTP response body for the "bad-request" error.
+type ListMineBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -247,11 +325,35 @@ type DownloadBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// ExportStatusResponseBody is used to define fields on response body types.
+type ExportStatusResponseBody struct {
+	ID          int64       `form:"id" json:"id" xml:"id"`
+	CreatedAt   int64       `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
+	Kind        string      `form:"kind" json:"kind" xml:"kind"`
+	Progress    float32     `form:"progress" json:"progress" xml:"progress"`
+	URL         *string     `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	Args        interface{} `form:"args" json:"args" xml:"args"`
+}
+
 // NewExportResponseBody builds the HTTP response body from the result of the
 // "export" endpoint of the "csv" service.
 func NewExportResponseBody(res *csv.ExportResult) *ExportResponseBody {
 	body := &ExportResponseBody{
 		Location: res.Location,
+	}
+	return body
+}
+
+// NewListMineResponseBody builds the HTTP response body from the result of the
+// "list mine" endpoint of the "csv" service.
+func NewListMineResponseBody(res *csvviews.UserExportsView) *ListMineResponseBody {
+	body := &ListMineResponseBody{}
+	if res.Exports != nil {
+		body.Exports = make([]*ExportStatusResponseBody, len(res.Exports))
+		for i, val := range res.Exports {
+			body.Exports[i] = marshalCsvviewsExportStatusViewToExportStatusResponseBody(val)
+		}
 	}
 	return body
 }
@@ -317,6 +419,62 @@ func NewExportNotFoundResponseBody(res *goa.ServiceError) *ExportNotFoundRespons
 // result of the "export" endpoint of the "csv" service.
 func NewExportBadRequestResponseBody(res *goa.ServiceError) *ExportBadRequestResponseBody {
 	body := &ExportBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListMineUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "csv" service.
+func NewListMineUnauthorizedResponseBody(res *goa.ServiceError) *ListMineUnauthorizedResponseBody {
+	body := &ListMineUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListMineForbiddenResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "csv" service.
+func NewListMineForbiddenResponseBody(res *goa.ServiceError) *ListMineForbiddenResponseBody {
+	body := &ListMineForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListMineNotFoundResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "csv" service.
+func NewListMineNotFoundResponseBody(res *goa.ServiceError) *ListMineNotFoundResponseBody {
+	body := &ListMineNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListMineBadRequestResponseBody builds the HTTP response body from the
+// result of the "list mine" endpoint of the "csv" service.
+func NewListMineBadRequestResponseBody(res *goa.ServiceError) *ListMineBadRequestResponseBody {
+	body := &ListMineBadRequestResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -450,6 +608,14 @@ func NewExportPayload(start *int64, end *int64, stations *string, sensors *strin
 	v.Aggregate = aggregate
 	v.Complete = complete
 	v.Tail = tail
+	v.Auth = auth
+
+	return v
+}
+
+// NewListMinePayload builds a csv service list mine endpoint payload.
+func NewListMinePayload(auth string) *csv.ListMinePayload {
+	v := &csv.ListMinePayload{}
 	v.Auth = auth
 
 	return v

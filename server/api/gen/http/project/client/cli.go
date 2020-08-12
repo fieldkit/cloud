@@ -23,7 +23,7 @@ func BuildAddUpdatePayload(projectAddUpdateBody string, projectAddUpdateProjectI
 	{
 		err = json.Unmarshal([]byte(projectAddUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Suscipit quia.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Quidem nisi et dolorem.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -88,7 +88,7 @@ func BuildModifyUpdatePayload(projectModifyUpdateBody string, projectModifyUpdat
 	{
 		err = json.Unmarshal([]byte(projectModifyUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Totam aliquid.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"body\": \"Quia occaecati a sequi vero reiciendis.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -266,7 +266,7 @@ func BuildAddPayload(projectAddBody string, projectAddAuth string) (*project.Add
 	{
 		err = json.Unmarshal([]byte(projectAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Tenetur odio minus amet.\",\n      \"meta\": \"Natus accusantium adipisci mollitia cupiditate.\",\n      \"module\": \"Possimus magni.\",\n      \"profile\": \"Voluptatem aut eligendi qui.\",\n      \"url\": \"Quidem voluptate numquam recusandae.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Adipisci mollitia cupiditate laudantium eligendi.\",\n      \"meta\": \"Rerum quaerat eius quibusdam.\",\n      \"module\": \"Neque rerum sunt consequatur nisi eum.\",\n      \"profile\": \"Amet quam quia sit sunt voluptatum distinctio.\",\n      \"url\": \"Harum non.\"\n   }'")
 		}
 	}
 	var auth string
@@ -299,7 +299,7 @@ func BuildUpdatePayload(projectUpdateBody string, projectUpdateProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Laborum nesciunt debitis dolores.\",\n      \"endTime\": \"Quia illo reiciendis excepturi doloremque maxime eos.\",\n      \"goal\": \"Fuga autem similique.\",\n      \"location\": \"Omnis ducimus dolor pariatur qui et.\",\n      \"name\": \"Est animi.\",\n      \"privacy\": 1119619863,\n      \"startTime\": \"Repellendus explicabo.\",\n      \"tags\": \"Totam enim qui nam rerum voluptatem.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Ullam sit.\",\n      \"endTime\": \"Necessitatibus velit.\",\n      \"goal\": \"Animi magni incidunt.\",\n      \"location\": \"Quo pariatur possimus odio et et.\",\n      \"name\": \"Magnam aut velit temporibus.\",\n      \"privacy\": 2136274809,\n      \"startTime\": \"Perferendis laborum.\",\n      \"tags\": \"Rem nam.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -396,7 +396,7 @@ func BuildInvitePayload(projectInviteBody string, projectInviteProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectInviteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Non accusamus et.\",\n      \"role\": 1481626704\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Fugit voluptatem.\",\n      \"role\": 351639931\n   }'")
 		}
 	}
 	var projectID int32
@@ -433,7 +433,7 @@ func BuildRemoveUserPayload(projectRemoveUserBody string, projectRemoveUserProje
 	{
 		err = json.Unmarshal([]byte(projectRemoveUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Natus cum ut dolore et eaque aliquam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Sapiente animi eos rerum facilis.\"\n   }'")
 		}
 	}
 	var projectID int32

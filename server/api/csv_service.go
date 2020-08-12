@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -104,6 +105,32 @@ func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPaylo
 	}, nil
 }
 
+func (c *CsvService) ListMine(ctx context.Context, payload *csvService.ListMinePayload) (*csvService.UserExports, error) {
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := repositories.NewExportRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	mine, err := r.QueryByUserID(ctx, p.UserID())
+	if err != nil {
+		return nil, err
+	}
+
+	web, err := MakeExportStatuses(mine)
+	if err != nil {
+		return nil, err
+	}
+
+	return &csvService.UserExports{
+		Exports: web,
+	}, nil
+}
+
 func (c *CsvService) Status(ctx context.Context, payload *csvService.StatusPayload) (*csvService.ExportStatus, error) {
 	log := Logger(ctx).Sugar()
 
@@ -112,7 +139,7 @@ func (c *CsvService) Status(ctx context.Context, payload *csvService.StatusPaylo
 		return nil, err
 	}
 
-	log.Infow("download", "token", payload.ID, "user_id", p.UserID())
+	log.Infow("status", "token", payload.ID, "user_id", p.UserID())
 
 	r, err := repositories.NewExportRepository(c.options.Database)
 	if err != nil {
@@ -128,31 +155,7 @@ func (c *CsvService) Status(ctx context.Context, payload *csvService.StatusPaylo
 		return nil, csvService.MakeForbidden(errors.New("forbidden"))
 	}
 
-	var url *string
-	if de.DownloadURL != nil {
-		downloadAt := fmt.Sprintf("/export/%v/download", payload.ID)
-		url = &downloadAt
-	}
-
-	completedAt := int64(0)
-	if de.CompletedAt != nil {
-		completedAt = de.CompletedAt.Unix() * 1000
-	}
-
-	args := make(map[string]interface{})
-	if err := json.Unmarshal(de.Args, &args); err != nil {
-		return nil, err
-	}
-
-	return &csvService.ExportStatus{
-		ID:          de.ID,
-		URL:         url,
-		CreatedAt:   de.CreatedAt.Unix() * 1000,
-		CompletedAt: &completedAt,
-		Kind:        de.Kind,
-		Progress:    de.Progress,
-		Args:        args,
-	}, nil
+	return MakeExportStatus(de)
 }
 
 func (c *CsvService) Download(ctx context.Context, payload *csvService.DownloadPayload) (*csvService.DownloadResult, io.ReadCloser, error) {
@@ -203,4 +206,44 @@ func (s *CsvService) JWTAuth(ctx context.Context, token string, scheme *security
 		Unauthorized: func(m string) error { return csvService.MakeUnauthorized(errors.New(m)) },
 		Forbidden:    func(m string) error { return csvService.MakeForbidden(errors.New(m)) },
 	})
+}
+
+func MakeExportStatuses(all []*data.DataExport) ([]*csvService.ExportStatus, error) {
+	web := make([]*csvService.ExportStatus, len(all))
+	for i, de := range all {
+		deWeb, err := MakeExportStatus(de)
+		if err != nil {
+			return nil, err
+		}
+		web[i] = deWeb
+	}
+	return web, nil
+}
+
+func MakeExportStatus(de *data.DataExport) (*csvService.ExportStatus, error) {
+	var url *string
+	if de.DownloadURL != nil {
+		downloadAt := fmt.Sprintf("/export/%v/download", hex.EncodeToString(de.Token))
+		url = &downloadAt
+	}
+
+	completedAt := int64(0)
+	if de.CompletedAt != nil {
+		completedAt = de.CompletedAt.Unix() * 1000
+	}
+
+	args := make(map[string]interface{})
+	if err := json.Unmarshal(de.Args, &args); err != nil {
+		return nil, err
+	}
+
+	return &csvService.ExportStatus{
+		ID:          de.ID,
+		URL:         url,
+		CreatedAt:   de.CreatedAt.Unix() * 1000,
+		CompletedAt: &completedAt,
+		Kind:        de.Kind,
+		Progress:    de.Progress,
+		Args:        args,
+	}, nil
 }

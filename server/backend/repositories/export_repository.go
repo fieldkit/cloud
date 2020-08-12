@@ -18,6 +18,17 @@ func NewExportRepository(db *sqlxcache.DB) (*ExportRepository, error) {
 	return &ExportRepository{db: db}, nil
 }
 
+func (r *ExportRepository) QueryByUserID(ctx context.Context, userID int32) (i []*data.DataExport, err error) {
+	found := []*data.DataExport{}
+	if err := r.db.SelectContext(ctx, &found, `
+		SELECT id, token, user_id, created_at, completed_at, download_url, progress, kind, args FROM fieldkit.data_export WHERE user_id = $1
+		`, userID); err != nil {
+		return nil, fmt.Errorf("error querying for export: %v", err)
+	}
+
+	return found, nil
+}
+
 func (r *ExportRepository) QueryByID(ctx context.Context, id int64) (i *data.DataExport, err error) {
 	found := []*data.DataExport{}
 	if err := r.db.SelectContext(ctx, &found, `
