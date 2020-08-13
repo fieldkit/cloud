@@ -21,7 +21,7 @@ func NewExportRepository(db *sqlxcache.DB) (*ExportRepository, error) {
 func (r *ExportRepository) QueryByUserID(ctx context.Context, userID int32) (i []*data.DataExport, err error) {
 	found := []*data.DataExport{}
 	if err := r.db.SelectContext(ctx, &found, `
-		SELECT id, token, user_id, created_at, completed_at, download_url, size, progress, kind, args FROM fieldkit.data_export WHERE user_id = $1 ORDER BY completed_at DESC
+		SELECT id, token, user_id, created_at, completed_at, download_url, size, progress, kind, args FROM fieldkit.data_export WHERE user_id = $1 ORDER BY completed_at DESC LIMIT 20
 		`, userID); err != nil {
 		return nil, fmt.Errorf("error querying for export: %v", err)
 	}
