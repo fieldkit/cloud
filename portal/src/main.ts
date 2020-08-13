@@ -5,6 +5,7 @@ import Vuelidate from "vuelidate";
 import VCalendar from "v-calendar";
 import VueConfirmDialog from "vue-confirm-dialog";
 
+import prettyBytes from "pretty-bytes";
 import moment from "moment";
 import { sync } from "vuex-router-sync";
 import i18n from "./i18n";
@@ -83,7 +84,10 @@ Vue.filter("prettyDuration", (value) => {
 });
 
 Vue.filter("prettyBytes", (value) => {
-    return value;
+    if (!value) {
+        return "N/A";
+    }
+    return prettyBytes(value);
 });
 
 const store = storeFactory();
