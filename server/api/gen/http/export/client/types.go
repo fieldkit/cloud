@@ -415,10 +415,11 @@ func NewStatusBadRequest(body *StatusBadRequestResponseBody) *goa.ServiceError {
 
 // NewDownloadResultOK builds a "export" service "download" endpoint result
 // from a HTTP "OK" response.
-func NewDownloadResultOK(length int64, contentType string) *export.DownloadResult {
+func NewDownloadResultOK(length int64, contentType string, contentDisposition string) *export.DownloadResult {
 	v := &export.DownloadResult{}
 	v.Length = length
 	v.ContentType = contentType
+	v.ContentDisposition = contentDisposition
 
 	return v
 }

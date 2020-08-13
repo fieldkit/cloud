@@ -236,6 +236,7 @@ func EncodeDownloadResponse(encoder func(context.Context, http.ResponseWriter) g
 		lengths := strconv.FormatInt(val, 10)
 		w.Header().Set("Content-Length", lengths)
 		w.Header().Set("Content-Type", res.ContentType)
+		w.Header().Set("Content-Disposition", res.ContentDisposition)
 		w.WriteHeader(http.StatusOK)
 		return nil
 	}

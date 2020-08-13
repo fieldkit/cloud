@@ -365,9 +365,10 @@ func DecodeDownloadResponse(decoder func(*http.Response) goahttp.Decoder, restor
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				length      int64
-				contentType string
-				err         error
+				length             int64
+				contentType        string
+				contentDisposition string
+				err                error
 			)
 			{
 				lengthRaw := resp.Header.Get("Content-Length")
@@ -385,10 +386,15 @@ func DecodeDownloadResponse(decoder func(*http.Response) goahttp.Decoder, restor
 				err = goa.MergeErrors(err, goa.MissingFieldError("Content-Type", "header"))
 			}
 			contentType = contentTypeRaw
+			contentDispositionRaw := resp.Header.Get("Content-Disposition")
+			if contentDispositionRaw == "" {
+				err = goa.MergeErrors(err, goa.MissingFieldError("Content-Disposition", "header"))
+			}
+			contentDisposition = contentDispositionRaw
 			if err != nil {
 				return nil, goahttp.ErrValidationError("export", "download", err)
 			}
-			res := NewDownloadResultOK(length, contentType)
+			res := NewDownloadResultOK(length, contentType, contentDisposition)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (

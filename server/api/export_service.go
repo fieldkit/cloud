@@ -111,9 +111,12 @@ func (c *ExportService) Download(ctx context.Context, payload *exportService.Dow
 		return nil, nil, err
 	}
 
+	disposition := fmt.Sprintf("attachment; filename=\"data.csv\"")
+
 	return &exportService.DownloadResult{
-		Length:      opened.Size,
-		ContentType: opened.ContentType,
+		Length:             opened.Size,
+		ContentType:        opened.ContentType,
+		ContentDisposition: disposition,
 	}, opened.Body, nil
 }
 

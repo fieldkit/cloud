@@ -98,6 +98,8 @@ var _ = Service("export", func() {
 			Required("length")
 			Attribute("contentType", String)
 			Required("contentType")
+			Attribute("contentDisposition", String)
+			Required("contentDisposition")
 		})
 
 		HTTP(func() {
@@ -110,6 +112,7 @@ var _ = Service("export", func() {
 			Response(func() {
 				Header("length:Content-Length")
 				Header("contentType:Content-Type")
+				Header("contentDisposition:Content-Disposition")
 			})
 
 			SkipResponseBodyEncodeDecode()

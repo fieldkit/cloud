@@ -80,8 +80,9 @@ type DownloadPayload struct {
 
 // DownloadResult is the result type of the export service download method.
 type DownloadResult struct {
-	Length      int64
-	ContentType string
+	Length             int64
+	ContentType        string
+	ContentDisposition string
 }
 
 // MakeUnauthorized builds a goa.ServiceError from an error.
