@@ -13,6 +13,9 @@
         </div>
         <div class="user-exports" v-if="history">
             <div class="previous-heading">Previous Exports</div>
+            <div v-if="history.length == 0">
+                No previous exports.
+            </div>
             <div v-for="de in history" class="export" v-bind:key="de.id">
                 <div class="kind">{{ prettyKind(de.kind) }}</div>
                 <div class="created">{{ de.createdAt | prettyTime }}</div>
