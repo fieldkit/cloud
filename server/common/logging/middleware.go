@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -20,15 +21,20 @@ func LoggingAndInfrastructure(name string) func(h http.Handler) http.Handler {
 			withCtx := r.WithContext(newCtx)
 
 			log := Logger(newCtx).Named(name).Sugar()
+			sanitizedUrl := sanitize(r.URL)
 
-			log.Infow("req:begin", "req", r.Method+" "+r.URL.String(), "from", from(r))
+			log.Infow("req:begin", "req", r.Method+" "+sanitizedUrl.String(), "from", from(r))
 
 			cw := CaptureResponse(w)
 			h.ServeHTTP(AllowWriteHeaderPrevention(cw), withCtx)
 
 			elapsed := time.Since(started)
 
-			log.Infow("req:done", "status", cw.StatusCode, "bytes", cw.ContentLength, "time", fmt.Sprintf("%vns", elapsed.Nanoseconds()), "time_human", elapsed.String(), "req", r.Method+" "+r.URL.String(), "from", from(r))
+			log.Infow("req:done", "status", cw.StatusCode, "bytes", cw.ContentLength,
+				"time", fmt.Sprintf("%vns", elapsed.Nanoseconds()),
+				"time_human", elapsed.String(),
+				"req", r.Method+" "+sanitizedUrl.String(),
+				"from", from(r))
 		})
 	}
 }
@@ -50,4 +56,11 @@ func from(req *http.Request) string {
 		return f
 	}
 	return ip
+}
+
+func sanitize(url *url.URL) *url.URL {
+	q := url.Query()
+	q.Set("auth", "PRIVATE")
+	url.RawQuery = q.Encode()
+	return url
 }
