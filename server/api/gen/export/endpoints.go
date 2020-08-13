@@ -38,7 +38,7 @@ func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		ListMine: NewListMineEndpoint(s, a.JWTAuth),
 		Status:   NewStatusEndpoint(s, a.JWTAuth),
-		Download: NewDownloadEndpoint(s, a.JWTAuth),
+		Download: NewDownloadEndpoint(s),
 	}
 }
 
@@ -99,19 +99,9 @@ func NewStatusEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 
 // NewDownloadEndpoint returns an endpoint function that calls the method
 // "download" of service "export".
-func NewDownloadEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+func NewDownloadEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*DownloadPayload)
-		var err error
-		sc := security.JWTScheme{
-			Name:           "jwt",
-			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
-		}
-		ctx, err = authJWTFn(ctx, p.Auth, &sc)
-		if err != nil {
-			return nil, err
-		}
 		res, body, err := s.Download(ctx, p)
 		if err != nil {
 			return nil, err

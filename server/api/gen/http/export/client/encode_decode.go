@@ -334,10 +334,9 @@ func EncodeDownloadRequest(encoder func(*http.Request) goahttp.Encoder) func(*ht
 		if !ok {
 			return goahttp.ErrInvalidType("export", "download", "*export.DownloadPayload", v)
 		}
-		{
-			head := p.Auth
-			req.Header.Set("Authorization", head)
-		}
+		values := req.URL.Query()
+		values.Add("auth", p.Auth)
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }

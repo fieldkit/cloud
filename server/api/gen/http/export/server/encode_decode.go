@@ -253,19 +253,14 @@ func DecodeDownloadRequest(mux goahttp.Muxer, decoder func(*http.Request) goahtt
 			params = mux.Vars(r)
 		)
 		id = params["id"]
-		auth = r.Header.Get("Authorization")
+		auth = r.URL.Query().Get("auth")
 		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+			err = goa.MergeErrors(err, goa.MissingFieldError("auth", "query string"))
 		}
 		if err != nil {
 			return nil, err
 		}
 		payload := NewDownloadPayload(id, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
-		}
 
 		return payload, nil
 	}

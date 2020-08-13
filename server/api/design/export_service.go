@@ -86,15 +86,11 @@ var _ = Service("export", func() {
 	})
 
 	Method("download", func() {
-		Security(JWTAuth, func() {
-			Scope("api:access")
-		})
-
 		Payload(func() {
-			Token("auth")
-			Required("auth")
 			Attribute("id", String)
 			Required("id")
+			Attribute("auth", String)
+			Required("auth")
 		})
 
 		Result(func() {
@@ -107,14 +103,16 @@ var _ = Service("export", func() {
 		HTTP(func() {
 			GET("export/{id}/download")
 
+			Params(func() {
+				Param("auth")
+			})
+
 			Response(func() {
 				Header("length:Content-Length")
 				Header("contentType:Content-Type")
 			})
 
 			SkipResponseBodyEncodeDecode()
-
-			httpAuthentication()
 		})
 	})
 

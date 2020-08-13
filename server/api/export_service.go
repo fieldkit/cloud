@@ -46,7 +46,7 @@ func (c *ExportService) ListMine(ctx context.Context, payload *exportService.Lis
 		return nil, err
 	}
 
-	web, err := MakeExportStatuses(mine)
+	web, err := MakeExportStatuses(c.options.signer, mine)
 	if err != nil {
 		return nil, err
 	}
@@ -80,18 +80,17 @@ func (c *ExportService) Status(ctx context.Context, payload *exportService.Statu
 		return nil, exportService.MakeForbidden(errors.New("forbidden"))
 	}
 
-	return MakeExportStatus(de)
+	return MakeExportStatus(c.options.signer, de)
 }
 
 func (c *ExportService) Download(ctx context.Context, payload *exportService.DownloadPayload) (*exportService.DownloadResult, io.ReadCloser, error) {
 	log := Logger(ctx).Sugar()
 
-	p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err != nil {
+	log.Infow("download", "token", payload.ID)
+
+	if err := c.options.signer.Verify(payload.Auth); err != nil {
 		return nil, nil, err
 	}
-
-	log.Infow("download", "token", payload.ID, "user_id", p.UserID())
 
 	r, err := repositories.NewExportRepository(c.options.Database)
 	if err != nil {
@@ -101,10 +100,6 @@ func (c *ExportService) Download(ctx context.Context, payload *exportService.Dow
 	de, err := r.QueryByToken(ctx, payload.ID)
 	if err != nil {
 		return nil, nil, err
-	}
-
-	if p.UserID() != de.UserID {
-		return nil, nil, exportService.MakeForbidden(errors.New("forbidden"))
 	}
 
 	if de.DownloadURL == nil {
@@ -133,10 +128,10 @@ func (s *ExportService) JWTAuth(ctx context.Context, token string, scheme *secur
 	})
 }
 
-func MakeExportStatuses(all []*data.DataExport) ([]*exportService.ExportStatus, error) {
+func MakeExportStatuses(signer *Signer, all []*data.DataExport) ([]*exportService.ExportStatus, error) {
 	web := make([]*exportService.ExportStatus, len(all))
 	for i, de := range all {
-		deWeb, err := MakeExportStatus(de)
+		deWeb, err := MakeExportStatus(signer, de)
 		if err != nil {
 			return nil, err
 		}
@@ -145,7 +140,7 @@ func MakeExportStatuses(all []*data.DataExport) ([]*exportService.ExportStatus, 
 	return web, nil
 }
 
-func MakeExportStatus(de *data.DataExport) (*exportService.ExportStatus, error) {
+func MakeExportStatus(signer *Signer, de *data.DataExport) (*exportService.ExportStatus, error) {
 	completedAt := int64(0)
 	if de.CompletedAt != nil {
 		completedAt = de.CompletedAt.Unix() * 1000
@@ -158,7 +153,11 @@ func MakeExportStatus(de *data.DataExport) (*exportService.ExportStatus, error) 
 
 	var downloadURL *string
 	if de.DownloadURL != nil {
-		downloadAt := fmt.Sprintf("/export/%v/download", hex.EncodeToString(de.Token))
+		downloadAt, err := signer.SignURL(fmt.Sprintf("/export/%v/download", hex.EncodeToString(de.Token)))
+		if err != nil {
+			return nil, err
+		}
+
 		downloadURL = &downloadAt
 	}
 

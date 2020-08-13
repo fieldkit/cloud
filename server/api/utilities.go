@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/sha1"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -106,6 +107,29 @@ func NewSigner(key []byte) (s *Signer) {
 	return &Signer{
 		key: key,
 	}
+}
+
+func (s *Signer) Verify(token string) error {
+	claims := make(jwtgo.MapClaims)
+	_, err := jwtgo.ParseWithClaims(token, claims, func(t *jwtgo.Token) (interface{}, error) {
+		return s.key, nil
+	})
+	if err != nil {
+		return err
+	}
+	if claims["exp"] == nil {
+		return errors.New("auth missing expiration")
+	}
+
+	unix := claims["exp"].(float64)
+	expiration := time.Unix(int64(unix), 0)
+	now := time.Now()
+
+	if now.After(expiration) {
+		return errors.New("auth expired")
+	}
+
+	return nil
 }
 
 func (s *Signer) SignURL(url string) (string, error) {

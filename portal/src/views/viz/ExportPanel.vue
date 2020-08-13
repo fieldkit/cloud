@@ -18,7 +18,7 @@
                 <div class="created">{{ de.createdAt | prettyTime }}</div>
                 <div class="busy" v-if="!de.downloadUrl">Generating</div>
                 <div class="size" v-if="de.downloadUrl">{{ de.size | prettyBytes }}</div>
-                <div class="download" v-if="de.downloadUrl"><div @click="(ev) => onDownload(ev, de)">Download</div></div>
+                <div class="download" v-if="de.downloadUrl"><a :href="$config.baseUrl + de.downloadUrl">Download</a></div>
             </div>
         </div>
     </div>

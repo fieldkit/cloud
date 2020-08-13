@@ -74,8 +74,8 @@ type ExportStatus struct {
 
 // DownloadPayload is the payload type of the export service download method.
 type DownloadPayload struct {
-	Auth string
 	ID   string
+	Auth string
 }
 
 // DownloadResult is the result type of the export service download method.
