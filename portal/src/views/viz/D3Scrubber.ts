@@ -125,10 +125,15 @@ export const D3Scrubber = Vue.extend({
                     .area()
                     .x((d) => x(d.time))
                     .y0(bottom)
-                    .y1((d) => y(d.value));
+                    .y1((d) => {
+                        if (d.value) {
+                            return y(d.value);
+                        }
+                        return bottom;
+                    });
             };
 
-            const renderedArea = (scrubber) => area(scrubber)(scrubber.data.sdr.data.filter((d) => d.value));
+            const renderedArea = (scrubber) => area(scrubber)(scrubber.data.sdr.data);
 
             const backgroundAreas = svg
                 .select(".background-areas")
