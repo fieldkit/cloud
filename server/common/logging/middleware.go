@@ -60,7 +60,9 @@ func from(req *http.Request) string {
 
 func sanitize(url *url.URL) *url.URL {
 	q := url.Query()
-	q.Set("auth", "PRIVATE")
+	if q.Get("auth") != "" {
+		q.Set("auth", "PRIVATE")
+	}
 	url.RawQuery = q.Encode()
 	return url
 }
