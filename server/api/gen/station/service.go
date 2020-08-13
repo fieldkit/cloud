@@ -221,7 +221,12 @@ type SensorRange struct {
 
 type StationLocation struct {
 	Precise []float64
-	Region  [][][]float64
+	Regions []*StationRegion
+}
+
+type StationRegion struct {
+	Name  string
+	Shape [][][]float64
 }
 
 type StationDataSummary struct {
@@ -715,14 +720,33 @@ func transformStationviewsStationLocationViewToStationLocation(v *stationviews.S
 			res.Precise[i] = val
 		}
 	}
-	if v.Region != nil {
-		res.Region = make([][][]float64, len(v.Region))
-		for i, val := range v.Region {
-			res.Region[i] = make([][]float64, len(val))
+	if v.Regions != nil {
+		res.Regions = make([]*StationRegion, len(v.Regions))
+		for i, val := range v.Regions {
+			res.Regions[i] = transformStationviewsStationRegionViewToStationRegion(val)
+		}
+	}
+
+	return res
+}
+
+// transformStationviewsStationRegionViewToStationRegion builds a value of type
+// *StationRegion from a value of type *stationviews.StationRegionView.
+func transformStationviewsStationRegionViewToStationRegion(v *stationviews.StationRegionView) *StationRegion {
+	if v == nil {
+		return nil
+	}
+	res := &StationRegion{
+		Name: *v.Name,
+	}
+	if v.Shape != nil {
+		res.Shape = make([][][]float64, len(v.Shape))
+		for i, val := range v.Shape {
+			res.Shape[i] = make([][]float64, len(val))
 			for j, val := range val {
-				res.Region[i][j] = make([]float64, len(val))
+				res.Shape[i][j] = make([]float64, len(val))
 				for k, val := range val {
-					res.Region[i][j][k] = val
+					res.Shape[i][j][k] = val
 				}
 			}
 		}
@@ -908,14 +932,33 @@ func transformStationLocationToStationviewsStationLocationView(v *StationLocatio
 			res.Precise[i] = val
 		}
 	}
-	if v.Region != nil {
-		res.Region = make([][][]float64, len(v.Region))
-		for i, val := range v.Region {
-			res.Region[i] = make([][]float64, len(val))
+	if v.Regions != nil {
+		res.Regions = make([]*stationviews.StationRegionView, len(v.Regions))
+		for i, val := range v.Regions {
+			res.Regions[i] = transformStationRegionToStationviewsStationRegionView(val)
+		}
+	}
+
+	return res
+}
+
+// transformStationRegionToStationviewsStationRegionView builds a value of type
+// *stationviews.StationRegionView from a value of type *StationRegion.
+func transformStationRegionToStationviewsStationRegionView(v *StationRegion) *stationviews.StationRegionView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.StationRegionView{
+		Name: &v.Name,
+	}
+	if v.Shape != nil {
+		res.Shape = make([][][]float64, len(v.Shape))
+		for i, val := range v.Shape {
+			res.Shape[i] = make([][]float64, len(val))
 			for j, val := range val {
-				res.Region[i][j] = make([]float64, len(val))
+				res.Shape[i][j] = make([]float64, len(val))
 				for k, val := range val {
-					res.Region[i][j][k] = val
+					res.Shape[i][j][k] = val
 				}
 			}
 		}

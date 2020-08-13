@@ -16,7 +16,7 @@ import (
 
 type StationArea struct {
 	ID       int32        `db:"id,omitempty"`
-	Names    string       `db:"name"`
+	Name     string       `db:"name"`
 	Geometry MultiPolygon `db:"geometry"`
 }
 

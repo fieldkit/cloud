@@ -1350,15 +1350,33 @@ func unmarshalStationLocationResponseBodyToStationviewsStationLocationView(v *St
 			res.Precise[i] = val
 		}
 	}
-	if v.Region != nil {
-		res.Region = make([][][]float64, len(v.Region))
-		for i, val := range v.Region {
-			res.Region[i] = make([][]float64, len(val))
-			for j, val := range val {
-				res.Region[i][j] = make([]float64, len(val))
-				for k, val := range val {
-					res.Region[i][j][k] = val
-				}
+	if v.Regions != nil {
+		res.Regions = make([]*stationviews.StationRegionView, len(v.Regions))
+		for i, val := range v.Regions {
+			res.Regions[i] = unmarshalStationRegionResponseBodyToStationviewsStationRegionView(val)
+		}
+	}
+
+	return res
+}
+
+// unmarshalStationRegionResponseBodyToStationviewsStationRegionView builds a
+// value of type *stationviews.StationRegionView from a value of type
+// *StationRegionResponseBody.
+func unmarshalStationRegionResponseBodyToStationviewsStationRegionView(v *StationRegionResponseBody) *stationviews.StationRegionView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.StationRegionView{
+		Name: v.Name,
+	}
+	res.Shape = make([][][]float64, len(v.Shape))
+	for i, val := range v.Shape {
+		res.Shape[i] = make([][]float64, len(val))
+		for j, val := range val {
+			res.Shape[i][j] = make([]float64, len(val))
+			for k, val := range val {
+				res.Shape[i][j][k] = val
 			}
 		}
 	}

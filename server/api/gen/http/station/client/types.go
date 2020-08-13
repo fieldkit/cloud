@@ -803,8 +803,14 @@ type SensorRangeResponseBody struct {
 
 // StationLocationResponseBody is used to define fields on response body types.
 type StationLocationResponseBody struct {
-	Precise []float64     `form:"precise,omitempty" json:"precise,omitempty" xml:"precise,omitempty"`
-	Region  [][][]float64 `form:"region,omitempty" json:"region,omitempty" xml:"region,omitempty"`
+	Precise []float64                    `form:"precise,omitempty" json:"precise,omitempty" xml:"precise,omitempty"`
+	Regions []*StationRegionResponseBody `form:"regions,omitempty" json:"regions,omitempty" xml:"regions,omitempty"`
+}
+
+// StationRegionResponseBody is used to define fields on response body types.
+type StationRegionResponseBody struct {
+	Name  *string       `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Shape [][][]float64 `form:"shape,omitempty" json:"shape,omitempty" xml:"shape,omitempty"`
 }
 
 // StationDataSummaryResponseBody is used to define fields on response body
@@ -2497,6 +2503,31 @@ func ValidateSensorRangeResponseBody(body *SensorRangeResponseBody) (err error) 
 	return
 }
 
+// ValidateStationLocationResponseBody runs the validations defined on
+// StationLocationResponseBody
+func ValidateStationLocationResponseBody(body *StationLocationResponseBody) (err error) {
+	for _, e := range body.Regions {
+		if e != nil {
+			if err2 := ValidateStationRegionResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateStationRegionResponseBody runs the validations defined on
+// StationRegionResponseBody
+func ValidateStationRegionResponseBody(body *StationRegionResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Shape == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("shape", "body"))
+	}
+	return
+}
+
 // ValidateStationDataSummaryResponseBody runs the validations defined on
 // StationDataSummaryResponseBody
 func ValidateStationDataSummaryResponseBody(body *StationDataSummaryResponseBody) (err error) {
@@ -2577,6 +2608,11 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 			err = goa.MergeErrors(err, err2)
 		}
 	}
+	if body.Location != nil {
+		if err2 := ValidateStationLocationResponseBody(body.Location); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
 	if body.Data != nil {
 		if err2 := ValidateStationDataSummaryResponseBody(body.Data); err2 != nil {
 			err = goa.MergeErrors(err, err2)
@@ -2608,6 +2644,11 @@ func ValidateEssentialStationResponseBody(body *EssentialStationResponseBody) (e
 	}
 	if body.Owner != nil {
 		if err2 := ValidateStationOwnerResponseBody(body.Owner); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if body.Location != nil {
+		if err2 := ValidateStationLocationResponseBody(body.Location); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}

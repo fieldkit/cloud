@@ -601,11 +601,16 @@ func transformLocation(sf *data.StationFull, preciseLocation bool) *station.Stat
 
 		if preciseLocation {
 			sl.Precise = []float64{l.Longitude(), l.Latitude()}
-		} else {
-			if len(sf.Areas) > 0 {
-				sl.Region = sf.Areas[0].Geometry.Coordinates()
-			}
 		}
+
+		regions := make([]*station.StationRegion, 0)
+		for _, area := range sf.Areas {
+			regions = append(regions, &station.StationRegion{
+				Name:  area.Name,
+				Shape: area.Geometry.Coordinates(),
+			})
+		}
+		sl.Regions = regions
 
 		return sl
 	}
