@@ -25,17 +25,17 @@ type MultiPolygon struct {
 }
 
 func (l *MultiPolygon) Coordinates() [][][]float64 {
-	c := make([][][]float64, 0)
+	coordinates := make([][][]float64, 0)
 	for _, polygon := range *l.g {
 		newPoly := make([][]float64, 0)
 		for _, ring := range polygon {
 			for _, c := range ring {
-				newPoly = append(newPoly, c[:])
+				newPoly = append(newPoly, []float64{c[0], c[1]})
 			}
 		}
-		c = append(c, newPoly)
+		coordinates = append(coordinates, newPoly)
 	}
-	return c
+	return coordinates
 }
 
 func (l *MultiPolygon) Scan(data interface{}) error {
