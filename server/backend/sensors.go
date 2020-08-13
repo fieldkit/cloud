@@ -180,10 +180,56 @@ type DataQuerier struct {
 	db *sqlxcache.DB
 }
 
+type SensorMeta struct {
+	data.Sensor
+}
+
+type StationMeta struct {
+	ID   int32  `db:"id"`
+	Name string `db:"name"`
+}
+
+type QueryMeta struct {
+	Sensors  map[int64]*SensorMeta
+	Stations map[int32]*StationMeta
+}
+
 func NewDataQuerier(db *sqlxcache.DB) *DataQuerier {
 	return &DataQuerier{
 		db: db,
 	}
+}
+
+func (dq *DataQuerier) QueryMeta(ctx context.Context, qp *QueryParams) (qm *QueryMeta, err error) {
+	sensors := []*SensorMeta{}
+	if err := dq.db.SelectContext(ctx, &sensors, `SELECT id, key FROM fieldkit.aggregated_sensor`); err != nil {
+		return nil, fmt.Errorf("error querying for sensor meta: %v", err)
+	}
+
+	query, args, err := sqlx.In(`SELECT id, name FROM fieldkit.station WHERE id IN (?)`, qp.Stations)
+	if err != nil {
+		return nil, err
+	}
+
+	stations := []*StationMeta{}
+	if err := dq.db.SelectContext(ctx, &stations, dq.db.Rebind(query), args...); err != nil {
+		return nil, err
+	}
+
+	sensorsByID := make(map[int64]*SensorMeta)
+	for _, s := range sensors {
+		sensorsByID[s.ID] = s
+	}
+
+	stationsByID := make(map[int32]*StationMeta)
+	for _, s := range stations {
+		stationsByID[s.ID] = s
+	}
+
+	return &QueryMeta{
+		Sensors:  sensorsByID,
+		Stations: stationsByID,
+	}, nil
 }
 
 func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (summaries map[string]*AggregateSummary, name string, err error) {

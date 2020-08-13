@@ -70,6 +70,11 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 
 	dq := NewDataQuerier(h.db)
 
+	qm, err := dq.QueryMeta(ctx, qp)
+	if err != nil {
+		return err
+	}
+
 	queried, err := dq.QueryAggregate(ctx, aqp)
 	if err != nil {
 		return err
@@ -122,12 +127,14 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 	writer := csv.NewWriter(pipeWriter)
 	records := 0
 
+	writer.Write(makeHeader())
+
 	for queried.Next() {
 		row := &DataRow{}
 		if err = queried.StructScan(row); err != nil {
 			return err
 		}
-		writer.Write(makeRow(row))
+		writer.Write(makeRow(qm, row))
 		records += 1
 	}
 
@@ -148,14 +155,30 @@ func (h *ExportCsvHandler) Handle(ctx context.Context, m *messages.ExportCsv) er
 	return nil
 }
 
-func makeRow(row *DataRow) []string {
-	cols := make([]string, 7)
+const (
+	NumberOfColumns = 7
+)
+
+func makeHeader() []string {
+	cols := make([]string, NumberOfColumns)
+	cols[0] = "Time (JS)"
+	cols[1] = "Station"
+	cols[2] = "Sensor"
+	cols[3] = "Latitude"
+	cols[4] = "Longitude"
+	cols[5] = "Reading"
+	cols[6] = "Time Group"
+	return cols
+}
+
+func makeRow(qm *QueryMeta, row *DataRow) []string {
+	cols := make([]string, NumberOfColumns)
 	cols[0] = fmt.Sprintf("%v", row.Time.Time().Unix()*1000)
 	if row.StationID != nil {
-		cols[1] = fmt.Sprintf("%v", *row.StationID)
+		cols[1] = fmt.Sprintf("%v", qm.Stations[*row.StationID].Name)
 	}
 	if row.SensorID != nil {
-		cols[2] = fmt.Sprintf("%v", *row.SensorID)
+		cols[2] = fmt.Sprintf("%v", qm.Sensors[*row.SensorID].Key)
 	}
 	if row.Location != nil {
 		cols[3] = fmt.Sprintf("%v", row.Location.Latitude())
