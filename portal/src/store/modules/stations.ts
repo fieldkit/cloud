@@ -2,12 +2,13 @@ import _ from "lodash";
 import Vue from "vue";
 import * as MutationTypes from "../mutations";
 import * as ActionTypes from "../actions";
-import { Location, BoundingRectangle } from "../map-types";
+import { Location, BoundingRectangle, LngLat } from "../map-types";
 import FKApi, {
     OnNoReject,
     Station,
     StationModule,
     ModuleSensor,
+    StationRegion,
     Project,
     ProjectUser,
     ProjectFollowers,
@@ -95,6 +96,7 @@ export class DisplayStation {
     placeNameOther: string | null;
     placeNameNative: string | null;
     battery: number | null;
+    regions: StationRegion[] | null;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -111,8 +113,11 @@ export class DisplayStation {
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))
                 .head() || [];
-        if (station.location?.precise) {
-            this.location = new Location(station.location.precise[1], station.location.precise[0]);
+        if (station.location) {
+            if (station.location.precise) {
+                this.location = new Location(station.location.precise[1], station.location.precise[0]);
+            }
+            this.regions = station.location.regions;
         }
     }
 }
@@ -123,19 +128,28 @@ export class ProjectModule {
 
 export class MapFeature {
     type = "Feature";
-    geometry: { type: string; coordinates: number[] } | null = null;
+    geometry: { type: string; coordinates: number[] | LngLat[][] } | null = null;
     properties: { title: string; icon: string; id: number } | null = null;
 
-    constructor(station: DisplayStation) {
+    constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
-            type: "Point",
-            coordinates: station.location.lngLat(),
+            type: type,
+            coordinates: coordinates,
         };
         this.properties = {
             id: station.id,
             title: station.name,
             icon: "marker",
         };
+    }
+
+    public static makeFeatures(station: DisplayStation): MapFeature[] {
+        if (station.regions) {
+            const region = station.regions[0];
+            return region.shape.map((polygon) => new MapFeature(station, "Polygon", [polygon], polygon));
+        }
+        const precise = station.location.lngLat();
+        return [new MapFeature(station, "Point", precise, [precise])];
     }
 }
 
@@ -144,23 +158,29 @@ export class MappedStations {
     features: MapFeature[] = [];
 
     constructor(stations: DisplayStation[]) {
-        const DefaultLocation = new Location(34.3318104, -118.0730372); // TwinPeaks
+        const DefaultLocation: LngLat = [-118.0730372, 34.3318104]; // TwinPeaks
 
         const located = stations.filter((station) => station.location != null);
-        const around = located.reduce((bb, station) => bb.include(station.location), new BoundingRectangle());
-        const feetAround = located.length > 0 ? 1000 : 100000;
+        const features = _.flatten(located.map((ds) => MapFeature.makeFeatures(ds)));
+        const around = features.reduce((bb, feature) => bb.includeAll(feature.bounds), new BoundingRectangle());
+        const feetAround = features.length > 0 ? 1000 : 100000;
 
+        console.log("features", features);
+
+        this.features = features;
         this.bounds = around.zoomOutOrAround(DefaultLocation, feetAround);
-        this.features = located.map((ds) => new MapFeature(ds));
+
+        console.log("around", around);
+        console.log("bounds", this.bounds);
     }
 
     get valid(): boolean {
         return this.bounds != null;
     }
 
-    boundsLngLat(): number[][] {
+    boundsLngLat(): LngLat[] {
         console.log("map: returning bounds", this.bounds, this.features);
-        return [this.bounds.min.lngLat(), this.bounds.max.lngLat()];
+        return [this.bounds.min, this.bounds.max];
     }
 }
 

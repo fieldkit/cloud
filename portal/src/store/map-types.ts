@@ -1,6 +1,18 @@
+import _ from "lodash";
+
 export interface HasLocation {
     readonly latitude: number | null;
     readonly longitude: number | null;
+}
+
+export type LngLat = [number, number];
+
+function lngLatMinimum(c: LngLat[]): LngLat {
+    return [_.min(_.map(c, (v) => v[0])), _.min(_.map(c, (v) => v[1]))];
+}
+
+function lngLatMaximum(c: LngLat[]): LngLat {
+    return [_.max(_.map(c, (v) => v[0])), _.max(_.map(c, (v) => v[1]))];
 }
 
 export class Location implements HasLocation {
@@ -24,41 +36,40 @@ export class Location implements HasLocation {
         return new Location(this.latitude, this.longitude);
     }
 
-    lngLat(): number[] {
+    lngLat(): LngLat {
         return [this.longitude, this.latitude];
     }
 }
 
 export class BoundingRectangle {
-    constructor(public min: Location | null = null, public max: Location | null = null) {}
+    constructor(public min: LngLat | null = null, public max: LngLat | null = null) {}
 
     public empty(): boolean {
         return this.min == null || this.max == null;
     }
 
-    public include(l: Location): BoundingRectangle {
-        this.min = this.min == null ? l.clone() : this.min.minimum(l);
-        this.max = this.max == null ? l.clone() : this.max.maximum(l);
+    public include(l: LngLat): BoundingRectangle {
+        this.min = this.min == null ? l : lngLatMinimum([this.min, l]);
+        this.max = this.max == null ? l : lngLatMaximum([this.max, l]);
         return this;
     }
 
-    public contains(l: Location): boolean {
+    public includeAll(l: LngLat[]): BoundingRectangle {
+        return l.reduce((b, c) => b.include(c), this);
+    }
+
+    public contains(l: LngLat): boolean {
         if (this.min == null || this.max == null) {
             return false;
         }
-        return (
-            l.latitude >= this.min.latitude &&
-            l.longitude >= this.min.longitude &&
-            l.latitude <= this.max.latitude &&
-            l.longitude <= this.max.longitude
-        );
+        return l[1] >= this.min[1] && l[0] >= this.min[0] && l[1] <= this.max[1] && l[0] <= this.max[0];
     }
 
     public isEmpty(): boolean {
         return this.min == null || this.max == null;
     }
 
-    public zoomOutOrAround(defaultCenter: Location, margin: number): BoundingRectangle {
+    public zoomOutOrAround(defaultCenter: LngLat, margin: number): BoundingRectangle {
         if (this.isEmpty()) {
             return BoundingRectangle.around(defaultCenter, margin);
         }
@@ -83,12 +94,12 @@ export class BoundingRectangle {
         const FeetPerLongitude = 288200; /* ft per degree */
         const latitudeMargin = margin / FeetPerLatitude;
         const longitudeMargin = margin / FeetPerLongitude;
-        const min = new Location(this.min.latitude - latitudeMargin, this.min.longitude - longitudeMargin);
-        const max = new Location(this.max.latitude + latitudeMargin, this.max.longitude + longitudeMargin);
+        const min: LngLat = [this.min[0] - longitudeMargin, this.min[1] - latitudeMargin];
+        const max: LngLat = [this.max[0] + longitudeMargin, this.max[1] + latitudeMargin];
         return new BoundingRectangle(min, max);
     }
 
-    public expandIfSingleCoordinate(defaultCenter: Location, margin: number): BoundingRectangle {
+    public expandIfSingleCoordinate(defaultCenter: LngLat, margin: number): BoundingRectangle {
         if (this.isEmpty()) {
             return BoundingRectangle.around(defaultCenter, margin);
         }
@@ -99,10 +110,10 @@ export class BoundingRectangle {
     }
 
     public isSingleCoordinate(): boolean {
-        return this.min.latitude === this.max.latitude || this.min.longitude === this.max.longitude;
+        return this.min[0] === this.max[0] || this.min[1] === this.max[1];
     }
 
-    public static around(center: Location, margin: number) {
+    public static around(center: LngLat, margin: number) {
         return new BoundingRectangle(center, center).zoomOut(margin);
     }
 }

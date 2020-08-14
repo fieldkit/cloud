@@ -77,22 +77,38 @@ export default Vue.extend({
             if (!this.map) {
                 return;
             }
+
             if (!this.mapped || !this.mapped.valid) {
                 return;
             }
 
             if (!this.map.getLayer("station-markers")) {
                 console.log("map: updating", this.mapped);
+
+                this.map.addSource("stations", {
+                    type: "geojson",
+                    data: {
+                        type: "FeatureCollection",
+                        features: this.mapped.features,
+                    },
+                });
+
+                this.map.addLayer({
+                    id: "regions",
+                    type: "fill",
+                    source: "stations",
+                    paint: {
+                        "fill-color": "#aaaaaa",
+                        "fill-opacity": 0.2,
+                    },
+                    filter: ["==", "$type", "Polygon"],
+                });
+
                 this.map.addLayer({
                     id: "station-markers",
                     type: "symbol",
-                    source: {
-                        type: "geojson",
-                        data: {
-                            type: "FeatureCollection",
-                            features: this.mapped.features,
-                        },
-                    },
+                    source: "stations",
+                    filter: ["==", "$type", "Point"],
                     layout: {
                         "icon-image": "dot",
                         "text-field": "{title}",

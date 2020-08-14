@@ -222,9 +222,14 @@ export interface Configurations {
     all: StationConfiguration[];
 }
 
+export interface StationRegion {
+    name: string;
+    shape: [number, number][][];
+}
+
 export interface StationLocation {
-    readonly precise: number[] | null;
-    readonly region: number[] | null;
+    readonly precise: [number, number] | null;
+    readonly regions: StationRegion[] | null;
 }
 
 export interface Station {
