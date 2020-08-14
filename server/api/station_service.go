@@ -610,7 +610,9 @@ func transformLocation(sf *data.StationFull, preciseLocation bool) *station.Stat
 				Shape: area.Geometry.Coordinates(),
 			})
 		}
-		sl.Regions = regions
+		if false {
+			sl.Regions = regions
+		}
 
 		return sl
 	}
