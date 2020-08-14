@@ -90,9 +90,18 @@ var StationRegion = Type("StationRegion", func() {
 	Required("name", "shape")
 })
 
-var StationLocation = Type("StationLocation", func() {
-	Attribute("precise", ArrayOf(Float64))
-	Attribute("regions", ArrayOf(StationRegion))
+var StationLocation = ResultType("application/vnd.app.station.location", func() {
+	TypeName("StationLocation")
+	Attributes(func() {
+		Attribute("precise", ArrayOf(Float64))
+		Attribute("regions", ArrayOf(StationRegion))
+		Attribute("url", String)
+	})
+	View("default", func() {
+		Attribute("precise")
+		Attribute("regions")
+		Attribute("url")
+	})
 })
 
 var StationDataSummary = Type("StationDataSummary", func() {
@@ -304,7 +313,6 @@ var _ = Service("station", func() {
 
 		Payload(func() {
 			Token("auth")
-			// Required("auth")
 			Attribute("id", Int32)
 			Required("id")
 		})

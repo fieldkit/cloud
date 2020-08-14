@@ -1156,7 +1156,9 @@ func marshalStationviewsStationLocationViewToStationLocationResponseBody(v *stat
 	if v == nil {
 		return nil
 	}
-	res := &StationLocationResponseBody{}
+	res := &StationLocationResponseBody{
+		URL: v.URL,
+	}
 	if v.Precise != nil {
 		res.Precise = make([]float64, len(v.Precise))
 		for i, val := range v.Precise {

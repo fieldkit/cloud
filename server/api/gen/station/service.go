@@ -222,6 +222,7 @@ type SensorRange struct {
 type StationLocation struct {
 	Precise []float64
 	Regions []*StationRegion
+	URL     *string
 }
 
 type StationRegion struct {
@@ -394,11 +395,11 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	if vres.Configurations != nil {
 		res.Configurations = transformStationviewsStationConfigurationsViewToStationConfigurations(vres.Configurations)
 	}
-	if vres.Location != nil {
-		res.Location = transformStationviewsStationLocationViewToStationLocation(vres.Location)
-	}
 	if vres.Data != nil {
 		res.Data = transformStationviewsStationDataSummaryViewToStationDataSummary(vres.Data)
+	}
+	if vres.Location != nil {
+		res.Location = newStationLocation(vres.Location)
 	}
 	return res
 }
@@ -437,11 +438,53 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 	if res.Configurations != nil {
 		vres.Configurations = transformStationConfigurationsToStationviewsStationConfigurationsView(res.Configurations)
 	}
-	if res.Location != nil {
-		vres.Location = transformStationLocationToStationviewsStationLocationView(res.Location)
-	}
 	if res.Data != nil {
 		vres.Data = transformStationDataSummaryToStationviewsStationDataSummaryView(res.Data)
+	}
+	if res.Location != nil {
+		vres.Location = newStationLocationView(res.Location)
+	}
+	return vres
+}
+
+// newStationLocation converts projected type StationLocation to service type
+// StationLocation.
+func newStationLocation(vres *stationviews.StationLocationView) *StationLocation {
+	res := &StationLocation{
+		URL: vres.URL,
+	}
+	if vres.Precise != nil {
+		res.Precise = make([]float64, len(vres.Precise))
+		for i, val := range vres.Precise {
+			res.Precise[i] = val
+		}
+	}
+	if vres.Regions != nil {
+		res.Regions = make([]*StationRegion, len(vres.Regions))
+		for i, val := range vres.Regions {
+			res.Regions[i] = transformStationviewsStationRegionViewToStationRegion(val)
+		}
+	}
+	return res
+}
+
+// newStationLocationView projects result type StationLocation to projected
+// type StationLocationView using the "default" view.
+func newStationLocationView(res *StationLocation) *stationviews.StationLocationView {
+	vres := &stationviews.StationLocationView{
+		URL: res.URL,
+	}
+	if res.Precise != nil {
+		vres.Precise = make([]float64, len(res.Precise))
+		for i, val := range res.Precise {
+			vres.Precise[i] = val
+		}
+	}
+	if res.Regions != nil {
+		vres.Regions = make([]*stationviews.StationRegionView, len(res.Regions))
+		for i, val := range res.Regions {
+			vres.Regions[i] = transformStationRegionToStationviewsStationRegionView(val)
+		}
 	}
 	return vres
 }
@@ -707,54 +750,6 @@ func transformStationviewsSensorRangeViewToSensorRange(v *stationviews.SensorRan
 	return res
 }
 
-// transformStationviewsStationLocationViewToStationLocation builds a value of
-// type *StationLocation from a value of type *stationviews.StationLocationView.
-func transformStationviewsStationLocationViewToStationLocation(v *stationviews.StationLocationView) *StationLocation {
-	if v == nil {
-		return nil
-	}
-	res := &StationLocation{}
-	if v.Precise != nil {
-		res.Precise = make([]float64, len(v.Precise))
-		for i, val := range v.Precise {
-			res.Precise[i] = val
-		}
-	}
-	if v.Regions != nil {
-		res.Regions = make([]*StationRegion, len(v.Regions))
-		for i, val := range v.Regions {
-			res.Regions[i] = transformStationviewsStationRegionViewToStationRegion(val)
-		}
-	}
-
-	return res
-}
-
-// transformStationviewsStationRegionViewToStationRegion builds a value of type
-// *StationRegion from a value of type *stationviews.StationRegionView.
-func transformStationviewsStationRegionViewToStationRegion(v *stationviews.StationRegionView) *StationRegion {
-	if v == nil {
-		return nil
-	}
-	res := &StationRegion{
-		Name: *v.Name,
-	}
-	if v.Shape != nil {
-		res.Shape = make([][][]float64, len(v.Shape))
-		for i, val := range v.Shape {
-			res.Shape[i] = make([][]float64, len(val))
-			for j, val := range val {
-				res.Shape[i][j] = make([]float64, len(val))
-				for k, val := range val {
-					res.Shape[i][j][k] = val
-				}
-			}
-		}
-	}
-
-	return res
-}
-
 // transformStationviewsStationDataSummaryViewToStationDataSummary builds a
 // value of type *StationDataSummary from a value of type
 // *stationviews.StationDataSummaryView.
@@ -919,23 +914,41 @@ func transformSensorRangeToStationviewsSensorRangeView(v *SensorRange) *stationv
 	return res
 }
 
-// transformStationLocationToStationviewsStationLocationView builds a value of
-// type *stationviews.StationLocationView from a value of type *StationLocation.
-func transformStationLocationToStationviewsStationLocationView(v *StationLocation) *stationviews.StationLocationView {
+// transformStationDataSummaryToStationviewsStationDataSummaryView builds a
+// value of type *stationviews.StationDataSummaryView from a value of type
+// *StationDataSummary.
+func transformStationDataSummaryToStationviewsStationDataSummaryView(v *StationDataSummary) *stationviews.StationDataSummaryView {
 	if v == nil {
 		return nil
 	}
-	res := &stationviews.StationLocationView{}
-	if v.Precise != nil {
-		res.Precise = make([]float64, len(v.Precise))
-		for i, val := range v.Precise {
-			res.Precise[i] = val
-		}
+	res := &stationviews.StationDataSummaryView{
+		Start:           &v.Start,
+		End:             &v.End,
+		NumberOfSamples: &v.NumberOfSamples,
 	}
-	if v.Regions != nil {
-		res.Regions = make([]*stationviews.StationRegionView, len(v.Regions))
-		for i, val := range v.Regions {
-			res.Regions[i] = transformStationRegionToStationviewsStationRegionView(val)
+
+	return res
+}
+
+// transformStationviewsStationRegionViewToStationRegion builds a value of type
+// *StationRegion from a value of type *stationviews.StationRegionView.
+func transformStationviewsStationRegionViewToStationRegion(v *stationviews.StationRegionView) *StationRegion {
+	if v == nil {
+		return nil
+	}
+	res := &StationRegion{
+		Name: *v.Name,
+	}
+	if v.Shape != nil {
+		res.Shape = make([][][]float64, len(v.Shape))
+		for i, val := range v.Shape {
+			res.Shape[i] = make([][]float64, len(val))
+			for j, val := range val {
+				res.Shape[i][j] = make([]float64, len(val))
+				for k, val := range val {
+					res.Shape[i][j][k] = val
+				}
+			}
 		}
 	}
 
@@ -962,22 +975,6 @@ func transformStationRegionToStationviewsStationRegionView(v *StationRegion) *st
 				}
 			}
 		}
-	}
-
-	return res
-}
-
-// transformStationDataSummaryToStationviewsStationDataSummaryView builds a
-// value of type *stationviews.StationDataSummaryView from a value of type
-// *StationDataSummary.
-func transformStationDataSummaryToStationviewsStationDataSummaryView(v *StationDataSummary) *stationviews.StationDataSummaryView {
-	if v == nil {
-		return nil
-	}
-	res := &stationviews.StationDataSummaryView{
-		Start:           &v.Start,
-		End:             &v.End,
-		NumberOfSamples: &v.NumberOfSamples,
 	}
 
 	return res
@@ -1013,6 +1010,31 @@ func transformStationviewsEssentialStationViewToEssentialStation(v *stationviews
 	return res
 }
 
+// transformStationviewsStationLocationViewToStationLocation builds a value of
+// type *StationLocation from a value of type *stationviews.StationLocationView.
+func transformStationviewsStationLocationViewToStationLocation(v *stationviews.StationLocationView) *StationLocation {
+	if v == nil {
+		return nil
+	}
+	res := &StationLocation{
+		URL: v.URL,
+	}
+	if v.Precise != nil {
+		res.Precise = make([]float64, len(v.Precise))
+		for i, val := range v.Precise {
+			res.Precise[i] = val
+		}
+	}
+	if v.Regions != nil {
+		res.Regions = make([]*StationRegion, len(v.Regions))
+		for i, val := range v.Regions {
+			res.Regions[i] = transformStationviewsStationRegionViewToStationRegion(val)
+		}
+	}
+
+	return res
+}
+
 // transformEssentialStationToStationviewsEssentialStationView builds a value
 // of type *stationviews.EssentialStationView from a value of type
 // *EssentialStation.
@@ -1035,6 +1057,31 @@ func transformEssentialStationToStationviewsEssentialStationView(v *EssentialSta
 	}
 	if v.Location != nil {
 		res.Location = transformStationLocationToStationviewsStationLocationView(v.Location)
+	}
+
+	return res
+}
+
+// transformStationLocationToStationviewsStationLocationView builds a value of
+// type *stationviews.StationLocationView from a value of type *StationLocation.
+func transformStationLocationToStationviewsStationLocationView(v *StationLocation) *stationviews.StationLocationView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.StationLocationView{
+		URL: v.URL,
+	}
+	if v.Precise != nil {
+		res.Precise = make([]float64, len(v.Precise))
+		for i, val := range v.Precise {
+			res.Precise[i] = val
+		}
+	}
+	if v.Regions != nil {
+		res.Regions = make([]*stationviews.StationRegionView, len(v.Regions))
+		for i, val := range v.Regions {
+			res.Regions[i] = transformStationRegionToStationviewsStationRegionView(val)
+		}
 	}
 
 	return res

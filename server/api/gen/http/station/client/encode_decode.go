@@ -1343,7 +1343,9 @@ func unmarshalStationLocationResponseBodyToStationviewsStationLocationView(v *St
 	if v == nil {
 		return nil
 	}
-	res := &stationviews.StationLocationView{}
+	res := &stationviews.StationLocationView{
+		URL: v.URL,
+	}
 	if v.Precise != nil {
 		res.Precise = make([]float64, len(v.Precise))
 		for i, val := range v.Precise {

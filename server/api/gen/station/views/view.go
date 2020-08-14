@@ -144,6 +144,7 @@ type SensorRangeView struct {
 type StationLocationView struct {
 	Precise []float64
 	Regions []*StationRegionView
+	URL     *string
 }
 
 // StationRegionView is a type that runs validations on a projected type.
@@ -249,6 +250,15 @@ var (
 		"default": []string{
 			"stations",
 			"total",
+		},
+	}
+	// StationLocationMap is a map of attribute names in result type
+	// StationLocation indexed by view name.
+	StationLocationMap = map[string][]string{
+		"default": []string{
+			"precise",
+			"regions",
+			"url",
 		},
 	}
 	// StationFullCollectionMap is a map of attribute names in result type
@@ -379,13 +389,13 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
-	if result.Location != nil {
-		if err2 := ValidateStationLocationView(result.Location); err2 != nil {
+	if result.Data != nil {
+		if err2 := ValidateStationDataSummaryView(result.Data); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
-	if result.Data != nil {
-		if err2 := ValidateStationDataSummaryView(result.Data); err2 != nil {
+	if result.Location != nil {
+		if err2 := ValidateStationLocationView(result.Location); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
@@ -566,7 +576,7 @@ func ValidateSensorRangeView(result *SensorRangeView) (err error) {
 }
 
 // ValidateStationLocationView runs the validations defined on
-// StationLocationView.
+// StationLocationView using the "default" view.
 func ValidateStationLocationView(result *StationLocationView) (err error) {
 	for _, e := range result.Regions {
 		if e != nil {
