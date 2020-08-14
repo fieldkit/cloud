@@ -144,12 +144,15 @@ export class MapFeature {
     }
 
     public static makeFeatures(station: DisplayStation): MapFeature[] {
-        if (station.regions) {
-            const region = station.regions[0];
-            return region.shape.map((polygon) => new MapFeature(station, "Polygon", [polygon], polygon));
+        if (station.location) {
+            const precise = station.location.lngLat();
+            return [new MapFeature(station, "Point", precise, [precise])];
         }
-        const precise = station.location.lngLat();
-        return [new MapFeature(station, "Point", precise, [precise])];
+        if (!station.regions || station.regions.length === 0) {
+            throw new Error("unmappable");
+        }
+        const region = station.regions[0];
+        return region.shape.map((polygon) => new MapFeature(station, "Polygon", [polygon], polygon));
     }
 }
 
