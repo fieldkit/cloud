@@ -64,11 +64,12 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 
 	elapsed := time.Now().Sub(rw.started)
 	log := Logger(ctx).Sugar()
-	log.Infow("done", "station_id", params.StationID, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
 
 	if err := handler.OnDone(ctx); err != nil {
 		return err
 	}
+
+	log.Infow("done", "station_id", params.StationID, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
 
 	return nil
 }
