@@ -1,141 +1,170 @@
 #+TITLE:  README for cloud
-#+EMAIL:  jacob@conservify.org 
+#+EMAIL:  jacob@conservify.org
 
 * Overview
   This repository contains:
 
-  1) All backend server side code, mostly written in Golang.
+  1) All backend server side code, written in Golang.
 
-  2) All public facing web sites, specifically the administrative site and the non-authenticated frontend.
+  2) All public facing custom web sites, specifically the portal.
 
-  3) PostgreSQL schema and sample/seed data.
+  3) PostgreSQL schema, sample/seed data, and tools.
 
 * Developers
-*** Machine Setup
-**** Linux
-     1) Install docker, nodejs, and yarn.
+** Dependencies
 
-     #+BEGIN_SRC sh
-     sudo apt-get install docker.io docker-compose nodejs
-     npm install -g yarn
-     #+END_SRC
+   In order to build this project and be able to run it yourself you'll need the following dependencies:
 
-     2) Configure docker
+   - Docker (19.03.12) (https://docs.docker.com/get-docker/)
+   - Golang 1.15 (https://golang.org/dl/)
+   - nodejs (12.18.1) (https://nodejs.org/en/download/)
+   - yarn (1.22.4)
 
-     #+BEGIN_SRC sh
-     sudo gpasswd -a $USER docker
-     newgrp docker 
-     docker ps -a # testing
-     #+END_SRC
+	 *NOTE*: It should be possible to use ~npm~ if you'd like to avoid installing ~yarn~.
 
-     3) Ensure you have the latest golang (>1.12)
+** Overview
 
-**** OSX
-     1) Install nodejs/npm (https://nodejs.org/en/download/)
-     2) Install docker (https://docs.docker.com/docker-for-mac/install/)
-     3) Ensure you have the latest golang (>1.12)
+   The server side architecture is broken into two main parts:
 
-*** Running Locally
-    1) Establish a default developer setup.
+   *Server*: A monolothic ~golang~ service that provides the backend
+   REST API for FieldKit. It requires a PostgreSQL instance, which is
+   covered later. It also reads objects from S3 for a more seamless
+   developer experience. Any write that would go to S3 will go to the
+   local file system when running in single-machine configuration.
 
-    #+BEGIN_SRC sh
-    make
-    #+END_SRC
+   *Portal*: A Vuejs (JavaScript/TypeScript) single page application
+   that communicates with the backend server's API, this is the shiny
+   and interesting stuff.
 
-    This will create a default ~fieldkit.env~ for you as well as materialize the various ~secrets.js~ files.
-       
-    2) Run the database.
+** Local Setup
 
-    #+BEGIN_SRC sh
-    make restart-postgres
-    #+END_SRC
+   *Clone*:
 
-    #+BEGIN_SRC sh
-    ➜  cloud git:(master) make restart-postgres
-    docker-compose stop postgres
-    docker-compose rm -f postgres
-    No stopped containers
-    docker-compose up -d postgres
-    Creating cloud_postgres_1 ... done
-    #+END_SRC
+   #+BEGIN_SRC sh
+   git clone https://github.com/fieldkit/cloud.git
+   #+END_SRC
 
-    3) Run the server.
+   *Build*:
 
-    #+BEGIN_SRC sh
-    ./run-server.sh
-    #+END_SRC
+   #+BEGIN_SRC sh
+   make
+   #+END_SRC
 
-    This builds and runs the server outside of a docker container. This means that PostgreSQL is usually the only docker container running.
+   This will establish some local defaults suitable for a single
+   developer machine and build all of the ~golang~ binaries. After
+   which the portal's assets will be bundled and then the tests for
+   the project will run. It's a good practice to run this
+   periodically, especially before pushing, to ensure that tests still
+   pass and there aren't any serious errors generating the asset
+   bundles.
 
-    #+BEGIN_SRC sh
-    ➜  cloud git:(master) ./run-server-containerless.sh
-    + export FIELDKIT_ADDR=:8080
-    + FIELDKIT_ADDR=:8080
-    + export 'FIELDKIT_POSTGRES_URL=postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable'
-    + FIELDKIT_POSTGRES_URL='postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable'
-    + export FIELDKIT_DISABLE_MEMORY_LOGGING=true
-    + FIELDKIT_DISABLE_MEMORY_LOGGING=true
-    + export FIELDKIT_DISABLE_STARTUP_REFRESH=true
-    + FIELDKIT_DISABLE_STARTUP_REFRESH=true
-    + export FIELDKIT_API_DOMAIN=127.0.0.1:8080
-    + FIELDKIT_API_DOMAIN=127.0.0.1:8080
-    + export FIELDKIT_API_HOST=http://127.0.0.1:8080
-    + FIELDKIT_API_HOST=http://127.0.0.1:8080
-    + '[' -f aws.env ']'
-    + make server
-    cp server/inaturalist/secrets.go.template server/inaturalist/secrets.go
-    cd server && env GOOS=linux GOARCH=amd64 go build -o /Users/jlewallen/fieldkit/cloud/build/server server.go
-    go: finding github.com/pkg/errors v0.0.0-20190227000051-27936f6d90f9
-    go: finding github.com/hashicorp/go-immutable-radix v0.0.0-20180129170900-7f3cd4390caa
-    go: finding github.com/dghubble/sling v0.0.0-20170219194632-91b015f8c5e2
-    go: finding github.com/aws/aws-sdk-go v0.0.0-20170317202926-5b99715ae294
-    go: finding github.com/dghubble/oauth1 v0.0.0-20170219195226-3c7784d12fed
-    go: finding github.com/armon/go-metrics v0.0.0-20180713145231-3c58d8115a78
-    go: finding github.com/PyYoshi/goa-logging-zap v0.2.3
-    # Lots and lots more Golang packages.
-    + build/server
-    2019-08-06T10:57:31.864-0700    INFO    fieldkit        server/server.go:135    Starting
-    2019-08-06T10:57:31.864-0700    INFO    fieldkit        server/server.go:343    Selected        {"archiver": "aws"}
-    2019-08-06T10:57:31.864-0700    INFO    fieldkit.backend        backend/concatenation.go:320    Worker starting
-    2019-08-06T10:57:31.891-0700    INFO    fieldkit.jobs   jobs/postgres.go:101    Listening       {"queue": "messages"}
-    # More startup log messages...
-    #+END_SRC
+   *PostgreSQL*:
 
-    4) Run one of the web sites in development mode.
+   #+BEGIN_SRC sh
+   make restart-postgres
+   #+END_SRC
 
-    #+BEGIN_SRC sh
-    cd portal
-    npm run serve
-    #+END_SRC
+   This will execute the necessary docker commands to start the
+   PostgreSQL container. This container will load any SQL that's in
+   the ~schema~ directory. On a fresh install this will be empty but
+   can be used later to load testing databases.
 
-    #+BEGIN_SRC sh
-    DONE  Compiled successfully
+   *Migrations*:
 
-    App running at:
-    - Local:   http://localhost:8081/
-    - Network: http://192.168.0.3:8081/
+   A fresh database install will have no schema, so it's important to
+   migrate the database. To do this, developers will first have to
+   download the migration tool from:
 
-    Note that the development build is not optimized.
-    To create a production build, use yarn build.
-    #+END_SRC
+   https://github.com/golang-migrate/migrate/releases
 
-*** Migrations
+   And then copy the ~migrate~ binary into your PATH. Once that is
+   available, you can migrate:
 
-    We use this tool for database migrations:
+   #+BEGIN_SRC sh
+   make migrate-up
+   #+END_SRC
 
-    https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
+   This will execute several SQL files. It's a good practice to run
+   this periodically after fetching upstream changes, just to be sure
+   the schema stays up to date.
 
-    
-**** Setup
-     1) The link above has instructions on how to download the install the tool. Put the tool somewhere in your path.
+   *Run the server*:
 
-**** New Migrations
-     1) There's a tool mkm.sh in this directory that will create a new migration
-        with the name you've given. The file will create new up and down SQL
-        files in the migrations directory.
+   #+BEGIN_SRC sh
+   ./run-server.sh
+   #+END_SRC
 
-**** Migrating
-     1) Just run make `migrate-up` to migrate your local database.
-     2) To rerun a migration, run migrate-down and then you can re-run migrate-up.
+   This runs the server with the default developer configuration,
+   connecting to the PostgreSQL instance.
 
-* EOF
+   *Run the portal dev-server*:
+
+   In order to view the portal locally, developers will need to serve
+   the portal's static assets. To speed up development it's suggseted
+   that developers use ~yarn serve~ to serve the portal assets and
+   allow for automatic reloading:
+
+   #+BEGIN_SRC sh
+   cd portal
+   yarn install
+   yarn serve
+   #+END_SRC
+
+   As noted above you are free to use ~npm~ as well. If everything is
+   successful you should see something like this:
+
+   #+BEGIN_SRC sh
+   App running at:
+   - Local:   http://localhost:8081/
+   - Network: http://192.168.0.100:8081/
+
+   Note that the development build is not optimized.
+   To create a production build, use yarn build.
+   #+END_SRC
+
+   With all of this done, you should be able to navigate your browser
+   to http://127.0.0.1:8081 and get a login screen. Notice that due to
+   CORS the hostname that's used here is important for things to work
+   correctly.
+
+** Migrations
+
+   This repository uses the following third-party-tool for migrations:
+
+   https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
+
+*** Setup
+    1) The link above has instructions on how to download the install the tool. Put the tool somewhere in your path.
+
+*** New Migrations
+    1) There's a tool mkm.sh in this directory that will create a new migration
+       with the name you've given. The file will create new up and down SQL
+       files in the migrations directory.
+
+*** Migrating
+    1) Just run make `migrate-up` to migrate your local database.
+    2) To rerun a migration, run migrate-down and then you can re-run migrate-up.
+
+** Notes
+*** Docker Installation (Linux)
+
+	Here's some quick instructions on how to install and configure Docker under Ubuntu:
+
+	#+BEGIN_SRC sh
+    sudo apt-get install docker.io docker-compose nodejs
+    npm install -g yarn
+	#+END_SRC
+
+	In order to avoid having to run all docker commands with sudo, we
+	reccomend adding your user to the docker group:
+
+	#+BEGIN_SRC sh
+    sudo gpasswd -a $USER docker
+    newgrp docker
+	#+END_SRC
+
+	With this in place, you should be able to run ~docker ps~ as your
+	user with no errors.
+
+
+*EOF*
