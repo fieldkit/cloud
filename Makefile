@@ -114,6 +114,7 @@ clean-postgres:
 	rm -f active-schema
 
 active-schema:
+	mkdir -p schema
 	ln -sf schema active-schema
 
 restart-postgres: active-schema
