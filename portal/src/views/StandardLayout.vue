@@ -20,6 +20,7 @@
                 <slot></slot>
             </div>
         </div>
+        <Zoho />
     </div>
 </template>
 
@@ -27,6 +28,7 @@
 import Vue from "@/store/strong-vue";
 import HeaderBar from "./shared/HeaderBar.vue";
 import SidebarNav from "./shared/SidebarNav.vue";
+import Zoho from "./shared/Zoho.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
@@ -36,6 +38,7 @@ export default Vue.extend({
     components: {
         HeaderBar,
         SidebarNav,
+        Zoho,
     },
     props: {
         viewingProjects: {
