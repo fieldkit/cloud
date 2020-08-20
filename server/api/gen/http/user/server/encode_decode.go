@@ -2055,6 +2055,7 @@ func marshalUserviewsProjectUserViewToProjectUserResponseBody(v *userviews.Proje
 	res := &ProjectUserResponseBody{
 		Role:       *v.Role,
 		Membership: *v.Membership,
+		Invited:    *v.Invited,
 	}
 	if v.User != nil {
 		res.User = marshalUserviewsUserViewToUserResponseBody(v.User)

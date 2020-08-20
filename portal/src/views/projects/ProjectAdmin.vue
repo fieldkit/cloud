@@ -45,11 +45,9 @@
                 <div class="details-bottom">
                     <div class="details-team">
                         <div class="title">Team</div>
-                        <UserPhoto
-                            v-for="projectUser in displayProject.users"
-                            v-bind:key="projectUser.user.email"
-                            :user="projectUser.user"
-                        />
+                        <template v-for="projectUser in displayProject.users">
+                            <UserPhoto :user="projectUser.user" v-if="!projectUser.invited" v-bind:key="projectUser.user.email" />
+                        </template>
                     </div>
                     <div class="details-modules">
                         <div class="title">Modules</div>

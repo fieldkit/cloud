@@ -2699,7 +2699,7 @@ IssueTransmissionToken implements issue transmission token.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user issue- transmission- token --auth "Animi laudantium qui tempora atque cupiditate sequi."
+    `+os.Args[0]+` user issue- transmission- token --auth "Laudantium qui tempora atque."
 `, os.Args[0])
 }
 
@@ -2724,6 +2724,6 @@ Example:
     `+os.Args[0]+` user admin- delete --body '{
       "email": "Consequuntur in voluptatem.",
       "password": "Sint tempore nesciunt error."
-   }' --auth "Ut dolores."
+   }' --auth "Quo voluptatibus et quod provident."
 `, os.Args[0])
 }

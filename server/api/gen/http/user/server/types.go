@@ -1539,6 +1539,7 @@ type ProjectUserResponseBody struct {
 	User       *UserResponseBody `form:"user" json:"user" xml:"user"`
 	Role       string            `form:"role" json:"role" xml:"role"`
 	Membership string            `form:"membership" json:"membership" xml:"membership"`
+	Invited    bool              `form:"invited" json:"invited" xml:"invited"`
 }
 
 // UserResponseBody is used to define fields on response body types.

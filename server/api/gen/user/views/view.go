@@ -111,6 +111,7 @@ type ProjectUserView struct {
 	User       *UserView
 	Role       *string
 	Membership *string
+	Invited    *bool
 }
 
 // TransmissionTokenView is a type that runs validations on a projected type.
@@ -186,6 +187,7 @@ var (
 			"user",
 			"role",
 			"membership",
+			"invited",
 		},
 	}
 	// ProjectUserMap is a map of attribute names in result type ProjectUser
@@ -195,6 +197,7 @@ var (
 			"user",
 			"role",
 			"membership",
+			"invited",
 		},
 	}
 	// ProjectRoleMap is a map of attribute names in result type ProjectRole
@@ -389,6 +392,9 @@ func ValidateProjectUserView(result *ProjectUserView) (err error) {
 	}
 	if result.Membership == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("membership", "result"))
+	}
+	if result.Invited == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("invited", "result"))
 	}
 	if result.User != nil {
 		if err2 := ValidateUserView(result.User); err2 != nil {

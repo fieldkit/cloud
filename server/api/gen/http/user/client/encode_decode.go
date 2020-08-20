@@ -2585,6 +2585,7 @@ func unmarshalProjectUserResponseBodyToUserviewsProjectUserView(v *ProjectUserRe
 	res := &userviews.ProjectUserView{
 		Role:       v.Role,
 		Membership: v.Membership,
+		Invited:    v.Invited,
 	}
 	res.User = unmarshalUserResponseBodyToUserviewsUserView(v.User)
 

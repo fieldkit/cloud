@@ -1539,6 +1539,7 @@ type ProjectUserResponseBody struct {
 	User       *UserResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
 	Role       *string           `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
 	Membership *string           `form:"membership,omitempty" json:"membership,omitempty" xml:"membership,omitempty"`
+	Invited    *bool             `form:"invited,omitempty" json:"invited,omitempty" xml:"invited,omitempty"`
 }
 
 // UserResponseBody is used to define fields on response body types.
@@ -4763,6 +4764,9 @@ func ValidateProjectUserResponseBody(body *ProjectUserResponseBody) (err error) 
 	}
 	if body.Membership == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("membership", "body"))
+	}
+	if body.Invited == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("invited", "body"))
 	}
 	if body.User != nil {
 		if err2 := ValidateUserResponseBody(body.User); err2 != nil {
