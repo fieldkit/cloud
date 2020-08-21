@@ -239,55 +239,6 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 	return filtered, nil
 }
 
-func (mf *MetaFactory) CombinedMetaByIDs(ids []int64) (combined *VersionMeta, err error) {
-	station := &DataMetaStation{}
-	modulesByID := make(map[string]*DataMetaModule)
-
-	for _, id := range ids {
-		meta := mf.byMetaID[id]
-
-		for _, module := range meta.Station.Modules {
-			modulesByID[module.ID] = module
-		}
-
-		station = meta.Station
-	}
-
-	modules := make([]*DataMetaModule, 0)
-	for _, module := range modulesByID {
-		modules = append(modules, module)
-	}
-
-	station.Modules = modules
-
-	combined = &VersionMeta{
-		ID:      0,
-		Station: station,
-	}
-
-	return
-}
-
-type ModuleAndMetaID struct {
-	MetaID int64
-	Module *DataMetaModule
-}
-
-func (mf *MetaFactory) AllModules() map[string]*ModuleAndMetaID {
-	modulesByID := make(map[string]*ModuleAndMetaID)
-
-	for _, meta := range mf.ordered {
-		for _, module := range meta.Station.Modules {
-			modulesByID[module.ID] = &ModuleAndMetaID{
-				MetaID: meta.ID,
-				Module: module,
-			}
-		}
-	}
-
-	return modulesByID
-}
-
 func getLocation(l *pb.DeviceLocation) []float64 {
 	if l == nil {
 		return nil
