@@ -771,7 +771,7 @@ type MetaAndData struct {
 	Data *AddedDataRecords
 }
 
-func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*MetaAndData, error) {
+func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User, numberData int) (*MetaAndData, error) {
 	recordRepository, err := repositories.NewRecordRepository(e.DB)
 	if err != nil {
 		return nil, err
@@ -807,7 +807,7 @@ func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User) (*MetaA
 
 		metaRecords = append(metaRecords, metaRecord)
 
-		for d := 0; d < 4; d += 1 {
+		for d := 0; d < numberData; d += 1 {
 			data := e.NewDataReading(meta.Signed.Record, dataNumber)
 
 			buffer := proto.NewBuffer(make([]byte, 0))

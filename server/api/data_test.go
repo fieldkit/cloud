@@ -21,7 +21,7 @@ func TestGetDeviceSummary(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	_, err = e.AddMetaAndData(fd.Stations[0], fd.Owner)
+	_, err = e.AddMetaAndData(fd.Stations[0], fd.Owner, 5)
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/data/devices/%s/summary", fd.Stations[0].DeviceIDHex()), nil)

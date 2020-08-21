@@ -34,7 +34,7 @@ func TestGetMetaRecord(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	ar, err := e.AddMetaAndData(fd.Stations[0], fd.Owner)
+	ar, err := e.AddMetaAndData(fd.Stations[0], fd.Owner, 5)
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)
@@ -68,7 +68,7 @@ func TestGetDataRecord(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	ar, err := e.AddMetaAndData(fd.Stations[0], fd.Owner)
+	ar, err := e.AddMetaAndData(fd.Stations[0], fd.Owner, 5)
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)
@@ -112,7 +112,7 @@ func TestGetDataRecordResolved(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	ar, err := e.AddMetaAndData(fd.Stations[0], fd.Owner)
+	ar, err := e.AddMetaAndData(fd.Stations[0], fd.Owner, 5)
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)
