@@ -2,6 +2,8 @@ package repositories
 
 import (
 	"time"
+
+	pb "github.com/fieldkit/data-protocol"
 )
 
 type SensorRanges struct {
@@ -39,11 +41,6 @@ type ModuleHeader struct {
 	Kind         uint32   `json:"kind"`
 	Version      uint32   `json:"version"`
 	AllKinds     []uint32 `json:"all_kinds"`
-}
-
-type Version struct {
-	Meta *VersionMeta `json:"meta"`
-	Data []*DataRow   `json:"data"`
 }
 
 type VersionMeta struct {
@@ -254,4 +251,11 @@ func unique(values []int64) []int64 {
 		}
 	}
 	return uniq
+}
+
+func isInternalModule(m *pb.ModuleInfo) bool {
+	if m.Flags&META_INTERNAL_MASK == META_INTERNAL_MASK {
+		return true
+	}
+	return m.Name == "random" || m.Name == "diagnostics"
 }
