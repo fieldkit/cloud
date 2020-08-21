@@ -288,43 +288,6 @@ func (mf *MetaFactory) AllModules() map[string]*ModuleAndMetaID {
 	return modulesByID
 }
 
-func (mf *MetaFactory) ToModulesAndData(resampled []*Resampled, summary *DataSummary) (modulesAndData *ModulesAndData, err error) {
-	allModules := mf.AllModules()
-
-	modules := make([]*DataMetaModule, 0)
-	for _, m := range allModules {
-		modules = append(modules, m.Module)
-	}
-
-	// The long term plan in here is to take the unique modules map
-	// and look for key collisions and then introduce prefixes on the
-	// keys to disambiguate things.
-
-	// I think a generalized disambigation will be necessary anyway,
-	// akin to having modules with differening
-	// kind/manufacture/version with the same keys, to avoid
-	// misinterpreting those. For now, I'm leaving this alone and just
-	// returning all the modules.
-
-	data := make([]*DataRow, 0, len(resampled))
-	for _, r := range resampled {
-		data = append(data, r.ToDataRow())
-	}
-
-	modulesAndData = &ModulesAndData{
-		Modules: modules,
-		Data:    data,
-		Statistics: &DataSimpleStatistics{
-			Start:               *summary.Start,
-			End:                 *summary.End,
-			NumberOfDataRecords: summary.NumberOfDataRecords,
-			NumberOfMetaRecords: summary.NumberOfMetaRecords,
-		},
-	}
-
-	return
-}
-
 func getLocation(l *pb.DeviceLocation) []float64 {
 	if l == nil {
 		return nil

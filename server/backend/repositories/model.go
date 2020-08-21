@@ -87,15 +87,6 @@ type DataMetaStationFirmware struct {
 	Hash      string `json:"hash"`
 }
 
-type DataRow struct {
-	ID       int64                  `json:"id"`
-	Time     int64                  `json:"time"`
-	MetaIDs  []int64                `json:"meta_ids"`
-	Location []float64              `json:"location"`
-	Filtered []string               `json:"filtered"`
-	D        map[string]interface{} `json:"d"`
-}
-
 type ReadingValue struct {
 	MetaRecordID int64           `json:"meta_record_id"`
 	Module       *DataMetaModule `json:"module"`
@@ -113,46 +104,6 @@ type ResolvedRecord struct {
 type MatchedFilters struct {
 	Record   []string            `json:"record"`
 	Readings map[string][]string `json:"readings"`
-}
-
-type RecordsByFilter = map[string][]int64
-
-type FilterAuditLog struct {
-	Records  RecordsByFilter            `json:"records"`
-	Readings map[string]RecordsByFilter `json:"readings"`
-}
-
-func NewFilterAuditLog() *FilterAuditLog {
-	return &FilterAuditLog{
-		Records:  make(map[string][]int64),
-		Readings: make(map[string]RecordsByFilter),
-	}
-}
-
-func (fl *FilterAuditLog) Include(fr *FilteredRecord) {
-	id := fr.Record.ID
-
-	for _, filter := range fr.Filters.Record {
-		if fl.Records[filter] == nil {
-			fl.Records[filter] = make([]int64, 0, 1)
-		}
-		fl.Records[filter] = append(fl.Records[filter], id)
-	}
-
-	for sensor, filters := range fr.Filters.Readings {
-		if fl.Readings[sensor] == nil {
-			fl.Readings[sensor] = make(map[string][]int64)
-		}
-
-		sensorFilters := fl.Readings[sensor]
-
-		for _, filter := range filters {
-			if sensorFilters[filter] == nil {
-				sensorFilters[filter] = make([]int64, 0, 1)
-			}
-			sensorFilters[filter] = append(sensorFilters[filter], id)
-		}
-	}
 }
 
 func (mf *MatchedFilters) AddRecord(name string) {
@@ -187,76 +138,16 @@ type FilteredRecord struct {
 	Filters *MatchedFilters `json:"filters"`
 }
 
-func (full *ResolvedRecord) ToDataRow() *DataRow {
-	data := make(map[string]interface{})
-	metaIDs := make([]int64, 0)
-
-	for key, reading := range full.Readings {
-		metaIDs = append(metaIDs, reading.MetaRecordID)
-		data[key] = reading.Value
-	}
-
-	return &DataRow{
-		ID:       full.ID,
-		Time:     full.Time,
-		Location: full.Location,
-		MetaIDs:  unique(metaIDs),
-		D:        data,
-	}
-}
-
-type DataSimpleStatistics struct {
-	Start               time.Time
-	End                 time.Time
-	NumberOfDataRecords int64
-	NumberOfMetaRecords int64
-}
-
-type ModulesAndData struct {
-	Modules    []*DataMetaModule
-	Data       []*DataRow
-	Statistics *DataSimpleStatistics
-}
-
-type ResampleInfo struct {
-	Size int32   `json:"size"`
-	IDs  []int64 `json:"ids"`
-}
-
-type Resampled struct {
-	NumberOfSamples int32
-	MetaIDs         []int64
-	Location        []float64
-	Time            time.Time
-	D               map[string]interface{}
-}
-
-func (r *Resampled) ToDataRow() *DataRow {
-	return &DataRow{
-		ID:       0,
-		MetaIDs:  r.MetaIDs,
-		Time:     r.Time.Unix(),
-		Location: r.Location,
-		D:        r.D,
-		Filtered: []string{},
-	}
-}
-
-func unique(values []int64) []int64 {
-	keys := make(map[int64]bool)
-	uniq := []int64{}
-	for _, entry := range values {
-		if _, value := keys[entry]; !value {
-			keys[entry] = true
-			uniq = append(uniq, entry)
-		}
-	}
-	return uniq
-}
-
 func isInternalModule(m *pb.ModuleInfo) bool {
 	if m.Flags&META_INTERNAL_MASK == META_INTERNAL_MASK {
 		return true
 	}
 	return m.Name == "random" || m.Name == "diagnostics"
+}
+
+type DataSummary struct {
+	Start               *time.Time `db:"start"`
+	End                 *time.Time `db:"end"`
+	NumberOfDataRecords int64      `db:"number_of_data_records"`
+	NumberOfMetaRecords int64      `db:"number_of_meta_records"`
 }

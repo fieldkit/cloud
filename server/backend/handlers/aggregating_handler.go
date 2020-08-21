@@ -87,7 +87,7 @@ func (v *AggregatingHandler) OnDone(ctx context.Context) error {
 		}
 	}
 
-	// Delete out of range data.
+	// TODO Delete out of range data.
 
 	return nil
 }
