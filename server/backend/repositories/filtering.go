@@ -11,20 +11,20 @@ type Filter interface {
 }
 
 type Filtering struct {
-	Filters []Filter
+	filters []Filter
 }
 
 func NewFiltering() (f *Filtering) {
 	return &Filtering{
-		Filters: []Filter{
-			&TimeFilter{
-				Epoch: time.Date(2010, 1, 1, 0, 0, 0, 0, time.UTC),
+		filters: []Filter{
+			&timeFilter{
+				epoch: time.Date(2010, 1, 1, 0, 0, 0, 0, time.UTC),
 			},
-			&SensorRangeFilter{},
-			&MultipleFilteredReadingsFilter{
-				Threshold: 3,
+			&sensorRangeFilter{},
+			&multipleFilteredReadingsFilter{
+				threshold: 3,
 			},
-			&EmptyFilter{},
+			&emptyFilter{},
 		},
 	}
 }
@@ -35,7 +35,7 @@ func (f *Filtering) Apply(ctx context.Context, record *ResolvedRecord) *Filtered
 		Readings: make(map[string][]string),
 	}
 
-	for _, filter := range f.Filters {
+	for _, filter := range f.filters {
 		filter.Apply(ctx, record, filters)
 	}
 
@@ -45,30 +45,30 @@ func (f *Filtering) Apply(ctx context.Context, record *ResolvedRecord) *Filtered
 	}
 }
 
-type TimeFilter struct {
-	Epoch time.Time
+type timeFilter struct {
+	epoch time.Time
 }
 
-func (f *TimeFilter) Name() string {
+func (f *timeFilter) Name() string {
 	return "time"
 }
 
-func (f *TimeFilter) Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters) {
-	if record.Time < f.Epoch.Unix() {
+func (f *timeFilter) Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters) {
+	if record.Time < f.epoch.Unix() {
 		filters.AddRecord(f.Name())
 	}
 }
 
-type SensorRangeFilter struct {
+type sensorRangeFilter struct {
 }
 
-func (f *SensorRangeFilter) Name() string {
+func (f *sensorRangeFilter) Name() string {
 	return "range"
 }
 
-func (f *SensorRangeFilter) Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters) {
+func (f *sensorRangeFilter) Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters) {
 	for key, reading := range record.Readings {
-		for _, r := range reading.Meta.Ranges {
+		for _, r := range reading.Sensor.Ranges {
 			if r.Minimum == r.Maximum {
 				if reading.Value == r.Minimum {
 					filters.AddReading(key, f.Name())
@@ -83,29 +83,29 @@ func (f *SensorRangeFilter) Apply(ctx context.Context, record *ResolvedRecord, f
 	}
 }
 
-type EmptyFilter struct {
+type emptyFilter struct {
 }
 
-func (f *EmptyFilter) Name() string {
+func (f *emptyFilter) Name() string {
 	return "empty"
 }
 
-func (f *EmptyFilter) Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters) {
+func (f *emptyFilter) Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters) {
 	if len(record.Readings) == 0 {
 		filters.AddRecord(f.Name())
 	}
 }
 
-type MultipleFilteredReadingsFilter struct {
-	Threshold int
+type multipleFilteredReadingsFilter struct {
+	threshold int
 }
 
-func (f *MultipleFilteredReadingsFilter) Name() string {
+func (f *multipleFilteredReadingsFilter) Name() string {
 	return "multiple"
 }
 
-func (f *MultipleFilteredReadingsFilter) Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters) {
-	if filters.NumberOfReadingsFiltered() >= f.Threshold {
+func (f *multipleFilteredReadingsFilter) Apply(ctx context.Context, record *ResolvedRecord, filters *MatchedFilters) {
+	if filters.NumberOfReadingsFiltered() >= f.threshold {
 		filters.AddRecord(f.Name())
 	}
 }
