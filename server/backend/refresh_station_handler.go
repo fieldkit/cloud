@@ -57,10 +57,10 @@ func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRec
 		start = time.Now().Add(-howRecently)
 	}
 	walkParams := &WalkParameters{
-		StationID: stationID,
-		Start:     start,
-		End:       time.Now(),
-		PageSize:  1000,
+		Start:      start,
+		End:        time.Now(),
+		StationIDs: []int32{stationID},
+		PageSize:   1000,
 	}
 	return sr.walk(ctx, walkParams)
 }

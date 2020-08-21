@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jmoiron/sqlx"
+
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/data"
@@ -29,11 +31,11 @@ func NewRecordWalker(db *sqlxcache.DB) (rw *RecordWalker) {
 }
 
 type WalkParameters struct {
-	Page      int
-	PageSize  int
-	StationID int32
-	Start     time.Time
-	End       time.Time
+	Page       int
+	PageSize   int
+	StationIDs []int32
+	Start      time.Time
+	End        time.Time
 }
 
 type WalkInfo struct {
@@ -69,7 +71,7 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 		return err
 	}
 
-	log.Infow("done", "station_id", params.StationID, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
+	log.Infow("done", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
 
 	return nil
 }
@@ -85,20 +87,30 @@ func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler,
 
 	log.Infow("querying")
 
-	_, err := rw.db.ExecContext(ctx, `
-			DECLARE records_cursor CURSOR FOR
-			SELECT r.id, r.provision_id, r.time, r.number, r.meta_record_id, ST_AsBinary(r.location) AS location, r.raw, r.pb
-			FROM fieldkit.data_record AS r JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
-			WHERE (p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1) AND r.time >= $2 AND r.time < $3)
-			ORDER BY r.time OFFSET $4 LIMIT $5
-		`, params.StationID, params.Start, params.End, params.Page*params.PageSize, params.PageSize)
+	query, args, err := sqlx.In(`
+		DECLARE records_cursor CURSOR FOR
+		SELECT
+			r.id, r.provision_id, r.time, r.number, r.meta_record_id, r.raw, r.pb,
+			ST_AsBinary(r.location) AS location
+		FROM fieldkit.data_record AS r
+		JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
+		WHERE (
+			p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id IN (?))
+			AND r.time >= ?
+			AND r.time < ?
+		)
+		ORDER BY r.time OFFSET ? LIMIT ?
+		`, params.StationIDs, params.Start, params.End, params.Page*params.PageSize, params.PageSize)
+	if err != nil {
+		return err
+	}
+
+	_, err = rw.db.ExecContext(ctx, rw.db.Rebind(query), args...)
 	if err != nil {
 		return err
 	}
 
 	done := false
-
-	log.Infow("walking")
 
 	if err := rw.walkQuery(ctx, handler, params); err != nil {
 		if err != sql.ErrNoRows {
@@ -107,7 +119,7 @@ func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler,
 		done = true
 	}
 
-	if _, err := rw.db.ExecContext(ctx, "CLOSE records_cursor"); err != nil {
+	if _, err := rw.db.ExecContext(ctx, `CLOSE records_cursor`); err != nil {
 		return err
 	}
 
@@ -149,7 +161,7 @@ func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler, pa
 
 				if rw.dataRecords%1000 == 0 {
 					elapsed := time.Now().Sub(rw.started)
-					log.Infow("progress", "station_id", params.StationID, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
+					log.Infow("progress", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
 				}
 			}
 		}
