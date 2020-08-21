@@ -98,7 +98,8 @@ type DataRow struct {
 
 type ReadingValue struct {
 	MetaRecordID int64           `json:"meta_record_id"`
-	Meta         *DataMetaSensor `json:"meta"`
+	Module       *DataMetaModule `json:"module"`
+	Sensor       *DataMetaSensor `json:"sensor"`
 	Value        float64         `json:"value"`
 }
 

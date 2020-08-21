@@ -203,7 +203,8 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 				}
 
 				readings[sensor.Key] = &ReadingValue{
-					Meta:         sensor,
+					Sensor:       sensor,
+					Module:       module,
 					MetaRecordID: databaseRecord.MetaRecordID,
 					Value:        float64(reading.Value),
 				}
