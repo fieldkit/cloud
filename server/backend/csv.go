@@ -19,7 +19,8 @@ type csvFormat struct {
 }
 
 type csvWriter struct {
-	writer *csv.Writer
+	writer  *csv.Writer
+	columns []string
 }
 
 func NewCsvFormatter() *csvFormat {
@@ -32,49 +33,51 @@ func (f *csvFormat) MimeType() string {
 
 func (f *csvFormat) CreateWriter(ctx context.Context, writer io.Writer) (ExportWriter, error) {
 	return &csvWriter{
-		writer: csv.NewWriter(writer),
+		writer:  csv.NewWriter(writer),
+		columns: make([]string, NumberOfColumns),
 	}, nil
 }
 
 func (f *csvWriter) Begin(ctx context.Context, stations []*data.Station, sensors []*repositories.SensorAndModuleMeta) error {
-	cols := make([]string, NumberOfColumns)
-	cols[0] = "time_js"
-	cols[1] = "uptime"
-	cols[2] = "station_id"
-	cols[3] = "station_name"
-	cols[4] = "latitude"
-	cols[5] = "longitude"
+	f.columns[0] = "time_js"
+	f.columns[1] = "uptime"
+	f.columns[2] = "station_id"
+	f.columns[3] = "station_name"
+	f.columns[4] = "latitude"
+	f.columns[5] = "longitude"
 
 	for _, sensor := range sensors {
-		cols = append(cols, sensor.Sensor.FullKey)
+		f.columns = append(f.columns, sensor.Sensor.FullKey)
 	}
 
-	f.writer.Write(cols)
+	f.writer.Write(f.columns)
 
 	return nil
 }
 
 func (f *csvWriter) Row(ctx context.Context, station *data.Station, sensors []*repositories.ReadingValue, row *repositories.FilteredRecord) error {
-	cols := make([]string, NumberOfColumns)
-	cols[0] = fmt.Sprintf("%v", row.Record.Time*1000)
-	cols[1] = fmt.Sprintf("%v", 0)
-	cols[2] = fmt.Sprintf("%v", station.ID)
-	cols[3] = fmt.Sprintf("%v", station.Name)
+	f.columns[0] = fmt.Sprintf("%v", row.Record.Time*1000)
+	f.columns[1] = fmt.Sprintf("%v", 0)
+	f.columns[2] = fmt.Sprintf("%v", station.ID)
+	f.columns[3] = station.Name
 	if row.Record.Location != nil {
 		l := row.Record.Location
-		cols[4] = fmt.Sprintf("%v", l[0])
-		cols[5] = fmt.Sprintf("%v", l[1])
+		f.columns[4] = fmt.Sprintf("%v", l[0])
+		f.columns[5] = fmt.Sprintf("%v", l[1])
+	} else {
+		f.columns[4] = ""
+		f.columns[5] = ""
 	}
 
-	for _, sam := range sensors {
+	for i, sam := range sensors {
 		if sam != nil {
-			cols = append(cols, fmt.Sprintf("%v", sam.Value))
+			f.columns[6+i] = fmt.Sprintf("%v", sam.Value)
 		} else {
-			cols = append(cols, "")
+			f.columns[6+i] = ""
 		}
 	}
 
-	f.writer.Write(cols)
+	f.writer.Write(f.columns)
 
 	return nil
 }

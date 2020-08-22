@@ -129,11 +129,6 @@ func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParamet
 }
 
 func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
-	if false {
-		log := Logger(ctx).Sugar()
-		log.Infow("querying", "page", params.Page, "page_size", params.PageSize)
-	}
-
 	query, args, err := sqlx.In(`
 		SELECT
 			r.id, r.provision_id, r.time, r.number, r.meta_record_id, r.raw AS raw, r.pb,
@@ -151,7 +146,7 @@ func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler,
 		return err
 	}
 
-	rows := []*data.DataRecord{}
+	rows := make([]*data.DataRecord, 0, 1000)
 	err = rw.db.SelectContext(ctx, &rows, rw.db.Rebind(query), args...)
 	if err != nil {
 		return err
@@ -175,7 +170,6 @@ func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler,
 		return fmt.Errorf("error loading provision: %v", err)
 	} else {
 		if meta, err := rw.loadMeta(ctx, provision, record.MetaRecordID, handler); err != nil {
-			// return fmt.Errorf("error loading meta: %v", err)
 			log := Logger(ctx).Sugar()
 			log.Infow("warning", "error", err)
 		} else {
