@@ -36,6 +36,10 @@ func (h *ExportDataHandler) Handle(ctx context.Context, m *messages.ExportData) 
 
 	log.Infow("processing")
 
+	if false {
+		defer profile.Start().Stop()
+	}
+
 	r, err := repositories.NewExportRepository(h.db)
 	if err != nil {
 		return err

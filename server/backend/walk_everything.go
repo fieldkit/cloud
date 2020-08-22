@@ -20,6 +20,10 @@ import (
 func walkEverything(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	log := Logger(ctx).Sugar()
 
+	if false {
+		defer profile.Start().Stop()
+	}
+
 	stationIDs := make([]int32, 0)
 	if err := services.database.SelectContext(ctx, &stationIDs, `SELECT id FROM fieldkit.station`); err != nil {
 		return err
