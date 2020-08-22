@@ -23,10 +23,11 @@ type RecordWalker struct {
 	metas       map[int64]*data.MetaRecord
 	provisions  map[int64]*data.Provision
 	db          *sqlxcache.DB
+	statistics  *WalkStatistics
 	started     time.Time
 	metaRecords int64
 	dataRecords int64
-	statistics  *WalkStatistics
+	bytes       int64
 }
 
 func NewRecordWalker(db *sqlxcache.DB) (rw *RecordWalker) {
@@ -65,6 +66,8 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 		return err
 	}
 
+	rw.statistics = ws
+
 	log := Logger(ctx).Sugar()
 
 	if ws.Records == 0 {
@@ -72,8 +75,6 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 	} else {
 		log.Infow("statistics", "start", ws.Start, "end", ws.End, "records", ws.Records)
 	}
-
-	rw.statistics = ws
 
 	for params.Page = 0; true; params.Page += 1 {
 		if err := rw.processBatchInTransaction(ctx, handler, params); err != nil {
@@ -176,16 +177,16 @@ func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler,
 			if err := handler.OnData(ctx, provision, nil, record, meta); err != nil {
 				return fmt.Errorf("error handling row: %v", err)
 			}
-
-			rw.dataRecords += 1
-
-			if rw.dataRecords%1000 == 0 {
-				elapsed := time.Now().Sub(rw.started)
-				percentage := float64(rw.dataRecords) / float64(rw.statistics.Records) * 100.0
-				log := Logger(ctx).Sugar()
-				log.Infow("progress", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds(), "progress", percentage)
-			}
 		}
+	}
+
+	rw.dataRecords += 1
+
+	if rw.dataRecords%1000 == 0 {
+		elapsed := time.Now().Sub(rw.started)
+		percentage := float64(rw.dataRecords) / float64(rw.statistics.Records) * 100.0
+		log := Logger(ctx).Sugar()
+		log.Infow("progress", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds(), "progress", percentage)
 	}
 
 	return nil
