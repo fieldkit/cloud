@@ -22,6 +22,23 @@ var _ = Service("ingestion", func() {
 		})
 	})
 
+	Method("walk everything", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+		})
+
+		HTTP(func() {
+			POST("data/walk")
+
+			httpAuthentication()
+		})
+	})
+
 	Method("process station", func() {
 		Security(JWTAuth, func() {
 			Scope("api:admin")

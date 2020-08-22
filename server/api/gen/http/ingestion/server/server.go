@@ -22,6 +22,7 @@ import (
 type Server struct {
 	Mounts           []*MountPoint
 	ProcessPending   http.Handler
+	WalkEverything   http.Handler
 	ProcessStation   http.Handler
 	ProcessIngestion http.Handler
 	Delete           http.Handler
@@ -62,15 +63,18 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"ProcessPending", "POST", "/data/process"},
+			{"WalkEverything", "POST", "/data/walk"},
 			{"ProcessStation", "POST", "/data/stations/{stationId}/process"},
 			{"ProcessIngestion", "POST", "/data/ingestions/{ingestionId}/process"},
 			{"Delete", "DELETE", "/data/ingestions/{ingestionId}"},
 			{"CORS", "OPTIONS", "/data/process"},
+			{"CORS", "OPTIONS", "/data/walk"},
 			{"CORS", "OPTIONS", "/data/stations/{stationId}/process"},
 			{"CORS", "OPTIONS", "/data/ingestions/{ingestionId}/process"},
 			{"CORS", "OPTIONS", "/data/ingestions/{ingestionId}"},
 		},
 		ProcessPending:   NewProcessPendingHandler(e.ProcessPending, mux, decoder, encoder, errhandler, formatter),
+		WalkEverything:   NewWalkEverythingHandler(e.WalkEverything, mux, decoder, encoder, errhandler, formatter),
 		ProcessStation:   NewProcessStationHandler(e.ProcessStation, mux, decoder, encoder, errhandler, formatter),
 		ProcessIngestion: NewProcessIngestionHandler(e.ProcessIngestion, mux, decoder, encoder, errhandler, formatter),
 		Delete:           NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
@@ -84,6 +88,7 @@ func (s *Server) Service() string { return "ingestion" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.ProcessPending = m(s.ProcessPending)
+	s.WalkEverything = m(s.WalkEverything)
 	s.ProcessStation = m(s.ProcessStation)
 	s.ProcessIngestion = m(s.ProcessIngestion)
 	s.Delete = m(s.Delete)
@@ -93,6 +98,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 // Mount configures the mux to serve the ingestion endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountProcessPendingHandler(mux, h.ProcessPending)
+	MountWalkEverythingHandler(mux, h.WalkEverything)
 	MountProcessStationHandler(mux, h.ProcessStation)
 	MountProcessIngestionHandler(mux, h.ProcessIngestion)
 	MountDeleteHandler(mux, h.Delete)
@@ -129,6 +135,57 @@ func NewProcessPendingHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "process pending")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "ingestion")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountWalkEverythingHandler configures the mux to serve the "ingestion"
+// service "walk everything" endpoint.
+func MountWalkEverythingHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleIngestionOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/data/walk", f)
+}
+
+// NewWalkEverythingHandler creates a HTTP handler which loads the HTTP request
+// and calls the "ingestion" service "walk everything" endpoint.
+func NewWalkEverythingHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeWalkEverythingRequest(mux, decoder)
+		encodeResponse = EncodeWalkEverythingResponse(encoder)
+		encodeError    = EncodeWalkEverythingError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "walk everything")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "ingestion")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -314,6 +371,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("OPTIONS", "/data/process", f)
+	mux.Handle("OPTIONS", "/data/walk", f)
 	mux.Handle("OPTIONS", "/data/stations/{stationId}/process", f)
 	mux.Handle("OPTIONS", "/data/ingestions/{ingestionId}/process", f)
 	mux.Handle("OPTIONS", "/data/ingestions/{ingestionId}", f)

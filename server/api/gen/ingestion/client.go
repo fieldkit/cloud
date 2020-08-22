@@ -16,15 +16,17 @@ import (
 // Client is the "ingestion" service client.
 type Client struct {
 	ProcessPendingEndpoint   goa.Endpoint
+	WalkEverythingEndpoint   goa.Endpoint
 	ProcessStationEndpoint   goa.Endpoint
 	ProcessIngestionEndpoint goa.Endpoint
 	DeleteEndpoint           goa.Endpoint
 }
 
 // NewClient initializes a "ingestion" service client given the endpoints.
-func NewClient(processPending, processStation, processIngestion, delete_ goa.Endpoint) *Client {
+func NewClient(processPending, walkEverything, processStation, processIngestion, delete_ goa.Endpoint) *Client {
 	return &Client{
 		ProcessPendingEndpoint:   processPending,
+		WalkEverythingEndpoint:   walkEverything,
 		ProcessStationEndpoint:   processStation,
 		ProcessIngestionEndpoint: processIngestion,
 		DeleteEndpoint:           delete_,
@@ -35,6 +37,13 @@ func NewClient(processPending, processStation, processIngestion, delete_ goa.End
 // service.
 func (c *Client) ProcessPending(ctx context.Context, p *ProcessPendingPayload) (err error) {
 	_, err = c.ProcessPendingEndpoint(ctx, p)
+	return
+}
+
+// WalkEverything calls the "walk everything" endpoint of the "ingestion"
+// service.
+func (c *Client) WalkEverything(ctx context.Context, p *WalkEverythingPayload) (err error) {
+	_, err = c.WalkEverythingEndpoint(ctx, p)
 	return
 }
 

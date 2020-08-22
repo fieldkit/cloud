@@ -21,6 +21,10 @@ type Client struct {
 	// pending endpoint.
 	ProcessPendingDoer goahttp.Doer
 
+	// WalkEverything Doer is the HTTP client used to make requests to the walk
+	// everything endpoint.
+	WalkEverythingDoer goahttp.Doer
+
 	// ProcessStation Doer is the HTTP client used to make requests to the process
 	// station endpoint.
 	ProcessStationDoer goahttp.Doer
@@ -56,6 +60,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		ProcessPendingDoer:   doer,
+		WalkEverythingDoer:   doer,
 		ProcessStationDoer:   doer,
 		ProcessIngestionDoer: doer,
 		DeleteDoer:           doer,
@@ -87,6 +92,30 @@ func (c *Client) ProcessPending() goa.Endpoint {
 		resp, err := c.ProcessPendingDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("ingestion", "process pending", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// WalkEverything returns an endpoint that makes HTTP requests to the ingestion
+// service walk everything server.
+func (c *Client) WalkEverything() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeWalkEverythingRequest(c.encoder)
+		decodeResponse = DecodeWalkEverythingResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildWalkEverythingRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.WalkEverythingDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("ingestion", "walk everything", err)
 		}
 		return decodeResponse(resp)
 	}

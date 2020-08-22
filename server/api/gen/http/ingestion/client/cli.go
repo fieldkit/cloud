@@ -27,6 +27,19 @@ func BuildProcessPendingPayload(ingestionProcessPendingAuth string) (*ingestion.
 	return v, nil
 }
 
+// BuildWalkEverythingPayload builds the payload for the ingestion walk
+// everything endpoint from CLI flags.
+func BuildWalkEverythingPayload(ingestionWalkEverythingAuth string) (*ingestion.WalkEverythingPayload, error) {
+	var auth string
+	{
+		auth = ingestionWalkEverythingAuth
+	}
+	v := &ingestion.WalkEverythingPayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
 // BuildProcessStationPayload builds the payload for the ingestion process
 // station endpoint from CLI flags.
 func BuildProcessStationPayload(ingestionProcessStationStationID string, ingestionProcessStationCompletely string, ingestionProcessStationAuth string) (*ingestion.ProcessStationPayload, error) {

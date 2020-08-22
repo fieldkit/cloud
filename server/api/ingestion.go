@@ -27,6 +27,14 @@ func NewIngestionService(ctx context.Context, options *ControllerOptions) *Inges
 	}
 }
 
+func (c *IngestionService) WalkEverything(ctx context.Context, payload *ingestion.WalkEverythingPayload) (err error) {
+	message := messages.WalkEverything{}
+	if err := c.options.Publisher.Publish(ctx, &message); err != nil {
+		return nil
+	}
+	return nil
+}
+
 func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestion.ProcessPendingPayload) (err error) {
 	log := Logger(ctx).Sugar()
 

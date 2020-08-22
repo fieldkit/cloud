@@ -85,6 +85,79 @@ type ProcessPendingBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// WalkEverythingUnauthorizedResponseBody is the type of the "ingestion"
+// service "walk everything" endpoint HTTP response body for the "unauthorized"
+// error.
+type WalkEverythingUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// WalkEverythingForbiddenResponseBody is the type of the "ingestion" service
+// "walk everything" endpoint HTTP response body for the "forbidden" error.
+type WalkEverythingForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// WalkEverythingNotFoundResponseBody is the type of the "ingestion" service
+// "walk everything" endpoint HTTP response body for the "not-found" error.
+type WalkEverythingNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// WalkEverythingBadRequestResponseBody is the type of the "ingestion" service
+// "walk everything" endpoint HTTP response body for the "bad-request" error.
+type WalkEverythingBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // ProcessStationUnauthorizedResponseBody is the type of the "ingestion"
 // service "process station" endpoint HTTP response body for the "unauthorized"
 // error.
@@ -360,6 +433,62 @@ func NewProcessPendingBadRequestResponseBody(res *goa.ServiceError) *ProcessPend
 	return body
 }
 
+// NewWalkEverythingUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "walk everything" endpoint of the "ingestion" service.
+func NewWalkEverythingUnauthorizedResponseBody(res *goa.ServiceError) *WalkEverythingUnauthorizedResponseBody {
+	body := &WalkEverythingUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewWalkEverythingForbiddenResponseBody builds the HTTP response body from
+// the result of the "walk everything" endpoint of the "ingestion" service.
+func NewWalkEverythingForbiddenResponseBody(res *goa.ServiceError) *WalkEverythingForbiddenResponseBody {
+	body := &WalkEverythingForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewWalkEverythingNotFoundResponseBody builds the HTTP response body from the
+// result of the "walk everything" endpoint of the "ingestion" service.
+func NewWalkEverythingNotFoundResponseBody(res *goa.ServiceError) *WalkEverythingNotFoundResponseBody {
+	body := &WalkEverythingNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewWalkEverythingBadRequestResponseBody builds the HTTP response body from
+// the result of the "walk everything" endpoint of the "ingestion" service.
+func NewWalkEverythingBadRequestResponseBody(res *goa.ServiceError) *WalkEverythingBadRequestResponseBody {
+	body := &WalkEverythingBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewProcessStationUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "process station" endpoint of the "ingestion" service.
 func NewProcessStationUnauthorizedResponseBody(res *goa.ServiceError) *ProcessStationUnauthorizedResponseBody {
@@ -533,6 +662,15 @@ func NewDeleteBadRequestResponseBody(res *goa.ServiceError) *DeleteBadRequestRes
 // payload.
 func NewProcessPendingPayload(auth string) *ingestion.ProcessPendingPayload {
 	v := &ingestion.ProcessPendingPayload{}
+	v.Auth = auth
+
+	return v
+}
+
+// NewWalkEverythingPayload builds a ingestion service walk everything endpoint
+// payload.
+func NewWalkEverythingPayload(auth string) *ingestion.WalkEverythingPayload {
+	v := &ingestion.WalkEverythingPayload{}
 	v.Auth = auth
 
 	return v

@@ -16,6 +16,11 @@ func ProcessPendingIngestionPath() string {
 	return "/data/process"
 }
 
+// WalkEverythingIngestionPath returns the URL path to the ingestion service walk everything HTTP endpoint.
+func WalkEverythingIngestionPath() string {
+	return "/data/walk"
+}
+
 // ProcessStationIngestionPath returns the URL path to the ingestion service process station HTTP endpoint.
 func ProcessStationIngestionPath(stationID int32) string {
 	return fmt.Sprintf("/data/stations/%v/process", stationID)

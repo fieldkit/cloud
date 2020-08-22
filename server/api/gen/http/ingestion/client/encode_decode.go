@@ -139,6 +139,126 @@ func DecodeProcessPendingResponse(decoder func(*http.Response) goahttp.Decoder, 
 	}
 }
 
+// BuildWalkEverythingRequest instantiates a HTTP request object with method
+// and path set to call the "ingestion" service "walk everything" endpoint
+func (c *Client) BuildWalkEverythingRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: WalkEverythingIngestionPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("ingestion", "walk everything", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeWalkEverythingRequest returns an encoder for requests sent to the
+// ingestion walk everything server.
+func EncodeWalkEverythingRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*ingestion.WalkEverythingPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("ingestion", "walk everything", "*ingestion.WalkEverythingPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeWalkEverythingResponse returns a decoder for responses returned by the
+// ingestion walk everything endpoint. restoreBody controls whether the
+// response body should be restored after having been read.
+// DecodeWalkEverythingResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeWalkEverythingResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body WalkEverythingUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "walk everything", err)
+			}
+			err = ValidateWalkEverythingUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "walk everything", err)
+			}
+			return nil, NewWalkEverythingUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body WalkEverythingForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "walk everything", err)
+			}
+			err = ValidateWalkEverythingForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "walk everything", err)
+			}
+			return nil, NewWalkEverythingForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body WalkEverythingNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "walk everything", err)
+			}
+			err = ValidateWalkEverythingNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "walk everything", err)
+			}
+			return nil, NewWalkEverythingNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body WalkEverythingBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "walk everything", err)
+			}
+			err = ValidateWalkEverythingBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "walk everything", err)
+			}
+			return nil, NewWalkEverythingBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("ingestion", "walk everything", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildProcessStationRequest instantiates a HTTP request object with method
 // and path set to call the "ingestion" service "process station" endpoint
 func (c *Client) BuildProcessStationRequest(ctx context.Context, v interface{}) (*http.Request, error) {

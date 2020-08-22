@@ -17,6 +17,7 @@ import (
 // Endpoints wraps the "ingestion" service endpoints.
 type Endpoints struct {
 	ProcessPending   goa.Endpoint
+	WalkEverything   goa.Endpoint
 	ProcessStation   goa.Endpoint
 	ProcessIngestion goa.Endpoint
 	Delete           goa.Endpoint
@@ -28,6 +29,7 @@ func NewEndpoints(s Service) *Endpoints {
 	a := s.(Auther)
 	return &Endpoints{
 		ProcessPending:   NewProcessPendingEndpoint(s, a.JWTAuth),
+		WalkEverything:   NewWalkEverythingEndpoint(s, a.JWTAuth),
 		ProcessStation:   NewProcessStationEndpoint(s, a.JWTAuth),
 		ProcessIngestion: NewProcessIngestionEndpoint(s, a.JWTAuth),
 		Delete:           NewDeleteEndpoint(s, a.JWTAuth),
@@ -37,6 +39,7 @@ func NewEndpoints(s Service) *Endpoints {
 // Use applies the given middleware to all the "ingestion" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ProcessPending = m(e.ProcessPending)
+	e.WalkEverything = m(e.WalkEverything)
 	e.ProcessStation = m(e.ProcessStation)
 	e.ProcessIngestion = m(e.ProcessIngestion)
 	e.Delete = m(e.Delete)
@@ -58,6 +61,25 @@ func NewProcessPendingEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.En
 			return nil, err
 		}
 		return nil, s.ProcessPending(ctx, p)
+	}
+}
+
+// NewWalkEverythingEndpoint returns an endpoint function that calls the method
+// "walk everything" of service "ingestion".
+func NewWalkEverythingEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*WalkEverythingPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:admin"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.WalkEverything(ctx, p)
 	}
 }
 

@@ -18,6 +18,8 @@ import (
 type Service interface {
 	// ProcessPending implements process pending.
 	ProcessPending(context.Context, *ProcessPendingPayload) (err error)
+	// WalkEverything implements walk everything.
+	WalkEverything(context.Context, *WalkEverythingPayload) (err error)
 	// ProcessStation implements process station.
 	ProcessStation(context.Context, *ProcessStationPayload) (err error)
 	// ProcessIngestion implements process ingestion.
@@ -40,11 +42,17 @@ const ServiceName = "ingestion"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"process pending", "process station", "process ingestion", "delete"}
+var MethodNames = [5]string{"process pending", "walk everything", "process station", "process ingestion", "delete"}
 
 // ProcessPendingPayload is the payload type of the ingestion service process
 // pending method.
 type ProcessPendingPayload struct {
+	Auth string
+}
+
+// WalkEverythingPayload is the payload type of the ingestion service walk
+// everything method.
+type WalkEverythingPayload struct {
 	Auth string
 }
 
