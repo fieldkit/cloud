@@ -129,14 +129,12 @@ func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParamet
 }
 
 func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
-	log := Logger(ctx).Sugar()
-
 	if false {
+		log := Logger(ctx).Sugar()
 		log.Infow("querying", "page", params.Page, "page_size", params.PageSize)
 	}
 
 	query, args, err := sqlx.In(`
-		DECLARE records_cursor CURSOR FOR
 		SELECT
 			r.id, r.provision_id, r.time, r.number, r.meta_record_id, r.raw AS raw, r.pb,
 			ST_AsBinary(r.location) AS location
@@ -153,39 +151,32 @@ func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler,
 		return err
 	}
 
-	_, err = rw.db.ExecContext(ctx, rw.db.Rebind(query), args...)
+	rows := []*data.DataRecord{}
+	err = rw.db.SelectContext(ctx, &rows, rw.db.Rebind(query), args...)
 	if err != nil {
 		return err
 	}
 
-	done := false
+	if len(rows) == 0 {
+		return sql.ErrNoRows
+	}
 
-	if err := rw.walkQuery(ctx, handler, params); err != nil {
-		if err != sql.ErrNoRows {
+	for _, row := range rows {
+		if err := rw.handleRecord(ctx, handler, params, row); err != nil {
 			return err
 		}
-		done = true
-	}
-
-	if _, err := rw.db.ExecContext(ctx, `CLOSE records_cursor`); err != nil {
-		return err
-	}
-
-	if done {
-		return sql.ErrNoRows
 	}
 
 	return nil
 }
 
 func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler, params *WalkParameters, record *data.DataRecord) error {
-	log := Logger(ctx).Sugar()
-
 	if provision, err := rw.loadProvision(ctx, record.ProvisionID); err != nil {
 		return fmt.Errorf("error loading provision: %v", err)
 	} else {
 		if meta, err := rw.loadMeta(ctx, provision, record.MetaRecordID, handler); err != nil {
 			// return fmt.Errorf("error loading meta: %v", err)
+			log := Logger(ctx).Sugar()
 			log.Infow("warning", "error", err)
 		} else {
 			if err := handler.OnData(ctx, provision, nil, record, meta); err != nil {
@@ -197,39 +188,10 @@ func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler,
 			if rw.dataRecords%1000 == 0 {
 				elapsed := time.Now().Sub(rw.started)
 				percentage := float64(rw.dataRecords) / float64(rw.statistics.Records) * 100.0
+				log := Logger(ctx).Sugar()
 				log.Infow("progress", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds(), "progress", percentage)
 			}
 		}
-	}
-
-	return nil
-}
-
-func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
-	// log := Logger(ctx).Sugar()
-
-	tx := rw.db.Transaction(ctx)
-	batchSize := 0
-
-	data := &data.DataRecord{}
-
-	for {
-		if err := tx.QueryRowxContext(ctx, `FETCH NEXT FROM records_cursor`).StructScan(data); err != nil {
-			if err == sql.ErrNoRows {
-				break
-			}
-			return err
-		}
-
-		if err := rw.handleRecord(ctx, handler, params, data); err != nil {
-			return err
-		}
-
-		batchSize += 1
-	}
-
-	if batchSize == 0 {
-		return sql.ErrNoRows
 	}
 
 	return nil

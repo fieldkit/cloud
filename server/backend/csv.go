@@ -55,12 +55,6 @@ func (f *csvWriter) Begin(ctx context.Context, stations []*data.Station, sensors
 }
 
 func (f *csvWriter) Row(ctx context.Context, station *data.Station, sensors []*repositories.ReadingValue, row *repositories.FilteredRecord) error {
-	log := Logger(ctx).Sugar()
-
-	if false {
-		log.Infow("record", "readings", row.Record.Readings)
-	}
-
 	cols := make([]string, NumberOfColumns)
 	cols[0] = fmt.Sprintf("%v", row.Record.Time*1000)
 	cols[1] = fmt.Sprintf("%v", 0)
