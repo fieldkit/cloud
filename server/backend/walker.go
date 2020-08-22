@@ -58,8 +58,6 @@ func (rw *RecordWalker) Info(ctx context.Context) (*WalkInfo, error) {
 }
 
 func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
-	done := false
-
 	rw.started = time.Now()
 
 	ws, err := rw.queryStatistics(ctx, params)
@@ -77,7 +75,7 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 
 	rw.statistics = ws
 
-	for params.Page = 0; !done; params.Page += 1 {
+	for params.Page = 0; true; params.Page += 1 {
 		if err := rw.processBatchInTransaction(ctx, handler, params); err != nil {
 			if err == sql.ErrNoRows {
 				break
@@ -180,8 +178,35 @@ func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler,
 	return nil
 }
 
-func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
+func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler, params *WalkParameters, record *data.DataRecord) error {
 	log := Logger(ctx).Sugar()
+
+	if provision, err := rw.loadProvision(ctx, record.ProvisionID); err != nil {
+		return fmt.Errorf("error loading provision: %v", err)
+	} else {
+		if meta, err := rw.loadMeta(ctx, provision, record.MetaRecordID, handler); err != nil {
+			// return fmt.Errorf("error loading meta: %v", err)
+			log.Infow("warning", "error", err)
+		} else {
+			if err := handler.OnData(ctx, provision, nil, record, meta); err != nil {
+				return fmt.Errorf("error handling row: %v", err)
+			}
+
+			rw.dataRecords += 1
+
+			if rw.dataRecords%1000 == 0 {
+				elapsed := time.Now().Sub(rw.started)
+				percentage := float64(rw.dataRecords) / float64(rw.statistics.Records) * 100.0
+				log.Infow("progress", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds(), "progress", percentage)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
+	// log := Logger(ctx).Sugar()
 
 	tx := rw.db.Transaction(ctx)
 	batchSize := 0
@@ -196,25 +221,8 @@ func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler, pa
 			return err
 		}
 
-		if provision, err := rw.loadProvision(ctx, data.ProvisionID); err != nil {
-			return fmt.Errorf("error loading provision: %v", err)
-		} else {
-			if meta, err := rw.loadMeta(ctx, provision, data.MetaRecordID, handler); err != nil {
-				// return fmt.Errorf("error loading meta: %v", err)
-				log.Infow("warning", "error", err)
-			} else {
-				if err := handler.OnData(ctx, provision, nil, data, meta); err != nil {
-					return fmt.Errorf("error handling row: %v", err)
-				}
-
-				rw.dataRecords += 1
-
-				if rw.dataRecords%1000 == 0 {
-					elapsed := time.Now().Sub(rw.started)
-					percentage := float64(rw.dataRecords) / float64(rw.statistics.Records) * 100.0
-					log.Infow("progress", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds(), "progress", percentage)
-				}
-			}
+		if err := rw.handleRecord(ctx, handler, params, data); err != nil {
+			return err
 		}
 
 		batchSize += 1
