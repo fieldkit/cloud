@@ -69,7 +69,11 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 
 	log := Logger(ctx).Sugar()
 
-	log.Infow("statistics", "start", ws.Start, "end", ws.End, "records", ws.Records)
+	if ws.Records == 0 {
+		log.Infow("empty")
+	} else {
+		log.Infow("statistics", "start", ws.Start, "end", ws.End, "records", ws.Records)
+	}
 
 	rw.statistics = ws
 
