@@ -43,6 +43,9 @@ func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFun
 		messageLog := Logger(messageCtx).Sugar()
 
 		err := h(messageCtx, j, services, transport)
+		if err != nil {
+			messageLog.Errorw("error", "error", err)
+		}
 
 		messageLog.Infow("completed", "message_type", transport.Package+"."+transport.Type, "time", time.Since(startedAt).String())
 
@@ -81,6 +84,7 @@ func exportData(ctx context.Context, j *que.Job, services *BackgroundServices, t
 func CreateMap(services *BackgroundServices) que.WorkMap {
 	return que.WorkMap{
 		"Example":           wrapContext(wrapTransportMessage(services, exampleJob)),
+		"WalkEverything":    wrapContext(wrapTransportMessage(services, walkEverything)),
 		"IngestionReceived": wrapContext(wrapTransportMessage(services, ingestionReceived)),
 		"RefreshStation":    wrapContext(wrapTransportMessage(services, refreshStation)),
 		"ExportData":        wrapContext(wrapTransportMessage(services, exportData)),
