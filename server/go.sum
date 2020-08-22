@@ -159,6 +159,7 @@ github.com/fieldkit/cloud v0.0.0-20200628205510-bd83dd7bd571 h1:QqzGyxFMesfBkFNm
 github.com/fieldkit/cloud v0.0.0-20200701023840-ec3219a1665a h1:O284fVTkUlcB8KTR2BfiSeztQ+wairYaSefFIwGOrRc=
 github.com/fieldkit/cloud v0.0.0-20200706154703-f8205d288bc5 h1:RbDLAF9WAp0diqxB8P8md/Z/OOVRjBJORgFGGZPGikc=
 github.com/fieldkit/cloud v0.0.0-20200720185507-efba818f6223 h1:UOnX0qTpvBX6DHXKuSUG5ZJUihjEZgzdNNhSK8FlCPg=
+github.com/fieldkit/cloud v0.0.0-20200820213045-44b177fbec23 h1:Pffq3woD6xwSa452Sq52pBwInU3O1esAutDuIZhsuPU=
 github.com/fieldkit/data-protocol v0.0.0-20180327223702-03a931c33d8e h1:rFW2B+LYyxl52yCRhUXiORgPL9HXM9h40mkkyPg2jY0=
 github.com/fieldkit/data-protocol v0.0.0-20180327223702-03a931c33d8e/go.mod h1:Atpguegf5+RPc1NjBgZ3oukS3WAqckGBcLjdRJOvY6A=
 github.com/fieldkit/data-protocol v0.0.0-20190903230951-dd4bd77f8fec h1:UZ8oj/i5PLGrAV0WqiRYzy32woAictOHHrPFWhA4w18=
@@ -204,6 +205,7 @@ github.com/go-openapi/swag v0.19.2/go.mod h1:POnQmlKehdgb5mhVOsnJFsivZCEZ/vjK9gh
 github.com/go-openapi/swag v0.19.5/go.mod h1:POnQmlKehdgb5mhVOsnJFsivZCEZ/vjK9gh66Z9tfKk=
 github.com/go-openapi/swag v0.19.7/go.mod h1:ao+8BpOPyKdpQz3AOJfbeEVpLmWAvlT1IfTe5McPyhY=
 github.com/go-sql-driver/mysql v1.4.0/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
+github.com/go-sql-driver/mysql v1.5.0 h1:ozyZYNQW3x3HtqT1jira07DN2PArx2v7/mN66gGcHOs=
 github.com/go-sql-driver/mysql v1.5.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
 github.com/goadesign/goa v1.4.0 h1:2K0k+KtwGcErmWUoarsItuV9cPKG/7KBG86Oh89kHqs=
@@ -281,6 +283,7 @@ github.com/google/btree v1.0.0/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ
 github.com/google/go-cmp v0.2.0/go.mod h1:oXzfMopK8JAjlY9xF4vHSVASa0yLyX7SntLO5aqRK0M=
 github.com/google/go-cmp v0.3.0/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
+github.com/google/go-cmp v0.4.0 h1:xsAVV57WRhGj6kEIi8ReJzQlHHqcBYCElAvkovg3B/4=
 github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-github v17.0.0+incompatible/go.mod h1:zLgOLi98H3fifZn+44m+umXrS52loVEgC2AApnigrVQ=
 github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135 h1:zLTLjkaOFEFIOxY5BWLFLwh+cL8vOBW4XJ2aqLE/Tf0=
@@ -418,6 +421,7 @@ github.com/mattn/go-colorable v0.1.1/go.mod h1:FuOcm+DKB9mbwrcAfNl7/TZVBZ6rcncea
 github.com/mattn/go-isatty v0.0.5/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
 github.com/mattn/go-isatty v0.0.7/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
 github.com/mattn/go-sqlite3 v1.9.0/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
+github.com/mattn/go-sqlite3 v1.10.0 h1:jbhqpg7tQe4SupckyijYiy0mJJ/pRyHvXf7JdWK860o=
 github.com/mattn/go-sqlite3 v1.10.0/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=

@@ -114,7 +114,7 @@ func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sen
 	}, nil
 }
 
-func (c *SensorService) stationsMeta(ctx context.Context, stations []int64) (*sensor.DataResult, error) {
+func (c *SensorService) stationsMeta(ctx context.Context, stations []int32) (*sensor.DataResult, error) {
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT sensor_id, station_id, s.key, station.name AS station_name
 		FROM %s AS agg
@@ -172,7 +172,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return nil, sensor.MakeBadRequest(err)
 	}
 
-	log.Infow("query_parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate, "tail", qp.Tail)
+	log.Infow("parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate, "tail", qp.Tail)
 
 	if qp.Tail > 0 {
 		return c.tail(ctx, qp)

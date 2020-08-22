@@ -71,6 +71,16 @@ type DataMetaModule struct {
 	Internal     bool              `json:"internal"`
 }
 
+type SensorAndModuleMeta struct {
+	Sensor *SensorMeta `json:"sensor"`
+	Module *ModuleMeta `json:"module"`
+}
+
+type SensorAndModule struct {
+	Sensor *DataMetaSensor `json:"sensor"`
+	Module *DataMetaModule `json:"module"`
+}
+
 type DataMetaStation struct {
 	ID         string                   `json:"id"`
 	Name       string                   `json:"name"`
@@ -88,10 +98,9 @@ type DataMetaStationFirmware struct {
 }
 
 type ReadingValue struct {
-	MetaRecordID int64           `json:"meta_record_id"`
-	Module       *DataMetaModule `json:"module"`
-	Sensor       *DataMetaSensor `json:"sensor"`
-	Value        float64         `json:"value"`
+	Module *DataMetaModule `json:"module"`
+	Sensor *DataMetaSensor `json:"sensor"`
+	Value  float64         `json:"value"`
 }
 
 type ResolvedRecord struct {

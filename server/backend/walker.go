@@ -13,6 +13,12 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+type WalkStatistics struct {
+	Start   *time.Time `db:"start"`
+	End     *time.Time `db:"end"`
+	Records int64      `db:"records"`
+}
+
 type RecordWalker struct {
 	metas       map[int64]*data.MetaRecord
 	provisions  map[int64]*data.Provision
@@ -20,6 +26,7 @@ type RecordWalker struct {
 	started     time.Time
 	metaRecords int64
 	dataRecords int64
+	statistics  *WalkStatistics
 }
 
 func NewRecordWalker(db *sqlxcache.DB) (rw *RecordWalker) {
@@ -55,6 +62,17 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 
 	rw.started = time.Now()
 
+	ws, err := rw.queryStatistics(ctx, params)
+	if err != nil {
+		return err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	log.Infow("statistics", "start", ws.Start, "end", ws.End, "records", ws.Records)
+
+	rw.statistics = ws
+
 	for params.Page = 0; !done; params.Page += 1 {
 		if err := rw.processBatchInTransaction(ctx, handler, params); err != nil {
 			if err == sql.ErrNoRows {
@@ -65,7 +83,6 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 	}
 
 	elapsed := time.Now().Sub(rw.started)
-	log := Logger(ctx).Sugar()
 
 	if err := handler.OnDone(ctx); err != nil {
 		return err
@@ -82,15 +99,44 @@ func (rw *RecordWalker) processBatchInTransaction(ctx context.Context, handler R
 	})
 }
 
+func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParameters) (*WalkStatistics, error) {
+	query, args, err := sqlx.In(`
+		SELECT
+			MIN(r.time) AS start,
+			MAX(r.time) AS end,
+			COUNT(r.id) AS records
+		FROM fieldkit.data_record AS r
+		JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
+		WHERE (
+			p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id IN (?))
+			AND r.time >= ?
+			AND r.time < ?
+		)
+		`, params.StationIDs, params.Start, params.End)
+	if err != nil {
+		return nil, err
+	}
+
+	ws := &WalkStatistics{}
+	err = rw.db.GetContext(ctx, ws, rw.db.Rebind(query), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return ws, nil
+}
+
 func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("querying")
+	if false {
+		log.Infow("querying", "page", params.Page, "page_size", params.PageSize)
+	}
 
 	query, args, err := sqlx.In(`
 		DECLARE records_cursor CURSOR FOR
 		SELECT
-			r.id, r.provision_id, r.time, r.number, r.meta_record_id, r.raw, r.pb,
+			r.id, r.provision_id, r.time, r.number, r.meta_record_id, r.raw AS raw, r.pb,
 			ST_AsBinary(r.location) AS location
 		FROM fieldkit.data_record AS r
 		JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
@@ -161,7 +207,8 @@ func (rw *RecordWalker) walkQuery(ctx context.Context, handler RecordHandler, pa
 
 				if rw.dataRecords%1000 == 0 {
 					elapsed := time.Now().Sub(rw.started)
-					log.Infow("progress", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
+					percentage := float64(rw.dataRecords) / float64(rw.statistics.Records) * 100.0
+					log.Infow("progress", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds(), "progress", percentage)
 				}
 			}
 		}

@@ -59,13 +59,8 @@ func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPaylo
 
 	// We do some quick validation on the parameters before we
 	// continue, just to avoid unnecessary work.
-	qp, err := args.BuildQueryParams()
-	if err != nil {
+	if _, err := args.BuildQueryParams(); err != nil {
 		return nil, csvService.MakeBadRequest(err)
-	}
-
-	if len(qp.Sensors) == 0 {
-		return nil, errors.New("sensors is required")
 	}
 
 	r, err := repositories.NewExportRepository(c.options.Database)
@@ -77,7 +72,7 @@ func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPaylo
 	de := data.DataExport{
 		Token:     token[:],
 		UserID:    p.UserID(),
-		Kind:      reflect.TypeOf(messages.ExportCsv{}).Name(),
+		Kind:      reflect.TypeOf(messages.ExportData{}).Name(),
 		CreatedAt: time.Now(),
 		Progress:  0,
 	}
@@ -85,13 +80,12 @@ func (c *CsvService) Export(ctx context.Context, payload *csvService.ExportPaylo
 		return nil, err
 	}
 
-	exportMessage := messages.ExportCsv{
-		ID:     de.ID,
-		UserID: p.UserID(),
-		Token:  token.String(),
-	}
-
-	if err := c.options.Publisher.Publish(ctx, &exportMessage); err != nil {
+	if err := c.options.Publisher.Publish(ctx, &messages.ExportData{
+		ID:        de.ID,
+		UserID:    p.UserID(),
+		Token:     token.String(),
+		Formatter: backend.CSVFormatter,
+	}); err != nil {
 		return nil, nil
 	}
 

@@ -203,10 +203,9 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 				}
 
 				readings[sensor.Key] = &ReadingValue{
-					Sensor:       sensor,
-					Module:       module,
-					MetaRecordID: databaseRecord.MetaRecordID,
-					Value:        float64(reading.Value),
+					Sensor: sensor,
+					Module: module,
+					Value:  float64(reading.Value),
 				}
 			}
 		}
@@ -226,7 +225,6 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 	}
 
 	location := getLocation(dataRecord.Readings.Location)
-
 	resolved := &ResolvedRecord{
 		ID:       databaseRecord.ID,
 		Time:     dataRecord.Readings.Time,

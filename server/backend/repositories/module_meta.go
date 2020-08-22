@@ -36,6 +36,25 @@ func NewModuleMetaRepository() *ModuleMetaRepository {
 	return &ModuleMetaRepository{}
 }
 
+func (r *ModuleMetaRepository) FindByFullKey(fullKey string) (mm *SensorAndModuleMeta, err error) {
+	all, err := r.FindAllModulesMeta()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, module := range all {
+		for _, sensor := range module.Sensors {
+			mm = &SensorAndModuleMeta{
+				Module: module,
+				Sensor: sensor,
+			}
+			return
+		}
+	}
+
+	return nil, fmt.Errorf("unknown sensor: %s", fullKey)
+}
+
 func (r *ModuleMetaRepository) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, err error) {
 	all, err := r.FindAllModulesMeta()
 	if err != nil {

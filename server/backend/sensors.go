@@ -37,7 +37,7 @@ type QueryParams struct {
 	Start      time.Time `json:"start"`
 	End        time.Time `json:"end"`
 	Sensors    []int64   `json:"sensors"`
-	Stations   []int64   `json:"stations"`
+	Stations   []int32   `json:"stations"`
 	Resolution int32     `json:"resolution"`
 	Aggregate  string    `json:"aggregate"`
 	Tail       int32     `json:"tail"`
@@ -60,12 +60,12 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		resolution = *raw.Resolution
 	}
 
-	stations := make([]int64, 0)
+	stations := make([]int32, 0)
 	if raw.Stations != nil {
 		parts := strings.Split(*raw.Stations, ",")
 		for _, p := range parts {
 			if i, err := strconv.Atoi(p); err == nil {
-				stations = append(stations, int64(i))
+				stations = append(stations, int32(i))
 			}
 		}
 	}
@@ -125,7 +125,7 @@ type AggregateQueryParams struct {
 	Start              time.Time
 	End                time.Time
 	Sensors            []int64
-	Stations           []int64
+	Stations           []int32
 	Complete           bool
 	Interval           int32
 	TimeGroupThreshold int32
