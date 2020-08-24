@@ -20,7 +20,7 @@
             <div v-for="de in history" class="export" v-bind:key="de.id">
                 <div class="kind">{{ prettyKind(de.format) }}</div>
                 <div class="created">{{ de.createdAt | prettyTime }}</div>
-                <div class="busy" v-if="!de.downloadUrl">Generating</div>
+                <div class="busy" v-if="!de.downloadUrl">{{ de.progress | prettyPercentage }}</div>
                 <div class="size" v-if="de.downloadUrl">{{ de.size | prettyBytes }}</div>
                 <div class="download" v-if="de.downloadUrl"><a :href="$config.baseUrl + de.downloadUrl">Download</a></div>
             </div>

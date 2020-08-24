@@ -65,6 +65,13 @@ export interface ReadingLike {
     reading: number;
 }
 
+Vue.filter("prettyPercentage", (value: number | null) => {
+    if (!value) {
+        return "--";
+    }
+    return value.toFixed(1) + "%";
+});
+
 Vue.filter("prettyReading", (sensor: ReadingLike) => {
     if (!sensor.reading) {
         return "--";

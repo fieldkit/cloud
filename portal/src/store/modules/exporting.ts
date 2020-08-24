@@ -53,7 +53,16 @@ const actions = {
     },
     [ActionTypes.NEED_EXPORTS]: async ({ dispatch, commit }: ActionParameters, payload: ExportDataAction) => {
         return new FKApi().getUserExports().then((exports) => {
-            return commit(USER_EXPORTS, exports);
+            commit(USER_EXPORTS, exports);
+
+            return Promise.all(
+                exports.exports.map((de) => {
+                    if (!de.completedAt) {
+                        return dispatch(EXPORT_CHECK, { statusUrl: de.statusUrl });
+                    }
+                    return de;
+                })
+            );
         });
     },
     [ActionTypes.BEGIN_EXPORT]: async ({ dispatch, commit }: ActionParameters, payload: ExportDataAction) => {
