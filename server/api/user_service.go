@@ -504,7 +504,9 @@ func (s *UserService) IssueTransmissionToken(ctx context.Context, payload *user.
 	}
 
 	authed := &data.User{}
-	if err := s.options.Database.GetContext(ctx, authed, `SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1`, p.UserID()); err != nil {
+	if err := s.options.Database.GetContext(ctx, authed, `
+		SELECT u.* FROM fieldkit.user AS u WHERE u.id = $1
+		`, p.UserID()); err != nil {
 		return nil, err
 	}
 
@@ -515,7 +517,10 @@ func (s *UserService) IssueTransmissionToken(ctx context.Context, payload *user.
 		return nil, fmt.Errorf("failed to sign token: %s", err)
 	}
 
+	url := fmt.Sprintf("https://api.%s/ingestion", s.options.Domain)
+
 	return &user.TransmissionToken{
+		URL:   url,
 		Token: signedToken,
 	}, nil
 }

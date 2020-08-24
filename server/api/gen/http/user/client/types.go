@@ -141,6 +141,7 @@ type ListByProjectResponseBody struct {
 // transmission token" endpoint HTTP response body.
 type IssueTransmissionTokenResponseBody struct {
 	Token *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+	URL   *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 }
 
 // ProjectRolesResponseBody is the type of the "user" service "project roles"
@@ -2709,6 +2710,7 @@ func NewListByProjectBadRequest(body *ListByProjectBadRequestResponseBody) *goa.
 func NewIssueTransmissionTokenTransmissionTokenOK(body *IssueTransmissionTokenResponseBody) *userviews.TransmissionTokenView {
 	v := &userviews.TransmissionTokenView{
 		Token: body.Token,
+		URL:   body.URL,
 	}
 
 	return v

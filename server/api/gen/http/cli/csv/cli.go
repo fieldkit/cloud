@@ -62,7 +62,7 @@ user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` csv noop` + "\n" +
-		os.Args[0] + ` activity station --id 3895558212145093285 --page 7346244278166224340 --auth "Sed temporibus et est et dolor."` + "\n" +
+		os.Args[0] + ` activity station --id 986432958313344236 --page 7378203554224813246 --auth "Et dolor."` + "\n" +
 		os.Args[0] + ` data device- summary --device-id "Temporibus alias totam sint necessitatibus et temporibus." --auth "Itaque commodi."` + "\n" +
 		os.Args[0] + ` export list- mine --auth "Provident a sunt atque atque sapiente voluptatibus."` + "\n" +
 		os.Args[0] + ` firmware download --firmware-id 1158821534` + "\n" +
@@ -1393,7 +1393,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 3895558212145093285 --page 7346244278166224340 --auth "Sed temporibus et est et dolor."
+    `+os.Args[0]+` activity station --id 986432958313344236 --page 7378203554224813246 --auth "Et dolor."
 `, os.Args[0])
 }
 
@@ -2809,8 +2809,8 @@ AdminDelete implements admin delete.
 
 Example:
     `+os.Args[0]+` user admin- delete --body '{
-      "email": "Consequuntur natus at recusandae.",
-      "password": "Recusandae veritatis."
-   }' --auth "Laborum aliquam sit aut."
+      "email": "Recusandae veritatis.",
+      "password": "Temporibus delectus iusto."
+   }' --auth "Et nam velit illum mollitia enim et."
 `, os.Args[0])
 }

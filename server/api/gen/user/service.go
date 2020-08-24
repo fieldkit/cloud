@@ -223,6 +223,7 @@ type IssueTransmissionTokenPayload struct {
 // token method.
 type TransmissionToken struct {
 	Token string
+	URL   string
 }
 
 // ProjectRoleCollection is the result type of the user service project roles
@@ -586,6 +587,9 @@ func newTransmissionToken(vres *userviews.TransmissionTokenView) *TransmissionTo
 	if vres.Token != nil {
 		res.Token = *vres.Token
 	}
+	if vres.URL != nil {
+		res.URL = *vres.URL
+	}
 	return res
 }
 
@@ -594,6 +598,7 @@ func newTransmissionToken(vres *userviews.TransmissionTokenView) *TransmissionTo
 func newTransmissionTokenView(res *TransmissionToken) *userviews.TransmissionTokenView {
 	vres := &userviews.TransmissionTokenView{
 		Token: &res.Token,
+		URL:   &res.URL,
 	}
 	return vres
 }

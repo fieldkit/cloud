@@ -519,10 +519,13 @@ var TransmissionToken = ResultType("application/vnd.app.user.transmission.token+
 	TypeName("TransmissionToken")
 	Attributes(func() {
 		Attribute("token", String)
+		Attribute("url", String)
 		Required("token")
+		Required("url")
 	})
 	View("default", func() {
 		Attribute("token")
+		Attribute("url")
 	})
 })
 

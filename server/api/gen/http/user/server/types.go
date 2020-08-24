@@ -141,6 +141,7 @@ type ListByProjectResponseBody struct {
 // transmission token" endpoint HTTP response body.
 type IssueTransmissionTokenResponseBody struct {
 	Token string `form:"token" json:"token" xml:"token"`
+	URL   string `form:"url" json:"url" xml:"url"`
 }
 
 // ProjectRoleResponseCollection is the type of the "user" service "project
@@ -1665,6 +1666,7 @@ func NewListByProjectResponseBody(res *userviews.ProjectUsersView) *ListByProjec
 func NewIssueTransmissionTokenResponseBody(res *userviews.TransmissionTokenView) *IssueTransmissionTokenResponseBody {
 	body := &IssueTransmissionTokenResponseBody{
 		Token: *res.Token,
+		URL:   *res.URL,
 	}
 	return body
 }
