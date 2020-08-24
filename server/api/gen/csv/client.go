@@ -15,22 +15,18 @@ import (
 
 // Client is the "csv" service client.
 type Client struct {
-	ExportEndpoint goa.Endpoint
+	NoopEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "csv" service client given the endpoints.
-func NewClient(export goa.Endpoint) *Client {
+func NewClient(noop goa.Endpoint) *Client {
 	return &Client{
-		ExportEndpoint: export,
+		NoopEndpoint: noop,
 	}
 }
 
-// Export calls the "export" endpoint of the "csv" service.
-func (c *Client) Export(ctx context.Context, p *ExportPayload) (res *ExportResult, err error) {
-	var ires interface{}
-	ires, err = c.ExportEndpoint(ctx, p)
-	if err != nil {
-		return
-	}
-	return ires.(*ExportResult), nil
+// Noop calls the "noop" endpoint of the "csv" service.
+func (c *Client) Noop(ctx context.Context) (err error) {
+	_, err = c.NoopEndpoint(ctx, nil)
+	return
 }

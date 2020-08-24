@@ -8,13 +8,12 @@
 package client
 
 import (
-	csv "github.com/fieldkit/cloud/server/api/gen/csv"
 	goa "goa.design/goa/v3/pkg"
 )
 
-// ExportUnauthorizedResponseBody is the type of the "csv" service "export"
+// NoopUnauthorizedResponseBody is the type of the "csv" service "noop"
 // endpoint HTTP response body for the "unauthorized" error.
-type ExportUnauthorizedResponseBody struct {
+type NoopUnauthorizedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -30,9 +29,9 @@ type ExportUnauthorizedResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// ExportForbiddenResponseBody is the type of the "csv" service "export"
-// endpoint HTTP response body for the "forbidden" error.
-type ExportForbiddenResponseBody struct {
+// NoopForbiddenResponseBody is the type of the "csv" service "noop" endpoint
+// HTTP response body for the "forbidden" error.
+type NoopForbiddenResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -48,9 +47,9 @@ type ExportForbiddenResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// ExportNotFoundResponseBody is the type of the "csv" service "export"
-// endpoint HTTP response body for the "not-found" error.
-type ExportNotFoundResponseBody struct {
+// NoopNotFoundResponseBody is the type of the "csv" service "noop" endpoint
+// HTTP response body for the "not-found" error.
+type NoopNotFoundResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -66,9 +65,9 @@ type ExportNotFoundResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// ExportBadRequestResponseBody is the type of the "csv" service "export"
-// endpoint HTTP response body for the "bad-request" error.
-type ExportBadRequestResponseBody struct {
+// NoopBadRequestResponseBody is the type of the "csv" service "noop" endpoint
+// HTTP response body for the "bad-request" error.
+type NoopBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -84,18 +83,8 @@ type ExportBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// NewExportResultFound builds a "csv" service "export" endpoint result from a
-// HTTP "Found" response.
-func NewExportResultFound(location string) *csv.ExportResult {
-	v := &csv.ExportResult{}
-	v.Location = location
-
-	return v
-}
-
-// NewExportUnauthorized builds a csv service export endpoint unauthorized
-// error.
-func NewExportUnauthorized(body *ExportUnauthorizedResponseBody) *goa.ServiceError {
+// NewNoopUnauthorized builds a csv service noop endpoint unauthorized error.
+func NewNoopUnauthorized(body *NoopUnauthorizedResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -108,8 +97,8 @@ func NewExportUnauthorized(body *ExportUnauthorizedResponseBody) *goa.ServiceErr
 	return v
 }
 
-// NewExportForbidden builds a csv service export endpoint forbidden error.
-func NewExportForbidden(body *ExportForbiddenResponseBody) *goa.ServiceError {
+// NewNoopForbidden builds a csv service noop endpoint forbidden error.
+func NewNoopForbidden(body *NoopForbiddenResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -122,8 +111,8 @@ func NewExportForbidden(body *ExportForbiddenResponseBody) *goa.ServiceError {
 	return v
 }
 
-// NewExportNotFound builds a csv service export endpoint not-found error.
-func NewExportNotFound(body *ExportNotFoundResponseBody) *goa.ServiceError {
+// NewNoopNotFound builds a csv service noop endpoint not-found error.
+func NewNoopNotFound(body *NoopNotFoundResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -136,8 +125,8 @@ func NewExportNotFound(body *ExportNotFoundResponseBody) *goa.ServiceError {
 	return v
 }
 
-// NewExportBadRequest builds a csv service export endpoint bad-request error.
-func NewExportBadRequest(body *ExportBadRequestResponseBody) *goa.ServiceError {
+// NewNoopBadRequest builds a csv service noop endpoint bad-request error.
+func NewNoopBadRequest(body *NoopBadRequestResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -150,9 +139,9 @@ func NewExportBadRequest(body *ExportBadRequestResponseBody) *goa.ServiceError {
 	return v
 }
 
-// ValidateExportUnauthorizedResponseBody runs the validations defined on
-// export_unauthorized_response_body
-func ValidateExportUnauthorizedResponseBody(body *ExportUnauthorizedResponseBody) (err error) {
+// ValidateNoopUnauthorizedResponseBody runs the validations defined on
+// noop_unauthorized_response_body
+func ValidateNoopUnauthorizedResponseBody(body *NoopUnauthorizedResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -174,9 +163,9 @@ func ValidateExportUnauthorizedResponseBody(body *ExportUnauthorizedResponseBody
 	return
 }
 
-// ValidateExportForbiddenResponseBody runs the validations defined on
-// export_forbidden_response_body
-func ValidateExportForbiddenResponseBody(body *ExportForbiddenResponseBody) (err error) {
+// ValidateNoopForbiddenResponseBody runs the validations defined on
+// noop_forbidden_response_body
+func ValidateNoopForbiddenResponseBody(body *NoopForbiddenResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -198,9 +187,9 @@ func ValidateExportForbiddenResponseBody(body *ExportForbiddenResponseBody) (err
 	return
 }
 
-// ValidateExportNotFoundResponseBody runs the validations defined on
-// export_not-found_response_body
-func ValidateExportNotFoundResponseBody(body *ExportNotFoundResponseBody) (err error) {
+// ValidateNoopNotFoundResponseBody runs the validations defined on
+// noop_not-found_response_body
+func ValidateNoopNotFoundResponseBody(body *NoopNotFoundResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -222,9 +211,9 @@ func ValidateExportNotFoundResponseBody(body *ExportNotFoundResponseBody) (err e
 	return
 }
 
-// ValidateExportBadRequestResponseBody runs the validations defined on
-// export_bad-request_response_body
-func ValidateExportBadRequestResponseBody(body *ExportBadRequestResponseBody) (err error) {
+// ValidateNoopBadRequestResponseBody runs the validations defined on
+// noop_bad-request_response_body
+func ValidateNoopBadRequestResponseBody(body *NoopBadRequestResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}

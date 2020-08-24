@@ -21,11 +21,13 @@ import (
 
 // Server lists the export service endpoint HTTP handlers.
 type Server struct {
-	Mounts   []*MountPoint
-	ListMine http.Handler
-	Status   http.Handler
-	Download http.Handler
-	CORS     http.Handler
+	Mounts    []*MountPoint
+	ListMine  http.Handler
+	Status    http.Handler
+	Download  http.Handler
+	Csv       http.Handler
+	JSONLines http.Handler
+	CORS      http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -64,14 +66,20 @@ func New(
 			{"ListMine", "GET", "/export"},
 			{"Status", "GET", "/export/{id}"},
 			{"Download", "GET", "/export/{id}/download"},
+			{"Csv", "POST", "/export/csv"},
+			{"JSONLines", "POST", "/export/json-lines"},
 			{"CORS", "OPTIONS", "/export"},
 			{"CORS", "OPTIONS", "/export/{id}"},
 			{"CORS", "OPTIONS", "/export/{id}/download"},
+			{"CORS", "OPTIONS", "/export/csv"},
+			{"CORS", "OPTIONS", "/export/json-lines"},
 		},
-		ListMine: NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
-		Status:   NewStatusHandler(e.Status, mux, decoder, encoder, errhandler, formatter),
-		Download: NewDownloadHandler(e.Download, mux, decoder, encoder, errhandler, formatter),
-		CORS:     NewCORSHandler(),
+		ListMine:  NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
+		Status:    NewStatusHandler(e.Status, mux, decoder, encoder, errhandler, formatter),
+		Download:  NewDownloadHandler(e.Download, mux, decoder, encoder, errhandler, formatter),
+		Csv:       NewCsvHandler(e.Csv, mux, decoder, encoder, errhandler, formatter),
+		JSONLines: NewJSONLinesHandler(e.JSONLines, mux, decoder, encoder, errhandler, formatter),
+		CORS:      NewCORSHandler(),
 	}
 }
 
@@ -83,6 +91,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.ListMine = m(s.ListMine)
 	s.Status = m(s.Status)
 	s.Download = m(s.Download)
+	s.Csv = m(s.Csv)
+	s.JSONLines = m(s.JSONLines)
 	s.CORS = m(s.CORS)
 }
 
@@ -91,6 +101,8 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountListMineHandler(mux, h.ListMine)
 	MountStatusHandler(mux, h.Status)
 	MountDownloadHandler(mux, h.Download)
+	MountCsvHandler(mux, h.Csv)
+	MountJSONLinesHandler(mux, h.JSONLines)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -255,6 +267,108 @@ func NewDownloadHandler(
 	})
 }
 
+// MountCsvHandler configures the mux to serve the "export" service "csv"
+// endpoint.
+func MountCsvHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleExportOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/export/csv", f)
+}
+
+// NewCsvHandler creates a HTTP handler which loads the HTTP request and calls
+// the "export" service "csv" endpoint.
+func NewCsvHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeCsvRequest(mux, decoder)
+		encodeResponse = EncodeCsvResponse(encoder)
+		encodeError    = EncodeCsvError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "csv")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "export")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountJSONLinesHandler configures the mux to serve the "export" service "json
+// lines" endpoint.
+func MountJSONLinesHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleExportOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/export/json-lines", f)
+}
+
+// NewJSONLinesHandler creates a HTTP handler which loads the HTTP request and
+// calls the "export" service "json lines" endpoint.
+func NewJSONLinesHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeJSONLinesRequest(mux, decoder)
+		encodeResponse = EncodeJSONLinesResponse(encoder)
+		encodeError    = EncodeJSONLinesError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "json lines")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "export")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service export.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -268,6 +382,8 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/export", f)
 	mux.Handle("OPTIONS", "/export/{id}", f)
 	mux.Handle("OPTIONS", "/export/{id}/download", f)
+	mux.Handle("OPTIONS", "/export/csv", f)
+	mux.Handle("OPTIONS", "/export/json-lines", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

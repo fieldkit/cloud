@@ -185,8 +185,9 @@ func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler,
 	if rw.dataRecords%1000 == 0 {
 		elapsed := time.Now().Sub(rw.started)
 		percentage := float64(rw.dataRecords) / float64(rw.statistics.Records) * 100.0
+		rps := float64(rw.dataRecords) / elapsed.Seconds()
 		log := Logger(ctx).Sugar()
-		log.Infow("progress", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds(), "progress", percentage)
+		log.Infow("progress", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", rps, "progress", percentage)
 	}
 
 	return nil

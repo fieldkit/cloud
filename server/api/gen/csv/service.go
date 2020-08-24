@@ -11,19 +11,12 @@ import (
 	"context"
 
 	goa "goa.design/goa/v3/pkg"
-	"goa.design/goa/v3/security"
 )
 
 // Service is the csv service interface.
 type Service interface {
-	// Export implements export.
-	Export(context.Context, *ExportPayload) (res *ExportResult, err error)
-}
-
-// Auther defines the authorization functions to be implemented by the service.
-type Auther interface {
-	// JWTAuth implements the authorization logic for the JWT security scheme.
-	JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error)
+	// Noop implements noop.
+	Noop(context.Context) (err error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -34,25 +27,7 @@ const ServiceName = "csv"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"export"}
-
-// ExportPayload is the payload type of the csv service export method.
-type ExportPayload struct {
-	Auth       string
-	Start      *int64
-	End        *int64
-	Stations   *string
-	Sensors    *string
-	Resolution *int32
-	Aggregate  *string
-	Complete   *bool
-	Tail       *int32
-}
-
-// ExportResult is the result type of the csv service export method.
-type ExportResult struct {
-	Location string
-}
+var MethodNames = [1]string{"noop"}
 
 // MakeUnauthorized builds a goa.ServiceError from an error.
 func MakeUnauthorized(err error) *goa.ServiceError {

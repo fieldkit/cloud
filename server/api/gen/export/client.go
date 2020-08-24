@@ -16,17 +16,21 @@ import (
 
 // Client is the "export" service client.
 type Client struct {
-	ListMineEndpoint goa.Endpoint
-	StatusEndpoint   goa.Endpoint
-	DownloadEndpoint goa.Endpoint
+	ListMineEndpoint  goa.Endpoint
+	StatusEndpoint    goa.Endpoint
+	DownloadEndpoint  goa.Endpoint
+	CsvEndpoint       goa.Endpoint
+	JSONLinesEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "export" service client given the endpoints.
-func NewClient(listMine, status, download goa.Endpoint) *Client {
+func NewClient(listMine, status, download, csv, jSONLines goa.Endpoint) *Client {
 	return &Client{
-		ListMineEndpoint: listMine,
-		StatusEndpoint:   status,
-		DownloadEndpoint: download,
+		ListMineEndpoint:  listMine,
+		StatusEndpoint:    status,
+		DownloadEndpoint:  download,
+		CsvEndpoint:       csv,
+		JSONLinesEndpoint: jSONLines,
 	}
 }
 
@@ -59,4 +63,24 @@ func (c *Client) Download(ctx context.Context, p *DownloadPayload) (res *Downloa
 	}
 	o := ires.(*DownloadResponseData)
 	return o.Result, o.Body, nil
+}
+
+// Csv calls the "csv" endpoint of the "export" service.
+func (c *Client) Csv(ctx context.Context, p *CsvPayload) (res *CsvResult, err error) {
+	var ires interface{}
+	ires, err = c.CsvEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*CsvResult), nil
+}
+
+// JSONLines calls the "json lines" endpoint of the "export" service.
+func (c *Client) JSONLines(ctx context.Context, p *JSONLinesPayload) (res *JSONLinesResult, err error) {
+	var ires interface{}
+	ires, err = c.JSONLinesEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*JSONLinesResult), nil
 }

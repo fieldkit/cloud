@@ -8,13 +8,12 @@
 package server
 
 import (
-	csv "github.com/fieldkit/cloud/server/api/gen/csv"
 	goa "goa.design/goa/v3/pkg"
 )
 
-// ExportUnauthorizedResponseBody is the type of the "csv" service "export"
+// NoopUnauthorizedResponseBody is the type of the "csv" service "noop"
 // endpoint HTTP response body for the "unauthorized" error.
-type ExportUnauthorizedResponseBody struct {
+type NoopUnauthorizedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -30,9 +29,9 @@ type ExportUnauthorizedResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// ExportForbiddenResponseBody is the type of the "csv" service "export"
-// endpoint HTTP response body for the "forbidden" error.
-type ExportForbiddenResponseBody struct {
+// NoopForbiddenResponseBody is the type of the "csv" service "noop" endpoint
+// HTTP response body for the "forbidden" error.
+type NoopForbiddenResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -48,9 +47,9 @@ type ExportForbiddenResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// ExportNotFoundResponseBody is the type of the "csv" service "export"
-// endpoint HTTP response body for the "not-found" error.
-type ExportNotFoundResponseBody struct {
+// NoopNotFoundResponseBody is the type of the "csv" service "noop" endpoint
+// HTTP response body for the "not-found" error.
+type NoopNotFoundResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -66,9 +65,9 @@ type ExportNotFoundResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// ExportBadRequestResponseBody is the type of the "csv" service "export"
-// endpoint HTTP response body for the "bad-request" error.
-type ExportBadRequestResponseBody struct {
+// NoopBadRequestResponseBody is the type of the "csv" service "noop" endpoint
+// HTTP response body for the "bad-request" error.
+type NoopBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -84,10 +83,10 @@ type ExportBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// NewExportUnauthorizedResponseBody builds the HTTP response body from the
-// result of the "export" endpoint of the "csv" service.
-func NewExportUnauthorizedResponseBody(res *goa.ServiceError) *ExportUnauthorizedResponseBody {
-	body := &ExportUnauthorizedResponseBody{
+// NewNoopUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "noop" endpoint of the "csv" service.
+func NewNoopUnauthorizedResponseBody(res *goa.ServiceError) *NoopUnauthorizedResponseBody {
+	body := &NoopUnauthorizedResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -98,10 +97,10 @@ func NewExportUnauthorizedResponseBody(res *goa.ServiceError) *ExportUnauthorize
 	return body
 }
 
-// NewExportForbiddenResponseBody builds the HTTP response body from the result
-// of the "export" endpoint of the "csv" service.
-func NewExportForbiddenResponseBody(res *goa.ServiceError) *ExportForbiddenResponseBody {
-	body := &ExportForbiddenResponseBody{
+// NewNoopForbiddenResponseBody builds the HTTP response body from the result
+// of the "noop" endpoint of the "csv" service.
+func NewNoopForbiddenResponseBody(res *goa.ServiceError) *NoopForbiddenResponseBody {
+	body := &NoopForbiddenResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -112,10 +111,10 @@ func NewExportForbiddenResponseBody(res *goa.ServiceError) *ExportForbiddenRespo
 	return body
 }
 
-// NewExportNotFoundResponseBody builds the HTTP response body from the result
-// of the "export" endpoint of the "csv" service.
-func NewExportNotFoundResponseBody(res *goa.ServiceError) *ExportNotFoundResponseBody {
-	body := &ExportNotFoundResponseBody{
+// NewNoopNotFoundResponseBody builds the HTTP response body from the result of
+// the "noop" endpoint of the "csv" service.
+func NewNoopNotFoundResponseBody(res *goa.ServiceError) *NoopNotFoundResponseBody {
+	body := &NoopNotFoundResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -126,10 +125,10 @@ func NewExportNotFoundResponseBody(res *goa.ServiceError) *ExportNotFoundRespons
 	return body
 }
 
-// NewExportBadRequestResponseBody builds the HTTP response body from the
-// result of the "export" endpoint of the "csv" service.
-func NewExportBadRequestResponseBody(res *goa.ServiceError) *ExportBadRequestResponseBody {
-	body := &ExportBadRequestResponseBody{
+// NewNoopBadRequestResponseBody builds the HTTP response body from the result
+// of the "noop" endpoint of the "csv" service.
+func NewNoopBadRequestResponseBody(res *goa.ServiceError) *NoopBadRequestResponseBody {
+	body := &NoopBadRequestResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -138,20 +137,4 @@ func NewExportBadRequestResponseBody(res *goa.ServiceError) *ExportBadRequestRes
 		Fault:     res.Fault,
 	}
 	return body
-}
-
-// NewExportPayload builds a csv service export endpoint payload.
-func NewExportPayload(start *int64, end *int64, stations *string, sensors *string, resolution *int32, aggregate *string, complete *bool, tail *int32, auth string) *csv.ExportPayload {
-	v := &csv.ExportPayload{}
-	v.Start = start
-	v.End = end
-	v.Stations = stations
-	v.Sensors = sensors
-	v.Resolution = resolution
-	v.Aggregate = aggregate
-	v.Complete = complete
-	v.Tail = tail
-	v.Auth = auth
-
-	return v
 }

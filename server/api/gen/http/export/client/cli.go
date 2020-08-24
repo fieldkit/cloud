@@ -8,6 +8,9 @@
 package client
 
 import (
+	"fmt"
+	"strconv"
+
 	export "github.com/fieldkit/cloud/server/api/gen/export"
 )
 
@@ -55,6 +58,106 @@ func BuildDownloadPayload(exportDownloadID string, exportDownloadAuth string) (*
 	}
 	v := &export.DownloadPayload{}
 	v.ID = id
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildCsvPayload builds the payload for the export csv endpoint from CLI
+// flags.
+func BuildCsvPayload(exportCsvStart string, exportCsvEnd string, exportCsvStations string, exportCsvSensors string, exportCsvAuth string) (*export.CsvPayload, error) {
+	var err error
+	var start *int64
+	{
+		if exportCsvStart != "" {
+			val, err := strconv.ParseInt(exportCsvStart, 10, 64)
+			start = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for start, must be INT64")
+			}
+		}
+	}
+	var end *int64
+	{
+		if exportCsvEnd != "" {
+			val, err := strconv.ParseInt(exportCsvEnd, 10, 64)
+			end = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for end, must be INT64")
+			}
+		}
+	}
+	var stations *string
+	{
+		if exportCsvStations != "" {
+			stations = &exportCsvStations
+		}
+	}
+	var sensors *string
+	{
+		if exportCsvSensors != "" {
+			sensors = &exportCsvSensors
+		}
+	}
+	var auth string
+	{
+		auth = exportCsvAuth
+	}
+	v := &export.CsvPayload{}
+	v.Start = start
+	v.End = end
+	v.Stations = stations
+	v.Sensors = sensors
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildJSONLinesPayload builds the payload for the export json lines endpoint
+// from CLI flags.
+func BuildJSONLinesPayload(exportJSONLinesStart string, exportJSONLinesEnd string, exportJSONLinesStations string, exportJSONLinesSensors string, exportJSONLinesAuth string) (*export.JSONLinesPayload, error) {
+	var err error
+	var start *int64
+	{
+		if exportJSONLinesStart != "" {
+			val, err := strconv.ParseInt(exportJSONLinesStart, 10, 64)
+			start = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for start, must be INT64")
+			}
+		}
+	}
+	var end *int64
+	{
+		if exportJSONLinesEnd != "" {
+			val, err := strconv.ParseInt(exportJSONLinesEnd, 10, 64)
+			end = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for end, must be INT64")
+			}
+		}
+	}
+	var stations *string
+	{
+		if exportJSONLinesStations != "" {
+			stations = &exportJSONLinesStations
+		}
+	}
+	var sensors *string
+	{
+		if exportJSONLinesSensors != "" {
+			sensors = &exportJSONLinesSensors
+		}
+	}
+	var auth string
+	{
+		auth = exportJSONLinesAuth
+	}
+	v := &export.JSONLinesPayload{}
+	v.Start = start
+	v.End = end
+	v.Stations = stations
+	v.Sensors = sensors
 	v.Auth = auth
 
 	return v, nil

@@ -32,7 +32,7 @@ func NewExportDataHandler(db *sqlxcache.DB, files files.FileArchive, metrics *lo
 }
 
 func (h *ExportDataHandler) Handle(ctx context.Context, m *messages.ExportData) error {
-	log := Logger(ctx).Sugar().Named("exporting").With("data_export_id", m.ID).With("user_id", m.UserID).With("formatter", m.Formatter)
+	log := Logger(ctx).Sugar().Named("exporting").With("data_export_id", m.ID).With("user_id", m.UserID).With("formatter", m.Format)
 
 	log.Infow("processing")
 

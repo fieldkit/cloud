@@ -10,126 +10,23 @@ package server
 import (
 	"context"
 	"net/http"
-	"strconv"
-	"strings"
 
-	csv "github.com/fieldkit/cloud/server/api/gen/csv"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
 
-// EncodeExportResponse returns an encoder for responses returned by the csv
-// export endpoint.
-func EncodeExportResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeNoopResponse returns an encoder for responses returned by the csv noop
+// endpoint.
+func EncodeNoopResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*csv.ExportResult)
-		w.Header().Set("Location", res.Location)
-		w.WriteHeader(http.StatusFound)
+		w.WriteHeader(http.StatusNoContent)
 		return nil
 	}
 }
 
-// DecodeExportRequest returns a decoder for requests sent to the csv export
+// EncodeNoopError returns an encoder for errors returned by the noop csv
 // endpoint.
-func DecodeExportRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
-	return func(r *http.Request) (interface{}, error) {
-		var (
-			start      *int64
-			end        *int64
-			stations   *string
-			sensors    *string
-			resolution *int32
-			aggregate  *string
-			complete   *bool
-			tail       *int32
-			auth       string
-			err        error
-		)
-		{
-			startRaw := r.URL.Query().Get("start")
-			if startRaw != "" {
-				v, err2 := strconv.ParseInt(startRaw, 10, 64)
-				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("start", startRaw, "integer"))
-				}
-				start = &v
-			}
-		}
-		{
-			endRaw := r.URL.Query().Get("end")
-			if endRaw != "" {
-				v, err2 := strconv.ParseInt(endRaw, 10, 64)
-				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("end", endRaw, "integer"))
-				}
-				end = &v
-			}
-		}
-		stationsRaw := r.URL.Query().Get("stations")
-		if stationsRaw != "" {
-			stations = &stationsRaw
-		}
-		sensorsRaw := r.URL.Query().Get("sensors")
-		if sensorsRaw != "" {
-			sensors = &sensorsRaw
-		}
-		{
-			resolutionRaw := r.URL.Query().Get("resolution")
-			if resolutionRaw != "" {
-				v, err2 := strconv.ParseInt(resolutionRaw, 10, 32)
-				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("resolution", resolutionRaw, "integer"))
-				}
-				pv := int32(v)
-				resolution = &pv
-			}
-		}
-		aggregateRaw := r.URL.Query().Get("aggregate")
-		if aggregateRaw != "" {
-			aggregate = &aggregateRaw
-		}
-		{
-			completeRaw := r.URL.Query().Get("complete")
-			if completeRaw != "" {
-				v, err2 := strconv.ParseBool(completeRaw)
-				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("complete", completeRaw, "boolean"))
-				}
-				complete = &v
-			}
-		}
-		{
-			tailRaw := r.URL.Query().Get("tail")
-			if tailRaw != "" {
-				v, err2 := strconv.ParseInt(tailRaw, 10, 32)
-				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("tail", tailRaw, "integer"))
-				}
-				pv := int32(v)
-				tail = &pv
-			}
-		}
-		auth = r.Header.Get("Authorization")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
-		}
-		if err != nil {
-			return nil, err
-		}
-		payload := NewExportPayload(start, end, stations, sensors, resolution, aggregate, complete, tail, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
-		}
-
-		return payload, nil
-	}
-}
-
-// EncodeExportError returns an encoder for errors returned by the export csv
-// endpoint.
-func EncodeExportError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+func EncodeNoopError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		en, ok := v.(ErrorNamer)
@@ -144,7 +41,7 @@ func EncodeExportError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewExportUnauthorizedResponseBody(res)
+				body = NewNoopUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", "unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)
@@ -156,7 +53,7 @@ func EncodeExportError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewExportForbiddenResponseBody(res)
+				body = NewNoopForbiddenResponseBody(res)
 			}
 			w.Header().Set("goa-error", "forbidden")
 			w.WriteHeader(http.StatusForbidden)
@@ -168,7 +65,7 @@ func EncodeExportError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewExportNotFoundResponseBody(res)
+				body = NewNoopNotFoundResponseBody(res)
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
@@ -180,7 +77,7 @@ func EncodeExportError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewExportBadRequestResponseBody(res)
+				body = NewNoopBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)

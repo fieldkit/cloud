@@ -25,3 +25,13 @@ func StatusExportPath(id string) string {
 func DownloadExportPath(id string) string {
 	return fmt.Sprintf("/export/%v/download", id)
 }
+
+// CsvExportPath returns the URL path to the export service csv HTTP endpoint.
+func CsvExportPath() string {
+	return "/export/csv"
+}
+
+// JSONLinesExportPath returns the URL path to the export service json lines HTTP endpoint.
+func JSONLinesExportPath() string {
+	return "/export/json-lines"
+}

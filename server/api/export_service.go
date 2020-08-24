@@ -7,6 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"reflect"
+	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/conservify/sqlxcache"
 
@@ -14,8 +18,10 @@ import (
 
 	exportService "github.com/fieldkit/cloud/server/api/gen/export"
 
+	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 type ExportService struct {
@@ -178,4 +184,95 @@ func MakeExportStatus(signer *Signer, de *data.DataExport) (*exportService.Expor
 		Progress:    de.Progress,
 		Args:        args,
 	}, nil
+}
+
+func NewRawQueryParamsFromCsvExport(payload *exportService.CsvPayload) (*backend.RawQueryParams, error) {
+	return &backend.RawQueryParams{
+		Start:    payload.Start,
+		End:      payload.End,
+		Stations: payload.Stations,
+		Sensors:  payload.Sensors,
+	}, nil
+}
+
+func (c *ExportService) Csv(ctx context.Context, payload *exportService.CsvPayload) (*exportService.CsvResult, error) {
+	args, err := NewRawQueryParamsFromCsvExport(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	de, err := c.exportFormat(ctx, args, backend.CSVFormatter)
+	if err != nil {
+		return nil, err
+	}
+
+	return &exportService.CsvResult{
+		Location: fmt.Sprintf("/export/%v", hex.EncodeToString(de.Token)),
+	}, nil
+}
+
+func NewRawQueryParamsFromJSONLinesExport(payload *exportService.JSONLinesPayload) (*backend.RawQueryParams, error) {
+	return &backend.RawQueryParams{
+		Start:    payload.Start,
+		End:      payload.End,
+		Stations: payload.Stations,
+		Sensors:  payload.Sensors,
+	}, nil
+}
+
+func (c *ExportService) JSONLines(ctx context.Context, payload *exportService.JSONLinesPayload) (*exportService.JSONLinesResult, error) {
+	args, err := NewRawQueryParamsFromJSONLinesExport(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	de, err := c.exportFormat(ctx, args, backend.JSONLinesFormatter)
+	if err != nil {
+		return nil, err
+	}
+
+	return &exportService.JSONLinesResult{
+		Location: fmt.Sprintf("/export/%v", hex.EncodeToString(de.Token)),
+	}, nil
+}
+
+func (c *ExportService) exportFormat(ctx context.Context, args *backend.RawQueryParams, format string) (*data.DataExport, error) {
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	// We do some quick validation on the parameters before we
+	// continue, just to avoid unnecessary work.
+	if _, err := args.BuildQueryParams(); err != nil {
+		return nil, exportService.MakeBadRequest(err)
+	}
+
+	r, err := repositories.NewExportRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	token := uuid.Must(uuid.NewRandom())
+	de := &data.DataExport{
+		Token:     token[:],
+		UserID:    p.UserID(),
+		Kind:      reflect.TypeOf(messages.ExportData{}).Name(),
+		CreatedAt: time.Now(),
+		Progress:  0,
+	}
+	if _, err := r.AddDataExportWithArgs(ctx, de, args); err != nil {
+		return nil, err
+	}
+
+	if err := c.options.Publisher.Publish(ctx, &messages.ExportData{
+		ID:     de.ID,
+		UserID: p.UserID(),
+		Token:  token.String(),
+		Format: format,
+	}); err != nil {
+		return nil, nil
+	}
+
+	return de, nil
 }

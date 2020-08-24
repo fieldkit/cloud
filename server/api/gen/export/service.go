@@ -24,6 +24,10 @@ type Service interface {
 	Status(context.Context, *StatusPayload) (res *ExportStatus, err error)
 	// Download implements download.
 	Download(context.Context, *DownloadPayload) (res *DownloadResult, body io.ReadCloser, err error)
+	// Csv implements csv.
+	Csv(context.Context, *CsvPayload) (res *CsvResult, err error)
+	// JSONLines implements json lines.
+	JSONLines(context.Context, *JSONLinesPayload) (res *JSONLinesResult, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -40,7 +44,7 @@ const ServiceName = "export"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [3]string{"list mine", "status", "download"}
+var MethodNames = [5]string{"list mine", "status", "download", "csv", "json lines"}
 
 // ListMinePayload is the payload type of the export service list mine method.
 type ListMinePayload struct {
@@ -83,6 +87,34 @@ type DownloadResult struct {
 	Length             int64
 	ContentType        string
 	ContentDisposition string
+}
+
+// CsvPayload is the payload type of the export service csv method.
+type CsvPayload struct {
+	Auth     string
+	Start    *int64
+	End      *int64
+	Stations *string
+	Sensors  *string
+}
+
+// CsvResult is the result type of the export service csv method.
+type CsvResult struct {
+	Location string
+}
+
+// JSONLinesPayload is the payload type of the export service json lines method.
+type JSONLinesPayload struct {
+	Auth     string
+	Start    *int64
+	End      *int64
+	Stations *string
+	Sensors  *string
+}
+
+// JSONLinesResult is the result type of the export service json lines method.
+type JSONLinesResult struct {
+	Location string
 }
 
 // MakeUnauthorized builds a goa.ServiceError from an error.

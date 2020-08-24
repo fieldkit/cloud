@@ -119,5 +119,75 @@ var _ = Service("export", func() {
 		})
 	})
 
+	exportPayload := func() {
+		Token("auth")
+		Required("auth")
+		Attribute("start", Int64)
+		Attribute("end", Int64)
+		Attribute("stations", String)
+		Attribute("sensors", String)
+	}
+
+	exportParams := func() {
+		Param("start")
+		Param("end")
+		Param("stations")
+		Param("sensors")
+	}
+
+	Method("csv", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(exportPayload)
+
+		Result(func() {
+			Attribute("location", String)
+			Required("location")
+		})
+
+		HTTP(func() {
+			POST("export/csv")
+
+			Params(exportParams)
+
+			Response(StatusFound, func() {
+				Headers(func() {
+					Header("location:Location")
+				})
+			})
+
+			httpAuthentication()
+		})
+	})
+
+	Method("json lines", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(exportPayload)
+
+		Result(func() {
+			Attribute("location", String)
+			Required("location")
+		})
+
+		HTTP(func() {
+			POST("export/json-lines")
+
+			Params(exportParams)
+
+			Response(StatusFound, func() {
+				Headers(func() {
+					Header("location:Location")
+				})
+			})
+
+			httpAuthentication()
+		})
+	})
+
 	commonOptions()
 })

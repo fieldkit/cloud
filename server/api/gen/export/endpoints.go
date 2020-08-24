@@ -17,9 +17,11 @@ import (
 
 // Endpoints wraps the "export" service endpoints.
 type Endpoints struct {
-	ListMine goa.Endpoint
-	Status   goa.Endpoint
-	Download goa.Endpoint
+	ListMine  goa.Endpoint
+	Status    goa.Endpoint
+	Download  goa.Endpoint
+	Csv       goa.Endpoint
+	JSONLines goa.Endpoint
 }
 
 // DownloadResponseData holds both the result and the HTTP response body reader
@@ -36,9 +38,11 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		ListMine: NewListMineEndpoint(s, a.JWTAuth),
-		Status:   NewStatusEndpoint(s, a.JWTAuth),
-		Download: NewDownloadEndpoint(s),
+		ListMine:  NewListMineEndpoint(s, a.JWTAuth),
+		Status:    NewStatusEndpoint(s, a.JWTAuth),
+		Download:  NewDownloadEndpoint(s),
+		Csv:       NewCsvEndpoint(s, a.JWTAuth),
+		JSONLines: NewJSONLinesEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -47,6 +51,8 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ListMine = m(e.ListMine)
 	e.Status = m(e.Status)
 	e.Download = m(e.Download)
+	e.Csv = m(e.Csv)
+	e.JSONLines = m(e.JSONLines)
 }
 
 // NewListMineEndpoint returns an endpoint function that calls the method "list
@@ -107,5 +113,43 @@ func NewDownloadEndpoint(s Service) goa.Endpoint {
 			return nil, err
 		}
 		return &DownloadResponseData{Result: res, Body: body}, nil
+	}
+}
+
+// NewCsvEndpoint returns an endpoint function that calls the method "csv" of
+// service "export".
+func NewCsvEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*CsvPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.Csv(ctx, p)
+	}
+}
+
+// NewJSONLinesEndpoint returns an endpoint function that calls the method
+// "json lines" of service "export".
+func NewJSONLinesEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*JSONLinesPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.JSONLines(ctx, p)
 	}
 }

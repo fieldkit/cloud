@@ -7,7 +7,7 @@
 
 package server
 
-// ExportCsvPath returns the URL path to the csv service export HTTP endpoint.
-func ExportCsvPath() string {
-	return "/export/csv"
+// NoopCsvPath returns the URL path to the csv service noop HTTP endpoint.
+func NoopCsvPath() string {
+	return "/csv/noop"
 }

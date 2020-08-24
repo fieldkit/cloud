@@ -10,23 +10,20 @@ package client
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 
-	csv "github.com/fieldkit/cloud/server/api/gen/csv"
 	goahttp "goa.design/goa/v3/http"
-	goa "goa.design/goa/v3/pkg"
 )
 
-// BuildExportRequest instantiates a HTTP request object with method and path
-// set to call the "csv" service "export" endpoint
-func (c *Client) BuildExportRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ExportCsvPath()}
+// BuildNoopRequest instantiates a HTTP request object with method and path set
+// to call the "csv" service "noop" endpoint
+func (c *Client) BuildNoopRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: NoopCsvPath()}
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("csv", "export", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("csv", "noop", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -35,58 +32,16 @@ func (c *Client) BuildExportRequest(ctx context.Context, v interface{}) (*http.R
 	return req, nil
 }
 
-// EncodeExportRequest returns an encoder for requests sent to the csv export
-// server.
-func EncodeExportRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
-	return func(req *http.Request, v interface{}) error {
-		p, ok := v.(*csv.ExportPayload)
-		if !ok {
-			return goahttp.ErrInvalidType("csv", "export", "*csv.ExportPayload", v)
-		}
-		{
-			head := p.Auth
-			req.Header.Set("Authorization", head)
-		}
-		values := req.URL.Query()
-		if p.Start != nil {
-			values.Add("start", fmt.Sprintf("%v", *p.Start))
-		}
-		if p.End != nil {
-			values.Add("end", fmt.Sprintf("%v", *p.End))
-		}
-		if p.Stations != nil {
-			values.Add("stations", *p.Stations)
-		}
-		if p.Sensors != nil {
-			values.Add("sensors", *p.Sensors)
-		}
-		if p.Resolution != nil {
-			values.Add("resolution", fmt.Sprintf("%v", *p.Resolution))
-		}
-		if p.Aggregate != nil {
-			values.Add("aggregate", *p.Aggregate)
-		}
-		if p.Complete != nil {
-			values.Add("complete", fmt.Sprintf("%v", *p.Complete))
-		}
-		if p.Tail != nil {
-			values.Add("tail", fmt.Sprintf("%v", *p.Tail))
-		}
-		req.URL.RawQuery = values.Encode()
-		return nil
-	}
-}
-
-// DecodeExportResponse returns a decoder for responses returned by the csv
-// export endpoint. restoreBody controls whether the response body should be
-// restored after having been read.
-// DecodeExportResponse may return the following errors:
+// DecodeNoopResponse returns a decoder for responses returned by the csv noop
+// endpoint. restoreBody controls whether the response body should be restored
+// after having been read.
+// DecodeNoopResponse may return the following errors:
 //	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
 //	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
 //	- "not-found" (type *goa.ServiceError): http.StatusNotFound
 //	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
-func DecodeExportResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+func DecodeNoopResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
 			b, err := ioutil.ReadAll(resp.Body)
@@ -101,80 +56,67 @@ func DecodeExportResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			defer resp.Body.Close()
 		}
 		switch resp.StatusCode {
-		case http.StatusFound:
-			var (
-				location string
-				err      error
-			)
-			locationRaw := resp.Header.Get("Location")
-			if locationRaw == "" {
-				err = goa.MergeErrors(err, goa.MissingFieldError("Location", "header"))
-			}
-			location = locationRaw
-			if err != nil {
-				return nil, goahttp.ErrValidationError("csv", "export", err)
-			}
-			res := NewExportResultFound(location)
-			return res, nil
+		case http.StatusNoContent:
+			return nil, nil
 		case http.StatusUnauthorized:
 			var (
-				body ExportUnauthorizedResponseBody
+				body NoopUnauthorizedResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("csv", "export", err)
+				return nil, goahttp.ErrDecodingError("csv", "noop", err)
 			}
-			err = ValidateExportUnauthorizedResponseBody(&body)
+			err = ValidateNoopUnauthorizedResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("csv", "export", err)
+				return nil, goahttp.ErrValidationError("csv", "noop", err)
 			}
-			return nil, NewExportUnauthorized(&body)
+			return nil, NewNoopUnauthorized(&body)
 		case http.StatusForbidden:
 			var (
-				body ExportForbiddenResponseBody
+				body NoopForbiddenResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("csv", "export", err)
+				return nil, goahttp.ErrDecodingError("csv", "noop", err)
 			}
-			err = ValidateExportForbiddenResponseBody(&body)
+			err = ValidateNoopForbiddenResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("csv", "export", err)
+				return nil, goahttp.ErrValidationError("csv", "noop", err)
 			}
-			return nil, NewExportForbidden(&body)
+			return nil, NewNoopForbidden(&body)
 		case http.StatusNotFound:
 			var (
-				body ExportNotFoundResponseBody
+				body NoopNotFoundResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("csv", "export", err)
+				return nil, goahttp.ErrDecodingError("csv", "noop", err)
 			}
-			err = ValidateExportNotFoundResponseBody(&body)
+			err = ValidateNoopNotFoundResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("csv", "export", err)
+				return nil, goahttp.ErrValidationError("csv", "noop", err)
 			}
-			return nil, NewExportNotFound(&body)
+			return nil, NewNoopNotFound(&body)
 		case http.StatusBadRequest:
 			var (
-				body ExportBadRequestResponseBody
+				body NoopBadRequestResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("csv", "export", err)
+				return nil, goahttp.ErrDecodingError("csv", "noop", err)
 			}
-			err = ValidateExportBadRequestResponseBody(&body)
+			err = ValidateNoopBadRequestResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("csv", "export", err)
+				return nil, goahttp.ErrValidationError("csv", "noop", err)
 			}
-			return nil, NewExportBadRequest(&body)
+			return nil, NewNoopBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("csv", "export", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("csv", "noop", resp.StatusCode, string(body))
 		}
 	}
 }

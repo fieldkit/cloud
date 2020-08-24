@@ -17,8 +17,8 @@ import (
 
 // Client lists the csv service endpoint HTTP clients.
 type Client struct {
-	// Export Doer is the HTTP client used to make requests to the export endpoint.
-	ExportDoer goahttp.Doer
+	// Noop Doer is the HTTP client used to make requests to the noop endpoint.
+	NoopDoer goahttp.Doer
 
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
@@ -43,7 +43,7 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		ExportDoer:          doer,
+		NoopDoer:            doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -53,25 +53,20 @@ func NewClient(
 	}
 }
 
-// Export returns an endpoint that makes HTTP requests to the csv service
-// export server.
-func (c *Client) Export() goa.Endpoint {
+// Noop returns an endpoint that makes HTTP requests to the csv service noop
+// server.
+func (c *Client) Noop() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeExportRequest(c.encoder)
-		decodeResponse = DecodeExportResponse(c.decoder, c.RestoreResponseBody)
+		decodeResponse = DecodeNoopResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildExportRequest(ctx, v)
+		req, err := c.BuildNoopRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
-		err = encodeRequest(req, v)
+		resp, err := c.NoopDoer.Do(req)
 		if err != nil {
-			return nil, err
-		}
-		resp, err := c.ExportDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("csv", "export", err)
+			return nil, goahttp.ErrRequestError("csv", "noop", err)
 		}
 		return decodeResponse(resp)
 	}

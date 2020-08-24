@@ -11,43 +11,29 @@ import (
 	"context"
 
 	goa "goa.design/goa/v3/pkg"
-	"goa.design/goa/v3/security"
 )
 
 // Endpoints wraps the "csv" service endpoints.
 type Endpoints struct {
-	Export goa.Endpoint
+	Noop goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "csv" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
-	// Casting service to Auther interface
-	a := s.(Auther)
 	return &Endpoints{
-		Export: NewExportEndpoint(s, a.JWTAuth),
+		Noop: NewNoopEndpoint(s),
 	}
 }
 
 // Use applies the given middleware to all the "csv" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
-	e.Export = m(e.Export)
+	e.Noop = m(e.Noop)
 }
 
-// NewExportEndpoint returns an endpoint function that calls the method
-// "export" of service "csv".
-func NewExportEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+// NewNoopEndpoint returns an endpoint function that calls the method "noop" of
+// service "csv".
+func NewNoopEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*ExportPayload)
-		var err error
-		sc := security.JWTScheme{
-			Name:           "jwt",
-			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
-		}
-		ctx, err = authJWTFn(ctx, p.Auth, &sc)
-		if err != nil {
-			return nil, err
-		}
-		return s.Export(ctx, p)
+		return nil, s.Noop(ctx)
 	}
 }

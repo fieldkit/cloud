@@ -29,6 +29,13 @@ type Client struct {
 	// endpoint.
 	DownloadDoer goahttp.Doer
 
+	// Csv Doer is the HTTP client used to make requests to the csv endpoint.
+	CsvDoer goahttp.Doer
+
+	// JSONLines Doer is the HTTP client used to make requests to the json lines
+	// endpoint.
+	JSONLinesDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -55,6 +62,8 @@ func NewClient(
 		ListMineDoer:        doer,
 		StatusDoer:          doer,
 		DownloadDoer:        doer,
+		CsvDoer:             doer,
+		JSONLinesDoer:       doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -138,5 +147,53 @@ func (c *Client) Download() goa.Endpoint {
 			return nil, goahttp.ErrDecodingError("export", "download", err)
 		}
 		return &export.DownloadResponseData{Result: res.(*export.DownloadResult), Body: resp.Body}, nil
+	}
+}
+
+// Csv returns an endpoint that makes HTTP requests to the export service csv
+// server.
+func (c *Client) Csv() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeCsvRequest(c.encoder)
+		decodeResponse = DecodeCsvResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildCsvRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.CsvDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("export", "csv", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// JSONLines returns an endpoint that makes HTTP requests to the export service
+// json lines server.
+func (c *Client) JSONLines() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeJSONLinesRequest(c.encoder)
+		decodeResponse = DecodeJSONLinesResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildJSONLinesRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.JSONLinesDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("export", "json lines", err)
+		}
+		return decodeResponse(resp)
 	}
 }

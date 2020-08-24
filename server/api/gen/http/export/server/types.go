@@ -250,6 +250,150 @@ type DownloadBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// CsvUnauthorizedResponseBody is the type of the "export" service "csv"
+// endpoint HTTP response body for the "unauthorized" error.
+type CsvUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CsvForbiddenResponseBody is the type of the "export" service "csv" endpoint
+// HTTP response body for the "forbidden" error.
+type CsvForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CsvNotFoundResponseBody is the type of the "export" service "csv" endpoint
+// HTTP response body for the "not-found" error.
+type CsvNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CsvBadRequestResponseBody is the type of the "export" service "csv" endpoint
+// HTTP response body for the "bad-request" error.
+type CsvBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// JSONLinesUnauthorizedResponseBody is the type of the "export" service "json
+// lines" endpoint HTTP response body for the "unauthorized" error.
+type JSONLinesUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// JSONLinesForbiddenResponseBody is the type of the "export" service "json
+// lines" endpoint HTTP response body for the "forbidden" error.
+type JSONLinesForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// JSONLinesNotFoundResponseBody is the type of the "export" service "json
+// lines" endpoint HTTP response body for the "not-found" error.
+type JSONLinesNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// JSONLinesBadRequestResponseBody is the type of the "export" service "json
+// lines" endpoint HTTP response body for the "bad-request" error.
+type JSONLinesBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // ExportStatusResponseBody is used to define fields on response body types.
 type ExportStatusResponseBody struct {
 	ID          int64       `form:"id" json:"id" xml:"id"`
@@ -463,6 +607,118 @@ func NewDownloadBadRequestResponseBody(res *goa.ServiceError) *DownloadBadReques
 	return body
 }
 
+// NewCsvUnauthorizedResponseBody builds the HTTP response body from the result
+// of the "csv" endpoint of the "export" service.
+func NewCsvUnauthorizedResponseBody(res *goa.ServiceError) *CsvUnauthorizedResponseBody {
+	body := &CsvUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCsvForbiddenResponseBody builds the HTTP response body from the result of
+// the "csv" endpoint of the "export" service.
+func NewCsvForbiddenResponseBody(res *goa.ServiceError) *CsvForbiddenResponseBody {
+	body := &CsvForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCsvNotFoundResponseBody builds the HTTP response body from the result of
+// the "csv" endpoint of the "export" service.
+func NewCsvNotFoundResponseBody(res *goa.ServiceError) *CsvNotFoundResponseBody {
+	body := &CsvNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCsvBadRequestResponseBody builds the HTTP response body from the result
+// of the "csv" endpoint of the "export" service.
+func NewCsvBadRequestResponseBody(res *goa.ServiceError) *CsvBadRequestResponseBody {
+	body := &CsvBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewJSONLinesUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "json lines" endpoint of the "export" service.
+func NewJSONLinesUnauthorizedResponseBody(res *goa.ServiceError) *JSONLinesUnauthorizedResponseBody {
+	body := &JSONLinesUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewJSONLinesForbiddenResponseBody builds the HTTP response body from the
+// result of the "json lines" endpoint of the "export" service.
+func NewJSONLinesForbiddenResponseBody(res *goa.ServiceError) *JSONLinesForbiddenResponseBody {
+	body := &JSONLinesForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewJSONLinesNotFoundResponseBody builds the HTTP response body from the
+// result of the "json lines" endpoint of the "export" service.
+func NewJSONLinesNotFoundResponseBody(res *goa.ServiceError) *JSONLinesNotFoundResponseBody {
+	body := &JSONLinesNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewJSONLinesBadRequestResponseBody builds the HTTP response body from the
+// result of the "json lines" endpoint of the "export" service.
+func NewJSONLinesBadRequestResponseBody(res *goa.ServiceError) *JSONLinesBadRequestResponseBody {
+	body := &JSONLinesBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewListMinePayload builds a export service list mine endpoint payload.
 func NewListMinePayload(auth string) *export.ListMinePayload {
 	v := &export.ListMinePayload{}
@@ -484,6 +740,30 @@ func NewStatusPayload(id string, auth string) *export.StatusPayload {
 func NewDownloadPayload(id string, auth string) *export.DownloadPayload {
 	v := &export.DownloadPayload{}
 	v.ID = id
+	v.Auth = auth
+
+	return v
+}
+
+// NewCsvPayload builds a export service csv endpoint payload.
+func NewCsvPayload(start *int64, end *int64, stations *string, sensors *string, auth string) *export.CsvPayload {
+	v := &export.CsvPayload{}
+	v.Start = start
+	v.End = end
+	v.Stations = stations
+	v.Sensors = sensors
+	v.Auth = auth
+
+	return v
+}
+
+// NewJSONLinesPayload builds a export service json lines endpoint payload.
+func NewJSONLinesPayload(start *int64, end *int64, stations *string, sensors *string, auth string) *export.JSONLinesPayload {
+	v := &export.JSONLinesPayload{}
+	v.Start = start
+	v.End = end
+	v.Stations = stations
+	v.Sensors = sensors
 	v.Auth = auth
 
 	return v
