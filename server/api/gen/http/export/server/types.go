@@ -26,8 +26,9 @@ type StatusResponseBody struct {
 	Token       string      `form:"token" json:"token" xml:"token"`
 	CreatedAt   int64       `form:"createdAt" json:"createdAt" xml:"createdAt"`
 	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
-	Kind        string      `form:"kind" json:"kind" xml:"kind"`
+	Format      string      `form:"format" json:"format" xml:"format"`
 	Progress    float32     `form:"progress" json:"progress" xml:"progress"`
+	Message     *string     `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
 	StatusURL   string      `form:"statusUrl" json:"statusUrl" xml:"statusUrl"`
 	DownloadURL *string     `form:"downloadUrl,omitempty" json:"downloadUrl,omitempty" xml:"downloadUrl,omitempty"`
 	Size        *int32      `form:"size,omitempty" json:"size,omitempty" xml:"size,omitempty"`
@@ -400,8 +401,9 @@ type ExportStatusResponseBody struct {
 	Token       string      `form:"token" json:"token" xml:"token"`
 	CreatedAt   int64       `form:"createdAt" json:"createdAt" xml:"createdAt"`
 	CompletedAt *int64      `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
-	Kind        string      `form:"kind" json:"kind" xml:"kind"`
+	Format      string      `form:"format" json:"format" xml:"format"`
 	Progress    float32     `form:"progress" json:"progress" xml:"progress"`
+	Message     *string     `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
 	StatusURL   string      `form:"statusUrl" json:"statusUrl" xml:"statusUrl"`
 	DownloadURL *string     `form:"downloadUrl,omitempty" json:"downloadUrl,omitempty" xml:"downloadUrl,omitempty"`
 	Size        *int32      `form:"size,omitempty" json:"size,omitempty" xml:"size,omitempty"`
@@ -429,8 +431,9 @@ func NewStatusResponseBody(res *exportviews.ExportStatusView) *StatusResponseBod
 		Token:       *res.Token,
 		CreatedAt:   *res.CreatedAt,
 		CompletedAt: res.CompletedAt,
-		Kind:        *res.Kind,
+		Format:      *res.Format,
 		Progress:    *res.Progress,
+		Message:     res.Message,
 		StatusURL:   *res.StatusURL,
 		DownloadURL: res.DownloadURL,
 		Size:        res.Size,

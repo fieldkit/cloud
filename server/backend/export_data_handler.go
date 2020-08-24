@@ -13,21 +13,24 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common/logging"
+	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/messages"
 )
 
 type ExportDataHandler struct {
-	db      *sqlxcache.DB
-	files   files.FileArchive
-	metrics *logging.Metrics
+	db        *sqlxcache.DB
+	files     files.FileArchive
+	metrics   *logging.Metrics
+	updatedAt time.Time
 }
 
 func NewExportDataHandler(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics) *ExportDataHandler {
 	return &ExportDataHandler{
-		db:      db,
-		files:   files,
-		metrics: metrics,
+		db:        db,
+		files:     files,
+		metrics:   metrics,
+		updatedAt: time.Now(),
 	}
 }
 
@@ -39,6 +42,24 @@ func (h *ExportDataHandler) createFormat(format string) (ExportFormat, error) {
 		return NewJSONLinesFormatter(), nil
 	}
 	return nil, fmt.Errorf("unknown format: %v", format)
+}
+
+func (h *ExportDataHandler) updateProgress(ctx context.Context, de *data.DataExport, progress float64, message string) error {
+	elapsed := time.Now().Sub(h.updatedAt)
+	if elapsed.Seconds() < 5 {
+		return nil
+	}
+	h.updatedAt = time.Now()
+	de.Progress = progress
+	de.Message = &message
+	r, err := repositories.NewExportRepository(h.db)
+	if err != nil {
+		return err
+	}
+	if _, err := r.UpdateDataExport(ctx, de); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (h *ExportDataHandler) Handle(ctx context.Context, m *messages.ExportData) error {
@@ -108,9 +129,8 @@ func (h *ExportDataHandler) Handle(ctx context.Context, m *messages.ExportData) 
 		return nil
 	}
 
-	progressFunc := func(ctx context.Context) error {
-		log.Infow("progress")
-		return nil
+	progressFunc := func(ctx context.Context, progress float64, message string) error {
+		return h.updateProgress(ctx, de, progress, message)
 	}
 
 	writeFunc := func(ctx context.Context, writer io.Writer) error {

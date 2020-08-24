@@ -46,7 +46,7 @@ func walkEverything(ctx context.Context, j *que.Job, services *BackgroundService
 			services: services,
 		}
 
-		if err := walker.WalkStation(ctx, handler, walkParams); err != nil {
+		if err := walker.WalkStation(ctx, handler, WalkerProgressNoop, walkParams); err != nil {
 			return err
 		}
 	}

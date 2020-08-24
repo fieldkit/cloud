@@ -68,7 +68,7 @@ func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRec
 func (sr *StationRefresher) walk(ctx context.Context, walkParams *WalkParameters) error {
 	rw := NewRecordWalker(sr.db)
 	handler := handlers.NewAggregatingHandler(sr.db)
-	if err := rw.WalkStation(ctx, handler, walkParams); err != nil {
+	if err := rw.WalkStation(ctx, handler, WalkerProgressNoop, walkParams); err != nil {
 		return err
 	}
 	return nil

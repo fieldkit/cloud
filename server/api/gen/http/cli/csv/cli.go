@@ -65,7 +65,7 @@ func UsageExamples() string {
 		os.Args[0] + ` activity station --id 2454429836752577701 --page 5204631808380783140 --auth "Velit qui sunt."` + "\n" +
 		os.Args[0] + ` data device- summary --device-id "Quia deleniti temporibus rem ullam quis." --auth "Accusamus blanditiis eum ipsum ex."` + "\n" +
 		os.Args[0] + ` export list- mine --auth "Debitis eius ducimus quas."` + "\n" +
-		os.Args[0] + ` firmware download --firmware-id 1987543211` + "\n" +
+		os.Args[0] + ` firmware download --firmware-id 2121618564` + "\n" +
 		""
 }
 
@@ -1463,7 +1463,7 @@ Status implements status.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` export status --id "Sapiente voluptatibus." --auth "Quia veritatis."
+    `+os.Args[0]+` export status --id "Earum minima." --auth "Exercitationem tempore et quia minima."
 `, os.Args[0])
 }
 
@@ -1475,7 +1475,7 @@ Download implements download.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` export download --id "Veniam mollitia quibusdam quas." --auth "Et itaque aliquid."
+    `+os.Args[0]+` export download --id "Voluptates maxime quae fuga nobis repellat debitis." --auth "Suscipit deleniti velit vel accusamus consequatur."
 `, os.Args[0])
 }
 
@@ -1490,7 +1490,7 @@ Csv implements csv.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` export csv --start 8615167686407021064 --end 4167360526412917796 --stations "Labore ipsam sit sapiente." --sensors "Consequatur in quaerat inventore magnam at fugiat." --auth "Eligendi molestiae amet aperiam nulla consequatur."
+    `+os.Args[0]+` export csv --start 4680115394753847752 --end 9147952359980412597 --stations "Nulla consequatur iusto provident." --sensors "Dolores dolorem sint aut." --auth "Et vitae officiis itaque nihil ipsam nostrum."
 `, os.Args[0])
 }
 
@@ -1505,7 +1505,7 @@ JSONLines implements json lines.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` export json- lines --start 8965536130426827334 --end 3399194626716182707 --stations "Perspiciatis perspiciatis minus sed." --sensors "Vero dolorem autem quae ut voluptatem veritatis." --auth "Alias suscipit vero repellat et aperiam minima."
+    `+os.Args[0]+` export json- lines --start 8896597930885494366 --end 5603776760789169219 --stations "Repellat et aperiam minima cum." --sensors "Quia occaecati." --auth "Qui ea."
 `, os.Args[0])
 }
 
@@ -1532,7 +1532,7 @@ Download implements download.
     -firmware-id INT32: 
 
 Example:
-    `+os.Args[0]+` firmware download --firmware-id 1987543211
+    `+os.Args[0]+` firmware download --firmware-id 2121618564
 `, os.Args[0])
 }
 
@@ -1545,12 +1545,12 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` firmware add --body '{
-      "etag": "Eos quod molestias et molestiae sunt.",
-      "meta": "Odio magnam a autem et tempora.",
-      "module": "Id inventore libero iste a mollitia cupiditate.",
-      "profile": "Veritatis velit aspernatur impedit voluptates.",
-      "url": "Incidunt et nihil iusto et et."
-   }' --auth "Dolor dolorum laudantium."
+      "etag": "Mollitia cupiditate nulla.",
+      "meta": "A autem et tempora sunt dolor dolorum.",
+      "module": "Velit aspernatur.",
+      "profile": "Voluptates ea incidunt et.",
+      "url": "Iusto et et vel odio."
+   }' --auth "Officiis consequatur quasi."
 `, os.Args[0])
 }
 
@@ -1565,7 +1565,7 @@ List implements list.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` firmware list --module "Eaque voluptatem nisi maxime voluptas distinctio." --profile "Occaecati quae est." --page-size 784360431 --page 1623892568 --auth "Necessitatibus sapiente maxime occaecati aut."
+    `+os.Args[0]+` firmware list --module "Maxime voluptas distinctio." --profile "Occaecati quae est." --page-size 784360431 --page 1623892568 --auth "Necessitatibus sapiente maxime occaecati aut."
 `, os.Args[0])
 }
 
@@ -2048,11 +2048,11 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` project add --body '{
-      "etag": "Eos quod molestias et molestiae sunt.",
-      "meta": "Odio magnam a autem et tempora.",
-      "module": "Id inventore libero iste a mollitia cupiditate.",
-      "profile": "Veritatis velit aspernatur impedit voluptates.",
-      "url": "Incidunt et nihil iusto et et."
+      "etag": "Mollitia cupiditate nulla.",
+      "meta": "A autem et tempora sunt dolor dolorum.",
+      "module": "Velit aspernatur.",
+      "profile": "Voluptates ea incidunt et.",
+      "url": "Iusto et et vel odio."
    }' --auth "Natus assumenda."
 `, os.Args[0])
 }
@@ -2721,11 +2721,11 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` user add --body '{
-      "etag": "Eos quod molestias et molestiae sunt.",
-      "meta": "Odio magnam a autem et tempora.",
-      "module": "Id inventore libero iste a mollitia cupiditate.",
-      "profile": "Veritatis velit aspernatur impedit voluptates.",
-      "url": "Incidunt et nihil iusto et et."
+      "etag": "Mollitia cupiditate nulla.",
+      "meta": "A autem et tempora sunt dolor dolorum.",
+      "module": "Velit aspernatur.",
+      "profile": "Voluptates ea incidunt et.",
+      "url": "Iusto et et vel odio."
    }'
 `, os.Args[0])
 }

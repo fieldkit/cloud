@@ -68,8 +68,9 @@ type ExportStatus struct {
 	Token       string
 	CreatedAt   int64
 	CompletedAt *int64
-	Kind        string
+	Format      string
 	Progress    float32
+	Message     *string
 	StatusURL   string
 	DownloadURL *string
 	Size        *int32
@@ -210,6 +211,7 @@ func newUserExportsView(res *UserExports) *exportviews.UserExportsView {
 func newExportStatus(vres *exportviews.ExportStatusView) *ExportStatus {
 	res := &ExportStatus{
 		CompletedAt: vres.CompletedAt,
+		Message:     vres.Message,
 		DownloadURL: vres.DownloadURL,
 		Size:        vres.Size,
 		Args:        vres.Args,
@@ -223,8 +225,8 @@ func newExportStatus(vres *exportviews.ExportStatusView) *ExportStatus {
 	if vres.CreatedAt != nil {
 		res.CreatedAt = *vres.CreatedAt
 	}
-	if vres.Kind != nil {
-		res.Kind = *vres.Kind
+	if vres.Format != nil {
+		res.Format = *vres.Format
 	}
 	if vres.Progress != nil {
 		res.Progress = *vres.Progress
@@ -243,8 +245,9 @@ func newExportStatusView(res *ExportStatus) *exportviews.ExportStatusView {
 		Token:       &res.Token,
 		CreatedAt:   &res.CreatedAt,
 		CompletedAt: res.CompletedAt,
-		Kind:        &res.Kind,
+		Format:      &res.Format,
 		Progress:    &res.Progress,
+		Message:     res.Message,
 		StatusURL:   &res.StatusURL,
 		DownloadURL: res.DownloadURL,
 		Size:        res.Size,
@@ -264,8 +267,9 @@ func transformExportviewsExportStatusViewToExportStatus(v *exportviews.ExportSta
 		Token:       *v.Token,
 		CreatedAt:   *v.CreatedAt,
 		CompletedAt: v.CompletedAt,
-		Kind:        *v.Kind,
+		Format:      *v.Format,
 		Progress:    *v.Progress,
+		Message:     v.Message,
 		StatusURL:   *v.StatusURL,
 		DownloadURL: v.DownloadURL,
 		Size:        v.Size,
@@ -283,8 +287,9 @@ func transformExportStatusToExportviewsExportStatusView(v *ExportStatus) *export
 		Token:       &v.Token,
 		CreatedAt:   &v.CreatedAt,
 		CompletedAt: v.CompletedAt,
-		Kind:        &v.Kind,
+		Format:      &v.Format,
 		Progress:    &v.Progress,
+		Message:     v.Message,
 		StatusURL:   &v.StatusURL,
 		DownloadURL: v.DownloadURL,
 		Size:        v.Size,

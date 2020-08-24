@@ -14,9 +14,9 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
-type ExportProgressFunc func(ctx context.Context) error
+type ExportProgressFunc func(ctx context.Context, progress float64, message string) error
 
-func ProgressNoop(ctx context.Context) error {
+func ExportProgressNoop(ctx context.Context, progress float64, message string) error {
 	return nil
 }
 
@@ -129,7 +129,11 @@ func (e *Exporter) Export(ctx context.Context, criteria *ExportCriteria, format 
 		Page:       0,
 	}
 
-	if err := e.walker.WalkStation(ctx, e, walkParams); err != nil {
+	walkerProgress := func(ctx context.Context, progress float64) error {
+		return progressFunc(ctx, progress, "")
+	}
+
+	if err := e.walker.WalkStation(ctx, e, walkerProgress, walkParams); err != nil {
 		return err
 	}
 

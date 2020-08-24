@@ -36,5 +36,5 @@ func TestExportCsv(t *testing.T) {
 		Sensors:  []int64{},
 		Start:    time.Now().Add(-24 * time.Hour),
 		End:      time.Now().Add(24 * time.Hour),
-	}, formatter, ProgressNoop, ioutil.Discard))
+	}, formatter, ExportProgressNoop, ioutil.Discard))
 }

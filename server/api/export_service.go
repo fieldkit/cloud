@@ -178,9 +178,10 @@ func MakeExportStatus(signer *Signer, de *data.DataExport) (*exportService.Expor
 		DownloadURL: downloadURL,
 		CreatedAt:   de.CreatedAt.Unix() * 1000,
 		CompletedAt: &completedAt,
-		Kind:        de.Kind,
+		Format:      de.Format,
 		Size:        de.Size,
-		Progress:    de.Progress,
+		Progress:    float32(de.Progress),
+		Message:     de.Message,
 		Args:        args,
 	}, nil
 }
@@ -257,7 +258,7 @@ func (c *ExportService) exportFormat(ctx context.Context, args *backend.RawQuery
 		Token:     token[:],
 		UserID:    p.UserID(),
 		CreatedAt: time.Now(),
-		Kind:      format,
+		Format:    format,
 		Progress:  0,
 	}
 	if _, err := r.AddDataExportWithArgs(ctx, de, args); err != nil {

@@ -13,6 +13,12 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+type WalkerProgressFunc func(ctx context.Context, progress float64) error
+
+func WalkerProgressNoop(ctx context.Context, progress float64) error {
+	return nil
+}
+
 type WalkStatistics struct {
 	Start   *time.Time `db:"start"`
 	End     *time.Time `db:"end"`
@@ -58,7 +64,7 @@ func (rw *RecordWalker) Info(ctx context.Context) (*WalkInfo, error) {
 	}, nil
 }
 
-func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
+func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, params *WalkParameters) error {
 	rw.started = time.Now()
 
 	ws, err := rw.queryStatistics(ctx, params)
@@ -77,7 +83,7 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 	}
 
 	for params.Page = 0; true; params.Page += 1 {
-		if err := rw.processBatchInTransaction(ctx, handler, params); err != nil {
+		if err := rw.processBatchInTransaction(ctx, handler, progress, params); err != nil {
 			if err == sql.ErrNoRows {
 				break
 			}
@@ -96,9 +102,9 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 	return nil
 }
 
-func (rw *RecordWalker) processBatchInTransaction(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
+func (rw *RecordWalker) processBatchInTransaction(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, params *WalkParameters) error {
 	return rw.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
-		return rw.processBatch(txCtx, handler, params)
+		return rw.processBatch(txCtx, handler, progress, params)
 	})
 }
 
@@ -129,7 +135,7 @@ func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParamet
 	return ws, nil
 }
 
-func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler, params *WalkParameters) error {
+func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, params *WalkParameters) error {
 	query, args, err := sqlx.In(`
 		SELECT
 			r.id, r.provision_id, r.time, r.number, r.meta_record_id, r.raw AS raw, r.pb,
@@ -158,7 +164,7 @@ func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler,
 	}
 
 	for _, row := range rows {
-		if err := rw.handleRecord(ctx, handler, params, row); err != nil {
+		if err := rw.handleRecord(ctx, handler, progress, params, row); err != nil {
 			return err
 		}
 	}
@@ -166,7 +172,7 @@ func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler,
 	return nil
 }
 
-func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler, params *WalkParameters, record *data.DataRecord) error {
+func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, params *WalkParameters, record *data.DataRecord) error {
 	if provision, err := rw.loadProvision(ctx, record.ProvisionID); err != nil {
 		return fmt.Errorf("error loading provision: %v", err)
 	} else {
@@ -188,6 +194,9 @@ func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler,
 		rps := float64(rw.dataRecords) / elapsed.Seconds()
 		log := Logger(ctx).Sugar()
 		log.Infow("progress", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", rps, "progress", percentage)
+		if err := progress(ctx, percentage); err != nil {
+			return err
+		}
 	}
 
 	return nil
