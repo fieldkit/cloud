@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"reflect"
 	"time"
 
 	"github.com/google/uuid"
@@ -257,8 +256,8 @@ func (c *ExportService) exportFormat(ctx context.Context, args *backend.RawQuery
 	de := &data.DataExport{
 		Token:     token[:],
 		UserID:    p.UserID(),
-		Kind:      reflect.TypeOf(messages.ExportData{}).Name(),
 		CreatedAt: time.Now(),
+		Kind:      format,
 		Progress:  0,
 	}
 	if _, err := r.AddDataExportWithArgs(ctx, de, args); err != nil {

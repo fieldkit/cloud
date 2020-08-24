@@ -31,6 +31,16 @@ func NewExportDataHandler(db *sqlxcache.DB, files files.FileArchive, metrics *lo
 	}
 }
 
+func (h *ExportDataHandler) createFormat(format string) (ExportFormat, error) {
+	if format == CSVFormatter {
+		return NewCsvFormatter(), nil
+	}
+	if format == JSONLinesFormatter {
+		return NewJSONLinesFormatter(), nil
+	}
+	return nil, fmt.Errorf("unknown format: %v", format)
+}
+
 func (h *ExportDataHandler) Handle(ctx context.Context, m *messages.ExportData) error {
 	log := Logger(ctx).Sugar().Named("exporting").With("data_export_id", m.ID).With("user_id", m.UserID).With("formatter", m.Format)
 
@@ -60,7 +70,10 @@ func (h *ExportDataHandler) Handle(ctx context.Context, m *messages.ExportData) 
 		return fmt.Errorf("invalid query params: %v", err)
 	}
 
-	format := NewCsvFormatter()
+	format, err := h.createFormat(m.Format)
+	if err != nil {
+		return err
+	}
 
 	log.Infow("parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations)
 

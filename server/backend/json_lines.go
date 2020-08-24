@@ -21,7 +21,7 @@ type jsonLinesWriter struct {
 	readings map[string]*float64
 }
 
-func NewJsonLinesFormatter() *jsonLinesFormat {
+func NewJSONLinesFormatter() *jsonLinesFormat {
 	return &jsonLinesFormat{}
 }
 
@@ -54,11 +54,10 @@ type JSONLineRow struct {
 }
 
 func (f *jsonLinesWriter) Row(ctx context.Context, station *data.Station, sensors []*repositories.ReadingValue, row *repositories.FilteredRecord) error {
+	f.readings = make(map[string]*float64)
 	for _, sam := range sensors {
 		if sam != nil {
 			f.readings[sam.Sensor.FullKey] = &sam.Value
-		} else {
-			f.readings[sam.Sensor.FullKey] = nil
 		}
 	}
 
