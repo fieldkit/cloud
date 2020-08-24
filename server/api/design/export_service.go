@@ -128,6 +128,10 @@ var _ = Service("export", func() {
 		Attribute("end", Int64)
 		Attribute("stations", String)
 		Attribute("sensors", String)
+		Attribute("resolution", Int32)
+		Attribute("aggregate", String)
+		Attribute("complete", Boolean)
+		Attribute("tail", Int32)
 	}
 
 	exportParams := func() {
@@ -135,6 +139,10 @@ var _ = Service("export", func() {
 		Param("end")
 		Param("stations")
 		Param("sensors")
+		Param("resolution")
+		Param("aggregate")
+		Param("complete")
+		Param("tail")
 	}
 
 	Method("csv", func() {

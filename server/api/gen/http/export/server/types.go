@@ -749,24 +749,32 @@ func NewDownloadPayload(id string, auth string) *export.DownloadPayload {
 }
 
 // NewCsvPayload builds a export service csv endpoint payload.
-func NewCsvPayload(start *int64, end *int64, stations *string, sensors *string, auth string) *export.CsvPayload {
+func NewCsvPayload(start *int64, end *int64, stations *string, sensors *string, resolution *int32, aggregate *string, complete *bool, tail *int32, auth string) *export.CsvPayload {
 	v := &export.CsvPayload{}
 	v.Start = start
 	v.End = end
 	v.Stations = stations
 	v.Sensors = sensors
+	v.Resolution = resolution
+	v.Aggregate = aggregate
+	v.Complete = complete
+	v.Tail = tail
 	v.Auth = auth
 
 	return v
 }
 
 // NewJSONLinesPayload builds a export service json lines endpoint payload.
-func NewJSONLinesPayload(start *int64, end *int64, stations *string, sensors *string, auth string) *export.JSONLinesPayload {
+func NewJSONLinesPayload(start *int64, end *int64, stations *string, sensors *string, resolution *int32, aggregate *string, complete *bool, tail *int32, auth string) *export.JSONLinesPayload {
 	v := &export.JSONLinesPayload{}
 	v.Start = start
 	v.End = end
 	v.Stations = stations
 	v.Sensors = sensors
+	v.Resolution = resolution
+	v.Aggregate = aggregate
+	v.Complete = complete
+	v.Tail = tail
 	v.Auth = auth
 
 	return v

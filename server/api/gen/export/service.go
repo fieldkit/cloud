@@ -92,11 +92,15 @@ type DownloadResult struct {
 
 // CsvPayload is the payload type of the export service csv method.
 type CsvPayload struct {
-	Auth     string
-	Start    *int64
-	End      *int64
-	Stations *string
-	Sensors  *string
+	Auth       string
+	Start      *int64
+	End        *int64
+	Stations   *string
+	Sensors    *string
+	Resolution *int32
+	Aggregate  *string
+	Complete   *bool
+	Tail       *int32
 }
 
 // CsvResult is the result type of the export service csv method.
@@ -106,11 +110,15 @@ type CsvResult struct {
 
 // JSONLinesPayload is the payload type of the export service json lines method.
 type JSONLinesPayload struct {
-	Auth     string
-	Start    *int64
-	End      *int64
-	Stations *string
-	Sensors  *string
+	Auth       string
+	Start      *int64
+	End        *int64
+	Stations   *string
+	Sensors    *string
+	Resolution *int32
+	Aggregate  *string
+	Complete   *bool
+	Tail       *int32
 }
 
 // JSONLinesResult is the result type of the export service json lines method.

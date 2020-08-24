@@ -347,12 +347,16 @@ func EncodeCsvResponse(encoder func(context.Context, http.ResponseWriter) goahtt
 func DecodeCsvRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			start    *int64
-			end      *int64
-			stations *string
-			sensors  *string
-			auth     string
-			err      error
+			start      *int64
+			end        *int64
+			stations   *string
+			sensors    *string
+			resolution *int32
+			aggregate  *string
+			complete   *bool
+			tail       *int32
+			auth       string
+			err        error
 		)
 		{
 			startRaw := r.URL.Query().Get("start")
@@ -382,6 +386,42 @@ func DecodeCsvRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Dec
 		if sensorsRaw != "" {
 			sensors = &sensorsRaw
 		}
+		{
+			resolutionRaw := r.URL.Query().Get("resolution")
+			if resolutionRaw != "" {
+				v, err2 := strconv.ParseInt(resolutionRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("resolution", resolutionRaw, "integer"))
+				}
+				pv := int32(v)
+				resolution = &pv
+			}
+		}
+		aggregateRaw := r.URL.Query().Get("aggregate")
+		if aggregateRaw != "" {
+			aggregate = &aggregateRaw
+		}
+		{
+			completeRaw := r.URL.Query().Get("complete")
+			if completeRaw != "" {
+				v, err2 := strconv.ParseBool(completeRaw)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("complete", completeRaw, "boolean"))
+				}
+				complete = &v
+			}
+		}
+		{
+			tailRaw := r.URL.Query().Get("tail")
+			if tailRaw != "" {
+				v, err2 := strconv.ParseInt(tailRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("tail", tailRaw, "integer"))
+				}
+				pv := int32(v)
+				tail = &pv
+			}
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -389,7 +429,7 @@ func DecodeCsvRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Dec
 		if err != nil {
 			return nil, err
 		}
-		payload := NewCsvPayload(start, end, stations, sensors, auth)
+		payload := NewCsvPayload(start, end, stations, sensors, resolution, aggregate, complete, tail, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
@@ -480,12 +520,16 @@ func EncodeJSONLinesResponse(encoder func(context.Context, http.ResponseWriter) 
 func DecodeJSONLinesRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			start    *int64
-			end      *int64
-			stations *string
-			sensors  *string
-			auth     string
-			err      error
+			start      *int64
+			end        *int64
+			stations   *string
+			sensors    *string
+			resolution *int32
+			aggregate  *string
+			complete   *bool
+			tail       *int32
+			auth       string
+			err        error
 		)
 		{
 			startRaw := r.URL.Query().Get("start")
@@ -515,6 +559,42 @@ func DecodeJSONLinesRequest(mux goahttp.Muxer, decoder func(*http.Request) goaht
 		if sensorsRaw != "" {
 			sensors = &sensorsRaw
 		}
+		{
+			resolutionRaw := r.URL.Query().Get("resolution")
+			if resolutionRaw != "" {
+				v, err2 := strconv.ParseInt(resolutionRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("resolution", resolutionRaw, "integer"))
+				}
+				pv := int32(v)
+				resolution = &pv
+			}
+		}
+		aggregateRaw := r.URL.Query().Get("aggregate")
+		if aggregateRaw != "" {
+			aggregate = &aggregateRaw
+		}
+		{
+			completeRaw := r.URL.Query().Get("complete")
+			if completeRaw != "" {
+				v, err2 := strconv.ParseBool(completeRaw)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("complete", completeRaw, "boolean"))
+				}
+				complete = &v
+			}
+		}
+		{
+			tailRaw := r.URL.Query().Get("tail")
+			if tailRaw != "" {
+				v, err2 := strconv.ParseInt(tailRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("tail", tailRaw, "integer"))
+				}
+				pv := int32(v)
+				tail = &pv
+			}
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -522,7 +602,7 @@ func DecodeJSONLinesRequest(mux goahttp.Muxer, decoder func(*http.Request) goaht
 		if err != nil {
 			return nil, err
 		}
-		payload := NewJSONLinesPayload(start, end, stations, sensors, auth)
+		payload := NewJSONLinesPayload(start, end, stations, sensors, resolution, aggregate, complete, tail, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]

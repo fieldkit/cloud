@@ -65,7 +65,7 @@ func BuildDownloadPayload(exportDownloadID string, exportDownloadAuth string) (*
 
 // BuildCsvPayload builds the payload for the export csv endpoint from CLI
 // flags.
-func BuildCsvPayload(exportCsvStart string, exportCsvEnd string, exportCsvStations string, exportCsvSensors string, exportCsvAuth string) (*export.CsvPayload, error) {
+func BuildCsvPayload(exportCsvStart string, exportCsvEnd string, exportCsvStations string, exportCsvSensors string, exportCsvResolution string, exportCsvAggregate string, exportCsvComplete string, exportCsvTail string, exportCsvAuth string) (*export.CsvPayload, error) {
 	var err error
 	var start *int64
 	{
@@ -99,6 +99,47 @@ func BuildCsvPayload(exportCsvStart string, exportCsvEnd string, exportCsvStatio
 			sensors = &exportCsvSensors
 		}
 	}
+	var resolution *int32
+	{
+		if exportCsvResolution != "" {
+			var v int64
+			v, err = strconv.ParseInt(exportCsvResolution, 10, 32)
+			val := int32(v)
+			resolution = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for resolution, must be INT32")
+			}
+		}
+	}
+	var aggregate *string
+	{
+		if exportCsvAggregate != "" {
+			aggregate = &exportCsvAggregate
+		}
+	}
+	var complete *bool
+	{
+		if exportCsvComplete != "" {
+			var val bool
+			val, err = strconv.ParseBool(exportCsvComplete)
+			complete = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for complete, must be BOOL")
+			}
+		}
+	}
+	var tail *int32
+	{
+		if exportCsvTail != "" {
+			var v int64
+			v, err = strconv.ParseInt(exportCsvTail, 10, 32)
+			val := int32(v)
+			tail = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for tail, must be INT32")
+			}
+		}
+	}
 	var auth string
 	{
 		auth = exportCsvAuth
@@ -108,6 +149,10 @@ func BuildCsvPayload(exportCsvStart string, exportCsvEnd string, exportCsvStatio
 	v.End = end
 	v.Stations = stations
 	v.Sensors = sensors
+	v.Resolution = resolution
+	v.Aggregate = aggregate
+	v.Complete = complete
+	v.Tail = tail
 	v.Auth = auth
 
 	return v, nil
@@ -115,7 +160,7 @@ func BuildCsvPayload(exportCsvStart string, exportCsvEnd string, exportCsvStatio
 
 // BuildJSONLinesPayload builds the payload for the export json lines endpoint
 // from CLI flags.
-func BuildJSONLinesPayload(exportJSONLinesStart string, exportJSONLinesEnd string, exportJSONLinesStations string, exportJSONLinesSensors string, exportJSONLinesAuth string) (*export.JSONLinesPayload, error) {
+func BuildJSONLinesPayload(exportJSONLinesStart string, exportJSONLinesEnd string, exportJSONLinesStations string, exportJSONLinesSensors string, exportJSONLinesResolution string, exportJSONLinesAggregate string, exportJSONLinesComplete string, exportJSONLinesTail string, exportJSONLinesAuth string) (*export.JSONLinesPayload, error) {
 	var err error
 	var start *int64
 	{
@@ -149,6 +194,47 @@ func BuildJSONLinesPayload(exportJSONLinesStart string, exportJSONLinesEnd strin
 			sensors = &exportJSONLinesSensors
 		}
 	}
+	var resolution *int32
+	{
+		if exportJSONLinesResolution != "" {
+			var v int64
+			v, err = strconv.ParseInt(exportJSONLinesResolution, 10, 32)
+			val := int32(v)
+			resolution = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for resolution, must be INT32")
+			}
+		}
+	}
+	var aggregate *string
+	{
+		if exportJSONLinesAggregate != "" {
+			aggregate = &exportJSONLinesAggregate
+		}
+	}
+	var complete *bool
+	{
+		if exportJSONLinesComplete != "" {
+			var val bool
+			val, err = strconv.ParseBool(exportJSONLinesComplete)
+			complete = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for complete, must be BOOL")
+			}
+		}
+	}
+	var tail *int32
+	{
+		if exportJSONLinesTail != "" {
+			var v int64
+			v, err = strconv.ParseInt(exportJSONLinesTail, 10, 32)
+			val := int32(v)
+			tail = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for tail, must be INT32")
+			}
+		}
+	}
 	var auth string
 	{
 		auth = exportJSONLinesAuth
@@ -158,6 +244,10 @@ func BuildJSONLinesPayload(exportJSONLinesStart string, exportJSONLinesEnd strin
 	v.End = end
 	v.Stations = stations
 	v.Sensors = sensors
+	v.Resolution = resolution
+	v.Aggregate = aggregate
+	v.Complete = complete
+	v.Tail = tail
 	v.Auth = auth
 
 	return v, nil

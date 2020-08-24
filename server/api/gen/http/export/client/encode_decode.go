@@ -500,6 +500,18 @@ func EncodeCsvRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Re
 		if p.Sensors != nil {
 			values.Add("sensors", *p.Sensors)
 		}
+		if p.Resolution != nil {
+			values.Add("resolution", fmt.Sprintf("%v", *p.Resolution))
+		}
+		if p.Aggregate != nil {
+			values.Add("aggregate", *p.Aggregate)
+		}
+		if p.Complete != nil {
+			values.Add("complete", fmt.Sprintf("%v", *p.Complete))
+		}
+		if p.Tail != nil {
+			values.Add("tail", fmt.Sprintf("%v", *p.Tail))
+		}
 		req.URL.RawQuery = values.Encode()
 		return nil
 	}
@@ -646,6 +658,18 @@ func EncodeJSONLinesRequest(encoder func(*http.Request) goahttp.Encoder) func(*h
 		}
 		if p.Sensors != nil {
 			values.Add("sensors", *p.Sensors)
+		}
+		if p.Resolution != nil {
+			values.Add("resolution", fmt.Sprintf("%v", *p.Resolution))
+		}
+		if p.Aggregate != nil {
+			values.Add("aggregate", *p.Aggregate)
+		}
+		if p.Complete != nil {
+			values.Add("complete", fmt.Sprintf("%v", *p.Complete))
+		}
+		if p.Tail != nil {
+			values.Add("tail", fmt.Sprintf("%v", *p.Tail))
 		}
 		req.URL.RawQuery = values.Encode()
 		return nil
