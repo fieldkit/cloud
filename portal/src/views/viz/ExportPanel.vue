@@ -10,6 +10,7 @@
         </div>
         <div class="export-options">
             <div class="button" @click="onExportCSV">CSV</div>
+            <div class="button" @click="onExportJSONLines">JSON Lines</div>
         </div>
         <div class="user-exports" v-if="history">
             <div class="previous-heading">Previous Exports</div>
@@ -17,7 +18,7 @@
                 No previous exports.
             </div>
             <div v-for="de in history" class="export" v-bind:key="de.id">
-                <div class="kind">{{ prettyKind(de.kind) }}</div>
+                <div class="kind">{{ prettyKind(de.format) }}</div>
                 <div class="created">{{ de.createdAt | prettyTime }}</div>
                 <div class="busy" v-if="!de.downloadUrl">Generating</div>
                 <div class="size" v-if="de.downloadUrl">{{ de.size | prettyBytes }}</div>
@@ -34,7 +35,7 @@ import CommonComponents from "@/views/shared";
 
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
-import { ExportDataAction } from "@/store/typed-actions";
+import { ExportDataAction, ExportParams } from "@/store/typed-actions";
 import { GlobalState } from "@/store/modules/global";
 import { ExportStatus } from "@/api/api";
 
@@ -71,14 +72,22 @@ export default Vue.extend({
     },
     methods: {
         prettyKind(kind: string): string {
-            return "CSV";
+            const map = {
+                csv: "CSV",
+                "json-lines": "JSON Lines",
+            };
+            return map[kind] || "Unknown";
         },
         onClose() {
             this.$emit("close");
         },
         onExportCSV() {
             console.log("viz: exporting");
-            return this.$store.dispatch(new ExportDataAction(this.bookmark));
+            return this.$store.dispatch(new ExportDataAction(this.bookmark, new ExportParams({ csv: true })));
+        },
+        onExportJSONLines() {
+            console.log("viz: exporting");
+            return this.$store.dispatch(new ExportDataAction(this.bookmark, new ExportParams({ jsonLines: true })));
         },
         onDownload(ev: any, de: ExportStatus) {
             console.log("viz: download", de);
@@ -149,5 +158,6 @@ export default Vue.extend({
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
+    margin-bottom: 1em;
 }
 </style>

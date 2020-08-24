@@ -60,7 +60,7 @@ const actions = {
         const params = makeExportParams(payload.bookmark);
         console.log("exporting:begin", payload, params);
         return new FKApi()
-            .exportCsv(params)
+            .exportData(params, payload.params)
             .then((de) => {
                 commit(EXPORT_START, de);
                 return dispatch(EXPORT_CHECK, { statusUrl: de.statusUrl });

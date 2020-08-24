@@ -3,11 +3,17 @@ import * as ActionTypes from "@/store/actions";
 import { Bookmark } from "@/views/viz/viz";
 
 export class ExportParams {
-    constructor(public readonly csv: boolean) {}
+    public readonly csv: boolean = false;
+    public readonly jsonLines: boolean = false;
+
+    constructor(f: { csv?: boolean; jsonLines?: boolean }) {
+        this.csv = f.csv || false;
+        this.jsonLines = f.jsonLines || false;
+    }
 }
 
 export class ExportDataAction {
     type = ActionTypes.BEGIN_EXPORT;
 
-    constructor(public readonly bookmark: Bookmark, public readonly params: ExportParams = { csv: true }) {}
+    constructor(public readonly bookmark: Bookmark, public readonly params: ExportParams) {}
 }

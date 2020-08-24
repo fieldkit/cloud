@@ -3,6 +3,7 @@ import axios from "axios";
 import TokenStorage from "./tokens";
 import Config from "../secrets";
 import { keysToCamel, keysToCamelWithWarnings } from "@/json-tools";
+import { ExportParams } from "@/store/typed-actions";
 
 export class ApiError extends Error {
     constructor(message) {
@@ -818,11 +819,17 @@ class FKApi {
         });
     }
 
-    public exportCsv(params: URLSearchParams): Promise<ExportStatus> {
+    public exportData(queryParams: URLSearchParams, params: ExportParams): Promise<ExportStatus> {
+        console.log("api:exporting", queryParams, params);
+        const getUrl = () => {
+            if (params.csv) return "/export/csv";
+            if (params.jsonLines) return "/export/json-lines";
+            throw new Error("unexecpted export params");
+        };
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
-            url: this.baseUrl + "/export/csv?" + params.toString(),
+            url: this.baseUrl + getUrl() + "?" + queryParams.toString(),
         });
     }
 
