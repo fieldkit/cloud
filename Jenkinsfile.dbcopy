@@ -2,31 +2,31 @@
 
 properties([
 	buildDiscarder(logRotator(numToKeepStr: '5')),
-    disableConcurrentBuilds(),
-    parameters([
-        string(defaultValue: 'dev', name: 'WorkEnv')
-    ])
+	disableConcurrentBuilds(),
+	parameters([
+		string(defaultValue: 'dev', name: 'WorkEnv')
+	])
 ])
 
 timestamps {
-    node () {
-        try {
-            def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
+	node () {
+		try {
+			def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
 
-            def now = new Date()
-            def stamp = now.format("yyyyMMdd-HHmmss", TimeZone.getTimeZone('UTC'))
+			def now = new Date()
+			def stamp = now.format("yyyyMMdd-HHmmss", TimeZone.getTimeZone('UTC'))
 
-            stage ('dbcopy') {
+			stage ('dbcopy') {
 				sh "rm -rf *.bz2"
-                sh "docker run --rm postgres pg_dump '${ws.database_url.value}' | bzip2 > db-${stamp}.sql.bz2"
-            }
+				sh "docker run --rm postgres pg_dump '${ws.database_url.value}' | bzip2 > db-${stamp}.sql.bz2"
+			}
 
 			stage ('archive') {
 				archiveArtifacts(artifacts: "*.bz2")
 			}
-        }
-        catch (Exception e) {
-            throw e
-        }
-    }
+		}
+		catch (Exception e) {
+			throw e
+		}
+	}
 }
