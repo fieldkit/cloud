@@ -48,6 +48,7 @@ type Exporter struct {
 	stations    []*data.Station
 	sensors     []*repositories.SensorAndModuleMeta
 	sensorsByID map[int64]*data.Sensor
+	errors      int32
 }
 
 type stationInfo struct {
@@ -186,7 +187,8 @@ func (e *Exporter) OnData(ctx context.Context, p *data.Provision, r *pb.DataReco
 		return fmt.Errorf("resolving: %v", err)
 	}
 	if filtered == nil {
-		return fmt.Errorf("resolving: unknown")
+		e.errors += 1
+		return nil
 	}
 
 	sensors := make([]*repositories.ReadingValue, 0)
@@ -207,5 +209,9 @@ func (e *Exporter) OnData(ctx context.Context, p *data.Provision, r *pb.DataReco
 }
 
 func (e *Exporter) OnDone(ctx context.Context) error {
+	if e.errors > 0 {
+		log := Logger(ctx).Sugar()
+		log.Warnw("exporting", "errors", e.errors)
+	}
 	return nil
 }
