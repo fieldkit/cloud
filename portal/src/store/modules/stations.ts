@@ -168,21 +168,21 @@ export class MappedStations {
         const around = features.reduce((bb, feature) => bb.includeAll(feature.bounds), new BoundingRectangle());
         const feetAround = features.length > 0 ? 1000 : 100000;
 
-        console.log("features", features);
+        // console.log("features", features);
 
         this.features = features;
         this.bounds = around.zoomOutOrAround(DefaultLocation, feetAround);
 
-        console.log("around", around);
-        console.log("bounds", this.bounds);
+        // console.log("around", around);
+        // console.log("bounds", this.bounds);
     }
 
-    get valid(): boolean {
+    public get valid(): boolean {
         return this.bounds != null;
     }
 
-    boundsLngLat(): LngLat[] {
-        console.log("map: returning bounds", this.bounds, this.features);
+    public boundsLngLat(): LngLat[] {
+        // console.log("map: returning bounds", this.bounds, this.features);
         return [this.bounds.min, this.bounds.max];
     }
 }
