@@ -667,8 +667,8 @@ func (e *TestEnv) NewDataReading(meta, reading uint64) *pb.DataRecord {
 	return &pb.DataRecord{
 		Readings: &pb.Readings{
 			Time:    int64(now.Unix()),
-			Reading: uint32(reading),
-			Meta:    uint32(meta),
+			Reading: uint64(reading),
+			Meta:    uint64(meta),
 			Flags:   0,
 			Location: &pb.DeviceLocation{
 				Fix:        1,

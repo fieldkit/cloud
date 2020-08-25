@@ -184,12 +184,7 @@ func (d *DataRecord) GetData() (fields map[string]interface{}, err error) {
 
 func (d *DataRecord) Unmarshal(r *pb.DataRecord) error {
 	if d.PB != nil {
-		buffer := proto.NewBuffer(d.PB)
-		err := buffer.Unmarshal(r)
-		if err != nil {
-			return fmt.Errorf("error parsing data record pb: %v", err)
-		}
-		return nil
+		return r.Unmarshal(d.PB)
 	}
 	err := json.Unmarshal(d.Data, r)
 	if err != nil {
