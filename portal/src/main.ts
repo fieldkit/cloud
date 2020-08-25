@@ -66,7 +66,7 @@ export interface ReadingLike {
 }
 
 Vue.filter("prettyPercentage", (value: number | null) => {
-    if (!value) {
+    if (value === null || value === undefined) {
         return "--";
     }
     return value.toFixed(1) + "%";

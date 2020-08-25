@@ -125,8 +125,6 @@ func (e *Exporter) Export(ctx context.Context, criteria *ExportCriteria, format 
 		Start:      criteria.Start,
 		End:        criteria.End,
 		StationIDs: criteria.Stations,
-		PageSize:   1000,
-		Page:       0,
 	}
 
 	walkerProgress := func(ctx context.Context, progress float64) error {

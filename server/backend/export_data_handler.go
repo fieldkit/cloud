@@ -18,6 +18,10 @@ import (
 	"github.com/fieldkit/cloud/server/messages"
 )
 
+const (
+	SecondsBetweenProgressUpdates = 1
+)
+
 type ExportDataHandler struct {
 	db        *sqlxcache.DB
 	files     files.FileArchive
@@ -46,7 +50,7 @@ func (h *ExportDataHandler) createFormat(format string) (ExportFormat, error) {
 
 func (h *ExportDataHandler) updateProgress(ctx context.Context, de *data.DataExport, progress float64, message string) error {
 	elapsed := time.Now().Sub(h.updatedAt)
-	if elapsed.Seconds() < 5 {
+	if elapsed.Seconds() < SecondsBetweenProgressUpdates {
 		return nil
 	}
 	h.updatedAt = time.Now()

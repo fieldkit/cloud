@@ -36,8 +36,6 @@ func walkEverything(ctx context.Context, j *que.Job, services *BackgroundService
 			Start:      time.Time{},
 			End:        time.Now().Add(1 * time.Hour),
 			StationIDs: []int32{id},
-			PageSize:   1000,
-			Page:       0,
 		}
 
 		walker := NewRecordWalker(services.database)

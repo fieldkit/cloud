@@ -4,13 +4,21 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 
+	"github.com/hashicorp/go-multierror"
+
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/data"
+)
+
+const (
+	InitialBatchSize = 50000
+	MaximumBatchSize = 200000
 )
 
 type WalkerProgressFunc func(ctx context.Context, progress float64) error
@@ -34,6 +42,8 @@ type RecordWalker struct {
 	metaRecords int64
 	dataRecords int64
 	bytes       int64
+	wg          sync.WaitGroup
+	queue       chan []*data.DataRecord
 }
 
 func NewRecordWalker(db *sqlxcache.DB) (rw *RecordWalker) {
@@ -41,12 +51,11 @@ func NewRecordWalker(db *sqlxcache.DB) (rw *RecordWalker) {
 		provisions: make(map[int64]*data.Provision),
 		metas:      make(map[int64]*data.MetaRecord),
 		db:         db,
+		queue:      make(chan []*data.DataRecord, 10),
 	}
 }
 
 type WalkParameters struct {
-	Page       int
-	PageSize   int
 	StationIDs []int32
 	Start      time.Time
 	End        time.Time
@@ -65,6 +74,8 @@ func (rw *RecordWalker) Info(ctx context.Context) (*WalkInfo, error) {
 }
 
 func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, params *WalkParameters) error {
+	log := Logger(ctx).Sugar()
+
 	rw.started = time.Now()
 
 	ws, err := rw.queryStatistics(ctx, params)
@@ -74,22 +85,71 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 
 	rw.statistics = ws
 
-	log := Logger(ctx).Sugar()
-
 	if ws.Records == 0 {
 		log.Infow("empty")
 	} else {
 		log.Infow("statistics", "start", ws.Start, "end", ws.End, "records", ws.Records)
 	}
 
-	for params.Page = 0; true; params.Page += 1 {
-		if err := rw.processBatchInTransaction(ctx, handler, progress, params); err != nil {
-			if err == sql.ErrNoRows {
+	var errors *multierror.Error
+
+	rw.wg.Add(2)
+
+	querierFunc := func() {
+		offset := int64(0)
+		batchSize := int64(InitialBatchSize)
+
+		for {
+			if rows, err := rw.queryBatch(ctx, params, offset, batchSize); err != nil {
+				if err == sql.ErrNoRows {
+					break
+				}
+				errors = multierror.Append(errors, err)
+				break
+			} else {
+				if len(rw.queue) == 0 && batchSize < MaximumBatchSize {
+					batchSize *= 2
+				}
+
+				rw.queue <- rows
+
+				offset += int64(len(rows))
+			}
+		}
+
+		close(rw.queue)
+
+		rw.wg.Done()
+	}
+
+	processorFunc := func() {
+		for {
+			rows, valid := <-rw.queue
+			if !valid {
 				break
 			}
-			return err
+
+			if err := rw.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+				for _, row := range rows {
+					if err := rw.handleRecord(txCtx, handler, progress, row); err != nil {
+						return err
+					}
+				}
+				return nil
+			}); err != nil {
+				errors = multierror.Append(errors, err)
+				break
+			}
 		}
+
+		rw.wg.Done()
 	}
+
+	go querierFunc()
+
+	go processorFunc()
+
+	rw.wg.Wait()
 
 	elapsed := time.Now().Sub(rw.started)
 
@@ -99,12 +159,12 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 
 	log.Infow("done", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", float64(rw.dataRecords)/elapsed.Seconds())
 
-	return nil
+	return errors.ErrorOrNil()
 }
 
-func (rw *RecordWalker) processBatchInTransaction(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, params *WalkParameters) error {
+func (rw *RecordWalker) processBatchInTransaction(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, params *WalkParameters, offset, batchSize int64) error {
 	return rw.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
-		return rw.processBatch(txCtx, handler, progress, params)
+		return rw.processBatch(txCtx, handler, progress, params, offset, batchSize)
 	})
 }
 
@@ -135,7 +195,11 @@ func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParamet
 	return ws, nil
 }
 
-func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, params *WalkParameters) error {
+func (rw *RecordWalker) queryBatch(ctx context.Context, params *WalkParameters, offset int64, batchSize int64) ([]*data.DataRecord, error) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("querying", "station_ids", params.StationIDs, "offset", offset, "batch_size", batchSize)
+
 	query, args, err := sqlx.In(`
 		SELECT
 			r.id, r.provision_id, r.time, r.number, r.meta_record_id, r.raw AS raw, r.pb,
@@ -148,23 +212,32 @@ func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler,
 			AND r.time < ?
 		)
 		ORDER BY r.time OFFSET ? LIMIT ?
-		`, params.StationIDs, params.Start, params.End, params.Page*params.PageSize, params.PageSize)
+		`, params.StationIDs, params.Start, params.End, offset, batchSize)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	rows := make([]*data.DataRecord, 0, 1000)
+	rows := make([]*data.DataRecord, 0)
 	err = rw.db.SelectContext(ctx, &rows, rw.db.Rebind(query), args...)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if len(rows) == 0 {
-		return sql.ErrNoRows
+		return nil, sql.ErrNoRows
+	}
+
+	return rows, nil
+}
+
+func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, params *WalkParameters, offset, batchSize int64) error {
+	rows, err := rw.queryBatch(ctx, params, offset, batchSize)
+	if err != nil {
+		return err
 	}
 
 	for _, row := range rows {
-		if err := rw.handleRecord(ctx, handler, progress, params, row); err != nil {
+		if err := rw.handleRecord(ctx, handler, progress, row); err != nil {
 			return err
 		}
 	}
@@ -172,7 +245,7 @@ func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler,
 	return nil
 }
 
-func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, params *WalkParameters, record *data.DataRecord) error {
+func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, record *data.DataRecord) error {
 	if provision, err := rw.loadProvision(ctx, record.ProvisionID); err != nil {
 		return fmt.Errorf("error loading provision: %v", err)
 	} else {
@@ -193,7 +266,7 @@ func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler,
 		percentage := float64(rw.dataRecords) / float64(rw.statistics.Records) * 100.0
 		rps := float64(rw.dataRecords) / elapsed.Seconds()
 		log := Logger(ctx).Sugar()
-		log.Infow("progress", "station_ids", params.StationIDs, "records", rw.dataRecords, "rps", rps, "progress", percentage)
+		log.Infow("progress", "records", rw.dataRecords, "rps", rps, "progress", percentage)
 		if err := progress(ctx, percentage); err != nil {
 			return err
 		}
