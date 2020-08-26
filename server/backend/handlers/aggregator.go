@@ -50,6 +50,7 @@ var (
 type aggregation struct {
 	opened   time.Time
 	interval time.Duration
+	name     string
 	table    string
 	values   map[string][]float64
 	location []float64
@@ -152,36 +153,43 @@ func NewAggregator(db *sqlxcache.DB, stationID int32, batchSize int) *Aggregator
 		aggregations: []*aggregation{
 			&aggregation{
 				interval: time.Minute * 1,
+				name:     "1m",
 				table:    "fieldkit.aggregated_1m",
 				values:   make(map[string][]float64),
 			},
 			&aggregation{
 				interval: time.Minute * 10,
+				name:     "10m",
 				table:    "fieldkit.aggregated_10m",
 				values:   make(map[string][]float64),
 			},
 			&aggregation{
 				interval: time.Minute * 30,
+				name:     "30m",
 				table:    "fieldkit.aggregated_30m",
 				values:   make(map[string][]float64),
 			},
 			&aggregation{
 				interval: time.Hour * 1,
+				name:     "1h",
 				table:    "fieldkit.aggregated_1h",
 				values:   make(map[string][]float64),
 			},
 			&aggregation{
 				interval: time.Hour * 6,
+				name:     "6h",
 				table:    "fieldkit.aggregated_6h",
 				values:   make(map[string][]float64),
 			},
 			&aggregation{
 				interval: time.Hour * 12,
+				name:     "12h",
 				table:    "fieldkit.aggregated_12h",
 				values:   make(map[string][]float64),
 			},
 			&aggregation{
 				interval: time.Hour * 24,
+				name:     "24h",
 				table:    "fieldkit.aggregated_24h",
 				values:   make(map[string][]float64),
 			},
@@ -197,7 +205,7 @@ func (v *Aggregator) upsertBatch(ctx context.Context, a *aggregation, batch []*A
 			}
 		}
 		log := Logger(ctx).Sugar().With("station_id", v.stationID)
-		log.Infow("batch", "aggregate", a.table, "records", len(batch))
+		log.Infow("batch", "aggregate", a.name, "records", len(batch))
 		return nil
 	})
 }
