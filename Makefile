@@ -9,29 +9,21 @@ GOARCH ?= amd64
 GOOS ?= darwin
 endif
 
+ifeq (, $(shell which yarn))
+JSPKG ?= npm
+else
+JSPKG ?= yarn
+endif
+
 GO ?= env GOOS=$(GOOS) GOARCH=$(GOARCH) go
 BUILD ?= $(abspath build)
-WORKING_DIRECTORY ?= `pwd`
-DOCKER_TAG ?= master
+WORKING_DIRECTORY ?= $(shell pwd)
 SERVER_SOURCES = $(shell find server -type f -name '*.go')
+DOCKER_TAG ?= main
 
-default: setup binaries tests gotests
-
-ci: setup binaries tests
-
-ci-db-tests:
-	rm -rf active-schema
-	mkdir -p active-schema
-	docker stop fktests-pg || true
-	docker rm fktests-pg || true
-	docker run --name fktests-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password --network=docker_default -d mdillon/postgis
-	sleep 5 # TODO Add a loop here to check
-	IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' fktests-pg`; \
-	cd server && FIELDKIT_POSTGRES_URL="postgres://fieldkit:password@$$IP/fieldkit?sslmode=disable" go test -p 1 -v -coverprofile=coverage.data ./...
-	docker stop fktests-pg || true
+default: setup binaries jstests gotests
 
 setup: portal/src/secrets.ts
-	true || env GO111MODULE=on go get -u goa.design/goa/v3/...@v3
 
 portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
@@ -39,14 +31,10 @@ portal/src/secrets.ts: portal/src/secrets.ts.template
 binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata
 
 portal/node_modules:
-	cd portal && yarn install
+	cd portal && $(JSPKG) install
 
-tests: portal/node_modules
-	if [ -f portal/node_modules/.yarn-integrity ]; then  \
-	cd portal && yarn install;                           \
-	else                                                 \
-	cd portal && npm install;                            \
-	fi
+jstests: portal/node_modules
+	cd portal && $(JSPKG) install
 	cd portal && vue-cli-service build
 	cd portal && vue-cli-service test:unit
 
@@ -55,11 +43,6 @@ gotests:
 
 view-coverage:
 	cd server && go tool cover -html=coverage.data
-
-dev-portal: portal/node_modules
-	cd portal && npm run serve
-
-all: binaries
 
 server: $(BUILD)/server
 
@@ -84,13 +67,9 @@ $(BUILD)/fkdata: server/cmd/fkdata/*.go $(SERVER_SOURCES)
 generate:
 	cd server/api && goa gen github.com/fieldkit/cloud/server/api/design
 
-generate-goa-example:
-	mkdir -p server/api/example
-	cd server/api/example && goa example github.com/fieldkit/cloud/server/api/design
-
 clean:
 	rm -rf $(BUILD)
-	rm -rf portal/node_modules
+	rm -rf $(WORKING_DIRECTORY)/portal/node_modules
 
 schema-production:
 	@mkdir -p schema-production
@@ -124,11 +103,27 @@ restart-postgres: active-schema
 
 veryclean:
 
+run-server: server
+	./run-server.sh
+
 migrate-up:
 	migrate -path migrations -database "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" up
 
 migrate-down:
 	migrate -path migrations -database "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" down
+
+ci: setup binaries jstests
+
+ci-db-tests:
+	rm -rf active-schema
+	mkdir -p active-schema
+	docker stop fktests-pg || true
+	docker rm fktests-pg || true
+	docker run --name fktests-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password --network=docker_default -d mdillon/postgis
+	sleep 5 # TODO Add a loop here to check
+	IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' fktests-pg`; \
+	cd server && FIELDKIT_POSTGRES_URL="postgres://fieldkit:password@$$IP/fieldkit?sslmode=disable" go test -p 1 -v -coverprofile=coverage.data ./...
+	docker stop fktests-pg || true
 
 aws-image:
 	cp portal/src/secrets.ts.aws portal/src/secrets.ts
