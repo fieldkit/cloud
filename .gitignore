@@ -1,6 +1,7 @@
 .DS_Store
 fieldkit.env
 build
+sanitize-data
 schema-production
 active-schema
 migration
@@ -16,5 +17,6 @@ secrets.js
 secrets.ts
 *.fkpb
 *.di.bz2
+*.sql.bz2
 coverage.data
 .fs

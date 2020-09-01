@@ -127,23 +127,49 @@
    CORS the hostname that's used here is important for things to work
    correctly.
 
-** Migrations
+** Database
+*** Migrations
 
-   This repository uses the following third-party-tool for migrations:
+	This repository uses the following third-party-tool for migrations:
 
-   https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
+	https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
 
-*** Setup
-    1) The link above has instructions on how to download the install the tool. Put the tool somewhere in your path.
+**** Setup
+     1) The link above has instructions on how to download the install the tool. Put the tool somewhere in your path.
 
-*** New Migrations
-    1) There's a tool mkm.sh in this directory that will create a new migration
-       with the name you've given. The file will create new up and down SQL
-       files in the migrations directory.
+**** New Migrations
+     1) There's a tool mkm.sh in this directory that will create a new migration
+		with the name you've given. The file will create new up and down SQL
+		files in the migrations directory.
 
-*** Migrating
-    1) Just run make `migrate-up` to migrate your local database.
-    2) To rerun a migration, run migrate-down and then you can re-run migrate-up.
+**** Migrating
+     1) Just run make `migrate-up` to migrate your local database.
+     2) To rerun a migration, run migrate-down and then you can re-run migrate-up.
+*** Example Data
+
+	Out of the box the database is pretty boring and doesn't even
+	contain a user to test with and so the first step is to register a
+	test account.
+
+	If you have a sample database, you can follow these instructions
+	to load that instead.
+
+	*Copy*
+
+	Sample databases usually come as a ~sql.bz2~ file and the first
+	step is to place that file in a directory name ~schema-production~
+	inside the ~cloud~ directory.
+
+	*Load*
+
+	With that in place, you can run ~make schema-production~ in order
+	to configure the PostgreSQL docker container to load the sample
+	data.
+
+	It can take a while for PostgreSQL to load a large sample
+	databases so you may see connection refused errors until the
+	process is done. To check the progress you can tail the logs of
+	the docker container.
 
 ** Notes
 *** Docker Installation (Linux)

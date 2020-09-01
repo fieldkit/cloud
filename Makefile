@@ -28,7 +28,7 @@ setup: portal/src/secrets.ts
 portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
 
-binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata
+binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer
 
 portal/node_modules:
 	cd portal && $(JSPKG) install
@@ -52,6 +52,8 @@ fktool: $(BUILD)/fktool
 
 fkdata: $(BUILD)/fkdata
 
+sanitizer: $(BUILD)/sanitizer
+
 $(BUILD)/server: $(SERVER_SOURCES)
 	cd server/cmd/server && $(GO) build -o $@
 
@@ -63,6 +65,9 @@ $(BUILD)/fktool: server/cmd/fktool/*.go $(SERVER_SOURCES)
 
 $(BUILD)/fkdata: server/cmd/fkdata/*.go $(SERVER_SOURCES)
 	cd server/cmd/fkdata && $(GO) build -o $@ *.go
+
+$(BUILD)/sanitizer: server/cmd/sanitizer/*.go $(SERVER_SOURCES)
+	cd server/cmd/sanitizer && $(GO) build -o $@ *.go
 
 generate:
 	cd server/api && goa gen github.com/fieldkit/cloud/server/api/design
@@ -85,8 +90,6 @@ schema-production:
 		rm $$f                                                       ;\
 	done
 	$(MAKE) restart-postgres
-
-.PHONY: schema-production
 
 clean-postgres:
 	docker-compose stop postgres
@@ -128,3 +131,13 @@ ci-db-tests:
 aws-image:
 	cp portal/src/secrets.ts.aws portal/src/secrets.ts
 	WORKING_DIRECTORY=$(WORKING_DIRECTORY) DOCKER_TAG=$(DOCKER_TAG) ./build.sh
+
+sanitize: sanitizer
+	mkdir -p sanitize-data
+	rsync -zvua schema-production/* sanitize-data
+	docker run --rm --name fksanitize-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password -p "5432:5432" -v `pwd`/sanitize-data:/docker-entrypoint-initdb.d/:ro -d mdillon/postgis
+	$(BUILD)/sanitizer
+	docker exec fksanitize-pg pg_dump 'postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable' | bzip2 > db-sanitized.sql.bz2
+	docker stop fksanitize-pg
+
+.PHONY: schema-production sanitize
