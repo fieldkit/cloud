@@ -231,7 +231,7 @@ export default Vue.extend({
 }
 .icons-container .unlink-icon {
     background-position: center;
-    background-image: url(../../assets/open_link.png);
+    background-image: url(../../assets/link.png);
     background-size: 30px;
     background-repeat: no-repeat;
     width: 40px;
@@ -239,7 +239,7 @@ export default Vue.extend({
 }
 .icons-container .link-icon {
     background-position: center;
-    background-image: url(../../assets/link.png);
+    background-image: url(../../assets/open_link.png);
     background-size: 30px;
     background-repeat: no-repeat;
     width: 40px;
