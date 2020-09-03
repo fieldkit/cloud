@@ -43,6 +43,14 @@
         font-family: 'Avenir';
         padding-left: 0;
         padding-right: 0;
+
+        &:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px white inset !important;
+
+            + span {
+                display: none;
+            }
+        }
     }
 
     .has-float-label {
