@@ -6,141 +6,152 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+    import Vue, { PropType } from "vue";
 
-export default Vue.extend({
-    name: "TextField",
-    props: {
-        type: {
-            type: String,
-            default: "text",
+    export default Vue.extend({
+        name: "TextField",
+        props: {
+            type: {
+                type: String,
+                default: "text",
+            },
+            value: {
+                type: String,
+                required: true,
+            },
+            placeholder: {
+                type: String,
+                required: false,
+                default: null,
+            },
+            label: {
+                type: String,
+                required: false,
+            },
         },
-        value: {
-            type: String,
-            required: true,
+        methods: {
+            onInput(ev) {
+                this.$emit("input", ev.target.value);
+            },
         },
-        placeholder: {
-            type: String,
-            required: false,
-            default: null,
-        },
-        label: {
-            type: String,
-            required: false,
-        },
-    },
-    methods: {
-        onInput(ev) {
-            this.$emit("input", ev.target.value);
-        },
-    },
-});
+    });
 </script>
 
-<style scoped>
-.has-float-label input {
-    width: 100%;
-}
+<style scoped lang="scss">
+    .has-float-label input {
+        width: 100%;
+        font-family: 'Avenir';
+        padding-left: 0;
+        padding-right: 0;
+    }
 
-.has-float-label {
-    width: inherit;
-    display: block;
-    position: relative;
-}
+    .has-float-label {
+        width: inherit;
+        display: block;
+        position: relative;
+    }
 
-/* https://github.com/tonystar/float-label-css */
-.has-float-label label,
-.has-float-label > span {
-    position: absolute;
-    left: 0;
-    top: 0;
-    cursor: text;
-    font-size: 75%;
-    opacity: 1;
-    -webkit-transition: all 0.2s;
-    transition: all 0.2s;
-}
-.has-float-label select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-.has-float-label textarea {
-    width: 100%;
-}
-.has-float-label input,
-.has-float-label select,
-.has-float-label textarea {
-    font-size: inherit;
-    padding-top: 1em;
-    margin-bottom: 2px;
-    border: 0;
-    border-radius: 0;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-}
-.has-float-label input::-webkit-input-placeholder,
-.has-float-label select::-webkit-input-placeholder,
-.has-float-label textarea::-webkit-input-placeholder {
-    opacity: 1;
-    -webkit-transition: all 0.2s;
-    transition: all 0.2s;
-}
-.has-float-label input::-moz-placeholder,
-.has-float-label select::-moz-placeholder,
-.has-float-label textarea::-moz-placeholder {
-    opacity: 1;
-    transition: all 0.2s;
-}
-.has-float-label input:-ms-input-placeholder,
-.has-float-label select:-ms-input-placeholder,
-.has-float-label textarea:-ms-input-placeholder {
-    opacity: 1;
-    transition: all 0.2s;
-}
-.has-float-label input::placeholder,
-.has-float-label select::placeholder,
-.has-float-label textarea::placeholder {
-    opacity: 1;
-    -webkit-transition: all 0.2s;
-    transition: all 0.2s;
-}
-.has-float-label input:placeholder-shown:not(:focus)::-webkit-input-placeholder,
-.has-float-label select:placeholder-shown:not(:focus)::-webkit-input-placeholder,
-.has-float-label textarea:placeholder-shown:not(:focus)::-webkit-input-placeholder {
-    opacity: 0;
-}
-.has-float-label input:placeholder-shown:not(:focus)::-moz-placeholder,
-.has-float-label select:placeholder-shown:not(:focus)::-moz-placeholder,
-.has-float-label textarea:placeholder-shown:not(:focus)::-moz-placeholder {
-    opacity: 0;
-}
-.has-float-label input:placeholder-shown:not(:focus):-ms-input-placeholder,
-.has-float-label select:placeholder-shown:not(:focus):-ms-input-placeholder,
-.has-float-label textarea:placeholder-shown:not(:focus):-ms-input-placeholder {
-    opacity: 0;
-}
-.has-float-label input:placeholder-shown:not(:focus)::placeholder,
-.has-float-label select:placeholder-shown:not(:focus)::placeholder,
-.has-float-label textarea:placeholder-shown:not(:focus)::placeholder {
-    opacity: 0;
-}
-.has-float-label input:placeholder-shown:not(:focus) + *,
-.has-float-label select:placeholder-shown:not(:focus) + *,
-.has-float-label textarea:placeholder-shown:not(:focus) + * {
-    font-size: 150%;
-    opacity: 0.5;
-    top: 0.25em;
-}
-.has-float-label input:focus,
-.has-float-label select:focus,
-.has-float-label textarea:focus {
-    outline: none;
-    border-color: rgba(0, 0, 0, 0.5);
-}
-.has-float-label select {
-    padding-right: 1em;
-    background: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23333' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E")
+    /* https://github.com/tonystar/float-label-css */
+    .has-float-label label,
+    .has-float-label > span {
+        position: absolute;
+        left: 0;
+        top: 0;
+        cursor: text;
+        font-size: 75%;
+        opacity: 1;
+        -webkit-transition: all 0.2s;
+        transition: all 0.2s;
+    }
+    .has-float-label select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+    .has-float-label textarea {
+        width: 100%;
+    }
+    .has-float-label input,
+    .has-float-label select,
+    .has-float-label textarea {
+        font-size: inherit;
+        padding-top: 1em;
+        margin-bottom: 2px;
+        border: 0;
+        border-radius: 0;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+
+        &:focus {
+            &::placeholder {
+                opacity: 0;
+            }
+        }
+    }
+    .has-float-label input::-webkit-input-placeholder,
+    .has-float-label select::-webkit-input-placeholder,
+    .has-float-label textarea::-webkit-input-placeholder {
+        opacity: 1;
+        -webkit-transition: all 0.2s;
+        transition: all 0.2s;
+    }
+    .has-float-label input::-moz-placeholder,
+    .has-float-label select::-moz-placeholder,
+    .has-float-label textarea::-moz-placeholder {
+        opacity: 1;
+        transition: all 0.2s;
+    }
+    .has-float-label input:-ms-input-placeholder,
+    .has-float-label select:-ms-input-placeholder,
+    .has-float-label textarea:-ms-input-placeholder {
+        opacity: 1;
+        transition: all 0.2s;
+    }
+    .has-float-label input::placeholder,
+    .has-float-label select::placeholder,
+    .has-float-label textarea::placeholder {
+        opacity: 1;
+        -webkit-transition: all 0.2s;
+        transition: all 0.2s;
+    }
+    .has-float-label input:placeholder-shown:not(:focus)::-webkit-input-placeholder,
+    .has-float-label select:placeholder-shown:not(:focus)::-webkit-input-placeholder,
+    .has-float-label textarea:placeholder-shown:not(:focus)::-webkit-input-placeholder {
+        opacity: 0;
+    }
+    .has-float-label input:placeholder-shown:not(:focus)::-moz-placeholder,
+    .has-float-label select:placeholder-shown:not(:focus)::-moz-placeholder,
+    .has-float-label textarea:placeholder-shown:not(:focus)::-moz-placeholder {
+        opacity: 0;
+    }
+    .has-float-label input:placeholder-shown:not(:focus):-ms-input-placeholder,
+    .has-float-label select:placeholder-shown:not(:focus):-ms-input-placeholder,
+    .has-float-label textarea:placeholder-shown:not(:focus):-ms-input-placeholder {
+        opacity: 0;
+    }
+    .has-float-label input:placeholder-shown:not(:focus)::placeholder,
+    .has-float-label select:placeholder-shown:not(:focus)::placeholder,
+    .has-float-label textarea:placeholder-shown:not(:focus)::placeholder {
+        opacity: 0;
+    }
+    .has-float-label input:placeholder-shown:not(:focus) + *,
+    .has-float-label select:placeholder-shown:not(:focus) + *,
+    .has-float-label textarea:placeholder-shown:not(:focus) + * {
+        font-size: 100%;
+        color: #6a6d71;
+        top: 0.9em;
+    }
+    .has-float-label input:focus,
+    .has-float-label select:focus,
+    .has-float-label textarea:focus {
+        outline: none;
+        border-color: rgba(0, 0, 0, 0.5);
+    }
+    .has-float-label select {
+        padding-right: 1em;
+        background: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23333' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E")
         no-repeat right 0.5em bottom 0.25em;
-    background-size: 8px 10px;
-}
+        background-size: 8px 10px;
+    }
+
+
 </style>
