@@ -70,6 +70,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import '../../scss/mixins';
 .projects-view {
     display: flex;
     flex-direction: column;
@@ -111,6 +112,11 @@ export default {
     margin-left: auto;
     margin-right: 40px;
     cursor: pointer;
+    @include flex(center);
+
+    img {
+        margin-right: 5px;
+    }
 }
 #add-project img {
     vertical-align: bottom;
