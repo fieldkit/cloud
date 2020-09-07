@@ -91,11 +91,10 @@ export default {
 
 <style scoped>
 .project-container {
-    width: 270px;
+    flex-basis: calc(33.33% - 24px);
     height: 265px;
     border: 1px solid #d8dce0;
-    margin-right: 20px;
-    margin-bottom: 20px;
+    margin: 0 12px 40px;
 }
 .project-name {
     font-weight: bold;

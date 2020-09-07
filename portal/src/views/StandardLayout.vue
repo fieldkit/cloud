@@ -110,6 +110,7 @@ export default Vue.extend({
     flex-grow: 1;
     flex-direction: column;
     display: flex;
+    background: #fcfcfc;
 }
 .container-header {
     height: 70px;

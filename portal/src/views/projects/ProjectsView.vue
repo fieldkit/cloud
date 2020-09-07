@@ -69,26 +69,29 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .projects-view {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    background-color: #fcfcfc;
-    padding: 40px;
+    max-width: 860px;
+    padding: 10px 90px;
     text-align: left;
 }
-.container {
-}
+
 .container.community {
-    border-top: 2px solid #afafaf;
-    margin-right: 20px;
+    border-top: 1px solid #d8dce0;
 }
 .container .header {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: baseline;
+
+    h1 {
+        font-size: 36px;
+        margin-bottom: 30px;
+        margin-top: 40px;
+    }
 }
 #loading {
     width: 100%;

@@ -19,7 +19,7 @@
         padding: 40px 0;
         @include flex(center, center);
         flex-direction: column;
-        min-height: 100%;
+        min-height: 100vh;
 
         @include bp-down($xs) {
             padding: 40px 0;
