@@ -74,82 +74,82 @@
 </template>
 
 <script lang="ts">
-    import Vue from "vue";
-    import CommonComponents from "@/views/shared";
+import Vue from "vue";
+import CommonComponents from "@/views/shared";
 
-    import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
-    import FKApi from "@/api/api";
+import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
+import FKApi from "@/api/api";
 
-    export default Vue.extend({
-        name: "CreateAccountView",
-        components: {
-            ...CommonComponents,
-        },
-        data() {
-            return {
-                form: {
-                    name: "",
-                    email: "",
-                    password: "",
-                    passwordConfirmation: "",
-                },
-                available: true,
-                creating: true,
-                created: null,
-                resending: false,
-            };
-        },
-        validations: {
+export default Vue.extend({
+    name: "CreateAccountView",
+    components: {
+        ...CommonComponents,
+    },
+    data() {
+        return {
             form: {
-                name: {
-                    required,
-                },
-                email: {
-                    required,
-                    email,
-                    taken: function (this: any) {
-                        return this.available;
-                    },
-                },
-                password: { required, min: minLength(10) },
-                passwordConfirmation: { required, min: minLength(10), sameAsPassword: sameAs("password") },
+                name: "",
+                email: "",
+                password: "",
+                passwordConfirmation: "",
             },
+            available: true,
+            creating: true,
+            created: null,
+            resending: false,
+        };
+    },
+    validations: {
+        form: {
+            name: {
+                required,
+            },
+            email: {
+                required,
+                email,
+                taken: function (this: any) {
+                    return this.available;
+                },
+            },
+            password: { required, min: minLength(10) },
+            passwordConfirmation: { required, min: minLength(10), sameAsPassword: sameAs("password") },
         },
-        methods: {
-            save() {
-                this.$v.form.$touch();
-                if (this.$v.form.$pending || this.$v.form.$error) {
-                    return;
-                }
+    },
+    methods: {
+        save() {
+            this.$v.form.$touch();
+            if (this.$v.form.$pending || this.$v.form.$error) {
+                return;
+            }
 
-                this.creating = true;
+            this.creating = true;
 
-                return new FKApi()
-                    .register(this.form)
-                    .then((created) => {
-                        this.created = created;
-                    })
-                    .catch((error) => {
-                        if (error.status === 400) {
-                            this.available = false;
-                        } else {
-                            return this.$seriousError(error);
-                        }
-                    })
-                    .finally(() => {
-                        this.creating = false;
-                    });
-            },
-            resend() {
-                this.resending = true;
-                return new FKApi().resendCreateAccount(this.created.id).then(() => {
-                    this.resending = false;
+            return new FKApi()
+                .register(this.form)
+                .then((created) => {
+                    this.created = created;
+                })
+                .catch((error) => {
+                    if (error.status === 400) {
+                        this.available = false;
+                    } else {
+                        return this.$seriousError(error);
+                    }
+                })
+                .finally(() => {
+                    this.creating = false;
                 });
-            },
         },
-    });
+        resend() {
+            this.resending = true;
+            return new FKApi().resendCreateAccount(this.created.id).then(() => {
+                this.resending = false;
+            });
+        },
+    },
+});
 </script>
 
 <style scoped lang="scss">
-    @import '../../scss/forms.scss';
+@import "../../scss/forms.scss";
 </style>

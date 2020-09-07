@@ -43,54 +43,44 @@
 </template>
 
 <script lang="ts">
-    import _ from "lodash";
-    import Vue from "vue";
-    import CommonComponents from "@/views/shared";
+import _ from "lodash";
+import Vue from "vue";
+import CommonComponents from "@/views/shared";
 
-    import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
+import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
 
-    import FKApi, { LoginPayload } from "@/api/api";
-    import * as ActionTypes from "@/store/actions";
+import FKApi, { LoginPayload } from "@/api/api";
+import * as ActionTypes from "@/store/actions";
 
-    export default Vue.extend({
-        components: {
-            ...CommonComponents,
+export default Vue.extend({
+    components: {
+        ...CommonComponents,
+    },
+    props: {
+        spoofing: {
+            type: Boolean,
+            default: false,
         },
-        props: {
-            spoofing: {
-                type: Boolean,
-                default: false,
+    },
+    data() {
+        return {
+            form: {
+                spoofEmail: "",
+                email: "",
+                password: "",
             },
-        },
-        data() {
+            busy: false,
+            failed: false,
+        };
+    },
+    validations() {
+        if (this.spoofing) {
             return {
                 form: {
-                    spoofEmail: "",
-                    email: "",
-                    password: "",
-                },
-                busy: false,
-                failed: false,
-            };
-        },
-        validations() {
-            if (this.spoofing) {
-                return {
-                    form: {
-                        spoofEmail: {
-                            required,
-                            email,
-                        },
-                        email: {
-                            required,
-                            email,
-                        },
-                        password: { required, min: minLength(10) },
+                    spoofEmail: {
+                        required,
+                        email,
                     },
-                };
-            }
-            return {
-                form: {
                     email: {
                         required,
                         email,
@@ -98,57 +88,65 @@
                     password: { required, min: minLength(10) },
                 },
             };
+        }
+        return {
+            form: {
+                email: {
+                    required,
+                    email,
+                },
+                password: { required, min: minLength(10) },
+            },
+        };
+    },
+    methods: {
+        forwardAfterQuery() {
+            if (this.$route.query.after) {
+                return {
+                    after: this.$route.query.after,
+                };
+            }
+            return {};
         },
-        methods: {
-            forwardAfterQuery() {
-                if (this.$route.query.after) {
-                    return {
-                        after: this.$route.query.after,
-                    };
-                }
-                return {};
-            },
-            createPayload() {
-                if (this.spoofing) {
-                    return new LoginPayload(this.form.spoofEmail, this.form.email + " " + this.form.password);
-                }
-                return new LoginPayload(this.form.email, this.form.password);
-            },
-            save() {
-                this.$v.form.$touch();
-                if (this.$v.form.$pending || this.$v.form.$error) {
-                    return;
-                }
+        createPayload() {
+            if (this.spoofing) {
+                return new LoginPayload(this.form.spoofEmail, this.form.email + " " + this.form.password);
+            }
+            return new LoginPayload(this.form.email, this.form.password);
+        },
+        save() {
+            this.$v.form.$touch();
+            if (this.$v.form.$pending || this.$v.form.$error) {
+                return;
+            }
 
-                const payload = this.createPayload();
+            const payload = this.createPayload();
 
-                this.busy = true;
-                this.failed = false;
+            this.busy = true;
+            this.failed = false;
 
-                return this.$store
-                    .dispatch(ActionTypes.LOGIN, payload)
-                    .then(
-                        () => {
-                            if (this.$route.query.after) {
-                                if (_.isArray(this.$route.query.after)) {
-                                    return this.$router.push(this.$route.query.after[0]);
-                                }
-                                return this.$router.push(this.$route.query.after as string);
+            return this.$store
+                .dispatch(ActionTypes.LOGIN, payload)
+                .then(
+                    () => {
+                        if (this.$route.query.after) {
+                            if (_.isArray(this.$route.query.after)) {
+                                return this.$router.push(this.$route.query.after[0]);
                             }
-                            return this.$router.push({ name: "projects" });
-                        },
-                        () => (this.failed = true)
-                    )
-                    .finally(() => {
-                        this.busy = false;
-                    });
-            },
+                            return this.$router.push(this.$route.query.after as string);
+                        }
+                        return this.$router.push({ name: "projects" });
+                    },
+                    () => (this.failed = true)
+                )
+                .finally(() => {
+                    this.busy = false;
+                });
         },
-    });
+    },
+});
 </script>
 
 <style scoped lang="scss">
-
-    @import '../../scss/forms.scss';
-
+@import '../../scss/forms.scss';
 </style>
