@@ -29,16 +29,14 @@
                     <img alt="Follows" src="@/assets/heart.png" class="follow-icon" />
                     <span>{{ project.following.total }}</span>
                 </div>
-                <!--
-                <div class="social notifications" v-if="project.notifications">
+                <div class="social notifications" v-if="!project.notifications">
                     <img alt="Notifications" src="@/assets/notification.png" class="notify-icon" />
                     <span>2</span>
                 </div>
-                <div class="social comments" v-if="project.comments">
+                <div class="social comments" v-if="!project.comments">
                     <img alt="Comments" src="@/assets/comment.png" class="comment-icon" />
                     <span>3</span>
                 </div>
-				-->
             </div>
         </router-link>
     </div>
@@ -89,32 +87,43 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .project-container {
     flex-basis: calc(33.33% - 24px);
-    height: 265px;
     border: 1px solid #d8dce0;
     margin: 0 12px 40px;
+    transition: all 0.33s;
+    padding-bottom: 40px;
+    @include position(relative, 0 0 0 0);
+
+    @include attention() {
+        top: -3px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+    }
 }
 .project-name {
     font-weight: bold;
     font-size: 16px;
-    margin: 10px 15px 0 15px;
+    margin: 13px 15px 0 15px;
 }
 .project-description {
     overflow-wrap: break-word;
     font-weight: lighter;
     font-size: 14px;
-    margin: 0 15px 10px 15px;
+    margin: 2px 15px 10px 15px;
 }
 .project-image-container {
     height: 138px;
     text-align: center;
     border-bottom: 1px solid #d8dce0;
+
 }
-/deep/ .project-image {
-    max-width: 270px;
+::v-deep .project-image {
     max-height: 138px;
+    object-fit: cover;
+    width: 100%;
 }
 .invited-icon {
     float: right;
@@ -130,6 +139,7 @@ export default {
     z-index: 10;
 }
 .social-container {
+    @include position(absolute, null null 15px 0);
 }
 .social {
     display: inline-block;
