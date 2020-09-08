@@ -103,8 +103,12 @@ export default {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
     }
 
-    @include bp-down($md) {
+    @include bp-down($sm) {
         flex-basis: calc(50% - 24px);
+    }
+
+    @include bp-down($xs) {
+        flex-basis: calc(100% - 24px);
     }
 }
 .project-name {
@@ -125,9 +129,9 @@ export default {
 
 }
 ::v-deep .project-image {
-    max-height: 138px;
-    object-fit: cover;
+    height: 100%;
     width: 100%;
+    object-fit: cover;
 }
 .invited-icon {
     float: right;

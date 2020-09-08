@@ -45,7 +45,7 @@ export default Vue.extend({
     },
     data() {
         return {
-            isMenuTriggered: true,
+            isMenuTriggered: window.screen.availWidth > 1040 ? true : false,
         };
     },
     methods: {
@@ -75,7 +75,6 @@ export default Vue.extend({
     width: 100%;
     height: 69px;
     float: left;
-    border-bottom: 2px solid #d8dce0;
 }
 .menu-icon-container {
     float: left;

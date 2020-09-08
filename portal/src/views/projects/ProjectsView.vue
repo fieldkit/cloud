@@ -19,7 +19,7 @@
                     <h1>Community Projects</h1>
                 </div>
                 <ProjectThumbnails :projects="publicProjects" />
-            </div>op
+            </div>
         </div>
     </StandardLayout>
 </template>
@@ -81,6 +81,10 @@ export default {
     @include bp-down($lg) {
         padding: 10px 45px;
     }
+
+    @include bp-down($xs) {
+        padding: 0 10px;
+    }
 }
 
 .container.community {
@@ -90,16 +94,29 @@ export default {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: baseline;
+    margin-bottom: 30px;
+    margin-top: 40px;
+
+    @include bp-down($lg) {
+        margin-bottom: 20px;
+        margin-top: 30px;
+    }
+
+    @include bp-down($xs) {
+        margin-bottom: 25px;
+        margin-top: 20px;
+    }
 
     h1 {
         font-size: 36px;
-        margin-bottom: 30px;
-        margin-top: 40px;
+        margin: 0;
 
         @include bp-down($lg) {
-            margin-bottom: 20px;
-            margin-top: 30px;
+            font-size: 32px;
+        }
+
+        @include bp-down($xs) {
+            font-size: 24px;
         }
     }
 }

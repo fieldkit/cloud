@@ -81,7 +81,8 @@ export default {
     width: 65px;
     transition: width 0.33s;
     overflow: hidden;
-    border-right: 1px solid rgba(235, 235, 235, 1);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.28);
+    z-index: $z-index-top;
 
     &.active {
         width: 240px;

@@ -65,7 +65,7 @@ export default Vue.extend({
     data: () => {
         return {
             sidebar: {
-                narrow: false,
+                narrow: window.screen.availWidth > 1040 ? false : true,
             },
         };
     },
@@ -97,7 +97,8 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../scss/variables';
 .container-ignored {
     height: 100%;
 }
@@ -113,7 +114,9 @@ export default Vue.extend({
     background: #fcfcfc;
 }
 .container-header {
-    height: 70px;
+    height: 69px;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);
+    z-index: $z-index-top;
 }
 .scrolling-disabled {
     overflow-y: hidden;

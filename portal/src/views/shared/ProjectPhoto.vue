@@ -1,8 +1,6 @@
 <template>
-    <div>
-        <img v-if="photo" :src="photo" class="project-photo project-image photo" alt="Project Image" />
-        <img v-if="missing" src="@/assets/fieldkit_project.png" class="project-photo project-image photo" alt="FieldKit Project" />
-    </div>
+    <img v-if="photo" :src="photo" class="project-photo project-image photo" alt="Project Image" />
+    <img v-else-if="missing" src="@/assets/fieldkit_project.png" class="project-photo project-image photo" alt="FieldKit Project" />
 </template>
 
 <script lang="ts">
