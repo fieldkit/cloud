@@ -17,9 +17,10 @@
         background-image: linear-gradient(#52b5e4, #1b80c9);
         height: 100%;
         padding: 40px 0;
-        @include flex(center, center);
         flex-direction: column;
         min-height: 100vh;
+        box-sizing: border-box;
+        @include flex(center, center);
 
         @include bp-down($xs) {
             padding: 40px 0;
