@@ -46,7 +46,7 @@
             </div>
         </div>
         <div class="sidebar-header sidebar-compass">
-            <img alt="FieldKit Compass Logo" src="@/assets/compass.png" />
+            <img alt="FieldKit Compass Logo" src="@/assets/logo-compass.svg" width="45" height="45" />
         </div>
     </div>
 </template>

@@ -2,7 +2,7 @@
     <div id="white-header" class="header">
         <div class="header-inner-section">
             <a class="menu-icon-container" v-on:click="toggleSidebar" v-bind:class="{ active: isMenuTriggered }">
-                <img alt="Menu icon" src="@/assets/menu.png" />
+                <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22"/>
             </a>
             <div class="text-elements">
                 <div class="user-name">
@@ -94,7 +94,7 @@ export default Vue.extend({
 
     @include bp-down($md) {
         &.active {
-            transform: translateX(240px);
+            transform: translateX(190px);
         }
     }
 }
