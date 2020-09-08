@@ -75,15 +75,19 @@ export default {
     display: flex;
     flex-direction: column;
     max-width: 860px;
-    padding: 10px 90px;
+    padding: 10px 90px 60px;
     text-align: left;
 
     @include bp-down($lg) {
-        padding: 10px 45px;
+        padding: 10px 45px 60px;
+    }
+
+    @include bp-down($sm) {
+        padding: 0 20px 30px;
     }
 
     @include bp-down($xs) {
-        padding: 0 10px;
+        padding: 0 10px 30px;
     }
 }
 

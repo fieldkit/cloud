@@ -28,14 +28,14 @@
                 <img alt="Follows" src="@/assets/heart.png" class="follow-icon" />
                 <span>{{ project.following.total }}</span>
             </div>
-            <div class="social notifications" v-if="!project.notifications">
+            <!--<div class="social notifications" v-if="!project.notifications">
                 <img alt="Notifications" src="@/assets/notification.png" class="notify-icon" />
                 <span>2</span>
             </div>
             <div class="social comments" v-if="!project.comments">
                 <img alt="Comments" src="@/assets/comment.png" class="comment-icon" />
                 <span>3</span>
-            </div>
+            </div>-->
         </div>
     </router-link>
 </template>
@@ -163,12 +163,15 @@ export default {
 .invited-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: space-between;
     padding: 7px 15px 0;
     margin-top: auto;
+
+    img {
+        margin: 0 5px 0 3px;
+    }
 }
 .invited-container .accept {
-    flex: 1;
     padding: 5px;
     text-align: center;
     font-size: 14px;
@@ -176,13 +179,16 @@ export default {
     color: #2c3e50;
     border-radius: 3px;
     border: solid 1px #cccdcf;
+    white-space: nowrap;
+    @include flex(center);
 }
 .invited-container .reject {
-    flex: 1;
     padding: 5px;
     text-align: center;
     font-size: 14px;
     font-weight: 900;
     color: #2c3e50;
+    white-space: nowrap;
+    @include flex(center);
 }
 </style>

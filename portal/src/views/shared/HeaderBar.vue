@@ -73,13 +73,24 @@ export default Vue.extend({
 }
 .header-inner-section {
     width: 100%;
+    max-width: 1180px;
     height: 69px;
     float: left;
+    padding: 0 10px;
+    box-sizing: border-box;
+
+    @include bp-down($sm) {
+        padding: 0 20px;
+    }
+
+    @include bp-down($xs) {
+        padding: 0 10px;
+    }
 }
 .menu-icon-container {
     float: left;
-    margin: 20px 0 0 15px;
     transition: all 0.33s;
+    margin-top: 20px;
 
     @include bp-down($md) {
         &.active {
@@ -91,7 +102,7 @@ export default Vue.extend({
     float: right;
 }
 .user-name {
-    padding: 12px 20px 0 0;
+    padding: 12px 0 0 0;
 }
 .account-link {
     text-decoration: underline;
@@ -99,7 +110,7 @@ export default Vue.extend({
 }
 .log-out,
 .log-in {
-    padding: 0 20px 0 0;
+    padding: 0 0 0 0;
     cursor: pointer;
 }
 </style>
