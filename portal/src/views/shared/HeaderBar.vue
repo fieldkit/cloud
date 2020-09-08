@@ -1,9 +1,9 @@
 <template>
     <div id="white-header" class="header">
         <div class="header-inner-section">
-            <div class="menu-icon-container">
-                <img alt="Menu icon" src="@/assets/menu.png" v-on:click="toggleSidebar" />
-            </div>
+            <a class="menu-icon-container" v-on:click="toggleSidebar" v-bind:class="{ active: isMenuTriggered }">
+                <img alt="Menu icon" src="@/assets/menu.png" />
+            </a>
             <div class="text-elements">
                 <div class="user-name">
                     <router-link v-if="user" :to="{ name: 'editUser' }" class="account-link">
@@ -43,6 +43,11 @@ export default Vue.extend({
             return null;
         },
     },
+    data() {
+        return {
+            isMenuTriggered: true,
+        };
+    },
     methods: {
         logout() {
             return this.$store.dispatch(ActionTypes.LOGOUT).then(() => {
@@ -50,13 +55,16 @@ export default Vue.extend({
             });
         },
         toggleSidebar() {
+            this.$data.isMenuTriggered = !this.$data.isMenuTriggered;
             this.$emit("toggled");
         },
     },
+
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
 #white-header {
     width: auto;
     color: gray;
@@ -72,7 +80,13 @@ export default Vue.extend({
 .menu-icon-container {
     float: left;
     margin: 20px 0 0 15px;
-    cursor: pointer;
+    transition: all 0.33s;
+
+    @include bp-down($md) {
+        &.active {
+            transform: translateX(240px);
+        }
+    }
 }
 .text-elements {
     float: right;

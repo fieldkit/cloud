@@ -19,7 +19,7 @@
                     <h1>Community Projects</h1>
                 </div>
                 <ProjectThumbnails :projects="publicProjects" />
-            </div>
+            </div>op
         </div>
     </StandardLayout>
 </template>
@@ -77,6 +77,10 @@ export default {
     max-width: 860px;
     padding: 10px 90px;
     text-align: left;
+
+    @include bp-down($lg) {
+        padding: 10px 45px;
+    }
 }
 
 .container.community {
@@ -92,6 +96,11 @@ export default {
         font-size: 36px;
         margin-bottom: 30px;
         margin-top: 40px;
+
+        @include bp-down($lg) {
+            margin-bottom: 20px;
+            margin-top: 30px;
+        }
     }
 }
 #loading {
@@ -110,7 +119,6 @@ export default {
 }
 #add-project {
     margin-left: auto;
-    margin-right: 40px;
     cursor: pointer;
     @include flex(center);
 

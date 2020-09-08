@@ -1,56 +1,52 @@
 <template>
-    <div>
-        <div v-if="!narrow" class="container-side-wide">
-            <div class="sidebar-header">
+    <div class="container-side" v-bind:class="{ active: !narrow }">
+        <div class="sidebar-header">
+            <router-link :to="{ name: 'projects' }">
+                <img alt="FieldKit Logo" id="header-logo" src="@/assets/FieldKit_Logo_Blue.png" />
+            </router-link>
+        </div>
+        <div id="inner-nav">
+            <div class="nav-section">
                 <router-link :to="{ name: 'projects' }">
-                    <img alt="FieldKit Logo" id="header-logo" src="@/assets/FieldKit_Logo_Blue.png" />
+                    <div class="nav-label">
+                        <img alt="Projects" src="@/assets/Icon_Projects_blue.png" />
+                        <span v-bind:class="{ selected: viewingProjects }">
+                            Projects
+                        </span>
+                    </div>
                 </router-link>
-            </div>
-            <div id="inner-nav">
-                <div class="nav-section">
-                    <router-link :to="{ name: 'projects' }">
-                        <div class="nav-label">
-                            <img alt="Projects" src="@/assets/Icon_Projects_blue.png" />
-                            <span v-bind:class="{ selected: viewingProjects }">
-                                Projects
-                            </span>
-                        </div>
+                <div v-for="project in projects" v-bind:key="project.id">
+                    <router-link
+                        :to="{ name: 'viewProject', params: { id: project.id } }"
+                        class="project-link"
+                        v-bind:class="{ selected: viewingProject && viewingProject.id === project.id }"
+                    >
+                        {{ project.name }}
                     </router-link>
-                    <div v-for="project in projects" v-bind:key="project.id">
-                        <router-link
-                            :to="{ name: 'viewProject', params: { id: project.id } }"
-                            class="project-link"
-                            v-bind:class="{ selected: viewingProject && viewingProject.id === project.id }"
-                        >
-                            {{ project.name }}
-                        </router-link>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <router-link :to="{ name: 'stations' }">
+                    <div class="nav-label">
+                        <img alt="Stations" src="@/assets/Icon_Station_blue.png" />
+                        <span v-bind:class="{ selected: viewingStations }">
+                            Stations
+                        </span>
+                    </div>
+                </router-link>
+                <div v-for="station in stations" v-bind:key="station.id">
+                    <div class="station-link" v-on:click="showStation(station)">
+                        {{ station.name }}
                     </div>
                 </div>
-
-                <div class="nav-section">
-                    <router-link :to="{ name: 'stations' }">
-                        <div class="nav-label">
-                            <img alt="Stations" src="@/assets/Icon_Station_blue.png" />
-                            <span v-bind:class="{ selected: viewingStations }">
-                                Stations
-                            </span>
-                        </div>
-                    </router-link>
-                    <div v-for="station in stations" v-bind:key="station.id">
-                        <div class="station-link" v-on:click="showStation(station)">
-                            {{ station.name }}
-                        </div>
-                    </div>
-                    <div v-if="isAuthenticated && stations.length == 0" class="station-link">
-                        No stations added
-                    </div>
+                <div v-if="isAuthenticated && stations.length == 0" class="station-link">
+                    No stations added
                 </div>
             </div>
         </div>
-        <div v-if="narrow" class="container-side-narrow">
-            <div class="sidebar-header sidebar-compass">
-                <img alt="FieldKit Compass Logo" src="@/assets/compass.png" />
-            </div>
+        <div class="sidebar-header sidebar-compass">
+            <img alt="FieldKit Compass Logo" src="@/assets/compass.png" />
         </div>
     </div>
 </template>
@@ -78,18 +74,28 @@ export default {
 };
 </script>
 
-<style scoped>
-.container-side-wide {
-    width: 240px;
-    height: 100%;
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
+.container-side {
+    width: 65px;
+    transition: width 0.33s;
+    overflow: hidden;
     border-right: 1px solid rgba(235, 235, 235, 1);
+
+    &.active {
+        width: 240px;
+    }
+
+    @include bp-down($md) {
+        width: 0;
+        z-index: $z-index-top;
+        background: #fff;
+        height: 100%;
+        @include position(fixed, 0 null null 0);
+    }
 }
 
-.container-side-narrow {
-    width: 65px;
-    height: 100%;
-    border-right: 1px solid rgba(235, 235, 235, 1);
-}
 #sidebar-nav-narrow img {
     margin-top: 10px;
 }
@@ -98,6 +104,11 @@ export default {
     height: 70px;
     float: left;
     border-bottom: 1px solid rgba(235, 235, 235, 1);
+    opacity: 0;
+
+    @at-root .container-side.active & {
+       opacity: 1;
+    }
 }
 #header-logo {
     width: 140px;
@@ -110,6 +121,14 @@ export default {
     text-align: left;
     padding-top: 20px;
     padding-left: 15px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.33s;
+
+    @at-root .container-side.active & {
+        opacity: 1;
+        visibility: visible;
+    }
 }
 .nav-section {
     margin-bottom: 40px;
@@ -119,6 +138,7 @@ export default {
     font-size: 16px;
     margin: 12px 0;
     cursor: pointer;
+    white-space: nowrap;
 }
 .nav-label img {
     vertical-align: sub;
@@ -145,11 +165,22 @@ export default {
     font-size: 14px;
     margin: 0 0 0 30px;
     display: inline-block;
+    white-space: nowrap;
 }
 .sidebar-compass {
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 1;
+    transition: all 0.33s;
+    @include position(absolute, 0 null null 0);
+    transform: translateX(0);
+    width: 65px;
+
+    @at-root .container-side.active & {
+        opacity: 0;
+        transform: translateX(100px);
+    }
 }
 .sidebar-compass img {
     align-self: center;

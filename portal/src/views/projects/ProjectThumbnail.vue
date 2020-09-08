@@ -102,6 +102,10 @@ export default {
         top: -3px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
     }
+
+    @include bp-down($md) {
+        flex-basis: calc(50% - 24px);
+    }
 }
 .project-name {
     font-weight: bold;
@@ -112,7 +116,7 @@ export default {
     overflow-wrap: break-word;
     font-weight: lighter;
     font-size: 14px;
-    margin: 2px 15px 10px 15px;
+    margin: 2px 15px 15px 15px;
 }
 .project-image-container {
     height: 138px;
