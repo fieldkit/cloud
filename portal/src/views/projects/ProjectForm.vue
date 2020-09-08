@@ -108,12 +108,11 @@
                 </div>
             </div>
             <div class="action-container">
-                <button class="save-button" v-if="!project" type="submit">Add</button>
-                <button class="save-button" v-if="project && project.id" type="submit">Update</button>
-                <div v-if="project && project.id" class="delete-container" v-on:click="deleteProject">
-                    <img alt="Delete" src="@/assets/Delete.png" />
-                    Delete this project
-                </div>
+                <button class="btn" v-if="!project" type="submit"> Add project </button>
+                <button class="btn" v-if="project && project.id" type="submit"> Save updates </button>
+                <button v-if="project && project.id" class="btn btn-delete" type="submit" v-on:click="deleteProject">
+                    Delete Project
+                </button>
             </div>
         </form>
     </div>
@@ -361,13 +360,17 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .project-form {
     display: flex;
     flex-direction: column;
     border: 1px solid #d8dce0;
     background: white;
-    padding: 20px;
+    padding: 0 22px 14px;
+    max-width: 700px;
+    position: relative;
 }
 
 form > div {
@@ -388,9 +391,9 @@ form > div {
 }
 .image-container {
     width: 100%;
-    margin: 15px 0;
+    margin: 28px 0 15px;
 }
-/deep/ .image-container img {
+::v-deep .image-container img {
     max-width: 275px;
     max-height: 135px;
     margin-right: 10px;
@@ -398,12 +401,15 @@ form > div {
 .date-container {
     flex: 1;
     display: flex;
+    position: relative;
 }
 .date-container .outer-input-container {
     flex-grow: 1;
 }
 .date-container button {
     position: absolute;
+    bottom: 5px;
+    right: 0;
     margin: -4px 0 0 -30px;
     background: none;
     padding: 0;
@@ -412,7 +418,6 @@ form > div {
 .date-container img {
     vertical-align: bottom;
     padding-bottom: 2px;
-    margin-left: 4px;
 }
 
 #public-checkbox-container {
@@ -450,31 +455,32 @@ form > div {
 
 .action-container {
     display: flex;
-    align-items: baseline;
 }
-.save-button {
+.close-form-button {
+    cursor: pointer;
+    @include position(absolute, 14px 14px null null);
+}
+.btn {
     width: 300px;
-    height: 50px;
+    height: 45px;
     font-size: 18px;
     color: white;
     background-color: #ce596b;
     border: none;
     border-radius: 5px;
+    font-weight: 900;
+    letter-spacing: 0.1px;
+
+    &-delete {
+        margin-left: 18px;
+        background: #fff;
+        width: 215px;
+        height: 45px;
+        border: 1px solid #ce596b;
+        color: #ce596b;
+    }
 }
-.close-form-button {
-    margin-left: auto;
-    margin-top: 15px;
-    cursor: pointer;
-}
-.delete-container {
-    margin-left: auto;
-    cursor: pointer;
-    display: inline-block;
-}
-.delete-container img {
-    width: 12px;
-    margin-right: 4px;
-}
+
 .validation-errors {
     color: #c42c44;
     display: block;
@@ -482,7 +488,18 @@ form > div {
     margin-bottom: 25px;
 }
 
-/deep/ .ti-tag {
+::v-deep .ti-tag {
     background-color: #0a67aa;
+}
+
+::v-deep .outer-input-container {
+
+    input {
+        border-bottom: 1px solid #d8dce0;
+    }
+
+    span {
+        top: -4px;
+    }
 }
 </style>
