@@ -94,6 +94,7 @@ label {
     transform: translateY(-7px);
     font-size: 14px;
     cursor: pointer;
+    margin-left: 12px;
 
     @include bp-down($xs) {
         width: 100%;

@@ -137,6 +137,23 @@
     }
 }
 
+.form {
+    &-edit {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #d8dce0;
+        background: white;
+        padding: 0 22px 14px;
+        max-width: 700px;
+        position: relative;
+        text-align: left;
+
+        @include bp-down($xs) {
+            padding: 0 10px 14px;
+        }
+    }
+}
+
 .bold {
     font-weight: bold;
 }

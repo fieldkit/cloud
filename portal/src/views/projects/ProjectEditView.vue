@@ -63,27 +63,8 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import '../../scss/mixins';
-.main-panel {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background-color: #fcfcfc;
-    text-align: left;
-    padding: 65px 87px 60px;
+@import '../../scss/layout';
 
-    @include bp-down($lg) {
-        padding: 45px 45px 60px;
-        align-items: center;
-    }
-
-    @include bp-down($sm) {
-        padding: 45px 20px 30px;
-    }
-
-    @include bp-down($xs) {
-        padding: 0;
-    }
-}
 .small-arrow {
     font-size: 11px;
     float: left;

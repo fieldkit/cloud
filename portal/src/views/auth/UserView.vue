@@ -1,22 +1,26 @@
 <template>
     <StandardLayout>
-        <div class="user-view" v-if="user">
-            <div class="container">
-                <div class="heading">My Account</div>
-                <div class="notification success" v-if="notifySaved">
-                    Profile saved.
-                </div>
+        <div class="main-panel">
+            <div class="form-edit" v-if="user">
+                <div class="container">
+                    <div>
+                        <h2> My Account </h2>
+                    </div>
+                    <div class="notification success" v-if="notifySaved">
+                        Profile saved.
+                    </div>
 
-                <ProfileForm :user="user" @save="saveForm" />
+                    <ProfileForm :user="user" @save="saveForm" />
 
-                <div class="notification success" v-if="notifyPasswordChanged">
-                    Password changed.
-                </div>
-                <div class="notification failed" v-if="!passwordOk">
-                    Please check your password and try again.
-                </div>
+                    <div class="notification success" v-if="notifyPasswordChanged">
+                        Password changed.
+                    </div>
+                    <div class="notification failed" v-if="!passwordOk">
+                        Please check your password and try again.
+                    </div>
 
-                <ChangePasswordForm :user="user" @save="changePassword" />
+                    <ChangePasswordForm :user="user" @save="changePassword" />
+                </div>
             </div>
         </div>
     </StandardLayout>
@@ -114,15 +118,11 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
-.user-view {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background-color: #fcfcfc;
-    padding: 40px;
-    text-align: left;
-}
+<style scoped lang="scss">
+@import '../../scss/mixins';
+@import '../../scss/forms';
+@import '../../scss/layout';
+
 .container {
     max-width: 700px;
 }
@@ -133,7 +133,7 @@ export default Vue.extend({
 .image-container {
     margin-bottom: 40px;
 }
-/deep/ .user-image img {
+::v-deep .user-image img {
     max-width: 400px;
     max-height: 400px;
 }

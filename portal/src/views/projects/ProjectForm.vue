@@ -1,5 +1,5 @@
 <template>
-    <div class="project-form">
+    <div class="form-edit">
         <div class="header-row">
             <h2 v-if="!project">New Project</h2>
             <h2 v-if="project && project.id">Edit Project</h2>
@@ -372,20 +372,7 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import '../../scss/mixins';
-
-.project-form {
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #d8dce0;
-    background: white;
-    padding: 0 22px 14px;
-    max-width: 700px;
-    position: relative;
-
-    @include bp-down($xs) {
-        padding: 0 10px 14px;
-    }
-}
+@import '../../scss/forms';
 
 form > .outer-input-container {
     margin-bottom: 20px;
@@ -553,17 +540,6 @@ form > .outer-input-container {
     display: block;
     font-size: 14px;
     margin-bottom: 25px;
-}
-
-::v-deep .outer-input-container {
-
-    .has-float-label > input {
-        border-bottom: 1px solid #d8dce0;
-    }
-
-    span {
-        top: -4px;
-    }
 }
 
 .tags {
