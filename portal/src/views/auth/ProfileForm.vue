@@ -34,7 +34,7 @@
                     <div v-if="!$v.form.bio.required">Short Description is a required field.</div>
                 </div>
             </div>
-            <button class="save" type="submit">Update</button>
+            <button class="button-solid" type="submit">Update</button>
         </form>
     </div>
 </template>
@@ -135,6 +135,7 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import '../../scss/mixins';
 @import '../../scss/forms';
+@import '../../scss/global';
 
 h3 {
     font-size: 16px;
@@ -176,18 +177,12 @@ form > div {
     font-weight: 500;
     margin-bottom: 40px;
 }
-
-button.save {
+.button-solid {
     margin-top: 20px;
-    width: 240px;
-    height: 45px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    background-color: #ce596b;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
+
+    @include bp-down($xs) {
+        width: 100%;
+    }
 }
 .validation-errors {
     color: #c42c44;

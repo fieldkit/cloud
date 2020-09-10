@@ -2,25 +2,21 @@
     <StandardLayout>
         <div class="main-panel">
             <div class="form-edit" v-if="user">
-                <div class="container">
-                    <div>
-                        <h2> My Account </h2>
-                    </div>
-                    <div class="notification success" v-if="notifySaved">
-                        Profile saved.
-                    </div>
-
-                    <ProfileForm :user="user" @save="saveForm" />
-
-                    <div class="notification success" v-if="notifyPasswordChanged">
-                        Password changed.
-                    </div>
-                    <div class="notification failed" v-if="!passwordOk">
-                        Please check your password and try again.
-                    </div>
-
-                    <ChangePasswordForm :user="user" @save="changePassword" />
+                <h2> My Account </h2>
+                <div class="notification success" v-if="notifySaved">
+                    Profile saved.
                 </div>
+
+                <ProfileForm :user="user" @save="saveForm" />
+
+                <div class="notification success" v-if="notifyPasswordChanged">
+                    Password changed.
+                </div>
+                <div class="notification failed" v-if="!passwordOk">
+                    Please check your password and try again.
+                </div>
+
+                <ChangePasswordForm :user="user" @save="changePassword" />
             </div>
         </div>
     </StandardLayout>
@@ -123,9 +119,6 @@ export default Vue.extend({
 @import '../../scss/forms';
 @import '../../scss/layout';
 
-.container {
-    max-width: 700px;
-}
 .heading {
     font-weight: bold;
     font-size: 24px;
@@ -164,17 +157,7 @@ export default Vue.extend({
 .password-change {
     margin-top: 20px;
 }
-.save-btn {
-    width: 300px;
-    height: 50px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    background-color: #ce596b;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+
 .validation-errors {
     color: #c42c44;
     display: block;
