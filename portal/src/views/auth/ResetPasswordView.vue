@@ -1,61 +1,53 @@
 <template>
-    <div id="login-form-container">
-        <img class="form-header-logo" alt="FieldKit Logo" src="../../assets/FieldKit_Logo_White.png" />
-        <div>
-            <div id="user-form-container">
-                <div class="password-change" v-if="!success && !failed">
-                    <div class="inner-password-change">
-                        <div class="password-change-heading">Reset Password</div>
+    <div class="form-container">
+        <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
+        <form class="form" @submit.prevent="save">
+            <template v-if="!success && !failed">
+                <h1 class="form-title"> Reset Password </h1>
 
-                        <div class="outer-input-container">
-                            <div class="input-container">
-                                <TextField v-model="form.password" label="Password" type="password" />
+                <div class="form-group">
+                    <TextField v-model="form.password" label="Password" type="password" />
 
-                                <div class="validation-errors" v-if="$v.form.password.$error">
-                                    <div v-if="!$v.form.password.required">This is a required field.</div>
-                                    <div v-if="!$v.form.password.min">Password must be at least 10 characters.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="outer-input-container">
-                            <div class="input-container middle-container">
-                                <TextField v-model="form.passwordConfirmation" label="Confirm Password" type="password" />
-
-                                <div class="validation-errors" v-if="$v.form.passwordConfirmation.$error">
-                                    <div v-if="!$v.form.passwordConfirmation.required">Confirmation is a required field.</div>
-                                    <div v-if="!$v.form.passwordConfirmation.sameAsPassword">Passwords must match.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="save-btn" v-on:click="save">Reset</button>
-                    <div>
-                        <router-link :to="{ name: 'login' }" class="create-link">
-                            Back to Log In
-                        </router-link>
+                    <div class="form-errors" v-if="$v.form.password.$error">
+                        <div v-if="!$v.form.password.required"> This is a required field. </div>
+                        <div v-if="!$v.form.password.min"> Password must be at least 10 characters. </div>
                     </div>
                 </div>
-                <div v-if="success">
-                    <img alt="Success" src="../../assets/Icon_Success.png" width="57px" />
-                    <p class="success">Success!</p>
 
-                    <router-link :to="{ name: 'login' }" class="create-link">
+                <div class="form-group">
+                    <TextField v-model="form.passwordConfirmation" label="Confirm Password" type="password" />
+
+                    <div class="form-errors" v-if="$v.form.passwordConfirmation.$error">
+                        <div v-if="!$v.form.passwordConfirmation.required"> Confirmation is a required field. </div>
+                        <div v-if="!$v.form.passwordConfirmation.sameAsPassword"> Passwords must match. </div>
+                    </div>
+                </div>
+                <button class="form-submit" v-on:click="save">Reset</button>
+                <div>
+                    <router-link :to="{ name: 'login' }" class="form-link">
                         Back to Log In
                     </router-link>
                 </div>
-                <div v-if="failed">
-                    <img alt="Unsuccessful" src="../../assets/Icon_Warning_error.png" width="57px" />
-                    <p class="error">Password Not Reset</p>
-                    <div class="notification-text">Unfortunately we were unable to reset your password.</div>
-                    <p>
-                        Please
-                        <a href="https://www.fieldkit.org/contact/" class="contact-link">contact us</a>
-                        if you would like assistance.
-                    </p>
-                </div>
-            </div>
-        </div>
+            </template>
+            <template v-if="success">
+                <img src="@/assets/Icon_Success.png" alt="Success"  class="form-header-icon" width="57px" />
+                <h1 class="form-title"> Success! </h1>
+
+                <router-link :to="{ name: 'login' }" class="form-link">
+                    Back to Log In
+                </router-link>
+            </template>
+            <template v-if="failed">
+                <img src="@/assets/Icon_Warning_error.png" alt="Unsuccessful" class="form-header-icon" width="57px" />
+                <h1 class="form-title"> Password Not Reset </h1>
+                <div class="form-subtitle"> Unfortunately we were unable to reset your password. </div>
+                <d>
+                    Please
+                    <a href="https://www.fieldkit.org/contact/" class="contact-link">contact us</a>
+                    if you would like assistance.
+                </d>
+            </template>
+        </form>
     </div>
 </template>
 
@@ -118,78 +110,16 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
-#login-form-container {
-    width: 100%;
-    min-height: 100%;
-    background-image: linear-gradient(#52b5e4, #1b80c9);
-}
-#user-form-container {
-    width: 460px;
-    background-color: white;
-    display: inline-block;
-    text-align: center;
-    padding-bottom: 60px;
-    padding-top: 78px;
-}
-.outer-input-container {
-    width: 300px;
-    margin: auto;
-}
-.input-container {
-    margin: auto;
-    width: 100%;
-    text-align: left;
-}
-.middle-container {
-    margin-top: 22px;
-}
-input {
-    background: none;
-    border: 0;
-    border-bottom: 2px solid #d8dce0;
-    outline: 0;
-    font-size: 18px;
-    padding-bottom: 2px;
-}
-.password-change-heading {
-    font-size: 24px;
-    font-weight: 500;
-    margin-bottom: 50px;
-}
-.save-btn {
-    width: 300px;
-    height: 45px;
-    color: white;
-    font-size: 18px;
-    font-weight: 600;
-    background-color: #ce596b;
-    border: none;
-    border-radius: 5px;
-    margin: 40px 0 20px 0;
-    cursor: pointer;
-}
-.validation-errors {
-    color: #c42c44;
-    display: block;
-    font-size: 14px;
-}
-.success,
-.error {
-    margin: 25px 0 25px 0;
-    font-size: 24px;
-}
-.notification-text {
-    width: 300px;
-    margin: 0 auto 40px auto;
-}
+<style scoped lang="scss">
+@import '../../scss/forms.scss';
+
 .contact-link {
     cursor: pointer;
+    font-weight: 500;
     text-decoration: underline;
-}
-.form-header-logo {
-    width: 210px;
-    margin-top: 150px;
-    margin-bottom: 86px;
+
+    @include bp-down($xs) {
+        font-size: 14px;
+    }
 }
 </style>

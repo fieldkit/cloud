@@ -20,3 +20,5 @@ secrets.ts
 *.sql.bz2
 coverage.data
 .fs
+.idea
+

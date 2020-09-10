@@ -37,9 +37,20 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .has-float-label input {
     width: 100%;
+    font-family: 'Avenir';
+    padding-left: 0;
+    padding-right: 0;
+
+    &:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0 30px white inset !important;
+
+        + span {
+            display: none;
+        }
+    }
 }
 
 .has-float-label {
@@ -77,6 +88,12 @@ export default Vue.extend({
     border: 0;
     border-radius: 0;
     border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+
+    &:focus {
+        &::placeholder {
+            opacity: 0;
+        }
+    }
 }
 .has-float-label input::-webkit-input-placeholder,
 .has-float-label select::-webkit-input-placeholder,
@@ -127,9 +144,9 @@ export default Vue.extend({
 .has-float-label input:placeholder-shown:not(:focus) + *,
 .has-float-label select:placeholder-shown:not(:focus) + *,
 .has-float-label textarea:placeholder-shown:not(:focus) + * {
-    font-size: 150%;
-    opacity: 0.5;
-    top: 0.25em;
+    font-size: 100%;
+    color: #6a6d71;
+    top: 0.9em;
 }
 .has-float-label input:focus,
 .has-float-label select:focus,
@@ -140,7 +157,7 @@ export default Vue.extend({
 .has-float-label select {
     padding-right: 1em;
     background: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23333' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E")
-        no-repeat right 0.5em bottom 0.25em;
+    no-repeat right 0.5em bottom 0.25em;
     background-size: 8px 10px;
 }
 </style>

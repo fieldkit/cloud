@@ -1,55 +1,44 @@
 <template>
-    <div id="login-form-container">
-        <img class="form-header-logo" alt="FieldKit Logo" src="../../assets/FieldKit_Logo_White.png" />
-        <div>
-            <form id="form" @submit.prevent="save">
-                <h1>Log In to Your Account</h1>
-                <div class="outer-input-container" v-if="spoofing">
-                    <div class="input-container middle-container">
-                        <TextField v-model="form.spoofEmail" label="Spoof Email" />
-
-                        <div class="validation-errors" v-if="$v.form.spoofEmail.$error">
-                            <div v-if="!$v.form.spoofEmail.required">Spoof Email is a required field.</div>
-                            <div v-if="!$v.form.spoofEmail.email">Must be a valid email address.</div>
-                        </div>
-                    </div>
+    <div class="form-container">
+        <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
+        <form class="form" @submit.prevent="save">
+            <h1 class="form-title"> Log In to Your Account </h1>
+            <div class="form-group" v-if="spoofing">
+                <TextField v-model="form.spoofEmail" label="Spoof Email" />
+                <div class="form-errors" v-if="$v.form.spoofEmail.$error">
+                    <div v-if="!$v.form.spoofEmail.required">Spoof Email is a required field.</div>
+                    <div v-if="!$v.form.spoofEmail.email">Must be a valid email address.</div>
                 </div>
-                <div class="outer-input-container">
-                    <div class="input-container middle-container">
-                        <TextField v-model="form.email" label="Email" />
-
-                        <div class="validation-errors" v-if="$v.form.email.$error">
-                            <div v-if="!$v.form.email.required">Email is a required field.</div>
-                            <div v-if="!$v.form.email.email">Must be a valid email address.</div>
-                        </div>
-                    </div>
+            </div>
+            <div class="form-group">
+                <TextField v-model="form.email" label="Email" />
+                <div class="form-errors" v-if="$v.form.email.$error">
+                    <div v-if="!$v.form.email.required">Email is a required field.</div>
+                    <div v-if="!$v.form.email.email">Must be a valid email address.</div>
                 </div>
-                <div class="outer-input-container">
-                    <div class="input-container middle-container">
-                        <TextField v-model="form.password" label="Password" type="password" />
-
-                        <div class="validation-errors" v-if="$v.form.password.$error">
-                            <div v-if="!$v.form.password.required">This is a required field.</div>
-                            <div v-if="!$v.form.password.min">Password must be at least 10 characters.</div>
-                        </div>
-                    </div>
+            </div>
+            <div class="form-group">
+                <TextField v-model="form.password" label="Password" type="password" />
+                <div class="form-errors" v-if="$v.form.password.$error">
+                    <div v-if="!$v.form.password.required">This is a required field.</div>
+                    <div v-if="!$v.form.password.min">Password must be at least 10 characters.</div>
                 </div>
-                <div v-if="failed" class="login-failed">
-                    Unfortunately we were unable to log you in. Please check your credentials and try again.
-                </div>
-                <button class="form-save-btn" type="submit">Log In</button>
-                <div>
-                    <router-link :to="{ name: 'recover', query: forwardAfterQuery() }" class="create-link">
-                        Reset My Password
-                    </router-link>
-                </div>
-                <div>
-                    <router-link :to="{ name: 'register', query: forwardAfterQuery() }" class="create-link">
-                        Create an Account
-                    </router-link>
-                </div>
-            </form>
-        </div>
+            </div>
+            <div class="form-link-recover">
+                <router-link :to="{ name: 'recover', query: forwardAfterQuery() }" class="form-link">
+                    Reset password
+                </router-link>
+            </div>
+            <div v-if="failed" class="login-failed">
+                Unfortunately we were unable to log you in. Please check your credentials and try again.
+            </div>
+            <button class="form-submit" type="submit">Log In</button>
+            <div>
+                <router-link :to="{ name: 'register', query: forwardAfterQuery() }" class="form-link">
+                    Create an account
+                </router-link>
+            </div>
+        </form>
     </div>
 </template>
 
@@ -158,112 +147,6 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
-#login-form-container {
-    width: 100%;
-    min-height: 100%;
-    background-image: linear-gradient(#52b5e4, #1b80c9);
-}
-#form,
-#notifications {
-    width: 460px;
-    background-color: white;
-    display: inline-block;
-    text-align: center;
-    padding-bottom: 60px;
-    padding-top: 20px;
-}
-#notification {
-    padding-top: 58px;
-}
-#reset-container {
-    padding-top: 78px;
-}
-h1 {
-    font-weight: 500;
-    font-size: 24px;
-    margin-bottom: 55px;
-}
-.bold {
-    font-weight: bold;
-}
-.form-save-btn {
-    margin-top: 50px;
-    width: 300px;
-    height: 45px;
-    background-color: #ce596b;
-    border: none;
-    color: white;
-    font-size: 18px;
-    font-weight: 600;
-    border-radius: 5px;
-}
-.disabled {
-    margin-top: 20px;
-    width: 300px;
-    height: 50px;
-}
-.outer-input-container {
-    width: 300px;
-    margin: auto;
-}
-.input-container {
-    margin: auto;
-    width: 100%;
-    text-align: left;
-}
-.middle-container {
-    margin-top: 22px;
-}
-input {
-    background: none;
-    border: 0;
-    border-bottom: 2px solid #d8dce0;
-    outline: 0;
-    font-size: 18px;
-    padding-bottom: 2px;
-}
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-li {
-    display: inline-block;
-    margin: 0 10px;
-}
-.policy-terms-container {
-    font-size: 13px;
-    line-height: 16px;
-    text-align: left;
-}
-.create-link {
-    cursor: pointer;
-    display: block;
-    margin-top: 30px;
-    font-size: 14px;
-    font-weight: bold;
-}
-.form-header-logo {
-    width: 210px;
-    margin-top: 150px;
-    margin-bottom: 86px;
-}
-.validation-errors {
-    color: #c42c44;
-    display: block;
-    font-size: 14px;
-}
-.recover-link {
-    color: black;
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 30px;
-    display: block;
-}
-.login-failed {
-    color: #c42c44;
-    font-weight: bold;
-    width: 50%;
-    margin: auto;
-}
+<style scoped lang="scss">
+@import '../../scss/forms.scss';
 </style>

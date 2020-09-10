@@ -1,0 +1,45 @@
+@import 'variables';
+
+@mixin placeholder ($color: #999) {
+
+    &::-webkit-input-placeholder {
+        color: $color;
+    }
+    &:-moz-placeholder {
+        color: $color;
+    }
+    &::-moz-placeholder {
+        color: $color;
+    }
+    &:-ms-input-placeholder {
+        color: $color;
+    }
+}
+
+@mixin bp-up($breakpoint) {
+
+    @media screen and (min-width: #{$breakpoint + 'px'}) {
+        @content;
+    }
+}
+
+@mixin bp-down($breakpoint) {
+
+    @media screen and (max-width: #{$breakpoint + 'px'}) {
+        @content;
+    }
+}
+
+
+@mixin flex($align: null, $justify: null) {
+
+    display: flex;
+
+    @if ($align != null) {
+        align-items: $align;
+    }
+
+    @if ($justify != null) {
+        justify-content: $justify;
+    }
+}
