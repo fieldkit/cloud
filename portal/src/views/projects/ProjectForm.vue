@@ -83,8 +83,9 @@
                 </div>
             </div>
 
-            <div class="outer-input-container">
-                <vue-tags-input v-model="form.tag" :tags="form.tags" @tags-changed="onTagsChanged" />
+            <div class="outer-input-container tags-container">
+                <span class="tags-placeholder js-tagsPlaceholder"> Tags </span>
+                <vue-tags-input v-model="form.tag" :tags="form.tags" @tags-changed="onTagsChanged" @blur="onTagsFocus" @focus="onTagsFocus" placeholder="" />
 
                 <div class="validation-errors" v-if="$v.form.tags.$error">
                     <div v-if="!$v.form.tags.maxLength">This field has a limit of 100 characters.</div>
@@ -97,14 +98,14 @@
                 </div>
 
                 <div v-if="form.public" class="public-options">
-                    <div class="privacy-field">
+                    <label class="privacy-field">
                         <input type="radio" id="privacy" value="1" v-model="form.privacy" />
-                        Show exact location of stations.
-                    </div>
-                    <div class="privacy-field">
+                        Show exact location of stations
+                    </label>
+                    <label class="privacy-field">
                         <input type="radio" id="privacy" value="2" v-model="form.privacy" />
-                        Show general location of stations.
-                    </div>
+                        Show general location of stations
+                    </label>
                 </div>
             </div>
             <div class="action-container">
@@ -243,6 +244,10 @@ export default Vue.extend({
         },
     },
     methods: {
+        onTagsFocus(e) {
+            console.log("z", e);
+            document.querySelector('.js-tagsPlaceholder').classList.toggle('focused');
+        },
         saveForm() {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
@@ -440,12 +445,36 @@ form > div {
 
 #public-checkbox-container .privacy-field {
     display: flex;
+
+    input {
+        opacity: 0;
+        position: absolute;
+        z-index: -1;
+    }
+
+    &:nth-of-type(1) {
+        color: red;
+    }
 }
 
 #public-checkbox-container .public-options {
     display: flex;
     flex-direction: column;
     margin-left: 1em;
+
+    .privacy-field {
+        padding-left: 8px;
+        position: relative;
+
+        &:before {
+            content: '';
+            width: 22px;
+            height: 22px;
+            border-radius: 100px;
+            border: solid 1px rgba(0, 0, 0, 0.1);
+            @include position(absolute, 0 null null 0);
+        }
+    }
 }
 
 .outer-date-container {
@@ -502,4 +531,74 @@ form > div {
         top: -4px;
     }
 }
+
+.tags {
+
+    &-placeholder {
+        font-size: 100%;
+        color: #6a6d71;
+        transition: all 0.2s;
+        cursor: text;
+        z-index: $z-index-top;
+        @include position(absolute, 0.9em null null 0);
+
+        &.focused {
+            font-size: 75%;
+            top: 0;
+        }
+    }
+
+    &-container {
+        position: relative;
+        padding-top: 1em;
+    }
+}
+
+::v-deep .vue-tags-input {
+
+    .ti-input {
+        border: 0;
+        padding: 0;
+    }
+
+    .ti-new-tag-input {
+        font-size: 16px;
+
+        &-wrapper {
+            padding: 0;
+            margin: 0;
+        }
+    }
+
+    .ti-tag {
+        color: #2c3e50;
+        font-size: 13px;
+        height: 20px;
+        border-radius: 10px;
+        background-color: #f4f5f7;
+    }
+
+    .ti-icon-close {
+        width: 10px;
+        height: 10px;
+        background: url('../../assets/icon-close.svg') no-repeat center center;
+        background-size: 10px;
+        background-color: transparent;
+
+        &:before {
+            content: '';
+        }
+    }
+
+    .ti-deletion-mark {
+        background: #ce596b!important;
+        color: white;
+
+        .ti-icon-close {
+            background: url('../../assets/icon-close-white.svg') no-repeat center center;
+            background-size: 10px;
+        }
+    }
+}
+
 </style>
