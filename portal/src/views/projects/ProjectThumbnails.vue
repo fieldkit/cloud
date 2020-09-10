@@ -25,10 +25,15 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .project-thumbnails {
     display: flex;
     flex-wrap: wrap;
     text-align: left;
+    margin: 0 -12px;
+
+    * {
+        box-sizing: border-box;
+    }
 }
 </style>

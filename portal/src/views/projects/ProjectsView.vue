@@ -69,26 +69,63 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
 .projects-view {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    background-color: #fcfcfc;
-    padding: 40px;
+    padding: 10px 90px 60px;
     text-align: left;
+
+    .container-side.active ~ .container-main & {
+        max-width: 860px;
+    }
+
+    @include bp-down($lg) {
+        padding: 10px 45px 60px;
+    }
+
+    @include bp-down($sm) {
+        padding: 0 20px 30px;
+    }
+
+    @include bp-down($xs) {
+        padding: 0 10px 30px;
+    }
 }
-.container {
-}
+
 .container.community {
-    border-top: 2px solid #afafaf;
-    margin-right: 20px;
+    border-top: 1px solid #d8dce0;
 }
 .container .header {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: baseline;
+    margin-bottom: 30px;
+    margin-top: 40px;
+
+    @include bp-down($lg) {
+        margin-bottom: 20px;
+        margin-top: 30px;
+    }
+
+    @include bp-down($xs) {
+        margin-bottom: 25px;
+        margin-top: 20px;
+    }
+
+    h1 {
+        font-size: 36px;
+        margin: 0;
+
+        @include bp-down($lg) {
+            font-size: 32px;
+        }
+
+        @include bp-down($xs) {
+            font-size: 24px;
+        }
+    }
 }
 #loading {
     width: 100%;
@@ -106,8 +143,12 @@ export default {
 }
 #add-project {
     margin-left: auto;
-    margin-right: 40px;
     cursor: pointer;
+    @include flex(center);
+
+    img {
+        margin-right: 5px;
+    }
 }
 #add-project img {
     vertical-align: bottom;

@@ -43,3 +43,33 @@
         justify-content: $justify;
     }
 }
+
+@mixin attention($self: false) {
+
+    @if ($self != false) {
+
+        &,
+        &:hover,
+        &:active,
+        &:focus {
+            @content;
+        }
+    }
+
+    @else {
+
+        &:hover,
+        &:active,
+        &:focus {
+            @content;
+        }
+    }
+}
+
+@mixin position($position, $coordinates: null null null null) {
+    position: $position;
+    top:    nth($coordinates, 1);
+    right:  nth($coordinates, 2);
+    bottom: nth($coordinates, 3);
+    left:   nth($coordinates, 4);
+}
