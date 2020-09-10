@@ -72,15 +72,16 @@ export default Vue.extend({
     padding: 65px 87px 60px;
 
     @include bp-down($lg) {
-        padding: 10px 45px 60px;
+        padding: 45px 45px 60px;
+        align-items: center;
     }
 
     @include bp-down($sm) {
-        padding: 0 20px 30px;
+        padding: 45px 20px 30px;
     }
 
     @include bp-down($xs) {
-        padding: 0 10px 30px;
+        padding: 0;
     }
 }
 .small-arrow {

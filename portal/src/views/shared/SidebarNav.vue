@@ -82,7 +82,7 @@ export default {
     transition: width 0.33s;
     overflow: hidden;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.28);
-    z-index: $z-index-top;
+    z-index: $z-index-menu;
 
     &.active {
         width: 240px;
