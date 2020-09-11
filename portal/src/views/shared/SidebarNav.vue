@@ -79,6 +79,7 @@ export default {
 
 .container-side {
     width: 65px;
+    flex: 0 0 65px;
     transition: width 0.33s;
     overflow: hidden;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.28);
@@ -86,6 +87,7 @@ export default {
 
     &.active {
         width: 240px;
+        flex: 0 0 240px;
     }
 
     @include bp-down($md) {
