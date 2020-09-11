@@ -5,7 +5,7 @@
                 <div class="name">{{ station.name }}</div>
                 <div class="completed">{{ completed }}% Complete</div>
                 <div class="buttons">
-                    <div class="button" v-on:click="onSave">Save</div>
+                    <button type="submit" class="button" v-on:click="onSave">Save</button>
                 </div>
             </div>
             <div class="site-notes">
@@ -105,17 +105,18 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .notes-form {
     text-align: left;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 28px;
 }
 .header {
-    display: flex;
-    align-items: baseline;
-    padding-bottom: 25px;
+    @include flex(center);
+    padding-bottom: 11px;
     border-bottom: 1px solid #d8dce0;
 }
 .header .name {
@@ -137,13 +138,19 @@ export default Vue.extend({
     margin-top: 20px;
 }
 .button {
-    margin-left: 20px;
-    font-size: 12px;
-    padding: 5px 10px;
+    padding: 0;
+    width: 80px;
+    height: 33px;
+    border-radius: 3px;
+    border: solid 1px #cccdcf;
     background-color: #ffffff;
-    border: 1px solid rgb(215, 220, 225);
-    border-radius: 4px;
-    cursor: pointer;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0.08px;
+    color: #2c3e50;
+    margin-left: 7px;
+    margin-bottom: 0;
+    @include flex(center, center);
 }
 
 .photos {
@@ -155,7 +162,7 @@ export default Vue.extend({
     flex-basis: 400px;
 }
 
-/deep/ .photos img {
+::v-deep .photos img {
     max-width: 400px;
     max-height: 400px;
     margin-right: 10px;

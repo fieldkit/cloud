@@ -233,14 +233,25 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .notes-view {
     display: flex;
     flex-direction: column;
     height: 100%;
+    max-width: 1080px;
     background-color: #fcfcfc;
     text-align: left;
-    padding: 40px;
+    padding: 40px 90px;
+
+    @include bp-down($md) {
+        padding: 30px 30px;
+    }
+
+    @include bp-down($xs) {
+        padding: 20px 10px;
+    }
 }
 .notes-view .header {
     margin-top: 40px;
@@ -280,7 +291,7 @@ export default Vue.extend({
     background-color: #f8d7da;
 }
 .notifications {
-    padding: 10px;
+    padding: 0 10px;
 }
 
 .spinner {

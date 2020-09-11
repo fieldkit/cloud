@@ -7,13 +7,11 @@
             v-on:click="(ev) => clicked(ev, station)"
             v-bind:class="{ selected: selected && station.id == selected.id }"
         >
-            <div class="tab-container">
-                <div class="name">
-                    {{ station.name }}
-                </div>
-                <div v-if="station.deployedAt" class="deployed">Deployed</div>
-                <div v-else class="undeployed">Not Deployed</div>
+            <div class="name">
+                {{ station.name }}
             </div>
+            <div v-if="station.deployedAt" class="deployed">Deployed</div>
+            <div v-else class="undeployed">Not Deployed</div>
         </div>
         <div class="vertical">&nbsp;</div>
     </div>
@@ -52,7 +50,7 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .station-tabs {
     text-align: left;
     display: flex;
@@ -60,16 +58,17 @@ export default Vue.extend({
     height: 100%;
 }
 .tab {
-    padding: 10px;
+    padding: 16px 13px;
     border-right: 1px solid #d8dce0;
     border-bottom: 1px solid #d8dce0;
     border-left: 4px solid white;
+    cursor: pointer;
+
+    &.selected {
+        border-right: none;
+    }
 }
-.tab:not(:last-child) {
-}
-.tab-container {
-    padding: 10px;
-}
+
 .vertical {
     margin-top: auto;
     border-right: 1px solid #d8dce0;
@@ -79,11 +78,14 @@ export default Vue.extend({
     font-size: 16px;
     font-weight: 500;
     color: #2c3e50;
+    margin-bottom: 1px;
+    font-weight: 500;
 }
 .undeployed,
 .deployed {
     font-size: 13px;
     color: #6a6d71;
+    font-weight: 500;
 }
 .selected {
     border-left: 4px solid #1b80c9;
