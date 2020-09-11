@@ -113,11 +113,19 @@ export default Vue.extend({
     display: flex;
     flex-direction: column;
     padding: 28px;
+
+    @include bp-down($md) {
+        padding: 28px 0;
+    }
 }
 .header {
     @include flex(center);
     padding-bottom: 11px;
     border-bottom: 1px solid #d8dce0;
+
+    @include bp-down($md) {
+        border: 0;
+    }
 }
 .header .name {
     color: #2c3e50;
