@@ -80,8 +80,15 @@
             </div>
 
             <div class="outer-input-container tags-container">
-                <span class="js-tagsPlaceholder" v-bind:class="{focused: form.tags}"> Tags </span>
-                <vue-tags-input v-model="form.tag" :tags="form.tags" @tags-changed="onTagsChanged" @blur="onTagsBlur" @focus="onTagsFocus" placeholder="" />
+                <span v-bind:class="{ focused: smallTagsLabel }">Tags</span>
+                <vue-tags-input
+                    v-model="form.tag"
+                    :tags="form.tags"
+                    @tags-changed="onTagsChanged"
+                    @blur="onTagsBlur"
+                    @focus="onTagsFocus"
+                    placeholder=""
+                />
 
                 <div class="validation-errors" v-if="$v.form.tags.$error">
                     <div v-if="!$v.form.tags.maxLength">This field has a limit of 100 characters.</div>
@@ -110,11 +117,9 @@
                 </div>
             </div>
             <div class="action-container">
-                <button class="btn" v-if="!project" type="submit"> Add project </button>
-                <button class="btn" v-if="project && project.id" type="submit"> Save updates </button>
-                <button v-if="project && project.id" class="btn btn-delete" type="submit" v-on:click="deleteProject">
-                    Delete Project
-                </button>
+                <button class="btn" v-if="!project" type="submit">Add project</button>
+                <button class="btn" v-if="project && project.id" type="submit">Save updates</button>
+                <button v-if="project && project.id" class="btn btn-delete" type="submit" v-on:click="deleteProject">Delete Project</button>
             </div>
         </form>
     </div>
@@ -162,6 +167,7 @@ export default Vue.extend({
     data: () => {
         return {
             image: null,
+            tagsFocused: false,
             form: {
                 name: "",
                 description: "",
@@ -237,6 +243,9 @@ export default Vue.extend({
         }
     },
     computed: {
+        smallTagsLabel(this: any): boolean {
+            return (this.form.tags && this.form.tags.length > 0) || this.tagsFocused;
+        },
         imageUrl(this: any) {
             if (this.project.photo) {
                 return this.$config.baseUrl + this.project.photo;
@@ -246,12 +255,10 @@ export default Vue.extend({
     },
     methods: {
         onTagsFocus(e) {
-            document.querySelector('.js-tagsPlaceholder').classList.add('focused');
+            this.tagsFocused = true;
         },
         onTagsBlur(e) {
-           // if (!this.$v.form.tags || this.$v.form.tags.length > 0) {
-                document.querySelector('.js-tagsPlaceholder').classList.remove('focused');
-           // }
+            this.tagsFocused = false;
         },
         saveForm() {
             this.$v.form.$touch();
@@ -371,7 +378,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 
 .project-form {
     display: flex;
@@ -453,7 +460,7 @@ form > .outer-input-container {
     }
 
     &-btn {
-        content: '';
+        content: "";
         width: 20px;
         height: 20px;
         border-radius: 100px;
@@ -469,10 +476,9 @@ form > .outer-input-container {
     }
 
     input:checked ~ .radio-btn {
-
         &:after {
             @include position(absolute, 5px null null 5px);
-            content: '';
+            content: "";
             width: 10px;
             height: 10px;
             border-radius: 50%;
@@ -503,11 +509,10 @@ form > .outer-input-container {
     }
 
     input:checked ~ .checkbox-btn {
-
         &:after {
             @include position(absolute, 0 null null 0);
-            content: '';
-            background: url('../../assets/icon-tick.svg') no-repeat center center;
+            content: "";
+            background: url("../../assets/icon-tick.svg") no-repeat center center;
             background-size: 10px 8px;
             width: 20px;
             height: 20px;
@@ -556,7 +561,6 @@ form > .outer-input-container {
 }
 
 ::v-deep .outer-input-container {
-
     .has-float-label > input {
         border-bottom: 1px solid #d8dce0;
     }
@@ -567,7 +571,6 @@ form > .outer-input-container {
 }
 
 .tags {
-
     &-container {
         position: relative;
         padding-top: 1em;
@@ -617,24 +620,23 @@ form > .outer-input-container {
     .ti-icon-close {
         width: 10px;
         height: 10px;
-        background: url('../../assets/icon-close.svg') no-repeat center center;
+        background: url("../../assets/icon-close.svg") no-repeat center center;
         background-size: 10px;
         background-color: transparent;
 
         &:before {
-            content: '';
+            content: "";
         }
     }
 
     .ti-deletion-mark {
-        background: #ce596b!important;
+        background: #ce596b !important;
         color: white;
 
         .ti-icon-close {
-            background: url('../../assets/icon-close-white.svg') no-repeat center center;
+            background: url("../../assets/icon-close-white.svg") no-repeat center center;
             background-size: 10px;
         }
     }
 }
-
 </style>
