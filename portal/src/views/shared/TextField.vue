@@ -64,7 +64,7 @@ export default Vue.extend({
 .has-float-label > span {
     position: absolute;
     left: 0;
-    top: 0;
+    top: -4px;
     cursor: text;
     font-size: 75%;
     opacity: 1;
@@ -87,7 +87,7 @@ export default Vue.extend({
     margin-bottom: 2px;
     border: 0;
     border-radius: 0;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #d8dce0;
 
     &:focus {
         &::placeholder {

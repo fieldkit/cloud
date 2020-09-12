@@ -94,11 +94,13 @@ label {
     transform: translateY(-7px);
     font-size: 14px;
     cursor: pointer;
+    margin-left: 12px;
 
     @include bp-down($xs) {
         width: 100%;
         display: block;
-        margin-top: 7px;
+        transform: translateY(5px);
+        margin-left: 0;
     }
 }
 

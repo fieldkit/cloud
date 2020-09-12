@@ -31,7 +31,7 @@ body,
 #app {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
 }
 body {
     font-family: "Avenir", Helvetica, Arial, sans-serif;

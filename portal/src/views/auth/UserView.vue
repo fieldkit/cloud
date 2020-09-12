@@ -1,8 +1,8 @@
 <template>
     <StandardLayout>
-        <div class="user-view" v-if="user">
-            <div class="container">
-                <div class="heading">My Account</div>
+        <div class="main-panel">
+            <div class="form-edit" v-if="user">
+                <h2> My Account </h2>
                 <div class="notification success" v-if="notifySaved">
                     Profile saved.
                 </div>
@@ -114,18 +114,11 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
-.user-view {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background-color: #fcfcfc;
-    padding: 40px;
-    text-align: left;
-}
-.container {
-    max-width: 700px;
-}
+<style scoped lang="scss">
+@import '../../scss/mixins';
+@import '../../scss/forms';
+@import '../../scss/layout';
+
 .heading {
     font-weight: bold;
     font-size: 24px;
@@ -133,7 +126,7 @@ export default Vue.extend({
 .image-container {
     margin-bottom: 40px;
 }
-/deep/ .user-image img {
+::v-deep .user-image img {
     max-width: 400px;
     max-height: 400px;
 }
@@ -164,17 +157,7 @@ export default Vue.extend({
 .password-change {
     margin-top: 20px;
 }
-.save-btn {
-    width: 300px;
-    height: 50px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    background-color: #ce596b;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+
 .validation-errors {
     color: #c42c44;
     display: block;

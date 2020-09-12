@@ -137,6 +137,30 @@
     }
 }
 
+.form {
+    &-edit {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #d8dce0;
+        background: white;
+        padding: 0 22px 14px;
+        width: 700px;
+        max-width: 100%;
+        position: relative;
+        text-align: left;
+
+        @include bp-down($md) {
+            max-width: 500px;
+        }
+
+        @include bp-down($xs) {
+            padding: 0 20px 14px;
+            width: 100%;
+        }
+    }
+}
+
 .bold {
     font-weight: bold;
 }

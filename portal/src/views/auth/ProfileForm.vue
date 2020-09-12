@@ -6,7 +6,6 @@
                 <ImageUploader :image="{ url: null }" v-if="!user.photo" @change="onImage" />
                 <ImageUploader :image="{ url: user.photo.url }" v-if="user.photo" @change="onImage" />
             </div>
-            <h3>User Profile</h3>
             <div>
                 <TextField v-model="form.name" label="Name" />
 
@@ -29,13 +28,13 @@
                 </div>
             </div>
             <div>
-                <TextField v-model="form.bio" label="Bio" />
+                <TextField v-model="form.bio" label="Short Description" />
 
                 <div class="validation-errors" v-if="$v.form.name.$error">
-                    <div v-if="!$v.form.bio.required">Bio is a required field.</div>
+                    <div v-if="!$v.form.bio.required">Short Description is a required field.</div>
                 </div>
             </div>
-            <button class="save" type="submit">Update</button>
+            <button class="button-solid" type="submit">Update</button>
         </form>
     </div>
 </template>
@@ -133,23 +132,23 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
-.main-panel {
-    display: flex;
-    flex-direction: column;
-    max-width: 700px;
-    padding: 20px;
+<style scoped lang="scss">
+@import '../../scss/mixins';
+@import '../../scss/forms';
+@import '../../scss/global';
+
+h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
 }
-.heading {
-    font-weight: bold;
-    font-size: 24px;
-}
+
 .image-container {
     margin-bottom: 40px;
 }
-/deep/ .user-image img {
-    max-width: 400px;
-    max-height: 400px;
+::v-deep .user-image img {
+    max-width: 198px!important;
+    max-height: 198px!important;
 }
 #loading {
     width: 100%;
@@ -178,20 +177,12 @@ form > div {
     font-weight: 500;
     margin-bottom: 40px;
 }
-.password-change {
+.button-solid {
     margin-top: 20px;
-}
-button.save {
-    margin-top: 20px;
-    width: 300px;
-    height: 50px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    background-color: #ce596b;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+
+    @include bp-down($xs) {
+        width: 100%;
+    }
 }
 .validation-errors {
     color: #c42c44;
