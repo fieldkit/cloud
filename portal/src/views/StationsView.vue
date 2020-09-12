@@ -2,48 +2,47 @@
     <StandardLayout @sidebar-toggle="onSidebarToggle" :viewingStations="true">
         <div class="view-type-container">
             <div class="view-type">
-                <div class="view-type-map" v-bind:class="{active: viewType === 'map'}" v-on:click="switchView('map')"></div>
-                <div class="view-type-list" v-bind:class="{active: viewType === 'list'}" v-on:click="switchView('list')"> </div>
+                <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')"></div>
+                <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')"></div>
             </div>
         </div>
 
         <template v-if="viewType === 'list'">
             <div class="stations-list">
                 <StationSummary
-                        v-for="station in stations"
-                        v-bind:key="station.id"
-                        class="summary-container"
-                        @close="closeSummary"
-                        :station="station"
+                    v-for="station in stations"
+                    v-bind:key="station.id"
+                    class="summary-container"
+                    @close="closeSummary"
+                    :station="station"
                 />
             </div>
         </template>
 
         <template v-if="viewType === 'map'">
             <div class="container-map">
-                <StationsMap @show-summary="showSummary" :mapped="mapped" :layoutChanges="layoutChanges" v-if="mapped"/>
+                <StationsMap @show-summary="showSummary" :mapped="mapped" :layoutChanges="layoutChanges" v-if="mapped" />
                 <StationSummary
-                        v-if="activeStation"
-                        class="summary-container"
-                        @close="closeSummary"
-                        :station="activeStation"
-                        v-bind:key="activeStation.id"
+                    v-if="activeStation"
+                    class="summary-container"
+                    @close="closeSummary"
+                    :station="activeStation"
+                    v-bind:key="activeStation.id"
                 />
                 <div v-if="isAuthenticated && showNoStationsMessage && hasNoStations" id="no-stations">
                     <div id="close-notice-btn" v-on:click="closeNotice">
-                        <img alt="Close" src="@/assets/close.png"/>
+                        <img alt="Close" src="@/assets/close.png" />
                     </div>
                     <p class="heading">Add a New Station</p>
                     <p class="text">
-                        You currently don't have any stations on your account. Download the FieldKit app and connect your
-                        station to add them to
-                        your account.
+                        You currently don't have any stations on your account. Download the FieldKit app and connect your station to add
+                        them to your account.
                     </p>
                     <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
-                        <img alt="App store" src="@/assets/appstore.png" class="app-btn"/>
+                        <img alt="App store" src="@/assets/appstore.png" class="app-btn" />
                     </a>
                     <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
-                        <img alt="Google Play" src="@/assets/googleplay.png" class="app-btn"/>
+                        <img alt="Google Play" src="@/assets/googleplay.png" class="app-btn" />
                     </a>
                 </div>
             </div>
@@ -57,9 +56,9 @@ import StandardLayout from "./StandardLayout.vue";
 import StationSummary from "./shared/StationSummary.vue";
 import StationsMap from "./shared/StationsMap.vue";
 
-import {mapState, mapGetters} from "vuex";
+import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
-import {GlobalState} from "@/store/modules/global";
+import { GlobalState } from "@/store/modules/global";
 
 export default Vue.extend({
     name: "StationsView",
@@ -69,17 +68,17 @@ export default Vue.extend({
         StationSummary,
     },
     props: {
-        id: {type: Number},
+        id: { type: Number },
     },
     data: () => {
         return {
             layoutChanges: 0,
             showNoStationsMessage: true,
-            viewType: 'list',
+            viewType: "list",
         };
     },
     computed: {
-        ...mapGetters({isAuthenticated: "isAuthenticated", isBusy: "isBusy", mapped: "mapped"}),
+        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy", mapped: "mapped" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
             hasNoStations: (s: GlobalState) => s.stations.hasNoStations,
@@ -93,13 +92,13 @@ export default Vue.extend({
     },
     beforeMount() {
         if (this.id) {
-            return this.$store.dispatch(ActionTypes.NEED_STATION, {id: this.id});
+            return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });
         }
     },
     watch: {
         id() {
             if (this.id) {
-                return this.$store.dispatch(ActionTypes.NEED_STATION, {id: this.id});
+                return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });
             }
         },
     },
@@ -113,11 +112,11 @@ export default Vue.extend({
         },
         showSummary(params: { id: number }) {
             if (this.id != params.id) {
-                return this.$router.push({name: "viewStation", params: params as any});
+                return this.$router.push({ name: "viewStation", params: params as any });
             }
         },
         closeSummary() {
-            return this.$router.push({name: "stations"});
+            return this.$router.push({ name: "stations" });
         },
         onSidebarToggle() {
             this.layoutChanges++;
@@ -133,7 +132,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../scss/mixins.scss';
+@import "../scss/mixins.scss";
 
 .container-ignored {
     height: 100%;
@@ -163,7 +162,6 @@ export default Vue.extend({
 .container-map {
     flex-grow: 1;
 }
-
 
 ::v-deep .station-hover-summary {
     left: 360px;
@@ -252,20 +250,20 @@ export default Vue.extend({
     }
 
     &-list {
-        background: url('../assets/icon-list.svg') no-repeat center center;
+        background: url("../assets/icon-list.svg") no-repeat center center;
         flex-basis: 50%;
 
         &.active {
-            background: url('../assets/icon-list-selected.svg') no-repeat center center;
+            background: url("../assets/icon-list-selected.svg") no-repeat center center;
         }
     }
 
     &-map {
-        background: url('../assets/icon-map.svg') no-repeat center center;
+        background: url("../assets/icon-map.svg") no-repeat center center;
         flex-basis: 50%;
 
         &-active {
-            background: url('../assets/icon-map-selected.svg') no-repeat center center;
+            background: url("../assets/icon-map-selected.svg") no-repeat center center;
         }
     }
 }
@@ -318,7 +316,5 @@ export default Vue.extend({
             display: none;
         }
     }
-
 }
-
 </style>
