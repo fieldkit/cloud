@@ -3,8 +3,11 @@
         <img alt="Image" :src="placeholderImage" v-if="!image || (!image.url && !preview)" />
         <img alt="Image" :src="$config.baseUrl + image.url" class="image" v-if="image && image.url && !preview" />
         <img alt="Image" :src="preview" class="image" v-if="preview" />
-        <br />
-        <input type="file" accept="image/gif, image/jpeg, image/png" @change="upload" />
+        <label for="imageInput">
+            <template v-if="!preview"> Choose Image </template>
+            <template v-if="preview"> Change Image </template>
+        </label>
+        <input id="imageInput" type="file" accept="image/gif, image/jpeg, image/png" @change="upload" />
     </div>
 </template>
 
@@ -79,4 +82,29 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
+.image-container {
+    @include flex(baseline);
+    flex-wrap: wrap;
+}
+
+label {
+    transform: translateY(-7px);
+    font-size: 14px;
+    cursor: pointer;
+
+    @include bp-down($xs) {
+        width: 100%;
+        display: block;
+        margin-top: 7px;
+    }
+}
+
+input {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+}
+</style>

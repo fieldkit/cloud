@@ -47,73 +47,79 @@
             </div>
 
             <div class="dates-row">
-                <div class="outer-date-container">
-                    <div class="date-container">
-                        <div class="outer-input-container">
-                            <TextField v-model="form.startTime" label="Start" />
-                        </div>
-                        <v-date-picker :value="form.pickedStart" @input="updateStart" :popover="{ placement: 'auto', visibility: 'click' }">
-                            <button type="button">
-                                <img alt="Calendar" src="@/assets/calendar.png" />
-                            </button>
-                        </v-date-picker>
+                <div class="date-container">
+                    <div class="outer-input-container">
+                        <TextField v-model="form.startTime" label="Start" />
                     </div>
-
-                    <div class="validation-errors" v-if="$v.form.startTime.$error">
-                        <div v-if="!$v.form.startTime.date">Please enter a valid date.</div>
-                    </div>
+                    <v-date-picker :value="form.pickedStart" @input="updateStart" :popover="{ placement: 'auto', visibility: 'click' }">
+                        <button type="button">
+                            <img alt="Calendar" src="@/assets/calendar.png" />
+                        </button>
+                    </v-date-picker>
                 </div>
-                <div class="space-hack"></div>
-                <div class="outer-date-container">
-                    <div class="date-container">
-                        <div class="outer-input-container">
-                            <TextField v-model="form.endTime" label="End" />
-                        </div>
-                        <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'auto', visibility: 'click' }">
-                            <button type="button">
-                                <img alt="Calendar" src="@/assets/calendar.png" />
-                            </button>
-                        </v-date-picker>
-                    </div>
 
-                    <div class="validation-errors" v-if="$v.form.endTime.$error">
-                        <div v-if="!$v.form.endTime.date">Please enter a valid date.</div>
-                        <div v-if="!$v.form.endTime.minValue">Please enter a date after the start date.</div>
+                <div class="validation-errors" v-if="$v.form.startTime.$error">
+                    <div v-if="!$v.form.startTime.date">Please enter a valid date.</div>
+                </div>
+
+                <div class="date-container">
+                    <div class="outer-input-container">
+                        <TextField v-model="form.endTime" label="End" />
                     </div>
+                    <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'auto', visibility: 'click' }">
+                        <button type="button">
+                            <img alt="Calendar" src="@/assets/calendar.png" />
+                        </button>
+                    </v-date-picker>
+                </div>
+
+                <div class="validation-errors" v-if="$v.form.endTime.$error">
+                    <div v-if="!$v.form.endTime.date">Please enter a valid date.</div>
+                    <div v-if="!$v.form.endTime.minValue">Please enter a date after the start date.</div>
                 </div>
             </div>
 
-            <div class="outer-input-container">
-                <vue-tags-input v-model="form.tag" :tags="form.tags" @tags-changed="onTagsChanged" />
+            <div class="outer-input-container tags-container">
+                <span v-bind:class="{ focused: smallTagsLabel }">Tags</span>
+                <vue-tags-input
+                    v-model="form.tag"
+                    :tags="form.tags"
+                    @tags-changed="onTagsChanged"
+                    @blur="onTagsBlur"
+                    @focus="onTagsFocus"
+                    placeholder=""
+                />
 
                 <div class="validation-errors" v-if="$v.form.tags.$error">
                     <div v-if="!$v.form.tags.maxLength">This field has a limit of 100 characters.</div>
                 </div>
             </div>
-            <div id="public-checkbox-container">
-                <div class="privacy-field">
-                    <input type="checkbox" id="checkbox" v-model="form.public" />
-                    <label for="checkbox">Make this project public</label>
+            <div class="privacy">
+                <div class="checkbox">
+                    <label>
+                        Make this project public
+                        <input type="checkbox" id="checkbox" v-model="form.public" />
+                        <span class="checkbox-btn"></span>
+                    </label>
                 </div>
 
-                <div v-if="form.public" class="public-options">
-                    <div class="privacy-field">
+                <div v-if="form.public" class="radio-container">
+                    <label class="radio">
                         <input type="radio" id="privacy" value="1" v-model="form.privacy" />
-                        Show exact location of stations.
-                    </div>
-                    <div class="privacy-field">
+                        <span class="radio-btn"></span>
+                        Show exact location of stations
+                    </label>
+                    <label class="radio">
                         <input type="radio" id="privacy" value="2" v-model="form.privacy" />
-                        Show general location of stations.
-                    </div>
+                        <span class="radio-btn"></span>
+                        Show general location of stations
+                    </label>
                 </div>
             </div>
             <div class="action-container">
-                <button class="save-button" v-if="!project" type="submit">Add</button>
-                <button class="save-button" v-if="project && project.id" type="submit">Update</button>
-                <div v-if="project && project.id" class="delete-container" v-on:click="deleteProject">
-                    <img alt="Delete" src="@/assets/Delete.png" />
-                    Delete this project
-                </div>
+                <button class="btn" v-if="!project" type="submit">Add project</button>
+                <button class="btn" v-if="project && project.id" type="submit">Save updates</button>
+                <button v-if="project && project.id" class="btn btn-delete" type="submit" v-on:click="deleteProject">Delete Project</button>
             </div>
         </form>
     </div>
@@ -161,6 +167,7 @@ export default Vue.extend({
     data: () => {
         return {
             image: null,
+            tagsFocused: false,
             form: {
                 name: "",
                 description: "",
@@ -236,6 +243,9 @@ export default Vue.extend({
         }
     },
     computed: {
+        smallTagsLabel(this: any): boolean {
+            return (this.form.tags && this.form.tags.length > 0) || this.tagsFocused;
+        },
         imageUrl(this: any) {
             if (this.project.photo) {
                 return this.$config.baseUrl + this.project.photo;
@@ -244,6 +254,12 @@ export default Vue.extend({
         },
     },
     methods: {
+        onTagsFocus(e) {
+            this.tagsFocused = true;
+        },
+        onTagsBlur(e) {
+            this.tagsFocused = false;
+        },
         saveForm() {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
@@ -361,16 +377,24 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../scss/mixins";
+
 .project-form {
     display: flex;
     flex-direction: column;
     border: 1px solid #d8dce0;
     background: white;
-    padding: 20px;
+    padding: 0 22px 14px;
+    max-width: 700px;
+    position: relative;
+
+    @include bp-down($xs) {
+        padding: 0 10px 14px;
+    }
 }
 
-form > div {
+form > .outer-input-container {
     margin-bottom: 20px;
 }
 
@@ -380,17 +404,18 @@ form > div {
 }
 
 .dates-row {
-    display: flex;
+    @include flex(center, space-between);
     flex-direction: row;
+    margin-bottom: 20px;
 }
 .dates-row > div {
     flex: 1;
 }
 .image-container {
     width: 100%;
-    margin: 15px 0;
+    margin: 28px 0 15px;
 }
-/deep/ .image-container img {
+::v-deep .image-container img {
     max-width: 275px;
     max-height: 135px;
     margin-right: 10px;
@@ -398,12 +423,16 @@ form > div {
 .date-container {
     flex: 1;
     display: flex;
+    position: relative;
+    max-width: 200px;
 }
 .date-container .outer-input-container {
     flex-grow: 1;
 }
 .date-container button {
     position: absolute;
+    bottom: 5px;
+    right: 0;
     margin: -4px 0 0 -30px;
     background: none;
     padding: 0;
@@ -412,69 +441,118 @@ form > div {
 .date-container img {
     vertical-align: bottom;
     padding-bottom: 2px;
-    margin-left: 4px;
 }
 
-#public-checkbox-container {
-    margin: 15px 0;
-    width: 98%;
-    padding-bottom: 20px;
-}
-#public-checkbox-container input {
-    float: left;
-    margin: 5px;
-}
-#public-checkbox-container label {
-    float: left;
-    margin: 2px 5px;
-}
-#public-checkbox-container img {
-    float: left;
-    margin: 2px 5px;
+.privacy {
+    margin: 34px 0;
 }
 
-#public-checkbox-container .privacy-field {
-    display: flex;
+.radio {
+    padding-left: 32px;
+    margin: 7px 0;
+    position: relative;
+    cursor: pointer;
+
+    input {
+        opacity: 0;
+        position: absolute;
+        z-index: -1;
+    }
+
+    &-btn {
+        content: "";
+        width: 20px;
+        height: 20px;
+        border-radius: 100px;
+        border: solid 1px rgba(0, 0, 0, 0.1);
+        background: #f2f4f7;
+        @include position(absolute, 0 null null 0);
+    }
+
+    &-container {
+        display: flex;
+        flex-direction: column;
+        margin-left: 27px;
+    }
+
+    input:checked ~ .radio-btn {
+        &:after {
+            @include position(absolute, 5px null null 5px);
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #2c3e50;
+        }
+    }
 }
 
-#public-checkbox-container .public-options {
-    display: flex;
-    flex-direction: column;
-    margin-left: 1em;
-}
+.checkbox {
+    position: relative;
+    padding-left: 30px;
+    margin: 7px 0;
+    cursor: pointer;
 
-.outer-date-container {
-    display: flex;
-    flex-direction: column;
+    input {
+        opacity: 0;
+        position: absolute;
+        z-index: -1;
+    }
+
+    &-btn {
+        width: 18px;
+        height: 18px;
+        border-radius: 2px;
+        border: solid 1px rgba(0, 0, 0, 0.1);
+        background: #f2f4f7;
+        @include position(absolute, 0 null null 0);
+    }
+
+    input:checked ~ .checkbox-btn {
+        &:after {
+            @include position(absolute, 0 null null 0);
+            content: "";
+            background: url("../../assets/icon-tick.svg") no-repeat center center;
+            background-size: 10px 8px;
+            width: 20px;
+            height: 20px;
+        }
+    }
 }
 
 .action-container {
     display: flex;
-    align-items: baseline;
+    flex-wrap: wrap;
 }
-.save-button {
-    width: 300px;
-    height: 50px;
+.close-form-button {
+    cursor: pointer;
+    @include position(absolute, 14px 14px null null);
+}
+.btn {
+    width: 280px;
+    height: 45px;
     font-size: 18px;
     color: white;
     background-color: #ce596b;
     border: none;
     border-radius: 5px;
+    font-weight: 900;
+    letter-spacing: 0.1px;
+    margin-bottom: 20px;
+
+    &:nth-of-type(1) {
+        margin-right: 18px;
+    }
+
+    &-delete {
+        background: #fff;
+        width: 215px;
+        height: 45px;
+        border: 1px solid #ce596b;
+        color: #ce596b;
+    }
 }
-.close-form-button {
-    margin-left: auto;
-    margin-top: 15px;
-    cursor: pointer;
-}
-.delete-container {
-    margin-left: auto;
-    cursor: pointer;
-    display: inline-block;
-}
-.delete-container img {
-    width: 12px;
-    margin-right: 4px;
-}
+
 .validation-errors {
     color: #c42c44;
     display: block;
@@ -482,7 +560,83 @@ form > div {
     margin-bottom: 25px;
 }
 
-/deep/ .ti-tag {
-    background-color: #0a67aa;
+::v-deep .outer-input-container {
+    .has-float-label > input {
+        border-bottom: 1px solid #d8dce0;
+    }
+
+    span {
+        top: -4px;
+    }
+}
+
+.tags {
+    &-container {
+        position: relative;
+        padding-top: 1em;
+
+        > span {
+            font-size: 100%;
+            color: #6a6d71;
+            transition: all 0.2s;
+            cursor: text;
+            z-index: $z-index-top;
+            @include position(absolute, 11px null null 0);
+
+            &.focused {
+                font-size: 75%;
+                top: -4px;
+            }
+        }
+    }
+}
+
+::v-deep .vue-tags-input {
+    max-width: unset;
+
+    .ti-input {
+        border: 0;
+        border-bottom: 1px solid #d8dce0;
+        padding: 0 0 3px 0;
+    }
+
+    .ti-new-tag-input {
+        font-size: 16px;
+
+        &-wrapper {
+            padding: 0;
+            margin: 0;
+        }
+    }
+
+    .ti-tag {
+        color: #2c3e50;
+        font-size: 13px;
+        height: 20px;
+        border-radius: 10px;
+        background-color: #f4f5f7;
+    }
+
+    .ti-icon-close {
+        width: 10px;
+        height: 10px;
+        background: url("../../assets/icon-close.svg") no-repeat center center;
+        background-size: 10px;
+        background-color: transparent;
+
+        &:before {
+            content: "";
+        }
+    }
+
+    .ti-deletion-mark {
+        background: #ce596b !important;
+        color: white;
+
+        .ti-icon-close {
+            background: url("../../assets/icon-close-white.svg") no-repeat center center;
+            background-size: 10px;
+        }
+    }
 }
 </style>
