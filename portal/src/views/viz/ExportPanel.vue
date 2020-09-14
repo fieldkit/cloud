@@ -1,9 +1,7 @@
 <template>
     <div :class="'export-panel ' + containerClass">
         <div class="heading">
-            <div class="title">
-                Export
-            </div>
+            <div class="title">Export</div>
             <div class="close-button" v-on:click="onClose">
                 <img alt="Close" src="../../assets/close.png" />
             </div>
@@ -14,15 +12,18 @@
         </div>
         <div class="user-exports" v-if="history">
             <div class="previous-heading">Previous Exports</div>
-            <div v-if="history.length == 0">
-                No previous exports.
-            </div>
+            <div v-if="history.length == 0">No previous exports.</div>
             <div v-for="de in history" class="export" v-bind:key="de.id">
                 <div class="kind">{{ prettyKind(de.format) }}</div>
                 <div class="created">{{ de.createdAt | prettyTime }}</div>
                 <div class="busy" v-if="!de.downloadUrl">{{ de.progress | prettyPercentage }}</div>
                 <div class="size" v-if="de.downloadUrl">{{ de.size | prettyBytes }}</div>
-                <div class="download" v-if="de.downloadUrl"><a :href="$config.baseUrl + de.downloadUrl">Download</a></div>
+                <div class="download" v-if="de.downloadUrl" v-bind:class="{ downloaded: false }">
+                    <a :href="$config.baseUrl + de.downloadUrl" @click="(ev) => onDownload(ev, de)">
+                        <template v-if="isDownloaded(de.id)">Downloaded</template>
+                        <template v-else>Download</template>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -39,6 +40,10 @@ import { ExportDataAction, ExportParams } from "@/store/typed-actions";
 import { GlobalState } from "@/store/modules/global";
 import { ExportStatus } from "@/api/api";
 
+interface Data {
+    downloaded: { [index: number]: boolean };
+}
+
 export default Vue.extend({
     name: "ExportPanel",
     components: {
@@ -54,8 +59,10 @@ export default Vue.extend({
             required: true,
         },
     },
-    data: () => {
-        return {};
+    data: (): Data => {
+        return {
+            downloaded: {},
+        };
     },
     computed: {
         ...mapState({
@@ -71,6 +78,9 @@ export default Vue.extend({
         return this.$store.dispatch(ActionTypes.NEED_EXPORTS);
     },
     methods: {
+        isDownloaded(this: any, id: number): boolean {
+            return this.downloaded[id] === true;
+        },
         prettyKind(kind: string): string {
             const map = {
                 csv: "CSV",
@@ -91,6 +101,7 @@ export default Vue.extend({
         },
         onDownload(ev: any, de: ExportStatus) {
             console.log("viz: download", de);
+            Vue.set(this.downloaded, de.id, true);
         },
     },
 });
@@ -132,12 +143,21 @@ export default Vue.extend({
 }
 
 .download {
-    font-size: 12px;
+    display: block;
     padding: 10px;
     background-color: #ffffff;
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
+    text-align: center;
+}
+
+.download.downloaded {
+    color: #efefef;
+}
+
+.download a {
+    text-align: center;
 }
 
 .export-options {
