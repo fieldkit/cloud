@@ -128,7 +128,7 @@ export default {
     padding: 20px 15px 0;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.66s;
+    transition: opacity 0.33s;
 
     @at-root .container-side.active & {
         opacity: 1;
