@@ -80,7 +80,7 @@ export default {
 .container-side {
     width: 65px;
     flex: 0 0 65px;
-    transition: width 0.33s;
+    transition: all 0.33s;
     overflow: hidden;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.28);
     z-index: $z-index-menu;
@@ -103,14 +103,18 @@ export default {
     margin-top: 10px;
 }
 .sidebar-header {
-    width: 100%;
     height: 70px;
-    float: left;
     border-bottom: 1px solid rgba(235, 235, 235, 1);
     opacity: 0;
+    @include flex(center, center);
 
     @at-root .container-side.active & {
        opacity: 1;
+    }
+
+    @include bp-down($md) {
+        justify-content: flex-start;
+        padding: 0 20px;
     }
 }
 #header-logo {
@@ -119,11 +123,9 @@ export default {
 }
 
 #inner-nav {
-    width: 92%;
     float: left;
     text-align: left;
-    padding-top: 20px;
-    padding-left: 15px;
+    padding: 20px 15px 0;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.33s;
@@ -131,17 +133,22 @@ export default {
     @at-root .container-side.active & {
         opacity: 1;
         visibility: visible;
+        width: 200px;
     }
 }
 .nav-section {
     margin-bottom: 40px;
+
+    > div {
+        padding: 4px 0;
+    }
 }
 .nav-label {
+    @include flex(center);
     font-weight: bold;
     font-size: 16px;
     margin: 12px 0;
     cursor: pointer;
-    white-space: nowrap;
 }
 .nav-label img {
     vertical-align: sub;
@@ -161,6 +168,9 @@ export default {
     margin: 20px 0 0 37px;
     display: inline-block;
 }
+.project-link {
+    line-height: 1.2;
+}
 .project-link,
 .station-link {
     cursor: pointer;
@@ -168,19 +178,18 @@ export default {
     font-size: 14px;
     margin: 0 0 0 30px;
     display: inline-block;
-    white-space: nowrap;
 }
 .sidebar-compass {
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 1;
-    transition: all 0.33s;
-    @include position(absolute, 0 null null 0);
     transform: translateX(0);
     width: 65px;
+    @include position(absolute, 0 null null 0);
 
     @at-root .container-side.active & {
+        transition: all 0.33s;
         opacity: 0;
         transform: translateX(100px);
     }
