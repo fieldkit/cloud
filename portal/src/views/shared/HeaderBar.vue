@@ -91,10 +91,12 @@ export default Vue.extend({
     float: left;
     transition: all 0.33s;
     margin-top: 20px;
+    cursor: pointer;
 
     @include bp-down($md) {
         &.active {
-            transform: translateX(190px);
+            transform: translateX(175px);
+            margin-top: 22px;
         }
     }
 }
