@@ -191,7 +191,7 @@ export default Vue.extend({
 }
 .section-heading {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 500;
     padding-top: 1em;
     padding-bottom: 1em;
     padding-left: 1em;
@@ -199,6 +199,7 @@ export default Vue.extend({
 }
 .stations-heading {
     display: flex;
+    align-items: center;
     flex-direction: row;
 }
 .section-body {
@@ -232,7 +233,8 @@ export default Vue.extend({
 }
 .stations-container {
     margin: 22px 0 0 0;
-    border: 2px solid #d8dce0;
+    border-radius: 1px;
+    border: solid 1px #d8dce0;
     background-color: #ffffff;
 }
 .stations-panel {

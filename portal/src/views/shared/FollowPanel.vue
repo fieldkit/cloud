@@ -62,13 +62,20 @@ export default Vue.extend({
 <style scoped>
 .follow-panel {
     display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 18px;
     font-weight: 500;
     color: #2c3e50;
-    padding-top: 10px;
+    padding-top: 24px;
+    border-radius: 1px;
+    border-top: solid 1px #d8dce0;
+    margin-top: 10px;
 }
 .icon {
     cursor: pointer;
-    margin-right: 0.25em;
+    margin-right: 10px;
+    width: 22px;
+    height: 20px;
 }
 </style>

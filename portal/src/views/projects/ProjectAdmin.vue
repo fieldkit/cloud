@@ -214,11 +214,11 @@ export default {
     max-width: 400px;
     min-height: 335px;
     flex: 1;
-    border: 2px solid #d8dce0;
-    border-radius: 2px;
+    border: 1px solid #d8dce0;
+    border-radius: 1px;
     margin-right: 20px;
     background-color: white;
-    padding: 20px;
+    padding: 25px;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -232,8 +232,8 @@ export default {
 }
 .details > .right {
     flex: 2;
-    border: 2px solid #d8dce0;
-    border-radius: 2px;
+    border: 1px solid #d8dce0;
+    border-radius: 1px;
     background-color: white;
     padding: 20px 30px;
     display: flex;
@@ -313,8 +313,8 @@ export default {
 }
 .project-data,
 .project-readings {
-    border: 2px solid #d8dce0;
-    border-radius: 2px;
+    border: 1px solid #d8dce0;
+    border-radius: 1px;
     background-color: white;
     padding: 20px;
     display: flex;

@@ -61,8 +61,8 @@ export default Vue.extend({
 .sps {
     display: flex;
     min-width: 260px;
-    border: 2px solid #d8dce0;
-    border-radius: 2px;
+    border: 1px solid #d8dce0;
+    border-radius: 1px;
 }
 .sps .standard {
     text-align: left;

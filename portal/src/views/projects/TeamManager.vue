@@ -175,7 +175,8 @@ export default Vue.extend({
     margin-top: 20px;
     display: flex;
     flex-direction: column;
-    border: 2px solid #d8dce0;
+    border: 1px solid #d8dce0;
+    border-radius: 1px;
     background: white;
     padding: 20px;
 }
