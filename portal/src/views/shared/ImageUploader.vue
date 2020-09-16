@@ -105,8 +105,6 @@ label {
 }
 
 input {
-    opacity: 0;
-    position: absolute;
-    z-index: -1;
+    display: none;
 }
 </style>

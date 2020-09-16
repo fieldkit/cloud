@@ -21,6 +21,9 @@
                                 <div v-else class="undeployed">Not Deployed</div>
                             </div>
                             <div class="tab-content" v-if="selectedStation && selectedNotes">
+                                <div v-if="loading" class="main">
+                                    <Spinner />
+                                </div>
                                 <div class="notifications">
                                     <div v-if="failed" class="notification failed">
                                         Oops, there was a problem.
@@ -45,46 +48,11 @@
                                         @change="onChange"
                                 />
                             </div>
-                            <div v-else class="main empty">
+                            <div v-else class="tab-content empty">
                                 Please choose a station from the left.
                             </div>
                         </div>
                     </div>
-                    <template v-if="loading">
-                        <div class="main">
-                            <Spinner />
-                        </div>
-                    </template>
-                    <template v-else>
-                       <!--&lt;!&ndash; <div class="main" v-if="selectedStation && selectedNotes">
-                            <div class="notifications">
-                                <div v-if="failed" class="notification failed">
-                                    Oops, there was a problem.
-                                </div>
-
-                                <div v-if="success" class="notification success">
-                                    Saved.
-                                </div>
-                            </div>
-                            <NotesViewer
-                                :station="selectedStation"
-                                :notes="selectedNotes"
-                                v-bind:key="stationId"
-                                v-if="project.project.readOnly"
-                            />
-                            <NotesForm
-                                v-else
-                                :station="selectedStation"
-                                :notes="selectedNotes"
-                                @save="saveForm"
-                                v-bind:key="stationId"
-                                @change="onChange"
-                            />
-                        </div>
-                        <div v-else class="main empty">
-                            Please choose a station from the left.
-                        </div>-->
-                    </template>
                 </template>
             </div>
         </div>
@@ -116,7 +84,6 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
         StandardLayout,
-     //   StationTabs,
         NotesForm,
         NotesViewer,
     },
@@ -223,12 +190,11 @@ export default Vue.extend({
             });
         },
         onSelected(station) {
-            console.log("on selected", station);
             if (this.stationId != station.id) {
                 return this.$router.push({
                     name: this.projectId ? "viewProjectStationNotes" : "viewStationNotes",
                     params: {
-                        projectId: this.projectId,
+                        projectId: this.projectId.toString(),
                         stationId: station.id,
                     },
                 });
@@ -344,6 +310,14 @@ export default Vue.extend({
         border: 0;
     }
 
+    &.active {
+        border-left: 4px solid #1b80c9;
+
+        @include bp-down($md) {
+            border-left: 0;
+        }
+    }
+
     &-wrap {
         position: relative;
         padding: 16px 13px;
@@ -373,11 +347,11 @@ export default Vue.extend({
 
             @include bp-up($md) {
                 content: '';
-                width: 1px;
+                width: 3px;
                 height: 100%;
                 background: #fff;
                 z-index: $z-index-top;
-                @include position(absolute, 0 -1px null null);
+                @include position(absolute, 0 -2px null null);
             }
         }
     }
@@ -400,6 +374,10 @@ export default Vue.extend({
             @at-root .tab.active & {
                 max-height: 1000px;
             }
+        }
+
+        &.empty {
+            padding: 20px;
         }
     }
 }
@@ -430,8 +408,5 @@ export default Vue.extend({
     font-size: 13px;
     color: #6a6d71;
     font-weight: 500;
-}
-.selected {
-    border-left: 4px solid #1b80c9;
 }
 </style>
