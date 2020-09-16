@@ -11,15 +11,15 @@
                 <template v-else>
                     <div class="station-tabs">
                         <div class="tab"
-                            v-for="station in stations"
-                            v-bind:key="station.id"
-                            v-on:click="(ev) => onSelected(ev, station)">
-
-                            <div class="name">
-                                {{ station.name }}
+                             v-for="station in stations"
+                             v-bind:key="station.id"
+                             v-bind:class="{active: selectedStation.id === station.id}"
+                             v-on:click="onSelected(station)">
+                            <div class="tab-wrap">
+                                <div class="name"> {{ station.name }} </div>
+                                <div v-if="station.deployedAt" class="deployed">Deployed</div>
+                                <div v-else class="undeployed">Not Deployed</div>
                             </div>
-                            <div v-if="station.deployedAt" class="deployed">Deployed</div>
-                            <div v-else class="undeployed">Not Deployed</div>
                             <div class="tab-content" v-if="selectedStation && selectedNotes">
                                 <div class="notifications">
                                     <div v-if="failed" class="notification failed">
@@ -45,37 +45,11 @@
                                         @change="onChange"
                                 />
                             </div>
-                        </div>
-                    </div>
-                    <!--<div class="main" v-if="selectedStation && selectedNotes">
-                        <div class="notifications">
-                            <div v-if="failed" class="notification failed">
-                                Oops, there was a problem.
-                            </div>
-
-                            <div v-if="success" class="notification success">
-                                Saved.
+                            <div v-else class="main empty">
+                                Please choose a station from the left.
                             </div>
                         </div>
-                        <NotesViewer
-                                :station="selectedStation"
-                                :notes="selectedNotes"
-                                v-bind:key="stationId"
-                                v-if="project.project.readOnly"
-                        />
-                        <NotesForm
-                                v-else
-                                :station="selectedStation"
-                                :notes="selectedNotes"
-                                @save="saveForm"
-                                v-bind:key="stationId"
-                                @change="onChange"
-                        />
                     </div>
-
-                    <div class="side">
-                        <StationTabs :stations="visibleStations" :selected="selectedStation" @selected="onSelected" />
-                    </div>-->
                     <template v-if="loading">
                         <div class="main">
                             <Spinner />
@@ -248,8 +222,8 @@ export default Vue.extend({
                 Vue.set(this, "loading", false);
             });
         },
-        onSelected(this: any, station) {
-            console.log("on selected", this, station);
+        onSelected(station) {
+            console.log("on selected", station);
             if (this.stationId != station.id) {
                 return this.$router.push({
                     name: this.projectId ? "viewProjectStationNotes" : "viewStationNotes",
@@ -308,7 +282,6 @@ export default Vue.extend({
 .notes-view .lower {
     display: flex;
     flex-direction: row;
-    border: 1px solid #d8dce0;
     background: white;
     margin-top: 20px;
     position: relative;
@@ -327,7 +300,7 @@ export default Vue.extend({
 
 .notification.success {
     margin-top: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     padding: 20px;
     border: 2px;
     border-radius: 4px;
@@ -355,47 +328,73 @@ export default Vue.extend({
     height: 100%;
     flex-basis: 250px;
     flex-shrink: 0;
+    border-top: 1px solid #d8dce0;
+    border-left: 1px solid #d8dce0;
+    border-right: 1px solid #d8dce0;
 
     @include bp-down($md) {
         flex-basis: 100%;
     }
 }
 .tab {
-    padding: 16px 13px;
-    border-right: 1px solid #d8dce0;
     border-bottom: 1px solid #d8dce0;
-    border-left: 4px solid white;
     cursor: pointer;
 
     @include bp-down($md) {
-        padding: 16px 10px;
-        border-right: 0;
-        transition: max-height 0.33s;
-        position: relative;
+        border: 0;
+    }
 
-        &:after {
-            background: url('../../assets/icon-chevron-right.svg') no-repeat center center;
-            transform: rotate(90deg) translateX(-50%);
-            content: '';
-            width: 20px;
-            height: 20px;
-            @include position(absolute, 50% 20px null null);
+    &-wrap {
+        position: relative;
+        padding: 16px 13px;
+        z-index: 10;
+
+        @include bp-down($md) {
+            padding: 16px 10px;
+            border-right: 0;
+            transition: max-height 0.33s;
+
+            &:after {
+                background: url('../../assets/icon-chevron-right.svg') no-repeat center center;
+                transform: rotate(90deg) translateX(-50%);
+                content: '';
+                width: 20px;
+                height: 20px;
+                transition: all 0.33s;
+                @include position(absolute, 50% 20px null null);
+
+                .tab.active & {
+                    transform: rotate(270deg) translateX(50%);
+                }
+            }
+        }
+
+        .tab.active &:before {
+
+            @include bp-up($md) {
+                content: '';
+                width: 1px;
+                height: 100%;
+                background: #fff;
+                z-index: $z-index-top;
+                @include position(absolute, 0 -1px null null);
+            }
         }
     }
 
-    &.selected {
-        border-right: none;
-    }
-
     &-content {
-        @include position(absolute, 0 null null 250px);
+        @include position(absolute, 0 null null 251px);
         width: calc(100% - 250px);
+        z-index: $z-index-top;
+        border: 1px solid #d8dce0;
 
         @include bp-down($md) {
             padding-top: 1px;
             position: unset;
             width: 100%;
             max-height: 0;
+            border: 0;
+            border-top: 1px solid #d8dce0;
             overflow: hidden;
 
             @at-root .tab.active & {
@@ -424,11 +423,6 @@ export default Vue.extend({
         width: calc(100% + 24px);
         box-sizing: border-box;
         margin-left: -14px;
-
-        @at-root .tab.active & {
-            border-bottom: solid 1px #d8dce0;
-            padding-bottom: 14px;
-        }
     }
 }
 .undeployed,

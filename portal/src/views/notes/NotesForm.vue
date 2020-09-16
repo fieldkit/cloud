@@ -115,7 +115,7 @@ export default Vue.extend({
     padding: 28px;
 
     @include bp-down($md) {
-        padding: 28px 0;
+        padding: 25px 8px;
     }
 }
 .header {
@@ -125,6 +125,7 @@ export default Vue.extend({
 
     @include bp-down($md) {
         border: 0;
+        padding: 0;
     }
 }
 .header .name {
