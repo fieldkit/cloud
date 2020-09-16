@@ -79,7 +79,7 @@ export default Vue.extend({
 }
 .heading {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 500;
 }
 .station-name {
     font-size: 14px;

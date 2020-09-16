@@ -193,7 +193,7 @@ export default Vue.extend({
     padding-top: 1em;
     padding-bottom: 1em;
     padding-left: 1em;
-    border-bottom: 1px solid lightgray;
+    border-bottom: 1px solid #d8dce0;
 }
 .stations-heading {
     display: flex;

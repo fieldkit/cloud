@@ -26,7 +26,7 @@ export default {
 }
 .heading {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 500;
 }
 .message {
     margin-top: 10px;

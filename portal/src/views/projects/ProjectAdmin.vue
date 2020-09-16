@@ -266,7 +266,7 @@ export default {
 .details .details-top {
     display: flex;
     flex-direction: row;
-    padding-bottom: 20px;
+    padding-bottom: 30px;
     line-height: 1.5;
 }
 .details .details-left {
