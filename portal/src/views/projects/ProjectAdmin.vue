@@ -393,15 +393,15 @@ export default {
     margin-right: 20px;
     flex: 2;
     padding: 15px 10px;
-
-    @include bp-down($xs) {
+    
+    @include bp-down($sm) {
         flex-basis: 100%;
         margin: 0 0 25px;
     }
 }
 .data-readings .project-readings {
     flex: 1;
-    min-width: 220px;
+    min-width: 360px;
 }
 
 .project-container {
