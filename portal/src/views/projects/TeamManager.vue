@@ -13,8 +13,8 @@
             <div class="user-row" v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.email">
                 <div class="cell">
                     <UserPhoto :user="projectUser.user" />
-                    <div class="invite-name">
-                        <div v-if="projectUser.user.name != projectUser.user.email">{{ projectUser.user.name }}</div>
+                    <div>
+                        <div class="name" v-if="projectUser.user.name != projectUser.user.email">{{ projectUser.user.name }}</div>
                         <div class="email">{{ projectUser.user.email }}</div>
                     </div>
                 </div>
@@ -23,7 +23,7 @@
                 <div class="cell">
                     <img
                         alt="Remove user"
-                        src="@/assets/close-icon.png"
+                        src="@/assets/icon-close-bold.svg"
                         class="remove-button"
                         :data-user="projectUser.user.id"
                         v-on:click="removeUser(projectUser)"
@@ -170,20 +170,31 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .manage-team-container {
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
     flex-direction: column;
-    border: 2px solid #d8dce0;
+    border: 1px solid #d8dce0;
+    border-radius: 1px;
     background: white;
-    padding: 20px;
+    padding: 25px 20px;
+
+    @include bp-down($xs) {
+        padding: 15px 10px 40px;
+    }
 }
 
 .manage-team-container .section-heading {
-    font-weight: bold;
-    margin-top: 10px;
+    font-size: 20px;
+    font-weight: 500;
     margin-bottom: 20px;
+
+    @include bp-down($xs) {
+        margin-bottom: 5px;
+    }
 }
 .invite-button {
     width: 80px;
@@ -198,46 +209,114 @@ export default Vue.extend({
 .user-row {
     display: grid;
     font-size: 13px;
-    grid-template-columns: 4fr 1fr 1fr 1fr;
+    grid-template-columns: 3fr 2fr 2fr 0.5fr;
     border-bottom: 1px solid rgb(215, 220, 225);
     padding: 10px 0;
     align-items: center;
+    position: relative;
+
+    &:last-of-type {
+        margin-bottom: 20px;
+
+        .cell {
+            &:nth-of-type(1),
+            &:nth-of-type(2) {
+                @include bp-down($sm) {
+                    padding-right: 85px;
+                }
+            }
+            &:nth-of-type(3) {
+                @include bp-down($sm) {
+                    @include position(absolute, 50% 0 null null);
+                    transform: translateY(-50%);
+                }
+            }
+        }
+    }
+
+    @include bp-down($lg) {
+        grid-template-columns: 2fr 1fr 1fr 0.5fr;
+    }
+
+    @include bp-down($sm) {
+        grid-template-columns: repeat(auto-fit, 100%);
+        padding: 3px 0 8px;
+    }
+
+    .cell {
+        flex-wrap: wrap;
+
+        &:nth-of-type(4) {
+            justify-content: flex-end;
+            padding: 0 20px;
+
+            @include bp-down($sm) {
+                padding: 0;
+                @include position(absolute, 14px 0 null null);
+            }
+        }
+    }
 }
-.cell .invite-status {
+.invite-status {
     color: #0a67aa;
     font-weight: 600;
 }
 .cell-heading {
     font-size: 14px;
     font-weight: bold;
+
+    &:nth-of-type(2) {
+        @include bp-down($sm) {
+            display: none;
+        }
+    }
 }
 .user-row .cell {
-    text-align: left;
+    @include flex(center);
+    line-height: 1.23;
+
+    &:nth-of-type(2),
+    &:nth-of-type(3) {
+
+        @include bp-down($sm) {
+            padding-left: 41px;
+        }
+    }
 }
 .cell .text-input {
     border: none;
     border-radius: 5px;
-    font-size: 15px;
-    padding: 4px 0 4px 8px;
+    font-size: 13px;
+    color: #818181;
+    padding: 4px 0 4px 42px;
+    font-family: Avenir;
 }
 .cell .validation-error {
     color: #c42c44;
     display: block;
+
+    @include bp-down($xs) {
+        padding: 0 0 8px 42px;
+    }
 }
 .cell .remove-button {
-    margin: 12px 0 0 0;
-    float: right;
     cursor: pointer;
 }
-.cell .invite-name {
-    display: inline-block;
-    vertical-align: top;
-    margin-top: 20px;
-}
-.cell.role {
+::v-deep .cell.role {
     margin-right: 1em;
+
+    select {
+        max-width: 150px;
+        font-size: 13px;
+    }
 }
 .users-container .user-icon {
     float: left;
+}
+.name {
+    font-size: 14px;
+}
+.email {
+    color: #818181;
 }
 </style>

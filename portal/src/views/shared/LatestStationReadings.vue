@@ -112,26 +112,37 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .readings-simple {
     display: flex;
+    justify-content: space-between;
     flex-wrap: wrap;
 }
 .readings-simple .reading-container {
     background-color: white;
-    flex: 50%;
+    flex: 0 0 calc(50% - 5px);
     margin-bottom: 10px;
+
+    @include bp-down($xs) {
+        flex-basis: 100%;
+    }
 }
 .reading {
-    background-color: #efefef;
     display: flex;
-    flex-direction: row;
-    padding: 5px;
-    margin: 5px 5px;
+    align-items: center;
+    padding: 0 9px;
+    height: 40px;
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 500;
+    background-color: #f4f5f7;
 }
 .reading .name {
     font-size: 12px;
     line-height: 20px;
+    margin-right: 5px;
 }
 .reading .value {
     margin-left: auto;

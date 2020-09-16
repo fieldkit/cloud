@@ -1,7 +1,7 @@
 <template>
     <div class="follow-panel">
         <span v-if="following" v-on:click="unfollowProject" class="icon">
-            <img src="@/assets/heart.png" class="icon" />
+            <img src="@/assets/heart.svg" class="icon" />
         </span>
         <span v-if="!following" v-on:click="followProject" class="icon">
             <img src="@/assets/heart_gray.png" class="icon" />
@@ -59,16 +59,29 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .follow-panel {
     display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 18px;
     font-weight: 500;
     color: #2c3e50;
-    padding-top: 10px;
+    padding-top: 24px;
+    border-radius: 1px;
+    border-top: solid 1px #d8dce0;
+    margin-top: 10px;
+
+    @include bp-down($xs) {
+        padding-top: 14px;
+    }
 }
 .icon {
     cursor: pointer;
-    margin-right: 0.25em;
+    margin-right: 10px;
+    width: 22px;
+    height: 20px;
 }
 </style>

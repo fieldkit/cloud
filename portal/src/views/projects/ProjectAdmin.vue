@@ -2,7 +2,7 @@
     <div class="project-admin project-container" v-if="project">
         <div class="details">
             <div class="left">
-                <div class="photo">
+                <div class="photo-container">
                     <ProjectPhoto :project="project" />
                 </div>
 
@@ -24,19 +24,27 @@
                     </div>
                     <div class="details-right">
                         <div class="time-container" v-if="project.startTime">
-                            <img alt="Location" src="@/assets/icon-calendar.png" class="icon" />
+                            <div class="details-icon-container">
+                                <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" />
+                            </div>
                             <template>Started: {{ project.startTime | prettyDate }}</template>
                         </div>
                         <div class="duration-container" v-if="displayProject.duration">
-                            <img alt="Location" src="@/assets/icon-time.png" class="icon" />
+                            <div class="details-icon-container">
+                                <img alt="Location" src="@/assets/icon-time.svg" class="icon" />
+                            </div>
                             <template>{{ displayProject.duration | prettyDuration }}</template>
                         </div>
                         <div class="location-container" v-if="project.location">
-                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                            <div class="details-icon-container">
+                                <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                            </div>
                             <template>{{ project.location }}</template>
                         </div>
                         <div class="location-container" v-if="displayProject.places.native">
-                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                            <div class="details-icon-container">
+                                <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                            </div>
                             <template>Native Lands: {{ displayProject.places.native }}</template>
                         </div>
                     </div>
@@ -163,7 +171,9 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .project-admin {
     display: flex;
     flex-direction: column;
@@ -199,35 +209,71 @@ export default {
 .details {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 }
 .details > .left {
     max-width: 400px;
-    min-height: 335px;
     flex: 1;
-    border: 2px solid #d8dce0;
-    border-radius: 2px;
+    border: 1px solid #d8dce0;
+    border-radius: 1px;
     margin-right: 20px;
     background-color: white;
-    padding: 20px;
+    padding: 25px;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+
+    @include bp-down($sm) {
+        max-width: 300px;
+    }
+
+    @include bp-down($xs) {
+        max-width: unset;
+        margin: 0;
+        padding: 15px 10PX;
+    }
 }
-.details .photo {
+.details > .photo {
     display: flex;
     flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.photo-container {
+    margin-bottom: 10px;
+    display: flex;
+
+    img {
+        object-fit: cover;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    @include bp-down($xs) {
+        max-height: 150px;
+    }
 }
 .details .below-photo {
     margin-top: auto;
 }
 .details > .right {
     flex: 2;
-    border: 2px solid #d8dce0;
-    border-radius: 2px;
+    border: 1px solid #d8dce0;
+    border-radius: 1px;
     background-color: white;
-    padding: 20px;
+    padding: 20px 30px;
     display: flex;
     flex-direction: column;
+
+    @include bp-down($sm) {
+        margin-top: 25px;
+        flex-basis: 100%;
+        padding: 20px 20px;
+    }
+
+    @include bp-down($xs) {
+        padding: 14px 10px 20px;
+    }
 }
 .project-stations {
 }
@@ -240,8 +286,13 @@ export default {
     flex-direction: row;
 }
 .details .details-heading .title {
-    font-weight: bold;
-    padding-bottom: 20px;
+    padding-bottom: 30px;
+    font-size: 20px;
+    font-weight: 500;
+
+    @include bp-down($sm) {
+        padding-boottom: 25px;
+    }
 }
 .details .details-heading .link {
     margin-left: auto;
@@ -255,70 +306,140 @@ export default {
 .details .details-top {
     display: flex;
     flex-direction: row;
-    padding-bottom: 20px;
+    flex-wrap: wrap;
+    padding-bottom: 30px;
+    line-height: 1.5;
+
+    @include bp-down($xs) {
+        padding-bottom: 20px;
+    }
 }
 .details .details-left {
     padding-right: 20px;
     flex-grow: 1;
     flex: 2;
+
+    @include bp-down($xs) {
+        flex-basis: 100%;
+        padding: 0;
+        margin-bottom: 15px;
+    }
 }
 .details .details-right {
     flex-grow: 1;
     flex: 1;
-}
-.details .details-right .icon {
-    padding-right: 0.2em;
+
+    > div {
+        margin-bottom: 5px;
+        white-space: nowrap;
+        @include flex(center);
+
+        @include bp-down($xs) {
+            margin-bottom: 2px;
+        }
+    }
 }
 .details .details-bottom {
     border-top: 1px solid #d8dce0;
     padding-top: 20px;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+
+    @include bp-down($xs) {
+        padding-top: 15px;
+    }
 }
 .details-bottom .details-team {
     flex: 1;
+
+    @include bp-down($xs) {
+        flex-basis: 100%;
+        margin-bottom: 15px;
+    }
 }
 .details-bottom .details-modules {
     flex: 1;
 }
 .details-bottom .title {
-    font-weight: bold;
+    font-weight: 500;
+    font-size: 14px;
+}
+.details-icon-container {
+    width: 20px;
 }
 
 .row-section.data-readings {
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
     flex-direction: row;
-}
-.project-data {
-    margin-right: 20px;
+    flex-wrap: wrap;
 }
 .project-data,
 .project-readings {
-    border: 2px solid #d8dce0;
-    border-radius: 2px;
+    border: 1px solid #d8dce0;
+    border-radius: 1px;
     background-color: white;
-    padding: 20px;
+    padding: 20px 25px;
     display: flex;
     flex-direction: column;
+
+    @include bp-down($xs) {
+        padding: 15px 10px 2px;
+    }
 }
-.data-readings .project-data {
+
+.project-data {
+    margin-right: 20px;
     flex: 2;
+    padding: 20px 25px;
+
+    @include bp-down($sm) {
+        flex-basis: 100%;
+        margin: 0 0 25px;
+    }
 }
 .data-readings .project-readings {
     flex: 1;
+    min-width: 360px;
 }
 
 .project-container {
-    margin-top: 20px;
+    margin-top: 18px;
 }
-/deep/ .project-image {
+::v-deep .project-image {
     width: 100%;
     height: auto;
 }
 .module-icon {
     width: 35px;
     height: 35px;
-    margin-right: 10px;
+    margin: 6px 7px 0 0;
+}
+.project-detail {
+    &:nth-of-type(1) {
+        padding-bottom: 6px;
+    }
+}
+
+::v-deep .default-user-icon {
+    margin: 6px 7px 0 0;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+::v-deep .pagination {
+
+    > div {
+        @include flex(center, ceenter);
+    }
+
+    .button {
+        font-size: 13px;
+        border: 0;
+        margin: 0;
+        transform: translateY(2px);
+    }
 }
 </style>

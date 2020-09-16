@@ -1,3 +1,5 @@
+@import "mixins";
+
 .main-panel {
     display: flex;
     flex-direction: column;
@@ -17,5 +19,27 @@
 
     @include bp-down($xs) {
         padding: 0;
+    }
+}
+
+.container-wrap {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 1080px;
+    background-color: #fcfcfc;
+    text-align: left;
+    padding: 40px 90px;
+
+    @include bp-down($lg) {
+        padding: 40px 60px;
+    }
+
+    @include bp-down($md) {
+        padding: 30px 30px;
+    }
+
+    @include bp-down($xs) {
+        padding: 20px 10px;
     }
 }

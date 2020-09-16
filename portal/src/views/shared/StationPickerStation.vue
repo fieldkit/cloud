@@ -54,15 +54,21 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .sps.selected {
     border: 2px solid #1b80c9;
 }
 .sps {
     display: flex;
     min-width: 260px;
-    border: 2px solid #d8dce0;
-    border-radius: 2px;
+    border: 1px solid #d8dce0;
+    border-radius: 1px;
+
+    @include bp-down($xs) {
+        min-width: 220px;
+    }
 }
 .sps .standard {
     text-align: left;
@@ -73,7 +79,7 @@ export default Vue.extend({
 }
 .sps .name {
     color: #2c3e50;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
 }
 .sps .location {

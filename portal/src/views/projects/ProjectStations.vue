@@ -30,9 +30,7 @@
                         </div>
                     </TinyStation>
                 </div>
-                <div class="pagination">
-                    <PaginationControls :page="page" :totalPages="totalPages" @new-page="onNewPage" />
-                </div>
+                <PaginationControls :page="page" :totalPages="totalPages" @new-page="onNewPage" />
             </div>
             <div class="toggle-icon-container" v-on:click="toggleStationsPanel">
                 <img v-if="showStationsPanel" alt="Collapse List" src="@/assets/tab-collapse.png" class="toggle-icon" />
@@ -178,7 +176,10 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .toggle-icon-container {
     float: right;
     margin: 16px -38px 0 0;
@@ -191,14 +192,15 @@ export default Vue.extend({
 }
 .section-heading {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 500;
     padding-top: 1em;
     padding-bottom: 1em;
     padding-left: 1em;
-    border-bottom: 1px solid lightgray;
+    border-bottom: 1px solid #d8dce0;
 }
 .stations-heading {
     display: flex;
+    align-items: center;
     flex-direction: row;
 }
 .section-body {
@@ -231,8 +233,9 @@ export default Vue.extend({
     color: #6a6d71;
 }
 .stations-container {
-    margin: 22px 0 0 0;
-    border: 2px solid #d8dce0;
+    margin: 25px 0 0 0;
+    border-radius: 1px;
+    border: solid 1px #d8dce0;
     background-color: #ffffff;
 }
 .stations-panel {
@@ -242,9 +245,11 @@ export default Vue.extend({
     flex-direction: column;
 }
 .stations-panel .stations {
-    padding-top: 1em;
-    padding-left: 1em;
-    padding-right: 1em;
+    padding: 20px 25px 0;
+
+    @include bp-down($xs) {
+        padding: 20px 10px;
+    }
 }
 .stations-panel .stations > * {
     margin-bottom: 1em;
@@ -298,7 +303,7 @@ export default Vue.extend({
     padding-bottom: 1em;
 }
 
-/deep/ .station-hover-summary {
+::v-deep .station-hover-summary {
     width: 359px;
     top: 30px;
     left: 122px;

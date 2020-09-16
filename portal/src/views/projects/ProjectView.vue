@@ -1,34 +1,37 @@
 <template>
     <StandardLayout :viewingProjects="true" :viewingProject="displayProject" :disableScrolling="activityVisible">
-        <div class="project-view" v-if="displayProject">
-            <DoubleHeader
-                :title="displayProject.name"
-                subtitle="Project Dashbord"
-                backTitle="Back to Dashboard"
-                backRoute="projects"
-                v-if="displayProject"
-            >
-                <div class="activity-button" v-on:click="onActivityToggle">
-                    Activity
-                </div>
-            </DoubleHeader>
+        <div class="container-wrap">
+            <div class="project-view" v-if="displayProject">
+                <DoubleHeader
+                        :title="displayProject.name"
+                        subtitle="Project Dashbord"
+                        backTitle="Back to Dashboard"
+                        backRoute="projects"
+                        v-if="displayProject"
+                >
+                    <div class="activity-button" v-on:click="onActivityToggle">
+                        <img alt="Notifification" src="@/assets/icon-notification.svg" class="icon" />
+                        Activity
+                    </div>
+                </DoubleHeader>
 
-            <div v-bind:key="id">
-                <ProjectActivity
-                    v-if="activityVisible"
-                    :user="user"
-                    :displayProject="displayProject"
-                    containerClass="project-activity-floating"
-                    @close="closeActivity"
-                />
-                <div class="">
-                    <ProjectAdmin v-if="isAdministrator" :user="user" :displayProject="displayProject" :userStations="stations" />
-                    <ProjectPublic
-                        v-if="!isAdministrator && displayProject"
-                        :user="user"
-                        :displayProject="displayProject"
-                        :userStations="stations"
+                <div v-bind:key="id">
+                    <ProjectActivity
+                            v-if="activityVisible"
+                            :user="user"
+                            :displayProject="displayProject"
+                            containerClass="project-activity-floating"
+                            @close="closeActivity"
                     />
+                    <div class="">
+                        <ProjectAdmin v-if="isAdministrator" :user="user" :displayProject="displayProject" :userStations="stations" />
+                        <ProjectPublic
+                                v-if="!isAdministrator && displayProject"
+                                :user="user"
+                                :displayProject="displayProject"
+                                :userStations="stations"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -126,15 +129,9 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
-.project-view {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background-color: #fcfcfc;
-    padding: 40px;
-    text-align: left;
-}
+<style scoped lang="scss">
+@import '../../scss/layout';
+
 .small-arrow {
     font-size: 11px;
     float: left;
@@ -172,11 +169,17 @@ export default Vue.extend({
     float: left;
 }
 .activity-button {
+    border-radius: 3px;
+    border: solid 1px #cccdcf;
     background-color: #ffffff;
-    border: 1px solid rgb(215, 220, 225);
-    border-radius: 4px;
     cursor: pointer;
-    padding: 0.5em;
+    font-weight: 600;
+    padding: 10px 22px;
+    @include flex(center, center);
+
+    img {
+        margin-right: 14px;
+    }
 }
 .project-activity-floating {
     position: absolute;

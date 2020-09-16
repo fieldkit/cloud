@@ -60,6 +60,7 @@ export default Vue.extend({
 
 <style scoped>
 .note-editor {
+
 }
 
 .title {

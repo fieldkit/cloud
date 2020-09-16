@@ -45,16 +45,22 @@ export default Vue.extend({
 });
 </script>
 
-<style>
-.double-header {
-    text-align: left;
-}
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .double-header {
     display: flex;
+    text-align: left;
+    flex-wrap: wrap;
 }
 .double-header .actions {
     margin-left: auto;
     margin-top: auto;
+
+    @include bp-down($xs) {
+        flex-basis: 100%;
+        margin: 15px 0;
+    }
 }
 .double-header > div {
 }
@@ -69,7 +75,7 @@ export default Vue.extend({
     font-weight: 900;
     font-size: 24px;
     color: #2c3e50;
-    margin-bottom: 10px;
+    margin-bottom: 1px;
 }
 .two {
     font-weight: 500;

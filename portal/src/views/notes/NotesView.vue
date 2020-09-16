@@ -1,6 +1,6 @@
 <template>
     <StandardLayout>
-        <div class="notes-view">
+        <div class="container-wrap notes-view">
             <DoubleHeader :title="project.name" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="project" />
             <DoubleHeader title="My Stations" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="!project" />
 
@@ -9,16 +9,80 @@
                     There are no stations to view.
                 </div>
                 <template v-else>
+                    <div class="station-tabs">
+                        <div class="tab"
+                            v-for="station in stations"
+                            v-bind:key="station.id"
+                            v-on:click="(ev) => onSelected(ev, station)">
+
+                            <div class="name">
+                                {{ station.name }}
+                            </div>
+                            <div v-if="station.deployedAt" class="deployed">Deployed</div>
+                            <div v-else class="undeployed">Not Deployed</div>
+                            <div class="tab-content" v-if="selectedStation && selectedNotes">
+                                <div class="notifications">
+                                    <div v-if="failed" class="notification failed">
+                                        Oops, there was a problem.
+                                    </div>
+
+                                    <div v-if="success" class="notification success">
+                                        Saved.
+                                    </div>
+                                </div>
+                                <NotesViewer
+                                        :station="selectedStation"
+                                        :notes="selectedNotes"
+                                        v-bind:key="stationId"
+                                        v-if="project.project.readOnly"
+                                />
+                                <NotesForm
+                                        v-else
+                                        :station="selectedStation"
+                                        :notes="selectedNotes"
+                                        @save="saveForm"
+                                        v-bind:key="stationId"
+                                        @change="onChange"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div class="main" v-if="selectedStation && selectedNotes">
+                        <div class="notifications">
+                            <div v-if="failed" class="notification failed">
+                                Oops, there was a problem.
+                            </div>
+
+                            <div v-if="success" class="notification success">
+                                Saved.
+                            </div>
+                        </div>
+                        <NotesViewer
+                                :station="selectedStation"
+                                :notes="selectedNotes"
+                                v-bind:key="stationId"
+                                v-if="project.project.readOnly"
+                        />
+                        <NotesForm
+                                v-else
+                                :station="selectedStation"
+                                :notes="selectedNotes"
+                                @save="saveForm"
+                                v-bind:key="stationId"
+                                @change="onChange"
+                        />
+                    </div>
+
                     <div class="side">
                         <StationTabs :stations="visibleStations" :selected="selectedStation" @selected="onSelected" />
-                    </div>
+                    </div>-->
                     <template v-if="loading">
                         <div class="main">
                             <Spinner />
                         </div>
                     </template>
                     <template v-else>
-                        <div class="main" v-if="selectedStation && selectedNotes">
+                       <!--&lt;!&ndash; <div class="main" v-if="selectedStation && selectedNotes">
                             <div class="notifications">
                                 <div v-if="failed" class="notification failed">
                                     Oops, there was a problem.
@@ -45,7 +109,7 @@
                         </div>
                         <div v-else class="main empty">
                             Please choose a station from the left.
-                        </div>
+                        </div>-->
                     </template>
                 </template>
             </div>
@@ -78,7 +142,7 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
         StandardLayout,
-        StationTabs,
+     //   StationTabs,
         NotesForm,
         NotesViewer,
     },
@@ -89,6 +153,10 @@ export default Vue.extend({
         },
         stationId: {
             type: Number,
+            required: false,
+        },
+        selected: {
+            type: Object,
             required: false,
         },
     },
@@ -181,6 +249,7 @@ export default Vue.extend({
             });
         },
         onSelected(this: any, station) {
+            console.log("on selected", this, station);
             if (this.stationId != station.id) {
                 return this.$router.push({
                     name: this.projectId ? "viewProjectStationNotes" : "viewStationNotes",
@@ -233,26 +302,22 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/layout';
+
 .notes-view {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background-color: #fcfcfc;
-    text-align: left;
-    padding: 40px;
+    @include bp-down($md) {
+        max-width: 600px;
+    }
 }
-.notes-view .header {
-    margin-top: 40px;
-    display: flex;
-    flex-direction: column;
-}
+
 .notes-view .lower {
     display: flex;
     flex-direction: row;
     border: 1px solid #d8dce0;
     background: white;
     margin-top: 20px;
+    position: relative;
 }
 .notes-view .lower .side {
     flex-basis: 16rem;
@@ -280,12 +345,105 @@ export default Vue.extend({
     background-color: #f8d7da;
 }
 .notifications {
-    padding: 10px;
+    padding: 0 10px;
 }
 
 .spinner {
     margin-top: 40px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.station-tabs {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex-basis: 250px;
+    flex-shrink: 0;
+
+    @include bp-down($md) {
+        flex-basis: 100%;
+    }
+}
+.tab {
+    padding: 16px 13px;
+    border-right: 1px solid #d8dce0;
+    border-bottom: 1px solid #d8dce0;
+    border-left: 4px solid white;
+    cursor: pointer;
+
+    @include bp-down($md) {
+        padding: 16px 10px;
+        border-right: 0;
+        transition: max-height 0.33s;
+        position: relative;
+
+        &:after {
+            background: url('../../assets/icon-chevron-right.svg') no-repeat center center;
+            transform: rotate(90deg) translateX(-50%);
+            content: '';
+            width: 20px;
+            height: 20px;
+            @include position(absolute, 50% 20px null null);
+        }
+    }
+
+    &.selected {
+        border-right: none;
+    }
+
+    &-content {
+        @include position(absolute, 0 null null 250px);
+        width: calc(100% - 250px);
+
+        @include bp-down($md) {
+            padding-top: 1px;
+            position: unset;
+            width: 100%;
+            max-height: 0;
+            overflow: hidden;
+
+            @at-root .tab.active & {
+                max-height: 1000px;
+            }
+        }
+    }
+}
+
+.vertical {
+    margin-top: auto;
+    border-right: 1px solid #d8dce0;
+    height: 100%;
+}
+.name {
+    font-size: 16px;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 1px;
+    font-weight: 500;
+}
+.undeployed {
+
+    @include bp-down($md) {
+        padding: 0 10px 0 14px;
+        width: calc(100% + 24px);
+        box-sizing: border-box;
+        margin-left: -14px;
+
+        @at-root .tab.active & {
+            border-bottom: solid 1px #d8dce0;
+            padding-bottom: 14px;
+        }
+    }
+}
+.undeployed,
+.deployed {
+    font-size: 13px;
+    color: #6a6d71;
+    font-weight: 500;
+}
+.selected {
+    border-left: 4px solid #1b80c9;
 }
 </style>
