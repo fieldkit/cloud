@@ -10,6 +10,7 @@
                         v-if="displayProject"
                 >
                     <div class="activity-button" v-on:click="onActivityToggle">
+                        <img alt="Notifification" src="@/assets/icon-notification.svg" class="icon" />
                         Activity
                     </div>
                 </DoubleHeader>
@@ -174,6 +175,11 @@ export default Vue.extend({
     cursor: pointer;
     font-weight: 600;
     padding: 10px 22px;
+    @include flex(center, center);
+
+    img {
+        margin-right: 14px;
+    }
 }
 .project-activity-floating {
     position: absolute;

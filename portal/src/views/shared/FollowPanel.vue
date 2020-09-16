@@ -59,7 +59,9 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .follow-panel {
     display: flex;
     justify-content: center;
@@ -71,6 +73,10 @@ export default Vue.extend({
     border-radius: 1px;
     border-top: solid 1px #d8dce0;
     margin-top: 10px;
+
+    @include bp-down($xs) {
+        padding-top: 14px;
+    }
 }
 .icon {
     cursor: pointer;

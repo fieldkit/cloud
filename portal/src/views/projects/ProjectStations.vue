@@ -176,7 +176,10 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .toggle-icon-container {
     float: right;
     margin: 16px -38px 0 0;
@@ -230,7 +233,7 @@ export default Vue.extend({
     color: #6a6d71;
 }
 .stations-container {
-    margin: 22px 0 0 0;
+    margin: 25px 0 0 0;
     border-radius: 1px;
     border: solid 1px #d8dce0;
     background-color: #ffffff;
@@ -243,6 +246,10 @@ export default Vue.extend({
 }
 .stations-panel .stations {
     padding: 20px 25px 0;
+
+    @include bp-down($xs) {
+        padding: 20px 10px;
+    }
 }
 .stations-panel .stations > * {
     margin-bottom: 1em;
@@ -296,7 +303,7 @@ export default Vue.extend({
     padding-bottom: 1em;
 }
 
-/deep/ .station-hover-summary {
+::v-deep .station-hover-summary {
     width: 359px;
     top: 30px;
     left: 122px;

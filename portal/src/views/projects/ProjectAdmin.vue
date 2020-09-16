@@ -2,7 +2,7 @@
     <div class="project-admin project-container" v-if="project">
         <div class="details">
             <div class="left">
-                <div class="photo">
+                <div class="photo-container">
                     <ProjectPhoto :project="project" />
                 </div>
 
@@ -209,10 +209,10 @@ export default {
 .details {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 }
 .details > .left {
     max-width: 400px;
-    min-height: 335px;
     flex: 1;
     border: 1px solid #d8dce0;
     border-radius: 1px;
@@ -222,10 +222,36 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+
+    @include bp-down($sm) {
+        max-width: 300px;
+    }
+
+    @include bp-down($xs) {
+        max-width: unset;
+        margin: 0;
+        padding: 15px 10PX;
+    }
 }
-.details .photo {
+.details > .photo {
     display: flex;
     flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.photo-container {
+    margin-bottom: 10px;
+    display: flex;
+
+    img {
+        object-fit: cover;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    @include bp-down($xs) {
+        max-height: 150px;
+    }
 }
 .details .below-photo {
     margin-top: auto;
@@ -238,6 +264,16 @@ export default {
     padding: 20px 30px;
     display: flex;
     flex-direction: column;
+
+    @include bp-down($sm) {
+        margin-top: 25px;
+        flex-basis: 100%;
+        padding: 20px 20px;
+    }
+
+    @include bp-down($xs) {
+        padding: 14px 10px 20px;
+    }
 }
 .project-stations {
 }
@@ -253,6 +289,10 @@ export default {
     padding-bottom: 30px;
     font-size: 20px;
     font-weight: 500;
+
+    @include bp-down($sm) {
+        padding-boottom: 25px;
+    }
 }
 .details .details-heading .link {
     margin-left: auto;
@@ -266,13 +306,24 @@ export default {
 .details .details-top {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     padding-bottom: 30px;
     line-height: 1.5;
+
+    @include bp-down($xs) {
+        padding-bottom: 20px;
+    }
 }
 .details .details-left {
     padding-right: 20px;
     flex-grow: 1;
     flex: 2;
+
+    @include bp-down($xs) {
+        flex-basis: 100%;
+        padding: 0;
+        margin-bottom: 15px;
+    }
 }
 .details .details-right {
     flex-grow: 1;
@@ -280,7 +331,12 @@ export default {
 
     > div {
         margin-bottom: 5px;
+        white-space: nowrap;
         @include flex(center);
+
+        @include bp-down($xs) {
+            margin-bottom: 2px;
+        }
     }
 }
 .details .details-bottom {
@@ -288,9 +344,19 @@ export default {
     padding-top: 20px;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+
+    @include bp-down($xs) {
+        padding-top: 15px;
+    }
 }
 .details-bottom .details-team {
     flex: 1;
+
+    @include bp-down($xs) {
+        flex-basis: 100%;
+        margin-bottom: 15px;
+    }
 }
 .details-bottom .details-modules {
     flex: 1;
@@ -304,12 +370,10 @@ export default {
 }
 
 .row-section.data-readings {
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
     flex-direction: row;
-}
-.project-data {
-    margin-right: 20px;
+    flex-wrap: wrap;
 }
 .project-data,
 .project-readings {
@@ -319,12 +383,25 @@ export default {
     padding: 20px;
     display: flex;
     flex-direction: column;
+
+    @include bp-down($xs) {
+        padding: 15px 10px 2px;
+    }
 }
-.data-readings .project-data {
+
+.project-data {
+    margin-right: 20px;
     flex: 2;
+    padding: 15px 10px;
+
+    @include bp-down($xs) {
+        flex-basis: 100%;
+        margin: 0 0 25px;
+    }
 }
 .data-readings .project-readings {
     flex: 1;
+    min-width: 220px;
 }
 
 .project-container {

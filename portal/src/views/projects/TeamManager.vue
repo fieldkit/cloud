@@ -174,19 +174,27 @@ export default Vue.extend({
 @import '../../scss/mixins';
 
 .manage-team-container {
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
     flex-direction: column;
     border: 1px solid #d8dce0;
     border-radius: 1px;
     background: white;
     padding: 25px 20px;
+
+    @include bp-down($xs) {
+        padding: 15px 10px 40px;
+    }
 }
 
 .manage-team-container .section-heading {
     font-size: 20px;
     font-weight: 500;
     margin-bottom: 20px;
+
+    @include bp-down($xs) {
+        margin-bottom: 5px;
+    }
 }
 .invite-button {
     width: 80px;
@@ -201,33 +209,79 @@ export default Vue.extend({
 .user-row {
     display: grid;
     font-size: 13px;
-    grid-template-columns: 2fr 2fr 2fr 1fr;
+    grid-template-columns: 3fr 2fr 2fr 0.5fr;
     border-bottom: 1px solid rgb(215, 220, 225);
     padding: 10px 0;
     align-items: center;
+    position: relative;
 
     &:last-of-type {
         margin-bottom: 20px;
+
+        .cell {
+            &:nth-of-type(1),
+            &:nth-of-type(2) {
+                @include bp-down($sm) {
+                    padding-right: 85px;
+                }
+            }
+            &:nth-of-type(3) {
+                @include bp-down($sm) {
+                    @include position(absolute, 50% 0 null null);
+                    transform: translateY(-50%);
+                }
+            }
+        }
+    }
+
+    @include bp-down($lg) {
+        grid-template-columns: 2fr 1fr 1fr 0.5fr;
+    }
+
+    @include bp-down($sm) {
+        grid-template-columns: repeat(auto-fit, 100%);
+        padding: 3px 0 8px;
     }
 
     .cell {
-        &:nth-of-type(4n) {
+        flex-wrap: wrap;
+
+        &:nth-of-type(4) {
             justify-content: flex-end;
             padding: 0 20px;
+
+            @include bp-down($sm) {
+                padding: 0;
+                @include position(absolute, 14px 0 null null);
+            }
         }
     }
 }
-.cell .invite-status {
+.invite-status {
     color: #0a67aa;
     font-weight: 600;
 }
 .cell-heading {
     font-size: 14px;
     font-weight: bold;
+
+    &:nth-of-type(2) {
+        @include bp-down($sm) {
+            display: none;
+        }
+    }
 }
 .user-row .cell {
     @include flex(center);
     line-height: 1.23;
+
+    &:nth-of-type(2),
+    &:nth-of-type(3) {
+
+        @include bp-down($sm) {
+            padding-left: 41px;
+        }
+    }
 }
 .cell .text-input {
     border: none;
@@ -240,6 +294,10 @@ export default Vue.extend({
 .cell .validation-error {
     color: #c42c44;
     display: block;
+
+    @include bp-down($xs) {
+        padding: 0 0 8px 42px;
+    }
 }
 .cell .remove-button {
     cursor: pointer;
@@ -247,8 +305,9 @@ export default Vue.extend({
 ::v-deep .cell.role {
     margin-right: 1em;
 
-    .select {
-        max-width: 100px;
+    select {
+        max-width: 150px;
+        font-size: 13px;
     }
 }
 .users-container .user-icon {
