@@ -69,7 +69,7 @@ export default Vue.extend({
     font-weight: 900;
     font-size: 24px;
     color: #2c3e50;
-    margin-bottom: 10px;
+    margin-bottom: 1px;
 }
 .two {
     font-weight: 500;

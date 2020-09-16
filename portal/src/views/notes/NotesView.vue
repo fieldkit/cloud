@@ -305,6 +305,12 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import '../../scss/layout';
 
+.notes-view {
+    @include bp-down($md) {
+        max-width: 600px;
+    }
+}
+
 .notes-view .lower {
     display: flex;
     flex-direction: row;

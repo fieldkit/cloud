@@ -168,11 +168,11 @@ export default Vue.extend({
     float: left;
 }
 .activity-button {
+    border-radius: 3px;
+    border: solid 1px #cccdcf;
     background-color: #ffffff;
-    border: 1px solid rgb(215, 220, 225);
-    border-radius: 4px;
     cursor: pointer;
-    padding: 0.5em;
+    padding: 10px 22px;
 }
 .project-activity-floating {
     position: absolute;

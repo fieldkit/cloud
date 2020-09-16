@@ -37,7 +37,6 @@
 
     @include bp-down($md) {
         padding: 30px 30px;
-        max-width: 600px;
     }
 
     @include bp-down($xs) {

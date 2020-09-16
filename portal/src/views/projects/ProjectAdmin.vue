@@ -24,19 +24,27 @@
                     </div>
                     <div class="details-right">
                         <div class="time-container" v-if="project.startTime">
-                            <img alt="Location" src="@/assets/icon-calendar.png" class="icon" />
+                            <div class="details-icon-container">
+                                <img alt="Location" src="@/assets/icon-calendar.png" class="icon" />
+                            </div>
                             <template>Started: {{ project.startTime | prettyDate }}</template>
                         </div>
                         <div class="duration-container" v-if="displayProject.duration">
-                            <img alt="Location" src="@/assets/icon-time.png" class="icon" />
+                            <div class="details-icon-container">
+                                <img alt="Location" src="@/assets/icon-time.png" class="icon" />
+                            </div>
                             <template>{{ displayProject.duration | prettyDuration }}</template>
                         </div>
                         <div class="location-container" v-if="project.location">
-                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                            <div class="details-icon-container">
+                                <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                            </div>
                             <template>{{ project.location }}</template>
                         </div>
                         <div class="location-container" v-if="displayProject.places.native">
-                            <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                            <div class="details-icon-container">
+                                <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                            </div>
                             <template>Native Lands: {{ displayProject.places.native }}</template>
                         </div>
                     </div>
@@ -163,7 +171,9 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/mixins';
+
 .project-admin {
     display: flex;
     flex-direction: column;
@@ -225,7 +235,7 @@ export default {
     border: 2px solid #d8dce0;
     border-radius: 2px;
     background-color: white;
-    padding: 20px;
+    padding: 20px 30px;
     display: flex;
     flex-direction: column;
 }
@@ -240,8 +250,9 @@ export default {
     flex-direction: row;
 }
 .details .details-heading .title {
-    font-weight: bold;
-    padding-bottom: 20px;
+    padding-bottom: 30px;
+    font-size: 20px;
+    font-weight: 500;
 }
 .details .details-heading .link {
     margin-left: auto;
@@ -256,6 +267,7 @@ export default {
     display: flex;
     flex-direction: row;
     padding-bottom: 20px;
+    line-height: 1.5;
 }
 .details .details-left {
     padding-right: 20px;
@@ -265,9 +277,11 @@ export default {
 .details .details-right {
     flex-grow: 1;
     flex: 1;
-}
-.details .details-right .icon {
-    padding-right: 0.2em;
+
+    > div {
+        margin-bottom: 5px;
+        @include flex(center);
+    }
 }
 .details .details-bottom {
     border-top: 1px solid #d8dce0;
@@ -282,7 +296,11 @@ export default {
     flex: 1;
 }
 .details-bottom .title {
-    font-weight: bold;
+    font-weight: 500;
+    font-size: 14px;
+}
+.details-icon-container {
+    width: 20px;
 }
 
 .row-section.data-readings {
@@ -310,15 +328,27 @@ export default {
 }
 
 .project-container {
-    margin-top: 20px;
+    margin-top: 18px;
 }
-/deep/ .project-image {
+::v-deep .project-image {
     width: 100%;
     height: auto;
 }
 .module-icon {
     width: 35px;
     height: 35px;
-    margin-right: 10px;
+    margin: 6px 7px 0 0;
+}
+.project-detail {
+    &:nth-of-type(1) {
+        padding-bottom: 6px;
+    }
+}
+
+::v-deep .default-user-icon {
+    margin: 6px 7px 0 0;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
 }
 </style>
