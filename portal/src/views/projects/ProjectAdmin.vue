@@ -25,25 +25,25 @@
                     <div class="details-right">
                         <div class="time-container" v-if="project.startTime">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-calendar.png" class="icon" />
+                                <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" />
                             </div>
                             <template>Started: {{ project.startTime | prettyDate }}</template>
                         </div>
                         <div class="duration-container" v-if="displayProject.duration">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-time.png" class="icon" />
+                                <img alt="Location" src="@/assets/icon-time.svg" class="icon" />
                             </div>
                             <template>{{ displayProject.duration | prettyDuration }}</template>
                         </div>
                         <div class="location-container" v-if="project.location">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                                <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
                             </div>
                             <template>{{ project.location }}</template>
                         </div>
                         <div class="location-container" v-if="displayProject.places.native">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                                <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
                             </div>
                             <template>Native Lands: {{ displayProject.places.native }}</template>
                         </div>
@@ -350,5 +350,19 @@ export default {
     width: 35px;
     height: 35px;
     border-radius: 50%;
+}
+
+::v-deep .pagination {
+
+    > div {
+        @include flex(center, ceenter);
+    }
+
+    .button {
+        font-size: 13px;
+        border: 0;
+        margin: 0;
+        transform: translateY(2px);
+    }
 }
 </style>

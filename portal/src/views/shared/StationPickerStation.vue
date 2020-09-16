@@ -73,7 +73,7 @@ export default Vue.extend({
 }
 .sps .name {
     color: #2c3e50;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
 }
 .sps .location {

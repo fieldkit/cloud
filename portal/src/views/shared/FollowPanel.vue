@@ -1,7 +1,7 @@
 <template>
     <div class="follow-panel">
         <span v-if="following" v-on:click="unfollowProject" class="icon">
-            <img src="@/assets/heart.png" class="icon" />
+            <img src="@/assets/heart.svg" class="icon" />
         </span>
         <span v-if="!following" v-on:click="followProject" class="icon">
             <img src="@/assets/heart_gray.png" class="icon" />

@@ -30,9 +30,7 @@
                         </div>
                     </TinyStation>
                 </div>
-                <div class="pagination">
-                    <PaginationControls :page="page" :totalPages="totalPages" @new-page="onNewPage" />
-                </div>
+                <PaginationControls :page="page" :totalPages="totalPages" @new-page="onNewPage" />
             </div>
             <div class="toggle-icon-container" v-on:click="toggleStationsPanel">
                 <img v-if="showStationsPanel" alt="Collapse List" src="@/assets/tab-collapse.png" class="toggle-icon" />
@@ -244,9 +242,7 @@ export default Vue.extend({
     flex-direction: column;
 }
 .stations-panel .stations {
-    padding-top: 1em;
-    padding-left: 1em;
-    padding-right: 1em;
+    padding: 20px 25px 0;
 }
 .stations-panel .stations > * {
     margin-bottom: 1em;
