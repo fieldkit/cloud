@@ -1,6 +1,6 @@
 <template>
     <StandardLayout>
-        <div class="notes-view">
+        <div class="container-wrap notes-view">
             <DoubleHeader :title="project.name" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="project" />
             <DoubleHeader title="My Stations" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="!project" />
 
@@ -14,7 +14,7 @@
                             v-for="station in stations"
                             v-bind:key="station.id"
                             v-on:click="(ev) => onSelected(ev, station)">
-                            
+
                             <div class="name">
                                 {{ station.name }}
                             </div>
@@ -303,30 +303,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
-
-.notes-view {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    max-width: 1080px;
-    background-color: #fcfcfc;
-    text-align: left;
-    padding: 40px 90px;
-
-    @include bp-down($lg) {
-        padding: 40px 60px;
-    }
-
-    @include bp-down($md) {
-        padding: 30px 30px;
-        max-width: 600px;
-    }
-
-    @include bp-down($xs) {
-        padding: 20px 10px;
-    }
-}
+@import '../../scss/layout';
 
 .notes-view .lower {
     display: flex;
