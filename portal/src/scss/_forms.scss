@@ -87,6 +87,10 @@
         border-radius: 3px;
         letter-spacing: 0.1px;
         font-family: Avenir, Helvetica, Arial, sans-serif;
+
+        @include bp-down($xs) {
+            max-width: unset;
+        }
     }
 
     &-link {
@@ -121,12 +125,6 @@
         color: #c42c44;
         font-size: 14px;
         text-align: left;
-    }
-
-    .reset-instructions {
-        font-size: 16px;
-        text-align: center;
-        margin: 15px 0 54px 0;
     }
 
     .login-failed {
