@@ -380,7 +380,7 @@ export default {
     border: 1px solid #d8dce0;
     border-radius: 1px;
     background-color: white;
-    padding: 20px;
+    padding: 20px 25px;
     display: flex;
     flex-direction: column;
 
@@ -392,8 +392,8 @@ export default {
 .project-data {
     margin-right: 20px;
     flex: 2;
-    padding: 15px 10px;
-    
+    padding: 20px 25px;
+
     @include bp-down($sm) {
         flex-basis: 100%;
         margin: 0 0 25px;
