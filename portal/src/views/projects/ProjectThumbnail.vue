@@ -25,7 +25,7 @@
         </div>
         <div class="social-container" v-else>
             <div class="social follows" v-if="project.following">
-                <img alt="Follows" src="@/assets/heart.png" class="follow-icon" />
+                <img alt="Follows" src="@/assets/heart.svg" width="17px" />
                 <span>{{ project.following.total }}</span>
             </div>
             <!--<div class="social notifications" v-if="!project.notifications">

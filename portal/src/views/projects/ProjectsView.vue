@@ -6,7 +6,7 @@
                     <h1 v-if="isAuthenticated">My Projects</h1>
                     <h1 v-if="!isAuthenticated">Projects</h1>
                     <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
-                        <img alt="Add project" src="@/assets/add.png" />
+                        <img alt="Add project" src="@/assets/icon-plus-round.svg" />
                         Add Project
                     </div>
                 </div>
@@ -147,7 +147,7 @@ export default {
     @include flex(center);
 
     img {
-        margin-right: 5px;
+        margin-right: 7px;
     }
 }
 #add-project img {

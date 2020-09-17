@@ -4,7 +4,7 @@
         <div class="section-heading stations-heading">
             FieldKit Stations
             <div class="add-station" v-on:click="showStationPicker" v-if="admin">
-                <img src="@/assets/add.png" class="add-station-btn" />
+                <img src="@/assets/icon-plus-round.svg" class="add-station-btn" />
                 Add Station
             </div>
         </div>
@@ -33,8 +33,8 @@
                 <PaginationControls :page="page" :totalPages="totalPages" @new-page="onNewPage" />
             </div>
             <div class="toggle-icon-container" v-on:click="toggleStationsPanel">
-                <img v-if="showStationsPanel" alt="Collapse List" src="@/assets/tab-collapse.png" class="toggle-icon" />
-                <img v-if="!showStationsPanel" alt="Expand List" src="@/assets/tab-expand.png" class="toggle-icon" />
+                <img v-if="showStationsPanel" alt="Collapse List" src="@/assets/icon-tab-collapse.svg" class="toggle-expand" />
+                <img v-if="!showStationsPanel" alt="Expand List" src="@/assets/icon-tab-expand.svg" class="toggle-icon" />
             </div>
             <div class="project-stations-map-container">
                 <StationsMap @show-summary="showSummary" :mapped="mappedProject" :layoutChanges="layoutChanges" />
@@ -187,6 +187,9 @@ export default Vue.extend({
     z-index: 2;
     cursor: pointer;
 }
+.toggle-expand {
+    transform: translateX(-4px);
+}
 .section {
     float: left;
 }
@@ -222,10 +225,12 @@ export default Vue.extend({
     font-size: 14px;
     margin-right: 1em;
     cursor: pointer;
+    display: flex;
 }
 .add-station-btn {
     width: 18px;
     vertical-align: text-top;
+    margin-right: 7px;
 }
 .last-seen {
     font-size: 12px;
