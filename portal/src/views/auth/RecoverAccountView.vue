@@ -10,7 +10,7 @@
                 <div class="form-group">
                     <TextField v-model="form.email" label="Email" keyboardType="email" />
 
-                    <div class="validation-errors" v-if="$v.form.email.$error">
+                    <div class="form-errors" v-if="$v.form.email.$error">
                         <div v-if="!$v.form.email.required">Email is a required field.</div>
                         <div v-if="!$v.form.email.email">Must be a valid email address.</div>
                     </div>
@@ -23,13 +23,13 @@
                 </div>
             </form>
         </div>
-        <div v-if="attempted">
+        <div v-if="attempted" class="form">
             <div v-if="!resending">
                 <img alt="Success" src="@/assets/Icon_Success.png" width="57px" />
                 <h1 class="form-title">Password Reset Email Sent</h1>
                 <div class="form-subtitle">Check your inbox for the email with a link to reset your password.</div>
                 <button class="form-submit" v-on:click="resend">Resend Email</button>
-                <router-link :to="{ name: 'login' }" class="create-link">
+                <router-link :to="{ name: 'login' }" class="form-link">
                     Back to Log In
                 </router-link>
             </div>
