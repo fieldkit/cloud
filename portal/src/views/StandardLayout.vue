@@ -14,7 +14,7 @@
 
             <div class="container-main">
                 <div class="container-header">
-                    <HeaderBar @toggled="onSidebarToggle" />
+                    <HeaderBar @toggled="onSidebarToggle" :isMenuNarrow="sidebar.narrow" />
                 </div>
 
                 <slot></slot>
@@ -81,6 +81,18 @@ export default Vue.extend({
     },
     beforeMount() {
         console.log("StandardLayout: beforeMount");
+    },
+    mounted() {
+        const desktopBreakpoint = 1040;
+
+        const resizeObserver = new ResizeObserver(entries => {
+            if (entries[0].contentRect.width < desktopBreakpoint) {
+                if (!this.sidebar.narrow) {
+                    this.onSidebarToggle();
+                }
+            }
+        });
+        resizeObserver.observe(document.querySelector('body'));
     },
     methods: {
         onSidebarToggle(...args) {
