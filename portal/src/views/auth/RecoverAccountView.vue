@@ -23,9 +23,9 @@
                 </div>
             </form>
         </div>
-        <div v-if="attempted" class="form">
+        <div v-if="attempted" class="form success">
             <div v-if="!resending">
-                <img alt="Success" src="@/assets/Icon_Success.png" width="57px" />
+                <img alt="Success" src="@/assets/Icon_Success.png" width="57px" class="form-header-icon" />
                 <h1 class="form-title">Password Reset Email Sent</h1>
                 <div class="form-subtitle">Check your inbox for the email with a link to reset your password.</div>
                 <button class="form-submit" v-on:click="resend">Resend Email</button>
@@ -34,7 +34,7 @@
                 </router-link>
             </div>
             <div v-if="resending">
-                <img alt="Resending" src="@/assets/Icon_Syncing2.png" width="57px" />
+                <img alt="Resending" src="@/assets/Icon_Syncing2.png" width="57px" class="form-header-icon" />
                 <p>Resending</p>
             </div>
         </div>
@@ -99,10 +99,20 @@ export default Vue.extend({
 }
 
 .form-submit {
-    margin-top: 70px;
+    margin-top: 80px;
 }
 
 .form-group {
     margin-top: 50px;
+}
+
+.form.success {
+    .form-submit {
+        margin-top: 50px;
+    }
+}
+
+.form:not(.success) .form-subtitle {
+    margin-top: -25px;
 }
 </style>
