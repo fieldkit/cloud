@@ -146,9 +146,11 @@ export default Vue.extend({
 }
 .reading .value {
     margin-left: auto;
+    margin-right: 2px;
     font-size: 16px;
 }
 .reading .uom {
     font-size: 10px;
+    margin-bottom: -3px;
 }
 </style>
