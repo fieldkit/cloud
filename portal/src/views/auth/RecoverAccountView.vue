@@ -100,6 +100,10 @@ export default Vue.extend({
 
 .form-submit {
     margin-top: 80px;
+
+    @include bp-down($xs) {
+        margin-top: 70px;
+    }
 }
 
 .form-group {
