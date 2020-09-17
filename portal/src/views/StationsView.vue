@@ -262,7 +262,7 @@ export default Vue.extend({
         background: url("../assets/icon-map.svg") no-repeat center center;
         flex-basis: 50%;
 
-        &-active {
+        &.active {
             background: url("../assets/icon-map-selected.svg") no-repeat center center;
         }
     }
