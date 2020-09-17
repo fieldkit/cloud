@@ -18,7 +18,7 @@ import App from "./App.vue";
 
 const AssetsPlugin = {
     install(Vue) {
-        const loader = require.context("@/assets/", true, /\.png$/);
+        const loader = require.context("@/assets/", true, /\.(?:svg|png)$/);
         Vue.prototype.$loadAsset = (path) => {
             return loader("./" + path);
         };

@@ -85,18 +85,19 @@ export function getModuleImg(module) {
 }
 
 export function getBatteryIcon(percentage: number): string {
+
     if (percentage == 0) {
-        return "battery/0.png";
+        return "battery/0.svg";
     } else if (percentage <= 20) {
-        return "battery/20.png";
+        return "battery/20.svg";
     } else if (percentage <= 40) {
-        return "battery/40.png";
+        return "battery/40.svg";
     } else if (percentage <= 60) {
-        return "battery/60.png";
+        return "battery/60.svg";
     } else if (percentage <= 80) {
-        return "battery/80.png";
+        return ("battery/80.svg");
     } else {
-        return "battery/100.png";
+        return "battery/100.svg";
     }
 }
 
