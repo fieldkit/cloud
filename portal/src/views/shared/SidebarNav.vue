@@ -2,14 +2,14 @@
     <div class="container-side" v-bind:class="{ active: !narrow }">
         <div class="sidebar-header">
             <router-link :to="{ name: 'projects' }">
-                <img alt="FieldKit Logo" id="header-logo" src="@/assets/FieldKit_Logo_Blue.png" />
+                <img alt="FieldKit Logo" id="header-logo" src="@/assets/logo-fieldkit.svg" />
             </router-link>
         </div>
         <div id="inner-nav">
             <div class="nav-section">
                 <router-link :to="{ name: 'projects' }">
                     <div class="nav-label">
-                        <img alt="Projects" src="@/assets/Icon_Projects_blue.png" />
+                        <img alt="Projects" src="@/assets/icon-projects.svg" />
                         <span v-bind:class="{ selected: viewingProjects }">
                             Projects
                         </span>
@@ -29,7 +29,7 @@
             <div class="nav-section">
                 <router-link :to="{ name: 'stations' }">
                     <div class="nav-label">
-                        <img alt="Stations" src="@/assets/Icon_Station_blue.png" />
+                        <img alt="Stations" src="@/assets/icon-stations.svg" />
                         <span v-bind:class="{ selected: viewingStations }">
                             Stations
                         </span>

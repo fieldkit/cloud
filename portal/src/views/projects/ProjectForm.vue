@@ -53,7 +53,7 @@
                     </div>
                     <v-date-picker :value="form.pickedStart" @input="updateStart" :popover="{ placement: 'auto', visibility: 'click' }">
                         <button type="button">
-                            <img alt="Calendar" src="@/assets/calendar.png" />
+                            <img alt="Calendar" src="@/assets/icon-calendar-gray.svg" />
                         </button>
                     </v-date-picker>
                 </div>
@@ -68,7 +68,7 @@
                     </div>
                     <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'auto', visibility: 'click' }">
                         <button type="button">
-                            <img alt="Calendar" src="@/assets/calendar.png" />
+                            <img alt="Calendar" src="@/assets/icon-calendar-gray.svg" />
                         </button>
                     </v-date-picker>
                 </div>

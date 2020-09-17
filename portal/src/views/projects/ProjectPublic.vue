@@ -18,19 +18,19 @@
                 </div>
                 <div class="details-top">
                     <div class="time-container" v-if="project.startTime">
-                        <img alt="Location" src="@/assets/icon-calendar.png" class="icon" />
+                        <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" />
                         <template>Started: {{ project.startTime | prettyDate }}</template>
                     </div>
                     <div class="duration-container" v-if="displayProject.duration">
-                        <img alt="Location" src="@/assets/icon-time.png" class="icon" />
+                        <img alt="Location" src="@/assets/icon-time.svg" class="icon" />
                         <template>{{ displayProject.duration | prettyDuration }}</template>
                     </div>
                     <div class="location-container" v-if="project.location">
-                        <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
                         <template>{{ project.location }}</template>
                     </div>
                     <div class="location-container" v-if="displayProject.places.native">
-                        <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
                         <template>Native Lands: {{ displayProject.places.native }}</template>
                     </div>
                 </div>
