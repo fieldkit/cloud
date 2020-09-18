@@ -1,7 +1,7 @@
 <template>
     <div id="white-header" class="header">
         <div class="header-inner-section">
-            <a class="menu-icon-container" v-on:click="toggleSidebar" v-bind:class="{ active: isMenuTriggered }">
+            <a class="menu-icon-container" v-on:click="toggleSidebar" v-bind:class="{ active: !isMenuNarrow }">
                 <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22"/>
             </a>
             <div class="text-elements">
@@ -33,6 +33,12 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
     },
+    props: {
+        isMenuNarrow: {
+            type: Boolean,
+            default: false,
+        },
+    },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({ user: (s: GlobalState) => s.user.user }),
@@ -43,11 +49,6 @@ export default Vue.extend({
             return null;
         },
     },
-    data() {
-        return {
-            isMenuTriggered: window.screen.availWidth > 1040 ? true : false,
-        };
-    },
     methods: {
         logout() {
             return this.$store.dispatch(ActionTypes.LOGOUT).then(() => {
@@ -55,7 +56,6 @@ export default Vue.extend({
             });
         },
         toggleSidebar() {
-            this.$data.isMenuTriggered = !this.$data.isMenuTriggered;
             this.$emit("toggled");
         },
     },
