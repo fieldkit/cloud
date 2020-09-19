@@ -85,14 +85,15 @@ export default Vue.extend({
     mounted() {
         const desktopBreakpoint = 1040;
 
-        const resizeObserver = new ResizeObserver(entries => {
+        const windowAny: any = window;
+        const resizeObserver = new windowAny.ResizeObserver((entries) => {
             if (entries[0].contentRect.width < desktopBreakpoint) {
                 if (!this.sidebar.narrow) {
                     this.onSidebarToggle();
                 }
             }
         });
-        resizeObserver.observe(document.querySelector('body'));
+        resizeObserver.observe(document.querySelector("body"));
     },
     methods: {
         onSidebarToggle(...args) {
@@ -110,7 +111,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../scss/variables';
+@import "../scss/variables";
 .container-ignored {
     height: 100%;
 }
