@@ -67,6 +67,9 @@ import (
 
 	exportService "github.com/fieldkit/cloud/server/api/gen/export"
 	exportServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/export/server"
+
+	collection "github.com/fieldkit/cloud/server/api/gen/collection"
+	collectionSvr "github.com/fieldkit/cloud/server/api/gen/http/collection/server"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -121,6 +124,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	exportSvc := NewExportService(ctx, options)
 	exportEndpoints := exportService.NewEndpoints(exportSvc)
 
+	collectionSvc := NewCollectionService(ctx, options)
+	collectionEndpoints := collection.NewEndpoints(collectionSvc)
+
 	for _, mw := range []func(goa.Endpoint) goa.Endpoint{jwtContext(), logErrors()} {
 		modulesEndpoints.Use(mw)
 		tasksEndpoints.Use(mw)
@@ -139,6 +145,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		dataEndpoints.Use(mw)
 		csvEndpoints.Use(mw)
 		exportEndpoints.Use(mw)
+		collectionEndpoints.Use(mw)
 	}
 
 	// Provide the transport specific request decoder and response encoder.
@@ -168,6 +175,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	dataServer := datasSvr.New(dataEndpoints, mux, dec, enc, eh, nil)
 	csvServer := csvServiceSvr.New(csvEndpoints, mux, dec, enc, eh, nil)
 	exportServer := exportServiceSvr.New(exportEndpoints, mux, dec, enc, eh, nil)
+	collectionServer := collectionSvr.New(collectionEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
@@ -186,6 +194,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	datasSvr.Mount(mux, dataServer)
 	csvServiceSvr.Mount(mux, csvServer)
 	exportServiceSvr.Mount(mux, exportServer)
+	collectionSvr.Mount(mux, collectionServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -238,6 +247,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range exportServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range collectionServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 

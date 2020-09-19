@@ -26,9 +26,10 @@ const (
 )
 
 type FakeStations struct {
-	Owner    *data.User
-	Project  *data.Project
-	Stations []*data.Station
+	Owner      *data.User
+	Project    *data.Project
+	Collection *data.Collection
+	Stations   []*data.Station
 }
 
 func (e *TestEnv) AddInvalidUser() (*data.User, error) {
@@ -97,6 +98,27 @@ func (e *TestEnv) AddAdminUser() (*data.User, error) {
 	return user, nil
 }
 
+func (e *TestEnv) AddCollection(ownerID int32) (*data.Collection, error) {
+	name := faker.Name()
+
+	collection := &data.Collection{
+		Name:    name + " Collection",
+		Origin:  "{}",
+		OwnerID: ownerID,
+		Private: false,
+	}
+
+	if err := e.DB.NamedGetContext(e.Ctx, collection, `
+		INSERT INTO fieldkit.collection (name, owner_id, private, origin)
+		VALUES (:name, :owner_id, :private, :origin)
+		RETURNING *
+		`, collection); err != nil {
+		return nil, err
+	}
+
+	return collection, nil
+}
+
 func (e *TestEnv) AddProject() (*data.Project, error) {
 	name := faker.Name()
 
@@ -128,6 +150,11 @@ func (e *TestEnv) AddProjectUser(p *data.Project, u *data.User, r *data.Role) er
 
 func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
 	owner, err := e.AddUser()
+	if err != nil {
+		return nil, err
+	}
+
+	collection, err := e.AddCollection(owner.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -177,9 +204,10 @@ func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
 	}
 
 	return &FakeStations{
-		Owner:    owner,
-		Project:  project,
-		Stations: stations,
+		Owner:      owner,
+		Project:    project,
+		Collection: collection,
+		Stations:   stations,
 	}, nil
 }
 

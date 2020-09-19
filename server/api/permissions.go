@@ -20,6 +20,13 @@ type ProjectPermissions interface {
 	CanModify() error
 }
 
+type CollectionPermissions interface {
+	Permissions
+	Collection() *data.Collection
+	CanView() error
+	CanModify() error
+}
+
 type StationPermissions interface {
 	Permissions
 	Station() *data.Station
@@ -34,6 +41,7 @@ type Permissions interface {
 	RefreshToken() string
 	IsAdmin() bool
 	ForProjectByID(id int32) (permissions ProjectPermissions, err error)
+	ForCollectionByID(id int32) (permissions CollectionPermissions, err error)
 	ForStationByID(id int) (permissions StationPermissions, err error)
 	ForStationByDeviceID(id []byte) (permissions StationPermissions, err error)
 	ForStation(station *data.Station) (permissions StationPermissions, err error)
@@ -209,6 +217,24 @@ func (p *defaultPermissions) ForProjectByID(id int32) (permissions ProjectPermis
 	return
 }
 
+func (p *defaultPermissions) ForCollectionByID(id int32) (permissions CollectionPermissions, err error) {
+	if err := p.unwrap(); err != nil {
+		return nil, err
+	}
+
+	collection := &data.Collection{}
+	if err := p.options.Database.GetContext(p.context, collection, "SELECT c.* FROM fieldkit.collection AS c WHERE c.id = $1", id); err != nil {
+		return nil, p.notFound(fmt.Sprintf("collection not found: %v", err))
+	}
+
+	permissions = &collectionPermissions{
+		defaultPermissions: *p,
+		collection:         collection,
+	}
+
+	return
+}
+
 func (p *defaultPermissions) ForStationByID(id int) (permissions StationPermissions, err error) {
 	if err := p.unwrap(); err != nil {
 		return nil, err
@@ -325,5 +351,25 @@ func (p *projectPermissions) CanModify() error {
 		return p.forbidden("forbidden")
 	}
 
+	return nil
+}
+
+type collectionPermissions struct {
+	defaultPermissions
+	collection *data.Collection
+}
+
+func (p *collectionPermissions) Collection() *data.Collection {
+	return p.collection
+}
+
+func (p *collectionPermissions) CanView() error {
+	return nil
+}
+
+func (p *collectionPermissions) CanModify() error {
+	if p.collection.OwnerID != p.UserID() {
+		return p.forbidden("forbidden")
+	}
 	return nil
 }

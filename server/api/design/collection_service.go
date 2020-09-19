@@ -8,7 +8,7 @@ var AddCollectionFields = Type("AddCollectionFields", func() {
 	Attribute("name", String)
 	Attribute("description", String)
 	Attribute("tags", String)
-	Attribute("privacy", Int32)
+	Attribute("private", Boolean)
 	Required("name", "description")
 })
 
@@ -20,15 +20,15 @@ var Collection = ResultType("application/vnd.app.collection+json", func() {
 		Attribute("name")
 		Attribute("description")
 		Attribute("tags")
-		Attribute("privacy", Int32)
-		Required("id", "name", "description", "privacy", "tags")
+		Attribute("private", Boolean)
+		Required("id", "name", "description", "private", "tags")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("name")
 		Attribute("description")
 		Attribute("tags")
-		Attribute("privacy")
+		Attribute("private")
 	})
 })
 
