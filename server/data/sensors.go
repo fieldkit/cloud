@@ -45,3 +45,19 @@ type AggregatedReading struct {
 	Value         float64         `db:"value" json:"value"`
 	NumberSamples int32           `db:"nsamples" json:"nsamples"`
 }
+
+type DataVisibility struct {
+	ID        int64     `db:"id"`
+	Start     time.Time `db:"start_time"`
+	End       time.Time `db:"end_time"`
+	StationID int32     `db:"station_id"`
+	ProjectID *int32    `db:"project_id"`
+	UserID    *int32    `db:"user_id"`
+}
+
+type UserVisibility struct {
+	UserID        int32
+	ProjectIDs    []int32
+	CollectionIDs []int32
+	StationIDs    []int32
+}

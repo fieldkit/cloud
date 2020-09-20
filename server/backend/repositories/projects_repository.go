@@ -44,6 +44,16 @@ func (pr *ProjectRepository) AddProject(ctx context.Context, userID int32, proje
 	return project, nil
 }
 
+func (pr *ProjectRepository) QueryProjectsByStationID(ctx context.Context, stationID int32) ([]*data.Project, error) {
+	projects := []*data.Project{}
+	if err := pr.db.SelectContext(ctx, &projects, `
+		SELECT * FROM fieldkit.project WHERE id IN (SELECT project_id FROM fieldkit.project_station WHERE station_id = $1)
+		`, stationID); err != nil {
+		return nil, err
+	}
+	return projects, nil
+}
+
 func (pr *ProjectRepository) AddStationToProjectByID(ctx context.Context, projectID, stationID int32) error {
 	if _, err := pr.db.ExecContext(ctx, `
 		INSERT INTO fieldkit.project_station (project_id, station_id) VALUES ($1, $2) ON CONFLICT DO NOTHING
