@@ -119,6 +119,18 @@ func (e *TestEnv) AddCollection(ownerID int32) (*data.Collection, error) {
 	return collection, nil
 }
 
+func (e *TestEnv) SaveProject(project *data.Project) (*data.Project, error) {
+	if err := e.DB.NamedGetContext(e.Ctx, project, `
+		INSERT INTO fieldkit.project (name, privacy, start_time, end_time)
+		VALUES (:name, :privacy, :start_time, :end_time)
+		RETURNING *
+		`, project); err != nil {
+		return nil, err
+	}
+
+	return project, nil
+}
+
 func (e *TestEnv) AddProject() (*data.Project, error) {
 	name := faker.Name()
 
@@ -127,15 +139,7 @@ func (e *TestEnv) AddProject() (*data.Project, error) {
 		Privacy: data.Private,
 	}
 
-	if err := e.DB.NamedGetContext(e.Ctx, project, `
-		INSERT INTO fieldkit.project (name, privacy)
-		VALUES (:name, :privacy)
-		RETURNING *
-		`, project); err != nil {
-		return nil, err
-	}
-
-	return project, nil
+	return e.SaveProject(project)
 }
 
 func (e *TestEnv) AddProjectUser(p *data.Project, u *data.User, r *data.Role) error {
@@ -177,26 +181,19 @@ func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
 		hasher.Write([]byte(name))
 		deviceID := hasher.Sum(nil)
 
-		station := &data.Station{
+		station, err := e.SaveStation(&data.Station{
 			OwnerID:   owner.ID,
 			Name:      name,
 			DeviceID:  deviceID,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			Location:  data.NewLocation([]float64{36.9053064, -117.5297165}),
-		}
-
-		if err := e.DB.NamedGetContext(e.Ctx, station, `
-			INSERT INTO fieldkit.station (name, device_id, owner_id, created_at, updated_at, location)
-			VALUES (:name, :device_id, :owner_id, :created_at, :updated_at, ST_SetSRID(ST_GeomFromText(:location), 4326))
-			RETURNING id
-		`, station); err != nil {
+		})
+		if err != nil {
 			return nil, err
 		}
 
-		if _, err := e.DB.ExecContext(e.Ctx, `
-			INSERT INTO fieldkit.project_station (project_id, station_id) VALUES ($1, $2)
-			`, project.ID, station.ID); err != nil {
+		if err := e.AddStationToProject(station, project); err != nil {
 			return nil, err
 		}
 
@@ -209,6 +206,31 @@ func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
 		Collection: collection,
 		Stations:   stations,
 	}, nil
+}
+
+func (e *TestEnv) SaveStation(station *data.Station) (*data.Station, error) {
+	if err := e.DB.NamedGetContext(e.Ctx, station, `
+		INSERT INTO fieldkit.station (name, device_id, owner_id, created_at, updated_at, location)
+		VALUES (:name, :device_id, :owner_id, :created_at, :updated_at, ST_SetSRID(ST_GeomFromText(:location), 4326))
+		RETURNING id
+		`, station); err != nil {
+		return nil, err
+	}
+
+	return station, nil
+}
+
+func (e *TestEnv) AddStationToProject(station *data.Station, project *data.Project) error {
+	if _, err := e.DB.ExecContext(e.Ctx, `
+		INSERT INTO fieldkit.project_station (project_id, station_id) VALUES ($1, $2)
+		`, project.ID, station.ID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *TestEnv) AddStation(owner *data.User) (*data.Station, error) {
+	return e.SaveStation(e.NewStation(owner))
 }
 
 func (e *TestEnv) NewStation(owner *data.User) *data.Station {
@@ -238,10 +260,10 @@ func (e *TestEnv) AddProvision(deviceID, generationID []byte) (*data.Provision, 
 	}
 
 	if err := e.DB.NamedGetContext(e.Ctx, provision, `
-			INSERT INTO fieldkit.provision (device_id, generation, created, updated)
-			VALUES (:device_id, :generation, :created, :updated) ON CONFLICT (device_id, generation)
-			DO UPDATE SET updated = NOW() RETURNING id
-			`, provision); err != nil {
+		INSERT INTO fieldkit.provision (device_id, generation, created, updated)
+		VALUES (:device_id, :generation, :created, :updated) ON CONFLICT (device_id, generation)
+		DO UPDATE SET updated = NOW() RETURNING id
+		`, provision); err != nil {
 		return nil, err
 	}
 
@@ -261,10 +283,10 @@ func (e *TestEnv) AddIngestion(user *data.User, url, typeName string, deviceID [
 	}
 
 	if err := e.DB.NamedGetContext(e.Ctx, ingestion, `
-			INSERT INTO fieldkit.ingestion (time, upload_id, user_id, device_id, generation, type, size, url, blocks, flags)
-			VALUES (NOW(), :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
-			RETURNING id
-			`, ingestion); err != nil {
+		INSERT INTO fieldkit.ingestion (time, upload_id, user_id, device_id, generation, type, size, url, blocks, flags)
+		VALUES (NOW(), :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
+		RETURNING id
+		`, ingestion); err != nil {
 		return nil, nil, err
 	}
 
@@ -274,10 +296,10 @@ func (e *TestEnv) AddIngestion(user *data.User, url, typeName string, deviceID [
 	}
 
 	if err := e.DB.NamedGetContext(e.Ctx, queued, `
-			INSERT INTO fieldkit.ingestion_queue (queued, ingestion_id)
-			VALUES (:queued, :ingestion_id)
-			RETURNING id
-			`, queued); err != nil {
+		INSERT INTO fieldkit.ingestion_queue (queued, ingestion_id)
+		VALUES (:queued, :ingestion_id)
+		RETURNING id
+		`, queued); err != nil {
 		return nil, nil, err
 	}
 
