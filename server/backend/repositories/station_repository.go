@@ -315,14 +315,23 @@ func (r *StationRepository) updateDeployedActivityFromStatus(ctx context.Context
 		return nil
 	}
 
-	if _, err := r.db.ExecContext(ctx, `
+	activity := &data.StationDeployed{
+		StationActivity: data.StationActivity{
+			CreatedAt: time.Now(),
+			StationID: station.ID,
+		},
+		DeployedAt: *station.RecordingStartedAt,
+		Location:   station.Location,
+	}
+
+	if err := r.db.NamedGetContext(ctx, activity, `
 		INSERT INTO fieldkit.station_deployed AS sd
 			(created_at, station_id, deployed_at, location) VALUES
-			(NOW(), $1, $2, ST_SetSRID(ST_GeomFromText($3), 4326))
+			(NOW(), :station_id, :deployed_at, ST_SetSRID(ST_GeomFromText(:location), 4326))
 		ON CONFLICT (station_id, deployed_at)
 		DO UPDATE SET location = EXCLUDED.location
 		RETURNING id
-		`, station.ID, station.RecordingStartedAt, station.Location); err != nil {
+		`, activity); err != nil {
 		return err
 	}
 
