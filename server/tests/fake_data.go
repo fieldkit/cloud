@@ -318,8 +318,10 @@ func (e *TestEnv) AddStationActivity(station *data.Station, user *data.User) err
 		Location:   location,
 	}
 
-	if _, err := e.DB.NamedExecContext(e.Ctx, `
-		INSERT INTO fieldkit.station_deployed (created_at, station_id, deployed_at, location) VALUES (:created_at, :station_id, :deployed_at, ST_SetSRID(ST_GeomFromText(:location), 4326))
+	if err := e.DB.NamedGetContext(e.Ctx, depoyedActivity, `
+		INSERT INTO fieldkit.station_deployed (created_at, station_id, deployed_at, location)
+		VALUES (:created_at, :station_id, :deployed_at, ST_SetSRID(ST_GeomFromText(:location), 4326))
+		RETURNING id
 		`, depoyedActivity); err != nil {
 		return err
 	}
@@ -366,8 +368,8 @@ func (e *TestEnv) AddProjectActivity(project *data.Project, station *data.Statio
 		Body:     "Project update",
 	}
 
-	if _, err := e.DB.NamedExecContext(e.Ctx, `
-		INSERT INTO fieldkit.project_update (created_at, project_id, author_id, body) VALUES (:created_at, :project_id, :author_id, :body)
+	if err := e.DB.NamedGetContext(e.Ctx, projectUpdate, `
+		INSERT INTO fieldkit.project_update (created_at, project_id, author_id, body) VALUES (:created_at, :project_id, :author_id, :body) RETURNING id
 		`, projectUpdate); err != nil {
 		return err
 	}
