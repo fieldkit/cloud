@@ -529,8 +529,7 @@ func TestUpdateMyStationWithProtobufStatusTwice(t *testing.T) {
 
 		assert.Equal(http.StatusOK, rr.Code)
 
-		sr, err := repositories.NewStationRepository(e.DB)
-		assert.NoError(err)
+		sr := repositories.NewStationRepository(e.DB)
 
 		sf, err := sr.QueryStationFull(e.Ctx, fd.Stations[0].ID)
 		assert.NoError(err)
@@ -578,8 +577,7 @@ func TestUpdateMyStationWithProtobufLiveReadingsTwice(t *testing.T) {
 
 		assert.Equal(http.StatusOK, rr.Code)
 
-		sr, err := repositories.NewStationRepository(e.DB)
-		assert.NoError(err)
+		sr := repositories.NewStationRepository(e.DB)
 
 		sf, err := sr.QueryStationFull(e.Ctx, fd.Stations[0].ID)
 		assert.NoError(err)

@@ -23,8 +23,8 @@ type StationRepository struct {
 	db *sqlxcache.DB
 }
 
-func NewStationRepository(db *sqlxcache.DB) (rr *StationRepository, err error) {
-	return &StationRepository{db: db}, nil
+func NewStationRepository(db *sqlxcache.DB) *StationRepository {
+	return &StationRepository{db: db}
 }
 
 func (r *StationRepository) Add(ctx context.Context, adding *data.Station) (station *data.Station, err error) {
@@ -207,10 +207,7 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 }
 
 func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Context, station *data.Station, statusReply *pbapp.HttpReply) error {
-	pr, err := NewProvisionRepository(r.db)
-	if err != nil {
-		return err
-	}
+	pr := NewProvisionRepository(r.db)
 
 	p, err := pr.QueryOrCreateProvision(ctx, station.DeviceID, statusReply.Status.Identity.Generation)
 	if err != nil {

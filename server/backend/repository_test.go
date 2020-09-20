@@ -17,8 +17,7 @@ func TestQueryStationByID(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	r, err := repositories.NewStationRepository(e.DB)
-	assert.NoError(err)
+	r := repositories.NewStationRepository(e.DB)
 
 	sf, err := r.QueryStationFull(e.Ctx, fd.Stations[0].ID)
 	assert.NoError(err)
@@ -38,8 +37,7 @@ func TestQueryStationsByOwnerID(t *testing.T) {
 	fd, err := e.AddStations(5)
 	assert.NoError(err)
 
-	r, err := repositories.NewStationRepository(e.DB)
-	assert.NoError(err)
+	r := repositories.NewStationRepository(e.DB)
 
 	sfs, err := r.QueryStationFullByOwnerID(e.Ctx, fd.Owner.ID)
 	assert.NoError(err)
@@ -59,8 +57,7 @@ func TestQueryStationsByProjectID(t *testing.T) {
 	fd, err := e.AddStations(5)
 	assert.NoError(err)
 
-	r, err := repositories.NewStationRepository(e.DB)
-	assert.NoError(err)
+	r := repositories.NewStationRepository(e.DB)
 
 	sfs, err := r.QueryStationFullByProjectID(e.Ctx, fd.Project.ID)
 	assert.NoError(err)
@@ -77,8 +74,7 @@ func TestQueryStationByDeviceID(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	r, err := repositories.NewStationRepository(e.DB)
-	assert.NoError(err)
+	r := repositories.NewStationRepository(e.DB)
 
 	sf, err := r.QueryStationByDeviceID(e.Ctx, fd.Stations[0].DeviceID)
 	assert.NoError(err)
@@ -95,8 +91,7 @@ func TestQueryStationsByDeviceID(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	r, err := repositories.NewStationRepository(e.DB)
-	assert.NoError(err)
+	r := repositories.NewStationRepository(e.DB)
 
 	sf, err := r.QueryStationsByDeviceID(e.Ctx, fd.Stations[0].DeviceID)
 	assert.NoError(err)
@@ -113,8 +108,7 @@ func TestTryQueryStationByDeviceID(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	r, err := repositories.NewStationRepository(e.DB)
-	assert.NoError(err)
+	r := repositories.NewStationRepository(e.DB)
 
 	sf, err := r.TryQueryStationByDeviceID(e.Ctx, fd.Stations[0].DeviceID)
 	assert.NoError(err)

@@ -29,10 +29,7 @@ func NewAggregatingHandler(db *sqlxcache.DB) *AggregatingHandler {
 
 func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, meta *data.MetaRecord) error {
 	if _, ok := v.stations[p.ID]; !ok {
-		sr, err := repositories.NewStationRepository(v.db)
-		if err != nil {
-			return err
-		}
+		sr := repositories.NewStationRepository(v.db)
 
 		station, err := sr.QueryStationByDeviceID(ctx, p.DeviceID)
 		if err != nil || station == nil {

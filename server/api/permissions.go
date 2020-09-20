@@ -240,10 +240,7 @@ func (p *defaultPermissions) ForStationByID(id int) (permissions StationPermissi
 		return nil, err
 	}
 
-	r, err := repositories.NewStationRepository(p.options.Database)
-	if err != nil {
-		return nil, err
-	}
+	r := repositories.NewStationRepository(p.options.Database)
 
 	station, err := r.QueryStationByID(p.context, int32(id))
 	if err != nil {
@@ -263,10 +260,7 @@ func (p *defaultPermissions) ForStationByDeviceID(id []byte) (permissions Statio
 		return nil, err
 	}
 
-	r, err := repositories.NewStationRepository(p.options.Database)
-	if err != nil {
-		return nil, err
-	}
+	r := repositories.NewStationRepository(p.options.Database)
 
 	station, err := r.QueryStationByDeviceID(p.context, id)
 	if err != nil {

@@ -13,8 +13,8 @@ type ProvisionRepository struct {
 	db *sqlxcache.DB
 }
 
-func NewProvisionRepository(db *sqlxcache.DB) (r *ProvisionRepository, err error) {
-	return &ProvisionRepository{db: db}, nil
+func NewProvisionRepository(db *sqlxcache.DB) *ProvisionRepository {
+	return &ProvisionRepository{db: db}
 }
 
 func (r *ProvisionRepository) QueryOrCreateProvision(ctx context.Context, deviceID, generationID []byte) (*data.Provision, error) {

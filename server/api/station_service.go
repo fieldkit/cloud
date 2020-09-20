@@ -35,10 +35,7 @@ func NewStationService(ctx context.Context, options *ControllerOptions) *Station
 func (c *StationService) updateStation(ctx context.Context, station *data.Station, rawStatusPb *string) error {
 	log := Logger(ctx).Sugar()
 
-	sr, err := repositories.NewStationRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
+	sr := repositories.NewStationRepository(c.options.Database)
 
 	if rawStatusPb != nil {
 		log.Infow("updating station from status", "station_id", station.ID)
@@ -87,10 +84,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 
 	log.Infow("adding station", "device_id", payload.DeviceID)
 
-	sr, err := repositories.NewStationRepository(c.options.Database)
-	if err != nil {
-		return nil, err
-	}
+	sr := repositories.NewStationRepository(c.options.Database)
 
 	stations, err := sr.QueryStationsByDeviceID(ctx, deviceId)
 	if err != nil {
@@ -162,10 +156,7 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 		return nil, err
 	}
 
-	r, err := repositories.NewStationRepository(c.options.Database)
-	if err != nil {
-		return nil, err
-	}
+	r := repositories.NewStationRepository(c.options.Database)
 
 	sf, err := r.QueryStationFull(ctx, payload.ID)
 	if err != nil {
@@ -178,10 +169,7 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 }
 
 func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
-	sr, err := repositories.NewStationRepository(c.options.Database)
-	if err != nil {
-		return nil, err
-	}
+	sr := repositories.NewStationRepository(c.options.Database)
 
 	updating, err := sr.QueryStationByID(ctx, payload.ID)
 	if err != nil {
@@ -221,10 +209,7 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 		return nil, err
 	}
 
-	r, err := repositories.NewStationRepository(c.options.Database)
-	if err != nil {
-		return nil, err
-	}
+	r := repositories.NewStationRepository(c.options.Database)
 
 	sfs, err := r.QueryStationFullByOwnerID(ctx, p.UserID())
 	if err != nil {
@@ -263,10 +248,7 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		}
 	}
 
-	r, err := repositories.NewStationRepository(c.options.Database)
-	if err != nil {
-		return nil, err
-	}
+	r := repositories.NewStationRepository(c.options.Database)
 
 	sfs, err := r.QueryStationFullByProjectID(ctx, payload.ID)
 	if err != nil {
@@ -286,10 +268,7 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 }
 
 func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPayload) (*station.PageOfStations, error) {
-	sr, err := repositories.NewStationRepository(c.options.Database)
-	if err != nil {
-		return nil, err
-	}
+	sr := repositories.NewStationRepository(c.options.Database)
 
 	qp := &repositories.EssentialQueryParams{
 		Page:     0,
@@ -360,10 +339,7 @@ func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPa
 }
 
 func (c *StationService) Delete(ctx context.Context, payload *station.DeletePayload) error {
-	sr, err := repositories.NewStationRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
+	sr := repositories.NewStationRepository(c.options.Database)
 
 	return sr.Delete(ctx, payload.StationID)
 }

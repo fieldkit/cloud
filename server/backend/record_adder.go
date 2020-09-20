@@ -71,19 +71,12 @@ func (ra *RecordAdder) tryParseSignedRecord(sr *pb.SignedRecord, dataRecord *pb.
 }
 
 func (ra *RecordAdder) tryFindStation(ctx context.Context, i *data.Ingestion) (*data.Station, error) {
-	r, err := repositories.NewStationRepository(ra.db)
-	if err != nil {
-		return nil, err
-	}
+	r := repositories.NewStationRepository(ra.db)
 	return r.TryQueryStationByDeviceID(ctx, i.DeviceID)
 }
 
 func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*data.Provision, error) {
-	r, err := repositories.NewProvisionRepository(ra.db)
-	if err != nil {
-		return nil, err
-	}
-
+	r := repositories.NewProvisionRepository(ra.db)
 	return r.QueryOrCreateProvision(ctx, i.DeviceID, i.GenerationID)
 }
 

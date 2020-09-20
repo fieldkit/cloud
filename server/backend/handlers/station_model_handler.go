@@ -29,10 +29,7 @@ func NewStationModelRecordHandler(db *sqlxcache.DB) *stationModelRecordHandler {
 }
 
 func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error {
-	sr, err := repositories.NewStationRepository(h.db)
-	if err != nil {
-		return err
-	}
+	sr := repositories.NewStationRepository(h.db)
 
 	configuration := &data.StationConfiguration{
 		ProvisionID:  p.ID,
