@@ -6,3 +6,5 @@ CREATE TABLE fieldkit.data_visibility (
 	project_id integer REFERENCES fieldkit.project (id),
 	user_id integer REFERENCES fieldkit.user (id)
 );
+
+CREATE UNIQUE INDEX ON fieldkit.data_visibility (start_time, end_time, station_id);
