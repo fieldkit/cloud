@@ -20,6 +20,7 @@
                         :to="{ name: 'viewProject', params: { id: project.id } }"
                         class="project-link"
                         v-bind:class="{ selected: viewingProject && viewingProject.id === project.id }"
+                        @click.native="closeMenuOnMobile()"
                     >
                         {{ project.name }}
                     </router-link>
@@ -70,6 +71,11 @@ export default {
         showStation(station) {
             this.$emit("show-station", station);
         },
+        closeMenuOnMobile() {
+            if (window.screen.availWidth < 1040) {
+                this.$emit("toggle-menu", true);
+            }
+        }
     },
 };
 </script>
