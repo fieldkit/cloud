@@ -48,8 +48,8 @@ type AggregatedReading struct {
 
 type DataVisibility struct {
 	ID        int64     `db:"id"`
-	Start     time.Time `db:"start_time"`
-	End       time.Time `db:"end_time"`
+	StartTime time.Time `db:"start_time"`
+	EndTime   time.Time `db:"end_time"`
 	StationID int32     `db:"station_id"`
 	ProjectID *int32    `db:"project_id"`
 	UserID    *int32    `db:"user_id"`

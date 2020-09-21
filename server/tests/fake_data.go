@@ -217,6 +217,10 @@ func (e *TestEnv) SaveStation(station *data.Station) (*data.Station, error) {
 		return nil, err
 	}
 
+	if err := e.AddStationOwner(station, station.OwnerID, data.MinimumTime, data.MaximumTime); err != nil {
+		return nil, err
+	}
+
 	return station, nil
 }
 
@@ -224,6 +228,24 @@ func (e *TestEnv) AddStationToProject(station *data.Station, project *data.Proje
 	if _, err := e.DB.ExecContext(e.Ctx, `
 		INSERT INTO fieldkit.project_station (project_id, station_id) VALUES ($1, $2)
 		`, project.ID, station.ID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *TestEnv) AddStationOwner(station *data.Station, userID int32, start, end time.Time) error {
+	ownership := &data.StationOwnership{
+		StationID: station.ID,
+		UserID:    userID,
+		StartTime: start,
+		EndTime:   end,
+	}
+
+	if err := e.DB.NamedGetContext(e.Ctx, ownership, `
+		INSERT INTO fieldkit.station_owner (station_id, user_id, start_time, end_time)
+		VALUES (:station_id, :user_id, :start_time, :end_time)
+		RETURNING id
+		`, ownership); err != nil {
 		return err
 	}
 	return nil

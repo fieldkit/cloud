@@ -78,6 +78,25 @@ func (r *StationRepository) QueryStationByID(ctx context.Context, id int32) (sta
 	return station, nil
 }
 
+func (r *StationRepository) SaveOwnership(ctx context.Context, ownership *data.StationOwnership) (*data.StationOwnership, error) {
+	if err := r.db.NamedGetContext(ctx, ownership, `
+		INSERT INTO fieldkit.station_owner (station_id, user_id, start_time, end_time)
+		VALUES (:station_id, :user_id, :start_time, :end_time)
+		RETURNING id
+		`, ownership); err != nil {
+		return nil, err
+	}
+	return ownership, nil
+}
+
+func (r *StationRepository) QueryStationOwnershipsByID(ctx context.Context, id int32) (ownerships []*data.StationOwnership, err error) {
+	ownerships = []*data.StationOwnership{}
+	if err := r.db.SelectContext(ctx, &ownerships, `SELECT * FROM fieldkit.station_owner WHERE station_id = $1 ORDER BY start_time`, id); err != nil {
+		return nil, err
+	}
+	return ownerships, nil
+}
+
 func (r *StationRepository) QueryStationsByDeviceID(ctx context.Context, deviceIdBytes []byte) (stations []*data.Station, err error) {
 	stations = []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `

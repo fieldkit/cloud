@@ -33,6 +33,7 @@ require (
 	github.com/go-kit/kit v0.8.0
 	github.com/go-logfmt/logfmt v0.4.0
 	github.com/go-stack/stack v1.8.0
+	github.com/go-test/deep v1.0.7
 	github.com/goadesign/goa v1.4.0
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang-migrate/migrate/v4 v4.11.0

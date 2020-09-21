@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-test/deep"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/fieldkit/cloud/server/data"
@@ -33,8 +35,20 @@ func TestGetStationVisibilityNoProjectsNoCollections(t *testing.T) {
 	dvs, err := vs.Slice(e.Ctx, s1.ID)
 	assert.NoError(err)
 	assert.NotNil(dvs)
+	assert.NotEmpty(dvs)
 
-	// TODO Should be visible only to the owner.
+	expected := []*data.DataVisibility{
+		{
+			StationID: s1.ID,
+			StartTime: data.MinimumTime,
+			EndTime:   data.MaximumTime,
+			UserID:    &user1.ID,
+		},
+	}
+
+	if diff := deep.Equal(dvs, expected); diff != nil {
+		t.Error(diff)
+	}
 }
 
 func TestGetStationVisibilityPrivateProject(t *testing.T) {
@@ -60,8 +74,26 @@ func TestGetStationVisibilityPrivateProject(t *testing.T) {
 	dvs, err := vs.Slice(e.Ctx, s1.ID)
 	assert.NoError(err)
 	assert.NotNil(dvs)
+	assert.NotEmpty(dvs)
 
-	// TODO Should be visible only to project members.
+	expected := []*data.DataVisibility{
+		{
+			StationID: s1.ID,
+			StartTime: *p1.StartTime,
+			EndTime:   *p1.EndTime,
+			ProjectID: &p1.ID,
+		},
+		{
+			StationID: s1.ID,
+			StartTime: data.MinimumTime,
+			EndTime:   data.MaximumTime,
+			UserID:    &user1.ID,
+		},
+	}
+
+	if diff := deep.Equal(dvs, expected); diff != nil {
+		t.Error(diff)
+	}
 }
 
 func TestGetStationVisibilityPublicProject(t *testing.T) {
@@ -87,6 +119,23 @@ func TestGetStationVisibilityPublicProject(t *testing.T) {
 	dvs, err := vs.Slice(e.Ctx, s1.ID)
 	assert.NoError(err)
 	assert.NotNil(dvs)
+	assert.NotEmpty(dvs)
 
-	// TODO Should be visible to anybody.
+	expected := []*data.DataVisibility{
+		{
+			StationID: s1.ID,
+			StartTime: *p1.StartTime,
+			EndTime:   *p1.EndTime,
+		},
+		{
+			StationID: s1.ID,
+			StartTime: data.MinimumTime,
+			EndTime:   data.MaximumTime,
+			UserID:    &user1.ID,
+		},
+	}
+
+	if diff := deep.Equal(dvs, expected); diff != nil {
+		t.Error(diff)
+	}
 }

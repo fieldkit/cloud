@@ -214,3 +214,11 @@ type EssentialStation struct {
 	Location           *Location  `db:"location"`
 	LastIngestionAt    *time.Time `db:"last_ingestion_at,omitempty"`
 }
+
+type StationOwnership struct {
+	ID        int64     `db:"id"`
+	StationID int32     `db:"station_id"`
+	UserID    int32     `db:"user_id"`
+	StartTime time.Time `db:"start_time"`
+	EndTime   time.Time `db:"end_time"`
+}
