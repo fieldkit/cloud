@@ -4,7 +4,7 @@ CREATE TABLE fieldkit.project_station_new (
 	PRIMARY KEY (project_id, station_id)
 );
 
-INSERT INTO fieldkit.project_station_new (project_id, station_id) SELECT project_id, station_id FROM fieldkit.project_station_new;
+INSERT INTO fieldkit.project_station_new (project_id, station_id) SELECT project_id, station_id FROM fieldkit.project_station;
 
 ALTER TABLE fieldkit.project_station RENAME TO project_station_old;
 
