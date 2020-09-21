@@ -144,7 +144,7 @@ func (e *TestEnv) AddProject() (*data.Project, error) {
 
 func (e *TestEnv) AddProjectUser(p *data.Project, u *data.User, r *data.Role) error {
 	if _, err := e.DB.ExecContext(e.Ctx, `
-		INSERT INTO fieldkit.project_user (project_id, user_id, role) VALUES ($1, $2, $3)
+		INSERT INTO fieldkit.project_user (project_id, user_id, role, created_at) VALUES ($1, $2, $3, NOW())
 		`, p.ID, u.ID, r.ID); err != nil {
 		return err
 	}
@@ -193,7 +193,7 @@ func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
 			return nil, err
 		}
 
-		if err := e.AddStationToProject(station, project); err != nil {
+		if err := e.AddStationToProject(station, project, nil); err != nil {
 			return nil, err
 		}
 
@@ -224,10 +224,10 @@ func (e *TestEnv) SaveStation(station *data.Station) (*data.Station, error) {
 	return station, nil
 }
 
-func (e *TestEnv) AddStationToProject(station *data.Station, project *data.Project) error {
+func (e *TestEnv) AddStationToProject(station *data.Station, project *data.Project, addedAt *time.Time) error {
 	if _, err := e.DB.ExecContext(e.Ctx, `
-		INSERT INTO fieldkit.project_station (project_id, station_id) VALUES ($1, $2)
-		`, project.ID, station.ID); err != nil {
+		INSERT INTO fieldkit.project_station (project_id, station_id, created_at) VALUES ($1, $2, COALESCE($3, NOW()))
+		`, project.ID, station.ID, addedAt); err != nil {
 		return err
 	}
 	return nil

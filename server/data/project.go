@@ -19,9 +19,16 @@ type Project struct {
 }
 
 type ProjectUser struct {
-	UserID    int32 `db:"user_id"`
-	ProjectID int32 `db:"project_id"`
-	Role      int32 `db:"role"`
+	ProjectID int32     `db:"project_id"`
+	UserID    int32     `db:"user_id"`
+	Role      int32     `db:"role"`
+	CreatedAt time.Time `db:"created_at"`
+}
+
+type ProjectStation struct {
+	ProjectID int32     `db:"project_id"`
+	StationID int32     `db:"station_id"`
+	CreatedAt time.Time `db:"created_at"`
 }
 
 type ProjectUserAndUser struct {

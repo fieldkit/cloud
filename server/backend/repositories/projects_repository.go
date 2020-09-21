@@ -56,7 +56,7 @@ func (pr *ProjectRepository) QueryProjectsByStationID(ctx context.Context, stati
 
 func (pr *ProjectRepository) AddStationToProjectByID(ctx context.Context, projectID, stationID int32) error {
 	if _, err := pr.db.ExecContext(ctx, `
-		INSERT INTO fieldkit.project_station (project_id, station_id) VALUES ($1, $2) ON CONFLICT DO NOTHING
+		INSERT INTO fieldkit.project_station (project_id, station_id, created_at) VALUES ($1, $2, NOW()) ON CONFLICT DO NOTHING
 		`, projectID, stationID); err != nil {
 		return err
 	}
