@@ -100,7 +100,6 @@
         font-weight: 900;
         border-radius: 3px;
         letter-spacing: 0.1px;
-        font-family: Avenir, Helvetica, Arial, sans-serif;
 
         @include bp-down($xs) {
             max-width: unset;
@@ -133,6 +132,10 @@
         width: 100%;
         max-width: 298px;
         margin: 25px auto 0 auto;
+
+        ::v-deep input:-webkit-autofill::first-line {
+            font-size: 16px!important;
+        }
     }
 
     &-errors {
