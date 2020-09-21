@@ -10,6 +10,7 @@
                 :projects="userProjects"
                 :narrow="sidebar.narrow"
                 @show-station="showStation"
+                @toggle-menu="onSidebarToggle"
             />
 
             <div class="container-main">
