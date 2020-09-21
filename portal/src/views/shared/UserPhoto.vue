@@ -40,5 +40,7 @@ export default Vue.extend({
     margin: 10px 12px 0 0;
     max-width: 50px;
     max-height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 </style>
