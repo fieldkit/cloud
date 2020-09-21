@@ -20,7 +20,7 @@ func MustParseTime(value string) *time.Time {
 	return &t
 }
 
-func TestGetStationVisibilityNoProjectsNoCollections(t *testing.T) {
+func TestGetVisibilityNoProjectsNoCollections(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -51,7 +51,7 @@ func TestGetStationVisibilityNoProjectsNoCollections(t *testing.T) {
 	}
 }
 
-func TestGetStationVisibilityPrivateProject(t *testing.T) {
+func TestGetVisibilityPrivateProject(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -67,7 +67,7 @@ func TestGetStationVisibilityPrivateProject(t *testing.T) {
 		Privacy:   data.Private,
 	})
 	assert.NoError(err)
-	assert.NoError(e.AddStationToProject(s1, p1))
+	assert.NoError(e.AddStationToProject(s1, p1, nil))
 
 	vs := NewVisibilitySlicer(e.DB)
 
@@ -79,15 +79,15 @@ func TestGetStationVisibilityPrivateProject(t *testing.T) {
 	expected := []*data.DataVisibility{
 		{
 			StationID: s1.ID,
-			StartTime: *p1.StartTime,
-			EndTime:   *p1.EndTime,
-			ProjectID: &p1.ID,
-		},
-		{
-			StationID: s1.ID,
 			StartTime: data.MinimumTime,
 			EndTime:   data.MaximumTime,
 			UserID:    &user1.ID,
+		},
+		{
+			StationID: s1.ID,
+			StartTime: *p1.StartTime,
+			EndTime:   *p1.EndTime,
+			ProjectID: &p1.ID,
 		},
 	}
 
@@ -96,7 +96,7 @@ func TestGetStationVisibilityPrivateProject(t *testing.T) {
 	}
 }
 
-func TestGetStationVisibilityPublicProject(t *testing.T) {
+func TestGetVisibilityPublicProject(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -112,7 +112,7 @@ func TestGetStationVisibilityPublicProject(t *testing.T) {
 		Privacy:   data.Public,
 	})
 	assert.NoError(err)
-	assert.NoError(e.AddStationToProject(s1, p1))
+	assert.NoError(e.AddStationToProject(s1, p1, nil))
 
 	vs := NewVisibilitySlicer(e.DB)
 
@@ -124,14 +124,78 @@ func TestGetStationVisibilityPublicProject(t *testing.T) {
 	expected := []*data.DataVisibility{
 		{
 			StationID: s1.ID,
+			StartTime: data.MinimumTime,
+			EndTime:   data.MaximumTime,
+			UserID:    &user1.ID,
+		},
+		{
+			StationID: s1.ID,
 			StartTime: *p1.StartTime,
 			EndTime:   *p1.EndTime,
 		},
+	}
+
+	if diff := deep.Equal(dvs, expected); diff != nil {
+		t.Error(diff)
+	}
+}
+
+func TestGetVisibilityStationPassesThroughTwoProjects(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	user1, err := e.AddUser()
+	assert.NoError(err)
+	s1, err := e.AddStation(user1)
+	assert.NoError(err)
+	p1, err := e.SaveProject(&data.Project{
+		Name:      "Public Project",
+		StartTime: MustParseTime("2008/01/01 00:00:00"),
+		EndTime:   MustParseTime("2009/01/01 00:00:00"),
+		Privacy:   data.Public,
+	})
+	assert.NoError(err)
+	assert.NoError(e.AddStationToProject(s1, p1, nil))
+
+	p2, err := e.SaveProject(&data.Project{
+		Name:      "Private Project",
+		StartTime: MustParseTime("2008/02/01 00:00:00"),
+		EndTime:   MustParseTime("2008/04/01 00:00:00"),
+		Privacy:   data.Private,
+	})
+	assert.NoError(err)
+	assert.NoError(e.AddStationToProject(s1, p2, nil))
+
+	vs := NewVisibilitySlicer(e.DB)
+
+	dvs, err := vs.Slice(e.Ctx, s1.ID)
+	assert.NoError(err)
+	assert.NotNil(dvs)
+	assert.NotEmpty(dvs)
+
+	expected := []*data.DataVisibility{
 		{
 			StationID: s1.ID,
 			StartTime: data.MinimumTime,
 			EndTime:   data.MaximumTime,
 			UserID:    &user1.ID,
+		},
+		{
+			StationID: s1.ID,
+			StartTime: *p1.StartTime,
+			EndTime:   *p2.StartTime,
+		},
+		{
+			StationID: s1.ID,
+			StartTime: *p2.StartTime,
+			EndTime:   *p2.EndTime,
+			ProjectID: &p2.ID,
+		},
+		{
+			StationID: s1.ID,
+			StartTime: *p2.EndTime,
+			EndTime:   *p1.EndTime,
 		},
 	}
 

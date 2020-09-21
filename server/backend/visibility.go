@@ -28,6 +28,8 @@ func NewVisibilitySlicer(db *sqlxcache.DB) *VisibilitySlicer {
 }
 
 func (vs *VisibilitySlicer) Slice(ctx context.Context, stationID int32) ([]*data.DataVisibility, error) {
+	verbose := false
+
 	ownerships, err := vs.stations.QueryStationOwnershipsByID(ctx, stationID)
 	if err != nil {
 		return nil, err
@@ -38,7 +40,7 @@ func (vs *VisibilitySlicer) Slice(ctx context.Context, stationID int32) ([]*data
 		return nil, err
 	}
 
-	if false {
+	if verbose {
 		fmt.Printf("\nVisibility: %v %v\n", stationID, projects)
 
 		for _, ownership := range ownerships {
@@ -56,47 +58,50 @@ func (vs *VisibilitySlicer) Slice(ctx context.Context, stationID int32) ([]*data
 	markers = append(markers, createOwnershipMarkers(ownerships)...)
 	markers = append(markers, createProjectMarkers(projects)...)
 
+	projectMark := data.MinimumTime
+
 	sort.Sort(byMark(markers))
 
 	openProjects := make(map[int32]*data.Project)
-	// owners := make(map[int32]*data.User)
 
 	for _, marker := range markers {
-		// fmt.Printf("marker: %v open=%v project=%v ownership=%v\n", marker.mark, marker.open, marker.project, marker.ownership)
+		if verbose {
+			fmt.Printf("marker: %v open=%v project=%v ownership=%v\n", marker.mark, marker.open, marker.project, marker.ownership)
+		}
 
-		if marker.open {
-			if marker.project != nil {
-				openProjects[marker.project.ID] = marker.project
-			}
-		} else {
-			if marker.project != nil {
-				projects = getProjects(openProjects)
+		if marker.project != nil {
+			projects = getProjects(openProjects)
 
-				if len(projects) != 1 {
-					return nil, fmt.Errorf("multiple projects unsupported")
-				}
-
-				// TODO Find all active projects and choose most restrictive.
-				project := projects[0]
+			if len(projects) > 0 {
+				project := getMostRestrictivePrivacy(projects)
 
 				if project.Privacy == data.Public {
 					dvs = append(dvs, &data.DataVisibility{
 						StationID: stationID,
-						StartTime: *project.StartTime,
-						EndTime:   *project.EndTime,
+						StartTime: projectMark,
+						EndTime:   marker.mark,
 					})
 				} else {
 					dvs = append(dvs, &data.DataVisibility{
 						StationID: stationID,
-						StartTime: *project.StartTime,
-						EndTime:   *project.EndTime,
+						StartTime: projectMark,
+						EndTime:   marker.mark,
 						ProjectID: &marker.project.ID,
 					})
 				}
-
-				openProjects[marker.project.ID] = nil
 			}
-			if marker.ownership != nil {
+
+			if marker.open {
+				openProjects[marker.project.ID] = marker.project
+			} else {
+				delete(openProjects, marker.project.ID)
+			}
+
+			projectMark = marker.mark
+		}
+
+		if marker.ownership != nil {
+			if marker.open {
 				dvs = append(dvs, &data.DataVisibility{
 					StationID: stationID,
 					StartTime: marker.ownership.StartTime,
@@ -107,9 +112,17 @@ func (vs *VisibilitySlicer) Slice(ctx context.Context, stationID int32) ([]*data
 		}
 	}
 
-	// fmt.Printf("\n")
-
 	return dvs, nil
+}
+
+func getMostRestrictivePrivacy(projects []*data.Project) *data.Project {
+	selected := projects[0]
+	for _, project := range projects {
+		if project.Privacy == data.Private {
+			return project
+		}
+	}
+	return selected
 }
 
 func getProjects(projects map[int32]*data.Project) []*data.Project {
