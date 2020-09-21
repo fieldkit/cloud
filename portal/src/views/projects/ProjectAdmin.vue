@@ -426,7 +426,6 @@ export default {
     margin: 6px 7px 0 0;
     width: 35px;
     height: 35px;
-    border-radius: 50%;
 }
 
 ::v-deep .pagination {
