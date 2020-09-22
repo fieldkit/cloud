@@ -38,7 +38,9 @@ export default Vue.extend({
 <style scoped>
 .default-user-icon {
     margin: 10px 12px 0 0;
-    max-width: 50px;
-    max-height: 50px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 </style>
