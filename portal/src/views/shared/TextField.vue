@@ -38,14 +38,20 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
+@import '../../scss/mixins';
+
 .has-float-label input {
     width: 100%;
-    font-family: 'Avenir';
     padding-left: 0;
     padding-right: 0;
+    filter: none; // hides default styling from moz autofill
 
     &:-webkit-autofill {
         -webkit-box-shadow: 0 0 0 30px white inset !important;
+
+        &::first-line {
+            font-family: "Avenir", Helvetica, Arial, sans-serif;
+        }
 
         + span {
             display: none;
@@ -88,6 +94,10 @@ export default Vue.extend({
     border: 0;
     border-radius: 0;
     border-bottom: 1px solid #d8dce0;
+
+    &:-webkit-autofill {
+        font-size: 16px!important;
+    }
 
     &:focus {
         &::placeholder {
