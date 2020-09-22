@@ -74,7 +74,7 @@ export default {
 .projects-view {
     display: flex;
     flex-direction: column;
-    padding: 10px 90px 60px;
+    padding: 10px 72px 60px;
     text-align: left;
 
     @include bp-down($lg) {
