@@ -14,9 +14,7 @@
             />
 
             <div class="container-main">
-                <div class="container-header">
-                    <HeaderBar @toggled="onSidebarToggle" :isMenuNarrow="sidebar.narrow" />
-                </div>
+                <HeaderBar @toggled="onSidebarToggle" :isMenuNarrow="sidebar.narrow" />
 
                 <slot></slot>
             </div>
@@ -126,11 +124,6 @@ export default Vue.extend({
     flex-direction: column;
     display: flex;
     background: #fcfcfc;
-}
-.container-header {
-    height: 69px;
-    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);
-    z-index: $z-index-top;
 }
 .scrolling-disabled {
     overflow-y: hidden;
