@@ -479,6 +479,8 @@ form > .outer-input-container {
     padding-left: 30px;
     margin: 7px 0;
     cursor: pointer;
+    min-height: 20px;
+    @include flex(center);
 
     input {
         opacity: 0;

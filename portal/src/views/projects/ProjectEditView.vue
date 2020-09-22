@@ -92,4 +92,8 @@ export default Vue.extend({
 #add-project img {
     vertical-align: bottom;
 }
+
+::v-deep .has-float-label input {
+    padding-bottom: 4px;
+}
 </style>
