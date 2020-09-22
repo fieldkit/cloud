@@ -1,20 +1,18 @@
 <template>
-    <div id="white-header" class="header">
-        <div class="header-inner-section">
-            <a class="menu-icon-container" v-on:click="toggleSidebar" v-bind:class="{ active: !isMenuNarrow }">
-                <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22"/>
-            </a>
-            <div class="header-account">
-                <UserPhoto v-if="user" :user="user" />
-                <div>
-                    <router-link v-if="user" :to="{ name: 'editUser' }">
-                        {{ user.name }}
-                    </router-link>
-                    <a class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</a>
-                    <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
-                        Log in
-                    </router-link>
-                </div>
+    <div class="header">
+        <a class="menu-icon-container" v-on:click="toggleSidebar" v-bind:class="{ active: !isMenuNarrow }">
+            <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22"/>
+        </a>
+        <div class="header-account">
+            <UserPhoto v-if="user" :user="user" />
+            <div>
+                <router-link v-if="user" :to="{ name: 'editUser' }">
+                    {{ user.name }}
+                </router-link>
+                <a class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</a>
+                <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
+                    Log in
+                </router-link>
             </div>
         </div>
     </div>
@@ -65,33 +63,29 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import '../../scss/mixins';
-#white-header {
-    width: auto;
-    color: gray;
-    text-align: right;
-    overflow: hidden;
-}
+
 .header {
+    background: #fff;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);
+    z-index: $z-index-top;
+    width: 100%;
+    height: 66px;
+    float: left;
+    padding: 0 10px;
+    box-sizing: border-box;
+    @include flex(center, space-between);
 
-    &-inner-section {
-        width: 100%;
-        height: 69px;
-        float: left;
+    @include bp-down($sm) {
+        padding: 0 20px;
+    }
+
+    @include bp-down($xs) {
         padding: 0 10px;
-        box-sizing: border-box;
-        @include flex(center, space-between);
-
-        @include bp-down($sm) {
-            padding: 0 20px;
-        }
-
-        @include bp-down($xs) {
-            padding: 0 10px;
-        }
     }
 
     &-account {
         padding-right: 62px;
+        text-align: right;
         @include flex(center);
 
         @include bp-down($lg) {

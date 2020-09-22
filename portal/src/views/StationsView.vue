@@ -235,14 +235,11 @@ export default Vue.extend({
     border: solid 1px #f4f5f7;
     background-color: #ffffff;
     cursor: pointer;
-    margin-left: auto;
     @include flex();
 
     &-container {
         z-index: $z-index-top;
-        width: 100%;
-        max-width: 1440px;
-        @include position(absolute, 100px null null 0);
+        @include position(absolute, 90px 25px null null);
 
         @include bp-down($xs) {
             @include position(absolute, 83px null null 0);
@@ -261,6 +258,7 @@ export default Vue.extend({
     &-map {
         background: url("../assets/icon-map.svg") no-repeat center center;
         flex-basis: 50%;
+        border-right: solid 1px #f4f5f7;
 
         &.active {
             background: url("../assets/icon-map-selected.svg") no-repeat center center;
@@ -273,6 +271,8 @@ export default Vue.extend({
     flex-wrap: wrap;
     padding: 100px 70px;
     margin: -20px;
+    width: calc(100% - 40px);
+    box-sizing: border-box;
     max-width: 1080px;
 
     @include bp-down($md) {
