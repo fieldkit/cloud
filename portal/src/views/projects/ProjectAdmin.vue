@@ -23,26 +23,26 @@
                         <div class="project-detail">{{ project.description }}</div>
                     </div>
                     <div class="details-right">
-                        <div class="time-container" v-if="project.startTime">
-                            <div class="details-icon-container">
+                        <div class="details-row" v-if="project.startTime">
+                            <div class="details-icon">
                                 <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" />
                             </div>
                             <template>Started: {{ project.startTime | prettyDate }}</template>
                         </div>
-                        <div class="duration-container" v-if="displayProject.duration">
-                            <div class="details-icon-container">
+                        <div class="details-row" v-if="displayProject.duration">
+                            <div class="details-icon">
                                 <img alt="Location" src="@/assets/icon-time.svg" class="icon" />
                             </div>
                             <template>{{ displayProject.duration | prettyDuration }}</template>
                         </div>
-                        <div class="location-container" v-if="project.location">
-                            <div class="details-icon-container">
+                        <div class="details-row" v-if="project.location">
+                            <div class="details-icon">
                                 <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
                             </div>
                             <template>{{ project.location }}</template>
                         </div>
-                        <div class="location-container" v-if="displayProject.places.native">
-                            <div class="details-icon-container">
+                        <div class="details-row" v-if="displayProject.places.native">
+                            <div class="details-icon">
                                 <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
                             </div>
                             <template>Native Lands: {{ displayProject.places.native }}</template>
@@ -173,6 +173,7 @@ export default {
 
 <style scoped lang="scss">
 @import '../../scss/mixins';
+@import '../../scss/project';
 
 .project-admin {
     display: flex;
@@ -303,42 +304,7 @@ export default {
     font-weight: 600;
     cursor: pointer;
 }
-.details .details-top {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding-bottom: 30px;
-    line-height: 1.5;
 
-    @include bp-down($xs) {
-        padding-bottom: 20px;
-    }
-}
-.details .details-left {
-    padding-right: 20px;
-    flex-grow: 1;
-    flex: 2;
-
-    @include bp-down($xs) {
-        flex-basis: 100%;
-        padding: 0;
-        margin-bottom: 15px;
-    }
-}
-.details .details-right {
-    flex-grow: 1;
-    flex: 1;
-
-    > div {
-        margin-bottom: 5px;
-        white-space: nowrap;
-        @include flex(center);
-
-        @include bp-down($xs) {
-            margin-bottom: 2px;
-        }
-    }
-}
 .details .details-bottom {
     border-top: 1px solid #d8dce0;
     padding-top: 20px;
@@ -364,9 +330,6 @@ export default {
 .details-bottom .title {
     font-weight: 500;
     font-size: 14px;
-}
-.details-icon-container {
-    width: 20px;
 }
 
 .row-section.data-readings {
@@ -417,7 +380,7 @@ export default {
     margin: 6px 7px 0 0;
 }
 .project-detail {
-    &:nth-of-type(1) {
+    &:not(:last-of-type) {
         padding-bottom: 6px;
     }
 }
