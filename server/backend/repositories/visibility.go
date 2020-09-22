@@ -132,12 +132,23 @@ func findMatching(dvs []*data.DataVisibility, c *data.DataVisibility) *data.Data
 		if dv.EndTime != c.EndTime {
 			continue
 		}
-		if dv.ProjectID != c.ProjectID {
+		if !compareInt32(dv.ProjectID, c.ProjectID) {
 			continue
 		}
-		if dv.UserID != c.UserID {
+		if !compareInt32(dv.UserID, c.UserID) {
 			continue
 		}
+		return dv
 	}
 	return nil
+}
+
+func compareInt32(a, b *int32) bool {
+	if a == nil && b == nil {
+		return true
+	}
+	if a != nil && b != nil {
+		return *a == *b
+	}
+	return false
 }
