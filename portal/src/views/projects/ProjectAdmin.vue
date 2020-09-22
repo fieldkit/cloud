@@ -213,7 +213,6 @@ export default {
 }
 .details > .left {
     max-width: 400px;
-    flex: 1;
     border: 1px solid #d8dce0;
     border-radius: 1px;
     margin-right: 20px;
@@ -242,10 +241,12 @@ export default {
 .photo-container {
     margin-bottom: 10px;
     display: flex;
+    width: 288px;
+    max-height: 139px;
 
     img {
         object-fit: cover;
-        max-width: 100%;
+        width: 100%;
         max-height: 100%;
     }
 

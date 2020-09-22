@@ -25,7 +25,7 @@
                         @selected="showSummary(station)"
                     >
                         <div class="station-links">
-                            <div class="notes" v-on:click="openNotes(station)">Notes</div>
+                            <img class="notes" v-on:click="openNotes(station)" src="@/assets/icon-field-notes.svg" />
                             <div class="remove" v-on:click="removeStation(station)">Delete</div>
                         </div>
                     </TinyStation>
@@ -284,12 +284,11 @@ export default Vue.extend({
 
 .station-links {
     margin-left: auto;
-    width: 5em;
+    flex: 0 0 61px;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
     border-left: 1px solid #d8dce0;
-    padding-left: 1em;
     text-align: center;
 }
 
