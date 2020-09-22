@@ -368,6 +368,7 @@ export default {
 }
 .details-icon-container {
     width: 20px;
+    display: flex;
 }
 
 .row-section.data-readings {

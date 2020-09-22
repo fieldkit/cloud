@@ -26,7 +26,6 @@
                     >
                         <div class="station-links">
                             <img class="notes" v-on:click="openNotes(station)" src="@/assets/icon-field-notes.svg" />
-                            <div class="remove" v-on:click="removeStation(station)">Delete</div>
                         </div>
                     </TinyStation>
                 </div>
@@ -242,12 +241,17 @@ export default Vue.extend({
     border-radius: 1px;
     border: solid 1px #d8dce0;
     background-color: #ffffff;
+    overflow: hidden;
 }
 .stations-panel {
     transition: width 0.5s;
     flex: 1;
     display: flex;
     flex-direction: column;
+
+    @include bp-down($xs) {
+        flex-basis: 85%;
+    }
 }
 .stations-panel .stations {
     padding: 20px 25px 0;
