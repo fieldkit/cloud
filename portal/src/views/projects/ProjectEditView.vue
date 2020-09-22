@@ -93,7 +93,4 @@ export default Vue.extend({
     vertical-align: bottom;
 }
 
-::v-deep .has-float-label input {
-    padding-bottom: 4px;
-}
 </style>

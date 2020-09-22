@@ -439,6 +439,8 @@ form > .outer-input-container {
     margin: 7px 0;
     position: relative;
     cursor: pointer;
+    min-height: 22px;
+    @include flex(center);
 
     input {
         opacity: 0;
@@ -617,5 +619,8 @@ form > .outer-input-container {
             background-size: 10px;
         }
     }
+}
+::v-deep .has-float-label input {
+    padding-bottom: 4px;
 }
 </style>
