@@ -109,7 +109,7 @@ export default {
     margin-top: 10px;
 }
 .sidebar-header {
-    height: 70px;
+    height: 61px;
     border-bottom: 1px solid rgba(235, 235, 235, 1);
     opacity: 0;
     @include flex(center, center);
