@@ -4,18 +4,18 @@
             <a class="menu-icon-container" v-on:click="toggleSidebar" v-bind:class="{ active: !isMenuNarrow }">
                 <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22"/>
             </a>
-            <div class="text-elements">
-                <div class="user-name">
-                    <router-link v-if="user" :to="{ name: 'editUser' }" class="account-link">
+            <div class="header-account">
+                <UserPhoto v-if="user" :user="user" />
+                <div>
+                    <router-link v-if="user" :to="{ name: 'editUser' }">
                         {{ user.name }}
                     </router-link>
+                    <a class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</a>
+                    <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
+                        Log in
+                    </router-link>
                 </div>
-                <div class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</div>
-                <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
-                    Log in
-                </router-link>
             </div>
-            <UserPhoto v-if="user" :user="user" />
         </div>
     </div>
 </template>
@@ -71,48 +71,61 @@ export default Vue.extend({
     text-align: right;
     overflow: hidden;
 }
-.header-inner-section {
-    width: 100%;
-    max-width: 1180px;
-    height: 69px;
-    float: left;
-    padding: 0 10px;
-    box-sizing: border-box;
+.header {
 
-    @include bp-down($sm) {
-        padding: 0 20px;
+    &-inner-section {
+        width: 100%;
+        height: 69px;
+        float: left;
+        padding: 0 10px;
+        box-sizing: border-box;
+        @include flex(center, space-between);
+
+        @include bp-down($sm) {
+            padding: 0 20px;
+        }
+
+        @include bp-down($xs) {
+            padding: 0 10px;
+        }
     }
 
-    @include bp-down($xs) {
-        padding: 0 10px;
+    &-account {
+        padding-right: 62px;
+        @include flex(center);
+
+        @include bp-down($lg) {
+            padding-right: 0;
+        }
+
+        a {
+            display: block;
+            font-size: 16px;
+            color: initial;
+
+            &:not(.log-out) {
+                font-weight: 500;
+            }
+        }
     }
 }
+
 .menu-icon-container {
     float: left;
     transition: all 0.33s;
-    margin-top: 20px;
     cursor: pointer;
 
     @include bp-down($md) {
         &.active {
             transform: translateX(175px);
-            margin-top: 22px;
         }
     }
 }
-.text-elements {
-    float: right;
-}
-.user-name {
-    padding: 12px 0 0 0;
-}
-.account-link {
-    text-decoration: underline;
-    cursor: pointer;
-}
+
 .log-out,
 .log-in {
     padding: 0 0 0 0;
     cursor: pointer;
 }
+
 </style>
