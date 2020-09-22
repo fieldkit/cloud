@@ -24,17 +24,17 @@
                     </div>
                 </div>
                 <div class="close-button" v-on:click="wantCloseSummary">
-                    <img alt="Close" src="@/assets/close.png" />
+                    <img alt="Close" src="@/assets/icon-close.svg" />
                 </div>
             </div>
 
             <div class="row where-row">
                 <div class="location-container" v-if="station.locationName ? station.locationName : station.placeNameOther">
-                    <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                    <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
                     <template>{{ station.locationName ? station.locationName : station.placeNameOther }}</template>
                 </div>
                 <div class="location-container" v-if="station.placeNameNative">
-                    <img alt="Location" src="@/assets/icon-location.png" class="icon" />
+                    <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
                     <template>Native Lands: {{ station.placeNameNative }}</template>
                 </div>
 
@@ -127,7 +127,7 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .station-hover-summary {
     position: absolute;
     background-color: #ffffff;
@@ -162,6 +162,11 @@ export default Vue.extend({
 .module-icon-container {
     float: left;
     margin-right: 5px;
+
+    img {
+        width: 22px;
+        height: 22px;
+    }
 }
 .location-coordinates {
     display: flex;

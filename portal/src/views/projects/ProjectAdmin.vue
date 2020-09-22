@@ -165,7 +165,7 @@ export default {
             this.viewingActivityFeed = true;
         },
         getModuleImg(module) {
-            return this.$loadAsset("modules-lg/" + utils.getModuleImg(module));
+            return this.$loadAsset(utils.getModuleImg(module));
         },
     },
 };

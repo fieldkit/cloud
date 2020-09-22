@@ -103,7 +103,7 @@ export default {
     },
     methods: {
         getModuleImg(module) {
-            return this.$loadAsset("modules-lg/" + utils.getModuleImg(module));
+            return this.$loadAsset(utils.getModuleImg(module));
         },
         getTeamHeading() {
             const members = this.displayProject.users.length == 1 ? "member" : "members";
