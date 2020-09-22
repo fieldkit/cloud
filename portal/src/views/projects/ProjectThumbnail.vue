@@ -89,7 +89,7 @@ export default {
 @import '../../scss/mixins';
 
 .project-container {
-    flex-basis: calc(33.33% - 24px);
+    flex-basis: 270px;
     border: 1px solid #d8dce0;
     margin: 0 12px 40px;
     padding-bottom: 17px;
