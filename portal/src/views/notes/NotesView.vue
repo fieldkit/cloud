@@ -4,57 +4,55 @@
             <DoubleHeader :title="project.name" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="project" />
             <DoubleHeader title="My Stations" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="!project" />
 
-            <div class="lower">
-                <div class="main empty" v-if="!hasStations">
-                    There are no stations to view.
-                </div>
-                <template v-else>
-                    <div class="station-tabs">
-                        <div class="tab"
-                             v-for="station in stations"
-                             v-bind:key="station.id"
-                             v-bind:class="{active: selectedStation.id === station.id}"
-                             v-on:click="onSelected(station)">
-                            <div class="tab-wrap">
-                                <div class="name"> {{ station.name }} </div>
-                                <div v-if="station.deployedAt" class="deployed">Deployed</div>
-                                <div v-else class="undeployed">Not Deployed</div>
+            <div class="main empty" v-if="!hasStations">
+                There are no stations to view.
+            </div>
+            <template v-else>
+                <div class="station-tabs">
+                    <div class="tab"
+                         v-for="station in stations"
+                         v-bind:key="station.id"
+                         v-bind:class="{active: selectedStation.id === station.id}"
+                         v-on:click="onSelected(station)">
+                        <div class="tab-wrap">
+                            <div class="name"> {{ station.name }} </div>
+                            <div v-if="station.deployedAt" class="deployed">Deployed</div>
+                            <div v-else class="undeployed">Not Deployed</div>
+                        </div>
+                        <div class="tab-content" v-if="selectedStation && selectedNotes">
+                            <div v-if="loading" class="main">
+                                <Spinner />
                             </div>
-                            <div class="tab-content" v-if="selectedStation && selectedNotes">
-                                <div v-if="loading" class="main">
-                                    <Spinner />
+                            <div class="notifications">
+                                <div v-if="failed" class="notification failed">
+                                    Oops, there was a problem.
                                 </div>
-                                <div class="notifications">
-                                    <div v-if="failed" class="notification failed">
-                                        Oops, there was a problem.
-                                    </div>
 
-                                    <div v-if="success" class="notification success">
-                                        Saved.
-                                    </div>
+                                <div v-if="success" class="notification success">
+                                    Saved.
                                 </div>
-                                <NotesViewer
-                                        :station="selectedStation"
-                                        :notes="selectedNotes"
-                                        v-bind:key="stationId"
-                                        v-if="project.project.readOnly"
-                                />
-                                <NotesForm
-                                        v-else
-                                        :station="selectedStation"
-                                        :notes="selectedNotes"
-                                        @save="saveForm"
-                                        v-bind:key="stationId"
-                                        @change="onChange"
-                                />
                             </div>
-                            <div v-else class="tab-content empty">
-                                Please choose a station from the left.
-                            </div>
+                            <NotesViewer
+                                    :station="selectedStation"
+                                    :notes="selectedNotes"
+                                    v-bind:key="stationId"
+                                    v-if="project.project.readOnly"
+                            />
+                            <NotesForm
+                                    v-else
+                                    :station="selectedStation"
+                                    :notes="selectedNotes"
+                                    @save="saveForm"
+                                    v-bind:key="stationId"
+                                    @change="onChange"
+                            />
+                        </div>
+                        <div v-else class="tab-content empty">
+                            Please choose a station from the left.
                         </div>
                     </div>
-                </template>
-            </div>
+                </div>
+            </template>
         </div>
     </StandardLayout>
 </template>
@@ -254,7 +252,6 @@ export default Vue.extend({
 .notes-view .lower {
     display: flex;
     flex-direction: row;
-    background: white;
     margin-top: 20px;
     position: relative;
 }
@@ -303,6 +300,7 @@ export default Vue.extend({
     border-top: 1px solid #d8dce0;
     border-left: 1px solid #d8dce0;
     border-right: 1px solid #d8dce0;
+    position: relative;
 
     @include bp-down($md) {
         flex-basis: 100%;
@@ -311,9 +309,12 @@ export default Vue.extend({
 .tab {
     border-bottom: 1px solid #d8dce0;
     cursor: pointer;
+    background: #fff;
+    width: 250px;
 
     @include bp-down($md) {
         border: 0;
+        width: unset;
     }
 
     &.active {

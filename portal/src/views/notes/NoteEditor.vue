@@ -59,14 +59,6 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.note-editor {
-
-}
-
-.title {
-    font-size: 16px;
-    font-weight: 500;
-}
 
 .field {
     margin-top: 10px;

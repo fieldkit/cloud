@@ -121,7 +121,7 @@ export class Notes {
     static Keys = ["studyObjective", "sitePurpose", "siteCriteria", "siteDescription"];
 
     public readonly studyObjective: NoteForm = new NoteForm("", new NoteHelp("Study Objective"));
-    public readonly sitePurpose: NoteForm = new NoteForm("", new NoteHelp("Purpose of Site"));
+    public readonly sitePurpose: NoteForm = new NoteForm("", new NoteHelp("Purpose of Site Location"));
     public readonly siteCriteria: NoteForm = new NoteForm("", new NoteHelp("Site Criteria"));
     public readonly siteDescription: NoteForm = new NoteForm("", new NoteHelp("Site Description"));
 
