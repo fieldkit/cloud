@@ -5,7 +5,7 @@
             <h2 v-if="project && project.id">Edit Project</h2>
 
             <div class="close-form-button" v-on:click="closeForm">
-                <img alt="Close" src="@/assets/close.png" />
+                <img alt="Close" src="@/assets/icon-close.svg" />
             </div>
         </div>
 

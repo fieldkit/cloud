@@ -24,6 +24,8 @@ export default {
 };
 </script>
 <style lang="scss">
+@import 'scss/mixins';
+
 html {
 }
 html,
@@ -55,6 +57,10 @@ body.disable-scrolling {
 }
 body.blue-background {
     background-color: #1b80c9;
+
+    @include bp-down($md) {
+        background-color: #fff;
+    }
 }
 html.map-view {
     height: 100%;

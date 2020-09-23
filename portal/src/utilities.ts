@@ -57,30 +57,30 @@ export function getModuleImg(module) {
     switch (module.name) {
         case "modules.distance":
         case "distance":
-            return "Icon_Distance_Module.png";
+            return "modules/icon-module-distance.svg";
         case "modules.weather":
         case "weather":
-            return "Icon_Weather_Module.png";
+            return "modules/icon-module-weather.svg";
         case "modules.water.ec":
         case "water.ec":
-            return "Icon_WaterConductivity_Module.png";
+            return "modules/icon-module-water-conductivity.svg";
         case "modules.water.ph":
         case "water.ph":
-            return "Icon_WaterpH_Module.png";
+            return "modules/icon-module-water-ph.svg";
         case "modules.water.do":
         case "water.do":
-            return "Icon_DissolvedOxygen_Module.png";
+            return "modules/icon-module-dissolved-oxygen.svg";
         case "modules.water.temp":
         case "water.temp":
-            return "Icon_WaterTemp_Module.png";
+            return "modules/icon-module-water-temp.svg";
         case "modules.water.orp":
         case "water.orp":
-            return "Icon_Water_Module.png";
+            return "modules/icon-module-water.svg";
         case "modules.water.unknown":
         case "water.unknown":
-            return "Icon_Water_Module.png";
+            return "modules/icon-module-water.svg";
         default:
-            return "Icon_Generic_Module.png";
+            return "modules/icon-module-generic.svg";
     }
 }
 

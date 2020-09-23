@@ -1,21 +1,19 @@
 <template>
-    <div id="white-header" class="header">
-        <div class="header-inner-section">
-            <a class="menu-icon-container" v-on:click="toggleSidebar" v-bind:class="{ active: !isMenuNarrow }">
-                <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22"/>
-            </a>
-            <div class="text-elements">
-                <div class="user-name">
-                    <router-link v-if="user" :to="{ name: 'editUser' }" class="account-link">
-                        {{ user.name }}
-                    </router-link>
-                </div>
-                <div class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</div>
+    <div class="header">
+        <a class="menu-icon-container" v-on:click="toggleSidebar" v-bind:class="{ active: !isMenuNarrow }">
+            <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22"/>
+        </a>
+        <div class="header-account">
+            <UserPhoto v-if="user" :user="user" />
+            <div>
+                <router-link v-if="user" :to="{ name: 'editUser' }">
+                    {{ user.name }}
+                </router-link>
+                <a class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</a>
                 <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
                     Log in
                 </router-link>
             </div>
-            <UserPhoto v-if="user" :user="user" />
         </div>
     </div>
 </template>
@@ -65,19 +63,17 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import '../../scss/mixins';
-#white-header {
-    width: auto;
-    color: gray;
-    text-align: right;
-    overflow: hidden;
-}
-.header-inner-section {
+
+.header {
+    background: #fff;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);
+    z-index: $z-index-top;
     width: 100%;
-    max-width: 1180px;
-    height: 69px;
+    height: 66px;
     float: left;
     padding: 0 10px;
     box-sizing: border-box;
+    @include flex(center, space-between);
 
     @include bp-down($sm) {
         padding: 0 20px;
@@ -86,33 +82,44 @@ export default Vue.extend({
     @include bp-down($xs) {
         padding: 0 10px;
     }
+
+    &-account {
+        padding-right: 62px;
+        text-align: right;
+        @include flex(center);
+
+        @include bp-down($lg) {
+            padding-right: 0;
+        }
+
+        a {
+            display: block;
+            font-size: 16px;
+            color: initial;
+
+            &:not(.log-out) {
+                font-weight: 500;
+            }
+        }
+    }
 }
+
 .menu-icon-container {
     float: left;
     transition: all 0.33s;
-    margin-top: 20px;
     cursor: pointer;
 
     @include bp-down($md) {
         &.active {
             transform: translateX(175px);
-            margin-top: 22px;
         }
     }
 }
-.text-elements {
-    float: right;
-}
-.user-name {
-    padding: 12px 0 0 0;
-}
-.account-link {
-    text-decoration: underline;
-    cursor: pointer;
-}
+
 .log-out,
 .log-in {
     padding: 0 0 0 0;
     cursor: pointer;
 }
+
 </style>

@@ -8,7 +8,6 @@
 
                 <div class="below-photo">
                     <DisplayProjectTags :tags="project.tags" />
-                    <FollowPanel :project="project" v-bind:key="project.id" />
                 </div>
             </div>
 
@@ -17,20 +16,28 @@
                     {{ project.name }}
                 </div>
                 <div class="details-top">
-                    <div class="time-container" v-if="project.startTime">
-                        <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" />
+                    <div class="details-row" v-if="project.startTime">
+                        <div class="details-icon">
+                            <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" />
+                        </div>
                         <template>Started: {{ project.startTime | prettyDate }}</template>
                     </div>
-                    <div class="duration-container" v-if="displayProject.duration">
-                        <img alt="Location" src="@/assets/icon-time.svg" class="icon" />
+                    <div class="details-row" v-if="displayProject.duration">
+                        <div class="details-icon">
+                            <img alt="Location" src="@/assets/icon-time.svg" class="icon" />
+                        </div>
                         <template>{{ displayProject.duration | prettyDuration }}</template>
                     </div>
-                    <div class="location-container" v-if="project.location">
-                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                    <div class="details-row" v-if="project.location">
+                        <div class="details-icon">
+                            <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                        </div>
                         <template>{{ project.location }}</template>
                     </div>
-                    <div class="location-container" v-if="displayProject.places.native">
-                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                    <div class="details-row" v-if="displayProject.places.native">
+                        <div class="details-icon">
+                            <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                        </div>
                         <template>Native Lands: {{ displayProject.places.native }}</template>
                     </div>
                 </div>
@@ -103,7 +110,7 @@ export default {
     },
     methods: {
         getModuleImg(module) {
-            return this.$loadAsset("modules-lg/" + utils.getModuleImg(module));
+            return this.$loadAsset(utils.getModuleImg(module));
         },
         getTeamHeading() {
             const members = this.displayProject.users.length == 1 ? "member" : "members";
@@ -113,7 +120,9 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/project';
+
 .project-public {
     display: flex;
     flex-direction: column;
@@ -148,24 +157,32 @@ export default {
 
 .details {
     display: flex;
-    flex-direction: row;
-    border: 2px solid #d8dce0;
     border-radius: 2px;
+    border: solid 1px #d8dce0;
     background-color: white;
 }
 .details > .left {
-    max-width: 400px;
-    min-height: 335px;
     flex: 1;
-    padding: 20px;
+    padding: 23px 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
 }
 .details .project-detail {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 9px;
+    line-height: 1.5;
 }
+
+.photo {
+    width: 380px;
+    max-height: 234px;
+
+    img {
+        object-fit: cover;
+    }
+}
+
+
 .details .below-photo {
     margin-top: auto;
 }
@@ -180,13 +197,14 @@ export default {
 
 .details .details-heading {
     font-weight: 900;
-    padding-bottom: 20px;
+    padding-bottom: 10px;
     font-size: 24px;
     color: #2c3e50;
 }
 .details .details-top {
     display: flex;
     flex-direction: column;
+    padding-bottom: 10px;
 }
 .details .icon {
     padding-right: 0.2em;
@@ -200,20 +218,20 @@ export default {
 .details-bottom .details-team {
     flex: 1;
 }
-.details-bottom .details-modules {
-    flex: 1;
+.details-modules {
+    margin-top: 4px;
 }
 .details-bottom .title {
     font-weight: bold;
 }
 
 .module-icon {
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     margin-right: 10px;
 }
 
-/deep/ .project-image {
+::v-deep .project-image {
     width: 100%;
     height: auto;
 }
@@ -221,4 +239,10 @@ export default {
 .project-container {
     margin-top: 20px;
 }
+
+.details-icon {
+    width: 23px;
+}
+
+
 </style>
