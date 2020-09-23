@@ -9,13 +9,11 @@
                 :isAuthenticated="isAuthenticated"
                 :stations="stations"
                 :projects="userProjects"
-                :narrow="sidebar.narrow"
                 @show-station="showStation"
-                @toggle-menu="onSidebarToggle"
             />
 
             <div class="container-main">
-                <HeaderBar @toggled="onSidebarToggle" :isMenuNarrow="sidebar.narrow" />
+                <HeaderBar />
 
                 <slot></slot>
             </div>
@@ -66,13 +64,6 @@ export default Vue.extend({
             default: false,
         },
     },
-    data: () => {
-        return {
-            sidebar: {
-                narrow: window.screen.availWidth > 1040 ? false : true,
-            },
-        };
-    },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy", mapped: "mapped" }),
         ...mapState({
@@ -86,24 +77,7 @@ export default Vue.extend({
     beforeMount() {
         console.log("StandardLayout: beforeMount");
     },
-    mounted() {
-        const desktopBreakpoint = 1040;
-
-        const windowAny: any = window;
-        const resizeObserver = new windowAny.ResizeObserver((entries) => {
-            if (entries[0].contentRect.width < desktopBreakpoint) {
-                if (!this.sidebar.narrow) {
-                    this.onSidebarToggle();
-                }
-            }
-        });
-        resizeObserver.observe(document.querySelector("body"));
-    },
     methods: {
-        onSidebarToggle(...args) {
-            this.sidebar.narrow = !this.sidebar.narrow;
-            this.$emit("sidebar-toggle", this.sidebar.narrow);
-        },
         showStation(station, ...args) {
             this.$emit("show-station", station.id);
             if (this.defaultShowStation) {

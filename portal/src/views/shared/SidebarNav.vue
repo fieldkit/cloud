@@ -1,10 +1,13 @@
 <template>
-    <div class="container-side" v-bind:class="{ active: !narrow }">
+    <div class="container-side" v-bind:class="{ active: !sidebar.narrow }">
         <div class="sidebar-header">
             <router-link :to="{ name: 'projects' }">
                 <img alt="FieldKit Logo" id="header-logo" src="@/assets/logo-fieldkit.svg" />
             </router-link>
         </div>
+        <a class="sidebar-trigger" v-on:click="toggleSidebar">
+            <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22"/>
+        </a>
         <div id="inner-nav">
             <div class="nav-section">
                 <router-link :to="{ name: 'projects' }">
@@ -36,9 +39,11 @@
                         </span>
                     </div>
                 </router-link>
-                <div class="nav-link" v-on:click="showStation(station)" v-for="station in stations" v-bind:key="station.id"
-                     v-bind:class="{ selected: viewingStations && viewingStation.id === station.id }">
-                    {{ station.name }}
+                <div v-for="station in stations" v-bind:key="station.id">
+                    <span class="nav-link" v-on:click="showStation(station)"
+                         v-bind:class="{ selected: viewingStations && viewingStation && viewingStation.id === station.id }">
+                        {{ station.name }}
+                    </span>
                 </div>
                 <div v-if="isAuthenticated && stations.length == 0" class="nav-link">
                     No stations added
@@ -67,15 +72,39 @@ export default {
             default: false,
         },
     },
+  /*  mounted() {
+        const desktopBreakpoint = 1040;
+
+        const windowAny: any = window;
+        const resizeObserver = new windowAny.ResizeObserver((entries) => {
+            if (entries[0].contentRect.width < desktopBreakpoint) {
+                if (!this.sidebar.narrow) {
+                    this.sidebar.narrow = true;
+                }
+            }
+        });
+        resizeObserver.observe(document.querySelector("body"));
+    },*/
+    data: () => {
+        return {
+            sidebar: {
+                narrow: window.screen.availWidth > 1040 ? false : true,
+            }
+        };
+    },
     methods: {
         showStation(station) {
             this.$emit("show-station", station);
+            this.closeMenuOnMobile();
         },
         closeMenuOnMobile() {
             if (window.screen.availWidth < 1040) {
-                this.$emit("toggle-menu", true);
+                this.sidebar.narrow = true;
             }
-        }
+        },
+        toggleSidebar(...args) {
+            this.sidebar.narrow = !this.sidebar.narrow;
+        },
     },
 };
 </script>
@@ -101,6 +130,7 @@ export default {
         width: 0;
         background: #fff;
         height: 100%;
+        overflow: visible;
         @include position(fixed, 0 null null 0);
     }
 }
@@ -109,16 +139,17 @@ export default {
     margin-top: 10px;
 }
 .sidebar-header {
-    height: 61px;
+    height: 66px;
     border-bottom: 1px solid rgba(235, 235, 235, 1);
     opacity: 0;
     @include flex(center, center);
+    transition: 0.33s opacity;
 
     @at-root .container-side.active & {
        opacity: 1;
     }
 
-    @include bp-down($md) {
+    @include bp-down($xs) {
         justify-content: flex-start;
         padding: 0 20px;
     }
@@ -180,12 +211,11 @@ export default {
     font-weight: normal;
     font-size: 14px;
     margin: 0 0 0 30px;
-    display: block;
+    display: inline-block;
     line-height: 1.2;
 
     &.selected {
         padding-bottom: 2px;
-        margin-bottom: 2px;
     }
 }
 .sidebar-compass {
@@ -195,6 +225,7 @@ export default {
     opacity: 1;
     transform: translateX(0);
     width: 65px;
+    height: 66px;
     @include position(absolute, 0 null null 0);
 
     @at-root .container-side.active & {
@@ -202,8 +233,37 @@ export default {
         opacity: 0;
         transform: translateX(100px);
     }
+
+    @include bp-down($md) {
+        display: none;
+    }
 }
 .sidebar-compass img {
     align-self: center;
+}
+.sidebar-trigger {
+    transition: all 0.33s;
+    cursor: pointer;
+    @include position(absolute, 23px null null 77px);
+
+    @include bp-down($md) {
+        left: 20px;
+
+        &.active {
+            transform: translateX(175px);
+        }
+    }
+
+    @include bp-down($xs) {
+        left: 10px;
+    }
+
+    .container-side.active & {
+        left: 251px;
+
+        @include bp-down($xs) {
+            left: 188px;
+        }
+    }
 }
 </style>

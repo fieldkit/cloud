@@ -1,8 +1,5 @@
 <template>
     <div class="header">
-        <a class="menu-icon-container" v-on:click="toggleSidebar" v-bind:class="{ active: !isMenuNarrow }">
-            <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22"/>
-        </a>
         <div class="header-account">
             <UserPhoto v-if="user" :user="user" />
             <div>
@@ -31,12 +28,6 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
     },
-    props: {
-        isMenuNarrow: {
-            type: Boolean,
-            default: false,
-        },
-    },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({ user: (s: GlobalState) => s.user.user }),
@@ -52,10 +43,7 @@ export default Vue.extend({
             return this.$store.dispatch(ActionTypes.LOGOUT).then(() => {
                 return this.$router.push({ name: "login" });
             });
-        },
-        toggleSidebar() {
-            this.$emit("toggled");
-        },
+        }
     },
 
 });
@@ -73,7 +61,7 @@ export default Vue.extend({
     float: left;
     padding: 0 10px;
     box-sizing: border-box;
-    @include flex(center, space-between);
+    @include flex(center, flex-end);
 
     @include bp-down($sm) {
         padding: 0 20px;
@@ -100,18 +88,6 @@ export default Vue.extend({
             &:not(.log-out) {
                 font-weight: 500;
             }
-        }
-    }
-}
-
-.menu-icon-container {
-    float: left;
-    transition: all 0.33s;
-    cursor: pointer;
-
-    @include bp-down($md) {
-        &.active {
-            transform: translateX(175px);
         }
     }
 }
