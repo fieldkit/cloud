@@ -92,4 +92,5 @@ export default Vue.extend({
 #add-project img {
     vertical-align: bottom;
 }
+
 </style>

@@ -35,7 +35,7 @@
                 </div>
             </div>
             <div class="image-container">
-                <ImageUploader :image="{ url: project ? project.photo : null }" @change="onImage" />
+                <ImageUploader :image="{ url: project ? project.photo : null }" :placeholder="imagePlaceholder" @change="onImage" />
             </div>
             <div class="outer-input-container">
                 <TextField v-model="form.location" label="Location" />
@@ -140,6 +140,8 @@ import { helpers, required, email, minValue, maxLength, minLength } from "vuelid
 import FKApi from "@/api/api";
 import * as ActionTypes from "@/store/actions";
 
+import PlaceholderImage from "../../assets/image-placeholder.svg";
+
 const afterOtherDate = (afterOtherDate) =>
     helpers.withParams({ type: "afterOtherDate", after: afterOtherDate }, function (this: any, value, parentVm) {
         const other = helpers.ref(afterOtherDate, this, parentVm);
@@ -182,6 +184,7 @@ export default Vue.extend({
                 pickedStart: null,
                 pickedEnd: null,
             },
+            imagePlaceholder: PlaceholderImage,
         };
     },
     validations: {
@@ -439,6 +442,8 @@ form > .outer-input-container {
     margin: 7px 0;
     position: relative;
     cursor: pointer;
+    min-height: 22px;
+    @include flex(center);
 
     input {
         opacity: 0;
@@ -479,6 +484,8 @@ form > .outer-input-container {
     padding-left: 30px;
     margin: 7px 0;
     cursor: pointer;
+    min-height: 20px;
+    @include flex(center);
 
     input {
         opacity: 0;
@@ -615,5 +622,8 @@ form > .outer-input-container {
             background-size: 10px;
         }
     }
+}
+::v-deep .has-float-label input {
+    padding-bottom: 4px;
 }
 </style>
