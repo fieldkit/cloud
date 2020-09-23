@@ -119,51 +119,30 @@ export default Vue.extend({
 @import '../../scss/forms';
 @import '../../scss/layout';
 
-.heading {
-    font-weight: bold;
-    font-size: 24px;
+h2 {
+    margin-bottom: 0;
+
+    @include bp-down($xs) {
+        margin: 40px 0 20px;
+    }
 }
-.image-container {
-    margin-bottom: 40px;
-}
+
 ::v-deep .user-image img {
     max-width: 400px;
     max-height: 400px;
 }
+::v-deep .heading {
+    font-size: 16px;
+    font-weight: 500;
+}
+
 #loading {
     width: 100%;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.65);
     text-align: center;
 }
-.input-container {
-    display: flex;
-    flex-direction: column;
-    margin: 10px 0 0 0px;
-}
-#public-checkbox-container {
-}
-#public-checkbox-container input {
-}
-#public-checkbox-container label {
-}
-#public-checkbox-container img {
-}
-.password-change-heading {
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 40px;
-}
-.password-change {
-    margin-top: 20px;
-}
 
-.validation-errors {
-    color: #c42c44;
-    display: block;
-    font-size: 14px;
-    margin-bottom: 25px;
-}
 .notification.success {
     margin-top: 20px;
     margin-bottom: 20px;

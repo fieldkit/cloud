@@ -381,8 +381,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
 @import '../../scss/forms';
+@import '../../scss/global';
 
 form > .outer-input-container {
     margin-bottom: 20px;
@@ -405,7 +405,7 @@ form > .outer-input-container {
     width: 100%;
     margin: 28px 0 15px;
 }
-::v-deep .image-container img {
+::v-deep .image-container .img {
     max-width: 275px;
     max-height: 135px;
     margin-right: 10px;
@@ -479,41 +479,6 @@ form > .outer-input-container {
     }
 }
 
-.checkbox {
-    position: relative;
-    padding-left: 30px;
-    margin: 7px 0;
-    cursor: pointer;
-    min-height: 20px;
-    @include flex(center);
-
-    input {
-        opacity: 0;
-        position: absolute;
-        z-index: -1;
-    }
-
-    &-btn {
-        width: 18px;
-        height: 18px;
-        border-radius: 2px;
-        border: solid 1px rgba(0, 0, 0, 0.1);
-        background: #f2f4f7;
-        @include position(absolute, 0 null null 0);
-    }
-
-    input:checked ~ .checkbox-btn {
-        &:after {
-            @include position(absolute, 0 null null 0);
-            content: "";
-            background: url("../../assets/icon-tick.svg") no-repeat center center;
-            background-size: 10px 8px;
-            width: 20px;
-            height: 20px;
-        }
-    }
-}
-
 .action-container {
     display: flex;
     flex-wrap: wrap;
@@ -545,13 +510,6 @@ form > .outer-input-container {
         border: 1px solid #ce596b;
         color: #ce596b;
     }
-}
-
-.validation-errors {
-    color: #c42c44;
-    display: block;
-    font-size: 14px;
-    margin-bottom: 25px;
 }
 
 .tags {
