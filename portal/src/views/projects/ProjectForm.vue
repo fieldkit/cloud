@@ -140,7 +140,7 @@ import { helpers, required, email, minValue, maxLength, minLength } from "vuelid
 import FKApi from "@/api/api";
 import * as ActionTypes from "@/store/actions";
 
-import PlaceholderImage from "../../assets/image-placeholder.svg";
+import PlaceholderImage from "@/assets/image-placeholder.svg";
 
 const afterOtherDate = (afterOtherDate) =>
     helpers.withParams({ type: "afterOtherDate", after: afterOtherDate }, function (this: any, value, parentVm) {
@@ -381,8 +381,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/forms';
-@import '../../scss/global';
+@import "../../scss/forms";
+@import "../../scss/global";
 
 form > .outer-input-container {
     margin-bottom: 20px;
