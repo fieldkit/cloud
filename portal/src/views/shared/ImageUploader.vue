@@ -1,14 +1,22 @@
 <template>
-    <div class="image-container">
-        <img alt="Image" :src="placeholderImage" v-if="!image || (!image.url && !preview)" />
-        <img alt="Image" :src="$config.baseUrl + image.url" class="image" v-if="image && image.url && !preview" />
-        <img alt="Image" :src="preview" class="image" v-if="preview" />
+    <div v-if="!image || (!image.url && !preview)" class="placeholder-container">
+        <img alt="Image" :src="placeholderImage" />
+        <div class="upload-trigger">
+            <label for="imageInput" class="upload-trigger"> Choose File </label>
+            <span> No file chosen </span>
+        </div>
+        <input id="imageInput" type="file" accept="image/gif, image/jpeg, image/png" @change="upload" />
+    </div>
+
+    <div class="image-container" v-else>
+        <img alt="Image" :src="$config.baseUrl + image.url" class="img" v-if="image && image.url && !preview" />
+        <img alt="Image" :src="preview" class="img" v-if="preview" />
         <label for="imageInput">
-            <template v-if="!preview"> Choose Image </template>
-            <template v-if="preview"> Change Image </template>
+            <template> Change Image </template>
         </label>
         <input id="imageInput" type="file" accept="image/gif, image/jpeg, image/png" @change="upload" />
     </div>
+
 </template>
 
 <script lang="ts">
@@ -106,5 +114,27 @@ label {
 
 input {
     display: none;
+}
+
+.upload-trigger {
+    margin: 14px 0 0;
+    @include flex();
+
+    label {
+        @include flex(center, center);
+        padding: 0 17px;
+        height: 30px;
+        border-radius: 2px;
+        border: solid 1px #cccdcf;
+        background-color: #ffffff;
+        font-size: 14px;
+        font-weight: 900;
+        margin: 0 15px 0 0;
+    }
+}
+.img-placeholder {
+    width: 220px;
+    height: 200px;
+    max-height: unset;
 }
 </style>
