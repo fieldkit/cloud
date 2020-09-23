@@ -8,7 +8,7 @@
         </div>
 
         <template v-if="viewType === 'list'">
-            <div class="stations-list">
+            <div class="stations-list" v-bind:class="{'stations-list--list-view': viewType === 'list'}">
                 <StationSummary
                     v-for="station in stations"
                     v-bind:key="station.id"
@@ -74,7 +74,7 @@ export default Vue.extend({
         return {
             layoutChanges: 0,
             showNoStationsMessage: true,
-            viewType: "list",
+            viewType: "map",
         };
     },
     computed: {
@@ -166,7 +166,6 @@ export default Vue.extend({
 ::v-deep .station-hover-summary {
     left: 360px;
     top: 120px;
-    width: 415px;
     border-radius: 3px;
 }
 
