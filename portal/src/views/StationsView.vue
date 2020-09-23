@@ -254,6 +254,10 @@ export default Vue.extend({
         z-index: $z-index-top;
         @include position(absolute, 90px 25px null null);
 
+        @include bp-down($md) {
+           right: 20px;
+        }
+
         @include bp-down($xs) {
             @include position(absolute, 80px 10px null null);
         }
@@ -284,11 +288,13 @@ export default Vue.extend({
     flex-wrap: wrap;
     padding: 100px 70px;
     margin: -20px;
-    width: calc(100% - 40px);
+    transform: translateX(20px);
+    width: 100%;
     box-sizing: border-box;
 
     @include bp-down($md) {
-        padding: 100px 30px;
+        padding: 100px 20px;
+        margin: -20px 0;
     }
 
     @include bp-down($sm) {
@@ -296,8 +302,10 @@ export default Vue.extend({
     }
 
     @include bp-down($xs) {
-        padding: 80px 10px;
+        padding: 80px 0px;
         margin: -5px 0;
+        transform: translateX(10px);
+        width: calc(100% - 20px);
     }
 
     .summary-container {
@@ -315,13 +323,14 @@ export default Vue.extend({
 
         @include bp-down($sm) {
             justify-self: center;
-            max-width: 400px;
-            flex-basis: 100%;
+            flex: 1 1 389px;
+            max-width: 389px;
             margin: 10px 0;
         }
 
         @include bp-down($xs) {
             margin: 5px 0;
+            max-width: unset;
         }
 
         .close-button {
