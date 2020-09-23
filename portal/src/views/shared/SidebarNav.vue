@@ -72,7 +72,7 @@ export default {
             default: false,
         },
     },
-  /*  mounted() {
+    mounted() {
         const desktopBreakpoint = 1040;
 
         const windowAny: any = window;
@@ -84,7 +84,7 @@ export default {
             }
         });
         resizeObserver.observe(document.querySelector("body"));
-    },*/
+    },
     data: () => {
         return {
             sidebar: {
