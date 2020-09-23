@@ -237,15 +237,11 @@ export default Vue.extend({
     color: #ffffff;
     text-align: center;
     padding: 10px;
-    margin: 24px 0 6px 0px;
+    margin: 24px 0 0 0px;
     background-color: #ce596b;
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
-
-    .stations-list--list-view & {
-        margin-bottom: 0;
-    }
 }
 .icon {
     padding-right: 7px;

@@ -118,6 +118,7 @@ export default Vue.extend({
     display: flex;
     flex-direction: row;
     min-height: 100vh;
+    position: relative;
 }
 .container-main {
     flex-grow: 1;

@@ -84,6 +84,7 @@ export default {
 @import '../../scss/mixins';
 
 .container-side {
+    background: #fff;
     width: 65px;
     flex: 0 0 65px;
     transition: all 0.33s;
