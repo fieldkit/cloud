@@ -252,6 +252,7 @@ export default Vue.extend({
 
     &-container {
         z-index: $z-index-top;
+        margin: 0;
         @include position(absolute, 90px 25px null null);
 
         @include bp-down($md) {

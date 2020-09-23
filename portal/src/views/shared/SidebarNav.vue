@@ -149,7 +149,7 @@ export default {
        opacity: 1;
     }
 
-    @include bp-down($xs) {
+    @include bp-down($sm) {
         justify-content: flex-start;
         padding: 0 20px;
     }
@@ -254,14 +254,14 @@ export default {
         }
     }
 
-    @include bp-down($xs) {
+    @include bp-down($sm) {
         left: 10px;
     }
 
     .container-side.active & {
         left: 251px;
 
-        @include bp-down($xs) {
+        @include bp-down($sm) {
             left: 188px;
         }
     }

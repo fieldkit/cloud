@@ -69,6 +69,11 @@ export default Vue.extend({
 
     @include bp-down($xs) {
         padding: 0 10px;
+        position: fixed;
+
+        ::v-deep + * {
+            margin-top: 67px;
+        }
     }
 
     &-account {
