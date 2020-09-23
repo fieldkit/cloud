@@ -3,6 +3,7 @@
         <div class="container-top">
             <SidebarNav
                 :viewingStations="viewingStations"
+                :viewingStation="viewingStation"
                 :viewingProjects="viewingProjects"
                 :viewingProject="viewingProject"
                 :isAuthenticated="isAuthenticated"
@@ -51,6 +52,10 @@ export default Vue.extend({
         viewingStations: {
             type: Boolean,
             default: false,
+        },
+        viewingStation: {
+            type: Object,
+            default: null,
         },
         defaultShowStation: {
             type: Boolean,

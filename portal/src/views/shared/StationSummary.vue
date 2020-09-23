@@ -191,7 +191,7 @@ export default Vue.extend({
     display: flex;
     flex-direction: row;
     position: relative;
-    padding-right: 15px;
+    padding-right: 23px;
 }
 .coordinates-row {
     display: flex;

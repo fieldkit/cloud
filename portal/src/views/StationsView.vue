@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout @sidebar-toggle="onSidebarToggle" :viewingStations="true">
+    <StandardLayout :viewingStations="true" :viewingStation="activeStation">
         <div class="view-type-container">
             <div class="view-type">
                 <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')"></div>
@@ -21,7 +21,7 @@
 
         <template v-if="viewType === 'map'">
             <div class="container-map">
-                <StationsMap @show-summary="showSummary" :mapped="mapped" v-if="mapped" />
+                <StationsMap @show-summary="showSummary" :mapped="mapped" v-if="mapped" :layoutChanges="layoutChanges" />
             </div>
             <StationSummary
                     v-if="activeStation"
@@ -167,9 +167,14 @@ export default Vue.extend({
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
     position: unset;
     margin: 120px 0 60px 119px;
+    max-width: calc(100vw - 20px);
 
     .explore-button {
         margin-bottom: 6px;
+    }
+
+    @include bp-down($sm) {
+        margin: 120px auto 60px auto;
     }
 }
 
@@ -191,7 +196,7 @@ export default Vue.extend({
     padding: 0 15px 15px 15px;
     margin: 60px;
     border: 1px solid rgb(215, 220, 225);
-    z-index: 2;
+    z-index: $z-index-top;
 }
 
 #no-stations {
@@ -201,7 +206,7 @@ export default Vue.extend({
     margin: 120px auto 60px auto;
     text-align: center;
     border: 1px solid rgb(215, 220, 225);
-    z-index: 2;
+    z-index: $z-index-top;
 
     a {
         display: inline-block;
@@ -250,7 +255,7 @@ export default Vue.extend({
         @include position(absolute, 90px 25px null null);
 
         @include bp-down($xs) {
-            @include position(absolute, 83px null null 0);
+            @include position(absolute, 80px 10px null null);
         }
     }
 

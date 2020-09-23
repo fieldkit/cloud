@@ -18,7 +18,7 @@
                 <div v-for="project in projects" v-bind:key="project.id">
                     <router-link
                         :to="{ name: 'viewProject', params: { id: project.id } }"
-                        class="project-link"
+                        class="nav-link"
                         v-bind:class="{ selected: viewingProject && viewingProject.id === project.id }"
                         @click.native="closeMenuOnMobile()"
                     >
@@ -36,12 +36,11 @@
                         </span>
                     </div>
                 </router-link>
-                <div v-for="station in stations" v-bind:key="station.id">
-                    <div class="station-link" v-on:click="showStation(station)">
-                        {{ station.name }}
-                    </div>
+                <div class="nav-link" v-on:click="showStation(station)" v-for="station in stations" v-bind:key="station.id"
+                     v-bind:class="{ selected: viewingStations && viewingStation.id === station.id }">
+                    {{ station.name }}
                 </div>
-                <div v-if="isAuthenticated && stations.length == 0" class="station-link">
+                <div v-if="isAuthenticated && stations.length == 0" class="nav-link">
                     No stations added
                 </div>
             </div>
@@ -57,6 +56,7 @@ export default {
     name: "SidebarNav",
     props: {
         viewingProject: { type: Object, default: null },
+        viewingStation: { type: Object, default: null },
         viewingProjects: { default: false },
         viewingStations: { default: false },
         isAuthenticated: { required: true },
@@ -99,7 +99,6 @@ export default {
 
     @include bp-down($md) {
         width: 0;
-        z-index: $z-index-top;
         background: #fff;
         height: 100%;
         @include position(fixed, 0 null null 0);
@@ -175,16 +174,19 @@ export default {
     margin: 20px 0 0 37px;
     display: inline-block;
 }
-.project-link {
-    line-height: 1.2;
-}
-.project-link,
-.station-link {
+
+.nav-link {
     cursor: pointer;
     font-weight: normal;
     font-size: 14px;
     margin: 0 0 0 30px;
-    display: inline-block;
+    display: block;
+    line-height: 1.2;
+
+    &.selected {
+        padding-bottom: 2px;
+        margin-bottom: 2px;
+    }
 }
 .sidebar-compass {
     display: flex;
