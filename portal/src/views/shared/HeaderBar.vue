@@ -1,17 +1,21 @@
 <template>
     <div class="header">
-        <div class="header-account" v-on:click="onAccountClick()" v-on:mouseenter="onAccountHover($event)" v-on:mouseleave="onAccountHover($event)">
+        <div
+            class="header-account"
+            v-on:click="onAccountClick()"
+            v-on:mouseenter="onAccountHover($event)"
+            v-on:mouseleave="onAccountHover($event)"
+        >
             <UserPhoto v-if="user" :user="user" />
-            <a class="header-account-name">{{ user.name.split(' ')[0] }}</a>
+            <a class="header-account-name">{{ user.name.split(" ")[0] }}</a>
             <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
                 Log in
             </router-link>
-            <div class="header-account-menu" v-bind:class="{active: isAccountHovered}">
+            <div class="header-account-menu" v-bind:class="{ active: isAccountHovered }">
                 <router-link v-if="user" :to="{ name: 'editUser' }">My Account</router-link>
                 <a class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</a>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -28,6 +32,11 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
     },
+    data: () => {
+        return {
+            isAccountHovered: false,
+        };
+    },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({ user: (s: GlobalState) => s.user.user }),
@@ -38,11 +47,6 @@ export default Vue.extend({
             return null;
         },
     },
-    data: () => {
-      return {
-          isAccountHovered: false,
-      }
-    },
     methods: {
         logout() {
             return this.$store.dispatch(ActionTypes.LOGOUT).then(() => {
@@ -50,14 +54,14 @@ export default Vue.extend({
             });
         },
         onAccountHover(event) {
-            if (window.screen.availWidth < 768 && event.type == 'mouseenter') {
+            if (window.screen.availWidth < 768 && event.type == "mouseenter") {
                 return;
             }
             this.isAccountHovered = !this.isAccountHovered;
         },
         onAccountClick() {
             this.isAccountHovered = !this.isAccountHovered;
-        }
+        },
     },
 });
 </script>
@@ -164,8 +168,8 @@ export default Vue.extend({
             }
 
             &.active {
-                opacity: 1!important;
-                max-height: 100px!important;
+                opacity: 1 !important;
+                max-height: 100px !important;
                 border: solid 1px #e9e9e9;
             }
 
