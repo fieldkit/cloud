@@ -31,19 +31,16 @@
                     v-bind:key="activeStation.id"
             />
             <div id="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
-                <div id="close-notice-btn" v-on:click="closeNotice">
-                    <img alt="Close" src="@/assets/close.png" />
-                </div>
-                <p class="heading">Add a New Station</p>
+                <h1 class="heading">Add a New Station</h1>
                 <p class="text">
-                    You currently don't have any stations on your account. Download the FieldKit app and connect your station to add
+                    You currently don't have any stations on your account. Download the FieldKit app and connect your station to add them to
                     them to your account.
                 </p>
                 <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
-                    <img alt="App store" src="@/assets/appstore.png" class="app-btn" />
+                    <img alt="App store" src="@/assets/appstore.png" />
                 </a>
                 <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
-                    <img alt="Google Play" src="@/assets/googleplay.png" class="app-btn" />
+                    <img alt="Google Play" src="@/assets/googleplay.png" />
                 </a>
             </div>
         </template>
@@ -117,9 +114,6 @@ export default Vue.extend({
         closeSummary() {
             return this.$router.push({ name: "stations" });
         },
-        closeNotice() {
-            this.showNoStationsMessage = false;
-        },
         switchView(type) {
             this.viewType = type;
         },
@@ -129,25 +123,6 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import "../scss/mixins.scss";
-
-.container-ignored {
-    height: 100%;
-}
-
-.container-top {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-}
-
-.container-side {
-    width: 240px;
-    height: 100%;
-}
-
-.container-header {
-    height: 70px;
-}
 
 .container-map {
     position: absolute;
@@ -178,38 +153,34 @@ export default Vue.extend({
     }
 }
 
-#stations-view-panel {
-    margin: 0;
-}
-
-.closeSummary {
-    position: absolute;
-}
-
-#no-user {
-    font-size: 20px;
-    background-color: #ffffff;
-    width: 400px;
-    position: absolute;
-    top: 40px;
-    left: 260px;
-    padding: 0 15px 15px 15px;
-    margin: 60px;
-    border: 1px solid rgb(215, 220, 225);
-    z-index: $z-index-top;
-}
-
 #no-stations {
     background-color: #ffffff;
-    width: 360px;
-    padding: 85px 80px 95px 80px;
+    width: 486px;
+    padding: 95px 80px 95px 80px;
     margin: 120px auto 60px auto;
     text-align: center;
     border: 1px solid rgb(215, 220, 225);
     z-index: $z-index-top;
+    box-sizing: border-box;
+
+    @include bp-down($xs) {
+        width: calc(100% - 20px);
+        padding: 31px 13px;
+    }
 
     a {
-        display: inline-block;
+        @include bp-down($xs) {
+            display: block;
+        }
+
+        &:nth-of-type(1) {
+            margin-right: 27px;
+
+            @include bp-down($xs) {
+                margin-right: 0;
+                margin-bottom: 14px;
+            }
+        }
     }
 
     .heading {
@@ -218,27 +189,12 @@ export default Vue.extend({
         margin-bottom: 2px;
         margin-top: 0;
     }
-}
 
-
-#no-stations .text {
-    font-size: 14px;
-    margin: 0;
-}
-
-#no-stations .app-btn {
-    margin: 35px 14px 0;
-}
-
-#close-notice-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-}
-
-.show-link {
-    text-decoration: underline;
+    .text {
+        font-size: 14px;
+        max-width: 320px;
+        margin: 0 auto 35px;
+    }
 }
 
 .view-type {
@@ -256,7 +212,7 @@ export default Vue.extend({
         @include position(absolute, 90px 25px null null);
 
         @include bp-down($md) {
-           right: 20px;
+            right: 20px;
         }
 
         @include bp-down($xs) {
