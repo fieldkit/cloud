@@ -40,8 +40,10 @@
                     </div>
                 </router-link>
                 <div v-for="station in stations" v-bind:key="station.id">
-                    <span class="nav-link" v-on:click="showStation(station)"
-                         v-bind:class="{ selected: viewingStations && viewingStation && viewingStation.id === station.id }">
+                    <span class="nav-link"
+                        v-on:click="showStation(station)"
+                        v-bind:class="{ selected: viewingStations && viewingStation && viewingStation.id === station.id }"
+                    >
                         {{ station.name }}
                     </span>
                 </div>
@@ -56,8 +58,10 @@
     </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from "vue";
+
+export default Vue.extend({
     name: "SidebarNav",
     props: {
         viewingProject: { type: Object, default: null },
@@ -72,9 +76,8 @@ export default {
             default: false,
         },
     },
-    /*mounted() {
+    mounted() {
         const desktopBreakpoint = 1040;
-
         const windowAny: any = window;
         const resizeObserver = new windowAny.ResizeObserver((entries) => {
             if (entries[0].contentRect.width < desktopBreakpoint) {
@@ -83,13 +86,14 @@ export default {
                 }
             }
         });
+
         resizeObserver.observe(document.querySelector("body"));
-    },*/
+    },
     data: () => {
         return {
             sidebar: {
-                narrow: window.screen.availWidth > 1040 ? false : true,
-            }
+                narrow: window.screen.availWidth <= 1040,
+            },
         };
     },
     methods: {
@@ -106,7 +110,7 @@ export default {
             this.sidebar.narrow = !this.sidebar.narrow;
         },
     },
-};
+});
 </script>
 
 <style scoped lang="scss">
