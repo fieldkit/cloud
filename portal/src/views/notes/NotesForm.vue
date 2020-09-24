@@ -18,6 +18,7 @@
         <div class="photos">
             <div class="title"> Photos </div>
             <div class="photo" v-for="photo in photos" v-bind:key="photo.key">
+                {{photo}}
                 <AuthenticatedPhoto :url="photo.url" />
             </div>
             <div class="photo" v-for="photo in form.addedPhotos" v-bind:key="photo.key">
@@ -81,6 +82,7 @@ export default Vue.extend({
         },
     },
     mounted(this: any) {
+        console.log("NOTES MUNTED");
         this.form = Notes.createFrom(this.notes);
     },
     methods: {
@@ -113,6 +115,7 @@ export default Vue.extend({
     flex-direction: column;
     padding: 28px;
     background: #fff;
+    cursor: initial;
 
     @include bp-down($md) {
         padding: 25px 8px;
@@ -166,15 +169,18 @@ export default Vue.extend({
     margin-top: 45px;
     display: flex;
     flex-wrap: wrap;
+    height: 200px;
 
     .title {
         flex-basis: 100%;
         margin-bottom: 20px;
     }
-}
 
-.photos .photo {
-    flex-basis: 400px;
+    img {
+        height: 100%;
+        width: auto;
+        object-fit: contain;
+    }
 }
 
 ::v-deep .photos img {

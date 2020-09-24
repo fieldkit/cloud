@@ -19,7 +19,9 @@
                             <div v-if="station.deployedAt" class="deployed">Deployed</div>
                             <div v-else class="undeployed">Not Deployed</div>
                         </div>
-                        <div class="tab-content" v-if="selectedStation && selectedNotes">
+                        <div class="tab-content" v-if="(selectedStation.id === station.id) && selectedNotes">
+                            {{selectedStation.id}}
+                            {{selectedNotes}}
                             <div v-if="loading" class="main">
                                 <Spinner />
                             </div>
@@ -47,7 +49,7 @@
                                     @change="onChange"
                             />
                         </div>
-                        <div v-else class="tab-content empty">
+                        <div v-if="!selectedStation" class="tab-content empty">
                             Please choose a station from the left.
                         </div>
                     </div>
@@ -189,6 +191,7 @@ export default Vue.extend({
         },
         onSelected(station) {
             if (this.stationId != station.id) {
+                console.log("selected station", station.id);
                 return this.$router.push({
                     name: this.projectId ? "viewProjectStationNotes" : "viewStationNotes",
                     params: {

@@ -21,10 +21,12 @@ export default Vue.extend({
     },
     watch: {
         url(this: any) {
+            console.log("watch");
             return this.refresh();
         },
     },
-    mounted(this: any) {
+    created(this: any) {
+        console.log("MOUNTED", this.url);
         return this.refresh();
     },
     methods: {
