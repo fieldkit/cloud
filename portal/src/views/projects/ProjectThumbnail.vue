@@ -175,7 +175,7 @@ export default {
     padding: 5px;
     text-align: center;
     font-size: 14px;
-    font-weight: 900;
+    font-weight: 600;
     color: #2c3e50;
     border-radius: 3px;
     border: solid 1px #cccdcf;
@@ -186,7 +186,7 @@ export default {
     padding: 5px;
     text-align: center;
     font-size: 14px;
-    font-weight: 900;
+    font-weight: 600;
     color: #2c3e50;
     white-space: nowrap;
     @include flex(center);

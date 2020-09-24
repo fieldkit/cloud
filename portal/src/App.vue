@@ -45,8 +45,6 @@ body {
 
     * {
         font-family: "Avenir", Helvetica, Arial, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
     }
 }
 body:not(.disable-scrolling) {
@@ -83,5 +81,9 @@ button {
 .main-panel h1 {
     font-size: 36px;
     margin-top: 40px;
+}
+
+h1 {
+    font-weight: 600;
 }
 </style>
