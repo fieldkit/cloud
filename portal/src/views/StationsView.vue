@@ -1,12 +1,5 @@
 <template>
     <StandardLayout :viewingStations="true" :viewingStation="activeStation">
-        <div class="view-type-container">
-            <div class="view-type">
-                <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')"></div>
-                <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')"></div>
-            </div>
-        </div>
-
         <template v-if="viewType === 'list'">
             <div class="stations-list">
                 <StationSummary
@@ -44,6 +37,12 @@
                 </a>
             </div>
         </template>
+        <div class="view-type-container">
+            <div class="view-type">
+                <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')"></div>
+                <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')"></div>
+            </div>
+        </div>
     </StandardLayout>
 </template>
 
@@ -130,18 +129,19 @@ export default Vue.extend({
     height: calc(100% - 67px);
     left: 0;
     top: 67px;
+    margin-top: 0;
 }
 
 ::v-deep .station-hover-summary {
     left: 360px;
-    top: 120px;
+    top: 170px;
     border-radius: 3px;
 }
 
 ::v-deep .summary-container {
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
     position: unset;
-    margin: 120px 0 60px 119px;
+    margin: 190px 0 60px 119px;
     max-width: calc(100vw - 20px);
 
     .explore-button {
@@ -149,7 +149,7 @@ export default Vue.extend({
     }
 
     @include bp-down($sm) {
-        margin: 120px auto 60px auto;
+        margin: 190px auto 60px auto;
     }
 }
 
@@ -210,12 +210,8 @@ export default Vue.extend({
         z-index: $z-index-top;
         margin: 0;
         @include position(absolute, 90px 25px null null);
-
-        @include bp-down($md) {
-            right: 20px;
-        }
-
-        @include bp-down($xs) {
+        
+        @include bp-down($lg) {
             @include position(absolute, 80px 10px null null);
         }
     }
@@ -245,7 +241,6 @@ export default Vue.extend({
     flex-wrap: wrap;
     padding: 100px 70px;
     margin: -20px;
-    transform: translateX(20px);
     width: 100%;
     box-sizing: border-box;
 
@@ -256,11 +251,12 @@ export default Vue.extend({
 
     @include bp-down($sm) {
         justify-content: center;
+        margin: 70px -20px -20px;
     }
 
     @include bp-down($xs) {
         padding: 80px 0px;
-        margin: -5px 0;
+        margin: 65px 0 -5px 0;
         transform: translateX(10px);
         width: calc(100% - 20px);
     }
@@ -287,7 +283,7 @@ export default Vue.extend({
 
         @include bp-down($xs) {
             margin: 5px 0;
-            max-width: unset;
+            width: auto;
         }
 
         .close-button {
