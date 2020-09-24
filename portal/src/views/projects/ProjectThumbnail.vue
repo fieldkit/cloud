@@ -95,6 +95,7 @@ export default {
     padding-bottom: 17px;
     transition: all 0.33s;
     flex-direction: column;
+    line-height: 1.4;
     @include flex();
     @include position(relative, 0 0 0 0);
 
