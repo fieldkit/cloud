@@ -128,7 +128,7 @@ input {
         border: solid 1px #cccdcf;
         background-color: #ffffff;
         font-size: 14px;
-        font-weight: 900;
+        font-weight: 600;
         margin: 0 15px 0 0;
     }
 }

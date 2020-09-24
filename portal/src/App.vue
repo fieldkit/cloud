@@ -82,4 +82,8 @@ button {
     font-size: 36px;
     margin-top: 40px;
 }
+
+h1 {
+    font-weight: 600;
+}
 </style>

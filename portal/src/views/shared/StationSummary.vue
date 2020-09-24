@@ -147,7 +147,7 @@ export default Vue.extend({
 }
 .station-name {
     font-size: 18px;
-    font-weight: 900;
+    font-weight: 600;
     margin-bottom: 2px;
 }
 .station-synced {

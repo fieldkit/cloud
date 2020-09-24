@@ -495,7 +495,7 @@ form > .outer-input-container {
     background-color: #ce596b;
     border: none;
     border-radius: 5px;
-    font-weight: 900;
+    font-weight: 600;
     letter-spacing: 0.1px;
     margin-bottom: 20px;
 

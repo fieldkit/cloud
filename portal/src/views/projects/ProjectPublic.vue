@@ -196,7 +196,7 @@ export default {
 }
 
 .details .details-heading {
-    font-weight: 900;
+    font-weight: 600;
     padding-bottom: 10px;
     font-size: 24px;
     color: #2c3e50;
