@@ -7,7 +7,7 @@
             v-on:mouseleave="onAccountHover($event)"
         >
             <UserPhoto v-if="user" :user="user" />
-            <a class="header-account-name">{{ user.name.split(" ")[0] }}</a>
+            <a v-if="user" class="header-account-name">{{ firstName }}</a>
             <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
                 Log in
             </router-link>
@@ -45,6 +45,9 @@ export default Vue.extend({
                 return this.$config.baseUrl + this.$store.state.user.user.photo.url;
             }
             return null;
+        },
+        firstName(this: any) {
+            return this.user.name.split(" ")[0];
         },
     },
     methods: {
