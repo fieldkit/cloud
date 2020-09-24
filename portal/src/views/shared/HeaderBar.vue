@@ -68,16 +68,17 @@ export default Vue.extend({
 .header {
     background: #fff;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);
-    z-index: $z-index-top;
     width: 100%;
     height: 66px;
     float: left;
     padding: 0 10px;
     box-sizing: border-box;
+    z-index: $z-index-header;
     @include flex(center, flex-end);
 
     @include bp-down($sm) {
         padding: 0 20px;
+        height: 54px;
     }
 
     @include bp-down($sm) {
@@ -158,8 +159,8 @@ export default Vue.extend({
             padding: 8px;
             @include position(absolute, calc(100% - 5px) 70px null null);
 
-            @include bp-down($sm) {
-                @include position(fixed, 55px 10px null unset);
+            @include bp-down($lg) {
+                @include position(fixed, 60px 10px null unset);
             }
 
             &.active {
