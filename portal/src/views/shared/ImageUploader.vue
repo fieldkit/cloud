@@ -2,26 +2,26 @@
     <div v-if="!image || (!image.url && !preview)" class="placeholder-container">
         <img alt="Image" :src="placeholderImage" />
         <div class="upload-trigger">
-            <label for="imageInput" class="upload-trigger"> Choose File </label>
-            <span> No file chosen </span>
+            <label for="imageInput" class="upload-trigger">Choose File</label>
+            <span>No file chosen</span>
         </div>
         <input id="imageInput" type="file" accept="image/gif, image/jpeg, image/png" @change="upload" />
     </div>
 
     <div class="image-container" v-else>
-        <img alt="Image" :src="$config.baseUrl + image.url" class="img" v-if="image && image.url && !preview" />
+        <img alt="Image" :src="photo" class="img" v-if="photo && !preview" />
         <img alt="Image" :src="preview" class="img" v-if="preview" />
         <label for="imageInput">
-            <template> Change Image </template>
+            <template>Change Image</template>
         </label>
         <input id="imageInput" type="file" accept="image/gif, image/jpeg, image/png" @change="upload" />
     </div>
-
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import NewPhoto from "../../assets/Profile_Image.png";
+import FKApi from "@/api/api";
 
 export interface Image {
     url: string;
@@ -48,12 +48,20 @@ export default Vue.extend({
             imageType: null,
             preview: null,
             acceptedTypes: ["jpg", "jpeg", "png", "gif"],
+            photo: null,
         };
     },
     computed: {
         placeholderImage() {
             return this.placeholder || NewPhoto;
         },
+    },
+    mounted(this: any) {
+        if (this.image && this.image.url) {
+            return new FKApi().loadMedia(this.image.url, { size: 800 }).then((photo) => {
+                this.photo = photo;
+            });
+        }
     },
     methods: {
         acceptable(this: any, files: { type: string }[]): boolean {
@@ -91,7 +99,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 
 .image-container {
     @include flex(baseline);
