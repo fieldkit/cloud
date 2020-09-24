@@ -100,6 +100,10 @@ export default Vue.extend({
             padding-right: 14px;
         }
 
+        @include bp-down($sm) {
+            padding-right: 0;
+        }
+
         * {
             font-weight: 500;
             color: #2c3e50;
