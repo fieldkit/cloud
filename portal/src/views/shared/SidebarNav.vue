@@ -260,6 +260,7 @@ export default Vue.extend({
 
     @include bp-down($sm) {
         left: 10px;
+        top: 16px;
     }
 
     .container-side.active & {

@@ -124,12 +124,10 @@ export default Vue.extend({
 @import "../scss/mixins.scss";
 
 .container-map {
-    position: absolute;
     width: 100%;
-    height: calc(100% - 67px);
-    left: 0;
-    top: 67px;
+    height: calc(100% - 54px);
     margin-top: 0;
+    @include position(absolute, 54px null null 0);
 }
 
 ::v-deep .station-hover-summary {
@@ -149,7 +147,7 @@ export default Vue.extend({
     }
 
     @include bp-down($sm) {
-        margin: 190px auto 60px auto;
+        margin: 117px auto 60px auto;
     }
 }
 
@@ -157,10 +155,10 @@ export default Vue.extend({
     background-color: #ffffff;
     width: 486px;
     padding: 95px 80px 95px 80px;
-    margin: 120px auto 60px auto;
+    margin: 117px auto 60px auto;
     text-align: center;
     border: 1px solid rgb(215, 220, 225);
-    z-index: $z-index-top;
+    z-index: 2;
     box-sizing: border-box;
 
     @include bp-down($xs) {
@@ -210,9 +208,9 @@ export default Vue.extend({
         z-index: $z-index-top;
         margin: 0;
         @include position(absolute, 90px 25px null null);
-        
-        @include bp-down($lg) {
-            @include position(absolute, 80px 10px null null);
+
+        @include bp-down($sm) {
+            @include position(absolute, 67px 10px null null);
         }
     }
 
@@ -251,12 +249,12 @@ export default Vue.extend({
 
     @include bp-down($sm) {
         justify-content: center;
-        margin: 70px -20px -20px;
+        margin: 30px -20px -20px;
     }
 
     @include bp-down($xs) {
         padding: 80px 0px;
-        margin: 65px 0 -5px 0;
+        margin: 55px 0 -5px 0;
         transform: translateX(10px);
         width: calc(100% - 20px);
     }
