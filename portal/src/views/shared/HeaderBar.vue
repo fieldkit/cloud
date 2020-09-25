@@ -1,18 +1,19 @@
 <template>
     <div class="header">
-        <a class="menu-icon-container" v-on:click="toggleSidebar" v-bind:class="{ active: !isMenuNarrow }">
-            <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22"/>
-        </a>
-        <div class="header-account">
+        <div
+            class="header-account"
+            v-on:click="onAccountClick()"
+            v-on:mouseenter="onAccountHover($event)"
+            v-on:mouseleave="onAccountHover($event)"
+        >
             <UserPhoto v-if="user" :user="user" />
-            <div>
-                <router-link v-if="user" :to="{ name: 'editUser' }">
-                    {{ user.name }}
-                </router-link>
+            <a v-if="user" class="header-account-name">{{ firstName }}</a>
+            <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
+                Log in
+            </router-link>
+            <div class="header-account-menu" v-bind:class="{ active: isAccountHovered }">
+                <router-link v-if="user" :to="{ name: 'editUser' }">My Account</router-link>
                 <a class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</a>
-                <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
-                    Log in
-                </router-link>
             </div>
         </div>
     </div>
@@ -31,11 +32,10 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
     },
-    props: {
-        isMenuNarrow: {
-            type: Boolean,
-            default: false,
-        },
+    data: () => {
+        return {
+            isAccountHovered: false,
+        };
     },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
@@ -46,6 +46,9 @@ export default Vue.extend({
             }
             return null;
         },
+        firstName(this: any) {
+            return this.user.name.split(" ")[0];
+        },
     },
     methods: {
         logout() {
@@ -53,65 +56,132 @@ export default Vue.extend({
                 return this.$router.push({ name: "login" });
             });
         },
-        toggleSidebar() {
-            this.$emit("toggled");
+        onAccountHover(event) {
+            if (window.screen.availWidth < 768 && event.type == "mouseenter") {
+                return;
+            }
+            this.isAccountHovered = !this.isAccountHovered;
+        },
+        onAccountClick() {
+            this.isAccountHovered = !this.isAccountHovered;
         },
     },
-
 });
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 
 .header {
     background: #fff;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);
-    z-index: $z-index-top;
     width: 100%;
     height: 66px;
     float: left;
     padding: 0 10px;
     box-sizing: border-box;
-    @include flex(center, space-between);
+    z-index: $z-index-header;
+    @include flex(center, flex-end);
 
     @include bp-down($sm) {
         padding: 0 20px;
+        height: 54px;
     }
 
-    @include bp-down($xs) {
+    @include bp-down($sm) {
         padding: 0 10px;
+        position: fixed;
+
+        ::v-deep + * {
+            margin-top: 67px;
+        }
     }
 
     &-account {
-        padding-right: 62px;
+        padding-right: 85px;
         text-align: right;
+        position: relative;
+        height: 100%;
         @include flex(center);
 
         @include bp-down($lg) {
+            padding-right: 14px;
+        }
+
+        @include bp-down($sm) {
             padding-right: 0;
         }
 
-        a {
-            display: block;
-            font-size: 16px;
-            color: initial;
+        * {
+            font-weight: 500;
+            color: #2c3e50;
+            cursor: pointer;
+        }
 
-            &:not(.log-out) {
-                font-weight: 500;
+        &-name {
+            font-size: 16px;
+            font-weight: 500;
+            z-index: $z-index-top;
+
+            @include bp-down($sm) {
+                display: none;
             }
         }
-    }
-}
 
-.menu-icon-container {
-    float: left;
-    transition: all 0.33s;
-    cursor: pointer;
+        &:after {
+            content: "";
+            background: url("../../assets/icon-chevron-dropdown.svg") no-repeat center center;
+            width: 10px;
+            height: 10px;
+            transition: all 0.33s;
+            transform: translateY(-50%);
+            cursor: pointer;
+            @include position(absolute, 50% 69px null null);
 
-    @include bp-down($md) {
-        &.active {
-            transform: translateX(175px);
+            @include bp-down($lg) {
+                right: 0;
+            }
+
+            @include bp-down($sm) {
+                display: none;
+            }
+        }
+
+        &:hover {
+            &:after {
+                transform: rotate(180deg) translateY(50%);
+            }
+        }
+
+        &-menu {
+            overflow: hidden;
+            max-height: 0;
+            background: #fff;
+            transition: opacity 0.25s, max-height 0.33s;
+            opacity: 0;
+            text-align: left;
+            min-width: 143px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+            padding: 8px;
+            @include position(absolute, calc(100% - 5px) 70px null null);
+
+            @include bp-down($lg) {
+                @include position(fixed, 60px 10px null unset);
+            }
+
+            &.active {
+                opacity: 1 !important;
+                max-height: 100px !important;
+                border: solid 1px #e9e9e9;
+            }
+
+            a {
+                padding: 8px 17px;
+                font-size: 14px;
+                display: block;
+                user-select: none;
+            }
         }
     }
 }
@@ -122,4 +192,13 @@ export default Vue.extend({
     cursor: pointer;
 }
 
+::v-deep .default-user-icon {
+    margin: 0 10px 0 0;
+
+    @include bp-down($sm) {
+        margin: 0;
+        width: 25px;
+        height: 25px;
+    }
+}
 </style>
