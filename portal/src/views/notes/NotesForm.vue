@@ -18,7 +18,6 @@
         <div class="photos">
             <div class="title"> Photos </div>
             <div class="photo" v-for="photo in photos" v-bind:key="photo.key">
-                {{photo}}
                 <AuthenticatedPhoto :url="photo.url" />
             </div>
             <div class="photo" v-for="photo in form.addedPhotos" v-bind:key="photo.key">
@@ -169,15 +168,13 @@ export default Vue.extend({
     margin-top: 45px;
     display: flex;
     flex-wrap: wrap;
-    max-height: 200px;
-    max-width: 200px;
 
     .title {
         flex-basis: 100%;
         margin-bottom: 20px;
     }
 
-    img {
+    ::v-deep img {
         height: 100%;
         width: auto;
         object-fit: contain;
@@ -186,6 +183,16 @@ export default Vue.extend({
 
 ::v-deep .photos img {
     margin-right: 10px;
+    margin-bottom: 10px;
+    max-height: 200px;
+    max-width: 200px;
+    width: 200px;
+    height: auto;
+    object-fit: contain;
+}
+
+::v-deep .placeholder-container {
+    flex-basis: 100%;
 }
 
 ::v-deep .title {

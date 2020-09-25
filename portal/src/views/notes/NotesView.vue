@@ -20,7 +20,7 @@
                                 <div v-if="station.deployedAt" class="deployed">Deployed</div>
                                 <div v-else class="undeployed">Not Deployed</div>
                             </div>
-                            <div class="tab-content" v-if="selectedStation && selectedNotes">
+                            <div class="tab-content" v-if="selectedStation && selectedNotes && (selectedStation.id == station.id)">
                                 <div v-if="loading" class="main">
                                     <Spinner />
                                 </div>
@@ -37,19 +37,15 @@
                                         :station="selectedStation"
                                         :notes="selectedNotes"
                                         v-bind:key="stationId"
-                                        v-if="(selectedStation.id == station.id) && project.project.readOnly"
-                                />
+                                        v-if="project.project.readOnly"/>
                                 <NotesForm
-                                        v-if="selectedStation.id == station.id"
+                                        v-else
                                         :station="selectedStation"
                                         :notes="selectedNotes"
                                         @save="saveForm"
                                         v-bind:key="stationId"
                                         @change="onChange"
                                 />
-                            </div>
-                            <div v-else class="tab-content empty">
-                                Please choose a station from the left.
                             </div>
                         </div>
                     </div>
@@ -380,10 +376,6 @@ export default Vue.extend({
             @at-root .tab.active & {
                 max-height: 1000px;
             }
-        }
-
-        &.empty {
-            padding: 20px;
         }
     }
 }
