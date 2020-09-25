@@ -194,4 +194,18 @@ export default Vue.extend({
 ::v-deep .project-tag {
     margin-right: 10px;
 }
+
+::v-deep .pagination {
+
+    > div {
+        @include flex(center, ceenter);
+    }
+
+    .button {
+        font-size: 13px;
+        border: 0;
+        margin: 0;
+        transform: translateY(2px);
+    }
+}
 </style>

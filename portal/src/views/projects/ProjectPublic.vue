@@ -76,7 +76,7 @@
             <button class="button-solid"> Get involved </button>
         </div>
 
-        <div class="project-stations" style="display: none">
+        <div class="project-stations">
             <ProjectStations :project="project" :admin="false" :userStations="userStations" />
         </div>
 

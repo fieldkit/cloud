@@ -13,8 +13,12 @@
 }
 .details .details-left {
     padding-right: 20px;
-    flex-grow: 1;
     flex: 2;
+
+    @include bp-down($md) {
+        flex: 1;
+        flex-basis: calc(50% - 20px);
+    }
 
     @include bp-down($xs) {
         flex-basis: 100%;
@@ -24,6 +28,10 @@
 }
 .details .details-right {
     flex: 1;
+
+    @include bp-down($md) {
+        flex-basis: 50%;
+    }
 }
 
 .details {

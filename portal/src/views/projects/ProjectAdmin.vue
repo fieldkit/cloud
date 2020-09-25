@@ -219,14 +219,14 @@ export default {
     flex-direction: column;
     justify-content: space-evenly;
 
-    @include bp-down($sm) {
-        max-width: 300px;
+    @include bp-down($md) {
+        max-width: unset;
     }
 
     @include bp-down($xs) {
-        max-width: unset;
+        flex: 1;
         margin: 0;
-        padding: 15px 10PX;
+        padding: 15px 10px;
     }
 }
 .details > .photo {
@@ -239,6 +239,10 @@ export default {
     width: 288px;
     max-height: 139px;
 
+    @include bp-down($sm) {
+        max-height: 150px;
+    }
+
     @include bp-down($xs) {
         max-height: 150px;
     }
@@ -250,8 +254,12 @@ export default {
     background-color: white;
     padding: 20px 30px;
 
-    @include bp-down($sm) {
+    @include bp-down($md) {
+        flex-basis: 100%;
         margin-top: 25px;
+    }
+
+    @include bp-down($sm) {
         flex-basis: 100%;
         padding: 20px 20px;
     }
@@ -353,6 +361,10 @@ export default {
 .data-readings .project-readings {
     flex: 1;
     min-width: 360px;
+
+    @include bp-down($xs) {
+        min-width: unset;
+    }
 }
 
 .project-container {
@@ -379,17 +391,4 @@ export default {
     height: 35px;
 }
 
-::v-deep .pagination {
-
-    > div {
-        @include flex(center, ceenter);
-    }
-
-    .button {
-        font-size: 13px;
-        border: 0;
-        margin: 0;
-        transform: translateY(2px);
-    }
-}
 </style>
