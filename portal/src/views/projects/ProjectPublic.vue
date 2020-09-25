@@ -2,13 +2,12 @@
     <div class="project-public project-container" v-if="project">
         <div class="details">
             <div class="left">
-                <div class="photo">
+                <div class="photo-container">
                     <ProjectPhoto :project="project" />
                 </div>
 
                 <div class="below-photo">
                     <DisplayProjectTags :tags="project.tags" />
-                    <FollowPanel :project="project" v-bind:key="project.id" />
                 </div>
             </div>
 
@@ -17,20 +16,28 @@
                     {{ project.name }}
                 </div>
                 <div class="details-top">
-                    <div class="time-container" v-if="project.startTime">
-                        <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" />
+                    <div class="details-row" v-if="project.startTime">
+                        <div class="details-icon">
+                            <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" width="12px" height="14px" />
+                        </div>
                         <template>Started: {{ project.startTime | prettyDate }}</template>
                     </div>
-                    <div class="duration-container" v-if="displayProject.duration">
-                        <img alt="Location" src="@/assets/icon-time.svg" class="icon" />
+                    <div class="details-row" v-if="displayProject.duration">
+                        <div class="details-icon">
+                            <img alt="Location" src="@/assets/icon-time.svg" class="icon" width="12px" height="14px"/>
+                        </div>
                         <template>{{ displayProject.duration | prettyDuration }}</template>
                     </div>
-                    <div class="location-container" v-if="project.location">
-                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                    <div class="details-row" v-if="project.location">
+                        <div class="details-icon">
+                            <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="13px" height="16px" />
+                        </div>
                         <template>{{ project.location }}</template>
                     </div>
-                    <div class="location-container" v-if="displayProject.places.native">
-                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                    <div class="details-row" v-if="displayProject.places.native">
+                        <div class="details-icon">
+                            <img alt="Location" src="@/assets/icon-location.svg" class="icon"  width="13px" height="16px" />
+                        </div>
                         <template>Native Lands: {{ displayProject.places.native }}</template>
                     </div>
                 </div>
@@ -44,6 +51,16 @@
                         class="module-icon"
                         :src="module.url"
                     />
+                </div>
+                <div class="right-actions">
+                    <button class="button-social">
+                        <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon">
+                        Follow
+                    </button>
+                    <button class="button-social">
+                        <img src="@/assets/icon-share.svg" width="12px" alt="Icon">
+                        Share
+                    </button>
                 </div>
             </div>
         </div>
@@ -113,7 +130,10 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../scss/project';
+@import '../../scss/global';
+
 .project-public {
     display: flex;
     flex-direction: column;
@@ -148,45 +168,45 @@ export default {
 
 .details {
     display: flex;
-    flex-direction: row;
-    border: 2px solid #d8dce0;
     border-radius: 2px;
+    border: solid 1px #d8dce0;
     background-color: white;
 }
 .details > .left {
-    max-width: 400px;
-    min-height: 335px;
     flex: 1;
-    padding: 20px;
+    padding: 23px 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
 }
 .details .project-detail {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 9px;
+    line-height: 1.5;
 }
+
+.photo-container {
+    width: 380px;
+    max-height: 234px;
+}
+
+
 .details .below-photo {
     margin-top: auto;
 }
 .details > .right {
-    flex: 2;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
+    padding: 20px 20px 67px 20px;
+    position: relative;
 }
-.project-stations {
-}
-
 .details .details-heading {
-    font-weight: 900;
-    padding-bottom: 20px;
+    font-weight: 600;
+    padding-bottom: 10px;
     font-size: 24px;
     color: #2c3e50;
 }
 .details .details-top {
     display: flex;
     flex-direction: column;
+    padding-bottom: 10px;
 }
 .details .icon {
     padding-right: 0.2em;
@@ -200,20 +220,20 @@ export default {
 .details-bottom .details-team {
     flex: 1;
 }
-.details-bottom .details-modules {
-    flex: 1;
+.details-modules {
+    margin-top: 4px;
 }
 .details-bottom .title {
     font-weight: bold;
 }
 
 .module-icon {
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     margin-right: 10px;
 }
 
-/deep/ .project-image {
+::v-deep .project-image {
     width: 100%;
     height: auto;
 }
@@ -221,4 +241,18 @@ export default {
 .project-container {
     margin-top: 20px;
 }
+
+.details-icon {
+    width: 23px;
+}
+
+.right-actions {
+    @include position(absolute, null 14px 18px null);
+    @include flex();
+
+    button {
+        margin-right: 10px;
+    }
+}
+
 </style>

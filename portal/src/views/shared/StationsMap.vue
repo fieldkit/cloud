@@ -1,21 +1,19 @@
-<template>
-    <div v-if="mapped.valid" class="ignored" style="height: 100%; width: 100%;">
-        <mapbox
-            class="stations-map"
-            :access-token="mapboxToken"
-            :map-options="{
-                style: 'mapbox://styles/mapbox/outdoors-v11',
-                bounds: mapped.boundsLngLat(),
-                zoom: 10,
-            }"
-            :nav-control="{
-                show: true,
-                position: 'bottom-left',
-            }"
-            @map-init="onMapInitialized"
-            @map-load="onMapLoaded"
-        />
-    </div>
+<template v-if="mapped.valid">
+    <mapbox
+        class="stations-map"
+        :access-token="mapboxToken"
+        :map-options="{
+            style: 'mapbox://styles/mapbox/outdoors-v11',
+            bounds: mapped.boundsLngLat(),
+            zoom: 10,
+        }"
+        :nav-control="{
+            show: true,
+            position: 'bottom-left',
+        }"
+        @map-init="onMapInitialized"
+        @map-load="onMapLoaded"
+    />
 </template>
 
 <script lang="ts">

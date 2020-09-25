@@ -35,7 +35,7 @@
                 </div>
             </div>
             <div class="image-container">
-                <ImageUploader :image="{ url: project ? project.photo : null }" @change="onImage" />
+                <ImageUploader :image="{ url: project ? project.photo : null }" :placeholder="imagePlaceholder" @change="onImage" />
             </div>
             <div class="outer-input-container">
                 <TextField v-model="form.location" label="Location" />
@@ -140,6 +140,8 @@ import { helpers, required, email, minValue, maxLength, minLength } from "vuelid
 import FKApi from "@/api/api";
 import * as ActionTypes from "@/store/actions";
 
+import PlaceholderImage from "@/assets/image-placeholder.svg";
+
 const afterOtherDate = (afterOtherDate) =>
     helpers.withParams({ type: "afterOtherDate", after: afterOtherDate }, function (this: any, value, parentVm) {
         const other = helpers.ref(afterOtherDate, this, parentVm);
@@ -182,6 +184,7 @@ export default Vue.extend({
                 pickedStart: null,
                 pickedEnd: null,
             },
+            imagePlaceholder: PlaceholderImage,
         };
     },
     validations: {
@@ -378,8 +381,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
-@import '../../scss/forms';
+@import "../../scss/forms";
+@import "../../scss/global";
 
 form > .outer-input-container {
     margin-bottom: 20px;
@@ -402,7 +405,7 @@ form > .outer-input-container {
     width: 100%;
     margin: 28px 0 15px;
 }
-::v-deep .image-container img {
+::v-deep .image-container .img {
     max-width: 275px;
     max-height: 135px;
     margin-right: 10px;
@@ -439,6 +442,8 @@ form > .outer-input-container {
     margin: 7px 0;
     position: relative;
     cursor: pointer;
+    min-height: 22px;
+    @include flex(center);
 
     input {
         opacity: 0;
@@ -474,39 +479,6 @@ form > .outer-input-container {
     }
 }
 
-.checkbox {
-    position: relative;
-    padding-left: 30px;
-    margin: 7px 0;
-    cursor: pointer;
-
-    input {
-        opacity: 0;
-        position: absolute;
-        z-index: -1;
-    }
-
-    &-btn {
-        width: 18px;
-        height: 18px;
-        border-radius: 2px;
-        border: solid 1px rgba(0, 0, 0, 0.1);
-        background: #f2f4f7;
-        @include position(absolute, 0 null null 0);
-    }
-
-    input:checked ~ .checkbox-btn {
-        &:after {
-            @include position(absolute, 0 null null 0);
-            content: "";
-            background: url("../../assets/icon-tick.svg") no-repeat center center;
-            background-size: 10px 8px;
-            width: 20px;
-            height: 20px;
-        }
-    }
-}
-
 .action-container {
     display: flex;
     flex-wrap: wrap;
@@ -523,7 +495,7 @@ form > .outer-input-container {
     background-color: #ce596b;
     border: none;
     border-radius: 5px;
-    font-weight: 900;
+    font-weight: 600;
     letter-spacing: 0.1px;
     margin-bottom: 20px;
 
@@ -538,13 +510,6 @@ form > .outer-input-container {
         border: 1px solid #ce596b;
         color: #ce596b;
     }
-}
-
-.validation-errors {
-    color: #c42c44;
-    display: block;
-    font-size: 14px;
-    margin-bottom: 25px;
 }
 
 .tags {
@@ -615,5 +580,8 @@ form > .outer-input-container {
             background-size: 10px;
         }
     }
+}
+::v-deep .has-float-label input {
+    padding-bottom: 4px;
 }
 </style>

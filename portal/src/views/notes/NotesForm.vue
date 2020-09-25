@@ -137,7 +137,7 @@ export default Vue.extend({
     margin-left: 10px;
     color: #0a67aa;
     font-size: 14px;
-    font-weight: 900;
+    font-weight: 600;
 }
 .header .buttons {
     margin-left: auto;
@@ -154,7 +154,7 @@ export default Vue.extend({
     border: solid 1px #cccdcf;
     background-color: #ffffff;
     font-size: 14px;
-    font-weight: 900;
+    font-weight: 600;
     letter-spacing: 0.08px;
     color: #2c3e50;
     margin-left: 7px;

@@ -1,12 +1,5 @@
 <template>
-    <StandardLayout @sidebar-toggle="onSidebarToggle" :viewingStations="true">
-        <div class="view-type-container">
-            <div class="view-type">
-                <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')"></div>
-                <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')"></div>
-            </div>
-        </div>
-
+    <StandardLayout :viewingStations="true" :viewingStation="activeStation">
         <template v-if="viewType === 'list'">
             <div class="stations-list">
                 <StationSummary
@@ -21,32 +14,35 @@
 
         <template v-if="viewType === 'map'">
             <div class="container-map">
-                <StationsMap @show-summary="showSummary" :mapped="mapped" :layoutChanges="layoutChanges" v-if="mapped" />
-                <StationSummary
+                <StationsMap @show-summary="showSummary" :mapped="mapped" v-if="mapped" />
+            </div>
+            <StationSummary
                     v-if="activeStation"
                     class="summary-container"
                     @close="closeSummary"
                     :station="activeStation"
                     v-bind:key="activeStation.id"
-                />
-                <div v-if="isAuthenticated && showNoStationsMessage && hasNoStations" id="no-stations">
-                    <div id="close-notice-btn" v-on:click="closeNotice">
-                        <img alt="Close" src="@/assets/close.png" />
-                    </div>
-                    <p class="heading">Add a New Station</p>
-                    <p class="text">
-                        You currently don't have any stations on your account. Download the FieldKit app and connect your station to add
-                        them to your account.
-                    </p>
-                    <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
-                        <img alt="App store" src="@/assets/appstore.png" class="app-btn" />
-                    </a>
-                    <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
-                        <img alt="Google Play" src="@/assets/googleplay.png" class="app-btn" />
-                    </a>
-                </div>
+            />
+            <div id="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
+                <h1 class="heading">Add a New Station</h1>
+                <p class="text">
+                    You currently don't have any stations on your account. Download the FieldKit app and connect your station to add them to
+                    them to your account.
+                </p>
+                <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
+                    <img alt="App store" src="@/assets/appstore.png" />
+                </a>
+                <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
+                    <img alt="Google Play" src="@/assets/googleplay.png" />
+                </a>
             </div>
         </template>
+        <div class="view-type-container">
+            <div class="view-type">
+                <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')"></div>
+                <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')"></div>
+            </div>
+        </div>
     </StandardLayout>
 </template>
 
@@ -72,9 +68,8 @@ export default Vue.extend({
     },
     data: () => {
         return {
-            layoutChanges: 0,
             showNoStationsMessage: true,
-            viewType: "list",
+            viewType: "map",
         };
     },
     computed: {
@@ -118,12 +113,6 @@ export default Vue.extend({
         closeSummary() {
             return this.$router.push({ name: "stations" });
         },
-        onSidebarToggle() {
-            this.layoutChanges++;
-        },
-        closeNotice() {
-            this.showNoStationsMessage = false;
-        },
         switchView(type) {
             this.viewType = type;
         },
@@ -134,98 +123,76 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import "../scss/mixins.scss";
 
-.container-ignored {
-    height: 100%;
-}
-
-.container-top {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-}
-
-.container-side {
-    width: 240px;
-    height: 100%;
-}
-
-.container-main {
-    flex-grow: 1;
-    flex-direction: column;
-    display: flex;
-}
-
-.container-header {
-    height: 70px;
-}
-
 .container-map {
-    flex-grow: 1;
+    width: 100%;
+    height: calc(100% - 54px);
+    margin-top: 0;
+    @include position(absolute, 54px null null 0);
 }
 
 ::v-deep .station-hover-summary {
     left: 360px;
-    top: 120px;
-    width: 415px;
+    top: 170px;
     border-radius: 3px;
 }
 
-#stations-view-panel {
-    margin: 0;
-}
+::v-deep .summary-container {
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+    position: unset;
+    margin: 190px 0 60px 119px;
+    max-width: calc(100vw - 20px);
 
-.closeSummary {
-    position: absolute;
-}
+    .explore-button {
+        margin-bottom: 6px;
+    }
 
-#no-user {
-    font-size: 20px;
-    background-color: #ffffff;
-    width: 400px;
-    position: absolute;
-    top: 40px;
-    left: 260px;
-    padding: 0 15px 15px 15px;
-    margin: 60px;
-    border: 1px solid rgb(215, 220, 225);
-    z-index: 2;
+    @include bp-down($sm) {
+        margin: 117px auto 60px auto;
+    }
 }
 
 #no-stations {
     background-color: #ffffff;
-    width: 360px;
-    position: absolute;
-    top: 70px;
-    left: 50%;
-    padding: 75px 60px 75px 60px;
-    margin: 135px 0 0 -120px;
+    width: 486px;
+    padding: 95px 80px 95px 80px;
+    margin: 117px auto 60px auto;
     text-align: center;
     border: 1px solid rgb(215, 220, 225);
     z-index: 2;
-}
+    box-sizing: border-box;
 
-#no-stations .heading {
-    font-size: 18px;
-    font-weight: bold;
-}
+    @include bp-down($xs) {
+        width: calc(100% - 20px);
+        padding: 31px 13px;
+    }
 
-#no-stations .text {
-    font-size: 14px;
-}
+    a {
+        @include bp-down($xs) {
+            display: block;
+        }
 
-#no-stations .app-btn {
-    margin: 20px 14px;
-}
+        &:nth-of-type(1) {
+            margin-right: 27px;
 
-#close-notice-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-}
+            @include bp-down($xs) {
+                margin-right: 0;
+                margin-bottom: 14px;
+            }
+        }
+    }
 
-.show-link {
-    text-decoration: underline;
+    .heading {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 2px;
+        margin-top: 0;
+    }
+
+    .text {
+        font-size: 14px;
+        max-width: 320px;
+        margin: 0 auto 35px;
+    }
 }
 
 .view-type {
@@ -239,10 +206,11 @@ export default Vue.extend({
 
     &-container {
         z-index: $z-index-top;
+        margin: 0;
         @include position(absolute, 90px 25px null null);
 
-        @include bp-down($xs) {
-            @include position(absolute, 83px null null 0);
+        @include bp-down($sm) {
+            @include position(absolute, 67px 10px null null);
         }
     }
 
@@ -271,21 +239,24 @@ export default Vue.extend({
     flex-wrap: wrap;
     padding: 100px 70px;
     margin: -20px;
-    width: calc(100% - 40px);
+    width: 100%;
     box-sizing: border-box;
-    max-width: 1080px;
 
     @include bp-down($md) {
-        padding: 100px 30px;
+        padding: 100px 20px;
+        margin: -20px 0;
     }
 
     @include bp-down($sm) {
         justify-content: center;
+        margin: 30px -20px -20px;
     }
 
     @include bp-down($xs) {
-        padding: 80px 10px;
-        margin: -5px 0;
+        padding: 80px 0px;
+        margin: 55px 0 -5px 0;
+        transform: translateX(10px);
+        width: calc(100% - 20px);
     }
 
     .summary-container {
@@ -303,13 +274,14 @@ export default Vue.extend({
 
         @include bp-down($sm) {
             justify-self: center;
-            max-width: 400px;
-            flex-basis: 100%;
+            flex: 1 1 389px;
+            max-width: 389px;
             margin: 10px 0;
         }
 
         @include bp-down($xs) {
             margin: 5px 0;
+            width: auto;
         }
 
         .close-button {

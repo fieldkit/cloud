@@ -1,6 +1,6 @@
 <template>
     <form @submit.prevent="saveForm">
-        <h3>Change Password</h3>
+        <h3 class="heading">Change Password</h3>
         <div>
             <TextField v-model="form.existing" label="Current password" type="password" />
 
@@ -117,12 +117,6 @@ form > div {
     margin-bottom: 20px;
 }
 
-.validation-errors {
-    color: #c42c44;
-    display: block;
-    font-size: 14px;
-    margin-bottom: 25px;
-}
 .notification {
     margin: 20px;
     padding: 20px;
@@ -132,11 +126,11 @@ form > div {
 }
 
 form {
-    margin-top: 60px;
+    margin-top: 45px;
+    padding-bottom: 80px;
 }
 
 .button-solid {
-    width: 335px;
     margin-top: 15px;
     margin-bottom: 20px;
 

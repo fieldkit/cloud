@@ -104,7 +104,7 @@ export default Vue.extend({
     margin-left: 10px;
     color: #0a67aa;
     font-size: 14px;
-    font-weight: 900;
+    font-weight: 600;
 }
 .header .buttons {
     margin-left: auto;
@@ -132,7 +132,7 @@ export default Vue.extend({
 
 /deep/ .note .title {
     font-size: 18px;
-    font-weight: 900;
+    font-weight: 600;
     margin-bottom: 1em;
 }
 

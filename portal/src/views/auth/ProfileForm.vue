@@ -1,7 +1,7 @@
 <template>
     <div class="profile-change">
         <form @submit.prevent="saveForm">
-            <h3>Profile Picture</h3>
+            <h3 class="heading">Profile Picture</h3>
             <div class="user-image image-container">
                 <ImageUploader :image="{ url: null }" v-if="!user.photo" @change="onImage" />
                 <ImageUploader :image="{ url: user.photo.url }" v-if="user.photo" @change="onImage" />
@@ -33,6 +33,13 @@
                 <div class="validation-errors" v-if="$v.form.name.$error">
                     <div v-if="!$v.form.bio.required">Short Description is a required field.</div>
                 </div>
+            </div>
+            <div class="checkbox">
+                <label>
+                    Make my profile public
+                    <input type="checkbox" id="checkbox" v-model="form.public" />
+                    <span class="checkbox-btn"></span>
+                </label>
             </div>
             <button class="button-solid" type="submit">Update</button>
         </form>
@@ -133,18 +140,15 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
 @import '../../scss/forms';
 @import '../../scss/global';
 
-h3 {
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 8px;
-}
-
 .image-container {
-    margin-bottom: 40px;
+    margin-bottom: 33px;
+
+    @include bp-down($xs) {
+        margin-bottom: 40px;
+    }
 }
 ::v-deep .user-image img {
     max-width: 198px!important;
@@ -156,21 +160,8 @@ h3 {
     background-color: rgba(255, 255, 255, 0.65);
     text-align: center;
 }
-.input-container {
-    display: flex;
-    flex-direction: column;
-    margin: 10px 0 0 0px;
-}
 form > div {
     margin-bottom: 20px;
-}
-#public-checkbox-container {
-}
-#public-checkbox-container input {
-}
-#public-checkbox-container label {
-}
-#public-checkbox-container img {
 }
 .password-change-heading {
     font-size: 16px;
@@ -178,23 +169,14 @@ form > div {
     margin-bottom: 40px;
 }
 .button-solid {
-    margin-top: 20px;
+    margin-top: 25px;
 
     @include bp-down($xs) {
         width: 100%;
     }
 }
-.validation-errors {
-    color: #c42c44;
-    display: block;
-    font-size: 14px;
-    margin-bottom: 25px;
-}
-.notification {
-    margin: 20px;
-    padding: 20px;
-    background-color: #d4edda;
-    border: 2px;
-    border-radius: 4px;
+
+.checkbox {
+    margin-top: 25px;
 }
 </style>
