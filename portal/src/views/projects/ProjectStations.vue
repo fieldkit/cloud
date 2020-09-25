@@ -267,6 +267,7 @@ export default Vue.extend({
     transition: width 0.5s;
     position: relative;
     flex: 2;
+    height: 100%;
 }
 .station-box {
     height: 38px;

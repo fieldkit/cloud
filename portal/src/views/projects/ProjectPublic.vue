@@ -65,7 +65,20 @@
             </div>
         </div>
 
-        <div class="project-stations">
+        <div class="update">
+            <UserPhoto :user="user" />
+            <div>
+                <h1> Project update title </h1>
+                <h2> by Lauren Martin | 01/21/2020 </h2>
+                <p>
+                    Thank you so much for contributing and supporting us during this project. Lorem ipsum dolor sit amet,
+                    consectetur adipiscing elit. Sedo eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                </p>
+            </div>
+            <button class="button-solid"> Get involved </button>
+        </div>
+
+        <div class="project-stations" style="display: none">
             <ProjectStations :project="project" :admin="false" :userStations="userStations" />
         </div>
 
@@ -171,6 +184,7 @@ export default {
     border-radius: 2px;
     border: solid 1px #d8dce0;
     background-color: white;
+    flex-wrap: wrap;
 }
 .details > .left {
     flex: 1;
@@ -178,6 +192,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    flex-basis: 100%;
 }
 .details .project-detail {
     margin-bottom: 9px;
@@ -187,8 +202,11 @@ export default {
 .photo-container {
     width: 380px;
     max-height: 234px;
-}
 
+    @include bp-down($xs) {
+        width: 100%;
+    }
+}
 
 .details .below-photo {
     margin-top: auto;
@@ -252,6 +270,54 @@ export default {
 
     button {
         margin-right: 10px;
+    }
+}
+
+.update {
+    padding: 26px 29px 23px;
+    border-radius: 2px;
+    border: solid 1px #d8dce0;
+    background-color: #ffffff;
+    margin-top: 16px;
+    @include flex();
+
+    @include bp-down($xs) {
+        padding: 16px 10px 23px;
+    }
+
+    .default-user-icon {
+        width: 35px;
+        height: 35px;
+        margin: 4px 14px 0;
+
+        @include bp-down($xs) {
+            margin: 4px 7px 0 0;
+        }
+    }
+
+    h1 {
+        font-size: 20px;
+        font-weight: 500;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    h2 {
+        font-size: 16px;
+        line-height: 1.3;
+        margin: 0;
+        font-weight: 300;
+    }
+
+    p {
+        line-height: 1.5;
+        margin: 9px 54px 0 0;
+    }
+
+    .button-solid {
+        padding: 0 45px;
+        white-space: nowrap;
+        align-self: center;
     }
 }
 
