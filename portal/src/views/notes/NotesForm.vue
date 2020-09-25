@@ -169,7 +169,8 @@ export default Vue.extend({
     margin-top: 45px;
     display: flex;
     flex-wrap: wrap;
-    height: 200px;
+    max-height: 200px;
+    max-width: 200px;
 
     .title {
         flex-basis: 100%;
