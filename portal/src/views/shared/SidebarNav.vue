@@ -251,14 +251,6 @@ export default Vue.extend({
     @include position(absolute, 23px null null 77px);
 
     @include bp-down($md) {
-        left: 20px;
-
-        &.active {
-            transform: translateX(175px);
-        }
-    }
-
-    @include bp-down($sm) {
         left: 10px;
         top: 16px;
     }

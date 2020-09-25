@@ -6,10 +6,8 @@
                     <ProjectPhoto :project="project" />
                 </div>
 
-                <div class="below-photo">
-                    <DisplayProjectTags :tags="project.tags" />
-                    <FollowPanel :project="project" v-bind:key="project.id" />
-                </div>
+                <DisplayProjectTags :tags="project.tags" />
+                <FollowPanel :project="project" v-bind:key="project.id" />
             </div>
 
             <div class="right">
@@ -87,7 +85,6 @@
 
         <TeamManager :displayProject="displayProject" v-bind:key="displayProject.id" />
 
-        <ProjectActivity :displayProject="displayProject" v-if="false" />
     </div>
 </template>
 
@@ -106,7 +103,6 @@ export default {
     components: {
         ...CommonComponents,
         ProjectStations,
-        ProjectActivity,
         ProjectDataFiles,
         StationsReadings,
         TeamManager,
@@ -247,9 +243,7 @@ export default {
         max-height: 150px;
     }
 }
-.details .below-photo {
-    margin-top: auto;
-}
+
 .details > .right {
     border: 1px solid #d8dce0;
     border-radius: 1px;

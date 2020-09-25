@@ -6,9 +6,7 @@
                     <ProjectPhoto :project="project" />
                 </div>
 
-                <div class="below-photo">
-                    <DisplayProjectTags :tags="project.tags" />
-                </div>
+                <DisplayProjectTags :tags="project.tags" />
             </div>
 
             <div class="right">
@@ -82,7 +80,65 @@
             <ProjectStations :project="project" :admin="false" :userStations="userStations" />
         </div>
 
-        <ProjectActivity :displayProject="displayProject" v-if="false" />
+        <div class="project-team-activity">
+            <div class="project-team">
+                <h1> Project Team (4 members)</h1>
+                <ul>
+                    <li>
+                        <img src="@/assets/image-placeholder.svg" alt="Team Member Avatar">
+                        <div>
+                            <div>
+                                Lauren Martin
+                            </div>
+                            <div class="project-team-role">
+                                Project Lead
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <img src="@/assets/image-placeholder.svg" alt="Team Member Avatar">
+                        <div>
+                            <div>
+                                Lauren Martin
+                            </div>
+                            <div class="project-team-role">
+                                Project Lead
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="recent-activity">
+                <h1> Recent Activity </h1>
+                <ul>
+                    <li>
+                        <img src="@/assets/icon-compass.svg" width="30"/>
+                        <div>
+                            <div>
+                                <h2> Downloaded New Data </h2>
+                                <span> 12/12/2020 </span>
+                            </div>
+                            <p>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. sed do eiusmod tempor
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <img src="@/assets/icon-compass.svg" width="30"/>
+                        <div>
+                            <div>
+                                <h2> Downloaded New Data </h2>
+                                <span> 12/12/2020 </span>
+                            </div>
+                            <p>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. sed do eiusmod tempor
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -99,7 +155,6 @@ export default {
     components: {
         ...CommonComponents,
         ProjectStations,
-        ProjectActivity,
     },
     data: () => {
         return {};
@@ -184,15 +239,25 @@ export default {
     border-radius: 2px;
     border: solid 1px #d8dce0;
     background-color: white;
-    flex-wrap: wrap;
+
+    @include bp-down($sm) {
+        flex-wrap: wrap;
+    }
 }
 .details > .left {
     flex: 1;
     padding: 23px 20px;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
-    flex-basis: 100%;
+
+    @include bp-down($sm) {
+        flex-basis: 100%;
+        padding-bottom: 0;
+    }
+
+    @include bp-down($xs) {
+        padding: 10px 10px 0;
+    }
 }
 .details .project-detail {
     margin-bottom: 9px;
@@ -208,18 +273,27 @@ export default {
     }
 }
 
-.details .below-photo {
-    margin-top: auto;
-}
 .details > .right {
     padding: 20px 20px 67px 20px;
     position: relative;
+
+    @include bp-down($xs) {
+        padding-top: 14px;
+    }
+
+    @include bp-down($xs) {
+        padding: 10px 10px 64px;
+    }
 }
 .details .details-heading {
     font-weight: 600;
     padding-bottom: 10px;
     font-size: 24px;
     color: #2c3e50;
+
+    @include bp-down($sm) {
+        font-size: 22px;
+    }
 }
 .details .details-top {
     display: flex;
@@ -257,7 +331,11 @@ export default {
 }
 
 .project-container {
-    margin-top: 20px;
+    margin-top: -10px;
+
+    @include bp-down($sm) {
+        margin-top: 8px;
+    }
 }
 
 .details-icon {
@@ -267,6 +345,11 @@ export default {
 .right-actions {
     @include position(absolute, null 14px 18px null);
     @include flex();
+
+    @include bp-down($xs) {
+        right: 0;
+        bottom: 12px;
+    }
 
     button {
         margin-right: 10px;
@@ -282,6 +365,10 @@ export default {
     position: relative;
     @include flex();
 
+    @include bp-down($md) {
+        padding: 26px 23px 23px;
+    }
+
     @include bp-down($sm) {
         flex-wrap: wrap;
     }
@@ -296,10 +383,6 @@ export default {
         margin: 4px 14px 0;
 
         @include bp-down($md) {
-            margin-left: 0;
-        }
-
-        @include bp-down($sm) {
             margin: 4px 7px 0 0;
 
             @include position(absolute, 26px null null 29px);
@@ -316,7 +399,11 @@ export default {
         margin: 0;
         line-height: 1.4;
 
-        @include bp-down($sm) {
+        @include bp-down($md) {
+            padding-left: 52px;
+        }
+
+        @include bp-down($xs) {
             padding-left: 42px;
         }
     }
@@ -327,7 +414,11 @@ export default {
         margin: 0;
         font-weight: 300;
 
-        @include bp-down($sm) {
+        @include bp-down($md) {
+            padding-left: 52px;
+        }
+
+        @include bp-down($xs) {
             padding-left: 42px;
         }
     }
@@ -354,6 +445,129 @@ export default {
         @include bp-down($xs) {
             width: 100%;
         }
+    }
+}
+
+.recent-activity {
+    border-radius: 2px;
+    border: solid 1px #d8dce0;
+    background-color: #ffffff;
+    padding: 17px 23px;
+    flex: 1;
+
+    @include bp-down($sm) {
+        padding: 19px 10px;
+    }
+
+    h1 {
+        margin: 0 0 23px;
+        font-size: 20px;
+        font-weight: 500;
+
+        @include bp-down($sm) {
+            font-size: 18px;
+        }
+    }
+
+    h2 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 500;
+
+        + span {
+            margin-left: auto;
+            padding-left: 10px;
+            font-weight: 300;
+            font-size: 14px;
+            color: #6a6d71;
+        }
+    }
+
+    li {
+        @include flex(flex-start);
+        font-size: 16px;
+        margin-bottom: 30px;
+
+        > div {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            line-height: 1.3;
+
+            > div {
+                display: flex;
+            }
+        }
+
+        img {
+            margin-right: 16px;
+            margin-top: 2px;
+        }
+
+        p {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+    }
+}
+
+.project-team-activity {
+    @include flex();
+    margin-top: 21px;
+
+    @include bp-down($sm) {
+        flex-wrap: wrap;
+    }
+}
+
+.project-team {
+    flex-basis: 349px;
+    padding: 17px 20px;
+    border-radius: 2px;
+    border: solid 1px #d8dce0;
+    background-color: #ffffff;
+    margin-right: 32px;
+
+    @include bp-down($sm) {
+        flex-basis: 100%;
+        margin-right: 0;
+        margin-bottom: 26px;
+    }
+
+    @include bp-down($sm) {
+      padding: 19px 10px;
+    }
+
+    h1 {
+        font-size: 20px;
+        font-weight: 500;
+        margin: 0 0 23px;
+
+        @include bp-down($sm) {
+            font-size: 18px;
+        }
+    }
+
+    li {
+        padding-left: 4px;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 15px;
+        @include flex(center);
+
+        img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 14px;
+        }
+    }
+
+    &-role {
+        color: #818181;
+        font-size: 13px;
+        line-height: 1.2;
     }
 }
 

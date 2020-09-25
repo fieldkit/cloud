@@ -86,4 +86,12 @@ button {
 h1 {
     font-weight: 600;
 }
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+li {
+    list-style-type: none;
+}
 </style>

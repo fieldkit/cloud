@@ -147,7 +147,7 @@ export default Vue.extend({
     }
 
     @include bp-down($sm) {
-        margin: 117px auto 60px auto;
+        margin: 129px auto 60px auto;
     }
 }
 
@@ -155,7 +155,7 @@ export default Vue.extend({
     background-color: #ffffff;
     width: 486px;
     padding: 95px 80px 95px 80px;
-    margin: 117px auto 60px auto;
+    margin: 129px auto 60px auto;
     text-align: center;
     border: 1px solid rgb(215, 220, 225);
     z-index: 2;
@@ -244,12 +244,11 @@ export default Vue.extend({
 
     @include bp-down($md) {
         padding: 100px 20px;
-        margin: -20px 0;
+        margin: 30px -20px -20px;
     }
 
     @include bp-down($sm) {
         justify-content: center;
-        margin: 30px -20px -20px;
     }
 
     @include bp-down($xs) {

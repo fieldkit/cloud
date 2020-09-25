@@ -83,17 +83,13 @@ export default Vue.extend({
     z-index: $z-index-header;
     @include flex(center, flex-end);
 
-    @include bp-down($sm) {
-        padding: 0 20px;
-        height: 54px;
-    }
-
-    @include bp-down($sm) {
+    @include bp-down($md) {
         padding: 0 10px;
+        height: 54px;
         position: fixed;
 
         ::v-deep + * {
-            margin-top: 67px;
+            margin-top: 54px;
         }
     }
 
@@ -195,10 +191,13 @@ export default Vue.extend({
 ::v-deep .default-user-icon {
     margin: 0 10px 0 0;
 
-    @include bp-down($sm) {
-        margin: 0;
+    @include bp-down($md) {
         width: 25px;
         height: 25px;
+    }
+
+    @include bp-down($sm) {
+        margin: 0;
     }
 }
 </style>

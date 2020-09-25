@@ -3,19 +3,20 @@
         <div class="container-wrap">
             <div class="project-view" v-if="displayProject">
                 <DoubleHeader
-                    :title="displayProject.name"
-                    subtitle="Project Dashboard"
+                    :title="isAdministrator ? displayProject.name : null"
+                    :subtitle="isAdministrator ? 'Project Dashboard' : null"
                     backTitle="Back to Dashboard"
                     backRoute="projects"
                     v-if="displayProject"
                 >
-                    <div class="activity-button" v-on:click="onActivityToggle">
+                    <div class="activity-button" v-if="isAdministrator" v-on:click="onActivityToggle">
                         <img alt="Notifification" src="@/assets/icon-notification.svg" class="icon" />
                         Activity
                     </div>
                 </DoubleHeader>
 
-                <div v-bind:key="id">
+
+                <div v-if="isAdministrator" v-bind:key="id">
                     <ProjectActivity
                         v-if="activityVisible"
                         :user="user"
@@ -23,16 +24,14 @@
                         containerClass="project-activity-floating"
                         @close="closeActivity"
                     />
-                    <div class="">
-                        <ProjectAdmin v-if="isAdministrator" :user="user" :displayProject="displayProject" :userStations="stations" />
-                        <ProjectPublic
-                            v-if="!isAdministrator && displayProject"
-                            :user="user"
-                            :displayProject="displayProject"
-                            :userStations="stations"
-                        />
-                    </div>
-                </div>
+                        <ProjectAdmin :user="user" :displayProject="displayProject" :userStations="stations" />
+                </div >
+                <ProjectPublic
+                        v-if="!isAdministrator && displayProject"
+                        :user="user"
+                        :displayProject="displayProject"
+                        :userStations="stations"
+                />
             </div>
         </div>
     </StandardLayout>
@@ -191,5 +190,8 @@ export default Vue.extend({
     z-index: 10;
     overflow-y: scroll;
     width: 30em;
+}
+::v-deep .project-tag {
+    margin-right: 10px;
 }
 </style>
