@@ -279,7 +279,12 @@ export default {
     border: solid 1px #d8dce0;
     background-color: #ffffff;
     margin-top: 16px;
+    position: relative;
     @include flex();
+
+    @include bp-down($sm) {
+        flex-wrap: wrap;
+    }
 
     @include bp-down($xs) {
         padding: 16px 10px 23px;
@@ -290,8 +295,18 @@ export default {
         height: 35px;
         margin: 4px 14px 0;
 
-        @include bp-down($xs) {
+        @include bp-down($md) {
+            margin-left: 0;
+        }
+
+        @include bp-down($sm) {
             margin: 4px 7px 0 0;
+
+            @include position(absolute, 26px null null 29px);
+        }
+
+        @include bp-down($xs) {
+            @include position(absolute, 16px null null 10px);
         }
     }
 
@@ -300,6 +315,10 @@ export default {
         font-weight: 500;
         margin: 0;
         line-height: 1.4;
+
+        @include bp-down($sm) {
+            padding-left: 42px;
+        }
     }
 
     h2 {
@@ -307,17 +326,34 @@ export default {
         line-height: 1.3;
         margin: 0;
         font-weight: 300;
+
+        @include bp-down($sm) {
+            padding-left: 42px;
+        }
     }
 
     p {
         line-height: 1.5;
         margin: 9px 54px 0 0;
+
+        @include bp-down($md) {
+            margin-right: 20px;
+        }
+
+        @include bp-down($sm) {
+            flex-basis: 100%;
+            margin: 11px 0 15px 0;
+        }
     }
 
     .button-solid {
         padding: 0 45px;
         white-space: nowrap;
         align-self: center;
+
+        @include bp-down($xs) {
+            width: 100%;
+        }
     }
 }
 
