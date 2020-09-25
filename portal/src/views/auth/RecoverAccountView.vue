@@ -25,7 +25,7 @@
         </div>
         <div v-if="attempted" class="form success">
             <div v-if="!resending">
-                <img alt="Success" src="@/assets/Icon_Success.png" width="57px" class="form-header-icon" />
+                <img alt="Success" src="@/assets/icon-success.svg" width="57px" class="form-header-icon" />
                 <h1 class="form-title">Password Reset Email Sent</h1>
                 <div class="form-subtitle">Check your inbox for the email with a link to reset your password.</div>
                 <button class="form-submit" v-on:click="resend">Resend Email</button>
