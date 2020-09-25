@@ -8,7 +8,7 @@
             <div class="one">{{ title }}</div>
             <div class="two" v-if="subtitle">{{ subtitle }}</div>
         </div>
-        <div class="actions" v-if="this.$slot">
+        <div class="actions">
             <slot></slot>
         </div>
     </div>

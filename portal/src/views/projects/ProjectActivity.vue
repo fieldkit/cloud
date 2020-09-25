@@ -137,10 +137,15 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../scss/mixins";
 .heading {
     padding: 1em;
     display: flex;
+
+    @include bp-down($sm) {
+        font-size: 20px;
+    }
 }
 .heading .title {
     font-size: 20px;

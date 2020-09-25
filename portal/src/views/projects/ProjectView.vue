@@ -190,6 +190,14 @@ export default Vue.extend({
     z-index: 10;
     overflow-y: scroll;
     width: 30em;
+    paddinig: 1em;
+
+    @include bp-down($sm) {
+        @include position(fixed, 55px null null 0);
+        border: 0;
+        width: 100%;
+        padding: 20px 0;
+    }
 }
 ::v-deep .project-tag {
     margin-right: 10px;

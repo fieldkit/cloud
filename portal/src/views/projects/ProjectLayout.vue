@@ -88,7 +88,6 @@
             />
         </div>
 
-        <ProjectActivity :displayProject="displayProject" v-if="false" />
     </div>
 </template>
 

@@ -337,7 +337,7 @@ export default {
     margin-top: -10px;
 
     @include bp-down($sm) {
-        margin-top: 8px;
+        margin-top: -28px;
     }
 }
 
