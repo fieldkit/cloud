@@ -205,7 +205,10 @@ export default {
 .project-public {
     display: flex;
     flex-direction: column;
-    padding-bottom: 100px;
+
+    @include bp-down($sm) {
+        padding-bottom: 20px;
+    }
 }
 .header {
     display: flex;
