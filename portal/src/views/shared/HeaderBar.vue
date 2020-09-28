@@ -93,7 +93,7 @@ export default Vue.extend({
         position: fixed;
 
         ::v-deep + * {
-            margin-top: 67px;
+            margin-top: 54px;
         }
     }
 
