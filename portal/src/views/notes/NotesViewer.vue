@@ -114,15 +114,6 @@ export default Vue.extend({
     margin-top: 20px;
 }
 
-.photos {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.photos .photo {
-    flex-basis: 400px;
-}
-
 /deep/ .photos img {
     max-width: 400px;
     max-height: 400px;

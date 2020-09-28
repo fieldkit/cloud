@@ -146,8 +146,8 @@ export default Vue.extend({
     height: 66px;
     border-bottom: 1px solid rgba(235, 235, 235, 1);
     opacity: 0;
-    @include flex(center, center);
     transition: 0.33s opacity;
+    @include flex(center, center);
 
     @at-root .container-side.active & {
        opacity: 1;
@@ -156,11 +156,16 @@ export default Vue.extend({
     @include bp-down($sm) {
         justify-content: flex-start;
         padding: 0 20px;
+        height: 54px;
     }
 }
 #header-logo {
     width: 140px;
     margin: 16px auto;
+
+    @include bp-down($md) {
+        display: none;
+    }
 }
 
 #inner-nav {
@@ -252,13 +257,14 @@ export default Vue.extend({
 
     @include bp-down($md) {
         left: 10px;
+        top: 22px;
         top: 16px;
     }
 
     .container-side.active & {
         left: 251px;
 
-        @include bp-down($sm) {
+        @include bp-down($md) {
             left: 188px;
         }
     }

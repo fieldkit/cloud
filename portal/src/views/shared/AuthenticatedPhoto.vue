@@ -24,7 +24,7 @@ export default Vue.extend({
             return this.refresh();
         },
     },
-    mounted(this: any) {
+    created(this: any) {
         return this.refresh();
     },
     methods: {

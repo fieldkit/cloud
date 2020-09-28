@@ -5,7 +5,7 @@
                 Activity History
             </div>
             <div class="close-button" v-on:click="onClose">
-                <img alt="Close" src="../../assets/close.png" />
+                <img alt="Close" src="@/assets/icon-close.svg" />
             </div>
         </div>
         <div class="feed-container" v-if="visibleActivities.length > 0">
@@ -21,7 +21,7 @@
                     <div class="activity-text">
                         {{ activity.records.toLocaleString() }} readings uploaded from {{ activity.name }}, with
                         {{ activity.errors ? " an error." : "no errors." }}
-                        <img src="@/assets/Icon_Warning_error.png" v-if="activity.errors" class="activity-error" />
+                        <img src="@/assets/icon-warning-error.svg" v-if="activity.errors" class="activity-error" />
                     </div>
                 </div>
                 <div class="panel" v-if="activity.type == 'update'">
@@ -40,7 +40,7 @@
                     </div>
                     <div class="activity-text">{{ activity.name }} was deployed.</div>
                     <div class="activity-text">
-                        <img src="@/assets/icon-location.png" />
+                        <img src="@/assets/icon-location.svg" />
                         {{ activity.location[1] | prettyCoordinate }}, {{ activity.location[0] | prettyCoordinate }}
                     </div>
                 </div>
@@ -83,7 +83,7 @@ export default Vue.extend({
             return false;
         },
         visibleActivities(this: any) {
-            const compass = this.$loadAsset("compass-icon.png");
+            const compass = this.$loadAsset("icon-compass.svg");
             return _.take(
                 this.activities.activities.map((a, i) => {
                     if (a.type == "StationIngestion") {

@@ -30,7 +30,7 @@
                 </div>
             </template>
             <template v-if="success">
-                <img src="@/assets/Icon_Success.png" alt="Success"  class="form-header-icon" width="57px" />
+                <img src="@/assets/icon-success.svg" alt="Success"  class="form-header-icon" width="57px" />
                 <h1 class="form-title"> Success! </h1>
 
                 <router-link :to="{ name: 'login' }" class="form-link">
@@ -38,7 +38,7 @@
                 </router-link>
             </template>
             <template v-if="failed">
-                <img src="@/assets/Icon_Warning_error.png" alt="Unsuccessful" class="form-header-icon" width="57px" />
+                <img src="@/assets/icon-warning-error.svg" alt="Unsuccessful" class="form-header-icon" width="57px" />
                 <h1 class="form-title"> Password Not Reset </h1>
                 <div class="form-subtitle"> Unfortunately we were unable to reset your password. </div>
                 <d>

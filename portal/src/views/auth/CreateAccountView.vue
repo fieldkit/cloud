@@ -56,7 +56,7 @@
             </form>
             <form class="form" v-if="created">
                 <template v-if="!resending">
-                    <img src="@/assets/Icon_Success.png" alt="Success" class="form-header-icon" width="57px" />
+                    <img src="@/assets/icon-success.svg" alt="Success" class="form-header-icon" width="57px" />
                     <h1 class="form-title"> Account Created </h1>
                     <h2 class="form-subtitle"> We sent you an account validation email. </h2>
                     <button class="form-submit" v-on:click="resend"> Resend Email </button>
