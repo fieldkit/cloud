@@ -1,5 +1,8 @@
 <template>
     <div class="header">
+        <router-link :to="{ name: 'projects' }">
+            <img alt="FieldKit Logo" id="header-logo" src="@/assets/logo-fieldkit.svg" />
+        </router-link>
         <div
             class="header-account"
             v-on:click="onAccountClick()"
@@ -199,6 +202,20 @@ export default Vue.extend({
         margin: 0;
         width: 25px;
         height: 25px;
+    }
+}
+
+#header-logo {
+    @include position(fixed, 18px null null 50%);
+    width: 103px;
+    transform: translateX(-50%);
+
+    @include bp-up($sm) {
+        width: 140px;
+    }
+
+    @include bp-up($md) {
+        display: none;
     }
 }
 </style>
