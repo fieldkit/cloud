@@ -22,7 +22,7 @@
                     </div>
                     <div class="details-row" v-if="displayProject.duration">
                         <div class="details-icon">
-                            <img alt="Location" src="@/assets/icon-time.svg" class="icon" width="12px" height="14px"/>
+                            <img alt="Location" src="@/assets/icon-time.svg" class="icon" width="12px" height="14px" />
                         </div>
                         <template>{{ displayProject.duration | prettyDuration }}</template>
                     </div>
@@ -34,7 +34,7 @@
                     </div>
                     <div class="details-row" v-if="displayProject.places.native">
                         <div class="details-icon">
-                            <img alt="Location" src="@/assets/icon-location.svg" class="icon"  width="13px" height="16px" />
+                            <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="13px" height="16px" />
                         </div>
                         <template>Native Lands: {{ displayProject.places.native }}</template>
                     </div>
@@ -52,11 +52,11 @@
                 </div>
                 <div class="right-actions">
                     <button class="button-social">
-                        <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon">
+                        <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
                         Follow
                     </button>
                     <button class="button-social">
-                        <img src="@/assets/icon-share.svg" width="12px" alt="Icon">
+                        <img src="@/assets/icon-share.svg" width="12px" alt="Icon" />
                         Share
                     </button>
                 </div>
@@ -66,14 +66,14 @@
         <div class="update">
             <UserPhoto :user="user" />
             <div>
-                <h1> Project update title </h1>
-                <h2> by Lauren Martin | 01/21/2020 </h2>
+                <h1>Project update title</h1>
+                <h2>by Lauren Martin | 01/21/2020</h2>
                 <p>
-                    Thank you so much for contributing and supporting us during this project. Lorem ipsum dolor sit amet,
-                    consectetur adipiscing elit. Sedo eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    Thank you so much for contributing and supporting us during this project. Lorem ipsum dolor sit amet, consectetur
+                    adipiscing elit. Sedo eiusmod tempor incididunt ut labore et dolore magna aliqua.
                 </p>
             </div>
-            <button class="button-solid"> Get involved </button>
+            <button class="button-solid">Get involved</button>
         </div>
 
         <div class="project-stations">
@@ -82,58 +82,46 @@
 
         <div class="project-team-activity">
             <div class="project-team">
-                <h1> Project Team (4 members)</h1>
+                <h1>Project Team (4 members)</h1>
                 <ul>
                     <li>
-                        <img src="@/assets/image-placeholder.svg" alt="Team Member Avatar">
+                        <img src="@/assets/image-placeholder.svg" alt="Team Member Avatar" />
                         <div>
-                            <div>
-                                Lauren Martin
-                            </div>
-                            <div class="project-team-role">
-                                Project Lead
-                            </div>
+                            <div>Lauren Martin</div>
+                            <div class="project-team-role">Project Lead</div>
                         </div>
                     </li>
                     <li>
-                        <img src="@/assets/image-placeholder.svg" alt="Team Member Avatar">
+                        <img src="@/assets/image-placeholder.svg" alt="Team Member Avatar" />
                         <div>
-                            <div>
-                                Lauren Martin
-                            </div>
-                            <div class="project-team-role">
-                                Project Lead
-                            </div>
+                            <div>Lauren Martin</div>
+                            <div class="project-team-role">Project Lead</div>
                         </div>
                     </li>
                 </ul>
             </div>
 
             <div class="recent-activity">
-                <h1> Recent Activity </h1>
+                <h1>Recent Activity</h1>
                 <ul>
                     <li>
-                        <img src="@/assets/icon-compass.svg" width="30"/>
+                        <img src="@/assets/icon-compass.svg" width="30" />
                         <div>
                             <div>
-                                <h2> Downloaded New Data </h2>
-                                <span> 12/12/2020 </span>
+                                <h2>Downloaded New Data</h2>
+                                <span>12/12/2020</span>
                             </div>
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. sed do eiusmod tempor
-                            </p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. sed do eiusmod tempor</p>
                         </div>
                     </li>
                     <li>
-                        <img src="@/assets/icon-compass.svg" width="30"/>
+                        <img src="@/assets/icon-compass.svg" width="30" />
                         <div>
                             <div>
-                                <h2> Downloaded New Data </h2>
-                                <span> 12/12/2020 </span>
+                                <h2>Downloaded New Data</h2>
+                                <span>12/12/2020</span>
                             </div>
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. sed do eiusmod tempor
-                            </p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. sed do eiusmod tempor</p>
                         </div>
                     </li>
                 </ul>
@@ -199,8 +187,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/project';
-@import '../../scss/global';
+@import "../../scss/project";
+@import "../../scss/global";
 
 .project-public {
     display: flex;
@@ -538,7 +526,7 @@ export default {
     }
 
     @include bp-down($sm) {
-      padding: 19px 10px;
+        padding: 19px 10px;
     }
 
     h1 {
@@ -573,5 +561,4 @@ export default {
         line-height: 1.2;
     }
 }
-
 </style>
