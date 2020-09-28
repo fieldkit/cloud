@@ -89,6 +89,7 @@ export default Vue.extend({
 .has-float-label select,
 .has-float-label textarea {
     font-size: inherit;
+    color: #2c3e50;
     padding-top: 1em;
     margin-bottom: 2px;
     border: 0;
