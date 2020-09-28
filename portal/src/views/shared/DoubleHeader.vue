@@ -5,7 +5,7 @@
                 <span class="small-arrow">&lt;</span>
                 {{ backTitle }}
             </div>
-            <div class="one">{{ title }}</div>
+            <div class="one" v-if="title">{{ title }}</div>
             <div class="two" v-if="subtitle">{{ subtitle }}</div>
         </div>
         <div class="actions">
@@ -22,7 +22,7 @@ export default Vue.extend({
     props: {
         title: {
             type: String,
-            required: true,
+            default: null,
         },
         subtitle: {
             type: String,
@@ -46,7 +46,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 
 .double-header {
     display: flex;
