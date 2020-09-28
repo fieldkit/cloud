@@ -23,7 +23,7 @@ const ResizeAuto = Vue.extend({
     mounted() {
         this.$nextTick(() => {
             const el: any = this.$el;
-            el.setAttribute("style", "height:" + (this.$el.scrollHeight - 0) + "px");
+            el.setAttribute("style", "height:" + (this.$el.scrollHeight - 10) + "px");
         });
 
         this.$el.addEventListener("input", this.resize);

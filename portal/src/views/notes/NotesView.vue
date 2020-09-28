@@ -5,50 +5,102 @@
             <DoubleHeader title="My Stations" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="!project" />
 
             <div class="lower">
-                <div class="main empty" v-if="!hasStations">
+                <div class="loading-container empty" v-if="!hasStations">
                     There are no stations to view.
                 </div>
                 <template v-else>
-                    <div class="station-tabs">
-                        <div class="tab"
-                             v-for="station in stations"
-                             v-bind:key="station.id"
-                             v-bind:class="{active: selectedStation.id === station.id}"
-                             v-on:click="onSelected(station)">
-                            <div class="tab-wrap">
-                                <div class="name"> {{ station.name }} </div>
-                                <div v-if="station.deployedAt" class="deployed">Deployed</div>
-                                <div v-else class="undeployed">Not Deployed</div>
-                            </div>
-                            <div class="tab-content" v-if="selectedStation && selectedNotes && (selectedStation.id == station.id)">
-                                <div v-if="loading" class="main">
-                                    <Spinner />
+                    <template v-if="isMobileView()">
+                        <div class="station-tabs">
+                            <div class="tab"
+                                 v-for="station in stations"
+                                 v-bind:key="station.id"
+                                 v-bind:class="{active: selectedStation.id === station.id}"
+                                 v-on:click="onSelected(station)">
+                                <div class="tab-wrap">
+                                    <div class="name"> {{ station.name }} </div>
+                                    <div v-if="station.deployedAt" class="deployed">Deployed</div>
+                                    <div v-else class="undeployed">Not Deployed</div>
                                 </div>
-                                <div class="notifications">
-                                    <div v-if="failed" class="notification failed">
-                                        Oops, there was a problem.
+                                <div class="tab-content" v-if="selectedStation && selectedNotes">
+                                    <div v-if="loading" class="loading-container">
+                                        <Spinner />
                                     </div>
+                                    <div class="notifications">
+                                        <div v-if="failed" class="notification failed">
+                                            Oops, there was a problem.
+                                        </div>
 
-                                    <div v-if="success" class="notification success">
-                                        Saved.
+                                        <div v-if="success" class="notification success">
+                                            Saved.
+                                        </div>
                                     </div>
+                                    <NotesViewer
+                                            :station="selectedStation"
+                                            :notes="selectedNotes"
+                                            v-bind:key="stationId"
+                                            v-if="project.project.readOnly"
+                                    />
+                                    <NotesForm
+                                            v-else
+                                            :station="selectedStation"
+                                            :notes="selectedNotes"
+                                            @save="saveForm"
+                                            v-bind:key="stationId"
+                                            @change="onChange"
+                                    />
                                 </div>
-                                <NotesViewer
-                                        :station="selectedStation"
-                                        :notes="selectedNotes"
-                                        v-bind:key="stationId"
-                                        v-if="project.project.readOnly"/>
-                                <NotesForm
-                                        v-else
-                                        :station="selectedStation"
-                                        :notes="selectedNotes"
-                                        @save="saveForm"
-                                        v-bind:key="stationId"
-                                        @change="onChange"
-                                />
+                                <div v-else class="tab-content empty">
+                                    Please choose a station from the left.
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </template>
+                    <template v-else>
+                        <div class="station-tabs">
+                            <div class="tab"
+                                 v-for="station in stations"
+                                 v-bind:key="station.id"
+                                 v-bind:class="{active: selectedStation.id === station.id}"
+                                 v-on:click="onSelected(station)">
+                                <div class="tab-wrap">
+                                    <div class="name"> {{ station.name }} </div>
+                                    <div v-if="station.deployedAt" class="deployed">Deployed</div>
+                                    <div v-else class="undeployed">Not Deployed</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-content" v-if="selectedStation && selectedNotes">
+                            <div v-if="loading" class="loading-container">
+                                <Spinner />
+                            </div>
+                            <div class="notifications">
+                                <div v-if="failed" class="notification failed">
+                                    Oops, there was a problem.
+                                </div>
+
+                                <div v-if="success" class="notification success">
+                                    Saved.
+                                </div>
+                            </div>
+                            <NotesViewer
+                                    :station="selectedStation"
+                                    :notes="selectedNotes"
+                                    v-bind:key="stationId"
+                                    v-if="project.project.readOnly"
+                            />
+                            <NotesForm
+                                    v-else
+                                    :station="selectedStation"
+                                    :notes="selectedNotes"
+                                    @save="saveForm"
+                                    v-bind:key="stationId"
+                                    @change="onChange"
+                            />
+                        </div>
+                        <div v-else class="tab-content empty">
+                            Please choose a station from the left.
+                        </div>
+                    </template>
                 </template>
             </div>
         </div>
@@ -104,6 +156,7 @@ export default Vue.extend({
             loading: false,
             success: false,
             failed: false,
+            mobileView: window.screen.availWidth < 1040,
         };
     },
     computed: {
@@ -154,6 +207,21 @@ export default Vue.extend({
         },
     },
     mounted(this: any) {
+        const desktopBreakpoint = 768;
+        const windowAny: any = window;
+        const resizeObserver = new windowAny.ResizeObserver((entries) => {
+            console.log("data", this.$data.mobileView);
+            const windowWidth = entries[0].contentRect.width;
+
+            if (this.$data.mobileView && (windowWidth > desktopBreakpoint)) {
+                this.$data.mobileView = false;
+            }
+            if (!this.$data.mobileView && (windowWidth < desktopBreakpoint)) {
+                this.$data.mobileView = true;
+            }
+        });
+        resizeObserver.observe(document.querySelector("body"));
+
         const pending = [];
         if (this.projectId) {
             pending.push(this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId }));
@@ -234,35 +302,36 @@ export default Vue.extend({
                 );
             });
         },
+        isMobileView() {
+            return this.$data.mobileView;
+        },
     },
 });
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/layout';
+@import "../../scss/layout";
 
 .notes-view {
     @include bp-down($md) {
         max-width: 600px;
     }
 }
-
 .notes-view .lower {
     display: flex;
-    flex-direction: row;
     background: white;
     margin-top: 20px;
     position: relative;
+
+    @include bp-down($xs) {
+        margin-top: -15px;
+    }
 }
-.notes-view .lower .side {
-    flex-basis: 16rem;
-    flex-shrink: 0;
+.loading-container {
+    height: 100%;
+    @include flex(center);
 }
-.notes-view .lower .main {
-    flex-grow: 1;
-    text-align: left;
-}
-.notes-view .lower .main.empty {
+.notes-view .lower .loading-container.empty {
     padding: 20px;
 }
 
@@ -293,12 +362,11 @@ export default Vue.extend({
     text-align: left;
     display: flex;
     flex-direction: column;
-    height: 100%;
     flex-basis: 250px;
     flex-shrink: 0;
     border-top: 1px solid #d8dce0;
     border-left: 1px solid #d8dce0;
-    border-right: 1px solid #d8dce0;
+    border-bottom: 1px solid #d8dce0;
 
     @include bp-down($md) {
         flex-basis: 100%;
@@ -309,7 +377,8 @@ export default Vue.extend({
     cursor: pointer;
 
     @include bp-down($md) {
-        border: 0;
+        border-right: 1px solid #d8dce0;
+        border-bottom: 0;
     }
 
     &.active {
@@ -331,7 +400,7 @@ export default Vue.extend({
             transition: max-height 0.33s;
 
             &:after {
-                background: url('../../assets/icon-chevron-right.svg') no-repeat center center;
+                background: url("../../assets/icon-chevron-right.svg") no-repeat center center;
                 transform: rotate(90deg) translateX(-50%);
                 content: '';
                 width: 20px;
@@ -346,7 +415,6 @@ export default Vue.extend({
         }
 
         .tab.active &:before {
-
             @include bp-up($md) {
                 content: '';
                 width: 3px;
@@ -359,14 +427,12 @@ export default Vue.extend({
     }
 
     &-content {
-        @include position(absolute, 0 null null 251px);
         width: calc(100% - 250px);
         z-index: $z-index-top;
         border: 1px solid #d8dce0;
 
         @include bp-down($md) {
             padding-top: 1px;
-            position: unset;
             width: 100%;
             max-height: 0;
             border: 0;
@@ -390,10 +456,8 @@ export default Vue.extend({
     font-weight: 500;
     color: #2c3e50;
     margin-bottom: 1px;
-    font-weight: 500;
 }
 .undeployed {
-
     @include bp-down($md) {
         padding: 0 10px 0 14px;
         width: calc(100% + 24px);
@@ -408,5 +472,14 @@ export default Vue.extend({
     font-weight: 500;
 }
 
+::v-deep textarea {
+    overflow-y: hidden;
+    resize: none;
+    color: #2c3e50;
+    font-size: 14px !important;
 
+    @include bp-down($xs) {
+        font-size: 12px !important;
+    }
+}
 </style>

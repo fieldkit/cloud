@@ -81,7 +81,6 @@ export default Vue.extend({
         },
     },
     mounted(this: any) {
-        console.log("NOTES MUNTED");
         this.form = Notes.createFrom(this.notes);
     },
     methods: {
@@ -118,6 +117,7 @@ export default Vue.extend({
 
     @include bp-down($md) {
         padding: 25px 8px;
+        border-bottom: 1px solid #d8dce0;
     }
 }
 .header {
@@ -146,7 +146,11 @@ export default Vue.extend({
     display: flex;
 }
 .site-notes {
-    margin-top: 20px;
+    margin-top: 26px;
+
+    @include bp-down($sm) {
+        margin-top: 18px;
+    }
 }
 .button {
     padding: 0;
@@ -169,35 +173,49 @@ export default Vue.extend({
     display: flex;
     flex-wrap: wrap;
 
+    @include bp-down($sm) {
+        margin-top: 15px;
+    }
+
     .title {
         flex-basis: 100%;
+        font-weight: 500;
         margin-bottom: 20px;
+
+        @include bp-down($sm) {
+            color: #6a6d71;
+        }
+
+        @include bp-down($xs) {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
     }
 
     ::v-deep img {
-        height: 100%;
-        width: auto;
+        border-radius: 3px;
         object-fit: contain;
+        max-height: 200px;
+        max-width: 200px;
+        width: 200px;
+        height: auto;
+        object-fit: contain;
+
+        @include bp-down($sm) {
+            max-height: 82px;
+            max-width: 90px;
+        }
     }
 }
 
-::v-deep .photos img {
+::v-deep .photos img-container img {
     margin-right: 10px;
     margin-bottom: 10px;
-    max-height: 200px;
-    max-width: 200px;
-    width: 200px;
-    height: auto;
-    object-fit: contain;
 }
 
 ::v-deep .placeholder-container {
     flex-basis: 100%;
 }
 
-::v-deep .title {
-    font-size: 16px;
-    font-weight: 500;
-}
 
 </style>

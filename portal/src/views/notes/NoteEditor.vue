@@ -58,11 +58,17 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../scss/mixins";
 
 .field {
     margin-top: 10px;
     margin-bottom: 10px;
+
+    @include bp-down($xs) {
+        margin-top: 0;
+        margin-bottom: 4px;
+    }
 }
 
 .attached-audio {
@@ -79,5 +85,14 @@ export default Vue.extend({
     font-size: 14px;
     font-weight: 500;
     margin-right: 10px;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 500;
+
+    @include bp-down($xs) {
+        font-size: 14px;
+    }
 }
 </style>

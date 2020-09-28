@@ -104,19 +104,19 @@ export default Vue.extend({
 .image-container {
     @include flex(baseline);
     flex-wrap: wrap;
-}
 
-label {
-    transform: translateY(-7px);
-    font-size: 14px;
-    cursor: pointer;
-    margin-left: 12px;
+    label {
+        transform: translateY(-7px);
+        font-size: 14px;
+        cursor: pointer;
+        margin-left: 12px;
 
-    @include bp-down($xs) {
-        width: 100%;
-        display: block;
-        transform: translateY(5px);
-        margin-left: 0;
+        @include bp-down($xs) {
+            width: 100%;
+            display: block;
+            transform: translateY(5px);
+            margin-left: 0;
+        }
     }
 }
 
@@ -126,7 +126,7 @@ input {
 
 .upload-trigger {
     margin: 14px 0 0;
-    @include flex();
+    @include flex(center);
 
     label {
         @include flex(center, center);
