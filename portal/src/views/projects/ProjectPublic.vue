@@ -63,7 +63,7 @@
             </div>
         </div>
 
-        <div class="update">
+        <div class="update todo-disabled">
             <UserPhoto :user="user" />
             <div>
                 <h1>Project update title</h1>
@@ -80,7 +80,7 @@
             <ProjectStations :project="project" :admin="false" :userStations="userStations" />
         </div>
 
-        <div class="project-team-activity">
+        <div class="project-team-activity todo-disabled">
             <div class="project-team">
                 <h1>Project Team (4 members)</h1>
                 <ul>
@@ -560,5 +560,9 @@ export default {
         font-size: 13px;
         line-height: 1.2;
     }
+}
+
+.todo-disabled {
+    display: none;
 }
 </style>
