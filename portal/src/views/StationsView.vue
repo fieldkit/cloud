@@ -1,7 +1,7 @@
 <template>
     <StandardLayout :viewingStations="true" :viewingStation="activeStation">
         <template v-if="viewType === 'list'">
-            <div class="stations-list">
+            <div class="stations-list" v-if="stations && stations.length > 0">
                 <StationSummary
                     v-for="station in stations"
                     v-bind:key="station.id"
@@ -23,20 +23,20 @@
                     :station="activeStation"
                     v-bind:key="activeStation.id"
             />
-            <div id="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
-                <h1 class="heading">Add a New Station</h1>
-                <p class="text">
-                    You currently don't have any stations on your account. Download the FieldKit app and connect your station to add them to
-                    them to your account.
-                </p>
-                <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
-                    <img alt="App store" src="@/assets/appstore.png" />
-                </a>
-                <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
-                    <img alt="Google Play" src="@/assets/googleplay.png" />
-                </a>
-            </div>
         </template>
+        <div class="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
+            <h1 class="heading">Add a New Station</h1>
+            <p class="text">
+                You currently don't have any stations on your account. Download the FieldKit app and connect your station to add them to
+                them to your account.
+            </p>
+            <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
+                <img alt="App store" src="@/assets/appstore.png" />
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
+                <img alt="Google Play" src="@/assets/googleplay.png" />
+            </a>
+        </div>
         <div class="view-type-container">
             <div class="view-type">
                 <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')"></div>
@@ -151,7 +151,7 @@ export default Vue.extend({
     }
 }
 
-#no-stations {
+.no-stations {
     background-color: #ffffff;
     width: 486px;
     padding: 95px 80px 95px 80px;
