@@ -77,7 +77,6 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-
 .has-float-label textarea {
     width: 100%;
     font-family: "Avenir", Helvetica, Arial, sans-serif;
