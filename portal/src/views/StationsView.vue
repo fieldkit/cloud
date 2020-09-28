@@ -27,14 +27,14 @@
         <div class="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
             <h1 class="heading">Add a New Station</h1>
             <p class="text">
-                You currently don't have any stations on your account. Download the FieldKit app and connect your station to add them to
-                them to your account.
+                You don't have any stations added to your account.
+                Download the FieldKit app, log in and connect to your station to add it to your account.
             </p>
             <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
-                <img alt="App store" src="@/assets/appstore.png" />
+                <img alt="App store" src="@/assets/appstore.png" width="150" />
             </a>
             <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
-                <img alt="Google Play" src="@/assets/googleplay.png" />
+                <img alt="Google Play" src="@/assets/googleplay.svg" width="147" />
             </a>
         </div>
         <div class="view-type-container">
