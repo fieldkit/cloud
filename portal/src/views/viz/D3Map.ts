@@ -183,7 +183,7 @@ export const D3Map = Vue.extend({
                 });
             } else {
                 const coordinates = geojson.geometry.coordinates;
-                const bounds = coordinates.reduce((bounds, c) => bounds.extend(c, c), new LngLatBounds(coordinates[0], coordinates[0]));
+                const bounds = coordinates.reduce((bounds, c) => bounds.extend(c), new LngLatBounds(coordinates[0], coordinates[0]));
 
                 this.viz.log("map-refresh: bounds(data)", bounds.toArray());
 

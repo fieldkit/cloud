@@ -39,7 +39,7 @@ export interface DataRow {
     time: number;
     stationId: number;
     sensorId: number;
-    location: number[] | null;
+    location: [number, number] | null;
     value: number;
 }
 
