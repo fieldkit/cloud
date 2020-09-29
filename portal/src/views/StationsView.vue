@@ -31,7 +31,7 @@
                 Download the FieldKit app, log in and connect to your station to add it to your account.
             </p>
             <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
-                <img alt="App store" src="@/assets/appstore.png" width="150" />
+                <img alt="App store" src="@/assets/appstore.svg" width="150" />
             </a>
             <a href="https://play.google.com/store/apps/details?id=com.fieldkit&hl=en_US" target="_blank">
                 <img alt="Google Play" src="@/assets/googleplay.svg" width="147" />
