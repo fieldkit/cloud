@@ -40,5 +40,6 @@ export default Vue.extend({
     height: 44px;
     border-radius: 50%;
     object-fit: cover;
+    image-rendering: -webkit-optimize-contrast;
 }
 </style>
