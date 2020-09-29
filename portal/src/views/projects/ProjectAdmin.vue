@@ -215,9 +215,9 @@ export default {
     margin-right: 20px;
     background-color: #fff;
     padding: 25px;
-    display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    @include flex();
 
     @include bp-down($md) {
         max-width: unset;
@@ -238,6 +238,7 @@ export default {
 .photo-container {
     width: 288px;
     max-height: 139px;
+    align-self: center;
 
     @include bp-down($sm) {
         max-height: 150px;
