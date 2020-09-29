@@ -50,6 +50,9 @@ export default {
         }),
     },
     mounted() {
+        setTimeout(() => {
+            console.log("usr", this.userProjects);
+        }, 2000);
         return new FKApi().getInvitesByUser().then((invites) => {
             this.invites = invites;
         });
