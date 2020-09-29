@@ -122,6 +122,7 @@ ci-db-tests:
 	mkdir -p active-schema
 	docker stop fktests-pg || true
 	docker rm fktests-pg || true
+	docker network create docker_default || true
 	docker run --name fktests-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password --network=docker_default -d mdillon/postgis
 	sleep 5 # TODO Add a loop here to check
 	IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' fktests-pg`; \
