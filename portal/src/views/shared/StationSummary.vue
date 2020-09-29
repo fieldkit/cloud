@@ -134,6 +134,10 @@ export default Vue.extend({
     padding: 23px 21px;
     width: 389px;
     box-sizing: border-box;
+
+    * {
+        font-family: $font-family-light;
+    }
 }
 .image-container {
     width: 124px;
@@ -147,7 +151,7 @@ export default Vue.extend({
 }
 .station-name {
     font-size: 18px;
-    font-weight: 600;
+    font-family: $font-family-bold;
     margin-bottom: 2px;
 }
 .station-synced {
@@ -230,10 +234,11 @@ export default Vue.extend({
 }
 .readings-container div.title {
     padding-bottom: 13px;
+    font-family: $font-family-normal;
 }
 .explore-button {
     font-size: 18px;
-    font-weight: bold;
+    font-family: $font-family-bold;
     color: #ffffff;
     text-align: center;
     padding: 10px;

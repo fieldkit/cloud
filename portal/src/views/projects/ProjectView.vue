@@ -172,7 +172,7 @@ export default Vue.extend({
     border: solid 1px #cccdcf;
     background-color: #ffffff;
     cursor: pointer;
-    font-weight: 600;
+    font-family: $font-family-bold;
     padding: 10px 22px;
     @include flex(center, center);
 

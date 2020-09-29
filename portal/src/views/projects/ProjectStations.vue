@@ -216,7 +216,6 @@ export default Vue.extend({
 }
 .station-name {
     font-size: 14px;
-    font-weight: 600;
     cursor: pointer;
 }
 .add-station {
@@ -233,7 +232,7 @@ export default Vue.extend({
 }
 .last-seen {
     font-size: 12px;
-    font-weight: 600;
+    font-family: $font-family-bold;
     color: #6a6d71;
 }
 .stations-container {
@@ -282,9 +281,9 @@ export default Vue.extend({
     margin: auto;
     padding-top: 20px;
 }
-.project-stations-no-stations h1 {
-}
+
 .project-stations-no-stations p {
+    font-family: $font-family-light;
 }
 
 .station-links {

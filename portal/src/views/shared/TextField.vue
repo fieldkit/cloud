@@ -73,6 +73,7 @@ export default Vue.extend({
     top: -4px;
     cursor: text;
     font-size: 75%;
+    font-family: $font-family-light;
     opacity: 1;
     -webkit-transition: all 0.2s;
     transition: all 0.2s;

@@ -46,6 +46,7 @@ body {
 
     * {
         font-family: "Avenir", Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
     }
 }
 body:not(.disable-scrolling) {
@@ -85,7 +86,7 @@ button {
 }
 
 h1 {
-    font-weight: 600;
+    font-family: $font-family-bold;
 }
 
 ul {

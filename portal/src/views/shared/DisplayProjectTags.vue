@@ -27,7 +27,7 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .project-tags {
     display: flex;
     align-items: baseline;

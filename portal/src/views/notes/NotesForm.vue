@@ -160,7 +160,7 @@ export default Vue.extend({
     border: solid 1px #cccdcf;
     background-color: #ffffff;
     font-size: 14px;
-    font-weight: 600;
+    font-family: $font-family-bold;
     letter-spacing: 0.08px;
     color: #2c3e50;
     margin-left: 7px;
