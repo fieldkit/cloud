@@ -27,7 +27,8 @@ make ci-db-tests
         }
 
 		stage ('update tools') {
-			sh "[ -d ~/workspace/bin ] && cp build/fktool ~/workspace/bin"
+			sh "mkdir -p ~/workspace/bin"
+			sh "cp build/fktool ~/workspace/bin"
 		}
 
         stage ('archive') {
