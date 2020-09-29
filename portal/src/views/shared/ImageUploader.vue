@@ -3,7 +3,7 @@
         <img alt="Image" :src="placeholderImage" />
         <div class="upload-trigger">
             <label for="imageInput" class="upload-trigger">Choose File</label>
-            <span>No file chosen</span>
+            <span class="upload-trigger-msg">No file chosen</span>
         </div>
         <input id="imageInput" type="file" accept="image/gif, image/jpeg, image/png" @change="upload" />
     </div>
@@ -11,7 +11,7 @@
     <div class="image-container" v-else>
         <img alt="Image" :src="photo" class="img" v-if="photo && !preview" />
         <img alt="Image" :src="preview" class="img" v-if="preview" />
-        <label for="imageInput">
+        <label for="imageInput" class="upload-trigger-change">
             <template>Change Image</template>
         </label>
         <input id="imageInput" type="file" accept="image/gif, image/jpeg, image/png" @change="upload" />
@@ -106,17 +106,11 @@ export default Vue.extend({
     flex-wrap: wrap;
 
     label {
-        transform: translateY(-7px);
-        font-size: 14px;
         cursor: pointer;
-        margin-left: 12px;
+    }
 
-        @include bp-down($xs) {
-            width: 100%;
-            display: block;
-            transform: translateY(5px);
-            margin-left: 0;
-        }
+    img {
+        margin-right: 12px;
     }
 }
 
@@ -126,7 +120,8 @@ input {
 
 .upload-trigger {
     margin: 14px 0 0;
-    @include flex(center);
+    font-size: 14px;
+    @include flex(flex-end);
 
     label {
         @include flex(center, center);
@@ -138,6 +133,18 @@ input {
         font-size: 14px;
         font-weight: 600;
         margin: 0 15px 0 0;
+    }
+
+    &-msg {
+        color: #6a6d71;
+        font-weight: 500;
+    }
+
+    &-change {
+        margin-top: 12px;
+        font-size: 14px;
+        color: #6a6d71;
+        font-weight: 500;
     }
 }
 .img-placeholder {

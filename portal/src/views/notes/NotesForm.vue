@@ -168,6 +168,10 @@ export default Vue.extend({
     @include flex(center, center);
 }
 
+.photo {
+    @include flex(flex-start);
+}
+
 .photos {
     margin-top: 45px;
     display: flex;
@@ -193,6 +197,8 @@ export default Vue.extend({
     }
 
     ::v-deep img {
+        margin-right: 27px;
+        margin-bottom: 12px;
         border-radius: 3px;
         object-fit: contain;
         max-height: 200px;
@@ -204,6 +210,7 @@ export default Vue.extend({
         @include bp-down($sm) {
             max-height: 82px;
             max-width: 90px;
+            margin-right: 12px;
         }
     }
 }
