@@ -72,7 +72,7 @@ export default Vue.extend({
     cursor: pointer;
 }
 .one {
-    font-weight: 600;
+    font-family: $font-family-bold;
     font-size: 24px;
     color: #2c3e50;
     margin-bottom: 1px;

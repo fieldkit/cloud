@@ -190,13 +190,13 @@ export default {
 }
 .header .project-name {
     font-size: 24px;
-    font-weight: bold;
+    font-family: $font-family-bold;
     margin: 0 15px 0 0;
     display: inline-block;
 }
 .header .project-dashboard {
     font-size: 20px;
-    font-weight: bold;
+    font-family: $font-family-bold;
     margin: 0 15px 0 0;
     display: inline-block;
     margin-top: 10px;
@@ -292,9 +292,8 @@ export default {
     margin-left: auto;
 }
 .link {
-    font-weight: bold;
+    font-family: $font-family-bold;
     font-size: 14px;
-    font-weight: 600;
     cursor: pointer;
 }
 
@@ -381,6 +380,8 @@ export default {
     margin: 6px 7px 0 0;
 }
 .project-detail {
+    font-family: $font-family-light;
+
     &:not(:last-of-type) {
         padding-bottom: 6px;
     }

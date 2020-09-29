@@ -202,7 +202,7 @@ export default Vue.extend({
     border-radius: 3px;
     border: 1px solid #cccdcf;
     font-size: 14px;
-    font-weight: bold;
+    font-family: $font-family-bold;
     background-color: #ffffff;
     cursor: pointer;
 }
@@ -245,6 +245,7 @@ export default Vue.extend({
 
     .cell {
         flex-wrap: wrap;
+        font-family: $font-family-light;
 
         &:nth-of-type(4) {
             justify-content: flex-end;
@@ -257,13 +258,10 @@ export default Vue.extend({
         }
     }
 }
-.invite-status {
-    color: #0a67aa;
-    font-weight: 600;
-}
+
 .cell-heading {
     font-size: 14px;
-    font-weight: bold;
+    font-family: $font-family-bold;
 
     &:nth-of-type(2) {
         @include bp-down($sm) {
@@ -283,13 +281,17 @@ export default Vue.extend({
         }
     }
 }
+.invite-status {
+    color: #0a67aa;
+    font-family: $font-family-normal !important;
+}
 .cell .text-input {
     border: none;
     border-radius: 5px;
-    font-size: 13px;
     color: #818181;
     padding: 4px 0 4px 42px;
-    font-family: Avenir;
+    font-size: 13px;
+    font-family: $font-family-light;
 }
 .cell .validation-error {
     color: #c42c44;
@@ -318,5 +320,6 @@ export default Vue.extend({
 }
 .email {
     color: #818181;
+    font-family: $font-family-light;
 }
 </style>

@@ -125,7 +125,7 @@ export default {
     height: 30px;
     color: white;
     font-size: 18px;
-    font-weight: 600;
+    font-family: $font-family-bold;
     background-color: #ce596b;
     border: none;
     border-radius: 5px;

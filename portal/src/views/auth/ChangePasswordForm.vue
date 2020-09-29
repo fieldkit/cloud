@@ -94,7 +94,7 @@ export default Vue.extend({
     padding: 20px;
 }
 .heading {
-    font-weight: bold;
+    font-family: $font-family-bold;
     font-size: 24px;
 }
 #loading {

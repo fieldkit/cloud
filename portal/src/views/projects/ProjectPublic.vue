@@ -212,13 +212,13 @@ export default {
 }
 .header .project-name {
     font-size: 24px;
-    font-weight: bold;
+    font-family: $font-family-bold;
     margin: 0 15px 0 0;
     display: inline-block;
 }
 .header .project-dashboard {
     font-size: 20px;
-    font-weight: bold;
+    font-family: $font-family-bold;
     margin: 0 15px 0 0;
     display: inline-block;
     margin-top: 10px;
@@ -251,6 +251,7 @@ export default {
     }
 }
 .details .project-detail {
+    font-family: $font-family-light;
     margin-bottom: 9px;
     line-height: 1.5;
 }
@@ -277,7 +278,7 @@ export default {
     }
 }
 .details .details-heading {
-    font-weight: 600;
+    font-family: $font-family-bold;
     padding-bottom: 10px;
     font-size: 24px;
     color: #2c3e50;
@@ -307,7 +308,7 @@ export default {
     margin-top: 4px;
 }
 .details-bottom .title {
-    font-weight: bold;
+    font-family: $font-family-bold;
 }
 
 .module-icon {

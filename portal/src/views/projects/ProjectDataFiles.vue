@@ -21,7 +21,9 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../scss/mixins";
+
 .datafiles-container {
 }
 .heading {
@@ -30,5 +32,6 @@ export default {
 }
 .message {
     margin-top: 10px;
+    font-family: $font-family-light;
 }
 </style>

@@ -1,0 +1,27 @@
+$font_path: '~@/fonts/';
+
+@font-face {
+    font-family: "Avenir";
+    src: url($font_path + 'Avenir/AvenirLTPro-Medium.eot'); /* IE9 Compat Modes */
+    src: url($font_path + 'Avenir/AvenirLTPro-Medium.eot?#iefix') format("embedded-opentype"), /* IE6-IE8 */
+    url($font_path + 'Avenir/AvenirLTPro-Medium.woff') format("woff"), /* Modern Browsers */
+    url($font_path + 'Avenir/AvenirLTPro-Medium.ttf') format("truetype") /* Safari, Android, iOS */
+}
+
+@font-face {
+    font-family: "Avenir Light";
+    src: url($font_path + 'Avenir/AvenirLTPro-Light.eot'); /* IE9 Compat Modes */
+    src: url($font_path + 'Avenir/AvenirLTPro-Light.eot?#iefix') format("embedded-opentype"), /* IE6-IE8 */
+    url($font_path + 'Avenir/AvenirLTPro-Light.woff') format("woff"), /* Modern Browsers */
+    url($font_path + 'Avenir/AvenirLTPro-Light.ttf') format("truetype") /* Safari, Android, iOS */
+}
+
+@font-face {
+    font-family: "Avenir Heavy";
+    src: url($font_path + 'Avenir/AvenirLTPro-Heavy.eot'); /* IE9 Compat Modes */
+    src: url($font_path + 'Avenir/AvenirLTPro-Heavy.eot?#iefix') format("embedded-opentype"), /* IE6-IE8 */
+    url($font_path + 'Avenir/AvenirLTPro-Heavy.woff') format("woff"), /* Modern Browsers */
+    url($font_path + 'Avenir/AvenirLTPro-Heavy.ttf') format("truetype") /* Safari, Android, iOS */
+}
+
+

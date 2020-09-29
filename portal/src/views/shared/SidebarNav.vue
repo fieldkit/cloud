@@ -189,7 +189,7 @@ export default Vue.extend({
 }
 .nav-label {
     @include flex(center);
-    font-weight: bold;
+    font-family: $font-family-bold;
     font-size: 16px;
     margin: 12px 0;
     cursor: pointer;
@@ -215,7 +215,7 @@ export default Vue.extend({
 
 .nav-link {
     cursor: pointer;
-    font-weight: normal;
+    font-family: $font-family-light;
     font-size: 14px;
     margin: 0 0 0 30px;
     display: inline-block;

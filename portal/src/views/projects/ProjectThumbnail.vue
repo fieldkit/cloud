@@ -113,13 +113,13 @@ export default {
     }
 }
 .project-name {
-    font-weight: bold;
+    font-family: $font-family-bold;
     font-size: 16px;
     margin: 13px 15px 0 15px;
 }
 .project-description {
     overflow-wrap: break-word;
-    font-weight: lighter;
+    font-family: $font-family-light;
     font-size: 14px;
     margin: 2px 15px 15px 15px;
 }
@@ -178,7 +178,7 @@ export default {
     padding: 5px;
     text-align: center;
     font-size: 14px;
-    font-weight: 600;
+    font-family: $font-family-bold;
     color: #2c3e50;
     border-radius: 3px;
     border: solid 1px #cccdcf;
@@ -189,7 +189,7 @@ export default {
     padding: 5px;
     text-align: center;
     font-size: 14px;
-    font-weight: 600;
+    font-family: $font-family-bold;
     color: #2c3e50;
     white-space: nowrap;
     @include flex(center);

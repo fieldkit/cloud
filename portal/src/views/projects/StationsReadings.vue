@@ -71,7 +71,8 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../scss/mixins";
 .readings-container {
     display: flex;
     flex-direction: column;
@@ -84,7 +85,6 @@ export default Vue.extend({
 }
 .station-name {
     font-size: 14px;
-    font-weight: 600;
     margin-bottom: 10px;
     margin-top: 10px;
 }
@@ -93,5 +93,8 @@ export default Vue.extend({
 
 .pagination {
     margin-top: auto;
+}
+.empty-project {
+    font-family: $font-family-light;
 }
 </style>

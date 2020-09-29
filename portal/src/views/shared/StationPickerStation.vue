@@ -87,6 +87,7 @@ export default Vue.extend({
     color: #6a6d71;
 }
 .sps .status {
+    margin-top: 2px;
     font-size: 12px;
     color: #6a6d71;
 }
