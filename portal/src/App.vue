@@ -25,6 +25,7 @@ export default {
 </script>
 <style lang="scss">
 @import 'scss/mixins';
+@import 'scss/typography';
 
 html {
 }
