@@ -3,7 +3,7 @@
 conservifyProperties([ disableConcurrentBuilds() ])
 
 timestamps {
-    node () {
+    node ("jenkins-aws-ubuntu") {
         stage ('git') {
             checkout scm
         }
@@ -13,12 +13,9 @@ timestamps {
                 sh """
 # Permissions errors:
 # docker exec -u 0:0 docker_jenkins_1 chmod 777 /var/run/docker.sock
+docker ps -a
 
 export PATH=$PATH:node_modules/.bin
-which docker
-which go
-docker ps -a
-go version
 make clean
 make ci
 make ci-db-tests
