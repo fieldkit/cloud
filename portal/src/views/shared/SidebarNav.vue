@@ -120,8 +120,7 @@ export default Vue.extend({
     background: #fff;
     width: 65px;
     flex: 0 0 65px;
-    transition: all 0.33s;
-    overflow: hidden;
+    transition: all 0.25s;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.28);
     z-index: $z-index-menu;
 
@@ -134,7 +133,6 @@ export default Vue.extend({
         width: 0;
         background: #fff;
         height: 100%;
-        overflow: visible;
         @include position(fixed, 0 null null 0);
     }
 }
@@ -146,11 +144,11 @@ export default Vue.extend({
     height: 66px;
     border-bottom: 1px solid rgba(235, 235, 235, 1);
     opacity: 0;
-    transition: 0.33s opacity;
+    transition: 0.25s all;
     @include flex(center, center);
 
     @at-root .container-side.active & {
-       opacity: 1;
+        opacity: 1;
     }
 
     @include bp-down($sm) {
@@ -174,7 +172,7 @@ export default Vue.extend({
     padding: 20px 15px 0;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.33s;
+    transition: opacity 0.33s ease-in;
 
     @at-root .container-side.active & {
         opacity: 1;
@@ -251,13 +249,12 @@ export default Vue.extend({
     align-self: center;
 }
 .sidebar-trigger {
-    transition: all 0.33s;
+    transition: all 0.25s;
     cursor: pointer;
     @include position(absolute, 23px null null 77px);
 
     @include bp-down($md) {
         left: 10px;
-        top: 22px;
         top: 16px;
     }
 

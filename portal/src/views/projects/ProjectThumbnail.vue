@@ -29,11 +29,11 @@
                 <span>{{ project.following.total }}</span>
             </div>
             <!--<div class="social notifications" v-if="!project.notifications">
-                <img alt="Notifications" src="@/assets/notification.png" class="notify-icon" />
+                <img alt="Notifications" src="@/assets/icon-notification.svg" width="15" />
                 <span>2</span>
             </div>
-            <div class="social comments" v-if="!project.comments">
-                <img alt="Comments" src="@/assets/comment.png" class="comment-icon" />
+            <div class="social comments" v-if="!project.comments" width="17">
+                <img alt="Comments" src="@/assets/icon-message.svg" />
                 <span>3</span>
             </div>-->
         </div>
@@ -148,19 +148,21 @@ export default {
     z-index: 10;
 }
 .social {
-    display: inline-block;
+    @include flex(center);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     margin: 0 14px 0 15px;
+
+    img {
+        margin-right: 5px;
+    }
 
     &-container {
         margin-top: auto;
+        @include flex();
     }
 }
-.social img {
-    float: left;
-    margin: 2px 4px 0 0;
-}
+
 .invited-container {
     display: flex;
     flex-direction: row;
