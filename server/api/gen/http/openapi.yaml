@@ -3881,37 +3881,37 @@ definitions:
     properties:
       created_at:
         type: integer
-        example: 3672482011004619868
+        example: 3038691077841824346
         format: int64
       id:
         type: integer
-        example: 6077890853960696521
+        example: 5381908375920664728
         format: int64
       key:
         type: string
-        example: Culpa error ea.
+        example: Consequatur culpa error ea quia.
       meta:
-        example: Sit est perspiciatis deserunt sed recusandae nulla.
+        example: Deleniti sit est perspiciatis.
       project:
         $ref: '#/definitions/ProjectSummaryResponseBody'
       station:
         $ref: '#/definitions/StationSummaryResponseBody'
       type:
         type: string
-        example: Voluptatum excepturi vero eos incidunt quis.
+        example: Voluptate voluptatum voluptatum excepturi vero eos incidunt.
     description: ActivityEntryResponseBody result type (default view)
     example:
-      created_at: 1582827670302184260
-      id: 6055429166227612584
-      key: Debitis provident ea molestiae asperiores commodi.
-      meta: Cumque aut et alias.
+      created_at: 8443792929055305766
+      id: 3270541304194346525
+      key: Recusandae nulla impedit eos.
+      meta: Consequuntur tenetur illum ut sed distinctio vero.
       project:
         id: 4018157674684449664
         name: Facilis laudantium.
       station:
         id: 6128509544624299885
         name: Voluptatem qui.
-      type: Consequuntur tenetur illum ut sed distinctio vero.
+      type: Ea molestiae asperiores commodi ipsam.
     required:
     - id
     - key
@@ -3951,6 +3951,28 @@ definitions:
         id: 6128509544624299885
         name: Voluptatem qui.
       type: Qui a quia a quia deleniti temporibus.
+    - created_at: 2376302317003825207
+      id: 8884371113633141058
+      key: Adipisci voluptas.
+      meta: Ullam quis cum accusamus blanditiis.
+      project:
+        id: 4018157674684449664
+        name: Facilis laudantium.
+      station:
+        id: 6128509544624299885
+        name: Voluptatem qui.
+      type: Qui a quia a quia deleniti temporibus.
+    - created_at: 2376302317003825207
+      id: 8884371113633141058
+      key: Adipisci voluptas.
+      meta: Ullam quis cum accusamus blanditiis.
+      project:
+        id: 4018157674684449664
+        name: Facilis laudantium.
+      station:
+        id: 6128509544624299885
+        name: Voluptatem qui.
+      type: Qui a quia a quia deleniti temporibus.
   ActivityProjectBadRequestResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -3958,7 +3980,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -3976,19 +3998,19 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: project_bad-request_response_body result type (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: true
+      timeout: false
     required:
     - name
     - id
@@ -4003,7 +4025,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -4025,15 +4047,15 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: project_forbidden_response_body result type (default view)
     example:
       fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
-      timeout: false
+      temporary: true
+      timeout: true
     required:
     - name
     - id
@@ -4070,15 +4092,15 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: project_not-found_response_body result type (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
-      timeout: true
+      temporary: false
+      timeout: false
     required:
     - name
     - id
@@ -4094,11 +4116,11 @@ definitions:
         $ref: '#/definitions/ActivityEntryResponseBodyCollection'
       page:
         type: integer
-        example: 220292054
+        example: 1332023771
         format: int32
       total:
         type: integer
-        example: 1242663040
+        example: 1659221061
         format: int32
     description: ProjectResponseBody result type (default view)
     example:
@@ -4136,8 +4158,8 @@ definitions:
           id: 6128509544624299885
           name: Voluptatem qui.
         type: Qui a quia a quia deleniti temporibus.
-      page: 1021388624
-      total: 180278058
+      page: 478735877
+      total: 403874325
     required:
     - activities
     - total
@@ -4167,7 +4189,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -4179,7 +4201,7 @@ definitions:
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: true
+      timeout: false
     required:
     - name
     - id
@@ -4194,7 +4216,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -4212,19 +4234,19 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: station_bad-request_response_body result type (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
-      timeout: false
+      temporary: true
+      timeout: true
     required:
     - name
     - id
@@ -4239,7 +4261,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -4257,7 +4279,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -4269,7 +4291,7 @@ definitions:
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: false
-      timeout: true
+      timeout: false
     required:
     - name
     - id
@@ -4284,7 +4306,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -4302,19 +4324,19 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
         example: false
     description: station_not-found_response_body result type (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
-      timeout: true
+      temporary: true
+      timeout: false
     required:
     - name
     - id
@@ -4330,11 +4352,11 @@ definitions:
         $ref: '#/definitions/ActivityEntryResponseBodyCollection'
       page:
         type: integer
-        example: 363644938
+        example: 451378436
         format: int32
       total:
         type: integer
-        example: 1131931485
+        example: 1335612519
         format: int32
     description: StationResponseBody result type (default view)
     example:
@@ -4372,8 +4394,8 @@ definitions:
           id: 6128509544624299885
           name: Voluptatem qui.
         type: Qui a quia a quia deleniti temporibus.
-      page: 1683969046
-      total: 2025953654
+      page: 1905155523
+      total: 1763396038
     required:
     - activities
     - total
@@ -4407,15 +4429,15 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: station_unauthorized_response_body result type (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
-      timeout: false
+      temporary: false
+      timeout: true
     required:
     - name
     - id
@@ -4487,8 +4509,8 @@ definitions:
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
-      timeout: true
+      temporary: true
+      timeout: false
     required:
     - name
     - id
@@ -4521,19 +4543,19 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: noop_forbidden_response_body result type (default view)
     example:
       fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
-      timeout: true
+      temporary: true
+      timeout: false
     required:
     - name
     - id
@@ -4566,18 +4588,18 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: noop_not-found_response_body result type (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
+      temporary: true
       timeout: false
     required:
     - name
@@ -4593,7 +4615,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -4618,7 +4640,7 @@ definitions:
         example: true
     description: noop_unauthorized_response_body result type (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
@@ -4872,20 +4894,20 @@ definitions:
     properties:
       first:
         type: integer
-        example: 1352972699726514141
+        example: 6521897470523603413
         format: int64
       last:
         type: integer
-        example: 608090901067575323
+        example: 5804965564265659147
         format: int64
       size:
         type: integer
-        example: 8771198742879181006
+        example: 1413634132332421339
         format: int64
     example:
-      first: 5693875958492549119
-      last: 3503988200868088220
-      size: 560142523075906384
+      first: 1352972699726514141
+      last: 608090901067575323
+      size: 8771198742879181006
     required:
     - size
     - first
@@ -4896,20 +4918,20 @@ definitions:
     properties:
       first:
         type: integer
-        example: 4871736220881461105
+        example: 3660366733430692651
         format: int64
       last:
         type: integer
-        example: 5162699257053466147
+        example: 3721326267160174118
         format: int64
       size:
         type: integer
-        example: 4073758737624297635
+        example: 4397359666100667113
         format: int64
     example:
-      first: 6521897470523603413
-      last: 5804965564265659147
-      size: 1413634132332421339
+      first: 4871736220881461105
+      last: 5162699257053466147
+      size: 4073758737624297635
     required:
     - size
     - first
@@ -4921,18 +4943,18 @@ definitions:
     properties:
       created:
         type: integer
-        example: 3660366733430692651
+        example: 9044436579328894605
         format: int64
       data:
         $ref: '#/definitions/DeviceDataSummaryResponseBody'
       generation:
         type: string
-        example: Consequatur molestiae est iste.
+        example: Exercitationem doloribus tempore voluptatem ut consequatur.
       meta:
         $ref: '#/definitions/DeviceMetaSummaryResponseBody'
       updated:
         type: integer
-        example: 3721326267160174118
+        example: 9157677293517037133
         format: int64
     description: DeviceProvisionSummaryResponseBody result type (default view)
     example:
@@ -4941,7 +4963,7 @@ definitions:
         first: 8990298678625798786
         last: 9084208847786097828
         size: 4324778768950597420
-      generation: Suscipit cum commodi.
+      generation: Maxime aut esse suscipit cum commodi.
       meta:
         first: 5295291880895623538
         last: 855421215042699046
@@ -16372,15 +16394,15 @@ definitions:
     properties:
       id:
         type: integer
-        example: 640000435
+        example: 841823904
         format: int32
       name:
         type: string
-        example: Magni labore hic quo reprehenderit.
+        example: Inventore dolores perferendis ipsum.
     description: ProjectRoleResponse result type (default view)
     example:
-      id: 966533760
-      name: Velit quo consequatur consectetur fugiat enim.
+      id: 173373869
+      name: Id magni labore.
     required:
     - id
     - name
@@ -16390,14 +16412,14 @@ definitions:
     properties:
       id:
         type: integer
-        example: 2228608725545308826
+        example: 3886380386495690393
         format: int64
       name:
         type: string
-        example: Quidem quaerat delectus nisi fuga commodi.
+        example: Quaerat delectus nisi fuga.
     example:
-      id: 4965205020747789358
-      name: Explicabo sapiente.
+      id: 1947494129279100418
+      name: Repellendus explicabo sapiente voluptatum.
     required:
     - id
     - name
@@ -16873,12 +16895,18 @@ definitions:
     title: 'Mediatype identifier: application/vnd.app.project.user+json; view=default'
     type: object
     properties:
+      accepted:
+        type: boolean
+        example: false
       invited:
         type: boolean
         example: false
       membership:
         type: string
         example: Qui necessitatibus et totam quidem.
+      rejected:
+        type: boolean
+        example: true
       role:
         type: string
         example: Illo qui praesentium qui.
@@ -16886,9 +16914,11 @@ definitions:
         $ref: '#/definitions/UserResponseBody'
     description: ProjectUserResponseBody result type (default view)
     example:
-      invited: false
-      membership: Ratione velit quibusdam optio dolores impedit.
-      role: Blanditiis sed voluptate officiis.
+      accepted: false
+      invited: true
+      membership: Velit quibusdam.
+      rejected: false
+      role: Voluptate officiis corrupti.
       user:
         admin: true
         bio: Deserunt consectetur.
@@ -16902,6 +16932,8 @@ definitions:
     - role
     - membership
     - invited
+    - accepted
+    - rejected
   ProjectUserResponseBodyCollection:
     title: 'Mediatype identifier: application/vnd.app.project.user+json; type=collection;
       view=default'
@@ -16911,8 +16943,10 @@ definitions:
     description: ProjectUserCollectionResponseBody is the result type for an array
       of ProjectUserResponseBody (default view)
     example:
-    - invited: true
+    - accepted: false
+      invited: true
       membership: Sint inventore.
+      rejected: true
       role: Itaque autem voluptates ullam odit sequi sunt.
       user:
         admin: true
@@ -16922,8 +16956,10 @@ definitions:
         name: k19
         photo:
           url: Recusandae aut.
-    - invited: true
+    - accepted: false
+      invited: true
       membership: Sint inventore.
+      rejected: true
       role: Itaque autem voluptates ullam odit sequi sunt.
       user:
         admin: true
@@ -16933,19 +16969,10 @@ definitions:
         name: k19
         photo:
           url: Recusandae aut.
-    - invited: true
+    - accepted: false
+      invited: true
       membership: Sint inventore.
-      role: Itaque autem voluptates ullam odit sequi sunt.
-      user:
-        admin: true
-        bio: Deserunt consectetur.
-        email: asia@ruecker.net
-        id: 414739767
-        name: k19
-        photo:
-          url: Recusandae aut.
-    - invited: true
-      membership: Sint inventore.
+      rejected: true
       role: Itaque autem voluptates ullam odit sequi sunt.
       user:
         admin: true
@@ -28760,14 +28787,14 @@ definitions:
     properties:
       id:
         type: integer
-        example: 928419406726350125
+        example: 3080989698715016619
         format: int64
       name:
         type: string
-        example: Quo aut ab unde similique iusto.
+        example: Aut ab unde.
     example:
-      id: 7073356136245883764
-      name: Consequuntur et qui et fuga.
+      id: 6074535755686587714
+      name: Autem est consequuntur et qui.
     required:
     - id
     - name
@@ -30576,11 +30603,11 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: admin delete_bad-request_response_body result type (default view)
     example:
       fault: false
@@ -30588,7 +30615,7 @@ definitions:
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: true
+      timeout: false
     required:
     - name
     - id
@@ -30603,7 +30630,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -30621,11 +30648,11 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: admin delete_forbidden_response_body result type (default view)
     example:
       fault: false
@@ -30648,7 +30675,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -30666,7 +30693,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -30692,14 +30719,14 @@ definitions:
     properties:
       email:
         type: string
-        example: Et velit et totam nostrum maiores saepe.
+        example: Libero modi aperiam quos distinctio ea eaque.
       password:
         type: string
-        example: Nisi omnis ad.
+        example: Quaerat qui non et.
     description: Admin DeleteRequestBody result type (default view)
     example:
-      email: Quia et.
-      password: Animi quibusdam at aut dolorum.
+      email: Et totam.
+      password: Maiores saepe.
     required:
     - email
     - password
@@ -30710,7 +30737,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -30732,15 +30759,15 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: admin delete_unauthorized_response_body result type (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: true
+      timeout: false
     required:
     - name
     - id
@@ -31679,7 +31706,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -31705,7 +31732,7 @@ definitions:
     description: issue transmission token_bad-request_response_body result type (default
       view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
@@ -31725,7 +31752,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -31747,15 +31774,15 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: issue transmission token_forbidden_response_body result type (default
       view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
+      temporary: true
       timeout: true
     required:
     - name
@@ -31793,16 +31820,16 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: issue transmission token_not-found_response_body result type (default
       view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
-      timeout: true
+      temporary: false
+      timeout: false
     required:
     - name
     - id
@@ -31817,14 +31844,14 @@ definitions:
     properties:
       token:
         type: string
-        example: Nihil voluptatibus maiores illum sint et occaecati.
+        example: Voluptatem nihil voluptatibus.
       url:
         type: string
-        example: Laborum et possimus.
+        example: Illum sint et occaecati.
     description: Issue Transmission TokenResponseBody result type (default view)
     example:
-      token: Quas placeat aspernatur exercitationem impedit molestiae.
-      url: Cumque cum deleniti eligendi facilis eaque.
+      token: Laborum et possimus.
+      url: Quas placeat aspernatur exercitationem impedit molestiae.
     required:
     - token
     - url
@@ -31853,20 +31880,20 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: issue transmission token_unauthorized_response_body result type (default
       view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: false
+      timeout: true
     required:
     - name
     - id
@@ -31881,7 +31908,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -31899,11 +31926,11 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: list by project_bad-request_response_body result type (default view)
     example:
       fault: false
@@ -31951,11 +31978,11 @@ definitions:
         example: true
     description: list by project_forbidden_response_body result type (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
+      temporary: true
       timeout: false
     required:
     - name
@@ -31996,12 +32023,12 @@ definitions:
         example: true
     description: list by project_not-found_response_body result type (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: false
+      timeout: true
     required:
     - name
     - id
@@ -32018,8 +32045,10 @@ definitions:
     description: List By ProjectResponseBody result type (default view)
     example:
       users:
-      - invited: true
+      - accepted: false
+        invited: true
         membership: Sint inventore.
+        rejected: true
         role: Itaque autem voluptates ullam odit sequi sunt.
         user:
           admin: true
@@ -32029,8 +32058,10 @@ definitions:
           name: k19
           photo:
             url: Recusandae aut.
-      - invited: true
+      - accepted: false
+        invited: true
         membership: Sint inventore.
+        rejected: true
         role: Itaque autem voluptates ullam odit sequi sunt.
         user:
           admin: true
@@ -32071,14 +32102,14 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: list by project_unauthorized_response_body result type (default view)
     example:
       fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
+      temporary: false
       timeout: true
     required:
     - name
@@ -32484,14 +32515,14 @@ definitions:
     description: Project RolesResponseBody is the result type for an array of ProjectRoleResponse
       (default view)
     example:
-    - id: 2050316510
-      name: Voluptatibus et accusantium eum.
-    - id: 2050316510
-      name: Voluptatibus et accusantium eum.
-    - id: 2050316510
-      name: Voluptatibus et accusantium eum.
-    - id: 2050316510
-      name: Voluptatibus et accusantium eum.
+    - id: 1025818176
+      name: At inventore voluptatibus et accusantium eum laborum.
+    - id: 1025818176
+      name: At inventore voluptatibus et accusantium eum laborum.
+    - id: 1025818176
+      name: At inventore voluptatibus et accusantium eum laborum.
+    - id: 1025818176
+      name: At inventore voluptatibus et accusantium eum laborum.
   UserProjectRolesBadRequestResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -32499,7 +32530,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -32517,7 +32548,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -32528,8 +32559,8 @@ definitions:
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
-      timeout: true
+      temporary: false
+      timeout: false
     required:
     - name
     - id
@@ -32569,12 +32600,12 @@ definitions:
         example: false
     description: project roles_forbidden_response_body result type (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: false
+      timeout: true
     required:
     - name
     - id
@@ -32611,15 +32642,15 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: project roles_not-found_response_body result type (default view)
     example:
       fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
-      timeout: true
+      temporary: true
+      timeout: false
     required:
     - name
     - id
@@ -32634,7 +32665,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the
@@ -32652,7 +32683,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -32664,7 +32695,7 @@ definitions:
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: false
-      timeout: true
+      timeout: false
     required:
     - name
     - id

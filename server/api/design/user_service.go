@@ -494,13 +494,17 @@ var ProjectUser = ResultType("application/vnd.app.project.user+json", func() {
 		Attribute("role", String)
 		Attribute("membership", String)
 		Attribute("invited", Boolean)
-		Required("user", "role", "membership", "invited")
+		Attribute("accepted", Boolean)
+		Attribute("rejected", Boolean)
+		Required("user", "role", "membership", "invited", "accepted", "rejected")
 	})
 	View("default", func() {
 		Attribute("user")
 		Attribute("role")
 		Attribute("membership")
 		Attribute("invited")
+		Attribute("accepted")
+		Attribute("rejected")
 	})
 })
 
