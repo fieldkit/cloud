@@ -7,7 +7,7 @@
                     <h1 v-if="!isAuthenticated">Projects</h1>
                     <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
                         <img alt="Add project" src="@/assets/icon-plus-round.svg" />
-                        Add Project
+                        <span> Add Project </span>
                     </div>
                 </div>
 
@@ -140,7 +140,7 @@ export default {
 #add-project {
     margin-left: auto;
     cursor: pointer;
-    @include flex(center);
+    @include flex(flex-end);
 
     img {
         margin-right: 7px;
