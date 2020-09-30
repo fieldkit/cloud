@@ -112,6 +112,7 @@
         margin: 5px auto 0;
         font-size: 14px;
         max-width: 300px;
+        color: #2c3e50;
 
         &-recover {
             text-align: right;
@@ -146,8 +147,7 @@
     .login-failed {
         color: #c42c44;
         font-family: $font-family-bold;
-        width: 50%;
-        margin: auto;
+        margin-top: 25px;
     }
 }
 

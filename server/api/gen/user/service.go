@@ -285,6 +285,8 @@ type ProjectUser struct {
 	Role       string
 	Membership string
 	Invited    bool
+	Accepted   bool
+	Rejected   bool
 }
 
 type ProjectRole struct {
@@ -560,6 +562,12 @@ func newProjectUser(vres *userviews.ProjectUserView) *ProjectUser {
 	if vres.Invited != nil {
 		res.Invited = *vres.Invited
 	}
+	if vres.Accepted != nil {
+		res.Accepted = *vres.Accepted
+	}
+	if vres.Rejected != nil {
+		res.Rejected = *vres.Rejected
+	}
 	if vres.User != nil {
 		res.User = newUser(vres.User)
 	}
@@ -573,6 +581,8 @@ func newProjectUserView(res *ProjectUser) *userviews.ProjectUserView {
 		Role:       &res.Role,
 		Membership: &res.Membership,
 		Invited:    &res.Invited,
+		Accepted:   &res.Accepted,
+		Rejected:   &res.Rejected,
 	}
 	if res.User != nil {
 		vres.User = newUserView(res.User)

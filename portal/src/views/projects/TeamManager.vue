@@ -19,7 +19,11 @@
                     </div>
                 </div>
                 <div class="cell">{{ projectUser.role }}</div>
-                <div class="cell invite-status">Invite {{ projectUser.membership.toLowerCase() }}</div>
+                <div class="cell invite-status">
+                    <template v-if="projectUser.invited">
+                        Invite pending
+                    </template>
+                </div>
                 <div class="cell">
                     <img
                         alt="Remove user"
@@ -225,6 +229,7 @@ export default Vue.extend({
                     padding-right: 85px;
                 }
             }
+
             &:nth-of-type(3) {
                 @include bp-down($sm) {
                     @include position(absolute, 50% 0 null null);
@@ -245,7 +250,10 @@ export default Vue.extend({
 
     .cell {
         flex-wrap: wrap;
-        font-family: $font-family-light;
+
+        &:nth-of-type(2) {
+            color: #6a6d71;
+        }
 
         &:nth-of-type(4) {
             justify-content: flex-end;
@@ -291,7 +299,6 @@ export default Vue.extend({
     color: #818181;
     padding: 4px 0 4px 42px;
     font-size: 13px;
-    font-family: $font-family-light;
 }
 .cell .validation-error {
     color: #c42c44;
@@ -320,6 +327,5 @@ export default Vue.extend({
 }
 .email {
     color: #818181;
-    font-family: $font-family-light;
 }
 </style>

@@ -154,15 +154,16 @@ export default Vue.extend({
 
         &-menu {
             overflow: hidden;
-            max-height: 0;
+            padding: 8px;
             background: #fff;
             transition: opacity 0.25s, max-height 0.33s;
             opacity: 0;
+            visibility: hidden;
             text-align: left;
             min-width: 143px;
             box-sizing: border-box;
             box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-            padding: 8px;
+            z-index: -1;
             @include position(absolute, calc(100% - 5px) 70px null null);
 
             @include bp-down($lg) {
@@ -171,8 +172,9 @@ export default Vue.extend({
 
             &.active {
                 opacity: 1 !important;
-                max-height: 100px !important;
+                visibility: visible;
                 border: solid 1px #e9e9e9;
+                z-index: initial;
             }
 
             a {

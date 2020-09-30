@@ -729,8 +729,15 @@ func ProjectUsersType(signer *Signer, users []*data.ProjectUserAndUser, invites 
 		usersCollection = append(usersCollection, pu)
 	}
 	for _, invite := range invites {
-		if invite.RejectedTime == nil {
-			membership := data.MembershipPending
+		membership := data.MembershipPending
+		if invite.AcceptedTime != nil {
+			membership = data.MembershipAccepted
+		}
+		if invite.RejectedTime != nil {
+			membership = data.MembershipRejected
+		}
+
+		if invite.RejectedTime == nil && invite.AcceptedTime == nil {
 			usersCollection = append(usersCollection, &user.ProjectUser{
 				User: &user.User{
 					Name:  invite.InvitedEmail,
@@ -738,6 +745,8 @@ func ProjectUsersType(signer *Signer, users []*data.ProjectUserAndUser, invites 
 				},
 				Role:       invite.LookupRole().Name,
 				Membership: membership,
+				Accepted:   invite.AcceptedTime != nil,
+				Rejected:   invite.RejectedTime != nil,
 				Invited:    true,
 			})
 		}

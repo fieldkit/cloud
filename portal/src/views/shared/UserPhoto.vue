@@ -1,6 +1,6 @@
 <template v-if="icon">
     <img v-if="userImage" :src="userImage" class="default-user-icon" />
-    <img v-else src="@/assets/Profile_Image.png" class="default-user-icon" />
+    <img v-else src="@/assets/profile-image-placeholder.svg" class="default-user-icon" />
 </template>
 
 <script lang="ts">

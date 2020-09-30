@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import NewPhoto from "../../assets/Profile_Image.png";
+import NewPhoto from "../../assets/profile-image-placeholder.svg";
 import FKApi from "@/api/api";
 
 export interface Image {
