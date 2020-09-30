@@ -19,7 +19,7 @@
                 Update
             </button>
             <div v-if="formType == 'update'" class="delete-container" v-on:click="deleteProjectUpdate">
-                <img alt="Delete" src="@/assets/Delete.png" />
+                <img alt="Delete" src="@/assets/icon-close-bold.svg" />
                 Delete this update
             </div>
         </div>

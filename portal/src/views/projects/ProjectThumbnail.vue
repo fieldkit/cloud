@@ -15,12 +15,12 @@
         <div class="project-description">{{ project.description }}</div>
         <div class="invited-container" v-if="invited">
             <div class="accept" v-on:click.stop.prevent="onAccept">
-                <img alt="Close" src="@/assets/tick.png" />
-                Accept Invite
+                <img alt="Close" src="@/assets/icon-tick-blue.svg" />
+                <span> Accept Invite </span>
             </div>
             <div class="reject" v-on:click.stop.prevent="onDecline">
-                <img alt="Close" src="@/assets/Delete.png" />
-                Decline
+                <img alt="Close" src="@/assets/icon-close-bold.svg" />
+                <span> Decline </span>
             </div>
         </div>
         <div class="social-container" v-else>
@@ -170,15 +170,19 @@ export default {
     padding: 7px 15px 0;
     margin-top: auto;
 
+    * {
+        font-family: $font-family-bold;
+    }
+
     img {
         margin: 0 5px 0 3px;
+        height: 100%;
     }
 }
 .invited-container .accept {
     padding: 5px;
     text-align: center;
     font-size: 14px;
-    font-family: $font-family-bold;
     color: #2c3e50;
     border-radius: 3px;
     border: solid 1px #cccdcf;
@@ -187,11 +191,13 @@ export default {
 }
 .invited-container .reject {
     padding: 5px;
-    text-align: center;
     font-size: 14px;
-    font-family: $font-family-bold;
     color: #2c3e50;
     white-space: nowrap;
     @include flex(center);
+
+    span {
+        padding-top: 2px;
+    }
 }
 </style>
