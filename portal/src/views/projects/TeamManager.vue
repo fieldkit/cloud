@@ -10,9 +10,7 @@
                 <div class="cell-heading"></div>
                 <div class="cell"></div>
             </div>
-            <div class="user-row"
-                 v-for="projectUser in displayProject.users.filter((user) => user.membership.toLowerCase() !== 'declined')"
-                 v-bind:key="projectUser.user.email">
+            <div class="user-row" v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.email">
                 <div class="cell">
                     <UserPhoto :user="projectUser.user" />
                     <div>
@@ -22,8 +20,8 @@
                 </div>
                 <div class="cell">{{ projectUser.role }}</div>
                 <div class="cell invite-status">
-                    <template v-if="projectUser.membership.toLowerCase() !== 'accepted'">
-                        Invite {{ projectUser.membership.toLowerCase() }}
+                    <template v-if="projectUser.invited">
+                        Invite pending
                     </template>
                 </div>
                 <div class="cell">
