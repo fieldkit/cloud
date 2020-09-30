@@ -1257,6 +1257,19 @@ func handleUserOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
+		if cors.MatchOrigin(origin, "http://192.168.\\d+.\\d+:\\d+/") {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
 		if cors.MatchOrigin(origin, "https://*.fieldkit.org") {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
