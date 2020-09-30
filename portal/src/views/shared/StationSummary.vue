@@ -189,6 +189,10 @@ export default Vue.extend({
 
     > div {
         margin-bottom: 2px;
+
+        &:nth-of-type(2) {
+            font-size: 12px;
+        }
     }
 }
 .general-row {
@@ -200,9 +204,10 @@ export default Vue.extend({
 .coordinates-row {
     display: flex;
     flex-direction: row;
-    margin-top: 15px;
+    margin-top: 7px;
 }
 .where-row > div {
+    padding-bottom: 8px;
     @include flex(center);
 }
 .where-row {
@@ -225,7 +230,7 @@ export default Vue.extend({
     color: #2c3e50;
 }
 .readings-container {
-    margin-top: 20px;
+    margin-top: 7px;
     padding-top: 9px;
     border-top: 1px solid #f1eeee;
     text-align: left;
