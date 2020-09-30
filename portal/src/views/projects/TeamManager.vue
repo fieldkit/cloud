@@ -19,7 +19,11 @@
                     </div>
                 </div>
                 <div class="cell">{{ projectUser.role }}</div>
-                <div class="cell invite-status">Invite {{ projectUser.membership.toLowerCase() }}</div>
+                <div class="cell invite-status">
+                    <template v-if="projectUser.membership.toLowerCase() !== 'accepted'">
+                        Invite {{ projectUser.membership.toLowerCase() }}
+                    </template>
+                </div>
                 <div class="cell">
                     <img
                         alt="Remove user"
