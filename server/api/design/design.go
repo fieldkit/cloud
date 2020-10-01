@@ -30,11 +30,11 @@ func commonOptions() {
 	cors.Origin("https://*.fieldkit.org", corsRules)
 	cors.Origin("https://fkdev.org", corsRules)
 	cors.Origin("https://*.fkdev.org", corsRules)
-	cors.Origin("http://192.168.\\d+.\\d+:\\d+/", corsRules) // Dev
-	cors.Origin("/(.+[.])?127.0.0.1:\\d+/", corsRules)       // Dev
-	cors.Origin("/(.+[.])?localhost:\\d+/", corsRules)       // Dev
-	cors.Origin("/(.+[.])?fieldkit.org:\\d+/", corsRules)    // Dev
-	cors.Origin("/(.+[.])?local.fkdev.org:\\d+/", corsRules) // Dev
+	cors.Origin("/(.+[.])?192.168.\\d+.\\d+:\\d+/", corsRules) // Dev
+	cors.Origin("/(.+[.])?127.0.0.1:\\d+/", corsRules)         // Dev
+	cors.Origin("/(.+[.])?localhost:\\d+/", corsRules)         // Dev
+	cors.Origin("/(.+[.])?fieldkit.org:\\d+/", corsRules)      // Dev
+	cors.Origin("/(.+[.])?local.fkdev.org:\\d+/", corsRules)   // Dev
 
 	Error("unauthorized", func() {})
 	Error("forbidden", func() {})

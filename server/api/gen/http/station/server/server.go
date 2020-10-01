@@ -560,9 +560,10 @@ func NewCORSHandler() http.Handler {
 // origin for the service station.
 func handleStationOrigin(h http.Handler) http.Handler {
 	spec0 := regexp.MustCompile("(.+[.])?127.0.0.1:\\d+")
-	spec1 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
-	spec2 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
-	spec3 := regexp.MustCompile("(.+[.])?localhost:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?192.168.\\d+.\\d+:\\d+")
+	spec2 := regexp.MustCompile("(.+[.])?fieldkit.org:\\d+")
+	spec3 := regexp.MustCompile("(.+[.])?local.fkdev.org:\\d+")
+	spec4 := regexp.MustCompile("(.+[.])?localhost:\\d+")
 	origHndlr := h.(http.HandlerFunc)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
@@ -623,7 +624,7 @@ func handleStationOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
-		if cors.MatchOrigin(origin, "http://192.168.\\d+.\\d+:\\d+/") {
+		if cors.MatchOriginRegexp(origin, spec4) {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
