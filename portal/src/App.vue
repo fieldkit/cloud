@@ -4,25 +4,26 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue";
 import * as ActionTypes from "@/store/actions";
-import { AuthenticationRequiredError } from "@/api/api";
+import { AuthenticationRequiredError } from "@/api";
 
-export default {
+export default Vue.extend({
     mounted() {
         return this.$store.dispatch(ActionTypes.INITIALIZE).catch((err) => {
             console.log("initialize error", err, err.stack);
         });
     },
     errorCaptured(err, vm, info) {
-        console.log("vuejs:error-captured", err);
-        if (err instanceof AuthenticationRequiredError) {
+        console.log("vuejs:error-captured", JSON.stringify(err));
+        if (AuthenticationRequiredError.isInstance(err)) {
             this.$router.push({ name: "login", query: { after: this.$route.path } });
             return false;
         }
         return true;
     },
-};
+});
 </script>
 <style lang="scss">
 @import "scss/mixins";

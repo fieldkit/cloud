@@ -10,12 +10,20 @@ export class ApiError extends Error {
         super(message);
         this.name = "ApiError";
     }
+
+    public static isInstance(err: Error): boolean {
+        return err.name === "ApiError";
+    }
 }
 
 export class ApiUnexpectedStatus extends ApiError {
     constructor(public readonly status: number) {
         super("unexpected status");
         this.name = "ApiUnexpectedStatus ";
+    }
+
+    public static isInstance(err: Error): boolean {
+        return err.name === "ApiUnexpectedStatus";
     }
 }
 
@@ -24,6 +32,10 @@ export class TokenError extends ApiError {
         super(message);
         this.name = "TokenError";
     }
+
+    public static isInstance(err: Error): boolean {
+        return err.name === "TokenError";
+    }
 }
 
 export class AuthenticationRequiredError extends TokenError {
@@ -31,12 +43,20 @@ export class AuthenticationRequiredError extends TokenError {
         super("authentication required");
         this.name = "AuthenticationRequiredError";
     }
+
+    public static isInstance(err: Error): boolean {
+        return err.name === "AuthenticationRequiredError";
+    }
 }
 
 export class MissingTokenError extends TokenError {
     constructor() {
         super("missing token");
         this.name = "MissingTokenError";
+    }
+
+    public static isInstance(err: Error): boolean {
+        return err.name === "MissingTokenError";
     }
 }
 
@@ -388,7 +408,7 @@ class FKApi {
         })
             .then(
                 (response) => this.handleLogin(response),
-                (error) => this.logout().then(() => Promise.reject(error))
+                (error) => this.logout().then(() => Promise.reject(new AuthenticationRequiredError()))
             )
             .finally(() => {
                 this.refreshing = null;
