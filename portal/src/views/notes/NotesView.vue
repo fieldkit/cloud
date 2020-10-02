@@ -5,19 +5,19 @@
             <DoubleHeader title="My Stations" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="!project" />
 
             <div class="lower">
-                <div class="loading-container empty" v-if="!hasStations">
-                    There are no stations to view.
-                </div>
+                <div class="loading-container empty" v-if="!hasStations">There are no stations to view.</div>
                 <template v-else>
                     <template v-if="isMobileView()">
                         <div class="station-tabs">
-                            <div class="tab"
-                                 v-for="station in stations"
-                                 v-bind:key="station.id"
-                                 v-bind:class="{active: selectedStation.id === station.id}"
-                                 v-on:click="onSelected(station)">
+                            <div
+                                class="tab"
+                                v-for="station in stations"
+                                v-bind:key="station.id"
+                                v-bind:class="{ active: selectedStation.id === station.id }"
+                                v-on:click="onSelected(station)"
+                            >
                                 <div class="tab-wrap">
-                                    <div class="name"> {{ station.name }} </div>
+                                    <div class="name">{{ station.name }}</div>
                                     <div v-if="station.deployedAt" class="deployed">Deployed</div>
                                     <div v-else class="undeployed">Not Deployed</div>
                                 </div>
@@ -26,44 +26,40 @@
                                         <Spinner />
                                     </div>
                                     <div class="notifications">
-                                        <div v-if="failed" class="notification failed">
-                                            Oops, there was a problem.
-                                        </div>
+                                        <div v-if="failed" class="notification failed">Oops, there was a problem.</div>
 
-                                        <div v-if="success" class="notification success">
-                                            Saved.
-                                        </div>
+                                        <div v-if="success" class="notification success">Saved.</div>
                                     </div>
                                     <NotesViewer
-                                            :station="selectedStation"
-                                            :notes="selectedNotes"
-                                            v-bind:key="stationId"
-                                            v-if="project.project.readOnly"
+                                        :station="selectedStation"
+                                        :notes="selectedNotes"
+                                        v-bind:key="stationId"
+                                        v-if="project.project.readOnly"
                                     />
                                     <NotesForm
-                                            v-else
-                                            :station="selectedStation"
-                                            :notes="selectedNotes"
-                                            @save="saveForm"
-                                            v-bind:key="stationId"
-                                            @change="onChange"
+                                        v-else
+                                        :station="selectedStation"
+                                        :notes="selectedNotes"
+                                        @save="saveForm"
+                                        v-bind:key="stationId"
+                                        @change="onChange"
                                     />
                                 </div>
-                                <div v-else class="tab-content empty">
-                                    Please choose a station from the left.
-                                </div>
+                                <div v-else class="tab-content empty">Please choose a station from the left.</div>
                             </div>
                         </div>
                     </template>
                     <template v-else>
                         <div class="station-tabs">
-                            <div class="tab"
-                                 v-for="station in stations"
-                                 v-bind:key="station.id"
-                                 v-bind:class="{active: selectedStation.id === station.id}"
-                                 v-on:click="onSelected(station)">
+                            <div
+                                class="tab"
+                                v-for="station in stations"
+                                v-bind:key="station.id"
+                                v-bind:class="{ active: selectedStation.id === station.id }"
+                                v-on:click="onSelected(station)"
+                            >
                                 <div class="tab-wrap">
-                                    <div class="name"> {{ station.name }} </div>
+                                    <div class="name">{{ station.name }}</div>
                                     <div v-if="station.deployedAt" class="deployed">Deployed</div>
                                     <div v-else class="undeployed">Not Deployed</div>
                                 </div>
@@ -74,32 +70,26 @@
                                 <Spinner />
                             </div>
                             <div class="notifications">
-                                <div v-if="failed" class="notification failed">
-                                    Oops, there was a problem.
-                                </div>
+                                <div v-if="failed" class="notification failed">Oops, there was a problem.</div>
 
-                                <div v-if="success" class="notification success">
-                                    Saved.
-                                </div>
+                                <div v-if="success" class="notification success">Saved.</div>
                             </div>
                             <NotesViewer
-                                    :station="selectedStation"
-                                    :notes="selectedNotes"
-                                    v-bind:key="stationId"
-                                    v-if="project.project.readOnly"
+                                :station="selectedStation"
+                                :notes="selectedNotes"
+                                v-bind:key="stationId"
+                                v-if="project.project.readOnly"
                             />
                             <NotesForm
-                                    v-else
-                                    :station="selectedStation"
-                                    :notes="selectedNotes"
-                                    @save="saveForm"
-                                    v-bind:key="stationId"
-                                    @change="onChange"
+                                v-else
+                                :station="selectedStation"
+                                :notes="selectedNotes"
+                                @save="saveForm"
+                                v-bind:key="stationId"
+                                @change="onChange"
                             />
                         </div>
-                        <div v-else class="tab-content empty">
-                            Please choose a station from the left.
-                        </div>
+                        <div v-else class="tab-content empty">Please choose a station from the left.</div>
                     </template>
                 </template>
             </div>
@@ -122,8 +112,6 @@ import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
 
 import { serializePromiseChain } from "@/utilities";
-
-import FKApi from "@/api/api";
 
 import { Notes, mergeNotes } from "./model";
 
@@ -213,10 +201,10 @@ export default Vue.extend({
             console.log("data", this.$data.mobileView);
             const windowWidth = entries[0].contentRect.width;
 
-            if (this.$data.mobileView && (windowWidth > desktopBreakpoint)) {
+            if (this.$data.mobileView && windowWidth > desktopBreakpoint) {
                 this.$data.mobileView = false;
             }
-            if (!this.$data.mobileView && (windowWidth < desktopBreakpoint)) {
+            if (!this.$data.mobileView && windowWidth < desktopBreakpoint) {
                 this.$data.mobileView = true;
             }
         });
@@ -248,7 +236,7 @@ export default Vue.extend({
             this.success = false;
             this.failed = false;
             Vue.set(this, "loading", true);
-            return new FKApi().getStationNotes(stationId).then((notes) => {
+            return this.$services.api.getStationNotes(stationId).then((notes) => {
                 Vue.set(this.notes, stationId, notes);
                 Vue.set(this, "loading", false);
             });
@@ -283,13 +271,13 @@ export default Vue.extend({
             this.failed = false;
 
             return serializePromiseChain(formNotes.addedPhotos, (photo) => {
-                return new FKApi().uploadStationMedia(this.stationId, photo.key, photo.file).then((media) => {
+                return this.$services.api.uploadStationMedia(this.stationId, photo.key, photo.file).then((media) => {
                     console.log(media);
                     return [];
                 });
             }).then(() => {
                 const payload = mergeNotes(this.notes[this.stationId], formNotes);
-                return new FKApi().patchStationNotes(this.stationId, payload).then(
+                return this.$services.api.patchStationNotes(this.stationId, payload).then(
                     (updated) => {
                         this.dirty = false;
                         this.success = true;
@@ -402,7 +390,7 @@ export default Vue.extend({
             &:after {
                 background: url("../../assets/icon-chevron-right.svg") no-repeat center center;
                 transform: rotate(90deg) translateX(-50%);
-                content: '';
+                content: "";
                 width: 20px;
                 height: 20px;
                 transition: all 0.33s;
@@ -416,7 +404,7 @@ export default Vue.extend({
 
         .tab.active &:before {
             @include bp-up($md) {
-                content: '';
+                content: "";
                 width: 3px;
                 height: 100%;
                 background: #fff;

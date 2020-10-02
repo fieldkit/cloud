@@ -1,20 +1,14 @@
 <template>
     <StandardLayout>
         <div class="container">
-            <router-link :to="{ name: 'adminMain' }" class="link">
-                Back to Admin
-            </router-link>
+            <router-link :to="{ name: 'adminMain' }" class="link">Back to Admin</router-link>
 
             <vue-confirm-dialog />
 
             <div class="delete-user">
-                <div v-if="deletion.failed" class="notification failed">
-                    Oops, there was a problem.
-                </div>
+                <div v-if="deletion.failed" class="notification failed">Oops, there was a problem.</div>
 
-                <div v-if="deletion.success" class="notification success">
-                    They're toast.
-                </div>
+                <div v-if="deletion.success" class="notification success">They're toast.</div>
 
                 <form id="delete-user-form" @submit.prevent="deleteUser">
                     <h2>Delete User</h2>
@@ -45,12 +39,6 @@ import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
 
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
-
-import FKApi from "@/api/api";
-
-import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "@/store/actions";
-import { GlobalState } from "@/store/modules/global";
 
 export default Vue.extend({
     name: "AdminMain",
@@ -98,7 +86,7 @@ export default Vue.extend({
                 },
                 callback: (confirm) => {
                     if (confirm) {
-                        return new FKApi().adminDeleteUser(this.form).then(
+                        return this.$services.api.adminDeleteUser(this.form).then(
                             () => {
                                 this.deletion.success = true;
                                 this.deletion.failed = false;

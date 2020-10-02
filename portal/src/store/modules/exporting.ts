@@ -6,7 +6,7 @@ import * as ActionTypes from "../actions";
 import { ExportDataAction, ExportParams } from "../typed-actions";
 import { Bookmark } from "@/views/viz/viz";
 
-import { FKApi, Services, OnNoReject, UserExports, ExportStatus } from "@/api";
+import { Services, OnNoReject, UserExports, ExportStatus } from "@/api";
 
 const EXPORT_START = "EXPORT_START";
 const EXPORT_PROGRESS = "EXPORT_PROGRESS";
@@ -40,7 +40,7 @@ function makeExportParams(bookmark: Bookmark): URLSearchParams {
 const actions = (services: Services) => {
     return {
         [EXPORT_CHECK]: async ({ dispatch, commit }: ActionParameters, payload: CheckPayload) => {
-            return new FKApi().exportStatus(payload.statusUrl).then((de) => {
+            return services.api.exportStatus(payload.statusUrl).then((de) => {
                 console.log("exporting:status", de);
                 if (!de.downloadUrl) {
                     commit(EXPORT_PROGRESS, de);
@@ -54,7 +54,7 @@ const actions = (services: Services) => {
             });
         },
         [ActionTypes.NEED_EXPORTS]: async ({ dispatch, commit }: ActionParameters, payload: ExportDataAction) => {
-            return new FKApi().getUserExports().then((exports) => {
+            return services.api.getUserExports().then((exports) => {
                 commit(USER_EXPORTS, exports);
 
                 return Promise.all(
@@ -70,7 +70,7 @@ const actions = (services: Services) => {
         [ActionTypes.BEGIN_EXPORT]: async ({ dispatch, commit }: ActionParameters, payload: ExportDataAction) => {
             const params = makeExportParams(payload.bookmark);
             console.log("exporting:begin", payload, params);
-            return new FKApi()
+            return services.api
                 .exportData(params, payload.params)
                 .then((de) => {
                     commit(EXPORT_START, de);

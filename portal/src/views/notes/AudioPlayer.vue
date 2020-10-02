@@ -7,7 +7,6 @@
 <script lang="ts">
 import Vue from "vue";
 import VueAudio from "vue-audio";
-import FKApi from "@/api/api";
 
 export default Vue.extend({
     name: "AudioPlayer",
@@ -26,7 +25,7 @@ export default Vue.extend({
         };
     },
     mounted(this: any) {
-        return new FKApi().loadMedia(this.url).then((loaded) => {
+        return this.$services.api.loadMedia(this.url).then((loaded) => {
             this.loaded = loaded;
         });
     },

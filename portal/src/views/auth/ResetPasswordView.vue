@@ -3,14 +3,14 @@
         <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
         <form class="form" @submit.prevent="save">
             <template v-if="!success && !failed">
-                <h1 class="form-title"> Reset Password </h1>
+                <h1 class="form-title">Reset Password</h1>
 
                 <div class="form-group">
                     <TextField v-model="form.password" label="Password" type="password" />
 
                     <div class="form-errors" v-if="$v.form.password.$error">
-                        <div v-if="!$v.form.password.required"> This is a required field. </div>
-                        <div v-if="!$v.form.password.min"> Password must be at least 10 characters. </div>
+                        <div v-if="!$v.form.password.required">This is a required field.</div>
+                        <div v-if="!$v.form.password.min">Password must be at least 10 characters.</div>
                     </div>
                 </div>
 
@@ -18,29 +18,25 @@
                     <TextField v-model="form.passwordConfirmation" label="Confirm Password" type="password" />
 
                     <div class="form-errors" v-if="$v.form.passwordConfirmation.$error">
-                        <div v-if="!$v.form.passwordConfirmation.required"> Confirmation is a required field. </div>
-                        <div v-if="!$v.form.passwordConfirmation.sameAsPassword"> Passwords must match. </div>
+                        <div v-if="!$v.form.passwordConfirmation.required">Confirmation is a required field.</div>
+                        <div v-if="!$v.form.passwordConfirmation.sameAsPassword">Passwords must match.</div>
                     </div>
                 </div>
                 <button class="form-submit" v-on:click="save">Reset</button>
                 <div>
-                    <router-link :to="{ name: 'login' }" class="form-link">
-                        Back to Log In
-                    </router-link>
+                    <router-link :to="{ name: 'login' }" class="form-link">Back to Log In</router-link>
                 </div>
             </template>
             <template v-if="success">
-                <img src="@/assets/icon-success.svg" alt="Success"  class="form-header-icon" width="57px" />
-                <h1 class="form-title"> Success! </h1>
+                <img src="@/assets/icon-success.svg" alt="Success" class="form-header-icon" width="57px" />
+                <h1 class="form-title">Success!</h1>
 
-                <router-link :to="{ name: 'login' }" class="form-link">
-                    Back to Log In
-                </router-link>
+                <router-link :to="{ name: 'login' }" class="form-link">Back to Log In</router-link>
             </template>
             <template v-if="failed">
                 <img src="@/assets/icon-warning-error.svg" alt="Unsuccessful" class="form-header-icon" width="57px" />
-                <h1 class="form-title"> Password Not Reset </h1>
-                <div class="form-subtitle"> Unfortunately we were unable to reset your password. </div>
+                <h1 class="form-title">Password Not Reset</h1>
+                <div class="form-subtitle">Unfortunately we were unable to reset your password.</div>
                 <d>
                     Please
                     <a href="https://www.fieldkit.org/contact/" class="contact-link">contact us</a>
@@ -55,7 +51,6 @@
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
-import FKApi from "@/api/api";
 
 export default Vue.extend({
     name: "ResetPasswordView",
@@ -94,7 +89,7 @@ export default Vue.extend({
                 token: this.$route.query.token,
                 password: this.form.password,
             };
-            return new FKApi()
+            return this.$services.api
                 .resetPassword(payload)
                 .then(() => {
                     this.success = true;
@@ -111,7 +106,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/forms.scss';
+@import "../../scss/forms.scss";
 
 .contact-link {
     cursor: pointer;

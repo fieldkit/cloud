@@ -29,7 +29,7 @@ const actions = (services: Services) => {
             return null;
         },
         [ActionTypes.LOGIN]: ({ commit, dispatch, state }: ActionParameters, payload: LoginPayload) => {
-            return new FKApi().login(payload.email, payload.password).then((token) => {
+            return services.api.login(payload.email, payload.password).then((token) => {
                 commit(UPDATE_TOKEN, token);
                 return dispatch(ActionTypes.REFRESH_CURRENT_USER).then(() => {
                     return dispatch(ActionTypes.AUTHENTICATED).then(() => {
@@ -43,18 +43,18 @@ const actions = (services: Services) => {
             commit(CURRENT_USER, null);
         },
         [ActionTypes.REFRESH_CURRENT_USER]: ({ commit, dispatch, state }: ActionParameters) => {
-            return new FKApi().getCurrentUser().then((user) => {
+            return services.api.getCurrentUser().then((user) => {
                 commit(CURRENT_USER, user);
                 return user;
             });
         },
         [ActionTypes.UPLOAD_USER_PHOTO]: ({ commit, dispatch, state }: ActionParameters, payload: any) => {
-            return new FKApi().uploadUserImage({ type: payload.type, file: payload.file }).then(() => {
+            return services.api.uploadUserImage({ type: payload.type, file: payload.file }).then(() => {
                 return dispatch(ActionTypes.REFRESH_CURRENT_USER);
             });
         },
         [ActionTypes.UPDATE_USER_PROFILE]: ({ commit, dispatch, state }: ActionParameters, payload: any) => {
-            return new FKApi().updateUser(payload.user).then(() => {
+            return services.api.updateUser(payload.user).then(() => {
                 return dispatch(ActionTypes.REFRESH_CURRENT_USER);
             });
         },

@@ -3,8 +3,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import FKApi from "@/api/api";
+import Vue from "vue";
 
 export default Vue.extend({
     name: "AuthenticatedPhoto",
@@ -29,7 +28,7 @@ export default Vue.extend({
     },
     methods: {
         refresh(this: any) {
-            return new FKApi().loadMedia(this.url).then((photo) => {
+            return this.$services.api.loadMedia(this.url).then((photo) => {
                 this.photo = photo;
             });
         },

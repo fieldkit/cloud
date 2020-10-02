@@ -17,7 +17,6 @@
 <script lang="ts">
 import _ from "lodash";
 import Vue from "vue";
-import FKApi from "@/api/api";
 
 export enum TrendType {
     Downward,
@@ -43,9 +42,9 @@ export default Vue.extend({
             required: true,
         },
     },
-    data: () => {
+    data() {
         return {
-            allSensorsMemoized: _.memoize(() => new FKApi().getAllSensors()),
+            allSensorsMemoized: _.memoize(() => this.$services.api.getAllSensors()),
             loading: true,
             sensors: [],
         };
@@ -64,7 +63,7 @@ export default Vue.extend({
                 const params = new URLSearchParams();
                 params.append("stations", [this.id].join(","));
                 params.append("tail", "1");
-                return new FKApi().tailSensorData(params);
+                return this.$services.api.tailSensorData(params);
             };
 
             this.loading = true;
@@ -113,7 +112,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 
 .readings-simple {
     display: flex;

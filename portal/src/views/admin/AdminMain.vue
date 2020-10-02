@@ -2,12 +2,8 @@
     <StandardLayout>
         <div class="container">
             <div class="menu">
-                <router-link :to="{ name: 'adminUsers' }" class="link">
-                    Users
-                </router-link>
-                <router-link :to="{ name: 'adminStations' }" class="link">
-                    Stations
-                </router-link>
+                <router-link :to="{ name: 'adminUsers' }" class="link">Users</router-link>
+                <router-link :to="{ name: 'adminStations' }" class="link">Stations</router-link>
             </div>
 
             <div class="status" v-if="status">
@@ -40,11 +36,6 @@
 import Vue from "vue";
 import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
-import FKApi from "@/api/api";
-
-import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "@/store/actions";
-import { GlobalState } from "@/store/modules/global";
 
 export default Vue.extend({
     name: "AdminMain",
@@ -59,8 +50,7 @@ export default Vue.extend({
         };
     },
     mounted() {
-        return new FKApi().getStatus().then((status) => {
-            console.log(status);
+        return this.$services.api.getStatus().then((status) => {
             this.status = status;
         });
     },

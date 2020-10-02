@@ -7,7 +7,7 @@
                     <h1 v-if="!isAuthenticated">Projects</h1>
                     <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
                         <img alt="Add project" src="@/assets/icon-plus-round.svg" />
-                        <span> Add Project </span>
+                        <span>Add Project</span>
                     </div>
                 </div>
 
@@ -25,13 +25,13 @@
 </template>
 
 <script>
+import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout";
 import ProjectThumbnails from "./ProjectThumbnails";
 import * as ActionTypes from "@/store/actions";
-import FKApi from "@/api/api";
 
-export default {
+export default Vue.extend({
     name: "ProjectsView",
     components: {
         StandardLayout,
@@ -50,7 +50,7 @@ export default {
         }),
     },
     mounted() {
-        return new FKApi().getInvitesByUser().then((invites) => {
+        return this.$services.api.getInvitesByUser().then((invites) => {
             this.invites = invites;
         });
     },
@@ -66,11 +66,11 @@ export default {
             this.$router.push({ name: "addProject" });
         },
     },
-};
+});
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 .projects-view {
     display: flex;
     flex-direction: column;

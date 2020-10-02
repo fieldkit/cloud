@@ -21,7 +21,6 @@
 <script lang="ts">
 import Vue from "vue";
 import NewPhoto from "../../assets/profile-image-placeholder.svg";
-import FKApi from "@/api/api";
 
 export interface Image {
     url: string;
@@ -58,7 +57,7 @@ export default Vue.extend({
     },
     mounted(this: any) {
         if (this.image && this.image.url) {
-            return new FKApi().loadMedia(this.image.url, { size: 800 }).then((photo) => {
+            return this.$services.api.loadMedia(this.image.url, { size: 800 }).then((photo) => {
                 this.photo = photo;
             });
         }

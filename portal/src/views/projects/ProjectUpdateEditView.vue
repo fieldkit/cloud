@@ -15,9 +15,7 @@
         <div v-if="noCurrentUser" class="no-user-message">
             <p>
                 Please
-                <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
-                    log in
-                </router-link>
+                <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">log in</router-link>
                 to view projects.
             </p>
         </div>
@@ -25,11 +23,11 @@
 </template>
 
 <script>
+import Vue from "vue";
 import StandardLayout from "../StandardLayout";
-import FKApi from "@/api/api";
 import ProjectUpdateForm from "./ProjectUpdateForm";
 
-export default {
+export default Vue.extend({
     name: "ProjectEditView",
     components: {
         StandardLayout,
@@ -48,8 +46,7 @@ export default {
         };
     },
     async beforeCreate() {
-        this.api = new FKApi();
-        this.api
+        this.$services.api
             .getCurrentUser()
             .then((user) => {
                 this.user = user;
@@ -102,7 +99,7 @@ export default {
             this.$router.push({ name: "viewStation", params: { id: station.id } });
         },
     },
-};
+});
 </script>
 
 <style scoped>

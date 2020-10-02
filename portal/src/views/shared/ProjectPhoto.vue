@@ -5,7 +5,6 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import FKApi from "@/api/api";
 
 export default Vue.extend({
     name: "ProjectPhoto",
@@ -36,7 +35,7 @@ export default Vue.extend({
     methods: {
         refresh(this: any) {
             if (this.project.photo) {
-                return new FKApi().loadMedia(this.project.photo, { size: 800 }).then((photo) => {
+                return this.$services.api.loadMedia(this.project.photo, { size: 800 }).then((photo) => {
                     this.photo = photo;
                 });
             } else {

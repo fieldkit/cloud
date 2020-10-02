@@ -44,7 +44,7 @@ export default Vue.extend({
         },
         getProject(projectId) {
             this.loading = true;
-            return new FKApi()
+            return this.$services.api
                 .getProject(projectId)
                 .then((project) => {
                     this.activeProject = project;
@@ -62,8 +62,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
-@import '../../scss/layout';
+@import "../../scss/mixins";
+@import "../../scss/layout";
 
 .small-arrow {
     font-size: 11px;
@@ -92,5 +92,4 @@ export default Vue.extend({
 #add-project img {
     vertical-align: bottom;
 }
-
 </style>

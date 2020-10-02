@@ -8,13 +8,9 @@
                 </DoubleHeader>
             </div>
 
-            <div v-if="showNoSensors" class="notification">
-                Oh snap, this station doesn't appear to have any sensors to show you.
-            </div>
+            <div v-if="showNoSensors" class="notification">Oh snap, this station doesn't appear to have any sensors to show you.</div>
 
-            <div v-if="!workspace && !bookmark">
-                Nothing selected to visualize, please choose a station or project from the left.
-            </div>
+            <div v-if="!workspace && !bookmark">Nothing selected to visualize, please choose a station or project from the left.</div>
 
             <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
         </div>
@@ -32,8 +28,6 @@ import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { ExportDataAction } from "@/store/typed-actions";
 import { GlobalState } from "@/store/modules/global";
-
-import FKApi from "@/api/api";
 
 import { Workspace, Bookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
@@ -77,7 +71,7 @@ export default Vue.extend({
     },
     beforeMount(this: any) {
         if (this.bookmark) {
-            return new FKApi().getAllSensors().then((sensorKeys) => {
+            return this.$services.api.getAllSensors().then((sensorKeys) => {
                 if (this.bookmark.s.length > 0) {
                     return this.showStation(this.bookmark.s[0]);
                 }
@@ -114,7 +108,7 @@ export default Vue.extend({
                 return Promise.resolve(this.workspace);
             }
 
-            return new FKApi().getAllSensors().then((sensorKeys) => {
+            return this.$services.api.getAllSensors().then((sensorKeys) => {
                 this.workspace = new Workspace(sensorKeys);
                 return this.workspace;
             });
@@ -125,7 +119,7 @@ export default Vue.extend({
             const station = this.$store.state.stations.stations[stationId];
 
             return this.createWorkspaceIfNecessary().then((workspace) => {
-                return new FKApi().getQuickSensors([stationId]).then((quickSensors) => {
+                return this.$services.api.getQuickSensors([stationId]).then((quickSensors) => {
                     console.log("viz: quick-sensors", quickSensors);
                     if (quickSensors.stations[stationId].length == 0) {
                         console.log("viz: no sensors");

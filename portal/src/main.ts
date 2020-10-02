@@ -17,10 +17,12 @@ import ConfigurationPlugin from "./config";
 import Config from "./secrets";
 import App from "./App.vue";
 
+const services = new Services();
+
 const AssetsPlugin = {
     install(Vue) {
         const loader = require.context("@/assets/", true, /\.(?:svg|png)$/);
-        Vue.prototype.$loadAsset = (path) => {
+        Vue.prototype.$loadAsset = (path: string) => {
             return loader("./" + path);
         };
     },
@@ -29,6 +31,12 @@ const AssetsPlugin = {
 Object.defineProperty(Vue.prototype, "$getters", {
     get: function(this: Vue) {
         return this.$store.getters;
+    },
+});
+
+Object.defineProperty(Vue.prototype, "$services", {
+    get: function(this: Vue) {
+        return services;
     },
 });
 
@@ -62,16 +70,16 @@ Vue.filter("prettyDate", (value) => {
     return moment(value).format("M/D/YYYY");
 });
 
-export interface ReadingLike {
-    reading: number;
-}
-
 Vue.filter("prettyPercentage", (value: number | null) => {
     if (value === null || value === undefined) {
         return "--";
     }
     return value.toFixed(1) + "%";
 });
+
+export interface ReadingLike {
+    reading: number;
+}
 
 Vue.filter("prettyReading", (sensor: ReadingLike) => {
     if (!sensor.reading) {
@@ -98,7 +106,7 @@ Vue.filter("prettyBytes", (value) => {
     return prettyBytes(value);
 });
 
-const store = storeFactory(new Services());
+const store = storeFactory(services);
 store.commit(MutationTypes.INITIALIZE);
 
 const router = routerFactory(store);

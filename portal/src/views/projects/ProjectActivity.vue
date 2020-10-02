@@ -1,9 +1,7 @@
 <template>
     <div :class="'project-activity ' + containerClass">
         <div class="heading">
-            <div class="title">
-                Activity History
-            </div>
+            <div class="title">Activity History</div>
             <div class="close-button" v-on:click="onClose">
                 <img alt="Close" src="@/assets/icon-close.svg" />
             </div>
@@ -46,16 +44,13 @@
                 </div>
             </div>
         </div>
-        <div class="feed-container empty" v-else>
-            No recent activity.
-        </div>
+        <div class="feed-container empty" v-else>No recent activity.</div>
     </div>
 </template>
 
 <script lang="ts">
 import _ from "lodash";
 import Vue from "vue";
-import FKApi from "@/api/api";
 
 export default Vue.extend({
     name: "ProjectActivity",
@@ -125,7 +120,7 @@ export default Vue.extend({
     },
     methods: {
         refresh(this: any) {
-            return new FKApi().getProjectActivity(this.displayProject.id).then((activities) => {
+            return this.$services.api.getProjectActivity(this.displayProject.id).then((activities) => {
                 this.activities = activities;
                 return activities;
             });

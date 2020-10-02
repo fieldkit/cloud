@@ -2,9 +2,7 @@
     <StandardLayout>
         <div class="invites-view" v-if="user && !loading">
             <div id="user-name">Hi, {{ user.name }}</div>
-            <div class="notification" v-if="invalidToken">
-                Sorry, that invite link appears to have been already used or is invalid.
-            </div>
+            <div class="notification" v-if="invalidToken">Sorry, that invite link appears to have been already used or is invalid.</div>
             <div v-if="pending.length == 0" class="invite-heading">You have no pending invites.</div>
             <div v-if="pending.length > 0" class="invite-heading">You've been invited to the following projects:</div>
             <div v-for="invite in pending" v-bind:key="invite.id" class="project-row">
@@ -19,7 +17,6 @@
 <script>
 import StandardLayout from "./StandardLayout";
 import * as ActionTypes from "@/store/actions";
-import FKApi from "../api/api";
 
 export default {
     name: "InvitesView",
@@ -39,10 +36,8 @@ export default {
         },
     },
     async beforeCreate() {
-        this.api = new FKApi();
-
         if (this.$route.query.token) {
-            this.api.getInvitesByToken(this.$route.query.token).then(
+            this.$services.api.getInvitesByToken(this.$route.query.token).then(
                 (result) => {
                     this.pending = result.pending;
                 },

@@ -2,19 +2,13 @@
     <StandardLayout>
         <div class="main-panel">
             <div class="form-edit" v-if="user">
-                <h2> My Account </h2>
-                <div class="notification success" v-if="notifySaved">
-                    Profile saved.
-                </div>
+                <h2>My Account</h2>
+                <div class="notification success" v-if="notifySaved">Profile saved.</div>
 
                 <ProfileForm :user="user" @save="saveForm" />
 
-                <div class="notification success" v-if="notifyPasswordChanged">
-                    Password changed.
-                </div>
-                <div class="notification failed" v-if="!passwordOk">
-                    Please check your password and try again.
-                </div>
+                <div class="notification success" v-if="notifyPasswordChanged">Password changed.</div>
+                <div class="notification failed" v-if="!passwordOk">Please check your password and try again.</div>
 
                 <ChangePasswordForm :user="user" @save="changePassword" />
             </div>
@@ -29,7 +23,6 @@ import ProfileForm from "./ProfileForm.vue";
 import ChangePasswordForm from "./ChangePasswordForm.vue";
 
 import Promise from "bluebird";
-import FKApi from "@/api/api";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
@@ -94,7 +87,7 @@ export default Vue.extend({
                 oldPassword: form.existing,
                 newPassword: form.password,
             };
-            return new FKApi()
+            return this.$services.api
                 .updatePassword(data)
                 .then(() => {
                     this.loading = false;
@@ -115,9 +108,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
-@import '../../scss/forms';
-@import '../../scss/layout';
+@import "../../scss/mixins";
+@import "../../scss/forms";
+@import "../../scss/layout";
 
 h2 {
     margin-bottom: 0;

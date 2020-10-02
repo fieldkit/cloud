@@ -1,9 +1,7 @@
 <template>
     <StandardLayout>
         <div class="container">
-            <router-link :to="{ name: 'adminMain' }" class="link">
-                Back to Admin
-            </router-link>
+            <router-link :to="{ name: 'adminMain' }" class="link">Back to Admin</router-link>
 
             <vue-confirm-dialog />
 
@@ -65,10 +63,6 @@ import PaginationControls from "@/views/shared/PaginationControls.vue";
 
 import FKApi, { EssentialStation } from "@/api/api";
 
-import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "@/store/actions";
-import { GlobalState } from "@/store/modules/global";
-
 export default Vue.extend({
     name: "AdminStations",
     components: {
@@ -90,7 +84,7 @@ export default Vue.extend({
     },
     methods: {
         refresh() {
-            return new FKApi().getAllStations(this.page, this.pageSize).then((page) => {
+            return this.$services.api.getAllStations(this.page, this.pageSize).then((page) => {
                 this.totalPages = Math.ceil(page.total / this.pageSize);
                 this.stations = page.stations;
             });
@@ -108,7 +102,7 @@ export default Vue.extend({
                 },
                 callback: (confirm) => {
                     if (confirm) {
-                        return new FKApi().deleteStation(station.id).then(() => {
+                        return this.$services.api.deleteStation(station.id).then(() => {
                             return this.refresh();
                         });
                     }

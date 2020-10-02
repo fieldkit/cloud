@@ -137,7 +137,6 @@ import { tryParseTags } from "@/utilities";
 
 import { helpers, required, email, minValue, maxLength, minLength } from "vuelidate/lib/validators";
 
-import FKApi from "@/api/api";
 import * as ActionTypes from "@/store/actions";
 
 import PlaceholderImage from "@/assets/image-placeholder.svg";
@@ -304,7 +303,7 @@ export default Vue.extend({
                         file: this.image.file,
                         id: project.id,
                     };
-                    return new FKApi().uploadProjectImage(params).then(() => {
+                    return this.$services.api.uploadProjectImage(params).then(() => {
                         return this.$router.push({
                             name: "viewProject",
                             params: { id: project.id },
@@ -330,7 +329,7 @@ export default Vue.extend({
                     file: this.image.file,
                     id: this.project.id,
                 };
-                return new FKApi().uploadProjectImage(payload).then(() => {
+                return this.$services.api.uploadProjectImage(payload).then(() => {
                     return this.$store.dispatch(ActionTypes.SAVE_PROJECT, data).then(() => {
                         return this.$router.push({
                             name: "viewProject",

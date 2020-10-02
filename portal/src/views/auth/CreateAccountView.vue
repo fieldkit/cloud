@@ -3,7 +3,7 @@
         <div class="form-wrap">
             <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
             <form v-if="!created" class="form" @submit.prevent="save">
-                <h1 class="form-title"> Create Your Account </h1>
+                <h1 class="form-title">Create Your Account</h1>
                 <div class="form-group">
                     <TextField v-model="form.name" label="Name" />
 
@@ -19,9 +19,7 @@
                         <div v-if="!$v.form.email.email">Must be a valid email address.</div>
                         <div v-if="!$v.form.email.taken">
                             This address appears to already be registered.
-                            <router-link :to="{ name: 'recover' }" class="form-link recover">
-                                Recover Account
-                            </router-link>
+                            <router-link :to="{ name: 'recover' }" class="form-link recover">Recover Account</router-link>
                         </div>
                     </div>
                 </div>
@@ -49,24 +47,20 @@
                 </div>
                 <button class="form-submit" type="submit">Create Account</button>
                 <div>
-                    <router-link :to="{ name: 'login' }" class="form-link">
-                        Back to Log In
-                    </router-link>
+                    <router-link :to="{ name: 'login' }" class="form-link">Back to Log In</router-link>
                 </div>
             </form>
             <form class="form" v-if="created">
                 <template v-if="!resending">
                     <img src="@/assets/icon-success.svg" alt="Success" class="form-header-icon" width="57px" />
-                    <h1 class="form-title"> Account Created </h1>
-                    <h2 class="form-subtitle"> We sent you an account validation email. </h2>
-                    <button class="form-submit" v-on:click="resend"> Resend Email </button>
-                    <router-link :to="{ name: 'login' }" class="form-link">
-                        Back to Log In
-                    </router-link>
+                    <h1 class="form-title">Account Created</h1>
+                    <h2 class="form-subtitle">We sent you an account validation email.</h2>
+                    <button class="form-submit" v-on:click="resend">Resend Email</button>
+                    <router-link :to="{ name: 'login' }" class="form-link">Back to Log In</router-link>
                 </template>
                 <template v-if="resending">
                     <img src="@/assets/Icon_Syncing2.png" alt="Resending" class="form-header-icon" width="57px" />
-                    <p class="form-link"> Resending </p>
+                    <p class="form-link">Resending</p>
                 </template>
             </form>
         </div>
@@ -124,7 +118,7 @@ export default Vue.extend({
 
             this.creating = true;
 
-            return new FKApi()
+            return this.$services.api
                 .register(this.form)
                 .then((created) => {
                     this.created = created;
@@ -142,7 +136,7 @@ export default Vue.extend({
         },
         resend() {
             this.resending = true;
-            return new FKApi().resendCreateAccount(this.created.id).then(() => {
+            return this.$services.api.resendCreateAccount(this.created.id).then(() => {
                 this.resending = false;
             });
         },

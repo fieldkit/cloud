@@ -12,12 +12,8 @@
         </div>
 
         <div class="action-container">
-            <button class="save-btn" v-if="formType == 'add'" v-on:click="addProjectUpdate">
-                Add
-            </button>
-            <button class="save-btn" v-if="formType == 'update'" v-on:click="updateProjectUpdate">
-                Update
-            </button>
+            <button class="save-btn" v-if="formType == 'add'" v-on:click="addProjectUpdate">Add</button>
+            <button class="save-btn" v-if="formType == 'update'" v-on:click="updateProjectUpdate">Update</button>
             <div v-if="formType == 'update'" class="delete-container" v-on:click="deleteProjectUpdate">
                 <img alt="Delete" src="@/assets/icon-close-bold.svg" />
                 Delete this update
@@ -27,9 +23,9 @@
 </template>
 
 <script>
-import FKApi from "@/api/api";
+import Vue from "vue";
 
-export default {
+export default Vue.extend({
     name: "ProjectUpdateForm",
     props: ["projectUpdate", "project"],
     data: () => {
@@ -67,28 +63,25 @@ export default {
         },
         addProjectUpdate() {
             this.$emit("updating");
-            const api = new FKApi();
             const data = this.createParams();
-            api.addProjectUpdate(data).then(() => {
-                this.$router.push({ name: "viewProject", params: { id: this.project.id } });
+            return this.$services.api.addProjectUpdate(data).then(() => {
+                return this.$router.push({ name: "viewProject", params: { id: this.project.id } });
             });
         },
         updateProjectUpdate() {
             this.$emit("updating");
-            const api = new FKApi();
             const data = this.createParams();
-            api.updateProjectUpdate(data).then(() => {
-                this.$router.push({ name: "viewProject", params: { id: this.project.id } });
+            return this.$services.api.updateProjectUpdate(data).then(() => {
+                return this.$router.push({ name: "viewProject", params: { id: this.project.id } });
             });
         },
         deleteProjectUpdate() {
             if (window.confirm("Are you sure you want to delete this project update?")) {
-                const api = new FKApi();
                 const params = {
                     projectId: this.project.id,
                     updateId: this.projectUpdate.id,
                 };
-                api.deleteProjectUpdate(params).then(() => {
+                return this.$services.api.deleteProjectUpdate(params).then(() => {
                     this.$router.push({ name: "viewProject", params: { id: this.project.id } });
                 });
             }
@@ -97,7 +90,7 @@ export default {
             this.$router.push({ name: "viewProject", params: { id: this.project.id } });
         },
     },
-};
+});
 </script>
 
 <style scoped>

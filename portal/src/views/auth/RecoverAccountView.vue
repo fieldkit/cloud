@@ -4,9 +4,7 @@
         <div v-if="!attempted">
             <form class="form" @submit.prevent="save">
                 <h1 class="form-title">Recover Account</h1>
-                <div class="form-subtitle">
-                    Enter your email address below, and password reset instructions will be sent.
-                </div>
+                <div class="form-subtitle">Enter your email address below, and password reset instructions will be sent.</div>
                 <div class="form-group">
                     <TextField v-model="form.email" label="Email" keyboardType="email" />
 
@@ -17,9 +15,7 @@
                 </div>
                 <button class="form-submit" type="submit">Recover</button>
                 <div>
-                    <router-link :to="{ name: 'login' }" class="form-link">
-                        Back to Log In
-                    </router-link>
+                    <router-link :to="{ name: 'login' }" class="form-link">Back to Log In</router-link>
                 </div>
             </form>
         </div>
@@ -29,9 +25,7 @@
                 <h1 class="form-title">Password Reset Email Sent</h1>
                 <div class="form-subtitle">Check your inbox for the email with a link to reset your password.</div>
                 <button class="form-submit" v-on:click="resend">Resend Email</button>
-                <router-link :to="{ name: 'login' }" class="form-link">
-                    Back to Log In
-                </router-link>
+                <router-link :to="{ name: 'login' }" class="form-link">Back to Log In</router-link>
             </div>
             <div v-if="resending">
                 <img alt="Resending" src="@/assets/Icon_Syncing2.png" width="57px" class="form-header-icon" />
@@ -46,7 +40,6 @@ import Vue from "vue";
 import CommonComponents from "@/views/shared";
 
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
-import FKApi from "@/api/api";
 
 export default Vue.extend({
     name: "RecoverAccountView",
@@ -78,7 +71,7 @@ export default Vue.extend({
                 return;
             }
             this.busy = true;
-            return new FKApi()
+            return this.$services.api
                 .sendResetPasswordEmail(this.form.email)
                 .then(() => (this.attempted = true))
                 .finally(() => (this.busy = true));
