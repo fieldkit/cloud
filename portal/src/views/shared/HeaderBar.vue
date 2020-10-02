@@ -24,7 +24,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import FKApi from "@/api/api";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import CommonComponents from "@/views/shared";

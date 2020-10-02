@@ -38,9 +38,13 @@ const actions = (services: Services) => {
                 });
             });
         },
-        [ActionTypes.LOGOUT]: ({ commit }: { commit: any }) => {
-            commit(UPDATE_TOKEN, null);
-            commit(CURRENT_USER, null);
+        [ActionTypes.LOGOUT]: async ({ commit }: { commit: any }) => {
+            try {
+                await services.api.logout();
+            } finally {
+                commit(UPDATE_TOKEN, null);
+                commit(CURRENT_USER, null);
+            }
         },
         [ActionTypes.REFRESH_CURRENT_USER]: ({ commit, dispatch, state }: ActionParameters) => {
             return services.api.getCurrentUser().then((user) => {

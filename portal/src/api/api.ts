@@ -437,7 +437,7 @@ class FKApi {
         }
     }
 
-    login(email, password) {
+    public login(email, password) {
         return axios({
             method: "POST",
             url: this.baseUrl + "/login",
@@ -463,9 +463,21 @@ class FKApi {
         }
     }
 
-    logout() {
-        this.token.clear();
-        return Promise.resolve();
+    public async logout() {
+        try {
+            if (!this.token.authenticated()) {
+                return Promise.resolve();
+            }
+            const token = this.token.getHeader();
+            const headers = { "Content-Type": "application/json", Authorization: token };
+            await axios({
+                method: "POST",
+                url: this.baseUrl + "/logout",
+                headers: headers,
+            });
+        } finally {
+            this.token.clear();
+        }
     }
 
     register(user) {
