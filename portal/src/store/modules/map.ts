@@ -1,20 +1,23 @@
-import _ from "lodash";
-import * as MutationTypes from "../mutations";
+import { Services } from "@/api";
 
 export class MapState {}
 
 const getters = {};
 
-const actions = {};
+const actions = (services: Services) => {
+    return {};
+};
 
 const mutations = {};
 
-const state = () => new MapState();
+export const map = (services: Services) => {
+    const state = () => new MapState();
 
-export const map = {
-    namespaced: false,
-    state,
-    getters,
-    actions,
-    mutations,
+    return {
+        namespaced: false,
+        state,
+        getters,
+        actioins: actions(services),
+        mutations,
+    };
 };

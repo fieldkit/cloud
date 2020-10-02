@@ -1,5 +1,6 @@
 import Vue from "vue";
 import * as MutationTypes from "../mutations";
+import { Services } from "@/api";
 
 export class Clock {
     public now: Date = new Date();
@@ -12,7 +13,9 @@ export class ClockState {
 
 const getters = {};
 
-const actions = {};
+const actions = (services: Services) => {
+    return {};
+};
 
 const mutations = {
     [MutationTypes.TICK]: (state: ClockState) => {
@@ -20,12 +23,14 @@ const mutations = {
     },
 };
 
-const state = () => new ClockState();
+export const clock = (services: Services) => {
+    const state = () => new ClockState();
 
-export const clock = {
-    namespaced: false,
-    state,
-    getters,
-    actions,
-    mutations,
+    return {
+        namespaced: false,
+        state,
+        getters,
+        actions: actions(services),
+        mutations,
+    };
 };

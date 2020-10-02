@@ -9,6 +9,8 @@ import { progress } from "./modules/progress";
 import { layout } from "./modules/layout";
 import { exporting } from "./modules/exporting";
 
+import { Services } from "@/api";
+
 // import * as MutationTypes from "./mutations";
 // import * as ActionTypes from "./actions";
 
@@ -41,17 +43,17 @@ function customizeLogger() {
     });
 }
 
-export default function() {
+export default function(services: Services) {
     return new Vuex.Store({
         plugins: [customizeLogger()],
         modules: {
-            clock,
-            exporting,
-            user,
-            stations,
-            map,
-            progress,
-            layout,
+            clock: clock(services),
+            exporting: exporting(services),
+            user: user(services),
+            stations: stations(services),
+            map: map(services),
+            progress: progress(services),
+            layout: layout(services),
         },
         // This was causing a call stack error (_traverse)
         strict: process.env.NODE_ENV !== "production",

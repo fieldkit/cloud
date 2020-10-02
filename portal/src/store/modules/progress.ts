@@ -1,6 +1,7 @@
 import _ from "lodash";
 import Vue from "vue";
 import * as MutationTypes from "../mutations";
+import { Services } from "@/api";
 
 type LoadingPayload = { [index: string]: boolean };
 
@@ -14,7 +15,9 @@ const getters = {
     },
 };
 
-const actions = {};
+const actions = (services: Services) => {
+    return {};
+};
 
 const mutations = {
     [MutationTypes.LOADING]: (state: ProgressState, payload: LoadingPayload) => {
@@ -22,12 +25,14 @@ const mutations = {
     },
 };
 
-const state = () => new ProgressState();
+export const progress = (services: Services) => {
+    const state = () => new ProgressState();
 
-export const progress = {
-    namespaced: false,
-    state,
-    getters,
-    actions,
-    mutations,
+    return {
+        namespaced: false,
+        state,
+        getters,
+        actions: actions(services),
+        mutations,
+    };
 };

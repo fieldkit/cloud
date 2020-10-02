@@ -10,6 +10,7 @@ import moment from "moment";
 import { sync } from "vuex-router-sync";
 import i18n from "./i18n";
 import * as MutationTypes from "./store/mutations";
+import { Services } from "@/api";
 import storeFactory from "./store";
 import routerFactory from "./router";
 import ConfigurationPlugin from "./config";
@@ -97,7 +98,7 @@ Vue.filter("prettyBytes", (value) => {
     return prettyBytes(value);
 });
 
-const store = storeFactory();
+const store = storeFactory(new Services());
 store.commit(MutationTypes.INITIALIZE);
 
 const router = routerFactory(store);

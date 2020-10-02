@@ -3,7 +3,10 @@ import Vue from "vue";
 import * as MutationTypes from "../mutations";
 import * as ActionTypes from "../actions";
 import { Location, BoundingRectangle, LngLat } from "../map-types";
-import FKApi, {
+
+import {
+    FKApi,
+    Services,
     OnNoReject,
     Station,
     StationModule,
@@ -15,7 +18,7 @@ import FKApi, {
     Activity,
     Configurations,
     Photos,
-} from "../../api/api";
+} from "@/api";
 
 export const HAVE_USER_STATIONS = "HAVE_USER_STATIONS";
 export const HAVE_USER_PROJECTS = "HAVE_USER_PROJECTS";
@@ -239,159 +242,161 @@ const getters = {
     },
 };
 
-const actions = {
-    [ActionTypes.INITIALIZE]: async ({ dispatch }: { dispatch: any }) => {
-        await dispatch(ActionTypes.NEED_COMMON);
-    },
-    [ActionTypes.AUTHENTICATED]: async ({ dispatch }: { dispatch: any }) => {
-        await dispatch(ActionTypes.NEED_COMMON);
-    },
-    [ActionTypes.NEED_COMMON]: async ({ dispatch }: { dispatch: any }) => {
-        await dispatch(ActionTypes.NEED_PROJECTS);
-        await dispatch(ActionTypes.NEED_STATIONS);
-    },
-    [ActionTypes.NEED_PROJECTS]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
-        commit(MutationTypes.LOADING, { projects: true });
-        const [communityProjects, userProjects] = await Promise.all([
-            new FKApi().getPublicProjects(),
-            new FKApi().getUserProjects(() => {
-                return Promise.resolve({
-                    projects: [],
-                });
-            }),
-        ]);
-        commit(HAVE_COMMUNITY_PROJECTS, communityProjects.projects);
-        commit(HAVE_USER_PROJECTS, userProjects.projects);
-        commit(MutationTypes.LOADING, { projects: false });
-    },
-    [ActionTypes.NEED_STATIONS]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
-        commit(MutationTypes.LOADING, { stations: true });
-        const [stations] = await Promise.all([
-            new FKApi().getUserStations(() => {
-                return Promise.resolve({
-                    stations: [],
-                });
-            }),
-        ]);
-        commit(HAVE_USER_STATIONS, stations.stations);
-        commit(MutationTypes.LOADING, { stations: false });
-    },
-    [ActionTypes.NEED_PROJECT]: async (
-        { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
-        payload: { id: number }
-    ) => {
-        commit(MutationTypes.LOADING, { projects: true });
+const actions = (services: Services) => {
+    return {
+        [ActionTypes.INITIALIZE]: async ({ dispatch }: { dispatch: any }) => {
+            await dispatch(ActionTypes.NEED_COMMON);
+        },
+        [ActionTypes.AUTHENTICATED]: async ({ dispatch }: { dispatch: any }) => {
+            await dispatch(ActionTypes.NEED_COMMON);
+        },
+        [ActionTypes.NEED_COMMON]: async ({ dispatch }: { dispatch: any }) => {
+            await dispatch(ActionTypes.NEED_PROJECTS);
+            await dispatch(ActionTypes.NEED_STATIONS);
+        },
+        [ActionTypes.NEED_PROJECTS]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
+            commit(MutationTypes.LOADING, { projects: true });
+            const [communityProjects, userProjects] = await Promise.all([
+                new FKApi().getPublicProjects(),
+                new FKApi().getUserProjects(() => {
+                    return Promise.resolve({
+                        projects: [],
+                    });
+                }),
+            ]);
+            commit(HAVE_COMMUNITY_PROJECTS, communityProjects.projects);
+            commit(HAVE_USER_PROJECTS, userProjects.projects);
+            commit(MutationTypes.LOADING, { projects: false });
+        },
+        [ActionTypes.NEED_STATIONS]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
+            commit(MutationTypes.LOADING, { stations: true });
+            const [stations] = await Promise.all([
+                new FKApi().getUserStations(() => {
+                    return Promise.resolve({
+                        stations: [],
+                    });
+                }),
+            ]);
+            commit(HAVE_USER_STATIONS, stations.stations);
+            commit(MutationTypes.LOADING, { stations: false });
+        },
+        [ActionTypes.NEED_PROJECT]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            payload: { id: number }
+        ) => {
+            commit(MutationTypes.LOADING, { projects: true });
 
-        const api = new FKApi();
-        const [project, users, stations] = await Promise.all([
-            api.getProject(payload.id),
-            api.getUsersByProject(payload.id),
-            api.getStationsByProject(payload.id),
-        ]);
+            const api = new FKApi();
+            const [project, users, stations] = await Promise.all([
+                api.getProject(payload.id),
+                api.getUsersByProject(payload.id),
+                api.getStationsByProject(payload.id),
+            ]);
 
-        commit(PROJECT_LOADED, project);
-        commit(PROJECT_USERS, { projectId: payload.id, users: users.users });
-        commit(PROJECT_STATIONS, { projectId: payload.id, stations: stations.stations });
+            commit(PROJECT_LOADED, project);
+            commit(PROJECT_USERS, { projectId: payload.id, users: users.users });
+            commit(PROJECT_STATIONS, { projectId: payload.id, stations: stations.stations });
 
-        commit(MutationTypes.LOADING, { projects: false });
-    },
-    [ActionTypes.NEED_STATION]: async (
-        { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
-        payload: { id: number }
-    ) => {
-        commit(MutationTypes.LOADING, { stations: true });
+            commit(MutationTypes.LOADING, { projects: false });
+        },
+        [ActionTypes.NEED_STATION]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            payload: { id: number }
+        ) => {
+            commit(MutationTypes.LOADING, { stations: true });
 
-        const [station] = await Promise.all([new FKApi().getStation(payload.id)]);
+            const [station] = await Promise.all([new FKApi().getStation(payload.id)]);
 
-        commit(STATION_UPDATE, station);
+            commit(STATION_UPDATE, station);
 
-        commit(MutationTypes.LOADING, { stations: false });
-    },
-    [ActionTypes.PROJECT_FOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
-        await new FKApi().followProject(payload.projectId);
-    },
-    [ActionTypes.PROJECT_UNFOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
-        await new FKApi().unfollowProject(payload.projectId);
-    },
-    [ActionTypes.STATION_PROJECT_ADD]: async (
-        { commit, dispatch }: { commit: any; dispatch: any },
-        payload: { stationId: number; projectId: number }
-    ) => {
-        await new FKApi().addStationToProject(payload);
+            commit(MutationTypes.LOADING, { stations: false });
+        },
+        [ActionTypes.PROJECT_FOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+            await new FKApi().followProject(payload.projectId);
+        },
+        [ActionTypes.PROJECT_UNFOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+            await new FKApi().unfollowProject(payload.projectId);
+        },
+        [ActionTypes.STATION_PROJECT_ADD]: async (
+            { commit, dispatch }: { commit: any; dispatch: any },
+            payload: { stationId: number; projectId: number }
+        ) => {
+            await new FKApi().addStationToProject(payload);
 
-        const stations = await new FKApi().getStationsByProject(payload.projectId);
-        commit(PROJECT_STATIONS, { projectId: payload.projectId, stations: stations.stations });
-    },
-    [ActionTypes.STATION_PROJECT_REMOVE]: async (
-        { commit, dispatch }: { commit: any; dispatch: any },
-        payload: { stationId: number; projectId: number }
-    ) => {
-        await new FKApi().removeStationFromProject(payload);
+            const stations = await new FKApi().getStationsByProject(payload.projectId);
+            commit(PROJECT_STATIONS, { projectId: payload.projectId, stations: stations.stations });
+        },
+        [ActionTypes.STATION_PROJECT_REMOVE]: async (
+            { commit, dispatch }: { commit: any; dispatch: any },
+            payload: { stationId: number; projectId: number }
+        ) => {
+            await new FKApi().removeStationFromProject(payload);
 
-        const stations = await new FKApi().getStationsByProject(payload.projectId);
-        commit(PROJECT_STATIONS, { projectId: payload.projectId, stations: stations.stations });
-    },
-    [ActionTypes.PROJECT_INVITE]: async (
-        { commit, dispatch }: { commit: any; dispatch: any },
-        payload: { projectId: number; email: string; role: string }
-    ) => {
-        await new FKApi().sendInvite(payload);
-        const usersReply = await new FKApi().getUsersByProject(payload.projectId);
-        commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
-    },
-    [ActionTypes.PROJECT_REMOVE]: async (
-        { commit, dispatch }: { commit: any; dispatch: any },
-        payload: { projectId: number; email: string }
-    ) => {
-        await new FKApi().removeUserFromProject(payload);
-        const usersReply = await new FKApi().getUsersByProject(payload.projectId);
-        commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
-    },
-    [ActionTypes.ACCEPT_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
-        await new FKApi().acceptProjectInvite(payload);
+            const stations = await new FKApi().getStationsByProject(payload.projectId);
+            commit(PROJECT_STATIONS, { projectId: payload.projectId, stations: stations.stations });
+        },
+        [ActionTypes.PROJECT_INVITE]: async (
+            { commit, dispatch }: { commit: any; dispatch: any },
+            payload: { projectId: number; email: string; role: string }
+        ) => {
+            await new FKApi().sendInvite(payload);
+            const usersReply = await new FKApi().getUsersByProject(payload.projectId);
+            commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
+        },
+        [ActionTypes.PROJECT_REMOVE]: async (
+            { commit, dispatch }: { commit: any; dispatch: any },
+            payload: { projectId: number; email: string }
+        ) => {
+            await new FKApi().removeUserFromProject(payload);
+            const usersReply = await new FKApi().getUsersByProject(payload.projectId);
+            commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
+        },
+        [ActionTypes.ACCEPT_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+            await new FKApi().acceptProjectInvite(payload);
 
-        const userProjects = await new FKApi().getUserProjects(OnNoReject);
-        commit(HAVE_USER_PROJECTS, userProjects.projects);
-    },
-    [ActionTypes.DECLINE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
-        await new FKApi().declineProjectInvite(payload);
-    },
-    [ActionTypes.ACCEPT_PROJECT_INVITE]: async (
-        { commit, dispatch }: { commit: any; dispatch: any },
-        payload: { id: number; token: string }
-    ) => {
-        await new FKApi().acceptInvite(payload);
+            const userProjects = await new FKApi().getUserProjects(OnNoReject);
+            commit(HAVE_USER_PROJECTS, userProjects.projects);
+        },
+        [ActionTypes.DECLINE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+            await new FKApi().declineProjectInvite(payload);
+        },
+        [ActionTypes.ACCEPT_PROJECT_INVITE]: async (
+            { commit, dispatch }: { commit: any; dispatch: any },
+            payload: { id: number; token: string }
+        ) => {
+            await new FKApi().acceptInvite(payload);
 
-        const userProjects = await new FKApi().getUserProjects(OnNoReject);
-        commit(HAVE_USER_PROJECTS, userProjects.projects);
-    },
-    [ActionTypes.DECLINE_PROJECT_INVITE]: async (
-        { commit, dispatch }: { commit: any; dispatch: any },
-        payload: { id: number; token: string }
-    ) => {
-        await new FKApi().declineInvite(payload);
-    },
-    [ActionTypes.DELETE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
-        await new FKApi().deleteProject(payload);
+            const userProjects = await new FKApi().getUserProjects(OnNoReject);
+            commit(HAVE_USER_PROJECTS, userProjects.projects);
+        },
+        [ActionTypes.DECLINE_PROJECT_INVITE]: async (
+            { commit, dispatch }: { commit: any; dispatch: any },
+            payload: { id: number; token: string }
+        ) => {
+            await new FKApi().declineInvite(payload);
+        },
+        [ActionTypes.DELETE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+            await new FKApi().deleteProject(payload);
 
-        commit(PROJECT_DELETED, payload);
+            commit(PROJECT_DELETED, payload);
 
-        return payload;
-    },
-    [ActionTypes.ADD_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: any) => {
-        const project = await new FKApi().addProject(payload);
+            return payload;
+        },
+        [ActionTypes.ADD_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: any) => {
+            const project = await new FKApi().addProject(payload);
 
-        commit(PROJECT_UPDATE, project);
+            commit(PROJECT_UPDATE, project);
 
-        return project;
-    },
-    [ActionTypes.SAVE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: any) => {
-        const project = await new FKApi().updateProject(payload);
+            return project;
+        },
+        [ActionTypes.SAVE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: any) => {
+            const project = await new FKApi().updateProject(payload);
 
-        commit(PROJECT_UPDATE, project);
+            commit(PROJECT_UPDATE, project);
 
-        return project;
-    },
+            return project;
+        },
+    };
 };
 
 const mutations = {
@@ -452,12 +457,14 @@ const mutations = {
     },
 };
 
-const state = () => new StationsState();
+export const stations = (services: Services) => {
+    const state = () => new StationsState();
 
-export const stations = {
-    namespaced: false,
-    state,
-    getters,
-    actions,
-    mutations,
+    return {
+        namespaced: false,
+        state,
+        getters,
+        actions: actions(services),
+        mutations,
+    };
 };

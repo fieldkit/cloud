@@ -1,8 +1,9 @@
 import _ from "lodash";
 import * as MutationTypes from "../mutations";
-import FKApi, { CurrentUser, Project } from "../../api/api";
 import { DisplayStation } from "./stations";
 import { GlobalState, GlobalGetters } from "./global";
+
+import { Services, CurrentUser, Project } from "@/api";
 
 export class LayoutState {
     user: CurrentUser | null;
@@ -26,16 +27,20 @@ const getters = {
     },
 };
 
-const actions = {};
+const actions = (services: Services) => {
+    return {};
+};
 
 const mutations = {};
 
-const state = () => new LayoutState();
+export const layout = (services: Services) => {
+    const state = () => new LayoutState();
 
-export const layout = {
-    namespaced: false,
-    state,
-    getters,
-    actions,
-    mutations,
+    return {
+        namespaced: false,
+        state,
+        getters,
+        actions: actions(services),
+        mutations,
+    };
 };

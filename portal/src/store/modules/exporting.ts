@@ -5,7 +5,8 @@ import * as ActionTypes from "../actions";
 
 import { ExportDataAction, ExportParams } from "../typed-actions";
 import { Bookmark } from "@/views/viz/viz";
-import FKApi, { OnNoReject, UserExports, ExportStatus } from "@/api/api";
+
+import { FKApi, Services, OnNoReject, UserExports, ExportStatus } from "@/api";
 
 const EXPORT_START = "EXPORT_START";
 const EXPORT_PROGRESS = "EXPORT_PROGRESS";
@@ -36,48 +37,50 @@ function makeExportParams(bookmark: Bookmark): URLSearchParams {
     return params;
 }
 
-const actions = {
-    [EXPORT_CHECK]: async ({ dispatch, commit }: ActionParameters, payload: CheckPayload) => {
-        return new FKApi().exportStatus(payload.statusUrl).then((de) => {
-            console.log("exporting:status", de);
-            if (!de.downloadUrl) {
-                commit(EXPORT_PROGRESS, de);
-                return Promise.delay(1000).then(() => {
-                    return dispatch(EXPORT_CHECK, payload);
-                });
-            } else {
-                commit(EXPORT_DONE, de);
-                return dispatch(ActionTypes.NEED_EXPORTS);
-            }
-        });
-    },
-    [ActionTypes.NEED_EXPORTS]: async ({ dispatch, commit }: ActionParameters, payload: ExportDataAction) => {
-        return new FKApi().getUserExports().then((exports) => {
-            commit(USER_EXPORTS, exports);
-
-            return Promise.all(
-                exports.exports.map((de) => {
-                    if (!de.completedAt) {
-                        return dispatch(EXPORT_CHECK, { statusUrl: de.statusUrl });
-                    }
-                    return de;
-                })
-            );
-        });
-    },
-    [ActionTypes.BEGIN_EXPORT]: async ({ dispatch, commit }: ActionParameters, payload: ExportDataAction) => {
-        const params = makeExportParams(payload.bookmark);
-        console.log("exporting:begin", payload, params);
-        return new FKApi()
-            .exportData(params, payload.params)
-            .then((de) => {
-                commit(EXPORT_START, de);
-                return dispatch(EXPORT_CHECK, { statusUrl: de.statusUrl });
-            })
-            .catch((error) => {
-                commit(EXPORT_ERROR, error);
+const actions = (services: Services) => {
+    return {
+        [EXPORT_CHECK]: async ({ dispatch, commit }: ActionParameters, payload: CheckPayload) => {
+            return new FKApi().exportStatus(payload.statusUrl).then((de) => {
+                console.log("exporting:status", de);
+                if (!de.downloadUrl) {
+                    commit(EXPORT_PROGRESS, de);
+                    return Promise.delay(1000).then(() => {
+                        return dispatch(EXPORT_CHECK, payload);
+                    });
+                } else {
+                    commit(EXPORT_DONE, de);
+                    return dispatch(ActionTypes.NEED_EXPORTS);
+                }
             });
-    },
+        },
+        [ActionTypes.NEED_EXPORTS]: async ({ dispatch, commit }: ActionParameters, payload: ExportDataAction) => {
+            return new FKApi().getUserExports().then((exports) => {
+                commit(USER_EXPORTS, exports);
+
+                return Promise.all(
+                    exports.exports.map((de) => {
+                        if (!de.completedAt) {
+                            return dispatch(EXPORT_CHECK, { statusUrl: de.statusUrl });
+                        }
+                        return de;
+                    })
+                );
+            });
+        },
+        [ActionTypes.BEGIN_EXPORT]: async ({ dispatch, commit }: ActionParameters, payload: ExportDataAction) => {
+            const params = makeExportParams(payload.bookmark);
+            console.log("exporting:begin", payload, params);
+            return new FKApi()
+                .exportData(params, payload.params)
+                .then((de) => {
+                    commit(EXPORT_START, de);
+                    return dispatch(EXPORT_CHECK, { statusUrl: de.statusUrl });
+                })
+                .catch((error) => {
+                    commit(EXPORT_ERROR, error);
+                });
+        },
+    };
 };
 
 const mutations = {
@@ -98,12 +101,14 @@ const mutations = {
     },
 };
 
-const state = () => new ExportingState();
+export const exporting = (services: Services) => {
+    const state = () => new ExportingState();
 
-export const exporting = {
-    namespaced: false,
-    state,
-    getters,
-    actions,
-    mutations,
+    return {
+        namespaced: false,
+        state,
+        getters,
+        actions: actions(services),
+        mutations,
+    };
 };
