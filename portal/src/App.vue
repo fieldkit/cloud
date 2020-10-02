@@ -15,6 +15,7 @@ export default {
         });
     },
     errorCaptured(err, vm, info) {
+        console.log("vuejs:error-captured", err);
         if (err instanceof AuthenticationRequiredError) {
             this.$router.push({ name: "login", query: { after: this.$route.path } });
             return false;
@@ -24,8 +25,8 @@ export default {
 };
 </script>
 <style lang="scss">
-@import 'scss/mixins';
-@import 'scss/typography';
+@import "scss/mixins";
+@import "scss/typography";
 
 html {
 }
