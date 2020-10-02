@@ -73,12 +73,9 @@ func (s *UserService) Logout(ctx context.Context, payload *user.LogoutPayload) e
 		return err
 	}
 
-	refreshToken := data.Token{}
-	if err := refreshToken.UnmarshalText([]byte(p.RefreshToken())); err != nil {
-		return err
-	}
-
-	if _, err := s.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.refresh_token WHERE token = $1`, p.RefreshToken()); err != nil {
+	if _, err := s.options.Database.ExecContext(ctx, `
+		DELETE FROM fieldkit.refresh_token WHERE token = $1
+		`, p.RefreshToken()); err != nil {
 		return err
 	}
 
@@ -378,12 +375,28 @@ func (s *UserService) Refresh(ctx context.Context, payload *user.RefreshPayload)
 	if err == sql.ErrNoRows {
 		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
 	}
-
 	if err != nil {
 		return nil, err
 	}
 
-	jwtToken := trying.NewToken(now, refreshToken)
+	newRefreshToken, err := data.NewRefreshToken(trying.ID, 20, now.Add(time.Duration(72)*time.Hour))
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := s.options.Database.NamedExecContext(ctx, `
+		DELETE FROM fieldkit.refresh_token WHERE token = :token
+	`, refreshToken); err != nil {
+		return nil, err
+	}
+
+	if _, err := s.options.Database.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.refresh_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
+		`, newRefreshToken); err != nil {
+		return nil, err
+	}
+
+	jwtToken := trying.NewToken(now, newRefreshToken)
 	signedToken, err := jwtToken.SignedString(s.options.JWTHMACKey)
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign token: %s", err)
