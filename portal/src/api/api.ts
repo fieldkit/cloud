@@ -287,6 +287,7 @@ export interface InvokeParams {
 class FKApi {
     private readonly baseUrl: string = Config.API_HOST;
     private readonly token: TokenStorage = new TokenStorage();
+    private refreshing: Promise<any> | null = null;
 
     authenticated() {
         return this.token.authenticated();
@@ -362,30 +363,45 @@ class FKApi {
         }
     }
 
-    private refreshExpiredToken(original) {
+    private afterTokenRefresh(): Promise<any> {
+        if (this.refreshing !== null) {
+            console.log("api: already refreshing");
+            return this.refreshing;
+        }
+
         const parsed = this.parseToken(this.token.getHeader());
         if (!parsed) {
+            console.log("api: refresh skipped, invalid token");
             return this.logout().then(() => Promise.reject(new AuthenticationRequiredError()));
         }
+
+        console.log("api: refreshing");
 
         const requestBody = {
             refreshToken: parsed.refresh_token, // eslint-disable-line
         };
 
-        console.log("api: refreshing");
-        return axios({
+        this.refreshing = axios({
             method: "POST",
             url: this.baseUrl + "/refresh",
             data: requestBody,
-        }).then(
-            (response) => {
-                return this.handleLogin(response).then(() => {
-                    console.log("api: retry original");
-                    return this.invoke(_.extend({ refreshed: true }, original));
-                });
-            },
-            (error) => this.logout().then(() => Promise.reject(error))
-        );
+        })
+            .then(
+                (response) => this.handleLogin(response),
+                (error) => this.logout().then(() => Promise.reject(error))
+            )
+            .finally(() => {
+                this.refreshing = null;
+            });
+
+        return this.refreshing;
+    }
+
+    private refreshExpiredToken(original: InvokeParams): Promise<any> {
+        return this.afterTokenRefresh().then(() => {
+            console.log("api: retry original");
+            return this.invoke(_.extend({ refreshed: true }, original));
+        });
     }
 
     private handle(params: InvokeParams, response) {
