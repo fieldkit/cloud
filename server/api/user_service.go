@@ -68,26 +68,19 @@ func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*u
 }
 
 func (s *UserService) Logout(ctx context.Context, payload *user.LogoutPayload) error {
-	/*
-			token := jwt.ContextJWT(ctx)
-			if token == nil {
-				return fmt.Errorf("JWT token is missing from context") // internal error
-			}
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return err
+	}
 
-			claims, ok := token.Claims.(jwtgo.MapClaims)
-			if !ok {
-				return fmt.Errorf("JWT claims error") // internal error
-			}
+	refreshToken := data.Token{}
+	if err := refreshToken.UnmarshalText([]byte(p.RefreshToken())); err != nil {
+		return err
+	}
 
-		refreshToken := data.Token{}
-		if err := refreshToken.UnmarshalText([]byte(claims["refresh_token"].(string))); err != nil {
-			return err
-		}
-
-		if _, err := c.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.refresh_token WHERE token = $1`, refreshToken); err != nil {
-			return err
-		}
-	*/
+	if _, err := s.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.refresh_token WHERE token = $1`, p.RefreshToken()); err != nil {
+		return err
+	}
 
 	return nil
 }

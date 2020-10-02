@@ -31,6 +31,7 @@ type StationPermissions interface {
 type Permissions interface {
 	Unwrap() (permissions Permissions, err error)
 	UserID() int32
+	RefreshToken() string
 	IsAdmin() bool
 	ForProjectByID(id int32) (permissions ProjectPermissions, err error)
 	ForStationByID(id int) (permissions StationPermissions, err error)
@@ -39,10 +40,11 @@ type Permissions interface {
 }
 
 type unwrappedPermissions struct {
-	userID      int32
-	authAttempt *AuthAttempt
-	scopes      []string
-	admin       bool
+	userID       int32
+	authAttempt  *AuthAttempt
+	scopes       []string
+	admin        bool
+	refreshToken string
 }
 
 type defaultPermissions struct {
@@ -150,13 +152,18 @@ func (p *defaultPermissions) unwrap() error {
 	}
 
 	p.unwrapped = &unwrappedPermissions{
-		authAttempt: authAttempt,
-		userID:      userID,
-		scopes:      scopesArray,
-		admin:       admin,
+		authAttempt:  authAttempt,
+		userID:       userID,
+		scopes:       scopesArray,
+		admin:        admin,
+		refreshToken: claims["refresh_token"].(string),
 	}
 
 	return nil
+}
+
+func (p *defaultPermissions) RefreshToken() string {
+	return p.unwrapped.refreshToken
 }
 
 func (p *defaultPermissions) UserID() int32 {
