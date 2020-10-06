@@ -109,7 +109,8 @@ export default {
     }
 
     @include bp-down($xs) {
-        flex-basis: calc(100% - 24px);
+        margin: 0 0 40px;
+        flex-basis: 100%;
     }
 }
 .project-name {
