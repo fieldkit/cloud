@@ -3,9 +3,12 @@
 .details .details-top {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     padding-bottom: 30px;
     line-height: 1.5;
+
+    @include bp-down($xl) {
+        flex-wrap: wrap;
+    }
 
     @include bp-down($xs) {
         padding-bottom: 20px;
@@ -13,7 +16,7 @@
 }
 .details .details-left {
     padding-right: 20px;
-    flex: 2;
+    flex-basis: calc(60% - 20px);
 
     @include bp-down($md) {
         flex: 1;
@@ -27,7 +30,7 @@
     }
 }
 .details .details-right {
-    flex: 1;
+    flex-basis: 40%;
 
     @include bp-down($md) {
         flex-basis: 50%;
@@ -38,12 +41,31 @@
 
     &-row {
         margin-bottom: 5px;
-        white-space: nowrap;
         font-family: $font-family-light;
+        white-space: nowrap;
         @include flex(center);
 
         @include bp-down($xs) {
             margin-bottom: 2px;
+        }
+
+        &.has-tooltip {
+            position: relative;
+            padding-right: 24px;
+
+            &:after {
+                content: '';
+                background: url('../../assets/icon-tooltip.svg') no-repeat center center;
+                background-size: contain;
+                width: 14px;
+                height: 14px;
+                @include position(absolute, 50% 0 null null);
+                transform: translateY(-50%);
+            }
+        }
+
+        span {
+            cursor: pointer;
         }
     }
 

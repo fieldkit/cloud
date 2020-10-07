@@ -24,4 +24,9 @@ $font_path: '~@/fonts/';
     url($font_path + 'Avenir/AvenirLTPro-Heavy.ttf') format("truetype") /* Safari, Android, iOS */
 }
 
+.bold {
+    font-family: $font-family-bold;
+}
+
+
 

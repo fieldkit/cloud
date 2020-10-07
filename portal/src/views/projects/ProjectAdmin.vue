@@ -37,13 +37,19 @@
                             <div class="details-icon-container">
                                 <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
                             </div>
-                            <template>{{ project.location }}</template>
+                            <template>{{ project.location.slice(0, 30) }}</template>
+                            <template v-if="project.location.length > 30">
+                                ... <span class="bold"> more </span>
+                            </template>
                         </div>
-                        <div class="details-row" v-if="displayProject.places.native">
+                        <div class="details-row has-tooltip" v-if="displayProject.places.native">
                             <div class="details-icon-container">
                                 <img alt="Location" src="@/assets/icon-location.svg" class="icon"  width="12px" height="14px" />
                             </div>
                             <template>Native Lands: {{ displayProject.places.native }}</template>
+                            <template v-if="displayProject.places.native.length > 20">
+                                ... <span class="bold"> more </span>
+                            </template>
                         </div>
                     </div>
                 </div>
