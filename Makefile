@@ -33,6 +33,9 @@ binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BU
 portal/node_modules:
 	cd portal && $(JSPKG) install
 
+cycle-checks:
+	npx madge --circular --extensions ts ./portal/src
+
 jstests: portal/node_modules
 	cd portal && $(JSPKG) install
 	cd portal && vue-cli-service build
