@@ -104,6 +104,7 @@ export default Vue.extend({
     flex-direction: column;
     display: flex;
     background: #fcfcfc;
+    position: relative;
 }
 .scrolling-disabled {
     overflow-y: hidden;

@@ -44,7 +44,9 @@ export default Vue.extend({
     watch: {
         layoutChanges(this: any) {
             if (this.map) {
-                this.map.resize();
+                setTimeout(() => {
+                    this.map.resize();
+                }, 250);
             }
         },
     },

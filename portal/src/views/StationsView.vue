@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout :viewingStations="true" :viewingStation="activeStation">
+    <StandardLayout :viewingStations="true" :viewingStation="activeStation" @sidebar-toggle="layoutChanges++">
         <template v-if="viewType === 'list'">
             <div class="stations-list" v-if="stations && stations.length > 0">
                 <StationSummary
@@ -14,7 +14,7 @@
 
         <template v-if="viewType === 'map'">
             <div class="container-map">
-                <StationsMap @show-summary="showSummary" :mapped="mapped" v-if="mapped" />
+                <StationsMap @show-summary="showSummary" :mapped="mapped" :layoutChanges="layoutChanges" v-if="mapped" />
             </div>
             <StationSummary
                     v-if="activeStation"
@@ -70,6 +70,7 @@ export default Vue.extend({
         return {
             showNoStationsMessage: true,
             viewType: "map",
+            layoutChanges: 0,
         };
     },
     computed: {
@@ -115,8 +116,9 @@ export default Vue.extend({
         },
         switchView(type) {
             this.viewType = type;
-        },
-    },
+            this.layoutChanges++;
+        }
+    }
 });
 </script>
 
@@ -125,9 +127,14 @@ export default Vue.extend({
 
 .container-map {
     width: 100%;
-    height: calc(100% - 54px);
+    height: calc(100% - 66px);
     margin-top: 0;
-    @include position(absolute, 54px null null 0);
+    @include position(absolute, 66px null null 0);
+
+    @include bp-down($sm) {
+        top: 54px;
+        height: calc(100% - 54px);
+    }
 }
 
 ::v-deep .station-hover-summary {
