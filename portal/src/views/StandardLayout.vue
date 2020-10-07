@@ -10,6 +10,7 @@
                 :stations="stations"
                 :projects="userProjects"
                 @show-station="showStation"
+                @sidebar-toggle="onSidebarToggle"
             />
 
             <div class="container-main">
@@ -83,6 +84,9 @@ export default Vue.extend({
             if (this.defaultShowStation) {
                 this.$router.push({ name: "viewStation", params: { id: station.id } });
             }
+        },
+        onSidebarToggle() {
+            this.$emit("sidebar-toggle");
         },
     },
 });

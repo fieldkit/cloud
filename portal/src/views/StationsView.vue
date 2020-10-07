@@ -117,8 +117,8 @@ export default Vue.extend({
         switchView(type) {
             this.viewType = type;
             this.layoutChanges++;
-        }
-    }
+        },
+    },
 });
 </script>
 

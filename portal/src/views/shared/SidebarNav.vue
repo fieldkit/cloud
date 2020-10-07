@@ -55,7 +55,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import EventBus from 'vue';
 
 export default Vue.extend({
     name: "SidebarNav",
@@ -105,7 +104,7 @@ export default Vue.extend({
         },
         toggleSidebar(...args) {
             this.sidebar.narrow = !this.sidebar.narrow;
-            this.$parent.$emit('sidebar-toggle');
+            this.$emit("sidebar-toggle");
         },
     },
 });
