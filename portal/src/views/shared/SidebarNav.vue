@@ -6,16 +6,14 @@
             </router-link>
         </div>
         <a class="sidebar-trigger" v-on:click="toggleSidebar">
-            <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22"/>
+            <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22" />
         </a>
         <div id="inner-nav">
             <div class="nav-section">
                 <router-link :to="{ name: 'projects' }">
                     <div class="nav-label">
                         <img alt="Projects" src="@/assets/icon-projects.svg" />
-                        <span v-bind:class="{ selected: viewingProjects }">
-                            Projects
-                        </span>
+                        <span v-bind:class="{ selected: viewingProjects }">Projects</span>
                     </div>
                 </router-link>
                 <div v-for="project in projects" v-bind:key="project.id">
@@ -34,22 +32,19 @@
                 <router-link :to="{ name: 'stations' }">
                     <div class="nav-label">
                         <img alt="Stations" src="@/assets/icon-stations.svg" />
-                        <span v-bind:class="{ selected: viewingStations }">
-                            Stations
-                        </span>
+                        <span v-bind:class="{ selected: viewingStations }">Stations</span>
                     </div>
                 </router-link>
                 <div v-for="station in stations" v-bind:key="station.id">
-                    <span class="nav-link"
+                    <span
+                        class="nav-link"
                         v-on:click="showStation(station)"
                         v-bind:class="{ selected: viewingStations && viewingStation && viewingStation.id === station.id }"
                     >
                         {{ station.name }}
                     </span>
                 </div>
-                <div v-if="isAuthenticated && stations.length == 0" class="nav-link">
-                    No stations added
-                </div>
+                <div v-if="isAuthenticated && stations.length == 0" class="nav-link">No stations added</div>
             </div>
         </div>
         <div class="sidebar-header sidebar-compass">
@@ -117,7 +112,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 
 .container-side {
     background: #fff;
