@@ -2,14 +2,9 @@ package api
 
 import (
 	"context"
-	_ "encoding/hex"
-	_ "encoding/json"
 	"errors"
-	_ "fmt"
-	_ "io"
-	_ "time"
-
-	_ "github.com/google/uuid"
+	"fmt"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 
@@ -17,10 +12,8 @@ import (
 
 	discService "github.com/fieldkit/cloud/server/api/gen/discussion"
 
-	_ "github.com/fieldkit/cloud/server/backend"
-	_ "github.com/fieldkit/cloud/server/backend/repositories"
-	_ "github.com/fieldkit/cloud/server/data"
-	_ "github.com/fieldkit/cloud/server/messages"
+	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/data"
 )
 
 type DiscussionService struct {
@@ -36,15 +29,77 @@ func NewDiscussionService(ctx context.Context, options *ControllerOptions) *Disc
 }
 
 func (c *DiscussionService) Project(ctx context.Context, payload *discService.ProjectPayload) (*discService.Discussion, error) {
-	return &discService.Discussion{}, nil
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	_ = p
+
+	dr := repositories.NewDiscussionRepository(c.db)
+	page, err := dr.QueryByProjectID(ctx, payload.ProjectID)
+	if err != nil {
+		return nil, err
+	}
+
+	threaded, err := ThreadedPage(page)
+	if err != nil {
+		return nil, err
+	}
+
+	return &discService.Discussion{
+		Posts: threaded,
+	}, nil
 }
 
 func (c *DiscussionService) Data(ctx context.Context, payload *discService.DataPayload) (*discService.Discussion, error) {
-	return &discService.Discussion{}, nil
+	return &discService.Discussion{
+		Posts: []*discService.ThreadedPost{},
+	}, nil
 }
 
 func (c *DiscussionService) PostMessage(ctx context.Context, payload *discService.PostMessagePayload) (*discService.PostMessageResult, error) {
-	return &discService.PostMessageResult{}, nil
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	if payload.Post.ProjectID == nil {
+		return nil, fmt.Errorf("malformed request: missing project or bookmark")
+	}
+
+	ur := repositories.NewUserRepository(c.db)
+	user, err := ur.QueryByID(ctx, p.UserID())
+	if err != nil {
+		return nil, err
+	}
+
+	dr := repositories.NewDiscussionRepository(c.db)
+	post, err := dr.AddPost(ctx, &data.DiscussionPost{
+		UserID:     user.ID,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+		ProjectID:  payload.Post.ProjectID,
+		ThreadID:   payload.Post.ThreadID,
+		StationIDs: []int64{},
+		Body:       payload.Post.Body,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	users := map[int32]*data.User{
+		user.ID: user,
+	}
+
+	threaded, err := ThreadedPost(post, users)
+	if err != nil {
+		return nil, err
+	}
+
+	return &discService.PostMessageResult{
+		Post: threaded,
+	}, nil
 }
 
 func (s *DiscussionService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
@@ -56,4 +111,47 @@ func (s *DiscussionService) JWTAuth(ctx context.Context, token string, scheme *s
 		Unauthorized: func(m string) error { return discService.MakeUnauthorized(errors.New(m)) },
 		Forbidden:    func(m string) error { return discService.MakeForbidden(errors.New(m)) },
 	})
+}
+
+func ThreadedPost(dp *data.DiscussionPost, users map[int32]*data.User) (*discService.ThreadedPost, error) {
+	user := users[dp.UserID]
+	if user == nil {
+		return nil, fmt.Errorf("missing user")
+	}
+
+	return &discService.ThreadedPost{
+		ID:        dp.ID,
+		CreatedAt: dp.CreatedAt.Unix() * 1000,
+		UpdatedAt: dp.UpdatedAt.Unix() * 1000,
+		Author: &discService.PostAuthor{
+			ID:       user.ID,
+			Name:     user.Name,
+			MediaURL: user.MediaURL,
+		},
+		Replies: []*discService.ThreadedPost{},
+		Body:    dp.Body,
+	}, nil
+}
+
+func ThreadedPage(page *data.PageOfDiscussion) ([]*discService.ThreadedPost, error) {
+	byID := make(map[int64]*discService.ThreadedPost)
+	threaded := make([]*discService.ThreadedPost, 0)
+	for _, post := range page.Posts {
+		tp, err := ThreadedPost(post, page.UsersByID)
+		if err != nil {
+			return nil, err
+		}
+
+		byID[tp.ID] = tp
+	}
+	for _, post := range page.Posts {
+		tp := byID[post.ID]
+		if post.ThreadID != nil {
+			parent := byID[*post.ThreadID]
+			parent.Replies = append(parent.Replies, tp)
+		} else {
+			threaded = append(threaded, tp)
+		}
+	}
+	return threaded, nil
 }
