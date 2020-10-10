@@ -16,7 +16,7 @@ import (
 	"github.com/fieldkit/cloud/server/tests"
 )
 
-func TestGetDiscussionProjectEmpty(t *testing.T) {
+func TestDiscussionGetDiscussionProjectEmpty(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -40,7 +40,7 @@ func TestGetDiscussionProjectEmpty(t *testing.T) {
 		}`)
 }
 
-func TestPostFirstProjectDiscussion(t *testing.T) {
+func TestDiscussionPostFirstProjectDiscussion(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -107,7 +107,7 @@ func TestPostFirstProjectDiscussion(t *testing.T) {
 		}`)
 }
 
-func TestPostProjectDiscussionReply(t *testing.T) {
+func TestDiscussionPostProjectDiscussionReply(t *testing.T) {
 	ja := jsonassert.New(t)
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
@@ -190,7 +190,7 @@ func TestPostProjectDiscussionReply(t *testing.T) {
 		}`)
 }
 
-func TestUpdateMyPost(t *testing.T) {
+func TestDiscussionUpdateMyPost(t *testing.T) {
 	ja := jsonassert.New(t)
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
@@ -266,7 +266,7 @@ func TestUpdateMyPost(t *testing.T) {
 		}`)
 }
 
-func TestUpdateStrangersPost(t *testing.T) {
+func TestDiscussionUpdateStrangersPost(t *testing.T) {
 	ja := jsonassert.New(t)
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
@@ -330,7 +330,7 @@ func TestUpdateStrangersPost(t *testing.T) {
 	assert.Equal(http.StatusForbidden, rrUpdate.Code)
 }
 
-func TestDeleteMyPost(t *testing.T) {
+func TestDiscussionDeleteMyPost(t *testing.T) {
 	ja := jsonassert.New(t)
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
@@ -382,7 +382,7 @@ func TestDeleteMyPost(t *testing.T) {
 	assert.Equal(http.StatusNoContent, rrUpdate.Code)
 }
 
-func TestDeleteStrangersPost(t *testing.T) {
+func TestDiscussionDeleteStrangersPost(t *testing.T) {
 	ja := jsonassert.New(t)
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
@@ -437,7 +437,7 @@ func TestDeleteStrangersPost(t *testing.T) {
 	assert.Equal(http.StatusForbidden, rrUpdate.Code)
 }
 
-func TestDeleteMyPostWithReply(t *testing.T) {
+func TestDiscussionDeleteMyPostWithReply(t *testing.T) {
 	ja := jsonassert.New(t)
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
@@ -510,6 +510,76 @@ func TestDeleteMyPostWithReply(t *testing.T) {
 				},
 				"replies": [],
 				"body": "Message #2"
+			}]
+		}`)
+}
+
+func TestDiscussionPostFirstContextDiscussion(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	bookmark := fmt.Sprintf(`{"v":1,"g":[[[[[%d],[2],[-8640000000000000,8640000000000000],[],0,0]]]],"s":[]}`, fd.Stations[0].ID)
+	payload, err := json.Marshal(
+		struct {
+			Post discService.NewPost `json:"post"`
+		}{
+			Post: discService.NewPost{
+				Bookmark: &bookmark,
+				Body:     "Message",
+			},
+		},
+	)
+	assert.NoError(err)
+
+	reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload))
+	reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rrPost := tests.ExecuteRequest(reqPost, api)
+
+	assert.Equal(http.StatusOK, rrPost.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rrPost.Body.String(), `
+		{
+			"post": {
+				"id": "<<PRESENCE>>",
+				"createdAt": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
+				"author": {
+					"id": "<<PRESENCE>>",
+					"name": "<<PRESENCE>>"
+				},
+				"replies": [],
+				"bookmark": "<<PRESENCE>>",
+				"body": "Message"
+			}
+		}`)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/discussion?bookmark=%v", bookmark), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja.Assertf(rr.Body.String(), `
+		{
+			"posts": [{
+				"id": "<<PRESENCE>>",
+				"createdAt": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
+				"author": {
+					"id": "<<PRESENCE>>",
+					"name": "<<PRESENCE>>"
+				},
+				"replies": [],
+				"bookmark": "<<PRESENCE>>",
+				"body": "Message"
 			}]
 		}`)
 }

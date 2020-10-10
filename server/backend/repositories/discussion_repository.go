@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/conservify/sqlxcache"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -75,6 +76,51 @@ func (r *DiscussionRepository) QueryByProjectID(ctx context.Context, id int32) (
 		)
 		`, id); err != nil {
 		return nil, err
+	}
+
+	postsByID := make(map[int64]*data.DiscussionPost)
+	for _, post := range posts {
+		postsByID[post.ID] = post
+	}
+
+	usersByID := make(map[int32]*data.User)
+	for _, user := range users {
+		usersByID[user.ID] = user
+	}
+
+	return &data.PageOfDiscussion{
+		Posts:     posts,
+		PostsByID: postsByID,
+		UsersByID: usersByID,
+	}, nil
+}
+
+func (r *DiscussionRepository) QueryByStationIDs(ctx context.Context, ids []int32) (*data.PageOfDiscussion, error) {
+	posts := []*data.DiscussionPost{}
+	{
+		query, args, err := sqlx.In(`SELECT * FROM fieldkit.discussion_post WHERE station_ids && array[?]::integer[] ORDER BY created_at DESC`, ids)
+		if err != nil {
+			return nil, err
+		}
+		if err := r.db.SelectContext(ctx, &posts, r.db.Rebind(query), args...); err != nil {
+			return nil, err
+		}
+	}
+
+	userIDs := make([]int32, 0)
+	for _, post := range posts {
+		userIDs = append(userIDs, post.UserID)
+	}
+
+	users := []*data.User{}
+	{
+		query, args, err := sqlx.In(`SELECT * FROM fieldkit.user WHERE id IN (?)`, userIDs)
+		if err != nil {
+			return nil, err
+		}
+		if err := r.db.SelectContext(ctx, &users, r.db.Rebind(query), args...); err != nil {
+			return nil, err
+		}
 	}
 
 	postsByID := make(map[int64]*data.DiscussionPost)

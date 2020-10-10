@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/conservify/sqlxcache"
+	"github.com/jmoiron/sqlx/types"
 
 	"goa.design/goa/v3/security"
 
@@ -53,8 +54,33 @@ func (c *DiscussionService) Project(ctx context.Context, payload *discService.Pr
 }
 
 func (c *DiscussionService) Data(ctx context.Context, payload *discService.DataPayload) (*discService.Discussion, error) {
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	_ = p
+
+	bookmark, err := data.ParseBookmark(payload.Bookmark)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO Verify the user can see discussion about "bookmark.StationIDs()" stations
+
+	dr := repositories.NewDiscussionRepository(c.db)
+	page, err := dr.QueryByStationIDs(ctx, bookmark.StationIDs())
+	if err != nil {
+		return nil, err
+	}
+
+	threaded, err := ThreadedPage(page)
+	if err != nil {
+		return nil, err
+	}
+
 	return &discService.Discussion{
-		Posts: []*discService.ThreadedPost{},
+		Posts: threaded,
 	}, nil
 }
 
@@ -64,7 +90,7 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 		return nil, err
 	}
 
-	if payload.Post.ProjectID == nil {
+	if payload.Post.ProjectID == nil && payload.Post.Bookmark == nil {
 		return nil, fmt.Errorf("malformed request: missing project or bookmark")
 	}
 
@@ -76,6 +102,21 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 		return nil, err
 	}
 
+	stationIDs := []int64{}
+	var context *types.JSONText
+	if payload.Post.Bookmark != nil && len(*payload.Post.Bookmark) > 0 {
+		bytes := types.JSONText([]byte(*payload.Post.Bookmark))
+		context = &bytes
+
+		bookmark, err := data.ParseBookmark(*payload.Post.Bookmark)
+		if err != nil {
+			return nil, err
+		}
+		for _, id := range bookmark.StationIDs() {
+			stationIDs = append(stationIDs, int64(id))
+		}
+	}
+
 	dr := repositories.NewDiscussionRepository(c.db)
 	post, err := dr.AddPost(ctx, &data.DiscussionPost{
 		UserID:     user.ID,
@@ -83,7 +124,8 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 		UpdatedAt:  time.Now(),
 		ProjectID:  payload.Post.ProjectID,
 		ThreadID:   payload.Post.ThreadID,
-		StationIDs: []int64{},
+		StationIDs: stationIDs,
+		Context:    context,
 		Body:       payload.Post.Body,
 	})
 	if err != nil {
@@ -198,8 +240,9 @@ func ThreadedPost(dp *data.DiscussionPost, users map[int32]*data.User) (*discSer
 			Name:     user.Name,
 			MediaURL: user.MediaURL,
 		},
-		Replies: []*discService.ThreadedPost{},
-		Body:    dp.Body,
+		Replies:  []*discService.ThreadedPost{},
+		Bookmark: dp.StringBookmark(),
+		Body:     dp.Body,
 	}, nil
 }
 

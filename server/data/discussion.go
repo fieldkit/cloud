@@ -1,6 +1,7 @@
 package data
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/lib/pq"
@@ -18,6 +19,36 @@ type DiscussionPost struct {
 	UpdatedAt  time.Time       `db:"updated_at"`
 	Body       string          `db:"body"`
 	Context    *types.JSONText `db:"context"`
+}
+
+func (d *DiscussionPost) StringBookmark() *string {
+	if d.Context == nil {
+		return nil
+	}
+	bytes := []byte(*d.Context)
+	str := string(bytes)
+	return &str
+}
+
+func (d *DiscussionPost) SetContext(data interface{}) error {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	jsonText := types.JSONText(jsonData)
+	d.Context = &jsonText
+	return nil
+}
+
+func (d *DiscussionPost) GetContext() (fields map[string]interface{}, err error) {
+	if d.Context == nil {
+		return nil, nil
+	}
+	err = json.Unmarshal(*d.Context, &fields)
+	if err != nil {
+		return nil, err
+	}
+	return
 }
 
 type PageOfDiscussion struct {
