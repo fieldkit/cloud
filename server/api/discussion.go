@@ -120,6 +120,10 @@ func (c *DiscussionService) UpdateMessage(ctx context.Context, payload *discServ
 		return nil, err
 	}
 
+	if post.UserID != p.UserID() {
+		return nil, discService.MakeForbidden(errors.New("unauthorized"))
+	}
+
 	post.UpdatedAt = time.Now()
 	post.Body = payload.Body
 
@@ -147,20 +151,14 @@ func (c *DiscussionService) DeleteMessage(ctx context.Context, payload *discServ
 		return err
 	}
 
-	/*
-		ur := repositories.NewUserRepository(c.db)
-		user, err := ur.QueryByID(ctx, p.UserID())
-		if err != nil {
-			return nil, err
-		}
-	*/
-
-	_ = p
-
 	dr := repositories.NewDiscussionRepository(c.db)
 	post, err := dr.QueryPostByID(ctx, payload.PostID)
 	if err != nil {
 		return err
+	}
+
+	if post.UserID != p.UserID() {
+		return discService.MakeForbidden(errors.New("unauthorized"))
 	}
 
 	if err := dr.DeletePostByID(ctx, payload.PostID); err != nil {

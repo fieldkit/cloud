@@ -266,6 +266,70 @@ func TestUpdateMyPost(t *testing.T) {
 		}`)
 }
 
+func TestUpdateStrangersPost(t *testing.T) {
+	ja := jsonassert.New(t)
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	stranger, err := e.AddUser()
+	assert.NoError(err)
+
+	payload1, err := json.Marshal(
+		struct {
+			Post discService.NewPost `json:"post"`
+		}{
+			Post: discService.NewPost{
+				ProjectID: &fd.Project.ID,
+				Body:      "Message #1",
+			},
+		},
+	)
+	assert.NoError(err)
+
+	reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload1))
+	reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(stranger))
+	rrPost := tests.ExecuteRequest(reqPost, api)
+	assert.Equal(http.StatusOK, rrPost.Code)
+
+	ja.Assertf(rrPost.Body.String(), `
+		{
+			"post": {
+				"id": "<<PRESENCE>>",
+				"createdAt": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
+				"author": {
+					"id": "<<PRESENCE>>",
+					"name": "<<PRESENCE>>"
+				},
+				"replies": [],
+				"body": "Message #1"
+			}
+		}`)
+
+	firstID := int64(gjson.Get(rrPost.Body.String(), "post.id").Num)
+
+	payload2, err := json.Marshal(
+		struct {
+			Body string `json:"body"`
+		}{
+			Body: "Message #2",
+		},
+	)
+	assert.NoError(err)
+
+	reqUpdate, _ := http.NewRequest("POST", fmt.Sprintf("/discussion/%d", firstID), bytes.NewReader(payload2))
+	reqUpdate.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rrUpdate := tests.ExecuteRequest(reqUpdate, api)
+	assert.Equal(http.StatusForbidden, rrUpdate.Code)
+}
+
 func TestDeleteMyPost(t *testing.T) {
 	ja := jsonassert.New(t)
 	assert := assert.New(t)
@@ -316,4 +380,59 @@ func TestDeleteMyPost(t *testing.T) {
 	reqUpdate.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rrUpdate := tests.ExecuteRequest(reqUpdate, api)
 	assert.Equal(http.StatusNoContent, rrUpdate.Code)
+}
+
+func TestDeleteStrangersPost(t *testing.T) {
+	ja := jsonassert.New(t)
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	stranger, err := e.AddUser()
+	assert.NoError(err)
+
+	payload1, err := json.Marshal(
+		struct {
+			Post discService.NewPost `json:"post"`
+		}{
+			Post: discService.NewPost{
+				ProjectID: &fd.Project.ID,
+				Body:      "Message #1",
+			},
+		},
+	)
+	assert.NoError(err)
+
+	reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload1))
+	reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(stranger))
+	rrPost := tests.ExecuteRequest(reqPost, api)
+	assert.Equal(http.StatusOK, rrPost.Code)
+
+	ja.Assertf(rrPost.Body.String(), `
+		{
+			"post": {
+				"id": "<<PRESENCE>>",
+				"createdAt": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
+				"author": {
+					"id": "<<PRESENCE>>",
+					"name": "<<PRESENCE>>"
+				},
+				"replies": [],
+				"body": "Message #1"
+			}
+		}`)
+
+	firstID := int64(gjson.Get(rrPost.Body.String(), "post.id").Num)
+
+	reqUpdate, _ := http.NewRequest("DELETE", fmt.Sprintf("/discussion/%d", firstID), nil)
+	reqUpdate.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rrUpdate := tests.ExecuteRequest(reqUpdate, api)
+	assert.Equal(http.StatusForbidden, rrUpdate.Code)
 }
