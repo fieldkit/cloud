@@ -12,8 +12,8 @@ type UserRepository struct {
 	db *sqlxcache.DB
 }
 
-func NewUserRepository(db *sqlxcache.DB) (r *UserRepository, err error) {
-	return &UserRepository{db: db}, nil
+func NewUserRepository(db *sqlxcache.DB) (r *UserRepository) {
+	return &UserRepository{db: db}
 }
 
 func (r *UserRepository) QueryByID(ctx context.Context, id int32) (*data.User, error) {

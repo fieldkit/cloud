@@ -607,10 +607,7 @@ func (s *UserService) Roles(ctx context.Context, payload *user.RolesPayload) (*u
 }
 
 func (s *UserService) Delete(ctx context.Context, payload *user.DeletePayload) error {
-	r, err := repositories.NewUserRepository(s.options.Database)
-	if err != nil {
-		return err
-	}
+	r := repositories.NewUserRepository(s.options.Database)
 	return r.Delete(ctx, payload.UserID)
 }
 
