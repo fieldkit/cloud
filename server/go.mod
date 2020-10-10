@@ -39,7 +39,7 @@ require (
 	github.com/golang/freetype v0.0.0-20161208064710-d9be45aaf745
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-querystring v1.0.0
-	github.com/google/uuid v1.1.1
+	github.com/google/uuid v1.1.2
 	github.com/govau/que-go v1.0.1
 	github.com/h2non/filetype v1.0.10
 	github.com/hashicorp/go-immutable-radix v0.0.0-20180129170900-7f3cd4390caa
@@ -80,7 +80,7 @@ require (
 	github.com/sohlich/go-dbscan v0.0.0-20161128164835-242a0c72bf77
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.1
 	github.com/tidwall/gjson v1.6.0
 	github.com/ugorji/go v0.0.0-20190320090025-2dc34c0b8780
 	github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35
@@ -91,16 +91,18 @@ require (
 	go.uber.org/atomic v1.4.0
 	go.uber.org/multierr v1.1.0
 	go.uber.org/zap v1.10.0
-	goa.design/goa/v3 v3.1.2
+	goa.design/goa/v3 v3.2.4
 	goa.design/plugins/v3 v3.1.1
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
-	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
+	golang.org/x/net v0.0.0-20201009032441-dbdefad45b89
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	golang.org/x/sys v0.0.0-20200212091648-12a6c2dcc1e4
+	golang.org/x/sys v0.0.0-20201009025420-dfb3f7c4e634
 	golang.org/x/text v0.3.3 // indirect
-	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
+	golang.org/x/tools v0.0.0-20201009162240-fcf82128ed91
 	google.golang.org/appengine v1.6.5
+	google.golang.org/genproto v0.0.0-20201009135657-4d944d34d83c // indirect
+	google.golang.org/grpc v1.33.0 // indirect
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0
-	gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v2 v2.3.0
 )
