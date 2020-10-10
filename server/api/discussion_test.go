@@ -436,3 +436,80 @@ func TestDeleteStrangersPost(t *testing.T) {
 	rrUpdate := tests.ExecuteRequest(reqUpdate, api)
 	assert.Equal(http.StatusForbidden, rrUpdate.Code)
 }
+
+func TestDeleteMyPostWithReply(t *testing.T) {
+	ja := jsonassert.New(t)
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	stranger, err := e.AddUser()
+	assert.NoError(err)
+
+	payload1, err := json.Marshal(
+		struct {
+			Post discService.NewPost `json:"post"`
+		}{
+			Post: discService.NewPost{
+				ProjectID: &fd.Project.ID,
+				Body:      "Message #1",
+			},
+		},
+	)
+	assert.NoError(err)
+
+	req1, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload1))
+	req1.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr1 := tests.ExecuteRequest(req1, api)
+	assert.Equal(http.StatusOK, rr1.Code)
+	id1 := int64(gjson.Get(rr1.Body.String(), "post.id").Num)
+
+	payload2, err := json.Marshal(
+		struct {
+			Post discService.NewPost `json:"post"`
+		}{
+			Post: discService.NewPost{
+				ThreadID:  &id1,
+				ProjectID: &fd.Project.ID,
+				Body:      "Message #2",
+			},
+		},
+	)
+	assert.NoError(err)
+
+	req2, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload2))
+	req2.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(stranger))
+	rr2 := tests.ExecuteRequest(req2, api)
+	assert.Equal(http.StatusOK, rr2.Code)
+
+	req3, _ := http.NewRequest("DELETE", fmt.Sprintf("/discussion/%v", id1), nil)
+	req3.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr3 := tests.ExecuteRequest(req3, api)
+	assert.Equal(http.StatusNoContent, rr3.Code)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/discussion/projects/%d", fd.Project.ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr := tests.ExecuteRequest(req, api)
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja.Assertf(rr.Body.String(), `
+		{
+			"posts": [{
+				"id": "<<PRESENCE>>",
+				"createdAt": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
+				"author": {
+					"id": "<<PRESENCE>>",
+					"name": "<<PRESENCE>>"
+				},
+				"replies": [],
+				"body": "Message #2"
+			}]
+		}`)
+}

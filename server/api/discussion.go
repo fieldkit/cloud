@@ -68,6 +68,8 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 		return nil, fmt.Errorf("malformed request: missing project or bookmark")
 	}
 
+	// TODO Check that the user can post to this Project
+
 	ur := repositories.NewUserRepository(c.db)
 	user, err := ur.QueryByID(ctx, p.UserID())
 	if err != nil {

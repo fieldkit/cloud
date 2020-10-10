@@ -28,6 +28,11 @@ func (r *DiscussionRepository) QueryPostByID(ctx context.Context, id int64) (*da
 
 func (r *DiscussionRepository) DeletePostByID(ctx context.Context, id int64) error {
 	if _, err := r.db.ExecContext(ctx, `
+		UPDATE fieldkit.discussion_post SET thread_id = NULL WHERE thread_id = $1
+		`, id); err != nil {
+		return err
+	}
+	if _, err := r.db.ExecContext(ctx, `
 		DELETE FROM fieldkit.discussion_post WHERE id = $1
 		`, id); err != nil {
 		return err
