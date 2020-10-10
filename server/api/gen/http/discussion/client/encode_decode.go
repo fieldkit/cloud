@@ -452,6 +452,291 @@ func DecodePostMessageResponse(decoder func(*http.Response) goahttp.Decoder, res
 	}
 }
 
+// BuildUpdateMessageRequest instantiates a HTTP request object with method and
+// path set to call the "discussion" service "update message" endpoint
+func (c *Client) BuildUpdateMessageRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		postID int64
+	)
+	{
+		p, ok := v.(*discussion.UpdateMessagePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("discussion", "update message", "*discussion.UpdateMessagePayload", v)
+		}
+		postID = p.PostID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UpdateMessageDiscussionPath(postID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("discussion", "update message", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeUpdateMessageRequest returns an encoder for requests sent to the
+// discussion update message server.
+func EncodeUpdateMessageRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*discussion.UpdateMessagePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("discussion", "update message", "*discussion.UpdateMessagePayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		body := NewUpdateMessageRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("discussion", "update message", err)
+		}
+		return nil
+	}
+}
+
+// DecodeUpdateMessageResponse returns a decoder for responses returned by the
+// discussion update message endpoint. restoreBody controls whether the
+// response body should be restored after having been read.
+// DecodeUpdateMessageResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeUpdateMessageResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body UpdateMessageResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("discussion", "update message", err)
+			}
+			err = ValidateUpdateMessageResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("discussion", "update message", err)
+			}
+			res := NewUpdateMessageResultOK(&body)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body UpdateMessageUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("discussion", "update message", err)
+			}
+			err = ValidateUpdateMessageUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("discussion", "update message", err)
+			}
+			return nil, NewUpdateMessageUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body UpdateMessageForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("discussion", "update message", err)
+			}
+			err = ValidateUpdateMessageForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("discussion", "update message", err)
+			}
+			return nil, NewUpdateMessageForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body UpdateMessageNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("discussion", "update message", err)
+			}
+			err = ValidateUpdateMessageNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("discussion", "update message", err)
+			}
+			return nil, NewUpdateMessageNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body UpdateMessageBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("discussion", "update message", err)
+			}
+			err = ValidateUpdateMessageBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("discussion", "update message", err)
+			}
+			return nil, NewUpdateMessageBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("discussion", "update message", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildDeleteMessageRequest instantiates a HTTP request object with method and
+// path set to call the "discussion" service "delete message" endpoint
+func (c *Client) BuildDeleteMessageRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		postID int64
+	)
+	{
+		p, ok := v.(*discussion.DeleteMessagePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("discussion", "delete message", "*discussion.DeleteMessagePayload", v)
+		}
+		postID = p.PostID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteMessageDiscussionPath(postID)}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("discussion", "delete message", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeDeleteMessageRequest returns an encoder for requests sent to the
+// discussion delete message server.
+func EncodeDeleteMessageRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*discussion.DeleteMessagePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("discussion", "delete message", "*discussion.DeleteMessagePayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeDeleteMessageResponse returns a decoder for responses returned by the
+// discussion delete message endpoint. restoreBody controls whether the
+// response body should be restored after having been read.
+// DecodeDeleteMessageResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeDeleteMessageResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusNoContent:
+			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body DeleteMessageUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("discussion", "delete message", err)
+			}
+			err = ValidateDeleteMessageUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("discussion", "delete message", err)
+			}
+			return nil, NewDeleteMessageUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body DeleteMessageForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("discussion", "delete message", err)
+			}
+			err = ValidateDeleteMessageForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("discussion", "delete message", err)
+			}
+			return nil, NewDeleteMessageForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body DeleteMessageNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("discussion", "delete message", err)
+			}
+			err = ValidateDeleteMessageNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("discussion", "delete message", err)
+			}
+			return nil, NewDeleteMessageNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body DeleteMessageBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("discussion", "delete message", err)
+			}
+			err = ValidateDeleteMessageBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("discussion", "delete message", err)
+			}
+			return nil, NewDeleteMessageBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("discussion", "delete message", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalThreadedPostResponseBodyToDiscussionviewsThreadedPostView builds a
 // value of type *discussionviews.ThreadedPostView from a value of type
 // *ThreadedPostResponseBody.

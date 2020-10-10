@@ -20,11 +20,13 @@ import (
 
 // Server lists the discussion service endpoint HTTP handlers.
 type Server struct {
-	Mounts      []*MountPoint
-	Project     http.Handler
-	Data        http.Handler
-	PostMessage http.Handler
-	CORS        http.Handler
+	Mounts        []*MountPoint
+	Project       http.Handler
+	Data          http.Handler
+	PostMessage   http.Handler
+	UpdateMessage http.Handler
+	DeleteMessage http.Handler
+	CORS          http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -63,13 +65,18 @@ func New(
 			{"Project", "GET", "/discussion/projects/{projectID}"},
 			{"Data", "GET", "/discussion"},
 			{"PostMessage", "POST", "/discussion"},
+			{"UpdateMessage", "POST", "/discussion/{postId}"},
+			{"DeleteMessage", "DELETE", "/discussion/{postId}"},
 			{"CORS", "OPTIONS", "/discussion/projects/{projectID}"},
 			{"CORS", "OPTIONS", "/discussion"},
+			{"CORS", "OPTIONS", "/discussion/{postId}"},
 		},
-		Project:     NewProjectHandler(e.Project, mux, decoder, encoder, errhandler, formatter),
-		Data:        NewDataHandler(e.Data, mux, decoder, encoder, errhandler, formatter),
-		PostMessage: NewPostMessageHandler(e.PostMessage, mux, decoder, encoder, errhandler, formatter),
-		CORS:        NewCORSHandler(),
+		Project:       NewProjectHandler(e.Project, mux, decoder, encoder, errhandler, formatter),
+		Data:          NewDataHandler(e.Data, mux, decoder, encoder, errhandler, formatter),
+		PostMessage:   NewPostMessageHandler(e.PostMessage, mux, decoder, encoder, errhandler, formatter),
+		UpdateMessage: NewUpdateMessageHandler(e.UpdateMessage, mux, decoder, encoder, errhandler, formatter),
+		DeleteMessage: NewDeleteMessageHandler(e.DeleteMessage, mux, decoder, encoder, errhandler, formatter),
+		CORS:          NewCORSHandler(),
 	}
 }
 
@@ -81,6 +88,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Project = m(s.Project)
 	s.Data = m(s.Data)
 	s.PostMessage = m(s.PostMessage)
+	s.UpdateMessage = m(s.UpdateMessage)
+	s.DeleteMessage = m(s.DeleteMessage)
 	s.CORS = m(s.CORS)
 }
 
@@ -89,6 +98,8 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountProjectHandler(mux, h.Project)
 	MountDataHandler(mux, h.Data)
 	MountPostMessageHandler(mux, h.PostMessage)
+	MountUpdateMessageHandler(mux, h.UpdateMessage)
+	MountDeleteMessageHandler(mux, h.DeleteMessage)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -245,6 +256,108 @@ func NewPostMessageHandler(
 	})
 }
 
+// MountUpdateMessageHandler configures the mux to serve the "discussion"
+// service "update message" endpoint.
+func MountUpdateMessageHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleDiscussionOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/discussion/{postId}", f)
+}
+
+// NewUpdateMessageHandler creates a HTTP handler which loads the HTTP request
+// and calls the "discussion" service "update message" endpoint.
+func NewUpdateMessageHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUpdateMessageRequest(mux, decoder)
+		encodeResponse = EncodeUpdateMessageResponse(encoder)
+		encodeError    = EncodeUpdateMessageError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "update message")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "discussion")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountDeleteMessageHandler configures the mux to serve the "discussion"
+// service "delete message" endpoint.
+func MountDeleteMessageHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleDiscussionOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("DELETE", "/discussion/{postId}", f)
+}
+
+// NewDeleteMessageHandler creates a HTTP handler which loads the HTTP request
+// and calls the "discussion" service "delete message" endpoint.
+func NewDeleteMessageHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDeleteMessageRequest(mux, decoder)
+		encodeResponse = EncodeDeleteMessageResponse(encoder)
+		encodeError    = EncodeDeleteMessageError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "delete message")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "discussion")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service discussion.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -257,6 +370,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	}
 	mux.Handle("OPTIONS", "/discussion/projects/{projectID}", f)
 	mux.Handle("OPTIONS", "/discussion", f)
+	mux.Handle("OPTIONS", "/discussion/{postId}", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

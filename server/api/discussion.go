@@ -102,6 +102,76 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 	}, nil
 }
 
+func (c *DiscussionService) UpdateMessage(ctx context.Context, payload *discService.UpdateMessagePayload) (*discService.UpdateMessageResult, error) {
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	ur := repositories.NewUserRepository(c.db)
+	user, err := ur.QueryByID(ctx, p.UserID())
+	if err != nil {
+		return nil, err
+	}
+
+	dr := repositories.NewDiscussionRepository(c.db)
+	post, err := dr.QueryPostByID(ctx, payload.PostID)
+	if err != nil {
+		return nil, err
+	}
+
+	post.UpdatedAt = time.Now()
+	post.Body = payload.Body
+
+	if _, err := dr.UpdatePostByID(ctx, post); err != nil {
+		return nil, err
+	}
+
+	users := map[int32]*data.User{
+		user.ID: user,
+	}
+
+	threaded, err := ThreadedPost(post, users)
+	if err != nil {
+		return nil, err
+	}
+
+	return &discService.UpdateMessageResult{
+		Post: threaded,
+	}, nil
+}
+
+func (c *DiscussionService) DeleteMessage(ctx context.Context, payload *discService.DeleteMessagePayload) error {
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	/*
+		ur := repositories.NewUserRepository(c.db)
+		user, err := ur.QueryByID(ctx, p.UserID())
+		if err != nil {
+			return nil, err
+		}
+	*/
+
+	_ = p
+
+	dr := repositories.NewDiscussionRepository(c.db)
+	post, err := dr.QueryPostByID(ctx, payload.PostID)
+	if err != nil {
+		return err
+	}
+
+	if err := dr.DeletePostByID(ctx, payload.PostID); err != nil {
+		return err
+	}
+
+	_ = post
+
+	return nil
+}
+
 func (s *DiscussionService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
 		Token:        token,

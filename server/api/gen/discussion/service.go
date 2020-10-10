@@ -23,6 +23,10 @@ type Service interface {
 	Data(context.Context, *DataPayload) (res *Discussion, err error)
 	// PostMessage implements post message.
 	PostMessage(context.Context, *PostMessagePayload) (res *PostMessageResult, err error)
+	// UpdateMessage implements update message.
+	UpdateMessage(context.Context, *UpdateMessagePayload) (res *UpdateMessageResult, err error)
+	// DeleteMessage implements delete message.
+	DeleteMessage(context.Context, *DeleteMessagePayload) (err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -39,7 +43,7 @@ const ServiceName = "discussion"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [3]string{"project", "data", "post message"}
+var MethodNames = [5]string{"project", "data", "post message", "update message", "delete message"}
 
 // ProjectPayload is the payload type of the discussion service project method.
 type ProjectPayload struct {
@@ -69,6 +73,27 @@ type PostMessagePayload struct {
 // method.
 type PostMessageResult struct {
 	Post *ThreadedPost
+}
+
+// UpdateMessagePayload is the payload type of the discussion service update
+// message method.
+type UpdateMessagePayload struct {
+	Auth   string
+	PostID int64
+	Body   string
+}
+
+// UpdateMessageResult is the result type of the discussion service update
+// message method.
+type UpdateMessageResult struct {
+	Post *ThreadedPost
+}
+
+// DeleteMessagePayload is the payload type of the discussion service delete
+// message method.
+type DeleteMessagePayload struct {
+	Auth   string
+	PostID int64
 }
 
 type ThreadedPost struct {

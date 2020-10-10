@@ -16,6 +16,34 @@ func NewDiscussionRepository(db *sqlxcache.DB) (rr *DiscussionRepository) {
 	return &DiscussionRepository{db: db}
 }
 
+func (r *DiscussionRepository) QueryPostByID(ctx context.Context, id int64) (*data.DiscussionPost, error) {
+	post := &data.DiscussionPost{}
+	if err := r.db.GetContext(ctx, post, `
+		SELECT * FROM fieldkit.discussion_post WHERE id = $1
+		`, id); err != nil {
+		return nil, err
+	}
+	return post, nil
+}
+
+func (r *DiscussionRepository) DeletePostByID(ctx context.Context, id int64) error {
+	if _, err := r.db.ExecContext(ctx, `
+		DELETE FROM fieldkit.discussion_post WHERE id = $1
+		`, id); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *DiscussionRepository) UpdatePostByID(ctx context.Context, post *data.DiscussionPost) (*data.DiscussionPost, error) {
+	if _, err := r.db.NamedExecContext(ctx, `
+		UPDATE fieldkit.discussion_post SET body = :body, updated_at = :updated_at WHERE id = :id
+		`, post); err != nil {
+		return nil, err
+	}
+	return post, nil
+}
+
 func (r *DiscussionRepository) AddPost(ctx context.Context, post *data.DiscussionPost) (*data.DiscussionPost, error) {
 	if err := r.db.NamedGetContext(ctx, post, `
 		INSERT INTO fieldkit.discussion_post (user_id, thread_id, project_id, station_ids, created_at, updated_at, body, context)

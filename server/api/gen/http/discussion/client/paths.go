@@ -25,3 +25,13 @@ func DataDiscussionPath() string {
 func PostMessageDiscussionPath() string {
 	return "/discussion"
 }
+
+// UpdateMessageDiscussionPath returns the URL path to the discussion service update message HTTP endpoint.
+func UpdateMessageDiscussionPath(postID int64) string {
+	return fmt.Sprintf("/discussion/%v", postID)
+}
+
+// DeleteMessageDiscussionPath returns the URL path to the discussion service delete message HTTP endpoint.
+func DeleteMessageDiscussionPath(postID int64) string {
+	return fmt.Sprintf("/discussion/%v", postID)
+}

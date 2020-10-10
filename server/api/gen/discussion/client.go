@@ -15,17 +15,21 @@ import (
 
 // Client is the "discussion" service client.
 type Client struct {
-	ProjectEndpoint     goa.Endpoint
-	DataEndpoint        goa.Endpoint
-	PostMessageEndpoint goa.Endpoint
+	ProjectEndpoint       goa.Endpoint
+	DataEndpoint          goa.Endpoint
+	PostMessageEndpoint   goa.Endpoint
+	UpdateMessageEndpoint goa.Endpoint
+	DeleteMessageEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "discussion" service client given the endpoints.
-func NewClient(project, data, postMessage goa.Endpoint) *Client {
+func NewClient(project, data, postMessage, updateMessage, deleteMessage goa.Endpoint) *Client {
 	return &Client{
-		ProjectEndpoint:     project,
-		DataEndpoint:        data,
-		PostMessageEndpoint: postMessage,
+		ProjectEndpoint:       project,
+		DataEndpoint:          data,
+		PostMessageEndpoint:   postMessage,
+		UpdateMessageEndpoint: updateMessage,
+		DeleteMessageEndpoint: deleteMessage,
 	}
 }
 
@@ -57,4 +61,22 @@ func (c *Client) PostMessage(ctx context.Context, p *PostMessagePayload) (res *P
 		return
 	}
 	return ires.(*PostMessageResult), nil
+}
+
+// UpdateMessage calls the "update message" endpoint of the "discussion"
+// service.
+func (c *Client) UpdateMessage(ctx context.Context, p *UpdateMessagePayload) (res *UpdateMessageResult, err error) {
+	var ires interface{}
+	ires, err = c.UpdateMessageEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*UpdateMessageResult), nil
+}
+
+// DeleteMessage calls the "delete message" endpoint of the "discussion"
+// service.
+func (c *Client) DeleteMessage(ctx context.Context, p *DeleteMessagePayload) (err error) {
+	_, err = c.DeleteMessageEndpoint(ctx, p)
+	return
 }

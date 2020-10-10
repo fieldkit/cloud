@@ -19,6 +19,12 @@ type PostMessageRequestBody struct {
 	Post *NewPostRequestBody `form:"post,omitempty" json:"post,omitempty" xml:"post,omitempty"`
 }
 
+// UpdateMessageRequestBody is the type of the "discussion" service "update
+// message" endpoint HTTP request body.
+type UpdateMessageRequestBody struct {
+	Body *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+}
+
 // ProjectResponseBody is the type of the "discussion" service "project"
 // endpoint HTTP response body.
 type ProjectResponseBody struct {
@@ -34,6 +40,12 @@ type DataResponseBody struct {
 // PostMessageResponseBody is the type of the "discussion" service "post
 // message" endpoint HTTP response body.
 type PostMessageResponseBody struct {
+	Post *ThreadedPostResponseBody `form:"post" json:"post" xml:"post"`
+}
+
+// UpdateMessageResponseBody is the type of the "discussion" service "update
+// message" endpoint HTTP response body.
+type UpdateMessageResponseBody struct {
 	Post *ThreadedPostResponseBody `form:"post" json:"post" xml:"post"`
 }
 
@@ -253,6 +265,152 @@ type PostMessageBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// UpdateMessageUnauthorizedResponseBody is the type of the "discussion"
+// service "update message" endpoint HTTP response body for the "unauthorized"
+// error.
+type UpdateMessageUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateMessageForbiddenResponseBody is the type of the "discussion" service
+// "update message" endpoint HTTP response body for the "forbidden" error.
+type UpdateMessageForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateMessageNotFoundResponseBody is the type of the "discussion" service
+// "update message" endpoint HTTP response body for the "not-found" error.
+type UpdateMessageNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateMessageBadRequestResponseBody is the type of the "discussion" service
+// "update message" endpoint HTTP response body for the "bad-request" error.
+type UpdateMessageBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteMessageUnauthorizedResponseBody is the type of the "discussion"
+// service "delete message" endpoint HTTP response body for the "unauthorized"
+// error.
+type DeleteMessageUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteMessageForbiddenResponseBody is the type of the "discussion" service
+// "delete message" endpoint HTTP response body for the "forbidden" error.
+type DeleteMessageForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteMessageNotFoundResponseBody is the type of the "discussion" service
+// "delete message" endpoint HTTP response body for the "not-found" error.
+type DeleteMessageNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteMessageBadRequestResponseBody is the type of the "discussion" service
+// "delete message" endpoint HTTP response body for the "bad-request" error.
+type DeleteMessageBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // ThreadedPostResponseBody is used to define fields on response body types.
 type ThreadedPostResponseBody struct {
 	ID        int64                       `form:"id" json:"id" xml:"id"`
@@ -309,6 +467,16 @@ func NewDataResponseBody(res *discussionviews.DiscussionView) *DataResponseBody 
 // the "post message" endpoint of the "discussion" service.
 func NewPostMessageResponseBody(res *discussion.PostMessageResult) *PostMessageResponseBody {
 	body := &PostMessageResponseBody{}
+	if res.Post != nil {
+		body.Post = marshalDiscussionThreadedPostToThreadedPostResponseBody(res.Post)
+	}
+	return body
+}
+
+// NewUpdateMessageResponseBody builds the HTTP response body from the result
+// of the "update message" endpoint of the "discussion" service.
+func NewUpdateMessageResponseBody(res *discussion.UpdateMessageResult) *UpdateMessageResponseBody {
+	body := &UpdateMessageResponseBody{}
 	if res.Post != nil {
 		body.Post = marshalDiscussionThreadedPostToThreadedPostResponseBody(res.Post)
 	}
@@ -483,6 +651,118 @@ func NewPostMessageBadRequestResponseBody(res *goa.ServiceError) *PostMessageBad
 	return body
 }
 
+// NewUpdateMessageUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "update message" endpoint of the "discussion" service.
+func NewUpdateMessageUnauthorizedResponseBody(res *goa.ServiceError) *UpdateMessageUnauthorizedResponseBody {
+	body := &UpdateMessageUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateMessageForbiddenResponseBody builds the HTTP response body from the
+// result of the "update message" endpoint of the "discussion" service.
+func NewUpdateMessageForbiddenResponseBody(res *goa.ServiceError) *UpdateMessageForbiddenResponseBody {
+	body := &UpdateMessageForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateMessageNotFoundResponseBody builds the HTTP response body from the
+// result of the "update message" endpoint of the "discussion" service.
+func NewUpdateMessageNotFoundResponseBody(res *goa.ServiceError) *UpdateMessageNotFoundResponseBody {
+	body := &UpdateMessageNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateMessageBadRequestResponseBody builds the HTTP response body from
+// the result of the "update message" endpoint of the "discussion" service.
+func NewUpdateMessageBadRequestResponseBody(res *goa.ServiceError) *UpdateMessageBadRequestResponseBody {
+	body := &UpdateMessageBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteMessageUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "delete message" endpoint of the "discussion" service.
+func NewDeleteMessageUnauthorizedResponseBody(res *goa.ServiceError) *DeleteMessageUnauthorizedResponseBody {
+	body := &DeleteMessageUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteMessageForbiddenResponseBody builds the HTTP response body from the
+// result of the "delete message" endpoint of the "discussion" service.
+func NewDeleteMessageForbiddenResponseBody(res *goa.ServiceError) *DeleteMessageForbiddenResponseBody {
+	body := &DeleteMessageForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteMessageNotFoundResponseBody builds the HTTP response body from the
+// result of the "delete message" endpoint of the "discussion" service.
+func NewDeleteMessageNotFoundResponseBody(res *goa.ServiceError) *DeleteMessageNotFoundResponseBody {
+	body := &DeleteMessageNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteMessageBadRequestResponseBody builds the HTTP response body from
+// the result of the "delete message" endpoint of the "discussion" service.
+func NewDeleteMessageBadRequestResponseBody(res *goa.ServiceError) *DeleteMessageBadRequestResponseBody {
+	body := &DeleteMessageBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewProjectPayload builds a discussion service project endpoint payload.
 func NewProjectPayload(projectID int32, auth string) *discussion.ProjectPayload {
 	v := &discussion.ProjectPayload{}
@@ -511,6 +791,28 @@ func NewPostMessagePayload(body *PostMessageRequestBody, auth string) *discussio
 	return v
 }
 
+// NewUpdateMessagePayload builds a discussion service update message endpoint
+// payload.
+func NewUpdateMessagePayload(body *UpdateMessageRequestBody, postID int64, auth string) *discussion.UpdateMessagePayload {
+	v := &discussion.UpdateMessagePayload{
+		Body: *body.Body,
+	}
+	v.PostID = postID
+	v.Auth = auth
+
+	return v
+}
+
+// NewDeleteMessagePayload builds a discussion service delete message endpoint
+// payload.
+func NewDeleteMessagePayload(postID int64, auth string) *discussion.DeleteMessagePayload {
+	v := &discussion.DeleteMessagePayload{}
+	v.PostID = postID
+	v.Auth = auth
+
+	return v
+}
+
 // ValidatePostMessageRequestBody runs the validations defined on Post
 // MessageRequestBody
 func ValidatePostMessageRequestBody(body *PostMessageRequestBody) (err error) {
@@ -521,6 +823,15 @@ func ValidatePostMessageRequestBody(body *PostMessageRequestBody) (err error) {
 		if err2 := ValidateNewPostRequestBody(body.Post); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateUpdateMessageRequestBody runs the validations defined on Update
+// MessageRequestBody
+func ValidateUpdateMessageRequestBody(body *UpdateMessageRequestBody) (err error) {
+	if body.Body == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("body", "body"))
 	}
 	return
 }

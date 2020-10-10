@@ -87,3 +87,56 @@ func BuildPostMessagePayload(discussionPostMessageBody string, discussionPostMes
 
 	return v, nil
 }
+
+// BuildUpdateMessagePayload builds the payload for the discussion update
+// message endpoint from CLI flags.
+func BuildUpdateMessagePayload(discussionUpdateMessageBody string, discussionUpdateMessagePostID string, discussionUpdateMessageAuth string) (*discussion.UpdateMessagePayload, error) {
+	var err error
+	var body UpdateMessageRequestBody
+	{
+		err = json.Unmarshal([]byte(discussionUpdateMessageBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Sunt quae id inventore libero iste.\"\n   }'")
+		}
+	}
+	var postID int64
+	{
+		postID, err = strconv.ParseInt(discussionUpdateMessagePostID, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for postID, must be INT64")
+		}
+	}
+	var auth string
+	{
+		auth = discussionUpdateMessageAuth
+	}
+	v := &discussion.UpdateMessagePayload{
+		Body: body.Body,
+	}
+	v.PostID = postID
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildDeleteMessagePayload builds the payload for the discussion delete
+// message endpoint from CLI flags.
+func BuildDeleteMessagePayload(discussionDeleteMessagePostID string, discussionDeleteMessageAuth string) (*discussion.DeleteMessagePayload, error) {
+	var err error
+	var postID int64
+	{
+		postID, err = strconv.ParseInt(discussionDeleteMessagePostID, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for postID, must be INT64")
+		}
+	}
+	var auth string
+	{
+		auth = discussionDeleteMessageAuth
+	}
+	v := &discussion.DeleteMessagePayload{}
+	v.PostID = postID
+	v.Auth = auth
+
+	return v, nil
+}

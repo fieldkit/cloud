@@ -28,6 +28,14 @@ type Client struct {
 	// message endpoint.
 	PostMessageDoer goahttp.Doer
 
+	// UpdateMessage Doer is the HTTP client used to make requests to the update
+	// message endpoint.
+	UpdateMessageDoer goahttp.Doer
+
+	// DeleteMessage Doer is the HTTP client used to make requests to the delete
+	// message endpoint.
+	DeleteMessageDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -54,6 +62,8 @@ func NewClient(
 		ProjectDoer:         doer,
 		DataDoer:            doer,
 		PostMessageDoer:     doer,
+		UpdateMessageDoer:   doer,
+		DeleteMessageDoer:   doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -130,6 +140,54 @@ func (c *Client) PostMessage() goa.Endpoint {
 		resp, err := c.PostMessageDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("discussion", "post message", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// UpdateMessage returns an endpoint that makes HTTP requests to the discussion
+// service update message server.
+func (c *Client) UpdateMessage() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUpdateMessageRequest(c.encoder)
+		decodeResponse = DecodeUpdateMessageResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildUpdateMessageRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UpdateMessageDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("discussion", "update message", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// DeleteMessage returns an endpoint that makes HTTP requests to the discussion
+// service delete message server.
+func (c *Client) DeleteMessage() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDeleteMessageRequest(c.encoder)
+		decodeResponse = DecodeDeleteMessageResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDeleteMessageRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DeleteMessageDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("discussion", "delete message", err)
 		}
 		return decodeResponse(resp)
 	}

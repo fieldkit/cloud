@@ -133,5 +133,50 @@ var _ = Service("discussion", func() {
 		})
 	})
 
+	Method("update message", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("postId", Int64)
+			Required("postId")
+			Attribute("body", String)
+			Required("body")
+		})
+
+		Result(func() {
+			Attribute("post", ThreadedPost)
+			Required("post")
+		})
+
+		HTTP(func() {
+			POST("discussion/{postId}")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("delete message", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("postId", Int64)
+			Required("postId")
+		})
+
+		HTTP(func() {
+			DELETE("discussion/{postId}")
+
+			httpAuthentication()
+		})
+	})
+
 	commonOptions()
 })
