@@ -17,23 +17,29 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import Mapbox from "mapbox-gl-vue";
 import Config from "@/secrets";
+import { promiseAfter } from "@/utilities";
+import { MappedStations } from "@/store";
+
+interface ProtectedData {
+    map: any;
+}
 
 export default Vue.extend({
     name: "StationsMap",
     components: {
         Mapbox,
     },
-    data: () => {
+    data(): { mapboxToken: string } {
         return {
             mapboxToken: Config.MAPBOX_ACCESS_TOKEN,
         };
     },
     props: {
         mapped: {
-            type: Object,
+            type: MappedStations,
             required: true,
         },
         layoutChanges: {
@@ -41,40 +47,47 @@ export default Vue.extend({
             default: 0,
         },
     },
+    computed: {
+        // Mapbox maps absolutely hate being mangled by Vue
+        protectedData(): ProtectedData {
+            return (this as unknown) as ProtectedData;
+        },
+    },
     watch: {
-        layoutChanges(this: any) {
-            if (this.map) {
-                setTimeout(() => {
-                    this.map.resize();
-                }, 250);
+        layoutChanges(): void {
+            if (this.protectedData.map) {
+                // TODO Not a fan of this.
+                promiseAfter(250, {}).then(() => {
+                    this.protectedData.map.resize();
+                });
             }
         },
     },
     methods: {
-        onMapInitialized(this: any, map) {
+        onMapInitialized(map: any): void {
             console.log("map: initialized");
-            this.map = map;
+            this.protectedData.map = map;
         },
-        onMapLoaded(this: any, map) {
+        onMapLoaded(map: any): void {
             console.log("map: loaded");
-            this.map = map;
+            this.protectedData.map = map;
 
-            if (!this.map.hasImage("dot")) {
+            if (!map.hasImage("dot")) {
                 const compass = this.$loadAsset("Icon_Map_Dot.png");
-                this.map.loadImage(compass, (error, image) => {
+                map.loadImage(compass, (error, image) => {
                     if (error) throw error;
-                    if (!this.map.hasImage("dot")) {
-                        this.map.addImage("dot", image);
+                    if (!map.hasImage("dot")) {
+                        map.addImage("dot", image);
                     }
                 });
             }
 
-            this.map.resize();
+            map.resize();
 
             this.updateMap();
         },
-        updateMap(this: any) {
-            if (!this.map) {
+        updateMap(): void {
+            if (!this.protectedData.map) {
                 return;
             }
 
@@ -82,10 +95,12 @@ export default Vue.extend({
                 return;
             }
 
-            if (!this.map.getLayer("station-markers")) {
+            const map = this.protectedData.map;
+
+            if (!map.getLayer("station-markers")) {
                 console.log("map: updating", this.mapped);
 
-                this.map.addSource("stations", {
+                map.addSource("stations", {
                     type: "geojson",
                     data: {
                         type: "FeatureCollection",
@@ -93,7 +108,7 @@ export default Vue.extend({
                     },
                 });
 
-                this.map.addLayer({
+                map.addLayer({
                     id: "regions",
                     type: "fill",
                     source: "stations",
@@ -104,7 +119,7 @@ export default Vue.extend({
                     filter: ["==", "$type", "Polygon"],
                 });
 
-                this.map.addLayer({
+                map.addLayer({
                     id: "station-markers",
                     type: "symbol",
                     source: "stations",
@@ -121,7 +136,7 @@ export default Vue.extend({
                     },
                 });
 
-                this.map.on("click", "station-markers", (e) => {
+                map.on("click", "station-markers", (e) => {
                     const id = e.features[0].properties.id;
                     console.log("map: click", id);
                     this.$emit("show-summary", { id: id });

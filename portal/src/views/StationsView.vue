@@ -17,18 +17,17 @@
                 <StationsMap @show-summary="showSummary" :mapped="mapped" :layoutChanges="layoutChanges" v-if="mapped" />
             </div>
             <StationSummary
-                    v-if="activeStation"
-                    class="summary-container"
-                    @close="closeSummary"
-                    :station="activeStation"
-                    v-bind:key="activeStation.id"
+                v-if="activeStation"
+                class="summary-container"
+                @close="closeSummary"
+                :station="activeStation"
+                v-bind:key="activeStation.id"
             />
         </template>
         <div class="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
             <h1 class="heading">Add a New Station</h1>
             <p class="text">
-                You don't have any stations.
-                Download the FieldKit app, log in and connect to your station to add it to your account.
+                You don't have any stations. Download the FieldKit app, log in and connect to your station to add it to your account.
             </p>
             <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
                 <img alt="App store" src="@/assets/appstore.svg" width="150" />
@@ -55,6 +54,7 @@ import StationsMap from "./shared/StationsMap.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
+import { DisplayStation } from "@/store";
 
 export default Vue.extend({
     name: "StationsView",
@@ -66,7 +66,7 @@ export default Vue.extend({
     props: {
         id: { type: Number },
     },
-    data: () => {
+    data(): { showNoStationsMessage: boolean; viewType: string; layoutChanges: number } {
         return {
             showNoStationsMessage: true,
             viewType: "map",
@@ -82,39 +82,43 @@ export default Vue.extend({
             userProjects: (s: GlobalState) => Object.values(s.stations.user.projects),
             anyStations: (s: GlobalState) => Object.values(s.stations.user.stations).length > 0,
         }),
-        activeStation() {
+        activeStation(): DisplayStation {
             return this.$store.state.stations.stations[this.id];
         },
     },
-    beforeMount() {
+    beforeMount(): Promise<any> {
         if (this.id) {
             return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });
         }
+        return Promise.resolve();
     },
     watch: {
-        id() {
+        id(): Promise<any> {
             if (this.id) {
                 return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });
             }
+            return Promise.resolve();
         },
     },
     methods: {
-        goBack() {
+        goBack(): void {
             if (window.history.length) {
-                return this.$router.go(-1);
+                this.$router.go(-1);
             } else {
-                return this.$router.push("/");
+                this.$router.push("/");
             }
         },
-        showSummary(params: { id: number }) {
+        showSummary(params: { id: number }): Promise<any> {
             if (this.id != params.id) {
+                console.log(`showing: ${params.id}`);
                 return this.$router.push({ name: "viewStation", params: params as any });
             }
+            return Promise.resolve();
         },
-        closeSummary() {
+        closeSummary(): Promise<any> {
             return this.$router.push({ name: "stations" });
         },
-        switchView(type) {
+        switchView(type: string): void {
             this.viewType = type;
             this.layoutChanges++;
         },
