@@ -83,7 +83,7 @@ export default Vue.extend({
             this.$emit("show-station", station.id);
             if (this.defaultShowStation) {
                 // All parameters are strings.
-                this.$router.push({ name: "viewStation", params: { id: String(station.id) } });
+                this.$router.push({ name: "mapStation", params: { id: String(station.id) } });
             }
             return Promise.resolve();
         },

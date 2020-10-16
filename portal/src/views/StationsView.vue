@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import StandardLayout from "./StandardLayout.vue";
 import StationSummary from "./shared/StationSummary.vue";
 import StationsMap from "./shared/StationsMap.vue";
@@ -54,7 +54,7 @@ import StationsMap from "./shared/StationsMap.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
-import { DisplayStation } from "@/store";
+import { DisplayStation, MappedStations } from "@/store";
 
 export default Vue.extend({
     name: "StationsView",
@@ -64,7 +64,14 @@ export default Vue.extend({
         StationSummary,
     },
     props: {
-        id: { type: Number },
+        id: {
+            type: Number,
+            required: false,
+        },
+        bounds: {
+            type: (Array as unknown) as PropType<[[number, number], [number, number]]>,
+            required: false,
+        },
     },
     data(): { showNoStationsMessage: boolean; viewType: string; layoutChanges: number } {
         return {
@@ -74,7 +81,7 @@ export default Vue.extend({
         };
     },
     computed: {
-        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy", mapped: "mapped" }),
+        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
             hasNoStations: (s: GlobalState) => s.stations.hasNoStations,
@@ -83,7 +90,21 @@ export default Vue.extend({
             anyStations: (s: GlobalState) => Object.values(s.stations.user.stations).length > 0,
         }),
         activeStation(): DisplayStation {
-            return this.$store.state.stations.stations[this.id];
+            return this.$state.stations.stations[this.id];
+        },
+        mapped(): MappedStations | null {
+            if (!this.$getters.mapped) {
+                return null;
+            }
+            if (this.bounds) {
+                console.log(`focusing bounds: ${this.bounds}`);
+                return this.$getters.mapped.overrideBounds(this.bounds);
+            }
+            if (this.id) {
+                console.log(`focusing station: ${this.id}`);
+                return this.$getters.mapped.focusOn(this.id);
+            }
+            return this.$getters.mapped;
         },
     },
     beforeMount(): Promise<any> {
@@ -108,15 +129,29 @@ export default Vue.extend({
                 this.$router.push("/");
             }
         },
+        boundsParam(): string {
+            return JSON.stringify([this.mapped.bounds.min, this.mapped.bounds.max]);
+        },
         showSummary(params: { id: number }): Promise<any> {
             if (this.id != params.id) {
-                console.log(`showing: ${params.id}`);
-                return this.$router.push({ name: "viewStation", params: params as any });
+                console.log(`clicked station, showing: ${params.id}`);
+                return this.$router.push({
+                    name: "mapStationBounds",
+                    params: {
+                        id: String(params.id),
+                        bounds: this.boundsParam(),
+                    },
+                });
             }
             return Promise.resolve();
         },
         closeSummary(): Promise<any> {
-            return this.$router.push({ name: "stations" });
+            return this.$router.push({
+                name: "mapAllStationsBounds",
+                params: {
+                    bounds: this.boundsParam(),
+                },
+            });
         },
         switchView(type: string): void {
             this.viewType = type;

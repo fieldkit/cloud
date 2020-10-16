@@ -146,7 +146,7 @@ export default Vue.extend({
         },
         showStation(station: DisplayStation): Promise<any> {
             // All parameters are strings.
-            return this.$router.push({ name: "viewStation", params: { id: String(station.id) } });
+            return this.$router.push({ name: "mapStation", params: { id: String(station.id) } });
         },
         showStationPicker(): void {
             this.addingStation = true;

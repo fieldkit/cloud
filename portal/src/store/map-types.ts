@@ -77,7 +77,7 @@ export class BoundingRectangle {
         return maximum * 50000;
     }
 
-    public zoomOutOrAround(defaultCenter: LngLat, margin: number | undefined): BoundingRectangle {
+    public zoomOutOrAround(defaultCenter: LngLat, margin: number | undefined = undefined): BoundingRectangle {
         if (this.isEmpty()) {
             return BoundingRectangle.around(defaultCenter, margin);
         }

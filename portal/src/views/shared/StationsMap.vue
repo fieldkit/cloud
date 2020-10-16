@@ -55,12 +55,17 @@ export default Vue.extend({
     },
     watch: {
         layoutChanges(): void {
+            console.log("map: layout changed");
             if (this.protectedData.map) {
                 // TODO Not a fan of this.
                 promiseAfter(250, {}).then(() => {
                     this.protectedData.map.resize();
                 });
             }
+        },
+        mapped(): void {
+            console.log("map: mapped changed");
+            this.updateMap();
         },
     },
     methods: {
@@ -142,7 +147,8 @@ export default Vue.extend({
                     this.$emit("show-summary", { id: id });
                 });
             } else {
-                console.log("map: ignored", this.mapped);
+                console.log("map: keeping features", this.mapped);
+                map.fitBounds(this.mapped.boundsLngLat(), { duration: 0 });
             }
         },
     },

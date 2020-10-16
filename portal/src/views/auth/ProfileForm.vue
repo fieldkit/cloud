@@ -21,9 +21,7 @@
                     <div v-if="!$v.form.email.email">Must be a valid email address.</div>
                     <div v-if="!$v.form.email.taken">
                         This address appears to already be registered.
-                        <router-link :to="{ name: 'recover' }" class="recover-link">
-                            Recover Account
-                        </router-link>
+                        <router-link :to="{ name: 'recover' }" class="recover-link">Recover Account</router-link>
                     </div>
                 </div>
             </div>
@@ -112,7 +110,7 @@ export default Vue.extend({
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
         showStation(station) {
-            return this.$router.push({ name: "viewStation", params: { id: station.id } });
+            return this.$router.push({ name: "mapStation", params: { id: station.id } });
         },
         saveForm() {
             this.$v.form.$touch();
@@ -140,8 +138,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/forms';
-@import '../../scss/global';
+@import "../../scss/forms";
+@import "../../scss/global";
 
 .image-container {
     margin-bottom: 33px;
@@ -151,8 +149,8 @@ export default Vue.extend({
     }
 }
 ::v-deep .user-image img {
-    max-width: 198px!important;
-    max-height: 198px!important;
+    max-width: 198px !important;
+    max-height: 198px !important;
 }
 #loading {
     width: 100%;
