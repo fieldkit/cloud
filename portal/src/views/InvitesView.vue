@@ -53,7 +53,7 @@ export default {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
         showStation(station) {
-            this.$router.push({ name: "viewStation", params: { id: station.id } });
+            this.$router.push({ name: "mapStation", params: { id: station.id } });
         },
         accept(ev, invite) {
             const token = this.$route.query.token;

@@ -199,7 +199,7 @@ const routes = [
     },
     {
         path: "/dashboard/stations",
-        name: "stations",
+        name: "mapAllStations",
         component: StationsView,
         props: true,
         meta: {
@@ -208,8 +208,8 @@ const routes = [
         },
     },
     {
-        path: "/dashboard/stations/:id",
-        name: "viewStation",
+        path: "/dashboard/stations/:id(\\d+)",
+        name: "mapStation",
         component: StationsView,
         props: (route) => {
             return {
@@ -218,6 +218,36 @@ const routes = [
         },
         meta: {
             bodyClass: "map-view",
+            secured: true,
+        },
+    },
+    {
+        path: "/dashboard/stations/all/:bounds",
+        name: "mapAllStationsBounds",
+        component: StationsView,
+        props: (route) => {
+            return {
+                bounds: JSON.parse(route.params.bounds),
+            };
+        },
+        meta: {
+            bodyClass: "map-view",
+            secured: true,
+        },
+    },
+    {
+        path: "/dashboard/stations/:bounds/:id(\\d+)",
+        name: "mapStationBounds",
+        component: StationsView,
+        props: (route) => {
+            return {
+                id: Number(route.params.id),
+                bounds: JSON.parse(route.params.bounds),
+            };
+        },
+        meta: {
+            bodyClass: "map-view",
+            secured: true,
         },
     },
     {

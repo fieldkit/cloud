@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"strings"
 	"time"
 
@@ -20,6 +21,7 @@ import (
 type Options struct {
 	PostgresURL     string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
 	WaitForDatabase bool
+	Anonymize       bool
 }
 
 func sanitize(ctx context.Context, options *Options) error {
@@ -60,7 +62,13 @@ func main() {
 	ctx := context.Background()
 	options := &Options{
 		WaitForDatabase: true,
+		Anonymize:       false,
 	}
+
+	flag.BoolVar(&options.Anonymize, "anonymize", false, "")
+	flag.BoolVar(&options.WaitForDatabase, "waiting", false, "")
+
+	flag.Parse()
 
 	logging.Configure(false, "sanitizer")
 

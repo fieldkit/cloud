@@ -15,7 +15,6 @@
                     </div>
                 </DoubleHeader>
 
-
                 <div v-if="isAdministrator" v-bind:key="id">
                     <ProjectActivity
                         v-if="activityVisible"
@@ -24,13 +23,13 @@
                         containerClass="project-activity-floating"
                         @close="closeActivity"
                     />
-                        <ProjectAdmin :user="user" :displayProject="displayProject" :userStations="stations" />
-                </div >
+                    <ProjectAdmin :user="user" :displayProject="displayProject" :userStations="stations" />
+                </div>
                 <ProjectPublic
-                        v-if="!isAdministrator && displayProject"
-                        :user="user"
-                        :displayProject="displayProject"
-                        :userStations="stations"
+                    v-if="!isAdministrator && displayProject"
+                    :user="user"
+                    :displayProject="displayProject"
+                    :userStations="stations"
                 />
             </div>
         </div>
@@ -112,7 +111,7 @@ export default Vue.extend({
             }
         },
         showStation(station) {
-            return this.$router.push({ name: "viewStation", params: { id: station.id } });
+            return this.$router.push({ name: "mapStation", params: { id: station.id } });
         },
         onActivityToggle(this: any) {
             if (this.activityVisible) {
@@ -204,7 +203,6 @@ export default Vue.extend({
 }
 
 ::v-deep .pagination {
-
     > div {
         @include flex(center, ceenter);
     }

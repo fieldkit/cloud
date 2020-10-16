@@ -1,10 +1,9 @@
-import { StationsState, DisplayProject } from "./stations";
+import { DisplayStation, StationsState, DisplayProject, MappedStations } from "./stations";
 import { ClockState } from "./clock";
 import { MapState } from "./map";
 import { UserState } from "./user";
 import { LayoutState } from "./layout";
 import { ExportingState } from "./exporting";
-import { Station } from "@/api";
 
 export interface RouteState {
     name: string | null;
@@ -29,8 +28,8 @@ export interface GlobalState {
 
 export interface GlobalGetters {
     projectsById: { [index: number]: DisplayProject };
-    stationsById: { [index: number]: Station };
+    stationsById: { [index: number]: DisplayStation };
     isAuthenticated: boolean;
     isBusy: boolean;
-    mapped: any;
+    mapped: MappedStations;
 }
