@@ -79,7 +79,18 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
     },
-    data() {
+    data(): {
+        form: {
+            name: string;
+            email: string;
+            password: string;
+            passwordConfirmation: string;
+        };
+        available: boolean;
+        creating: boolean;
+        resending: boolean;
+        created: { id: number } | null;
+    } {
         return {
             form: {
                 name: "",
@@ -89,8 +100,8 @@ export default Vue.extend({
             },
             available: true,
             creating: true,
-            created: null,
             resending: false,
+            created: null,
         };
     },
     validations: {
@@ -110,10 +121,10 @@ export default Vue.extend({
         },
     },
     methods: {
-        save() {
+        save(): Promise<any> {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
-                return;
+                return Promise.resolve();
             }
 
             this.creating = true;
@@ -134,7 +145,7 @@ export default Vue.extend({
                     this.creating = false;
                 });
         },
-        resend() {
+        resend(): Promise<any> {
             this.resending = true;
             return this.$services.api.resendCreateAccount(this.created.id).then(() => {
                 this.resending = false;
