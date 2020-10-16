@@ -29,7 +29,7 @@
             </div>
 
             <div class="nav-section">
-                <router-link :to="{ name: 'stations' }">
+                <router-link :to="{ name: 'mapAllStations' }">
                     <div class="nav-label">
                         <img alt="Stations" src="@/assets/icon-stations.svg" />
                         <span v-bind:class="{ selected: viewingStations }">Stations</span>

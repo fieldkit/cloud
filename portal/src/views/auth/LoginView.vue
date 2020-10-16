@@ -2,7 +2,7 @@
     <div class="form-container">
         <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
         <form class="form" @submit.prevent="save">
-            <h1 class="form-title"> Log In to Your Account </h1>
+            <h1 class="form-title">Log In to Your Account</h1>
             <div class="form-group" v-if="spoofing">
                 <TextField v-model="form.spoofEmail" label="Spoof Email" />
                 <div class="form-errors" v-if="$v.form.spoofEmail.$error">
@@ -25,18 +25,14 @@
                 </div>
             </div>
             <div class="form-link-recover">
-                <router-link :to="{ name: 'recover', query: forwardAfterQuery() }" class="form-link">
-                    Reset password
-                </router-link>
+                <router-link :to="{ name: 'recover', query: forwardAfterQuery() }" class="form-link">Reset password</router-link>
             </div>
             <div v-if="failed" class="login-failed">
                 Unfortunately we were unable to log you in. Please check your credentials and try again.
             </div>
             <button class="form-submit" type="submit">Log In</button>
             <div>
-                <router-link :to="{ name: 'register', query: forwardAfterQuery() }" class="form-link">
-                    Create an account
-                </router-link>
+                <router-link :to="{ name: 'register', query: forwardAfterQuery() }" class="form-link">Create an account</router-link>
             </div>
         </form>
     </div>
@@ -62,7 +58,7 @@ export default Vue.extend({
             default: false,
         },
     },
-    data() {
+    data(): { form: { spoofEmail: string; email: string; password: string }; busy: boolean; failed: boolean } {
         return {
             form: {
                 spoofEmail: "",
@@ -100,7 +96,7 @@ export default Vue.extend({
         };
     },
     methods: {
-        forwardAfterQuery() {
+        forwardAfterQuery(): { after?: string | string[] } {
             if (this.$route.query.after) {
                 return {
                     after: this.$route.query.after,
@@ -108,16 +104,16 @@ export default Vue.extend({
             }
             return {};
         },
-        createPayload() {
+        createPayload(): LoginPayload {
             if (this.spoofing) {
                 return new LoginPayload(this.form.spoofEmail, this.form.email + " " + this.form.password);
             }
             return new LoginPayload(this.form.email, this.form.password);
         },
-        save() {
+        save(): Promise<any> {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
-                return;
+                return Promise.resolve();
             }
 
             const payload = this.createPayload();
@@ -148,5 +144,5 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/forms.scss';
+@import "../../scss/forms.scss";
 </style>

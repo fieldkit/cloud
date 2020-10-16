@@ -130,9 +130,9 @@ export class ProjectModule {
 }
 
 export class MapFeature {
-    type = "Feature";
-    geometry: { type: string; coordinates: number[] | LngLat[][] } | null = null;
-    properties: { title: string; icon: string; id: number } | null = null;
+    public readonly type = "Feature";
+    public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
+    public readonly properties: { title: string; icon: string; id: number } | null = null;
 
     constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
@@ -159,34 +159,41 @@ export class MapFeature {
     }
 }
 
+const DefaultLocation: LngLat = [-118.0730372, 34.3318104]; // TwinPeaks
+
 export class MappedStations {
-    bounds: BoundingRectangle | null = null;
-    features: MapFeature[] = [];
-
-    constructor(stations: DisplayStation[]) {
-        const DefaultLocation: LngLat = [-118.0730372, 34.3318104]; // TwinPeaks
-
+    public static make(stations: DisplayStation[]): MappedStations {
         const located = stations.filter((station) => station.location != null);
         const features = _.flatten(located.map((ds) => MapFeature.makeFeatures(ds)));
-        const around = features.reduce((bb, feature) => bb.includeAll(feature.bounds), new BoundingRectangle());
-        const feetAround = features.length > 0 ? 1000 : 100000;
-
-        // console.log("features", features);
-
-        this.features = features;
-        this.bounds = around.zoomOutOrAround(DefaultLocation, feetAround);
-
-        // console.log("around", around);
-        // console.log("bounds", this.bounds);
+        const around: BoundingRectangle = features.reduce(
+            (bb: BoundingRectangle, feature: MapFeature) => bb.includeAll(feature.bounds),
+            new BoundingRectangle()
+        );
+        return new MappedStations(stations, features, around.zoomOutOrAround(DefaultLocation));
     }
+
+    constructor(
+        public readonly stations: DisplayStation[] = [],
+        public readonly features: MapFeature[] = [],
+        public readonly bounds: BoundingRectangle | null = null
+    ) {}
 
     public get valid(): boolean {
         return this.bounds != null;
     }
 
     public boundsLngLat(): LngLat[] {
-        // console.log("map: returning bounds", this.bounds, this.features);
         return [this.bounds.min, this.bounds.max];
+    }
+
+    public overrideBounds(bounds: [LngLat, LngLat]): MappedStations {
+        return new MappedStations(this.stations, this.features, new BoundingRectangle(bounds[0], bounds[1]));
+    }
+
+    public focusOn(id: number): MappedStations {
+        const station = this.stations.find((s) => s.id == id)!;
+        const centered = new BoundingRectangle().include(station.location.lngLat());
+        return new MappedStations(this.stations, this.features, centered.zoomOutOrAround(DefaultLocation));
     }
 }
 
@@ -208,7 +215,7 @@ export class DisplayProject {
             .uniqBy((m) => m.name)
             .map((m) => new ProjectModule(m.name, null))
             .value();
-        this.mapped = new MappedStations(stations);
+        this.mapped = MappedStations.make(stations);
         if (project.startTime && project.endTime) {
             const start = new Date(project.startTime);
             const end = new Date(project.endTime);
@@ -424,7 +431,7 @@ const mutations = {
         );
         Vue.set(state, "stations", { ...state.stations, ..._.keyBy(stations, (s) => s.id) });
         Vue.set(state, "hasNoStations", stations.length == 0);
-        Vue.set(state, "mapped", new MappedStations(stations));
+        Vue.set(state, "mapped", MappedStations.make(stations));
     },
     [PROJECT_USERS]: (state: StationsState, payload: { projectId: number; users: ProjectUser[] }) => {
         Vue.set(state.projectUsers, payload.projectId, payload.users);

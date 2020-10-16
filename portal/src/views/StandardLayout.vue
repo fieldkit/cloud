@@ -30,7 +30,7 @@ import SidebarNav from "./shared/SidebarNav.vue";
 import Zoho from "./shared/Zoho.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
-import { GlobalState } from "@/store/modules/global";
+import { GlobalState, DisplayStation } from "@/store";
 
 export default Vue.extend({
     name: "StandardLayout",
@@ -75,17 +75,19 @@ export default Vue.extend({
             anyStations: (s: GlobalState) => Object.values(s.stations.user.stations).length > 0,
         }),
     },
-    beforeMount() {
+    beforeMount(): void {
         console.log("StandardLayout: beforeMount");
     },
     methods: {
-        showStation(station, ...args) {
+        showStation(station: DisplayStation): Promise<any> {
             this.$emit("show-station", station.id);
             if (this.defaultShowStation) {
-                this.$router.push({ name: "viewStation", params: { id: station.id } });
+                // All parameters are strings.
+                this.$router.push({ name: "mapStation", params: { id: String(station.id) } });
             }
+            return Promise.resolve();
         },
-        onSidebarToggle() {
+        onSidebarToggle(): void {
             this.$emit("sidebar-toggle");
         },
     },

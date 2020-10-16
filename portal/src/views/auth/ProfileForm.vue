@@ -21,9 +21,7 @@
                     <div v-if="!$v.form.email.email">Must be a valid email address.</div>
                     <div v-if="!$v.form.email.taken">
                         This address appears to already be registered.
-                        <router-link :to="{ name: 'recover' }" class="recover-link">
-                            Recover Account
-                        </router-link>
+                        <router-link :to="{ name: 'recover' }" class="recover-link">Recover Account</router-link>
                     </div>
                 </div>
             </div>
@@ -49,12 +47,10 @@
 <script lang="ts">
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
-
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
-
-import Promise from "bluebird";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
+import { DisplayStation } from "@/store";
 
 export default Vue.extend({
     name: "ProfileForm",
@@ -67,7 +63,24 @@ export default Vue.extend({
             required: true,
         },
     },
-    data: function (this: any) {
+    data(): {
+        loading: boolean;
+        form: {
+            id: number;
+            name: string;
+            email: string;
+            bio: string;
+            image: any;
+        };
+        changePasswordForm: {
+            existing: string;
+            password: string;
+            passwordConfirmation: string;
+        };
+        notifySaved: boolean;
+        notifyPasswordChanged: boolean;
+        emailAvailable: boolean;
+    } {
         return {
             loading: false,
             form: {
@@ -108,31 +121,31 @@ export default Vue.extend({
         },
     },
     methods: {
-        goBack() {
+        goBack(): void {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
-        showStation(station) {
-            return this.$router.push({ name: "viewStation", params: { id: station.id } });
+        showStation(station: DisplayStation): Promise<any> {
+            return this.$router.push({ name: "mapStation", params: { id: String(station.id) } });
         },
-        saveForm() {
+        saveForm(): void {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
                 console.log("save form, validation error");
                 return;
             }
 
-            return this.$emit("save", this.form);
+            this.$emit("save", this.form);
         },
-        changePassword() {
+        changePassword(): void {
             this.$v.changePasswordForm.$touch();
             if (this.$v.changePasswordForm.$pending || this.$v.changePasswordForm.$error) {
                 console.log("password form, validation error");
                 return;
             }
 
-            return this.$emit("change-password", this.changePasswordForm);
+            this.$emit("change-password", this.changePasswordForm);
         },
-        onImage(image) {
+        onImage(image): void {
             this.form.image = image;
         },
     },
@@ -140,8 +153,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/forms';
-@import '../../scss/global';
+@import "../../scss/forms";
+@import "../../scss/global";
 
 .image-container {
     margin-bottom: 33px;
@@ -151,8 +164,8 @@ export default Vue.extend({
     }
 }
 ::v-deep .user-image img {
-    max-width: 198px!important;
-    max-height: 198px!important;
+    max-width: 198px !important;
+    max-height: 198px !important;
 }
 #loading {
     width: 100%;

@@ -96,7 +96,7 @@ export default Vue.extend({
             this.loading = true;
         },
         showStation(station) {
-            this.$router.push({ name: "viewStation", params: { id: station.id } });
+            this.$router.push({ name: "mapStation", params: { id: station.id } });
         },
     },
 });

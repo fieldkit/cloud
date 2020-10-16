@@ -1,6 +1,12 @@
 <template>
     <div class="stations-container">
-        <StationPickerModal :stations="userStations" @add="onAddStation" @close="onCloseStationPicker" v-if="addingStation" />
+        <StationPickerModal
+            :stations="userStations"
+            :filter="pickFilter"
+            @add="onAddStation"
+            @close="onCloseStationPicker"
+            v-if="addingStation"
+        />
         <div class="section-heading stations-heading">
             FieldKit Stations
             <div class="add-station" v-on:click="showStationPicker" v-if="admin">
@@ -12,9 +18,7 @@
             <div class="stations-panel" v-show="showStationsPanel">
                 <div v-if="projectStations.length == 0" class="project-stations-no-stations">
                     <h3>No Stations</h3>
-                    <p>
-                        Add a station to this project to include its recent data and activities.
-                    </p>
+                    <p>Add a station to this project to include its recent data and activities.</p>
                 </div>
                 <div v-if="projectStations.length > 0" class="stations">
                     <TinyStation
@@ -60,6 +64,7 @@ import StationsMap from "@/views/shared/StationsMap.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
 import TinyStation from "@/views/shared/TinyStation.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
+import { DisplayStation, DisplayProject, MappedStations } from "@/store";
 
 export default Vue.extend({
     name: "ProjectStations",
@@ -70,7 +75,14 @@ export default Vue.extend({
         PaginationControls,
         TinyStation,
     },
-    data: () => {
+    data(): {
+        activeStationId: number | null;
+        layoutChanges: number;
+        showStationsPanel: boolean;
+        addingStation: boolean;
+        page: number;
+        pageSize: number;
+    } {
         return {
             activeStationId: null,
             layoutChanges: 0,
@@ -81,29 +93,38 @@ export default Vue.extend({
         };
     },
     props: {
-        project: { required: true },
-        admin: { required: true },
-        userStations: { required: true },
+        project: {
+            type: Object as () => DisplayProject,
+            required: true,
+        },
+        admin: {
+            type: Boolean,
+            required: true,
+        },
+        userStations: {
+            type: Array as () => DisplayStation[],
+            required: true,
+        },
     },
     watch: {
-        project() {
+        project(): void {
             this.activeStationId = null;
         },
     },
     computed: {
-        projectStations(this: any) {
+        projectStations(): DisplayStation[] {
             return this.$getters.projectsById[this.project.id].stations;
         },
-        mappedProject(this: any) {
+        mappedProject(): MappedStations | null {
             return this.$getters.projectsById[this.project.id].mapped;
         },
-        activeStation(this: any) {
+        activeStation(): DisplayStation | null {
             if (this.activeStationId) {
                 return this.$getters.stationsById[this.activeStationId];
             }
             return null;
         },
-        visibleStations(this: any) {
+        visibleStations(): DisplayStation[] {
             if (!this.projectStations) {
                 return [];
             }
@@ -111,7 +132,7 @@ export default Vue.extend({
             const end = start + this.pageSize;
             return this.projectStations.slice(start, end);
         },
-        totalPages() {
+        totalPages(): number {
             if (this.projectStations) {
                 return Math.ceil(this.projectStations.length / this.pageSize);
             }
@@ -119,13 +140,18 @@ export default Vue.extend({
         },
     },
     methods: {
-        showStation(this: any, station) {
-            this.$router.push({ name: "viewStation", params: { id: station.id } });
+        pickFilter(station: DisplayStation): boolean {
+            const excluding = _.map(this.projectStations, (s) => s.id);
+            return excluding.indexOf(station.id) < 0;
         },
-        showStationPicker(this: any) {
+        showStation(station: DisplayStation): Promise<any> {
+            // All parameters are strings.
+            return this.$router.push({ name: "mapStation", params: { id: String(station.id) } });
+        },
+        showStationPicker(): void {
             this.addingStation = true;
         },
-        onAddStation(this: any, stationId) {
+        onAddStation(stationId: number): Promise<any> {
             this.addingStation = false;
             const payload = {
                 projectId: this.project.id,
@@ -133,17 +159,17 @@ export default Vue.extend({
             };
             return this.$store.dispatch(ActionTypes.STATION_PROJECT_ADD, payload);
         },
-        onCloseStationPicker() {
+        onCloseStationPicker(): void {
             this.addingStation = false;
         },
-        showSummary(station) {
+        showSummary(station: DisplayStation): void {
             console.log("showSummay", station);
             this.activeStationId = station.id;
         },
-        removeStation(this: any, station) {
+        removeStation(this: any, station: DisplayStation): Promise<any> {
             console.log("remove", station);
             if (!window.confirm("Are you sure you want to remove this station?")) {
-                return;
+                return Promise.resolve();
             }
             const payload = {
                 projectId: this.project.id,
@@ -151,7 +177,7 @@ export default Vue.extend({
             };
             return this.$store.dispatch(ActionTypes.STATION_PROJECT_REMOVE, payload);
         },
-        openNotes(this: any, station) {
+        openNotes(this: any, station: DisplayStation): Promise<any> {
             return this.$router.push({
                 name: "viewProjectStationNotes",
                 params: {
@@ -160,24 +186,23 @@ export default Vue.extend({
                 },
             });
         },
-        onCloseSummary() {
+        onCloseSummary(): void {
             this.activeStationId = null;
         },
-        toggleStationsPanel() {
+        toggleStationsPanel(): void {
             this.layoutChanges++;
             this.showStationsPanel = !this.showStationsPanel;
             console.log("toggle", this.showStationsPanel, this.layoutChanges);
         },
-        onNewPage(this: any, page: number) {
+        onNewPage(page: number): void {
             this.page = page;
         },
     },
 });
 </script>
 
-
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 
 .toggle-icon-container {
     float: right;

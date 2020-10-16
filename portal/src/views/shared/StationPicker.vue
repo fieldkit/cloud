@@ -29,8 +29,7 @@ import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import StationPickerStation from "./StationPickerStation.vue";
 import PaginationControls from "./PaginationControls.vue";
-
-import { DisplayStation } from "@/store/modules/stations";
+import { DisplayStation } from "@/store";
 
 export default Vue.extend({
     name: "StationPicker",
@@ -41,15 +40,22 @@ export default Vue.extend({
     },
     props: {
         stations: {
-            type: Array,
+            type: Array as PropType<DisplayStation[]>,
             required: true,
         },
         filter: {
-            type: Function,
+            type: Function as PropType<(station: DisplayStation) => boolean>,
             default: (station) => true,
         },
     },
-    data() {
+    data(): {
+        selected: any | null;
+        paging: {
+            number: number;
+            size: number;
+        };
+        search: string;
+    } {
         return {
             selected: null,
             paging: {
@@ -60,36 +66,39 @@ export default Vue.extend({
         };
     },
     computed: {
-        visible(this: any) {
+        visible(): DisplayStation[] {
             const start = this.paging.number * this.paging.size;
             const end = start + this.paging.size;
             return this.filteredStations().slice(start, end);
         },
     },
     methods: {
-        filteredStations(this: any) {
+        filteredStations(): DisplayStation[] {
             if (this.search.length === 0) {
-                return this.stations.filter(this.filter);
+                return this.stations.filter((station) => this.filter(station));
             }
-            return _.filter(this.stations.filter(this.filter), (station) => {
-                return station.name.toLowerCase().indexOf(this.search.toLowerCase()) >= 0;
-            });
+            return _.filter(
+                this.stations.filter((station) => this.filter(station)),
+                (station) => {
+                    return station.name.toLowerCase().indexOf(this.search.toLowerCase()) >= 0;
+                }
+            );
         },
-        totalPages(this: any) {
+        totalPages(): number {
             return Math.ceil(this.filteredStations().length / this.paging.size);
         },
-        onSelected(this: any, station: DisplayStation) {
+        onSelected(station: DisplayStation): void {
             this.selected = station.id;
         },
-        onClose() {
+        onClose(): void {
             this.$emit("close");
         },
-        onAdd() {
+        onAdd(): void {
             if (this.selected) {
                 this.$emit("add", this.selected);
             }
         },
-        onNewPage(this: any, page: number) {
+        onNewPage(page: number): void {
             this.paging.number = page;
         },
     },
