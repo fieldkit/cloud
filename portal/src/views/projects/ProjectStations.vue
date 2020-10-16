@@ -1,6 +1,12 @@
 <template>
     <div class="stations-container">
-        <StationPickerModal :stations="userStations" @add="onAddStation" @close="onCloseStationPicker" v-if="addingStation" />
+        <StationPickerModal
+            :stations="userStations"
+            :filter="pickFilter"
+            @add="onAddStation"
+            @close="onCloseStationPicker"
+            v-if="addingStation"
+        />
         <div class="section-heading stations-heading">
             FieldKit Stations
             <div class="add-station" v-on:click="showStationPicker" v-if="admin">
@@ -134,8 +140,13 @@ export default Vue.extend({
         },
     },
     methods: {
-        showStation(station): void {
-            this.$router.push({ name: "viewStation", params: { id: station.id } });
+        pickFilter(station: DisplayStation): boolean {
+            const excluding = _.map(this.projectStations, (s) => s.id);
+            return excluding.indexOf(station.id) < 0;
+        },
+        showStation(station: DisplayStation): Promise<any> {
+            // All parameters are strings.
+            return this.$router.push({ name: "viewStation", params: { id: String(station.id) } });
         },
         showStationPicker(): void {
             this.addingStation = true;
@@ -155,7 +166,7 @@ export default Vue.extend({
             console.log("showSummay", station);
             this.activeStationId = station.id;
         },
-        removeStation(this: any, station): Promise<any> {
+        removeStation(this: any, station: DisplayStation): Promise<any> {
             console.log("remove", station);
             if (!window.confirm("Are you sure you want to remove this station?")) {
                 return Promise.resolve();
@@ -166,7 +177,7 @@ export default Vue.extend({
             };
             return this.$store.dispatch(ActionTypes.STATION_PROJECT_REMOVE, payload);
         },
-        openNotes(this: any, station): Promise<any> {
+        openNotes(this: any, station: DisplayStation): Promise<any> {
             return this.$router.push({
                 name: "viewProjectStationNotes",
                 params: {
@@ -183,7 +194,7 @@ export default Vue.extend({
             this.showStationsPanel = !this.showStationsPanel;
             console.log("toggle", this.showStationsPanel, this.layoutChanges);
         },
-        onNewPage(this: any, page: number): void {
+        onNewPage(page: number): void {
             this.page = page;
         },
     },

@@ -2,14 +2,14 @@
     <div class="modal-mask">
         <div class="modal-wrapper">
             <div class="modal-container">
-                <StationPicker :stations="stations" @add="(id) => $emit('add', id)" @close="$emit('close')" />
+                <StationPicker :stations="stations" :filter="filter" @add="(id) => $emit('add', id)" @close="$emit('close')" />
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import StationPicker from "./StationPicker.vue";
 import { DisplayStation } from "@/store";
 
@@ -20,8 +20,12 @@ export default Vue.extend({
     },
     props: {
         stations: {
-            type: Array as () => DisplayStation[],
+            type: Array as PropType<DisplayStation[]>,
             required: true,
+        },
+        filter: {
+            type: Function as PropType<(station: DisplayStation) => boolean>,
+            default: (station) => true,
         },
     },
 });
