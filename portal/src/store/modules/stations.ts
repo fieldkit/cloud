@@ -168,16 +168,12 @@ export class MappedStations {
 
         const located = stations.filter((station) => station.location != null);
         const features = _.flatten(located.map((ds) => MapFeature.makeFeatures(ds)));
-        const around = features.reduce((bb, feature) => bb.includeAll(feature.bounds), new BoundingRectangle());
-        const feetAround = features.length > 0 ? 1000 : 100000;
-
-        // console.log("features", features);
-
+        const around = features.reduce(
+            (bb: BoundingRectangle, feature: MapFeature) => bb.includeAll(feature.bounds),
+            new BoundingRectangle()
+        );
         this.features = features;
-        this.bounds = around.zoomOutOrAround(DefaultLocation, feetAround);
-
-        // console.log("around", around);
-        // console.log("bounds", this.bounds);
+        this.bounds = around.zoomOutOrAround(DefaultLocation);
     }
 
     public get valid(): boolean {

@@ -69,14 +69,22 @@ export class BoundingRectangle {
         return this.min == null || this.max == null;
     }
 
-    public zoomOutOrAround(defaultCenter: LngLat, margin: number): BoundingRectangle {
+    private calculateMargin(margin: number | undefined): number {
+        if (this.isSingleCoordinate()) {
+            return 1000;
+        }
+        const maximum = _.max([this.max[0] - this.min[0], this.max[1] - this.min[1]]);
+        return maximum * 50000;
+    }
+
+    public zoomOutOrAround(defaultCenter: LngLat, margin: number | undefined): BoundingRectangle {
         if (this.isEmpty()) {
             return BoundingRectangle.around(defaultCenter, margin);
         }
         if (this.isSingleCoordinate()) {
-            return BoundingRectangle.around(this.min, margin);
+            return BoundingRectangle.around(this.min, this.calculateMargin(margin));
         }
-        return this.zoomOut(margin);
+        return this.zoomOut(this.calculateMargin(margin));
     }
 
     public zoomOut(margin: number): BoundingRectangle {
