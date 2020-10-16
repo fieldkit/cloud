@@ -11,6 +11,7 @@
 <script lang="ts">
 import Vue from "vue";
 import StationPicker from "./StationPicker.vue";
+import { DisplayStation } from "@/store";
 
 export default Vue.extend({
     name: "StationPickerModal",
@@ -19,7 +20,7 @@ export default Vue.extend({
     },
     props: {
         stations: {
-            type: Array,
+            type: Array as () => DisplayStation[],
             required: true,
         },
     },

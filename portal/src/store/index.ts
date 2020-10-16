@@ -8,8 +8,15 @@ import { map } from "./modules/map";
 import { progress } from "./modules/progress";
 import { layout } from "./modules/layout";
 import { exporting } from "./modules/exporting";
-
 import { Services } from "@/api";
+
+export * from "./modules/clock";
+export * from "./modules/user";
+export * from "./modules/stations";
+export * from "./modules/exporting";
+export * from "./modules/map";
+export * from "./modules/progress";
+export * from "./modules/layout";
 
 // import * as MutationTypes from "./mutations";
 // import * as ActionTypes from "./actions";
