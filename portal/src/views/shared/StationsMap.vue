@@ -112,6 +112,9 @@ export default Vue.extend({
                     layout: {
                         "icon-image": "dot",
                         "text-field": "{title}",
+                        "icon-ignore-placement": true,
+                        "icon-allow-overlap": true,
+                        "text-allow-overlap": false,
                         "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
                         "text-offset": [0, 0.75],
                         "text-anchor": "top",
