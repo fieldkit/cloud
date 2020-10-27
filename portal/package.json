@@ -16,6 +16,7 @@
         "@types/mapbox-gl": "^1.12.2",
         "@types/node": "^14.0.14",
         "@types/vuelidate": "^0.7.13",
+        "@vue/cli": "^4.5.8",
         "axios": "^0.19.0",
         "bluebird": "^3.7.2",
         "core-js": "^3.6.5",
