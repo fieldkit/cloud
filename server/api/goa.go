@@ -13,7 +13,6 @@ import (
 	"goa.design/goa/v3/security"
 
 	goahttp "goa.design/goa/v3/http"
-	"goa.design/goa/v3/middleware"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 
@@ -247,7 +246,8 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 func errorHandler() func(context.Context, http.ResponseWriter, error) {
 	return func(ctx context.Context, w http.ResponseWriter, err error) {
 		log := Logger(ctx).Sugar()
-		id := ctx.Value(middleware.RequestIDKey).(string)
+		id := logging.FindTaskID(ctx)
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("[" + id + "] encoding: " + err.Error()))
 		log.Errorw("fatal", "id", id, "message", err.Error())
 	}

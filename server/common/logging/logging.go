@@ -51,6 +51,10 @@ func WithUserID(ctx context.Context, userID int32) context.Context {
 	return context.WithValue(ctx, userIDKey, userID)
 }
 
+func FindTaskID(ctx context.Context) string {
+	return ctx.Value(taskIDKey).(string)
+}
+
 func Logger(ctx context.Context) *zap.Logger {
 	if ctx == nil {
 		return rootLogger
