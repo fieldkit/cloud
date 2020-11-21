@@ -138,6 +138,10 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 
 	for sgIndex, sg := range h.dataRecord.Readings.SensorGroups {
 		for sIndex, sr := range sg.Readings {
+			if sr == nil {
+				return errors.Structured("sensor group with null reading", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
+			}
+
 			if sgIndex >= len(sensorsByModule) {
 				return errors.Structured("sensor group cardinality mismatch", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
 			}
