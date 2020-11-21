@@ -44,6 +44,9 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 	}
 
 	for moduleIndex, m := range r.Modules {
+		if m.Header == nil {
+			m.Header = &pb.ModuleHeader{}
+		}
 		module := &data.StationModule{
 			ConfigurationID: configuration.ID,
 			HardwareID:      m.Id,
