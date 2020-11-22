@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/conservify/sqlxcache"
@@ -84,6 +85,9 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 }
 
 func (h *stationModelRecordHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, dbData *data.DataRecord, dbMeta *data.MetaRecord) error {
+	if r == nil {
+		return fmt.Errorf("protobuf record required")
+	}
 	h.provision = p
 	h.dataRecord = r
 	h.dbData = dbData
@@ -142,16 +146,19 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 	for sgIndex, sg := range h.dataRecord.Readings.SensorGroups {
 		for sIndex, sr := range sg.Readings {
 			if sr == nil {
+				log.Errorw("sensor group with null reading", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
 				return errors.Structured("sensor group with null reading", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
 			}
 
 			if sgIndex >= len(sensorsByModule) {
+				log.Errorw("sensor group cardinality mismatch", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
 				return errors.Structured("sensor group cardinality mismatch", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
 			}
 
 			m := sensorsByModule[sgIndex]
 
 			if sIndex >= len(m) {
+				log.Errorw("sensor reading cardinality mismatch", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
 				return errors.Structured("sensor reading cardinality mismatch", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
 			}
 
