@@ -44,6 +44,17 @@
    git clone https://github.com/fieldkit/cloud.git
    #+END_SRC
 
+   *PostgreSQL*:
+
+   #+BEGIN_SRC sh
+   make restart-postgres
+   #+END_SRC
+
+   This will execute the necessary docker commands to start the
+   PostgreSQL container. This container will load any SQL that's in
+   the ~schema~ directory. On a fresh install this will be empty but
+   can be used later to load testing databases.
+
    *Build*:
 
    #+BEGIN_SRC sh
@@ -57,17 +68,6 @@
    periodically, especially before pushing, to ensure that tests still
    pass and there aren't any serious errors generating the asset
    bundles.
-
-   *PostgreSQL*:
-
-   #+BEGIN_SRC sh
-   make restart-postgres
-   #+END_SRC
-
-   This will execute the necessary docker commands to start the
-   PostgreSQL container. This container will load any SQL that's in
-   the ~schema~ directory. On a fresh install this will be empty but
-   can be used later to load testing databases.
 
    *Migrations*:
 
