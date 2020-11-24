@@ -80,7 +80,7 @@
             <ProjectStations :project="project" :admin="false" :userStations="userStations" />
         </div>
 
-        <div class="project-team-activity todo-disabled">
+        <div class="project-team-activity">
             <div class="project-team">
                 <h1>Project Team (4 members)</h1>
                 <ul>
@@ -127,6 +127,9 @@
                 </ul>
             </div>
         </div>
+
+        <Comments :type="'project'"> </Comments>
+
     </div>
 </template>
 
@@ -137,10 +140,12 @@ import FKApi from "@/api/api";
 import ProjectStations from "./ProjectStations";
 import ProjectActivity from "./ProjectActivity";
 import CommonComponents from "@/views/shared";
+import Comments from "../shared/Comments";
 
 export default {
     name: "ProjectPublic",
     components: {
+        Comments,
         ...CommonComponents,
         ProjectStations,
     },
