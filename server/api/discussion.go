@@ -17,6 +17,8 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+const DefaultPageSize = 10
+
 type DiscussionService struct {
 	options *ControllerOptions
 	db      *sqlxcache.DB
@@ -38,7 +40,7 @@ func (c *DiscussionService) Project(ctx context.Context, payload *discService.Pr
 	_ = p
 
 	dr := repositories.NewDiscussionRepository(c.db)
-	page, err := dr.QueryByProjectID(ctx, payload.ProjectID)
+	page, err := dr.QueryByProjectID(ctx, payload.ProjectID, DefaultPageSize, "")
 	if err != nil {
 		return nil, err
 	}
@@ -50,6 +52,9 @@ func (c *DiscussionService) Project(ctx context.Context, payload *discService.Pr
 
 	return &discService.Discussion{
 		Posts: threaded,
+		Summary: &discService.DiscussionSummary{
+			Total: int32(len(threaded)),
+		},
 	}, nil
 }
 
@@ -69,7 +74,7 @@ func (c *DiscussionService) Data(ctx context.Context, payload *discService.DataP
 	// TODO Verify the user can see discussion about "bookmark.StationIDs()" stations
 
 	dr := repositories.NewDiscussionRepository(c.db)
-	page, err := dr.QueryByStationIDs(ctx, bookmark.StationIDs())
+	page, err := dr.QueryByStationIDs(ctx, bookmark.StationIDs(), DefaultPageSize, "")
 	if err != nil {
 		return nil, err
 	}
@@ -81,6 +86,9 @@ func (c *DiscussionService) Data(ctx context.Context, payload *discService.DataP
 
 	return &discService.Discussion{
 		Posts: threaded,
+		Summary: &discService.DiscussionSummary{
+			Total: int32(len(threaded)),
+		},
 	}, nil
 }
 
@@ -240,7 +248,12 @@ func ThreadedPost(dp *data.DiscussionPost, users map[int32]*data.User) (*discSer
 			Name:     user.Name,
 			MediaURL: user.MediaURL,
 		},
-		Replies:  []*discService.ThreadedPost{},
+		Replies: &discService.Discussion{
+			Posts: make([]*discService.ThreadedPost, 0),
+			Summary: &discService.DiscussionSummary{
+				Total: 0,
+			},
+		},
 		Bookmark: dp.StringBookmark(),
 		Body:     dp.Body,
 	}, nil
@@ -254,17 +267,19 @@ func ThreadedPage(page *data.PageOfDiscussion) ([]*discService.ThreadedPost, err
 		if err != nil {
 			return nil, err
 		}
-
 		byID[tp.ID] = tp
 	}
+
 	for _, post := range page.Posts {
 		tp := byID[post.ID]
 		if post.ThreadID != nil {
-			parent := byID[*post.ThreadID]
-			parent.Replies = append(parent.Replies, tp)
+			replies := byID[*post.ThreadID].Replies.(*discService.Discussion)
+			replies.Posts = append(replies.Posts, tp)
+			replies.Summary.Total += 1
 		} else {
 			threaded = append(threaded, tp)
 		}
 	}
+
 	return threaded, nil
 }

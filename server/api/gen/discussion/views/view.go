@@ -21,25 +21,44 @@ type Discussion struct {
 
 // DiscussionView is a type that runs validations on a projected type.
 type DiscussionView struct {
-	Posts []*ThreadedPostView
+	// Summary
+	Summary *DiscussionSummaryView `json:"summary"`
+	// Posts
+	Posts []*ThreadedPostView `json:"posts"`
+}
+
+// DiscussionSummaryView is a type that runs validations on a projected type.
+type DiscussionSummaryView struct {
+	// Total
+	Total *int32 `json:"total"`
 }
 
 // ThreadedPostView is a type that runs validations on a projected type.
 type ThreadedPostView struct {
-	ID        *int64
-	CreatedAt *int64
-	UpdatedAt *int64
-	Author    *PostAuthorView
-	Replies   []*ThreadedPostView
-	Body      *string
-	Bookmark  *string
+	// id
+	ID *int64 `json:"id"`
+	// created at
+	CreatedAt *int64 `json:"createdAt"`
+	// updated at
+	UpdatedAt *int64 `json:"updatedAt"`
+	// author
+	Author *PostAuthorView `json:"author"`
+	// replies
+	Replies interface{} `json:"replies"`
+	// body
+	Body *string `json:"body"`
+	// bookmark
+	Bookmark *string `json:"bookmark"`
 }
 
 // PostAuthorView is a type that runs validations on a projected type.
 type PostAuthorView struct {
-	ID       *int32
-	Name     *string
-	MediaURL *string
+	// id
+	ID *int32 `json:"id"`
+	// name
+	Name *string `json:"name"`
+	// media url
+	MediaURL *string `json:"mediaUrl"`
 }
 
 var (
@@ -47,7 +66,15 @@ var (
 	// by view name.
 	DiscussionMap = map[string][]string{
 		"default": []string{
+			"summary",
 			"posts",
+		},
+	}
+	// DiscussionSummaryMap is a map of attribute names in result type
+	// DiscussionSummary indexed by view name.
+	DiscussionSummaryMap = map[string][]string{
+		"default": []string{
+			"total",
 		},
 	}
 	// ThreadedPostMap is a map of attribute names in result type ThreadedPost
@@ -90,6 +117,20 @@ func ValidateDiscussionView(result *DiscussionView) (err error) {
 			}
 		}
 	}
+	if result.Summary != nil {
+		if err2 := ValidateDiscussionSummaryView(result.Summary); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateDiscussionSummaryView runs the validations defined on
+// DiscussionSummaryView using the "default" view.
+func ValidateDiscussionSummaryView(result *DiscussionSummaryView) (err error) {
+	if result.Total == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("total", "result"))
+	}
 	return
 }
 
@@ -117,13 +158,6 @@ func ValidateThreadedPostView(result *ThreadedPostView) (err error) {
 	if result.Author != nil {
 		if err2 := ValidatePostAuthorView(result.Author); err2 != nil {
 			err = goa.MergeErrors(err, err2)
-		}
-	}
-	for _, e := range result.Replies {
-		if e != nil {
-			if err2 := ValidateThreadedPostView(e); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
 		}
 	}
 	return

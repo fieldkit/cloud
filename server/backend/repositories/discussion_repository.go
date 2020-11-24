@@ -61,7 +61,7 @@ func (r *DiscussionRepository) AddPost(ctx context.Context, post *data.Discussio
 	return post, nil
 }
 
-func (r *DiscussionRepository) QueryByProjectID(ctx context.Context, id int32) (*data.PageOfDiscussion, error) {
+func (r *DiscussionRepository) QueryByProjectID(ctx context.Context, id int32, pageSize int32, cursor string) (*data.PageOfDiscussion, error) {
 	posts := []*data.DiscussionPost{}
 	if err := r.db.SelectContext(ctx, &posts, `
 		SELECT * FROM fieldkit.discussion_post WHERE project_id = $1 ORDER BY created_at DESC
@@ -95,7 +95,7 @@ func (r *DiscussionRepository) QueryByProjectID(ctx context.Context, id int32) (
 	}, nil
 }
 
-func (r *DiscussionRepository) QueryByStationIDs(ctx context.Context, ids []int32) (*data.PageOfDiscussion, error) {
+func (r *DiscussionRepository) QueryByStationIDs(ctx context.Context, ids []int32, pageSize int32, cursor string) (*data.PageOfDiscussion, error) {
 	posts := []*data.DiscussionPost{}
 	{
 		query, args, err := sqlx.In(`SELECT * FROM fieldkit.discussion_post WHERE station_ids && array[?]::integer[] ORDER BY created_at DESC`, ids)

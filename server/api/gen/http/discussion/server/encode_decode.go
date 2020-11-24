@@ -595,6 +595,17 @@ func EncodeDeleteMessageError(encoder func(context.Context, http.ResponseWriter)
 	}
 }
 
+// marshalDiscussionviewsDiscussionSummaryViewToDiscussionSummaryResponseBody
+// builds a value of type *DiscussionSummaryResponseBody from a value of type
+// *discussionviews.DiscussionSummaryView.
+func marshalDiscussionviewsDiscussionSummaryViewToDiscussionSummaryResponseBody(v *discussionviews.DiscussionSummaryView) *DiscussionSummaryResponseBody {
+	res := &DiscussionSummaryResponseBody{
+		Total: *v.Total,
+	}
+
+	return res
+}
+
 // marshalDiscussionviewsThreadedPostViewToThreadedPostResponseBody builds a
 // value of type *ThreadedPostResponseBody from a value of type
 // *discussionviews.ThreadedPostView.
@@ -603,17 +614,12 @@ func marshalDiscussionviewsThreadedPostViewToThreadedPostResponseBody(v *discuss
 		ID:        *v.ID,
 		CreatedAt: *v.CreatedAt,
 		UpdatedAt: *v.UpdatedAt,
+		Replies:   v.Replies,
 		Body:      *v.Body,
 		Bookmark:  v.Bookmark,
 	}
 	if v.Author != nil {
 		res.Author = marshalDiscussionviewsPostAuthorViewToPostAuthorResponseBody(v.Author)
-	}
-	if v.Replies != nil {
-		res.Replies = make([]*ThreadedPostResponseBody, len(v.Replies))
-		for i, val := range v.Replies {
-			res.Replies[i] = marshalDiscussionviewsThreadedPostViewToThreadedPostResponseBody(val)
-		}
 	}
 
 	return res
@@ -652,17 +658,12 @@ func marshalDiscussionThreadedPostToThreadedPostResponseBody(v *discussion.Threa
 		ID:        v.ID,
 		CreatedAt: v.CreatedAt,
 		UpdatedAt: v.UpdatedAt,
+		Replies:   v.Replies,
 		Body:      v.Body,
 		Bookmark:  v.Bookmark,
 	}
 	if v.Author != nil {
 		res.Author = marshalDiscussionPostAuthorToPostAuthorResponseBody(v.Author)
-	}
-	if v.Replies != nil {
-		res.Replies = make([]*ThreadedPostResponseBody, len(v.Replies))
-		for i, val := range v.Replies {
-			res.Replies[i] = marshalDiscussionThreadedPostToThreadedPostResponseBody(val)
-		}
 	}
 
 	return res

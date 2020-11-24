@@ -53,7 +53,10 @@ type ProjectPayload struct {
 
 // Discussion is the result type of the discussion service project method.
 type Discussion struct {
-	Posts []*ThreadedPost
+	// Summary
+	Summary *DiscussionSummary `json:"summary"`
+	// Posts
+	Posts []*ThreadedPost `json:"posts"`
 }
 
 // DataPayload is the payload type of the discussion service data method.
@@ -96,20 +99,35 @@ type DeleteMessagePayload struct {
 	PostID int64
 }
 
+type DiscussionSummary struct {
+	// Total
+	Total int32 `json:"total"`
+}
+
 type ThreadedPost struct {
-	ID        int64
-	CreatedAt int64
-	UpdatedAt int64
-	Author    *PostAuthor
-	Replies   []*ThreadedPost
-	Body      string
-	Bookmark  *string
+	// id
+	ID int64 `json:"id"`
+	// created at
+	CreatedAt int64 `json:"createdAt"`
+	// updated at
+	UpdatedAt int64 `json:"updatedAt"`
+	// author
+	Author *PostAuthor `json:"author"`
+	// replies
+	Replies interface{} `json:"replies"`
+	// body
+	Body string `json:"body"`
+	// bookmark
+	Bookmark *string `json:"bookmark"`
 }
 
 type PostAuthor struct {
-	ID       int32
-	Name     string
-	MediaURL *string
+	// id
+	ID int32 `json:"id"`
+	// name
+	Name string `json:"name"`
+	// media url
+	MediaURL *string `json:"mediaUrl"`
 }
 
 type NewPost struct {
@@ -177,6 +195,9 @@ func newDiscussion(vres *discussionviews.DiscussionView) *Discussion {
 			res.Posts[i] = transformDiscussionviewsThreadedPostViewToThreadedPost(val)
 		}
 	}
+	if vres.Summary != nil {
+		res.Summary = newDiscussionSummary(vres.Summary)
+	}
 	return res
 }
 
@@ -190,6 +211,28 @@ func newDiscussionView(res *Discussion) *discussionviews.DiscussionView {
 			vres.Posts[i] = transformThreadedPostToDiscussionviewsThreadedPostView(val)
 		}
 	}
+	if res.Summary != nil {
+		vres.Summary = newDiscussionSummaryView(res.Summary)
+	}
+	return vres
+}
+
+// newDiscussionSummary converts projected type DiscussionSummary to service
+// type DiscussionSummary.
+func newDiscussionSummary(vres *discussionviews.DiscussionSummaryView) *DiscussionSummary {
+	res := &DiscussionSummary{}
+	if vres.Total != nil {
+		res.Total = *vres.Total
+	}
+	return res
+}
+
+// newDiscussionSummaryView projects result type DiscussionSummary to projected
+// type DiscussionSummaryView using the "default" view.
+func newDiscussionSummaryView(res *DiscussionSummary) *discussionviews.DiscussionSummaryView {
+	vres := &discussionviews.DiscussionSummaryView{
+		Total: &res.Total,
+	}
 	return vres
 }
 
@@ -197,6 +240,7 @@ func newDiscussionView(res *Discussion) *discussionviews.DiscussionView {
 // ThreadedPost.
 func newThreadedPost(vres *discussionviews.ThreadedPostView) *ThreadedPost {
 	res := &ThreadedPost{
+		Replies:  vres.Replies,
 		Bookmark: vres.Bookmark,
 	}
 	if vres.ID != nil {
@@ -214,12 +258,6 @@ func newThreadedPost(vres *discussionviews.ThreadedPostView) *ThreadedPost {
 	if vres.Author != nil {
 		res.Author = transformDiscussionviewsPostAuthorViewToPostAuthor(vres.Author)
 	}
-	if vres.Replies != nil {
-		res.Replies = make([]*ThreadedPost, len(vres.Replies))
-		for i, val := range vres.Replies {
-			res.Replies[i] = transformDiscussionviewsThreadedPostViewToThreadedPost(val)
-		}
-	}
 	return res
 }
 
@@ -230,17 +268,12 @@ func newThreadedPostView(res *ThreadedPost) *discussionviews.ThreadedPostView {
 		ID:        &res.ID,
 		CreatedAt: &res.CreatedAt,
 		UpdatedAt: &res.UpdatedAt,
+		Replies:   res.Replies,
 		Body:      &res.Body,
 		Bookmark:  res.Bookmark,
 	}
 	if res.Author != nil {
 		vres.Author = transformPostAuthorToDiscussionviewsPostAuthorView(res.Author)
-	}
-	if res.Replies != nil {
-		vres.Replies = make([]*discussionviews.ThreadedPostView, len(res.Replies))
-		for i, val := range res.Replies {
-			vres.Replies[i] = transformThreadedPostToDiscussionviewsThreadedPostView(val)
-		}
 	}
 	return vres
 }
@@ -255,17 +288,12 @@ func transformDiscussionviewsThreadedPostViewToThreadedPost(v *discussionviews.T
 		ID:        *v.ID,
 		CreatedAt: *v.CreatedAt,
 		UpdatedAt: *v.UpdatedAt,
+		Replies:   v.Replies,
 		Body:      *v.Body,
 		Bookmark:  v.Bookmark,
 	}
 	if v.Author != nil {
 		res.Author = transformDiscussionviewsPostAuthorViewToPostAuthor(v.Author)
-	}
-	if v.Replies != nil {
-		res.Replies = make([]*ThreadedPost, len(v.Replies))
-		for i, val := range v.Replies {
-			res.Replies[i] = transformDiscussionviewsThreadedPostViewToThreadedPost(val)
-		}
 	}
 
 	return res
@@ -290,17 +318,12 @@ func transformThreadedPostToDiscussionviewsThreadedPostView(v *ThreadedPost) *di
 		ID:        &v.ID,
 		CreatedAt: &v.CreatedAt,
 		UpdatedAt: &v.UpdatedAt,
+		Replies:   v.Replies,
 		Body:      &v.Body,
 		Bookmark:  v.Bookmark,
 	}
 	if v.Author != nil {
 		res.Author = transformPostAuthorToDiscussionviewsPostAuthorView(v.Author)
-	}
-	if v.Replies != nil {
-		res.Replies = make([]*discussionviews.ThreadedPostView, len(v.Replies))
-		for i, val := range v.Replies {
-			res.Replies[i] = transformThreadedPostToDiscussionviewsThreadedPostView(val)
-		}
 	}
 
 	return res

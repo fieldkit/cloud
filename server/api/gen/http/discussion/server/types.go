@@ -28,13 +28,19 @@ type UpdateMessageRequestBody struct {
 // ProjectResponseBody is the type of the "discussion" service "project"
 // endpoint HTTP response body.
 type ProjectResponseBody struct {
-	Posts []*ThreadedPostResponseBody `form:"posts" json:"posts" xml:"posts"`
+	// Summary
+	Summary *DiscussionSummaryResponseBody `json:"summary"`
+	// Posts
+	Posts []*ThreadedPostResponseBody `json:"posts"`
 }
 
 // DataResponseBody is the type of the "discussion" service "data" endpoint
 // HTTP response body.
 type DataResponseBody struct {
-	Posts []*ThreadedPostResponseBody `form:"posts" json:"posts" xml:"posts"`
+	// Summary
+	Summary *DiscussionSummaryResponseBody `json:"summary"`
+	// Posts
+	Posts []*ThreadedPostResponseBody `json:"posts"`
 }
 
 // PostMessageResponseBody is the type of the "discussion" service "post
@@ -411,22 +417,39 @@ type DeleteMessageBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// DiscussionSummaryResponseBody is used to define fields on response body
+// types.
+type DiscussionSummaryResponseBody struct {
+	// Total
+	Total int32 `json:"total"`
+}
+
 // ThreadedPostResponseBody is used to define fields on response body types.
 type ThreadedPostResponseBody struct {
-	ID        int64                       `form:"id" json:"id" xml:"id"`
-	CreatedAt int64                       `form:"createdAt" json:"createdAt" xml:"createdAt"`
-	UpdatedAt int64                       `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
-	Author    *PostAuthorResponseBody     `form:"author" json:"author" xml:"author"`
-	Replies   []*ThreadedPostResponseBody `form:"replies" json:"replies" xml:"replies"`
-	Body      string                      `form:"body" json:"body" xml:"body"`
-	Bookmark  *string                     `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
+	// id
+	ID int64 `json:"id"`
+	// created at
+	CreatedAt int64 `json:"createdAt"`
+	// updated at
+	UpdatedAt int64 `json:"updatedAt"`
+	// author
+	Author *PostAuthorResponseBody `json:"author"`
+	// replies
+	Replies interface{} `json:"replies"`
+	// body
+	Body string `json:"body"`
+	// bookmark
+	Bookmark *string `json:"bookmark"`
 }
 
 // PostAuthorResponseBody is used to define fields on response body types.
 type PostAuthorResponseBody struct {
-	ID       int32   `form:"id" json:"id" xml:"id"`
-	Name     string  `form:"name" json:"name" xml:"name"`
-	MediaURL *string `form:"mediaUrl,omitempty" json:"mediaUrl,omitempty" xml:"mediaUrl,omitempty"`
+	// id
+	ID int32 `json:"id"`
+	// name
+	Name string `json:"name"`
+	// media url
+	MediaURL *string `json:"mediaUrl"`
 }
 
 // NewPostRequestBody is used to define fields on request body types.
@@ -441,6 +464,9 @@ type NewPostRequestBody struct {
 // "project" endpoint of the "discussion" service.
 func NewProjectResponseBody(res *discussionviews.DiscussionView) *ProjectResponseBody {
 	body := &ProjectResponseBody{}
+	if res.Summary != nil {
+		body.Summary = marshalDiscussionviewsDiscussionSummaryViewToDiscussionSummaryResponseBody(res.Summary)
+	}
 	if res.Posts != nil {
 		body.Posts = make([]*ThreadedPostResponseBody, len(res.Posts))
 		for i, val := range res.Posts {
@@ -454,6 +480,9 @@ func NewProjectResponseBody(res *discussionviews.DiscussionView) *ProjectRespons
 // "data" endpoint of the "discussion" service.
 func NewDataResponseBody(res *discussionviews.DiscussionView) *DataResponseBody {
 	body := &DataResponseBody{}
+	if res.Summary != nil {
+		body.Summary = marshalDiscussionviewsDiscussionSummaryViewToDiscussionSummaryResponseBody(res.Summary)
+	}
 	if res.Posts != nil {
 		body.Posts = make([]*ThreadedPostResponseBody, len(res.Posts))
 		for i, val := range res.Posts {

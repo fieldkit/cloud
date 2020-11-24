@@ -28,13 +28,19 @@ type UpdateMessageRequestBody struct {
 // ProjectResponseBody is the type of the "discussion" service "project"
 // endpoint HTTP response body.
 type ProjectResponseBody struct {
-	Posts []*ThreadedPostResponseBody `form:"posts,omitempty" json:"posts,omitempty" xml:"posts,omitempty"`
+	// Summary
+	Summary *DiscussionSummaryResponseBody `json:"summary"`
+	// Posts
+	Posts []*ThreadedPostResponseBody `json:"posts"`
 }
 
 // DataResponseBody is the type of the "discussion" service "data" endpoint
 // HTTP response body.
 type DataResponseBody struct {
-	Posts []*ThreadedPostResponseBody `form:"posts,omitempty" json:"posts,omitempty" xml:"posts,omitempty"`
+	// Summary
+	Summary *DiscussionSummaryResponseBody `json:"summary"`
+	// Posts
+	Posts []*ThreadedPostResponseBody `json:"posts"`
 }
 
 // PostMessageResponseBody is the type of the "discussion" service "post
@@ -411,22 +417,39 @@ type DeleteMessageBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// DiscussionSummaryResponseBody is used to define fields on response body
+// types.
+type DiscussionSummaryResponseBody struct {
+	// Total
+	Total *int32 `json:"total"`
+}
+
 // ThreadedPostResponseBody is used to define fields on response body types.
 type ThreadedPostResponseBody struct {
-	ID        *int64                      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	CreatedAt *int64                      `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
-	UpdatedAt *int64                      `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
-	Author    *PostAuthorResponseBody     `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
-	Replies   []*ThreadedPostResponseBody `form:"replies,omitempty" json:"replies,omitempty" xml:"replies,omitempty"`
-	Body      *string                     `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-	Bookmark  *string                     `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
+	// id
+	ID *int64 `json:"id"`
+	// created at
+	CreatedAt *int64 `json:"createdAt"`
+	// updated at
+	UpdatedAt *int64 `json:"updatedAt"`
+	// author
+	Author *PostAuthorResponseBody `json:"author"`
+	// replies
+	Replies interface{} `json:"replies"`
+	// body
+	Body *string `json:"body"`
+	// bookmark
+	Bookmark *string `json:"bookmark"`
 }
 
 // PostAuthorResponseBody is used to define fields on response body types.
 type PostAuthorResponseBody struct {
-	ID       *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name     *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	MediaURL *string `form:"mediaUrl,omitempty" json:"mediaUrl,omitempty" xml:"mediaUrl,omitempty"`
+	// id
+	ID *int32 `json:"id"`
+	// name
+	Name *string `json:"name"`
+	// media url
+	MediaURL *string `json:"mediaUrl"`
 }
 
 // NewPostRequestBody is used to define fields on request body types.
@@ -460,6 +483,7 @@ func NewUpdateMessageRequestBody(p *discussion.UpdateMessagePayload) *UpdateMess
 // result from a HTTP "OK" response.
 func NewProjectDiscussionOK(body *ProjectResponseBody) *discussionviews.DiscussionView {
 	v := &discussionviews.DiscussionView{}
+	v.Summary = unmarshalDiscussionSummaryResponseBodyToDiscussionviewsDiscussionSummaryView(body.Summary)
 	v.Posts = make([]*discussionviews.ThreadedPostView, len(body.Posts))
 	for i, val := range body.Posts {
 		v.Posts[i] = unmarshalThreadedPostResponseBodyToDiscussionviewsThreadedPostView(val)
@@ -532,6 +556,7 @@ func NewProjectBadRequest(body *ProjectBadRequestResponseBody) *goa.ServiceError
 // from a HTTP "OK" response.
 func NewDataDiscussionOK(body *DataResponseBody) *discussionviews.DiscussionView {
 	v := &discussionviews.DiscussionView{}
+	v.Summary = unmarshalDiscussionSummaryResponseBodyToDiscussionviewsDiscussionSummaryView(body.Summary)
 	v.Posts = make([]*discussionviews.ThreadedPostView, len(body.Posts))
 	for i, val := range body.Posts {
 		v.Posts[i] = unmarshalThreadedPostResponseBodyToDiscussionviewsThreadedPostView(val)
@@ -1304,6 +1329,15 @@ func ValidateDeleteMessageBadRequestResponseBody(body *DeleteMessageBadRequestRe
 	return
 }
 
+// ValidateDiscussionSummaryResponseBody runs the validations defined on
+// DiscussionSummaryResponseBody
+func ValidateDiscussionSummaryResponseBody(body *DiscussionSummaryResponseBody) (err error) {
+	if body.Total == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("total", "body"))
+	}
+	return
+}
+
 // ValidateThreadedPostResponseBody runs the validations defined on
 // ThreadedPostResponseBody
 func ValidateThreadedPostResponseBody(body *ThreadedPostResponseBody) (err error) {
@@ -1328,13 +1362,6 @@ func ValidateThreadedPostResponseBody(body *ThreadedPostResponseBody) (err error
 	if body.Author != nil {
 		if err2 := ValidatePostAuthorResponseBody(body.Author); err2 != nil {
 			err = goa.MergeErrors(err, err2)
-		}
-	}
-	for _, e := range body.Replies {
-		if e != nil {
-			if err2 := ValidateThreadedPostResponseBody(e); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
 		}
 	}
 	return

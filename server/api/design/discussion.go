@@ -5,22 +5,74 @@ import (
 )
 
 var PostAuthor = Type("PostAuthor", func() {
-	Attribute("id", Int32)
-	Attribute("name", String)
-	Attribute("mediaUrl", String)
+	Attribute("id", Int32, "id", func() {
+		Meta("struct:tag:json", "id")
+	})
+	Attribute("name", String, "name", func() {
+		Meta("struct:tag:json", "name")
+	})
+	Attribute("mediaUrl", String, "media url", func() {
+		Meta("struct:tag:json", "mediaUrl")
+	})
 	Required("id", "name")
+})
+
+var DiscussionSummary = ResultType("application/vnd.app.discussion.summary", func() {
+	TypeName("DiscussionSummary")
+	Attributes(func() {
+		Attribute("total", Int32, "Total", func() {
+			Meta("struct:tag:json", "total")
+		})
+		Required("total")
+	})
+	View("default", func() {
+		Attribute("total")
+	})
+})
+
+var Discussion = ResultType("application/vnd.app.discussion", func() {
+	TypeName("Discussion")
+	Attributes(func() {
+		Attribute("summary", DiscussionSummary, "Summary", func() {
+			Meta("struct:tag:json", "summary")
+		})
+		Attribute("posts", ArrayOf(ThreadedPost), "Posts", func() {
+			Meta("struct:tag:json", "posts")
+		})
+		Required("summary")
+		Required("posts")
+	})
+	View("default", func() {
+		Attribute("summary")
+		Attribute("posts")
+	})
 })
 
 var ThreadedPost = ResultType("application/vnd.app.discussion.post", func() {
 	TypeName("ThreadedPost")
 	Attributes(func() {
-		Attribute("id", Int64)
-		Attribute("createdAt", Int64)
-		Attribute("updatedAt", Int64)
-		Attribute("author", PostAuthor)
-		Attribute("replies", ArrayOf("ThreadedPost"))
-		Attribute("body", String)
-		Attribute("bookmark", String)
+		Attribute("id", Int64, "id", func() {
+			Meta("struct:tag:json", "id")
+		})
+		Attribute("createdAt", Int64, "created at", func() {
+			Meta("struct:tag:json", "createdAt")
+		})
+		Attribute("updatedAt", Int64, "updated at", func() {
+			Meta("struct:tag:json", "updatedAt")
+		})
+		Attribute("author", PostAuthor, "author", func() {
+			Meta("struct:tag:json", "author")
+		})
+		// Wish this could be 'Discussion'
+		Attribute("replies", Any, "replies", func() {
+			Meta("struct:tag:json", "replies")
+		})
+		Attribute("body", String, "body", func() {
+			Meta("struct:tag:json", "body")
+		})
+		Attribute("bookmark", String, "bookmark", func() {
+			Meta("struct:tag:json", "bookmark")
+		})
 		Required("id", "createdAt", "updatedAt", "author", "replies", "body")
 	})
 	View("default", func() {
@@ -31,17 +83,6 @@ var ThreadedPost = ResultType("application/vnd.app.discussion.post", func() {
 		Attribute("replies")
 		Attribute("body")
 		Attribute("bookmark")
-	})
-})
-
-var Discussion = ResultType("application/vnd.app.discussion", func() {
-	TypeName("Discussion")
-	Attributes(func() {
-		Attribute("posts", ArrayOf(ThreadedPost))
-		Required("posts")
-	})
-	View("default", func() {
-		Attribute("posts")
 	})
 })
 

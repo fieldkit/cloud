@@ -36,7 +36,10 @@ func TestDiscussionGetDiscussionProjectEmpty(t *testing.T) {
 	ja := jsonassert.New(t)
 	ja.Assertf(rr.Body.String(), `
 		{
-			"posts": []
+			"posts": [],
+			"summary": {
+				"total": 0
+			}
 		}`)
 }
 
@@ -78,9 +81,16 @@ func TestDiscussionPostFirstProjectDiscussion(t *testing.T) {
 				"updatedAt": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
-					"name": "<<PRESENCE>>"
+					"name": "<<PRESENCE>>",
+					"mediaUrl": null
 				},
-				"replies": [],
+				"bookmark": null,
+				"replies": {
+                    "posts": [],
+                    "summary": {
+						"total": 0
+					}
+				},
 				"body": "Message"
 			}
 		}`)
@@ -91,6 +101,8 @@ func TestDiscussionPostFirstProjectDiscussion(t *testing.T) {
 
 	assert.Equal(http.StatusOK, rr.Code)
 
+	fmt.Printf("%s", rr.Body.String())
+
 	ja.Assertf(rr.Body.String(), `
 		{
 			"posts": [{
@@ -99,11 +111,21 @@ func TestDiscussionPostFirstProjectDiscussion(t *testing.T) {
 				"updatedAt": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
-					"name": "<<PRESENCE>>"
+					"name": "<<PRESENCE>>",
+					"mediaUrl": null
 				},
-				"replies": [],
+				"bookmark": null,
+				"replies": {
+                    "posts": [],
+                    "summary": {
+						"total": 0
+					}
+				},
 				"body": "Message"
-			}]
+			}],
+			"summary": {
+				"total": 1
+			}
 		}`)
 }
 
@@ -172,21 +194,38 @@ func TestDiscussionPostProjectDiscussionReply(t *testing.T) {
 				"updatedAt": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
-					"name": "<<PRESENCE>>"
+					"name": "<<PRESENCE>>",
+					"mediaUrl": null
 				},
-				"replies": [{
-					"id": "<<PRESENCE>>",
-					"createdAt": "<<PRESENCE>>",
-					"updatedAt": "<<PRESENCE>>",
-					"author": {
+				"bookmark": null,
+				"replies": {
+                    "posts": [{
 						"id": "<<PRESENCE>>",
-						"name": "<<PRESENCE>>"
-					},
-					"replies": [],
-					"body": "Reply"
-				}],
+						"createdAt": "<<PRESENCE>>",
+						"updatedAt": "<<PRESENCE>>",
+						"author": {
+							"id": "<<PRESENCE>>",
+							"name": "<<PRESENCE>>",
+							"mediaUrl": null
+						},
+						"bookmark": null,
+						"replies": {
+							"posts": [],
+							"summary": {
+								"total": 0
+							}
+						},
+						"body": "Reply"
+					}],
+					"summary": {
+						"total": 1
+					}
+				},
 				"body": "Message"
-			}]
+			}],
+			"summary": {
+				"total": 1
+			}
 		}`)
 }
 
@@ -227,9 +266,16 @@ func TestDiscussionUpdateMyPost(t *testing.T) {
 				"updatedAt": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
-					"name": "<<PRESENCE>>"
+					"name": "<<PRESENCE>>",
+					"mediaUrl": null
 				},
-				"replies": [],
+				"bookmark": null,
+				"replies": {
+                    "posts": [],
+                    "summary": {
+						"total": 0
+					}
+				},
 				"body": "Message #1"
 			}
 		}`)
@@ -258,9 +304,16 @@ func TestDiscussionUpdateMyPost(t *testing.T) {
 				"updatedAt": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
-					"name": "<<PRESENCE>>"
+					"name": "<<PRESENCE>>",
+					"mediaUrl": null
 				},
-				"replies": [],
+				"bookmark": null,
+				"replies": {
+                    "posts": [],
+                    "summary": {
+						"total": 0
+					}
+				},
 				"body": "Message #2"
 			}
 		}`)
@@ -306,9 +359,16 @@ func TestDiscussionUpdateStrangersPost(t *testing.T) {
 				"updatedAt": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
-					"name": "<<PRESENCE>>"
+					"name": "<<PRESENCE>>",
+					"mediaUrl": null
 				},
-				"replies": [],
+				"bookmark": null,
+				"replies": {
+                    "posts": [],
+                    "summary": {
+						"total": 0
+					}
+				},
 				"body": "Message #1"
 			}
 		}`)
@@ -367,9 +427,16 @@ func TestDiscussionDeleteMyPost(t *testing.T) {
 				"updatedAt": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
-					"name": "<<PRESENCE>>"
+					"name": "<<PRESENCE>>",
+					"mediaUrl": null
 				},
-				"replies": [],
+				"bookmark": null,
+				"replies": {
+                    "posts": [],
+                    "summary": {
+						"total": 0
+					}
+				},
 				"body": "Message #1"
 			}
 		}`)
@@ -422,9 +489,16 @@ func TestDiscussionDeleteStrangersPost(t *testing.T) {
 				"updatedAt": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
-					"name": "<<PRESENCE>>"
+					"name": "<<PRESENCE>>",
+					"mediaUrl": null
 				},
-				"replies": [],
+				"bookmark": null,
+				"replies": {
+                    "posts": [],
+                    "summary": {
+						"total": 0
+					}
+				},
 				"body": "Message #1"
 			}
 		}`)
@@ -506,11 +580,21 @@ func TestDiscussionDeleteMyPostWithReply(t *testing.T) {
 				"updatedAt": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
-					"name": "<<PRESENCE>>"
+					"name": "<<PRESENCE>>",
+					"mediaUrl": null
 				},
-				"replies": [],
+				"bookmark": null,
+				"replies": {
+                    "posts": [],
+                    "summary": {
+						"total": 0
+					}
+				},
 				"body": "Message #2"
-			}]
+			}],
+			"summary": {
+				"total": 1
+			}
 		}`)
 }
 
@@ -553,9 +637,16 @@ func TestDiscussionPostFirstContextDiscussion(t *testing.T) {
 				"updatedAt": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
-					"name": "<<PRESENCE>>"
+					"name": "<<PRESENCE>>",
+					"mediaUrl": null
 				},
-				"replies": [],
+				"bookmark": null,
+				"replies": {
+                    "posts": [],
+                    "summary": {
+						"total": 0
+					}
+				},
 				"bookmark": "<<PRESENCE>>",
 				"body": "Message"
 			}
@@ -575,11 +666,68 @@ func TestDiscussionPostFirstContextDiscussion(t *testing.T) {
 				"updatedAt": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
-					"name": "<<PRESENCE>>"
+					"name": "<<PRESENCE>>",
+					"mediaUrl": null
 				},
-				"replies": [],
+				"bookmark": null,
+				"replies": {
+                    "posts": [],
+                    "summary": {
+						"total": 0
+					}
+				},
 				"bookmark": "<<PRESENCE>>",
 				"body": "Message"
-			}]
+			}],
+			"summary": {
+				"total": 1
+			}
+		}`)
+}
+
+func TestDiscussionThreadedTopLevel(t *testing.T) {
+	ja := jsonassert.New(t)
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	for i := 0; i < 100; i += 1 {
+		payload, err := json.Marshal(
+			struct {
+				Post discService.NewPost `json:"post"`
+			}{
+				Post: discService.NewPost{
+					ProjectID: &fd.Project.ID,
+					Body:      fmt.Sprintf("Message %d", i),
+				},
+			},
+		)
+		assert.NoError(err)
+
+		reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload))
+		reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+		rrPost := tests.ExecuteRequest(reqPost, api)
+
+		assert.Equal(http.StatusOK, rrPost.Code)
+	}
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/discussion/projects/%d", fd.Project.ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja.Assertf(rr.Body.String(), `
+		{
+			"posts": "<<PRESENCE>>",
+			"summary": {
+				"total": 100
+			}
 		}`)
 }

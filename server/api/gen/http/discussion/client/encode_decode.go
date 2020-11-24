@@ -737,6 +737,17 @@ func DecodeDeleteMessageResponse(decoder func(*http.Response) goahttp.Decoder, r
 	}
 }
 
+// unmarshalDiscussionSummaryResponseBodyToDiscussionviewsDiscussionSummaryView
+// builds a value of type *discussionviews.DiscussionSummaryView from a value
+// of type *DiscussionSummaryResponseBody.
+func unmarshalDiscussionSummaryResponseBodyToDiscussionviewsDiscussionSummaryView(v *DiscussionSummaryResponseBody) *discussionviews.DiscussionSummaryView {
+	res := &discussionviews.DiscussionSummaryView{
+		Total: v.Total,
+	}
+
+	return res
+}
+
 // unmarshalThreadedPostResponseBodyToDiscussionviewsThreadedPostView builds a
 // value of type *discussionviews.ThreadedPostView from a value of type
 // *ThreadedPostResponseBody.
@@ -745,14 +756,11 @@ func unmarshalThreadedPostResponseBodyToDiscussionviewsThreadedPostView(v *Threa
 		ID:        v.ID,
 		CreatedAt: v.CreatedAt,
 		UpdatedAt: v.UpdatedAt,
+		Replies:   v.Replies,
 		Body:      v.Body,
 		Bookmark:  v.Bookmark,
 	}
 	res.Author = unmarshalPostAuthorResponseBodyToDiscussionviewsPostAuthorView(v.Author)
-	res.Replies = make([]*discussionviews.ThreadedPostView, len(v.Replies))
-	for i, val := range v.Replies {
-		res.Replies[i] = unmarshalThreadedPostResponseBodyToDiscussionviewsThreadedPostView(val)
-	}
 
 	return res
 }
@@ -803,14 +811,11 @@ func unmarshalThreadedPostResponseBodyToDiscussionThreadedPost(v *ThreadedPostRe
 		ID:        *v.ID,
 		CreatedAt: *v.CreatedAt,
 		UpdatedAt: *v.UpdatedAt,
+		Replies:   v.Replies,
 		Body:      *v.Body,
 		Bookmark:  v.Bookmark,
 	}
 	res.Author = unmarshalPostAuthorResponseBodyToDiscussionPostAuthor(v.Author)
-	res.Replies = make([]*discussion.ThreadedPost, len(v.Replies))
-	for i, val := range v.Replies {
-		res.Replies[i] = unmarshalThreadedPostResponseBodyToDiscussionThreadedPost(val)
-	}
 
 	return res
 }
