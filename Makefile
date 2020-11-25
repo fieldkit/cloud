@@ -44,6 +44,12 @@ jstests: portal/node_modules
 gotests:
 	cd server && go test -p 1 -coverprofile=coverage.data ./...
 
+gotest-specific:
+	cd server && go test -p 1 github.com/fieldkit/cloud/server/api
+	cd server && go test -p 1 github.com/fieldkit/cloud/server/data
+	cd server && go test -p 1 github.com/fieldkit/cloud/server/ingester
+	cd server && go test -p 1 github.com/fieldkit/cloud/server/backend
+
 view-coverage:
 	cd server && go tool cover -html=coverage.data
 
