@@ -110,8 +110,9 @@ export class DisplayStation {
         this.placeNameOther = station.placeNameOther;
         this.placeNameNative = station.placeNameNative;
         this.deployedAt = station.recordingStartedAt;
-        this.updatedAt = station.updatedAt ? new Date(station.updatedAt) : null;
-        this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time)));
+        if (!station.updatedAt) throw new Error(`station missing updatedAt`);
+        this.updatedAt = new Date(station.updatedAt);
+        this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time))) || null;
         this.modules =
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))
@@ -183,8 +184,11 @@ export class MappedStations {
         return this.bounds != null;
     }
 
-    public boundsLngLat(): LngLat[] {
-        return [this.bounds.min, this.bounds.max];
+    public boundsLngLat(): LngLat[] | null {
+        if (this.bounds) {
+            return this.bounds.lngLat();
+        }
+        return null;
     }
 
     public overrideBounds(bounds: [LngLat, LngLat]): MappedStations {
@@ -192,8 +196,8 @@ export class MappedStations {
     }
 
     public focusOn(id: number): MappedStations {
-        const station = this.stations.find((s) => s.id == id)!;
-        if (!station.location) {
+        const station = this.stations.find((s) => s.id == id);
+        if (!station || !station.location) {
             return this;
         }
         const centered = new BoundingRectangle().include(station.location.lngLat());
@@ -228,8 +232,8 @@ export class DisplayProject {
         }
         this.places.native = _(stations)
             .map((s) => s.placeNameNative)
+            .filter((n) => n != null && n.length > 0)
             .uniq()
-            .filter((n) => n && n.length > 0)
             .join(", ");
     }
 }

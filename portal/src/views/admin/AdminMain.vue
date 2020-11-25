@@ -36,6 +36,7 @@
 import Vue from "vue";
 import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
+import { PortalDeployStatus } from "@/api";
 
 export default Vue.extend({
     name: "AdminMain",
@@ -43,18 +44,18 @@ export default Vue.extend({
         StandardLayout,
         ...CommonComponents,
     },
-    props: {},
-    data: () => {
+    data(): {
+        status: PortalDeployStatus | null;
+    } {
         return {
             status: null,
         };
     },
-    mounted() {
-        return this.$services.api.getStatus().then((status) => {
+    async mounted(): Promise<void> {
+        await this.$services.api.getStatus().then((status) => {
             this.status = status;
         });
     },
-    methods: {},
 });
 </script>
 

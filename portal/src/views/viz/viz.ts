@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { SensorId, SensorsResponse, SensorDataResponse, SensorInfoResponse, ModuleSensor } from "./api";
+import { SensorId, SensorsResponse, SensorDataResponse, SensorInfoResponse, ModuleSensorMeta } from "./api";
 import { Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
 import { DisplayStation } from "@/store/modules/stations";
 import FKApi from "@/api/api";
@@ -35,14 +35,14 @@ export class QueriedData {
 
     constructor(public readonly timeRangeQueried: TimeRange, private readonly sdr: SensorDataResponse) {
         if (this.sdr.data.length > 0) {
-            const values = _(this.sdr.data)
-                .filter((d) => !!d.value)
-                .map((d) => d.value);
-            const times = _(this.sdr.data)
-                .filter((d) => !!d.value)
-                .map((d) => d.time);
-            this.dataRange = [values.min(), values.max()];
-            this.timeRangeData = [times.min(), times.max()];
+            const values = this.sdr.data.filter((d) => !!d.value).map((d) => d.value) as number[];
+            const times = this.sdr.data.filter((d) => !!d.value).map((d) => d.time) as number[];
+
+            if (values.length == 0) throw new Error(`empty ranges`);
+            if (times.length == 0) throw new Error(`empty ranges`);
+
+            this.dataRange = [_.min(values) as number, _.max(values) as number];
+            this.timeRangeData = [_.min(times) as number, _.max(times) as number];
 
             if (this.timeRangeQueried.isExtreme()) {
                 this.timeRange = this.timeRangeData;
@@ -131,17 +131,19 @@ export class Bookmark {
     }
 
     public get allTimeRange(): TimeRange {
-        const start = _.min(_.flatten(this.allVizes.map((viz) => viz[2][0])));
-        const end = _.max(_.flatten(this.allVizes.map((viz) => viz[2][1])));
+        const times: [number, number][] = this.allVizes.map((viz) => viz[2]).filter((times) => times !== undefined) as [number, number][];
+        const start = _.min(_.flatten(times.map((r) => r[0])));
+        const end = _.max(_.flatten(times.map((r) => r[1])));
+        if (!start || !end) throw new Error(`no time range in bookmark`);
         return new TimeRange(start, end);
     }
 
     public get allStations(): number[] {
-        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[0])));
+        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[0] || [])));
     }
 
     public get allSensors(): number[] {
-        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1])));
+        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1] || [])));
     }
 }
 
@@ -179,10 +181,10 @@ export class Graph extends Viz {
     }
 
     public timeZoomed(zoom: TimeZoom): TimeRange {
-        if (zoom.range) {
+        if (zoom.range !== null) {
             this.visible = zoom.range;
             this.fastTime = FastTime.Custom;
-        } else {
+        } else if (zoom.fast !== null) {
             this.visible = this.getFastRange(zoom.fast);
             this.fastTime = zoom.fast;
         }
@@ -233,6 +235,7 @@ export class Graph extends Viz {
     }
 
     public static fromBookmark(bm: VizBookmark): Viz {
+        if (bm.length == 0) throw new Error(`empty bookmark`);
         const visible = new TimeRange(bm[2][0], bm[2][1]);
         const chartParams = new DataQueryParams(visible, bm[0], bm[1]);
         const graph = new Graph(chartParams);
@@ -310,11 +313,22 @@ export class Group {
     }
 
     public get scrubbers(): Scrubbers {
-        return new Scrubbers(
-            this.id,
-            this.visible_,
-            this.vizes.filter((viz) => (viz as Graph).all).map((viz, i) => new Scrubber(i, (viz as Graph).all))
-        );
+        const children = this.vizes
+            .map((viz) => viz as Graph)
+            .map((graph, index) => {
+                return {
+                    graph,
+                    index,
+                };
+            })
+            .filter((r) => r.graph.all != null)
+            .map((r) => {
+                const all = r.graph.all;
+                if (!all) throw new Error(`no viz data on Graph`);
+                return new Scrubber(r.index, all);
+            });
+
+        return new Scrubbers(this.id, this.visible_, children);
     }
 
     public bookmark(): GroupBookmark {
@@ -463,7 +477,7 @@ export class Workspace {
             (iq) =>
                 this.querier.queryInfo(iq).then((info) => {
                     return _.map(info.stations, (info, stationId) => {
-                        const name = info[0].stationName;
+                        const name = info[0].name;
                         const sensors = info.map((row) => new SensorMeta(row.sensorId, row.key, row.key));
                         const station = new StationMeta(Number(stationId), name, sensors);
                         this.stations[station.id] = station;
@@ -619,7 +633,7 @@ export class Workspace {
             group.remove(viz);
             this.groups.unshift(new Group([viz]));
         } else {
-            this.groups.reduce((previous, iter) => {
+            this.groups.reduce((previous: Group | null, iter: Group): Group => {
                 if (iter == group) {
                     if (previous == null) {
                         throw new Error("tried linking first group, nice work");
@@ -646,7 +660,9 @@ export class Workspace {
             return this;
         }
         const removing = this.groups.shift();
-        this.groups[0].addAll(removing);
+        if (removing) {
+            this.groups[0].addAll(removing);
+        }
         return this;
     }
 

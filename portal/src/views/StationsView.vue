@@ -129,29 +129,36 @@ export default Vue.extend({
                 this.$router.push("/");
             }
         },
-        boundsParam(): string {
-            return JSON.stringify([this.mapped.bounds.min, this.mapped.bounds.max]);
+        boundsParam(): string | null {
+            const mapped = this.mapped;
+            if (!mapped || !mapped.bounds) return null;
+            return JSON.stringify([mapped.bounds.min, mapped.bounds.max]);
         },
-        showSummary(params: { id: number }): Promise<any> {
+        async showSummary(params: { id: number }): Promise<void> {
             if (this.id != params.id) {
-                console.log(`clicked station, showing: ${params.id}`);
-                return this.$router.push({
-                    name: "mapStationBounds",
+                const bounds = this.boundsParam();
+                if (bounds) {
+                    console.log(`clicked station, showing: ${params.id}`);
+                    await this.$router.push({
+                        name: "mapStationBounds",
+                        params: {
+                            id: String(params.id),
+                            bounds: bounds,
+                        },
+                    });
+                }
+            }
+        },
+        async closeSummary(): Promise<void> {
+            const bounds = this.boundsParam();
+            if (bounds) {
+                await this.$router.push({
+                    name: "mapAllStationsBounds",
                     params: {
-                        id: String(params.id),
-                        bounds: this.boundsParam(),
+                        bounds: bounds,
                     },
                 });
             }
-            return Promise.resolve();
-        },
-        closeSummary(): Promise<any> {
-            return this.$router.push({
-                name: "mapAllStationsBounds",
-                params: {
-                    bounds: this.boundsParam(),
-                },
-            });
         },
         switchView(type: string): void {
             this.viewType = type;

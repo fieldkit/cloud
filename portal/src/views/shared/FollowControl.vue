@@ -21,7 +21,9 @@ export default Vue.extend({
             required: true,
         },
     },
-    data() {
+    data(): {
+        action: ProjectFollowing | null;
+    } {
         return {
             action: null,
         };

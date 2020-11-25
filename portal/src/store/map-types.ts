@@ -8,15 +8,21 @@ export interface HasLocation {
 export type LngLat = [number, number];
 
 function lngLatMinimum(c: LngLat[]): LngLat {
-    return [_.min(_.map(c, (v) => v[0])), _.min(_.map(c, (v) => v[1]))];
+    const lng = _.min(_.map(c, (v) => v[0]));
+    const lat = _.min(_.map(c, (v) => v[1]));
+    if (!lng || !lat) throw new Error(`one LngLat is required`);
+    return [lng, lat];
 }
 
 function lngLatMaximum(c: LngLat[]): LngLat {
-    return [_.max(_.map(c, (v) => v[0])), _.max(_.map(c, (v) => v[1]))];
+    const lng = _.max(_.map(c, (v) => v[0]));
+    const lat = _.max(_.map(c, (v) => v[1]));
+    if (!lng || !lat) throw new Error(`one LngLat is required`);
+    return [lng, lat];
 }
 
 export class Location implements HasLocation {
-    constructor(public readonly latitude: number, public readonly longitude) {}
+    constructor(public readonly latitude: number, public readonly longitude: number) {}
 
     maximum(other: Location): Location {
         return new Location(
@@ -69,25 +75,34 @@ export class BoundingRectangle {
         return this.min == null || this.max == null;
     }
 
+    public lngLat(): LngLat[] | null {
+        if (!this.min || !this.max) return null;
+        return [this.min, this.max];
+    }
+
     private calculateMargin(margin: number | null): number {
         if (this.isSingleCoordinate()) {
             return 1000;
         }
+        if (!this.min || !this.max) throw new Error(`invalid operation`);
         const maximum = _.max([this.max[0] - this.min[0], this.max[1] - this.min[1]]);
+        if (!maximum) throw new Error(`invalid operation`);
         return maximum * 50000;
     }
 
-    public zoomOutOrAround(defaultCenter: LngLat, margin: number | null): BoundingRectangle {
+    public zoomOutOrAround(defaultCenter: LngLat, margin: number): BoundingRectangle {
         if (this.isEmpty()) {
             return BoundingRectangle.around(defaultCenter, margin);
         }
         if (this.isSingleCoordinate()) {
+            if (!this.min) throw new Error(`invalid operation`);
             return BoundingRectangle.around(this.min, this.calculateMargin(margin));
         }
         return this.zoomOut(this.calculateMargin(margin));
     }
 
     public zoomOut(margin: number): BoundingRectangle {
+        if (!this.min || !this.max) throw new Error(`invalid operation: zoomOut`);
         /*
 		At 38 degrees North latitude:
 		One degree of latitude equals approximately 364,000 feet (69
@@ -112,12 +127,14 @@ export class BoundingRectangle {
             return BoundingRectangle.around(defaultCenter, margin);
         }
         if (this.isSingleCoordinate()) {
+            if (!this.min) throw new Error(`invalid operation`);
             return BoundingRectangle.around(this.min, margin);
         }
         return this;
     }
 
     public isSingleCoordinate(): boolean {
+        if (this.min == null || this.max == null) return false;
         return this.min[0] === this.max[0] || this.min[1] === this.max[1];
     }
 

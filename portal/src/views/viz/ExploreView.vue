@@ -50,7 +50,10 @@ export default Vue.extend({
             default: false,
         },
     },
-    data: () => {
+    data(): {
+        workspace: Workspace | null;
+        showNoSensors: boolean;
+    } {
         return {
             workspace: null,
             showNoSensors: false,
