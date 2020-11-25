@@ -86,20 +86,20 @@ export class DisplayModule {
 }
 
 export class DisplayStation {
-    id: number;
-    name: string;
-    configurations: Configurations;
-    updatedAt: Date;
-    uploadedAt: Date | null = null;
-    deployedAt: Date | null = null;
-    totalReadings = 0;
-    location: Location | null = null;
-    photos: Photos;
-    modules: DisplayModule[] = [];
-    placeNameOther: string | null;
-    placeNameNative: string | null;
-    battery: number | null;
-    regions: StationRegion[] | null;
+    public readonly id: number;
+    public readonly name: string;
+    public readonly configurations: Configurations;
+    public readonly updatedAt: Date;
+    public readonly uploadedAt: Date | null = null;
+    public readonly deployedAt: Date | null = null;
+    public readonly totalReadings = 0;
+    public readonly location: Location | null = null;
+    public readonly photos: Photos;
+    public readonly modules: DisplayModule[] = [];
+    public readonly placeNameOther: string | null;
+    public readonly placeNameNative: string | null;
+    public readonly battery: number | null;
+    public readonly regions: StationRegion[] | null;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -193,18 +193,21 @@ export class MappedStations {
 
     public focusOn(id: number): MappedStations {
         const station = this.stations.find((s) => s.id == id)!;
+        if (!station.location) {
+            return this;
+        }
         const centered = new BoundingRectangle().include(station.location.lngLat());
         return new MappedStations(this.stations, this.features, centered.zoomOutOrAround(DefaultLocation, DefaultMargin));
     }
 }
 
 export class DisplayProject {
-    id: number;
-    name: string;
-    modules: ProjectModule[];
-    duration: number | null = null;
-    mapped: MappedStations;
-    places: { native: string | null } = { native: null };
+    public readonly id: number;
+    public readonly name: string;
+    public readonly modules: ProjectModule[];
+    public readonly duration: number | null = null;
+    public readonly mapped: MappedStations;
+    public readonly places: { native: string | null } = { native: null };
 
     constructor(public readonly project: Project, public readonly users: ProjectUser[], public readonly stations: DisplayStation[]) {
         this.id = project.id;
