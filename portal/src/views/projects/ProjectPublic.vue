@@ -51,11 +51,19 @@
                     />
                 </div>
                 <div class="right-actions">
-                    <button class="button-social">
-                        <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
-                        Follow
-                    </button>
-                    <button class="button-social">
+                    <FollowControl :project="project">
+                        <template #default="{ following, follow, unfollow }">
+                            <button class="button-social" v-on:click="unfollow" v-if="following">
+                                <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
+                                Unfollow
+                            </button>
+                            <button class="button-social" v-on:click="follow" v-if="!following">
+                                <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
+                                Follow
+                            </button>
+                        </template>
+                    </FollowControl>
+                    <button class="button-social" v-if="false">
                         <img src="@/assets/icon-share.svg" width="12px" alt="Icon" />
                         Share
                     </button>
@@ -63,7 +71,7 @@
             </div>
         </div>
 
-        <div class="update todo-disabled">
+        <div class="update todo-disabled" v-if="false">
             <UserPhoto :user="user" />
             <div>
                 <h1>Project update title</h1>
@@ -137,12 +145,14 @@ import FKApi from "@/api/api";
 import ProjectStations from "./ProjectStations";
 import ProjectActivity from "./ProjectActivity";
 import CommonComponents from "@/views/shared";
+import FollowControl from "@/views/shared/FollowControl.vue";
 
 export default {
     name: "ProjectPublic",
     components: {
         ...CommonComponents,
         ProjectStations,
+        FollowControl,
     },
     data: () => {
         return {};

@@ -187,7 +187,10 @@ export interface Project {
     mediaUrl: string;
     startTime?: Date;
     endTime?: Date;
-    numberOfFollowers: number;
+    following: {
+        following: boolean;
+        total: number;
+    };
 }
 
 export interface Owner {
