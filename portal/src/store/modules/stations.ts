@@ -160,6 +160,7 @@ export class MapFeature {
 }
 
 const DefaultLocation: LngLat = [-118.0730372, 34.3318104]; // TwinPeaks
+const DefaultMargin = 10000;
 
 export class MappedStations {
     public static make(stations: DisplayStation[]): MappedStations {
@@ -169,7 +170,7 @@ export class MappedStations {
             (bb: BoundingRectangle, feature: MapFeature) => bb.includeAll(feature.bounds),
             new BoundingRectangle()
         );
-        return new MappedStations(stations, features, around.zoomOutOrAround(DefaultLocation));
+        return new MappedStations(stations, features, around.zoomOutOrAround(DefaultLocation, DefaultMargin));
     }
 
     constructor(
@@ -193,7 +194,7 @@ export class MappedStations {
     public focusOn(id: number): MappedStations {
         const station = this.stations.find((s) => s.id == id)!;
         const centered = new BoundingRectangle().include(station.location.lngLat());
-        return new MappedStations(this.stations, this.features, centered.zoomOutOrAround(DefaultLocation));
+        return new MappedStations(this.stations, this.features, centered.zoomOutOrAround(DefaultLocation, DefaultMargin));
     }
 }
 

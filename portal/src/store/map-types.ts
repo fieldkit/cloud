@@ -69,7 +69,7 @@ export class BoundingRectangle {
         return this.min == null || this.max == null;
     }
 
-    private calculateMargin(margin: number | undefined): number {
+    private calculateMargin(margin: number | null): number {
         if (this.isSingleCoordinate()) {
             return 1000;
         }
@@ -77,7 +77,7 @@ export class BoundingRectangle {
         return maximum * 50000;
     }
 
-    public zoomOutOrAround(defaultCenter: LngLat, margin: number | undefined = undefined): BoundingRectangle {
+    public zoomOutOrAround(defaultCenter: LngLat, margin: number | null): BoundingRectangle {
         if (this.isEmpty()) {
             return BoundingRectangle.around(defaultCenter, margin);
         }
