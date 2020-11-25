@@ -144,6 +144,8 @@ type WriteInfo struct {
 	MetaErrors   int64
 	DataErrors   int64
 	StationID    *int32
+	DataStart    time.Time
+	DataEnd      time.Time
 }
 
 func (ra *RecordAdder) fixDataRecord(ctx context.Context, record *pb.DataRecord) (bool, error) {
@@ -307,6 +309,8 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 		MetaErrors:   int64(metaErrors),
 		DataErrors:   int64(dataErrors),
 		StationID:    stationID,
+		DataStart:    ra.statistics.start,
+		DataEnd:      ra.statistics.end,
 	}
 
 	return

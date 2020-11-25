@@ -91,9 +91,17 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		}
 
 		if info.StationID != nil {
+			now := time.Now()
+			howFarBack := time.Hour * 48
+			if now.After(info.DataStart) {
+				howFarBack += now.Sub(info.DataStart)
+				log.Infow("refreshing", "how_far_back", howFarBack)
+			} else {
+				log.Warnw("data-after-now", "data_start", info.DataStart, "data_end", info.DataEnd, "now", now)
+			}
 			if err := h.publisher.Publish(ctx, &messages.RefreshStation{
 				StationID:   *info.StationID,
-				HowRecently: time.Hour * 48,
+				HowRecently: howFarBack,
 				Completely:  false,
 				UserID:      i.UserID,
 			}); err != nil {
