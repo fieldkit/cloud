@@ -22,7 +22,7 @@
                     <img v-if="!module.internal" alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
                 </div>
             </div>
-            <img alt="Close" src="@/assets/icon-close.svg" class="close-button"  v-on:click="wantCloseSummary" />
+            <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
         </div>
 
         <div class="row where-row" v-if="station.placeNameNative || station.placeNameOther || station.placeNameNative">
@@ -38,12 +38,12 @@
             <div class="coordinates-row">
                 <div v-if="station.location" class="location-coordinates valid">
                     <div class="coordinate latitude">
-                        <div> {{ station.location.latitude | prettyCoordinate }} </div>
-                        <div> Latitude </div>
+                        <div>{{ station.location.latitude | prettyCoordinate }}</div>
+                        <div>Latitude</div>
                     </div>
                     <div class="coordinate longitude">
-                        <div> {{ station.location.longitude | prettyCoordinate }} </div>
-                        <div> Longitude </div>
+                        <div>{{ station.location.longitude | prettyCoordinate }}</div>
+                        <div>Longitude</div>
                     </div>
                 </div>
                 <!--
@@ -63,13 +63,13 @@
                 <div class="empty"></div>
             </div>
         </div>
+
         <div class="readings-container" v-if="readings">
             <div class="title">Latest Readings</div>
             <LatestStationReadings :id="station.id" />
         </div>
-        <div class="explore-button" v-if="readings" v-on:click="onClickExplore">
-            Explore Data
-        </div>
+
+        <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
     </div>
 </template>
 
@@ -96,6 +96,10 @@ export default Vue.extend({
             required: true,
         },
         readings: {
+            type: Boolean,
+            default: true,
+        },
+        explore: {
             type: Boolean,
             default: true,
         },
@@ -261,7 +265,7 @@ export default Vue.extend({
     color: #6a6d71;
 }
 ::v-deep .reading {
-   height: 35px;
+    height: 35px;
 
     .name {
         font-size: 11px;
