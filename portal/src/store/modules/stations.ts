@@ -111,7 +111,7 @@ export class DisplayStation {
         this.placeNameNative = station.placeNameNative;
         this.deployedAt = station.recordingStartedAt;
         this.updatedAt = station.updatedAt ? new Date(station.updatedAt) : null;
-        this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => u.time));
+        this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time)));
         this.modules =
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))

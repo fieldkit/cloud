@@ -107,7 +107,7 @@ export class BoundingRectangle {
         return new BoundingRectangle(min, max);
     }
 
-    public expandIfSingleCoordinate(defaultCenter: LngLat, margin: number): BoundingRectangle {
+    private expandIfSingleCoordinate(defaultCenter: LngLat, margin: number): BoundingRectangle {
         if (this.isEmpty()) {
             return BoundingRectangle.around(defaultCenter, margin);
         }

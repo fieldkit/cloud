@@ -36,10 +36,10 @@ export class QueriedData {
     constructor(public readonly timeRangeQueried: TimeRange, private readonly sdr: SensorDataResponse) {
         if (this.sdr.data.length > 0) {
             const values = _(this.sdr.data)
-                .filter((d) => d.value)
+                .filter((d) => !!d.value)
                 .map((d) => d.value);
             const times = _(this.sdr.data)
-                .filter((d) => d.value)
+                .filter((d) => !!d.value)
                 .map((d) => d.time);
             this.dataRange = [values.min(), values.max()];
             this.timeRangeData = [times.min(), times.max()];
@@ -459,19 +459,20 @@ export class Workspace {
         // Make all the queries and then give the queried data to the
         // resolve call for that query. This will end up calling the
         // above mapped resolve to set the appropriate data.
-        const pendingInfo = infoQueries.map((iq) =>
-            this.querier.queryInfo(iq).then((info) => {
-                return _.map(info.stations, (info, stationId) => {
-                    const name = info[0].name;
-                    const sensors = info.map((row) => new SensorMeta(row.sensorId, row.key, row.key));
-                    const station = new StationMeta(Number(stationId), name, sensors);
-                    this.stations[station.id] = station;
-                    return station;
-                });
-            })
+        const pendingInfo = infoQueries.map(
+            (iq) =>
+                this.querier.queryInfo(iq).then((info) => {
+                    return _.map(info.stations, (info, stationId) => {
+                        const name = info[0].stationName;
+                        const sensors = info.map((row) => new SensorMeta(row.sensorId, row.key, row.key));
+                        const station = new StationMeta(Number(stationId), name, sensors);
+                        this.stations[station.id] = station;
+                        return station;
+                    });
+                }) as Promise<unknown>
         );
 
-        const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq));
+        const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq) as Promise<unknown>);
         return Promise.all([...pendingInfo, ...pendingData]).then(() => {
             this._options = this.updateOptions();
         });
