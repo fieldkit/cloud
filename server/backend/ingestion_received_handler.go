@@ -95,7 +95,12 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 			howFarBack := time.Hour * 48
 			if now.After(info.DataStart) {
 				howFarBack += now.Sub(info.DataStart)
-				log.Infow("refreshing", "how_far_back", howFarBack)
+				if howFarBack < 0 {
+					log.Infow("refreshing-error", "how_far_back", howFarBack, "data_end", info.DataEnd, "now", now)
+					howFarBack = time.Hour * 48
+				} else {
+					log.Infow("refreshing", "how_far_back", howFarBack, "data_end", info.DataEnd, "now", now)
+				}
 			} else {
 				log.Warnw("data-after-now", "data_start", info.DataStart, "data_end", info.DataEnd, "now", now)
 			}
