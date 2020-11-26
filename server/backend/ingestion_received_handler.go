@@ -93,7 +93,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		if info.StationID != nil {
 			now := time.Now()
 			howFarBack := time.Hour * 48
-			if now.After(info.DataStart) {
+			if !info.DataStart.IsZero() && now.After(info.DataStart) {
 				howFarBack += now.Sub(info.DataStart)
 				if howFarBack < 0 {
 					log.Infow("refreshing-error", "how_far_back", howFarBack, "data_end", info.DataEnd, "now", now)
