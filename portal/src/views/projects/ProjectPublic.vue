@@ -128,7 +128,7 @@
             </div>
         </div>
 
-        <Comments :type="'project'"> </Comments>
+        <Comments :type="'project'" :user="user" :project="displayProject"> </Comments>
 
     </div>
 </template>

@@ -1009,6 +1009,25 @@ class FKApi {
             url: this.baseUrl + "/status",
         });
     }
+
+    public getComments(projectID) {
+
+        return this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + '/discussion/projects/' + projectID,
+        });
+    }
+
+    public postComment(comment) {
+
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + '/discussion',
+            data: { post: comment },
+        });
+    }
 }
 
 export interface PortalDeployStatus {
