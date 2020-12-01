@@ -1694,8 +1694,9 @@ paths:
                 posts:
                 - author:
                     id: 1660688653
-                    mediaUrl: Debitis deleniti accusantium porro ut ut.
                     name: Provident et est consequatur consequatur.
+                    photo:
+                      url: Debitis deleniti accusantium porro ut ut.
                   body: Explicabo hic voluptatem repellat.
                   bookmark: Qui dicta soluta.
                   createdAt: 133332481807086315
@@ -1708,8 +1709,9 @@ paths:
                   updatedAt: 4093833558468146381
                 - author:
                     id: 1660688653
-                    mediaUrl: Debitis deleniti accusantium porro ut ut.
                     name: Provident et est consequatur consequatur.
+                    photo:
+                      url: Debitis deleniti accusantium porro ut ut.
                   body: Explicabo hic voluptatem repellat.
                   bookmark: Qui dicta soluta.
                   createdAt: 133332481807086315
@@ -1722,8 +1724,9 @@ paths:
                   updatedAt: 4093833558468146381
                 - author:
                     id: 1660688653
-                    mediaUrl: Debitis deleniti accusantium porro ut ut.
                     name: Provident et est consequatur consequatur.
+                    photo:
+                      url: Debitis deleniti accusantium porro ut ut.
                   body: Explicabo hic voluptatem repellat.
                   bookmark: Qui dicta soluta.
                   createdAt: 133332481807086315
@@ -1736,8 +1739,9 @@ paths:
                   updatedAt: 4093833558468146381
                 - author:
                     id: 1660688653
-                    mediaUrl: Debitis deleniti accusantium porro ut ut.
                     name: Provident et est consequatur consequatur.
+                    photo:
+                      url: Debitis deleniti accusantium porro ut ut.
                   body: Explicabo hic voluptatem repellat.
                   bookmark: Qui dicta soluta.
                   createdAt: 133332481807086315
@@ -1833,8 +1837,9 @@ paths:
                 post:
                   author:
                     id: 1660688653
-                    mediaUrl: Debitis deleniti accusantium porro ut ut.
                     name: Provident et est consequatur consequatur.
+                    photo:
+                      url: Debitis deleniti accusantium porro ut ut.
                   body: Explicabo hic voluptatem repellat.
                   bookmark: Qui dicta soluta.
                   createdAt: 133332481807086315
@@ -2013,8 +2018,9 @@ paths:
                 post:
                   author:
                     id: 1660688653
-                    mediaUrl: Debitis deleniti accusantium porro ut ut.
                     name: Provident et est consequatur consequatur.
+                    photo:
+                      url: Debitis deleniti accusantium porro ut ut.
                   body: Explicabo hic voluptatem repellat.
                   bookmark: Qui dicta soluta.
                   createdAt: 133332481807086315
@@ -2108,8 +2114,9 @@ paths:
                 posts:
                 - author:
                     id: 1660688653
-                    mediaUrl: Debitis deleniti accusantium porro ut ut.
                     name: Provident et est consequatur consequatur.
+                    photo:
+                      url: Debitis deleniti accusantium porro ut ut.
                   body: Explicabo hic voluptatem repellat.
                   bookmark: Qui dicta soluta.
                   createdAt: 133332481807086315
@@ -2122,8 +2129,9 @@ paths:
                   updatedAt: 4093833558468146381
                 - author:
                     id: 1660688653
-                    mediaUrl: Debitis deleniti accusantium porro ut ut.
                     name: Provident et est consequatur consequatur.
+                    photo:
+                      url: Debitis deleniti accusantium porro ut ut.
                   body: Explicabo hic voluptatem repellat.
                   bookmark: Qui dicta soluta.
                   createdAt: 133332481807086315
@@ -17566,25 +17574,25 @@ components:
       properties:
         etag:
           type: string
-          example: Sint ut ullam ipsa aut.
+          example: Omnis iure eius non ullam.
         meta:
           type: string
-          example: Et ducimus tempora.
+          example: Ut harum et possimus.
         module:
           type: string
-          example: Sunt fuga porro.
+          example: Officiis vel et.
         profile:
           type: string
-          example: Nihil sed repellendus omnis.
+          example: Tempora ipsum.
         url:
           type: string
-          example: Eius non ullam laudantium officiis.
+          example: Debitis et.
       example:
-        etag: Praesentium debitis.
-        meta: Aut vero alias animi.
-        module: Totam ut harum et.
-        profile: Est quos impedit odit.
-        url: Consequuntur consequatur.
+        etag: Quos impedit odit velit consequuntur consequatur sed.
+        meta: Magni corrupti numquam temporibus dolores hic.
+        module: Vero alias.
+        profile: Consectetur corporis voluptatem incidunt placeat quo sit.
+        url: Et vero quibusdam.
       required:
       - etag
       - module
@@ -17831,10 +17839,10 @@ components:
           $ref: '#/components/schemas/PostAuthor'
         body:
           type: string
-          example: Voluptas aliquam enim nihil.
+          example: Quos iste necessitatibus voluptas aliquam enim.
         bookmark:
           type: string
-          example: Quos sunt id et minus iure.
+          example: Sit quos sunt id et.
         createdAt:
           type: integer
           example: 5561161051038848517
@@ -17850,8 +17858,9 @@ components:
           example:
           - author:
               id: 1660688653
-              mediaUrl: Debitis deleniti accusantium porro ut ut.
               name: Provident et est consequatur consequatur.
+              photo:
+                url: Debitis deleniti accusantium porro ut ut.
             body: Explicabo hic voluptatem repellat.
             bookmark: Qui dicta soluta.
             createdAt: 133332481807086315
@@ -17864,8 +17873,24 @@ components:
             updatedAt: 4093833558468146381
           - author:
               id: 1660688653
-              mediaUrl: Debitis deleniti accusantium porro ut ut.
               name: Provident et est consequatur consequatur.
+              photo:
+                url: Debitis deleniti accusantium porro ut ut.
+            body: Explicabo hic voluptatem repellat.
+            bookmark: Qui dicta soluta.
+            createdAt: 133332481807086315
+            id: 913029062225903214
+            replies:
+            - {}
+            - {}
+            - {}
+            - {}
+            updatedAt: 4093833558468146381
+          - author:
+              id: 1660688653
+              name: Provident et est consequatur consequatur.
+              photo:
+                url: Debitis deleniti accusantium porro ut ut.
             body: Explicabo hic voluptatem repellat.
             bookmark: Qui dicta soluta.
             createdAt: 133332481807086315
@@ -17883,17 +17908,19 @@ components:
       example:
         author:
           id: 1647552801
-          mediaUrl: Ipsam nostrum unde.
           name: Optio et vitae officiis itaque.
-        body: Quas nesciunt est omnis unde quo sunt.
-        bookmark: Nam sit pariatur ex natus nemo.
-        createdAt: 4268918349102343242
-        id: 2709786909255442978
+          photo:
+            url: Ipsam nostrum unde.
+        body: Ut sint.
+        bookmark: Nesciunt est omnis unde quo sunt ut.
+        createdAt: 7360702615290114251
+        id: 7494486506475841630
         replies:
         - author:
             id: 1660688653
-            mediaUrl: Debitis deleniti accusantium porro ut ut.
             name: Provident et est consequatur consequatur.
+            photo:
+              url: Debitis deleniti accusantium porro ut ut.
           body: Explicabo hic voluptatem repellat.
           bookmark: Qui dicta soluta.
           createdAt: 133332481807086315
@@ -17906,8 +17933,9 @@ components:
           updatedAt: 4093833558468146381
         - author:
             id: 1660688653
-            mediaUrl: Debitis deleniti accusantium porro ut ut.
             name: Provident et est consequatur consequatur.
+            photo:
+              url: Debitis deleniti accusantium porro ut ut.
           body: Explicabo hic voluptatem repellat.
           bookmark: Qui dicta soluta.
           createdAt: 133332481807086315
@@ -17918,35 +17946,7 @@ components:
           - {}
           - {}
           updatedAt: 4093833558468146381
-        - author:
-            id: 1660688653
-            mediaUrl: Debitis deleniti accusantium porro ut ut.
-            name: Provident et est consequatur consequatur.
-          body: Explicabo hic voluptatem repellat.
-          bookmark: Qui dicta soluta.
-          createdAt: 133332481807086315
-          id: 913029062225903214
-          replies:
-          - {}
-          - {}
-          - {}
-          - {}
-          updatedAt: 4093833558468146381
-        - author:
-            id: 1660688653
-            mediaUrl: Debitis deleniti accusantium porro ut ut.
-            name: Provident et est consequatur consequatur.
-          body: Explicabo hic voluptatem repellat.
-          bookmark: Qui dicta soluta.
-          createdAt: 133332481807086315
-          id: 913029062225903214
-          replies:
-          - {}
-          - {}
-          - {}
-          - {}
-          updatedAt: 4093833558468146381
-        updatedAt: 7916614735003109248
+        updatedAt: 2709786909255442978
       required:
       - id
       - createdAt
@@ -17959,23 +17959,23 @@ components:
       properties:
         body:
           type: string
-          example: Velit quasi.
+          example: Natus nemo quasi quibusdam odio quia.
         bookmark:
           type: string
-          example: Ut esse quis at.
+          example: Quis quasi ut esse quis at est.
         projectId:
           type: integer
-          example: 1197738626
+          example: 1923601047
           format: int32
         threadId:
           type: integer
-          example: 4051203120745301430
+          example: 6684073705581119796
           format: int64
       example:
-        body: Maxime vitae voluptatibus.
-        bookmark: Reprehenderit veritatis dolorum.
-        projectId: 1368831066
-        threadId: 7147071214095224877
+        body: Vitae voluptatibus occaecati facere.
+        bookmark: Dolorum nisi.
+        projectId: 956764918
+        threadId: 6006601004028058782
       required:
       - body
     AppExportStatus:
@@ -17983,55 +17983,55 @@ components:
       properties:
         args:
           type: string
-          example: Voluptatem ipsam architecto.
+          example: Omnis quia cupiditate voluptatem minima tenetur incidunt.
           format: binary
         completedAt:
           type: integer
-          example: 5299599333321942328
+          example: 6922977049003574510
           format: int64
         createdAt:
           type: integer
-          example: 7181156518991120087
+          example: 4470853734106695684
           format: int64
         downloadUrl:
           type: string
-          example: Doloremque fuga.
+          example: Culpa asperiores voluptatem ipsam.
         format:
           type: string
-          example: Atque id et porro quam autem.
+          example: Et porro quam autem ut.
         id:
           type: integer
-          example: 8190093574566680954
+          example: 5168426781915717742
           format: int64
         message:
           type: string
-          example: Sapiente non quae deserunt.
+          example: Non quae deserunt id quisquam numquam soluta.
         progress:
           type: number
-          example: 0.02244611
+          example: 0.871363
           format: float
         size:
           type: integer
-          example: 1915945584
+          example: 82167030
           format: int32
         statusUrl:
           type: string
-          example: Quisquam numquam soluta eos et.
+          example: Et rem doloremque.
         token:
           type: string
-          example: Facere in doloribus id.
+          example: Doloribus id molestias voluptas.
       example:
-        args: Doloremque beatae voluptas nemo quod.
-        completedAt: 7059532863013812684
-        createdAt: 1090663860682206174
-        downloadUrl: Beatae sint pariatur.
-        format: Voluptas ex repellendus fuga iusto numquam iusto.
-        id: 4669686068996666200
-        message: Quos laudantium reiciendis alias commodi labore.
-        progress: 0.73997635
-        size: 699294935
-        statusUrl: Similique animi provident molestiae et non nostrum.
-        token: Quia cupiditate voluptatem minima tenetur.
+        args: Aut voluptates sunt fuga porro quasi.
+        completedAt: 2399639592590268361
+        createdAt: 6825077044755761364
+        downloadUrl: Nemo quod cumque in quo sint ut.
+        format: Laudantium reiciendis alias commodi labore repellat similique.
+        id: 7059532863013812684
+        message: Molestiae et non nostrum voluptatum.
+        progress: 0.2668023
+        size: 2042708426
+        statusUrl: Sint pariatur qui in doloremque beatae.
+        token: Voluptas ex repellendus fuga iusto numquam iusto.
       required:
       - id
       - token
@@ -18045,49 +18045,48 @@ components:
       properties:
         buildNumber:
           type: integer
-          example: 1135689290
+          example: 1594812486
           format: int32
         buildTime:
           type: integer
-          example: 1623209227465119099
+          example: 3527810252569764137
           format: int64
         etag:
           type: string
-          example: Quo sit harum et vero.
+          example: Velit earum ut itaque qui.
         id:
           type: integer
-          example: 1241968223
+          example: 2068292949
           format: int32
         meta:
           type: object
           example:
-            Itaque qui enim ducimus perferendis dolores autem.: Fugiat deleniti excepturi aut delectus.
+            Est quos odit vel.: Unde maxime ut nulla.
+            Voluptas iusto ratione beatae quam fugit libero.: Et quam vel quis id laboriosam.
           additionalProperties: true
         module:
           type: string
-          example: Voluptates magni.
+          example: Ducimus perferendis dolores autem vero fugiat.
         profile:
           type: string
-          example: Numquam temporibus dolores hic iure sapiente.
+          example: Excepturi aut delectus dolorem.
         time:
           type: string
-          example: Voluptatem incidunt.
+          example: Ducimus quaerat sit id.
         url:
           type: string
-          example: Quaerat sit id est velit.
+          example: Unde pariatur cumque.
       example:
-        buildNumber: 1319986150
-        buildTime: 8498761167695386179
-        etag: Quam fugit libero.
-        id: 674198761
+        buildNumber: 1921858246
+        buildTime: 3604730765127663297
+        etag: Nobis ut distinctio saepe quasi tenetur delectus.
+        id: 2023079091
         meta:
-          Et tenetur quisquam.: Quia nobis ut.
-          Libero eum necessitatibus.: Nulla dolorum molestias consequatur.
-          Saepe quasi tenetur delectus laudantium eligendi quia.: Exercitationem qui sit.
-        module: Et quam vel quis id laboriosam.
-        profile: Est quos odit vel.
-        time: Cumque magnam enim voluptas iusto ratione.
-        url: Unde maxime ut nulla.
+          Sequi ut animi qui architecto soluta.: Explicabo aut.
+        module: Eligendi quia sit.
+        profile: Qui sit voluptatem libero eum necessitatibus.
+        time: Quisquam eveniet.
+        url: Nulla dolorum molestias consequatur.
       required:
       - id
       - time
@@ -18102,14 +18101,14 @@ components:
       type: object
       properties:
         avatar:
-          $ref: '#/components/schemas/Avatar'
+          $ref: '#/components/schemas/AuthorPhoto'
         id:
           type: integer
-          example: 8433987269386450659
+          example: 7851375624738892412
           format: int64
         name:
           type: string
-          example: Qui architecto soluta id explicabo aut non.
+          example: Omnis nemo velit explicabo.
       example:
         avatar:
           url: Esse ducimus quas eos non aut.
@@ -18497,6 +18496,16 @@ components:
               - 0.4787532228582846
               - 0.25503429254047066
         url: Qui tempore ea sapiente.
+    AuthorPhoto:
+      type: object
+      properties:
+        url:
+          type: string
+          example: Magni velit et ipsam reprehenderit aut sed.
+      example:
+        url: Aut qui ipsam nam.
+      required:
+      - url
     AvailableRoles:
       type: object
       properties:
@@ -18521,16 +18530,6 @@ components:
           name: Quia fugit sit.
       required:
       - roles
-    Avatar:
-      type: object
-      properties:
-        url:
-          type: string
-          example: Dolor deleniti.
-      example:
-        url: Omnis nemo velit explicabo.
-      required:
-      - url
     DeviceDataSummaryResponse:
       type: object
       properties:
@@ -19493,8 +19492,9 @@ components:
           example:
           - author:
               id: 1660688653
-              mediaUrl: Debitis deleniti accusantium porro ut ut.
               name: Provident et est consequatur consequatur.
+              photo:
+                url: Debitis deleniti accusantium porro ut ut.
             body: Explicabo hic voluptatem repellat.
             bookmark: Qui dicta soluta.
             createdAt: 133332481807086315
@@ -19507,8 +19507,9 @@ components:
             updatedAt: 4093833558468146381
           - author:
               id: 1660688653
-              mediaUrl: Debitis deleniti accusantium porro ut ut.
               name: Provident et est consequatur consequatur.
+              photo:
+                url: Debitis deleniti accusantium porro ut ut.
             body: Explicabo hic voluptatem repellat.
             bookmark: Qui dicta soluta.
             createdAt: 133332481807086315
@@ -19521,8 +19522,9 @@ components:
             updatedAt: 4093833558468146381
           - author:
               id: 1660688653
-              mediaUrl: Debitis deleniti accusantium porro ut ut.
               name: Provident et est consequatur consequatur.
+              photo:
+                url: Debitis deleniti accusantium porro ut ut.
             body: Explicabo hic voluptatem repellat.
             bookmark: Qui dicta soluta.
             createdAt: 133332481807086315
@@ -19535,8 +19537,9 @@ components:
             updatedAt: 4093833558468146381
           - author:
               id: 1660688653
-              mediaUrl: Debitis deleniti accusantium porro ut ut.
               name: Provident et est consequatur consequatur.
+              photo:
+                url: Debitis deleniti accusantium porro ut ut.
             body: Explicabo hic voluptatem repellat.
             bookmark: Qui dicta soluta.
             createdAt: 133332481807086315
@@ -19551,8 +19554,9 @@ components:
         posts:
         - author:
             id: 1660688653
-            mediaUrl: Debitis deleniti accusantium porro ut ut.
             name: Provident et est consequatur consequatur.
+            photo:
+              url: Debitis deleniti accusantium porro ut ut.
           body: Explicabo hic voluptatem repellat.
           bookmark: Qui dicta soluta.
           createdAt: 133332481807086315
@@ -19565,22 +19569,9 @@ components:
           updatedAt: 4093833558468146381
         - author:
             id: 1660688653
-            mediaUrl: Debitis deleniti accusantium porro ut ut.
             name: Provident et est consequatur consequatur.
-          body: Explicabo hic voluptatem repellat.
-          bookmark: Qui dicta soluta.
-          createdAt: 133332481807086315
-          id: 913029062225903214
-          replies:
-          - {}
-          - {}
-          - {}
-          - {}
-          updatedAt: 4093833558468146381
-        - author:
-            id: 1660688653
-            mediaUrl: Debitis deleniti accusantium porro ut ut.
-            name: Provident et est consequatur consequatur.
+            photo:
+              url: Debitis deleniti accusantium porro ut ut.
           body: Explicabo hic voluptatem repellat.
           bookmark: Qui dicta soluta.
           createdAt: 133332481807086315
@@ -21012,16 +21003,16 @@ components:
           type: integer
           example: 1798373999
           format: int32
-        mediaUrl:
-          type: string
-          example: Magni velit et ipsam reprehenderit aut sed.
         name:
           type: string
           example: Repellat in velit.
+        photo:
+          $ref: '#/components/schemas/AuthorPhoto'
       example:
-        id: 1553631782
-        mediaUrl: Unde ex voluptatibus velit qui beatae quos.
-        name: Qui ipsam nam.
+        id: 1601264291
+        name: Ex voluptatibus velit.
+        photo:
+          url: Ipsam nostrum unde.
       required:
       - id
       - name
@@ -21047,8 +21038,9 @@ components:
         post:
           author:
             id: 1660688653
-            mediaUrl: Debitis deleniti accusantium porro ut ut.
             name: Provident et est consequatur consequatur.
+            photo:
+              url: Debitis deleniti accusantium porro ut ut.
           body: Explicabo hic voluptatem repellat.
           bookmark: Qui dicta soluta.
           createdAt: 133332481807086315
@@ -29325,9 +29317,9 @@ components:
       properties:
         body:
           type: string
-          example: Quia enim facilis rem dolorum explicabo.
+          example: Enim facilis rem.
       example:
-        body: Nisi voluptatem.
+        body: Explicabo aut nisi voluptatem ipsa voluptatem.
       required:
       - body
     UpdateRequestBody:
@@ -29526,19 +29518,19 @@ components:
             size: 862612163
             statusUrl: Assumenda sunt.
             token: Qui aspernatur neque.
+          - args: Aut eius quibusdam illum omnis.
+            completedAt: 3809096952247978960
+            createdAt: 6573376015054568281
+            downloadUrl: Temporibus rerum.
+            format: Cumque ratione nostrum nostrum.
+            id: 3550966959740410251
+            message: Aut repellat nemo illo ut dicta.
+            progress: 0.12977818
+            size: 862612163
+            statusUrl: Assumenda sunt.
+            token: Qui aspernatur neque.
       example:
         exports:
-        - args: Aut eius quibusdam illum omnis.
-          completedAt: 3809096952247978960
-          createdAt: 6573376015054568281
-          downloadUrl: Temporibus rerum.
-          format: Cumque ratione nostrum nostrum.
-          id: 3550966959740410251
-          message: Aut repellat nemo illo ut dicta.
-          progress: 0.12977818
-          size: 862612163
-          statusUrl: Assumenda sunt.
-          token: Qui aspernatur neque.
         - args: Aut eius quibusdam illum omnis.
           completedAt: 3809096952247978960
           createdAt: 6573376015054568281

@@ -4626,6 +4626,17 @@ definitions:
     - temporary
     - timeout
     - fault
+  AuthorPhotoResponseBody:
+    title: AuthorPhotoResponseBody
+    type: object
+    properties:
+      url:
+        type: string
+        example: Omnis repellat repudiandae velit molestias.
+    example:
+      url: Laboriosam perferendis explicabo.
+    required:
+    - url
   AvailableRoleResponseBody:
     title: AvailableRoleResponseBody
     type: object
@@ -5286,8 +5297,9 @@ definitions:
         example:
         - author:
             id: 1647552801
-            mediaUrl: Ipsam nostrum unde.
             name: Optio et vitae officiis itaque.
+            photo:
+              url: Ipsam nostrum unde.
           body: Perspiciatis perspiciatis minus sed.
           bookmark: Vero dolorem autem quae ut voluptatem veritatis.
           createdAt: 8530931048661253846
@@ -5299,8 +5311,9 @@ definitions:
           updatedAt: 6559612527132995481
         - author:
             id: 1647552801
-            mediaUrl: Ipsam nostrum unde.
             name: Optio et vitae officiis itaque.
+            photo:
+              url: Ipsam nostrum unde.
           body: Perspiciatis perspiciatis minus sed.
           bookmark: Vero dolorem autem quae ut voluptatem veritatis.
           createdAt: 8530931048661253846
@@ -5312,8 +5325,9 @@ definitions:
           updatedAt: 6559612527132995481
         - author:
             id: 1647552801
-            mediaUrl: Ipsam nostrum unde.
             name: Optio et vitae officiis itaque.
+            photo:
+              url: Ipsam nostrum unde.
           body: Perspiciatis perspiciatis minus sed.
           bookmark: Vero dolorem autem quae ut voluptatem veritatis.
           createdAt: 8530931048661253846
@@ -5328,8 +5342,9 @@ definitions:
       posts:
       - author:
           id: 1647552801
-          mediaUrl: Ipsam nostrum unde.
           name: Optio et vitae officiis itaque.
+          photo:
+            url: Ipsam nostrum unde.
         body: Perspiciatis perspiciatis minus sed.
         bookmark: Vero dolorem autem quae ut voluptatem veritatis.
         createdAt: 8530931048661253846
@@ -5341,8 +5356,9 @@ definitions:
         updatedAt: 6559612527132995481
       - author:
           id: 1647552801
-          mediaUrl: Ipsam nostrum unde.
           name: Optio et vitae officiis itaque.
+          photo:
+            url: Ipsam nostrum unde.
         body: Perspiciatis perspiciatis minus sed.
         bookmark: Vero dolorem autem quae ut voluptatem veritatis.
         createdAt: 8530931048661253846
@@ -5354,8 +5370,9 @@ definitions:
         updatedAt: 6559612527132995481
       - author:
           id: 1647552801
-          mediaUrl: Ipsam nostrum unde.
           name: Optio et vitae officiis itaque.
+          photo:
+            url: Ipsam nostrum unde.
         body: Perspiciatis perspiciatis minus sed.
         bookmark: Vero dolorem autem quae ut voluptatem veritatis.
         createdAt: 8530931048661253846
@@ -5367,8 +5384,9 @@ definitions:
         updatedAt: 6559612527132995481
       - author:
           id: 1647552801
-          mediaUrl: Ipsam nostrum unde.
           name: Optio et vitae officiis itaque.
+          photo:
+            url: Ipsam nostrum unde.
         body: Perspiciatis perspiciatis minus sed.
         bookmark: Vero dolorem autem quae ut voluptatem veritatis.
         createdAt: 8530931048661253846
@@ -5748,8 +5766,9 @@ definitions:
       post:
         author:
           id: 1660688653
-          mediaUrl: Debitis deleniti accusantium porro ut ut.
           name: Provident et est consequatur consequatur.
+          photo:
+            url: Debitis deleniti accusantium porro ut ut.
         body: Explicabo hic voluptatem repellat.
         bookmark: Qui dicta soluta.
         createdAt: 133332481807086315
@@ -5945,8 +5964,9 @@ definitions:
         example:
         - author:
             id: 1647552801
-            mediaUrl: Ipsam nostrum unde.
             name: Optio et vitae officiis itaque.
+            photo:
+              url: Ipsam nostrum unde.
           body: Perspiciatis perspiciatis minus sed.
           bookmark: Vero dolorem autem quae ut voluptatem veritatis.
           createdAt: 8530931048661253846
@@ -5958,8 +5978,9 @@ definitions:
           updatedAt: 6559612527132995481
         - author:
             id: 1647552801
-            mediaUrl: Ipsam nostrum unde.
             name: Optio et vitae officiis itaque.
+            photo:
+              url: Ipsam nostrum unde.
           body: Perspiciatis perspiciatis minus sed.
           bookmark: Vero dolorem autem quae ut voluptatem veritatis.
           createdAt: 8530931048661253846
@@ -5971,8 +5992,9 @@ definitions:
           updatedAt: 6559612527132995481
         - author:
             id: 1647552801
-            mediaUrl: Ipsam nostrum unde.
             name: Optio et vitae officiis itaque.
+            photo:
+              url: Ipsam nostrum unde.
           body: Perspiciatis perspiciatis minus sed.
           bookmark: Vero dolorem autem quae ut voluptatem veritatis.
           createdAt: 8530931048661253846
@@ -5984,8 +6006,9 @@ definitions:
           updatedAt: 6559612527132995481
         - author:
             id: 1647552801
-            mediaUrl: Ipsam nostrum unde.
             name: Optio et vitae officiis itaque.
+            photo:
+              url: Ipsam nostrum unde.
           body: Perspiciatis perspiciatis minus sed.
           bookmark: Vero dolorem autem quae ut voluptatem veritatis.
           createdAt: 8530931048661253846
@@ -6000,8 +6023,9 @@ definitions:
       posts:
       - author:
           id: 1647552801
-          mediaUrl: Ipsam nostrum unde.
           name: Optio et vitae officiis itaque.
+          photo:
+            url: Ipsam nostrum unde.
         body: Perspiciatis perspiciatis minus sed.
         bookmark: Vero dolorem autem quae ut voluptatem veritatis.
         createdAt: 8530931048661253846
@@ -6013,8 +6037,9 @@ definitions:
         updatedAt: 6559612527132995481
       - author:
           id: 1647552801
-          mediaUrl: Ipsam nostrum unde.
           name: Optio et vitae officiis itaque.
+          photo:
+            url: Ipsam nostrum unde.
         body: Perspiciatis perspiciatis minus sed.
         bookmark: Vero dolorem autem quae ut voluptatem veritatis.
         createdAt: 8530931048661253846
@@ -6219,8 +6244,9 @@ definitions:
       post:
         author:
           id: 1660688653
-          mediaUrl: Debitis deleniti accusantium porro ut ut.
           name: Provident et est consequatur consequatur.
+          photo:
+            url: Debitis deleniti accusantium porro ut ut.
         body: Explicabo hic voluptatem repellat.
         bookmark: Qui dicta soluta.
         createdAt: 133332481807086315
@@ -12837,16 +12863,16 @@ definitions:
         type: integer
         example: 1403654513
         format: int32
-      mediaUrl:
-        type: string
-        example: Omnis repellat repudiandae velit molestias.
       name:
         type: string
         example: Architecto quia aliquam ad quam.
+      photo:
+        $ref: '#/definitions/AuthorPhotoResponseBody'
     example:
-      id: 840176377
-      mediaUrl: Nobis sit.
-      name: Perferendis explicabo rerum aut omnis.
+      id: 1522699228
+      name: Omnis consequatur nobis.
+      photo:
+        url: Ipsam nostrum unde.
     required:
     - id
     - name
@@ -31313,10 +31339,10 @@ definitions:
         $ref: '#/definitions/PostAuthorResponseBody'
       body:
         type: string
-        example: Quia magni dolores sed aut necessitatibus voluptatem.
+        example: Molestiae quia magni dolores sed.
       bookmark:
         type: string
-        example: Repudiandae soluta.
+        example: Necessitatibus voluptatem veritatis repudiandae soluta.
       createdAt:
         type: integer
         example: 997895411138794387
@@ -31332,8 +31358,9 @@ definitions:
         example:
         - author:
             id: 1647552801
-            mediaUrl: Ipsam nostrum unde.
             name: Optio et vitae officiis itaque.
+            photo:
+              url: Ipsam nostrum unde.
           body: Perspiciatis perspiciatis minus sed.
           bookmark: Vero dolorem autem quae ut voluptatem veritatis.
           createdAt: 8530931048661253846
@@ -31345,8 +31372,9 @@ definitions:
           updatedAt: 6559612527132995481
         - author:
             id: 1647552801
-            mediaUrl: Ipsam nostrum unde.
             name: Optio et vitae officiis itaque.
+            photo:
+              url: Ipsam nostrum unde.
           body: Perspiciatis perspiciatis minus sed.
           bookmark: Vero dolorem autem quae ut voluptatem veritatis.
           createdAt: 8530931048661253846
@@ -31358,8 +31386,9 @@ definitions:
           updatedAt: 6559612527132995481
         - author:
             id: 1647552801
-            mediaUrl: Ipsam nostrum unde.
             name: Optio et vitae officiis itaque.
+            photo:
+              url: Ipsam nostrum unde.
           body: Perspiciatis perspiciatis minus sed.
           bookmark: Vero dolorem autem quae ut voluptatem veritatis.
           createdAt: 8530931048661253846
@@ -31371,8 +31400,9 @@ definitions:
           updatedAt: 6559612527132995481
         - author:
             id: 1647552801
-            mediaUrl: Ipsam nostrum unde.
             name: Optio et vitae officiis itaque.
+            photo:
+              url: Ipsam nostrum unde.
           body: Perspiciatis perspiciatis minus sed.
           bookmark: Vero dolorem autem quae ut voluptatem veritatis.
           createdAt: 8530931048661253846
@@ -31389,8 +31419,9 @@ definitions:
     example:
       author:
         id: 1647552801
-        mediaUrl: Ipsam nostrum unde.
         name: Optio et vitae officiis itaque.
+        photo:
+          url: Ipsam nostrum unde.
       body: Blanditiis dicta eius voluptatum.
       bookmark: Praesentium vitae.
       createdAt: 5629371475723437576
@@ -31398,8 +31429,9 @@ definitions:
       replies:
       - author:
           id: 1647552801
-          mediaUrl: Ipsam nostrum unde.
           name: Optio et vitae officiis itaque.
+          photo:
+            url: Ipsam nostrum unde.
         body: Perspiciatis perspiciatis minus sed.
         bookmark: Vero dolorem autem quae ut voluptatem veritatis.
         createdAt: 8530931048661253846
@@ -31411,8 +31443,9 @@ definitions:
         updatedAt: 6559612527132995481
       - author:
           id: 1647552801
-          mediaUrl: Ipsam nostrum unde.
           name: Optio et vitae officiis itaque.
+          photo:
+            url: Ipsam nostrum unde.
         body: Perspiciatis perspiciatis minus sed.
         bookmark: Vero dolorem autem quae ut voluptatem veritatis.
         createdAt: 8530931048661253846
@@ -31424,8 +31457,9 @@ definitions:
         updatedAt: 6559612527132995481
       - author:
           id: 1647552801
-          mediaUrl: Ipsam nostrum unde.
           name: Optio et vitae officiis itaque.
+          photo:
+            url: Ipsam nostrum unde.
         body: Perspiciatis perspiciatis minus sed.
         bookmark: Vero dolorem autem quae ut voluptatem veritatis.
         createdAt: 8530931048661253846

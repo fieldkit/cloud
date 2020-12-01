@@ -762,9 +762,25 @@ func unmarshalThreadedPostResponseBodyToDiscussionviewsThreadedPostView(v *Threa
 // *PostAuthorResponseBody.
 func unmarshalPostAuthorResponseBodyToDiscussionviewsPostAuthorView(v *PostAuthorResponseBody) *discussionviews.PostAuthorView {
 	res := &discussionviews.PostAuthorView{
-		ID:       v.ID,
-		Name:     v.Name,
-		MediaURL: v.MediaURL,
+		ID:   v.ID,
+		Name: v.Name,
+	}
+	if v.Photo != nil {
+		res.Photo = unmarshalAuthorPhotoResponseBodyToDiscussionviewsAuthorPhotoView(v.Photo)
+	}
+
+	return res
+}
+
+// unmarshalAuthorPhotoResponseBodyToDiscussionviewsAuthorPhotoView builds a
+// value of type *discussionviews.AuthorPhotoView from a value of type
+// *AuthorPhotoResponseBody.
+func unmarshalAuthorPhotoResponseBodyToDiscussionviewsAuthorPhotoView(v *AuthorPhotoResponseBody) *discussionviews.AuthorPhotoView {
+	if v == nil {
+		return nil
+	}
+	res := &discussionviews.AuthorPhotoView{
+		URL: v.URL,
 	}
 
 	return res
@@ -819,9 +835,24 @@ func unmarshalThreadedPostResponseBodyToDiscussionThreadedPost(v *ThreadedPostRe
 // *discussion.PostAuthor from a value of type *PostAuthorResponseBody.
 func unmarshalPostAuthorResponseBodyToDiscussionPostAuthor(v *PostAuthorResponseBody) *discussion.PostAuthor {
 	res := &discussion.PostAuthor{
-		ID:       *v.ID,
-		Name:     *v.Name,
-		MediaURL: v.MediaURL,
+		ID:   *v.ID,
+		Name: *v.Name,
+	}
+	if v.Photo != nil {
+		res.Photo = unmarshalAuthorPhotoResponseBodyToDiscussionAuthorPhoto(v.Photo)
+	}
+
+	return res
+}
+
+// unmarshalAuthorPhotoResponseBodyToDiscussionAuthorPhoto builds a value of
+// type *discussion.AuthorPhoto from a value of type *AuthorPhotoResponseBody.
+func unmarshalAuthorPhotoResponseBodyToDiscussionAuthorPhoto(v *AuthorPhotoResponseBody) *discussion.AuthorPhoto {
+	if v == nil {
+		return nil
+	}
+	res := &discussion.AuthorPhoto{
+		URL: *v.URL,
 	}
 
 	return res

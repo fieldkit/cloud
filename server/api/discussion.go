@@ -231,14 +231,23 @@ func ThreadedPost(dp *data.DiscussionPost, users map[int32]*data.User) (*discSer
 		return nil, fmt.Errorf("missing user")
 	}
 
+	var photo *discService.AuthorPhoto
+
+	if user.MediaURL != nil {
+		url := fmt.Sprintf("/user/%d/media", user.ID)
+		photo = &discService.AuthorPhoto{
+			URL: url,
+		}
+	}
+
 	return &discService.ThreadedPost{
 		ID:        dp.ID,
 		CreatedAt: dp.CreatedAt.Unix() * 1000,
 		UpdatedAt: dp.UpdatedAt.Unix() * 1000,
 		Author: &discService.PostAuthor{
-			ID:       user.ID,
-			Name:     user.Name,
-			MediaURL: user.MediaURL,
+			ID:    user.ID,
+			Name:  user.Name,
+			Photo: photo,
 		},
 		Replies:  []*discService.ThreadedPost{},
 		Bookmark: dp.StringBookmark(),

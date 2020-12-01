@@ -424,9 +424,14 @@ type ThreadedPostResponseBody struct {
 
 // PostAuthorResponseBody is used to define fields on response body types.
 type PostAuthorResponseBody struct {
-	ID       *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name     *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	MediaURL *string `form:"mediaUrl,omitempty" json:"mediaUrl,omitempty" xml:"mediaUrl,omitempty"`
+	ID    *int32                   `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name  *string                  `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Photo *AuthorPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+}
+
+// AuthorPhotoResponseBody is used to define fields on response body types.
+type AuthorPhotoResponseBody struct {
+	URL *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 }
 
 // NewPostRequestBody is used to define fields on request body types.
@@ -1348,6 +1353,20 @@ func ValidatePostAuthorResponseBody(body *PostAuthorResponseBody) (err error) {
 	}
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Photo != nil {
+		if err2 := ValidateAuthorPhotoResponseBody(body.Photo); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateAuthorPhotoResponseBody runs the validations defined on
+// AuthorPhotoResponseBody
+func ValidateAuthorPhotoResponseBody(body *AuthorPhotoResponseBody) (err error) {
+	if body.URL == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("url", "body"))
 	}
 	return
 }
