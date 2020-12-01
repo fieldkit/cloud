@@ -424,9 +424,14 @@ type ThreadedPostResponseBody struct {
 
 // PostAuthorResponseBody is used to define fields on response body types.
 type PostAuthorResponseBody struct {
-	ID       int32   `form:"id" json:"id" xml:"id"`
-	Name     string  `form:"name" json:"name" xml:"name"`
-	MediaURL *string `form:"mediaUrl,omitempty" json:"mediaUrl,omitempty" xml:"mediaUrl,omitempty"`
+	ID    int32                    `form:"id" json:"id" xml:"id"`
+	Name  string                   `form:"name" json:"name" xml:"name"`
+	Photo *AuthorPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+}
+
+// AuthorPhotoResponseBody is used to define fields on response body types.
+type AuthorPhotoResponseBody struct {
+	URL string `form:"url" json:"url" xml:"url"`
 }
 
 // NewPostRequestBody is used to define fields on request body types.

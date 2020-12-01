@@ -4,10 +4,15 @@ import (
 	. "goa.design/goa/v3/dsl"
 )
 
+var AuthorPhoto = Type("AuthorPhoto", func() {
+	Attribute("url", String)
+	Required("url")
+})
+
 var PostAuthor = Type("PostAuthor", func() {
 	Attribute("id", Int32)
 	Attribute("name", String)
-	Attribute("mediaUrl", String)
+	Attribute("photo", AuthorPhoto)
 	Required("id", "name")
 })
 

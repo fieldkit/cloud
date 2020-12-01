@@ -37,9 +37,14 @@ type ThreadedPostView struct {
 
 // PostAuthorView is a type that runs validations on a projected type.
 type PostAuthorView struct {
-	ID       *int32
-	Name     *string
-	MediaURL *string
+	ID    *int32
+	Name  *string
+	Photo *AuthorPhotoView
+}
+
+// AuthorPhotoView is a type that runs validations on a projected type.
+type AuthorPhotoView struct {
+	URL *string
 }
 
 var (
@@ -136,6 +141,19 @@ func ValidatePostAuthorView(result *PostAuthorView) (err error) {
 	}
 	if result.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	if result.Photo != nil {
+		if err2 := ValidateAuthorPhotoView(result.Photo); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateAuthorPhotoView runs the validations defined on AuthorPhotoView.
+func ValidateAuthorPhotoView(result *AuthorPhotoView) (err error) {
+	if result.URL == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("url", "result"))
 	}
 	return
 }

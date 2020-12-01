@@ -107,9 +107,13 @@ type ThreadedPost struct {
 }
 
 type PostAuthor struct {
-	ID       int32
-	Name     string
-	MediaURL *string
+	ID    int32
+	Name  string
+	Photo *AuthorPhoto
+}
+
+type AuthorPhoto struct {
+	URL string
 }
 
 type NewPost struct {
@@ -275,9 +279,24 @@ func transformDiscussionviewsThreadedPostViewToThreadedPost(v *discussionviews.T
 // *PostAuthor from a value of type *discussionviews.PostAuthorView.
 func transformDiscussionviewsPostAuthorViewToPostAuthor(v *discussionviews.PostAuthorView) *PostAuthor {
 	res := &PostAuthor{
-		ID:       *v.ID,
-		Name:     *v.Name,
-		MediaURL: v.MediaURL,
+		ID:   *v.ID,
+		Name: *v.Name,
+	}
+	if v.Photo != nil {
+		res.Photo = transformDiscussionviewsAuthorPhotoViewToAuthorPhoto(v.Photo)
+	}
+
+	return res
+}
+
+// transformDiscussionviewsAuthorPhotoViewToAuthorPhoto builds a value of type
+// *AuthorPhoto from a value of type *discussionviews.AuthorPhotoView.
+func transformDiscussionviewsAuthorPhotoViewToAuthorPhoto(v *discussionviews.AuthorPhotoView) *AuthorPhoto {
+	if v == nil {
+		return nil
+	}
+	res := &AuthorPhoto{
+		URL: *v.URL,
 	}
 
 	return res
@@ -310,9 +329,24 @@ func transformThreadedPostToDiscussionviewsThreadedPostView(v *ThreadedPost) *di
 // *discussionviews.PostAuthorView from a value of type *PostAuthor.
 func transformPostAuthorToDiscussionviewsPostAuthorView(v *PostAuthor) *discussionviews.PostAuthorView {
 	res := &discussionviews.PostAuthorView{
-		ID:       &v.ID,
-		Name:     &v.Name,
-		MediaURL: v.MediaURL,
+		ID:   &v.ID,
+		Name: &v.Name,
+	}
+	if v.Photo != nil {
+		res.Photo = transformAuthorPhotoToDiscussionviewsAuthorPhotoView(v.Photo)
+	}
+
+	return res
+}
+
+// transformAuthorPhotoToDiscussionviewsAuthorPhotoView builds a value of type
+// *discussionviews.AuthorPhotoView from a value of type *AuthorPhoto.
+func transformAuthorPhotoToDiscussionviewsAuthorPhotoView(v *AuthorPhoto) *discussionviews.AuthorPhotoView {
+	if v == nil {
+		return nil
+	}
+	res := &discussionviews.AuthorPhotoView{
+		URL: &v.URL,
 	}
 
 	return res
