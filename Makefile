@@ -44,6 +44,12 @@ jstests: portal/node_modules
 gotests:
 	cd server && go test -p 1 -coverprofile=coverage.data ./...
 
+gotest-specific:
+	cd server && go test -p 1 github.com/fieldkit/cloud/server/api
+	cd server && go test -p 1 github.com/fieldkit/cloud/server/data
+	cd server && go test -p 1 github.com/fieldkit/cloud/server/ingester
+	cd server && go test -p 1 github.com/fieldkit/cloud/server/backend
+
 view-coverage:
 	cd server && go tool cover -html=coverage.data
 
@@ -140,7 +146,7 @@ sanitize: sanitizer
 	mkdir -p sanitize-data
 	rsync -zvua schema-production/* sanitize-data
 	docker run --rm --name fksanitize-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password -p "5432:5432" -v `pwd`/sanitize-data:/docker-entrypoint-initdb.d/:ro -d mdillon/postgis
-	$(BUILD)/sanitizer
+	$(BUILD)/sanitizer --waiting
 	docker exec fksanitize-pg pg_dump 'postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable' | bzip2 > db-sanitized.sql.bz2
 	docker stop fksanitize-pg
 

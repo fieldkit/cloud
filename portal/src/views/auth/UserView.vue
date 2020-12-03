@@ -40,7 +40,12 @@ export default Vue.extend({
             required: false,
         },
     },
-    data: () => {
+    data(): {
+        loading: boolean;
+        notifySaved: boolean;
+        notifyPasswordChanged: boolean;
+        passwordOk: boolean;
+    } {
         return {
             loading: false,
             notifySaved: false,
@@ -57,37 +62,40 @@ export default Vue.extend({
         }),
     },
     methods: {
-        goBack() {
+        goBack(): void {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
-        saveForm(form) {
+        async saveForm(form): Promise<void> {
             console.log("form", form);
             this.loading = true;
             if (form.image) {
-                return this.$store.dispatch(ActionTypes.UPLOAD_USER_PHOTO, { type: form.image.type, file: form.image.file }).then(() => {
+                await this.$store.dispatch(ActionTypes.UPLOAD_USER_PHOTO, { type: form.image.type, file: form.image.file }).then(() => {
                     return this.$store.dispatch(ActionTypes.UPDATE_USER_PROFILE, { user: form }).then(() => {
                         this.loading = false;
                         this.notifySaved = true;
                     });
                 });
             } else {
-                return this.$store.dispatch(ActionTypes.UPDATE_USER_PROFILE, { user: form }).then(() => {
+                await this.$store.dispatch(ActionTypes.UPDATE_USER_PROFILE, { user: form }).then(() => {
                     this.loading = false;
                     this.notifySaved = true;
                 });
             }
         },
-        changePassword(form) {
+        async changePassword(form): Promise<void> {
+            const user = this.user;
+            if (!user) throw new Error(`no user`);
+
             console.log("form", form);
 
             this.passwordOk = true;
 
             const data = {
-                userId: this.user.id,
+                userId: user.id,
                 oldPassword: form.existing,
                 newPassword: form.password,
             };
-            return this.$services.api
+            await this.$services.api
                 .updatePassword(data)
                 .then(() => {
                     this.loading = false;

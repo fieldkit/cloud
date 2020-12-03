@@ -436,9 +436,9 @@ type DownloadPhotoBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// LoginUnauthorizedResponseBody is the type of the "user" service "login"
-// endpoint HTTP response body for the "unauthorized" error.
-type LoginUnauthorizedResponseBody struct {
+// LoginUserUnverifiedResponseBody is the type of the "user" service "login"
+// endpoint HTTP response body for the "user-unverified" error.
+type LoginUserUnverifiedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -457,6 +457,24 @@ type LoginUnauthorizedResponseBody struct {
 // LoginForbiddenResponseBody is the type of the "user" service "login"
 // endpoint HTTP response body for the "forbidden" error.
 type LoginForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// LoginUnauthorizedResponseBody is the type of the "user" service "login"
+// endpoint HTTP response body for the "unauthorized" error.
+type LoginUnauthorizedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -1909,8 +1927,9 @@ func NewLoginResultNoContent(authorization string) *user.LoginResult {
 	return v
 }
 
-// NewLoginUnauthorized builds a user service login endpoint unauthorized error.
-func NewLoginUnauthorized(body *LoginUnauthorizedResponseBody) *goa.ServiceError {
+// NewLoginUserUnverified builds a user service login endpoint user-unverified
+// error.
+func NewLoginUserUnverified(body *LoginUserUnverifiedResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -1925,6 +1944,20 @@ func NewLoginUnauthorized(body *LoginUnauthorizedResponseBody) *goa.ServiceError
 
 // NewLoginForbidden builds a user service login endpoint forbidden error.
 func NewLoginForbidden(body *LoginForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewLoginUnauthorized builds a user service login endpoint unauthorized error.
+func NewLoginUnauthorized(body *LoginUnauthorizedResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -3292,9 +3325,9 @@ func ValidateDownloadPhotoBadRequestResponseBody(body *DownloadPhotoBadRequestRe
 	return
 }
 
-// ValidateLoginUnauthorizedResponseBody runs the validations defined on
-// login_unauthorized_response_body
-func ValidateLoginUnauthorizedResponseBody(body *LoginUnauthorizedResponseBody) (err error) {
+// ValidateLoginUserUnverifiedResponseBody runs the validations defined on
+// login_user-unverified_response_body
+func ValidateLoginUserUnverifiedResponseBody(body *LoginUserUnverifiedResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -3319,6 +3352,30 @@ func ValidateLoginUnauthorizedResponseBody(body *LoginUnauthorizedResponseBody) 
 // ValidateLoginForbiddenResponseBody runs the validations defined on
 // login_forbidden_response_body
 func ValidateLoginForbiddenResponseBody(body *LoginForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateLoginUnauthorizedResponseBody runs the validations defined on
+// login_unauthorized_response_body
+func ValidateLoginUnauthorizedResponseBody(body *LoginUnauthorizedResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}

@@ -132,7 +132,7 @@ import Vue from "@/store/strong-vue";
 import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
 import VueTagsInput from "@johmun/vue-tags-input";
-
+import { UploadedImage } from "@/views/shared/ImageUploader.vue";
 import { tryParseTags } from "@/utilities";
 
 import { helpers, required, email, minValue, maxLength, minLength } from "vuelidate/lib/validators";
@@ -165,10 +165,29 @@ export default Vue.extend({
             required: false,
         },
     },
-    data: () => {
+    data(): {
+        image: UploadedImage | null;
+        tagsFocused: boolean;
+        imagePlaceholder: string;
+        form: {
+            name: string;
+            description: string;
+            goal: string;
+            location: string;
+            startTime: string;
+            endTime: string;
+            tags: { text: string }[];
+            tag: string;
+            public: boolean;
+            privacy: number;
+            pickedStart: number | null;
+            pickedEnd: number | null;
+        };
+    } {
         return {
             image: null,
             tagsFocused: false,
+            imagePlaceholder: PlaceholderImage,
             form: {
                 name: "",
                 description: "",
@@ -183,7 +202,6 @@ export default Vue.extend({
                 pickedStart: null,
                 pickedEnd: null,
             },
-            imagePlaceholder: PlaceholderImage,
         };
     },
     validations: {
@@ -292,15 +310,16 @@ export default Vue.extend({
                 tags: JSON.stringify(this.form.tags.map((tag) => tag.text)),
             });
         },
-        addProject() {
+        async addProject(): Promise<void> {
             this.$emit("updating");
 
             const data = this.createParams();
-            if (this.image) {
-                return this.$store.dispatch(ActionTypes.ADD_PROJECT, data).then((project) => {
+            const image = this.image;
+            if (image) {
+                await this.$store.dispatch(ActionTypes.ADD_PROJECT, data).then((project) => {
                     const params = {
-                        type: this.image.type,
-                        file: this.image.file,
+                        type: image.type,
+                        file: image.file,
                         id: project.id,
                     };
                     return this.$services.api.uploadProjectImage(params).then(() => {
@@ -311,7 +330,7 @@ export default Vue.extend({
                     });
                 });
             } else {
-                return this.$store.dispatch(ActionTypes.ADD_PROJECT, data).then((project) => {
+                await this.$store.dispatch(ActionTypes.ADD_PROJECT, data).then((project) => {
                     return this.$router.push({
                         name: "viewProject",
                         params: { id: project.id },
@@ -319,17 +338,18 @@ export default Vue.extend({
                 });
             }
         },
-        updateProject() {
+        async updateProject(): Promise<void> {
             this.$emit("updating");
 
             const data = this.createParams();
-            if (this.image) {
+            const image = this.image;
+            if (image) {
                 const payload = {
-                    type: this.image.type,
-                    file: this.image.file,
+                    type: image.type,
+                    file: image.file,
                     id: this.project.id,
                 };
-                return this.$services.api.uploadProjectImage(payload).then(() => {
+                await this.$services.api.uploadProjectImage(payload).then(() => {
                     return this.$store.dispatch(ActionTypes.SAVE_PROJECT, data).then(() => {
                         return this.$router.push({
                             name: "viewProject",
@@ -338,7 +358,7 @@ export default Vue.extend({
                     });
                 });
             } else {
-                return this.$store.dispatch(ActionTypes.SAVE_PROJECT, data).then(() => {
+                await this.$store.dispatch(ActionTypes.SAVE_PROJECT, data).then(() => {
                     return this.$router.push({
                         name: "viewProject",
                         params: { id: this.project.id },

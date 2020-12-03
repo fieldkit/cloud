@@ -36,6 +36,9 @@ func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*u
 	if err == data.IncorrectPasswordError {
 		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
 	}
+	if err == data.UnverifiedUserError {
+		return nil, user.MakeUserUnverified(errors.New("user unverified"))
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -815,7 +818,7 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 	}
 
 	if !user.Valid {
-		return nil, data.IncorrectPasswordError
+		return nil, data.UnverifiedUserError
 	}
 
 	return user, nil

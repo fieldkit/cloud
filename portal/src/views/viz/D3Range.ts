@@ -22,7 +22,7 @@ export const D3Range = Vue.extend({
         },
     },
     computed: {
-        data(): QueriedData {
+        data(): QueriedData | null {
             if (this.viz.graphing) {
                 return this.viz.graphing;
             }

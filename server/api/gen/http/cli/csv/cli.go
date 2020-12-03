@@ -2861,7 +2861,7 @@ RecoveryLookup implements recovery lookup.
 
 Example:
     `+os.Args[0]+` user recovery- lookup --body '{
-      "email": "Fuga omnis."
+      "email": "Blanditiis soluta beatae voluptatem."
    }'
 `, os.Args[0])
 }
@@ -2874,8 +2874,8 @@ Recovery implements recovery.
 
 Example:
     `+os.Args[0]+` user recovery --body '{
-      "password": "vwg",
-      "token": "Unde aut voluptas."
+      "password": "7g5",
+      "token": "Veniam dicta quia laboriosam et repellat."
    }'
 `, os.Args[0])
 }
@@ -2887,7 +2887,7 @@ Logout implements logout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user logout --auth "Necessitatibus similique hic incidunt veritatis voluptatem."
+    `+os.Args[0]+` user logout --auth "Sit modi officiis incidunt recusandae eos sint."
 `, os.Args[0])
 }
 
@@ -2899,7 +2899,7 @@ Refresh implements refresh.
 
 Example:
     `+os.Args[0]+` user refresh --body '{
-      "refreshToken": "Sit dolor sapiente sunt accusantium aliquam."
+      "refreshToken": "Unde vero est."
    }'
 `, os.Args[0])
 }
@@ -2911,7 +2911,7 @@ SendValidation implements send validation.
     -user-id INT32: 
 
 Example:
-    `+os.Args[0]+` user send- validation --user-id 1591448224
+    `+os.Args[0]+` user send- validation --user-id 1287391495
 `, os.Args[0])
 }
 
@@ -2922,7 +2922,7 @@ Validate implements validate.
     -token STRING: 
 
 Example:
-    `+os.Args[0]+` user validate --token "Magni magni."
+    `+os.Args[0]+` user validate --token "Pariatur tempore doloribus sunt quasi consequatur totam."
 `, os.Args[0])
 }
 
@@ -2956,7 +2956,7 @@ Example:
       "name": "Dignissimos vero dolorem.",
       "private": false,
       "tags": "Repellat et aperiam minima cum."
-   }' --user-id 468256447 --auth "Accusantium eum."
+   }' --user-id 312715428 --auth "Aut et assumenda vel corporis omnis."
 `, os.Args[0])
 }
 
@@ -2970,9 +2970,9 @@ ChangePassword implements change password.
 
 Example:
     `+os.Args[0]+` user change- password --body '{
-      "newPassword": "ntf",
-      "oldPassword": "aam"
-   }' --user-id 1653293227 --auth "Ab unde similique iusto."
+      "newPassword": "sgz",
+      "oldPassword": "cy6"
+   }' --user-id 790293661 --auth "Qui et."
 `, os.Args[0])
 }
 
@@ -2983,7 +2983,7 @@ GetCurrent implements get current.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user get- current --auth "Modi laborum in."
+    `+os.Args[0]+` user get- current --auth "Ut voluptatem."
 `, os.Args[0])
 }
 
@@ -2995,7 +2995,7 @@ ListByProject implements list by project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user list- by- project --project-id 1013201100 --auth "Voluptatem exercitationem velit."
+    `+os.Args[0]+` user list- by- project --project-id 944210802 --auth "Dolores ab non animi iste optio."
 `, os.Args[0])
 }
 
@@ -3006,7 +3006,7 @@ IssueTransmissionToken implements issue transmission token.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user issue- transmission- token --auth "Rerum quod beatae."
+    `+os.Args[0]+` user issue- transmission- token --auth "Unde aut qui doloribus eum omnis cumque."
 `, os.Args[0])
 }
 
@@ -3031,6 +3031,6 @@ Example:
     `+os.Args[0]+` user admin- delete --body '{
       "email": "Enim recusandae quas odit dolorum.",
       "password": "Temporibus alias totam sint necessitatibus et temporibus."
-   }' --auth "Est et sit et totam beatae."
+   }' --auth "Aliquam et est voluptatibus."
 `, os.Args[0])
 }

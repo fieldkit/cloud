@@ -299,6 +299,15 @@ type AdminDeleteFields struct {
 	Password string
 }
 
+// MakeUserUnverified builds a goa.ServiceError from an error.
+func MakeUserUnverified(err error) *goa.ServiceError {
+	return &goa.ServiceError{
+		Name:    "user-unverified",
+		ID:      goa.NewErrorID(),
+		Message: err.Error(),
+	}
+}
+
 // MakeUnauthorized builds a goa.ServiceError from an error.
 func MakeUnauthorized(err error) *goa.ServiceError {
 	return &goa.ServiceError{

@@ -514,17 +514,17 @@ func EncodeLoginError(encoder func(context.Context, http.ResponseWriter) goahttp
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "unauthorized":
+		case "user-unverified":
 			res := v.(*goa.ServiceError)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewLoginUnauthorizedResponseBody(res)
+				body = NewLoginUserUnverifiedResponseBody(res)
 			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
+			w.Header().Set("goa-error", "user-unverified")
+			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "forbidden":
 			res := v.(*goa.ServiceError)
@@ -537,6 +537,18 @@ func EncodeLoginError(encoder func(context.Context, http.ResponseWriter) goahttp
 			}
 			w.Header().Set("goa-error", "forbidden")
 			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewLoginUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "not-found":
 			res := v.(*goa.ServiceError)

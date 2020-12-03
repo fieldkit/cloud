@@ -16,7 +16,7 @@
             </form>
         </div>
         <div class="photos">
-            <div class="title"> Photos </div>
+            <div class="title">Photos</div>
             <div class="photo" v-for="photo in photos" v-bind:key="photo.key">
                 <AuthenticatedPhoto :url="photo.url" />
             </div>
@@ -94,7 +94,11 @@ export default Vue.extend({
         onImage(this: any, image: any) {
             const reader = new FileReader();
             reader.readAsDataURL(image.file);
-            reader.onload = (ev) => this.form.addedPhotos.push(new AddedPhoto(image.type, image.file, ev.target.result));
+            reader.onload = (ev) => {
+                if (ev?.target?.result) {
+                    this.form.addedPhotos.push(new AddedPhoto(image.type, image.file, ev.target.result));
+                }
+            };
             this.$emit("change", this.form);
         },
         onChange() {
@@ -105,7 +109,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 
 .notes-form {
     text-align: left;
@@ -223,6 +227,4 @@ export default Vue.extend({
 ::v-deep .placeholder-container {
     flex-basis: 100%;
 }
-
-
 </style>

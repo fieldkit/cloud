@@ -625,8 +625,9 @@ func EncodeLoginRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.
 // login endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeLoginResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "user-unverified" (type *goa.ServiceError): http.StatusForbidden
 //	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
 //	- "not-found" (type *goa.ServiceError): http.StatusNotFound
 //	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
@@ -660,6 +661,41 @@ func DecodeLoginResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 			}
 			res := NewLoginResultNoContent(authorization)
 			return res, nil
+		case http.StatusForbidden:
+			en := resp.Header.Get("goa-error")
+			switch en {
+			case "user-unverified":
+				var (
+					body LoginUserUnverifiedResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("user", "login", err)
+				}
+				err = ValidateLoginUserUnverifiedResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("user", "login", err)
+				}
+				return nil, NewLoginUserUnverified(&body)
+			case "forbidden":
+				var (
+					body LoginForbiddenResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("user", "login", err)
+				}
+				err = ValidateLoginForbiddenResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("user", "login", err)
+				}
+				return nil, NewLoginForbidden(&body)
+			default:
+				body, _ := ioutil.ReadAll(resp.Body)
+				return nil, goahttp.ErrInvalidResponse("user", "login", resp.StatusCode, string(body))
+			}
 		case http.StatusUnauthorized:
 			var (
 				body LoginUnauthorizedResponseBody
@@ -674,20 +710,6 @@ func DecodeLoginResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 				return nil, goahttp.ErrValidationError("user", "login", err)
 			}
 			return nil, NewLoginUnauthorized(&body)
-		case http.StatusForbidden:
-			var (
-				body LoginForbiddenResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("user", "login", err)
-			}
-			err = ValidateLoginForbiddenResponseBody(&body)
-			if err != nil {
-				return nil, goahttp.ErrValidationError("user", "login", err)
-			}
-			return nil, NewLoginForbidden(&body)
 		case http.StatusNotFound:
 			var (
 				body LoginNotFoundResponseBody

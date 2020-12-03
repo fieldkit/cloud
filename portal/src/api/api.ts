@@ -4,6 +4,7 @@ import TokenStorage from "./tokens";
 import Config from "../secrets";
 import { keysToCamel, keysToCamelWithWarnings } from "@/json-tools";
 import { ExportParams } from "@/store/typed-actions";
+import { SensorsResponse } from "@/views/viz/api";
 
 export class ApiError extends Error {
     constructor(message) {
@@ -187,7 +188,10 @@ export interface Project {
     mediaUrl: string;
     startTime?: Date;
     endTime?: Date;
-    numberOfFollowers: number;
+    following: {
+        following: boolean;
+        total: number;
+    };
 }
 
 export interface Owner {
@@ -859,7 +863,7 @@ class FKApi {
         });
     }
 
-    getAllSensors() {
+    getAllSensors(): Promise<SensorsResponse> {
         return this.invoke({
             auth: Auth.Required,
             method: "GET",

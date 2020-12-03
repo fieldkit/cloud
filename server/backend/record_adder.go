@@ -137,6 +137,12 @@ type WriteInfo struct {
 	MetaErrors   int64
 	DataErrors   int64
 	StationID    *int32
+	DataStart    time.Time
+	DataEnd      time.Time
+}
+
+func (ra *RecordAdder) fixDataRecord(ctx context.Context, record *pb.DataRecord) (bool, error) {
+	return false, nil
 }
 
 func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (info *WriteInfo, err error) {
@@ -164,6 +170,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 	totalRecords := 0
 	dataProcessed := 0
 	dataErrors := 0
+	dataFixed := 0
 	metaProcessed := 0
 	metaErrors := 0
 	records := 0
@@ -185,18 +192,29 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 				unmarshalError = err
 			} else {
 				data = true
-				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{DataRecord: &dataRecord, Bytes: b})
-				if fatal != nil {
-					return nil, fatal
-				}
-				if warning == nil {
-					dataProcessed += 1
-					records += 1
-				} else {
+				if fixed, err := ra.fixDataRecord(ctx, &dataRecord); err != nil {
 					dataErrors += 1
 					if records > 0 {
 						log.Infow("processed", "record_run", records)
 						records = 0
+					}
+				} else {
+					warning, fatal := ra.Handle(ctx, i, &ParsedRecord{DataRecord: &dataRecord, Bytes: b})
+					if fatal != nil {
+						return nil, fatal
+					}
+					if fixed {
+						dataFixed += 1
+					}
+					if warning == nil {
+						dataProcessed += 1
+						records += 1
+					} else {
+						dataErrors += 1
+						if records > 0 {
+							log.Infow("processed", "record_run", records)
+							records = 0
+						}
 					}
 				}
 			}
@@ -253,6 +271,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 		"data_processed", dataProcessed,
 		"meta_errors", metaErrors,
 		"data_errors", dataErrors,
+		"data_fixed", dataFixed,
 		"record_run", records,
 		"start_human", prettyTime(ra.statistics.start),
 		"end_human", prettyTime(ra.statistics.end))
@@ -283,6 +302,8 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 		MetaErrors:   int64(metaErrors),
 		DataErrors:   int64(dataErrors),
 		StationID:    stationID,
+		DataStart:    ra.statistics.start,
+		DataEnd:      ra.statistics.end,
 	}
 
 	return
