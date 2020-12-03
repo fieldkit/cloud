@@ -80,7 +80,7 @@
             <ProjectStations :project="project" :admin="false" :userStations="userStations" />
         </div>
 
-        <div class="project-team-activity">
+        <div class="project-team-activity todo-disabled">
             <div class="project-team">
                 <h1>Project Team (4 members)</h1>
                 <ul>
