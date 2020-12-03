@@ -97,7 +97,7 @@ func (r *DiscussionRepository) QueryByProjectID(ctx context.Context, id int32) (
 
 func (r *DiscussionRepository) QueryByStationIDs(ctx context.Context, ids []int32) (*data.PageOfDiscussion, error) {
 	posts := []*data.DiscussionPost{}
-	{
+	if len(ids) > 0 {
 		query, args, err := sqlx.In(`SELECT * FROM fieldkit.discussion_post WHERE station_ids && array[?]::integer[] ORDER BY created_at DESC`, ids)
 		if err != nil {
 			return nil, err
@@ -113,7 +113,7 @@ func (r *DiscussionRepository) QueryByStationIDs(ctx context.Context, ids []int3
 	}
 
 	users := []*data.User{}
-	{
+	if len(userIDs) > 0 {
 		query, args, err := sqlx.In(`SELECT * FROM fieldkit.user WHERE id IN (?)`, userIDs)
 		if err != nil {
 			return nil, err
