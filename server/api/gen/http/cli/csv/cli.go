@@ -2636,7 +2636,7 @@ RecoveryLookup implements recovery lookup.
 
 Example:
     `+os.Args[0]+` user recovery- lookup --body '{
-      "email": "Aliquid dolores esse iure illo voluptate."
+      "email": "Iure illo voluptate."
    }'
 `, os.Args[0])
 }
