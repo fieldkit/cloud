@@ -2811,7 +2811,7 @@ RecoveryLookup implements recovery lookup.
 
 Example:
     `+os.Args[0]+` user recovery- lookup --body '{
-      "email": "Consequatur voluptas provident omnis."
+      "email": "Omnis porro."
    }'
 `, os.Args[0])
 }
@@ -2824,8 +2824,8 @@ Recovery implements recovery.
 
 Example:
     `+os.Args[0]+` user recovery --body '{
-      "password": "h28",
-      "token": "Tenetur fuga omnis numquam blanditiis soluta beatae."
+      "password": "5sk",
+      "token": "Fuga omnis."
    }'
 `, os.Args[0])
 }
@@ -2837,7 +2837,7 @@ Logout implements logout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user logout --auth "Laboriosam et repellat cum."
+    `+os.Args[0]+` user logout --auth "Expedita veniam."
 `, os.Args[0])
 }
 
@@ -2849,7 +2849,7 @@ Refresh implements refresh.
 
 Example:
     `+os.Args[0]+` user refresh --body '{
-      "refreshToken": "Voluptatem commodi qui sit modi."
+      "refreshToken": "Amet necessitatibus."
    }'
 `, os.Args[0])
 }
@@ -2861,7 +2861,7 @@ SendValidation implements send validation.
     -user-id INT32: 
 
 Example:
-    `+os.Args[0]+` user send- validation --user-id 989265595
+    `+os.Args[0]+` user send- validation --user-id 1236096551
 `, os.Args[0])
 }
 
@@ -2872,7 +2872,7 @@ Validate implements validate.
     -token STRING: 
 
 Example:
-    `+os.Args[0]+` user validate --token "Recusandae ratione dolorum cumque voluptas sit."
+    `+os.Args[0]+` user validate --token "Repudiandae excepturi eaque."
 `, os.Args[0])
 }
 
@@ -2911,7 +2911,7 @@ Example:
       "privacy": 206072132,
       "startTime": "Iste mollitia.",
       "tags": "Rerum atque aut."
-   }' --user-id 86338992 --auth "Aut eligendi."
+   }' --user-id 1935023706 --auth "Enim harum."
 `, os.Args[0])
 }
 
@@ -2925,9 +2925,9 @@ ChangePassword implements change password.
 
 Example:
     `+os.Args[0]+` user change- password --body '{
-      "newPassword": "u3i",
-      "oldPassword": "f26"
-   }' --user-id 1253073191 --auth "Consequatur culpa error ea quia."
+      "newPassword": "c1c",
+      "oldPassword": "iuj"
+   }' --user-id 212704244 --auth "Eius sit vitae corporis et."
 `, os.Args[0])
 }
 
@@ -2938,7 +2938,7 @@ GetCurrent implements get current.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user get- current --auth "Commodi laboriosam quia dolor voluptatem velit."
+    `+os.Args[0]+` user get- current --auth "Aut et alias fugiat culpa."
 `, os.Args[0])
 }
 
@@ -2950,7 +2950,7 @@ ListByProject implements list by project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user list- by- project --project-id 557317009 --auth "Quis vel."
+    `+os.Args[0]+` user list- by- project --project-id 130418344 --auth "Aut esse suscipit cum."
 `, os.Args[0])
 }
 
@@ -2961,7 +2961,7 @@ IssueTransmissionToken implements issue transmission token.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user issue- transmission- token --auth "Omnis quia minima ipsum."
+    `+os.Args[0]+` user issue- transmission- token --auth "Animi iste optio omnis quia minima ipsum."
 `, os.Args[0])
 }
 

@@ -436,9 +436,9 @@ type DownloadPhotoBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// LoginUnauthorizedResponseBody is the type of the "user" service "login"
-// endpoint HTTP response body for the "unauthorized" error.
-type LoginUnauthorizedResponseBody struct {
+// LoginUserUnverifiedResponseBody is the type of the "user" service "login"
+// endpoint HTTP response body for the "user-unverified" error.
+type LoginUserUnverifiedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -457,6 +457,24 @@ type LoginUnauthorizedResponseBody struct {
 // LoginForbiddenResponseBody is the type of the "user" service "login"
 // endpoint HTTP response body for the "forbidden" error.
 type LoginForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// LoginUnauthorizedResponseBody is the type of the "user" service "login"
+// endpoint HTTP response body for the "unauthorized" error.
+type LoginUnauthorizedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -1907,10 +1925,10 @@ func NewDownloadPhotoBadRequestResponseBody(res *goa.ServiceError) *DownloadPhot
 	return body
 }
 
-// NewLoginUnauthorizedResponseBody builds the HTTP response body from the
+// NewLoginUserUnverifiedResponseBody builds the HTTP response body from the
 // result of the "login" endpoint of the "user" service.
-func NewLoginUnauthorizedResponseBody(res *goa.ServiceError) *LoginUnauthorizedResponseBody {
-	body := &LoginUnauthorizedResponseBody{
+func NewLoginUserUnverifiedResponseBody(res *goa.ServiceError) *LoginUserUnverifiedResponseBody {
+	body := &LoginUserUnverifiedResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -1925,6 +1943,20 @@ func NewLoginUnauthorizedResponseBody(res *goa.ServiceError) *LoginUnauthorizedR
 // of the "login" endpoint of the "user" service.
 func NewLoginForbiddenResponseBody(res *goa.ServiceError) *LoginForbiddenResponseBody {
 	body := &LoginForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewLoginUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "login" endpoint of the "user" service.
+func NewLoginUnauthorizedResponseBody(res *goa.ServiceError) *LoginUnauthorizedResponseBody {
+	body := &LoginUnauthorizedResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,

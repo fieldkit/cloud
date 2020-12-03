@@ -71,7 +71,12 @@ export default Vue.extend({
         PaginationControls,
     },
     props: {},
-    data: () => {
+    data(): {
+        stations: EssentialStation[];
+        page: number;
+        pageSize: number;
+        totalPages: number;
+    } {
         return {
             stations: [],
             page: 0,

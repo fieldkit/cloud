@@ -15,7 +15,6 @@
         "@riophae/vue-treeselect": "^0.4.0",
         "@types/mapbox-gl": "^1.12.2",
         "@types/node": "^14.0.14",
-        "@types/vuelidate": "^0.7.13",
         "axios": "^0.19.0",
         "bluebird": "^3.7.2",
         "core-js": "^3.6.5",
@@ -42,6 +41,8 @@
     },
     "devDependencies": {
         "@types/jest": "^24.0.19",
+        "@types/lodash": "^4.14.165",
+        "@types/vuelidate": "^0.7.13",
         "@typescript-eslint/eslint-plugin": "^2.33.0",
         "@typescript-eslint/parser": "^2.33.0",
         "@vue/cli-plugin-babel": "~4.4.0",

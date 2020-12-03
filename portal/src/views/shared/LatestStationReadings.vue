@@ -17,6 +17,7 @@
 <script lang="ts">
 import _ from "lodash";
 import Vue from "vue";
+import { SensorsResponse } from "@/api";
 
 export enum TrendType {
     Downward,
@@ -42,7 +43,11 @@ export default Vue.extend({
             required: true,
         },
     },
-    data() {
+    data(): {
+        allSensorsMemoized: () => Promise<SensorsResponse>;
+        loading: boolean;
+        sensors: SensorReading[];
+    } {
         return {
             allSensorsMemoized: _.memoize(() => this.$services.api.getAllSensors()),
             loading: true,
@@ -50,12 +55,12 @@ export default Vue.extend({
         };
     },
     watch: {
-        id(this: any) {
-            return this.refresh();
+        async id(): Promise<void> {
+            await this.refresh();
         },
     },
-    beforeMount(this: any) {
-        return this.refresh();
+    async beforeMount(): Promise<void> {
+        await this.refresh();
     },
     methods: {
         refresh() {

@@ -61,18 +61,21 @@ export default Vue.extend({
     props: {
         viewingProject: { type: Object, default: null },
         viewingStation: { type: Object, default: null },
-        viewingProjects: { default: false },
-        viewingStations: { default: false },
-        isAuthenticated: { required: true },
-        stations: { required: true },
-        projects: { required: true },
+        viewingProjects: { type: Boolean, default: false },
+        viewingStations: { type: Boolean, default: false },
+        isAuthenticated: { type: Boolean, required: true },
+        stations: {
+            required: true,
+        },
+        projects: {
+            required: true,
+        },
         narrow: {
             type: Boolean,
             default: false,
         },
-        layoutChanges: null,
     },
-    mounted() {
+    mounted(): void {
         const desktopBreakpoint = 1040;
         const windowAny: any = window;
         const resizeObserver = new windowAny.ResizeObserver((entries) => {
@@ -85,7 +88,11 @@ export default Vue.extend({
 
         resizeObserver.observe(document.querySelector("body"));
     },
-    data: () => {
+    data(): {
+        sidebar: {
+            narrow: boolean;
+        };
+    } {
         return {
             sidebar: {
                 narrow: window.screen.availWidth <= 1040,
@@ -93,16 +100,16 @@ export default Vue.extend({
         };
     },
     methods: {
-        showStation(station) {
+        showStation(station: unknown): void {
             this.$emit("show-station", station);
             this.closeMenuOnMobile();
         },
-        closeMenuOnMobile() {
+        closeMenuOnMobile(): void {
             if (window.screen.availWidth < 1040) {
                 this.sidebar.narrow = true;
             }
         },
-        toggleSidebar(...args) {
+        toggleSidebar(): void {
             this.sidebar.narrow = !this.sidebar.narrow;
             this.$emit("sidebar-toggle");
         },

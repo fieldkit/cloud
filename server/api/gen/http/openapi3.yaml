@@ -1608,7 +1608,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Dolorem sapiente sint eos totam.
+                example: Saepe est aut sint officia vitae itaque.
                 format: binary
               example: Eum corporis et alias culpa neque qui.
         "400":
@@ -3184,7 +3184,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -3202,21 +3202,8 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: true
-        "403":
-          description: ""
-          content:
-            application/vnd.goa.error:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                fault: false
-                id: 123abc
-                message: parameter 'p' must be an integer
-                name: bad_request
-                temporary: false
                 timeout: false
-        "404":
+        "403":
           description: ""
           content:
             application/vnd.goa.error:
@@ -3229,6 +3216,19 @@ paths:
                 name: bad_request
                 temporary: true
                 timeout: true
+        "404":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: true
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: false
+                timeout: false
   /logout:
     post:
       tags:
@@ -3248,26 +3248,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
-                id: 123abc
-                message: parameter 'p' must be an integer
-                name: bad_request
-                temporary: true
-                timeout: true
-        "401":
-          description: ""
-          content:
-            application/vnd.goa.error:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
                 fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
-        "403":
+                temporary: true
+                timeout: false
+        "401":
           description: ""
           content:
             application/vnd.goa.error:
@@ -3280,6 +3267,19 @@ paths:
                 name: bad_request
                 temporary: true
                 timeout: false
+        "403":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: false
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: false
+                timeout: false
         "404":
           description: ""
           content:
@@ -3291,7 +3291,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: true
       security:
       - jwt_header_Authorization:
@@ -3311,7 +3311,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Et optio corrupti ut fuga omnis.
+                example: Sit sit recusandae.
                 format: binary
               example: Ea dolores iure.
         "400":
@@ -9155,7 +9155,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Soluta natus aut et vel omnis.
+                example: Deserunt quo illum ut aliquid fuga.
                 format: binary
               example: Quisquam exercitationem maiores.
         "400":
@@ -9237,7 +9237,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Repellendus voluptatem et id consequatur.
+                example: Tenetur sunt.
                 format: binary
               example: Excepturi iusto animi beatae tenetur deserunt.
         "400":
@@ -9319,7 +9319,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Corporis occaecati nobis provident autem deserunt.
+                example: Ipsam sequi exercitationem labore nostrum.
                 format: binary
               example: Sed harum dolorum eum.
         "400":
@@ -9392,7 +9392,7 @@ paths:
             schema:
               $ref: '#/components/schemas/RefreshRequestBody'
             example:
-              refreshToken: Voluptatem commodi qui sit modi.
+              refreshToken: Amet necessitatibus.
       responses:
         "204":
           description: ""
@@ -9413,12 +9413,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
         "401":
           description: ""
           content:
@@ -9426,7 +9426,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -9452,7 +9452,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -9547,7 +9547,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Deserunt quo illum ut aliquid fuga.
+                example: Dolor quia neque aperiam asperiores.
                 format: binary
               example: Quis ipsam.
         "400":
@@ -9676,7 +9676,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Ipsam sequi exercitationem labore nostrum.
+                example: Eum qui aut.
                 format: binary
               example: Et sunt aliquam architecto facilis molestias praesentium.
         "400":
@@ -12985,12 +12985,12 @@ paths:
                 $ref: '#/components/schemas/User'
               example:
                 admin: false
-                bio: Iste eos vero ex odio nesciunt.
-                email: brain@mannwiza.name
-                id: 1268666068
-                name: zpq
+                bio: Exercitationem doloribus tempore voluptatem ut consequatur.
+                email: delbert@spencer.com
+                id: 363644938
+                name: qk8
                 photo:
-                  url: Consequatur totam aut a.
+                  url: Voluptatem magnam quibusdam veniam.
         "400":
           description: ""
           content:
@@ -12998,7 +12998,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -13011,7 +13011,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -13024,11 +13024,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
         "404":
           description: ""
@@ -13037,12 +13037,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: true
+                timeout: false
       security:
       - jwt_header_Authorization:
         - api:access
@@ -13390,8 +13390,8 @@ paths:
             schema:
               $ref: '#/components/schemas/RecoveryFields'
             example:
-              password: h28
-              token: Tenetur fuga omnis numquam blanditiis soluta beatae.
+              password: 5sk
+              token: Fuga omnis.
       responses:
         "204":
           description: ""
@@ -13409,7 +13409,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
         "401":
           description: ""
@@ -13418,7 +13418,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -13431,12 +13431,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
         "404":
           description: ""
           content:
@@ -13444,11 +13444,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: true
   /user/recovery/lookup:
     post:
@@ -13463,7 +13463,7 @@ paths:
             schema:
               $ref: '#/components/schemas/RemoveUserFields'
             example:
-              email: Consequatur voluptas provident omnis.
+              email: Omnis porro.
       responses:
         "204":
           description: ""
@@ -13477,11 +13477,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
         "401":
           description: ""
@@ -13490,12 +13490,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: false
+                temporary: false
+                timeout: true
         "403":
           description: ""
           content:
@@ -13507,7 +13507,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
         "404":
           description: ""
@@ -13516,12 +13516,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: false
+                temporary: false
+                timeout: true
   /user/stations:
     get:
       tags:
@@ -16950,12 +16950,12 @@ paths:
                 $ref: '#/components/schemas/User'
               example:
                 admin: false
-                bio: Eum sit est.
-                email: micah@beahan.com
-                id: 911908232
-                name: b3d
+                bio: Quo rerum sunt.
+                email: tracy@osinski.net
+                id: 49434932
+                name: xjw
                 photo:
-                  url: Consequatur totam aut a.
+                  url: Voluptatem magnam quibusdam veniam.
         "400":
           description: ""
           content:
@@ -16963,11 +16963,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
         "401":
           description: ""
@@ -16980,8 +16980,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
         "403":
           description: ""
           content:
@@ -16993,8 +16993,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
         "404":
           description: ""
           content:
@@ -17002,12 +17002,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
   /users/{userId}:
     patch:
       tags:
@@ -17046,13 +17046,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
               example:
-                admin: true
-                bio: Aliquam ex.
-                email: benjamin@hilllkuvalis.info
-                id: 1018412118
-                name: hvb
+                admin: false
+                bio: Mollitia enim et consequatur et laboriosam sit.
+                email: anika@kohler.com
+                id: 522247656
+                name: esw
                 photo:
-                  url: Consequatur totam aut a.
+                  url: Voluptatem magnam quibusdam veniam.
         "400":
           description: ""
           content:
@@ -17060,11 +17060,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: false
         "401":
           description: ""
@@ -17091,7 +17091,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
         "404":
           description: ""
           content:
@@ -17104,7 +17104,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
       security:
       - jwt_header_Authorization:
         - api:access
@@ -17132,8 +17132,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateUserPasswordFields'
             example:
-              newPassword: u3i
-              oldPassword: f26
+              newPassword: c1c
+              oldPassword: iuj
       responses:
         "200":
           description: ""
@@ -17143,12 +17143,12 @@ paths:
                 $ref: '#/components/schemas/User'
               example:
                 admin: false
-                bio: Ipsam qui consequuntur tenetur illum.
-                email: larry@fadel.info
-                id: 904868446
-                name: f29
+                bio: Nulla impedit eos debitis provident ea.
+                email: josiah@sipes.org
+                id: 1015020833
+                name: cpp
                 photo:
-                  url: Consequatur totam aut a.
+                  url: Voluptatem magnam quibusdam veniam.
         "400":
           description: ""
           content:
@@ -17156,7 +17156,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -17174,7 +17174,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
         "403":
           description: ""
           content:
@@ -17182,11 +17182,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: true
         "404":
           description: ""
@@ -17199,8 +17199,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
       security:
       - jwt_header_Authorization:
         - api:access
@@ -17234,12 +17234,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
         "401":
           description: ""
           content:
@@ -17251,7 +17251,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
         "403":
           description: ""
@@ -17260,12 +17260,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: true
+                temporary: false
+                timeout: false
         "404":
           description: ""
           content:
@@ -17277,7 +17277,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
   /users/project/{projectId}:
     get:
@@ -17353,7 +17353,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
         "401":
           description: ""
@@ -17362,11 +17362,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: false
         "403":
           description: ""
@@ -17380,7 +17380,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
         "404":
           description: ""
           content:
@@ -17388,7 +17388,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -17438,7 +17438,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: false
         "401":
           description: ""
@@ -17452,7 +17452,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: true
+                timeout: false
         "403":
           description: ""
           content:
@@ -17465,7 +17465,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: false
+                timeout: true
         "404":
           description: ""
           content:
@@ -17473,7 +17473,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -17508,41 +17508,30 @@ components:
           id: 5594406092040065196
           name: Quo corporis perspiciatis.
         type: Blanditiis architecto ut tempora aspernatur.
-      - created_at: 3529168552779339004
-        id: 1112739775327270056
-        key: Et saepe amet et doloremque.
-        meta: Non minus eaque.
-        project:
-          id: 365701332937053932
-          name: Id ut.
-        station:
-          id: 5594406092040065196
-          name: Quo corporis perspiciatis.
-        type: Blanditiis architecto ut tempora aspernatur.
     AddFirmwarePayload:
       type: object
       properties:
         etag:
           type: string
-          example: Laudantium officiis vel et ducimus tempora ipsum.
+          example: Et possimus est.
         meta:
           type: string
-          example: Vero alias.
+          example: Harum et vero quibusdam voluptates.
         module:
           type: string
-          example: Debitis et.
+          example: Impedit odit velit consequuntur consequatur sed aut.
         profile:
           type: string
-          example: Ut harum et possimus.
+          example: Alias animi consectetur corporis voluptatem.
         url:
           type: string
-          example: Quos impedit odit velit consequuntur consequatur sed.
+          example: Placeat quo.
       example:
-        etag: Consectetur corporis voluptatem incidunt placeat quo sit.
-        meta: Velit earum ut itaque qui.
-        module: Et vero quibusdam.
-        profile: Magni corrupti numquam temporibus dolores hic.
-        url: Sapiente ducimus quaerat sit id.
+        etag: Corrupti numquam temporibus dolores hic iure sapiente.
+        meta: Vero fugiat deleniti excepturi aut delectus dolorem.
+        module: Quaerat sit id est velit.
+        profile: Ut itaque.
+        url: Enim ducimus perferendis dolores.
       required:
       - etag
       - module
@@ -17554,38 +17543,38 @@ components:
       properties:
         description:
           type: string
-          example: Sunt qui eos.
+          example: Sit itaque.
         endTime:
           type: string
-          example: Vel eum accusamus ipsum sit itaque.
+          example: Quia asperiores hic sint inventore non repellendus.
         goal:
           type: string
-          example: Minima voluptatem delectus perferendis non.
+          example: Qui a nihil placeat quibusdam.
         location:
           type: string
-          example: Aperiam ipsum aliquam error quod et ipsam.
+          example: Est quasi nisi modi tempore exercitationem.
         name:
           type: string
-          example: Nemo ut repellendus et ut.
+          example: Minima vel vel eum accusamus.
         privacy:
           type: integer
-          example: 978403359
+          example: 1203779821
           format: int32
         startTime:
           type: string
-          example: Mollitia velit minima.
+          example: Minima sit.
         tags:
           type: string
-          example: Voluptatem quia.
+          example: Blanditiis est deleniti illum aspernatur.
       example:
-        description: Est quasi nisi modi tempore exercitationem.
-        endTime: Ut error minima et.
-        goal: Blanditiis est deleniti illum aspernatur.
-        location: Ipsam minima sit.
-        name: Qui a nihil placeat quibusdam.
-        privacy: 1831893846
-        startTime: Rem enim est sint ipsa in.
-        tags: Quia asperiores hic sint inventore non repellendus.
+        description: Est sint ipsa.
+        endTime: Similique similique earum.
+        goal: Eum ut error minima.
+        location: Ad vitae officiis deleniti quos.
+        name: A rem.
+        privacy: 2119216131
+        startTime: Quibusdam ut doloremque saepe fugiat praesentium.
+        tags: Aut quos velit soluta ut voluptates necessitatibus.
       required:
       - name
       - description
@@ -17594,21 +17583,21 @@ components:
       properties:
         deviceId:
           type: string
-          example: Est aut.
+          example: Sit eius.
         locationName:
           type: string
-          example: Officia vitae itaque porro hic voluptatem sequi.
+          example: Aut sit blanditiis voluptas.
         name:
           type: string
-          example: Quod laborum assumenda corrupti ad.
+          example: Hic voluptatem sequi.
         statusPb:
           type: string
-          example: Sit eius.
+          example: Aut dolorum temporibus ex.
       example:
-        deviceId: Aut dolorum temporibus ex.
-        locationName: Error aspernatur dolor quis placeat consequatur.
-        name: Aut sit blanditiis voluptas.
-        statusPb: Officiis non assumenda et saepe excepturi earum.
+        deviceId: Officiis non assumenda et saepe excepturi earum.
+        locationName: Velit reprehenderit mollitia modi voluptatibus omnis.
+        name: Error aspernatur dolor quis placeat consequatur.
+        statusPb: Recusandae labore.
       required:
       - name
       - deviceId
@@ -17645,18 +17634,18 @@ components:
       properties:
         created_at:
           type: integer
-          example: 5410908199153279456
+          example: 7324478682065434289
           format: int64
         id:
           type: integer
-          example: 4347858792563034306
+          example: 8907849996595385289
           format: int64
         key:
           type: string
-          example: Enim et eum dolor eius nihil quasi.
+          example: Quibusdam inventore velit.
         meta:
           type: string
-          example: Tenetur placeat.
+          example: Provident et.
           format: binary
         project:
           $ref: '#/components/schemas/ProjectSummary'
@@ -17664,19 +17653,19 @@ components:
           $ref: '#/components/schemas/ProjectSummary'
         type:
           type: string
-          example: Optio culpa saepe id commodi.
+          example: Perferendis cumque rerum.
       example:
-        created_at: 7324478682065434289
-        id: 8952797833016185702
-        key: Voluptas quisquam.
-        meta: Provident et.
+        created_at: 2787004042511623899
+        id: 9007645789848187090
+        key: Accusamus animi veritatis quo nulla eum temporibus.
+        meta: Inventore similique sed.
         project:
           id: 3726507772045298675
           name: A sunt atque atque sapiente.
         station:
           id: 1012877378540922038
           name: Quia veritatis.
-        type: Perferendis cumque rerum.
+        type: Ullam corporis aut cupiditate tempore quisquam harum.
       required:
       - id
       - key
@@ -17705,20 +17694,20 @@ components:
       properties:
         first:
           type: integer
-          example: 6474099828304604032
+          example: 3823190594246319039
           format: int64
         last:
           type: integer
-          example: 8854600234786243224
+          example: 3245789605378939162
           format: int64
         size:
           type: integer
-          example: 416740172732792757
+          example: 557021391430075497
           format: int64
       example:
-        first: 7210600168553058937
-        last: 2255624855462390206
-        size: 4243069592654739447
+        first: 8495297761884384397
+        last: 6636699951000555036
+        size: 1077822193562768885
       required:
       - size
       - first
@@ -17728,20 +17717,20 @@ components:
       properties:
         first:
           type: integer
-          example: 4684994897849843926
+          example: 2790069167344356408
           format: int64
         last:
           type: integer
-          example: 9034583526014914957
+          example: 5561161051038848517
           format: int64
         size:
           type: integer
-          example: 8075796457350823538
+          example: 1891033416677252070
           format: int64
       example:
-        first: 4787580737858415084
-        last: 9169091092063736316
-        size: 2043999614904988974
+        first: 7723957513614122917
+        last: 3129977954272135383
+        size: 6255734666781337318
       required:
       - size
       - first
@@ -17751,31 +17740,31 @@ components:
       properties:
         created:
           type: integer
-          example: 7997007714520920767
+          example: 6081379770925248374
           format: int64
         data:
           $ref: '#/components/schemas/AppDeviceDataSummary'
         generation:
           type: string
-          example: In ullam corporis aut cupiditate tempore quisquam.
+          example: Tempora consectetur voluptatem.
         meta:
           $ref: '#/components/schemas/AppDeviceMetaSummary'
         updated:
           type: integer
-          example: 8556676726954595098
+          example: 1079336407889352461
           format: int64
       example:
-        created: 6081379770925248374
+        created: 1268538445393091789
         data:
           first: 2943544276172948223
           last: 4220955121392392601
           size: 8708537603873662897
-        generation: Tempora consectetur voluptatem.
+        generation: Ipsam reprehenderit aut sed quasi aut.
         meta:
           first: 6719719008391422781
           last: 4777179309905695327
           size: 1154087305895829829
-        updated: 1079336407889352461
+        updated: 7227138248082931894
       required:
       - generation
       - created
@@ -17790,42 +17779,42 @@ components:
         body:
           type: string
           description: body
-          example: Sit quos sunt id et.
+          example: Quibusdam odio quia velit quasi quis quasi.
         bookmark:
           type: string
           description: bookmark
-          example: Iure consequatur at ratione ut sint quas.
+          example: Esse quis at est nemo maxime.
         createdAt:
           type: integer
           description: created at
-          example: 7723957513614122917
+          example: 8546377591542094319
           format: int64
         id:
           type: integer
           description: id
-          example: 6255734666781337318
+          example: 7201346444394889723
           format: int64
         replies:
           type: string
           description: replies
-          example: Quos iste necessitatibus voluptas aliquam enim.
+          example: Sit pariatur ex natus nemo.
           format: binary
         updatedAt:
           type: integer
           description: updated at
-          example: 3129977954272135383
+          example: 1073142237194869442
           format: int64
       example:
         author:
           id: 1146798909
           mediaUrl: Provident ut perspiciatis.
           name: Et vitae officiis itaque nihil ipsam nostrum.
-        body: Sit pariatur ex natus nemo.
-        bookmark: Quibusdam odio quia velit quasi quis quasi.
-        createdAt: 5763359916280208570
-        id: 3608004792585185337
-        replies: Quo sunt ut.
-        updatedAt: 8606233244040825424
+        body: Quia enim facilis rem dolorum explicabo.
+        bookmark: Nisi voluptatem.
+        createdAt: 8276042813283856272
+        id: 7474830449390062580
+        replies: Reprehenderit veritatis dolorum.
+        updatedAt: 5879084665934342271
       required:
       - id
       - createdAt
@@ -17838,23 +17827,23 @@ components:
       properties:
         body:
           type: string
-          example: Est nemo maxime vitae.
+          example: Doloribus id molestias voluptas.
         bookmark:
           type: string
-          example: Facere reprehenderit.
+          example: Id et.
         projectId:
           type: integer
-          example: 1926916375
+          example: 1040951752
           format: int32
         threadId:
           type: integer
-          example: 2372029248877752057
+          example: 5168426781915717742
           format: int64
       example:
-        body: Nisi quia enim facilis rem dolorum.
-        bookmark: Nisi voluptatem.
-        projectId: 1590082649
-        threadId: 9154855506582639974
+        body: Autem ut quis sapiente.
+        bookmark: Deserunt id quisquam numquam.
+        projectId: 2128184377
+        threadId: 1971967730117376955
       required:
       - body
     AppDiscussionSummary:
@@ -17863,10 +17852,10 @@ components:
         total:
           type: integer
           description: Total
-          example: 649613600
+          example: 1601264291
           format: int32
       example:
-        total: 1294808706
+        total: 684379873
       required:
       - total
     AppExportStatus:
@@ -17874,55 +17863,55 @@ components:
       properties:
         args:
           type: string
-          example: Fuga iusto numquam iusto eum.
+          example: Doloremque beatae voluptas nemo quod.
           format: binary
         completedAt:
           type: integer
-          example: 4054461888229519826
+          example: 7059532863013812684
           format: int64
         createdAt:
           type: integer
-          example: 2297498078135139514
+          example: 1090663860682206174
           format: int64
         downloadUrl:
           type: string
-          example: Minima tenetur incidunt placeat qui voluptas.
+          example: Beatae sint pariatur.
         format:
           type: string
-          example: Quisquam numquam soluta eos et.
+          example: Voluptas ex repellendus fuga iusto numquam iusto.
         id:
           type: integer
-          example: 8427355040373915797
+          example: 4669686068996666200
           format: int64
         message:
           type: string
-          example: Fuga culpa asperiores.
+          example: Quos laudantium reiciendis alias commodi labore.
         progress:
           type: number
-          example: 0.30813384
+          example: 0.73997635
           format: float
         size:
           type: integer
-          example: 2039328514
+          example: 699294935
           format: int32
         statusUrl:
           type: string
-          example: Ipsam architecto at omnis quia cupiditate.
+          example: Similique animi provident molestiae et non nostrum.
         token:
           type: string
-          example: Ut quis sapiente non.
+          example: Quia cupiditate voluptatem minima tenetur.
       example:
-        args: Repellendus omnis iure.
-        completedAt: 5537734349953058658
-        createdAt: 2460817110161434848
-        downloadUrl: Voluptates sunt fuga porro quasi.
-        format: Et non nostrum voluptatum beatae sint.
-        id: 2399639592590268361
-        message: In doloremque beatae voluptas nemo quod cumque.
-        progress: 0.32745123
-        size: 263716752
-        statusUrl: Quo sint ut ullam ipsa.
-        token: Laudantium reiciendis alias commodi labore repellat similique.
+        args: Ipsum praesentium debitis et.
+        completedAt: 5430347317396236265
+        createdAt: 929328048546447169
+        downloadUrl: Officiis vel et.
+        format: Fuga porro quasi.
+        id: 2684192581245101464
+        message: Repellendus omnis iure.
+        progress: 0.12280268
+        size: 1509459276
+        statusUrl: Non ullam.
+        token: Quo sint ut ullam ipsa.
       required:
       - id
       - token
@@ -17936,50 +17925,51 @@ components:
       properties:
         buildNumber:
           type: integer
-          example: 384882119
+          example: 1319986150
           format: int32
         buildTime:
           type: integer
-          example: 7805266642137746207
+          example: 8498761167695386179
           format: int64
         etag:
           type: string
-          example: Excepturi aut delectus dolorem.
+          example: Voluptas iusto ratione beatae quam fugit libero.
         id:
           type: integer
-          example: 573187858
+          example: 377932849
           format: int32
         meta:
           type: object
           example:
-            Modi et.: Quisquam eveniet.
-            Quam vel quis id laboriosam aut est.: Odit vel autem unde maxime ut nulla.
+            Et tenetur quisquam.: Quia nobis ut.
+            Libero eum necessitatibus.: Nulla dolorum molestias consequatur.
+            Saepe quasi tenetur delectus laudantium eligendi quia.: Exercitationem qui sit.
           additionalProperties: true
         module:
           type: string
-          example: Unde pariatur cumque.
+          example: Et quam vel quis id laboriosam.
         profile:
           type: string
-          example: Enim voluptas iusto ratione.
+          example: Est quos odit vel.
         time:
           type: string
-          example: Perferendis dolores autem vero fugiat.
+          example: Pariatur cumque magnam.
         url:
           type: string
-          example: Quam fugit libero.
+          example: Unde maxime ut nulla.
       example:
-        buildNumber: 1873152400
-        buildTime: 4082111568154098497
-        etag: Exercitationem qui sit.
-        id: 1465640884
+        buildNumber: 94480308
+        buildTime: 3266671478687580874
+        etag: Non id dolor deleniti non.
+        id: 1587836933
         meta:
-          Explicabo aut.: Id dolor deleniti non omnis nemo.
-          Explicabo quaerat fugit ea quia.: Non quaerat repellat.
-          Fugit mollitia est ut nostrum.: Error adipisci et nesciunt.
-        module: Libero eum necessitatibus.
-        profile: Nulla dolorum molestias consequatur.
-        time: Saepe quasi tenetur delectus laudantium eligendi quia.
-        url: Harum sequi ut animi qui architecto.
+          Dolor ut ducimus.: Totam doloremque est veniam nemo.
+          Mollitia est ut nostrum voluptas error.: Et nesciunt ea omnis est.
+          Quis et corporis incidunt sapiente officia cupiditate.: Sed ipsa.
+        module: Nemo velit explicabo.
+        profile: Fugit ea quia.
+        time: Animi qui architecto soluta id explicabo.
+        url: Non quaerat repellat.
       required:
       - id
       - time
@@ -17997,16 +17987,16 @@ components:
           $ref: '#/components/schemas/Avatar'
         id:
           type: integer
-          example: 8217858049834211351
+          example: 3905962565511489149
           format: int64
         name:
           type: string
-          example: Ut ducimus nam totam doloremque est veniam.
+          example: Esse excepturi reprehenderit.
       example:
         avatar:
           url: Totam provident non tempore.
-        id: 405789834328316972
-        name: Ea qui.
+        id: 7157422692540219381
+        name: Quisquam autem consequatur.
       required:
       - id
       - name
@@ -18015,22 +18005,22 @@ components:
       properties:
         contentType:
           type: string
-          example: Sed adipisci.
+          example: Nihil iure aperiam dolorum aut.
         id:
           type: integer
-          example: 1286569330160122661
+          example: 5758628030981794915
           format: int64
         key:
           type: string
-          example: Amet qui et laborum.
+          example: Reprehenderit soluta tempora maiores non et qui.
         url:
           type: string
-          example: Accusamus quos tempora vel fugiat.
+          example: Repellendus magni.
       example:
-        contentType: Qui ut nihil iure aperiam dolorum aut.
-        id: 3529040769478865201
-        key: Tempora maiores non.
-        url: Alias repellendus magni quidem reprehenderit.
+        contentType: Aut aut sunt est voluptatem laborum aliquam.
+        id: 1537363006253169633
+        key: Omnis voluptatum cupiditate blanditiis iure error repellat.
+        url: Aut qui molestias.
       required:
       - id
       - url
@@ -18121,28 +18111,7 @@ components:
           - 534118255434787912
           - 2637032379217759402
           - 4821997293603470239
-        - body: Ad quia sapiente dicta est.
-          key: Nam ut.
-          mediaIds:
-          - 983557301767822690
-          - 534118255434787912
-          - 2637032379217759402
-          - 4821997293603470239
         notes:
-        - body: Tenetur est quibusdam.
-          id: 6615658144939495985
-          key: Doloremque fuga doloribus vitae ipsum.
-          mediaIds:
-          - 3401167970506164662
-          - 8615319345414507278
-          - 2861514097178343548
-        - body: Tenetur est quibusdam.
-          id: 6615658144939495985
-          key: Doloremque fuga doloribus vitae ipsum.
-          mediaIds:
-          - 3401167970506164662
-          - 8615319345414507278
-          - 2861514097178343548
         - body: Tenetur est quibusdam.
           id: 6615658144939495985
           key: Doloremque fuga doloribus vitae ipsum.
@@ -18165,56 +18134,56 @@ components:
       properties:
         description:
           type: string
-          example: Aut illo.
+          example: Maxime consequatur corporis vel aut est molestiae.
         endTime:
           type: string
-          example: Explicabo maxime consequatur.
+          example: Sapiente eos voluptatem cupiditate quisquam dicta quibusdam.
         following:
           $ref: '#/components/schemas/ProjectFollowing'
         goal:
           type: string
-          example: Doloribus error praesentium.
+          example: Omnis sed mollitia maxime sed.
         id:
           type: integer
-          example: 2063807078
+          example: 2090561247
           format: int32
         location:
           type: string
-          example: Ut qui.
+          example: Saepe quod.
         name:
           type: string
-          example: Tempore nemo laboriosam.
+          example: Minus magnam laudantium itaque optio molestiae.
         photo:
           type: string
-          example: Vel aut.
+          example: Omnis voluptatem pariatur non cum suscipit.
         privacy:
           type: integer
-          example: 647391920
+          example: 1636581729
           format: int32
         readOnly:
           type: boolean
           example: false
         startTime:
           type: string
-          example: Corporis unde minus magnam laudantium itaque optio.
+          example: Vero ipsam similique nesciunt.
         tags:
           type: string
-          example: Laborum a eum voluptatum illum.
+          example: Eligendi aliquam.
       example:
-        description: Animi vero ipsam similique nesciunt.
-        endTime: Quae illo aut eaque maxime.
+        description: Quae illo aut eaque maxime.
+        endTime: Aperiam ipsum aliquam error quod et ipsam.
         following:
           following: true
           total: 1842628113
-        goal: Sapiente eos voluptatem cupiditate quisquam dicta quibusdam.
-        id: 1203689305
-        location: Omnis voluptatem pariatur non cum suscipit.
-        name: Sed commodi saepe quod rerum eligendi aliquam.
-        photo: Maxime vel quia molestiae.
-        privacy: 797182171
+        goal: Maxime vel quia molestiae.
+        id: 943043814
+        location: Aperiam excepturi incidunt nemo ut repellendus et.
+        name: Dolores sed culpa.
+        photo: Voluptatem quia.
+        privacy: 1330826381
         readOnly: true
-        startTime: Sed culpa.
-        tags: Illo debitis odit doloremque iste.
+        startTime: Perferendis non.
+        tags: Quia sunt qui eos accusantium minima.
       required:
       - id
       - name
@@ -18289,11 +18258,13 @@ components:
           type: array
           items:
             type: number
-            example: 0.8820687962676997
+            example: 0.4581507198785253
             format: double
           example:
-          - 0.42130622254073785
-          - 0.4581507198785253
+          - 0.9334571243348214
+          - 0.15125475619684747
+          - 0.5123236965737921
+          - 0.8299933976634687
         regions:
           type: array
           items:
@@ -18487,9 +18458,9 @@ components:
       properties:
         url:
           type: string
-          example: Sed quis et corporis incidunt sapiente.
+          example: Odio et optio corrupti ut.
       example:
-        url: Cupiditate in sed ipsa.
+        url: Omnis earum labore ullam consequatur omnis cumque.
       required:
       - url
     DeviceDataSummaryResponse:
@@ -18979,7 +18950,7 @@ components:
         sensors:
           type: object
           example:
-            Eos et ipsa modi blanditiis animi consequatur.:
+            Nesciunt quas corrupti nulla facilis.:
             - fullKey: Et rerum aperiam sed velit.
               key: Perspiciatis occaecati vel inventore nostrum quidem illo.
               name: Ut asperiores a.
@@ -19596,93 +19567,7 @@ components:
           sourceId: 43246628
           time: 2030983248607233360
         sensors:
-          Nesciunt quas corrupti nulla facilis.:
-          - fullKey: Et rerum aperiam sed velit.
-            key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-            name: Ut asperiores a.
-            ranges:
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            reading:
-              last: 0.6773676
-              time: 3991256472824368181
-            unitOfMeasure: Quos unde quo.
-          - fullKey: Et rerum aperiam sed velit.
-            key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-            name: Ut asperiores a.
-            ranges:
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            reading:
-              last: 0.6773676
-              time: 3991256472824368181
-            unitOfMeasure: Quos unde quo.
-          - fullKey: Et rerum aperiam sed velit.
-            key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-            name: Ut asperiores a.
-            ranges:
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            reading:
-              last: 0.6773676
-              time: 3991256472824368181
-            unitOfMeasure: Quos unde quo.
-          - fullKey: Et rerum aperiam sed velit.
-            key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-            name: Ut asperiores a.
-            ranges:
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            reading:
-              last: 0.6773676
-              time: 3991256472824368181
-            unitOfMeasure: Quos unde quo.
-          Non ullam veritatis dignissimos delectus nam.:
-          - fullKey: Et rerum aperiam sed velit.
-            key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-            name: Ut asperiores a.
-            ranges:
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            reading:
-              last: 0.6773676
-              time: 3991256472824368181
-            unitOfMeasure: Quos unde quo.
-          - fullKey: Et rerum aperiam sed velit.
-            key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-            name: Ut asperiores a.
-            ranges:
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            reading:
-              last: 0.6773676
-              time: 3991256472824368181
-            unitOfMeasure: Quos unde quo.
-          Quisquam officia.:
-          - fullKey: Et rerum aperiam sed velit.
-            key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-            name: Ut asperiores a.
-            ranges:
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            - maximum: 0.37028545
-              minimum: 0.2422857
-            reading:
-              last: 0.6773676
-              time: 3991256472824368181
-            unitOfMeasure: Quos unde quo.
+          Sint eos totam rem quod laborum assumenda.:
           - fullKey: Et rerum aperiam sed velit.
             key: Perspiciatis occaecati vel inventore nostrum quidem illo.
             name: Ut asperiores a.
@@ -19727,6 +19612,17 @@ components:
       items:
         $ref: '#/components/schemas/AppDeviceProvisionSummary'
       example:
+      - created: 700229165142639575
+        data:
+          first: 2943544276172948223
+          last: 4220955121392392601
+          size: 8708537603873662897
+        generation: Rerum deleniti.
+        meta:
+          first: 6719719008391422781
+          last: 4777179309905695327
+          size: 1154087305895829829
+        updated: 2982126506836433239
       - created: 700229165142639575
         data:
           first: 2943544276172948223
@@ -19853,82 +19749,60 @@ components:
         body:
           type: string
           example:
-          - 84
+          - 83
           - 111
+          - 108
+          - 117
           - 116
           - 97
-          - 109
           - 32
+          - 110
+          - 97
+          - 116
           - 117
-          - 110
-          - 100
-          - 101
+          - 115
           - 32
           - 97
-          - 100
-          - 105
-          - 112
-          - 105
-          - 115
-          - 99
-          - 105
+          - 117
+          - 116
           - 32
-          - 115
           - 101
-          - 100
+          - 116
           - 32
-          - 97
-          - 110
-          - 105
+          - 118
+          - 101
+          - 108
+          - 32
+          - 111
           - 109
-          - 105
-          - 32
-          - 114
-          - 101
-          - 105
-          - 99
-          - 105
-          - 101
           - 110
-          - 100
           - 105
           - 115
           - 46
           format: binary
         contentType:
           type: string
-          example: Sed et natus reiciendis nihil occaecati.
+          example: Ducimus et corrupti sequi.
         etag:
           type: string
-          example: Ut aliquam.
+          example: Quaerat qui recusandae voluptatem.
         length:
           type: integer
-          example: 2886248557253701279
+          example: 7380415607048494768
           format: int64
       example:
         body:
-        - 81
-        - 117
-        - 97
+        - 82
         - 101
-        - 114
-        - 97
-        - 116
-        - 32
-        - 113
-        - 117
-        - 105
-        - 32
-        - 114
+        - 112
         - 101
-        - 99
-        - 117
-        - 115
-        - 97
+        - 108
+        - 108
+        - 101
         - 110
         - 100
-        - 97
-        - 101
+        - 117
+        - 115
         - 32
         - 118
         - 111
@@ -19940,10 +19814,28 @@ components:
         - 116
         - 101
         - 109
+        - 32
+        - 101
+        - 116
+        - 32
+        - 105
+        - 100
+        - 32
+        - 99
+        - 111
+        - 110
+        - 115
+        - 101
+        - 113
+        - 117
+        - 97
+        - 116
+        - 117
+        - 114
         - 46
-        contentType: Enim recusandae rerum ipsum ad cupiditate voluptates.
-        etag: Ad voluptatem ducimus et corrupti sequi.
-        length: 3779279415783107092
+        contentType: Occaecati nobis.
+        etag: Autem deserunt.
+        length: 7281672121447201836
       required:
       - length
       - contentType
@@ -19954,7 +19846,7 @@ components:
         fault:
           type: boolean
           description: Is the error a server-side fault?
-          example: true
+          example: false
         id:
           type: string
           description: ID is a unique identifier for this particular occurrence of the problem.
@@ -19970,7 +19862,7 @@ components:
         temporary:
           type: boolean
           description: Is the error temporary?
-          example: false
+          example: true
         timeout:
           type: boolean
           description: Is the error a timeout?
@@ -20123,32 +20015,32 @@ components:
       properties:
         body:
           type: string
-          example: Consequatur beatae.
+          example: Ducimus animi et sed.
         id:
           type: integer
-          example: 3778211306024659410
+          example: 8051266937098538872
           format: int64
         key:
           type: string
-          example: Ullam consequatur omnis cumque necessitatibus qui quisquam.
+          example: Sed non.
         mediaIds:
           type: array
           items:
             type: integer
-            example: 7345493417320455735
+            example: 2602991961869869039
             format: int64
           example:
-          - 6668860213034594697
-          - 1270966269466788735
-          - 510070108802558682
+          - 444258430311583527
+          - 3969044741487263648
+          - 8686825718263549540
       example:
-        body: Sed non.
-        id: 531971934958955000
-        key: Recusandae esse.
+        body: Et ut.
+        id: 2104188777070229926
+        key: Rerum architecto.
         mediaIds:
-        - 1912692279401234526
-        - 5501440607745519625
-        - 2949439786089599444
+        - 2373494484788258098
+        - 8085909201144302247
+        - 7463417125343917799
       required:
       - id
     FieldNote:
@@ -20158,18 +20050,18 @@ components:
           $ref: '#/components/schemas/FieldNoteAuthor'
         body:
           type: string
-          example: Rerum error ea rerum quia vel.
+          example: Sed adipisci.
         createdAt:
           type: integer
-          example: 2258161748933820737
+          example: 5491000103707014145
           format: int64
         id:
           type: integer
-          example: 7098580305891808838
+          example: 4944400878535059466
           format: int64
         key:
           type: string
-          example: Et facere sunt facere.
+          example: Fugiat tempora amet qui et laborum.
         media:
           type: array
           items:
@@ -20185,21 +20077,21 @@ components:
             url: Eligendi fugit maxime.
         updatedAt:
           type: integer
-          example: 127305132462836853
+          example: 4915582148085048916
           format: int64
         version:
           type: integer
-          example: 6982852713588598120
+          example: 3529040769478865201
           format: int64
       example:
         author:
           id: 403493725
           mediaUrl: Quia rem beatae atque totam animi.
           name: Qui aut aperiam.
-        body: Error repellat.
-        createdAt: 815572880642019044
-        id: 863036996178427114
-        key: Non omnis voluptatum cupiditate blanditiis.
+        body: Consectetur veniam.
+        createdAt: 154901850916378756
+        id: 943667278419469075
+        key: Tempora veritatis est voluptas veniam consequuntur.
         media:
         - contentType: Sunt alias reprehenderit accusamus ut.
           id: 4755469836378177211
@@ -20217,8 +20109,8 @@ components:
           id: 4755469836378177211
           key: Quaerat ducimus ducimus odit accusamus.
           url: Eligendi fugit maxime.
-        updatedAt: 4877994936926281548
-        version: 367994471891693278
+        updatedAt: 8237085472733461536
+        version: 3974702670134778665
       required:
       - id
       - createdAt
@@ -20231,18 +20123,18 @@ components:
       properties:
         id:
           type: integer
-          example: 753032114
+          example: 483880447
           format: int32
         mediaUrl:
           type: string
-          example: In dolorem qui debitis praesentium.
+          example: Et quis et eum et facere sunt.
         name:
           type: string
-          example: Hic fugit aut.
+          example: Ipsa a.
       example:
-        id: 1278473088
-        mediaUrl: Quis et.
-        name: Ut deserunt ipsa a aut.
+        id: 921164233
+        mediaUrl: Sequi culpa accusamus quos tempora.
+        name: Rerum error ea rerum quia vel.
       required:
       - id
       - name
@@ -20255,10 +20147,6 @@ components:
           items:
             $ref: '#/components/schemas/AppNoteMedia'
           example:
-          - contentType: Sunt alias reprehenderit accusamus ut.
-            id: 4755469836378177211
-            key: Quaerat ducimus ducimus odit accusamus.
-            url: Eligendi fugit maxime.
           - contentType: Sunt alias reprehenderit accusamus ut.
             id: 4755469836378177211
             key: Quaerat ducimus ducimus odit accusamus.
@@ -20322,12 +20210,54 @@ components:
               url: Eligendi fugit maxime.
             updatedAt: 4996459569611441693
             version: 7044345640954586935
+          - author:
+              id: 403493725
+              mediaUrl: Quia rem beatae atque totam animi.
+              name: Qui aut aperiam.
+            body: Ad et ratione atque laboriosam a.
+            createdAt: 110177102614607753
+            id: 6378770270063179192
+            key: Voluptatibus vero.
+            media:
+            - contentType: Sunt alias reprehenderit accusamus ut.
+              id: 4755469836378177211
+              key: Quaerat ducimus ducimus odit accusamus.
+              url: Eligendi fugit maxime.
+            - contentType: Sunt alias reprehenderit accusamus ut.
+              id: 4755469836378177211
+              key: Quaerat ducimus ducimus odit accusamus.
+              url: Eligendi fugit maxime.
+            - contentType: Sunt alias reprehenderit accusamus ut.
+              id: 4755469836378177211
+              key: Quaerat ducimus ducimus odit accusamus.
+              url: Eligendi fugit maxime.
+            updatedAt: 4996459569611441693
+            version: 7044345640954586935
+          - author:
+              id: 403493725
+              mediaUrl: Quia rem beatae atque totam animi.
+              name: Qui aut aperiam.
+            body: Ad et ratione atque laboriosam a.
+            createdAt: 110177102614607753
+            id: 6378770270063179192
+            key: Voluptatibus vero.
+            media:
+            - contentType: Sunt alias reprehenderit accusamus ut.
+              id: 4755469836378177211
+              key: Quaerat ducimus ducimus odit accusamus.
+              url: Eligendi fugit maxime.
+            - contentType: Sunt alias reprehenderit accusamus ut.
+              id: 4755469836378177211
+              key: Quaerat ducimus ducimus odit accusamus.
+              url: Eligendi fugit maxime.
+            - contentType: Sunt alias reprehenderit accusamus ut.
+              id: 4755469836378177211
+              key: Quaerat ducimus ducimus odit accusamus.
+              url: Eligendi fugit maxime.
+            updatedAt: 4996459569611441693
+            version: 7044345640954586935
       example:
         media:
-        - contentType: Sunt alias reprehenderit accusamus ut.
-          id: 4755469836378177211
-          key: Quaerat ducimus ducimus odit accusamus.
-          url: Eligendi fugit maxime.
         - contentType: Sunt alias reprehenderit accusamus ut.
           id: 4755469836378177211
           key: Quaerat ducimus ducimus odit accusamus.
@@ -20438,30 +20368,6 @@ components:
         profile: Sit cumque distinctio est.
         time: Sed voluptatem nihil inventore commodi.
         url: Nobis repellendus totam fuga in.
-      - buildNumber: 167400857
-        buildTime: 3802613619454225348
-        etag: Rerum nulla delectus quidem quam explicabo.
-        id: 1609976609
-        meta:
-          Et illum enim consequatur veritatis.: Necessitatibus odio hic perferendis rerum provident aut.
-          Omnis maiores vitae vel.: Ad excepturi officiis et.
-          Voluptatem provident tenetur.: Accusamus sint debitis ducimus.
-        module: Quis ad quasi optio illo.
-        profile: Sit cumque distinctio est.
-        time: Sed voluptatem nihil inventore commodi.
-        url: Nobis repellendus totam fuga in.
-      - buildNumber: 167400857
-        buildTime: 3802613619454225348
-        etag: Rerum nulla delectus quidem quam explicabo.
-        id: 1609976609
-        meta:
-          Et illum enim consequatur veritatis.: Necessitatibus odio hic perferendis rerum provident aut.
-          Omnis maiores vitae vel.: Ad excepturi officiis et.
-          Voluptatem provident tenetur.: Accusamus sint debitis ducimus.
-        module: Quis ad quasi optio illo.
-        profile: Sit cumque distinctio est.
-        time: Sed voluptatem nihil inventore commodi.
-        url: Nobis repellendus totam fuga in.
     Firmwares:
       type: object
       properties:
@@ -20532,6 +20438,14 @@ components:
           url: Exercitationem harum aut rerum ullam sapiente quo.
         id: 2910100608807366428
         name: Dolore omnis et officia.
+      - avatar:
+          url: Exercitationem harum aut rerum ullam sapiente quo.
+        id: 2910100608807366428
+        name: Dolore omnis et officia.
+      - avatar:
+          url: Exercitationem harum aut rerum ullam sapiente quo.
+        id: 2910100608807366428
+        name: Dolore omnis et officia.
     FollowersPage:
       type: object
       properties:
@@ -20539,11 +20453,11 @@ components:
           $ref: '#/components/schemas/FollowerCollection'
         page:
           type: integer
-          example: 1947826033
+          example: 1376302653
           format: int32
         total:
           type: integer
-          example: 1716919345
+          example: 1710255960
           format: int32
       example:
         followers:
@@ -20559,8 +20473,8 @@ components:
             url: Exercitationem harum aut rerum ullam sapiente quo.
           id: 2910100608807366428
           name: Dolore omnis et officia.
-        page: 478509135
-        total: 503481334
+        page: 295919894
+        total: 1552715015
       required:
       - followers
       - total
@@ -20570,14 +20484,14 @@ components:
       properties:
         email:
           type: string
-          example: Vitae officiis deleniti quos.
+          example: Aut sed et natus reiciendis nihil occaecati.
         role:
           type: integer
-          example: 119592101
+          example: 1873158588
           format: int32
       example:
-        email: Quos velit soluta ut voluptates necessitatibus nesciunt.
-        role: 1363440688
+        email: Aliquam sed.
+        role: 816970112
       required:
       - email
       - role
@@ -20604,28 +20518,26 @@ components:
       properties:
         body:
           type: string
-          example: Nihil iure rerum architecto eius et ut.
+          example: Nemo in dolor natus molestiae.
         key:
           type: string
-          example: Maxime perspiciatis consectetur.
+          example: Temporibus fuga sit asperiores facere.
         mediaIds:
           type: array
           items:
             type: integer
-            example: 9111349603067125813
+            example: 8825644529870886602
             format: int64
           example:
-          - 8085909201144302247
-          - 7463417125343917799
-          - 5478473408916169738
+          - 3822977562350711784
+          - 2606839251797432180
       example:
-        body: Nemo in dolor natus molestiae.
-        key: Temporibus fuga sit asperiores facere.
+        body: Ea quaerat hic.
+        key: Ab totam et natus odit.
         mediaIds:
-        - 8762822233376457525
-        - 3822977562350711784
-        - 2606839251797432180
-        - 4863697227369198832
+        - 7730663227713871807
+        - 1806946415705980016
+        - 5537480752972377197
     PageOfStations:
       type: object
       properties:
@@ -21081,25 +20993,25 @@ components:
       properties:
         id:
           type: integer
-          example: 8732940679760296009
+          example: 2104248567478793916
           format: int64
         project:
           $ref: '#/components/schemas/ProjectSummary'
         role:
           type: integer
-          example: 925432581
+          example: 1892910656
           format: int32
         time:
           type: integer
-          example: 9202751989852462426
+          example: 2920025138103777086
           format: int64
       example:
-        id: 3155199219914425580
+        id: 1839405255907099182
         project:
           id: 3726507772045298675
           name: A sunt atque atque sapiente.
-        role: 536105748
-        time: 6276987574289393000
+        role: 647391920
+        time: 6421215401084733788
       required:
       - id
       - project
@@ -21131,10 +21043,22 @@ components:
               name: A sunt atque atque sapiente.
             role: 1980312890
             time: 7662227323150155165
+          - id: 7927418223648845338
+            project:
+              id: 3726507772045298675
+              name: A sunt atque atque sapiente.
+            role: 1980312890
+            time: 7662227323150155165
         projects:
           $ref: '#/components/schemas/ProjectCollection'
       example:
         pending:
+        - id: 7927418223648845338
+          project:
+            id: 3726507772045298675
+            name: A sunt atque atque sapiente.
+          role: 1980312890
+          time: 7662227323150155165
         - id: 7927418223648845338
           project:
             id: 3726507772045298675
@@ -21191,20 +21115,20 @@ components:
         id:
           type: integer
           description: id
-          example: 129691649
+          example: 1057299748
           format: int32
         mediaUrl:
           type: string
           description: media url
-          example: Velit et ipsam reprehenderit aut sed quasi.
+          example: Sit quos sunt id et.
         name:
           type: string
           description: name
-          example: Velit totam.
+          example: Quos iste necessitatibus voluptas aliquam enim.
       example:
-        id: 1040041651
-        mediaUrl: Voluptatibus velit qui.
-        name: Ipsam nam quis unde.
+        id: 1744946117
+        mediaUrl: Nesciunt est omnis unde quo sunt ut.
+        name: Consequatur at ratione ut sint.
       required:
       - id
       - name
@@ -21247,11 +21171,11 @@ components:
           $ref: '#/components/schemas/ActivityEntryCollection'
         page:
           type: integer
-          example: 838941717
+          example: 987916624
           format: int32
         total:
           type: integer
-          example: 386352343
+          example: 2061622271
           format: int32
       example:
         activities:
@@ -21299,8 +21223,8 @@ components:
             id: 5594406092040065196
             name: Quo corporis perspiciatis.
           type: Blanditiis architecto ut tempora aspernatur.
-        page: 1606976227
-        total: 2044498757
+        page: 525178586
+        total: 1678848678
       required:
       - activities
       - total
@@ -21338,34 +21262,6 @@ components:
         readOnly: false
         startTime: Ut perferendis et molestias reiciendis omnis qui.
         tags: Tempora ab.
-      - description: Consequatur sint ut enim.
-        endTime: Dolores incidunt facilis voluptatem odio ex vitae.
-        following:
-          following: false
-          total: 454347865
-        goal: Aut et commodi.
-        id: 2077951621
-        location: Fugit blanditiis dignissimos sit mollitia maiores eum.
-        name: Qui minus consequatur voluptatibus eos.
-        photo: Non qui.
-        privacy: 1312845480
-        readOnly: false
-        startTime: Ut perferendis et molestias reiciendis omnis qui.
-        tags: Tempora ab.
-      - description: Consequatur sint ut enim.
-        endTime: Dolores incidunt facilis voluptatem odio ex vitae.
-        following:
-          following: false
-          total: 454347865
-        goal: Aut et commodi.
-        id: 2077951621
-        location: Fugit blanditiis dignissimos sit mollitia maiores eum.
-        name: Qui minus consequatur voluptatibus eos.
-        photo: Non qui.
-        privacy: 1312845480
-        readOnly: false
-        startTime: Ut perferendis et molestias reiciendis omnis qui.
-        tags: Tempora ab.
     ProjectFollowing:
       type: object
       properties:
@@ -21374,11 +21270,11 @@ components:
           example: false
         total:
           type: integer
-          example: 446984612
+          example: 1841750176
           format: int32
       example:
-        following: true
-        total: 339364783
+        following: false
+        total: 1418127236
       required:
       - total
       - following
@@ -21396,14 +21292,14 @@ components:
       properties:
         id:
           type: integer
-          example: 1958899687826744509
+          example: 5410908199153279456
           format: int64
         name:
           type: string
-          example: Natus saepe necessitatibus.
+          example: Optio culpa saepe id commodi.
       example:
-        id: 8907849996595385289
-        name: Quibusdam inventore velit.
+        id: 738092897048344784
+        name: Placeat odio rem voluptas quisquam.
       required:
       - id
       - name
@@ -21412,19 +21308,19 @@ components:
       properties:
         body:
           type: string
-          example: Qui consectetur.
+          example: Nemo laboriosam dolores aut illo harum doloribus.
         createdAt:
           type: integer
-          example: 154901850916378756
+          example: 3881761163667575848
           format: int64
         id:
           type: integer
-          example: 1248779844651677060
+          example: 4881388623567965657
           format: int64
       example:
-        body: Tempora veritatis est voluptas veniam consequuntur.
-        createdAt: 9077253197824103899
-        id: 8237085472733461536
+        body: Ut qui.
+        createdAt: 8205664048272162513
+        id: 7586228713638144251
       required:
       - id
       - body
@@ -21602,9 +21498,9 @@ components:
       properties:
         email:
           type: string
-          example: Ut doloremque saepe fugiat praesentium.
+          example: Adipisci sed animi reiciendis est ut.
       example:
-        email: Similique similique earum.
+        email: Recusandae rerum ipsum ad cupiditate voluptates qui.
       required:
       - email
     SensorRange:
@@ -21612,15 +21508,15 @@ components:
       properties:
         maximum:
           type: number
-          example: 0.056932792
+          example: 0.92377573
           format: float
         minimum:
           type: number
-          example: 0.3684445
+          example: 0.37695414
           format: float
       example:
-        maximum: 0.4190402
-        minimum: 0.46213466
+        maximum: 0.816838
+        minimum: 0.82307273
       required:
       - minimum
       - maximum
@@ -21629,15 +21525,15 @@ components:
       properties:
         last:
           type: number
-          example: 0.586392
+          example: 0.3684445
           format: float
         time:
           type: integer
-          example: 4367021764088316053
+          example: 525112331621624218
           format: int64
       example:
-        last: 0.48882684
-        time: 1294787416366340813
+        last: 0.46213466
+        time: 3864963567185898634
       required:
       - last
       - time
@@ -21648,11 +21544,11 @@ components:
           $ref: '#/components/schemas/ActivityEntryCollection'
         page:
           type: integer
-          example: 1648414080
+          example: 2134845380
           format: int32
         total:
           type: integer
-          example: 2059325399
+          example: 1114695504
           format: int32
       example:
         activities:
@@ -21700,8 +21596,8 @@ components:
             id: 5594406092040065196
             name: Quo corporis perspiciatis.
           type: Blanditiis architecto ut tempora aspernatur.
-        page: 1607275344
-        total: 325377413
+        page: 1507368830
+        total: 97029882
       required:
       - activities
       - total
@@ -21711,11 +21607,11 @@ components:
       properties:
         id:
           type: integer
-          example: 9169485104500950871
+          example: 1869821158297360283
           format: int64
         metaRecordId:
           type: integer
-          example: 3592108443843767758
+          example: 4735066886080610739
           format: int64
         modules:
           type: array
@@ -21812,21 +21708,111 @@ components:
                 last: 0.6773676
                 time: 3991256472824368181
               unitOfMeasure: Quos unde quo.
+          - flags: 2030557209
+            fullKey: Rerum quo asperiores incidunt.
+            hardwareId: Voluptatem qui consequuntur qui.
+            id: 4074953348759172490
+            internal: true
+            metaRecordId: 2545492271250422757
+            name: Eveniet reiciendis et ipsam nisi.
+            position: 1596038346
+            sensors:
+            - fullKey: Et rerum aperiam sed velit.
+              key: Perspiciatis occaecati vel inventore nostrum quidem illo.
+              name: Ut asperiores a.
+              ranges:
+              - maximum: 0.37028545
+                minimum: 0.2422857
+              - maximum: 0.37028545
+                minimum: 0.2422857
+              reading:
+                last: 0.6773676
+                time: 3991256472824368181
+              unitOfMeasure: Quos unde quo.
+            - fullKey: Et rerum aperiam sed velit.
+              key: Perspiciatis occaecati vel inventore nostrum quidem illo.
+              name: Ut asperiores a.
+              ranges:
+              - maximum: 0.37028545
+                minimum: 0.2422857
+              - maximum: 0.37028545
+                minimum: 0.2422857
+              reading:
+                last: 0.6773676
+                time: 3991256472824368181
+              unitOfMeasure: Quos unde quo.
+            - fullKey: Et rerum aperiam sed velit.
+              key: Perspiciatis occaecati vel inventore nostrum quidem illo.
+              name: Ut asperiores a.
+              ranges:
+              - maximum: 0.37028545
+                minimum: 0.2422857
+              - maximum: 0.37028545
+                minimum: 0.2422857
+              reading:
+                last: 0.6773676
+                time: 3991256472824368181
+              unitOfMeasure: Quos unde quo.
+          - flags: 2030557209
+            fullKey: Rerum quo asperiores incidunt.
+            hardwareId: Voluptatem qui consequuntur qui.
+            id: 4074953348759172490
+            internal: true
+            metaRecordId: 2545492271250422757
+            name: Eveniet reiciendis et ipsam nisi.
+            position: 1596038346
+            sensors:
+            - fullKey: Et rerum aperiam sed velit.
+              key: Perspiciatis occaecati vel inventore nostrum quidem illo.
+              name: Ut asperiores a.
+              ranges:
+              - maximum: 0.37028545
+                minimum: 0.2422857
+              - maximum: 0.37028545
+                minimum: 0.2422857
+              reading:
+                last: 0.6773676
+                time: 3991256472824368181
+              unitOfMeasure: Quos unde quo.
+            - fullKey: Et rerum aperiam sed velit.
+              key: Perspiciatis occaecati vel inventore nostrum quidem illo.
+              name: Ut asperiores a.
+              ranges:
+              - maximum: 0.37028545
+                minimum: 0.2422857
+              - maximum: 0.37028545
+                minimum: 0.2422857
+              reading:
+                last: 0.6773676
+                time: 3991256472824368181
+              unitOfMeasure: Quos unde quo.
+            - fullKey: Et rerum aperiam sed velit.
+              key: Perspiciatis occaecati vel inventore nostrum quidem illo.
+              name: Ut asperiores a.
+              ranges:
+              - maximum: 0.37028545
+                minimum: 0.2422857
+              - maximum: 0.37028545
+                minimum: 0.2422857
+              reading:
+                last: 0.6773676
+                time: 3991256472824368181
+              unitOfMeasure: Quos unde quo.
         provisionId:
           type: integer
-          example: 3751373142420738789
+          example: 529826556237196886
           format: int64
         sourceId:
           type: integer
-          example: 125901416
+          example: 1309138750
           format: int32
         time:
           type: integer
-          example: 5966461075231884705
+          example: 7797773499237319611
           format: int64
       example:
-        id: 518622455711825294
-        metaRecordId: 3549414955454387044
+        id: 246001940306333098
+        metaRecordId: 7446936045344296906
         modules:
         - flags: 2030557209
           fullKey: Rerum quo asperiores incidunt.
@@ -21963,9 +21949,54 @@ components:
               last: 0.6773676
               time: 3991256472824368181
             unitOfMeasure: Quos unde quo.
-        provisionId: 8476616959581626346
-        sourceId: 1551854925
-        time: 3726333529356884363
+        - flags: 2030557209
+          fullKey: Rerum quo asperiores incidunt.
+          hardwareId: Voluptatem qui consequuntur qui.
+          id: 4074953348759172490
+          internal: true
+          metaRecordId: 2545492271250422757
+          name: Eveniet reiciendis et ipsam nisi.
+          position: 1596038346
+          sensors:
+          - fullKey: Et rerum aperiam sed velit.
+            key: Perspiciatis occaecati vel inventore nostrum quidem illo.
+            name: Ut asperiores a.
+            ranges:
+            - maximum: 0.37028545
+              minimum: 0.2422857
+            - maximum: 0.37028545
+              minimum: 0.2422857
+            reading:
+              last: 0.6773676
+              time: 3991256472824368181
+            unitOfMeasure: Quos unde quo.
+          - fullKey: Et rerum aperiam sed velit.
+            key: Perspiciatis occaecati vel inventore nostrum quidem illo.
+            name: Ut asperiores a.
+            ranges:
+            - maximum: 0.37028545
+              minimum: 0.2422857
+            - maximum: 0.37028545
+              minimum: 0.2422857
+            reading:
+              last: 0.6773676
+              time: 3991256472824368181
+            unitOfMeasure: Quos unde quo.
+          - fullKey: Et rerum aperiam sed velit.
+            key: Perspiciatis occaecati vel inventore nostrum quidem illo.
+            name: Ut asperiores a.
+            ranges:
+            - maximum: 0.37028545
+              minimum: 0.2422857
+            - maximum: 0.37028545
+              minimum: 0.2422857
+            reading:
+              last: 0.6773676
+              time: 3991256472824368181
+            unitOfMeasure: Quos unde quo.
+        provisionId: 8439541258774066836
+        sourceId: 1273975493
+        time: 5361606806065581190
       required:
       - id
       - provisionId
@@ -21979,288 +22010,6 @@ components:
           items:
             $ref: '#/components/schemas/StationConfiguration'
           example:
-          - id: 4639693994513136595
-            metaRecordId: 908350483803367858
-            modules:
-            - flags: 2030557209
-              fullKey: Rerum quo asperiores incidunt.
-              hardwareId: Voluptatem qui consequuntur qui.
-              id: 4074953348759172490
-              internal: true
-              metaRecordId: 2545492271250422757
-              name: Eveniet reiciendis et ipsam nisi.
-              position: 1596038346
-              sensors:
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-            - flags: 2030557209
-              fullKey: Rerum quo asperiores incidunt.
-              hardwareId: Voluptatem qui consequuntur qui.
-              id: 4074953348759172490
-              internal: true
-              metaRecordId: 2545492271250422757
-              name: Eveniet reiciendis et ipsam nisi.
-              position: 1596038346
-              sensors:
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-            - flags: 2030557209
-              fullKey: Rerum quo asperiores incidunt.
-              hardwareId: Voluptatem qui consequuntur qui.
-              id: 4074953348759172490
-              internal: true
-              metaRecordId: 2545492271250422757
-              name: Eveniet reiciendis et ipsam nisi.
-              position: 1596038346
-              sensors:
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-            provisionId: 6980682094152026903
-            sourceId: 43246628
-            time: 2030983248607233360
-          - id: 4639693994513136595
-            metaRecordId: 908350483803367858
-            modules:
-            - flags: 2030557209
-              fullKey: Rerum quo asperiores incidunt.
-              hardwareId: Voluptatem qui consequuntur qui.
-              id: 4074953348759172490
-              internal: true
-              metaRecordId: 2545492271250422757
-              name: Eveniet reiciendis et ipsam nisi.
-              position: 1596038346
-              sensors:
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-            - flags: 2030557209
-              fullKey: Rerum quo asperiores incidunt.
-              hardwareId: Voluptatem qui consequuntur qui.
-              id: 4074953348759172490
-              internal: true
-              metaRecordId: 2545492271250422757
-              name: Eveniet reiciendis et ipsam nisi.
-              position: 1596038346
-              sensors:
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-            - flags: 2030557209
-              fullKey: Rerum quo asperiores incidunt.
-              hardwareId: Voluptatem qui consequuntur qui.
-              id: 4074953348759172490
-              internal: true
-              metaRecordId: 2545492271250422757
-              name: Eveniet reiciendis et ipsam nisi.
-              position: 1596038346
-              sensors:
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-              - fullKey: Et rerum aperiam sed velit.
-                key: Perspiciatis occaecati vel inventore nostrum quidem illo.
-                name: Ut asperiores a.
-                ranges:
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                - maximum: 0.37028545
-                  minimum: 0.2422857
-                reading:
-                  last: 0.6773676
-                  time: 3991256472824368181
-                unitOfMeasure: Quos unde quo.
-            provisionId: 6980682094152026903
-            sourceId: 43246628
-            time: 2030983248607233360
           - id: 4639693994513136595
             metaRecordId: 908350483803367858
             modules:
@@ -22998,7 +22747,7 @@ components:
       properties:
         battery:
           type: number
-          example: 0.7359946
+          example: 0.0044874744
           format: float
         configurations:
           $ref: '#/components/schemas/StationConfigurations'
@@ -23006,61 +22755,81 @@ components:
           $ref: '#/components/schemas/StationDataSummary'
         deviceId:
           type: string
-          example: Fugit quas nobis voluptas totam.
+          example: Molestiae tempore aut et consequuntur ipsum omnis.
         firmwareNumber:
           type: integer
-          example: 605640275
+          example: 1807406250
           format: int32
         firmwareTime:
           type: integer
-          example: 2493871634940158799
+          example: 6783100529184350287
           format: int64
         id:
           type: integer
-          example: 1348381618
+          example: 2076597455
           format: int32
         location:
           $ref: '#/components/schemas/AppStationLocation'
         locationName:
           type: string
-          example: Ea amet voluptatem rerum voluptatem.
+          example: Cum minima.
         memoryAvailable:
           type: integer
-          example: 834964440
+          example: 974654512
           format: int32
         memoryUsed:
           type: integer
-          example: 2132796231
+          example: 1282471807
           format: int32
         name:
           type: string
-          example: Reprehenderit mollitia modi voluptatibus omnis.
+          example: Odit nesciunt qui.
         owner:
           $ref: '#/components/schemas/StationOwner'
         photos:
           $ref: '#/components/schemas/StationPhotos'
         placeNameNative:
           type: string
-          example: Incidunt natus dolor et enim voluptas quos.
+          example: Quos quidem consectetur alias.
         placeNameOther:
           type: string
-          example: Ipsam quia quibusdam cum minima assumenda excepturi.
+          example: Excepturi aut incidunt natus dolor et enim.
         readOnly:
           type: boolean
-          example: false
+          example: true
         recordingStartedAt:
           type: integer
-          example: 3935731069666846124
+          example: 1359273755654750102
           format: int64
         updatedAt:
           type: integer
-          example: 708134324382346846
+          example: 7146799112857933956
           format: int64
         uploads:
           type: array
           items:
             $ref: '#/components/schemas/StationUpload'
           example:
+          - blocks:
+            - 1265535175550851359
+            - 2592414418483732930
+            - 504419979631637374
+            id: 409907880551157939
+            size: 1928134906768616257
+            time: 1546362433993504815
+            type: Voluptatem eum accusantium possimus fugiat nobis.
+            uploadId: Nam dolore.
+            url: Fugit sunt exercitationem laudantium praesentium.
+          - blocks:
+            - 1265535175550851359
+            - 2592414418483732930
+            - 504419979631637374
+            id: 409907880551157939
+            size: 1928134906768616257
+            time: 1546362433993504815
+            type: Voluptatem eum accusantium possimus fugiat nobis.
+            uploadId: Nam dolore.
+            url: Fugit sunt exercitationem laudantium praesentium.
           - blocks:
             - 1265535175550851359
             - 2592414418483732930
@@ -27026,31 +26795,31 @@ components:
       properties:
         flags:
           type: integer
-          example: 1842695429
+          example: 428400357
           format: int32
         fullKey:
           type: string
-          example: Iure ipsum.
+          example: Et culpa.
         hardwareId:
           type: string
-          example: Aperiam asperiores sunt eum qui aut.
+          example: Nostrum iure ipsum.
         id:
           type: integer
-          example: 2874844607531856315
+          example: 7914316604788334753
           format: int64
         internal:
           type: boolean
-          example: true
+          example: false
         metaRecordId:
           type: integer
-          example: 1869821158297360283
+          example: 7656621432849332713
           format: int64
         name:
           type: string
-          example: Sed voluptatem.
+          example: Ex consequatur est quia laborum.
         position:
           type: integer
-          example: 1309138750
+          example: 1285859213
           format: int32
         sensors:
           type: array
@@ -27082,14 +26851,14 @@ components:
               time: 3991256472824368181
             unitOfMeasure: Quos unde quo.
       example:
-        flags: 314610699
-        fullKey: Harum dicta iure quos et facilis.
-        hardwareId: Est qui numquam molestiae voluptatem consequatur eligendi.
-        id: 7534000767882101040
+        flags: 676537741
+        fullKey: Animi consequatur nesciunt ea qui dicta quisquam.
+        hardwareId: Sapiente voluptate.
+        id: 240012969265444671
         internal: true
-        metaRecordId: 1227728443670608411
-        name: Et aut totam qui.
-        position: 1103254717
+        metaRecordId: 3549414955454387044
+        name: Beatae eos voluptatem quasi eos.
+        position: 808411023
         sensors:
         - fullKey: Et rerum aperiam sed velit.
           key: Perspiciatis occaecati vel inventore nostrum quidem illo.
@@ -27128,14 +26897,14 @@ components:
       properties:
         id:
           type: integer
-          example: 49573968
+          example: 50666956
           format: int32
         name:
           type: string
-          example: Labore illum mollitia odit nesciunt qui.
+          example: Est provident eveniet asperiores molestiae est.
       example:
-        id: 50666956
-        name: Est provident eveniet asperiores molestiae est.
+        id: 1676496357
+        name: Quas nobis voluptas.
       required:
       - id
       - name
@@ -27144,9 +26913,9 @@ components:
       properties:
         small:
           type: string
-          example: Sed architecto maxime non.
+          example: Consequuntur sit quidem ex sed illum.
       example:
-        small: Fugiat fugit consequuntur sit quidem.
+        small: Nulla voluptatem expedita cumque vel.
       required:
       - small
     StationRegion:
@@ -27154,7 +26923,7 @@ components:
       properties:
         name:
           type: string
-          example: Autem voluptate.
+          example: Vel aut cupiditate vitae corporis aut.
         shape:
           type: array
           items:
@@ -27163,40 +26932,34 @@ components:
               type: array
               items:
                 type: number
-                example: 0.5123236965737921
+                example: 0.4031979533402162
                 format: double
               example:
-              - 0.6462682812523606
-              - 0.6013919083328731
-              - 0.5924574066211945
-              - 0.8784549803320469
+              - 0.026294007604059408
+              - 0.2707904047221016
             example:
-            - - 0.23257145881207375
-              - 0.4031979533402162
-              - 0.0002489655955070858
-            - - 0.2707904047221016
-              - 0.7737732596474683
             - - 0.819018004126112
               - 0.9750488008232487
             - - 0.8085711203693078
               - 0.2132091413567268
               - 0.26371000712125475
-          example:
-          - - - 0.5822384649949963
-              - 0.8613114328551357
-              - 0.9054710759947158
+            - - 0.18250719226436363
+              - 0.1030557051672037
+              - 0.5822384649949963
+            - - 0.9054710759947158
               - 0.2439341310562103
-            - - 0.11752913120629589
-              - 0.5252561716829633
-            - - 0.6494975086788177
+              - 0.6393385652343623
+          example:
+          - - - 0.6494975086788177
               - 0.8502421103314125
               - 0.30247308585720006
               - 0.4493180739742509
-          - - - 0.535167722565662
+            - - 0.8293001533703369
+              - 0.535167722565662
               - 0.4503852508727645
-            - - 0.676919801774645
-              - 0.6879584608683215
-            - - 0.41865158376961764
+              - 0.538100203207115
+          - - - 0.390369318459501
+              - 0.41865158376961764
               - 0.5514142142312343
               - 0.5091246965204972
             - - 0.3246693524235031
@@ -27259,13 +27022,13 @@ components:
       properties:
         fullKey:
           type: string
-          example: Repellendus consequuntur officia et repudiandae.
+          example: Et praesentium quia non facere rem sit.
         key:
           type: string
-          example: Ut ut aut numquam.
+          example: Non magni laborum provident non et.
         name:
           type: string
-          example: Eius ex.
+          example: Ut ut aut numquam.
         ranges:
           type: array
           items:
@@ -27275,17 +27038,15 @@ components:
             minimum: 0.2422857
           - maximum: 0.37028545
             minimum: 0.2422857
-          - maximum: 0.37028545
-            minimum: 0.2422857
         reading:
           $ref: '#/components/schemas/SensorReading'
         unitOfMeasure:
           type: string
-          example: Est quia laborum tempora commodi.
+          example: Repellendus consequuntur officia et repudiandae.
       example:
-        fullKey: Sit non.
-        key: Non facere.
-        name: Magni laborum.
+        fullKey: Fugit harum dicta iure quos et.
+        key: Totam qui quo repellendus.
+        name: Qui numquam molestiae voluptatem consequatur.
         ranges:
         - maximum: 0.37028545
           minimum: 0.2422857
@@ -27296,7 +27057,7 @@ components:
         reading:
           last: 0.6773676
           time: 3991256472824368181
-        unitOfMeasure: Non et dolorem et praesentium.
+        unitOfMeasure: Tempora magnam et.
       required:
       - name
       - unitOfMeasure
@@ -27310,43 +27071,44 @@ components:
           type: array
           items:
             type: integer
-            example: 6740865618271444718
+            example: 786374597458951486
             format: int64
           example:
-          - 8964713373745633942
           - 7678039892526782208
           - 7074375560227949719
+          - 2928900014383462091
         id:
-          type: integer
-          example: 819254501131770490
-          format: int64
-        size:
           type: integer
           example: 7579199195226844436
           format: int64
+        size:
+          type: integer
+          example: 841450028170121143
+          format: int64
         time:
           type: integer
-          example: 3679495726240213440
+          example: 8483822700381992322
           format: int64
         type:
           type: string
-          example: Ut vel fuga et fugiat incidunt.
+          example: Incidunt at.
         uploadId:
           type: string
-          example: Et consequuntur ipsum omnis.
+          example: Molestiae tempora.
         url:
           type: string
-          example: Corporis molestiae tempora rerum qui voluptatem ex.
+          example: Voluptatem ex sunt ut vel fuga et.
       example:
         blocks:
-        - 7251437692335073980
-        - 6361980700872481385
-        id: 2928900014383462091
-        size: 977987479488320243
-        time: 4721458456800182875
-        type: Mollitia eligendi aut ipsam debitis.
-        uploadId: Aperiam consectetur nesciunt.
-        url: Quia aspernatur omnis eius.
+        - 2441026080258939787
+        - 6624083170188867236
+        - 4877386763335012086
+        id: 4721458456800182875
+        size: 3296517765323967203
+        time: 1755287099372849089
+        type: Qui et et magnam sed.
+        uploadId: Consectetur nesciunt id suscipit quia aspernatur omnis.
+        url: Mollitia eligendi aut ipsam debitis.
       required:
       - id
       - time
@@ -30644,9 +30406,9 @@ components:
       properties:
         body:
           type: string
-          example: Voluptatem facere in doloribus id molestias.
+          example: Eos et rem doloremque fuga culpa.
       example:
-        body: Consequuntur atque id et porro.
+        body: Voluptatem ipsam architecto.
       required:
       - body
     UpdateRequestBody:
@@ -30796,7 +30558,7 @@ components:
         id: 339988874
         name: brt
         photo:
-          url: Consequatur totam aut a.
+          url: Voluptatem magnam quibusdam veniam.
       required:
       - id
       - name
@@ -30847,17 +30609,6 @@ components:
             token: Aspernatur neque omnis sapiente numquam cumque.
       example:
         exports:
-        - args: Facilis quasi perspiciatis rem quibusdam mollitia ut.
-          completedAt: 8763382593393016386
-          createdAt: 5425700825656930155
-          downloadUrl: Nulla aut eius quibusdam illum omnis fuga.
-          format: Inventore illo aut repellat nemo.
-          id: 7040933535796689736
-          message: Dicta omnis assumenda sunt.
-          progress: 0.2813406
-          size: 438331695
-          statusUrl: Temporibus rerum.
-          token: Aspernatur neque omnis sapiente numquam cumque.
         - args: Facilis quasi perspiciatis rem quibusdam mollitia ut.
           completedAt: 8763382593393016386
           createdAt: 5425700825656930155

@@ -3,7 +3,7 @@ interface SensorRange {
     maximum: number;
 }
 
-export interface ModuleSensor {
+export interface ModuleSensorMeta {
     key: string;
     fullKey: string;
     firmwareKey: string;
@@ -17,7 +17,7 @@ interface Module {
     key: string;
     internal: boolean;
     header: { manufacturer: number; kind: number; version: number; allKinds: number[] };
-    sensors: ModuleSensor[];
+    sensors: ModuleSensorMeta[];
 }
 
 export interface SensorId {
@@ -52,7 +52,7 @@ export interface SensorDataResponse {
 interface StationInfoResponse {
     sensorId: number;
     key: string;
-    stationName: string;
+    name: string;
 }
 
 export interface SensorInfoResponse {

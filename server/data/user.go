@@ -15,6 +15,7 @@ const (
 
 var (
 	IncorrectPasswordError = errors.New("incorrect password")
+	UnverifiedUserError    = errors.New("unverified user error")
 )
 
 func generateHashFromPassword(password string) ([]byte, error) {

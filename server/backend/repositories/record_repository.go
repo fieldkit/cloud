@@ -154,7 +154,7 @@ func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
 		return dr
 	}
 	for _, sg := range dr.Readings.SensorGroups {
-		newReadings := make([]*pb.SensorAndValue, len(sg.Readings))
+		newReadings := make([]*pb.SensorAndValue, 0, len(sg.Readings))
 		for _, sr := range sg.Readings {
 			if !math.IsNaN(float64(sr.Value)) {
 				newReadings = append(newReadings, sr)

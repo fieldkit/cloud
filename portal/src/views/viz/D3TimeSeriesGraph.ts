@@ -22,7 +22,7 @@ export const D3TimeSeriesGraph = Vue.extend({
         },
     },
     computed: {
-        data(): QueriedData {
+        data(): QueriedData | null {
             if (this.viz.graphing) {
                 return this.viz.graphing;
             }

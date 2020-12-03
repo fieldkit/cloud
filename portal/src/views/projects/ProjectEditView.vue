@@ -11,7 +11,7 @@ import Vue from "@/store/strong-vue";
 import StandardLayout from "../StandardLayout.vue";
 import ProjectForm from "./ProjectForm.vue";
 
-import FKApi from "@/api/api";
+import FKApi, { Project } from "@/api/api";
 
 export default Vue.extend({
     name: "ProjectEditView",
@@ -24,27 +24,31 @@ export default Vue.extend({
             type: Number,
         },
     },
-    data: () => {
+    data(): {
+        user: unknown;
+        activeProject: Project | null;
+        loading: boolean;
+    } {
         return {
             user: {},
             activeProject: null,
             loading: true,
         };
     },
-    mounted(this: any) {
+    async mounted(): Promise<void> {
         if (this.id) {
-            return this.getProject(this.id);
+            await this.getProject(this.id);
         } else {
             this.loading = false;
         }
     },
     methods: {
-        goBack() {
+        goBack(): void {
             window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
         },
-        getProject(projectId) {
+        async getProject(projectId: number): Promise<void> {
             this.loading = true;
-            return this.$services.api
+            await this.$services.api
                 .getProject(projectId)
                 .then((project) => {
                     this.activeProject = project;
@@ -54,7 +58,7 @@ export default Vue.extend({
                     return this.$router.push({ name: "projects" });
                 });
         },
-        onProjectUpdate() {
+        onProjectUpdate(): void {
             this.loading = true;
         },
     },

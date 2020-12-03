@@ -8,6 +8,7 @@
         "moduleResolution": "node",
         "experimentalDecorators": true,
         "esModuleInterop": true,
+        "strictNullChecks": true,
         "declaration": true,
         "allowSyntheticDefaultImports": true,
         "noImplicitThis": true /* Raise error on 'this' expressions with an implied 'any' type. */,

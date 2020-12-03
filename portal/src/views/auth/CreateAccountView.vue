@@ -121,15 +121,15 @@ export default Vue.extend({
         },
     },
     methods: {
-        save(): Promise<any> {
+        async save(): Promise<void> {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
-                return Promise.resolve();
+                return;
             }
 
             this.creating = true;
 
-            return this.$services.api
+            await this.$services.api
                 .register(this.form)
                 .then((created) => {
                     this.created = created;
@@ -145,9 +145,10 @@ export default Vue.extend({
                     this.creating = false;
                 });
         },
-        resend(): Promise<any> {
+        async resend(): Promise<void> {
+            if (!this.created) throw new Error(`nothing to resend`);
             this.resending = true;
-            return this.$services.api.resendCreateAccount(this.created.id).then(() => {
+            await this.$services.api.resendCreateAccount(this.created.id).then(() => {
                 this.resending = false;
             });
         },

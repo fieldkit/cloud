@@ -26,6 +26,8 @@ require (
 	github.com/dgrijalva/jwt-go v0.0.0-20170201225849-2268707a8f08
 	github.com/dimfeld/httppath v0.0.0-20170720192232-ee938bf73598
 	github.com/dimfeld/httptreemux v5.0.1+incompatible
+	github.com/disintegration/gift v1.2.1 // indirect
+	github.com/disintegration/imageorient v0.0.0-20180920195336-8147d86e83ec
 	github.com/dropbox/godropbox v0.0.0-20190501155911-5749d3b71cbe // indirect
 	github.com/fieldkit/app-protocol v0.0.0-20200515173549-e0925480073d
 	github.com/fieldkit/data-protocol v0.0.0-20200825203301-d452c6499956

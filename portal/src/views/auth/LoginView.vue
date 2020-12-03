@@ -43,7 +43,7 @@ import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 
-import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
+import { required, email, minLength, sameAs, requiredIf } from "vuelidate/lib/validators";
 
 import FKApi, { LoginPayload } from "@/api/api";
 import * as ActionTypes from "@/store/actions";
@@ -58,7 +58,15 @@ export default Vue.extend({
             default: false,
         },
     },
-    data(): { form: { spoofEmail: string; email: string; password: string }; busy: boolean; failed: boolean } {
+    data(): {
+        form: {
+            spoofEmail: string;
+            email: string;
+            password: string;
+        };
+        busy: boolean;
+        failed: boolean;
+    } {
         return {
             form: {
                 spoofEmail: "",
@@ -70,23 +78,15 @@ export default Vue.extend({
         };
     },
     validations() {
-        if (this.spoofing) {
-            return {
-                form: {
-                    spoofEmail: {
-                        required,
-                        email,
-                    },
-                    email: {
-                        required,
-                        email,
-                    },
-                    password: { required, min: minLength(10) },
-                },
-            };
-        }
         return {
             form: {
+                spoofEmail: {
+                    // eslint-disable-next-line
+                    required: requiredIf(function (this: any) {
+                        return this.spoofing;
+                    }),
+                    email,
+                },
                 email: {
                     required,
                     email,
@@ -96,11 +96,13 @@ export default Vue.extend({
         };
     },
     methods: {
-        forwardAfterQuery(): { after?: string | string[] } {
-            if (this.$route.query.after) {
-                return {
-                    after: this.$route.query.after,
-                };
+        forwardAfterQuery(): { after?: string } {
+            const after = this.$route.query.after;
+            if (after) {
+                if (_.isArray(after) && after.length > 0 && after[0]) {
+                    return { after: after[0] };
+                }
+                return { after: after as string };
             }
             return {};
         },
@@ -110,10 +112,10 @@ export default Vue.extend({
             }
             return new LoginPayload(this.form.email, this.form.password);
         },
-        save(): Promise<any> {
+        async save(): Promise<void> {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
-                return Promise.resolve();
+                return;
             }
 
             const payload = this.createPayload();
@@ -121,15 +123,13 @@ export default Vue.extend({
             this.busy = true;
             this.failed = false;
 
-            return this.$store
+            await this.$store
                 .dispatch(ActionTypes.LOGIN, payload)
                 .then(
                     () => {
-                        if (this.$route.query.after) {
-                            if (_.isArray(this.$route.query.after)) {
-                                return this.$router.push(this.$route.query.after[0]);
-                            }
-                            return this.$router.push(this.$route.query.after as string);
+                        const after = this.forwardAfterQuery();
+                        if (after.after) {
+                            return this.$router.push(after.after);
                         }
                         return this.$router.push({ name: "projects" });
                     },

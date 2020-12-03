@@ -22,6 +22,9 @@ var AvailableRoles = ResultType("application/vnd.app.roles.available", func() {
 })
 
 var _ = Service("user", func() {
+	Error("user-unverified", func() {
+	})
+
 	Method("roles", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -128,6 +131,8 @@ var _ = Service("user", func() {
 					Header("authorization:Authorization")
 				})
 			})
+
+			Response("user-unverified", StatusForbidden)
 		})
 	})
 

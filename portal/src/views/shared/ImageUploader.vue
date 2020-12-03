@@ -26,6 +26,12 @@ export interface Image {
     url: string;
 }
 
+export interface UploadedImage {
+    type: string;
+    image: unknown;
+    file: unknown;
+}
+
 export default Vue.extend({
     name: "ImageUploader",
     props: {
@@ -83,15 +89,20 @@ export default Vue.extend({
                 const reader = new FileReader();
                 reader.readAsDataURL(image);
                 reader.onload = (ev) => {
-                    this.preview = ev.target.result;
+                    const r = ev?.target?.result;
+                    if (r) {
+                        this.preview = r;
+                    }
                 };
             }
 
-            this.$emit("change", {
+            const uploaded: UploadedImage = {
                 type: this.imageType,
                 image: image, // TODO Remove
                 file: image,
-            });
+            };
+
+            this.$emit("change", uploaded);
         },
     },
 });

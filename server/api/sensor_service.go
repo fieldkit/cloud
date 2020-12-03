@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -205,6 +206,10 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 			row := &DataRow{}
 			if err = queried.StructScan(row); err != nil {
 				return nil, err
+			}
+
+			if row.Value != nil && math.IsNaN(*row.Value) {
+				row.Value = nil
 			}
 
 			rows = append(rows, row)

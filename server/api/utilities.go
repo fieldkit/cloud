@@ -12,6 +12,7 @@ import (
 	"image"
 	"image/jpeg"
 
+	"github.com/disintegration/imageorient"
 	"github.com/muesli/smartcrop"
 	"github.com/muesli/smartcrop/nfnt"
 
@@ -26,7 +27,7 @@ type ResizedImage struct {
 }
 
 func resizeLoadedMedia(ctx context.Context, lm *repositories.LoadedMedia, newWidth, newHeight uint) (resized *ResizedImage, err error) {
-	original, _, err := image.Decode(lm.Reader)
+	original, _, err := imageorient.Decode(lm.Reader)
 	if err != nil {
 		return nil, err
 	}
