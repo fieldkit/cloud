@@ -128,7 +128,7 @@
             </div>
         </div>
 
-        <Comments :type="'project'" :user="user" :project="displayProject"> </Comments>
+        <Comments :parentData="displayProject.id" :user="user"> </Comments>
 
     </div>
 </template>

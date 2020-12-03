@@ -1010,12 +1010,20 @@ class FKApi {
         });
     }
 
-    public getComments(projectID) {
+    public getComments(projectIDOrbookmark) {
+
+        let apiURL;
+
+        if (typeof projectIDOrbookmark === 'number') {
+            apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrbookmark;
+        } else {
+            apiURL = this.baseUrl + "/discussion?bookmark=" + projectIDOrbookmark;
+        }
 
         return this.invoke({
             auth: Auth.Required,
             method: "GET",
-            url: this.baseUrl + '/discussion/projects/' + projectID,
+            url: apiURL,
         });
     }
 
@@ -1024,7 +1032,7 @@ class FKApi {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
-            url: this.baseUrl + '/discussion',
+            url: this.baseUrl + "/discussion",
             data: { post: comment },
         });
     }

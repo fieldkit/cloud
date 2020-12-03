@@ -1,94 +1,162 @@
 <template>
-    <section class="container">
-        <header> Notes & Comments </header>
-        <form @submit.prevent="postComment" class="new-comment">
-            <UserPhoto :user="user"> </UserPhoto>
-            <input type="text" :placeholder="getNewCommentPlaceholder()" v-model="body">
-            <span class="new-comment-submit" v-if="body"> Post </span>
+    <section class="container" v-bind:class="{'data-view': viewType === 'data'}">
+
+        <header v-if="viewType === 'project'"> Notes & Comments </header>
+
+        <form @submit.prevent="save(newComment)" class="new-comment">
+            <UserPhoto v-if="user" :user="user"> </UserPhoto>
+            <input type="text" :placeholder="placeholder" v-model="newComment.body">
+            <button type="submit" class="new-comment-submit" v-if="newComment.body"> Post </button>
         </form>
+
+        <div v-if="errorGetComments"> Something went wrong loading the comments. </div>
+        <div v-if="errorPostComment"> Something went saving your comment. </div>
+
         <div class="list" v-if="posts.length > 0">
             <div class="subheader">
-                <span class="comments-counter"> {{posts.length}} comments </span>
+                <span class="comments-counter" v-if="viewType === 'project'"> {{posts.length}} comments </span>
+                <header v-if="viewType === 'data'"> Notes & Comments </header>
             </div>
-            <div class="item" v-for="post in posts" v-bind:key="post.id">
-                <UserPhoto :user="post.author"> </UserPhoto>
-                <div class="flex column">
-                    <span class="timestamp"> {{formatTimestamp(post.createdAt)}} </span>
-                    <span class="author"> {{post.author.name}} </span>
-                    <span class="body"> {{post.body}} </span>
-                    <div class="actions">
-                        <span>
-                            <img src="@/assets/icon-reply.svg" alt="">
-                            Reply
-                        </span>
+            <transition-group name="fade">
+                <div class="comment comment-main" v-for="post in posts" v-bind:key="post.id">
+                    <UserPhoto :user="post.author"> </UserPhoto>
+                    <div class="flex column">
+                        <span class="timestamp"> {{formatTimestamp(post.createdAt)}} </span>
+                        <span class="author"> {{post.author.name}} </span>
+                        <span class="body"> {{post.body}} </span>
+
+                        <transition-group name="fade">
+                            <div class="comment" v-for="reply in post.replies" v-bind:key="reply.id">
+                                <UserPhoto :user="post.author"> </UserPhoto>
+                                <div class="flex column">
+                                    <span class="author"> {{reply.author.name}} </span>
+                                    <span class="body"> {{reply.body}} </span>
+                                </div>
+                            </div>
+                        </transition-group>
+
+                        <transition name="fade">
+                            <form @submit.prevent="save(newReply)" class="new-comment reply" v-if="newReply && newReply.threadId === post.id">
+                                <UserPhoto :user="user"> </UserPhoto>
+                                <input type="text" placeholder="Reply to comment" v-model="newReply.body">
+                                <button type="submit" class="new-comment-submit" v-if="newReply.body"> Post </button>
+                            </form>
+                        </transition>
+
+                        <div class="actions">
+                            <button @click="addReply(post)">
+                                <img src="@/assets/icon-reply.svg">
+                                Reply
+                            </button>
+                            <button v-if="viewType === 'data'" @click="viewDataClick(post)">
+                                <img src="@/assets/icon-view-data.svg">
+                                View Data
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </transition-group>
         </div>
     </section>
 </template>
 
 <script>
+
+import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
 
-export default {
+export default Vue.extend({
     name: "Comments",
     components: {
         ...CommonComponents,
     },
     props: {
-        type: {
-            required: true,
-        },
         user: {
             required: true,
         },
-        project: {
+        parentData: {
             required: true,
         },
     },
     methods: {
         getNewCommentPlaceholder() {
-            console.log("project", this.project);
-
-            if (this.type === "project") {
+            if (this.viewType === "project") {
                 return "Comment on Project";
             } else {
                 return "Write a comment about this Data View";
             }
         },
-        postComment() {
-            const comment = {
-                projectID: this.project.id,
-                body: this.body,
-            };
-            return this.$services.api.postComment(comment).then(data => {
-                console.log("insert response", data);
+        save(comment) {
+            return this.$services.api.postComment(comment).then(response => {
+                this.newComment.body = null;
+                // add the comment to the replies array
+                if (comment.threadId) {
+                    this.posts.filter((post) => post.id === comment.threadId)[0].replies.push(response.post);
+                    this.newReply.body = null;
+                } else {// add it to the posts array
+                    this.posts.unshift(response.post);
+                    this.newComment.body = null;
+                }
+            }).catch(e => {
+                this.errorGetComments = true;
             });
         },
         formatTimestamp(timestamp) {
             return moment(timestamp).fromNow();
         },
+        addReply(post) {
+            this.newReply.threadId = post.id;
+            this.newReply.body = null;
+        },
+        getComments() {
+            this.$services.api.getComments(this.parentData).then((data) => {
+                this.posts = data.posts;
+            });
+        },
+        viewDataClick(post) {
+            this.$emit("viewDataClicked", JSON.parse(post.bookmark));
+        },
     },
     mounted() {
-        console.log("yo");
-        return this.$services.api.getComments(this.project.id).then((data) => {
-            this.posts = data.posts;
-            console.log("this comments", this.posts);
-        });
+        typeof this.parentData !== "number" ? (this.parentData = JSON.stringify(this.parentData)) : null;
+        this.placeholder = this.getNewCommentPlaceholder();
+        this.getComments();
     },
     data() {
         return {
-            body: null,
             posts: [],
+            placeholder: null,
+            viewType: typeof this.parentData === "number" ? "project" : "data",
+            newComment: {
+                projectId: typeof this.parentData === "number" ? this.parentData : null,
+                bookmark: typeof this.parentData === "number" ? null : JSON.stringify(this.parentData),
+                body: null,
+            },
+            newReply: {
+                projectId: typeof this.parentData === "number" ? this.parentData : null,
+                bookmark: typeof this.parentData === "number" ? null : JSON.stringify(this.parentData),
+                body: null,
+                threadId: null,
+            },
+            errorGetComments: false,
+            errorPostComment: false,
         };
     },
-};
+});
 </script>
 
 <style lang="scss" scoped>
 @import "../../scss/global";
+
+button {
+    padding: 0;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    cursor: pointer;
+    background: transparent;
+}
 
 * {
     box-sizing: border-box;
@@ -100,11 +168,19 @@ export default {
 
 .container {
     margin-top: 20px;
-    padding: 0 20px 30px;
+    padding: 0 25px 30px 20px;
     background: #fff;
     border-radius: 1px;
     border: 1px solid $color-border;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+
+    &.data-view {
+        margin-top: 0;
+        padding-top: 45px;
+        padding-bottom: 22px;
+        box-shadow: none;
+        border: 0;
+    }
 }
 
 header {
@@ -113,6 +189,12 @@ header {
     border-bottom: 1px solid $color-border;
     font-size: 20px;
     font-weight: 500;
+
+    .data-view & {
+        font-size: 18px;
+        height: auto;
+        border: none;
+    }
 }
 
 .subheader {
@@ -120,17 +202,51 @@ header {
     border-top: 1px solid $color-border;
     border-bottom: 1px solid $color-border;
     padding: 15px 0;
+
+    .data-view & {
+        border-top: none;
+    }
+}
+
+.list {
+    .data-view & {
+        margin-top: 30px;
+        width: 60%;
+    }
 }
 
 .new-comment {
+    @include flex(center);
     padding: 22px 0;
     position: relative;
-    @include flex(center);
+
+    .container.data-view & {
+        &:not(.reply) {
+            background-color: rgba(#f4f5f7, 0.55);
+            padding: 18px 23px 17px 15px;
+        }
+    }
+
+    &.reply {
+        padding: 0;
+        margin-top: 10px;
+
+        input {
+            height: 35px;
+        }
+    }
 
     img {
         margin-top: 0;
-        width: 46px;
-        height: 46px;
+        width: 30px;
+        height: 30px;
+    }
+
+    &:not(.reply) {
+        img {
+            width: 46px;
+            height: 46px;
+        }
     }
 
     input {
@@ -154,6 +270,10 @@ header {
         padding: 0 10px;
         transform: translateY(-50%);
         font-weight: 900;
+
+        .container.data-view & {
+            right: 35px;
+        }
     }
 }
 
@@ -165,6 +285,7 @@ header {
     font-size: 16px;
     font-weight: 500;
     margin-bottom: 5px;
+    margin-top: 2px;
 }
 
 .body {
@@ -172,11 +293,12 @@ header {
     font-family: $font-family-light;
 }
 
-.item {
+.comment {
     @include flex(flex-start);
     padding: 15px 0 0;
+    position: relative;
 
-    &::v-deep img {
+    &::v-deep > img {
         margin-top: 0;
         width: 30px;
         height: 30px;
@@ -185,26 +307,38 @@ header {
     > div {
         @include flex();
     }
+
+    &.highlight {
+        opacity: 0.1;
+        background-color: #a0dbe1;
+        @include position(absolute, 0 null null 0);
+    }
 }
 
 .column {
     width: 100%;
     flex-direction: column;
-    border-bottom: 1px solid $color-border;
     position: relative;
+}
+
+.comment-main > .column {
+    border-bottom: 1px solid $color-border;
 }
 
 .actions {
     margin: 15px 0;
+    user-select: none;
+    @include flex();
 
-    span {
+    button {
         font-weight: 500;
         margin-right: 20px;
+        @include flex(flex-start);
     }
 
     img {
         width: 14px;
-        height: 11px;
+        margin-right: 6px;
     }
 }
 
@@ -213,4 +347,8 @@ header {
     font-family: $font-family-light;
 }
 
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.25s ease-in-out;
+}
 </style>
