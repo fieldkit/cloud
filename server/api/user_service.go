@@ -91,7 +91,7 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 	if yes, err := s.userExists(ctx, payload.User.Email); err != nil {
 		return nil, err
 	} else if yes {
-		return nil, user.MakeBadRequest(errors.New("bad request"))
+		return nil, user.MakeUserEmailRegistered(errors.New("email registered"))
 	}
 
 	user := &data.User{

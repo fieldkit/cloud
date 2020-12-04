@@ -25,6 +25,9 @@ var _ = Service("user", func() {
 	Error("user-unverified", func() {
 	})
 
+	Error("user-email-registered", func() {
+	})
+
 	Method("roles", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -254,6 +257,8 @@ var _ = Service("user", func() {
 			POST("users")
 
 			Body("user")
+
+			Response("user-email-registered", StatusBadRequest)
 		})
 	})
 

@@ -2736,7 +2736,7 @@ Example:
       "privacy": 440537845,
       "startTime": "Nemo fugiat.",
       "tags": "Cumque eum neque."
-   }' --user-id 1473273611 --auth "Qui magnam ut beatae incidunt sed eum."
+   }' --user-id 1767996425 --auth "Beatae incidunt."
 `, os.Args[0])
 }
 
@@ -2750,9 +2750,9 @@ ChangePassword implements change password.
 
 Example:
     `+os.Args[0]+` user change- password --body '{
-      "newPassword": "x32",
-      "oldPassword": "7g5"
-   }' --user-id 729129814 --auth "Similique hic incidunt veritatis."
+      "newPassword": "g58",
+      "oldPassword": "pft"
+   }' --user-id 733702787 --auth "Praesentium amet necessitatibus similique hic incidunt."
 `, os.Args[0])
 }
 

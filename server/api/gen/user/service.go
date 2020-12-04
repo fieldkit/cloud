@@ -308,6 +308,15 @@ func MakeUserUnverified(err error) *goa.ServiceError {
 	}
 }
 
+// MakeUserEmailRegistered builds a goa.ServiceError from an error.
+func MakeUserEmailRegistered(err error) *goa.ServiceError {
+	return &goa.ServiceError{
+		Name:    "user-email-registered",
+		ID:      goa.NewErrorID(),
+		Message: err.Error(),
+	}
+}
+
 // MakeUnauthorized builds a goa.ServiceError from an error.
 func MakeUnauthorized(err error) *goa.ServiceError {
 	return &goa.ServiceError{
