@@ -481,6 +481,8 @@ class FKApi {
                     headers: headers,
                 });
             }
+        } catch (err) {
+            console.log("api: logout error:", err, err.stack);
         } finally {
             this.token.clear();
         }
