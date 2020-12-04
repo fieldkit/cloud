@@ -396,7 +396,7 @@ class FKApi {
         const parsed = this.parseToken(this.token.getHeader());
         if (!parsed) {
             console.log("api: refresh skipped, invalid token");
-            return this.logout().then(() => Promise.reject(new AuthenticationRequiredError()));
+            return this.logout(true).then(() => Promise.reject(new AuthenticationRequiredError()));
         }
 
         console.log("api: refreshing");
@@ -412,7 +412,7 @@ class FKApi {
         })
             .then(
                 (response) => this.handleLogin(response),
-                (error) => this.logout().then(() => Promise.reject(new AuthenticationRequiredError()))
+                (error) => this.logout(true).then(() => Promise.reject(new AuthenticationRequiredError()))
             )
             .finally(() => {
                 this.refreshing = null;
@@ -467,18 +467,20 @@ class FKApi {
         }
     }
 
-    public async logout() {
+    public async logout(discardToken = false): Promise<void> {
         try {
             if (!this.token.authenticated()) {
                 return Promise.resolve();
             }
-            const token = this.token.getHeader();
-            const headers = { "Content-Type": "application/json", Authorization: token };
-            await axios({
-                method: "POST",
-                url: this.baseUrl + "/logout",
-                headers: headers,
-            });
+            if (!discardToken) {
+                const token = this.token.getHeader();
+                const headers = { "Content-Type": "application/json", Authorization: token };
+                await axios({
+                    method: "POST",
+                    url: this.baseUrl + "/logout",
+                    headers: headers,
+                });
+            }
         } finally {
             this.token.clear();
         }
