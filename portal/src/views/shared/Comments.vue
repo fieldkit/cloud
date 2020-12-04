@@ -60,11 +60,21 @@
     </section>
 </template>
 
-<script>
+<script lang="ts">
 
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
+import {Bookmark} from "@/views/viz/viz";
+
+export interface Comment {
+    id: number,
+    author: object,
+    body: string;
+    replies: [];
+    createdAt: number;
+    updatedAt: number;
+}
 
 export default Vue.extend({
     name: "Comments",
@@ -77,55 +87,63 @@ export default Vue.extend({
         },
         parentData: {
             required: true,
+            type: [Number, Bookmark],
         },
     },
     methods: {
-        getNewCommentPlaceholder() {
+        getNewCommentPlaceholder(): string {
             if (this.viewType === "project") {
                 return "Comment on Project";
             } else {
                 return "Write a comment about this Data View";
             }
         },
-        save(comment) {
-            return this.$services.api.postComment(comment).then(response => {
-                this.newComment.body = null;
-                // add the comment to the replies array
-                if (comment.threadId) {
-                    this.posts.filter((post) => post.id === comment.threadId)[0].replies.push(response.post);
-                    this.newReply.body = null;
-                } else {// add it to the posts array
-                    this.posts.unshift(response.post);
+        save(comment): void {
+            this.$services.api
+                .postComment(comment)
+                .then((response: {post: Comment}) => {
                     this.newComment.body = null;
-                }
-            }).catch(e => {
-                this.errorGetComments = true;
-            });
+                    // add the comment to the replies array
+                    if (comment.threadId) {
+                        this.posts.filter((post) => post.id === comment.threadId)[0].replies.push(response.post);
+                        this.newReply.body = null;
+                    } else {// add it to the posts array
+                        this.posts.unshift(response.post);
+                        this.newComment.body = null;
+                    }
+                }).catch(e => {
+                    console.log("e", e);
+                    this.errorPostComment = true;
+                });
         },
-        formatTimestamp(timestamp) {
+        formatTimestamp(timestamp): string {
             return moment(timestamp).fromNow();
         },
-        addReply(post) {
+        addReply(post): void {
             this.newReply.threadId = post.id;
             this.newReply.body = null;
         },
-        getComments() {
-            this.$services.api.getComments(this.parentData).then((data) => {
-                this.posts = data.posts;
-            });
+        getComments(): void {
+            this.$services.api
+                .getComments(this.parentData)
+                .then((data) => {
+                    this.posts = data.posts;
+                })
+                .catch(e => {
+                    this.errorGetComments = true;
+                });
         },
         viewDataClick(post) {
             this.$emit("viewDataClicked", JSON.parse(post.bookmark));
         },
     },
-    mounted() {
-        typeof this.parentData !== "number" ? (this.parentData = JSON.stringify(this.parentData)) : null;
+    mounted(): void {
         this.placeholder = this.getNewCommentPlaceholder();
         this.getComments();
     },
-    data() {
+    data(): any {
         return {
-            posts: [],
+            posts: [Comment],
             placeholder: null,
             viewType: typeof this.parentData === "number" ? "project" : "data",
             newComment: {

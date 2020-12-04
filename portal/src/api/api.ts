@@ -1010,14 +1010,14 @@ class FKApi {
         });
     }
 
-    public getComments(projectIDOrbookmark) {
+    public getComments(projectIDOrBookmark): Promise<{posts: []}> {
 
         let apiURL;
 
-        if (typeof projectIDOrbookmark === 'number') {
-            apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrbookmark;
+        if (typeof projectIDOrBookmark === 'number') {
+            apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
         } else {
-            apiURL = this.baseUrl + "/discussion?bookmark=" + projectIDOrbookmark;
+            apiURL = this.baseUrl + "/discussion?bookmark=" + JSON.stringify(projectIDOrBookmark);
         }
 
         return this.invoke({
@@ -1027,7 +1027,7 @@ class FKApi {
         });
     }
 
-    public postComment(comment) {
+    public postComment(comment: Comment): Promise<{post: Comment}> {
 
         return this.invoke({
             auth: Auth.Required,
