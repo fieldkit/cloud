@@ -240,9 +240,9 @@ func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.Lis
 	followers := []*data.FollowersSummary{}
 	if err := c.options.Database.SelectContext(ctx, &followers, `
 		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (
-			SELECT id FROM fieldkit.project ORDER BY name LIMIT 10
+			SELECT id FROM fieldkit.project WHERE privacy = $1 ORDER BY name LIMIT 10
 		) GROUP BY f.project_id
-		`); err != nil {
+		`, data.Public); err != nil {
 		return nil, err
 	}
 

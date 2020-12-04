@@ -327,9 +327,11 @@ const actions = (services: Services) => {
         },
         [ActionTypes.PROJECT_FOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
             await services.api.followProject(payload.projectId);
+            commit(PROJECT_LOADED, await services.api.getProject(payload.projectId));
         },
         [ActionTypes.PROJECT_UNFOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
             await services.api.unfollowProject(payload.projectId);
+            commit(PROJECT_LOADED, await services.api.getProject(payload.projectId));
         },
         [ActionTypes.STATION_PROJECT_ADD]: async (
             { commit, dispatch }: { commit: any; dispatch: any },
@@ -460,14 +462,24 @@ const mutations = {
     },
     [PROJECT_LOADED]: (state: StationsState, project: Project) => {
         Vue.set(state.projects, project.id, project);
+        if (state.user.projects[project.id]) {
+            Vue.set(state.user.projects, project.id, project);
+        }
+        if (state.community.projects[project.id]) {
+            Vue.set(state.community.projects, project.id, project);
+        }
     },
     [PROJECT_UPDATE]: (state: StationsState, project: Project) => {
         Vue.set(state.projects, project.id, project);
         Vue.set(state.user.projects, project.id, project);
+        if (state.community.projects[project.id]) {
+            Vue.set(state.community.projects, project.id, project);
+        }
     },
     [PROJECT_DELETED]: (state: StationsState, payload: { projectId: number }) => {
         delete state.projects[payload.projectId];
         delete state.user.projects[payload.projectId];
+        delete state.community.projects[payload.projectId];
     },
 };
 
