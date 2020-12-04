@@ -112,7 +112,6 @@ export default Vue.extend({
                         this.newComment.body = null;
                     }
                 }).catch(e => {
-                    console.log("e", e);
                     this.errorPostComment = true;
                 });
         },
