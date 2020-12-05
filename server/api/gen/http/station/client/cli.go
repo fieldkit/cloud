@@ -65,6 +65,40 @@ func BuildGetPayload(stationGetID string, stationGetAuth string) (*station.GetPa
 	return v, nil
 }
 
+// BuildTransferPayload builds the payload for the station transfer endpoint
+// from CLI flags.
+func BuildTransferPayload(stationTransferID string, stationTransferOwnerID string, stationTransferAuth string) (*station.TransferPayload, error) {
+	var err error
+	var id int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationTransferID, 10, 32)
+		id = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for id, must be INT32")
+		}
+	}
+	var ownerID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationTransferOwnerID, 10, 32)
+		ownerID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for ownerID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = stationTransferAuth
+	}
+	v := &station.TransferPayload{}
+	v.ID = id
+	v.OwnerID = ownerID
+	v.Auth = auth
+
+	return v, nil
+}
+
 // BuildUpdatePayload builds the payload for the station update endpoint from
 // CLI flags.
 func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, stationUpdateAuth string) (*station.UpdatePayload, error) {
@@ -73,7 +107,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"locationName\": \"Perferendis autem nobis natus.\",\n      \"name\": \"Dolor deleniti.\",\n      \"statusPb\": \"Porro adipisci impedit ea velit.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"locationName\": \"Voluptatem porro corrupti autem libero et.\",\n      \"name\": \"Eius tempora dolore.\",\n      \"statusPb\": \"Atque adipisci eius facere aut.\"\n   }'")
 		}
 	}
 	var id int32

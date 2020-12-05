@@ -295,6 +295,78 @@ type GetBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// TransferUnauthorizedResponseBody is the type of the "station" service
+// "transfer" endpoint HTTP response body for the "unauthorized" error.
+type TransferUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// TransferForbiddenResponseBody is the type of the "station" service
+// "transfer" endpoint HTTP response body for the "forbidden" error.
+type TransferForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// TransferNotFoundResponseBody is the type of the "station" service "transfer"
+// endpoint HTTP response body for the "not-found" error.
+type TransferNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// TransferBadRequestResponseBody is the type of the "station" service
+// "transfer" endpoint HTTP response body for the "bad-request" error.
+type TransferBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // UpdateUnauthorizedResponseBody is the type of the "station" service "update"
 // endpoint HTTP response body for the "unauthorized" error.
 type UpdateUnauthorizedResponseBody struct {
@@ -1175,6 +1247,62 @@ func NewGetBadRequestResponseBody(res *goa.ServiceError) *GetBadRequestResponseB
 	return body
 }
 
+// NewTransferUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "transfer" endpoint of the "station" service.
+func NewTransferUnauthorizedResponseBody(res *goa.ServiceError) *TransferUnauthorizedResponseBody {
+	body := &TransferUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewTransferForbiddenResponseBody builds the HTTP response body from the
+// result of the "transfer" endpoint of the "station" service.
+func NewTransferForbiddenResponseBody(res *goa.ServiceError) *TransferForbiddenResponseBody {
+	body := &TransferForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewTransferNotFoundResponseBody builds the HTTP response body from the
+// result of the "transfer" endpoint of the "station" service.
+func NewTransferNotFoundResponseBody(res *goa.ServiceError) *TransferNotFoundResponseBody {
+	body := &TransferNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewTransferBadRequestResponseBody builds the HTTP response body from the
+// result of the "transfer" endpoint of the "station" service.
+func NewTransferBadRequestResponseBody(res *goa.ServiceError) *TransferBadRequestResponseBody {
+	body := &TransferBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewUpdateUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "update" endpoint of the "station" service.
 func NewUpdateUnauthorizedResponseBody(res *goa.ServiceError) *UpdateUnauthorizedResponseBody {
@@ -1528,6 +1656,16 @@ func NewAddPayload(body *AddRequestBody, auth string) *station.AddPayload {
 func NewGetPayload(id int32, auth string) *station.GetPayload {
 	v := &station.GetPayload{}
 	v.ID = id
+	v.Auth = auth
+
+	return v
+}
+
+// NewTransferPayload builds a station service transfer endpoint payload.
+func NewTransferPayload(id int32, ownerID int32, auth string) *station.TransferPayload {
+	v := &station.TransferPayload{}
+	v.ID = id
+	v.OwnerID = ownerID
 	v.Auth = auth
 
 	return v

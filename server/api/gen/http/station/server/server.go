@@ -23,6 +23,7 @@ type Server struct {
 	Mounts        []*MountPoint
 	Add           http.Handler
 	Get           http.Handler
+	Transfer      http.Handler
 	Update        http.Handler
 	ListMine      http.Handler
 	ListProject   http.Handler
@@ -67,6 +68,7 @@ func New(
 		Mounts: []*MountPoint{
 			{"Add", "POST", "/stations"},
 			{"Get", "GET", "/stations/{id}"},
+			{"Transfer", "POST", "/stations/{id}/transfer/{ownerId}"},
 			{"Update", "PATCH", "/stations/{id}"},
 			{"ListMine", "GET", "/user/stations"},
 			{"ListProject", "GET", "/projects/{id}/stations"},
@@ -75,6 +77,7 @@ func New(
 			{"Delete", "DELETE", "/admin/stations/{stationId}"},
 			{"CORS", "OPTIONS", "/stations"},
 			{"CORS", "OPTIONS", "/stations/{id}"},
+			{"CORS", "OPTIONS", "/stations/{id}/transfer/{ownerId}"},
 			{"CORS", "OPTIONS", "/user/stations"},
 			{"CORS", "OPTIONS", "/projects/{id}/stations"},
 			{"CORS", "OPTIONS", "/stations/{stationId}/photo"},
@@ -83,6 +86,7 @@ func New(
 		},
 		Add:           NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
 		Get:           NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		Transfer:      NewTransferHandler(e.Transfer, mux, decoder, encoder, errhandler, formatter),
 		Update:        NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
 		ListMine:      NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
 		ListProject:   NewListProjectHandler(e.ListProject, mux, decoder, encoder, errhandler, formatter),
@@ -100,6 +104,7 @@ func (s *Server) Service() string { return "station" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Add = m(s.Add)
 	s.Get = m(s.Get)
+	s.Transfer = m(s.Transfer)
 	s.Update = m(s.Update)
 	s.ListMine = m(s.ListMine)
 	s.ListProject = m(s.ListProject)
@@ -113,6 +118,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountAddHandler(mux, h.Add)
 	MountGetHandler(mux, h.Get)
+	MountTransferHandler(mux, h.Transfer)
 	MountUpdateHandler(mux, h.Update)
 	MountListMineHandler(mux, h.ListMine)
 	MountListProjectHandler(mux, h.ListProject)
@@ -203,6 +209,57 @@ func NewGetHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "get")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountTransferHandler configures the mux to serve the "station" service
+// "transfer" endpoint.
+func MountTransferHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleStationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/stations/{id}/transfer/{ownerId}", f)
+}
+
+// NewTransferHandler creates a HTTP handler which loads the HTTP request and
+// calls the "station" service "transfer" endpoint.
+func NewTransferHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeTransferRequest(mux, decoder)
+		encodeResponse = EncodeTransferResponse(encoder)
+		encodeError    = EncodeTransferError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "transfer")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -542,6 +599,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	}
 	mux.Handle("OPTIONS", "/stations", f)
 	mux.Handle("OPTIONS", "/stations/{id}", f)
+	mux.Handle("OPTIONS", "/stations/{id}/transfer/{ownerId}", f)
 	mux.Handle("OPTIONS", "/user/stations", f)
 	mux.Handle("OPTIONS", "/projects/{id}/stations", f)
 	mux.Handle("OPTIONS", "/stations/{stationId}/photo", f)

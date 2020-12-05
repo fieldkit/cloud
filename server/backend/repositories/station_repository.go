@@ -65,6 +65,15 @@ func (r *StationRepository) Update(ctx context.Context, station *data.Station) (
 	return nil
 }
 
+func (r *StationRepository) UpdateOwner(ctx context.Context, station *data.Station) (err error) {
+	// TODO Insert ownership transfer record. For data permission mapping.
+	if _, err := r.db.NamedExecContext(ctx, `UPDATE fieldkit.station SET owner_id = :owner_id, updated_at = :updated_at WHERE id = :id`, station); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *StationRepository) QueryStationByID(ctx context.Context, id int32) (station *data.Station, err error) {
 	station = &data.Station{}
 	if err := r.db.GetContext(ctx, station, `

@@ -21,6 +21,11 @@ func GetStationPath(id int32) string {
 	return fmt.Sprintf("/stations/%v", id)
 }
 
+// TransferStationPath returns the URL path to the station service transfer HTTP endpoint.
+func TransferStationPath(id int32, ownerID int32) string {
+	return fmt.Sprintf("/stations/%v/transfer/%v", id, ownerID)
+}
+
 // UpdateStationPath returns the URL path to the station service update HTTP endpoint.
 func UpdateStationPath(id int32) string {
 	return fmt.Sprintf("/stations/%v", id)

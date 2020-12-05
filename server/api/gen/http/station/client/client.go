@@ -23,6 +23,10 @@ type Client struct {
 	// Get Doer is the HTTP client used to make requests to the get endpoint.
 	GetDoer goahttp.Doer
 
+	// Transfer Doer is the HTTP client used to make requests to the transfer
+	// endpoint.
+	TransferDoer goahttp.Doer
+
 	// Update Doer is the HTTP client used to make requests to the update endpoint.
 	UpdateDoer goahttp.Doer
 
@@ -70,6 +74,7 @@ func NewClient(
 	return &Client{
 		AddDoer:             doer,
 		GetDoer:             doer,
+		TransferDoer:        doer,
 		UpdateDoer:          doer,
 		ListMineDoer:        doer,
 		ListProjectDoer:     doer,
@@ -128,6 +133,30 @@ func (c *Client) Get() goa.Endpoint {
 		resp, err := c.GetDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("station", "get", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Transfer returns an endpoint that makes HTTP requests to the station service
+// transfer server.
+func (c *Client) Transfer() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeTransferRequest(c.encoder)
+		decodeResponse = DecodeTransferResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildTransferRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.TransferDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "transfer", err)
 		}
 		return decodeResponse(resp)
 	}

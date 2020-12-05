@@ -263,6 +263,27 @@ var _ = Service("station", func() {
 		})
 	})
 
+	Method("transfer", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("id", Int32)
+			Required("id")
+			Attribute("ownerId", Int32)
+			Required("ownerId")
+		})
+
+		HTTP(func() {
+			POST("stations/{id}/transfer/{ownerId}")
+
+			httpAuthentication()
+		})
+	})
+
 	Method("update", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")

@@ -177,6 +177,39 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 	return transformStationFull(c.options.signer, p, sf, preciseLocation)
 }
 
+func (c *StationService) Transfer(ctx context.Context, payload *station.TransferPayload) (err error) {
+	sr, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
+		return err
+	}
+
+	updating, err := sr.QueryStationByID(ctx, payload.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return station.MakeNotFound(errors.New("station not found"))
+		}
+		return err
+	}
+
+	p, err := NewPermissions(ctx, c.options).ForStation(updating)
+	if err != nil {
+		return err
+	}
+
+	if err := p.CanModify(); err != nil {
+		return err
+	}
+
+	updating.UpdatedAt = time.Now()
+	updating.OwnerID = payload.OwnerID
+
+	if err := sr.UpdateOwner(ctx, updating); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
 	sr, err := repositories.NewStationRepository(c.options.Database)
 	if err != nil {

@@ -21,6 +21,8 @@ type Service interface {
 	Add(context.Context, *AddPayload) (res *StationFull, err error)
 	// Get implements get.
 	Get(context.Context, *GetPayload) (res *StationFull, err error)
+	// Transfer implements transfer.
+	Transfer(context.Context, *TransferPayload) (err error)
 	// Update implements update.
 	Update(context.Context, *UpdatePayload) (res *StationFull, err error)
 	// ListMine implements list mine.
@@ -49,7 +51,7 @@ const ServiceName = "station"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [8]string{"add", "get", "update", "list mine", "list project", "download photo", "list all", "delete"}
+var MethodNames = [9]string{"add", "get", "transfer", "update", "list mine", "list project", "download photo", "list all", "delete"}
 
 // AddPayload is the payload type of the station service add method.
 type AddPayload struct {
@@ -88,6 +90,13 @@ type StationFull struct {
 type GetPayload struct {
 	Auth string
 	ID   int32
+}
+
+// TransferPayload is the payload type of the station service transfer method.
+type TransferPayload struct {
+	Auth    string
+	ID      int32
+	OwnerID int32
 }
 
 // UpdatePayload is the payload type of the station service update method.

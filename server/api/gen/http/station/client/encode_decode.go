@@ -326,6 +326,138 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 	}
 }
 
+// BuildTransferRequest instantiates a HTTP request object with method and path
+// set to call the "station" service "transfer" endpoint
+func (c *Client) BuildTransferRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id      int32
+		ownerID int32
+	)
+	{
+		p, ok := v.(*station.TransferPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("station", "transfer", "*station.TransferPayload", v)
+		}
+		id = p.ID
+		ownerID = p.OwnerID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: TransferStationPath(id, ownerID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "transfer", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeTransferRequest returns an encoder for requests sent to the station
+// transfer server.
+func EncodeTransferRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.TransferPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "transfer", "*station.TransferPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		return nil
+	}
+}
+
+// DecodeTransferResponse returns a decoder for responses returned by the
+// station transfer endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeTransferResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeTransferResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body TransferUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "transfer", err)
+			}
+			err = ValidateTransferUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "transfer", err)
+			}
+			return nil, NewTransferUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body TransferForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "transfer", err)
+			}
+			err = ValidateTransferForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "transfer", err)
+			}
+			return nil, NewTransferForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body TransferNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "transfer", err)
+			}
+			err = ValidateTransferNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "transfer", err)
+			}
+			return nil, NewTransferNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body TransferBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "transfer", err)
+			}
+			err = ValidateTransferBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "transfer", err)
+			}
+			return nil, NewTransferBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "transfer", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildUpdateRequest instantiates a HTTP request object with method and path
 // set to call the "station" service "update" endpoint
 func (c *Client) BuildUpdateRequest(ctx context.Context, v interface{}) (*http.Request, error) {
