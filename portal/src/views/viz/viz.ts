@@ -1,7 +1,6 @@
 import _ from "lodash";
-import { SensorId, SensorsResponse, SensorDataResponse, SensorInfoResponse, ModuleSensorMeta } from "./api";
+import { SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
 import { Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
-import { DisplayStation } from "@/store/modules/stations";
 import FKApi from "@/api/api";
 
 import { ColorScale, createSensorColorScale } from "./d3-helpers";
@@ -27,6 +26,17 @@ export class TreeOption {
     ) {}
 }
 
+function makeRange(values: number[]): [number, number] {
+    const min = _.min(values);
+    const max = _.max(values);
+    if (min === undefined) throw new Error(`no min: ${values}`);
+    if (max === undefined) throw new Error(`no max: ${values}`);
+    if (min === max) {
+        console.warn(`range-warning: min == max ${values}`);
+    }
+    return [min, max];
+}
+
 export class QueriedData {
     empty = true;
     dataRange: number[] = [];
@@ -36,14 +46,14 @@ export class QueriedData {
     constructor(public readonly timeRangeQueried: TimeRange, private readonly sdr: SensorDataResponse) {
         if (this.sdr.data.length > 0) {
             const filtered = this.sdr.data.filter((d) => _.isNumber(d.value));
-            const values = filtered.map((d) => d.value) as number[];
-            const times = filtered.map((d) => d.time) as number[];
+            const values = filtered.map((d) => d.value);
+            const times = filtered.map((d) => d.time);
 
             if (values.length == 0) throw new Error(`empty data ranges`);
             if (times.length == 0) throw new Error(`empty time ranges`);
 
-            this.dataRange = [_.min(values) as number, _.max(values) as number];
-            this.timeRangeData = [_.min(times) as number, _.max(times) as number];
+            this.dataRange = makeRange(values);
+            this.timeRangeData = makeRange(times);
 
             if (this.timeRangeQueried.isExtreme()) {
                 this.timeRange = this.timeRangeData;
