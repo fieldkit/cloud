@@ -1,8 +1,6 @@
 import _ from "lodash";
 import Vue from "vue";
-
-import { TimeRange } from "./common";
-import { Graph, QueriedData, Workspace, ChartType } from "./viz";
+import { Graph, Workspace, ChartType } from "./viz";
 
 import { ViewingControls } from "./ViewingControls";
 import { D3TimeSeriesGraph } from "./D3TimeSeriesGraph";
@@ -23,10 +21,8 @@ export const VizGraph = Vue.extend({
         D3Map,
         D3Scrubber,
     },
-    data() {
-        return {
-            selected: null,
-        };
+    data(): {} {
+        return {};
     },
     props: {
         viz: {
@@ -45,33 +41,33 @@ export const VizGraph = Vue.extend({
         this.viz.log("updated");
     },
     computed: {
-        debug() {
+        debug(): boolean {
             return false;
         },
     },
     methods: {
-        raiseTimeZoomed(...args) {
-            return this.$emit("viz-time-zoomed", ...args);
+        raiseTimeZoomed(...args: unknown[]): void {
+            this.$emit("viz-time-zoomed", ...args);
         },
-        raiseGeoZoomed(...args) {
-            return this.$emit("viz-geo-zoomed", ...args);
+        raiseGeoZoomed(...args: unknown[]): void {
+            this.$emit("viz-geo-zoomed", ...args);
         },
-        raiseRemove(...args) {
-            return this.$emit("viz-remove", ...args);
+        raiseRemove(...args: unknown[]): void {
+            this.$emit("viz-remove", ...args);
         },
-        raiseCompare(...args) {
-            return this.$emit("viz-compare", ...args);
+        raiseCompare(...args: unknown[]): void {
+            this.$emit("viz-compare", ...args);
         },
-        raiseFastTime(...args) {
-            return this.$emit("viz-fast-time", ...args);
+        raiseFastTime(...args: unknown[]): void {
+            this.$emit("viz-fast-time", ...args);
         },
-        raiseChangeSensors(...args) {
-            return this.$emit("viz-change-sensors", ...args);
+        raiseChangeSensors(...args: unknown[]): void {
+            this.$emit("viz-change-sensors", ...args);
         },
-        raiseChangeChart(...args) {
-            return this.$emit("viz-change-chart", ...args);
+        raiseChangeChart(...args: unknown[]): void {
+            this.$emit("viz-change-chart", ...args);
         },
-        uiNameOf(graph: Graph) {
+        uiNameOf(graph: Graph): string {
             switch (graph.chartType) {
                 case ChartType.TimeSeries:
                     return "D3TimeSeriesGraph";
