@@ -1323,6 +1323,144 @@ func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 	}
 }
 
+// BuildAdminSearchRequest instantiates a HTTP request object with method and
+// path set to call the "station" service "admin search" endpoint
+func (c *Client) BuildAdminSearchRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AdminSearchStationPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "admin search", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeAdminSearchRequest returns an encoder for requests sent to the station
+// admin search server.
+func EncodeAdminSearchRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.AdminSearchPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "admin search", "*station.AdminSearchPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		values := req.URL.Query()
+		values.Add("query", p.Query)
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeAdminSearchResponse returns a decoder for responses returned by the
+// station admin search endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeAdminSearchResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeAdminSearchResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body AdminSearchResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "admin search", err)
+			}
+			p := NewAdminSearchPageOfStationsOK(&body)
+			view := "default"
+			vres := &stationviews.PageOfStations{Projected: p, View: view}
+			if err = stationviews.ValidatePageOfStations(vres); err != nil {
+				return nil, goahttp.ErrValidationError("station", "admin search", err)
+			}
+			res := station.NewPageOfStations(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body AdminSearchUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "admin search", err)
+			}
+			err = ValidateAdminSearchUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "admin search", err)
+			}
+			return nil, NewAdminSearchUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body AdminSearchForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "admin search", err)
+			}
+			err = ValidateAdminSearchForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "admin search", err)
+			}
+			return nil, NewAdminSearchForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body AdminSearchNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "admin search", err)
+			}
+			err = ValidateAdminSearchNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "admin search", err)
+			}
+			return nil, NewAdminSearchNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body AdminSearchBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "admin search", err)
+			}
+			err = ValidateAdminSearchBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "admin search", err)
+			}
+			return nil, NewAdminSearchBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "admin search", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView builds a
 // value of type *stationviews.StationOwnerView from a value of type
 // *StationOwnerResponseBody.

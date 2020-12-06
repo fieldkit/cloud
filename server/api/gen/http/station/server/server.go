@@ -30,6 +30,7 @@ type Server struct {
 	DownloadPhoto http.Handler
 	ListAll       http.Handler
 	Delete        http.Handler
+	AdminSearch   http.Handler
 	CORS          http.Handler
 }
 
@@ -75,6 +76,7 @@ func New(
 			{"DownloadPhoto", "GET", "/stations/{stationId}/photo"},
 			{"ListAll", "GET", "/admin/stations"},
 			{"Delete", "DELETE", "/admin/stations/{stationId}"},
+			{"AdminSearch", "POST", "/admin/stations/search"},
 			{"CORS", "OPTIONS", "/stations"},
 			{"CORS", "OPTIONS", "/stations/{id}"},
 			{"CORS", "OPTIONS", "/stations/{id}/transfer/{ownerId}"},
@@ -83,6 +85,7 @@ func New(
 			{"CORS", "OPTIONS", "/stations/{stationId}/photo"},
 			{"CORS", "OPTIONS", "/admin/stations"},
 			{"CORS", "OPTIONS", "/admin/stations/{stationId}"},
+			{"CORS", "OPTIONS", "/admin/stations/search"},
 		},
 		Add:           NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
 		Get:           NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
@@ -93,6 +96,7 @@ func New(
 		DownloadPhoto: NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
 		ListAll:       NewListAllHandler(e.ListAll, mux, decoder, encoder, errhandler, formatter),
 		Delete:        NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
+		AdminSearch:   NewAdminSearchHandler(e.AdminSearch, mux, decoder, encoder, errhandler, formatter),
 		CORS:          NewCORSHandler(),
 	}
 }
@@ -111,6 +115,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.DownloadPhoto = m(s.DownloadPhoto)
 	s.ListAll = m(s.ListAll)
 	s.Delete = m(s.Delete)
+	s.AdminSearch = m(s.AdminSearch)
 	s.CORS = m(s.CORS)
 }
 
@@ -125,6 +130,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountDownloadPhotoHandler(mux, h.DownloadPhoto)
 	MountListAllHandler(mux, h.ListAll)
 	MountDeleteHandler(mux, h.Delete)
+	MountAdminSearchHandler(mux, h.AdminSearch)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -587,6 +593,57 @@ func NewDeleteHandler(
 	})
 }
 
+// MountAdminSearchHandler configures the mux to serve the "station" service
+// "admin search" endpoint.
+func MountAdminSearchHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleStationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/admin/stations/search", f)
+}
+
+// NewAdminSearchHandler creates a HTTP handler which loads the HTTP request
+// and calls the "station" service "admin search" endpoint.
+func NewAdminSearchHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeAdminSearchRequest(mux, decoder)
+		encodeResponse = EncodeAdminSearchResponse(encoder)
+		encodeError    = EncodeAdminSearchError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "admin search")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service station.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -605,6 +662,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/stations/{stationId}/photo", f)
 	mux.Handle("OPTIONS", "/admin/stations", f)
 	mux.Handle("OPTIONS", "/admin/stations/{stationId}", f)
+	mux.Handle("OPTIONS", "/admin/stations/search", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

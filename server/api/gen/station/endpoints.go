@@ -25,6 +25,7 @@ type Endpoints struct {
 	DownloadPhoto goa.Endpoint
 	ListAll       goa.Endpoint
 	Delete        goa.Endpoint
+	AdminSearch   goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "station" service with endpoints.
@@ -41,6 +42,7 @@ func NewEndpoints(s Service) *Endpoints {
 		DownloadPhoto: NewDownloadPhotoEndpoint(s, a.JWTAuth),
 		ListAll:       NewListAllEndpoint(s, a.JWTAuth),
 		Delete:        NewDeleteEndpoint(s, a.JWTAuth),
+		AdminSearch:   NewAdminSearchEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -55,6 +57,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.DownloadPhoto = m(e.DownloadPhoto)
 	e.ListAll = m(e.ListAll)
 	e.Delete = m(e.Delete)
+	e.AdminSearch = m(e.AdminSearch)
 }
 
 // NewAddEndpoint returns an endpoint function that calls the method "add" of
@@ -114,7 +117,7 @@ func NewTransferEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint
 		sc := security.JWTScheme{
 			Name:           "jwt",
 			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
+			RequiredScopes: []string{"api:admin"},
 		}
 		ctx, err = authJWTFn(ctx, p.Auth, &sc)
 		if err != nil {
@@ -264,5 +267,29 @@ func NewDeleteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 			return nil, err
 		}
 		return nil, s.Delete(ctx, p)
+	}
+}
+
+// NewAdminSearchEndpoint returns an endpoint function that calls the method
+// "admin search" of service "station".
+func NewAdminSearchEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*AdminSearchPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:admin"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.AdminSearch(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedPageOfStations(res, "default")
+		return vres, nil
 	}
 }

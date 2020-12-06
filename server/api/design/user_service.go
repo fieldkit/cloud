@@ -400,6 +400,34 @@ var _ = Service("user", func() {
 		})
 	})
 
+	Method("admin search", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("query", String)
+			Required("query")
+		})
+
+		Result(func() {
+			Attribute("users", CollectionOf(User))
+			Required("users")
+		})
+
+		HTTP(func() {
+			POST("admin/users/search")
+
+			Params(func() {
+				Param("query")
+			})
+
+			httpAuthentication()
+		})
+	})
+
 	commonOptions()
 })
 

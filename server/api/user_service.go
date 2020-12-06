@@ -686,6 +686,31 @@ func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadP
 	}, nil
 }
 
+func (c *UserService) AdminSearch(ctx context.Context, payload *user.AdminSearchPayload) (*user.AdminSearchResult, error) {
+	sr, err := repositories.NewUserRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	users, err := sr.Search(ctx, payload.Query)
+	if err != nil {
+		return nil, err
+	}
+
+	wms := make([]*user.User, 0)
+	for _, user := range users {
+		wm, err := UserType(c.options.signer, user)
+		if err != nil {
+			return nil, err
+		}
+		wms = append(wms, wm)
+	}
+
+	return &user.AdminSearchResult{
+		Users: wms,
+	}, nil
+}
+
 func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
 		Token:        token,

@@ -23,7 +23,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"deviceId\": \"Ut quasi.\",\n      \"locationName\": \"Ipsum sit aliquid accusamus nihil.\",\n      \"name\": \"Voluptatibus hic quibusdam quaerat voluptas.\",\n      \"statusPb\": \"Iste cupiditate expedita sint dolorem.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"deviceId\": \"Est et odio fuga tempore.\",\n      \"locationName\": \"Provident eaque.\",\n      \"name\": \"Ducimus eum adipisci reprehenderit iusto consequatur.\",\n      \"statusPb\": \"Dolor itaque provident praesentium voluptatem.\"\n   }'")
 		}
 	}
 	var auth string
@@ -107,7 +107,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"locationName\": \"Voluptatem porro corrupti autem libero et.\",\n      \"name\": \"Eius tempora dolore.\",\n      \"statusPb\": \"Atque adipisci eius facere aut.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"locationName\": \"Et ex blanditiis dignissimos.\",\n      \"name\": \"Vitae iure vitae velit.\",\n      \"statusPb\": \"Dolore molestias culpa veniam autem tempore eveniet.\"\n   }'")
 		}
 	}
 	var id int32
@@ -303,6 +303,24 @@ func BuildDeletePayload(stationDeleteStationID string, stationDeleteAuth string)
 	}
 	v := &station.DeletePayload{}
 	v.StationID = stationID
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildAdminSearchPayload builds the payload for the station admin search
+// endpoint from CLI flags.
+func BuildAdminSearchPayload(stationAdminSearchQuery string, stationAdminSearchAuth string) (*station.AdminSearchPayload, error) {
+	var query string
+	{
+		query = stationAdminSearchQuery
+	}
+	var auth string
+	{
+		auth = stationAdminSearchAuth
+	}
+	v := &station.AdminSearchPayload{}
+	v.Query = query
 	v.Auth = auth
 
 	return v, nil

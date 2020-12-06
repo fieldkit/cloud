@@ -128,7 +128,7 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userLoginBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"kelsie@dickinson.info\",\n      \"password\": \"z8m\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"gennaro.bernhard@mann.net\",\n      \"password\": \"y86\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
@@ -158,7 +158,7 @@ func BuildRecoveryLookupPayload(userRecoveryLookupBody string) (*user.RecoveryLo
 	{
 		err = json.Unmarshal([]byte(userRecoveryLookupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Voluptatem aliquid dolores esse iure illo voluptate.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Odio quia fugit sit.\"\n   }'")
 		}
 	}
 	v := &user.RecoveryLookupFields{
@@ -179,7 +179,7 @@ func BuildRecoveryPayload(userRecoveryBody string) (*user.RecoveryPayload, error
 	{
 		err = json.Unmarshal([]byte(userRecoveryBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"password\": \"who\",\n      \"token\": \"Pariatur dolor qui deserunt dolor beatae.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"password\": \"93m\",\n      \"token\": \"Porro hic.\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Password) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 10, true))
@@ -220,7 +220,7 @@ func BuildRefreshPayload(userRefreshBody string) (*user.RefreshPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userRefreshBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"refreshToken\": \"Omnis et nulla dolorem sequi.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"refreshToken\": \"Aliquid magni fugit qui.\"\n   }'")
 		}
 	}
 	v := &user.RefreshPayload{
@@ -269,7 +269,7 @@ func BuildAddPayload(userAddBody string) (*user.AddPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Ut voluptas laborum voluptatem.\",\n      \"meta\": \"Eius assumenda enim omnis.\",\n      \"module\": \"Sapiente amet doloribus corporis ut asperiores maiores.\",\n      \"profile\": \"Unde iusto.\",\n      \"url\": \"Commodi alias in est assumenda perferendis et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"etag\": \"Neque totam est.\",\n      \"meta\": \"Maxime autem ut cupiditate dolores totam facere.\",\n      \"module\": \"Mollitia voluptas non excepturi assumenda laboriosam dolorum.\",\n      \"profile\": \"Eum est.\",\n      \"url\": \"Consectetur quos voluptatem ut quo quia.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -305,7 +305,7 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateUserID string, userUpda
 	{
 		err = json.Unmarshal([]byte(userUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Recusandae illum eum sed et.\",\n      \"endTime\": \"Laborum illo.\",\n      \"goal\": \"Hic et.\",\n      \"location\": \"Numquam non sunt quia.\",\n      \"name\": \"Sunt ut provident laboriosam veritatis nemo.\",\n      \"privacy\": 440537845,\n      \"startTime\": \"Nemo fugiat.\",\n      \"tags\": \"Cumque eum neque.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"description\": \"Laboriosam ad voluptatem id aspernatur quisquam.\",\n      \"endTime\": \"At ab sint.\",\n      \"goal\": \"Facilis nulla accusantium.\",\n      \"location\": \"Veniam sequi rerum ab et consectetur.\",\n      \"name\": \"Facilis voluptas debitis iusto error exercitationem.\",\n      \"privacy\": 276155740,\n      \"startTime\": \"Atque est debitis earum a.\",\n      \"tags\": \"Excepturi tempora rerum laudantium qui facere asperiores.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -352,7 +352,7 @@ func BuildChangePasswordPayload(userChangePasswordBody string, userChangePasswor
 	{
 		err = json.Unmarshal([]byte(userChangePasswordBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"newPassword\": \"g58\",\n      \"oldPassword\": \"pft\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"newPassword\": \"zjn\",\n      \"oldPassword\": \"m2k\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.OldPassword) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.oldPassword", body.OldPassword, utf8.RuneCountInString(body.OldPassword), 10, true))
@@ -448,7 +448,7 @@ func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth str
 	{
 		err = json.Unmarshal([]byte(userAdminDeleteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Est et dolor cum.\",\n      \"password\": \"Non adipisci.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"email\": \"Voluptatem qui.\",\n      \"password\": \"Labore qui a.\"\n   }'")
 		}
 	}
 	var auth string
@@ -465,4 +465,22 @@ func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth str
 	res.Auth = auth
 
 	return res, nil
+}
+
+// BuildAdminSearchPayload builds the payload for the user admin search
+// endpoint from CLI flags.
+func BuildAdminSearchPayload(userAdminSearchQuery string, userAdminSearchAuth string) (*user.AdminSearchPayload, error) {
+	var query string
+	{
+		query = userAdminSearchQuery
+	}
+	var auth string
+	{
+		auth = userAdminSearchAuth
+	}
+	v := &user.AdminSearchPayload{}
+	v.Query = query
+	v.Auth = auth
+
+	return v, nil
 }

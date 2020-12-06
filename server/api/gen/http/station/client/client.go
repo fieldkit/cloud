@@ -49,6 +49,10 @@ type Client struct {
 	// Delete Doer is the HTTP client used to make requests to the delete endpoint.
 	DeleteDoer goahttp.Doer
 
+	// AdminSearch Doer is the HTTP client used to make requests to the admin
+	// search endpoint.
+	AdminSearchDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -81,6 +85,7 @@ func NewClient(
 		DownloadPhotoDoer:   doer,
 		ListAllDoer:         doer,
 		DeleteDoer:          doer,
+		AdminSearchDoer:     doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -301,6 +306,30 @@ func (c *Client) Delete() goa.Endpoint {
 		resp, err := c.DeleteDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("station", "delete", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// AdminSearch returns an endpoint that makes HTTP requests to the station
+// service admin search server.
+func (c *Client) AdminSearch() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAdminSearchRequest(c.encoder)
+		decodeResponse = DecodeAdminSearchResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildAdminSearchRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AdminSearchDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "admin search", err)
 		}
 		return decodeResponse(resp)
 	}

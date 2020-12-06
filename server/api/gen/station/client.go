@@ -24,10 +24,11 @@ type Client struct {
 	DownloadPhotoEndpoint goa.Endpoint
 	ListAllEndpoint       goa.Endpoint
 	DeleteEndpoint        goa.Endpoint
+	AdminSearchEndpoint   goa.Endpoint
 }
 
 // NewClient initializes a "station" service client given the endpoints.
-func NewClient(add, get, transfer, update, listMine, listProject, downloadPhoto, listAll, delete_ goa.Endpoint) *Client {
+func NewClient(add, get, transfer, update, listMine, listProject, downloadPhoto, listAll, delete_, adminSearch goa.Endpoint) *Client {
 	return &Client{
 		AddEndpoint:           add,
 		GetEndpoint:           get,
@@ -38,6 +39,7 @@ func NewClient(add, get, transfer, update, listMine, listProject, downloadPhoto,
 		DownloadPhotoEndpoint: downloadPhoto,
 		ListAllEndpoint:       listAll,
 		DeleteEndpoint:        delete_,
+		AdminSearchEndpoint:   adminSearch,
 	}
 }
 
@@ -121,4 +123,14 @@ func (c *Client) ListAll(ctx context.Context, p *ListAllPayload) (res *PageOfSta
 func (c *Client) Delete(ctx context.Context, p *DeletePayload) (err error) {
 	_, err = c.DeleteEndpoint(ctx, p)
 	return
+}
+
+// AdminSearch calls the "admin search" endpoint of the "station" service.
+func (c *Client) AdminSearch(ctx context.Context, p *AdminSearchPayload) (res *PageOfStations, err error) {
+	var ires interface{}
+	ires, err = c.AdminSearchEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*PageOfStations), nil
 }

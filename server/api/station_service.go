@@ -196,7 +196,7 @@ func (c *StationService) Transfer(ctx context.Context, payload *station.Transfer
 		return err
 	}
 
-	if err := p.CanModify(); err != nil {
+	if err := p.RequireAdmin(); err != nil {
 		return err
 	}
 
@@ -318,29 +318,7 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 	return
 }
 
-func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPayload) (*station.PageOfStations, error) {
-	sr, err := repositories.NewStationRepository(c.options.Database)
-	if err != nil {
-		return nil, err
-	}
-
-	qp := &repositories.EssentialQueryParams{
-		Page:     0,
-		PageSize: 20,
-	}
-
-	if payload.Page != nil {
-		qp.Page = *payload.Page
-	}
-	if payload.PageSize != nil {
-		qp.PageSize = *payload.PageSize
-	}
-
-	queried, err := sr.QueryEssentialStations(ctx, qp)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *StationService) queriedToPage(queried *repositories.QueriedEssential) (*station.PageOfStations, error) {
 	stationsWm := make([]*station.EssentialStation, 0)
 
 	for _, es := range queried.Stations {
@@ -384,12 +362,36 @@ func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPa
 		})
 	}
 
-	wm := &station.PageOfStations{
+	return &station.PageOfStations{
 		Stations: stationsWm,
 		Total:    queried.Total,
+	}, nil
+}
+
+func (c *StationService) ListAll(ctx context.Context, payload *station.ListAllPayload) (*station.PageOfStations, error) {
+	sr, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
+		return nil, err
 	}
 
-	return wm, nil
+	qp := &repositories.EssentialQueryParams{
+		Page:     0,
+		PageSize: 20,
+	}
+
+	if payload.Page != nil {
+		qp.Page = *payload.Page
+	}
+	if payload.PageSize != nil {
+		qp.PageSize = *payload.PageSize
+	}
+
+	queried, err := sr.QueryEssentialStations(ctx, qp)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.queriedToPage(queried)
 }
 
 func (c *StationService) Delete(ctx context.Context, payload *station.DeletePayload) error {
@@ -491,6 +493,20 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 		Etag:        etag,
 		Body:        data,
 	}, nil
+}
+
+func (c *StationService) AdminSearch(ctx context.Context, payload *station.AdminSearchPayload) (*station.PageOfStations, error) {
+	sr, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	queried, err := sr.Search(ctx, payload.Query)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.queriedToPage(queried)
 }
 
 func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {

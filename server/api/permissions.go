@@ -32,6 +32,7 @@ type Permissions interface {
 	Unwrap() (permissions Permissions, err error)
 	UserID() int32
 	RefreshToken() string
+	RequireAdmin() error
 	IsAdmin() bool
 	ForProjectByID(id int32) (permissions ProjectPermissions, err error)
 	ForStationByID(id int) (permissions StationPermissions, err error)
@@ -172,6 +173,13 @@ func (p *defaultPermissions) UserID() int32 {
 
 func (p *defaultPermissions) IsAdmin() bool {
 	return p.unwrapped.admin
+}
+
+func (p *defaultPermissions) RequireAdmin() error {
+	if p.IsAdmin() {
+		return nil
+	}
+	return p.forbidden("forbidden")
 }
 
 func (p *defaultPermissions) Unwrap() (Permissions, error) {

@@ -2597,6 +2597,142 @@ func DecodeAdminDeleteResponse(decoder func(*http.Response) goahttp.Decoder, res
 	}
 }
 
+// BuildAdminSearchRequest instantiates a HTTP request object with method and
+// path set to call the "user" service "admin search" endpoint
+func (c *Client) BuildAdminSearchRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AdminSearchUserPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("user", "admin search", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeAdminSearchRequest returns an encoder for requests sent to the user
+// admin search server.
+func EncodeAdminSearchRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*user.AdminSearchPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("user", "admin search", "*user.AdminSearchPayload", v)
+		}
+		{
+			head := p.Auth
+			req.Header.Set("Authorization", head)
+		}
+		values := req.URL.Query()
+		values.Add("query", p.Query)
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeAdminSearchResponse returns a decoder for responses returned by the
+// user admin search endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeAdminSearchResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeAdminSearchResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body AdminSearchResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "admin search", err)
+			}
+			err = ValidateAdminSearchResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "admin search", err)
+			}
+			res := NewAdminSearchResultOK(&body)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body AdminSearchUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "admin search", err)
+			}
+			err = ValidateAdminSearchUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "admin search", err)
+			}
+			return nil, NewAdminSearchUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body AdminSearchForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "admin search", err)
+			}
+			err = ValidateAdminSearchForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "admin search", err)
+			}
+			return nil, NewAdminSearchForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body AdminSearchNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "admin search", err)
+			}
+			err = ValidateAdminSearchNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "admin search", err)
+			}
+			return nil, NewAdminSearchNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body AdminSearchBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "admin search", err)
+			}
+			err = ValidateAdminSearchBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "admin search", err)
+			}
+			return nil, NewAdminSearchBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("user", "admin search", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalAvailableRoleResponseBodyToUserviewsAvailableRoleView builds a
 // value of type *userviews.AvailableRoleView from a value of type
 // *AvailableRoleResponseBody.
@@ -2661,6 +2797,36 @@ func unmarshalProjectRoleResponseToUserviewsProjectRoleView(v *ProjectRoleRespon
 	res := &userviews.ProjectRoleView{
 		ID:   v.ID,
 		Name: v.Name,
+	}
+
+	return res
+}
+
+// unmarshalUserResponseBodyToUserUser builds a value of type *user.User from a
+// value of type *UserResponseBody.
+func unmarshalUserResponseBodyToUserUser(v *UserResponseBody) *user.User {
+	res := &user.User{
+		ID:    *v.ID,
+		Name:  *v.Name,
+		Email: *v.Email,
+		Bio:   *v.Bio,
+		Admin: *v.Admin,
+	}
+	if v.Photo != nil {
+		res.Photo = unmarshalUserPhotoResponseBodyToUserUserPhoto(v.Photo)
+	}
+
+	return res
+}
+
+// unmarshalUserPhotoResponseBodyToUserUserPhoto builds a value of type
+// *user.UserPhoto from a value of type *UserPhotoResponseBody.
+func unmarshalUserPhotoResponseBodyToUserUserPhoto(v *UserPhotoResponseBody) *user.UserPhoto {
+	if v == nil {
+		return nil
+	}
+	res := &user.UserPhoto{
+		URL: v.URL,
 	}
 
 	return res

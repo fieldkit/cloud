@@ -55,3 +55,8 @@ func ListAllStationPath() string {
 func DeleteStationPath(stationID int32) string {
 	return fmt.Sprintf("/admin/stations/%v", stationID)
 }
+
+// AdminSearchStationPath returns the URL path to the station service admin search HTTP endpoint.
+func AdminSearchStationPath() string {
+	return "/admin/stations/search"
+}

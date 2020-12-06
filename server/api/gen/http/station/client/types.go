@@ -133,6 +133,13 @@ type ListAllResponseBody struct {
 	Total    *int32                          `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
 }
 
+// AdminSearchResponseBody is the type of the "station" service "admin search"
+// endpoint HTTP response body.
+type AdminSearchResponseBody struct {
+	Stations []*EssentialStationResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
+	Total    *int32                          `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
+}
+
 // AddStationOwnerConflictResponseBody is the type of the "station" service
 // "add" endpoint HTTP response body for the "station-owner-conflict" error.
 type AddStationOwnerConflictResponseBody struct {
@@ -784,6 +791,78 @@ type DeleteNotFoundResponseBody struct {
 // DeleteBadRequestResponseBody is the type of the "station" service "delete"
 // endpoint HTTP response body for the "bad-request" error.
 type DeleteBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// AdminSearchUnauthorizedResponseBody is the type of the "station" service
+// "admin search" endpoint HTTP response body for the "unauthorized" error.
+type AdminSearchUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// AdminSearchForbiddenResponseBody is the type of the "station" service "admin
+// search" endpoint HTTP response body for the "forbidden" error.
+type AdminSearchForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// AdminSearchNotFoundResponseBody is the type of the "station" service "admin
+// search" endpoint HTTP response body for the "not-found" error.
+type AdminSearchNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// AdminSearchBadRequestResponseBody is the type of the "station" service
+// "admin search" endpoint HTTP response body for the "bad-request" error.
+type AdminSearchBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -1664,6 +1743,80 @@ func NewDeleteBadRequest(body *DeleteBadRequestResponseBody) *goa.ServiceError {
 	return v
 }
 
+// NewAdminSearchPageOfStationsOK builds a "station" service "admin search"
+// endpoint result from a HTTP "OK" response.
+func NewAdminSearchPageOfStationsOK(body *AdminSearchResponseBody) *stationviews.PageOfStationsView {
+	v := &stationviews.PageOfStationsView{
+		Total: body.Total,
+	}
+	v.Stations = make([]*stationviews.EssentialStationView, len(body.Stations))
+	for i, val := range body.Stations {
+		v.Stations[i] = unmarshalEssentialStationResponseBodyToStationviewsEssentialStationView(val)
+	}
+
+	return v
+}
+
+// NewAdminSearchUnauthorized builds a station service admin search endpoint
+// unauthorized error.
+func NewAdminSearchUnauthorized(body *AdminSearchUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewAdminSearchForbidden builds a station service admin search endpoint
+// forbidden error.
+func NewAdminSearchForbidden(body *AdminSearchForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewAdminSearchNotFound builds a station service admin search endpoint
+// not-found error.
+func NewAdminSearchNotFound(body *AdminSearchNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewAdminSearchBadRequest builds a station service admin search endpoint
+// bad-request error.
+func NewAdminSearchBadRequest(body *AdminSearchBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
 // ValidateAddStationOwnerConflictResponseBody runs the validations defined on
 // add_station-owner-conflict_response_body
 func ValidateAddStationOwnerConflictResponseBody(body *AddStationOwnerConflictResponseBody) (err error) {
@@ -2531,6 +2684,102 @@ func ValidateDeleteNotFoundResponseBody(body *DeleteNotFoundResponseBody) (err e
 // ValidateDeleteBadRequestResponseBody runs the validations defined on
 // delete_bad-request_response_body
 func ValidateDeleteBadRequestResponseBody(body *DeleteBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateAdminSearchUnauthorizedResponseBody runs the validations defined on
+// admin search_unauthorized_response_body
+func ValidateAdminSearchUnauthorizedResponseBody(body *AdminSearchUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateAdminSearchForbiddenResponseBody runs the validations defined on
+// admin search_forbidden_response_body
+func ValidateAdminSearchForbiddenResponseBody(body *AdminSearchForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateAdminSearchNotFoundResponseBody runs the validations defined on
+// admin search_not-found_response_body
+func ValidateAdminSearchNotFoundResponseBody(body *AdminSearchNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateAdminSearchBadRequestResponseBody runs the validations defined on
+// admin search_bad-request_response_body
+func ValidateAdminSearchBadRequestResponseBody(body *AdminSearchBadRequestResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}

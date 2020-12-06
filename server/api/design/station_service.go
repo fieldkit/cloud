@@ -265,7 +265,7 @@ var _ = Service("station", func() {
 
 	Method("transfer", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			Scope("api:admin")
 		})
 
 		Payload(func() {
@@ -422,6 +422,31 @@ var _ = Service("station", func() {
 
 		HTTP(func() {
 			DELETE("admin/stations/{stationId}")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("admin search", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("query", String)
+			Required("query")
+		})
+
+		Result(PageOfStations)
+
+		HTTP(func() {
+			POST("admin/stations/search")
+
+			Params(func() {
+				Param("query")
+			})
 
 			httpAuthentication()
 		})

@@ -133,6 +133,13 @@ type ListAllResponseBody struct {
 	Total    int32                           `form:"total" json:"total" xml:"total"`
 }
 
+// AdminSearchResponseBody is the type of the "station" service "admin search"
+// endpoint HTTP response body.
+type AdminSearchResponseBody struct {
+	Stations []*EssentialStationResponseBody `form:"stations" json:"stations" xml:"stations"`
+	Total    int32                           `form:"total" json:"total" xml:"total"`
+}
+
 // AddStationOwnerConflictResponseBody is the type of the "station" service
 // "add" endpoint HTTP response body for the "station-owner-conflict" error.
 type AddStationOwnerConflictResponseBody struct {
@@ -799,6 +806,78 @@ type DeleteBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// AdminSearchUnauthorizedResponseBody is the type of the "station" service
+// "admin search" endpoint HTTP response body for the "unauthorized" error.
+type AdminSearchUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AdminSearchForbiddenResponseBody is the type of the "station" service "admin
+// search" endpoint HTTP response body for the "forbidden" error.
+type AdminSearchForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AdminSearchNotFoundResponseBody is the type of the "station" service "admin
+// search" endpoint HTTP response body for the "not-found" error.
+type AdminSearchNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AdminSearchBadRequestResponseBody is the type of the "station" service
+// "admin search" endpoint HTTP response body for the "bad-request" error.
+type AdminSearchBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
 	ID   int32  `form:"id" json:"id" xml:"id"`
@@ -1110,6 +1189,21 @@ func NewDownloadPhotoResponseBody(res *stationviews.DownloadedPhotoView) *Downlo
 // "list all" endpoint of the "station" service.
 func NewListAllResponseBody(res *stationviews.PageOfStationsView) *ListAllResponseBody {
 	body := &ListAllResponseBody{
+		Total: *res.Total,
+	}
+	if res.Stations != nil {
+		body.Stations = make([]*EssentialStationResponseBody, len(res.Stations))
+		for i, val := range res.Stations {
+			body.Stations[i] = marshalStationviewsEssentialStationViewToEssentialStationResponseBody(val)
+		}
+	}
+	return body
+}
+
+// NewAdminSearchResponseBody builds the HTTP response body from the result of
+// the "admin search" endpoint of the "station" service.
+func NewAdminSearchResponseBody(res *stationviews.PageOfStationsView) *AdminSearchResponseBody {
+	body := &AdminSearchResponseBody{
 		Total: *res.Total,
 	}
 	if res.Stations != nil {
@@ -1639,6 +1733,62 @@ func NewDeleteBadRequestResponseBody(res *goa.ServiceError) *DeleteBadRequestRes
 	return body
 }
 
+// NewAdminSearchUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "admin search" endpoint of the "station" service.
+func NewAdminSearchUnauthorizedResponseBody(res *goa.ServiceError) *AdminSearchUnauthorizedResponseBody {
+	body := &AdminSearchUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAdminSearchForbiddenResponseBody builds the HTTP response body from the
+// result of the "admin search" endpoint of the "station" service.
+func NewAdminSearchForbiddenResponseBody(res *goa.ServiceError) *AdminSearchForbiddenResponseBody {
+	body := &AdminSearchForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAdminSearchNotFoundResponseBody builds the HTTP response body from the
+// result of the "admin search" endpoint of the "station" service.
+func NewAdminSearchNotFoundResponseBody(res *goa.ServiceError) *AdminSearchNotFoundResponseBody {
+	body := &AdminSearchNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAdminSearchBadRequestResponseBody builds the HTTP response body from the
+// result of the "admin search" endpoint of the "station" service.
+func NewAdminSearchBadRequestResponseBody(res *goa.ServiceError) *AdminSearchBadRequestResponseBody {
+	body := &AdminSearchBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewAddPayload builds a station service add endpoint payload.
 func NewAddPayload(body *AddRequestBody, auth string) *station.AddPayload {
 	v := &station.AddPayload{
@@ -1730,6 +1880,15 @@ func NewListAllPayload(page *int32, pageSize *int32, ownerID *int32, query *stri
 func NewDeletePayload(stationID int32, auth string) *station.DeletePayload {
 	v := &station.DeletePayload{}
 	v.StationID = stationID
+	v.Auth = auth
+
+	return v
+}
+
+// NewAdminSearchPayload builds a station service admin search endpoint payload.
+func NewAdminSearchPayload(query string, auth string) *station.AdminSearchPayload {
+	v := &station.AdminSearchPayload{}
+	v.Query = query
 	v.Auth = auth
 
 	return v
