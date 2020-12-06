@@ -92,6 +92,10 @@
                                         Server Logs:
                                         <a :href="urlForServerLogs(station)" target="_blank">10 days</a>
                                     </div>
+                                    <h3>Transfer</h3>
+                                    <div>
+                                        <TransferStation :station="station" @transferred="(user) => onTransferred(station, user)" />
+                                    </div>
                                 </div>
                             </div>
                         </td>
@@ -111,8 +115,8 @@ import Vue from "vue";
 import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-
-import FKApi, { Station, EssentialStation } from "@/api/api";
+import FKApi, { Station, SimpleUser, EssentialStation } from "@/api/api";
+import TransferStation from "./TransferStation.vue";
 
 export default Vue.extend({
     name: "AdminStations",
@@ -120,6 +124,7 @@ export default Vue.extend({
         ...CommonComponents,
         StandardLayout,
         PaginationControls,
+        TransferStation,
     },
     props: {},
     data(): {
@@ -177,6 +182,9 @@ export default Vue.extend({
             const query = `device_id:("${deviceIdBase64}" or "${deviceIdHex}")`;
 
             return "https://code.conservify.org/logs-viewer/?range=864000&query=" + encodeURIComponent(query);
+        },
+        onTransferred(station: EssentialStation, user: SimpleUser): void {
+            station.owner = user;
         },
     },
 });
@@ -256,6 +264,7 @@ td.focused {
 }
 
 .row .tools {
+    width: 400px;
 }
 .row .uploads {
 }

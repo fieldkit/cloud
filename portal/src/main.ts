@@ -4,6 +4,7 @@ import Vuex from "vuex";
 import Vuelidate from "vuelidate";
 import VCalendar from "v-calendar";
 import VueConfirmDialog from "vue-confirm-dialog";
+import Multiselect from "vue-multiselect";
 
 import prettyBytes from "pretty-bytes";
 import moment from "moment";
@@ -53,6 +54,7 @@ Vue.use(Vuex);
 Vue.use(Vuelidate);
 Vue.use(VueConfirmDialog);
 Vue.component("vue-confirm-dialog", VueConfirmDialog.default);
+Vue.component("multiselect", Multiselect);
 
 Vue.config.productionTip = false;
 

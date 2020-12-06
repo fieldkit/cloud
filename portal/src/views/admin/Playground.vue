@@ -2,6 +2,10 @@
     <StandardLayout>
         <button v-on:click="onToggle">Modal</button>
         <StationPickerModal :stations="stations" @close="onToggle" v-if="modalOpen" />
+
+        <div>
+            <UserPicker @picked="onUser" />
+        </div>
     </StandardLayout>
 </template>
 
@@ -12,6 +16,7 @@ import CommonComponents from "@/views/shared";
 
 import StationPicker from "@/views/shared/StationPicker.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
+import UserPicker from "./UserPicker.vue";
 
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
@@ -23,6 +28,7 @@ export default Vue.extend({
         StandardLayout,
         ...CommonComponents,
         StationPickerModal,
+        UserPicker,
     },
     props: {},
     data: () => {
@@ -36,8 +42,11 @@ export default Vue.extend({
         }),
     },
     methods: {
-        onToggle() {
+        onToggle(): void {
             this.modalOpen = !this.modalOpen;
+        },
+        onUser(user: unknown): void {
+            console.log(`user-picked: ${user}`);
         },
     },
 });

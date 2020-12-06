@@ -979,6 +979,34 @@ class FKApi {
         });
     }
 
+    public adminSearchUsers(query: string): Promise<{ users: SimpleUser[] }> {
+        const qp = new URLSearchParams();
+        qp.append("query", query);
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/admin/users/search?" + qp.toString(),
+        });
+    }
+
+    public adminSearchStations(query: string): Promise<PageOfStations> {
+        const qp = new URLSearchParams();
+        qp.append("query", query);
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/admin/stations/search?" + qp.toString(),
+        });
+    }
+
+    public adminTransferStation(stationId: number, ownerId: number): Promise<void> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + `/stations/${stationId}/transfer/${ownerId}`,
+        });
+    }
+
     public deleteStation(stationId: number): Promise<any> {
         return this.invoke({
             auth: Auth.Required,
