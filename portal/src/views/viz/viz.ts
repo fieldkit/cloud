@@ -35,11 +35,12 @@ export class QueriedData {
 
     constructor(public readonly timeRangeQueried: TimeRange, private readonly sdr: SensorDataResponse) {
         if (this.sdr.data.length > 0) {
-            const values = this.sdr.data.filter((d) => !!d.value).map((d) => d.value) as number[];
-            const times = this.sdr.data.filter((d) => !!d.value).map((d) => d.time) as number[];
+            const filtered = this.sdr.data.filter((d) => _.isNumber(d.value));
+            const values = filtered.map((d) => d.value) as number[];
+            const times = filtered.map((d) => d.time) as number[];
 
-            if (values.length == 0) throw new Error(`empty ranges`);
-            if (times.length == 0) throw new Error(`empty ranges`);
+            if (values.length == 0) throw new Error(`empty data ranges`);
+            if (times.length == 0) throw new Error(`empty time ranges`);
 
             this.dataRange = [_.min(values) as number, _.max(values) as number];
             this.timeRangeData = [_.min(times) as number, _.max(times) as number];
