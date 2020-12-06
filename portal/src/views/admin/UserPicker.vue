@@ -4,7 +4,7 @@
             v-model="selected"
             label="name"
             track-by="id"
-            placeholder="Type to search"
+            placeholder="User's name or email"
             open-direction="bottom"
             :options="users"
             :multiple="false"
