@@ -47,12 +47,12 @@ type QueryParams struct {
 func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 	start := time.Time{}
 	if raw.Start != nil {
-		start = time.Unix(0, *raw.Start*int64(time.Millisecond))
+		start = time.Unix(0, *raw.Start*int64(time.Millisecond)).UTC()
 	}
 
 	end := time.Now()
 	if raw.End != nil {
-		end = time.Unix(0, *raw.End*int64(time.Millisecond))
+		end = time.Unix(0, *raw.End*int64(time.Millisecond)).UTC()
 	}
 
 	resolution := int32(0)
