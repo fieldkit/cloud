@@ -335,17 +335,23 @@ func (v *Aggregator) NextTime(ctx context.Context, sampled time.Time) error {
 
 func (v *Aggregator) closeChild(ctx context.Context, index int, tail bool) error {
 	aggregation := v.aggregations[index]
+
 	if values, err := aggregation.close(); err != nil {
 		return fmt.Errorf("error closing aggregation: %v", err)
 	} else {
 		if v.batchSize > 1 {
 			if len(v.batches[index]) == v.batchSize || tail {
+				if tail {
+					v.batches[index] = append(v.batches[index], values)
+				}
 				if err := v.upsertBatch(ctx, aggregation, v.batches[index]); err != nil {
 					return err
 				}
 				v.batches[index] = v.batches[index][:0]
 			}
-			v.batches[index] = append(v.batches[index], values)
+			if !tail {
+				v.batches[index] = append(v.batches[index], values)
+			}
 		} else {
 			if err := v.upsertSingle(ctx, aggregation, values); err != nil {
 				return fmt.Errorf("error upserting aggregated: %v", err)
