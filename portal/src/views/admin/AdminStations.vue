@@ -201,7 +201,7 @@ export default Vue.extend({
                 },
                 callback: (confirm) => {
                     if (confirm) {
-                        return this.$services.api.adminProcessStation(station.id);
+                        return this.$services.api.adminProcessStation(station.id, true);
                     }
                 },
             });

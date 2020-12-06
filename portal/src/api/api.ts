@@ -1007,11 +1007,15 @@ class FKApi {
         });
     }
 
-    public adminProcessStation(stationId: number): Promise<void> {
+    public adminProcessStation(stationId: number, completely: boolean): Promise<void> {
+        const qp = new URLSearchParams();
+        if (completely) {
+            qp.append("completely", "true");
+        }
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
-            url: this.baseUrl + `/data/stations/${stationId}/process`,
+            url: this.baseUrl + `/data/stations/${stationId}/process?` + qp.toString(),
         });
     }
 
