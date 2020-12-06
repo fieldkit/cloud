@@ -19,8 +19,11 @@ func NewStationRefresher(db *sqlxcache.DB) (sr *StationRefresher, err error) {
 	}, nil
 }
 
-func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRecently time.Duration) error {
+func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRecently time.Duration, completely bool) error {
 	start := time.Time{}
+	if howRecently == 0 {
+		howRecently = time.Hour * 48
+	}
 	if howRecently > 0 {
 		start = time.Now().Add(-howRecently)
 	}
@@ -29,12 +32,12 @@ func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRec
 		End:        time.Now(),
 		StationIDs: []int32{stationID},
 	}
-	return sr.walk(ctx, walkParams)
+	return sr.walk(ctx, walkParams, completely)
 }
 
-func (sr *StationRefresher) walk(ctx context.Context, walkParams *WalkParameters) error {
+func (sr *StationRefresher) walk(ctx context.Context, walkParams *WalkParameters, completely bool) error {
 	rw := NewRecordWalker(sr.db)
-	handler := handlers.NewAggregatingHandler(sr.db)
+	handler := handlers.NewAggregatingHandler(sr.db, completely)
 	if err := rw.WalkStation(ctx, handler, WalkerProgressNoop, walkParams); err != nil {
 		return err
 	}

@@ -282,6 +282,41 @@ func (v *Aggregator) upsertSingle(ctx context.Context, a *aggregation, d *Aggreg
 	return nil
 }
 
+func (v *Aggregator) ClearNumberSamples(ctx context.Context) error {
+	log := Logger(ctx).Sugar().With("station_id", v.stationID)
+
+	log.Infow("nsamples-clear")
+
+	for _, child := range v.aggregations {
+		if _, err := v.db.ExecContext(ctx, fmt.Sprintf(`UPDATE %s SET nsamples = 0 WHERE station_id = $1`, child.table), v.stationID); err != nil {
+			return fmt.Errorf("error updating aggregate nsamples: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func (v *Aggregator) DeleteEmptyAggregates(ctx context.Context) error {
+	log := Logger(ctx).Sugar().With("station_id", v.stationID)
+
+	for _, child := range v.aggregations {
+		total := int32(0)
+		if err := v.db.GetContext(ctx, &total, fmt.Sprintf(`SELECT COUNT(*) FROM %s WHERE nsamples = 0 AND station_id = $1`, child.table), v.stationID); err != nil {
+			return fmt.Errorf("error deleting empty aggregates: %v", err)
+		}
+
+		if total > 0 {
+			log.Infow("nsamples-delete", "table", child.table, "records", total)
+		}
+
+		if _, err := v.db.ExecContext(ctx, fmt.Sprintf(`DELETE FROM %s WHERE nsamples = 0 AND station_id = $1`, child.table), v.stationID); err != nil {
+			return fmt.Errorf("error deleting empty aggregates: %v", err)
+		}
+	}
+
+	return nil
+}
+
 func (v *Aggregator) AddSample(ctx context.Context, sampled time.Time, location []float64, sensorKey string, value float64) error {
 	for _, child := range v.aggregations {
 		time := child.getTime(sampled)

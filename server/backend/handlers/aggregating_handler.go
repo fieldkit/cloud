@@ -17,13 +17,15 @@ type AggregatingHandler struct {
 	metaFactory *repositories.MetaFactory
 	stations    map[int64]*Aggregator
 	aggregator  *Aggregator
+	completely  bool
 }
 
-func NewAggregatingHandler(db *sqlxcache.DB) *AggregatingHandler {
+func NewAggregatingHandler(db *sqlxcache.DB, completely bool) *AggregatingHandler {
 	return &AggregatingHandler{
 		db:          db,
 		metaFactory: repositories.NewMetaFactory(),
 		stations:    make(map[int64]*Aggregator),
+		completely:  completely,
 	}
 }
 
@@ -36,11 +38,19 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 
 		station, err := sr.QueryStationByDeviceID(ctx, p.DeviceID)
 		if err != nil || station == nil {
-			// mark giving up
+			// TODO Mark giving up?
 			return nil
 		}
 
-		v.stations[p.ID] = NewAggregator(v.db, station.ID, 100)
+		aggregator := NewAggregator(v.db, station.ID, 100)
+
+		if v.completely {
+			if err := aggregator.ClearNumberSamples(ctx); err != nil {
+				return err
+			}
+		}
+
+		v.stations[p.ID] = aggregator
 	}
 
 	_, err := v.metaFactory.Add(ctx, meta, true)
@@ -87,7 +97,13 @@ func (v *AggregatingHandler) OnDone(ctx context.Context) error {
 		}
 	}
 
-	// TODO Delete out of range data.
+	if v.completely {
+		for _, aggregator := range v.stations {
+			if err := aggregator.DeleteEmptyAggregates(ctx); err != nil {
+				return err
+			}
+		}
+	}
 
 	return nil
 }
