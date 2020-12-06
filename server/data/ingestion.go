@@ -296,3 +296,18 @@ type ModuleSensor struct {
 	ReadingValue    *float64   `db:"reading_last" json:"reading_last"`
 	ReadingTime     *time.Time `db:"reading_time" json:"reading_time"`
 }
+
+type RecordRangeFlagEnum int
+
+const (
+	NoneRecordRangeFlag   RecordRangeFlagEnum = 0
+	HiddenRecordRangeFlag RecordRangeFlagEnum = 1
+)
+
+type RecordRangeMeta struct {
+	ID        int64     `db:"id" json:"id"`
+	StationID int32     `db:"station_id" json:"station_id"`
+	StartTime time.Time `db:"start_time" json:"start_time"`
+	EndTime   time.Time `db:"end_time" json:"end_time"`
+	Flags     uint32    `db:"flags" json:"flags"`
+}
