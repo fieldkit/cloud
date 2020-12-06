@@ -29,10 +29,10 @@ export class TreeOption {
 function makeRange(values: number[]): [number, number] {
     const min = _.min(values);
     const max = _.max(values);
-    if (min === undefined) throw new Error(`no min: ${values}`);
-    if (max === undefined) throw new Error(`no max: ${values}`);
+    if (min === undefined) throw new Error(`no min: ${values.length}`);
+    if (max === undefined) throw new Error(`no max: ${values.length}`);
     if (min === max) {
-        console.warn(`range-warning: min == max ${values}`);
+        console.warn(`range-warning: min == max ${values.length}`);
     }
     return [min, max];
 }
@@ -155,6 +155,12 @@ export class Bookmark {
 
     public get allSensors(): number[] {
         return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1] || [])));
+    }
+
+    public static sameAs(a: Bookmark, b: Bookmark): boolean {
+        const aEncoded = JSON.stringify(a);
+        const bEncoded = JSON.stringify(b);
+        return aEncoded == bEncoded;
     }
 }
 
@@ -402,6 +408,13 @@ export class Querier {
         return new FKApi()
             .sensorData(queryParams)
             .then((sdr: SensorDataResponse) => {
+                // eslint-disable-next-line
+                if (false) {
+                    console.log(
+                        `queried-data`,
+                        sdr.data.filter((r) => _.isNumber(r.value)).map((r) => r.value)
+                    );
+                }
                 const queried = new QueriedData(params.when, sdr);
                 this.data[key] = queried;
                 return queried;
@@ -694,7 +707,16 @@ export class Workspace {
         );
     }
 
-    public eventually(callback: (ws: Workspace) => Promise<any>) {
+    public async updateFromBookmark(bm: Bookmark): Promise<void> {
+        if (Bookmark.sameAs(this.bookmark(), bm)) {
+            return;
+        }
+        this.groups = bm.g.map((gm) => Group.fromBookmark(gm));
+        await this.query();
+        return;
+    }
+
+    private eventually(callback: (ws: Workspace) => Promise<any>) {
         callback(this);
         return Promise.resolve(this);
     }
