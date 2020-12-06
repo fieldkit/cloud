@@ -42,7 +42,7 @@
                             </div>
                         </td>
                         <td>
-                            <div class="button" v-on:click="deleteStation(station)">Delete</div>
+                            <div class="button" @click.stop="deleteStation(station)">Delete</div>
                         </td>
                     </tr>
                     <tr v-if="focused && focused.id == station.id">
@@ -92,6 +92,9 @@
                                         Server Logs:
                                         <a :href="urlForServerLogs(station)" target="_blank">10 days</a>
                                     </div>
+                                    <div>
+                                        <button v-on:click="onExplore(station)" class="button">Explore Data</button>
+                                    </div>
                                     <h3>Transfer</h3>
                                     <div>
                                         <TransferStation :station="station" @transferred="(user) => onTransferred(station, user)" />
@@ -116,6 +119,7 @@ import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import FKApi, { Station, SimpleUser, EssentialStation } from "@/api/api";
+import { BookmarkFactory } from "@/views/viz/viz";
 import TransferStation from "./TransferStation.vue";
 
 export default Vue.extend({
@@ -147,6 +151,9 @@ export default Vue.extend({
     },
     methods: {
         async selected(station: EssentialStation): Promise<void> {
+            if (this.focused && this.focused.id == station.id) {
+                return;
+            }
             this.focused = null;
             this.focused = await this.$services.api.getStation(station.id);
         },
@@ -185,6 +192,10 @@ export default Vue.extend({
         },
         onTransferred(station: EssentialStation, user: SimpleUser): void {
             station.owner = user;
+        },
+        async onExplore(station: EssentialStation): Promise<void> {
+            const bm = BookmarkFactory.forStation(station.id);
+            await this.$router.push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bm) } });
         },
     },
 });
