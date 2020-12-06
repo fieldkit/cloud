@@ -95,6 +95,9 @@
                                     <div>
                                         <button v-on:click="onExplore(station)" class="button">Explore Data</button>
                                     </div>
+                                    <div>
+                                        <button v-on:click="onProcess(station)" class="button">Process Data</button>
+                                    </div>
                                     <h3>Transfer</h3>
                                     <div>
                                         <TransferStation :station="station" @transferred="(user) => onTransferred(station, user)" />
@@ -187,8 +190,21 @@ export default Vue.extend({
             const deviceIdBase64 = Buffer.from(station.deviceId, "hex").toString("base64");
             const deviceIdHex = station.deviceId;
             const query = `device_id:("${deviceIdBase64}" or "${deviceIdHex}")`;
-
             return "https://code.conservify.org/logs-viewer/?range=864000&query=" + encodeURIComponent(query);
+        },
+        async onProcess(station: EssentialStation): Promise<void> {
+            await this.$confirm({
+                message: `Are you sure? This could take a while for certain stations.`,
+                button: {
+                    no: "No",
+                    yes: "Yes",
+                },
+                callback: (confirm) => {
+                    if (confirm) {
+                        return this.$services.api.adminProcessStation(station.id);
+                    }
+                },
+            });
         },
         onTransferred(station: EssentialStation, user: SimpleUser): void {
             station.owner = user;

@@ -1007,6 +1007,14 @@ class FKApi {
         });
     }
 
+    public adminProcessStation(stationId: number): Promise<void> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + `/data/stations/${stationId}/process`,
+        });
+    }
+
     public deleteStation(stationId: number): Promise<any> {
         return this.invoke({
             auth: Auth.Required,
