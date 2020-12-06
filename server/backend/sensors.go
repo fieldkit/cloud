@@ -255,10 +255,25 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 			return nil, "", err
 		}
 
+		// Queried records depends on if we're doing a complete query,
+		// filling in missing samples.
+		queriedRecords := summary.NumberRecords
+
+		if qp.Complete {
+			if summary.Start != nil && summary.End != nil {
+				interval := handlers.AggregateIntervals[name]
+				duration := summary.End.Time().Sub(summary.Start.Time())
+				queriedRecords = int64(duration.Seconds()) / int64(interval)
+
+				log := Logger(ctx).Sugar()
+				log.Infow("aggregate", "queried", queriedRecords, "records", summary.NumberRecords, "duration", duration)
+			}
+		}
+
 		summaries[name] = summary
 
 		if qp.Resolution > 0 {
-			if summary.NumberRecords < int64(qp.Resolution) {
+			if queriedRecords < int64(qp.Resolution) {
 				selectedAggregateName = name
 			}
 		}
