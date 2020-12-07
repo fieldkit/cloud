@@ -39,16 +39,18 @@
                             </div>
                             <template>{{ project.location.slice(0, 30) }}</template>
                             <template v-if="project.location.length > 30">
-                                ... <span class="bold"> more </span>
+                                ...
+                                <span class="bold">more</span>
                             </template>
                         </div>
                         <div class="details-row has-tooltip" v-if="displayProject.places.native">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-location.svg" class="icon"  width="12px" height="14px" />
+                                <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="12px" height="14px" />
                             </div>
                             <template>Native Lands: {{ displayProject.places.native }}</template>
                             <template v-if="displayProject.places.native.length > 20">
-                                ... <span class="bold"> more </span>
+                                ...
+                                <span class="bold">more</span>
                             </template>
                         </div>
                     </div>
@@ -89,8 +91,9 @@
             </div>
         </div>
 
-        <TeamManager :displayProject="displayProject" v-bind:key="displayProject.id" />
+        <Comments :parentData="displayProject.id" :user="user"></Comments>
 
+        <TeamManager :displayProject="displayProject" v-bind:key="displayProject.id" />
     </div>
 </template>
 
@@ -100,8 +103,8 @@ import ProjectStations from "./ProjectStations.vue";
 import ProjectActivity from "./ProjectActivity.vue";
 import ProjectDataFiles from "./ProjectDataFiles.vue";
 import StationsReadings from "./StationsReadings.vue";
+import Comments from "../comments/Comments";
 import TeamManager from "./TeamManager.vue";
-
 import * as utils from "../../utilities";
 
 export default {
@@ -112,8 +115,13 @@ export default {
         ProjectDataFiles,
         StationsReadings,
         TeamManager,
+        Comments,
     },
     props: {
+        user: {
+            type: Object,
+            required: true,
+        },
         displayProject: {
             type: Object,
             required: true,
@@ -174,8 +182,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
-@import '../../scss/project';
+@import "../../scss/mixins";
+@import "../../scss/project";
 
 .project-admin {
     display: flex;
@@ -398,5 +406,4 @@ export default {
     width: 35px;
     height: 35px;
 }
-
 </style>

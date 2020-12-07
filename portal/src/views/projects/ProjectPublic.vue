@@ -58,9 +58,9 @@
                                 Unfollow
                             </button>
                             <button class="button-social" v-on:click="follow" v-if="!following">
-                        <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
-                        Follow
-                    </button>
+                                <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
+                                Follow
+                            </button>
                         </template>
                     </FollowControl>
                     <button class="button-social" v-if="false">
@@ -136,8 +136,7 @@
             </div>
         </div>
 
-        <Comments :parentData="displayProject.id" :user="user"> </Comments>
-
+        <Comments :parentData="displayProject.id" :user="user"></Comments>
     </div>
 </template>
 
