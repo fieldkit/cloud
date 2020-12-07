@@ -662,7 +662,7 @@ func TestAdminTransferStation(t *testing.T) {
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(adminUser))
 	rr := tests.ExecuteRequest(req, api)
 
-	assert.Equal(http.StatusOK, rr.Code)
+	assert.Equal(http.StatusNoContent, rr.Code)
 }
 
 func TestAdminSearchStationsRequiresAdmin(t *testing.T) {
