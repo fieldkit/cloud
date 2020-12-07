@@ -148,6 +148,12 @@ type IssueTransmissionTokenResponseBody struct {
 // roles" endpoint HTTP response body.
 type ProjectRoleResponseCollection []*ProjectRoleResponse
 
+// AdminSearchResponseBody is the type of the "user" service "admin search"
+// endpoint HTTP response body.
+type AdminSearchResponseBody struct {
+	Users UserCollectionResponseBody `form:"users" json:"users" xml:"users"`
+}
+
 // RolesUnauthorizedResponseBody is the type of the "user" service "roles"
 // endpoint HTTP response body for the "unauthorized" error.
 type RolesUnauthorizedResponseBody struct {
@@ -436,9 +442,9 @@ type DownloadPhotoBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// LoginUnauthorizedResponseBody is the type of the "user" service "login"
-// endpoint HTTP response body for the "unauthorized" error.
-type LoginUnauthorizedResponseBody struct {
+// LoginUserUnverifiedResponseBody is the type of the "user" service "login"
+// endpoint HTTP response body for the "user-unverified" error.
+type LoginUserUnverifiedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -457,6 +463,24 @@ type LoginUnauthorizedResponseBody struct {
 // LoginForbiddenResponseBody is the type of the "user" service "login"
 // endpoint HTTP response body for the "forbidden" error.
 type LoginForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// LoginUnauthorizedResponseBody is the type of the "user" service "login"
+// endpoint HTTP response body for the "unauthorized" error.
+type LoginUnauthorizedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -940,6 +964,42 @@ type ValidateBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// AddUserEmailRegisteredResponseBody is the type of the "user" service "add"
+// endpoint HTTP response body for the "user-email-registered" error.
+type AddUserEmailRegisteredResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AddBadRequestResponseBody is the type of the "user" service "add" endpoint
+// HTTP response body for the "bad-request" error.
+type AddBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // AddUnauthorizedResponseBody is the type of the "user" service "add" endpoint
 // HTTP response body for the "unauthorized" error.
 type AddUnauthorizedResponseBody struct {
@@ -979,24 +1039,6 @@ type AddForbiddenResponseBody struct {
 // AddNotFoundResponseBody is the type of the "user" service "add" endpoint
 // HTTP response body for the "not-found" error.
 type AddNotFoundResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// AddBadRequestResponseBody is the type of the "user" service "add" endpoint
-// HTTP response body for the "bad-request" error.
-type AddBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -1520,6 +1562,78 @@ type AdminDeleteBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// AdminSearchUnauthorizedResponseBody is the type of the "user" service "admin
+// search" endpoint HTTP response body for the "unauthorized" error.
+type AdminSearchUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AdminSearchForbiddenResponseBody is the type of the "user" service "admin
+// search" endpoint HTTP response body for the "forbidden" error.
+type AdminSearchForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AdminSearchNotFoundResponseBody is the type of the "user" service "admin
+// search" endpoint HTTP response body for the "not-found" error.
+type AdminSearchNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AdminSearchBadRequestResponseBody is the type of the "user" service "admin
+// search" endpoint HTTP response body for the "bad-request" error.
+type AdminSearchBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // AvailableRoleResponseBody is used to define fields on response body types.
 type AvailableRoleResponseBody struct {
 	ID   int32  `form:"id" json:"id" xml:"id"`
@@ -1560,6 +1674,9 @@ type ProjectRoleResponse struct {
 	ID   int32  `form:"id" json:"id" xml:"id"`
 	Name string `form:"name" json:"name" xml:"name"`
 }
+
+// UserCollectionResponseBody is used to define fields on response body types.
+type UserCollectionResponseBody []*UserResponseBody
 
 // NewRolesResponseBody builds the HTTP response body from the result of the
 // "roles" endpoint of the "user" service.
@@ -1679,6 +1796,19 @@ func NewProjectRoleResponseCollection(res userviews.ProjectRoleCollectionView) P
 	body := make([]*ProjectRoleResponse, len(res))
 	for i, val := range res {
 		body[i] = marshalUserviewsProjectRoleViewToProjectRoleResponse(val)
+	}
+	return body
+}
+
+// NewAdminSearchResponseBody builds the HTTP response body from the result of
+// the "admin search" endpoint of the "user" service.
+func NewAdminSearchResponseBody(res *user.AdminSearchResult) *AdminSearchResponseBody {
+	body := &AdminSearchResponseBody{}
+	if res.Users != nil {
+		body.Users = make([]*UserResponseBody, len(res.Users))
+		for i, val := range res.Users {
+			body.Users[i] = marshalUserUserToUserResponseBody(val)
+		}
 	}
 	return body
 }
@@ -1907,10 +2037,10 @@ func NewDownloadPhotoBadRequestResponseBody(res *goa.ServiceError) *DownloadPhot
 	return body
 }
 
-// NewLoginUnauthorizedResponseBody builds the HTTP response body from the
+// NewLoginUserUnverifiedResponseBody builds the HTTP response body from the
 // result of the "login" endpoint of the "user" service.
-func NewLoginUnauthorizedResponseBody(res *goa.ServiceError) *LoginUnauthorizedResponseBody {
-	body := &LoginUnauthorizedResponseBody{
+func NewLoginUserUnverifiedResponseBody(res *goa.ServiceError) *LoginUserUnverifiedResponseBody {
+	body := &LoginUserUnverifiedResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -1925,6 +2055,20 @@ func NewLoginUnauthorizedResponseBody(res *goa.ServiceError) *LoginUnauthorizedR
 // of the "login" endpoint of the "user" service.
 func NewLoginForbiddenResponseBody(res *goa.ServiceError) *LoginForbiddenResponseBody {
 	body := &LoginForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewLoginUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "login" endpoint of the "user" service.
+func NewLoginUnauthorizedResponseBody(res *goa.ServiceError) *LoginUnauthorizedResponseBody {
+	body := &LoginUnauthorizedResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -2299,6 +2443,34 @@ func NewValidateBadRequestResponseBody(res *goa.ServiceError) *ValidateBadReques
 	return body
 }
 
+// NewAddUserEmailRegisteredResponseBody builds the HTTP response body from the
+// result of the "add" endpoint of the "user" service.
+func NewAddUserEmailRegisteredResponseBody(res *goa.ServiceError) *AddUserEmailRegisteredResponseBody {
+	body := &AddUserEmailRegisteredResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAddBadRequestResponseBody builds the HTTP response body from the result
+// of the "add" endpoint of the "user" service.
+func NewAddBadRequestResponseBody(res *goa.ServiceError) *AddBadRequestResponseBody {
+	body := &AddBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewAddUnauthorizedResponseBody builds the HTTP response body from the result
 // of the "add" endpoint of the "user" service.
 func NewAddUnauthorizedResponseBody(res *goa.ServiceError) *AddUnauthorizedResponseBody {
@@ -2331,20 +2503,6 @@ func NewAddForbiddenResponseBody(res *goa.ServiceError) *AddForbiddenResponseBod
 // the "add" endpoint of the "user" service.
 func NewAddNotFoundResponseBody(res *goa.ServiceError) *AddNotFoundResponseBody {
 	body := &AddNotFoundResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewAddBadRequestResponseBody builds the HTTP response body from the result
-// of the "add" endpoint of the "user" service.
-func NewAddBadRequestResponseBody(res *goa.ServiceError) *AddBadRequestResponseBody {
-	body := &AddBadRequestResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -2751,6 +2909,62 @@ func NewAdminDeleteBadRequestResponseBody(res *goa.ServiceError) *AdminDeleteBad
 	return body
 }
 
+// NewAdminSearchUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "admin search" endpoint of the "user" service.
+func NewAdminSearchUnauthorizedResponseBody(res *goa.ServiceError) *AdminSearchUnauthorizedResponseBody {
+	body := &AdminSearchUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAdminSearchForbiddenResponseBody builds the HTTP response body from the
+// result of the "admin search" endpoint of the "user" service.
+func NewAdminSearchForbiddenResponseBody(res *goa.ServiceError) *AdminSearchForbiddenResponseBody {
+	body := &AdminSearchForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAdminSearchNotFoundResponseBody builds the HTTP response body from the
+// result of the "admin search" endpoint of the "user" service.
+func NewAdminSearchNotFoundResponseBody(res *goa.ServiceError) *AdminSearchNotFoundResponseBody {
+	body := &AdminSearchNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAdminSearchBadRequestResponseBody builds the HTTP response body from the
+// result of the "admin search" endpoint of the "user" service.
+func NewAdminSearchBadRequestResponseBody(res *goa.ServiceError) *AdminSearchBadRequestResponseBody {
+	body := &AdminSearchBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewRolesPayload builds a user service roles endpoint payload.
 func NewRolesPayload(auth string) *user.RolesPayload {
 	v := &user.RolesPayload{}
@@ -2948,6 +3162,15 @@ func NewAdminDeletePayload(body *AdminDeleteRequestBody, auth string) *user.Admi
 	res.Auth = auth
 
 	return res
+}
+
+// NewAdminSearchPayload builds a user service admin search endpoint payload.
+func NewAdminSearchPayload(query string, auth string) *user.AdminSearchPayload {
+	v := &user.AdminSearchPayload{}
+	v.Query = query
+	v.Auth = auth
+
+	return v
 }
 
 // ValidateLoginRequestBody runs the validations defined on LoginRequestBody

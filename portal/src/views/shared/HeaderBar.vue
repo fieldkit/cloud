@@ -16,6 +16,7 @@
             </router-link>
             <div class="header-account-menu" v-bind:class="{ active: isAccountHovered }">
                 <router-link v-if="user" :to="{ name: 'editUser' }">My Account</router-link>
+                <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">Admin</router-link>
                 <a class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</a>
             </div>
         </div>

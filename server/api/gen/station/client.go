@@ -17,25 +17,29 @@ import (
 type Client struct {
 	AddEndpoint           goa.Endpoint
 	GetEndpoint           goa.Endpoint
+	TransferEndpoint      goa.Endpoint
 	UpdateEndpoint        goa.Endpoint
 	ListMineEndpoint      goa.Endpoint
 	ListProjectEndpoint   goa.Endpoint
 	DownloadPhotoEndpoint goa.Endpoint
 	ListAllEndpoint       goa.Endpoint
 	DeleteEndpoint        goa.Endpoint
+	AdminSearchEndpoint   goa.Endpoint
 }
 
 // NewClient initializes a "station" service client given the endpoints.
-func NewClient(add, get, update, listMine, listProject, downloadPhoto, listAll, delete_ goa.Endpoint) *Client {
+func NewClient(add, get, transfer, update, listMine, listProject, downloadPhoto, listAll, delete_, adminSearch goa.Endpoint) *Client {
 	return &Client{
 		AddEndpoint:           add,
 		GetEndpoint:           get,
+		TransferEndpoint:      transfer,
 		UpdateEndpoint:        update,
 		ListMineEndpoint:      listMine,
 		ListProjectEndpoint:   listProject,
 		DownloadPhotoEndpoint: downloadPhoto,
 		ListAllEndpoint:       listAll,
 		DeleteEndpoint:        delete_,
+		AdminSearchEndpoint:   adminSearch,
 	}
 }
 
@@ -57,6 +61,12 @@ func (c *Client) Get(ctx context.Context, p *GetPayload) (res *StationFull, err 
 		return
 	}
 	return ires.(*StationFull), nil
+}
+
+// Transfer calls the "transfer" endpoint of the "station" service.
+func (c *Client) Transfer(ctx context.Context, p *TransferPayload) (err error) {
+	_, err = c.TransferEndpoint(ctx, p)
+	return
 }
 
 // Update calls the "update" endpoint of the "station" service.
@@ -113,4 +123,14 @@ func (c *Client) ListAll(ctx context.Context, p *ListAllPayload) (res *PageOfSta
 func (c *Client) Delete(ctx context.Context, p *DeletePayload) (err error) {
 	_, err = c.DeleteEndpoint(ctx, p)
 	return
+}
+
+// AdminSearch calls the "admin search" endpoint of the "station" service.
+func (c *Client) AdminSearch(ctx context.Context, p *AdminSearchPayload) (res *PageOfStations, err error) {
+	var ires interface{}
+	ires, err = c.AdminSearchEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*PageOfStations), nil
 }

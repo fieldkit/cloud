@@ -16,18 +16,28 @@
         <div class="invited-container" v-if="invited">
             <div class="accept" v-on:click.stop.prevent="onAccept">
                 <img alt="Close" src="@/assets/icon-tick-blue.svg" />
-                <span> Accept Invite </span>
+                <span>Accept Invite</span>
             </div>
             <div class="reject" v-on:click.stop.prevent="onDecline">
                 <img alt="Close" src="@/assets/icon-close-bold.svg" />
-                <span> Decline </span>
+                <span>Decline</span>
             </div>
         </div>
         <div class="social-container" v-else>
             <div class="social follows" v-if="project.following">
-                <img alt="Follows" src="@/assets/icon-heart.svg" width="17px" />
-                <span>{{ project.following.total }}</span>
+                <FollowControl :project="project">
+                    <template #default="{ following, followers, follow, unfollow }">
+                        <span v-if="following" v-on:click="unfollow" class="icon">
+                            <img src="@/assets/icon-heart.svg" class="icon" />
+                        </span>
+                        <span v-if="!following" v-on:click="follow" class="icon">
+                            <img src="@/assets/icon-heart-gray.svg" class="icon" />
+                        </span>
+                        {{ followers }}
+                    </template>
+                </FollowControl>
             </div>
+
             <!--<div class="social notifications" v-if="!project.notifications">
                 <img alt="Notifications" src="@/assets/icon-notification.svg" width="15" />
                 <span>2</span>
@@ -41,12 +51,14 @@
 </template>
 <script lang="ts">
 import CommonComponents from "@/views/shared";
+import FollowControl from "@/views/shared/FollowControl.vue";
 import * as ActionTypes from "@/store/actions";
 
 export default {
     name: "ProjectThumbnail",
     components: {
         ...CommonComponents,
+        FollowControl,
     },
     props: {
         project: {
@@ -86,7 +98,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 
 .project-container {
     flex-basis: 270px;
@@ -128,7 +140,6 @@ export default {
     height: 138px;
     text-align: center;
     border-bottom: 1px solid #d8dce0;
-
 }
 ::v-deep .project-image {
     height: 100%;

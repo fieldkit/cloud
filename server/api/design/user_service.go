@@ -22,6 +22,12 @@ var AvailableRoles = ResultType("application/vnd.app.roles.available", func() {
 })
 
 var _ = Service("user", func() {
+	Error("user-unverified", func() {
+	})
+
+	Error("user-email-registered", func() {
+	})
+
 	Method("roles", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -128,6 +134,8 @@ var _ = Service("user", func() {
 					Header("authorization:Authorization")
 				})
 			})
+
+			Response("user-unverified", StatusForbidden)
 		})
 	})
 
@@ -249,6 +257,8 @@ var _ = Service("user", func() {
 			POST("users")
 
 			Body("user")
+
+			Response("user-email-registered", StatusBadRequest)
 		})
 	})
 
@@ -385,6 +395,34 @@ var _ = Service("user", func() {
 			DELETE("admin/user")
 
 			Body("delete")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("admin search", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("query", String)
+			Required("query")
+		})
+
+		Result(func() {
+			Attribute("users", CollectionOf(User))
+			Required("users")
+		})
+
+		HTTP(func() {
+			POST("admin/users/search")
+
+			Params(func() {
+				Param("query")
+			})
 
 			httpAuthentication()
 		})

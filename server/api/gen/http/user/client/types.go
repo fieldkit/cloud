@@ -148,6 +148,12 @@ type IssueTransmissionTokenResponseBody struct {
 // endpoint HTTP response body.
 type ProjectRolesResponseBody []*ProjectRoleResponse
 
+// AdminSearchResponseBody is the type of the "user" service "admin search"
+// endpoint HTTP response body.
+type AdminSearchResponseBody struct {
+	Users UserCollectionResponseBody `form:"users,omitempty" json:"users,omitempty" xml:"users,omitempty"`
+}
+
 // RolesUnauthorizedResponseBody is the type of the "user" service "roles"
 // endpoint HTTP response body for the "unauthorized" error.
 type RolesUnauthorizedResponseBody struct {
@@ -436,9 +442,9 @@ type DownloadPhotoBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// LoginUnauthorizedResponseBody is the type of the "user" service "login"
-// endpoint HTTP response body for the "unauthorized" error.
-type LoginUnauthorizedResponseBody struct {
+// LoginUserUnverifiedResponseBody is the type of the "user" service "login"
+// endpoint HTTP response body for the "user-unverified" error.
+type LoginUserUnverifiedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -457,6 +463,24 @@ type LoginUnauthorizedResponseBody struct {
 // LoginForbiddenResponseBody is the type of the "user" service "login"
 // endpoint HTTP response body for the "forbidden" error.
 type LoginForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// LoginUnauthorizedResponseBody is the type of the "user" service "login"
+// endpoint HTTP response body for the "unauthorized" error.
+type LoginUnauthorizedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -940,6 +964,42 @@ type ValidateBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// AddUserEmailRegisteredResponseBody is the type of the "user" service "add"
+// endpoint HTTP response body for the "user-email-registered" error.
+type AddUserEmailRegisteredResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// AddBadRequestResponseBody is the type of the "user" service "add" endpoint
+// HTTP response body for the "bad-request" error.
+type AddBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
 // AddUnauthorizedResponseBody is the type of the "user" service "add" endpoint
 // HTTP response body for the "unauthorized" error.
 type AddUnauthorizedResponseBody struct {
@@ -979,24 +1039,6 @@ type AddForbiddenResponseBody struct {
 // AddNotFoundResponseBody is the type of the "user" service "add" endpoint
 // HTTP response body for the "not-found" error.
 type AddNotFoundResponseBody struct {
-	// Name is the name of this class of errors.
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	// Is the error temporary?
-	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
-	// Is the error a timeout?
-	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
-	// Is the error a server-side fault?
-	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
-}
-
-// AddBadRequestResponseBody is the type of the "user" service "add" endpoint
-// HTTP response body for the "bad-request" error.
-type AddBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -1520,6 +1562,78 @@ type AdminDeleteBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// AdminSearchUnauthorizedResponseBody is the type of the "user" service "admin
+// search" endpoint HTTP response body for the "unauthorized" error.
+type AdminSearchUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// AdminSearchForbiddenResponseBody is the type of the "user" service "admin
+// search" endpoint HTTP response body for the "forbidden" error.
+type AdminSearchForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// AdminSearchNotFoundResponseBody is the type of the "user" service "admin
+// search" endpoint HTTP response body for the "not-found" error.
+type AdminSearchNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// AdminSearchBadRequestResponseBody is the type of the "user" service "admin
+// search" endpoint HTTP response body for the "bad-request" error.
+type AdminSearchBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
 // AvailableRoleResponseBody is used to define fields on response body types.
 type AvailableRoleResponseBody struct {
 	ID   *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -1560,6 +1674,9 @@ type ProjectRoleResponse struct {
 	ID   *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 }
+
+// UserCollectionResponseBody is used to define fields on response body types.
+type UserCollectionResponseBody []*UserResponseBody
 
 // NewLoginRequestBody builds the HTTP request body from the payload of the
 // "login" endpoint of the "user" service.
@@ -1909,8 +2026,9 @@ func NewLoginResultNoContent(authorization string) *user.LoginResult {
 	return v
 }
 
-// NewLoginUnauthorized builds a user service login endpoint unauthorized error.
-func NewLoginUnauthorized(body *LoginUnauthorizedResponseBody) *goa.ServiceError {
+// NewLoginUserUnverified builds a user service login endpoint user-unverified
+// error.
+func NewLoginUserUnverified(body *LoginUserUnverifiedResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -1925,6 +2043,20 @@ func NewLoginUnauthorized(body *LoginUnauthorizedResponseBody) *goa.ServiceError
 
 // NewLoginForbidden builds a user service login endpoint forbidden error.
 func NewLoginForbidden(body *LoginForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewLoginUnauthorized builds a user service login endpoint unauthorized error.
+func NewLoginUnauthorized(body *LoginUnauthorizedResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -2351,6 +2483,35 @@ func NewAddUserOK(body *AddResponseBody) *userviews.UserView {
 	return v
 }
 
+// NewAddUserEmailRegistered builds a user service add endpoint
+// user-email-registered error.
+func NewAddUserEmailRegistered(body *AddUserEmailRegisteredResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewAddBadRequest builds a user service add endpoint bad-request error.
+func NewAddBadRequest(body *AddBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
 // NewAddUnauthorized builds a user service add endpoint unauthorized error.
 func NewAddUnauthorized(body *AddUnauthorizedResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
@@ -2381,20 +2542,6 @@ func NewAddForbidden(body *AddForbiddenResponseBody) *goa.ServiceError {
 
 // NewAddNotFound builds a user service add endpoint not-found error.
 func NewAddNotFound(body *AddNotFoundResponseBody) *goa.ServiceError {
-	v := &goa.ServiceError{
-		Name:      *body.Name,
-		ID:        *body.ID,
-		Message:   *body.Message,
-		Temporary: *body.Temporary,
-		Timeout:   *body.Timeout,
-		Fault:     *body.Fault,
-	}
-
-	return v
-}
-
-// NewAddBadRequest builds a user service add endpoint bad-request error.
-func NewAddBadRequest(body *AddBadRequestResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -2908,6 +3055,90 @@ func NewAdminDeleteBadRequest(body *AdminDeleteBadRequestResponseBody) *goa.Serv
 	return v
 }
 
+// NewAdminSearchResultOK builds a "user" service "admin search" endpoint
+// result from a HTTP "OK" response.
+func NewAdminSearchResultOK(body *AdminSearchResponseBody) *user.AdminSearchResult {
+	v := &user.AdminSearchResult{}
+	v.Users = make([]*user.User, len(body.Users))
+	for i, val := range body.Users {
+		v.Users[i] = unmarshalUserResponseBodyToUserUser(val)
+	}
+
+	return v
+}
+
+// NewAdminSearchUnauthorized builds a user service admin search endpoint
+// unauthorized error.
+func NewAdminSearchUnauthorized(body *AdminSearchUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewAdminSearchForbidden builds a user service admin search endpoint
+// forbidden error.
+func NewAdminSearchForbidden(body *AdminSearchForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewAdminSearchNotFound builds a user service admin search endpoint not-found
+// error.
+func NewAdminSearchNotFound(body *AdminSearchNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewAdminSearchBadRequest builds a user service admin search endpoint
+// bad-request error.
+func NewAdminSearchBadRequest(body *AdminSearchBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// ValidateAdminSearchResponseBody runs the validations defined on Admin
+// SearchResponseBody
+func ValidateAdminSearchResponseBody(body *AdminSearchResponseBody) (err error) {
+	if body.Users == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("users", "body"))
+	}
+	if err2 := ValidateUserCollectionResponseBody(body.Users); err2 != nil {
+		err = goa.MergeErrors(err, err2)
+	}
+	return
+}
+
 // ValidateRolesUnauthorizedResponseBody runs the validations defined on
 // roles_unauthorized_response_body
 func ValidateRolesUnauthorizedResponseBody(body *RolesUnauthorizedResponseBody) (err error) {
@@ -3292,9 +3523,9 @@ func ValidateDownloadPhotoBadRequestResponseBody(body *DownloadPhotoBadRequestRe
 	return
 }
 
-// ValidateLoginUnauthorizedResponseBody runs the validations defined on
-// login_unauthorized_response_body
-func ValidateLoginUnauthorizedResponseBody(body *LoginUnauthorizedResponseBody) (err error) {
+// ValidateLoginUserUnverifiedResponseBody runs the validations defined on
+// login_user-unverified_response_body
+func ValidateLoginUserUnverifiedResponseBody(body *LoginUserUnverifiedResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -3319,6 +3550,30 @@ func ValidateLoginUnauthorizedResponseBody(body *LoginUnauthorizedResponseBody) 
 // ValidateLoginForbiddenResponseBody runs the validations defined on
 // login_forbidden_response_body
 func ValidateLoginForbiddenResponseBody(body *LoginForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateLoginUnauthorizedResponseBody runs the validations defined on
+// login_unauthorized_response_body
+func ValidateLoginUnauthorizedResponseBody(body *LoginUnauthorizedResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -3964,6 +4219,54 @@ func ValidateValidateBadRequestResponseBody(body *ValidateBadRequestResponseBody
 	return
 }
 
+// ValidateAddUserEmailRegisteredResponseBody runs the validations defined on
+// add_user-email-registered_response_body
+func ValidateAddUserEmailRegisteredResponseBody(body *AddUserEmailRegisteredResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateAddBadRequestResponseBody runs the validations defined on
+// add_bad-request_response_body
+func ValidateAddBadRequestResponseBody(body *AddBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
 // ValidateAddUnauthorizedResponseBody runs the validations defined on
 // add_unauthorized_response_body
 func ValidateAddUnauthorizedResponseBody(body *AddUnauthorizedResponseBody) (err error) {
@@ -4015,30 +4318,6 @@ func ValidateAddForbiddenResponseBody(body *AddForbiddenResponseBody) (err error
 // ValidateAddNotFoundResponseBody runs the validations defined on
 // add_not-found_response_body
 func ValidateAddNotFoundResponseBody(body *AddNotFoundResponseBody) (err error) {
-	if body.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
-	}
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Temporary == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
-	}
-	if body.Timeout == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
-	}
-	if body.Fault == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
-	}
-	return
-}
-
-// ValidateAddBadRequestResponseBody runs the validations defined on
-// add_bad-request_response_body
-func ValidateAddBadRequestResponseBody(body *AddBadRequestResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -4732,6 +5011,102 @@ func ValidateAdminDeleteBadRequestResponseBody(body *AdminDeleteBadRequestRespon
 	return
 }
 
+// ValidateAdminSearchUnauthorizedResponseBody runs the validations defined on
+// admin search_unauthorized_response_body
+func ValidateAdminSearchUnauthorizedResponseBody(body *AdminSearchUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateAdminSearchForbiddenResponseBody runs the validations defined on
+// admin search_forbidden_response_body
+func ValidateAdminSearchForbiddenResponseBody(body *AdminSearchForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateAdminSearchNotFoundResponseBody runs the validations defined on
+// admin search_not-found_response_body
+func ValidateAdminSearchNotFoundResponseBody(body *AdminSearchNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateAdminSearchBadRequestResponseBody runs the validations defined on
+// admin search_bad-request_response_body
+func ValidateAdminSearchBadRequestResponseBody(body *AdminSearchBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
 // ValidateAvailableRoleResponseBody runs the validations defined on
 // AvailableRoleResponseBody
 func ValidateAvailableRoleResponseBody(body *AvailableRoleResponseBody) (err error) {
@@ -4825,6 +5200,19 @@ func ValidateProjectRoleResponse(body *ProjectRoleResponse) (err error) {
 	}
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	return
+}
+
+// ValidateUserCollectionResponseBody runs the validations defined on
+// UserCollectionResponseBody
+func ValidateUserCollectionResponseBody(body UserCollectionResponseBody) (err error) {
+	for _, e := range body {
+		if e != nil {
+			if err2 := ValidateUserResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
 	}
 	return
 }

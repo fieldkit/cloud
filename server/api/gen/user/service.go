@@ -56,6 +56,8 @@ type Service interface {
 	ProjectRoles(context.Context) (res ProjectRoleCollection, err error)
 	// AdminDelete implements admin delete.
 	AdminDelete(context.Context, *AdminDeletePayload) (err error)
+	// AdminSearch implements admin search.
+	AdminSearch(context.Context, *AdminSearchPayload) (res *AdminSearchResult, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -72,7 +74,7 @@ const ServiceName = "user"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [19]string{"roles", "delete", "upload photo", "download photo", "login", "recovery lookup", "recovery", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "get current", "list by project", "issue transmission token", "project roles", "admin delete"}
+var MethodNames = [20]string{"roles", "delete", "upload photo", "download photo", "login", "recovery lookup", "recovery", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "get current", "list by project", "issue transmission token", "project roles", "admin delete", "admin search"}
 
 // RolesPayload is the payload type of the user service roles method.
 type RolesPayload struct {
@@ -237,6 +239,18 @@ type AdminDeletePayload struct {
 	Delete *AdminDeleteFields
 }
 
+// AdminSearchPayload is the payload type of the user service admin search
+// method.
+type AdminSearchPayload struct {
+	Auth  string
+	Query string
+}
+
+// AdminSearchResult is the result type of the user service admin search method.
+type AdminSearchResult struct {
+	Users UserCollection
+}
+
 type AvailableRole struct {
 	ID   int32
 	Name string
@@ -297,6 +311,26 @@ type ProjectRole struct {
 type AdminDeleteFields struct {
 	Email    string
 	Password string
+}
+
+type UserCollection []*User
+
+// MakeUserUnverified builds a goa.ServiceError from an error.
+func MakeUserUnverified(err error) *goa.ServiceError {
+	return &goa.ServiceError{
+		Name:    "user-unverified",
+		ID:      goa.NewErrorID(),
+		Message: err.Error(),
+	}
+}
+
+// MakeUserEmailRegistered builds a goa.ServiceError from an error.
+func MakeUserEmailRegistered(err error) *goa.ServiceError {
+	return &goa.ServiceError{
+		Name:    "user-email-registered",
+		ID:      goa.NewErrorID(),
+		Message: err.Error(),
+	}
 }
 
 // MakeUnauthorized builds a goa.ServiceError from an error.

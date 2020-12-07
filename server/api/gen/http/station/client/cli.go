@@ -65,6 +65,40 @@ func BuildGetPayload(stationGetID string, stationGetAuth string) (*station.GetPa
 	return v, nil
 }
 
+// BuildTransferPayload builds the payload for the station transfer endpoint
+// from CLI flags.
+func BuildTransferPayload(stationTransferID string, stationTransferOwnerID string, stationTransferAuth string) (*station.TransferPayload, error) {
+	var err error
+	var id int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationTransferID, 10, 32)
+		id = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for id, must be INT32")
+		}
+	}
+	var ownerID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationTransferOwnerID, 10, 32)
+		ownerID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for ownerID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = stationTransferAuth
+	}
+	v := &station.TransferPayload{}
+	v.ID = id
+	v.OwnerID = ownerID
+	v.Auth = auth
+
+	return v, nil
+}
+
 // BuildUpdatePayload builds the payload for the station update endpoint from
 // CLI flags.
 func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, stationUpdateAuth string) (*station.UpdatePayload, error) {
@@ -73,7 +107,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Dicta ipsum ullam quia delectus ratione et.\",\n      \"name\": \"Dolorem eos nostrum deleniti qui odio exercitationem.\",\n      \"statusPb\": \"Ad ut pariatur.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Dolores illo expedita quia atque ut voluptas.\",\n      \"name\": \"Quod voluptatem odit voluptatem eos eos.\",\n      \"statusPb\": \"Totam ut quo id.\"\n   }'")
 		}
 	}
 	var id int32
@@ -269,6 +303,24 @@ func BuildDeletePayload(stationDeleteStationID string, stationDeleteAuth string)
 	}
 	v := &station.DeletePayload{}
 	v.StationID = stationID
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildAdminSearchPayload builds the payload for the station admin search
+// endpoint from CLI flags.
+func BuildAdminSearchPayload(stationAdminSearchQuery string, stationAdminSearchAuth string) (*station.AdminSearchPayload, error) {
+	var query string
+	{
+		query = stationAdminSearchQuery
+	}
+	var auth string
+	{
+		auth = stationAdminSearchAuth
+	}
+	v := &station.AdminSearchPayload{}
+	v.Query = query
 	v.Auth = auth
 
 	return v, nil

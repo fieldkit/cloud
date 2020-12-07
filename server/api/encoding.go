@@ -83,8 +83,10 @@ func (e *StreamAndCacheFriendlyEncoder) Encode(v interface{}) error {
 
 func InterceptDownloadResponses(defaultEncoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(ctx context.Context, w http.ResponseWriter) goahttp.Encoder {
 	return func(ctx context.Context, w http.ResponseWriter) goahttp.Encoder {
-		psr := w.(*logging.PreventableStatusResponse)
-		psr.BufferNextWriteHeader()
-		return NewStreamAndCacheFriendlyEncoder(ctx, defaultEncoder, w)
+		if psr, ok := w.(*logging.PreventableStatusResponse); ok {
+			psr.BufferNextWriteHeader()
+			return NewStreamAndCacheFriendlyEncoder(ctx, defaultEncoder, w)
+		}
+		return defaultEncoder(ctx, w)
 	}
 }

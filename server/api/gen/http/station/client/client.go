@@ -23,6 +23,10 @@ type Client struct {
 	// Get Doer is the HTTP client used to make requests to the get endpoint.
 	GetDoer goahttp.Doer
 
+	// Transfer Doer is the HTTP client used to make requests to the transfer
+	// endpoint.
+	TransferDoer goahttp.Doer
+
 	// Update Doer is the HTTP client used to make requests to the update endpoint.
 	UpdateDoer goahttp.Doer
 
@@ -44,6 +48,10 @@ type Client struct {
 
 	// Delete Doer is the HTTP client used to make requests to the delete endpoint.
 	DeleteDoer goahttp.Doer
+
+	// AdminSearch Doer is the HTTP client used to make requests to the admin
+	// search endpoint.
+	AdminSearchDoer goahttp.Doer
 
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
@@ -70,12 +78,14 @@ func NewClient(
 	return &Client{
 		AddDoer:             doer,
 		GetDoer:             doer,
+		TransferDoer:        doer,
 		UpdateDoer:          doer,
 		ListMineDoer:        doer,
 		ListProjectDoer:     doer,
 		DownloadPhotoDoer:   doer,
 		ListAllDoer:         doer,
 		DeleteDoer:          doer,
+		AdminSearchDoer:     doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -128,6 +138,30 @@ func (c *Client) Get() goa.Endpoint {
 		resp, err := c.GetDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("station", "get", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Transfer returns an endpoint that makes HTTP requests to the station service
+// transfer server.
+func (c *Client) Transfer() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeTransferRequest(c.encoder)
+		decodeResponse = DecodeTransferResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildTransferRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.TransferDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "transfer", err)
 		}
 		return decodeResponse(resp)
 	}
@@ -272,6 +306,30 @@ func (c *Client) Delete() goa.Endpoint {
 		resp, err := c.DeleteDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("station", "delete", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// AdminSearch returns an endpoint that makes HTTP requests to the station
+// service admin search server.
+func (c *Client) AdminSearch() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAdminSearchRequest(c.encoder)
+		decodeResponse = DecodeAdminSearchResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildAdminSearchRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AdminSearchDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "admin search", err)
 		}
 		return decodeResponse(resp)
 	}

@@ -18,7 +18,10 @@ export const D3Map = Vue.extend({
     components: {
         Mapbox,
     },
-    data() {
+    data(): {
+        mapboxToken: string;
+        refreshed: boolean;
+    } {
         return {
             mapboxToken: Config.MAPBOX_ACCESS_TOKEN,
             refreshed: false,
@@ -35,7 +38,7 @@ export const D3Map = Vue.extend({
         },
     },
     computed: {
-        data(): QueriedData {
+        data(): QueriedData | null {
             if (this.viz.graphing && !this.viz.graphing.empty) {
                 return this.viz.graphing;
             }
@@ -43,7 +46,7 @@ export const D3Map = Vue.extend({
         },
     },
     watch: {
-        data(newValue, oldValue) {
+        data(newValue: unknown, oldValue: unknown): void {
             this.viz.log("graphing (data)");
             this.refresh();
         },
@@ -59,7 +62,7 @@ export const D3Map = Vue.extend({
         this.viz.log("updated");
     },
     methods: {
-        getMap(): Map {
+        getMap(): Map | null {
             return mapStore.get(this.viz.id);
         },
         ready() {
@@ -83,8 +86,17 @@ export const D3Map = Vue.extend({
                 return;
             }
             const map = this.getMap();
-            const data = this.data.data;
-            const located = data.filter((row) => row.location && row.location.length);
+            if (!map) {
+                return;
+            }
+            const data = this.data?.data;
+            if (!data) {
+                return;
+            }
+            const located = data.filter((row) => row.location && row.location.length) as {
+                value: number;
+                location: [number, number];
+            }[];
             const vizInfo = this.workspace.vizInfo(this.viz);
             const colors = vizInfo.colorScale;
             const enabled = true;
@@ -183,7 +195,10 @@ export const D3Map = Vue.extend({
                 });
             } else {
                 const coordinates = geojson.geometry.coordinates;
-                const bounds = coordinates.reduce((bounds, c) => bounds.extend(c), new LngLatBounds(coordinates[0], coordinates[0]));
+                if (coordinates.length == 0) throw new Error(`empty geometry`);
+                const single = coordinates[0];
+                if (!single) throw new Error(`empty geometry`);
+                const bounds = coordinates.reduce((bounds, c) => bounds.extend(c), new LngLatBounds(single, single));
 
                 this.viz.log("map-refresh: bounds(data)", bounds.toArray());
 
@@ -225,16 +240,10 @@ export const D3Map = Vue.extend({
             this.refresh();
         },
         mapMoveEnd(...args) {
-            if (this.ready() && this.refreshed) {
+            const map = this.getMap();
+            if (this.ready() && this.refreshed && map) {
                 this.viz.log("map-move-end");
-                this.$emit(
-                    "viz-geo-zoomed",
-                    new GeoZoom(
-                        this.getMap()
-                            .getBounds()
-                            .toArray()
-                    )
-                );
+                this.$emit("viz-geo-zoomed", new GeoZoom(map.getBounds().toArray()));
             } else {
                 this.viz.log("map-move-end(ignored)");
             }

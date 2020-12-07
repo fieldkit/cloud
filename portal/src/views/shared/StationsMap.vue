@@ -32,9 +32,13 @@ export default Vue.extend({
     components: {
         Mapbox,
     },
-    data(): { mapboxToken: string } {
+    data(): {
+        mapboxToken: string;
+        ready: boolean;
+    } {
         return {
             mapboxToken: Config.MAPBOX_ACCESS_TOKEN,
+            ready: false,
         };
     },
     props: {
@@ -89,6 +93,7 @@ export default Vue.extend({
 
             map.resize();
 
+            this.ready = true;
             this.updateMap();
         },
         updateMap(): void {
@@ -96,7 +101,7 @@ export default Vue.extend({
                 return;
             }
 
-            if (!this.mapped || !this.mapped.valid) {
+            if (!this.mapped || !this.mapped.valid || !this.ready) {
                 return;
             }
 

@@ -35,10 +35,11 @@ type Client struct {
 	IssueTransmissionTokenEndpoint goa.Endpoint
 	ProjectRolesEndpoint           goa.Endpoint
 	AdminDeleteEndpoint            goa.Endpoint
+	AdminSearchEndpoint            goa.Endpoint
 }
 
 // NewClient initializes a "user" service client given the endpoints.
-func NewClient(roles, delete_, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, logout, refresh, sendValidation, validate, add, update, changePassword, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminDelete goa.Endpoint) *Client {
+func NewClient(roles, delete_, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, logout, refresh, sendValidation, validate, add, update, changePassword, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminDelete, adminSearch goa.Endpoint) *Client {
 	return &Client{
 		RolesEndpoint:                  roles,
 		DeleteEndpoint:                 delete_,
@@ -59,6 +60,7 @@ func NewClient(roles, delete_, uploadPhoto, downloadPhoto, login, recoveryLookup
 		IssueTransmissionTokenEndpoint: issueTransmissionToken,
 		ProjectRolesEndpoint:           projectRoles,
 		AdminDeleteEndpoint:            adminDelete,
+		AdminSearchEndpoint:            adminSearch,
 	}
 }
 
@@ -223,4 +225,14 @@ func (c *Client) ProjectRoles(ctx context.Context) (res ProjectRoleCollection, e
 func (c *Client) AdminDelete(ctx context.Context, p *AdminDeletePayload) (err error) {
 	_, err = c.AdminDeleteEndpoint(ctx, p)
 	return
+}
+
+// AdminSearch calls the "admin search" endpoint of the "user" service.
+func (c *Client) AdminSearch(ctx context.Context, p *AdminSearchPayload) (res *AdminSearchResult, err error) {
+	var ires interface{}
+	ires, err = c.AdminSearchEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*AdminSearchResult), nil
 }

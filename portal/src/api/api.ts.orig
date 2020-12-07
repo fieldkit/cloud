@@ -4,10 +4,13 @@ import TokenStorage from "./tokens";
 import Config from "../secrets";
 import { keysToCamel, keysToCamelWithWarnings } from "@/json-tools";
 import { ExportParams } from "@/store/typed-actions";
-import { NewComment } from '@/views/comments/model';
-import { Comment } from '@/views/comments/model';
-import { SensorsResponse } from "@/views/viz/api";
+<<<<<<< HEAD
+import {NewComment} from '@/views/comments/model';
+import {Comment} from '@/views/comments/model';
 
+=======
+import { SensorsResponse } from "@/views/viz/api";
+>>>>>>> main
 
 export class ApiError extends Error {
     constructor(message) {
@@ -476,13 +479,13 @@ class FKApi {
                 return Promise.resolve();
             }
             if (!discardToken) {
-            const token = this.token.getHeader();
-            const headers = { "Content-Type": "application/json", Authorization: token };
-            await axios({
-                method: "POST",
-                url: this.baseUrl + "/logout",
-                headers: headers,
-            });
+                const token = this.token.getHeader();
+                const headers = { "Content-Type": "application/json", Authorization: token };
+                await axios({
+                    method: "POST",
+                    url: this.baseUrl + "/logout",
+                    headers: headers,
+                });
             }
         } catch (err) {
             console.log("api: logout error:", err, err.stack);

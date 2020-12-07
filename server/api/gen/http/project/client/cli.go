@@ -23,7 +23,7 @@ func BuildAddUpdatePayload(projectAddUpdateBody string, projectAddUpdateProjectI
 	{
 		err = json.Unmarshal([]byte(projectAddUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Sed autem rem dolor corporis est.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Architecto aliquid alias.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -88,7 +88,7 @@ func BuildModifyUpdatePayload(projectModifyUpdateBody string, projectModifyUpdat
 	{
 		err = json.Unmarshal([]byte(projectModifyUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Pariatur quae.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Tenetur est molestias nam quidem laborum facere.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -266,7 +266,7 @@ func BuildAddPayload(projectAddBody string, projectAddAuth string) (*project.Add
 	{
 		err = json.Unmarshal([]byte(projectAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Accusantium numquam quisquam nihil ducimus.\",\n      \"meta\": \"Molestias culpa a pariatur totam praesentium.\",\n      \"module\": \"Hic sed et maxime dolore et distinctio.\",\n      \"profile\": \"Aut quis cupiditate qui repudiandae.\",\n      \"url\": \"Blanditiis dolor mollitia impedit quo hic.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Sed et maxime dolore.\",\n      \"meta\": \"Praesentium atque quibusdam tempora assumenda sed eos.\",\n      \"module\": \"Distinctio nesciunt aut.\",\n      \"profile\": \"Cupiditate qui repudiandae et blanditiis dolor mollitia.\",\n      \"url\": \"Quo hic a molestias culpa a pariatur.\"\n   }'")
 		}
 	}
 	var auth string

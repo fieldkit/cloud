@@ -96,7 +96,7 @@ func BuildUpdateMessagePayload(discussionUpdateMessageBody string, discussionUpd
 	{
 		err = json.Unmarshal([]byte(discussionUpdateMessageBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Sunt quae id inventore libero iste.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Vel odio magnam.\"\n   }'")
 		}
 	}
 	var postID int64

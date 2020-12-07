@@ -36,6 +36,7 @@ type Endpoints struct {
 	IssueTransmissionToken goa.Endpoint
 	ProjectRoles           goa.Endpoint
 	AdminDelete            goa.Endpoint
+	AdminSearch            goa.Endpoint
 }
 
 // UploadPhotoRequestData holds both the payload and the HTTP request body
@@ -71,6 +72,7 @@ func NewEndpoints(s Service) *Endpoints {
 		IssueTransmissionToken: NewIssueTransmissionTokenEndpoint(s, a.JWTAuth),
 		ProjectRoles:           NewProjectRolesEndpoint(s),
 		AdminDelete:            NewAdminDeleteEndpoint(s, a.JWTAuth),
+		AdminSearch:            NewAdminSearchEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -95,6 +97,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.IssueTransmissionToken = m(e.IssueTransmissionToken)
 	e.ProjectRoles = m(e.ProjectRoles)
 	e.AdminDelete = m(e.AdminDelete)
+	e.AdminSearch = m(e.AdminSearch)
 }
 
 // NewRolesEndpoint returns an endpoint function that calls the method "roles"
@@ -409,5 +412,24 @@ func NewAdminDeleteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpo
 			return nil, err
 		}
 		return nil, s.AdminDelete(ctx, p)
+	}
+}
+
+// NewAdminSearchEndpoint returns an endpoint function that calls the method
+// "admin search" of service "user".
+func NewAdminSearchEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*AdminSearchPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:admin"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.AdminSearch(ctx, p)
 	}
 }

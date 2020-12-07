@@ -210,7 +210,7 @@ export default Vue.extend({
         });
         resizeObserver.observe(document.querySelector("body"));
 
-        const pending = [];
+        const pending: Promise<never>[] = [];
         if (this.projectId) {
             pending.push(this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId }));
         }

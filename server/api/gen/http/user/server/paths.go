@@ -105,3 +105,8 @@ func ProjectRolesUserPath() string {
 func AdminDeleteUserPath() string {
 	return "/admin/user"
 }
+
+// AdminSearchUserPath returns the URL path to the user service admin search HTTP endpoint.
+func AdminSearchUserPath() string {
+	return "/admin/users/search"
+}

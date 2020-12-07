@@ -13,10 +13,8 @@ module.exports = {
     output: {
         publicPath: PUBLIC_PATH,
     },
-	module: {
-        loaders: [
-            { test: /\.css$/, loader: "css-loader" }
-        ]
+    module: {
+        loaders: [{ test: /\.css$/, loader: "css-loader" }],
         rules: [
             {
                 test: /\.vue$/,

@@ -171,8 +171,8 @@ export function mergeNotes(portalNotes: PortalStationNotesReply, notesForm: Note
 
     const modifications = _(localByKey)
         .mapValues((value, key) => {
-            const photoIds = value.photos.map((m) => media[m.path]).filter((v) => v);
-            const audioIds = value.audio.map((m) => media[m.path]).filter((v) => v);
+            const photoIds = value.photos.map((m) => media[m.key]).filter((v) => v);
+            const audioIds = value.audio.map((m) => media[m.key]).filter((v) => v);
             const mediaIds = [...photoIds, ...audioIds];
 
             if (portalExisting[key]) {

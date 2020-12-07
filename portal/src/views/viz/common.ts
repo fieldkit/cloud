@@ -40,6 +40,9 @@ export class TimeRange {
         const max = _(ranges)
             .map((r) => r[1])
             .max();
+        if (!min || !max) {
+            return TimeRange.eternity;
+        }
         return new TimeRange(min, max);
     }
 

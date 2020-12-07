@@ -8,6 +8,7 @@ declare module "vue/types/vue" {
         $config: {
             baseUrl: string;
         };
+        $confirm: any;
         $loadAsset(path: string): any;
         $getters: GlobalGetters;
         $state: GlobalState;

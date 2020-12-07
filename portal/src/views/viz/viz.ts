@@ -1,7 +1,6 @@
 import _ from "lodash";
-import { SensorId, SensorsResponse, SensorDataResponse, SensorInfoResponse, ModuleSensor } from "./api";
+import { SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
 import { Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
-import { DisplayStation } from "@/store/modules/stations";
 import FKApi from "@/api/api";
 
 import { ColorScale, createSensorColorScale } from "./d3-helpers";
@@ -27,6 +26,17 @@ export class TreeOption {
     ) {}
 }
 
+function makeRange(values: number[]): [number, number] {
+    const min = _.min(values);
+    const max = _.max(values);
+    if (min === undefined) throw new Error(`no min: ${values.length}`);
+    if (max === undefined) throw new Error(`no max: ${values.length}`);
+    if (min === max) {
+        console.warn(`range-warning: min == max ${values.length}`);
+    }
+    return [min, max];
+}
+
 export class QueriedData {
     empty = true;
     dataRange: number[] = [];
@@ -35,14 +45,15 @@ export class QueriedData {
 
     constructor(public readonly timeRangeQueried: TimeRange, private readonly sdr: SensorDataResponse) {
         if (this.sdr.data.length > 0) {
-            const values = _(this.sdr.data)
-                .filter((d) => d.value)
-                .map((d) => d.value);
-            const times = _(this.sdr.data)
-                .filter((d) => d.value)
-                .map((d) => d.time);
-            this.dataRange = [values.min(), values.max()];
-            this.timeRangeData = [times.min(), times.max()];
+            const filtered = this.sdr.data.filter((d) => _.isNumber(d.value));
+            const values = filtered.map((d) => d.value);
+            const times = filtered.map((d) => d.time);
+
+            if (values.length == 0) throw new Error(`empty data ranges`);
+            if (times.length == 0) throw new Error(`empty time ranges`);
+
+            this.dataRange = makeRange(values);
+            this.timeRangeData = makeRange(times);
 
             if (this.timeRangeQueried.isExtreme()) {
                 this.timeRange = this.timeRangeData;
@@ -131,17 +142,25 @@ export class Bookmark {
     }
 
     public get allTimeRange(): TimeRange {
-        const start = _.min(_.flatten(this.allVizes.map((viz) => viz[2][0])));
-        const end = _.max(_.flatten(this.allVizes.map((viz) => viz[2][1])));
+        const times: [number, number][] = this.allVizes.map((viz) => viz[2]).filter((times) => times !== undefined) as [number, number][];
+        const start = _.min(_.flatten(times.map((r) => r[0])));
+        const end = _.max(_.flatten(times.map((r) => r[1])));
+        if (!start || !end) throw new Error(`no time range in bookmark`);
         return new TimeRange(start, end);
     }
 
     public get allStations(): number[] {
-        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[0])));
+        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[0] || [])));
     }
 
     public get allSensors(): number[] {
-        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1])));
+        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1] || [])));
+    }
+
+    public static sameAs(a: Bookmark, b: Bookmark): boolean {
+        const aEncoded = JSON.stringify(a);
+        const bEncoded = JSON.stringify(b);
+        return aEncoded == bEncoded;
     }
 }
 
@@ -179,10 +198,10 @@ export class Graph extends Viz {
     }
 
     public timeZoomed(zoom: TimeZoom): TimeRange {
-        if (zoom.range) {
+        if (zoom.range !== null) {
             this.visible = zoom.range;
             this.fastTime = FastTime.Custom;
-        } else {
+        } else if (zoom.fast !== null) {
             this.visible = this.getFastRange(zoom.fast);
             this.fastTime = zoom.fast;
         }
@@ -233,6 +252,7 @@ export class Graph extends Viz {
     }
 
     public static fromBookmark(bm: VizBookmark): Viz {
+        if (bm.length == 0) throw new Error(`empty bookmark`);
         const visible = new TimeRange(bm[2][0], bm[2][1]);
         const chartParams = new DataQueryParams(visible, bm[0], bm[1]);
         const graph = new Graph(chartParams);
@@ -310,11 +330,22 @@ export class Group {
     }
 
     public get scrubbers(): Scrubbers {
-        return new Scrubbers(
-            this.id,
-            this.visible_,
-            this.vizes.filter((viz) => (viz as Graph).all).map((viz, i) => new Scrubber(i, (viz as Graph).all))
-        );
+        const children = this.vizes
+            .map((viz) => viz as Graph)
+            .map((graph, index) => {
+                return {
+                    graph,
+                    index,
+                };
+            })
+            .filter((r) => r.graph.all != null)
+            .map((r) => {
+                const all = r.graph.all;
+                if (!all) throw new Error(`no viz data on Graph`);
+                return new Scrubber(r.index, all);
+            });
+
+        return new Scrubbers(this.id, this.visible_, children);
     }
 
     public bookmark(): GroupBookmark {
@@ -377,6 +408,13 @@ export class Querier {
         return new FKApi()
             .sensorData(queryParams)
             .then((sdr: SensorDataResponse) => {
+                // eslint-disable-next-line
+                if (false) {
+                    console.log(
+                        `queried-data`,
+                        sdr.data.filter((r) => _.isNumber(r.value)).map((r) => r.value)
+                    );
+                }
                 const queried = new QueriedData(params.when, sdr);
                 this.data[key] = queried;
                 return queried;
@@ -459,19 +497,20 @@ export class Workspace {
         // Make all the queries and then give the queried data to the
         // resolve call for that query. This will end up calling the
         // above mapped resolve to set the appropriate data.
-        const pendingInfo = infoQueries.map((iq) =>
-            this.querier.queryInfo(iq).then((info) => {
-                return _.map(info.stations, (info, stationId) => {
-                    const name = info[0].name;
-                    const sensors = info.map((row) => new SensorMeta(row.sensorId, row.key, row.key));
-                    const station = new StationMeta(Number(stationId), name, sensors);
-                    this.stations[station.id] = station;
-                    return station;
-                });
-            })
+        const pendingInfo = infoQueries.map(
+            (iq) =>
+                this.querier.queryInfo(iq).then((info) => {
+                    return _.map(info.stations, (info, stationId) => {
+                        const name = info[0].name;
+                        const sensors = info.map((row) => new SensorMeta(row.sensorId, row.key, row.key));
+                        const station = new StationMeta(Number(stationId), name, sensors);
+                        this.stations[station.id] = station;
+                        return station;
+                    });
+                }) as Promise<unknown>
         );
 
-        const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq));
+        const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq) as Promise<unknown>);
         return Promise.all([...pendingInfo, ...pendingData]).then(() => {
             this._options = this.updateOptions();
         });
@@ -618,7 +657,7 @@ export class Workspace {
             group.remove(viz);
             this.groups.unshift(new Group([viz]));
         } else {
-            this.groups.reduce((previous, iter) => {
+            this.groups.reduce((previous: Group | null, iter: Group): Group => {
                 if (iter == group) {
                     if (previous == null) {
                         throw new Error("tried linking first group, nice work");
@@ -645,7 +684,9 @@ export class Workspace {
             return this;
         }
         const removing = this.groups.shift();
-        this.groups[0].addAll(removing);
+        if (removing) {
+            this.groups[0].addAll(removing);
+        }
         return this;
     }
 
@@ -666,7 +707,16 @@ export class Workspace {
         );
     }
 
-    public eventually(callback: (ws: Workspace) => Promise<any>) {
+    public async updateFromBookmark(bm: Bookmark): Promise<void> {
+        if (Bookmark.sameAs(this.bookmark(), bm)) {
+            return;
+        }
+        this.groups = bm.g.map((gm) => Group.fromBookmark(gm));
+        await this.query();
+        return;
+    }
+
+    private eventually(callback: (ws: Workspace) => Promise<any>) {
         callback(this);
         return Promise.resolve(this);
     }

@@ -46,7 +46,14 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
     },
-    data() {
+    data(): {
+        form: {
+            email: string;
+        };
+        resending: boolean;
+        attempted: boolean;
+        busy: boolean;
+    } {
         return {
             form: {
                 email: "",
@@ -65,20 +72,20 @@ export default Vue.extend({
         },
     },
     methods: {
-        save() {
+        async save(): Promise<void> {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
                 return;
             }
             this.busy = true;
-            return this.$services.api
+            await this.$services.api
                 .sendResetPasswordEmail(this.form.email)
                 .then(() => (this.attempted = true))
                 .finally(() => (this.busy = true));
         },
-        resend() {
+        async resend(): Promise<void> {
             this.resending = true;
-            return this.save().finally(() => (this.resending = false));
+            await this.save().finally(() => (this.resending = false));
         },
     },
 });

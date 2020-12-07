@@ -36,6 +36,9 @@ func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*u
 	if err == data.IncorrectPasswordError {
 		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
 	}
+	if err == data.UnverifiedUserError {
+		return nil, user.MakeUserUnverified(errors.New("user unverified"))
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +46,7 @@ func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*u
 		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
 	}
 
-	refreshToken, err := data.NewRefreshToken(authed.ID, 20, now.Add(time.Duration(72)*time.Hour))
+	refreshToken, err := data.NewRefreshToken(authed.ID, 20, now.Add(data.RefreshTokenTtl))
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +91,7 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 	if yes, err := s.userExists(ctx, payload.User.Email); err != nil {
 		return nil, err
 	} else if yes {
-		return nil, user.MakeBadRequest(errors.New("bad request"))
+		return nil, user.MakeUserEmailRegistered(errors.New("email registered"))
 	}
 
 	user := &data.User{
@@ -109,7 +112,7 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 		return nil, err
 	}
 
-	validationToken, err := data.NewValidationToken(user.ID, 20, time.Now().Add(time.Duration(72)*time.Hour))
+	validationToken, err := data.NewValidationToken(user.ID, 20, time.Now().Add(data.ValidationTokenTtl))
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +325,7 @@ func (s *UserService) RecoveryLookup(ctx context.Context, payload *user.Recovery
 
 	now := time.Now().UTC()
 
-	recoveryToken, err := data.NewRecoveryToken(trying.ID, 20, now.Add(time.Duration(1)*time.Hour))
+	recoveryToken, err := data.NewRecoveryToken(trying.ID, 20, now.Add(data.RecoveryTokenTtl))
 	if err != nil {
 		return err
 	}
@@ -379,7 +382,7 @@ func (s *UserService) Refresh(ctx context.Context, payload *user.RefreshPayload)
 		return nil, err
 	}
 
-	newRefreshToken, err := data.NewRefreshToken(trying.ID, 20, now.Add(time.Duration(72)*time.Hour))
+	newRefreshToken, err := data.NewRefreshToken(trying.ID, 20, now.Add(data.RefreshTokenTtl))
 	if err != nil {
 		return nil, err
 	}
@@ -421,7 +424,7 @@ func (s *UserService) SendValidation(ctx context.Context, payload *user.SendVali
 
 	// TODO Rate limit the number of these we can send?
 	if !updating.Valid {
-		validationToken, err := data.NewValidationToken(updating.ID, 20, time.Now().Add(time.Duration(72)*time.Hour))
+		validationToken, err := data.NewValidationToken(updating.ID, 20, time.Now().Add(data.ValidationTokenTtl))
 		if err != nil {
 			return err
 		}
@@ -494,7 +497,7 @@ func NewTransmissionToken(now time.Time, user *data.User) *jwtgo.Token {
 	token := jwtgo.New(jwtgo.SigningMethodHS512)
 	token.Claims = jwtgo.MapClaims{
 		"iat":    now.Unix(),
-		"exp":    now.Add(time.Hour * 24 * 365).Unix(),
+		"exp":    now.Add(data.TransmissionTokenTtl).Unix(),
 		"sub":    user.ID,
 		"email":  user.Email,
 		"scopes": scopes,
@@ -680,6 +683,28 @@ func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadP
 	}, nil
 }
 
+func (c *UserService) AdminSearch(ctx context.Context, payload *user.AdminSearchPayload) (*user.AdminSearchResult, error) {
+	sr := repositories.NewUserRepository(c.options.Database)
+
+	users, err := sr.Search(ctx, payload.Query)
+	if err != nil {
+		return nil, err
+	}
+
+	wms := make([]*user.User, 0)
+	for _, user := range users {
+		wm, err := UserType(c.options.signer, user)
+		if err != nil {
+			return nil, err
+		}
+		wms = append(wms, wm)
+	}
+
+	return &user.AdminSearchResult{
+		Users: wms,
+	}, nil
+}
+
 func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
 		Token:        token,
@@ -812,7 +837,7 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 	}
 
 	if !user.Valid {
-		return nil, data.IncorrectPasswordError
+		return nil, data.UnverifiedUserError
 	}
 
 	return user, nil

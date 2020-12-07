@@ -48,9 +48,9 @@ type RecordWalker struct {
 
 func NewRecordWalker(db *sqlxcache.DB) (rw *RecordWalker) {
 	return &RecordWalker{
+		db:         db,
 		provisions: make(map[int64]*data.Provision),
 		metas:      make(map[int64]*data.MetaRecord),
-		db:         db,
 		queue:      make(chan []*data.DataRecord, 10),
 	}
 }
@@ -169,17 +169,29 @@ func (rw *RecordWalker) processBatchInTransaction(ctx context.Context, handler R
 }
 
 func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParameters) (*WalkStatistics, error) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("query-statistics", "station_ids", params.StationIDs, "start", params.Start, "end", params.End)
+
 	query, args, err := sqlx.In(`
+		WITH station_ids AS (
+			SELECT UNNEST(ARRAY[?]::integer[]) AS id
+		),
+		hidden_ranges AS (
+			SELECT tsrange(start_time, end_time) AS range, flags FROM fieldkit.record_range_meta WHERE station_id IN (SELECT id FROM station_ids) AND flags = 1
+		)
 		SELECT
 			MIN(r.time) AS start,
 			MAX(r.time) AS end,
 			COUNT(r.id) AS records
 		FROM fieldkit.data_record AS r
 		JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
+		LEFT JOIN hidden_ranges AS hr ON (r.time::timestamp <@ hr.range)
 		WHERE (
-			p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id IN (?))
+			p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id IN (SELECT id FROM station_ids))
 			AND r.time >= ?
 			AND r.time < ?
+			AND hr.flags IS NULL
 		)
 		`, params.StationIDs, params.Start, params.End)
 	if err != nil {
@@ -189,6 +201,7 @@ func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParamet
 	ws := &WalkStatistics{}
 	err = rw.db.GetContext(ctx, ws, rw.db.Rebind(query), args...)
 	if err != nil {
+		log.Errorw("error", "sql", rw.db.Rebind(query))
 		return nil, err
 	}
 
@@ -198,18 +211,26 @@ func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParamet
 func (rw *RecordWalker) queryBatch(ctx context.Context, params *WalkParameters, offset int64, batchSize int64) ([]*data.DataRecord, error) {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("querying", "station_ids", params.StationIDs, "offset", offset, "batch_size", batchSize)
+	log.Infow("query-rows", "station_ids", params.StationIDs, "offset", offset, "batch_size", batchSize, "start", params.Start, "end", params.End)
 
 	query, args, err := sqlx.In(`
+		WITH station_ids AS (
+			SELECT UNNEST(ARRAY[?]::integer[]) AS id
+		),
+		hidden_ranges AS (
+			SELECT tsrange(start_time, end_time) AS range, flags FROM fieldkit.record_range_meta WHERE station_id IN (SELECT id FROM station_ids) AND flags = 1
+		)
 		SELECT
 			r.id, r.provision_id, r.time, r.number, r.meta_record_id, r.raw AS raw, r.pb,
 			ST_AsBinary(r.location) AS location
 		FROM fieldkit.data_record AS r
 		JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
+		LEFT JOIN hidden_ranges AS hr ON (r.time::timestamp <@ hr.range)
 		WHERE (
-			p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id IN (?))
+			p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id IN (SELECT id FROM station_ids))
 			AND r.time >= ?
 			AND r.time < ?
+			AND hr.flags IS NULL
 		)
 		ORDER BY r.time OFFSET ? LIMIT ?
 		`, params.StationIDs, params.Start, params.End, offset, batchSize)
