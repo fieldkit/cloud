@@ -1012,7 +1012,7 @@ class FKApi {
         });
     }
 
-    public getComments(projectIDOrBookmark): Promise<{posts: []}> {
+    public getComments(projectIDOrBookmark: number | string): Promise<{posts: []}> {
 
         let apiURL;
 
