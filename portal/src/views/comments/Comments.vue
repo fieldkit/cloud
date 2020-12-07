@@ -1,55 +1,58 @@
 <template>
-    <section class="container" v-bind:class="{'data-view': viewType === 'data'}">
-
-        <header v-if="viewType === 'project'"> Notes & Comments </header>
+    <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
+        <header v-if="viewType === 'project'">Notes & Comments</header>
 
         <form @submit.prevent="save(newComment)" class="new-comment">
-            <UserPhoto v-if="user" :user="user"> </UserPhoto>
-            <input type="text" :placeholder="placeholder" v-model="newComment.body">
-            <button type="submit" class="new-comment-submit" v-if="newComment.body"> Post </button>
+            <UserPhoto v-if="user" :user="user"></UserPhoto>
+            <input type="text" :placeholder="placeholder" v-model="newComment.body" />
+            <button type="submit" class="new-comment-submit" v-if="newComment.body">Post</button>
         </form>
 
-        <div v-if="errorGetComments"> Something went wrong loading the comments. </div>
-        <div v-if="errorPostComment"> Something went saving your comment. </div>
+        <div v-if="errorGetComments">Something went wrong loading the comments.</div>
+        <div v-if="errorPostComment">Something went saving your comment.</div>
 
         <div class="list" v-if="posts && posts.length > 0">
             <div class="subheader">
-                <span class="comments-counter" v-if="viewType === 'project'"> {{posts.length}} comments </span>
-                <header v-if="viewType === 'data'"> Notes & Comments </header>
+                <span class="comments-counter" v-if="viewType === 'project'">{{ posts.length }} comments</span>
+                <header v-if="viewType === 'data'">Notes & Comments</header>
             </div>
             <transition-group name="fade">
                 <div class="comment comment-main" v-for="post in posts" v-bind:key="post.id">
-                    <UserPhoto :user="post.author"> </UserPhoto>
+                    <UserPhoto :user="post.author"></UserPhoto>
                     <div class="flex column">
-                        <span class="timestamp"> {{formatTimestamp(post.createdAt)}} </span>
-                        <span class="author"> {{post.author.name}} </span>
-                        <span class="body"> {{post.body}} </span>
+                        <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
+                        <span class="author">{{ post.author.name }}</span>
+                        <span class="body">{{ post.body }}</span>
 
                         <transition-group name="fade">
                             <div class="comment" v-for="reply in post.replies" v-bind:key="reply.id">
-                                <UserPhoto :user="post.author"> </UserPhoto>
+                                <UserPhoto :user="post.author"></UserPhoto>
                                 <div class="flex column">
-                                    <span class="author"> {{reply.author.name}} </span>
-                                    <span class="body"> {{reply.body}} </span>
+                                    <span class="author">{{ reply.author.name }}</span>
+                                    <span class="body">{{ reply.body }}</span>
                                 </div>
                             </div>
                         </transition-group>
 
                         <transition name="fade">
-                            <form @submit.prevent="save(newReply)" class="new-comment reply" v-if="newReply && newReply.threadId === post.id">
-                                <UserPhoto :user="user"> </UserPhoto>
-                                <input type="text" placeholder="Reply to comment" v-model="newReply.body">
-                                <button type="submit" class="new-comment-submit" v-if="newReply.body"> Post </button>
+                            <form
+                                @submit.prevent="save(newReply)"
+                                class="new-comment reply"
+                                v-if="newReply && newReply.threadId === post.id"
+                            >
+                                <UserPhoto :user="user"></UserPhoto>
+                                <input type="text" placeholder="Reply to comment" v-model="newReply.body" />
+                                <button type="submit" class="new-comment-submit" v-if="newReply.body">Post</button>
                             </form>
                         </transition>
 
                         <div class="actions">
                             <button @click="addReply(post)">
-                                <img src="@/assets/icon-reply.svg">
+                                <img src="@/assets/icon-reply.svg" />
                                 Reply
                             </button>
                             <button v-if="viewType === 'data'" @click="viewDataClick(post)">
-                                <img src="@/assets/icon-view-data.svg">
+                                <img src="@/assets/icon-view-data.svg" />
                                 View Data
                             </button>
                         </div>
@@ -64,8 +67,8 @@
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
-import {NewComment} from '@/views/comments/model';
-import {Comment} from '@/views/comments/model';
+import { NewComment } from "@/views/comments/model";
+import { Comment } from "@/views/comments/model";
 
 export default Vue.extend({
     name: "Comments",
@@ -123,7 +126,7 @@ export default Vue.extend({
             }
             this.$services.api
                 .postComment(comment)
-                .then((response: {post: Comment}) => {
+                .then((response: { post: Comment }) => {
                     this.newComment.body = null;
                     // add the comment to the replies array
                     if (comment.threadId) {
@@ -134,7 +137,8 @@ export default Vue.extend({
                         this.posts.unshift(response.post);
                         this.newComment.body = null;
                     }
-                }).catch(() => {
+                })
+                .catch(() => {
                     this.errorPostComment = true;
                 });
         },
@@ -151,7 +155,7 @@ export default Vue.extend({
                 .then((data) => {
                     this.posts = data.posts;
                 })
-                .catch(e => {
+                .catch(() => {
                     this.errorGetComments = true;
                 });
         },
