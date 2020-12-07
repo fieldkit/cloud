@@ -85,11 +85,20 @@ export default Vue.extend({
         },
     },
     data(): {
-        posts: Comment[];
-        placeholder: string;
+        posts: Comment[] | null;
+        placeholder: string | null;
         viewType: string;
-        newComment: NewComment;
-        newReply: NewComment;
+        newComment: {
+            projectId: number | null;
+            bookmark: string | null;
+            body: string | null;
+        };
+        newReply: {
+            projectId: number | null;
+            bookmark: string | null;
+            body: string | null;
+            threadId: number | null;
+        };
         errorGetComments: boolean;
         errorPostComment: boolean;
     } {
@@ -130,12 +139,20 @@ export default Vue.extend({
                     this.newComment.body = null;
                     // add the comment to the replies array
                     if (comment.threadId) {
-                        this.posts.filter((post) => post.id === comment.threadId)[0].replies.push(response.post);
-                        this.newReply.body = null;
+                        if (this.posts) {
+                            this.posts.filter((post) => post.id === comment.threadId)[0].replies.push(response.post);
+                            this.newReply.body = null;
+                        } else {
+                            console.warn(`posts is null`);
+                        }
                     } else {
                         // add it to the posts array
-                        this.posts.unshift(response.post);
-                        this.newComment.body = null;
+                        if (this.posts) {
+                            this.posts.unshift(response.post);
+                            this.newComment.body = null;
+                        } else {
+                            console.log(`posts is null`);
+                        }
                     }
                 })
                 .catch(() => {
@@ -160,7 +177,9 @@ export default Vue.extend({
                 });
         },
         viewDataClick(post: Comment) {
-            this.$emit("viewDataClicked", JSON.parse(post.bookmark));
+            if (post.bookmark) {
+                this.$emit("viewDataClicked", JSON.parse(post.bookmark));
+            }
         },
     },
     mounted(): void {
