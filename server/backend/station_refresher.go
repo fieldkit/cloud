@@ -21,8 +21,10 @@ func NewStationRefresher(db *sqlxcache.DB) (sr *StationRefresher, err error) {
 
 func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRecently time.Duration, completely bool) error {
 	start := time.Time{}
-	if howRecently == 0 {
-		howRecently = time.Hour * 48
+	if !completely {
+		if howRecently == 0 {
+			howRecently = time.Hour * 48
+		}
 	}
 	if howRecently > 0 {
 		start = time.Now().Add(-howRecently)

@@ -169,6 +169,10 @@ func (rw *RecordWalker) processBatchInTransaction(ctx context.Context, handler R
 }
 
 func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParameters) (*WalkStatistics, error) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("query-statistics", "station_ids", params.StationIDs, "start", params.Start, "end", params.End)
+
 	query, args, err := sqlx.In(`
 		WITH station_ids AS (
 			SELECT UNNEST(ARRAY[?]::integer[]) AS id
@@ -197,7 +201,6 @@ func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParamet
 	ws := &WalkStatistics{}
 	err = rw.db.GetContext(ctx, ws, rw.db.Rebind(query), args...)
 	if err != nil {
-		log := Logger(ctx).Sugar()
 		log.Errorw("error", "sql", rw.db.Rebind(query))
 		return nil, err
 	}
@@ -208,7 +211,7 @@ func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParamet
 func (rw *RecordWalker) queryBatch(ctx context.Context, params *WalkParameters, offset int64, batchSize int64) ([]*data.DataRecord, error) {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("querying", "station_ids", params.StationIDs, "offset", offset, "batch_size", batchSize)
+	log.Infow("query-rows", "station_ids", params.StationIDs, "offset", offset, "batch_size", batchSize, "start", params.Start, "end", params.End)
 
 	query, args, err := sqlx.In(`
 		WITH station_ids AS (
