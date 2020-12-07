@@ -45,7 +45,10 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 		aggregator := NewAggregator(v.db, station.ID, 100)
 
 		if v.completely {
-			if err := aggregator.ClearNumberSamples(ctx); err != nil {
+			err = v.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+				return aggregator.ClearNumberSamples(txCtx)
+			})
+			if err != nil {
 				return err
 			}
 		}
@@ -98,10 +101,16 @@ func (v *AggregatingHandler) OnDone(ctx context.Context) error {
 	}
 
 	if v.completely {
-		for _, aggregator := range v.stations {
-			if err := aggregator.DeleteEmptyAggregates(ctx); err != nil {
-				return err
+		err := v.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+			for _, aggregator := range v.stations {
+				if err := aggregator.DeleteEmptyAggregates(txCtx); err != nil {
+					return err
+				}
 			}
+			return nil
+		})
+		if err != nil {
+			return err
 		}
 	}
 
