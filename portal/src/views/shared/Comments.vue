@@ -3,6 +3,8 @@
 
         <header v-if="viewType === 'project'"> Notes & Comments </header>
 
+        {{parentData}}
+
         <form @submit.prevent="save(newComment)" class="new-comment">
             <UserPhoto v-if="user" :user="user"> </UserPhoto>
             <input type="text" :placeholder="placeholder" v-model="newComment.body">
@@ -68,8 +70,9 @@ import moment from "moment";
 import {Bookmark} from "@/views/viz/viz";
 
 export interface Comment {
-    id: number,
-    author: object,
+    id: number;
+    author: object;
+    bookmark?: any;
     body: string;
     replies: [];
     createdAt: number;
@@ -90,6 +93,26 @@ export default Vue.extend({
             type: [Number, Bookmark],
         },
     },
+    data() {
+        return {
+            posts: [Comment],
+            placeholder: null,
+            viewType: typeof this.$props.parentData === "number" ? "project" : "data",
+            newComment: {
+                projectId: typeof this.parentData === "number" ? this.parentData : null,
+                bookmark: null,
+                body: null,
+            },
+            newReply: {
+                projectId: typeof this.parentData === "number" ? this.parentData : null,
+                bookmark: null,
+                body: null,
+                threadId: null,
+            },
+            errorGetComments: false,
+            errorPostComment: false,
+        };
+    },
     methods: {
         getNewCommentPlaceholder(): string {
             if (this.viewType === "project") {
@@ -98,7 +121,10 @@ export default Vue.extend({
                 return "Write a comment about this Data View";
             }
         },
-        save(comment): void {
+        save(comment: Comment): void {
+            if (this.viewType === 'data') {
+                comment.bookmark = JSON.stringify(this.parentData);
+            }
             this.$services.api
                 .postComment(comment)
                 .then((response: {post: Comment}) => {
@@ -107,7 +133,8 @@ export default Vue.extend({
                     if (comment.threadId) {
                         this.posts.filter((post) => post.id === comment.threadId)[0].replies.push(response.post);
                         this.newReply.body = null;
-                    } else {// add it to the posts array
+                    } else {
+                        // add it to the posts array
                         this.posts.unshift(response.post);
                         this.newComment.body = null;
                     }
@@ -115,10 +142,10 @@ export default Vue.extend({
                     this.errorPostComment = true;
                 });
         },
-        formatTimestamp(timestamp): string {
+        formatTimestamp(timestamp: number): string {
             return moment(timestamp).fromNow();
         },
-        addReply(post): void {
+        addReply(post: Comment): void {
             this.newReply.threadId = post.id;
             this.newReply.body = null;
         },
@@ -132,33 +159,13 @@ export default Vue.extend({
                     this.errorGetComments = true;
                 });
         },
-        viewDataClick(post) {
+        viewDataClick(post: Comment) {
             this.$emit("viewDataClicked", JSON.parse(post.bookmark));
         },
     },
     mounted(): void {
         this.placeholder = this.getNewCommentPlaceholder();
         this.getComments();
-    },
-    data(): any {
-        return {
-            posts: [Comment],
-            placeholder: null,
-            viewType: typeof this.parentData === "number" ? "project" : "data",
-            newComment: {
-                projectId: typeof this.parentData === "number" ? this.parentData : null,
-                bookmark: typeof this.parentData === "number" ? null : JSON.stringify(this.parentData),
-                body: null,
-            },
-            newReply: {
-                projectId: typeof this.parentData === "number" ? this.parentData : null,
-                bookmark: typeof this.parentData === "number" ? null : JSON.stringify(this.parentData),
-                body: null,
-                threadId: null,
-            },
-            errorGetComments: false,
-            errorPostComment: false,
-        };
     },
 });
 </script>

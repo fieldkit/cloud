@@ -4,6 +4,8 @@ import TokenStorage from "./tokens";
 import Config from "../secrets";
 import { keysToCamel, keysToCamelWithWarnings } from "@/json-tools";
 import { ExportParams } from "@/store/typed-actions";
+import {Comment} from '@/views/shared/Comments';
+
 
 export class ApiError extends Error {
     constructor(message) {
@@ -1017,7 +1019,7 @@ class FKApi {
         if (typeof projectIDOrBookmark === 'number') {
             apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
         } else {
-            apiURL = this.baseUrl + "/discussion?bookmark=" + JSON.stringify(projectIDOrBookmark);
+            apiURL = this.baseUrl + "/discussion?bookmark=" + projectIDOrBookmark;
         }
 
         return this.invoke({
@@ -1028,7 +1030,7 @@ class FKApi {
     }
 
     public postComment(comment: Comment): Promise<{post: Comment}> {
-
+        console.log("POST COMMENT", comment);
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
