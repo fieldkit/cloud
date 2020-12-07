@@ -140,7 +140,7 @@ import FKApi from "@/api/api";
 import ProjectStations from "./ProjectStations";
 import ProjectActivity from "./ProjectActivity";
 import CommonComponents from "@/views/shared";
-import Comments from "../shared/Comments";
+import Comments from "../comments/Comments";
 
 export default {
     name: "ProjectPublic",

@@ -4,7 +4,8 @@ import TokenStorage from "./tokens";
 import Config from "../secrets";
 import { keysToCamel, keysToCamelWithWarnings } from "@/json-tools";
 import { ExportParams } from "@/store/typed-actions";
-import {Comment} from '@/views/shared/Comments';
+import {NewComment} from '@/views/comments/model';
+import {Comment} from '@/views/comments/model';
 
 
 export class ApiError extends Error {
@@ -1013,13 +1014,12 @@ class FKApi {
     }
 
     public getComments(projectIDOrBookmark: number | string): Promise<{posts: []}> {
-
         let apiURL;
 
         if (typeof projectIDOrBookmark === 'number') {
             apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
         } else {
-            apiURL = this.baseUrl + "/discussion?bookmark=" + projectIDOrBookmark;
+            apiURL = this.baseUrl + "/discussion?bookmark=" + JSON.stringify(projectIDOrBookmark);
         }
 
         return this.invoke({
@@ -1029,8 +1029,7 @@ class FKApi {
         });
     }
 
-    public postComment(comment: Comment): Promise<{post: Comment}> {
-        console.log("POST COMMENT", comment);
+    public postComment(comment: NewComment): Promise<{post: Comment}> {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",

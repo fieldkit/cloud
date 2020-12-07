@@ -12,7 +12,7 @@
         <div v-if="errorGetComments"> Something went wrong loading the comments. </div>
         <div v-if="errorPostComment"> Something went saving your comment. </div>
 
-        <div class="list" v-if="posts.length > 0">
+        <div class="list" v-if="posts && posts.length > 0">
             <div class="subheader">
                 <span class="comments-counter" v-if="viewType === 'project'"> {{posts.length}} comments </span>
                 <header v-if="viewType === 'data'"> Notes & Comments </header>
@@ -64,24 +64,8 @@
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
-import {Bookmark} from "@/views/viz/viz";
-
-export interface Comment {
-    id: number;
-    author: object;
-    bookmark?: object;
-    body: string;
-    replies: [];
-    createdAt: number;
-    updatedAt: number;
-}
-
-export interface NewComment {
-    projectId: null;
-    bookmark: null;
-    body: null;
-    threadId?: number;
-}
+import {NewComment} from '@/views/comments/model';
+import {Comment} from '@/views/comments/model';
 
 export default Vue.extend({
     name: "Comments",
@@ -94,11 +78,11 @@ export default Vue.extend({
         },
         parentData: {
             required: true,
-            type: [Number, Bookmark],
+            type: [Number, Object],
         },
     },
     data(): {
-        posts: [Comment];
+        posts: Comment[];
         placeholder: string;
         viewType: string;
         newComment: NewComment;
@@ -133,7 +117,7 @@ export default Vue.extend({
                 return "Write a comment about this Data View";
             }
         },
-        save(comment: Comment): void {
+        save(comment: NewComment): void {
             if (this.viewType === "data") {
                 comment.bookmark = JSON.stringify(this.parentData);
             }

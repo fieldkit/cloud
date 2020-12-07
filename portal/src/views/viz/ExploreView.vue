@@ -36,7 +36,7 @@ import { GlobalState } from "@/store/modules/global";
 import { Workspace, Bookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 
-import Comments from "../shared/Comments.vue";
+import Comments from "../comments/Comments.vue";
 
 export default Vue.extend({
     name: "ExploreView",
