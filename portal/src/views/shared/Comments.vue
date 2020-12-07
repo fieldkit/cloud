@@ -3,8 +3,6 @@
 
         <header v-if="viewType === 'project'"> Notes & Comments </header>
 
-        {{parentData}}
-
         <form @submit.prevent="save(newComment)" class="new-comment">
             <UserPhoto v-if="user" :user="user"> </UserPhoto>
             <input type="text" :placeholder="placeholder" v-model="newComment.body">
@@ -63,7 +61,6 @@
 </template>
 
 <script lang="ts">
-
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
@@ -72,11 +69,18 @@ import {Bookmark} from "@/views/viz/viz";
 export interface Comment {
     id: number;
     author: object;
-    bookmark?: any;
+    bookmark?: object;
     body: string;
     replies: [];
     createdAt: number;
     updatedAt: number;
+}
+
+export interface NewComment {
+    projectId: null;
+    bookmark: null;
+    body: null;
+    threadId?: number;
 }
 
 export default Vue.extend({
@@ -93,9 +97,17 @@ export default Vue.extend({
             type: [Number, Bookmark],
         },
     },
-    data() {
+    data(): {
+        posts: [Comment];
+        placeholder: string;
+        viewType: string;
+        newComment: NewComment;
+        newReply: NewComment;
+        errorGetComments: boolean;
+        errorPostComment: boolean;
+    } {
         return {
-            posts: [Comment],
+            posts: null,
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
             newComment: {
@@ -122,7 +134,7 @@ export default Vue.extend({
             }
         },
         save(comment: Comment): void {
-            if (this.viewType === 'data') {
+            if (this.viewType === "data") {
                 comment.bookmark = JSON.stringify(this.parentData);
             }
             this.$services.api
@@ -138,7 +150,7 @@ export default Vue.extend({
                         this.posts.unshift(response.post);
                         this.newComment.body = null;
                     }
-                }).catch(e => {
+                }).catch(() => {
                     this.errorPostComment = true;
                 });
         },
