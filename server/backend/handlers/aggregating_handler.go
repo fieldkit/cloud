@@ -16,6 +16,7 @@ type AggregatingHandler struct {
 	db          *sqlxcache.DB
 	metaFactory *repositories.MetaFactory
 	stations    map[int64]*Aggregator
+	seen        map[int32]*data.Station
 	aggregator  *Aggregator
 	completely  bool
 }
@@ -25,6 +26,7 @@ func NewAggregatingHandler(db *sqlxcache.DB, completely bool) *AggregatingHandle
 		db:          db,
 		metaFactory: repositories.NewMetaFactory(),
 		stations:    make(map[int64]*Aggregator),
+		seen:        make(map[int32]*data.Station),
 		completely:  completely,
 	}
 }
@@ -44,13 +46,16 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 
 		aggregator := NewAggregator(v.db, station.ID, 100)
 
-		if v.completely {
-			err = v.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
-				return aggregator.ClearNumberSamples(txCtx)
-			})
-			if err != nil {
-				return err
+		if _, ok := v.seen[station.ID]; !ok {
+			if v.completely {
+				err = v.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+					return aggregator.ClearNumberSamples(txCtx)
+				})
+				if err != nil {
+					return err
+				}
 			}
+			v.seen[station.ID] = station
 		}
 
 		v.stations[p.ID] = aggregator
