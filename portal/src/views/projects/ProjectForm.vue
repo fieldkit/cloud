@@ -119,7 +119,9 @@
             <div class="action-container">
                 <button class="btn" v-if="!project" type="submit">Add project</button>
                 <button class="btn" v-if="project && project.id" type="submit">Save updates</button>
-                <button v-if="project && project.id" class="btn btn-delete" type="submit" v-on:click="deleteProject">Delete Project</button>
+                <button v-if="project && project.id" class="btn btn-delete" type="submit" v-on:click.prevent="deleteProject">
+                    Delete Project
+                </button>
             </div>
         </form>
     </div>
@@ -247,7 +249,7 @@ export default Vue.extend({
             },
         },
     },
-    mounted(this: any) {
+    mounted(): void {
         if (this.project) {
             this.form = {
                 name: this.project.name,
@@ -259,14 +261,17 @@ export default Vue.extend({
                 tags: tryParseTags(this.project.tags),
                 public: this.project.privacy > 0,
                 privacy: this.project.privacy == 0 ? 1 : this.project.privacy,
+                pickedStart: null,
+                pickedEnd: null,
+                tag: "",
             };
         }
     },
     computed: {
-        smallTagsLabel(this: any): boolean {
+        smallTagsLabel(): boolean {
             return (this.form.tags && this.form.tags.length > 0) || this.tagsFocused;
         },
-        imageUrl(this: any) {
+        imageUrl(): string | null {
             if (this.project.photo) {
                 return this.$config.baseUrl + this.project.photo;
             }
@@ -274,25 +279,28 @@ export default Vue.extend({
         },
     },
     methods: {
-        onTagsFocus(e) {
+        onTagsFocus(): void {
             this.tagsFocused = true;
         },
-        onTagsBlur(e) {
+        onTagsBlur(): void {
             this.tagsFocused = false;
         },
-        saveForm() {
+        async saveForm(): Promise<void> {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
                 console.log("save form, validation error");
                 return;
             }
 
+            console.log("saving form");
+
             if (this.project && this.project.id) {
-                return this.updateProject();
+                await this.updateProject();
+            } else {
+                await this.addProject();
             }
-            return this.addProject();
         },
-        onTagsChanged(newTags) {
+        onTagsChanged(newTags): void {
             this.form.tags = newTags;
         },
         createParams() {
@@ -339,6 +347,8 @@ export default Vue.extend({
             }
         },
         async updateProject(): Promise<void> {
+            console.log("updating");
+
             this.$emit("updating");
 
             const data = this.createParams();
@@ -366,33 +376,33 @@ export default Vue.extend({
                 });
             }
         },
-        deleteProject() {
+        async deleteProject(): Promise<void> {
             if (window.confirm("Are you sure you want to delete this project?")) {
-                return this.$store.dispatch(ActionTypes.DELETE_PROJECT, { projectId: this.project.id }).then(() => {
+                await this.$store.dispatch(ActionTypes.DELETE_PROJECT, { projectId: this.project.id }).then(() => {
                     return this.$router.push({ name: "projects" });
                 });
             }
         },
-        updateStart(date, ...args) {
+        updateStart(date): void {
             this.form.startTime = date ? moment(date).format("M/D/YYYY") : "";
         },
-        updateEnd(date, ...args) {
+        updateEnd(date, ...args): void {
             this.form.endTime = date ? moment(date).format("M/D/YYYY") : "";
         },
-        prettyDate(date) {
+        prettyDate(date): string {
             if (date) {
                 return moment(date).format("M/D/YYYY");
             }
             return "";
         },
-        closeForm() {
+        async closeForm(): Promise<void> {
             if (this.project) {
-                return this.$router.push({ name: "viewProject", params: { id: this.project.id } });
+                await this.$router.push({ name: "viewProject", params: { id: this.project.id } });
             } else {
-                return this.$router.push({ name: "projects" });
+                await this.$router.push({ name: "projects" });
             }
         },
-        onImage(image) {
+        onImage(image): void {
             this.image = image;
         },
     },
