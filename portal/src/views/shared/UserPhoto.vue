@@ -7,7 +7,10 @@
 import Vue, { PropType } from "vue";
 
 interface UserPhoto {
-    photo: { url: string | null };
+    updatedAt?: number;
+    photo: {
+        url: string | null;
+    };
 }
 
 export default Vue.extend({
@@ -25,6 +28,9 @@ export default Vue.extend({
     computed: {
         userImage(): string | null {
             if (this.user && this.user.photo) {
+                if (this.user.updatedAt) {
+                    return this.$config.baseUrl + this.user.photo.url + "?ts=" + this.user.updatedAt;
+                }
                 return this.$config.baseUrl + this.user.photo.url;
             }
             return null;

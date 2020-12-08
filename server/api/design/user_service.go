@@ -500,7 +500,8 @@ var User = ResultType("application/vnd.app.user+json", func() {
 		Attribute("bio")
 		Attribute("photo", UserPhoto)
 		Attribute("admin", Boolean)
-		Required("id", "name", "email", "bio", "admin")
+		Attribute("updatedAt", Int64)
+		Required("id", "name", "email", "bio", "admin", "updatedAt")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -509,6 +510,7 @@ var User = ResultType("application/vnd.app.user+json", func() {
 		Attribute("bio")
 		Attribute("photo")
 		Attribute("admin")
+		Attribute("updatedAt")
 	})
 })
 

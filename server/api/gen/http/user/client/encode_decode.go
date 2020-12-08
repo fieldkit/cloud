@@ -2823,11 +2823,12 @@ func unmarshalProjectUserResponseBodyToUserviewsProjectUserView(v *ProjectUserRe
 // *userviews.UserView from a value of type *UserResponseBody.
 func unmarshalUserResponseBodyToUserviewsUserView(v *UserResponseBody) *userviews.UserView {
 	res := &userviews.UserView{
-		ID:    v.ID,
-		Name:  v.Name,
-		Email: v.Email,
-		Bio:   v.Bio,
-		Admin: v.Admin,
+		ID:        v.ID,
+		Name:      v.Name,
+		Email:     v.Email,
+		Bio:       v.Bio,
+		Admin:     v.Admin,
+		UpdatedAt: v.UpdatedAt,
 	}
 	if v.Photo != nil {
 		res.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(v.Photo)
@@ -2851,11 +2852,12 @@ func unmarshalProjectRoleResponseToUserviewsProjectRoleView(v *ProjectRoleRespon
 // value of type *UserResponseBody.
 func unmarshalUserResponseBodyToUserUser(v *UserResponseBody) *user.User {
 	res := &user.User{
-		ID:    *v.ID,
-		Name:  *v.Name,
-		Email: *v.Email,
-		Bio:   *v.Bio,
-		Admin: *v.Admin,
+		ID:        *v.ID,
+		Name:      *v.Name,
+		Email:     *v.Email,
+		Bio:       *v.Bio,
+		Admin:     *v.Admin,
+		UpdatedAt: *v.UpdatedAt,
 	}
 	if v.Photo != nil {
 		res.Photo = unmarshalUserPhotoResponseBodyToUserUserPhoto(v.Photo)

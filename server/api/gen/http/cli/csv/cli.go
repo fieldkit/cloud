@@ -2973,7 +2973,7 @@ Example:
       "privacy": 206072132,
       "startTime": "Iste mollitia.",
       "tags": "Rerum atque aut."
-   }' --user-id 1560119203 --auth "Reiciendis voluptas."
+   }' --user-id 1515052036 --auth "Sed voluptas incidunt."
 `, os.Args[0])
 }
 
@@ -2987,9 +2987,9 @@ ChangePassword implements change password.
 
 Example:
     `+os.Args[0]+` user change- password --body '{
-      "newPassword": "hs0",
-      "oldPassword": "4mp"
-   }' --user-id 368530785 --auth "Consequuntur tenetur illum ut sed distinctio vero."
+      "newPassword": "kvw",
+      "oldPassword": "yt2"
+   }' --user-id 592888700 --auth "Aut et alias fugiat culpa."
 `, os.Args[0])
 }
 
@@ -3000,7 +3000,7 @@ GetCurrent implements get current.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user get- current --auth "Nesciunt est debitis quas aut voluptatum."
+    `+os.Args[0]+` user get- current --auth "Maxime aut esse suscipit cum commodi."
 `, os.Args[0])
 }
 
@@ -3012,7 +3012,7 @@ ListByProject implements list by project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user list- by- project --project-id 1209220339 --auth "Eum omnis."
+    `+os.Args[0]+` user list- by- project --project-id 619303180 --auth "Facilis consequatur pariatur illum recusandae."
 `, os.Args[0])
 }
 
@@ -3023,7 +3023,7 @@ IssueTransmissionToken implements issue transmission token.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user issue- transmission- token --auth "Saepe fugiat."
+    `+os.Args[0]+` user issue- transmission- token --auth "Beatae et voluptatibus."
 `, os.Args[0])
 }
 
@@ -3048,7 +3048,7 @@ Example:
     `+os.Args[0]+` user admin- delete --body '{
       "email": "Eum deserunt.",
       "password": "Dignissimos atque doloremque aut veniam officia culpa."
-   }' --auth "Qui voluptatem officia rem."
+   }' --auth "Ipsa voluptatem recusandae aut officiis."
 `, os.Args[0])
 }
 
@@ -3060,6 +3060,6 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user admin- search --query "Aut officiis quia aliquam amet hic." --auth "Ut exercitationem qui culpa."
+    `+os.Args[0]+` user admin- search --query "Asperiores occaecati et provident voluptas in." --auth "Nesciunt occaecati dolores nihil."
 `, os.Args[0])
 }

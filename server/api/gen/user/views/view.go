@@ -84,12 +84,13 @@ type DownloadedPhotoView struct {
 
 // UserView is a type that runs validations on a projected type.
 type UserView struct {
-	ID    *int32
-	Name  *string
-	Email *string
-	Bio   *string
-	Photo *UserPhotoView
-	Admin *bool
+	ID        *int32
+	Name      *string
+	Email     *string
+	Bio       *string
+	Photo     *UserPhotoView
+	Admin     *bool
+	UpdatedAt *int64
 }
 
 // UserPhotoView is a type that runs validations on a projected type.
@@ -159,6 +160,7 @@ var (
 			"bio",
 			"photo",
 			"admin",
+			"updatedAt",
 		},
 	}
 	// ProjectUsersMap is a map of attribute names in result type ProjectUsers
@@ -348,6 +350,9 @@ func ValidateUserView(result *UserView) (err error) {
 	}
 	if result.Admin == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("admin", "result"))
+	}
+	if result.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "result"))
 	}
 	if result.Name != nil {
 		err = goa.MergeErrors(err, goa.ValidatePattern("result.name", *result.Name, "\\S"))

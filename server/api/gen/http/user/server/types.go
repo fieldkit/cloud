@@ -90,45 +90,49 @@ type DownloadPhotoResponseBody struct {
 // AddResponseBody is the type of the "user" service "add" endpoint HTTP
 // response body.
 type AddResponseBody struct {
-	ID    int32                  `form:"id" json:"id" xml:"id"`
-	Name  string                 `form:"name" json:"name" xml:"name"`
-	Email string                 `form:"email" json:"email" xml:"email"`
-	Bio   string                 `form:"bio" json:"bio" xml:"bio"`
-	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	Admin bool                   `form:"admin" json:"admin" xml:"admin"`
+	ID        int32                  `form:"id" json:"id" xml:"id"`
+	Name      string                 `form:"name" json:"name" xml:"name"`
+	Email     string                 `form:"email" json:"email" xml:"email"`
+	Bio       string                 `form:"bio" json:"bio" xml:"bio"`
+	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin     bool                   `form:"admin" json:"admin" xml:"admin"`
+	UpdatedAt int64                  `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 }
 
 // UpdateResponseBody is the type of the "user" service "update" endpoint HTTP
 // response body.
 type UpdateResponseBody struct {
-	ID    int32                  `form:"id" json:"id" xml:"id"`
-	Name  string                 `form:"name" json:"name" xml:"name"`
-	Email string                 `form:"email" json:"email" xml:"email"`
-	Bio   string                 `form:"bio" json:"bio" xml:"bio"`
-	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	Admin bool                   `form:"admin" json:"admin" xml:"admin"`
+	ID        int32                  `form:"id" json:"id" xml:"id"`
+	Name      string                 `form:"name" json:"name" xml:"name"`
+	Email     string                 `form:"email" json:"email" xml:"email"`
+	Bio       string                 `form:"bio" json:"bio" xml:"bio"`
+	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin     bool                   `form:"admin" json:"admin" xml:"admin"`
+	UpdatedAt int64                  `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 }
 
 // ChangePasswordResponseBody is the type of the "user" service "change
 // password" endpoint HTTP response body.
 type ChangePasswordResponseBody struct {
-	ID    int32                  `form:"id" json:"id" xml:"id"`
-	Name  string                 `form:"name" json:"name" xml:"name"`
-	Email string                 `form:"email" json:"email" xml:"email"`
-	Bio   string                 `form:"bio" json:"bio" xml:"bio"`
-	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	Admin bool                   `form:"admin" json:"admin" xml:"admin"`
+	ID        int32                  `form:"id" json:"id" xml:"id"`
+	Name      string                 `form:"name" json:"name" xml:"name"`
+	Email     string                 `form:"email" json:"email" xml:"email"`
+	Bio       string                 `form:"bio" json:"bio" xml:"bio"`
+	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin     bool                   `form:"admin" json:"admin" xml:"admin"`
+	UpdatedAt int64                  `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 }
 
 // GetCurrentResponseBody is the type of the "user" service "get current"
 // endpoint HTTP response body.
 type GetCurrentResponseBody struct {
-	ID    int32                  `form:"id" json:"id" xml:"id"`
-	Name  string                 `form:"name" json:"name" xml:"name"`
-	Email string                 `form:"email" json:"email" xml:"email"`
-	Bio   string                 `form:"bio" json:"bio" xml:"bio"`
-	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	Admin bool                   `form:"admin" json:"admin" xml:"admin"`
+	ID        int32                  `form:"id" json:"id" xml:"id"`
+	Name      string                 `form:"name" json:"name" xml:"name"`
+	Email     string                 `form:"email" json:"email" xml:"email"`
+	Bio       string                 `form:"bio" json:"bio" xml:"bio"`
+	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin     bool                   `form:"admin" json:"admin" xml:"admin"`
+	UpdatedAt int64                  `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 }
 
 // ListByProjectResponseBody is the type of the "user" service "list by
@@ -1661,12 +1665,13 @@ type ProjectUserResponseBody struct {
 
 // UserResponseBody is used to define fields on response body types.
 type UserResponseBody struct {
-	ID    int32                  `form:"id" json:"id" xml:"id"`
-	Name  string                 `form:"name" json:"name" xml:"name"`
-	Email string                 `form:"email" json:"email" xml:"email"`
-	Bio   string                 `form:"bio" json:"bio" xml:"bio"`
-	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	Admin bool                   `form:"admin" json:"admin" xml:"admin"`
+	ID        int32                  `form:"id" json:"id" xml:"id"`
+	Name      string                 `form:"name" json:"name" xml:"name"`
+	Email     string                 `form:"email" json:"email" xml:"email"`
+	Bio       string                 `form:"bio" json:"bio" xml:"bio"`
+	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin     bool                   `form:"admin" json:"admin" xml:"admin"`
+	UpdatedAt int64                  `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 }
 
 // ProjectRoleResponse is used to define fields on response body types.
@@ -1707,11 +1712,12 @@ func NewDownloadPhotoResponseBody(res *userviews.DownloadedPhotoView) *DownloadP
 // "add" endpoint of the "user" service.
 func NewAddResponseBody(res *userviews.UserView) *AddResponseBody {
 	body := &AddResponseBody{
-		ID:    *res.ID,
-		Name:  *res.Name,
-		Email: *res.Email,
-		Bio:   *res.Bio,
-		Admin: *res.Admin,
+		ID:        *res.ID,
+		Name:      *res.Name,
+		Email:     *res.Email,
+		Bio:       *res.Bio,
+		Admin:     *res.Admin,
+		UpdatedAt: *res.UpdatedAt,
 	}
 	if res.Photo != nil {
 		body.Photo = marshalUserviewsUserPhotoViewToUserPhotoResponseBody(res.Photo)
@@ -1723,11 +1729,12 @@ func NewAddResponseBody(res *userviews.UserView) *AddResponseBody {
 // "update" endpoint of the "user" service.
 func NewUpdateResponseBody(res *userviews.UserView) *UpdateResponseBody {
 	body := &UpdateResponseBody{
-		ID:    *res.ID,
-		Name:  *res.Name,
-		Email: *res.Email,
-		Bio:   *res.Bio,
-		Admin: *res.Admin,
+		ID:        *res.ID,
+		Name:      *res.Name,
+		Email:     *res.Email,
+		Bio:       *res.Bio,
+		Admin:     *res.Admin,
+		UpdatedAt: *res.UpdatedAt,
 	}
 	if res.Photo != nil {
 		body.Photo = marshalUserviewsUserPhotoViewToUserPhotoResponseBody(res.Photo)
@@ -1739,11 +1746,12 @@ func NewUpdateResponseBody(res *userviews.UserView) *UpdateResponseBody {
 // of the "change password" endpoint of the "user" service.
 func NewChangePasswordResponseBody(res *userviews.UserView) *ChangePasswordResponseBody {
 	body := &ChangePasswordResponseBody{
-		ID:    *res.ID,
-		Name:  *res.Name,
-		Email: *res.Email,
-		Bio:   *res.Bio,
-		Admin: *res.Admin,
+		ID:        *res.ID,
+		Name:      *res.Name,
+		Email:     *res.Email,
+		Bio:       *res.Bio,
+		Admin:     *res.Admin,
+		UpdatedAt: *res.UpdatedAt,
 	}
 	if res.Photo != nil {
 		body.Photo = marshalUserviewsUserPhotoViewToUserPhotoResponseBody(res.Photo)
@@ -1755,11 +1763,12 @@ func NewChangePasswordResponseBody(res *userviews.UserView) *ChangePasswordRespo
 // the "get current" endpoint of the "user" service.
 func NewGetCurrentResponseBody(res *userviews.UserView) *GetCurrentResponseBody {
 	body := &GetCurrentResponseBody{
-		ID:    *res.ID,
-		Name:  *res.Name,
-		Email: *res.Email,
-		Bio:   *res.Bio,
-		Admin: *res.Admin,
+		ID:        *res.ID,
+		Name:      *res.Name,
+		Email:     *res.Email,
+		Bio:       *res.Bio,
+		Admin:     *res.Admin,
+		UpdatedAt: *res.UpdatedAt,
 	}
 	if res.Photo != nil {
 		body.Photo = marshalUserviewsUserPhotoViewToUserPhotoResponseBody(res.Photo)

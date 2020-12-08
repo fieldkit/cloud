@@ -2201,11 +2201,12 @@ func marshalUserviewsProjectUserViewToProjectUserResponseBody(v *userviews.Proje
 // *UserResponseBody from a value of type *userviews.UserView.
 func marshalUserviewsUserViewToUserResponseBody(v *userviews.UserView) *UserResponseBody {
 	res := &UserResponseBody{
-		ID:    *v.ID,
-		Name:  *v.Name,
-		Email: *v.Email,
-		Bio:   *v.Bio,
-		Admin: *v.Admin,
+		ID:        *v.ID,
+		Name:      *v.Name,
+		Email:     *v.Email,
+		Bio:       *v.Bio,
+		Admin:     *v.Admin,
+		UpdatedAt: *v.UpdatedAt,
 	}
 	if v.Photo != nil {
 		res.Photo = marshalUserviewsUserPhotoViewToUserPhotoResponseBody(v.Photo)
@@ -2229,11 +2230,12 @@ func marshalUserviewsProjectRoleViewToProjectRoleResponse(v *userviews.ProjectRo
 // from a value of type *user.User.
 func marshalUserUserToUserResponseBody(v *user.User) *UserResponseBody {
 	res := &UserResponseBody{
-		ID:    v.ID,
-		Name:  v.Name,
-		Email: v.Email,
-		Bio:   v.Bio,
-		Admin: v.Admin,
+		ID:        v.ID,
+		Name:      v.Name,
+		Email:     v.Email,
+		Bio:       v.Bio,
+		Admin:     v.Admin,
+		UpdatedAt: v.UpdatedAt,
 	}
 	if v.Photo != nil {
 		res.Photo = marshalUserUserPhotoToUserPhotoResponseBody(v.Photo)

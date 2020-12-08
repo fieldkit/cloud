@@ -90,45 +90,49 @@ type DownloadPhotoResponseBody struct {
 // AddResponseBody is the type of the "user" service "add" endpoint HTTP
 // response body.
 type AddResponseBody struct {
-	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Email *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	Bio   *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
-	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	Admin *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	ID        *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name      *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email     *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Bio       *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
 }
 
 // UpdateResponseBody is the type of the "user" service "update" endpoint HTTP
 // response body.
 type UpdateResponseBody struct {
-	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Email *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	Bio   *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
-	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	Admin *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	ID        *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name      *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email     *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Bio       *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
 }
 
 // ChangePasswordResponseBody is the type of the "user" service "change
 // password" endpoint HTTP response body.
 type ChangePasswordResponseBody struct {
-	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Email *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	Bio   *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
-	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	Admin *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	ID        *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name      *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email     *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Bio       *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
 }
 
 // GetCurrentResponseBody is the type of the "user" service "get current"
 // endpoint HTTP response body.
 type GetCurrentResponseBody struct {
-	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Email *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	Bio   *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
-	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	Admin *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	ID        *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name      *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email     *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Bio       *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
 }
 
 // ListByProjectResponseBody is the type of the "user" service "list by
@@ -1661,12 +1665,13 @@ type ProjectUserResponseBody struct {
 
 // UserResponseBody is used to define fields on response body types.
 type UserResponseBody struct {
-	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Email *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	Bio   *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
-	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	Admin *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	ID        *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name      *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email     *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Bio       *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
 }
 
 // ProjectRoleResponse is used to define fields on response body types.
@@ -2470,11 +2475,12 @@ func NewValidateBadRequest(body *ValidateBadRequestResponseBody) *goa.ServiceErr
 // response.
 func NewAddUserOK(body *AddResponseBody) *userviews.UserView {
 	v := &userviews.UserView{
-		ID:    body.ID,
-		Name:  body.Name,
-		Email: body.Email,
-		Bio:   body.Bio,
-		Admin: body.Admin,
+		ID:        body.ID,
+		Name:      body.Name,
+		Email:     body.Email,
+		Bio:       body.Bio,
+		Admin:     body.Admin,
+		UpdatedAt: body.UpdatedAt,
 	}
 	if body.Photo != nil {
 		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
@@ -2558,11 +2564,12 @@ func NewAddNotFound(body *AddNotFoundResponseBody) *goa.ServiceError {
 // "OK" response.
 func NewUpdateUserOK(body *UpdateResponseBody) *userviews.UserView {
 	v := &userviews.UserView{
-		ID:    body.ID,
-		Name:  body.Name,
-		Email: body.Email,
-		Bio:   body.Bio,
-		Admin: body.Admin,
+		ID:        body.ID,
+		Name:      body.Name,
+		Email:     body.Email,
+		Bio:       body.Bio,
+		Admin:     body.Admin,
+		UpdatedAt: body.UpdatedAt,
 	}
 	if body.Photo != nil {
 		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
@@ -2632,11 +2639,12 @@ func NewUpdateBadRequest(body *UpdateBadRequestResponseBody) *goa.ServiceError {
 // result from a HTTP "OK" response.
 func NewChangePasswordUserOK(body *ChangePasswordResponseBody) *userviews.UserView {
 	v := &userviews.UserView{
-		ID:    body.ID,
-		Name:  body.Name,
-		Email: body.Email,
-		Bio:   body.Bio,
-		Admin: body.Admin,
+		ID:        body.ID,
+		Name:      body.Name,
+		Email:     body.Email,
+		Bio:       body.Bio,
+		Admin:     body.Admin,
+		UpdatedAt: body.UpdatedAt,
 	}
 	if body.Photo != nil {
 		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
@@ -2709,11 +2717,12 @@ func NewChangePasswordBadRequest(body *ChangePasswordBadRequestResponseBody) *go
 // from a HTTP "OK" response.
 func NewGetCurrentUserOK(body *GetCurrentResponseBody) *userviews.UserView {
 	v := &userviews.UserView{
-		ID:    body.ID,
-		Name:  body.Name,
-		Email: body.Email,
-		Bio:   body.Bio,
-		Admin: body.Admin,
+		ID:        body.ID,
+		Name:      body.Name,
+		Email:     body.Email,
+		Bio:       body.Bio,
+		Admin:     body.Admin,
+		UpdatedAt: body.UpdatedAt,
 	}
 	if body.Photo != nil {
 		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
@@ -5177,6 +5186,9 @@ func ValidateUserResponseBody(body *UserResponseBody) (err error) {
 	}
 	if body.Admin == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("admin", "body"))
+	}
+	if body.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "body"))
 	}
 	if body.Name != nil {
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", *body.Name, "\\S"))

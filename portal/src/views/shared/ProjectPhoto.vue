@@ -14,28 +14,28 @@ export default Vue.extend({
             required: true,
         },
     },
-    data() {
+    data(): { photo: unknown } {
         return {
             photo: null,
         };
     },
     watch: {
-        project(this: any) {
-            return this.refresh();
+        async project(): Promise<void> {
+            void this.refresh();
         },
     },
     computed: {
-        missing(this: any) {
+        missing(): boolean {
             return !this.project.photo;
         },
     },
-    mounted(this: any) {
+    mounted(): Promise<void> {
         return this.refresh();
     },
     methods: {
-        refresh(this: any) {
+        async refresh(): Promise<void> {
             if (this.project.photo) {
-                return this.$services.api.loadMedia(this.project.photo, { size: 800 }).then((photo) => {
+                await this.$services.api.loadMedia(this.project.photo, { size: 800 }).then((photo) => {
                     this.photo = photo;
                 });
             } else {

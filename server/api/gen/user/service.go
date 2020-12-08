@@ -175,12 +175,13 @@ type AddPayload struct {
 
 // User is the result type of the user service add method.
 type User struct {
-	ID    int32
-	Name  string
-	Email string
-	Bio   string
-	Photo *UserPhoto
-	Admin bool
+	ID        int32
+	Name      string
+	Email     string
+	Bio       string
+	Photo     *UserPhoto
+	Admin     bool
+	UpdatedAt int64
 }
 
 // UpdatePayload is the payload type of the user service update method.
@@ -521,6 +522,9 @@ func newUser(vres *userviews.UserView) *User {
 	if vres.Admin != nil {
 		res.Admin = *vres.Admin
 	}
+	if vres.UpdatedAt != nil {
+		res.UpdatedAt = *vres.UpdatedAt
+	}
 	if vres.Photo != nil {
 		res.Photo = transformUserviewsUserPhotoViewToUserPhoto(vres.Photo)
 	}
@@ -531,11 +535,12 @@ func newUser(vres *userviews.UserView) *User {
 // "default" view.
 func newUserView(res *User) *userviews.UserView {
 	vres := &userviews.UserView{
-		ID:    &res.ID,
-		Name:  &res.Name,
-		Email: &res.Email,
-		Bio:   &res.Bio,
-		Admin: &res.Admin,
+		ID:        &res.ID,
+		Name:      &res.Name,
+		Email:     &res.Email,
+		Bio:       &res.Bio,
+		Admin:     &res.Admin,
+		UpdatedAt: &res.UpdatedAt,
 	}
 	if res.Photo != nil {
 		vres.Photo = transformUserPhotoToUserviewsUserPhotoView(res.Photo)
