@@ -966,7 +966,7 @@ func (sr *StationRepository) Delete(ctx context.Context, stationID int32) error 
 
 	return sr.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
 		for _, query := range queries {
-			if _, err := sr.db.ExecContext(ctx, query, stationID); err != nil {
+			if _, err := sr.db.ExecContext(txCtx, query, stationID); err != nil {
 				return err
 			}
 		}

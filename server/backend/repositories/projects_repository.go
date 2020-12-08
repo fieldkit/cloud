@@ -102,18 +102,23 @@ func (pr *ProjectRepository) QueryUserProjectRelationships(ctx context.Context, 
 	return relationships, nil
 }
 
-func (pr *ProjectRepository) Delete(ctx context.Context, projectID int32) error {
-	if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project_station WHERE project_id = $1`, projectID); err != nil {
-		return err
-	}
-	if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project_follower WHERE project_id = $1`, projectID); err != nil {
-		return err
-	}
-	if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project_user WHERE project_id = $1`, projectID); err != nil {
-		return err
-	}
-	if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project WHERE id = $1`, projectID); err != nil {
-		return err
-	}
-	return nil
+func (pr *ProjectRepository) Delete(outerCtx context.Context, projectID int32) error {
+	return pr.db.WithNewTransaction(outerCtx, func(ctx context.Context) error {
+		if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project_station WHERE project_id = $1`, projectID); err != nil {
+			return err
+		}
+		if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project_follower WHERE project_id = $1`, projectID); err != nil {
+			return err
+		}
+		if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project_invite WHERE project_id = $1`, projectID); err != nil {
+			return err
+		}
+		if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project_user WHERE project_id = $1`, projectID); err != nil {
+			return err
+		}
+		if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project WHERE id = $1`, projectID); err != nil {
+			return err
+		}
+		return nil
+	})
 }
