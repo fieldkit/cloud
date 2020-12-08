@@ -26,7 +26,7 @@
 
                         <transition-group name="fade">
                             <div class="comment" v-for="reply in post.replies" v-bind:key="reply.id">
-                                <UserPhoto :user="post.author"></UserPhoto>
+                                <UserPhoto :user="reply.author"></UserPhoto>
                                 <div class="flex column">
                                     <span class="author">{{ reply.author.name }}</span>
                                     <span class="body">{{ reply.body }}</span>
