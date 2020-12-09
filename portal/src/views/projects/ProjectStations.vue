@@ -329,6 +329,9 @@ export default Vue.extend({
 .station-links .notes {
     cursor: pointer;
     font-size: 14px;
+    width: 20px;
+    height: 20px;
+    margin: auto;
 }
 
 .pagination {
