@@ -64,11 +64,12 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
 import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
+import { CurrentUser } from "@/api";
 
 export default Vue.extend({
     name: "Comments",
@@ -77,11 +78,12 @@ export default Vue.extend({
     },
     props: {
         user: {
+            type: Object as PropType<CurrentUser>,
             required: true,
         },
         parentData: {
-            required: true,
             type: [Number, Object],
+            required: true,
         },
     },
     data(): {
@@ -121,6 +123,15 @@ export default Vue.extend({
             errorPostComment: false,
         };
     },
+    watch: {
+        parentData(): Promise<void> {
+            return this.getComments();
+        },
+    },
+    mounted(): Promise<void> {
+        this.placeholder = this.getNewCommentPlaceholder();
+        return this.getComments();
+    },
     methods: {
         getNewCommentPlaceholder(): string {
             if (this.viewType === "project") {
@@ -129,11 +140,11 @@ export default Vue.extend({
                 return "Write a comment about this Data View";
             }
         },
-        save(comment: NewComment): void {
+        async save(comment: NewComment): Promise<void> {
             if (this.viewType === "data") {
                 comment.bookmark = JSON.stringify(this.parentData);
             }
-            this.$services.api
+            await this.$services.api
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
                     this.newComment.body = null;
@@ -166,8 +177,8 @@ export default Vue.extend({
             this.newReply.threadId = post.id;
             this.newReply.body = null;
         },
-        getComments(): void {
-            this.$services.api
+        async getComments(): Promise<void> {
+            await this.$services.api
                 .getComments(this.parentData)
                 .then((data) => {
                     this.posts = data.posts;
@@ -181,10 +192,6 @@ export default Vue.extend({
                 this.$emit("viewDataClicked", JSON.parse(post.bookmark));
             }
         },
-    },
-    mounted(): void {
-        this.placeholder = this.getNewCommentPlaceholder();
-        this.getComments();
     },
 });
 </script>

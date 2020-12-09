@@ -13,9 +13,9 @@
             <div v-if="!workspace && !bookmark">Nothing selected to visualize, please choose a station or project from the left.</div>
 
             <div class="workspace-container">
-                <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange"/>
+                <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
 
-                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange"> </Comments>
+                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="user"></Comments>
             </div>
         </div>
     </StandardLayout>
