@@ -50,7 +50,8 @@
 
 <script lang="ts">
 import _ from "lodash";
-import Vue from "vue";
+import Vue, { PropType } from "vue";
+import { DisplayProject } from "@/store";
 
 export default Vue.extend({
     name: "ProjectActivity",
@@ -63,10 +64,15 @@ export default Vue.extend({
             required: true,
         },
         displayProject: {
+            type: Object as PropType<DisplayProject>,
             required: true,
         },
     },
-    data: () => {
+    data(): {
+        activities: {
+            activities: any[];
+        };
+    } {
         return {
             activities: {
                 activities: [],
@@ -74,10 +80,10 @@ export default Vue.extend({
         };
     },
     computed: {
-        loading(this: any) {
+        loading(): boolean {
             return false;
         },
-        visibleActivities(this: any) {
+        visibleActivities(): any[] {
             const compass = this.$loadAsset("icon-compass.svg");
             return _.take(
                 this.activities.activities.map((a, i) => {
@@ -115,17 +121,17 @@ export default Vue.extend({
             );
         },
     },
-    mounted(this: any) {
-        return this.refresh();
+    async mounted(): Promise<void> {
+        await this.refresh();
     },
     methods: {
-        refresh(this: any) {
-            return this.$services.api.getProjectActivity(this.displayProject.id).then((activities) => {
+        async refresh(): Promise<void> {
+            await this.$services.api.getProjectActivity(this.displayProject.id).then((activities) => {
                 this.activities = activities;
                 return activities;
             });
         },
-        onClose() {
+        onClose(): void {
             this.$emit("close");
         },
     },

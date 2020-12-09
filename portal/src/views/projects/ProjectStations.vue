@@ -233,7 +233,7 @@ export default Vue.extend({
 .section-body {
     display: flex;
     flex-direction: row;
-    height: 352px;
+    height: 372px;
 }
 .stations-container {
     display: flex;
