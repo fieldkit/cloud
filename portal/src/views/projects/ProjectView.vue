@@ -23,7 +23,7 @@
                         containerClass="project-activity-floating"
                         @close="closeActivity"
                     />
-                    <ProjectAdmin :user="user" :displayProject="displayProject" :userStations="stations" />
+                    <ProjectAdmin :user="user" :displayProject="displayProject" :userStations="stations" v-if="user" />
                 </div>
                 <ProjectPublic
                     v-if="!isAdministrator && displayProject"

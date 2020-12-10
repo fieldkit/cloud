@@ -1,7 +1,6 @@
 import _ from "lodash";
-import { SensorId, SensorsResponse, SensorDataResponse, SensorInfoResponse, ModuleSensorMeta } from "./api";
+import { SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
 import { Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
-import { DisplayStation } from "@/store/modules/stations";
 import FKApi from "@/api/api";
 
 import { ColorScale, createSensorColorScale } from "./d3-helpers";
@@ -27,6 +26,17 @@ export class TreeOption {
     ) {}
 }
 
+function makeRange(values: number[]): [number, number] {
+    const min = _.min(values);
+    const max = _.max(values);
+    if (min === undefined) throw new Error(`no min: ${values.length}`);
+    if (max === undefined) throw new Error(`no max: ${values.length}`);
+    if (min === max) {
+        console.warn(`range-warning: min == max ${values.length}`);
+    }
+    return [min, max];
+}
+
 export class QueriedData {
     empty = true;
     dataRange: number[] = [];
@@ -35,14 +45,15 @@ export class QueriedData {
 
     constructor(public readonly timeRangeQueried: TimeRange, private readonly sdr: SensorDataResponse) {
         if (this.sdr.data.length > 0) {
-            const values = this.sdr.data.filter((d) => !!d.value).map((d) => d.value) as number[];
-            const times = this.sdr.data.filter((d) => !!d.value).map((d) => d.time) as number[];
+            const filtered = this.sdr.data.filter((d) => _.isNumber(d.value));
+            const values = filtered.map((d) => d.value);
+            const times = filtered.map((d) => d.time);
 
-            if (values.length == 0) throw new Error(`empty ranges`);
-            if (times.length == 0) throw new Error(`empty ranges`);
+            if (values.length == 0) throw new Error(`empty data ranges`);
+            if (times.length == 0) throw new Error(`empty time ranges`);
 
-            this.dataRange = [_.min(values) as number, _.max(values) as number];
-            this.timeRangeData = [_.min(times) as number, _.max(times) as number];
+            this.dataRange = makeRange(values);
+            this.timeRangeData = makeRange(times);
 
             if (this.timeRangeQueried.isExtreme()) {
                 this.timeRange = this.timeRangeData;
@@ -144,6 +155,12 @@ export class Bookmark {
 
     public get allSensors(): number[] {
         return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1] || [])));
+    }
+
+    public static sameAs(a: Bookmark, b: Bookmark): boolean {
+        const aEncoded = JSON.stringify(a);
+        const bEncoded = JSON.stringify(b);
+        return aEncoded == bEncoded;
     }
 }
 
@@ -391,6 +408,13 @@ export class Querier {
         return new FKApi()
             .sensorData(queryParams)
             .then((sdr: SensorDataResponse) => {
+                // eslint-disable-next-line
+                if (false) {
+                    console.log(
+                        `queried-data`,
+                        sdr.data.filter((r) => _.isNumber(r.value)).map((r) => r.value)
+                    );
+                }
                 const queried = new QueriedData(params.when, sdr);
                 this.data[key] = queried;
                 return queried;
@@ -683,7 +707,16 @@ export class Workspace {
         );
     }
 
-    public eventually(callback: (ws: Workspace) => Promise<any>) {
+    public async updateFromBookmark(bm: Bookmark): Promise<void> {
+        if (Bookmark.sameAs(this.bookmark(), bm)) {
+            return;
+        }
+        this.groups = bm.g.map((gm) => Group.fromBookmark(gm));
+        await this.query();
+        return;
+    }
+
+    private eventually(callback: (ws: Workspace) => Promise<any>) {
         callback(this);
         return Promise.resolve(this);
     }

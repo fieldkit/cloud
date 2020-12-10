@@ -282,6 +282,41 @@ func (v *Aggregator) upsertSingle(ctx context.Context, a *aggregation, d *Aggreg
 	return nil
 }
 
+func (v *Aggregator) ClearNumberSamples(ctx context.Context) error {
+	log := Logger(ctx).Sugar().With("station_id", v.stationID)
+
+	log.Infow("nsamples-clear")
+
+	for _, child := range v.aggregations {
+		if _, err := v.db.ExecContext(ctx, fmt.Sprintf(`UPDATE %s SET nsamples = 0 WHERE station_id = $1`, child.table), v.stationID); err != nil {
+			return fmt.Errorf("error updating aggregate nsamples: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func (v *Aggregator) DeleteEmptyAggregates(ctx context.Context) error {
+	log := Logger(ctx).Sugar().With("station_id", v.stationID)
+
+	for _, child := range v.aggregations {
+		total := int32(0)
+		if err := v.db.GetContext(ctx, &total, fmt.Sprintf(`SELECT COUNT(*) FROM %s WHERE nsamples = 0 AND station_id = $1`, child.table), v.stationID); err != nil {
+			return fmt.Errorf("error deleting empty aggregates: %v", err)
+		}
+
+		if total > 0 {
+			log.Infow("nsamples-delete", "table", child.table, "records", total)
+		}
+
+		if _, err := v.db.ExecContext(ctx, fmt.Sprintf(`DELETE FROM %s WHERE nsamples = 0 AND station_id = $1`, child.table), v.stationID); err != nil {
+			return fmt.Errorf("error deleting empty aggregates: %v", err)
+		}
+	}
+
+	return nil
+}
+
 func (v *Aggregator) AddSample(ctx context.Context, sampled time.Time, location []float64, sensorKey string, value float64) error {
 	for _, child := range v.aggregations {
 		time := child.getTime(sampled)
@@ -335,17 +370,23 @@ func (v *Aggregator) NextTime(ctx context.Context, sampled time.Time) error {
 
 func (v *Aggregator) closeChild(ctx context.Context, index int, tail bool) error {
 	aggregation := v.aggregations[index]
+
 	if values, err := aggregation.close(); err != nil {
 		return fmt.Errorf("error closing aggregation: %v", err)
 	} else {
 		if v.batchSize > 1 {
 			if len(v.batches[index]) == v.batchSize || tail {
+				if tail {
+					v.batches[index] = append(v.batches[index], values)
+				}
 				if err := v.upsertBatch(ctx, aggregation, v.batches[index]); err != nil {
 					return err
 				}
 				v.batches[index] = v.batches[index][:0]
 			}
-			v.batches[index] = append(v.batches[index], values)
+			if !tail {
+				v.batches[index] = append(v.batches[index], values)
+			}
 		} else {
 			if err := v.upsertSingle(ctx, aggregation, values); err != nil {
 				return fmt.Errorf("error upserting aggregated: %v", err)

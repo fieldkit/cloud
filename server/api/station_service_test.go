@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/kinbiko/jsonassert"
@@ -636,4 +637,77 @@ func TestGetStationsAllNoPermissions(t *testing.T) {
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusUnauthorized, rr.Code)
+}
+
+func TestAdminTransferStation(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	adminUser, err := e.AddAdminUser()
+	assert.NoError(err)
+
+	otherUser, err := e.AddUser()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("POST", fmt.Sprintf("/stations/%d/transfer/%d", fd.Stations[0].ID, otherUser.ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(adminUser))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusNoContent, rr.Code)
+}
+
+func TestAdminSearchStationsRequiresAdmin(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(5)
+	assert.NoError(err)
+
+	user, err := e.AddUser()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("POST", "/admin/stations/search?query="+fd.Stations[0].Name, nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusUnauthorized, rr.Code)
+}
+
+func TestAdminSearchStationsBasic(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(5)
+	assert.NoError(err)
+
+	adminUser, err := e.AddAdminUser()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("POST", "/admin/stations/search?query="+url.QueryEscape(fd.Stations[0].Name), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(adminUser))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+	{
+		"stations": [ "<<PRESENCE>>" ],
+		"total": 1
+	}`)
 }

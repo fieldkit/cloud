@@ -25,6 +25,9 @@ var _ = Service("user", func() {
 	Error("user-unverified", func() {
 	})
 
+	Error("user-email-registered", func() {
+	})
+
 	Method("roles", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -254,6 +257,8 @@ var _ = Service("user", func() {
 			POST("users")
 
 			Body("user")
+
+			Response("user-email-registered", StatusBadRequest)
 		})
 	})
 
@@ -395,6 +400,34 @@ var _ = Service("user", func() {
 		})
 	})
 
+	Method("admin search", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("query", String)
+			Required("query")
+		})
+
+		Result(func() {
+			Attribute("users", CollectionOf(User))
+			Required("users")
+		})
+
+		HTTP(func() {
+			POST("admin/users/search")
+
+			Params(func() {
+				Param("query")
+			})
+
+			httpAuthentication()
+		})
+	})
+
 	commonOptions()
 })
 
@@ -467,7 +500,8 @@ var User = ResultType("application/vnd.app.user+json", func() {
 		Attribute("bio")
 		Attribute("photo", UserPhoto)
 		Attribute("admin", Boolean)
-		Required("id", "name", "email", "bio", "admin")
+		Attribute("updatedAt", Int64)
+		Required("id", "name", "email", "bio", "admin", "updatedAt")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -476,6 +510,7 @@ var User = ResultType("application/vnd.app.user+json", func() {
 		Attribute("bio")
 		Attribute("photo")
 		Attribute("admin")
+		Attribute("updatedAt")
 	})
 })
 

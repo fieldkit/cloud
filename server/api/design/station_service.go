@@ -263,6 +263,27 @@ var _ = Service("station", func() {
 		})
 	})
 
+	Method("transfer", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("id", Int32)
+			Required("id")
+			Attribute("ownerId", Int32)
+			Required("ownerId")
+		})
+
+		HTTP(func() {
+			POST("stations/{id}/transfer/{ownerId}")
+
+			httpAuthentication()
+		})
+	})
+
 	Method("update", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -401,6 +422,31 @@ var _ = Service("station", func() {
 
 		HTTP(func() {
 			DELETE("admin/stations/{stationId}")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("admin search", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("query", String)
+			Required("query")
+		})
+
+		Result(PageOfStations)
+
+		HTTP(func() {
+			POST("admin/stations/search")
+
+			Params(func() {
+				Param("query")
+			})
 
 			httpAuthentication()
 		})

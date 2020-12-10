@@ -32,10 +32,10 @@
                     <div v-if="!$v.form.bio.required">Short Description is a required field.</div>
                 </div>
             </div>
-            <div class="checkbox">
+            <div class="checkbox" v-show="false">
                 <label>
                     Make my profile public
-                    <input type="checkbox" id="checkbox" v-model="form.public" />
+                    <input type="checkbox" id="checkbox" v-model="form.publicProfile" />
                     <span class="checkbox-btn"></span>
                 </label>
             </div>
@@ -71,6 +71,7 @@ export default Vue.extend({
             email: string;
             bio: string;
             image: any;
+            publicProfile: boolean;
         };
         changePasswordForm: {
             existing: string;
@@ -89,6 +90,7 @@ export default Vue.extend({
                 email: this.user.email,
                 bio: this.user.bio,
                 image: null,
+                publicProfile: false,
             },
             changePasswordForm: {
                 existing: "",

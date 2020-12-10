@@ -86,21 +86,19 @@ export const VizWorkspace = Vue.extend({
         },
     },
     template: `
-		<div class="workspace-container">
-			<div class="groups-container">
-				<template v-for="(group, index) in workspace.groups" :key="group.id">
-					<VizGroup :group="group" :workspace="workspace" :topGroup="index == 0"
-						@group-time-zoomed="(...args) => onGroupTimeZoomed(group, ...args)"
-						@viz-time-zoomed="(...args) => onGraphTimeZoomed(group, ...args)"
-						@viz-geo-zoomed="(...args) => onGraphGeoZoomed(group, ...args)"
-						@viz-remove="(...args) => onRemove(group, ...args)"
-						@viz-compare="(...args) => onCompare(group, ...args)"
-						@viz-change-sensors="(...args) => onChangeSensors(group, ...args)"
-						@viz-change-chart="(...args) => onChangeChart(group, ...args)"
-						@viz-change-linkage="(...args) => onChangeLinkage(group, ...args)"
-					/>
-				</template>
-			</div>
-		</div>
+        <div class="groups-container">
+            <template v-for="(group, index) in workspace.groups" :key="group.id">
+                <VizGroup :group="group" :workspace="workspace" :topGroup="index == 0"
+                    @group-time-zoomed="(...args) => onGroupTimeZoomed(group, ...args)"
+                    @viz-time-zoomed="(...args) => onGraphTimeZoomed(group, ...args)"
+                    @viz-geo-zoomed="(...args) => onGraphGeoZoomed(group, ...args)"
+                    @viz-remove="(...args) => onRemove(group, ...args)"
+                    @viz-compare="(...args) => onCompare(group, ...args)"
+                    @viz-change-sensors="(...args) => onChangeSensors(group, ...args)"
+                    @viz-change-chart="(...args) => onChangeChart(group, ...args)"
+                    @viz-change-linkage="(...args) => onChangeLinkage(group, ...args)"
+                />
+            </template>
+        </div>
 	`,
 });

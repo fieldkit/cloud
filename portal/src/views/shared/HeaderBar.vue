@@ -16,6 +16,7 @@
             </router-link>
             <div class="header-account-menu" v-bind:class="{ active: isAccountHovered }">
                 <router-link v-if="user" :to="{ name: 'editUser' }">My Account</router-link>
+                <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">Admin</router-link>
                 <a class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</a>
             </div>
         </div>
@@ -34,7 +35,7 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
     },
-    data: () => {
+    data(): { isAccountHovered: boolean } {
         return {
             isAccountHovered: false,
         };
@@ -42,29 +43,26 @@ export default Vue.extend({
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({ user: (s: GlobalState) => s.user.user }),
-        userImage() {
-            if (this.$store.state.user.user.photo) {
-                return this.$config.baseUrl + this.$store.state.user.user.photo.url;
+        firstName(): string {
+            if (!this.user) {
+                return "";
             }
-            return null;
-        },
-        firstName(this: any) {
             return this.user.name.split(" ")[0];
         },
     },
     methods: {
-        logout() {
-            return this.$store.dispatch(ActionTypes.LOGOUT).then(() => {
+        async logout(): Promise<void> {
+            await this.$store.dispatch(ActionTypes.LOGOUT).then(() => {
                 return this.$router.push({ name: "login" });
             });
         },
-        onAccountHover(event) {
+        onAccountHover(event: Event): void {
             if (window.screen.availWidth < 768 && event.type == "mouseenter") {
                 return;
             }
             this.isAccountHovered = !this.isAccountHovered;
         },
-        onAccountClick() {
+        onAccountClick(): void {
             this.isAccountHovered = !this.isAccountHovered;
         },
     },

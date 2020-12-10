@@ -46,7 +46,7 @@ func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*u
 		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
 	}
 
-	refreshToken, err := data.NewRefreshToken(authed.ID, 20, now.Add(time.Duration(72)*time.Hour))
+	refreshToken, err := data.NewRefreshToken(authed.ID, 20, now.Add(data.RefreshTokenTtl))
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 	if yes, err := s.userExists(ctx, payload.User.Email); err != nil {
 		return nil, err
 	} else if yes {
-		return nil, user.MakeBadRequest(errors.New("bad request"))
+		return nil, user.MakeUserEmailRegistered(errors.New("email registered"))
 	}
 
 	user := &data.User{
@@ -112,7 +112,7 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 		return nil, err
 	}
 
-	validationToken, err := data.NewValidationToken(user.ID, 20, time.Now().Add(time.Duration(72)*time.Hour))
+	validationToken, err := data.NewValidationToken(user.ID, 20, time.Now().Add(data.ValidationTokenTtl))
 	if err != nil {
 		return nil, err
 	}
@@ -325,7 +325,7 @@ func (s *UserService) RecoveryLookup(ctx context.Context, payload *user.Recovery
 
 	now := time.Now().UTC()
 
-	recoveryToken, err := data.NewRecoveryToken(trying.ID, 20, now.Add(time.Duration(1)*time.Hour))
+	recoveryToken, err := data.NewRecoveryToken(trying.ID, 20, now.Add(data.RecoveryTokenTtl))
 	if err != nil {
 		return err
 	}
@@ -382,7 +382,7 @@ func (s *UserService) Refresh(ctx context.Context, payload *user.RefreshPayload)
 		return nil, err
 	}
 
-	newRefreshToken, err := data.NewRefreshToken(trying.ID, 20, now.Add(time.Duration(72)*time.Hour))
+	newRefreshToken, err := data.NewRefreshToken(trying.ID, 20, now.Add(data.RefreshTokenTtl))
 	if err != nil {
 		return nil, err
 	}
@@ -424,7 +424,7 @@ func (s *UserService) SendValidation(ctx context.Context, payload *user.SendVali
 
 	// TODO Rate limit the number of these we can send?
 	if !updating.Valid {
-		validationToken, err := data.NewValidationToken(updating.ID, 20, time.Now().Add(time.Duration(72)*time.Hour))
+		validationToken, err := data.NewValidationToken(updating.ID, 20, time.Now().Add(data.ValidationTokenTtl))
 		if err != nil {
 			return err
 		}
@@ -497,7 +497,7 @@ func NewTransmissionToken(now time.Time, user *data.User) *jwtgo.Token {
 	token := jwtgo.New(jwtgo.SigningMethodHS512)
 	token.Claims = jwtgo.MapClaims{
 		"iat":    now.Unix(),
-		"exp":    now.Add(time.Hour * 24 * 365).Unix(),
+		"exp":    now.Add(data.TransmissionTokenTtl).Unix(),
 		"sub":    user.ID,
 		"email":  user.Email,
 		"scopes": scopes,
@@ -534,64 +534,65 @@ func (s *UserService) IssueTransmissionToken(ctx context.Context, payload *user.
 	}, nil
 }
 
-func (s *UserService) AdminDelete(ctx context.Context, payload *user.AdminDeletePayload) error {
-	log := Logger(ctx).Sugar()
+func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminDeletePayload) error {
+	log := Logger(outerCtx).Sugar()
 
-	p, err := NewPermissions(ctx, s.options).Unwrap()
-	if err != nil {
-		return err
-	}
-
-	admin := &data.User{}
-	if err := s.options.Database.GetContext(ctx, admin, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
-		return user.MakeForbidden(errors.New("forbidden"))
-	}
-
-	err = admin.CheckPassword(payload.Delete.Password)
-	if err != nil {
-		return user.MakeForbidden(errors.New("forbidden"))
-	}
-
-	deleting := &data.User{}
-	if err = s.options.Database.GetContext(ctx, deleting, `SELECT * FROM fieldkit.user WHERE LOWER(email) = LOWER($1)`, payload.Delete.Email); err != nil {
-		return user.MakeForbidden(errors.New("forbidden"))
-	}
-
-	log.Infow("deleting", "user_id", deleting.ID)
-
-	queries := []string{
-		`DELETE FROM fieldkit.project_invite WHERE user_id = $1`,
-		`DELETE FROM fieldkit.project_follower WHERE follower_id = $1`,
-		`DELETE FROM fieldkit.project_user WHERE user_id = $1`,
-
-		`DELETE FROM fieldkit.notes_media WHERE user_id = $1`,
-		`DELETE FROM fieldkit.notes WHERE author_id = $1`,
-		`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-		`DELETE FROM fieldkit.notes_media WHERE id IN (SELECT media_id FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)))`,
-		`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))`,
-		`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-		`DELETE FROM fieldkit.aggregated_24h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-		`DELETE FROM fieldkit.aggregated_12h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-		`DELETE FROM fieldkit.aggregated_6h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-		`DELETE FROM fieldkit.aggregated_1h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-		`DELETE FROM fieldkit.aggregated_30m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-		`DELETE FROM fieldkit.aggregated_10m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-		`DELETE FROM fieldkit.aggregated_1m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-		`DELETE FROM fieldkit.visible_configuration WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-		`DELETE FROM fieldkit.project_station WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-		`DELETE FROM fieldkit.station_activity WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-		`DELETE FROM fieldkit.station_ingestion WHERE uploader_id = $1`,
-		`DELETE FROM fieldkit.station WHERE owner_id = $1`,
-		`DELETE FROM fieldkit.user WHERE id = $1`,
-	}
-
-	for _, query := range queries {
-		if _, err := s.options.Database.ExecContext(ctx, query, deleting.ID); err != nil {
+	return s.options.Database.WithNewTransaction(outerCtx, func(ctx context.Context) error {
+		p, err := NewPermissions(ctx, s.options).Unwrap()
+		if err != nil {
 			return err
 		}
-	}
 
-	return nil
+		admin := &data.User{}
+		if err := s.options.Database.GetContext(ctx, admin, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
+			return user.MakeForbidden(errors.New("forbidden"))
+		}
+
+		err = admin.CheckPassword(payload.Delete.Password)
+		if err != nil {
+			return user.MakeForbidden(errors.New("forbidden"))
+		}
+
+		deleting := &data.User{}
+		if err = s.options.Database.GetContext(ctx, deleting, `SELECT * FROM fieldkit.user WHERE LOWER(email) = LOWER($1)`, payload.Delete.Email); err != nil {
+			return user.MakeForbidden(errors.New("forbidden"))
+		}
+
+		log.Infow("deleting", "user_id", deleting.ID)
+
+		queries := []string{
+			`DELETE FROM fieldkit.project_invite WHERE user_id = $1`,
+			`DELETE FROM fieldkit.project_follower WHERE follower_id = $1`,
+			`DELETE FROM fieldkit.project_user WHERE user_id = $1`,
+
+			`DELETE FROM fieldkit.notes_media WHERE user_id = $1`,
+			`DELETE FROM fieldkit.notes WHERE author_id = $1`,
+			`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.notes_media WHERE id IN (SELECT media_id FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)))`,
+			`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))`,
+			`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_24h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_12h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_6h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_1h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_30m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_10m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_1m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.visible_configuration WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.project_station WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.station_activity WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.station_ingestion WHERE uploader_id = $1`,
+			`DELETE FROM fieldkit.station WHERE owner_id = $1`,
+			`DELETE FROM fieldkit.user WHERE id = $1`,
+		}
+
+		for _, query := range queries {
+			if _, err := s.options.Database.ExecContext(ctx, query, deleting.ID); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 func (s *UserService) Roles(ctx context.Context, payload *user.RolesPayload) (*user.AvailableRoles, error) {
@@ -610,10 +611,7 @@ func (s *UserService) Roles(ctx context.Context, payload *user.RolesPayload) (*u
 }
 
 func (s *UserService) Delete(ctx context.Context, payload *user.DeletePayload) error {
-	r, err := repositories.NewUserRepository(s.options.Database)
-	if err != nil {
-		return err
-	}
+	r := repositories.NewUserRepository(s.options.Database)
 	return r.Delete(ctx, payload.UserID)
 }
 
@@ -635,7 +633,7 @@ func (s *UserService) UploadPhoto(ctx context.Context, payload *user.UploadPhoto
 
 	user := &data.User{}
 	if err := s.options.Database.GetContext(ctx, user, `
-		UPDATE fieldkit.user SET media_url = $1, media_content_type = $2 WHERE id = $3 RETURNING *
+		UPDATE fieldkit.user SET media_url = $1, media_content_type = $2, updated_at = NOW() WHERE id = $3 RETURNING *
 		`, saved.URL, saved.MimeType, p.UserID()); err != nil {
 		return err
 	}
@@ -686,6 +684,28 @@ func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadP
 	}, nil
 }
 
+func (c *UserService) AdminSearch(ctx context.Context, payload *user.AdminSearchPayload) (*user.AdminSearchResult, error) {
+	sr := repositories.NewUserRepository(c.options.Database)
+
+	users, err := sr.Search(ctx, payload.Query)
+	if err != nil {
+		return nil, err
+	}
+
+	wms := make([]*user.User, 0)
+	for _, user := range users {
+		wm, err := UserType(c.options.signer, user)
+		if err != nil {
+			return nil, err
+		}
+		wms = append(wms, wm)
+	}
+
+	return &user.AdminSearchResult{
+		Users: wms,
+	}, nil
+}
+
 func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
 		Token:        token,
@@ -699,11 +719,12 @@ func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *securit
 
 func UserType(signer *Signer, dm *data.User) (*user.User, error) {
 	userType := &user.User{
-		ID:    dm.ID,
-		Name:  dm.Name,
-		Email: dm.Email,
-		Bio:   dm.Bio,
-		Admin: dm.Admin,
+		ID:        dm.ID,
+		Name:      dm.Name,
+		Email:     dm.Email,
+		Bio:       dm.Bio,
+		Admin:     dm.Admin,
+		UpdatedAt: dm.UpdatedAt.Unix() * 1000,
 	}
 
 	if dm.MediaURL != nil {

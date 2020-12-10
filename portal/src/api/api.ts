@@ -4,7 +4,10 @@ import TokenStorage from "./tokens";
 import Config from "../secrets";
 import { keysToCamel, keysToCamelWithWarnings } from "@/json-tools";
 import { ExportParams } from "@/store/typed-actions";
+import { NewComment } from '@/views/comments/model';
+import { Comment } from '@/views/comments/model';
 import { SensorsResponse } from "@/views/viz/api";
+
 
 export class ApiError extends Error {
     constructor(message) {
@@ -396,7 +399,7 @@ class FKApi {
         const parsed = this.parseToken(this.token.getHeader());
         if (!parsed) {
             console.log("api: refresh skipped, invalid token");
-            return this.logout().then(() => Promise.reject(new AuthenticationRequiredError()));
+            return this.logout(true).then(() => Promise.reject(new AuthenticationRequiredError()));
         }
 
         console.log("api: refreshing");
@@ -412,7 +415,7 @@ class FKApi {
         })
             .then(
                 (response) => this.handleLogin(response),
-                (error) => this.logout().then(() => Promise.reject(new AuthenticationRequiredError()))
+                (error) => this.logout(true).then(() => Promise.reject(new AuthenticationRequiredError()))
             )
             .finally(() => {
                 this.refreshing = null;
@@ -467,11 +470,12 @@ class FKApi {
         }
     }
 
-    public async logout() {
+    public async logout(discardToken = false): Promise<void> {
         try {
             if (!this.token.authenticated()) {
                 return Promise.resolve();
             }
+            if (!discardToken) {
             const token = this.token.getHeader();
             const headers = { "Content-Type": "application/json", Authorization: token };
             await axios({
@@ -479,6 +483,9 @@ class FKApi {
                 url: this.baseUrl + "/logout",
                 headers: headers,
             });
+            }
+        } catch (err) {
+            console.log("api: logout error:", err, err.stack);
         } finally {
             this.token.clear();
         }
@@ -975,6 +982,46 @@ class FKApi {
         });
     }
 
+    public adminSearchUsers(query: string): Promise<{ users: SimpleUser[] }> {
+        const qp = new URLSearchParams();
+        qp.append("query", query);
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/admin/users/search?" + qp.toString(),
+        });
+    }
+
+    public adminSearchStations(query: string): Promise<PageOfStations> {
+        const qp = new URLSearchParams();
+        qp.append("query", query);
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/admin/stations/search?" + qp.toString(),
+        });
+    }
+
+    public adminTransferStation(stationId: number, ownerId: number): Promise<void> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + `/stations/${stationId}/transfer/${ownerId}`,
+        });
+    }
+
+    public adminProcessStation(stationId: number, completely: boolean): Promise<void> {
+        const qp = new URLSearchParams();
+        if (completely) {
+            qp.append("completely", "true");
+        }
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + `/data/stations/${stationId}/process?` + qp.toString(),
+        });
+    }
+
     public deleteStation(stationId: number): Promise<any> {
         return this.invoke({
             auth: Auth.Required,
@@ -1011,6 +1058,31 @@ class FKApi {
             auth: Auth.None,
             method: "GET",
             url: this.baseUrl + "/status",
+        });
+    }
+
+    public getComments(projectIDOrBookmark: number | string): Promise<{posts: []}> {
+        let apiURL;
+
+        if (typeof projectIDOrBookmark === 'number') {
+            apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
+        } else {
+            apiURL = this.baseUrl + "/discussion?bookmark=" + JSON.stringify(projectIDOrBookmark);
+        }
+
+        return this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: apiURL,
+        });
+    }
+
+    public postComment(comment: NewComment): Promise<{post: Comment}> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/discussion",
+            data: { post: comment },
         });
     }
 }

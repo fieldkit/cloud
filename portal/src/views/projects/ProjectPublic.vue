@@ -135,6 +135,8 @@
                 </ul>
             </div>
         </div>
+
+        <Comments :parentData="displayProject.id" :user="user"></Comments>
     </div>
 </template>
 
@@ -145,11 +147,13 @@ import FKApi from "@/api/api";
 import ProjectStations from "./ProjectStations";
 import ProjectActivity from "./ProjectActivity";
 import CommonComponents from "@/views/shared";
+import Comments from "../comments/Comments";
 import FollowControl from "@/views/shared/FollowControl.vue";
 
 export default {
     name: "ProjectPublic",
     components: {
+        Comments,
         ...CommonComponents,
         ProjectStations,
         FollowControl,

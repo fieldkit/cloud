@@ -12,7 +12,11 @@
 
             <div v-if="!workspace && !bookmark">Nothing selected to visualize, please choose a station or project from the left.</div>
 
-            <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
+            <div class="workspace-container">
+                <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
+
+                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="user"></Comments>
+            </div>
         </div>
     </StandardLayout>
 </template>
@@ -32,6 +36,8 @@ import { GlobalState } from "@/store/modules/global";
 import { Workspace, Bookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 
+import Comments from "../comments/Comments.vue";
+
 export default Vue.extend({
     name: "ExploreView",
     components: {
@@ -39,6 +45,7 @@ export default Vue.extend({
         StandardLayout,
         VizWorkspace,
         ExportPanel,
+        Comments,
     },
     props: {
         bookmark: {
@@ -68,58 +75,53 @@ export default Vue.extend({
         }),
     },
     watch: {
-        $route(to, from) {
-            console.log("viz: route");
+        async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
+            console.log(`viz: route:`, newValue);
+            if (this.workspace) {
+                await this.workspace.updateFromBookmark(newValue);
+            }
         },
     },
-    beforeMount(this: any) {
+    async beforeMount(): Promise<void> {
         if (this.bookmark) {
-            return this.$services.api.getAllSensors().then((sensorKeys) => {
+            await this.$services.api.getAllSensors().then(async (sensorKeys) => {
                 if (this.bookmark.s.length > 0) {
                     return this.showStation(this.bookmark.s[0]);
                 }
-                if (this.bookmark.g.length > 0) {
-                    this.workspace = Workspace.fromBookmark(sensorKeys, this.bookmark);
-                }
+                await this.createWorkspaceIfNecessary();
             });
         }
     },
     methods: {
-        onChange(bookmark: Bookmark) {
-            const activeEncoded = JSON.stringify(this.bookmark);
-            const newEncoded = JSON.stringify(bookmark);
-
-            console.log("viz: new", newEncoded);
-            console.log("viz: old", activeEncoded);
-
-            if (newEncoded == activeEncoded) {
+        async onChange(bookmark: Bookmark): Promise<void> {
+            if (Bookmark.sameAs(this.bookmark, bookmark)) {
                 return Promise.resolve(this.workspace);
             }
-
-            return this.$router.push({ name: "exploreBookmark", params: { bookmark: newEncoded } }).then(() => this.workspace);
+            await this.$router.push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bookmark) } }).then(() => this.workspace);
         },
-        openExports() {
+        async openExports(): Promise<void> {
             const encoded = JSON.stringify(this.bookmark);
-            return this.$router.push({ name: "exportBookmark", params: { bookmark: encoded } });
+            await this.$router.push({ name: "exportBookmark", params: { bookmark: encoded } });
         },
-        closeExports() {
+        async closeExports(): Promise<void> {
             const encoded = JSON.stringify(this.bookmark);
-            return this.$router.push({ name: "exploreBookmark", params: { bookmark: encoded } });
+            await this.$router.push({ name: "exploreBookmark", params: { bookmark: encoded } });
         },
-        createWorkspaceIfNecessary() {
+        async createWorkspaceIfNecessary(): Promise<Workspace> {
             if (this.workspace) {
-                return Promise.resolve(this.workspace);
+                return this.workspace;
             }
-
-            return this.$services.api.getAllSensors().then((sensorKeys) => {
-                this.workspace = new Workspace(sensorKeys);
+            return await this.$services.api.getAllSensors().then((sensorKeys) => {
+                if (this.bookmark) {
+                    this.workspace = Workspace.fromBookmark(sensorKeys, this.bookmark);
+                } else {
+                    this.workspace = new Workspace(sensorKeys);
+                }
                 return this.workspace;
             });
         },
-        showStation(stationId: number) {
+        async showStation(stationId: number): Promise<void> {
             console.log("viz: show-station", stationId);
-
-            const station = this.$store.state.stations.stations[stationId];
 
             return this.createWorkspaceIfNecessary().then((workspace) => {
                 return this.$services.api.getQuickSensors([stationId]).then((quickSensors) => {
@@ -174,9 +176,11 @@ export default Vue.extend({
 }
 
 .workspace-container {
-    height: 100%;
     display: flex;
     flex-direction: column;
+    border-radius: 1px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.07);
+    border: solid 1px #f4f5f7;
 }
 .tree-container {
     flex: 0;
@@ -185,8 +189,6 @@ export default Vue.extend({
     padding: 20px;
 }
 .groups-container {
-    border: 2px solid #efefef;
-    border-radius: 4px;
     background-color: white;
 }
 

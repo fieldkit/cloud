@@ -1,0 +1,404 @@
+<template>
+    <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
+        <header v-if="viewType === 'project'">Notes & Comments</header>
+
+        <form @submit.prevent="save(newComment)" class="new-comment">
+            <UserPhoto v-if="user" :user="user"></UserPhoto>
+            <input type="text" :placeholder="placeholder" v-model="newComment.body" />
+            <button type="submit" class="new-comment-submit" v-if="newComment.body">Post</button>
+        </form>
+
+        <div v-if="errorGetComments">Something went wrong loading the comments.</div>
+        <div v-if="errorPostComment">Something went saving your comment.</div>
+
+        <div class="list" v-if="posts && posts.length > 0">
+            <div class="subheader">
+                <span class="comments-counter" v-if="viewType === 'project'">{{ posts.length }} comments</span>
+                <header v-if="viewType === 'data'">Notes & Comments</header>
+            </div>
+            <transition-group name="fade">
+                <div class="comment comment-main" v-for="post in posts" v-bind:key="post.id">
+                    <UserPhoto :user="post.author"></UserPhoto>
+                    <div class="flex column">
+                        <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
+                        <span class="author">{{ post.author.name }}</span>
+                        <span class="body">{{ post.body }}</span>
+
+                        <transition-group name="fade">
+                            <div class="comment" v-for="reply in post.replies" v-bind:key="reply.id">
+                                <UserPhoto :user="reply.author"></UserPhoto>
+                                <div class="flex column">
+                                    <span class="author">{{ reply.author.name }}</span>
+                                    <span class="body">{{ reply.body }}</span>
+                                </div>
+                            </div>
+                        </transition-group>
+
+                        <transition name="fade">
+                            <form
+                                @submit.prevent="save(newReply)"
+                                class="new-comment reply"
+                                v-if="newReply && newReply.threadId === post.id"
+                            >
+                                <UserPhoto :user="user"></UserPhoto>
+                                <input type="text" placeholder="Reply to comment" v-model="newReply.body" />
+                                <button type="submit" class="new-comment-submit" v-if="newReply.body">Post</button>
+                            </form>
+                        </transition>
+
+                        <div class="actions">
+                            <button @click="addReply(post)">
+                                <img src="@/assets/icon-reply.svg" />
+                                Reply
+                            </button>
+                            <button v-if="viewType === 'data'" @click="viewDataClick(post)">
+                                <img src="@/assets/icon-view-data.svg" />
+                                View Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </transition-group>
+        </div>
+    </section>
+</template>
+
+<script lang="ts">
+import Vue, { PropType } from "vue";
+import CommonComponents from "@/views/shared";
+import moment from "moment";
+import { NewComment } from "@/views/comments/model";
+import { Comment } from "@/views/comments/model";
+import { CurrentUser } from "@/api";
+
+export default Vue.extend({
+    name: "Comments",
+    components: {
+        ...CommonComponents,
+    },
+    props: {
+        user: {
+            type: Object as PropType<CurrentUser>,
+            required: true,
+        },
+        parentData: {
+            type: [Number, Object],
+            required: true,
+        },
+    },
+    data(): {
+        posts: Comment[] | null;
+        placeholder: string | null;
+        viewType: string;
+        newComment: {
+            projectId: number | null;
+            bookmark: string | null;
+            body: string | null;
+        };
+        newReply: {
+            projectId: number | null;
+            bookmark: string | null;
+            body: string | null;
+            threadId: number | null;
+        };
+        errorGetComments: boolean;
+        errorPostComment: boolean;
+    } {
+        return {
+            posts: null,
+            placeholder: null,
+            viewType: typeof this.$props.parentData === "number" ? "project" : "data",
+            newComment: {
+                projectId: typeof this.parentData === "number" ? this.parentData : null,
+                bookmark: null,
+                body: null,
+            },
+            newReply: {
+                projectId: typeof this.parentData === "number" ? this.parentData : null,
+                bookmark: null,
+                body: null,
+                threadId: null,
+            },
+            errorGetComments: false,
+            errorPostComment: false,
+        };
+    },
+    watch: {
+        parentData(): Promise<void> {
+            return this.getComments();
+        },
+    },
+    mounted(): Promise<void> {
+        this.placeholder = this.getNewCommentPlaceholder();
+        return this.getComments();
+    },
+    methods: {
+        getNewCommentPlaceholder(): string {
+            if (this.viewType === "project") {
+                return "Comment on Project";
+            } else {
+                return "Write a comment about this Data View";
+            }
+        },
+        async save(comment: NewComment): Promise<void> {
+            if (this.viewType === "data") {
+                comment.bookmark = JSON.stringify(this.parentData);
+            }
+            await this.$services.api
+                .postComment(comment)
+                .then((response: { post: Comment }) => {
+                    this.newComment.body = null;
+                    // add the comment to the replies array
+                    if (comment.threadId) {
+                        if (this.posts) {
+                            this.posts.filter((post) => post.id === comment.threadId)[0].replies.push(response.post);
+                            this.newReply.body = null;
+                        } else {
+                            console.warn(`posts is null`);
+                        }
+                    } else {
+                        // add it to the posts array
+                        if (this.posts) {
+                            this.posts.unshift(response.post);
+                            this.newComment.body = null;
+                        } else {
+                            console.log(`posts is null`);
+                        }
+                    }
+                })
+                .catch(() => {
+                    this.errorPostComment = true;
+                });
+        },
+        formatTimestamp(timestamp: number): string {
+            return moment(timestamp).fromNow();
+        },
+        addReply(post: Comment): void {
+            this.newReply.threadId = post.id;
+            this.newReply.body = null;
+        },
+        async getComments(): Promise<void> {
+            await this.$services.api
+                .getComments(this.parentData)
+                .then((data) => {
+                    this.posts = data.posts;
+                })
+                .catch((e) => {
+                    this.errorGetComments = true;
+                });
+        },
+        viewDataClick(post: Comment) {
+            if (post.bookmark) {
+                this.$emit("viewDataClicked", JSON.parse(post.bookmark));
+            }
+        },
+    },
+});
+</script>
+
+<style lang="scss" scoped>
+@import "../../scss/global";
+
+button {
+    padding: 0;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    cursor: pointer;
+    background: transparent;
+}
+
+* {
+    box-sizing: border-box;
+    font-size: 14px;
+}
+.hide {
+    display: none;
+}
+
+.container {
+    margin-top: 20px;
+    padding: 0 25px 30px 20px;
+    background: #fff;
+    border-radius: 1px;
+    border: 1px solid $color-border;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+
+    &.data-view {
+        margin-top: 0;
+        padding-top: 45px;
+        padding-bottom: 22px;
+        box-shadow: none;
+        border: 0;
+    }
+}
+
+header {
+    @include flex(center, space-between);
+    height: 52px;
+    border-bottom: 1px solid $color-border;
+    font-size: 20px;
+    font-weight: 500;
+
+    .data-view & {
+        font-size: 18px;
+        height: auto;
+        border: none;
+    }
+}
+
+.subheader {
+    @include flex(center, space-between);
+    border-top: 1px solid $color-border;
+    border-bottom: 1px solid $color-border;
+    padding: 15px 0;
+
+    .data-view & {
+        border-top: none;
+    }
+}
+
+.list {
+    .data-view & {
+        margin-top: 30px;
+        width: 60%;
+    }
+}
+
+.new-comment {
+    @include flex(center);
+    padding: 22px 0;
+    position: relative;
+
+    .container.data-view & {
+        &:not(.reply) {
+            background-color: rgba(#f4f5f7, 0.55);
+            padding: 18px 23px 17px 15px;
+        }
+    }
+
+    &.reply {
+        padding: 0;
+        margin-top: 10px;
+
+        input {
+            height: 35px;
+        }
+    }
+
+    img {
+        margin-top: 0;
+        width: 30px;
+        height: 30px;
+    }
+
+    &:not(.reply) {
+        img {
+            width: 46px;
+            height: 46px;
+        }
+    }
+
+    input {
+        height: 45px;
+        padding: 14px 72px 12px 13px;
+        border-radius: 2px;
+        border: solid 1px $color-border;
+        outline: none;
+        width: 100%;
+        font-weight: 500;
+
+        &::placeholder {
+            color: #cccdcf;
+        }
+    }
+
+    &-submit {
+        @include position(absolute, 50% 10px null null);
+        @include flex(center);
+        height: 45px;
+        padding: 0 10px;
+        transform: translateY(-50%);
+        font-weight: 900;
+
+        .container.data-view & {
+            right: 35px;
+        }
+    }
+}
+
+.comments-counter {
+    font-family: $font-family-light;
+}
+
+.author {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    margin-top: 2px;
+}
+
+.body {
+    max-width: 550px;
+    font-family: $font-family-light;
+}
+
+.comment {
+    @include flex(flex-start);
+    padding: 15px 0 0;
+    position: relative;
+
+    &::v-deep > img {
+        margin-top: 0;
+        width: 30px;
+        height: 30px;
+    }
+
+    > div {
+        @include flex();
+    }
+
+    &.highlight {
+        opacity: 0.1;
+        background-color: #a0dbe1;
+        @include position(absolute, 0 null null 0);
+    }
+}
+
+.column {
+    width: 100%;
+    flex-direction: column;
+    position: relative;
+}
+
+.comment-main > .column {
+    border-bottom: 1px solid $color-border;
+}
+
+.actions {
+    margin: 15px 0;
+    user-select: none;
+    @include flex();
+
+    button {
+        font-weight: 500;
+        margin-right: 20px;
+        @include flex(flex-start);
+    }
+
+    img {
+        width: 14px;
+        margin-right: 6px;
+    }
+}
+
+.timestamp {
+    @include position(absolute, 0 0 null null);
+    font-family: $font-family-light;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.25s ease-in-out;
+}
+</style>

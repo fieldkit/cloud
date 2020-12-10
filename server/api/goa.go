@@ -69,6 +69,9 @@ import (
 
 	collection "github.com/fieldkit/cloud/server/api/gen/collection"
 	collectionSvr "github.com/fieldkit/cloud/server/api/gen/http/collection/server"
+
+	discService "github.com/fieldkit/cloud/server/api/gen/discussion"
+	discServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/discussion/server"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -126,6 +129,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	collectionSvc := NewCollectionService(ctx, options)
 	collectionEndpoints := collection.NewEndpoints(collectionSvc)
 
+	discSvc := NewDiscussionService(ctx, options)
+	discEndpoints := discService.NewEndpoints(discSvc)
+
 	for _, mw := range []func(goa.Endpoint) goa.Endpoint{jwtContext(), logErrors()} {
 		modulesEndpoints.Use(mw)
 		tasksEndpoints.Use(mw)
@@ -145,6 +151,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		csvEndpoints.Use(mw)
 		exportEndpoints.Use(mw)
 		collectionEndpoints.Use(mw)
+		discEndpoints.Use(mw)
 	}
 
 	// Provide the transport specific request decoder and response encoder.
@@ -175,6 +182,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	csvServer := csvServiceSvr.New(csvEndpoints, mux, dec, enc, eh, nil)
 	exportServer := exportServiceSvr.New(exportEndpoints, mux, dec, enc, eh, nil)
 	collectionServer := collectionSvr.New(collectionEndpoints, mux, dec, enc, eh, nil)
+	discServer := discServiceSvr.New(discEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
@@ -194,6 +202,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	csvServiceSvr.Mount(mux, csvServer)
 	exportServiceSvr.Mount(mux, exportServer)
 	collectionSvr.Mount(mux, collectionServer)
+	discServiceSvr.Mount(mux, discServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -249,6 +258,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range collectionServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range discServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 

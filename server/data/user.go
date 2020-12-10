@@ -18,6 +18,18 @@ var (
 	UnverifiedUserError    = errors.New("unverified user error")
 )
 
+var (
+	// RefreshTokenTtl = 2 * time.Minute
+	// LoginTokenTtl   = 1 * time.Minute
+
+	RefreshTokenTtl = 72 * time.Hour
+	LoginTokenTtl   = 168 * time.Hour
+
+	RecoveryTokenTtl     = 1 * time.Hour
+	ValidationTokenTtl   = 72 * time.Hour
+	TransmissionTokenTtl = 2 * 24 * 365 * time.Hour
+)
+
 func generateHashFromPassword(password string) ([]byte, error) {
 	return bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
 }
@@ -93,7 +105,7 @@ func (user *User) NewToken(now time.Time, refreshToken *RefreshToken) *jwtgo.Tok
 	token := jwtgo.New(jwtgo.SigningMethodHS512)
 	token.Claims = jwtgo.MapClaims{
 		"iat":           now.Unix(),
-		"exp":           now.Add(time.Hour * 168).Unix(),
+		"exp":           now.Add(LoginTokenTtl).Unix(),
 		"sub":           user.ID,
 		"email":         user.Email,
 		"refresh_token": refreshToken.Token.String(),

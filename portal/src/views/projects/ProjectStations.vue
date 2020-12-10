@@ -233,7 +233,7 @@ export default Vue.extend({
 .section-body {
     display: flex;
     flex-direction: row;
-    height: 352px;
+    height: 372px;
 }
 .stations-container {
     display: flex;
@@ -329,6 +329,9 @@ export default Vue.extend({
 .station-links .notes {
     cursor: pointer;
     font-size: 14px;
+    width: 20px;
+    height: 20px;
+    margin: auto;
 }
 
 .pagination {
