@@ -3193,6 +3193,11 @@ func ValidateLoginRequestBody(body *LoginRequestBody) (err error) {
 	if body.Email != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
 	}
+	if body.Email != nil {
+		if utf8.RuneCountInString(*body.Email) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.email", *body.Email, utf8.RuneCountInString(*body.Email), 40, false))
+		}
+	}
 	if body.Password != nil {
 		if utf8.RuneCountInString(*body.Password) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 10, true))
@@ -3257,6 +3262,11 @@ func ValidateAddRequestBody(body *AddRequestBody) (err error) {
 	if body.Email != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
 	}
+	if body.Email != nil {
+		if utf8.RuneCountInString(*body.Email) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.email", *body.Email, utf8.RuneCountInString(*body.Email), 40, false))
+		}
+	}
 	if body.Password != nil {
 		if utf8.RuneCountInString(*body.Password) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 10, true))
@@ -3286,6 +3296,11 @@ func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
 	}
 	if body.Email != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
+	}
+	if body.Email != nil {
+		if utf8.RuneCountInString(*body.Email) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.email", *body.Email, utf8.RuneCountInString(*body.Email), 40, false))
+		}
 	}
 	return
 }

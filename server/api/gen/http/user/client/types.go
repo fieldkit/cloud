@@ -5201,6 +5201,11 @@ func ValidateUserResponseBody(body *UserResponseBody) (err error) {
 	if body.Email != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
 	}
+	if body.Email != nil {
+		if utf8.RuneCountInString(*body.Email) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.email", *body.Email, utf8.RuneCountInString(*body.Email), 40, false))
+		}
+	}
 	return
 }
 

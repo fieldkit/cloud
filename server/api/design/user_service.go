@@ -438,6 +438,7 @@ var AddUserFields = Type("AddUserFields", func() {
 	})
 	Attribute("email", String, func() {
 		Format("email")
+		MaxLength(40)
 	})
 	Attribute("password", String, func() {
 		MinLength(10)
