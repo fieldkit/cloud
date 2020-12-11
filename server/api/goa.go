@@ -3,9 +3,14 @@ package api
 import (
 	"context"
 	"crypto/rand"
+	"crypto/rsa"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/base64"
 	"io"
 	"net/http"
+	"net/url"
+	"strings"
 
 	goa "goa.design/goa/v3/pkg"
 
@@ -13,6 +18,8 @@ import (
 	"goa.design/goa/v3/security"
 
 	goahttp "goa.design/goa/v3/http"
+
+	"github.com/crewjam/saml/samlsp"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 
@@ -252,7 +259,54 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 
-	return mux, nil
+	keyPair, err := tls.LoadX509KeyPair("myservice.cert", "myservice.key")
+	if err != nil {
+		return nil, err
+	}
+
+	keyPair.Leaf, err = x509.ParseCertificate(keyPair.Certificate[0])
+	if err != nil {
+		return nil, err
+	}
+
+	idpMetadataURL, err := url.Parse("http://127.0.0.1:8090/auth/realms/fk/protocol/saml/descriptor")
+	if err != nil {
+		return nil, err
+	}
+
+	rootURL, err := url.Parse("http://127.0.0.1:8080")
+	if err != nil {
+		return nil, err
+	}
+
+	samlSP, _ := samlsp.New(samlsp.Options{
+		URL:            *rootURL,
+		Key:            keyPair.PrivateKey.(*rsa.PrivateKey),
+		Certificate:    keyPair.Leaf,
+		IDPMetadataURL: idpMetadataURL,
+	})
+
+	app := samlSP.RequireAccount(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s := samlsp.SessionFromContext(r.Context())
+		sa, ok := s.(samlsp.SessionWithAttributes)
+		if ok {
+			log.Infow("hello", "cn", samlsp.AttributeFromContext(r.Context(), "cn"), "attrs", sa.GetAttributes())
+		}
+	}))
+
+	final := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/saml/") {
+			log.Infow("saml", "url", r.URL)
+			samlSP.ServeHTTP(w, r)
+		} else if strings.HasPrefix(r.URL.Path, "/hello") {
+			log.Infow("hello", "url", r.URL)
+			app.ServeHTTP(w, r)
+		} else {
+			mux.ServeHTTP(w, r)
+		}
+	})
+
+	return final, nil
 }
 
 func errorHandler() func(context.Context, http.ResponseWriter, error) {

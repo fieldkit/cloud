@@ -19,11 +19,12 @@ require (
 	github.com/conservify/sqlxcache v0.0.0-20200605152630-7c47a2e4c819
 	github.com/conservify/tooling v0.0.0-20190530175209-bf2b6e69e188
 	github.com/creack/goselect v0.1.0 // indirect
+	github.com/crewjam/saml v0.4.2
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dghubble/go-twitter v0.0.0-20170219215544-fc93bb35701b
 	github.com/dghubble/oauth1 v0.0.0-20170219195226-3c7784d12fed
 	github.com/dghubble/sling v0.0.0-20170219194632-91b015f8c5e2
-	github.com/dgrijalva/jwt-go v0.0.0-20170201225849-2268707a8f08
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dimfeld/httppath v0.0.0-20170720192232-ee938bf73598
 	github.com/dimfeld/httptreemux v5.0.1+incompatible
 	github.com/disintegration/gift v1.2.1 // indirect
@@ -82,7 +83,7 @@ require (
 	github.com/sohlich/go-dbscan v0.0.0-20161128164835-242a0c72bf77
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.6.1
 	github.com/tidwall/gjson v1.6.0
 	github.com/ugorji/go v0.0.0-20190320090025-2dc34c0b8780
 	github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35
