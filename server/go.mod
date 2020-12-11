@@ -7,7 +7,7 @@ require (
 	github.com/PyYoshi/goa-logging-zap v0.2.3
 	github.com/ajg/form v1.5.1
 	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
-	github.com/armon/go-metrics v0.0.0-20180713145231-3c58d8115a78
+	github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da
 	github.com/aws/aws-lambda-go v0.0.0-20180413184133-ea03c2814414
 	github.com/aws/aws-sdk-go v1.29.20
 	github.com/bgentry/que-go v1.0.1
@@ -45,7 +45,7 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/govau/que-go v1.0.1
 	github.com/h2non/filetype v1.0.10
-	github.com/hashicorp/go-immutable-radix v0.0.0-20180129170900-7f3cd4390caa
+	github.com/hashicorp/go-immutable-radix v1.0.0
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/hashicorp/golang-lru v0.5.1
 	github.com/hongshibao/go-algo v0.0.0-20160521171829-b1aaa26798b6 // indirect
@@ -83,6 +83,7 @@ require (
 	github.com/sohlich/go-dbscan v0.0.0-20161128164835-242a0c72bf77
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
+	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
 	github.com/tidwall/gjson v1.6.0
 	github.com/ugorji/go v0.0.0-20190320090025-2dc34c0b8780

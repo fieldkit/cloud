@@ -10,6 +10,8 @@ import (
 	_ "net/http"
 	_ "net/http/pprof"
 
+	"github.com/spf13/viper"
+
 	"github.com/pkg/profile"
 
 	"github.com/kelseyhightower/envconfig"
@@ -88,6 +90,19 @@ func loadConfiguration() (*Config, *Options, error) {
 
 	if err := envconfig.Process("FIELDKIT", config); err != nil {
 		return nil, nil, err
+	}
+
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
+	viper.AddConfigPath("/etc/appname/")
+	viper.AddConfigPath("$HOME/.appname")
+	viper.AddConfigPath(".")
+	viper.SetEnvPrefix("FIELDKIT")
+	viper.AutomaticEnv()
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return nil, nil, err
+		}
 	}
 
 	if config.ApiDomain == "" {
