@@ -800,13 +800,14 @@ func (s *UserService) userExists(ctx context.Context, email string) (bool, error
 }
 
 func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password string) (*data.User, error) {
-	user := &data.User{}
-	err := s.options.Database.GetContext(ctx, user, `SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1)`, email)
-	if err == sql.ErrNoRows {
-		return nil, data.IncorrectPasswordError
-	}
+	users := repositories.NewUserRepository(s.options.Database)
+
+	user, err := users.QueryByEmail(ctx, email)
 	if err != nil {
 		return nil, err
+	}
+	if user == nil {
+		return nil, data.IncorrectPasswordError
 	}
 
 	parts := strings.Split(password, " ")
@@ -816,9 +817,11 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 		// NOTE Not logging password here, may be a real one.
 		log.Infow("spoofing", "email", email)
 
-		adminUser := &data.User{}
-		err := s.options.Database.GetContext(ctx, adminUser, `SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1) AND u.admin`, parts[0])
-		if err == nil {
+		adminUser, err := users.QueryAdminByEmail(ctx, parts[0])
+		if err != nil {
+			return nil, err
+		}
+		if adminUser != nil {
 			// We can safely log the user doing the spoofing here.
 			err = adminUser.CheckPassword(parts[1])
 			if err == nil {

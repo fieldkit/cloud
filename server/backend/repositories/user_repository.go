@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/conservify/sqlxcache"
 
@@ -19,6 +20,28 @@ func NewUserRepository(db *sqlxcache.DB) (r *UserRepository) {
 func (r *UserRepository) QueryByID(ctx context.Context, id int32) (*data.User, error) {
 	user := &data.User{}
 	if err := r.db.GetContext(ctx, user, `SELECT * FROM fieldkit.user WHERE id = $1`, id); err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (r *UserRepository) QueryAdminByEmail(ctx context.Context, email string) (*data.User, error) {
+	user := &data.User{}
+	err := r.db.GetContext(ctx, user, `SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1) AND u.admin`, email)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (r *UserRepository) QueryByEmail(ctx context.Context, email string) (*data.User, error) {
+	user := &data.User{}
+	err := r.db.GetContext(ctx, user, `SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1)`, email)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
 		return nil, err
 	}
 	return user, nil
