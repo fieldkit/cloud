@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 
@@ -54,6 +55,27 @@ func (r *UserRepository) Search(ctx context.Context, query string) ([]*data.User
 		return nil, err
 	}
 	return users, nil
+}
+
+func (r *UserRepository) NewRecoveryToken(ctx context.Context, user *data.User, duration time.Duration) (*data.RecoveryToken, error) {
+	now := time.Now()
+
+	recoveryToken, err := data.NewRecoveryToken(user.ID, 20, now.Add(duration))
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.recovery_token WHERE user_id = $1`, user.ID); err != nil {
+		return nil, err
+	}
+
+	if _, err := r.db.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.recovery_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
+		`, recoveryToken); err != nil {
+		return nil, err
+	}
+
+	return recoveryToken, nil
 }
 
 func (r *UserRepository) Add(ctx context.Context, user *data.User) error {

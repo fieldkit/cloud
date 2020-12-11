@@ -28,6 +28,7 @@ type Server struct {
 	Login                  http.Handler
 	RecoveryLookup         http.Handler
 	Recovery               http.Handler
+	Resume                 http.Handler
 	Logout                 http.Handler
 	Refresh                http.Handler
 	SendValidation         http.Handler
@@ -84,6 +85,7 @@ func New(
 			{"Login", "POST", "/login"},
 			{"RecoveryLookup", "POST", "/user/recovery/lookup"},
 			{"Recovery", "POST", "/user/recovery"},
+			{"Resume", "POST", "/user/resume"},
 			{"Logout", "POST", "/logout"},
 			{"Refresh", "POST", "/refresh"},
 			{"SendValidation", "POST", "/users/{userId}/validate-email"},
@@ -104,6 +106,7 @@ func New(
 			{"CORS", "OPTIONS", "/login"},
 			{"CORS", "OPTIONS", "/user/recovery/lookup"},
 			{"CORS", "OPTIONS", "/user/recovery"},
+			{"CORS", "OPTIONS", "/user/resume"},
 			{"CORS", "OPTIONS", "/logout"},
 			{"CORS", "OPTIONS", "/refresh"},
 			{"CORS", "OPTIONS", "/users/{userId}/validate-email"},
@@ -125,6 +128,7 @@ func New(
 		Login:                  NewLoginHandler(e.Login, mux, decoder, encoder, errhandler, formatter),
 		RecoveryLookup:         NewRecoveryLookupHandler(e.RecoveryLookup, mux, decoder, encoder, errhandler, formatter),
 		Recovery:               NewRecoveryHandler(e.Recovery, mux, decoder, encoder, errhandler, formatter),
+		Resume:                 NewResumeHandler(e.Resume, mux, decoder, encoder, errhandler, formatter),
 		Logout:                 NewLogoutHandler(e.Logout, mux, decoder, encoder, errhandler, formatter),
 		Refresh:                NewRefreshHandler(e.Refresh, mux, decoder, encoder, errhandler, formatter),
 		SendValidation:         NewSendValidationHandler(e.SendValidation, mux, decoder, encoder, errhandler, formatter),
@@ -154,6 +158,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Login = m(s.Login)
 	s.RecoveryLookup = m(s.RecoveryLookup)
 	s.Recovery = m(s.Recovery)
+	s.Resume = m(s.Resume)
 	s.Logout = m(s.Logout)
 	s.Refresh = m(s.Refresh)
 	s.SendValidation = m(s.SendValidation)
@@ -179,6 +184,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountLoginHandler(mux, h.Login)
 	MountRecoveryLookupHandler(mux, h.RecoveryLookup)
 	MountRecoveryHandler(mux, h.Recovery)
+	MountResumeHandler(mux, h.Resume)
 	MountLogoutHandler(mux, h.Logout)
 	MountRefreshHandler(mux, h.Refresh)
 	MountSendValidationHandler(mux, h.SendValidation)
@@ -532,6 +538,57 @@ func NewRecoveryHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "recovery")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountResumeHandler configures the mux to serve the "user" service "resume"
+// endpoint.
+func MountResumeHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleUserOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/user/resume", f)
+}
+
+// NewResumeHandler creates a HTTP handler which loads the HTTP request and
+// calls the "user" service "resume" endpoint.
+func NewResumeHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeResumeRequest(mux, decoder)
+		encodeResponse = EncodeResumeResponse(encoder)
+		encodeError    = EncodeResumeError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "resume")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -1226,6 +1283,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/login", f)
 	mux.Handle("OPTIONS", "/user/recovery/lookup", f)
 	mux.Handle("OPTIONS", "/user/recovery", f)
+	mux.Handle("OPTIONS", "/user/resume", f)
 	mux.Handle("OPTIONS", "/logout", f)
 	mux.Handle("OPTIONS", "/refresh", f)
 	mux.Handle("OPTIONS", "/users/{userId}/validate-email", f)

@@ -27,9 +27,32 @@ func NewUserService(ctx context.Context, options *ControllerOptions) *UserServic
 	return &UserService{options: options}
 }
 
-func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*user.LoginResult, error) {
+func (s *UserService) loggedInReturnToken(ctx context.Context, authed *data.User) (string, error) {
 	now := time.Now()
 
+	refreshToken, err := data.NewRefreshToken(authed.ID, 20, now.Add(data.RefreshTokenTtl))
+	if err != nil {
+		return "", err
+	}
+
+	if _, err := s.options.Database.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.refresh_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
+		`, refreshToken); err != nil {
+		return "", user.MakeUnauthorized(errors.New("invalid email or password"))
+	}
+
+	token := authed.NewToken(now, refreshToken)
+	signedToken, err := token.SignedString(s.options.JWTHMACKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to sign token: %s", err) // internal error
+	}
+
+	s.options.Metrics.AuthSuccess()
+
+	return signedToken, nil
+}
+
+func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*user.LoginResult, error) {
 	s.options.Metrics.AuthTry()
 
 	authed, err := s.authenticateOrSpoof(ctx, payload.Login.Email, payload.Login.Password)
@@ -46,24 +69,10 @@ func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*u
 		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
 	}
 
-	refreshToken, err := data.NewRefreshToken(authed.ID, 20, now.Add(data.RefreshTokenTtl))
+	signedToken, err := s.loggedInReturnToken(ctx, authed)
 	if err != nil {
 		return nil, err
 	}
-
-	if _, err := s.options.Database.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.refresh_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
-		`, refreshToken); err != nil {
-		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
-	}
-
-	token := authed.NewToken(now, refreshToken)
-	signedToken, err := token.SignedString(s.options.JWTHMACKey)
-	if err != nil {
-		return nil, fmt.Errorf("failed to sign token: %s", err) // internal error
-	}
-
-	s.options.Metrics.AuthSuccess()
 
 	return &user.LoginResult{
 		Authorization: "Bearer " + signedToken,
@@ -252,6 +261,51 @@ func (s *UserService) ProjectRoles(ctx context.Context) (user.ProjectRoleCollect
 	return roles, nil
 }
 
+func (s *UserService) Resume(ctx context.Context, payload *user.ResumePayload) (*user.ResumeResult, error) {
+	log := Logger(ctx).Sugar()
+
+	token := data.Token{}
+	if err := token.UnmarshalText([]byte(payload.Token)); err != nil {
+		return nil, err
+	}
+
+	log.Infow("resume", "token_raw", payload.Token, "token", token)
+
+	recoveryToken := &data.RecoveryToken{}
+	err := s.options.Database.GetContext(ctx, recoveryToken, `SELECT * FROM fieldkit.recovery_token WHERE token = $1`, token)
+	if err == sql.ErrNoRows {
+		log.Infow("recovery, token bad")
+		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	now := time.Now().UTC()
+	if now.After(recoveryToken.Expires) {
+		log.Infow("recovery, token expired", "token_expires", recoveryToken.Expires, "now", now)
+		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
+	}
+
+	trying := &data.User{}
+	err = s.options.Database.GetContext(ctx, trying, `SELECT * FROM fieldkit.user WHERE id = $1`, recoveryToken.UserID)
+	if err == sql.ErrNoRows {
+		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	signedToken, err := s.loggedInReturnToken(ctx, trying)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user.ResumeResult{
+		Authorization: "Bearer " + signedToken,
+	}, nil
+}
+
 func (s *UserService) Recovery(ctx context.Context, payload *user.RecoveryPayload) error {
 	log := Logger(ctx).Sugar()
 
@@ -279,9 +333,7 @@ func (s *UserService) Recovery(ctx context.Context, payload *user.RecoveryPayloa
 	}
 
 	trying := &data.User{}
-	err = s.options.Database.GetContext(ctx, trying, `
-		SELECT * FROM fieldkit.user WHERE id = $1
-		`, recoveryToken.UserID)
+	err = s.options.Database.GetContext(ctx, trying, `SELECT * FROM fieldkit.user WHERE id = $1`, recoveryToken.UserID)
 	if err == sql.ErrNoRows {
 		return nil
 	}
@@ -322,21 +374,11 @@ func (s *UserService) RecoveryLookup(ctx context.Context, payload *user.Recovery
 		return nil
 	}
 
-	now := time.Now().UTC()
-
-	recoveryToken, err := data.NewRecoveryToken(trying.ID, 20, now.Add(data.RecoveryTokenTtl))
+	users := repositories.NewUserRepository(s.options.Database)
+	recoveryToken, err := users.NewRecoveryToken(ctx, trying, data.RecoveryTokenTtl)
 	if err != nil {
-		return err
-	}
-
-	if _, err := s.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.recovery_token WHERE user_id = $1`, trying.ID); err != nil {
-		return err
-	}
-
-	if _, err := s.options.Database.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.recovery_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
-		`, recoveryToken); err != nil {
-		return err
+		log.Errorw("recovery", "error", err)
+		return nil
 	}
 
 	if err := s.options.Emailer.SendRecoveryToken(trying, recoveryToken); err != nil {

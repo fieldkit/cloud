@@ -680,6 +680,78 @@ type RecoveryBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// ResumeUnauthorizedResponseBody is the type of the "user" service "resume"
+// endpoint HTTP response body for the "unauthorized" error.
+type ResumeUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ResumeForbiddenResponseBody is the type of the "user" service "resume"
+// endpoint HTTP response body for the "forbidden" error.
+type ResumeForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ResumeNotFoundResponseBody is the type of the "user" service "resume"
+// endpoint HTTP response body for the "not-found" error.
+type ResumeNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ResumeBadRequestResponseBody is the type of the "user" service "resume"
+// endpoint HTTP response body for the "bad-request" error.
+type ResumeBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // LogoutUnauthorizedResponseBody is the type of the "user" service "logout"
 // endpoint HTTP response body for the "unauthorized" error.
 type LogoutUnauthorizedResponseBody struct {
@@ -2228,6 +2300,62 @@ func NewRecoveryBadRequestResponseBody(res *goa.ServiceError) *RecoveryBadReques
 	return body
 }
 
+// NewResumeUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "resume" endpoint of the "user" service.
+func NewResumeUnauthorizedResponseBody(res *goa.ServiceError) *ResumeUnauthorizedResponseBody {
+	body := &ResumeUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewResumeForbiddenResponseBody builds the HTTP response body from the result
+// of the "resume" endpoint of the "user" service.
+func NewResumeForbiddenResponseBody(res *goa.ServiceError) *ResumeForbiddenResponseBody {
+	body := &ResumeForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewResumeNotFoundResponseBody builds the HTTP response body from the result
+// of the "resume" endpoint of the "user" service.
+func NewResumeNotFoundResponseBody(res *goa.ServiceError) *ResumeNotFoundResponseBody {
+	body := &ResumeNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewResumeBadRequestResponseBody builds the HTTP response body from the
+// result of the "resume" endpoint of the "user" service.
+func NewResumeBadRequestResponseBody(res *goa.ServiceError) *ResumeBadRequestResponseBody {
+	body := &ResumeBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewLogoutUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "logout" endpoint of the "user" service.
 func NewLogoutUnauthorizedResponseBody(res *goa.ServiceError) *LogoutUnauthorizedResponseBody {
@@ -3049,6 +3177,18 @@ func NewRecoveryPayload(body *RecoveryRequestBody) *user.RecoveryPayload {
 	}
 
 	return res
+}
+
+// NewResumePayload builds a user service resume endpoint payload.
+func NewResumePayload(body struct {
+	Token *string `form:"token" json:"token" xml:"token"`
+}) *user.ResumePayload {
+	v := &user.ResumePayload{}
+	if body.Token != nil {
+		v.Token = *body.Token
+	}
+
+	return v
 }
 
 // NewLogoutPayload builds a user service logout endpoint payload.

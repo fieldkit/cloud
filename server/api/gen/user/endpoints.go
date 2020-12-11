@@ -24,6 +24,7 @@ type Endpoints struct {
 	Login                  goa.Endpoint
 	RecoveryLookup         goa.Endpoint
 	Recovery               goa.Endpoint
+	Resume                 goa.Endpoint
 	Logout                 goa.Endpoint
 	Refresh                goa.Endpoint
 	SendValidation         goa.Endpoint
@@ -60,6 +61,7 @@ func NewEndpoints(s Service) *Endpoints {
 		Login:                  NewLoginEndpoint(s),
 		RecoveryLookup:         NewRecoveryLookupEndpoint(s),
 		Recovery:               NewRecoveryEndpoint(s),
+		Resume:                 NewResumeEndpoint(s),
 		Logout:                 NewLogoutEndpoint(s, a.JWTAuth),
 		Refresh:                NewRefreshEndpoint(s),
 		SendValidation:         NewSendValidationEndpoint(s),
@@ -85,6 +87,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Login = m(e.Login)
 	e.RecoveryLookup = m(e.RecoveryLookup)
 	e.Recovery = m(e.Recovery)
+	e.Resume = m(e.Resume)
 	e.Logout = m(e.Logout)
 	e.Refresh = m(e.Refresh)
 	e.SendValidation = m(e.SendValidation)
@@ -200,6 +203,15 @@ func NewRecoveryEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*RecoveryPayload)
 		return nil, s.Recovery(ctx, p)
+	}
+}
+
+// NewResumeEndpoint returns an endpoint function that calls the method
+// "resume" of service "user".
+func NewResumeEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*ResumePayload)
+		return s.Resume(ctx, p)
 	}
 }
 

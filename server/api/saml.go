@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/crewjam/saml/samlsp"
 
@@ -63,8 +64,10 @@ func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, 
 
 	required := samlSP.RequireAccount(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		if err := sa.resolve(ctx); err != nil {
-			//
+		if token, err := sa.resolve(ctx); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		} else {
+			http.Redirect(w, r, fmt.Sprintf("http://127.0.0.1:8081/login/%s", token.Token), http.StatusTemporaryRedirect)
 		}
 	}))
 
@@ -83,7 +86,7 @@ func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, 
 	return final, nil
 }
 
-func (sa *SamlAuth) resolve(ctx context.Context) error {
+func (sa *SamlAuth) resolve(ctx context.Context) (token *data.RecoveryToken, err error) {
 	log := Logger(ctx).Sugar()
 
 	users := repositories.NewUserRepository(sa.options.Database)
@@ -91,7 +94,7 @@ func (sa *SamlAuth) resolve(ctx context.Context) error {
 	s := samlsp.SessionFromContext(ctx)
 	_, ok := s.(samlsp.SessionWithAttributes)
 	if !ok {
-		return fmt.Errorf("no attributes")
+		return nil, fmt.Errorf("no attributes")
 	}
 	email := samlsp.AttributeFromContext(ctx, "email")
 	surname := samlsp.AttributeFromContext(ctx, "surname")
@@ -99,7 +102,7 @@ func (sa *SamlAuth) resolve(ctx context.Context) error {
 
 	user, err := users.QueryByEmail(ctx, email)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if user == nil {
 		log.Infow("registering", "email", email, "surname", surname, "given", given)
@@ -112,11 +115,17 @@ func (sa *SamlAuth) resolve(ctx context.Context) error {
 			Valid:    true, // TODO Safe to assume, to me.
 		}
 		if err := users.Add(ctx, user); err != nil {
-			return err
+			return nil, err
 		}
 	} else {
 		log.Infow("found", "email", email, "surname", surname, "given", given)
 	}
 
-	return nil
+	recoveryToken, err := users.NewRecoveryToken(ctx, user, 10*time.Second)
+	if err != nil {
+		log.Errorw("recovery", "error", err)
+		return nil, err
+	}
+
+	return recoveryToken, nil
 }

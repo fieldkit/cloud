@@ -165,6 +165,32 @@ var _ = Service("user", func() {
 		})
 	})
 
+	Method("resume", func() {
+		Payload(func() {
+			Attribute("token", String)
+			Required("token")
+		})
+
+		Result(func() {
+			Attribute("authorization", String)
+			Required("authorization")
+		})
+
+		HTTP(func() {
+			POST("user/resume")
+
+			Body(func() {
+				Attribute("token")
+			})
+
+			Response(StatusNoContent, func() {
+				Headers(func() {
+					Header("authorization:Authorization")
+				})
+			})
+		})
+	})
+
 	Method("logout", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
