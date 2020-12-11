@@ -38,6 +38,15 @@ const routes = [
         },
     },
     {
+        path: "/login/:token",
+        name: "loginResume",
+        component: LoginView,
+        meta: {
+            bodyClass: "blue-background",
+            secured: false,
+        },
+    },
+    {
         path: "/spoof",
         name: "spoof",
         component: LoginView,

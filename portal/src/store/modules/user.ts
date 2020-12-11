@@ -2,6 +2,8 @@ import Vue from "vue";
 import * as ActionTypes from "../actions";
 import * as MutationTypes from "../mutations";
 
+import { ResumeAction } from "@/store";
+
 import { FKApi, TokenStorage, Services, LoginPayload, LoginResponse, CurrentUser } from "@/api";
 
 export const UPDATE_TOKEN = "UPDATE_TOKEN";
@@ -30,6 +32,16 @@ const actions = (services: Services) => {
         },
         [ActionTypes.LOGIN]: ({ commit, dispatch, state }: ActionParameters, payload: LoginPayload) => {
             return services.api.login(payload.email, payload.password).then((token) => {
+                commit(UPDATE_TOKEN, token);
+                return dispatch(ActionTypes.REFRESH_CURRENT_USER).then(() => {
+                    return dispatch(ActionTypes.AUTHENTICATED).then(() => {
+                        return new LoginResponse(token);
+                    });
+                });
+            });
+        },
+        [ActionTypes.LOGIN_RESUME]: ({ commit, dispatch, state }: ActionParameters, payload: ResumeAction) => {
+            return services.api.resume(payload.token).then((token) => {
                 commit(UPDATE_TOKEN, token);
                 return dispatch(ActionTypes.REFRESH_CURRENT_USER).then(() => {
                     return dispatch(ActionTypes.AUTHENTICATED).then(() => {

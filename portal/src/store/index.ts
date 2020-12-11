@@ -19,8 +19,12 @@ export * from "./modules/progress";
 export * from "./modules/layout";
 export * from "./modules/global";
 
-// import * as MutationTypes from "./mutations";
-// import * as ActionTypes from "./actions";
+import * as MutationTypes from "./mutations";
+import * as ActionTypes from "./actions";
+
+export { MutationTypes, ActionTypes };
+
+export * from "./typed-actions";
 
 function customizeLogger() {
     return createLogger({

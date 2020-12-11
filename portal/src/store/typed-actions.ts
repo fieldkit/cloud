@@ -17,3 +17,9 @@ export class ExportDataAction {
 
     constructor(public readonly bookmark: Bookmark, public readonly params: ExportParams) {}
 }
+
+export class ResumeAction {
+    type = ActionTypes.LOGIN_RESUME;
+
+    constructor(public readonly token: string) {}
+}

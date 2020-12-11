@@ -121,7 +121,7 @@ func (sa *SamlAuth) resolve(ctx context.Context) (token *data.RecoveryToken, err
 		log.Infow("found", "email", email, "surname", surname, "given", given)
 	}
 
-	recoveryToken, err := users.NewRecoveryToken(ctx, user, 10*time.Second)
+	recoveryToken, err := users.NewRecoveryToken(ctx, user, 30*time.Second)
 	if err != nil {
 		log.Errorw("recovery", "error", err)
 		return nil, err

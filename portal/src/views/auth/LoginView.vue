@@ -46,7 +46,7 @@ import CommonComponents from "@/views/shared";
 import { required, email, minLength, sameAs, requiredIf } from "vuelidate/lib/validators";
 
 import FKApi, { LoginPayload } from "@/api/api";
-import * as ActionTypes from "@/store/actions";
+import { ActionTypes, ResumeAction } from "@/store";
 
 export default Vue.extend({
     components: {
@@ -95,6 +95,12 @@ export default Vue.extend({
             },
         };
     },
+    async mounted(): Promise<void> {
+        if (this.$route.params.token) {
+            await this.$store.dispatch(new ResumeAction(this.$route.params.token));
+            await this.leaveAfterAuth();
+        }
+    },
     methods: {
         forwardAfterQuery(): { after?: string } {
             const after = this.$route.query.after;
@@ -126,18 +132,22 @@ export default Vue.extend({
             await this.$store
                 .dispatch(ActionTypes.LOGIN, payload)
                 .then(
-                    () => {
-                        const after = this.forwardAfterQuery();
-                        if (after.after) {
-                            return this.$router.push(after.after);
-                        }
-                        return this.$router.push({ name: "projects" });
+                    async () => {
+                        await this.leaveAfterAuth();
                     },
                     () => (this.failed = true)
                 )
                 .finally(() => {
                     this.busy = false;
                 });
+        },
+        async leaveAfterAuth(): Promise<void> {
+            const after = this.forwardAfterQuery();
+            if (after.after) {
+                await this.$router.push(after.after);
+            } else {
+                await this.$router.push({ name: "projects" });
+            }
         },
     },
 });

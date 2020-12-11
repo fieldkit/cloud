@@ -4,10 +4,9 @@ import TokenStorage from "./tokens";
 import Config from "../secrets";
 import { keysToCamel, keysToCamelWithWarnings } from "@/json-tools";
 import { ExportParams } from "@/store/typed-actions";
-import { NewComment } from '@/views/comments/model';
-import { Comment } from '@/views/comments/model';
+import { NewComment } from "@/views/comments/model";
+import { Comment } from "@/views/comments/model";
 import { SensorsResponse } from "@/views/viz/api";
-
 
 export class ApiError extends Error {
     constructor(message) {
@@ -444,7 +443,7 @@ class FKApi {
         }
     }
 
-    public login(email, password) {
+    public login(email: string, password: string): Promise<any> {
         return axios({
             method: "POST",
             url: this.baseUrl + "/login",
@@ -452,6 +451,17 @@ class FKApi {
             data: {
                 email: email,
                 password: password,
+            },
+        }).then((response) => this.handleLogin(response));
+    }
+
+    public resume(token: string): Promise<any> {
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/user/resume",
+            headers: { "Content-Type": "application/json" },
+            data: {
+                token: token,
             },
         }).then((response) => this.handleLogin(response));
     }
@@ -476,13 +486,13 @@ class FKApi {
                 return Promise.resolve();
             }
             if (!discardToken) {
-            const token = this.token.getHeader();
-            const headers = { "Content-Type": "application/json", Authorization: token };
-            await axios({
-                method: "POST",
-                url: this.baseUrl + "/logout",
-                headers: headers,
-            });
+                const token = this.token.getHeader();
+                const headers = { "Content-Type": "application/json", Authorization: token };
+                await axios({
+                    method: "POST",
+                    url: this.baseUrl + "/logout",
+                    headers: headers,
+                });
             }
         } catch (err) {
             console.log("api: logout error:", err, err.stack);
@@ -1061,10 +1071,10 @@ class FKApi {
         });
     }
 
-    public getComments(projectIDOrBookmark: number | string): Promise<{posts: []}> {
+    public getComments(projectIDOrBookmark: number | string): Promise<{ posts: [] }> {
         let apiURL;
 
-        if (typeof projectIDOrBookmark === 'number') {
+        if (typeof projectIDOrBookmark === "number") {
             apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
         } else {
             apiURL = this.baseUrl + "/discussion?bookmark=" + JSON.stringify(projectIDOrBookmark);
@@ -1077,7 +1087,7 @@ class FKApi {
         });
     }
 
-    public postComment(comment: NewComment): Promise<{post: Comment}> {
+    public postComment(comment: NewComment): Promise<{ post: Comment }> {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",

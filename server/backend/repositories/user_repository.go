@@ -58,7 +58,7 @@ func (r *UserRepository) Search(ctx context.Context, query string) ([]*data.User
 }
 
 func (r *UserRepository) NewRecoveryToken(ctx context.Context, user *data.User, duration time.Duration) (*data.RecoveryToken, error) {
-	now := time.Now()
+	now := time.Now().UTC()
 
 	recoveryToken, err := data.NewRecoveryToken(user.ID, 20, now.Add(duration))
 	if err != nil {
