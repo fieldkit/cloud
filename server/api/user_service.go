@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/viper"
+
 	"github.com/Nerzal/gocloak/v7"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -897,11 +899,19 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 
 func (s *UserService) updateAuthentication(ctx context.Context, user *data.User, password string) error {
 	log := Logger(ctx).Sugar()
-	realm := "fk"
+	realm := viper.GetString("KEYCLOAK_REALM")
+	url := viper.GetString("KEYCLOAK_URL")
+	adminUser := viper.GetString("KEYCLOAK_ADMIN_USER")
+	adminPassword := viper.GetString("KEYCLOAK_ADMIN_PASSWORD")
+	adminRealm := viper.GetString("KEYCLOAK_ADMIN_REALM")
 
-	client := gocloak.NewClient("http://127.0.0.1:8090")
+	if url == "" || realm == "" {
+		log.Infow("keycloak-skipping")
+		return nil
+	}
 
-	token, err := client.LoginAdmin(ctx, "admin", "admin", "master")
+	client := gocloak.NewClient(url)
+	token, err := client.LoginAdmin(ctx, adminUser, adminPassword, adminRealm)
 	if err != nil {
 		return fmt.Errorf("keycloak login: %v", err)
 	}
@@ -916,7 +926,7 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 	}
 
 	if len(users) > 1 {
-		log.Infow("too-many-keycloak-users", "number_users", len(users), "email", user.Email)
+		log.Infow("keycloak-too-many-users", "number_users", len(users), "email", user.Email)
 		return nil
 	}
 
