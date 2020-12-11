@@ -12,6 +12,8 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"goa.design/goa/v3/security"
 
+	"github.com/spf13/viper"
+
 	goahttp "goa.design/goa/v3/http"
 
 	"github.com/fieldkit/cloud/server/common/logging"
@@ -148,11 +150,11 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	}
 
 	samlConfig := &SamlConfig{
-		CertPath:           "myservice.cert",
-		KeyPath:            "myservice.key",
-		ServiceProviderURL: "http://127.0.0.1:8080",
-		LoginURLTemplate:   "http://127.0.0.1:8081/login/%s",
-		IDPMetaURL:         "http://127.0.0.1:8090/auth/realms/fk/protocol/saml/descriptor",
+		CertPath:           viper.GetString("SAML_CERT"),
+		KeyPath:            viper.GetString("SAML_KEY"),
+		ServiceProviderURL: viper.GetString("SAML_SP_URL"),
+		IDPMetaURL:         viper.GetString("SAML_IPD_META"),
+		LoginURLTemplate:   viper.GetString("SAML_LOGIN_URL"),
 	}
 	saml := NewSamlAuth(options, samlConfig)
 
