@@ -915,18 +915,26 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 		return fmt.Errorf("keycloak get users: %v", err)
 	}
 
+	if len(users) > 1 {
+		log.Infow("too-many-keycloak-users", "number_users", len(users), "email", user.Email)
+		return nil
+	}
+
 	updated := false
+
 	for _, ku := range users {
-		log.Infow("user", "user", ku)
 		ku.FirstName = gocloak.StringP(user.Name)
 		ku.LastName = gocloak.StringP(user.Name)
 		ku.Email = gocloak.StringP(user.Email)
 		ku.Username = gocloak.StringP(user.Email)
-		err = client.UpdateUser(ctx, token.AccessToken, realm, *ku)
-		if err != nil {
+		if err := client.UpdateUser(ctx, token.AccessToken, realm, *ku); err != nil {
 			return fmt.Errorf("keycloak update: %v", err)
 		}
+		if err = client.SetPassword(ctx, token.AccessToken, *ku.ID, realm, password, false); err != nil {
+			return fmt.Errorf("keycloak setpw: %v", err)
+		}
 		updated = true
+		log.Infow("updated", "keycloak_user_id", ku.ID)
 		break
 	}
 
@@ -939,18 +947,17 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 			Enabled:   gocloak.BoolP(true),
 		}
 
-		_, err = client.CreateUser(ctx, token.AccessToken, realm, cloaked)
+		createdID, err := client.CreateUser(ctx, token.AccessToken, realm, cloaked)
 		if err != nil {
 			return fmt.Errorf("keycloak create: %v", err)
 		}
+
+		if err = client.SetPassword(ctx, token.AccessToken, createdID, realm, password, false); err != nil {
+			return fmt.Errorf("keycloak setpw: %v", err)
+		}
+
+		log.Infow("created", "keycloak_user_id", createdID)
 	}
 
 	return nil
-
-	/*
-		ku, err := client.GetUserByID(ctx, token.AccessToken, realm, user.Email)
-		if err != nil {
-			return fmt.Errorf("keycloak get: %v", err)
-		}
-	*/
 }
