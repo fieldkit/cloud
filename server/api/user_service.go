@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Nerzal/gocloak/v7"
+
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"goa.design/goa/v3/security"
 
@@ -851,10 +853,10 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 		return nil, data.IncorrectPasswordError
 	}
 
+	log := Logger(ctx).Sugar()
+
 	parts := strings.Split(password, " ")
 	if len(parts) == 2 {
-		log := Logger(ctx).Sugar()
-
 		// NOTE Not logging password here, may be a real one.
 		log.Infow("spoofing", "email", email)
 
@@ -882,9 +884,73 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 		return nil, err
 	}
 
+	if err := s.updateAuthentication(ctx, user, password); err != nil {
+		log.Errorw("update-authentication", "user_id", user.ID, "error", err)
+	}
+
 	if !user.Valid {
 		return nil, data.UnverifiedUserError
 	}
 
 	return user, nil
+}
+
+func (s *UserService) updateAuthentication(ctx context.Context, user *data.User, password string) error {
+	log := Logger(ctx).Sugar()
+	realm := "fk"
+
+	client := gocloak.NewClient("http://127.0.0.1:8090")
+
+	token, err := client.LoginAdmin(ctx, "admin", "admin", "master")
+	if err != nil {
+		return fmt.Errorf("keycloak login: %v", err)
+	}
+
+	params := gocloak.GetUsersParams{
+		Email: &user.Email,
+	}
+
+	users, err := client.GetUsers(ctx, token.AccessToken, realm, params)
+	if err != nil {
+		return fmt.Errorf("keycloak get users: %v", err)
+	}
+
+	updated := false
+	for _, ku := range users {
+		log.Infow("user", "user", ku)
+		ku.FirstName = gocloak.StringP(user.Name)
+		ku.LastName = gocloak.StringP(user.Name)
+		ku.Email = gocloak.StringP(user.Email)
+		ku.Username = gocloak.StringP(user.Email)
+		err = client.UpdateUser(ctx, token.AccessToken, realm, *ku)
+		if err != nil {
+			return fmt.Errorf("keycloak update: %v", err)
+		}
+		updated = true
+		break
+	}
+
+	if !updated {
+		cloaked := gocloak.User{
+			FirstName: gocloak.StringP(user.Name),
+			LastName:  gocloak.StringP(user.Name),
+			Email:     gocloak.StringP(user.Email),
+			Username:  gocloak.StringP(user.Email),
+			Enabled:   gocloak.BoolP(true),
+		}
+
+		_, err = client.CreateUser(ctx, token.AccessToken, realm, cloaked)
+		if err != nil {
+			return fmt.Errorf("keycloak create: %v", err)
+		}
+	}
+
+	return nil
+
+	/*
+		ku, err := client.GetUserByID(ctx, token.AccessToken, realm, user.Email)
+		if err != nil {
+			return fmt.Errorf("keycloak get: %v", err)
+		}
+	*/
 }

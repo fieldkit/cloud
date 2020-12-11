@@ -3,6 +3,8 @@ module github.com/fieldkit/cloud/server
 go 1.12
 
 require (
+	github.com/Nerzal/gocloak v1.0.0 // indirect
+	github.com/Nerzal/gocloak/v7 v7.11.0
 	github.com/O-C-R/singlepage v0.0.0-20170327184421-bbbe2159ecec
 	github.com/PyYoshi/goa-logging-zap v0.2.3
 	github.com/ajg/form v1.5.1
@@ -78,7 +80,7 @@ require (
 	github.com/pkg/profile v1.5.0
 	github.com/robinpowered/go-proto v0.0.0-20160614142341-85ea3e1f1d3d
 	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b
-	github.com/segmentio/ksuid v1.0.1
+	github.com/segmentio/ksuid v1.0.3
 	github.com/sirupsen/logrus v1.4.2
 	github.com/sohlich/go-dbscan v0.0.0-20161128164835-242a0c72bf77
 	github.com/spf13/cobra v0.0.3
@@ -97,11 +99,11 @@ require (
 	go.uber.org/zap v1.10.0
 	goa.design/goa/v3 v3.2.4
 	goa.design/plugins/v3 v3.1.1
-	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
-	golang.org/x/net v0.0.0-20201009032441-dbdefad45b89
+	golang.org/x/net v0.0.0-20201209123823-ac852fbbde11
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	golang.org/x/sys v0.0.0-20201009025420-dfb3f7c4e634
+	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68
 	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.0.0-20201009162240-fcf82128ed91
 	google.golang.org/appengine v1.6.5
