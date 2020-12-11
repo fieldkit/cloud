@@ -19,20 +19,30 @@ import (
 
 type ResolveFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request) error
 
-type SamlAuth struct {
-	options *ControllerOptions
+type SamlConfig struct {
+	CertPath           string
+	KeyPath            string
+	ServiceProviderURL string
+	LoginURLTemplate   string
+	IDPMetaURL         string
 }
 
-func NewSamlAuth(options *ControllerOptions) *SamlAuth {
+type SamlAuth struct {
+	options *ControllerOptions
+	config  *SamlConfig
+}
+
+func NewSamlAuth(options *ControllerOptions, config *SamlConfig) *SamlAuth {
 	return &SamlAuth{
 		options: options,
+		config:  config,
 	}
 }
 
 func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, error) {
 	log := Logger(ctx).Sugar()
 
-	keyPair, err := tls.LoadX509KeyPair("myservice.cert", "myservice.key")
+	keyPair, err := tls.LoadX509KeyPair(sa.config.CertPath, sa.config.KeyPath)
 	if err != nil {
 		return nil, err
 	}
@@ -42,18 +52,18 @@ func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, 
 		return nil, err
 	}
 
-	idpMetadataURL, err := url.Parse("http://127.0.0.1:8090/auth/realms/fk/protocol/saml/descriptor")
+	idpMetadataURL, err := url.Parse(sa.config.IDPMetaURL)
 	if err != nil {
 		return nil, err
 	}
 
-	rootURL, err := url.Parse("http://127.0.0.1:8080")
+	spURL, err := url.Parse(sa.config.ServiceProviderURL)
 	if err != nil {
 		return nil, err
 	}
 
 	samlSP, _ := samlsp.New(samlsp.Options{
-		URL:            *rootURL,
+		URL:            *spURL,
 		Key:            keyPair.PrivateKey.(*rsa.PrivateKey),
 		Certificate:    keyPair.Leaf,
 		IDPMetadataURL: idpMetadataURL,
@@ -67,7 +77,7 @@ func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, 
 		if token, err := sa.resolve(ctx); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else {
-			http.Redirect(w, r, fmt.Sprintf("http://127.0.0.1:8081/login/%s", token.Token), http.StatusTemporaryRedirect)
+			http.Redirect(w, r, fmt.Sprintf(sa.config.LoginURLTemplate, token.Token), http.StatusTemporaryRedirect)
 		}
 	}))
 
@@ -76,7 +86,7 @@ func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, 
 			log.Infow("require-saml", "url", r.URL)
 			required.ServeHTTP(w, r)
 		} else if strings.HasPrefix(r.URL.Path, SamlPrefix) {
-			log.Infow("saml", "url", r.URL)
+			log.Infow("serve-saml", "url", r.URL)
 			samlSP.ServeHTTP(w, r)
 		} else {
 			app.ServeHTTP(w, r)

@@ -147,7 +147,14 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		discEndpoints.Use(mw)
 	}
 
-	saml := NewSamlAuth(options)
+	samlConfig := &SamlConfig{
+		CertPath:           "myservice.cert",
+		KeyPath:            "myservice.key",
+		ServiceProviderURL: "http://127.0.0.1:8080",
+		LoginURLTemplate:   "http://127.0.0.1:8081/login/%s",
+		IDPMetaURL:         "http://127.0.0.1:8090/auth/realms/fk/protocol/saml/descriptor",
+	}
+	saml := NewSamlAuth(options, samlConfig)
 
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
