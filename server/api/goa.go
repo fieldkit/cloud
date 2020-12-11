@@ -147,6 +147,8 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		discEndpoints.Use(mw)
 	}
 
+	saml := NewSamlAuth(options)
+
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
 	// Other encodings can be used by providing the corresponding functions,
@@ -252,12 +254,12 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 
-	wrapped, err := wrapWithSaml(ctx, mux)
+	withSamlMethods, err := saml.Mount(ctx, mux)
 	if err != nil {
 		return nil, err
 	}
 
-	return wrapped, nil
+	return withSamlMethods, nil
 }
 
 func errorHandler() func(context.Context, http.ResponseWriter, error) {

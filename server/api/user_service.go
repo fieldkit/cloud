@@ -105,10 +105,9 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 		return nil, err
 	}
 
-	if err := s.options.Database.NamedGetContext(ctx, user, `
-		INSERT INTO fieldkit.user (name, username, email, password, bio, created_at, updated_at)
-		VALUES (:name, :email, :email, :password, :bio, NOW(), NOW()) RETURNING *
-		`, user); err != nil {
+	ur := repositories.NewUserRepository(s.options.Database)
+
+	if err := ur.Add(ctx, user); err != nil {
 		return nil, err
 	}
 

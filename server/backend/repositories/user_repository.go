@@ -56,6 +56,16 @@ func (r *UserRepository) Search(ctx context.Context, query string) ([]*data.User
 	return users, nil
 }
 
+func (r *UserRepository) Add(ctx context.Context, user *data.User) error {
+	if err := r.db.NamedGetContext(ctx, user, `
+		INSERT INTO fieldkit.user (name, username, email, password, bio, created_at, updated_at)
+		VALUES (:name, :email, :email, :password, :bio, NOW(), NOW()) RETURNING *
+		`, user); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *UserRepository) Delete(outerCtx context.Context, id int32) (err error) {
 	return r.db.WithNewTransaction(outerCtx, func(ctx context.Context) error {
 		if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.project_follower WHERE follower_id = $1`, id); err != nil {
