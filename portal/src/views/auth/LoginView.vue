@@ -46,7 +46,7 @@ import CommonComponents from "@/views/shared";
 import { required, email, minLength, sameAs, requiredIf } from "vuelidate/lib/validators";
 
 import FKApi, { LoginPayload } from "@/api/api";
-import { ActionTypes, ResumeAction } from "@/store";
+import { ActionTypes } from "@/store";
 
 export default Vue.extend({
     components: {
@@ -94,12 +94,6 @@ export default Vue.extend({
                 password: { required, min: minLength(10) },
             },
         };
-    },
-    async mounted(): Promise<void> {
-        if (this.$route.params.token) {
-            await this.$store.dispatch(new ResumeAction(this.$route.params.token));
-            await this.leaveAfterAuth();
-        }
     },
     methods: {
         forwardAfterQuery(): { after?: string } {

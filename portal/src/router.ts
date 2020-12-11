@@ -3,6 +3,7 @@ import Router from "vue-router";
 import VueBodyClass from "vue-body-class";
 
 import LoginView from "./views/auth/LoginView.vue";
+import ResumeView from "./views/auth/ResumeView.vue";
 import CreateAccountView from "./views/auth/CreateAccountView.vue";
 import RecoverAccountView from "./views/auth/RecoverAccountView.vue";
 import ResetPasswordView from "./views/auth/ResetPasswordView.vue";
@@ -40,9 +41,9 @@ const routes = [
     {
         path: "/login/:token",
         name: "loginResume",
-        component: LoginView,
+        component: ResumeView,
         meta: {
-            bodyClass: "blue-background",
+            // bodyClass: "blue-background",
             secured: false,
         },
     },
