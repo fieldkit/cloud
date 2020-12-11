@@ -42,9 +42,14 @@ func NewSamlAuth(options *ControllerOptions, config *SamlConfig) *SamlAuth {
 func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, error) {
 	log := Logger(ctx).Sugar()
 
+	if sa.config.CertPath == "" || sa.config.KeyPath == "" {
+		log.Infow("saml-skipping")
+		return app, nil
+	}
+
 	keyPair, err := tls.LoadX509KeyPair(sa.config.CertPath, sa.config.KeyPath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating keypair: %v (%s, %s)", err, sa.config.CertPath, sa.config.KeyPath)
 	}
 
 	keyPair.Leaf, err = x509.ParseCertificate(keyPair.Certificate[0])

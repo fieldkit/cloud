@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -31,14 +32,14 @@ func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
 
 	database, err := sqlxcache.Open("postgres", e.PostgresURL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error opening pg: %v", err)
 	}
 
 	jq := jobs.NewDevNullMessagePublisher()
 
 	be, err := backend.New(e.PostgresURL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating backend: %v", err)
 	}
 
 	apiConfig := &ApiConfiguration{
@@ -48,12 +49,12 @@ func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
 
 	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, nil, metrics, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating service options: %v", err)
 	}
 
 	handler, err := CreateApi(e.Ctx, services)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating service api: %v", err)
 	}
 
 	testHandler = logging.LoggingAndInfrastructure("tests")(handler)
