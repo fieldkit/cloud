@@ -85,7 +85,6 @@ export function getModuleImg(module) {
 }
 
 export function getBatteryIcon(percentage: number): string {
-
     if (percentage == 0) {
         return "battery/0.svg";
     } else if (percentage <= 20) {
@@ -95,7 +94,7 @@ export function getBatteryIcon(percentage: number): string {
     } else if (percentage <= 60) {
         return "battery/60.svg";
     } else if (percentage <= 80) {
-        return ("battery/80.svg");
+        return "battery/80.svg";
     } else {
         return "battery/100.svg";
     }
@@ -177,4 +176,14 @@ export function tryParseTags(rawTags: string) {
             text: text,
         };
     });
+}
+
+export function toSingleValue(v: null | string | (string | null)[]): string | null {
+    if (v) {
+        if (_.isArray(v) && v.length > 0 && v[0]) {
+            return v[0];
+        }
+        return v as string;
+    }
+    return null;
 }
