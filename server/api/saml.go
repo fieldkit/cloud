@@ -42,7 +42,7 @@ func NewSamlAuth(options *ControllerOptions, config *SamlAuthConfig) *SamlAuth {
 func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, error) {
 	log := Logger(ctx).Sugar()
 
-	if sa.config.CertPath == "" || sa.config.KeyPath == "" {
+	if sa.config.CertPath == "" || sa.config.KeyPath == "" || sa.config.ServiceProviderURL == "" || sa.config.IDPMetaURL == "" {
 		log.Infow("saml-skipping")
 		return app, nil
 	}
@@ -74,7 +74,7 @@ func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, 
 		IDPMetadataURL: idpMetadataURL,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("saml error: %v (%v)", err, idpMetadataURL)
 	}
 
 	SamlPrefix := "/saml/"
