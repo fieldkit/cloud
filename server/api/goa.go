@@ -278,7 +278,10 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 
 	withSamlMethods, err := saml.Mount(ctx, mux)
 	if err != nil {
-		return nil, err
+		log.Errorw("error", "error", err)
+		return mux, nil
+	} else {
+		log.Infow("mount", "saml", true)
 	}
 
 	return withSamlMethods, nil

@@ -67,12 +67,15 @@ func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, 
 		return nil, err
 	}
 
-	samlSP, _ := samlsp.New(samlsp.Options{
+	samlSP, err := samlsp.New(samlsp.Options{
 		URL:            *spURL,
 		Key:            keyPair.PrivateKey.(*rsa.PrivateKey),
 		Certificate:    keyPair.Leaf,
 		IDPMetadataURL: idpMetadataURL,
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	SamlPrefix := "/saml/"
 	RequireSamlPath := "/saml/auth"
