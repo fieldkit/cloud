@@ -60,7 +60,6 @@ func (va *ValidatedDiscourseAttempt) Finish(userID, email, name, username string
 		values["require_activation"] = "true"
 	}
 
-	//KeyOrder
 	payload := ""
 	for _, key := range KeyOrder {
 		if value, ok := values[key]; ok {
@@ -71,10 +70,6 @@ func (va *ValidatedDiscourseAttempt) Finish(userID, email, name, username string
 		}
 	}
 
-	// payload := values.Encode()
-
-	fmt.Printf("\n\n%s\n\n", payload)
-
 	encoded := base64.StdEncoding.EncodeToString([]byte(payload))
 
 	sig, err := sign(encoded, va.sharedSecret)
@@ -83,11 +78,6 @@ func (va *ValidatedDiscourseAttempt) Finish(userID, email, name, username string
 	}
 
 	finalUrl := fmt.Sprintf(va.returnURL, url.QueryEscape(encoded), url.QueryEscape(sig))
-
-	fmt.Printf("encoded = %s\n", url.QueryEscape(encoded))
-	fmt.Printf("sig = %s\n", url.QueryEscape(sig))
-	fmt.Printf("returnURL = %s\n", va.returnURL)
-	fmt.Printf("url = %s\n", finalUrl)
 
 	return finalUrl, nil
 }
