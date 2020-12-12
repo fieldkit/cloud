@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"io"
 	"net/http"
+	"strings"
 
 	goa "goa.design/goa/v3/pkg"
 
@@ -345,31 +346,34 @@ type AuthAttempt struct {
 	NotFound     GenerateError
 }
 
-func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
+func VerifyToken(ctx context.Context, a AuthAttempt) (jwt.MapClaims, int32, error) {
+	token := a.Token
+
+	if strings.Contains(a.Token, " ") {
+		// Remove authorization scheme prefix (e.g. "Bearer")
+		cred := strings.SplitN(a.Token, " ", 2)[1]
+		token = cred
+	}
+
 	claims := make(jwt.MapClaims)
-	_, err := jwt.ParseWithClaims(a.Token, claims, func(t *jwt.Token) (interface{}, error) {
+	_, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
 		return a.Key, nil
 	})
 	if err != nil {
 		// Authentication is optional if required scopes is empty.
 		if len(a.Scheme.RequiredScopes) == 0 {
-			return ctx, nil
+			return nil, 0, nil
 		}
-		return ctx, a.Unauthorized("invalid token")
+		return nil, 0, a.Unauthorized("invalid token")
 	}
 
 	// Make sure this token we've been given has valid scopes.
 	if claims["scopes"] == nil {
-		return ctx, a.Unauthorized("invalid scopes")
+		return nil, 0, a.Unauthorized("invalid scopes")
 	}
 	scopes, ok := claims["scopes"].([]interface{})
 	if !ok {
-		return ctx, a.Unauthorized("invalid scopes")
-	}
-
-	if false {
-		log := Logger(ctx).Sugar()
-		log.Infow("auth", "user_id", claims["sub"])
+		return nil, 0, a.Unauthorized("invalid scopes")
 	}
 
 	scopesInToken := make([]string, len(scopes))
@@ -380,10 +384,22 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 	// We have a good token that has scopes, note that this does play
 	// nice with schemes that don't have any required scopes.
 	if err := a.Scheme.Validate(scopesInToken); err != nil {
-		return ctx, a.Unauthorized("invalid scopes")
+		return nil, 0, a.Unauthorized("invalid scopes")
 	}
 
 	userID := int32(claims["sub"].(float64))
+
+	return claims, userID, nil
+}
+
+func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
+	claims, userID, err := VerifyToken(ctx, a)
+	if err != nil {
+		return nil, err
+	}
+	if claims == nil {
+		return ctx, nil
+	}
 
 	withClaims := addClaimsToContext(ctx, claims)
 	withAttempt := addAuthAttemptToContext(withClaims, &a)

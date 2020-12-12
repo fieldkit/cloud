@@ -461,13 +461,18 @@ class FKApi {
         password: string | null,
         sso: string,
         sig: string
-    ): Promise<{ token: string; location: string }> {
+    ): Promise<{ token: string; location: string; header: string }> {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        if (token) {
+            headers["Authorization"] = "Bearer " + token;
+        }
         return axios({
             method: "POST",
             url: this.baseUrl + "/discourse/auth",
-            headers: { "Content-Type": "application/json" },
+            headers: headers,
             data: {
-                token: token,
                 email: email,
                 password: password,
                 sso: sso,
@@ -475,7 +480,7 @@ class FKApi {
             },
         })
             .then((response) => {
-                return response.data as { token: string; location: string };
+                return response.data as { token: string; location: string; header: string };
             })
             .then((response) => {
                 this.token.setToken(response.header);

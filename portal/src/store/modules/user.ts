@@ -59,15 +59,12 @@ const actions = (services: Services) => {
                     payload.discourse.sig
                 )
                 .then((response) => {
-                    console.log(response);
-                    /*
-                    commit(UPDATE_TOKEN, token);
+                    commit(UPDATE_TOKEN, response.token);
                     return dispatch(ActionTypes.REFRESH_CURRENT_USER).then(() => {
                         return dispatch(ActionTypes.AUTHENTICATED).then(() => {
-                            return new LoginResponse(token);
+                            // return new LoginResponse(response.token);
                         });
                     });
-					*/
                 });
         },
         [ActionTypes.LOGOUT]: async ({ commit }: { commit: any }) => {

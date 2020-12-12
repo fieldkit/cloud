@@ -17,6 +17,7 @@ import (
 	discourse "github.com/fieldkit/cloud/server/api/gen/discourse"
 	userService "github.com/fieldkit/cloud/server/api/gen/user"
 
+	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -157,7 +158,7 @@ func (s *DiscourseService) validate(ctx context.Context, payload *discourse.Auth
 		RequiredScopes: []string{"api:admin"},
 	}
 
-	authCtx, err := Authenticate(ctx, AuthAttempt{
+	claims, userID, err := VerifyToken(ctx, AuthAttempt{
 		Token:        *payload.Token,
 		Scheme:       &scheme,
 		Key:          s.options.JWTHMACKey,
@@ -168,10 +169,18 @@ func (s *DiscourseService) validate(ctx context.Context, payload *discourse.Auth
 	if err != nil {
 		return nil, err
 	}
+	if claims == nil {
+		return nil, discourse.MakeNotFound(fmt.Errorf("not found"))
+	}
 
-	_ = authCtx
+	r := repositories.NewUserRepository(s.options.Database)
 
-	return nil, nil
+	user, err := r.QueryByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *DiscourseService) login(ctx context.Context, payload *discourse.AuthenticatePayload) (*data.User, error) {
@@ -191,9 +200,12 @@ func (s *DiscourseService) login(ctx context.Context, payload *discourse.Authent
 func (s *DiscourseService) validateOrLogin(ctx context.Context, payload *discourse.AuthenticatePayload) (*data.User, error) {
 	if payload.Token != nil {
 		return s.validate(ctx, payload)
-	} else {
-		return s.login(ctx, payload)
+	} else if payload.Login != nil {
+		if payload.Login.Email != nil && payload.Login.Password != nil {
+			return s.login(ctx, payload)
+		}
 	}
+	return nil, discourse.MakeForbidden(fmt.Errorf("no user"))
 }
 
 func (s *DiscourseService) Authenticate(ctx context.Context, payload *discourse.AuthenticatePayload) (*discourse.AuthenticateResult, error) {

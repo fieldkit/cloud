@@ -30,9 +30,6 @@ export default Vue.extend({
             failed: false,
         };
     },
-    mounted(): void {
-        //
-    },
     computed: {
         forwardAfterQuery(): { after?: string } {
             const after = toSingleValue(this.$route.query.after);
@@ -50,6 +47,23 @@ export default Vue.extend({
             return null;
         },
     },
+    async mounted(): Promise<void> {
+        const params = this.discourseParams;
+        const token = this.$state.user.token;
+        if (params && token) {
+            await this.$store
+                .dispatch(new DiscourseLoginAction(token, null, params))
+                .then(
+                    async () => {
+                        // await this.leaveAfterAuth();
+                    },
+                    () => (this.failed = true)
+                )
+                .finally(() => {
+                    this.busy = false;
+                });
+        }
+    },
     methods: {
         async save(payload: LoginPayload): Promise<void> {
             const params = this.discourseParams;
@@ -58,13 +72,11 @@ export default Vue.extend({
                 return;
             }
 
-            const token = this.$state.user.token;
-
             this.busy = true;
             this.failed = false;
 
             await this.$store
-                .dispatch(new DiscourseLoginAction(token, payload, params))
+                .dispatch(new DiscourseLoginAction(null, payload, params))
                 .then(
                     async () => {
                         // await this.leaveAfterAuth();
