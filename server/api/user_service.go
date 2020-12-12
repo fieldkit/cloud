@@ -910,17 +910,17 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 	log := Logger(ctx).Sugar()
 	realm := viper.GetString("KEYCLOAK_REALM")
 	url := viper.GetString("KEYCLOAK_URL")
-	adminUser := viper.GetString("KEYCLOAK_ADMIN_USER")
-	adminPassword := viper.GetString("KEYCLOAK_ADMIN_PASSWORD")
-	adminRealm := viper.GetString("KEYCLOAK_ADMIN_REALM")
+	apiUser := viper.GetString("KEYCLOAK_API_USER")
+	apiPassword := viper.GetString("KEYCLOAK_API_PASSWORD")
+	apiRealm := viper.GetString("KEYCLOAK_API_REALM")
 
-	if url == "" || realm == "" {
-		log.Infow("keycloak-skipping")
+	if url == "" || realm == "" || apiUser == "" || apiPassword == "" || apiRealm == "" {
+		log.Infow("keycloak-skipping-no-config")
 		return nil
 	}
 
 	client := gocloak.NewClient(url)
-	token, err := client.LoginAdmin(ctx, adminUser, adminPassword, adminRealm)
+	token, err := client.LoginAdmin(ctx, apiUser, apiPassword, apiRealm)
 	if err != nil {
 		return fmt.Errorf("keycloak login: %v", err)
 	}
