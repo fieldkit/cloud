@@ -71,6 +71,9 @@ import (
 
 	discService "github.com/fieldkit/cloud/server/api/gen/discussion"
 	discServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/discussion/server"
+
+	discourseService "github.com/fieldkit/cloud/server/api/gen/discourse"
+	discourseServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/discourse/server"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -128,6 +131,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	discSvc := NewDiscussionService(ctx, options)
 	discEndpoints := discService.NewEndpoints(discSvc)
 
+	discourseSvc := NewDiscourseService(ctx, options)
+	discourseEndpoints := discourseService.NewEndpoints(discourseSvc)
+
 	for _, mw := range []func(goa.Endpoint) goa.Endpoint{jwtContext(), logErrors()} {
 		modulesEndpoints.Use(mw)
 		tasksEndpoints.Use(mw)
@@ -147,6 +153,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		csvEndpoints.Use(mw)
 		exportEndpoints.Use(mw)
 		discEndpoints.Use(mw)
+		discourseEndpoints.Use(mw)
 	}
 
 	samlConfig := &SamlAuthConfig{
@@ -191,6 +198,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	csvServer := csvServiceSvr.New(csvEndpoints, mux, dec, enc, eh, nil)
 	exportServer := exportServiceSvr.New(exportEndpoints, mux, dec, enc, eh, nil)
 	discServer := discServiceSvr.New(discEndpoints, mux, dec, enc, eh, nil)
+	discourseServer := discourseServiceSvr.New(discourseEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
@@ -210,6 +218,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	csvServiceSvr.Mount(mux, csvServer)
 	exportServiceSvr.Mount(mux, exportServer)
 	discServiceSvr.Mount(mux, discServer)
+	discourseServiceSvr.Mount(mux, discourseServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -265,6 +274,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range discServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range discourseServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 

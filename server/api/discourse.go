@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	discourse "github.com/fieldkit/cloud/server/api/gen/discourse"
 )
 
 type DiscourseAuthConfig struct {
@@ -178,4 +180,22 @@ func (sa *DiscourseAuth) Mount(ctx context.Context, app http.Handler) (http.Hand
 	})
 
 	return final, nil
+}
+
+type DiscourseService struct {
+	options *ControllerOptions
+}
+
+func NewDiscourseService(ctx context.Context, options *ControllerOptions) *DiscourseService {
+	return &DiscourseService{
+		options: options,
+	}
+}
+
+func (s *DiscourseService) Authenticate(ctx context.Context, payload *discourse.AuthenticatePayload) (*discourse.AuthenticateResult, error) {
+	log := Logger(ctx).Sugar()
+
+	_ = log
+
+	return &discourse.AuthenticateResult{}, nil
 }
