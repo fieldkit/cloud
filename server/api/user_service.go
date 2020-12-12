@@ -906,6 +906,14 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 	return user, nil
 }
 
+func splitName(name string) (first string, last string) {
+	parts := strings.SplitN(name, " ", 2)
+	if len(parts) == 2 {
+		return parts[0], parts[1]
+	}
+	return name, ""
+}
+
 func (s *UserService) updateAuthentication(ctx context.Context, user *data.User, password string) error {
 	log := Logger(ctx).Sugar()
 	realm := viper.GetString("KEYCLOAK_REALM")
@@ -922,7 +930,7 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 	client := gocloak.NewClient(url)
 	token, err := client.LoginAdmin(ctx, apiUser, apiPassword, apiRealm)
 	if err != nil {
-		return fmt.Errorf("keycloak login: %v", err)
+		return fmt.Errorf("keycloak-login: %v", err)
 	}
 
 	params := gocloak.GetUsersParams{
@@ -931,7 +939,7 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 
 	users, err := client.GetUsers(ctx, token.AccessToken, realm, params)
 	if err != nil {
-		return fmt.Errorf("keycloak get users: %v", err)
+		return fmt.Errorf("keycloak-get-users: %v", err)
 	}
 
 	if len(users) > 1 {
@@ -941,16 +949,18 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 
 	updated := false
 
+	first, last := splitName(user.Name)
+
 	for _, ku := range users {
-		ku.FirstName = gocloak.StringP(user.Name)
-		ku.LastName = gocloak.StringP(user.Name)
+		ku.FirstName = gocloak.StringP(first)
+		ku.LastName = gocloak.StringP(last)
 		ku.Email = gocloak.StringP(user.Email)
 		ku.Username = gocloak.StringP(user.Email)
 		if err := client.UpdateUser(ctx, token.AccessToken, realm, *ku); err != nil {
-			return fmt.Errorf("keycloak update: %v", err)
+			return fmt.Errorf("keycloak-update: %v", err)
 		}
 		if err = client.SetPassword(ctx, token.AccessToken, *ku.ID, realm, password, false); err != nil {
-			return fmt.Errorf("keycloak setpw: %v", err)
+			return fmt.Errorf("keycloak-setpw: %v", err)
 		}
 		updated = true
 		log.Infow("updated", "keycloak_user_id", ku.ID)
@@ -959,8 +969,8 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 
 	if !updated {
 		cloaked := gocloak.User{
-			FirstName: gocloak.StringP(user.Name),
-			LastName:  gocloak.StringP(user.Name),
+			FirstName: gocloak.StringP(first),
+			LastName:  gocloak.StringP(last),
 			Email:     gocloak.StringP(user.Email),
 			Username:  gocloak.StringP(user.Email),
 			Enabled:   gocloak.BoolP(true),
@@ -968,11 +978,11 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 
 		createdID, err := client.CreateUser(ctx, token.AccessToken, realm, cloaked)
 		if err != nil {
-			return fmt.Errorf("keycloak create: %v", err)
+			return fmt.Errorf("keycloak-create: %v", err)
 		}
 
 		if err = client.SetPassword(ctx, token.AccessToken, createdID, realm, password, false); err != nil {
-			return fmt.Errorf("keycloak setpw: %v", err)
+			return fmt.Errorf("keycloak-setpw: %v", err)
 		}
 
 		log.Infow("created", "keycloak_user_id", createdID)
