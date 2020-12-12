@@ -19,7 +19,7 @@ import (
 
 type ResolveFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request) error
 
-type SamlConfig struct {
+type SamlAuthConfig struct {
 	CertPath           string
 	KeyPath            string
 	ServiceProviderURL string
@@ -29,10 +29,10 @@ type SamlConfig struct {
 
 type SamlAuth struct {
 	options *ControllerOptions
-	config  *SamlConfig
+	config  *SamlAuthConfig
 }
 
-func NewSamlAuth(options *ControllerOptions, config *SamlConfig) *SamlAuth {
+func NewSamlAuth(options *ControllerOptions, config *SamlAuthConfig) *SamlAuth {
 	return &SamlAuth{
 		options: options,
 		config:  config,

@@ -149,7 +149,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		discEndpoints.Use(mw)
 	}
 
-	samlConfig := &SamlConfig{
+	samlConfig := &SamlAuthConfig{
 		CertPath:           viper.GetString("SAML_CERT"),
 		KeyPath:            viper.GetString("SAML_KEY"),
 		ServiceProviderURL: viper.GetString("SAML_SP_URL"),
@@ -157,6 +157,11 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		LoginURLTemplate:   viper.GetString("SAML_LOGIN_URL"),
 	}
 	saml := NewSamlAuth(options, samlConfig)
+
+	discourseConfig := &DiscourseAuthConfig{
+		SharedSecret: viper.GetString("DISCOURSE_SECRET"),
+	}
+	discourse := NewDiscourseAuth(options, discourseConfig)
 
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
@@ -268,7 +273,12 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		return nil, err
 	}
 
-	return withSamlMethods, nil
+	withDiscourseMethods, err := discourse.Mount(ctx, withSamlMethods)
+	if err != nil {
+		return nil, err
+	}
+
+	return withDiscourseMethods, nil
 }
 
 func errorHandler() func(context.Context, http.ResponseWriter, error) {

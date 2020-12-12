@@ -116,6 +116,11 @@ func loadConfiguration() (*Config, *Options, error) {
 	viper.SetDefault("KEYCLOAK_ADMIN_USER", "admin")
 	viper.SetDefault("KEYCLOAK_ADMIN_PASSWORD", "admin")
 	viper.SetDefault("KEYCLOAK_ADMIN_REALM", "master")
+	// NOTE This is the same secret used in the real world example.
+	// https://meta.discourse.org/t/discourseconnect-official-single-sign-on-for-discourse-sso/13045
+	viper.SetDefault("DISCOURSE_SECRET", "d836444a9e4084d5b224a60c208dce14")
+	viper.SetDefault("DISCOURSE_RETURN_URL", "https://community.fieldkit.org/session/sso_login")
+	viper.SetDefault("DISCOURSE_ADMIN_KEY", "")
 
 	if config.ApiDomain == "" {
 		config.ApiDomain = "api." + config.Domain
