@@ -3,6 +3,7 @@ import Router from "vue-router";
 import VueBodyClass from "vue-body-class";
 
 import LoginView from "./views/auth/LoginView.vue";
+import DiscourseView from "./views/auth/DiscourseView.vue";
 import ResumeView from "./views/auth/ResumeView.vue";
 import CreateAccountView from "./views/auth/CreateAccountView.vue";
 import RecoverAccountView from "./views/auth/RecoverAccountView.vue";
@@ -33,6 +34,15 @@ const routes = [
         path: "/login",
         name: "login",
         component: LoginView,
+        meta: {
+            bodyClass: "blue-background",
+            secured: false,
+        },
+    },
+    {
+        path: "/login/discourse",
+        name: "discourseLogin",
+        component: DiscourseView,
         meta: {
             bodyClass: "blue-background",
             secured: false,

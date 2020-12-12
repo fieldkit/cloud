@@ -74,7 +74,7 @@ func UsageExamples() string {
       "sig": "Quia veritatis.",
       "sso": "Provident a sunt atque atque sapiente voluptatibus."
    }' --token "Quia minima iusto dicta rerum quis."` + "\n" +
-		os.Args[0] + ` discussion project --project-id 918127003 --auth "Optio sit ducimus facilis voluptas."` + "\n" +
+		os.Args[0] + ` discussion project --project-id 660922603 --auth "Id nam fuga reiciendis explicabo dolorum."` + "\n" +
 		""
 }
 
@@ -1640,7 +1640,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` discussion project --project-id 918127003 --auth "Optio sit ducimus facilis voluptas."
+    `+os.Args[0]+` discussion project --project-id 660922603 --auth "Id nam fuga reiciendis explicabo dolorum."
 `, os.Args[0])
 }
 
@@ -1652,7 +1652,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` discussion data --bookmark "Labore ipsam sit sapiente." --auth "Consequatur in quaerat inventore magnam at fugiat."
+    `+os.Args[0]+` discussion data --bookmark "Sit sapiente." --auth "Consequatur in quaerat inventore magnam at fugiat."
 `, os.Args[0])
 }
 

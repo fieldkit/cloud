@@ -16,7 +16,6 @@ import (
 
 	discourse "github.com/fieldkit/cloud/server/api/gen/discourse"
 	goahttp "goa.design/goa/v3/http"
-	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildAuthenticateRequest instantiates a HTTP request object with method and
@@ -79,20 +78,20 @@ func DecodeAuthenticateResponse(decoder func(*http.Response) goahttp.Decoder, re
 			defer resp.Body.Close()
 		}
 		switch resp.StatusCode {
-		case http.StatusTemporaryRedirect:
+		case http.StatusOK:
 			var (
-				location string
-				err      error
+				body AuthenticateResponseBody
+				err  error
 			)
-			locationRaw := resp.Header.Get("Location")
-			if locationRaw == "" {
-				err = goa.MergeErrors(err, goa.MissingFieldError("Location", "header"))
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("discourse", "authenticate", err)
 			}
-			location = locationRaw
+			err = ValidateAuthenticateResponseBody(&body)
 			if err != nil {
 				return nil, goahttp.ErrValidationError("discourse", "authenticate", err)
 			}
-			res := NewAuthenticateResultTemporaryRedirect(location)
+			res := NewAuthenticateResultOK(&body)
 			return res, nil
 		case http.StatusForbidden:
 			en := resp.Header.Get("goa-error")

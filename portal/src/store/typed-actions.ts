@@ -23,3 +23,22 @@ export class ResumeAction {
 
     constructor(public readonly token: string) {}
 }
+
+export class DiscourseParams {
+    constructor(public readonly sso: string, public readonly sig: string) {}
+}
+
+export interface LoginFields {
+    readonly email: string;
+    readonly password: string;
+}
+
+export class DiscourseLoginAction {
+    type = ActionTypes.LOGIN_DISCOURSE;
+
+    constructor(
+        public readonly token: string | null,
+        public readonly login: LoginFields | null,
+        public readonly discourse: DiscourseParams
+    ) {}
+}

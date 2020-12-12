@@ -23,6 +23,13 @@ type AuthenticateRequestBody struct {
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 }
 
+// AuthenticateResponseBody is the type of the "discourse" service
+// "authenticate" endpoint HTTP response body.
+type AuthenticateResponseBody struct {
+	Location string `form:"location" json:"location" xml:"location"`
+	Token    string `form:"token" json:"token" xml:"token"`
+}
+
 // AuthenticateUserUnverifiedResponseBody is the type of the "discourse"
 // service "authenticate" endpoint HTTP response body for the "user-unverified"
 // error.
@@ -112,6 +119,16 @@ type AuthenticateBadRequestResponseBody struct {
 	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
 	// Is the error a server-side fault?
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// NewAuthenticateResponseBody builds the HTTP response body from the result of
+// the "authenticate" endpoint of the "discourse" service.
+func NewAuthenticateResponseBody(res *discourse.AuthenticateResult) *AuthenticateResponseBody {
+	body := &AuthenticateResponseBody{
+		Location: res.Location,
+		Token:    res.Token,
+	}
+	return body
 }
 
 // NewAuthenticateUserUnverifiedResponseBody builds the HTTP response body from

@@ -21,6 +21,13 @@ type AuthenticateRequestBody struct {
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 }
 
+// AuthenticateResponseBody is the type of the "discourse" service
+// "authenticate" endpoint HTTP response body.
+type AuthenticateResponseBody struct {
+	Location *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Token    *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+}
+
 // AuthenticateUserUnverifiedResponseBody is the type of the "discourse"
 // service "authenticate" endpoint HTTP response body for the "user-unverified"
 // error.
@@ -124,11 +131,13 @@ func NewAuthenticateRequestBody(p *discourse.AuthenticatePayload) *AuthenticateR
 	return body
 }
 
-// NewAuthenticateResultTemporaryRedirect builds a "discourse" service
-// "authenticate" endpoint result from a HTTP "TemporaryRedirect" response.
-func NewAuthenticateResultTemporaryRedirect(location string) *discourse.AuthenticateResult {
-	v := &discourse.AuthenticateResult{}
-	v.Location = location
+// NewAuthenticateResultOK builds a "discourse" service "authenticate" endpoint
+// result from a HTTP "OK" response.
+func NewAuthenticateResultOK(body *AuthenticateResponseBody) *discourse.AuthenticateResult {
+	v := &discourse.AuthenticateResult{
+		Location: *body.Location,
+		Token:    *body.Token,
+	}
 
 	return v
 }
@@ -206,6 +215,18 @@ func NewAuthenticateBadRequest(body *AuthenticateBadRequestResponseBody) *goa.Se
 	}
 
 	return v
+}
+
+// ValidateAuthenticateResponseBody runs the validations defined on
+// AuthenticateResponseBody
+func ValidateAuthenticateResponseBody(body *AuthenticateResponseBody) (err error) {
+	if body.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("location", "body"))
+	}
+	if body.Token == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("token", "body"))
+	}
+	return
 }
 
 // ValidateAuthenticateUserUnverifiedResponseBody runs the validations defined

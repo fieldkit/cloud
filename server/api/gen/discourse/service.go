@@ -40,6 +40,7 @@ type AuthenticatePayload struct {
 // method.
 type AuthenticateResult struct {
 	Location string
+	Token    string
 }
 
 type AuthenticateDiscourseFields struct {

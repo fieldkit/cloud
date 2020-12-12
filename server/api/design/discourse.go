@@ -29,6 +29,8 @@ var _ = Service("discourse", func() {
 		Result(func() {
 			Attribute("location", String)
 			Required("location")
+			Attribute("token", String)
+			Required("token")
 		})
 
 		HTTP(func() {
@@ -40,11 +42,7 @@ var _ = Service("discourse", func() {
 
 			Body("login")
 
-			Response(StatusTemporaryRedirect, func() {
-				Headers(func() {
-					Header("location:Location")
-				})
-			})
+			Response(StatusOK)
 
 			Response("user-unverified", StatusForbidden)
 		})

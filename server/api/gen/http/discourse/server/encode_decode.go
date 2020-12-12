@@ -22,9 +22,10 @@ import (
 func EncodeAuthenticateResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res := v.(*discourse.AuthenticateResult)
-		w.Header().Set("Location", res.Location)
-		w.WriteHeader(http.StatusTemporaryRedirect)
-		return nil
+		enc := encoder(ctx, w)
+		body := NewAuthenticateResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
 	}
 }
 

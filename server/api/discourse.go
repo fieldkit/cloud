@@ -134,6 +134,7 @@ func (va *ValidatedDiscourseAttempt) Finish(userID, email, name, username string
 type DiscourseService struct {
 	options *ControllerOptions
 	auth    *DiscourseAuth
+	users   *UserService
 }
 
 func NewDiscourseService(ctx context.Context, options *ControllerOptions) *DiscourseService {
@@ -145,6 +146,7 @@ func NewDiscourseService(ctx context.Context, options *ControllerOptions) *Disco
 	return &DiscourseService{
 		options: options,
 		auth:    NewDiscourseAuth(options, &config),
+		users:   NewUserService(ctx, options),
 	}
 }
 
@@ -173,9 +175,7 @@ func (s *DiscourseService) validate(ctx context.Context, payload *discourse.Auth
 }
 
 func (s *DiscourseService) login(ctx context.Context, payload *discourse.AuthenticatePayload) (*data.User, error) {
-	users := NewUserService(ctx, s.options)
-
-	user, err := users.loginForUser(ctx, &userService.LoginPayload{
+	user, err := s.users.loginForUser(ctx, &userService.LoginPayload{
 		Login: &userService.LoginFields{
 			Email:    *payload.Login.Email,
 			Password: *payload.Login.Password,
@@ -223,12 +223,18 @@ func (s *DiscourseService) Authenticate(ctx context.Context, payload *discourse.
 		return nil, err
 	}
 
+	token, err := s.users.loggedInReturnToken(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
 	_ = user
 	_ = va
 	_ = log
 
 	return &discourse.AuthenticateResult{
 		Location: where,
+		Token:    token,
 	}, nil
 }
 

@@ -455,6 +455,27 @@ class FKApi {
         }).then((response) => this.handleLogin(response));
     }
 
+    public loginDiscourse(
+        token: string | null,
+        email: string | null,
+        password: string | null,
+        sso: string,
+        sig: string
+    ): Promise<{ token: string; location: string }> {
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/discourse/auth",
+            headers: { "Content-Type": "application/json" },
+            data: {
+                token: token,
+                email: email,
+                password: password,
+                sso: sso,
+                sig: sig,
+            },
+        });
+    }
+
     public resume(token: string): Promise<any> {
         return axios({
             method: "POST",
