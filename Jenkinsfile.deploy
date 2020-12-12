@@ -16,7 +16,7 @@ timestamps {
 				}
 				def isDev = params.DeployFrom.indexOf("fkdev.org") >= 0
 				def statusUrl = isDev ? "https://api.fkdev.org/status" : "https://api.fieldkit.org/status"
-				def value = watchDeployment(url: statusUrl, seconds: 60)
+				def value = watchDeployment(url: statusUrl, seconds: 180)
 				println(value)
 				println("done")
 			}
