@@ -165,11 +165,6 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	}
 	saml := NewSamlAuth(options, samlConfig)
 
-	discourseConfig := &DiscourseAuthConfig{
-		SharedSecret: viper.GetString("DISCOURSE_SECRET"),
-	}
-	discourse := NewDiscourseAuth(options, discourseConfig)
-
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
 	// Other encodings can be used by providing the corresponding functions,
@@ -285,12 +280,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		return nil, err
 	}
 
-	withDiscourseMethods, err := discourse.Mount(ctx, withSamlMethods)
-	if err != nil {
-		return nil, err
-	}
-
-	return withDiscourseMethods, nil
+	return withSamlMethods, nil
 }
 
 func errorHandler() func(context.Context, http.ResponseWriter, error) {

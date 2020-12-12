@@ -23,6 +23,7 @@ import (
 
 const (
 	GoodPassword = "goodgoodgood"
+	BadPassword  = "badbadbadbad"
 )
 
 type FakeStations struct {

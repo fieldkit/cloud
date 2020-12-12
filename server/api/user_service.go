@@ -56,7 +56,7 @@ func (s *UserService) loggedInReturnToken(ctx context.Context, authed *data.User
 	return signedToken, nil
 }
 
-func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*user.LoginResult, error) {
+func (s *UserService) loginForUser(ctx context.Context, payload *user.LoginPayload) (*data.User, error) {
 	s.options.Metrics.AuthTry()
 
 	authed, err := s.authenticateOrSpoof(ctx, payload.Login.Email, payload.Login.Password)
@@ -71,6 +71,15 @@ func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*u
 	}
 	if authed == nil {
 		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
+	}
+
+	return authed, nil
+}
+
+func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*user.LoginResult, error) {
+	authed, err := s.loginForUser(ctx, payload)
+	if err != nil {
+		return nil, err
 	}
 
 	signedToken, err := s.loggedInReturnToken(ctx, authed)

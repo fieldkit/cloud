@@ -19,12 +19,7 @@ var (
 	testHandler http.Handler
 )
 
-func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
-	if testHandler != nil {
-		log.Printf("using existing test api")
-		return testHandler, nil
-	}
-
+func NewServiceOptions(e *tests.TestEnv) (*ControllerOptions, error) {
 	metrics := logging.NewMetrics(e.Ctx, &logging.MetricsSettings{
 		Prefix:  "fk.tests",
 		Address: "",
@@ -50,6 +45,20 @@ func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
 	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, nil, metrics, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating service options: %v", err)
+	}
+
+	return services, err
+}
+
+func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
+	if testHandler != nil {
+		log.Printf("using existing test api")
+		return testHandler, nil
+	}
+
+	services, err := NewServiceOptions(e)
+	if err != nil {
+		return nil, err
 	}
 
 	handler, err := CreateApi(e.Ctx, services)
