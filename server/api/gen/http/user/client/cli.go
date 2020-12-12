@@ -293,7 +293,7 @@ func BuildAddPayload(userAddBody string) (*user.AddPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Ex est.\",\n      \"meta\": \"Dicta reprehenderit error culpa et error omnis.\",\n      \"module\": \"Dolorem fuga fugiat.\",\n      \"profile\": \"Ipsum est voluptatem.\",\n      \"url\": \"Nihil voluptatibus non laudantium magnam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Culpa et error omnis doloremque quae maxime.\",\n      \"meta\": \"Minus deserunt aut laudantium.\",\n      \"module\": \"Aut quidem.\",\n      \"profile\": \"Voluptatum nihil.\",\n      \"url\": \"Ab libero repellendus perferendis earum.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -332,7 +332,7 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateUserID string, userUpda
 	{
 		err = json.Unmarshal([]byte(userUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Quam illo alias labore enim.\",\n      \"endTime\": \"Ut suscipit quis sunt voluptas omnis.\",\n      \"goal\": \"Aut rem veniam vero et aliquid.\",\n      \"location\": \"Autem ea illum ipsum.\",\n      \"name\": \"Possimus et.\",\n      \"privacy\": 1002371684,\n      \"startTime\": \"Accusantium ut inventore sunt nihil.\",\n      \"tags\": \"Quo hic veritatis distinctio aperiam tenetur delectus.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Ut suscipit quis sunt voluptas omnis.\",\n      \"endTime\": \"Et eos assumenda dolor occaecati rem quo.\",\n      \"goal\": \"Est corrupti voluptatibus pariatur.\",\n      \"location\": \"Non est et.\",\n      \"name\": \"Accusantium ut inventore sunt nihil.\",\n      \"privacy\": 1061320051,\n      \"startTime\": \"Nostrum autem quis laudantium natus ipsum.\",\n      \"tags\": \"Placeat dolor dolor.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {

@@ -26,6 +26,7 @@ type AuthenticateRequestBody struct {
 type AuthenticateResponseBody struct {
 	Location *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	Token    *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+	Header   *string `form:"header,omitempty" json:"header,omitempty" xml:"header,omitempty"`
 }
 
 // AuthenticateUserUnverifiedResponseBody is the type of the "discourse"
@@ -137,6 +138,7 @@ func NewAuthenticateResultOK(body *AuthenticateResponseBody) *discourse.Authenti
 	v := &discourse.AuthenticateResult{
 		Location: *body.Location,
 		Token:    *body.Token,
+		Header:   *body.Header,
 	}
 
 	return v
@@ -225,6 +227,9 @@ func ValidateAuthenticateResponseBody(body *AuthenticateResponseBody) (err error
 	}
 	if body.Token == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("token", "body"))
+	}
+	if body.Header == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("header", "body"))
 	}
 	return
 }

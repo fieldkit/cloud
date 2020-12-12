@@ -31,6 +31,8 @@ var _ = Service("discourse", func() {
 			Required("location")
 			Attribute("token", String)
 			Required("token")
+			Attribute("header", String)
+			Required("header")
 		})
 
 		HTTP(func() {

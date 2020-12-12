@@ -473,7 +473,14 @@ class FKApi {
                 sso: sso,
                 sig: sig,
             },
-        });
+        })
+            .then((response) => {
+                return response.data as { token: string; location: string };
+            })
+            .then((response) => {
+                this.token.setToken(response.header);
+                return response;
+            });
     }
 
     public resume(token: string): Promise<any> {

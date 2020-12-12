@@ -235,6 +235,7 @@ func (s *DiscourseService) Authenticate(ctx context.Context, payload *discourse.
 	return &discourse.AuthenticateResult{
 		Location: where,
 		Token:    token,
+		Header:   "Bearer " + token,
 	}, nil
 }
 

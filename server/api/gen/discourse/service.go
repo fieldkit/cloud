@@ -41,6 +41,7 @@ type AuthenticatePayload struct {
 type AuthenticateResult struct {
 	Location string
 	Token    string
+	Header   string
 }
 
 type AuthenticateDiscourseFields struct {

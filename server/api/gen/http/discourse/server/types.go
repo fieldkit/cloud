@@ -28,6 +28,7 @@ type AuthenticateRequestBody struct {
 type AuthenticateResponseBody struct {
 	Location string `form:"location" json:"location" xml:"location"`
 	Token    string `form:"token" json:"token" xml:"token"`
+	Header   string `form:"header" json:"header" xml:"header"`
 }
 
 // AuthenticateUserUnverifiedResponseBody is the type of the "discourse"
@@ -127,6 +128,7 @@ func NewAuthenticateResponseBody(res *discourse.AuthenticateResult) *Authenticat
 	body := &AuthenticateResponseBody{
 		Location: res.Location,
 		Token:    res.Token,
+		Header:   res.Header,
 	}
 	return body
 }
