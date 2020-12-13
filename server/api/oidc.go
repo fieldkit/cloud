@@ -99,12 +99,18 @@ func NewOidcService(ctx context.Context, options *ControllerOptions) *OidcServic
 	}
 
 	go (func() {
+		started := time.Now()
+
 		log := Logger(ctx).Sugar()
 
 		for {
 			auth, err := NewOidcAuth(ctx, s.options, s.config)
 			if err != nil {
-				log.Errorw("oidc", "error", err)
+				if time.Now().Sub(started) < time.Duration(1)*time.Minute {
+					log.Warnw("oidc", "error", err)
+				} else {
+					log.Errorw("oidc", "error", err)
+				}
 			} else {
 				s.auth = auth
 				break
