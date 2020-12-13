@@ -956,6 +956,7 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 		ku.LastName = gocloak.StringP(last)
 		ku.Email = gocloak.StringP(user.Email)
 		ku.Username = gocloak.StringP(user.Email)
+		ku.EmailVerified = gocloak.BoolP(true)
 		if err := client.UpdateUser(ctx, token.AccessToken, realm, *ku); err != nil {
 			return fmt.Errorf("keycloak-update: %v", err)
 		}
@@ -969,11 +970,12 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 
 	if !updated {
 		cloaked := gocloak.User{
-			FirstName: gocloak.StringP(first),
-			LastName:  gocloak.StringP(last),
-			Email:     gocloak.StringP(user.Email),
-			Username:  gocloak.StringP(user.Email),
-			Enabled:   gocloak.BoolP(true),
+			FirstName:     gocloak.StringP(first),
+			LastName:      gocloak.StringP(last),
+			Email:         gocloak.StringP(user.Email),
+			Username:      gocloak.StringP(user.Email),
+			EmailVerified: gocloak.BoolP(true),
+			Enabled:       gocloak.BoolP(true),
 		}
 
 		createdID, err := client.CreateUser(ctx, token.AccessToken, realm, cloaked)
