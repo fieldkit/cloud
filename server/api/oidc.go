@@ -57,7 +57,9 @@ func NewOidcAuth(ctx context.Context, options *ControllerOptions, config *OidcAu
 	oidcConfig := &oidc.Config{
 		ClientID: config.ClientID,
 	}
+
 	verifier := provider.Verifier(oidcConfig)
+
 	return &OidcAuth{
 		options:      options,
 		config:       config,
@@ -96,7 +98,14 @@ func NewOidcService(ctx context.Context, options *ControllerOptions) (*OidcServi
 }
 
 func (s *OidcService) Require(ctx context.Context, payload *oidcService.RequirePayload) (*oidcService.RequireResult, error) {
+	log := Logger(ctx).Sugar()
+
+	if s.auth == nil {
+		return nil, oidcService.MakeNotFound(fmt.Errorf("not found"))
+	}
+
 	if payload.Token == nil {
+		log.Infow("oidc", "token-missing", true)
 		return &oidcService.RequireResult{
 			Location: s.auth.oauth2Config.AuthCodeURL("portal-state"),
 		}, nil
@@ -104,12 +113,13 @@ func (s *OidcService) Require(ctx context.Context, payload *oidcService.RequireP
 
 	parts := strings.Split(*payload.Token, " ")
 	if len(parts) != 2 {
+		log.Infow("oidc", "token-bad", true)
 		return nil, oidcService.MakeForbidden(fmt.Errorf("forbidden"))
 	}
 
 	_, err := s.auth.verifier.Verify(ctx, parts[1])
-
 	if err != nil {
+		log.Infow("oidc", "token-invalid", true)
 		return &oidcService.RequireResult{
 			Location: s.auth.oauth2Config.AuthCodeURL("portal-state"),
 		}, nil
@@ -123,11 +133,13 @@ func (s *OidcService) Require(ctx context.Context, payload *oidcService.RequireP
 func (s *OidcService) Authenticate(ctx context.Context, payload *oidcService.AuthenticatePayload) (*oidcService.AuthenticateResult, error) {
 	log := Logger(ctx).Sugar()
 
+	if s.auth == nil {
+		return nil, oidcService.MakeNotFound(fmt.Errorf("not found"))
+	}
+
 	if payload.State != "portal-state" {
 		return nil, fmt.Errorf("state mismatch")
 	}
-
-	_ = log
 
 	oauth2Token, err := s.auth.oauth2Config.Exchange(ctx, payload.Code)
 	if err != nil {
