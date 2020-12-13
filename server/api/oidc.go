@@ -131,6 +131,9 @@ func (s *OidcService) Require(ctx context.Context, payload *oidcService.RequireP
 		if err != nil {
 			return nil, fmt.Errorf("oidc initialize error: %v", err)
 		}
+		if auth == nil {
+			return nil, oidcService.MakeNotFound(fmt.Errorf("not found"))
+		}
 
 		s.auth = auth
 	}
@@ -169,6 +172,9 @@ func (s *OidcService) Authenticate(ctx context.Context, payload *oidcService.Aut
 		if err != nil {
 			return nil, fmt.Errorf("oidc initialize error: %v", err)
 		}
+		if auth == nil {
+			return nil, oidcService.MakeNotFound(fmt.Errorf("not found"))
+		}
 
 		s.auth = auth
 	}
@@ -189,7 +195,6 @@ func (s *OidcService) Authenticate(ctx context.Context, payload *oidcService.Aut
 
 	idToken, err := s.auth.verifier.Verify(ctx, rawIDToken)
 	if err != nil {
-		fmt.Printf("\n\n%s\n\n", rawIDToken)
 		return nil, fmt.Errorf("failed to verify id token: %v", err)
 	}
 
