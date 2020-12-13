@@ -25,7 +25,7 @@ func TestDiscourseIncoming(t *testing.T) {
 
 	discourseAuthConfig := DiscourseAuthConfig{
 		SharedSecret: "d836444a9e4084d5b224a60c208dce14",
-		ReturnURL:    "https://community.fieldkit.org/session/sso_login?sso=%s&sig=%s",
+		RedirectURL:  "https://community.fieldkit.org/session/sso_login?sso=%s&sig=%s",
 	}
 
 	discourse := NewDiscourseAuth(nil, &discourseAuthConfig)
