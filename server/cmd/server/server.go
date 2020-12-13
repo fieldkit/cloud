@@ -111,11 +111,18 @@ func loadConfiguration() (*Config, *Options, error) {
 	viper.SetDefault("SAML_SP_URL", "http://127.0.0.1:8080")
 	viper.SetDefault("SAML_LOGIN_URL", "http://127.0.0.1:8081/login/%s")
 	viper.SetDefault("SAML_IPD_META", "http://127.0.0.1:8090/auth/realms/fk/protocol/saml/descriptor")
+
 	viper.SetDefault("KEYCLOAK_URL", "http://127.0.0.1:8090")
 	viper.SetDefault("KEYCLOAK_REALM", "fk")
 	viper.SetDefault("KEYCLOAK_API_USER", "admin")
 	viper.SetDefault("KEYCLOAK_API_PASSWORD", "admin")
 	viper.SetDefault("KEYCLOAK_API_REALM", "master")
+
+	viper.SetDefault("OIDC_CLIENT_ID", "portal")
+	viper.SetDefault("OIDC_CLIENT_SECRET", "9144cc7d-e9ba-4920-8e47-9a41dfbe4301")
+	viper.SetDefault("OIDC_CONFIG_URL", "http://127.0.0.1:8090/auth/realms/fk")
+	viper.SetDefault("OIDC_REDIRECT_URL", "http://127.0.0.1:8080/oidc/auth")
+
 	// NOTE This is the same secret used in the real world example.
 	// https://meta.discourse.org/t/discourseconnect-official-single-sign-on-for-discourse-sso/13045
 	viper.SetDefault("DISCOURSE_SECRET", "d836444a9e4084d5b224a60c208dce14")

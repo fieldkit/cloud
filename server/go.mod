@@ -20,6 +20,7 @@ require (
 	github.com/conservify/protobuf-tools v0.0.0-20180715164506-43b897198d14
 	github.com/conservify/sqlxcache v0.0.0-20200605152630-7c47a2e4c819
 	github.com/conservify/tooling v0.0.0-20190530175209-bf2b6e69e188
+	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/creack/goselect v0.1.0 // indirect
 	github.com/crewjam/saml v0.4.2
 	github.com/davecgh/go-spew v1.1.1
@@ -78,6 +79,7 @@ require (
 	github.com/paulmach/orb v0.1.6
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.5.0
+	github.com/pquerna/cachecontrol v0.0.0-20201205024021-ac21108117ac // indirect
 	github.com/robinpowered/go-proto v0.0.0-20160614142341-85ea3e1f1d3d
 	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b
 	github.com/segmentio/ksuid v1.0.3
@@ -110,5 +112,6 @@ require (
 	google.golang.org/genproto v0.0.0-20201009135657-4d944d34d83c // indirect
 	google.golang.org/grpc v1.33.0 // indirect
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0
+	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 	gopkg.in/yaml.v2 v2.3.0
 )
