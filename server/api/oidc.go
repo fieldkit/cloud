@@ -43,7 +43,7 @@ func NewOidcAuth(ctx context.Context, options *ControllerOptions, config *OidcAu
 
 	provider, err := oidc.NewProvider(ctx, config.ConfigURL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("odci provider error: %v (%v)", err, config.ConfigURL)
 	}
 
 	oauth2Config := &oauth2.Config{
@@ -86,7 +86,7 @@ func NewOidcService(ctx context.Context, options *ControllerOptions) (*OidcServi
 
 	auth, err := NewOidcAuth(ctx, options, &config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("oidc auth error: %v", err)
 	}
 
 	return &OidcService{

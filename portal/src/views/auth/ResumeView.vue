@@ -9,11 +9,6 @@ import { ResumeAction, LoginOidcAction } from "@/store";
 import { toSingleValue } from "@/utilities";
 
 export default Vue.extend({
-    components: {},
-    props: {},
-    data(): {} {
-        return {};
-    },
     async mounted(): Promise<void> {
         const p = this.$route.query;
         if (this.$route.params.token) {

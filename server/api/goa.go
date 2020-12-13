@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -140,7 +141,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 
 	oidcSvc, err := NewOidcService(ctx, options)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("oidc service error: %v", err)
 	}
 	oidcEndpoints := oidcService.NewEndpoints(oidcSvc)
 
