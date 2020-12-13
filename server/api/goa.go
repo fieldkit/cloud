@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -139,10 +138,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	discourseSvc := NewDiscourseService(ctx, options)
 	discourseEndpoints := discourseService.NewEndpoints(discourseSvc)
 
-	oidcSvc, err := NewOidcService(ctx, options)
-	if err != nil {
-		return nil, fmt.Errorf("oidc service error: %v", err)
-	}
+	oidcSvc := NewOidcService(ctx, options)
 	oidcEndpoints := oidcService.NewEndpoints(oidcSvc)
 
 	for _, mw := range []func(goa.Endpoint) goa.Endpoint{jwtContext(), logErrors()} {

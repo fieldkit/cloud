@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 
@@ -41,6 +42,8 @@ func NewOidcAuth(ctx context.Context, options *ControllerOptions, config *OidcAu
 		return nil, nil
 	}
 
+	log.Infow("oidc-initialize", "config_url", config.ConfigURL)
+
 	provider, err := oidc.NewProvider(ctx, config.ConfigURL)
 	if err != nil {
 		return nil, fmt.Errorf("odci provider error: %v (%v)", err, config.ConfigURL)
@@ -60,6 +63,8 @@ func NewOidcAuth(ctx context.Context, options *ControllerOptions, config *OidcAu
 
 	verifier := provider.Verifier(oidcConfig)
 
+	log.Infow("oidc-ready")
+
 	return &OidcAuth{
 		options:      options,
 		config:       config,
@@ -71,37 +76,57 @@ func NewOidcAuth(ctx context.Context, options *ControllerOptions, config *OidcAu
 
 type OidcService struct {
 	options *ControllerOptions
+	config  *OidcAuthConfig
 	auth    *OidcAuth
 	users   *UserService
 	repo    *repositories.UserRepository
 }
 
-func NewOidcService(ctx context.Context, options *ControllerOptions) (*OidcService, error) {
-	config := OidcAuthConfig{
+func NewOidcService(ctx context.Context, options *ControllerOptions) *OidcService {
+	config := &OidcAuthConfig{
 		ClientID:     viper.GetString("OIDC_CLIENT_ID"),
 		ClientSecret: viper.GetString("OIDC_CLIENT_SECRET"),
 		ConfigURL:    viper.GetString("OIDC_CONFIG_URL"),
 		RedirectURL:  viper.GetString("OIDC_REDIRECT_URL"),
 	}
 
-	auth, err := NewOidcAuth(ctx, options, &config)
-	if err != nil {
-		return nil, fmt.Errorf("oidc auth error: %v", err)
-	}
-
-	return &OidcService{
+	s := &OidcService{
 		options: options,
-		auth:    auth,
 		users:   NewUserService(ctx, options),
 		repo:    repositories.NewUserRepository(options.Database),
-	}, nil
+		config:  config,
+		auth:    nil,
+	}
+
+	go (func() {
+		log := Logger(ctx).Sugar()
+
+		for {
+			auth, err := NewOidcAuth(ctx, s.options, s.config)
+			if err != nil {
+				log.Errorw("oidc", "error", err)
+			} else {
+				s.auth = auth
+				break
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	})()
+
+	return s
 }
 
 func (s *OidcService) Require(ctx context.Context, payload *oidcService.RequirePayload) (*oidcService.RequireResult, error) {
 	log := Logger(ctx).Sugar()
 
 	if s.auth == nil {
-		return nil, oidcService.MakeNotFound(fmt.Errorf("not found"))
+		auth, err := NewOidcAuth(ctx, s.options, s.config)
+		if err != nil {
+			return nil, fmt.Errorf("oidc initialize error: %v", err)
+		}
+
+		s.auth = auth
 	}
 
 	if payload.Token == nil {
@@ -134,7 +159,12 @@ func (s *OidcService) Authenticate(ctx context.Context, payload *oidcService.Aut
 	log := Logger(ctx).Sugar()
 
 	if s.auth == nil {
-		return nil, oidcService.MakeNotFound(fmt.Errorf("not found"))
+		auth, err := NewOidcAuth(ctx, s.options, s.config)
+		if err != nil {
+			return nil, fmt.Errorf("oidc initialize error: %v", err)
+		}
+
+		s.auth = auth
 	}
 
 	if payload.State != "portal-state" {
@@ -153,6 +183,7 @@ func (s *OidcService) Authenticate(ctx context.Context, payload *oidcService.Aut
 
 	idToken, err := s.auth.verifier.Verify(ctx, rawIDToken)
 	if err != nil {
+		fmt.Printf("\n\n%s\n\n", rawIDToken)
 		return nil, fmt.Errorf("failed to verify id token: %v", err)
 	}
 
