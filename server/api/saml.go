@@ -49,22 +49,22 @@ func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, 
 
 	keyPair, err := tls.LoadX509KeyPair(sa.config.CertPath, sa.config.KeyPath)
 	if err != nil {
-		return nil, fmt.Errorf("error creating keypair: %v (%s, %s)", err, sa.config.CertPath, sa.config.KeyPath)
+		return app, fmt.Errorf("error creating keypair: %v (%s, %s)", err, sa.config.CertPath, sa.config.KeyPath)
 	}
 
 	keyPair.Leaf, err = x509.ParseCertificate(keyPair.Certificate[0])
 	if err != nil {
-		return nil, err
+		return app, err
 	}
 
 	idpMetadataURL, err := url.Parse(sa.config.IDPMetaURL)
 	if err != nil {
-		return nil, err
+		return app, err
 	}
 
 	spURL, err := url.Parse(sa.config.ServiceProviderURL)
 	if err != nil {
-		return nil, err
+		return app, err
 	}
 
 	samlSP, err := samlsp.New(samlsp.Options{
@@ -74,7 +74,7 @@ func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, 
 		IDPMetadataURL: idpMetadataURL,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("saml error: %v (%v)", err, idpMetadataURL)
+		return app, fmt.Errorf("saml error: %v (%v)", err, idpMetadataURL)
 	}
 
 	SamlPrefix := "/saml/"
