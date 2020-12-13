@@ -37,12 +37,12 @@ type OidcAuth struct {
 func NewOidcAuth(ctx context.Context, options *ControllerOptions, config *OidcAuthConfig) (*OidcAuth, error) {
 	log := Logger(ctx).Sugar()
 
-	if config.ClientID == "" || config.ClientSecret == "" || config.ConfigURL == "" {
+	if config.ClientID == "" || config.ClientSecret == "" || config.ConfigURL == "" || config.RedirectURL == "" {
 		log.Infow("oidc-skipping")
 		return nil, nil
 	}
 
-	log.Infow("oidc-initialize", "config_url", config.ConfigURL)
+	log.Infow("oidc-initialize", "config_url", config.ConfigURL, "redirect_url", config.RedirectURL)
 
 	provider, err := oidc.NewProvider(ctx, config.ConfigURL)
 	if err != nil {
