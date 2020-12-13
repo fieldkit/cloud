@@ -6,6 +6,7 @@
 import _ from "lodash";
 import Vue from "vue";
 import { ResumeAction } from "@/store";
+import { toSingleValue } from "@/utilities";
 
 export default Vue.extend({
     components: {},
@@ -21,12 +22,9 @@ export default Vue.extend({
     },
     methods: {
         forwardAfterQuery(): { after?: string } {
-            const after = this.$route.query.after;
+            const after = toSingleValue(this.$route.query.after);
             if (after) {
-                if (_.isArray(after) && after.length > 0 && after[0]) {
-                    return { after: after[0] };
-                }
-                return { after: after as string };
+                return { after: after };
             }
             return {};
         },

@@ -2,7 +2,7 @@ import Vue from "vue";
 import * as ActionTypes from "../actions";
 import * as MutationTypes from "../mutations";
 
-import { ResumeAction, DiscourseLoginAction } from "@/store";
+import { ResumeAction, LoginDiscourseAction, LoginOidcAction } from "@/store";
 
 import { FKApi, TokenStorage, Services, LoginPayload, LoginResponse, CurrentUser } from "@/api";
 
@@ -39,8 +39,18 @@ const actions = (services: Services) => {
                 });
             });
         },
+        [ActionTypes.LOGIN_OIDC]: async ({ commit, dispatch, state }: ActionParameters, payload: LoginOidcAction) => {
+            await services.api.loginOidc(null, payload).then((response) => {
+                commit(UPDATE_TOKEN, response.token);
+                return dispatch(ActionTypes.REFRESH_CURRENT_USER).then(() => {
+                    return dispatch(ActionTypes.AUTHENTICATED).then(() => {
+                        return new LoginResponse(response.token);
+                    });
+                });
+            });
+        },
         [ActionTypes.LOGIN_RESUME]: async ({ commit, dispatch, state }: ActionParameters, payload: ResumeAction) => {
-            await services.api.resume(payload.token).then((token) => {
+            await services.api.loginResume(payload.token).then((token) => {
                 commit(UPDATE_TOKEN, token);
                 return dispatch(ActionTypes.REFRESH_CURRENT_USER).then(() => {
                     return dispatch(ActionTypes.AUTHENTICATED).then(() => {
@@ -49,7 +59,7 @@ const actions = (services: Services) => {
                 });
             });
         },
-        [ActionTypes.LOGIN_DISCOURSE]: async ({ commit, dispatch, state }: ActionParameters, payload: DiscourseLoginAction) => {
+        [ActionTypes.LOGIN_DISCOURSE]: async ({ commit, dispatch, state }: ActionParameters, payload: LoginDiscourseAction) => {
             await services.api
                 .loginDiscourse(
                     payload.token,

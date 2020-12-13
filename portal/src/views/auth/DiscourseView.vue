@@ -12,7 +12,7 @@ import CommonComponents from "@/views/shared";
 import LoginForm from "./LoginForm.vue";
 
 import FKApi, { LoginPayload } from "@/api/api";
-import { ActionTypes, DiscourseParams, DiscourseLoginAction } from "@/store";
+import { ActionTypes, DiscourseParams, LoginDiscourseAction } from "@/store";
 import { toSingleValue } from "@/utilities";
 
 export default Vue.extend({
@@ -52,7 +52,7 @@ export default Vue.extend({
         const token = this.$state.user.token;
         if (params && token) {
             await this.$store
-                .dispatch(new DiscourseLoginAction(token, null, params))
+                .dispatch(new LoginDiscourseAction(token, null, params))
                 .then(
                     async () => {
                         // await this.leaveAfterAuth();
@@ -76,7 +76,7 @@ export default Vue.extend({
             this.failed = false;
 
             await this.$store
-                .dispatch(new DiscourseLoginAction(null, payload, params))
+                .dispatch(new LoginDiscourseAction(null, payload, params))
                 .then(
                     async () => {
                         // await this.leaveAfterAuth();

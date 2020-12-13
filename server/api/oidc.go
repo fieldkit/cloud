@@ -13,6 +13,9 @@ import (
 	"github.com/coreos/go-oidc"
 
 	oidcService "github.com/fieldkit/cloud/server/api/gen/oidc"
+
+	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/data"
 )
 
 type OidcAuthConfig struct {
@@ -68,6 +71,7 @@ type OidcService struct {
 	options *ControllerOptions
 	auth    *OidcAuth
 	users   *UserService
+	repo    *repositories.UserRepository
 }
 
 func NewOidcService(ctx context.Context, options *ControllerOptions) (*OidcService, error) {
@@ -87,6 +91,7 @@ func NewOidcService(ctx context.Context, options *ControllerOptions) (*OidcServi
 		options: options,
 		auth:    auth,
 		users:   NewUserService(ctx, options),
+		repo:    repositories.NewUserRepository(options.Database),
 	}, nil
 }
 
@@ -101,6 +106,7 @@ func (s *OidcService) Require(ctx context.Context, payload *oidcService.RequireP
 	if len(parts) != 2 {
 		return nil, oidcService.MakeForbidden(fmt.Errorf("forbidden"))
 	}
+
 	_, err := s.auth.verifier.Verify(ctx, parts[1])
 
 	if err != nil {
@@ -115,9 +121,13 @@ func (s *OidcService) Require(ctx context.Context, payload *oidcService.RequireP
 }
 
 func (s *OidcService) Authenticate(ctx context.Context, payload *oidcService.AuthenticatePayload) (*oidcService.AuthenticateResult, error) {
+	log := Logger(ctx).Sugar()
+
 	if payload.State != "portal-state" {
 		return nil, fmt.Errorf("state mismatch")
 	}
+
+	_ = log
 
 	oauth2Token, err := s.auth.oauth2Config.Exchange(ctx, payload.Code)
 	if err != nil {
@@ -134,21 +144,69 @@ func (s *OidcService) Authenticate(ctx context.Context, payload *oidcService.Aut
 		return nil, fmt.Errorf("failed to verify id token: %v", err)
 	}
 
-	resp := struct {
-		OAuth2Token   *oauth2.Token
-		IDTokenClaims *json.RawMessage // ID Token payload is just JSON.
-	}{oauth2Token, new(json.RawMessage)}
+	claims := Claims{}
 
-	if err := idToken.Claims(&resp.IDTokenClaims); err != nil {
+	if err := idToken.Claims(&claims); err != nil {
 		return nil, err
 	}
 
-	data, err := json.MarshalIndent(resp, "", "    ")
+	log.Infow("oidc", "claims", claims)
+
+	if false {
+		resp := struct {
+			OAuth2Token   *oauth2.Token
+			IDTokenClaims *json.RawMessage // ID Token payload is just JSON.
+		}{oauth2Token, new(json.RawMessage)}
+
+		if err := idToken.Claims(&resp.IDTokenClaims); err != nil {
+			return nil, err
+		}
+
+		data, err := json.MarshalIndent(resp, "", "    ")
+		if err != nil {
+			return nil, err
+		}
+
+		fmt.Printf("%v\n", string(data))
+	}
+
+	user, err := s.repo.QueryByEmail(ctx, claims.Email)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		log.Infow("registering", "email", claims.Email, "surname", claims.Family, "given", claims.Given)
+
+		user := &data.User{
+			Name:     claims.Name,
+			Email:    claims.Email,
+			Username: claims.Email,
+			Bio:      "",
+			Valid:    true, // TODO Safe to assume, to me.
+		}
+		if err := s.repo.Add(ctx, user); err != nil {
+			return nil, err
+		}
+	} else {
+		log.Infow("found", "email", claims.Email, "surname", claims.Family, "given", claims.Given)
+	}
+
+	token, err := s.users.loggedInReturnToken(ctx, user)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("%v\n", data)
+	return &oidcService.AuthenticateResult{
+		Location: "",
+		Token:    token,
+		Header:   "Bearer " + token,
+	}, nil
+}
 
-	return nil, nil
+type Claims struct {
+	Name     string `json:"name"`
+	Given    string `json:"given_name"`
+	Family   string `json:"family_name"`
+	Email    string `json:"email"`
+	Verified bool   `json:"email_verified"`
 }

@@ -5,6 +5,7 @@ import VueBodyClass from "vue-body-class";
 import LoginView from "./views/auth/LoginView.vue";
 import DiscourseView from "./views/auth/DiscourseView.vue";
 import ResumeView from "./views/auth/ResumeView.vue";
+import LoginKeycloakView from "./views/auth/LoginKeycloakView.vue";
 import CreateAccountView from "./views/auth/CreateAccountView.vue";
 import RecoverAccountView from "./views/auth/RecoverAccountView.vue";
 import ResetPasswordView from "./views/auth/ResetPasswordView.vue";
@@ -45,6 +46,14 @@ const routes = [
         component: DiscourseView,
         meta: {
             bodyClass: "blue-background",
+            secured: false,
+        },
+    },
+    {
+        path: "/login/keycloak",
+        name: "loginKeycloak",
+        component: LoginKeycloakView,
+        meta: {
             secured: false,
         },
     },

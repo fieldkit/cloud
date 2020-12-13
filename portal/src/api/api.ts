@@ -488,7 +488,39 @@ class FKApi {
             });
     }
 
-    public resume(token: string): Promise<any> {
+    public loginOidc(
+        token: string | null,
+        params: {
+            state: string;
+            sessionState: string;
+            code: string;
+        }
+    ): Promise<{ token: string; location: string; header: string }> {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        if (token) {
+            headers["Authorization"] = "Bearer " + token;
+        }
+        const qp = new URLSearchParams();
+        qp.append("state", params.state);
+        qp.append("session_state", params.sessionState);
+        qp.append("code", params.code);
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/oidc/auth?" + qp.toString(),
+            headers: headers,
+        })
+            .then((response) => {
+                return response.data as { token: string; location: string; header: string };
+            })
+            .then((response) => {
+                this.token.setToken(response.header);
+                return response;
+            });
+    }
+
+    public loginResume(token: string): Promise<any> {
         return axios({
             method: "POST",
             url: this.baseUrl + "/user/resume",
