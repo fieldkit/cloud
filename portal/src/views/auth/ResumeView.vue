@@ -5,7 +5,7 @@
 <script lang="ts">
 import _ from "lodash";
 import Vue from "vue";
-import { ResumeAction } from "@/store";
+import { ResumeAction, LoginOidcAction } from "@/store";
 import { toSingleValue } from "@/utilities";
 
 export default Vue.extend({
@@ -15,8 +15,17 @@ export default Vue.extend({
         return {};
     },
     async mounted(): Promise<void> {
+        const p = this.$route.query;
         if (this.$route.params.token) {
             await this.$store.dispatch(new ResumeAction(this.$route.params.token));
+            await this.leaveAfterAuth();
+        }
+
+        const state = toSingleValue(this.$route.query.state);
+        const sessionState = toSingleValue(this.$route.query.session_state);
+        const code = toSingleValue(this.$route.query.code);
+        if (state && sessionState && code) {
+            await this.$store.dispatch(new LoginOidcAction(this.$route.params.token, state, sessionState, code));
             await this.leaveAfterAuth();
         }
     },
