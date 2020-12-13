@@ -35,7 +35,7 @@ var (
 type DiscourseAuthConfig struct {
 	SharedSecret string
 	AdminKey     string
-	ReturnURL    string
+	RedirectURL  string
 }
 
 type DiscourseAuth struct {
@@ -46,7 +46,7 @@ type DiscourseAuth struct {
 type ValidatedDiscourseAttempt struct {
 	nonceMap     map[string][]string
 	sharedSecret string
-	returnURL    string
+	redirectURL  string
 }
 
 func NewDiscourseAuth(options *ControllerOptions, config *DiscourseAuthConfig) *DiscourseAuth {
@@ -92,7 +92,7 @@ func (sa *DiscourseAuth) Validate(ssoVal string, sigVal string) (*ValidatedDisco
 
 	return &ValidatedDiscourseAttempt{
 		sharedSecret: sa.config.SharedSecret,
-		returnURL:    sa.config.ReturnURL,
+		redirectURL:  sa.config.RedirectURL,
 		nonceMap:     parsed,
 	}, nil
 }
@@ -127,7 +127,7 @@ func (va *ValidatedDiscourseAttempt) Finish(userID, email, name, username string
 		return "", nil
 	}
 
-	finalUrl := fmt.Sprintf(va.returnURL, url.QueryEscape(encoded), url.QueryEscape(sig))
+	finalUrl := fmt.Sprintf(va.redirectURL, url.QueryEscape(encoded), url.QueryEscape(sig))
 
 	return finalUrl, nil
 }
@@ -141,7 +141,7 @@ type DiscourseService struct {
 func NewDiscourseService(ctx context.Context, options *ControllerOptions) *DiscourseService {
 	config := DiscourseAuthConfig{
 		SharedSecret: viper.GetString("DISCOURSE_SECRET"),
-		ReturnURL:    viper.GetString("DISCOURSE_RETURN_URL"),
+		RedirectURL:  viper.GetString("DISCOURSE_REDIRECT_URL"),
 		AdminKey:     viper.GetString("DISCOURSE_ADMIN_KEY"),
 	}
 	return &DiscourseService{
@@ -211,7 +211,7 @@ func (s *DiscourseService) validateOrLogin(ctx context.Context, payload *discour
 func (s *DiscourseService) Authenticate(ctx context.Context, payload *discourse.AuthenticatePayload) (*discourse.AuthenticateResult, error) {
 	log := Logger(ctx).Sugar()
 
-	if s.auth.config.SharedSecret == "" || s.auth.config.ReturnURL == "" {
+	if s.auth.config.SharedSecret == "" || s.auth.config.RedirectURL == "" {
 		log.Infow("discourse-skipping")
 		return nil, discourse.MakeForbidden(fmt.Errorf("forbidden"))
 	}
