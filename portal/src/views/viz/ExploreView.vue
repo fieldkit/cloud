@@ -12,7 +12,11 @@
 
             <div v-if="!workspace && !bookmark">Nothing selected to visualize, please choose a station or project from the left.</div>
 
-            <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
+            <div class="workspace-container">
+                <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange"/>
+
+                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange"> </Comments>
+            </div>
         </div>
     </StandardLayout>
 </template>
@@ -32,6 +36,8 @@ import { GlobalState } from "@/store/modules/global";
 import { Workspace, Bookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 
+import Comments from "../comments/Comments.vue";
+
 export default Vue.extend({
     name: "ExploreView",
     components: {
@@ -39,6 +45,7 @@ export default Vue.extend({
         StandardLayout,
         VizWorkspace,
         ExportPanel,
+        Comments,
     },
     props: {
         bookmark: {
@@ -171,9 +178,11 @@ export default Vue.extend({
 }
 
 .workspace-container {
-    height: 100%;
     display: flex;
     flex-direction: column;
+    border-radius: 1px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.07);
+    border: solid 1px #f4f5f7;
 }
 .tree-container {
     flex: 0;
@@ -182,8 +191,6 @@ export default Vue.extend({
     padding: 20px;
 }
 .groups-container {
-    border: 2px solid #efefef;
-    border-radius: 4px;
     background-color: white;
 }
 
