@@ -116,7 +116,7 @@ func NewOidcService(ctx context.Context, options *ControllerOptions) *OidcServic
 				break
 			}
 
-			time.Sleep(1 * time.Second)
+			time.Sleep(5 * time.Second)
 		}
 	})()
 
