@@ -83,19 +83,19 @@ const actions = (services: Services) => {
                 commit(CURRENT_USER, null);
             }
         },
-        [ActionTypes.REFRESH_CURRENT_USER]: ({ commit, dispatch, state }: ActionParameters) => {
-            return services.api.getCurrentUser().then((user) => {
+        [ActionTypes.REFRESH_CURRENT_USER]: async ({ commit, dispatch, state }: ActionParameters) => {
+            await services.api.getCurrentUser().then((user) => {
                 commit(CURRENT_USER, user);
                 return user;
             });
         },
-        [ActionTypes.UPLOAD_USER_PHOTO]: ({ commit, dispatch, state }: ActionParameters, payload: any) => {
-            return services.api.uploadUserImage({ type: payload.type, file: payload.file }).then(() => {
+        [ActionTypes.UPLOAD_USER_PHOTO]: async ({ commit, dispatch, state }: ActionParameters, payload: any) => {
+            await services.api.uploadUserImage({ type: payload.type, file: payload.file }).then(() => {
                 return dispatch(ActionTypes.REFRESH_CURRENT_USER);
             });
         },
-        [ActionTypes.UPDATE_USER_PROFILE]: ({ commit, dispatch, state }: ActionParameters, payload: any) => {
-            return services.api.updateUser(payload.user).then(() => {
+        [ActionTypes.UPDATE_USER_PROFILE]: async ({ commit, dispatch, state }: ActionParameters, payload: any) => {
+            await services.api.updateUser(payload.user).then(() => {
                 return dispatch(ActionTypes.REFRESH_CURRENT_USER);
             });
         },
