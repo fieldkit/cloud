@@ -54,8 +54,8 @@ export default Vue.extend({
             await this.$store
                 .dispatch(new LoginDiscourseAction(token, null, params))
                 .then(
-                    async () => {
-                        // await this.leaveAfterAuth();
+                    () => {
+                        // NOTE The action handler will navigate away. So nothign should happen after.
                     },
                     () => (this.failed = true)
                 )
@@ -78,22 +78,14 @@ export default Vue.extend({
             await this.$store
                 .dispatch(new LoginDiscourseAction(null, payload, params))
                 .then(
-                    async () => {
-                        // await this.leaveAfterAuth();
+                    () => {
+                        // NOTE The action handler will navigate away. So nothign should happen after.
                     },
                     () => (this.failed = true)
                 )
                 .finally(() => {
                     this.busy = false;
                 });
-        },
-        async leaveAfterAuth(): Promise<void> {
-            const after = this.forwardAfterQuery;
-            if (after.after) {
-                await this.$router.push(after.after);
-            } else {
-                await this.$router.push({ name: "projects" });
-            }
         },
     },
 });
