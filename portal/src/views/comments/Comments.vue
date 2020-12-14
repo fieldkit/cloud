@@ -340,7 +340,6 @@ header {
 
 .body {
     max-width: 550px;
-    font-family: $font-family-light;
 }
 
 .comment {
