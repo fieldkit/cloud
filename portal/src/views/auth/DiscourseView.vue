@@ -1,5 +1,5 @@
 <template>
-    <div class="form-container">
+    <div class="form-container" v-if="credentialsNecessary">
         <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
         <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="false" @login="save" />
     </div>
@@ -24,10 +24,12 @@ export default Vue.extend({
     data(): {
         busy: boolean;
         failed: boolean;
+        credentialsNecessary: boolean;
     } {
         return {
             busy: false,
             failed: false,
+            credentialsNecessary: false,
         };
     },
     computed: {
@@ -57,11 +59,16 @@ export default Vue.extend({
                     () => {
                         // NOTE The action handler will navigate away. So nothign should happen after.
                     },
-                    () => (this.failed = true)
+                    () => {
+                        this.failed = true;
+                        this.credentialsNecessary = true;
+                    }
                 )
                 .finally(() => {
                     this.busy = false;
                 });
+        } else {
+            this.credentialsNecessary = true;
         }
     },
     methods: {
@@ -81,7 +88,9 @@ export default Vue.extend({
                     () => {
                         // NOTE The action handler will navigate away. So nothign should happen after.
                     },
-                    () => (this.failed = true)
+                    () => {
+                        this.failed = true;
+                    }
                 )
                 .finally(() => {
                     this.busy = false;
