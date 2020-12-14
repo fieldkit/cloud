@@ -183,7 +183,7 @@ export default Vue.extend({
                 .then((data) => {
                     this.posts = data.posts;
                 })
-                .catch((e) => {
+                .catch(() => {
                     this.errorGetComments = true;
                 });
         },
