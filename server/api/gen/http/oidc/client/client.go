@@ -17,9 +17,12 @@ import (
 
 // Client lists the oidc service endpoint HTTP clients.
 type Client struct {
-	// Require Doer is the HTTP client used to make requests to the require
+	// Required Doer is the HTTP client used to make requests to the required
 	// endpoint.
-	RequireDoer goahttp.Doer
+	RequiredDoer goahttp.Doer
+
+	// URL Doer is the HTTP client used to make requests to the url endpoint.
+	URLDoer goahttp.Doer
 
 	// Authenticate Doer is the HTTP client used to make requests to the
 	// authenticate endpoint.
@@ -48,7 +51,8 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		RequireDoer:         doer,
+		RequiredDoer:        doer,
+		URLDoer:             doer,
 		AuthenticateDoer:    doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
@@ -59,15 +63,15 @@ func NewClient(
 	}
 }
 
-// Require returns an endpoint that makes HTTP requests to the oidc service
-// require server.
-func (c *Client) Require() goa.Endpoint {
+// Required returns an endpoint that makes HTTP requests to the oidc service
+// required server.
+func (c *Client) Required() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeRequireRequest(c.encoder)
-		decodeResponse = DecodeRequireResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeRequiredRequest(c.encoder)
+		decodeResponse = DecodeRequiredResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildRequireRequest(ctx, v)
+		req, err := c.BuildRequiredRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
@@ -75,9 +79,33 @@ func (c *Client) Require() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.RequireDoer.Do(req)
+		resp, err := c.RequiredDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("oidc", "require", err)
+			return nil, goahttp.ErrRequestError("oidc", "required", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// URL returns an endpoint that makes HTTP requests to the oidc service url
+// server.
+func (c *Client) URL() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeURLRequest(c.encoder)
+		decodeResponse = DecodeURLResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildURLRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.URLDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("oidc", "url", err)
 		}
 		return decodeResponse(resp)
 	}

@@ -15,30 +15,42 @@ import (
 
 // Endpoints wraps the "oidc" service endpoints.
 type Endpoints struct {
-	Require      goa.Endpoint
+	Required     goa.Endpoint
+	URL          goa.Endpoint
 	Authenticate goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "oidc" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
-		Require:      NewRequireEndpoint(s),
+		Required:     NewRequiredEndpoint(s),
+		URL:          NewURLEndpoint(s),
 		Authenticate: NewAuthenticateEndpoint(s),
 	}
 }
 
 // Use applies the given middleware to all the "oidc" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
-	e.Require = m(e.Require)
+	e.Required = m(e.Required)
+	e.URL = m(e.URL)
 	e.Authenticate = m(e.Authenticate)
 }
 
-// NewRequireEndpoint returns an endpoint function that calls the method
-// "require" of service "oidc".
-func NewRequireEndpoint(s Service) goa.Endpoint {
+// NewRequiredEndpoint returns an endpoint function that calls the method
+// "required" of service "oidc".
+func NewRequiredEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*RequirePayload)
-		return s.Require(ctx, p)
+		p := req.(*RequiredPayload)
+		return s.Required(ctx, p)
+	}
+}
+
+// NewURLEndpoint returns an endpoint function that calls the method "url" of
+// service "oidc".
+func NewURLEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*URLPayload)
+		return s.URL(ctx, p)
 	}
 }
 

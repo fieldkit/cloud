@@ -10,43 +10,64 @@ package server
 import (
 	"context"
 	"net/http"
+	"strconv"
 
 	oidc "github.com/fieldkit/cloud/server/api/gen/oidc"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
 
-// EncodeRequireResponse returns an encoder for responses returned by the oidc
-// require endpoint.
-func EncodeRequireResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeRequiredResponse returns an encoder for responses returned by the oidc
+// required endpoint.
+func EncodeRequiredResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*oidc.RequireResult)
+		res := v.(*oidc.RequiredResult)
 		w.Header().Set("Location", res.Location)
 		w.WriteHeader(http.StatusTemporaryRedirect)
 		return nil
 	}
 }
 
-// DecodeRequireRequest returns a decoder for requests sent to the oidc require
-// endpoint.
-func DecodeRequireRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+// DecodeRequiredRequest returns a decoder for requests sent to the oidc
+// required endpoint.
+func DecodeRequiredRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			token *string
+			after  *string
+			follow *bool
+			token  *string
+			err    error
 		)
+		afterRaw := r.URL.Query().Get("after")
+		if afterRaw != "" {
+			after = &afterRaw
+		}
+		{
+			followRaw := r.URL.Query().Get("follow")
+			if followRaw != "" {
+				v, err2 := strconv.ParseBool(followRaw)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("follow", followRaw, "boolean"))
+				}
+				follow = &v
+			}
+		}
 		tokenRaw := r.Header.Get("Authorization")
 		if tokenRaw != "" {
 			token = &tokenRaw
 		}
-		payload := NewRequirePayload(token)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewRequiredPayload(after, follow, token)
 
 		return payload, nil
 	}
 }
 
-// EncodeRequireError returns an encoder for errors returned by the require
+// EncodeRequiredError returns an encoder for errors returned by the required
 // oidc endpoint.
-func EncodeRequireError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+func EncodeRequiredError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		en, ok := v.(ErrorNamer)
@@ -61,7 +82,7 @@ func EncodeRequireError(encoder func(context.Context, http.ResponseWriter) goaht
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewRequireUnauthorizedResponseBody(res)
+				body = NewRequiredUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", "unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)
@@ -73,7 +94,7 @@ func EncodeRequireError(encoder func(context.Context, http.ResponseWriter) goaht
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewRequireForbiddenResponseBody(res)
+				body = NewRequiredForbiddenResponseBody(res)
 			}
 			w.Header().Set("goa-error", "forbidden")
 			w.WriteHeader(http.StatusForbidden)
@@ -85,7 +106,7 @@ func EncodeRequireError(encoder func(context.Context, http.ResponseWriter) goaht
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewRequireNotFoundResponseBody(res)
+				body = NewRequiredNotFoundResponseBody(res)
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
@@ -97,7 +118,120 @@ func EncodeRequireError(encoder func(context.Context, http.ResponseWriter) goaht
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewRequireBadRequestResponseBody(res)
+				body = NewRequiredBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeURLResponse returns an encoder for responses returned by the oidc url
+// endpoint.
+func EncodeURLResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*oidc.URLResult)
+		enc := encoder(ctx, w)
+		body := NewURLResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeURLRequest returns a decoder for requests sent to the oidc url
+// endpoint.
+func DecodeURLRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			after  *string
+			follow *bool
+			token  *string
+			err    error
+		)
+		afterRaw := r.URL.Query().Get("after")
+		if afterRaw != "" {
+			after = &afterRaw
+		}
+		{
+			followRaw := r.URL.Query().Get("follow")
+			if followRaw != "" {
+				v, err2 := strconv.ParseBool(followRaw)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("follow", followRaw, "boolean"))
+				}
+				follow = &v
+			}
+		}
+		tokenRaw := r.Header.Get("Authorization")
+		if tokenRaw != "" {
+			token = &tokenRaw
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewURLPayload(after, follow, token)
+
+		return payload, nil
+	}
+}
+
+// EncodeURLError returns an encoder for errors returned by the url oidc
+// endpoint.
+func EncodeURLError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewURLUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewURLForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewURLNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewURLBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)

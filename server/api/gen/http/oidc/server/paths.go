@@ -7,9 +7,14 @@
 
 package server
 
-// RequireOidcPath returns the URL path to the oidc service require HTTP endpoint.
-func RequireOidcPath() string {
+// RequiredOidcPath returns the URL path to the oidc service required HTTP endpoint.
+func RequiredOidcPath() string {
 	return "/oidc/required"
+}
+
+// URLOidcPath returns the URL path to the oidc service url HTTP endpoint.
+func URLOidcPath() string {
+	return "/oidc/url"
 }
 
 // AuthenticateOidcPath returns the URL path to the oidc service authenticate HTTP endpoint.

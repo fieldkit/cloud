@@ -12,6 +12,12 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// URLResponseBody is the type of the "oidc" service "url" endpoint HTTP
+// response body.
+type URLResponseBody struct {
+	Location *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+}
+
 // AuthenticateResponseBody is the type of the "oidc" service "authenticate"
 // endpoint HTTP response body.
 type AuthenticateResponseBody struct {
@@ -20,9 +26,9 @@ type AuthenticateResponseBody struct {
 	Header   *string `form:"header,omitempty" json:"header,omitempty" xml:"header,omitempty"`
 }
 
-// RequireUnauthorizedResponseBody is the type of the "oidc" service "require"
-// endpoint HTTP response body for the "unauthorized" error.
-type RequireUnauthorizedResponseBody struct {
+// RequiredUnauthorizedResponseBody is the type of the "oidc" service
+// "required" endpoint HTTP response body for the "unauthorized" error.
+type RequiredUnauthorizedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -38,9 +44,9 @@ type RequireUnauthorizedResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// RequireForbiddenResponseBody is the type of the "oidc" service "require"
+// RequiredForbiddenResponseBody is the type of the "oidc" service "required"
 // endpoint HTTP response body for the "forbidden" error.
-type RequireForbiddenResponseBody struct {
+type RequiredForbiddenResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -56,9 +62,9 @@ type RequireForbiddenResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// RequireNotFoundResponseBody is the type of the "oidc" service "require"
+// RequiredNotFoundResponseBody is the type of the "oidc" service "required"
 // endpoint HTTP response body for the "not-found" error.
-type RequireNotFoundResponseBody struct {
+type RequiredNotFoundResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -74,9 +80,81 @@ type RequireNotFoundResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// RequireBadRequestResponseBody is the type of the "oidc" service "require"
+// RequiredBadRequestResponseBody is the type of the "oidc" service "required"
 // endpoint HTTP response body for the "bad-request" error.
-type RequireBadRequestResponseBody struct {
+type RequiredBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// URLUnauthorizedResponseBody is the type of the "oidc" service "url" endpoint
+// HTTP response body for the "unauthorized" error.
+type URLUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// URLForbiddenResponseBody is the type of the "oidc" service "url" endpoint
+// HTTP response body for the "forbidden" error.
+type URLForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// URLNotFoundResponseBody is the type of the "oidc" service "url" endpoint
+// HTTP response body for the "not-found" error.
+type URLNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// URLBadRequestResponseBody is the type of the "oidc" service "url" endpoint
+// HTTP response body for the "bad-request" error.
+type URLBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -182,18 +260,18 @@ type AuthenticateBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// NewRequireResultTemporaryRedirect builds a "oidc" service "require" endpoint
-// result from a HTTP "TemporaryRedirect" response.
-func NewRequireResultTemporaryRedirect(location string) *oidc.RequireResult {
-	v := &oidc.RequireResult{}
+// NewRequiredResultTemporaryRedirect builds a "oidc" service "required"
+// endpoint result from a HTTP "TemporaryRedirect" response.
+func NewRequiredResultTemporaryRedirect(location string) *oidc.RequiredResult {
+	v := &oidc.RequiredResult{}
 	v.Location = location
 
 	return v
 }
 
-// NewRequireUnauthorized builds a oidc service require endpoint unauthorized
+// NewRequiredUnauthorized builds a oidc service required endpoint unauthorized
 // error.
-func NewRequireUnauthorized(body *RequireUnauthorizedResponseBody) *goa.ServiceError {
+func NewRequiredUnauthorized(body *RequiredUnauthorizedResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -206,8 +284,8 @@ func NewRequireUnauthorized(body *RequireUnauthorizedResponseBody) *goa.ServiceE
 	return v
 }
 
-// NewRequireForbidden builds a oidc service require endpoint forbidden error.
-func NewRequireForbidden(body *RequireForbiddenResponseBody) *goa.ServiceError {
+// NewRequiredForbidden builds a oidc service required endpoint forbidden error.
+func NewRequiredForbidden(body *RequiredForbiddenResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -220,8 +298,8 @@ func NewRequireForbidden(body *RequireForbiddenResponseBody) *goa.ServiceError {
 	return v
 }
 
-// NewRequireNotFound builds a oidc service require endpoint not-found error.
-func NewRequireNotFound(body *RequireNotFoundResponseBody) *goa.ServiceError {
+// NewRequiredNotFound builds a oidc service required endpoint not-found error.
+func NewRequiredNotFound(body *RequiredNotFoundResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -234,9 +312,75 @@ func NewRequireNotFound(body *RequireNotFoundResponseBody) *goa.ServiceError {
 	return v
 }
 
-// NewRequireBadRequest builds a oidc service require endpoint bad-request
+// NewRequiredBadRequest builds a oidc service required endpoint bad-request
 // error.
-func NewRequireBadRequest(body *RequireBadRequestResponseBody) *goa.ServiceError {
+func NewRequiredBadRequest(body *RequiredBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewURLResultOK builds a "oidc" service "url" endpoint result from a HTTP
+// "OK" response.
+func NewURLResultOK(body *URLResponseBody) *oidc.URLResult {
+	v := &oidc.URLResult{
+		Location: *body.Location,
+	}
+
+	return v
+}
+
+// NewURLUnauthorized builds a oidc service url endpoint unauthorized error.
+func NewURLUnauthorized(body *URLUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewURLForbidden builds a oidc service url endpoint forbidden error.
+func NewURLForbidden(body *URLForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewURLNotFound builds a oidc service url endpoint not-found error.
+func NewURLNotFound(body *URLNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewURLBadRequest builds a oidc service url endpoint bad-request error.
+func NewURLBadRequest(body *URLBadRequestResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -336,6 +480,14 @@ func NewAuthenticateBadRequest(body *AuthenticateBadRequestResponseBody) *goa.Se
 	return v
 }
 
+// ValidateURLResponseBody runs the validations defined on UrlResponseBody
+func ValidateURLResponseBody(body *URLResponseBody) (err error) {
+	if body.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("location", "body"))
+	}
+	return
+}
+
 // ValidateAuthenticateResponseBody runs the validations defined on
 // AuthenticateResponseBody
 func ValidateAuthenticateResponseBody(body *AuthenticateResponseBody) (err error) {
@@ -351,9 +503,9 @@ func ValidateAuthenticateResponseBody(body *AuthenticateResponseBody) (err error
 	return
 }
 
-// ValidateRequireUnauthorizedResponseBody runs the validations defined on
-// require_unauthorized_response_body
-func ValidateRequireUnauthorizedResponseBody(body *RequireUnauthorizedResponseBody) (err error) {
+// ValidateRequiredUnauthorizedResponseBody runs the validations defined on
+// required_unauthorized_response_body
+func ValidateRequiredUnauthorizedResponseBody(body *RequiredUnauthorizedResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -375,9 +527,9 @@ func ValidateRequireUnauthorizedResponseBody(body *RequireUnauthorizedResponseBo
 	return
 }
 
-// ValidateRequireForbiddenResponseBody runs the validations defined on
-// require_forbidden_response_body
-func ValidateRequireForbiddenResponseBody(body *RequireForbiddenResponseBody) (err error) {
+// ValidateRequiredForbiddenResponseBody runs the validations defined on
+// required_forbidden_response_body
+func ValidateRequiredForbiddenResponseBody(body *RequiredForbiddenResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -399,9 +551,9 @@ func ValidateRequireForbiddenResponseBody(body *RequireForbiddenResponseBody) (e
 	return
 }
 
-// ValidateRequireNotFoundResponseBody runs the validations defined on
-// require_not-found_response_body
-func ValidateRequireNotFoundResponseBody(body *RequireNotFoundResponseBody) (err error) {
+// ValidateRequiredNotFoundResponseBody runs the validations defined on
+// required_not-found_response_body
+func ValidateRequiredNotFoundResponseBody(body *RequiredNotFoundResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -423,9 +575,105 @@ func ValidateRequireNotFoundResponseBody(body *RequireNotFoundResponseBody) (err
 	return
 }
 
-// ValidateRequireBadRequestResponseBody runs the validations defined on
-// require_bad-request_response_body
-func ValidateRequireBadRequestResponseBody(body *RequireBadRequestResponseBody) (err error) {
+// ValidateRequiredBadRequestResponseBody runs the validations defined on
+// required_bad-request_response_body
+func ValidateRequiredBadRequestResponseBody(body *RequiredBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateURLUnauthorizedResponseBody runs the validations defined on
+// url_unauthorized_response_body
+func ValidateURLUnauthorizedResponseBody(body *URLUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateURLForbiddenResponseBody runs the validations defined on
+// url_forbidden_response_body
+func ValidateURLForbiddenResponseBody(body *URLForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateURLNotFoundResponseBody runs the validations defined on
+// url_not-found_response_body
+func ValidateURLNotFoundResponseBody(body *URLNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateURLBadRequestResponseBody runs the validations defined on
+// url_bad-request_response_body
+func ValidateURLBadRequestResponseBody(body *URLBadRequestResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}

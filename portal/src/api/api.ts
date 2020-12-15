@@ -520,6 +520,19 @@ class FKApi {
             });
     }
 
+    public loginUrl(after: string | null): Promise<string> {
+        const qp = new URLSearchParams();
+        if (after) {
+            qp.append("after", after);
+        }
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/oidc/url?" + qp.toString(),
+        }).then((response) => {
+            return response.data.location;
+        });
+    }
+
     public loginResume(token: string): Promise<any> {
         return axios({
             method: "POST",

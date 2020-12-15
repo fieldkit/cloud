@@ -15,26 +15,38 @@ import (
 
 // Client is the "oidc" service client.
 type Client struct {
-	RequireEndpoint      goa.Endpoint
+	RequiredEndpoint     goa.Endpoint
+	URLEndpoint          goa.Endpoint
 	AuthenticateEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "oidc" service client given the endpoints.
-func NewClient(require, authenticate goa.Endpoint) *Client {
+func NewClient(required, url_, authenticate goa.Endpoint) *Client {
 	return &Client{
-		RequireEndpoint:      require,
+		RequiredEndpoint:     required,
+		URLEndpoint:          url_,
 		AuthenticateEndpoint: authenticate,
 	}
 }
 
-// Require calls the "require" endpoint of the "oidc" service.
-func (c *Client) Require(ctx context.Context, p *RequirePayload) (res *RequireResult, err error) {
+// Required calls the "required" endpoint of the "oidc" service.
+func (c *Client) Required(ctx context.Context, p *RequiredPayload) (res *RequiredResult, err error) {
 	var ires interface{}
-	ires, err = c.RequireEndpoint(ctx, p)
+	ires, err = c.RequiredEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*RequireResult), nil
+	return ires.(*RequiredResult), nil
+}
+
+// URL calls the "url" endpoint of the "oidc" service.
+func (c *Client) URL(ctx context.Context, p *URLPayload) (res *URLResult, err error) {
+	var ires interface{}
+	ires, err = c.URLEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*URLResult), nil
 }
 
 // Authenticate calls the "authenticate" endpoint of the "oidc" service.

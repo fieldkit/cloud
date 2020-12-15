@@ -21,7 +21,8 @@ import (
 // Server lists the oidc service endpoint HTTP handlers.
 type Server struct {
 	Mounts       []*MountPoint
-	Require      http.Handler
+	Required     http.Handler
+	URL          http.Handler
 	Authenticate http.Handler
 	CORS         http.Handler
 }
@@ -59,12 +60,15 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"Require", "GET", "/oidc/required"},
+			{"Required", "GET", "/oidc/required"},
+			{"URL", "GET", "/oidc/url"},
 			{"Authenticate", "POST", "/oidc/auth"},
 			{"CORS", "OPTIONS", "/oidc/required"},
+			{"CORS", "OPTIONS", "/oidc/url"},
 			{"CORS", "OPTIONS", "/oidc/auth"},
 		},
-		Require:      NewRequireHandler(e.Require, mux, decoder, encoder, errhandler, formatter),
+		Required:     NewRequiredHandler(e.Required, mux, decoder, encoder, errhandler, formatter),
+		URL:          NewURLHandler(e.URL, mux, decoder, encoder, errhandler, formatter),
 		Authenticate: NewAuthenticateHandler(e.Authenticate, mux, decoder, encoder, errhandler, formatter),
 		CORS:         NewCORSHandler(),
 	}
@@ -75,21 +79,23 @@ func (s *Server) Service() string { return "oidc" }
 
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
-	s.Require = m(s.Require)
+	s.Required = m(s.Required)
+	s.URL = m(s.URL)
 	s.Authenticate = m(s.Authenticate)
 	s.CORS = m(s.CORS)
 }
 
 // Mount configures the mux to serve the oidc endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
-	MountRequireHandler(mux, h.Require)
+	MountRequiredHandler(mux, h.Required)
+	MountURLHandler(mux, h.URL)
 	MountAuthenticateHandler(mux, h.Authenticate)
 	MountCORSHandler(mux, h.CORS)
 }
 
-// MountRequireHandler configures the mux to serve the "oidc" service "require"
-// endpoint.
-func MountRequireHandler(mux goahttp.Muxer, h http.Handler) {
+// MountRequiredHandler configures the mux to serve the "oidc" service
+// "required" endpoint.
+func MountRequiredHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := handleOidcOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -99,9 +105,9 @@ func MountRequireHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("GET", "/oidc/required", f)
 }
 
-// NewRequireHandler creates a HTTP handler which loads the HTTP request and
-// calls the "oidc" service "require" endpoint.
-func NewRequireHandler(
+// NewRequiredHandler creates a HTTP handler which loads the HTTP request and
+// calls the "oidc" service "required" endpoint.
+func NewRequiredHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -110,13 +116,64 @@ func NewRequireHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeRequireRequest(mux, decoder)
-		encodeResponse = EncodeRequireResponse(encoder)
-		encodeError    = EncodeRequireError(encoder, formatter)
+		decodeRequest  = DecodeRequiredRequest(mux, decoder)
+		encodeResponse = EncodeRequiredResponse(encoder)
+		encodeError    = EncodeRequiredError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "require")
+		ctx = context.WithValue(ctx, goa.MethodKey, "required")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "oidc")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountURLHandler configures the mux to serve the "oidc" service "url"
+// endpoint.
+func MountURLHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleOidcOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/oidc/url", f)
+}
+
+// NewURLHandler creates a HTTP handler which loads the HTTP request and calls
+// the "oidc" service "url" endpoint.
+func NewURLHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeURLRequest(mux, decoder)
+		encodeResponse = EncodeURLResponse(encoder)
+		encodeError    = EncodeURLError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "url")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "oidc")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -200,6 +257,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("OPTIONS", "/oidc/required", f)
+	mux.Handle("OPTIONS", "/oidc/url", f)
 	mux.Handle("OPTIONS", "/oidc/auth", f)
 }
 

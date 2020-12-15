@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -123,7 +124,11 @@ func NewOidcService(ctx context.Context, options *ControllerOptions) *OidcServic
 	return s
 }
 
-func (s *OidcService) Require(ctx context.Context, payload *oidcService.RequirePayload) (*oidcService.RequireResult, error) {
+type LinkState struct {
+	After *string `json:"after"`
+}
+
+func (s *OidcService) URL(ctx context.Context, payload *oidcService.URLPayload) (*oidcService.URLResult, error) {
 	log := Logger(ctx).Sugar()
 
 	if s.auth == nil {
@@ -138,10 +143,56 @@ func (s *OidcService) Require(ctx context.Context, payload *oidcService.RequireP
 		s.auth = auth
 	}
 
+	state := &LinkState{
+		After: payload.After,
+	}
+
+	data, err := json.Marshal(state)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Infow("oidc", "state", string(data))
+
+	encoded := base64.StdEncoding.EncodeToString(data)
+
+	return &oidcService.URLResult{
+		Location: s.auth.oauth2Config.AuthCodeURL(encoded),
+	}, nil
+}
+
+func (s *OidcService) Required(ctx context.Context, payload *oidcService.RequiredPayload) (*oidcService.RequiredResult, error) {
+	log := Logger(ctx).Sugar()
+
+	if s.auth == nil {
+		auth, err := NewOidcAuth(ctx, s.options, s.config)
+		if err != nil {
+			return nil, fmt.Errorf("oidc initialize error: %v", err)
+		}
+		if auth == nil {
+			return nil, oidcService.MakeNotFound(fmt.Errorf("not found"))
+		}
+
+		s.auth = auth
+	}
+
+	state := &LinkState{
+		After: payload.After,
+	}
+
+	data, err := json.Marshal(state)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Infow("oidc", "state", string(data))
+
+	encoded := base64.StdEncoding.EncodeToString(data)
+
 	if payload.Token == nil {
 		log.Infow("oidc", "token-missing", true)
-		return &oidcService.RequireResult{
-			Location: s.auth.oauth2Config.AuthCodeURL("portal-state"),
+		return &oidcService.RequiredResult{
+			Location: s.auth.oauth2Config.AuthCodeURL(encoded),
 		}, nil
 	}
 
@@ -151,16 +202,16 @@ func (s *OidcService) Require(ctx context.Context, payload *oidcService.RequireP
 		return nil, oidcService.MakeForbidden(fmt.Errorf("forbidden"))
 	}
 
-	_, err := s.auth.verifier.Verify(ctx, parts[1])
+	_, err = s.auth.verifier.Verify(ctx, parts[1])
 	if err != nil {
 		log.Infow("oidc", "token-invalid", true)
-		return &oidcService.RequireResult{
-			Location: s.auth.oauth2Config.AuthCodeURL("portal-state"),
+		return &oidcService.RequiredResult{
+			Location: s.auth.oauth2Config.AuthCodeURL(encoded),
 		}, nil
 	}
 
-	return &oidcService.RequireResult{
-		Location: s.auth.oauth2Config.AuthCodeURL("portal-state"),
+	return &oidcService.RequiredResult{
+		Location: s.auth.oauth2Config.AuthCodeURL(encoded),
 	}, nil
 }
 

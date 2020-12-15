@@ -8,9 +8,11 @@ var _ = Service("oidc", func() {
 	Error("user-unverified", func() {
 	})
 
-	Method("require", func() {
+	Method("required", func() {
 		Payload(func() {
 			Attribute("token", String)
+			Attribute("follow", Boolean)
+			Attribute("after", String)
 		})
 
 		Result(func() {
@@ -25,11 +27,44 @@ var _ = Service("oidc", func() {
 				Pattern("^Bearer [^ ]+$")
 			})
 
+			Params(func() {
+				Param("after")
+				Param("follow")
+			})
+
 			Response(StatusTemporaryRedirect, func() {
 				Headers(func() {
 					Header("location:Location")
 				})
 			})
+		})
+	})
+
+	Method("url", func() {
+		Payload(func() {
+			Attribute("token", String)
+			Attribute("follow", Boolean)
+			Attribute("after", String)
+		})
+
+		Result(func() {
+			Attribute("location", String)
+			Required("location")
+		})
+
+		HTTP(func() {
+			GET("oidc/url")
+
+			Header("token:Authorization", String, "authentication token", func() {
+				Pattern("^Bearer [^ ]+$")
+			})
+
+			Params(func() {
+				Param("after")
+				Param("follow")
+			})
+
+			Response(StatusOK)
 		})
 	})
 

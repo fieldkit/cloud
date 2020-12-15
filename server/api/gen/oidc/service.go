@@ -15,8 +15,10 @@ import (
 
 // Service is the oidc service interface.
 type Service interface {
-	// Require implements require.
-	Require(context.Context, *RequirePayload) (res *RequireResult, err error)
+	// Required implements required.
+	Required(context.Context, *RequiredPayload) (res *RequiredResult, err error)
+	// URL implements url.
+	URL(context.Context, *URLPayload) (res *URLResult, err error)
 	// Authenticate implements authenticate.
 	Authenticate(context.Context, *AuthenticatePayload) (res *AuthenticateResult, err error)
 }
@@ -29,15 +31,29 @@ const ServiceName = "oidc"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [2]string{"require", "authenticate"}
+var MethodNames = [3]string{"required", "url", "authenticate"}
 
-// RequirePayload is the payload type of the oidc service require method.
-type RequirePayload struct {
-	Token *string
+// RequiredPayload is the payload type of the oidc service required method.
+type RequiredPayload struct {
+	Token  *string
+	Follow *bool
+	After  *string
 }
 
-// RequireResult is the result type of the oidc service require method.
-type RequireResult struct {
+// RequiredResult is the result type of the oidc service required method.
+type RequiredResult struct {
+	Location string
+}
+
+// URLPayload is the payload type of the oidc service url method.
+type URLPayload struct {
+	Token  *string
+	Follow *bool
+	After  *string
+}
+
+// URLResult is the result type of the oidc service url method.
+type URLResult struct {
 	Location string
 }
 

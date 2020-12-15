@@ -10,6 +10,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -19,13 +20,13 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// BuildRequireRequest instantiates a HTTP request object with method and path
-// set to call the "oidc" service "require" endpoint
-func (c *Client) BuildRequireRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: RequireOidcPath()}
+// BuildRequiredRequest instantiates a HTTP request object with method and path
+// set to call the "oidc" service "required" endpoint
+func (c *Client) BuildRequiredRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: RequiredOidcPath()}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("oidc", "require", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("oidc", "required", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -34,32 +35,40 @@ func (c *Client) BuildRequireRequest(ctx context.Context, v interface{}) (*http.
 	return req, nil
 }
 
-// EncodeRequireRequest returns an encoder for requests sent to the oidc
-// require server.
-func EncodeRequireRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+// EncodeRequiredRequest returns an encoder for requests sent to the oidc
+// required server.
+func EncodeRequiredRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
 	return func(req *http.Request, v interface{}) error {
-		p, ok := v.(*oidc.RequirePayload)
+		p, ok := v.(*oidc.RequiredPayload)
 		if !ok {
-			return goahttp.ErrInvalidType("oidc", "require", "*oidc.RequirePayload", v)
+			return goahttp.ErrInvalidType("oidc", "required", "*oidc.RequiredPayload", v)
 		}
 		if p.Token != nil {
 			head := *p.Token
 			req.Header.Set("Authorization", head)
 		}
+		values := req.URL.Query()
+		if p.After != nil {
+			values.Add("after", *p.After)
+		}
+		if p.Follow != nil {
+			values.Add("follow", fmt.Sprintf("%v", *p.Follow))
+		}
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }
 
-// DecodeRequireResponse returns a decoder for responses returned by the oidc
-// require endpoint. restoreBody controls whether the response body should be
+// DecodeRequiredResponse returns a decoder for responses returned by the oidc
+// required endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
-// DecodeRequireResponse may return the following errors:
+// DecodeRequiredResponse may return the following errors:
 //	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
 //	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
 //	- "not-found" (type *goa.ServiceError): http.StatusNotFound
 //	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //	- error: internal error
-func DecodeRequireResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+func DecodeRequiredResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
 			b, err := ioutil.ReadAll(resp.Body)
@@ -85,69 +94,209 @@ func DecodeRequireResponse(decoder func(*http.Response) goahttp.Decoder, restore
 			}
 			location = locationRaw
 			if err != nil {
-				return nil, goahttp.ErrValidationError("oidc", "require", err)
+				return nil, goahttp.ErrValidationError("oidc", "required", err)
 			}
-			res := NewRequireResultTemporaryRedirect(location)
+			res := NewRequiredResultTemporaryRedirect(location)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (
-				body RequireUnauthorizedResponseBody
+				body RequiredUnauthorizedResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("oidc", "require", err)
+				return nil, goahttp.ErrDecodingError("oidc", "required", err)
 			}
-			err = ValidateRequireUnauthorizedResponseBody(&body)
+			err = ValidateRequiredUnauthorizedResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("oidc", "require", err)
+				return nil, goahttp.ErrValidationError("oidc", "required", err)
 			}
-			return nil, NewRequireUnauthorized(&body)
+			return nil, NewRequiredUnauthorized(&body)
 		case http.StatusForbidden:
 			var (
-				body RequireForbiddenResponseBody
+				body RequiredForbiddenResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("oidc", "require", err)
+				return nil, goahttp.ErrDecodingError("oidc", "required", err)
 			}
-			err = ValidateRequireForbiddenResponseBody(&body)
+			err = ValidateRequiredForbiddenResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("oidc", "require", err)
+				return nil, goahttp.ErrValidationError("oidc", "required", err)
 			}
-			return nil, NewRequireForbidden(&body)
+			return nil, NewRequiredForbidden(&body)
 		case http.StatusNotFound:
 			var (
-				body RequireNotFoundResponseBody
+				body RequiredNotFoundResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("oidc", "require", err)
+				return nil, goahttp.ErrDecodingError("oidc", "required", err)
 			}
-			err = ValidateRequireNotFoundResponseBody(&body)
+			err = ValidateRequiredNotFoundResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("oidc", "require", err)
+				return nil, goahttp.ErrValidationError("oidc", "required", err)
 			}
-			return nil, NewRequireNotFound(&body)
+			return nil, NewRequiredNotFound(&body)
 		case http.StatusBadRequest:
 			var (
-				body RequireBadRequestResponseBody
+				body RequiredBadRequestResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("oidc", "require", err)
+				return nil, goahttp.ErrDecodingError("oidc", "required", err)
 			}
-			err = ValidateRequireBadRequestResponseBody(&body)
+			err = ValidateRequiredBadRequestResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("oidc", "require", err)
+				return nil, goahttp.ErrValidationError("oidc", "required", err)
 			}
-			return nil, NewRequireBadRequest(&body)
+			return nil, NewRequiredBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("oidc", "require", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("oidc", "required", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildURLRequest instantiates a HTTP request object with method and path set
+// to call the "oidc" service "url" endpoint
+func (c *Client) BuildURLRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: URLOidcPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("oidc", "url", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeURLRequest returns an encoder for requests sent to the oidc url server.
+func EncodeURLRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*oidc.URLPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("oidc", "url", "*oidc.URLPayload", v)
+		}
+		if p.Token != nil {
+			head := *p.Token
+			req.Header.Set("Authorization", head)
+		}
+		values := req.URL.Query()
+		if p.After != nil {
+			values.Add("after", *p.After)
+		}
+		if p.Follow != nil {
+			values.Add("follow", fmt.Sprintf("%v", *p.Follow))
+		}
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeURLResponse returns a decoder for responses returned by the oidc url
+// endpoint. restoreBody controls whether the response body should be restored
+// after having been read.
+// DecodeURLResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeURLResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body URLResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("oidc", "url", err)
+			}
+			err = ValidateURLResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("oidc", "url", err)
+			}
+			res := NewURLResultOK(&body)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body URLUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("oidc", "url", err)
+			}
+			err = ValidateURLUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("oidc", "url", err)
+			}
+			return nil, NewURLUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body URLForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("oidc", "url", err)
+			}
+			err = ValidateURLForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("oidc", "url", err)
+			}
+			return nil, NewURLForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body URLNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("oidc", "url", err)
+			}
+			err = ValidateURLNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("oidc", "url", err)
+			}
+			return nil, NewURLNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body URLBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("oidc", "url", err)
+			}
+			err = ValidateURLBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("oidc", "url", err)
+			}
+			return nil, NewURLBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("oidc", "url", resp.StatusCode, string(body))
 		}
 	}
 }

@@ -12,6 +12,12 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// URLResponseBody is the type of the "oidc" service "url" endpoint HTTP
+// response body.
+type URLResponseBody struct {
+	Location string `form:"location" json:"location" xml:"location"`
+}
+
 // AuthenticateResponseBody is the type of the "oidc" service "authenticate"
 // endpoint HTTP response body.
 type AuthenticateResponseBody struct {
@@ -20,9 +26,9 @@ type AuthenticateResponseBody struct {
 	Header   string `form:"header" json:"header" xml:"header"`
 }
 
-// RequireUnauthorizedResponseBody is the type of the "oidc" service "require"
-// endpoint HTTP response body for the "unauthorized" error.
-type RequireUnauthorizedResponseBody struct {
+// RequiredUnauthorizedResponseBody is the type of the "oidc" service
+// "required" endpoint HTTP response body for the "unauthorized" error.
+type RequiredUnauthorizedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -38,9 +44,9 @@ type RequireUnauthorizedResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// RequireForbiddenResponseBody is the type of the "oidc" service "require"
+// RequiredForbiddenResponseBody is the type of the "oidc" service "required"
 // endpoint HTTP response body for the "forbidden" error.
-type RequireForbiddenResponseBody struct {
+type RequiredForbiddenResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -56,9 +62,9 @@ type RequireForbiddenResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// RequireNotFoundResponseBody is the type of the "oidc" service "require"
+// RequiredNotFoundResponseBody is the type of the "oidc" service "required"
 // endpoint HTTP response body for the "not-found" error.
-type RequireNotFoundResponseBody struct {
+type RequiredNotFoundResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -74,9 +80,81 @@ type RequireNotFoundResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// RequireBadRequestResponseBody is the type of the "oidc" service "require"
+// RequiredBadRequestResponseBody is the type of the "oidc" service "required"
 // endpoint HTTP response body for the "bad-request" error.
-type RequireBadRequestResponseBody struct {
+type RequiredBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// URLUnauthorizedResponseBody is the type of the "oidc" service "url" endpoint
+// HTTP response body for the "unauthorized" error.
+type URLUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// URLForbiddenResponseBody is the type of the "oidc" service "url" endpoint
+// HTTP response body for the "forbidden" error.
+type URLForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// URLNotFoundResponseBody is the type of the "oidc" service "url" endpoint
+// HTTP response body for the "not-found" error.
+type URLNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// URLBadRequestResponseBody is the type of the "oidc" service "url" endpoint
+// HTTP response body for the "bad-request" error.
+type URLBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -182,6 +260,15 @@ type AuthenticateBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// NewURLResponseBody builds the HTTP response body from the result of the
+// "url" endpoint of the "oidc" service.
+func NewURLResponseBody(res *oidc.URLResult) *URLResponseBody {
+	body := &URLResponseBody{
+		Location: res.Location,
+	}
+	return body
+}
+
 // NewAuthenticateResponseBody builds the HTTP response body from the result of
 // the "authenticate" endpoint of the "oidc" service.
 func NewAuthenticateResponseBody(res *oidc.AuthenticateResult) *AuthenticateResponseBody {
@@ -193,10 +280,10 @@ func NewAuthenticateResponseBody(res *oidc.AuthenticateResult) *AuthenticateResp
 	return body
 }
 
-// NewRequireUnauthorizedResponseBody builds the HTTP response body from the
-// result of the "require" endpoint of the "oidc" service.
-func NewRequireUnauthorizedResponseBody(res *goa.ServiceError) *RequireUnauthorizedResponseBody {
-	body := &RequireUnauthorizedResponseBody{
+// NewRequiredUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "required" endpoint of the "oidc" service.
+func NewRequiredUnauthorizedResponseBody(res *goa.ServiceError) *RequiredUnauthorizedResponseBody {
+	body := &RequiredUnauthorizedResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -207,10 +294,10 @@ func NewRequireUnauthorizedResponseBody(res *goa.ServiceError) *RequireUnauthori
 	return body
 }
 
-// NewRequireForbiddenResponseBody builds the HTTP response body from the
-// result of the "require" endpoint of the "oidc" service.
-func NewRequireForbiddenResponseBody(res *goa.ServiceError) *RequireForbiddenResponseBody {
-	body := &RequireForbiddenResponseBody{
+// NewRequiredForbiddenResponseBody builds the HTTP response body from the
+// result of the "required" endpoint of the "oidc" service.
+func NewRequiredForbiddenResponseBody(res *goa.ServiceError) *RequiredForbiddenResponseBody {
+	body := &RequiredForbiddenResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -221,10 +308,10 @@ func NewRequireForbiddenResponseBody(res *goa.ServiceError) *RequireForbiddenRes
 	return body
 }
 
-// NewRequireNotFoundResponseBody builds the HTTP response body from the result
-// of the "require" endpoint of the "oidc" service.
-func NewRequireNotFoundResponseBody(res *goa.ServiceError) *RequireNotFoundResponseBody {
-	body := &RequireNotFoundResponseBody{
+// NewRequiredNotFoundResponseBody builds the HTTP response body from the
+// result of the "required" endpoint of the "oidc" service.
+func NewRequiredNotFoundResponseBody(res *goa.ServiceError) *RequiredNotFoundResponseBody {
+	body := &RequiredNotFoundResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -235,10 +322,66 @@ func NewRequireNotFoundResponseBody(res *goa.ServiceError) *RequireNotFoundRespo
 	return body
 }
 
-// NewRequireBadRequestResponseBody builds the HTTP response body from the
-// result of the "require" endpoint of the "oidc" service.
-func NewRequireBadRequestResponseBody(res *goa.ServiceError) *RequireBadRequestResponseBody {
-	body := &RequireBadRequestResponseBody{
+// NewRequiredBadRequestResponseBody builds the HTTP response body from the
+// result of the "required" endpoint of the "oidc" service.
+func NewRequiredBadRequestResponseBody(res *goa.ServiceError) *RequiredBadRequestResponseBody {
+	body := &RequiredBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewURLUnauthorizedResponseBody builds the HTTP response body from the result
+// of the "url" endpoint of the "oidc" service.
+func NewURLUnauthorizedResponseBody(res *goa.ServiceError) *URLUnauthorizedResponseBody {
+	body := &URLUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewURLForbiddenResponseBody builds the HTTP response body from the result of
+// the "url" endpoint of the "oidc" service.
+func NewURLForbiddenResponseBody(res *goa.ServiceError) *URLForbiddenResponseBody {
+	body := &URLForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewURLNotFoundResponseBody builds the HTTP response body from the result of
+// the "url" endpoint of the "oidc" service.
+func NewURLNotFoundResponseBody(res *goa.ServiceError) *URLNotFoundResponseBody {
+	body := &URLNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewURLBadRequestResponseBody builds the HTTP response body from the result
+// of the "url" endpoint of the "oidc" service.
+func NewURLBadRequestResponseBody(res *goa.ServiceError) *URLBadRequestResponseBody {
+	body := &URLBadRequestResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -319,9 +462,21 @@ func NewAuthenticateBadRequestResponseBody(res *goa.ServiceError) *AuthenticateB
 	return body
 }
 
-// NewRequirePayload builds a oidc service require endpoint payload.
-func NewRequirePayload(token *string) *oidc.RequirePayload {
-	v := &oidc.RequirePayload{}
+// NewRequiredPayload builds a oidc service required endpoint payload.
+func NewRequiredPayload(after *string, follow *bool, token *string) *oidc.RequiredPayload {
+	v := &oidc.RequiredPayload{}
+	v.After = after
+	v.Follow = follow
+	v.Token = token
+
+	return v
+}
+
+// NewURLPayload builds a oidc service url endpoint payload.
+func NewURLPayload(after *string, follow *bool, token *string) *oidc.URLPayload {
+	v := &oidc.URLPayload{}
+	v.After = after
+	v.Follow = follow
 	v.Token = token
 
 	return v

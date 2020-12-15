@@ -8,19 +8,76 @@
 package client
 
 import (
+	"fmt"
+	"strconv"
+
 	oidc "github.com/fieldkit/cloud/server/api/gen/oidc"
 )
 
-// BuildRequirePayload builds the payload for the oidc require endpoint from
+// BuildRequiredPayload builds the payload for the oidc required endpoint from
 // CLI flags.
-func BuildRequirePayload(oidcRequireToken string) (*oidc.RequirePayload, error) {
-	var token *string
+func BuildRequiredPayload(oidcRequiredAfter string, oidcRequiredFollow string, oidcRequiredToken string) (*oidc.RequiredPayload, error) {
+	var err error
+	var after *string
 	{
-		if oidcRequireToken != "" {
-			token = &oidcRequireToken
+		if oidcRequiredAfter != "" {
+			after = &oidcRequiredAfter
 		}
 	}
-	v := &oidc.RequirePayload{}
+	var follow *bool
+	{
+		if oidcRequiredFollow != "" {
+			var val bool
+			val, err = strconv.ParseBool(oidcRequiredFollow)
+			follow = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for follow, must be BOOL")
+			}
+		}
+	}
+	var token *string
+	{
+		if oidcRequiredToken != "" {
+			token = &oidcRequiredToken
+		}
+	}
+	v := &oidc.RequiredPayload{}
+	v.After = after
+	v.Follow = follow
+	v.Token = token
+
+	return v, nil
+}
+
+// BuildURLPayload builds the payload for the oidc url endpoint from CLI flags.
+func BuildURLPayload(oidcURLAfter string, oidcURLFollow string, oidcURLToken string) (*oidc.URLPayload, error) {
+	var err error
+	var after *string
+	{
+		if oidcURLAfter != "" {
+			after = &oidcURLAfter
+		}
+	}
+	var follow *bool
+	{
+		if oidcURLFollow != "" {
+			var val bool
+			val, err = strconv.ParseBool(oidcURLFollow)
+			follow = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for follow, must be BOOL")
+			}
+		}
+	}
+	var token *string
+	{
+		if oidcURLToken != "" {
+			token = &oidcURLToken
+		}
+	}
+	v := &oidc.URLPayload{}
+	v.After = after
+	v.Follow = follow
 	v.Token = token
 
 	return v, nil
