@@ -23,6 +23,15 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+var (
+	ErrNoConfig = errors.New("insufficient config")
+)
+
+const (
+	KeycloakPortalIDAttribute = "portal_id"
+	OurAudience               = ""
+)
+
 type UserService struct {
 	options *ControllerOptions
 }
@@ -895,8 +904,18 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 		return nil, err
 	}
 
-	if err := s.updateAuthentication(ctx, user, password); err != nil {
-		log.Errorw("update-authentication", "user_id", user.ID, "error", err)
+	if as, err := NewAuthServer(); err != nil {
+		if err != ErrNoConfig {
+			return nil, err
+		}
+	} else {
+		if err := as.UpdateAuthentication(ctx, user, password); err != nil {
+			log.Errorw("update-authentication", "user_id", user.ID, "error", err)
+		}
+
+		if _, err := as.Login(ctx, user.Email, password); err != nil {
+			log.Errorw("update-authentication", "user_id", user.ID, "error", err)
+		}
 	}
 
 	if !user.Valid {
@@ -914,7 +933,62 @@ func splitName(name string) (first string, last string) {
 	return name, ""
 }
 
-func (s *UserService) updateAuthentication(ctx context.Context, user *data.User, password string) error {
+type AuthServer struct {
+	realm       string
+	apiUser     string
+	apiPassword string
+	apiRealm    string
+	kc          gocloak.GoCloak
+}
+
+func NewAuthServer() (*AuthServer, error) {
+	realm := viper.GetString("KEYCLOAK_REALM")
+	url := viper.GetString("KEYCLOAK_URL")
+	apiUser := viper.GetString("KEYCLOAK_API_USER")
+	apiPassword := viper.GetString("KEYCLOAK_API_PASSWORD")
+	apiRealm := viper.GetString("KEYCLOAK_API_REALM")
+
+	if url == "" || realm == "" || apiUser == "" || apiPassword == "" || apiRealm == "" {
+		return nil, ErrNoConfig
+	}
+
+	kc := gocloak.NewClient(url)
+
+	return &AuthServer{
+		realm:       realm,
+		apiUser:     apiUser,
+		apiPassword: apiPassword,
+		apiRealm:    apiRealm,
+		kc:          kc,
+	}, nil
+}
+
+func (as *AuthServer) Login(ctx context.Context, email, password string) (*gocloak.JWT, error) {
+	log := Logger(ctx).Sugar()
+
+	oidcConfig := NewOidcAuthConfig()
+
+	token, err := as.kc.Login(ctx, oidcConfig.ClientID, oidcConfig.ClientSecret, as.realm, email, password)
+	if err != nil {
+		return nil, err
+	}
+
+	t, d, err := as.kc.DecodeAccessToken(ctx, token.AccessToken, as.realm, OurAudience)
+	if err != nil {
+		return nil, err
+	}
+
+	// log.Infow("oidc", "token", t)
+	// log.Infow("oidc", "decoded", d)
+
+	_ = log
+	_ = t
+	_ = d
+
+	return token, nil
+}
+
+func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User, password string) error {
 	log := Logger(ctx).Sugar()
 	realm := viper.GetString("KEYCLOAK_REALM")
 	url := viper.GetString("KEYCLOAK_URL")
@@ -952,7 +1026,7 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 	first, last := splitName(user.Name)
 
 	attrs := map[string][]string{
-		"portal_id": []string{fmt.Sprintf("%d", user.ID)},
+		KeycloakPortalIDAttribute: []string{fmt.Sprintf("%d", user.ID)},
 	}
 
 	for _, ku := range users {
