@@ -951,12 +951,18 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 
 	first, last := splitName(user.Name)
 
+	attrs := map[string][]string{
+		"portal_id": []string{fmt.Sprintf("%d", user.ID)},
+	}
+
 	for _, ku := range users {
 		ku.FirstName = gocloak.StringP(first)
 		ku.LastName = gocloak.StringP(last)
 		ku.Email = gocloak.StringP(user.Email)
 		ku.Username = gocloak.StringP(user.Email)
 		ku.EmailVerified = gocloak.BoolP(true)
+		ku.Attributes = &attrs
+
 		if err := client.UpdateUser(ctx, token.AccessToken, realm, *ku); err != nil {
 			return fmt.Errorf("keycloak-update: %v", err)
 		}
@@ -976,6 +982,7 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 			Username:      gocloak.StringP(user.Email),
 			EmailVerified: gocloak.BoolP(true),
 			Enabled:       gocloak.BoolP(true),
+			Attributes:    &attrs,
 		}
 
 		createdID, err := client.CreateUser(ctx, token.AccessToken, realm, cloaked)
