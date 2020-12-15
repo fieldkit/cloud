@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	_ "net/http"
 	_ "net/http/pprof"
@@ -92,11 +93,36 @@ func loadConfiguration() (*Config, *Options, error) {
 		return nil, nil, err
 	}
 
-	viper.SetConfigName("config")
-	viper.SetConfigType("json")
-	viper.AddConfigPath("$HOME/.fkserver")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	viper.SetConfigName("fkserver.json")
+	viper.AddConfigPath("$HOME/")
 	viper.AddConfigPath(".")
 	viper.SetEnvPrefix("FIELDKIT")
+
+	viper.SetDefault("SAML.CERT", "fk-saml.cert")
+	viper.SetDefault("SAML.KEY", "fk-saml.key")
+	viper.SetDefault("SAML.SP_URL", "http://127.0.0.1:8080")
+	viper.SetDefault("SAML.LOGIN_URL", "http://127.0.0.1:8081/login/%s")
+	viper.SetDefault("SAML.IPD_META", "http://127.0.0.1:8090/auth/realms/fk/protocol/saml/descriptor")
+
+	viper.SetDefault("KEYCLOAK.URL", "http://127.0.0.1:8090")
+	viper.SetDefault("KEYCLOAK.REALM", "fk")
+	viper.SetDefault("KEYCLOAK.API_USER", "admin")
+	viper.SetDefault("KEYCLOAK.API_PASSWORD", "admin")
+	viper.SetDefault("KEYCLOAK.API_REALM", "master")
+
+	viper.SetDefault("OIDC.CLIENT_ID", "portal")
+	viper.SetDefault("OIDC.CLIENT_SECRET", "9144cc7d-e9ba-4920-8e47-9a41dfbe4301")
+	viper.SetDefault("OIDC.CONFIG_URL", "http://127.0.0.1:8090/auth/realms/fk")
+	viper.SetDefault("OIDC.REDIRECT_URL", "http://127.0.0.1:8081/login/keycloak")
+
+	// NOTE This is the same secret used in the real world example.
+	// https://meta.discourse.org/t/discourseconnect-official-single-sign-on-for-discourse-sso/13045
+	viper.SetDefault("DISCOURSE.SECRET", "d836444a9e4084d5b224a60c208dce14")
+	viper.SetDefault("DISCOURSE.REDIRECT_URL", "https://community.fieldkit.org/session/sso_login?sso=%s&sig=%s")
+	viper.SetDefault("DISCOURSE.ADMIN_KEY", "")
+
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -105,28 +131,9 @@ func loadConfiguration() (*Config, *Options, error) {
 		}
 	}
 
-	viper.SetDefault("SAML_CERT", "fk-saml.cert")
-	viper.SetDefault("SAML_KEY", "fk-saml.key")
-	viper.SetDefault("SAML_SP_URL", "http://127.0.0.1:8080")
-	viper.SetDefault("SAML_LOGIN_URL", "http://127.0.0.1:8081/login/%s")
-	viper.SetDefault("SAML_IPD_META", "http://127.0.0.1:8090/auth/realms/fk/protocol/saml/descriptor")
-
-	viper.SetDefault("KEYCLOAK_URL", "http://127.0.0.1:8090")
-	viper.SetDefault("KEYCLOAK_REALM", "fk")
-	viper.SetDefault("KEYCLOAK_API_USER", "admin")
-	viper.SetDefault("KEYCLOAK_API_PASSWORD", "admin")
-	viper.SetDefault("KEYCLOAK_API_REALM", "master")
-
-	viper.SetDefault("OIDC_CLIENT_ID", "portal")
-	viper.SetDefault("OIDC_CLIENT_SECRET", "9144cc7d-e9ba-4920-8e47-9a41dfbe4301")
-	viper.SetDefault("OIDC_CONFIG_URL", "http://127.0.0.1:8090/auth/realms/fk")
-	viper.SetDefault("OIDC_REDIRECT_URL", "http://127.0.0.1:8081/login/keycloak")
-
-	// NOTE This is the same secret used in the real world example.
-	// https://meta.discourse.org/t/discourseconnect-official-single-sign-on-for-discourse-sso/13045
-	viper.SetDefault("DISCOURSE_SECRET", "d836444a9e4084d5b224a60c208dce14")
-	viper.SetDefault("DISCOURSE_REDIRECT_URL", "https://community.fieldkit.org/session/sso_login?sso=%s&sig=%s")
-	viper.SetDefault("DISCOURSE_ADMIN_KEY", "")
+	if err := viper.WriteConfigAs("fkserver.json"); err != nil {
+		return nil, nil, err
+	}
 
 	if config.ApiDomain == "" {
 		config.ApiDomain = "api." + config.Domain

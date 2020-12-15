@@ -33,9 +33,17 @@ var (
 )
 
 type DiscourseAuthConfig struct {
+	RedirectURL  string
 	SharedSecret string
 	AdminKey     string
-	RedirectURL  string
+}
+
+func NewDiscourseAuthConfig() *DiscourseAuthConfig {
+	return &DiscourseAuthConfig{
+		SharedSecret: viper.GetString("DISCOURSE.SECRET"),
+		RedirectURL:  viper.GetString("DISCOURSE.REDIRECT_URL"),
+		AdminKey:     viper.GetString("DISCOURSE.ADMIN_KEY"),
+	}
 }
 
 type DiscourseAuth struct {
@@ -139,14 +147,15 @@ type DiscourseService struct {
 }
 
 func NewDiscourseService(ctx context.Context, options *ControllerOptions) *DiscourseService {
-	config := DiscourseAuthConfig{
-		SharedSecret: viper.GetString("DISCOURSE_SECRET"),
-		RedirectURL:  viper.GetString("DISCOURSE_REDIRECT_URL"),
-		AdminKey:     viper.GetString("DISCOURSE_ADMIN_KEY"),
-	}
+	config := NewDiscourseAuthConfig()
+
+	log := Logger(ctx).Sugar()
+
+	log.Infow("discourse", "url", config.RedirectURL)
+
 	return &DiscourseService{
 		options: options,
-		auth:    NewDiscourseAuth(options, &config),
+		auth:    NewDiscourseAuth(options, config),
 		users:   NewUserService(ctx, options),
 	}
 }

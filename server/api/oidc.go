@@ -29,10 +29,10 @@ type OidcAuthConfig struct {
 
 func NewOidcAuthConfig() *OidcAuthConfig {
 	return &OidcAuthConfig{
-		ClientID:     viper.GetString("OIDC_CLIENT_ID"),
-		ClientSecret: viper.GetString("OIDC_CLIENT_SECRET"),
-		ConfigURL:    viper.GetString("OIDC_CONFIG_URL"),
-		RedirectURL:  viper.GetString("OIDC_REDIRECT_URL"),
+		ClientID:     viper.GetString("OIDC.CLIENT_ID"),
+		ClientSecret: viper.GetString("OIDC.CLIENT_SECRET"),
+		ConfigURL:    viper.GetString("OIDC.CONFIG_URL"),
+		RedirectURL:  viper.GetString("OIDC.REDIRECT_URL"),
 	}
 }
 

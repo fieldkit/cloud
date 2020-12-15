@@ -165,11 +165,11 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	}
 
 	samlConfig := &SamlAuthConfig{
-		CertPath:           viper.GetString("SAML_CERT"),
-		KeyPath:            viper.GetString("SAML_KEY"),
-		ServiceProviderURL: viper.GetString("SAML_SP_URL"),
-		IDPMetaURL:         viper.GetString("SAML_IPD_META"),
-		LoginURLTemplate:   viper.GetString("SAML_LOGIN_URL"),
+		CertPath:           viper.GetString("SAML.CERT"),
+		KeyPath:            viper.GetString("SAML.KEY"),
+		ServiceProviderURL: viper.GetString("SAML.SP_URL"),
+		IDPMetaURL:         viper.GetString("SAML.IPD_META"),
+		LoginURLTemplate:   viper.GetString("SAML.LOGIN_URL"),
 	}
 	saml := NewSamlAuth(options, samlConfig)
 
