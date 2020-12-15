@@ -128,19 +128,27 @@ type LinkState struct {
 	After *string `json:"after"`
 }
 
-func (s *OidcService) URL(ctx context.Context, payload *oidcService.URLPayload) (*oidcService.URLResult, error) {
-	log := Logger(ctx).Sugar()
-
+func (s *OidcService) ready(ctx context.Context) error {
 	if s.auth == nil {
 		auth, err := NewOidcAuth(ctx, s.options, s.config)
 		if err != nil {
-			return nil, fmt.Errorf("oidc initialize error: %v", err)
+			return fmt.Errorf("oidc initialize error: %v", err)
 		}
 		if auth == nil {
-			return nil, oidcService.MakeNotFound(fmt.Errorf("not found"))
+			return oidcService.MakeNotFound(fmt.Errorf("not found"))
 		}
 
 		s.auth = auth
+	}
+
+	return nil
+}
+
+func (s *OidcService) URL(ctx context.Context, payload *oidcService.URLPayload) (*oidcService.URLResult, error) {
+	log := Logger(ctx).Sugar()
+
+	if err := s.ready(ctx); err != nil {
+		return nil, err
 	}
 
 	state := &LinkState{
@@ -164,16 +172,8 @@ func (s *OidcService) URL(ctx context.Context, payload *oidcService.URLPayload) 
 func (s *OidcService) Required(ctx context.Context, payload *oidcService.RequiredPayload) (*oidcService.RequiredResult, error) {
 	log := Logger(ctx).Sugar()
 
-	if s.auth == nil {
-		auth, err := NewOidcAuth(ctx, s.options, s.config)
-		if err != nil {
-			return nil, fmt.Errorf("oidc initialize error: %v", err)
-		}
-		if auth == nil {
-			return nil, oidcService.MakeNotFound(fmt.Errorf("not found"))
-		}
-
-		s.auth = auth
+	if err := s.ready(ctx); err != nil {
+		return nil, err
 	}
 
 	state := &LinkState{
@@ -218,16 +218,8 @@ func (s *OidcService) Required(ctx context.Context, payload *oidcService.Require
 func (s *OidcService) Authenticate(ctx context.Context, payload *oidcService.AuthenticatePayload) (*oidcService.AuthenticateResult, error) {
 	log := Logger(ctx).Sugar()
 
-	if s.auth == nil {
-		auth, err := NewOidcAuth(ctx, s.options, s.config)
-		if err != nil {
-			return nil, fmt.Errorf("oidc initialize error: %v", err)
-		}
-		if auth == nil {
-			return nil, oidcService.MakeNotFound(fmt.Errorf("not found"))
-		}
-
-		s.auth = auth
+	if err := s.ready(ctx); err != nil {
+		return nil, err
 	}
 
 	oauth2Token, err := s.auth.oauth2Config.Exchange(ctx, payload.Code)
