@@ -27,6 +27,15 @@ type OidcAuthConfig struct {
 	RedirectURL  string
 }
 
+func NewOidcAuthConfig() *OidcAuthConfig {
+	return &OidcAuthConfig{
+		ClientID:     viper.GetString("OIDC_CLIENT_ID"),
+		ClientSecret: viper.GetString("OIDC_CLIENT_SECRET"),
+		ConfigURL:    viper.GetString("OIDC_CONFIG_URL"),
+		RedirectURL:  viper.GetString("OIDC_REDIRECT_URL"),
+	}
+}
+
 type OidcAuth struct {
 	options      *ControllerOptions
 	config       *OidcAuthConfig
@@ -84,12 +93,7 @@ type OidcService struct {
 }
 
 func NewOidcService(ctx context.Context, options *ControllerOptions) *OidcService {
-	config := &OidcAuthConfig{
-		ClientID:     viper.GetString("OIDC_CLIENT_ID"),
-		ClientSecret: viper.GetString("OIDC_CLIENT_SECRET"),
-		ConfigURL:    viper.GetString("OIDC_CONFIG_URL"),
-		RedirectURL:  viper.GetString("OIDC_REDIRECT_URL"),
-	}
+	config := NewOidcAuthConfig()
 
 	s := &OidcService{
 		options: options,
@@ -176,23 +180,17 @@ func (s *OidcService) Required(ctx context.Context, payload *oidcService.Require
 		return nil, err
 	}
 
-	state := &LinkState{
+	urls, err := s.URL(ctx, &oidcService.URLPayload{
 		After: payload.After,
-	}
-
-	data, err := json.Marshal(state)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	log.Infow("oidc", "state", string(data))
-
-	encoded := base64.StdEncoding.EncodeToString(data)
-
 	if payload.Token == nil {
 		log.Infow("oidc", "token-missing", true)
 		return &oidcService.RequiredResult{
-			Location: s.auth.oauth2Config.AuthCodeURL(encoded),
+			Location: urls.Location,
 		}, nil
 	}
 
@@ -206,12 +204,12 @@ func (s *OidcService) Required(ctx context.Context, payload *oidcService.Require
 	if err != nil {
 		log.Infow("oidc", "token-invalid", true)
 		return &oidcService.RequiredResult{
-			Location: s.auth.oauth2Config.AuthCodeURL(encoded),
+			Location: urls.Location,
 		}, nil
 	}
 
 	return &oidcService.RequiredResult{
-		Location: s.auth.oauth2Config.AuthCodeURL(encoded),
+		Location: urls.Location,
 	}, nil
 }
 
