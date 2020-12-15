@@ -291,7 +291,7 @@ export interface StationsResponse {
 export function makeAuthenticatedApiUrl(url) {
     const tokens = new TokenStorage();
     const token = tokens.getToken();
-    return Config.API_HOST + url + "?token=" + token;
+    return Config.baseUrl + url + "?token=" + token;
 }
 
 export enum Auth {
@@ -311,7 +311,7 @@ export interface InvokeParams {
 }
 
 class FKApi {
-    private readonly baseUrl: string = Config.API_HOST;
+    private readonly baseUrl: string = Config.baseUrl;
     private readonly token: TokenStorage = new TokenStorage();
     private refreshing: Promise<any> | null = null;
 
