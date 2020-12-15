@@ -94,8 +94,7 @@ func loadConfiguration() (*Config, *Options, error) {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
-	viper.AddConfigPath("/etc/appname/")
-	viper.AddConfigPath("$HOME/.appname")
+	viper.AddConfigPath("$HOME/.fkserver")
 	viper.AddConfigPath(".")
 	viper.SetEnvPrefix("FIELDKIT")
 	viper.AutomaticEnv()
