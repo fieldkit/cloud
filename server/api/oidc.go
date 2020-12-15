@@ -230,10 +230,6 @@ func (s *OidcService) Authenticate(ctx context.Context, payload *oidcService.Aut
 		s.auth = auth
 	}
 
-	if payload.State != "portal-state" {
-		return nil, fmt.Errorf("state mismatch")
-	}
-
 	oauth2Token, err := s.auth.oauth2Config.Exchange(ctx, payload.Code)
 	if err != nil {
 		return nil, fmt.Errorf("failed to exchange token: %v", err)

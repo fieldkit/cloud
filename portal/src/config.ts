@@ -1,7 +1,7 @@
 import Vue from "vue";
 
 export class Configuration {
-    constructor(public readonly baseUrl: string) {}
+    constructor(public readonly baseUrl: string, public readonly sso = true) {}
 }
 
 const plugin = {

@@ -13,10 +13,6 @@ export default Vue.extend({
     async mounted(): Promise<void> {
         try {
             await this.$store.dispatch(ActionTypes.INITIALIZE);
-            /*
-            const url = await this.$services.api.loginUrl(null);
-            console.log(url);
-			*/
         } catch (err) {
             console.log("initialize error", err, err.stack);
         }
