@@ -37,6 +37,9 @@ type UserService struct {
 }
 
 func NewUserService(ctx context.Context, options *ControllerOptions) *UserService {
+	config := NewKeycloakConfig()
+	log := Logger(ctx).Sugar()
+	log.Infow("keycloak", "config", config)
 	return &UserService{options: options}
 }
 
@@ -908,6 +911,7 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 		if err != ErrNoConfig {
 			return nil, err
 		}
+		log.Infow("keycloak-no-config", "error", err)
 	} else {
 		if err := as.UpdateAuthentication(ctx, user, password); err != nil {
 			log.Errorw("update-authentication", "user_id", user.ID, "error", err)
@@ -988,8 +992,8 @@ type KeycloakConfig struct {
 
 func NewKeycloakConfig() *KeycloakConfig {
 	return &KeycloakConfig{
-		Realm:       viper.GetString("KEYCLOAK.REALM"),
 		URL:         viper.GetString("KEYCLOAK.URL"),
+		Realm:       viper.GetString("KEYCLOAK.REALM"),
 		ApiUser:     viper.GetString("KEYCLOAK.API.USER"),
 		ApiPassword: viper.GetString("KEYCLOAK.API.PASSWORD"),
 		ApiRealm:    viper.GetString("KEYCLOAK.API.REALM"),
@@ -997,7 +1001,7 @@ func NewKeycloakConfig() *KeycloakConfig {
 }
 
 func (c *KeycloakConfig) Valid() bool {
-	return c.URL == "" || c.Realm == "" || c.ApiUser == "" || c.ApiPassword == "" || c.ApiRealm == ""
+	return !(c.URL == "" || c.Realm == "" || c.ApiUser == "" || c.ApiPassword == "" || c.ApiRealm == "")
 }
 
 func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User, password string) error {

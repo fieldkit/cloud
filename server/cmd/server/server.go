@@ -108,9 +108,9 @@ func loadConfiguration() (*Config, *Options, error) {
 
 	viper.SetDefault("KEYCLOAK.URL", "http://127.0.0.1:8090")
 	viper.SetDefault("KEYCLOAK.REALM", "fk")
-	viper.SetDefault("KEYCLOAK.API_USER", "admin")
-	viper.SetDefault("KEYCLOAK.API_PASSWORD", "admin")
-	viper.SetDefault("KEYCLOAK.API_REALM", "master")
+	viper.SetDefault("KEYCLOAK.API.USER", "admin")
+	viper.SetDefault("KEYCLOAK.API.PASSWORD", "admin")
+	viper.SetDefault("KEYCLOAK.API.REALM", "master")
 
 	viper.SetDefault("OIDC.CLIENT_ID", "portal")
 	viper.SetDefault("OIDC.CLIENT_SECRET", "9144cc7d-e9ba-4920-8e47-9a41dfbe4301")
