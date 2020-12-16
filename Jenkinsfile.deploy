@@ -5,17 +5,22 @@ timestamps {
 		try {
 			slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting... (<${env.BUILD_URL}|Open>)"
 
+			def isDev = params.DeployFrom.indexOf("fkdev.org") >= 0
+			def stackName = params.DeployStack ?: "portal-stack"
+			def statusUrl = isDev ? "https://api.fkdev.org/status" : "https://api.fieldkit.org/status"
+
+			print(stackName)
+
 			stage ('deploy') {
 				withCredentials([usernamePassword(credentialsId: 'jenkins-artifact-download', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASSWORD')]) {
 					sshagent (credentials: ['ssh-fkdev-deploy']) {
-						def downloadUrl = "https://${JENKINS_USER}:${JENKINS_PASSWORD}@code.conservify.org/jenkins/job/fk/job/aws-build-stacks/lastSuccessfulBuild/artifact/dev-ops/amis/build/fk-cloud-stack.tar"
+						def downloadUrl = "https://${JENKINS_USER}:${JENKINS_PASSWORD}@code.conservify.org/jenkins/job/fk/job/aws-build-stacks/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
 						sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${params.DeployFrom}"
 						sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} wget -nv --auth-no-challenge '${downloadUrl}'"
-						sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} sudo mv fk-cloud-stack.tar /tmp/incoming-stacks"
+						sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} sudo mv ${stackName}.tar /tmp/incoming-stacks"
 					}
 				}
-				def isDev = params.DeployFrom.indexOf("fkdev.org") >= 0
-				def statusUrl = isDev ? "https://api.fkdev.org/status" : "https://api.fieldkit.org/status"
+
 				def value = watchDeployment(url: statusUrl, seconds: 180)
 				println(value)
 				println("done")
