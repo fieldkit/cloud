@@ -914,11 +914,11 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 		log.Infow("keycloak-no-config", "error", err)
 	} else {
 		if err := as.UpdateAuthentication(ctx, user, password); err != nil {
-			log.Errorw("update-authentication", "user_id", user.ID, "error", err)
+			log.Errorw("keycloak-update-authentication", "user_id", user.ID, "error", err)
 		}
 
 		if _, err := as.Login(ctx, user.Email, password); err != nil {
-			log.Errorw("update-authentication", "user_id", user.ID, "error", err)
+			log.Errorw("keycloak-login", "user_id", user.ID, "error", err)
 		}
 	}
 
