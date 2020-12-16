@@ -21,9 +21,11 @@ timestamps {
 					}
 				}
 
-				def value = watchDeployment(url: statusUrl, seconds: 180)
-				println(value)
-				println("done")
+				if (stackName == "portal-stack") {
+					def value = watchDeployment(url: statusUrl, seconds: 180)
+					println(value)
+					println("done")
+				}
 			}
 		}
 		catch (Exception e) {
