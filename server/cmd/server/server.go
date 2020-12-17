@@ -114,7 +114,7 @@ func loadConfiguration() (*Config, *Options, error) {
 
 	viper.SetDefault("OIDC.CLIENT_ID", "portal")
 	viper.SetDefault("OIDC.CLIENT_SECRET", "9144cc7d-e9ba-4920-8e47-9a41dfbe4301")
-	viper.SetDefault("OIDC.CONFIG_URL", "http://127.0.0.1:8090/auth/realms/fk")
+	// viper.SetDefault("OIDC.CONFIG_URL", "http://127.0.0.1:8090/auth/realms/fk")
 	viper.SetDefault("OIDC.REDIRECT_URL", "http://127.0.0.1:8081/login/keycloak")
 
 	// NOTE This is the same secret used in the real world example.
