@@ -85,10 +85,10 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 
 	rw.statistics = ws
 
-	if ws.Records == 0 {
+	if ws.Records == 0 || ws.Start == nil || ws.End == nil {
 		log.Infow("empty")
 	} else {
-		log.Infow("statistics", "start", ws.Start, "end", ws.End, "records", ws.Records)
+		log.Infow("statistics", "start", *ws.Start, "end", *ws.End, "records", ws.Records)
 	}
 
 	var errors *multierror.Error
