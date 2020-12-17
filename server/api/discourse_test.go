@@ -15,9 +15,9 @@ import (
 )
 
 func init() {
-	viper.SetDefault("DISCOURSE_SECRET", "d836444a9e4084d5b224a60c208dce14")
-	viper.SetDefault("DISCOURSE_RETURN_URL", "https://community.fieldkit.org/session/sso_login?sso=%s&sig=%s")
-	viper.SetDefault("DISCOURSE_ADMIN_KEY", "")
+	viper.SetDefault("DISCOURSE.SECRET", "d836444a9e4084d5b224a60c208dce14")
+	viper.SetDefault("DISCOURSE.REDIRECT_URL", "https://community.fieldkit.org/session/sso_login?sso=%s&sig=%s")
+	viper.SetDefault("DISCOURSE.ADMIN_KEY", "")
 }
 
 func TestDiscourseIncoming(t *testing.T) {
@@ -25,7 +25,7 @@ func TestDiscourseIncoming(t *testing.T) {
 
 	discourseAuthConfig := DiscourseAuthConfig{
 		SharedSecret: "d836444a9e4084d5b224a60c208dce14",
-		ReturnURL:    "https://community.fieldkit.org/session/sso_login?sso=%s&sig=%s",
+		RedirectURL:  "https://community.fieldkit.org/session/sso_login?sso=%s&sig=%s",
 	}
 
 	discourse := NewDiscourseAuth(nil, &discourseAuthConfig)

@@ -1,5 +1,5 @@
 <template>
-    <div class="form-container">
+    <div class="form-container" v-if="credentialsNecessary">
         <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
         <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="false" @login="save" />
     </div>
@@ -12,7 +12,7 @@ import CommonComponents from "@/views/shared";
 import LoginForm from "./LoginForm.vue";
 
 import FKApi, { LoginPayload } from "@/api/api";
-import { ActionTypes, DiscourseParams, DiscourseLoginAction } from "@/store";
+import { ActionTypes, DiscourseParams, LoginDiscourseAction } from "@/store";
 import { toSingleValue } from "@/utilities";
 
 export default Vue.extend({
@@ -24,10 +24,12 @@ export default Vue.extend({
     data(): {
         busy: boolean;
         failed: boolean;
+        credentialsNecessary: boolean;
     } {
         return {
             busy: false,
             failed: false,
+            credentialsNecessary: false,
         };
     },
     computed: {
@@ -52,16 +54,21 @@ export default Vue.extend({
         const token = this.$state.user.token;
         if (params && token) {
             await this.$store
-                .dispatch(new DiscourseLoginAction(token, null, params))
+                .dispatch(new LoginDiscourseAction(token, null, params))
                 .then(
-                    async () => {
-                        // await this.leaveAfterAuth();
+                    () => {
+                        // NOTE The action handler will navigate away. So nothign should happen after.
                     },
-                    () => (this.failed = true)
+                    () => {
+                        this.failed = true;
+                        this.credentialsNecessary = true;
+                    }
                 )
                 .finally(() => {
                     this.busy = false;
                 });
+        } else {
+            this.credentialsNecessary = true;
         }
     },
     methods: {
@@ -76,24 +83,18 @@ export default Vue.extend({
             this.failed = false;
 
             await this.$store
-                .dispatch(new DiscourseLoginAction(null, payload, params))
+                .dispatch(new LoginDiscourseAction(null, payload, params))
                 .then(
-                    async () => {
-                        // await this.leaveAfterAuth();
+                    () => {
+                        // NOTE The action handler will navigate away. So nothign should happen after.
                     },
-                    () => (this.failed = true)
+                    () => {
+                        this.failed = true;
+                    }
                 )
                 .finally(() => {
                     this.busy = false;
                 });
-        },
-        async leaveAfterAuth(): Promise<void> {
-            const after = this.forwardAfterQuery;
-            if (after.after) {
-                await this.$router.push(after.after);
-            } else {
-                await this.$router.push({ name: "projects" });
-            }
         },
     },
 });

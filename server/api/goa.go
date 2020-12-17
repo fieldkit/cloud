@@ -75,6 +75,9 @@ import (
 
 	discourseService "github.com/fieldkit/cloud/server/api/gen/discourse"
 	discourseServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/discourse/server"
+
+	oidcServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/oidc/server"
+	oidcService "github.com/fieldkit/cloud/server/api/gen/oidc"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -135,6 +138,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	discourseSvc := NewDiscourseService(ctx, options)
 	discourseEndpoints := discourseService.NewEndpoints(discourseSvc)
 
+	oidcSvc := NewOidcService(ctx, options)
+	oidcEndpoints := oidcService.NewEndpoints(oidcSvc)
+
 	for _, mw := range []func(goa.Endpoint) goa.Endpoint{jwtContext(), logErrors()} {
 		modulesEndpoints.Use(mw)
 		tasksEndpoints.Use(mw)
@@ -155,14 +161,15 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		exportEndpoints.Use(mw)
 		discEndpoints.Use(mw)
 		discourseEndpoints.Use(mw)
+		oidcEndpoints.Use(mw)
 	}
 
 	samlConfig := &SamlAuthConfig{
-		CertPath:           viper.GetString("SAML_CERT"),
-		KeyPath:            viper.GetString("SAML_KEY"),
-		ServiceProviderURL: viper.GetString("SAML_SP_URL"),
-		IDPMetaURL:         viper.GetString("SAML_IPD_META"),
-		LoginURLTemplate:   viper.GetString("SAML_LOGIN_URL"),
+		CertPath:           viper.GetString("SAML.CERT"),
+		KeyPath:            viper.GetString("SAML.KEY"),
+		ServiceProviderURL: viper.GetString("SAML.SP_URL"),
+		IDPMetaURL:         viper.GetString("SAML.IPD_META"),
+		LoginURLTemplate:   viper.GetString("SAML.LOGIN_URL"),
 	}
 	saml := NewSamlAuth(options, samlConfig)
 
@@ -195,6 +202,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	exportServer := exportServiceSvr.New(exportEndpoints, mux, dec, enc, eh, nil)
 	discServer := discServiceSvr.New(discEndpoints, mux, dec, enc, eh, nil)
 	discourseServer := discourseServiceSvr.New(discourseEndpoints, mux, dec, enc, eh, nil)
+	oidcServer := oidcServiceSvr.New(oidcEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
@@ -215,6 +223,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	exportServiceSvr.Mount(mux, exportServer)
 	discServiceSvr.Mount(mux, discServer)
 	discourseServiceSvr.Mount(mux, discourseServer)
+	oidcServiceSvr.Mount(mux, oidcServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -275,11 +284,13 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	for _, m := range discourseServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
+	for _, m := range oidcServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
 
 	withSamlMethods, err := saml.Mount(ctx, mux)
 	if err != nil {
-		log.Errorw("error", "error", err)
-		return mux, nil
+		log.Errorw("saml-error", "error", err)
 	} else {
 		log.Infow("mount", "saml", true)
 	}

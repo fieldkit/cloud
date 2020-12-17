@@ -49,11 +49,18 @@ const routes = [
         },
     },
     {
+        path: "/login/keycloak",
+        name: "loginKeycloak",
+        component: ResumeView,
+        meta: {
+            secured: false,
+        },
+    },
+    {
         path: "/login/:token",
         name: "loginResume",
         component: ResumeView,
         meta: {
-            // bodyClass: "blue-background",
             secured: false,
         },
     },

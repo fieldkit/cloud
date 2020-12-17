@@ -23,11 +23,23 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+var (
+	ErrNoConfig = errors.New("insufficient config")
+)
+
+const (
+	KeycloakPortalIDAttribute = "portal_id"
+	OurAudience               = ""
+)
+
 type UserService struct {
 	options *ControllerOptions
 }
 
 func NewUserService(ctx context.Context, options *ControllerOptions) *UserService {
+	config := NewKeycloakConfig()
+	log := Logger(ctx).Sugar()
+	log.Infow("keycloak", "realm", config.Realm, "url", config.URL)
 	return &UserService{options: options}
 }
 
@@ -895,8 +907,19 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 		return nil, err
 	}
 
-	if err := s.updateAuthentication(ctx, user, password); err != nil {
-		log.Errorw("update-authentication", "user_id", user.ID, "error", err)
+	if as, err := NewAuthServer(); err != nil {
+		if err != ErrNoConfig {
+			return nil, err
+		}
+		log.Infow("keycloak-no-config", "error", err)
+	} else {
+		if err := as.UpdateAuthentication(ctx, user, password); err != nil {
+			log.Errorw("keycloak-update-authentication", "user_id", user.ID, "error", err)
+		}
+
+		if _, err := as.Login(ctx, user.Email, password); err != nil {
+			log.Errorw("keycloak-login", "user_id", user.ID, "error", err)
+		}
 	}
 
 	if !user.Valid {
@@ -914,21 +937,85 @@ func splitName(name string) (first string, last string) {
 	return name, ""
 }
 
-func (s *UserService) updateAuthentication(ctx context.Context, user *data.User, password string) error {
-	log := Logger(ctx).Sugar()
-	realm := viper.GetString("KEYCLOAK_REALM")
-	url := viper.GetString("KEYCLOAK_URL")
-	apiUser := viper.GetString("KEYCLOAK_API_USER")
-	apiPassword := viper.GetString("KEYCLOAK_API_PASSWORD")
-	apiRealm := viper.GetString("KEYCLOAK_API_REALM")
+type AuthServer struct {
+	config *KeycloakConfig
+	kc     gocloak.GoCloak
+}
 
-	if url == "" || realm == "" || apiUser == "" || apiPassword == "" || apiRealm == "" {
+func NewAuthServer() (*AuthServer, error) {
+	config := NewKeycloakConfig()
+
+	if !config.Valid() {
+		return nil, ErrNoConfig
+	}
+
+	kc := gocloak.NewClient(config.URL)
+
+	return &AuthServer{
+		config: config,
+		kc:     kc,
+	}, nil
+}
+
+func (as *AuthServer) Login(ctx context.Context, email, password string) (*gocloak.JWT, error) {
+	log := Logger(ctx).Sugar()
+
+	oidcConfig := NewOidcAuthConfig()
+
+	token, err := as.kc.Login(ctx, oidcConfig.ClientID, oidcConfig.ClientSecret, as.config.Realm, email, password)
+	if err != nil {
+		return nil, err
+	}
+
+	t, d, err := as.kc.DecodeAccessToken(ctx, token.AccessToken, as.config.Realm, OurAudience)
+	if err != nil {
+		return nil, err
+	}
+
+	// log.Infow("oidc", "token", t)
+	// log.Infow("oidc", "decoded", d)
+
+	_ = log
+	_ = t
+	_ = d
+
+	return token, nil
+}
+
+type KeycloakConfig struct {
+	Realm       string
+	URL         string
+	ApiUser     string
+	ApiPassword string
+	ApiRealm    string
+}
+
+func NewKeycloakConfig() *KeycloakConfig {
+	return &KeycloakConfig{
+		URL:         viper.GetString("KEYCLOAK.URL"),
+		Realm:       viper.GetString("KEYCLOAK.REALM"),
+		ApiUser:     viper.GetString("KEYCLOAK.API.USER"),
+		ApiPassword: viper.GetString("KEYCLOAK.API.PASSWORD"),
+		ApiRealm:    viper.GetString("KEYCLOAK.API.REALM"),
+	}
+}
+
+func (c *KeycloakConfig) Valid() bool {
+	return !(c.URL == "" || c.Realm == "" || c.ApiUser == "" || c.ApiPassword == "" || c.ApiRealm == "")
+}
+
+func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User, password string) error {
+	log := Logger(ctx).Sugar().With("user_id", user.ID)
+
+	config := NewKeycloakConfig()
+
+	if !config.Valid() {
 		log.Infow("keycloak-skipping-no-config")
 		return nil
 	}
 
-	client := gocloak.NewClient(url)
-	token, err := client.LoginAdmin(ctx, apiUser, apiPassword, apiRealm)
+	client := gocloak.NewClient(as.config.URL)
+	token, err := client.LoginAdmin(ctx, as.config.ApiUser, as.config.ApiPassword, as.config.ApiRealm)
 	if err != nil {
 		return fmt.Errorf("keycloak-login: %v", err)
 	}
@@ -937,7 +1024,7 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 		Email: &user.Email,
 	}
 
-	users, err := client.GetUsers(ctx, token.AccessToken, realm, params)
+	users, err := client.GetUsers(ctx, token.AccessToken, as.config.Realm, params)
 	if err != nil {
 		return fmt.Errorf("keycloak-get-users: %v", err)
 	}
@@ -951,15 +1038,22 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 
 	first, last := splitName(user.Name)
 
+	attrs := map[string][]string{
+		KeycloakPortalIDAttribute: []string{fmt.Sprintf("%d", user.ID)},
+	}
+
 	for _, ku := range users {
 		ku.FirstName = gocloak.StringP(first)
 		ku.LastName = gocloak.StringP(last)
 		ku.Email = gocloak.StringP(user.Email)
 		ku.Username = gocloak.StringP(user.Email)
-		if err := client.UpdateUser(ctx, token.AccessToken, realm, *ku); err != nil {
+		ku.EmailVerified = gocloak.BoolP(true)
+		ku.Attributes = &attrs
+
+		if err := client.UpdateUser(ctx, token.AccessToken, as.config.Realm, *ku); err != nil {
 			return fmt.Errorf("keycloak-update: %v", err)
 		}
-		if err = client.SetPassword(ctx, token.AccessToken, *ku.ID, realm, password, false); err != nil {
+		if err = client.SetPassword(ctx, token.AccessToken, *ku.ID, as.config.Realm, password, false); err != nil {
 			return fmt.Errorf("keycloak-setpw: %v", err)
 		}
 		updated = true
@@ -969,19 +1063,21 @@ func (s *UserService) updateAuthentication(ctx context.Context, user *data.User,
 
 	if !updated {
 		cloaked := gocloak.User{
-			FirstName: gocloak.StringP(first),
-			LastName:  gocloak.StringP(last),
-			Email:     gocloak.StringP(user.Email),
-			Username:  gocloak.StringP(user.Email),
-			Enabled:   gocloak.BoolP(true),
+			FirstName:     gocloak.StringP(first),
+			LastName:      gocloak.StringP(last),
+			Email:         gocloak.StringP(user.Email),
+			Username:      gocloak.StringP(user.Email),
+			EmailVerified: gocloak.BoolP(true),
+			Enabled:       gocloak.BoolP(true),
+			Attributes:    &attrs,
 		}
 
-		createdID, err := client.CreateUser(ctx, token.AccessToken, realm, cloaked)
+		createdID, err := client.CreateUser(ctx, token.AccessToken, as.config.Realm, cloaked)
 		if err != nil {
 			return fmt.Errorf("keycloak-create: %v", err)
 		}
 
-		if err = client.SetPassword(ctx, token.AccessToken, createdID, realm, password, false); err != nil {
+		if err = client.SetPassword(ctx, token.AccessToken, createdID, as.config.Realm, password, false); err != nil {
 			return fmt.Errorf("keycloak-setpw: %v", err)
 		}
 

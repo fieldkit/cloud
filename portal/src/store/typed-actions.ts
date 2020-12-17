@@ -24,6 +24,17 @@ export class ResumeAction {
     constructor(public readonly token: string) {}
 }
 
+export class LoginOidcAction {
+    type = ActionTypes.LOGIN_OIDC;
+
+    constructor(
+        public readonly token: string | null,
+        public readonly state: string,
+        public readonly sessionState: string,
+        public readonly code: string
+    ) {}
+}
+
 export class DiscourseParams {
     constructor(public readonly sso: string, public readonly sig: string) {}
 }
@@ -33,7 +44,7 @@ export interface LoginFields {
     readonly password: string;
 }
 
-export class DiscourseLoginAction {
+export class LoginDiscourseAction {
     type = ActionTypes.LOGIN_DISCOURSE;
 
     constructor(

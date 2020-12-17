@@ -2,7 +2,7 @@ import Vue from "vue";
 import * as ActionTypes from "../actions";
 import * as MutationTypes from "../mutations";
 
-import { ResumeAction, DiscourseLoginAction } from "@/store";
+import { ResumeAction, LoginDiscourseAction, LoginOidcAction } from "@/store";
 
 import { FKApi, TokenStorage, Services, LoginPayload, LoginResponse, CurrentUser } from "@/api";
 
@@ -39,8 +39,18 @@ const actions = (services: Services) => {
                 });
             });
         },
+        [ActionTypes.LOGIN_OIDC]: async ({ commit, dispatch, state }: ActionParameters, payload: LoginOidcAction) => {
+            await services.api.loginOidc(null, payload).then((response) => {
+                commit(UPDATE_TOKEN, response.token);
+                return dispatch(ActionTypes.REFRESH_CURRENT_USER).then(() => {
+                    return dispatch(ActionTypes.AUTHENTICATED).then(() => {
+                        return new LoginResponse(response.token);
+                    });
+                });
+            });
+        },
         [ActionTypes.LOGIN_RESUME]: async ({ commit, dispatch, state }: ActionParameters, payload: ResumeAction) => {
-            await services.api.resume(payload.token).then((token) => {
+            await services.api.loginResume(payload.token).then((token) => {
                 commit(UPDATE_TOKEN, token);
                 return dispatch(ActionTypes.REFRESH_CURRENT_USER).then(() => {
                     return dispatch(ActionTypes.AUTHENTICATED).then(() => {
@@ -49,7 +59,7 @@ const actions = (services: Services) => {
                 });
             });
         },
-        [ActionTypes.LOGIN_DISCOURSE]: async ({ commit, dispatch, state }: ActionParameters, payload: DiscourseLoginAction) => {
+        [ActionTypes.LOGIN_DISCOURSE]: async ({ commit, dispatch, state }: ActionParameters, payload: LoginDiscourseAction) => {
             await services.api
                 .loginDiscourse(
                     payload.token,
@@ -60,11 +70,9 @@ const actions = (services: Services) => {
                 )
                 .then((response) => {
                     commit(UPDATE_TOKEN, response.token);
-                    return dispatch(ActionTypes.REFRESH_CURRENT_USER).then(() => {
-                        return dispatch(ActionTypes.AUTHENTICATED).then(() => {
-                            // return new LoginResponse(response.token);
-                        });
-                    });
+                    if (response.location) {
+                        window.location.replace(response.location);
+                    }
                 });
         },
         [ActionTypes.LOGOUT]: async ({ commit }: { commit: any }) => {
@@ -75,19 +83,19 @@ const actions = (services: Services) => {
                 commit(CURRENT_USER, null);
             }
         },
-        [ActionTypes.REFRESH_CURRENT_USER]: ({ commit, dispatch, state }: ActionParameters) => {
-            return services.api.getCurrentUser().then((user) => {
+        [ActionTypes.REFRESH_CURRENT_USER]: async ({ commit, dispatch, state }: ActionParameters) => {
+            await services.api.getCurrentUser().then((user) => {
                 commit(CURRENT_USER, user);
                 return user;
             });
         },
-        [ActionTypes.UPLOAD_USER_PHOTO]: ({ commit, dispatch, state }: ActionParameters, payload: any) => {
-            return services.api.uploadUserImage({ type: payload.type, file: payload.file }).then(() => {
+        [ActionTypes.UPLOAD_USER_PHOTO]: async ({ commit, dispatch, state }: ActionParameters, payload: any) => {
+            await services.api.uploadUserImage({ type: payload.type, file: payload.file }).then(() => {
                 return dispatch(ActionTypes.REFRESH_CURRENT_USER);
             });
         },
-        [ActionTypes.UPDATE_USER_PROFILE]: ({ commit, dispatch, state }: ActionParameters, payload: any) => {
-            return services.api.updateUser(payload.user).then(() => {
+        [ActionTypes.UPDATE_USER_PROFILE]: async ({ commit, dispatch, state }: ActionParameters, payload: any) => {
+            await services.api.updateUser(payload.user).then(() => {
                 return dispatch(ActionTypes.REFRESH_CURRENT_USER);
             });
         },

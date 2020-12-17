@@ -291,7 +291,7 @@ export interface StationsResponse {
 export function makeAuthenticatedApiUrl(url) {
     const tokens = new TokenStorage();
     const token = tokens.getToken();
-    return Config.API_HOST + url + "?token=" + token;
+    return Config.baseUrl + url + "?token=" + token;
 }
 
 export enum Auth {
@@ -311,7 +311,7 @@ export interface InvokeParams {
 }
 
 class FKApi {
-    private readonly baseUrl: string = Config.API_HOST;
+    private readonly baseUrl: string = Config.baseUrl;
     private readonly token: TokenStorage = new TokenStorage();
     private refreshing: Promise<any> | null = null;
 
@@ -488,7 +488,52 @@ class FKApi {
             });
     }
 
-    public resume(token: string): Promise<any> {
+    public loginOidc(
+        token: string | null,
+        params: {
+            state: string;
+            sessionState: string;
+            code: string;
+        }
+    ): Promise<{ token: string; location: string; header: string }> {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        if (token) {
+            headers["Authorization"] = "Bearer " + token;
+        }
+        const qp = new URLSearchParams();
+        qp.append("state", params.state);
+        qp.append("session_state", params.sessionState);
+        qp.append("code", params.code);
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/oidc/auth?" + qp.toString(),
+            headers: headers,
+        })
+            .then((response) => {
+                return response.data as { token: string; location: string; header: string };
+            })
+            .then((response) => {
+                this.token.setToken(response.header);
+                return response;
+            });
+    }
+
+    public loginUrl(after: string | null): Promise<string> {
+        const qp = new URLSearchParams();
+        if (after) {
+            qp.append("after", after);
+        }
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/oidc/url?" + qp.toString(),
+        }).then((response) => {
+            return response.data.location;
+        });
+    }
+
+    public loginResume(token: string): Promise<any> {
         return axios({
             method: "POST",
             url: this.baseUrl + "/user/resume",

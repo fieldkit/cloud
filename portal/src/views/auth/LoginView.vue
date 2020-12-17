@@ -44,6 +44,12 @@ export default Vue.extend({
             return {};
         },
     },
+    async mounted(): Promise<void> {
+        if (this.$config.sso) {
+            const url = await this.$services.api.loginUrl(null);
+            window.location.replace(url);
+        }
+    },
     methods: {
         async save(payload: LoginPayload): Promise<void> {
             this.busy = true;

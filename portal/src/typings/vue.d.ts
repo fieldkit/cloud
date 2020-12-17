@@ -7,6 +7,7 @@ declare module "vue/types/vue" {
     interface Vue {
         $config: {
             baseUrl: string;
+            sso: boolean;
         };
         $confirm: any;
         $loadAsset(path: string): any;

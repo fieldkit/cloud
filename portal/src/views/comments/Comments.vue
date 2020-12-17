@@ -118,7 +118,7 @@ export default Vue.extend({
         },
     },
     data(): {
-        posts: Comment[] | null;
+        posts: Comment[];
         placeholder: string | null;
         viewType: string;
         newComment: {
@@ -135,7 +135,7 @@ export default Vue.extend({
         errorMessage: string | null;
     } {
         return {
-            posts: null,
+            posts: [],
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
             newComment: {
@@ -158,7 +158,6 @@ export default Vue.extend({
         },
     },
     mounted(): Promise<void> {
-        this.posts = [];
         this.placeholder = this.getNewCommentPlaceholder();
         return this.getComments();
     },

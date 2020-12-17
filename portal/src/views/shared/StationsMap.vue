@@ -37,7 +37,7 @@ export default Vue.extend({
         ready: boolean;
     } {
         return {
-            mapboxToken: Config.MAPBOX_ACCESS_TOKEN,
+            mapboxToken: Config.mapbox.token,
             ready: false,
         };
     },
