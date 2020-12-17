@@ -39,7 +39,7 @@ type UserService struct {
 func NewUserService(ctx context.Context, options *ControllerOptions) *UserService {
 	config := NewKeycloakConfig()
 	log := Logger(ctx).Sugar()
-	log.Infow("keycloak", "config", config)
+	log.Infow("keycloak", "realm", config.Realm, "url", config.URL)
 	return &UserService{options: options}
 }
 
