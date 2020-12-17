@@ -1104,7 +1104,7 @@ class FKApi {
         });
     }
 
-    public getComments(projectIDOrBookmark: number | string): Promise<{ posts: [] }> {
+    public getComments(projectIDOrBookmark: number | string): Promise<{ posts: Comment[] }> {
         let apiURL;
 
         if (typeof projectIDOrBookmark === "number") {
@@ -1126,6 +1126,23 @@ class FKApi {
             method: "POST",
             url: this.baseUrl + "/discussion",
             data: { post: comment },
+        });
+    }
+
+    public deleteComment(commentID: number): Promise<boolean> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/discussion/" + commentID,
+        });
+    }
+
+    public editComment(commentID: number, body: string): Promise<boolean> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/discussion/" + commentID,
+            data: { body: body },
         });
     }
 }

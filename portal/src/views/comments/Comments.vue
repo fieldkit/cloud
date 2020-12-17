@@ -8,8 +8,7 @@
             <button type="submit" class="new-comment-submit" v-if="newComment.body">Post</button>
         </form>
 
-        <div v-if="errorGetComments">Something went wrong loading the comments.</div>
-        <div v-if="errorPostComment">Something went saving your comment.</div>
+        <div v-if="errorMessage"> {{errorMessage}}</div>
 
         <div class="list" v-if="posts && posts.length > 0">
             <div class="subheader">
@@ -17,19 +16,50 @@
                 <header v-if="viewType === 'data'">Notes & Comments</header>
             </div>
             <transition-group name="fade">
-                <div class="comment comment-main" v-for="post in posts" v-bind:key="post.id">
-                    <UserPhoto :user="post.author"></UserPhoto>
-                    <div class="flex column">
-                        <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
-                        <span class="author">{{ post.author.name }}</span>
-                        <span class="body">{{ post.body }}</span>
-
-                        <transition-group name="fade">
+                <div class="comment" v-for="post in posts" v-bind:key="post.id">
+                    <div class="comment-main">
+                        <UserPhoto :user="post.author"></UserPhoto>
+                        <div class="column">
+                            <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
+                            <span class="author">
+                                {{ post.author.name }}
+                                <i class="icon-ellipsis options-trigger" v-if="user.id === post.author.id"
+                                   @click="showCommentOptions($event)">
+                                </i>
+                                <div class="options-btns">
+                                    <button @click="startEditing(post)"> Edit Post </button>
+                                    <button @click="deleteComment(post.id)"> Delete Post </button>
+                                </div>
+                            </span>
+                            <input type="text" class="body" v-model="post.body" :readonly="post.readonly">
+                            <button type="submit" class="new-comment-submit"
+                                    v-if="!post.readonly" @click="saveEdit(post.id, post.body)">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <transition-group name="fade" class="comment-replies">
                             <div class="comment" v-for="reply in post.replies" v-bind:key="reply.id">
-                                <UserPhoto :user="reply.author"></UserPhoto>
-                                <div class="flex column">
-                                    <span class="author">{{ reply.author.name }}</span>
-                                    <span class="body">{{ reply.body }}</span>
+                                <div class="comment-main">
+                                    <UserPhoto :user="reply.author"></UserPhoto>
+                                    <div class="column">
+                                        <span class="author">
+                                            {{ reply.author.name }}
+                                            <i class="icon-ellipsis options-trigger" v-if="user.id === post.author.id"
+                                                @click="showCommentOptions($event)">
+                                            </i>
+                                            <div class="options-btns">
+                                                <button @click="startEditing(reply)"> Edit Post </button>
+                                                <button @click="deleteComment(reply.id)"> Delete Post </button>
+                                            </div>
+                                        </span>
+                                        <input type="text" class="body" v-model="reply.body" :readonly="reply.readonly">
+                                        <button type="submit" class="new-comment-submit"
+                                                v-if="!reply.readonly" @click="saveEdit(reply.id, reply.body)">
+                                            Save
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </transition-group>
@@ -70,6 +100,7 @@ import moment from "moment";
 import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { CurrentUser } from "@/api";
+import { CommentsErrorsEnum } from "@/views/comments/model";
 
 export default Vue.extend({
     name: "Comments",
@@ -101,8 +132,7 @@ export default Vue.extend({
             body: string | null;
             threadId: number | null;
         };
-        errorGetComments: boolean;
-        errorPostComment: boolean;
+        errorMessage: string | null;
     } {
         return {
             posts: null,
@@ -119,8 +149,7 @@ export default Vue.extend({
                 body: null,
                 threadId: null,
             },
-            errorGetComments: false,
-            errorPostComment: false,
+            errorMessage: null,
         };
     },
     watch: {
@@ -129,6 +158,7 @@ export default Vue.extend({
         },
     },
     mounted(): Promise<void> {
+        this.posts = [];
         this.placeholder = this.getNewCommentPlaceholder();
         return this.getComments();
     },
@@ -141,6 +171,7 @@ export default Vue.extend({
             }
         },
         async save(comment: NewComment): Promise<void> {
+            this.errorMessage = null;
             if (this.viewType === "data") {
                 comment.bookmark = JSON.stringify(this.parentData);
             }
@@ -167,13 +198,14 @@ export default Vue.extend({
                     }
                 })
                 .catch(() => {
-                    this.errorPostComment = true;
+                    this.errorMessage = CommentsErrorsEnum.postComment;
                 });
         },
         formatTimestamp(timestamp: number): string {
             return moment(timestamp).fromNow();
         },
         addReply(post: Comment): void {
+            this.errorMessage = null;
             this.newReply.threadId = post.id;
             this.newReply.body = null;
         },
@@ -181,16 +213,90 @@ export default Vue.extend({
             await this.$services.api
                 .getComments(this.parentData)
                 .then((data) => {
-                    this.posts = data.posts;
+                    data.posts.forEach(post => {
+                        this.posts.push(new Comment(
+                            post.id,
+                            post.author,
+                            post.bookmark,
+                            post.body,
+                            post.createdAt,
+                            post.updatedAt,
+                        ));
+
+                        post.replies.forEach(reply => {
+                            this.posts[this.posts.length - 1].replies.push(new Comment(
+                                reply.id,
+                                reply.author,
+                                reply.bookmark,
+                                reply.body,
+                                reply.createdAt,
+                                reply.updatedAt,
+                            ));
+                        });
+                    });
                 })
-                .catch((e) => {
-                    this.errorGetComments = true;
+                .catch(() => {
+                    this.errorMessage = CommentsErrorsEnum.getComments;
                 });
         },
         viewDataClick(post: Comment) {
             if (post.bookmark) {
                 this.$emit("viewDataClicked", JSON.parse(post.bookmark));
             }
+        },
+        showCommentOptions(event: MouseEvent) {
+            if (event.target) {
+                const optionsMenu = (event.target as HTMLElement).nextElementSibling;
+
+                if (!(optionsMenu as HTMLElement).classList.contains('visible')) {
+                    (optionsMenu as HTMLElement).classList.add('visible');
+                    setTimeout(function() {
+                        document.addEventListener('click', function() {
+                                (optionsMenu as HTMLElement).classList.remove("visible");
+                            },
+                            {
+                                once: true,
+                            }
+                        );
+                    }, 1);
+                }
+            }
+        },
+        deleteComment(commentID: number) {
+            this.$services.api
+                .deleteComment(commentID)
+                .then(response => {
+                    if (response) {
+                        this.posts = this.posts.filter(post => post.id !== commentID);
+                    } else {
+                        this.errorMessage = CommentsErrorsEnum.deleteComment;
+                    }
+                })
+                .catch(() => {
+                    this.errorMessage = CommentsErrorsEnum.deleteComment;
+                });
+        },
+        startEditing(post: Comment) {
+            post.readonly = false;
+        },
+        saveEdit(commentID: number, body: string) {
+            this.$services.api
+                .editComment(commentID, body)
+                .then(response => {
+                    if (response) {
+                        this.posts.forEach(post => {
+                            if (post.id === commentID) {
+                                post.body = body;
+                                post.readonly = true;
+                            }
+                        });
+                    } else {
+                        this.errorMessage = CommentsErrorsEnum.deleteComment;
+                    }
+                })
+                .catch(() => {
+                    this.errorMessage = CommentsErrorsEnum.editComment;
+                });
         },
     },
 });
@@ -280,6 +386,7 @@ header {
     &.reply {
         padding: 0;
         margin-top: 10px;
+        width: 100%;
 
         input {
             height: 35px;
@@ -336,26 +443,85 @@ header {
     font-weight: 500;
     margin-bottom: 5px;
     margin-top: 2px;
+    position: relative;
+}
+
+.options {
+    &-trigger {
+        @include position(absolute, 0 -40px null null);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.33s;
+    }
+
+    &-btns {
+        @include position(absolute, 0 calc(-100px - 50px) null null);
+        opacity: 0;
+        visibility: hidden;
+        padding: 10px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+        background: #fff;
+        z-index: $z-index-top;
+        transition: opacity 0.33s;
+        width: 100px;
+
+        &.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        > * {
+            display: block;
+            white-space: nowrap;
+            font-family: $font-family-bold;
+            cursor: pointer;
+
+            &:not(:last-of-type) {
+                margin-bottom: 10px;
+            }
+        }
+    }
 }
 
 .body {
-    max-width: 550px;
+    max-width: unset;
     font-family: $font-family-light;
+    outline: none;
+    border: solid 1px $color-border;
+    width: calc(100% - 40px);
+
+    &[readonly] {
+        border: none;
+        max-width: 550px;
+    }
+
+    + .new-comment-submit {
+        transform: translateY(calc(-50% + 12px));
+        right: -10px;
+    }
 }
 
 .comment {
     @include flex(flex-start);
+    flex: 100%;
     padding: 15px 0 0;
     position: relative;
+    flex-wrap: wrap;
 
-    &::v-deep > img {
+    &::v-deep .default-user-icon {
         margin-top: 0;
         width: 30px;
         height: 30px;
     }
 
-    > div {
-        @include flex();
+    .column {
+
+        border-bottom: 1px solid $color-border;
+
+
+        &:nth-of-type(2) {
+            padding-left: 42px;
+        }
     }
 
     &.highlight {
@@ -365,14 +531,31 @@ header {
     }
 }
 
+.comment-replies {
+    width: 100%;
+
+    .column {
+        border-bottom: none;
+    }
+}
+
+.comment-main {
+    display: flex;
+    flex: 100%;
+
+    @include attention() {
+        .options-trigger {
+            opacity: 1;
+            visibility: visible;
+        }
+    }
+}
+
 .column {
+    @include flex(flex-start);
     width: 100%;
     flex-direction: column;
     position: relative;
-}
-
-.comment-main > .column {
-    border-bottom: 1px solid $color-border;
 }
 
 .actions {
@@ -401,4 +584,5 @@ header {
 .fade-leave-active {
     transition: opacity 0.25s ease-in-out;
 }
+
 </style>
