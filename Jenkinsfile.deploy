@@ -3,11 +3,11 @@
 timestamps {
 	node () {
 		try {
-			slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting... (<${env.BUILD_URL}|Open>)"
-
 			def isDev = params.DeployFrom.indexOf("fkdev.org") >= 0
 			def stackName = params.DeployStack ?: "portal-stack"
 			def statusUrl = isDev ? "https://api.fkdev.org/status" : "https://api.fieldkit.org/status"
+
+			slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting (stack = ${stackName}) (<${env.BUILD_URL}|Open>)"
 
 			print(stackName)
 
