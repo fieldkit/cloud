@@ -13,6 +13,6 @@ export FIELDKIT_ARCHIVER=default
 
 set -xe
 
-make server
+make setup server
 
 build/server "$@"
