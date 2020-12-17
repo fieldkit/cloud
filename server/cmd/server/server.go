@@ -106,7 +106,7 @@ func loadConfiguration() (*Config, *Options, error) {
 	viper.SetDefault("SAML.LOGIN_URL", "http://127.0.0.1:8081/login/%s")
 	viper.SetDefault("SAML.IPD_META", "http://127.0.0.1:8090/auth/realms/fk/protocol/saml/descriptor")
 
-	viper.SetDefault("KEYCLOAK.URL", "http://127.0.0.1:8090")
+	// viper.SetDefault("KEYCLOAK.URL", "http://127.0.0.1:8090")
 	viper.SetDefault("KEYCLOAK.REALM", "fk")
 	viper.SetDefault("KEYCLOAK.API.USER", "admin")
 	viper.SetDefault("KEYCLOAK.API.PASSWORD", "admin")
