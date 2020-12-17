@@ -1005,7 +1005,7 @@ func (c *KeycloakConfig) Valid() bool {
 }
 
 func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User, password string) error {
-	log := Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar().With("user_id", user.ID)
 
 	config := NewKeycloakConfig()
 
