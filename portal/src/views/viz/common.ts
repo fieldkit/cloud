@@ -63,7 +63,7 @@ export type Stations = number[];
 export type Sensors = number[];
 
 export class SensorParams {
-    constructor(public readonly sensors: Sensors, public readonly stations: Stations) {}
+    constructor(public readonly stations: Stations, public readonly sensors: Sensors) {}
 
     public get id(): string {
         if (this.stations.length == 0) {
@@ -92,7 +92,7 @@ export class DataQueryParams {
     }
 
     public get sensorParams(): SensorParams {
-        return new SensorParams(this.sensors, this.stations);
+        return new SensorParams(this.stations, this.sensors);
     }
 }
 

@@ -1,5 +1,5 @@
 import _ from "lodash";
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
@@ -7,15 +7,25 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import Spinner from "@/views/shared/Spinner.vue";
 
 import { TimeRange } from "./common";
-import { Graph, QueriedData, Workspace, FastTime, TimeZoom, ChartType } from "./viz";
+import { Graph, HasSensorParams, SensorParams, TreeOption, Workspace, FastTime, TimeZoom, ChartType } from "./viz";
+
+class NewParams implements HasSensorParams {
+    public readonly sensorParams: SensorParams;
+
+    constructor(stationId: number, sensorId: number) {
+        this.sensorParams = new SensorParams([stationId], [sensorId]);
+    }
+}
 
 export const ViewingControls = Vue.extend({
     name: "ViewingControls",
     components: {
-        Spinner,
         Treeselect,
+        Spinner,
     },
-    data() {
+    data(): {
+        chartTypes: { label: string; value: ChartType }[];
+    } {
         return {
             chartTypes: [
                 {
@@ -35,22 +45,32 @@ export const ViewingControls = Vue.extend({
                     value: ChartType.Map,
                 },
             ],
-            range: null,
         };
     },
     props: {
         viz: {
-            type: Graph,
+            type: Object as PropType<Graph>,
             required: true,
         },
         workspace: {
-            type: Workspace,
+            type: Object as PropType<Workspace>,
             required: true,
         },
     },
     computed: {
-        selectedTreeOption() {
-            return this.viz.chartParams.sensorParams.id;
+        stationOptions(): TreeOption[] {
+            this.viz.log("station-options", this.workspace.stationOptions);
+            return this.workspace.stationOptions;
+        },
+        sensorOptions(): TreeOption[] {
+            this.viz.log("sensor-options", this.workspace.sensorOptions);
+            return this.workspace.sensorOptions;
+        },
+        selectedStation(): number | null {
+            return this.viz.chartParams.sensorParams.stations[0];
+        },
+        selectedSensor(): number | null {
+            return this.viz.chartParams.sensorParams.sensors[0];
         },
         manualRangeValue() {
             if (this.viz.visible.isExtreme()) {
@@ -66,27 +86,33 @@ export const ViewingControls = Vue.extend({
         },
     },
     methods: {
-        raiseCompare(ev) {
+        raiseCompare(): void {
             console.log("raising viz-compare");
-            return this.$emit("viz-compare");
+            this.$emit("viz-compare");
         },
-        raiseRemove(ev) {
+        raiseRemove(): void {
             console.log("raising viz-remove");
-            return this.$emit("viz-remove");
+            this.$emit("viz-remove");
         },
-        raiseFastTime(ev, fast: FastTime, ...args) {
+        raiseFastTime(ev: never, fast: FastTime): void {
             console.log("raising viz-time-zoomed");
-            return this.$emit("viz-time-zoomed", new TimeZoom(fast, null));
+            this.$emit("viz-time-zoomed", new TimeZoom(fast, null));
         },
-        raiseChangeSensors(node, ...args) {
+        raiseChangeStation(node: TreeOption): void {
+            const sensor = this.viz.chartParams.sensorParams.sensors[0];
             console.log("raising viz-change-sensors");
-            return this.$emit("viz-change-sensors", node);
+            this.$emit("viz-change-sensors", new NewParams(Number(node.id), sensor));
         },
-        raiseChangeChartType(chartType, ...args) {
+        raiseChangeSensor(node: TreeOption): void {
+            const station = this.viz.chartParams.sensorParams.stations[0];
+            console.log("raising viz-change-sensors");
+            this.$emit("viz-change-sensors", new NewParams(station, Number(node.id)));
+        },
+        raiseChangeChartType(chartType: string): void {
             console.log("raising viz-change-chart");
-            return this.$emit("viz-change-chart", Number(chartType));
+            this.$emit("viz-change-chart", Number(chartType));
         },
-        raiseManualTime(fromPicker) {
+        raiseManualTime(fromPicker): void {
             if (fromPicker) {
                 // When the user picks a fast time this gets raised when
                 // the viz changes the visible time, which we're bound to
@@ -96,7 +122,7 @@ export const ViewingControls = Vue.extend({
                 const rangePicker = new TimeRange(fromPicker.start.getTime(), fromPicker.end.getTime());
                 if (rangeViz.start != rangePicker.start || rangeViz.end != rangePicker.end) {
                     console.log("raising viz-time-zoomed");
-                    return this.$emit("viz-time-zoomed", new TimeZoom(null, rangePicker));
+                    this.$emit("viz-time-zoomed", new TimeZoom(null, rangePicker));
                 } else {
                     console.log("swallowing viz-time-zoomed");
                 }
@@ -126,8 +152,9 @@ export const ViewingControls = Vue.extend({
 			</div>
 			<div class="row row-2">
 				<div class="left tree">
-					<treeselect v-if="workspace.options.length" :value="selectedTreeOption" :options="workspace.options" open-direction="bottom" @select="raiseChangeSensors" />
-					<div v-if="workspace.options.length == 0" class="loading-options">Loading Options</div>
+					<treeselect v-if="stationOptions.length" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" />
+					<treeselect v-if="sensorOptions.length" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" />
+					<div v-if="stationOptions.length == 0 || sensorOptions.length == 0" class="loading-options">Loading Options</div>
 				</div>
 
 				<div class="right chart-type">
