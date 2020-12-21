@@ -26,13 +26,13 @@
                         </div>
                         <template>{{ displayProject.duration | prettyDuration }}</template>
                     </div>
-                    <div class="details-row" v-if="project.location">
+                    <div class="details-row location-name" v-if="project.location">
                         <div class="details-icon">
                             <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="13px" height="16px" />
                         </div>
                         <template>{{ project.location }}</template>
                     </div>
-                    <div class="details-row" v-if="displayProject.places.native">
+                    <div class="details-row location-native" v-if="displayProject.places.native">
                         <div class="details-icon">
                             <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="13px" height="16px" />
                         </div>
@@ -136,7 +136,7 @@
             </div>
         </div>
 
-        <Comments :parentData="displayProject.id" :user="user"></Comments>
+        <Comments :parentData="displayProject.id" :user="user" v-if="user"></Comments>
     </div>
 </template>
 
@@ -346,6 +346,7 @@ export default {
 
 .details-icon {
     width: 23px;
+    flex-shrink: 0;
 }
 
 .right-actions {
@@ -579,5 +580,11 @@ export default {
 
 .todo-disabled {
     display: none;
+}
+
+.location-native {
+    white-space: break-spaces;
+    display: flex;
+    align-items: baseline;
 }
 </style>
