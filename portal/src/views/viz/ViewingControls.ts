@@ -8,6 +8,7 @@ import Spinner from "@/views/shared/Spinner.vue";
 
 import { TimeRange } from "./common";
 import { Graph, HasSensorParams, SensorParams, TreeOption, Workspace, FastTime, TimeZoom, ChartType } from "./viz";
+import { vueTickHack } from "@/utilities";
 
 class NewParams implements HasSensorParams {
     public readonly sensorParams: SensorParams;
@@ -101,12 +102,16 @@ export const ViewingControls = Vue.extend({
         raiseChangeStation(node: TreeOption): void {
             const sensor = this.viz.chartParams.sensorParams.sensors[0];
             console.log("raising viz-change-sensors");
-            this.$emit("viz-change-sensors", new NewParams(Number(node.id), sensor));
+            vueTickHack(() => {
+                this.$emit("viz-change-sensors", new NewParams(Number(node.id), sensor));
+            });
         },
         raiseChangeSensor(node: TreeOption): void {
             const station = this.viz.chartParams.sensorParams.stations[0];
             console.log("raising viz-change-sensors");
-            this.$emit("viz-change-sensors", new NewParams(station, Number(node.id)));
+            vueTickHack(() => {
+                this.$emit("viz-change-sensors", new NewParams(station, Number(node.id)));
+            });
         },
         raiseChangeChartType(chartType: string): void {
             console.log("raising viz-change-chart");

@@ -187,3 +187,7 @@ export function toSingleValue(v: null | string | (string | null)[]): string | nu
     }
     return null;
 }
+
+export function vueTickHack(callback: () => void): void {
+    setTimeout(callback, 0);
+}
