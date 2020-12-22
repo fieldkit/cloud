@@ -1,8 +1,8 @@
 <template>
     <div class="readings-simple">
         <template v-if="!loading">
-            <div v-for="sensor in sensors" v-bind:key="sensor.key" class="reading-container">
-                <div class="reading">
+            <div v-for="sensor in sensors" v-bind:key="sensor.labelKey" class="reading-container">
+                <div :class="'reading ' + sensor.classes">
                     <div class="name">{{ $t(sensor.labelKey) }}</div>
                     <div class="value">{{ sensor | prettyReading }}</div>
                     <div class="uom">{{ sensor.unitOfMeasure }}</div>
@@ -28,6 +28,7 @@ export enum TrendType {
 export class SensorReading {
     constructor(
         public readonly labelKey: string,
+        public readonly classes: string,
         public readonly unitOfMeasure: string,
         public readonly reading: number,
         public readonly trend: TrendType
@@ -102,7 +103,11 @@ export default Vue.extend({
                             if (!sensor) {
                                 throw new Error("no sensor meta");
                             }
-                            return new SensorReading(key, sensor.unitOfMeasure, value, TrendType.Steady);
+                            const classes = [key.replaceAll(".", "-")];
+                            if (sensor.unitOfMeasure == "°") {
+                                classes.push("degrees");
+                            }
+                            return new SensorReading(key, classes.join(" "), sensor.unitOfMeasure, value, TrendType.Steady);
                         })
                         .value();
                 })
@@ -156,5 +161,9 @@ export default Vue.extend({
 .reading .uom {
     font-size: 10px;
     margin-bottom: -3px;
+}
+.reading.degrees .uom {
+    align-self: start;
+    padding-top: 5px;
 }
 </style>
