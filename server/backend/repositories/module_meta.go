@@ -322,7 +322,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "windDir",
 					FirmwareKey:   "wind_dir",
-					UnitOfMeasure: "",
+					UnitOfMeasure: "°",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -357,7 +357,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "windHrMaxDir",
 					FirmwareKey:   "wind_hr_max_dir",
-					UnitOfMeasure: "",
+					UnitOfMeasure: "°",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -379,7 +379,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "wind10mMaxDir",
 					FirmwareKey:   "wind_10m_max_dir",
-					UnitOfMeasure: "",
+					UnitOfMeasure: "°",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -401,7 +401,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "wind2mAvgDir",
 					FirmwareKey:   "wind_2m_avg_dir",
-					UnitOfMeasure: "",
+					UnitOfMeasure: "°",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -512,7 +512,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "windDir",
 					FirmwareKey:   "wind_dir",
-					UnitOfMeasure: "",
+					UnitOfMeasure: "°",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
