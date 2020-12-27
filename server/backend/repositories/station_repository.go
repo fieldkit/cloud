@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/conservify/sqlxcache"
@@ -255,9 +256,13 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 
 				for sensorIndex, lrs := range lrm.Readings {
 					s := lrs.Sensor
-					value := float64(lrs.Value)
+					value64 := float64(lrs.Value)
+					value := &value64
+					if math.IsNaN(value64) {
+						value = nil
+					}
 
-					sensor := newModuleSensor(s, module, configuration, uint32(sensorIndex), &time, &value)
+					sensor := newModuleSensor(s, module, configuration, uint32(sensorIndex), &time, value)
 					if _, err := r.UpsertModuleSensor(ctx, sensor); err != nil {
 						return err
 					}
