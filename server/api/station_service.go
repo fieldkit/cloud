@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"math"
 	"strings"
 	"time"
 
@@ -538,6 +539,10 @@ func transformUploads(from []*data.Ingestion) (to []*station.StationUpload) {
 
 func transformReading(s *data.ModuleSensor) *station.SensorReading {
 	if s.ReadingValue == nil {
+		return nil
+	}
+
+	if math.IsNaN(*s.ReadingValue) {
 		return nil
 	}
 
