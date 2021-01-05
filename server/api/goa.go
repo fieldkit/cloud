@@ -302,8 +302,15 @@ func errorHandler() func(context.Context, http.ResponseWriter, error) {
 	return func(ctx context.Context, w http.ResponseWriter, err error) {
 		log := Logger(ctx).Sugar()
 		id := logging.FindTaskID(ctx)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("[" + id + "] encoding: " + err.Error()))
+		// What's super annoying is that when we end up here, it's
+		// usually a problem encoding the response. Typically a NaN in
+		// JSON or something, by then the headers are already on their
+		// way. No real way to avoid that issue w/o buffering the JSON
+		// into memory.
+		if false {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("[" + id + "] encoding: " + err.Error()))
+		}
 		log.Errorw("fatal", "id", id, "message", err.Error())
 	}
 }
