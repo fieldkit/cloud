@@ -33,25 +33,17 @@
                             </div>
                             <template>{{ displayProject.duration | prettyDuration }}</template>
                         </div>
-                        <div class="details-row" v-if="project.location" width="12px" height="14px">
+                        <div class="details-row location-native" v-if="project.location" width="12px" height="14px">
                             <div class="details-icon-container">
                                 <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
                             </div>
-                            <template>{{ project.location.slice(0, 30) }}</template>
-                            <template v-if="project.location.length > 30">
-                                ...
-                                <span class="bold">more</span>
-                            </template>
+                            <template>{{ project.location }}</template>
                         </div>
-                        <div class="details-row has-tooltip" v-if="displayProject.places.native">
+                        <div class="details-row location-native" v-if="displayProject.places.native">
                             <div class="details-icon-container">
                                 <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="12px" height="14px" />
                             </div>
                             <template>Native Lands: {{ displayProject.places.native }}</template>
-                            <template v-if="displayProject.places.native.length > 20">
-                                ...
-                                <span class="bold">more</span>
-                            </template>
                         </div>
                     </div>
                 </div>
@@ -340,6 +332,7 @@ export default {
 .details-icon-container {
     width: 20px;
     display: flex;
+    flex-shrink: 0;
 }
 
 .row-section.data-readings {
@@ -405,5 +398,11 @@ export default {
     margin: 6px 7px 0 0;
     width: 35px;
     height: 35px;
+}
+
+.location-native {
+    white-space: break-spaces;
+    display: flex;
+    align-items: baseline;
 }
 </style>
