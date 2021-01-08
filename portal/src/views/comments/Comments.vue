@@ -8,7 +8,9 @@
             <button type="submit" class="new-comment-submit" v-if="newComment.body">Post</button>
         </form>
 
-        <div v-if="errorMessage">{{ errorMessage }}</div>
+        <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
+
+        <div v-if="posts.length === 0">There are no comments yet.</div>
 
         <div class="list" v-if="posts && posts.length > 0">
             <div class="subheader">
@@ -614,5 +616,9 @@ header {
         font-size: 32px;
         font-family: $font-family-bold;
     }
+}
+.error {
+    color: $color-danger;
+    margin-bottom: 10px;
 }
 </style>
