@@ -231,7 +231,6 @@ export default Vue.extend({
             return moment(timestamp).fromNow();
         },
         addReply(post: Comment): void {
-            //
             if (this.newReply.body && post.id === this.newReply.threadId) {
                 return;
             }
@@ -602,5 +601,18 @@ header {
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.25s ease-in-out;
+}
+
+.icon-ellipsis {
+    display: block;
+    cursor: pointer;
+
+    &:after {
+        @include flex(flex-end);
+        content: '...';
+        height: 17px;
+        font-size: 32px;
+        font-family: $font-family-bold;
+    }
 }
 </style>
