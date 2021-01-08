@@ -8,7 +8,7 @@
             <button type="submit" class="new-comment-submit" v-if="newComment.body">Post</button>
         </form>
 
-        <div v-if="errorMessage"> {{errorMessage}}</div>
+        <div v-if="errorMessage">{{ errorMessage }}</div>
 
         <div class="list" v-if="posts && posts.length > 0">
             <div class="subheader">
@@ -16,24 +16,25 @@
                 <header v-if="viewType === 'data'">Notes & Comments</header>
             </div>
             <transition-group name="fade">
-                <div class="comment" v-for="post in posts" v-bind:key="post.id">
+                <div class="comment comment-first-level" v-for="post in posts" v-bind:key="post.id">
                     <div class="comment-main">
                         <UserPhoto :user="post.author"></UserPhoto>
                         <div class="column">
                             <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
                             <span class="author">
                                 {{ post.author.name }}
-                                <i class="icon-ellipsis options-trigger" v-if="user.id === post.author.id"
-                                   @click="showCommentOptions($event)">
-                                </i>
+                                <i
+                                    class="icon-ellipsis options-trigger"
+                                    v-if="user.id === post.author.id"
+                                    @click="showCommentOptions($event)"
+                                ></i>
                                 <div class="options-btns">
-                                    <button @click="startEditing(post)"> Edit Post </button>
-                                    <button @click="deleteComment(post.id)"> Delete Post </button>
+                                    <button @click="startEditing(post)">Edit Post</button>
+                                    <button @click="deleteComment(post.id)">Delete Post</button>
                                 </div>
                             </span>
-                            <input type="text" class="body" v-model="post.body" :readonly="post.readonly">
-                            <button type="submit" class="new-comment-submit"
-                                    v-if="!post.readonly" @click="saveEdit(post.id, post.body)">
+                            <input type="text" class="body" v-model="post.body" :readonly="post.readonly" />
+                            <button type="submit" class="new-comment-submit" v-if="!post.readonly" @click="saveEdit(post.id, post.body)">
                                 Save
                             </button>
                         </div>
@@ -46,17 +47,23 @@
                                     <div class="column">
                                         <span class="author">
                                             {{ reply.author.name }}
-                                            <i class="icon-ellipsis options-trigger" v-if="user.id === post.author.id"
-                                                @click="showCommentOptions($event)">
-                                            </i>
+                                            <i
+                                                class="icon-ellipsis options-trigger"
+                                                v-if="user.id === post.author.id"
+                                                @click="showCommentOptions($event)"
+                                            ></i>
                                             <div class="options-btns">
-                                                <button @click="startEditing(reply)"> Edit Post </button>
-                                                <button @click="deleteComment(reply.id)"> Delete Post </button>
+                                                <button @click="startEditing(reply)">Edit Post</button>
+                                                <button @click="deleteComment(reply.id)">Delete Post</button>
                                             </div>
                                         </span>
-                                        <input type="text" class="body" v-model="reply.body" :readonly="reply.readonly">
-                                        <button type="submit" class="new-comment-submit"
-                                                v-if="!reply.readonly" @click="saveEdit(reply.id, reply.body)">
+                                        <input type="text" class="body" v-model="reply.body" :readonly="reply.readonly" />
+                                        <button
+                                            type="submit"
+                                            class="new-comment-submit"
+                                            v-if="!reply.readonly"
+                                            @click="saveEdit(reply.id, reply.body)"
+                                        >
                                             Save
                                         </button>
                                     </div>
@@ -181,7 +188,18 @@ export default Vue.extend({
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
-                            this.posts.filter((post) => post.id === comment.threadId)[0].replies.push(response.post);
+                            this.posts
+                                .filter((post) => post.id === comment.threadId)[0]
+                                .replies.push(
+                                    new Comment(
+                                        response.post.id,
+                                        response.post.author,
+                                        response.post.bookmark,
+                                        response.post.body,
+                                        response.post.createdAt,
+                                        response.post.updatedAt
+                                    )
+                                );
                             this.newReply.body = null;
                         } else {
                             console.warn(`posts is null`);
@@ -189,7 +207,16 @@ export default Vue.extend({
                     } else {
                         // add it to the posts array
                         if (this.posts) {
-                            this.posts.unshift(response.post);
+                            this.posts.unshift(
+                                new Comment(
+                                    response.post.id,
+                                    response.post.author,
+                                    response.post.bookmark,
+                                    response.post.body,
+                                    response.post.createdAt,
+                                    response.post.updatedAt
+                                )
+                            );
                             this.newComment.body = null;
                         } else {
                             console.log(`posts is null`);
@@ -204,6 +231,10 @@ export default Vue.extend({
             return moment(timestamp).fromNow();
         },
         addReply(post: Comment): void {
+            //
+            if (this.newReply.body && post.id === this.newReply.threadId) {
+                return;
+            }
             this.errorMessage = null;
             this.newReply.threadId = post.id;
             this.newReply.body = null;
@@ -212,25 +243,14 @@ export default Vue.extend({
             await this.$services.api
                 .getComments(this.parentData)
                 .then((data) => {
-                    data.posts.forEach(post => {
-                        this.posts.push(new Comment(
-                            post.id,
-                            post.author,
-                            post.bookmark,
-                            post.body,
-                            post.createdAt,
-                            post.updatedAt,
-                        ));
+                    this.posts = [];
+                    data.posts.forEach((post) => {
+                        this.posts.push(new Comment(post.id, post.author, post.bookmark, post.body, post.createdAt, post.updatedAt));
 
-                        post.replies.forEach(reply => {
-                            this.posts[this.posts.length - 1].replies.push(new Comment(
-                                reply.id,
-                                reply.author,
-                                reply.bookmark,
-                                reply.body,
-                                reply.createdAt,
-                                reply.updatedAt,
-                            ));
+                        post.replies.forEach((reply) => {
+                            this.posts[this.posts.length - 1].replies.push(
+                                new Comment(reply.id, reply.author, reply.bookmark, reply.body, reply.createdAt, reply.updatedAt)
+                            );
                         });
                     });
                 })
@@ -247,10 +267,12 @@ export default Vue.extend({
             if (event.target) {
                 const optionsMenu = (event.target as HTMLElement).nextElementSibling;
 
-                if (!(optionsMenu as HTMLElement).classList.contains('visible')) {
-                    (optionsMenu as HTMLElement).classList.add('visible');
+                if (!(optionsMenu as HTMLElement).classList.contains("visible")) {
+                    (optionsMenu as HTMLElement).classList.add("visible");
                     setTimeout(function() {
-                        document.addEventListener('click', function() {
+                        document.addEventListener(
+                            "click",
+                            function() {
                                 (optionsMenu as HTMLElement).classList.remove("visible");
                             },
                             {
@@ -264,9 +286,9 @@ export default Vue.extend({
         deleteComment(commentID: number) {
             this.$services.api
                 .deleteComment(commentID)
-                .then(response => {
+                .then((response) => {
                     if (response) {
-                        this.posts = this.posts.filter(post => post.id !== commentID);
+                        this.getComments();
                     } else {
                         this.errorMessage = CommentsErrorsEnum.deleteComment;
                     }
@@ -281,14 +303,9 @@ export default Vue.extend({
         saveEdit(commentID: number, body: string) {
             this.$services.api
                 .editComment(commentID, body)
-                .then(response => {
+                .then((response) => {
                     if (response) {
-                        this.posts.forEach(post => {
-                            if (post.id === commentID) {
-                                post.body = body;
-                                post.readonly = true;
-                            }
-                        });
+                        this.getComments();
                     } else {
                         this.errorMessage = CommentsErrorsEnum.deleteComment;
                     }
@@ -379,6 +396,10 @@ header {
         &:not(.reply) {
             background-color: rgba(#f4f5f7, 0.55);
             padding: 18px 23px 17px 15px;
+
+            .new-comment-submit {
+                right: 30px;
+            }
         }
     }
 
@@ -426,10 +447,6 @@ header {
         padding: 0 10px;
         transform: translateY(-50%);
         font-weight: 900;
-
-        .container.data-view & {
-            right: 35px;
-        }
     }
 }
 
@@ -487,11 +504,14 @@ header {
     font-family: $font-family-light;
     outline: none;
     border: solid 1px $color-border;
+    min-height: 35px;
     width: calc(100% - 40px);
+    overflow-wrap: break-word;
 
     &[readonly] {
         border: none;
         max-width: 550px;
+        min-height: unset;
     }
 
     + .new-comment-submit {
@@ -507,6 +527,10 @@ header {
     position: relative;
     flex-wrap: wrap;
 
+    &-first-level {
+        border-bottom: 1px solid $color-border;
+    }
+
     &::v-deep .default-user-icon {
         margin-top: 0;
         width: 30px;
@@ -514,10 +538,6 @@ header {
     }
 
     .column {
-
-        border-bottom: 1px solid $color-border;
-
-
         &:nth-of-type(2) {
             padding-left: 42px;
         }
@@ -583,5 +603,4 @@ header {
 .fade-leave-active {
     transition: opacity 0.25s ease-in-out;
 }
-
 </style>
