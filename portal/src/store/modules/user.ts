@@ -1,10 +1,9 @@
 import Vue from "vue";
 import * as ActionTypes from "../actions";
 import * as MutationTypes from "../mutations";
-
 import { ResumeAction, LoginDiscourseAction, LoginOidcAction } from "@/store";
-
 import { FKApi, TokenStorage, Services, LoginPayload, LoginResponse, CurrentUser } from "@/api";
+import Config from "@/secrets";
 
 export const UPDATE_TOKEN = "UPDATE_TOKEN";
 export const CURRENT_USER = "CURRENT_USER";
@@ -78,6 +77,11 @@ const actions = (services: Services) => {
         [ActionTypes.LOGOUT]: async ({ commit }: { commit: any }) => {
             try {
                 await services.api.logout();
+                if (Config.auth && Config.auth.logoutUrl) {
+                    window.location.replace(Config.auth.logoutUrl);
+                } else {
+                    window.location.replace("/login");
+                }
             } finally {
                 commit(UPDATE_TOKEN, null);
                 commit(CURRENT_USER, null);

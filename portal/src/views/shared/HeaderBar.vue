@@ -53,7 +53,7 @@ export default Vue.extend({
     methods: {
         async logout(): Promise<void> {
             await this.$store.dispatch(ActionTypes.LOGOUT).then(() => {
-                return this.$router.push({ name: "login" });
+                // Action handles where we go after.
             });
         },
         onAccountHover(event: Event): void {
