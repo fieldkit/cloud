@@ -156,6 +156,17 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 		return nil, err
 	}
 
+	if as, err := NewAuthServer(); err != nil {
+		if err != ErrNoConfig {
+			return nil, err
+		}
+		log.Infow("keycloak-no-config", "error", err)
+	} else {
+		if err := as.UpdateAuthentication(ctx, user, payload.User.Password); err != nil {
+			log.Errorw("keycloak-update-authentication", "user_id", user.ID, "error", err)
+		}
+	}
+
 	if err := s.options.Emailer.SendValidationToken(user, validationToken); err != nil {
 		return nil, err
 	}
@@ -228,6 +239,17 @@ func (s *UserService) ChangePassword(ctx context.Context, payload *user.ChangePa
 
 	if err := updating.SetPassword(payload.Change.NewPassword); err != nil {
 		return nil, err
+	}
+
+	if as, err := NewAuthServer(); err != nil {
+		if err != ErrNoConfig {
+			return nil, err
+		}
+		log.Infow("keycloak-no-config", "error", err)
+	} else {
+		if err := as.UpdateAuthentication(ctx, updating, payload.Change.NewPassword); err != nil {
+			log.Errorw("keycloak-update-authentication", "user_id", updating.ID, "error", err)
+		}
 	}
 
 	if err := s.options.Database.NamedGetContext(ctx, updating, `
@@ -917,8 +939,10 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 			log.Errorw("keycloak-update-authentication", "user_id", user.ID, "error", err)
 		}
 
-		if _, err := as.Login(ctx, user.Email, password); err != nil {
-			log.Errorw("keycloak-login", "user_id", user.ID, "error", err)
+		if false {
+			if _, err := as.Login(ctx, user.Email, password); err != nil {
+				log.Errorw("keycloak-login", "user_id", user.ID, "error", err)
+			}
 		}
 	}
 
