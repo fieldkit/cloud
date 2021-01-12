@@ -51,7 +51,7 @@
                                             {{ reply.author.name }}
                                             <i
                                                 class="icon-ellipsis options-trigger"
-                                                v-if="user.id === post.author.id"
+                                                v-if="user.id === reply.author.id"
                                                 @click="showCommentOptions($event)"
                                             ></i>
                                             <div class="options-btns">
@@ -270,10 +270,10 @@ export default Vue.extend({
 
                 if (!(optionsMenu as HTMLElement).classList.contains("visible")) {
                     (optionsMenu as HTMLElement).classList.add("visible");
-                    setTimeout(function() {
+                    setTimeout(function () {
                         document.addEventListener(
                             "click",
-                            function() {
+                            function () {
                                 (optionsMenu as HTMLElement).classList.remove("visible");
                             },
                             {
@@ -611,7 +611,7 @@ header {
 
     &:after {
         @include flex(flex-end);
-        content: '...';
+        content: "...";
         height: 17px;
         font-size: 32px;
         font-family: $font-family-bold;
