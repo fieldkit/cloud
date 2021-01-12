@@ -1,5 +1,5 @@
 <template>
-    <div class="form-container">
+    <div class="form-container" v-if="!sso">
         <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
         <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="spoofing" @login="save" />
     </div>
@@ -36,6 +36,9 @@ export default Vue.extend({
         };
     },
     computed: {
+        sso(): boolean {
+            return this.$config.sso;
+        },
         forwardAfterQuery(): { after?: string } {
             const after = toSingleValue(this.$route.query.after);
             if (after) {
