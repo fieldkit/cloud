@@ -31,7 +31,7 @@
                                     @click="showCommentOptions($event)"
                                 ></i>
                                 <div class="options-btns">
-                                    <button @click="startEditing(post)">Edit Post</button>
+                                    <button @click="startEditing(post)" v-if="user.id == post.author.id">Edit Post</button>
                                     <button @click="deleteComment(post.id)">Delete Post</button>
                                 </div>
                             </span>
@@ -55,7 +55,7 @@
                                                 @click="showCommentOptions($event)"
                                             ></i>
                                             <div class="options-btns">
-                                                <button @click="startEditing(reply)">Edit Post</button>
+                                                <button @click="startEditing(reply)" v-if="user.id == reply.author.id">Edit Post</button>
                                                 <button @click="deleteComment(reply.id)">Delete Post</button>
                                             </div>
                                         </span>

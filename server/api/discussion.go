@@ -201,7 +201,7 @@ func (c *DiscussionService) DeleteMessage(ctx context.Context, payload *discServ
 		return err
 	}
 
-	if post.UserID != p.UserID() {
+	if post.UserID != p.UserID() && !p.IsAdmin() {
 		return discService.MakeForbidden(errors.New("unauthorized"))
 	}
 
