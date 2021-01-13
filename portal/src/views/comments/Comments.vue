@@ -27,7 +27,7 @@
                                 {{ post.author.name }}
                                 <i
                                     class="icon-ellipsis options-trigger"
-                                    v-if="user.id === post.author.id"
+                                    v-if="user.id === post.author.id || user.admin"
                                     @click="showCommentOptions($event)"
                                 ></i>
                                 <div class="options-btns">
@@ -51,7 +51,7 @@
                                             {{ reply.author.name }}
                                             <i
                                                 class="icon-ellipsis options-trigger"
-                                                v-if="user.id === reply.author.id"
+                                                v-if="user.id === reply.author.id || user.admin"
                                                 @click="showCommentOptions($event)"
                                             ></i>
                                             <div class="options-btns">
