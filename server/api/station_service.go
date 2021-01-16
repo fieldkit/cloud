@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"io"
 	"math"
 	"strings"
 	"time"
@@ -404,6 +405,15 @@ func (c *StationService) Delete(ctx context.Context, payload *station.DeletePayl
 	return sr.Delete(ctx, payload.StationID)
 }
 
+func findImage(media []*data.FieldNoteMedia) *data.FieldNoteMedia {
+	for _, m := range media {
+		if m.ContentType != "image/gif" {
+			return m
+		}
+	}
+	return nil
+}
+
 func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.DownloadPhotoPayload) (*station.DownloadedPhoto, error) {
 	x := uint(124)
 	y := uint(100)
@@ -419,7 +429,13 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 		return defaultPhoto(payload.StationID)
 	}
 
-	media := allMedia[0]
+	haveGif := false
+	media := findImage(allMedia)
+	if media == nil {
+		// Must be a gif, pick the first one.
+		media = allMedia[0]
+		haveGif = true
+	}
 
 	etag := quickHash(media.URL)
 	if payload.Size != nil {
@@ -442,11 +458,26 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 		return nil, err
 	}
 
+	if haveGif {
+		buffer := make([]byte, lm.Size)
+		_, err := io.ReadFull(lm.Reader, buffer)
+		if err != nil {
+			return nil, err
+		}
+		return &station.DownloadedPhoto{
+			Length:      lm.Size,
+			ContentType: media.ContentType,
+			Etag:        etag,
+			Body:        buffer,
+		}, nil
+	}
+
 	original, _, err := image.Decode(lm.Reader)
 	if err != nil {
 		log := Logger(ctx).Sugar()
-		log.Warnw("image-error", "error", err, "station_id", payload.StationID)
-		return defaultPhoto(payload.StationID)
+		log.Warnw("image-error", "error", err, "station_id", payload.StationID, "content_type", media.ContentType)
+		// return defaultPhoto(payload.StationID)
+		return nil, station.MakeNotFound(fmt.Errorf("not-found"))
 	}
 
 	data := []byte{}
@@ -696,6 +727,13 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		recordingStartedAt = &unix
 	}
 
+	var photos *station.StationPhotos
+	if sf.HasImages {
+		photos = &station.StationPhotos{
+			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
+		}
+	}
+
 	return &station.StationFull{
 		ID:       sf.Station.ID,
 		Name:     sf.Station.Name,
@@ -721,9 +759,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			ID:   sf.Owner.ID,
 			Name: sf.Owner.Name,
 		},
-		Photos: &station.StationPhotos{
-			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
-		},
+		Photos: photos,
 	}, nil
 }
 

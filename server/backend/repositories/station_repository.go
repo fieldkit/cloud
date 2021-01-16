@@ -414,8 +414,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 			ST_AsBinary(c.geom) AS geometry
 		FROM fieldkit.station AS s
 		JOIN fieldkit.counties AS c ON (ST_Contains(c.geom, s.location))
-		WHERE s.id = $1
-		  AND s.location IS NOT NULL
+		WHERE s.id = $1 AND s.location IS NOT NULL
 		`, id); err != nil {
 		return nil, err
 	}
@@ -428,6 +427,14 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		WHERE station_id IN ($1)
 		GROUP BY a.station_id
 	`, stations[0].ID); err != nil {
+		return nil, err
+	}
+
+	media := []*data.FieldNoteMedia{}
+	if err := r.db.SelectContext(ctx, &media, `
+		SELECT id, user_id, content_type, created_at, url, key, station_id
+		FROM fieldkit.notes_media WHERE station_id = $1 ORDER BY created_at ASC
+		`, id); err != nil {
 		return nil, err
 	}
 
@@ -485,7 +492,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	all, err := r.toStationFull(stations, owners, areas, dataSummaries, ingestions, provisions, configurations, modules, sensors)
+	all, err := r.toStationFull(stations, owners, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 	if err != nil {
 		return nil, err
 	}
@@ -533,6 +540,14 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)
 		GROUP BY a.station_id
 	`, id); err != nil {
+		return nil, err
+	}
+
+	media := []*data.FieldNoteMedia{}
+	if err := r.db.SelectContext(ctx, &media, `
+		SELECT id, user_id, content_type, created_at, url, key, station_id
+		FROM fieldkit.notes_media WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1) ORDER BY created_at ASC
+		`, id); err != nil {
 		return nil, err
 	}
 
@@ -608,7 +623,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, areas, dataSummaries, ingestions, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, owners, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 }
 
 func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id int32) ([]*data.StationFull, error) {
@@ -653,6 +668,14 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		WHERE station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
 		GROUP BY a.station_id
 	`, id); err != nil {
+		return nil, err
+	}
+
+	media := []*data.FieldNoteMedia{}
+	if err := r.db.SelectContext(ctx, &media, `
+		SELECT id, user_id, content_type, created_at, url, key, station_id
+		FROM fieldkit.notes_media WHERE station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1) ORDER BY created_at ASC
+		`, id); err != nil {
 		return nil, err
 	}
 
@@ -745,11 +768,11 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, areas, dataSummaries, ingestions, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, owners, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 }
 
-func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, areas []*data.StationArea, dataSummaries []*data.AggregatedDataSummary, ingestions []*data.Ingestion,
-	provisions []*data.Provision, configurations []*data.StationConfiguration,
+func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, areas []*data.StationArea, dataSummaries []*data.AggregatedDataSummary,
+	media []*data.FieldNoteMedia, ingestions []*data.Ingestion, provisions []*data.Provision, configurations []*data.StationConfiguration,
 	modules []*data.StationModule, sensors []*data.ModuleSensor) ([]*data.StationFull, error) {
 	ownersByID := make(map[int32]*data.User)
 	ingestionsByDeviceID := make(map[string][]*data.Ingestion)
@@ -780,6 +803,10 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 
 	for _, v := range dataSummaries {
 		summariesByStationID[v.StationID] = v
+	}
+
+	for _, v := range media {
+		mediaByStationID[v.StationID] = append(mediaByStationID[v.StationID], v)
 	}
 
 	for _, v := range ingestions {
@@ -831,6 +858,7 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 			Modules:        modulesByStationID[station.ID],
 			Sensors:        sensorsByStationID[station.ID],
 			DataSummary:    summariesByStationID[station.ID],
+			HasImages:      len(mediaByStationID[station.ID]) > 0,
 		})
 	}
 

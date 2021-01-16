@@ -233,7 +233,7 @@ export default Vue.extend({
 .section-body {
     display: flex;
     flex-direction: row;
-    height: 372px;
+    height: 420px;
 }
 .stations-container {
     display: flex;
@@ -341,7 +341,7 @@ export default Vue.extend({
 
 ::v-deep .station-hover-summary {
     width: 359px;
-    top: 30px;
+    top: 20px;
     left: 122px;
 }
 </style>

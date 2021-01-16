@@ -209,6 +209,7 @@ type StationFull struct {
 	Modules        []*StationModule
 	Sensors        []*ModuleSensor
 	DataSummary    *AggregatedDataSummary
+	HasImages      bool
 }
 
 type EssentialStation struct {

@@ -45,7 +45,7 @@ func TestGetStationsMine(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -57,7 +57,7 @@ func TestGetStationsMine(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -69,7 +69,7 @@ func TestGetStationsMine(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -81,7 +81,7 @@ func TestGetStationsMine(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -93,7 +93,7 @@ func TestGetStationsMine(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -128,7 +128,7 @@ func TestGetStation(t *testing.T) {
 		"deviceId": "<<PRESENCE>>",
 		"uploads": "<<PRESENCE>>",
 		"name": "<<PRESENCE>>",
-		"photos": "<<PRESENCE>>",
+		"photos": null,
 		"readOnly": "<<PRESENCE>>",
 		"location": "<<PRESENCE>>",
 		"configurations": { "all": [] }
@@ -163,7 +163,7 @@ func TestGetStationsProject(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -175,7 +175,7 @@ func TestGetStationsProject(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -187,7 +187,7 @@ func TestGetStationsProject(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -199,7 +199,7 @@ func TestGetStationsProject(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -211,7 +211,7 @@ func TestGetStationsProject(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -487,7 +487,7 @@ func TestGetStationUpdatedWithProtobufStatus(t *testing.T) {
 		"deviceId": "<<PRESENCE>>",
 		"uploads": "<<PRESENCE>>",
 		"name": "<<PRESENCE>>",
-		"photos": "<<PRESENCE>>",
+		"photos": null,
 		"readOnly": "<<PRESENCE>>",
 		"battery": "<<PRESENCE>>",
 		"location": "<<PRESENCE>>",
