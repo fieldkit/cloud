@@ -257,7 +257,6 @@ func ThreadedPost(dp *data.DiscussionPost, users map[int32]*data.User) (*discSer
 
 func ThreadedPage(page *data.PageOfDiscussion) ([]*discService.ThreadedPost, error) {
 	byID := make(map[int64]*discService.ThreadedPost)
-	threaded := make([]*discService.ThreadedPost, 0)
 	for _, post := range page.Posts {
 		tp, err := ThreadedPost(post, page.UsersByID)
 		if err != nil {
@@ -266,6 +265,7 @@ func ThreadedPage(page *data.PageOfDiscussion) ([]*discService.ThreadedPost, err
 
 		byID[tp.ID] = tp
 	}
+	threaded := make([]*discService.ThreadedPost, 0)
 	for _, post := range page.Posts {
 		tp := byID[post.ID]
 		if post.ThreadID != nil {
@@ -275,5 +275,12 @@ func ThreadedPage(page *data.PageOfDiscussion) ([]*discService.ThreadedPost, err
 			threaded = append(threaded, tp)
 		}
 	}
-	return threaded, nil
+	return reverse(threaded), nil
+}
+
+func reverse(posts []*discService.ThreadedPost) []*discService.ThreadedPost {
+	for i, j := 0, len(posts)-1; i < j; i, j = i+1, j-1 {
+		posts[i], posts[j] = posts[j], posts[i]
+	}
+	return posts
 }
