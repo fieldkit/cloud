@@ -199,6 +199,7 @@ export default {
     border-radius: 3px;
     border: solid 1px #cccdcf;
     white-space: nowrap;
+    flex-grow: 1;
     @include flex(center);
 }
 .invited-container .reject {
@@ -206,6 +207,7 @@ export default {
     font-size: 14px;
     color: #2c3e50;
     white-space: nowrap;
+    flex-grow: 1;
     @include flex(center);
 
     span {
