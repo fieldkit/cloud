@@ -30,25 +30,26 @@ export default Vue.extend({
         };
     },
     watch: {
-        station(this: any) {
-            return this.refresh();
+        async station(): Promise<void> {
+            await this.refresh();
         },
     },
-    mounted(this: any) {
-        return this.refresh();
+    async mounted(): Promise<void> {
+        await this.refresh();
     },
     methods: {
-        refresh(this: any) {
+        async refresh(): Promise<void> {
+            console.log(`loading-photo:`, this.station);
             if (this.station.photos) {
                 this.loading = true;
-                return this.$services.api
-                    .loadMedia(this.station.photos.small)
-                    .then((photo) => {
-                        this.photo = photo;
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                    });
+                try {
+                    const photo = await this.$services.api.loadMedia(this.station.photos.small);
+                    this.photo = photo;
+                } finally {
+                    this.loading = false;
+                }
+            } else {
+                this.loading = false;
             }
         },
     },
