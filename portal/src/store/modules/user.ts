@@ -77,7 +77,7 @@ const actions = (services: Services) => {
         [ActionTypes.LOGOUT]: async ({ commit }: { commit: any }) => {
             try {
                 await services.api.logout();
-                if (Config.auth && Config.auth.logoutUrl) {
+                if (Config.sso && Config.auth && Config.auth.logoutUrl) {
                     window.location.replace(Config.auth.logoutUrl);
                 } else {
                     window.location.replace("/login");
