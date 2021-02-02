@@ -1,7 +1,7 @@
 <template>
     <div class="form-container" v-if="!sso">
         <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
-        <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="spoofing" @login="save" />
+        <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="spoofing" :failed="failed" @login="save" />
     </div>
 </template>
 
