@@ -155,6 +155,10 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		Errors:          info.DataErrors > 0 || info.MetaErrors > 0,
 	}
 
+	if _, err := database.ExecContext(ctx, `UPDATE fieldkit.station SET ingestion_at = NOW() WHERE id = $1`, *info.StationID); err != nil {
+		return fmt.Errorf("error updating station: %v", err)
+	}
+
 	if err := database.NamedGetContext(ctx, activity, `
 		INSERT INTO fieldkit.station_ingestion (created_at, station_id, uploader_id, data_ingestion_id, data_records, errors)
 		VALUES (:created_at, :station_id, :uploader_id, :data_ingestion_id, :data_records, :errors)

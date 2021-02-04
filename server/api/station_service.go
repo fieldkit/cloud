@@ -42,6 +42,8 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 		return err
 	}
 
+	station.UpdatedAt = time.Now()
+
 	if rawStatusPb != nil {
 		log.Infow("updating station from status", "station_id", station.ID)
 
@@ -63,9 +65,9 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 				station.PlaceNative = names.NativeLandName
 			}
 		}
-	}
 
-	station.UpdatedAt = time.Now()
+		station.SyncedAt = &station.UpdatedAt
+	}
 
 	if err := sr.Update(ctx, station); err != nil {
 		return err

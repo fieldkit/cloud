@@ -58,6 +58,8 @@ type Station struct {
 	OwnerID            int32      `db:"owner_id,omitempty"`
 	CreatedAt          time.Time  `db:"created_at,omitempty"`
 	UpdatedAt          time.Time  `db:"updated_at,omitempty"`
+	SyncedAt           *time.Time `db:"synced_at"`
+	IngestionAt        *time.Time `db:"ingestion_at"`
 	Battery            *float32   `db:"battery"`
 	Location           *Location  `db:"location"`
 	LocationName       *string    `db:"location_name"`
