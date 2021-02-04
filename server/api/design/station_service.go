@@ -139,6 +139,9 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("location", StationLocation)
 		Required("updatedAt")
 
+		Attribute("syncedAt", Int64)
+		Attribute("ingestionAt", Int64)
+
 		Attribute("data", StationDataSummary)
 	})
 	View("default", func() {
@@ -163,6 +166,9 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("locationName")
 		Attribute("placeNameOther")
 		Attribute("placeNameNative")
+
+		Attribute("syncedAt", Int64)
+		Attribute("ingestionAt", Int64)
 
 		Attribute("data")
 	})

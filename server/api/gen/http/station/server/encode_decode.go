@@ -1462,6 +1462,8 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 		LocationName:       v.LocationName,
 		PlaceNameOther:     v.PlaceNameOther,
 		PlaceNameNative:    v.PlaceNameNative,
+		SyncedAt:           v.SyncedAt,
+		IngestionAt:        v.IngestionAt,
 	}
 	if v.Owner != nil {
 		res.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(v.Owner)

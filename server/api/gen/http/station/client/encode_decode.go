@@ -1732,6 +1732,8 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 		LocationName:       v.LocationName,
 		PlaceNameOther:     v.PlaceNameOther,
 		PlaceNameNative:    v.PlaceNameNative,
+		SyncedAt:           v.SyncedAt,
+		IngestionAt:        v.IngestionAt,
 	}
 	res.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v.Owner)
 	res.Uploads = make([]*stationviews.StationUploadView, len(v.Uploads))

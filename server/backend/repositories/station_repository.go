@@ -57,7 +57,9 @@ func (r *StationRepository) Update(ctx context.Context, station *data.Station) (
 			   memory_used = :memory_used,
 			   firmware_number = :firmware_number,
 			   firmware_time = :firmware_time,
-			   updated_at = :updated_at
+			   updated_at = :updated_at,
+			   synced_at = :synced_at,
+			   ingestion_at = :ingestion_at
 		WHERE id = :id
 		`, station); err != nil {
 		return err

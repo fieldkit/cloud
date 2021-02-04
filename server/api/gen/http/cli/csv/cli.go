@@ -2773,7 +2773,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 746052441 --auth "Ullam ipsam est dolore dolores."
+    `+os.Args[0]+` station get --id 1339788900 --auth "Dolore dolores ipsam itaque."
 `, os.Args[0])
 }
 
@@ -2786,7 +2786,7 @@ Transfer implements transfer.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station transfer --id 1253153027 --owner-id 135258016 --auth "Maxime voluptas temporibus nihil est."
+    `+os.Args[0]+` station transfer --id 1796173823 --owner-id 287893760 --auth "Dolor voluptas illum voluptate consequatur et quia."
 `, os.Args[0])
 }
 
@@ -2800,10 +2800,10 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "locationName": "Tempora est dolor enim animi asperiores.",
-      "name": "Officiis sed qui reiciendis ratione.",
-      "statusPb": "Quaerat enim laborum est quos ut."
-   }' --id 1791375802 --auth "Sunt minus illum."
+      "locationName": "Voluptatibus sunt minus illum maxime iusto.",
+      "name": "Quaerat enim laborum est quos ut.",
+      "statusPb": "Consequatur distinctio totam omnis amet."
+   }' --id 1555276552 --auth "Itaque tempora pariatur sed quas."
 `, os.Args[0])
 }
 
@@ -2814,7 +2814,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- mine --auth "Esse iure."
+    `+os.Args[0]+` station list- mine --auth "Accusantium nostrum nihil pariatur dolor qui deserunt."
 `, os.Args[0])
 }
 
@@ -2826,7 +2826,7 @@ ListProject implements list project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project --id 1050914386 --auth "Dolor qui deserunt dolor beatae consequatur."
+    `+os.Args[0]+` station list- project --id 819861887 --auth "Qui nesciunt veniam ea dolorum voluptatem sed."
 `, os.Args[0])
 }
 
@@ -2840,7 +2840,7 @@ DownloadPhoto implements download photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station download- photo --station-id 1317517660 --size 381068892 --if-none-match "Ea dolorum voluptatem sed fugit ea." --auth "Sint in rerum fuga."
+    `+os.Args[0]+` station download- photo --station-id 1527185252 --size 783533187 --if-none-match "Et nulla dolorem sequi." --auth "Debitis dolore."
 `, os.Args[0])
 }
 
@@ -2856,7 +2856,7 @@ ListAll implements list all.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- all --page 1321697222 --page-size 641388082 --owner-id 1153338083 --query "Ut quia aut asperiores sed." --sort-by "Quas deserunt harum non ut perferendis ipsum." --auth "Expedita reiciendis cum."
+    `+os.Args[0]+` station list- all --page 1423861339 --page-size 500782129 --owner-id 1168751603 --query "Ipsum porro." --sort-by "Reiciendis cum fugit." --auth "Dolores sit neque."
 `, os.Args[0])
 }
 
@@ -2868,7 +2868,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station delete --station-id 1384305682 --auth "Iure sed ab illo quaerat quisquam."
+    `+os.Args[0]+` station delete --station-id 1152892589 --auth "Blanditiis vel."
 `, os.Args[0])
 }
 
@@ -2880,7 +2880,7 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station admin- search --query "Quos sunt perferendis in aliquam." --auth "Qui eos praesentium."
+    `+os.Args[0]+` station admin- search --query "In aliquam." --auth "Qui eos praesentium."
 `, os.Args[0])
 }
 

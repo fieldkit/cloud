@@ -123,12 +123,14 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		})
 	}
 
+	now := time.Now()
 	adding := &data.Station{
 		OwnerID:      p.UserID(),
 		Name:         payload.Name,
 		DeviceID:     deviceId,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
+		CreatedAt:    now,
+		UpdatedAt:    now,
+		SyncedAt:     &now,
 		LocationName: payload.LocationName,
 	}
 
@@ -752,6 +754,8 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		FirmwareNumber:     sf.Station.FirmwareNumber,
 		FirmwareTime:       sf.Station.FirmwareTime,
 		UpdatedAt:          sf.Station.UpdatedAt.Unix() * 1000,
+		SyncedAt:           optionalTime(sf.Station.SyncedAt),
+		IngestionAt:        optionalTime(sf.Station.IngestionAt),
 		LocationName:       sf.Station.LocationName,
 		PlaceNameOther:     sf.Station.PlaceOther,
 		PlaceNameNative:    sf.Station.PlaceNative,
@@ -763,6 +767,14 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		},
 		Photos: photos,
 	}, nil
+}
+
+func optionalTime(t *time.Time) *int64 {
+	if t == nil {
+		return nil
+	}
+	value := t.Unix() * 1000
+	return &value
 }
 
 func transformDataSummary(ads *data.AggregatedDataSummary) *station.StationDataSummary {

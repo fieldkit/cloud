@@ -85,6 +85,8 @@ type StationFull struct {
 	PlaceNameOther     *string
 	PlaceNameNative    *string
 	Location           *StationLocation
+	SyncedAt           *int64
+	IngestionAt        *int64
 	Data               *StationDataSummary
 }
 
@@ -382,6 +384,8 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 		LocationName:       vres.LocationName,
 		PlaceNameOther:     vres.PlaceNameOther,
 		PlaceNameNative:    vres.PlaceNameNative,
+		SyncedAt:           vres.SyncedAt,
+		IngestionAt:        vres.IngestionAt,
 	}
 	if vres.ID != nil {
 		res.ID = *vres.ID
@@ -440,6 +444,8 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		LocationName:       res.LocationName,
 		PlaceNameOther:     res.PlaceNameOther,
 		PlaceNameNative:    res.PlaceNameNative,
+		SyncedAt:           res.SyncedAt,
+		IngestionAt:        res.IngestionAt,
 	}
 	if res.Owner != nil {
 		vres.Owner = transformStationOwnerToStationviewsStationOwnerView(res.Owner)

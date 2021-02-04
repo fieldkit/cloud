@@ -64,6 +64,8 @@ type StationFullView struct {
 	PlaceNameOther     *string
 	PlaceNameNative    *string
 	Location           *StationLocationView
+	SyncedAt           *int64
+	IngestionAt        *int64
 	Data               *StationDataSummaryView
 }
 
@@ -224,6 +226,8 @@ var (
 			"locationName",
 			"placeNameOther",
 			"placeNameNative",
+			"syncedAt",
+			"ingestionAt",
 			"data",
 		},
 	}
@@ -284,6 +288,8 @@ var (
 			"locationName",
 			"placeNameOther",
 			"placeNameNative",
+			"syncedAt",
+			"ingestionAt",
 			"data",
 		},
 	}

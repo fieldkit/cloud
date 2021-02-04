@@ -52,6 +52,8 @@ type AddResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	SyncedAt           *int64                             `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                             `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -77,6 +79,8 @@ type GetResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	SyncedAt           *int64                             `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                             `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -102,6 +106,8 @@ type UpdateResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	SyncedAt           *int64                             `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                             `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -998,6 +1004,8 @@ type StationFullResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	SyncedAt           *int64                             `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                             `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -1059,6 +1067,8 @@ func NewAddStationFullOK(body *AddResponseBody) *stationviews.StationFullView {
 		LocationName:       body.LocationName,
 		PlaceNameOther:     body.PlaceNameOther,
 		PlaceNameNative:    body.PlaceNameNative,
+		SyncedAt:           body.SyncedAt,
+		IngestionAt:        body.IngestionAt,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -1166,6 +1176,8 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 		LocationName:       body.LocationName,
 		PlaceNameOther:     body.PlaceNameOther,
 		PlaceNameNative:    body.PlaceNameNative,
+		SyncedAt:           body.SyncedAt,
+		IngestionAt:        body.IngestionAt,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -1318,6 +1330,8 @@ func NewUpdateStationFullOK(body *UpdateResponseBody) *stationviews.StationFullV
 		LocationName:       body.LocationName,
 		PlaceNameOther:     body.PlaceNameOther,
 		PlaceNameNative:    body.PlaceNameNative,
+		SyncedAt:           body.SyncedAt,
+		IngestionAt:        body.IngestionAt,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))

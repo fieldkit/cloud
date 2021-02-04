@@ -52,6 +52,8 @@ type AddResponseBody struct {
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
+	SyncedAt           *int64                             `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                             `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -77,6 +79,8 @@ type GetResponseBody struct {
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
+	SyncedAt           *int64                             `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                             `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -102,6 +106,8 @@ type UpdateResponseBody struct {
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
+	SyncedAt           *int64                             `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                             `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -998,6 +1004,8 @@ type StationFullResponseBody struct {
 	LocationName       *string                            `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
+	SyncedAt           *int64                             `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                             `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -1036,6 +1044,8 @@ func NewAddResponseBody(res *stationviews.StationFullView) *AddResponseBody {
 		LocationName:       res.LocationName,
 		PlaceNameOther:     res.PlaceNameOther,
 		PlaceNameNative:    res.PlaceNameNative,
+		SyncedAt:           res.SyncedAt,
+		IngestionAt:        res.IngestionAt,
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
@@ -1079,6 +1089,8 @@ func NewGetResponseBody(res *stationviews.StationFullView) *GetResponseBody {
 		LocationName:       res.LocationName,
 		PlaceNameOther:     res.PlaceNameOther,
 		PlaceNameNative:    res.PlaceNameNative,
+		SyncedAt:           res.SyncedAt,
+		IngestionAt:        res.IngestionAt,
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
@@ -1122,6 +1134,8 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 		LocationName:       res.LocationName,
 		PlaceNameOther:     res.PlaceNameOther,
 		PlaceNameNative:    res.PlaceNameNative,
+		SyncedAt:           res.SyncedAt,
+		IngestionAt:        res.IngestionAt,
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
