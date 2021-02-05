@@ -57,6 +57,7 @@ func (h *IngestStationHandler) Handle(ctx context.Context, m *messages.IngestSta
 				QueuedID: id,
 				UserID:   m.UserID,
 				Verbose:  m.Verbose,
+				Refresh:  false,
 			}); err != nil {
 				log.Warnw("publishing", "err", err)
 			}

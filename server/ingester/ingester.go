@@ -133,6 +133,7 @@ func NewIngesterHandler(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		if err := o.Publisher.Publish(ctx, &messages.IngestionReceived{
 			QueuedID: queuedID,
+			Refresh:  true,
 			UserID:   userID,
 		}); err != nil {
 			log.Warnw("publishing", "err", err)

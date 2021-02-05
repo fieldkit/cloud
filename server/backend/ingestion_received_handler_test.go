@@ -26,9 +26,10 @@ func TestIngestionReceivedNoSuchIngestion(t *testing.T) {
 	handler := NewIngestionReceivedHandler(e.DB, tests.NewInMemoryArchive(map[string][]byte{}), logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
 
 	err = handler.Handle(e.Ctx, &messages.IngestionReceived{
+		UserID:   user.ID,
 		QueuedID: int64(30342),
 		Verbose:  true,
-		UserID:   user.ID,
+		Refresh:  true,
 	})
 
 	assert.Errorf(err, "queued ingestion missing: %d", 30342)
@@ -55,9 +56,10 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		QueuedID: queued.ID,
 		UserID:   user.ID,
+		QueuedID: queued.ID,
 		Verbose:  true,
+		Refresh:  true,
 	}))
 }
 func TestIngestionReceivedMetaOnly(t *testing.T) {
@@ -82,9 +84,10 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		QueuedID: queued.ID,
 		UserID:   user.ID,
+		QueuedID: queued.ID,
 		Verbose:  true,
+		Refresh:  true,
 	}))
 }
 
@@ -117,15 +120,17 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		QueuedID: queuedMeta.ID,
 		UserID:   user.ID,
+		QueuedID: queuedMeta.ID,
 		Verbose:  true,
+		Refresh:  true,
 	}))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		QueuedID: queuedData.ID,
 		UserID:   user.ID,
+		QueuedID: queuedData.ID,
 		Verbose:  true,
+		Refresh:  true,
 	}))
 
 	ir, err := repositories.NewIngestionRepository(e.DB)
@@ -175,15 +180,17 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		QueuedID: queuedMeta.ID,
 		UserID:   user.ID,
+		QueuedID: queuedMeta.ID,
 		Verbose:  true,
+		Refresh:  true,
 	}))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		QueuedID: queuedData.ID,
 		UserID:   user.ID,
+		QueuedID: queuedData.ID,
 		Verbose:  true,
+		Refresh:  true,
 	}))
 
 	ir, err := repositories.NewIngestionRepository(e.DB)
@@ -237,15 +244,17 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	assert.NotNil(dataIngestion)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		QueuedID: queuedMeta.ID,
 		UserID:   fd.Owner.ID,
+		QueuedID: queuedMeta.ID,
 		Verbose:  true,
+		Refresh:  true,
 	}))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
-		QueuedID: queuedData.ID,
 		UserID:   fd.Owner.ID,
+		QueuedID: queuedData.ID,
 		Verbose:  true,
+		Refresh:  true,
 	}))
 
 	ir, err := repositories.NewIngestionRepository(e.DB)
