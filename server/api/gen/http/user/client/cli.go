@@ -128,7 +128,7 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userLoginBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"ncc\",\n      \"password\": \"mmv\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"mmv\",\n      \"password\": \"645\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
@@ -161,7 +161,7 @@ func BuildRecoveryLookupPayload(userRecoveryLookupBody string) (*user.RecoveryLo
 	{
 		err = json.Unmarshal([]byte(userRecoveryLookupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Est occaecati magni.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Occaecati magni.\"\n   }'")
 		}
 	}
 	v := &user.RecoveryLookupFields{
@@ -332,7 +332,7 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateUserID string, userUpda
 	{
 		err = json.Unmarshal([]byte(userUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Enim harum.\",\n      \"endTime\": \"Optio qui architecto perspiciatis nulla inventore ut.\",\n      \"goal\": \"Voluptatem adipisci dicta recusandae dolores assumenda.\",\n      \"location\": \"Qui doloremque nemo similique fuga voluptatem.\",\n      \"name\": \"Non aut velit tempora quibusdam voluptatibus ipsa.\",\n      \"privacy\": 989463924,\n      \"startTime\": \"Aut omnis.\",\n      \"tags\": \"Non quae voluptatem.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Voluptatem adipisci dicta recusandae dolores assumenda.\",\n      \"endTime\": \"Consequuntur totam impedit nobis inventore nesciunt.\",\n      \"goal\": \"Qui doloremque nemo similique fuga voluptatem.\",\n      \"location\": \"Non quae voluptatem.\",\n      \"name\": \"Corporis enim harum.\",\n      \"privacy\": 2011573778,\n      \"startTime\": \"Optio qui architecto perspiciatis nulla inventore ut.\",\n      \"tags\": \"Eius aut.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {

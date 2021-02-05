@@ -20,13 +20,14 @@ import (
 
 // Server lists the ingestion service endpoint HTTP handlers.
 type Server struct {
-	Mounts           []*MountPoint
-	ProcessPending   http.Handler
-	WalkEverything   http.Handler
-	ProcessStation   http.Handler
-	ProcessIngestion http.Handler
-	Delete           http.Handler
-	CORS             http.Handler
+	Mounts                   []*MountPoint
+	ProcessPending           http.Handler
+	WalkEverything           http.Handler
+	ProcessStation           http.Handler
+	ProcessStationIngestions http.Handler
+	ProcessIngestion         http.Handler
+	Delete                   http.Handler
+	CORS                     http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -65,20 +66,23 @@ func New(
 			{"ProcessPending", "POST", "/data/process"},
 			{"WalkEverything", "POST", "/data/walk"},
 			{"ProcessStation", "POST", "/data/stations/{stationId}/process"},
+			{"ProcessStationIngestions", "POST", "/data/stations/{stationId}/ingestions/process"},
 			{"ProcessIngestion", "POST", "/data/ingestions/{ingestionId}/process"},
 			{"Delete", "DELETE", "/data/ingestions/{ingestionId}"},
 			{"CORS", "OPTIONS", "/data/process"},
 			{"CORS", "OPTIONS", "/data/walk"},
 			{"CORS", "OPTIONS", "/data/stations/{stationId}/process"},
+			{"CORS", "OPTIONS", "/data/stations/{stationId}/ingestions/process"},
 			{"CORS", "OPTIONS", "/data/ingestions/{ingestionId}/process"},
 			{"CORS", "OPTIONS", "/data/ingestions/{ingestionId}"},
 		},
-		ProcessPending:   NewProcessPendingHandler(e.ProcessPending, mux, decoder, encoder, errhandler, formatter),
-		WalkEverything:   NewWalkEverythingHandler(e.WalkEverything, mux, decoder, encoder, errhandler, formatter),
-		ProcessStation:   NewProcessStationHandler(e.ProcessStation, mux, decoder, encoder, errhandler, formatter),
-		ProcessIngestion: NewProcessIngestionHandler(e.ProcessIngestion, mux, decoder, encoder, errhandler, formatter),
-		Delete:           NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
-		CORS:             NewCORSHandler(),
+		ProcessPending:           NewProcessPendingHandler(e.ProcessPending, mux, decoder, encoder, errhandler, formatter),
+		WalkEverything:           NewWalkEverythingHandler(e.WalkEverything, mux, decoder, encoder, errhandler, formatter),
+		ProcessStation:           NewProcessStationHandler(e.ProcessStation, mux, decoder, encoder, errhandler, formatter),
+		ProcessStationIngestions: NewProcessStationIngestionsHandler(e.ProcessStationIngestions, mux, decoder, encoder, errhandler, formatter),
+		ProcessIngestion:         NewProcessIngestionHandler(e.ProcessIngestion, mux, decoder, encoder, errhandler, formatter),
+		Delete:                   NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
+		CORS:                     NewCORSHandler(),
 	}
 }
 
@@ -90,6 +94,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.ProcessPending = m(s.ProcessPending)
 	s.WalkEverything = m(s.WalkEverything)
 	s.ProcessStation = m(s.ProcessStation)
+	s.ProcessStationIngestions = m(s.ProcessStationIngestions)
 	s.ProcessIngestion = m(s.ProcessIngestion)
 	s.Delete = m(s.Delete)
 	s.CORS = m(s.CORS)
@@ -100,6 +105,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountProcessPendingHandler(mux, h.ProcessPending)
 	MountWalkEverythingHandler(mux, h.WalkEverything)
 	MountProcessStationHandler(mux, h.ProcessStation)
+	MountProcessStationIngestionsHandler(mux, h.ProcessStationIngestions)
 	MountProcessIngestionHandler(mux, h.ProcessIngestion)
 	MountDeleteHandler(mux, h.Delete)
 	MountCORSHandler(mux, h.CORS)
@@ -258,6 +264,58 @@ func NewProcessStationHandler(
 	})
 }
 
+// MountProcessStationIngestionsHandler configures the mux to serve the
+// "ingestion" service "process station ingestions" endpoint.
+func MountProcessStationIngestionsHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleIngestionOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/data/stations/{stationId}/ingestions/process", f)
+}
+
+// NewProcessStationIngestionsHandler creates a HTTP handler which loads the
+// HTTP request and calls the "ingestion" service "process station ingestions"
+// endpoint.
+func NewProcessStationIngestionsHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeProcessStationIngestionsRequest(mux, decoder)
+		encodeResponse = EncodeProcessStationIngestionsResponse(encoder)
+		encodeError    = EncodeProcessStationIngestionsError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "process station ingestions")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "ingestion")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountProcessIngestionHandler configures the mux to serve the "ingestion"
 // service "process ingestion" endpoint.
 func MountProcessIngestionHandler(mux goahttp.Muxer, h http.Handler) {
@@ -373,6 +431,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/data/process", f)
 	mux.Handle("OPTIONS", "/data/walk", f)
 	mux.Handle("OPTIONS", "/data/stations/{stationId}/process", f)
+	mux.Handle("OPTIONS", "/data/stations/{stationId}/ingestions/process", f)
 	mux.Handle("OPTIONS", "/data/ingestions/{ingestionId}/process", f)
 	mux.Handle("OPTIONS", "/data/ingestions/{ingestionId}", f)
 }

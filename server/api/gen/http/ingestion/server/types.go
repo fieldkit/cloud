@@ -231,6 +231,82 @@ type ProcessStationBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// ProcessStationIngestionsUnauthorizedResponseBody is the type of the
+// "ingestion" service "process station ingestions" endpoint HTTP response body
+// for the "unauthorized" error.
+type ProcessStationIngestionsUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ProcessStationIngestionsForbiddenResponseBody is the type of the "ingestion"
+// service "process station ingestions" endpoint HTTP response body for the
+// "forbidden" error.
+type ProcessStationIngestionsForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ProcessStationIngestionsNotFoundResponseBody is the type of the "ingestion"
+// service "process station ingestions" endpoint HTTP response body for the
+// "not-found" error.
+type ProcessStationIngestionsNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ProcessStationIngestionsBadRequestResponseBody is the type of the
+// "ingestion" service "process station ingestions" endpoint HTTP response body
+// for the "bad-request" error.
+type ProcessStationIngestionsBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // ProcessIngestionUnauthorizedResponseBody is the type of the "ingestion"
 // service "process ingestion" endpoint HTTP response body for the
 // "unauthorized" error.
@@ -545,6 +621,66 @@ func NewProcessStationBadRequestResponseBody(res *goa.ServiceError) *ProcessStat
 	return body
 }
 
+// NewProcessStationIngestionsUnauthorizedResponseBody builds the HTTP response
+// body from the result of the "process station ingestions" endpoint of the
+// "ingestion" service.
+func NewProcessStationIngestionsUnauthorizedResponseBody(res *goa.ServiceError) *ProcessStationIngestionsUnauthorizedResponseBody {
+	body := &ProcessStationIngestionsUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewProcessStationIngestionsForbiddenResponseBody builds the HTTP response
+// body from the result of the "process station ingestions" endpoint of the
+// "ingestion" service.
+func NewProcessStationIngestionsForbiddenResponseBody(res *goa.ServiceError) *ProcessStationIngestionsForbiddenResponseBody {
+	body := &ProcessStationIngestionsForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewProcessStationIngestionsNotFoundResponseBody builds the HTTP response
+// body from the result of the "process station ingestions" endpoint of the
+// "ingestion" service.
+func NewProcessStationIngestionsNotFoundResponseBody(res *goa.ServiceError) *ProcessStationIngestionsNotFoundResponseBody {
+	body := &ProcessStationIngestionsNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewProcessStationIngestionsBadRequestResponseBody builds the HTTP response
+// body from the result of the "process station ingestions" endpoint of the
+// "ingestion" service.
+func NewProcessStationIngestionsBadRequestResponseBody(res *goa.ServiceError) *ProcessStationIngestionsBadRequestResponseBody {
+	body := &ProcessStationIngestionsBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewProcessIngestionUnauthorizedResponseBody builds the HTTP response body
 // from the result of the "process ingestion" endpoint of the "ingestion"
 // service.
@@ -682,6 +818,16 @@ func NewProcessStationPayload(stationID int32, completely *bool, auth string) *i
 	v := &ingestion.ProcessStationPayload{}
 	v.StationID = stationID
 	v.Completely = completely
+	v.Auth = auth
+
+	return v
+}
+
+// NewProcessStationIngestionsPayload builds a ingestion service process
+// station ingestions endpoint payload.
+func NewProcessStationIngestionsPayload(stationID int64, auth string) *ingestion.ProcessStationIngestionsPayload {
+	v := &ingestion.ProcessStationIngestionsPayload{}
+	v.StationID = stationID
 	v.Auth = auth
 
 	return v

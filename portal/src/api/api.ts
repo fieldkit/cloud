@@ -1098,6 +1098,14 @@ class FKApi {
         });
     }
 
+    public adminProcessStationData(stationId: number): Promise<void> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + `/data/stations/${stationId}/ingestions/process`,
+        });
+    }
+
     public adminProcessUpload(ingestionId: number): Promise<void> {
         const qp = new URLSearchParams();
         return this.invoke({

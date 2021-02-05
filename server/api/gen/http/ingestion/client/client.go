@@ -29,6 +29,10 @@ type Client struct {
 	// station endpoint.
 	ProcessStationDoer goahttp.Doer
 
+	// ProcessStationIngestions Doer is the HTTP client used to make requests to
+	// the process station ingestions endpoint.
+	ProcessStationIngestionsDoer goahttp.Doer
+
 	// ProcessIngestion Doer is the HTTP client used to make requests to the
 	// process ingestion endpoint.
 	ProcessIngestionDoer goahttp.Doer
@@ -59,17 +63,18 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		ProcessPendingDoer:   doer,
-		WalkEverythingDoer:   doer,
-		ProcessStationDoer:   doer,
-		ProcessIngestionDoer: doer,
-		DeleteDoer:           doer,
-		CORSDoer:             doer,
-		RestoreResponseBody:  restoreBody,
-		scheme:               scheme,
-		host:                 host,
-		decoder:              dec,
-		encoder:              enc,
+		ProcessPendingDoer:           doer,
+		WalkEverythingDoer:           doer,
+		ProcessStationDoer:           doer,
+		ProcessStationIngestionsDoer: doer,
+		ProcessIngestionDoer:         doer,
+		DeleteDoer:                   doer,
+		CORSDoer:                     doer,
+		RestoreResponseBody:          restoreBody,
+		scheme:                       scheme,
+		host:                         host,
+		decoder:                      dec,
+		encoder:                      enc,
 	}
 }
 
@@ -140,6 +145,30 @@ func (c *Client) ProcessStation() goa.Endpoint {
 		resp, err := c.ProcessStationDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("ingestion", "process station", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// ProcessStationIngestions returns an endpoint that makes HTTP requests to the
+// ingestion service process station ingestions server.
+func (c *Client) ProcessStationIngestions() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeProcessStationIngestionsRequest(c.encoder)
+		decodeResponse = DecodeProcessStationIngestionsResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildProcessStationIngestionsRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ProcessStationIngestionsDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("ingestion", "process station ingestions", err)
 		}
 		return decodeResponse(resp)
 	}

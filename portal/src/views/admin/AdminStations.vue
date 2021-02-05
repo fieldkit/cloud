@@ -98,7 +98,10 @@
                                         <button v-on:click="onExplore(station)" class="button">Explore Data</button>
                                     </div>
                                     <div>
-                                        <button v-on:click="onProcess(station)" class="button">Process Data</button>
+                                        <button v-on:click="onProcessRecords(station)" class="button">Process Recs</button>
+                                    </div>
+                                    <div>
+                                        <button v-on:click="onProcessData(station)" class="button">Process Data</button>
                                     </div>
                                     <h3>Transfer</h3>
                                     <div>
@@ -208,7 +211,21 @@ export default Vue.extend({
                 },
             });
         },
-        async onProcess(station: EssentialStation): Promise<void> {
+        async onProcessData(station: EssentialStation): Promise<void> {
+            await this.$confirm({
+                message: `Are you sure? This could take a while for certain stations.`,
+                button: {
+                    no: "No",
+                    yes: "Yes",
+                },
+                callback: async (confirm) => {
+                    if (confirm) {
+                        await this.$services.api.adminProcessStationData(station.id);
+                    }
+                },
+            });
+        },
+        async onProcessRecords(station: EssentialStation): Promise<void> {
             await this.$confirm({
                 message: `Are you sure? This could take a while for certain stations.`,
                 button: {

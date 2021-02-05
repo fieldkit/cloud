@@ -26,6 +26,11 @@ func ProcessStationIngestionPath(stationID int32) string {
 	return fmt.Sprintf("/data/stations/%v/process", stationID)
 }
 
+// ProcessStationIngestionsIngestionPath returns the URL path to the ingestion service process station ingestions HTTP endpoint.
+func ProcessStationIngestionsIngestionPath(stationID int64) string {
+	return fmt.Sprintf("/data/stations/%v/ingestions/process", stationID)
+}
+
 // ProcessIngestionIngestionPath returns the URL path to the ingestion service process ingestion HTTP endpoint.
 func ProcessIngestionIngestionPath(ingestionID int64) string {
 	return fmt.Sprintf("/data/ingestions/%v/process", ingestionID)

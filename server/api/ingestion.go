@@ -98,6 +98,28 @@ func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestio
 	return nil
 }
 
+func (c *IngestionService) ProcessStationIngestions(ctx context.Context, payload *ingestion.ProcessStationIngestionsPayload) (err error) {
+	log := Logger(ctx).Sugar()
+
+	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.StationID))
+	if err != nil {
+		return err
+	}
+
+	if err := p.CanModify(); err != nil {
+		return err
+	}
+
+	if err := c.options.Publisher.Publish(ctx, &messages.IngestStation{
+		StationID: int32(payload.StationID),
+		UserID:    p.UserID(),
+		Verbose:   true,
+	}); err != nil {
+		log.Errorw("publishing", "err", err)
+	}
+	return nil
+}
+
 func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingestion.ProcessIngestionPayload) (err error) {
 	log := Logger(ctx).Sugar()
 
