@@ -45,8 +45,8 @@ func (a *nopFilesArchive) OpenByURL(ctx context.Context, url string) (of *Opened
 	return nil, fmt.Errorf("unsupported")
 }
 
-func (a *nopFilesArchive) Opened(ctx context.Context, url string, opened *OpenedFile) error {
-	return nil
+func (a *nopFilesArchive) Opened(ctx context.Context, url string, opened *OpenedFile) (reopened *OpenedFile, err error) {
+	return nil, nil
 }
 
 func (a *nopFilesArchive) DeleteByKey(ctx context.Context, key string) (err error) {

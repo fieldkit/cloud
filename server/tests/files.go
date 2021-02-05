@@ -71,8 +71,8 @@ func (a *InMemoryArchive) DeleteByURL(ctx context.Context, url string) error {
 	return fmt.Errorf("no such file: %s", url)
 }
 
-func (a *InMemoryArchive) Opened(ctx context.Context, url string, opened *files.OpenedFile) error {
-	return nil
+func (a *InMemoryArchive) Opened(ctx context.Context, url string, opened *files.OpenedFile) (*files.OpenedFile, error) {
+	return opened, nil
 }
 
 func (a *InMemoryArchive) Info(ctx context.Context, key string) (info *files.FileInfo, err error) {

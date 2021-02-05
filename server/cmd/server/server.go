@@ -401,6 +401,10 @@ func createFileArchive(ctx context.Context, archiver, bucketName string, awsSess
 
 	switch archiver {
 	case "default":
+		fs := files.NewLocalFilesArchive()
+		reading = append(reading, fs)
+		writing = append(writing, fs)
+
 		if bucketName != "" {
 			s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, prefix)
 			if err != nil {
@@ -408,10 +412,6 @@ func createFileArchive(ctx context.Context, archiver, bucketName string, awsSess
 			}
 			reading = append(reading, s3)
 		}
-
-		fs := files.NewLocalFilesArchive()
-		reading = append(reading, fs)
-		writing = append(writing, fs)
 		break
 	case "aws":
 		s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, prefix)

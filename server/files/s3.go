@@ -106,8 +106,8 @@ func (a *S3FileArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFi
 	return a.open(ctx, object.Bucket, object.Key)
 }
 
-func (a *S3FileArchive) Opened(ctx context.Context, url string, opened *OpenedFile) error {
-	return nil
+func (a *S3FileArchive) Opened(ctx context.Context, url string, opened *OpenedFile) (reopened *OpenedFile, err error) {
+	return nil, nil
 }
 
 func (a *S3FileArchive) DeleteByURL(ctx context.Context, url string) (err error) {
