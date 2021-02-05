@@ -713,3 +713,30 @@ func TestAdminSearchStationsBasic(t *testing.T) {
 		"total": 1
 	}`)
 }
+
+func TestStationGetProgress(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(5)
+	assert.NoError(err)
+
+	adminUser, err := e.AddAdminUser()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/stations/%d/progress", fd.Stations[0].ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(adminUser))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+	{
+		"jobs": []
+	}`)
+}

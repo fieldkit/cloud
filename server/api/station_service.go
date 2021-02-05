@@ -545,6 +545,30 @@ func (c *StationService) AdminSearch(ctx context.Context, payload *station.Admin
 	return c.queriedToPage(queried)
 }
 
+func (c *StationService) Progress(ctx context.Context, payload *station.ProgressPayload) (response *station.StationProgress, err error) {
+	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.StationID))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.CanView(); err != nil {
+		return nil, err
+	}
+
+	r, err := repositories.NewStationRepository(c.options.Database)
+	if err != nil {
+		return nil, err
+	}
+
+	_ = r
+
+	jobs := make([]*station.StationJob, 0)
+
+	return &station.StationProgress{
+		Jobs: jobs,
+	}, nil
+}
+
 func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
 		Token:        token,

@@ -1502,6 +1502,155 @@ func DecodeAdminSearchResponse(decoder func(*http.Response) goahttp.Decoder, res
 	}
 }
 
+// BuildProgressRequest instantiates a HTTP request object with method and path
+// set to call the "station" service "progress" endpoint
+func (c *Client) BuildProgressRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		stationID int32
+	)
+	{
+		p, ok := v.(*station.ProgressPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("station", "progress", "*station.ProgressPayload", v)
+		}
+		stationID = p.StationID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ProgressStationPath(stationID)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "progress", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeProgressRequest returns an encoder for requests sent to the station
+// progress server.
+func EncodeProgressRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.ProgressPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "progress", "*station.ProgressPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeProgressResponse returns a decoder for responses returned by the
+// station progress endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeProgressResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeProgressResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ProgressResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "progress", err)
+			}
+			p := NewProgressStationProgressOK(&body)
+			view := "default"
+			vres := &stationviews.StationProgress{Projected: p, View: view}
+			if err = stationviews.ValidateStationProgress(vres); err != nil {
+				return nil, goahttp.ErrValidationError("station", "progress", err)
+			}
+			res := station.NewStationProgress(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body ProgressUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "progress", err)
+			}
+			err = ValidateProgressUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "progress", err)
+			}
+			return nil, NewProgressUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ProgressForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "progress", err)
+			}
+			err = ValidateProgressForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "progress", err)
+			}
+			return nil, NewProgressForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ProgressNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "progress", err)
+			}
+			err = ValidateProgressNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "progress", err)
+			}
+			return nil, NewProgressNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ProgressBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "progress", err)
+			}
+			err = ValidateProgressBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "progress", err)
+			}
+			return nil, NewProgressBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "progress", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView builds a
 // value of type *stationviews.StationOwnerView from a value of type
 // *StationOwnerResponseBody.
@@ -1772,6 +1921,20 @@ func unmarshalEssentialStationResponseBodyToStationviewsEssentialStationView(v *
 	res.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v.Owner)
 	if v.Location != nil {
 		res.Location = unmarshalStationLocationResponseBodyToStationviewsStationLocationView(v.Location)
+	}
+
+	return res
+}
+
+// unmarshalStationJobResponseBodyToStationviewsStationJobView builds a value
+// of type *stationviews.StationJobView from a value of type
+// *StationJobResponseBody.
+func unmarshalStationJobResponseBodyToStationviewsStationJobView(v *StationJobResponseBody) *stationviews.StationJobView {
+	res := &stationviews.StationJobView{
+		Title:       v.Title,
+		StartedAt:   v.StartedAt,
+		CompletedAt: v.CompletedAt,
+		Progress:    v.Progress,
 	}
 
 	return res

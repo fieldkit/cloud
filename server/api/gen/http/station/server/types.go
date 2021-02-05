@@ -146,6 +146,12 @@ type AdminSearchResponseBody struct {
 	Total    int32                           `form:"total" json:"total" xml:"total"`
 }
 
+// ProgressResponseBody is the type of the "station" service "progress"
+// endpoint HTTP response body.
+type ProgressResponseBody struct {
+	Jobs []*StationJobResponseBody `form:"jobs" json:"jobs" xml:"jobs"`
+}
+
 // AddStationOwnerConflictResponseBody is the type of the "station" service
 // "add" endpoint HTTP response body for the "station-owner-conflict" error.
 type AddStationOwnerConflictResponseBody struct {
@@ -884,6 +890,78 @@ type AdminSearchBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// ProgressUnauthorizedResponseBody is the type of the "station" service
+// "progress" endpoint HTTP response body for the "unauthorized" error.
+type ProgressUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ProgressForbiddenResponseBody is the type of the "station" service
+// "progress" endpoint HTTP response body for the "forbidden" error.
+type ProgressForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ProgressNotFoundResponseBody is the type of the "station" service "progress"
+// endpoint HTTP response body for the "not-found" error.
+type ProgressNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ProgressBadRequestResponseBody is the type of the "station" service
+// "progress" endpoint HTTP response body for the "bad-request" error.
+type ProgressBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
 	ID   int32  `form:"id" json:"id" xml:"id"`
@@ -1024,6 +1102,14 @@ type EssentialStationResponseBody struct {
 	FirmwareTime       *int64                       `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
 	Location           *StationLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	LastIngestionAt    *int64                       `form:"lastIngestionAt,omitempty" json:"lastIngestionAt,omitempty" xml:"lastIngestionAt,omitempty"`
+}
+
+// StationJobResponseBody is used to define fields on response body types.
+type StationJobResponseBody struct {
+	StartedAt   int64   `form:"startedAt" json:"startedAt" xml:"startedAt"`
+	CompletedAt *int64  `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
+	Progress    float32 `form:"progress" json:"progress" xml:"progress"`
+	Title       string  `form:"title" json:"title" xml:"title"`
 }
 
 // NewAddResponseBody builds the HTTP response body from the result of the
@@ -1224,6 +1310,19 @@ func NewAdminSearchResponseBody(res *stationviews.PageOfStationsView) *AdminSear
 		body.Stations = make([]*EssentialStationResponseBody, len(res.Stations))
 		for i, val := range res.Stations {
 			body.Stations[i] = marshalStationviewsEssentialStationViewToEssentialStationResponseBody(val)
+		}
+	}
+	return body
+}
+
+// NewProgressResponseBody builds the HTTP response body from the result of the
+// "progress" endpoint of the "station" service.
+func NewProgressResponseBody(res *stationviews.StationProgressView) *ProgressResponseBody {
+	body := &ProgressResponseBody{}
+	if res.Jobs != nil {
+		body.Jobs = make([]*StationJobResponseBody, len(res.Jobs))
+		for i, val := range res.Jobs {
+			body.Jobs[i] = marshalStationviewsStationJobViewToStationJobResponseBody(val)
 		}
 	}
 	return body
@@ -1803,6 +1902,62 @@ func NewAdminSearchBadRequestResponseBody(res *goa.ServiceError) *AdminSearchBad
 	return body
 }
 
+// NewProgressUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "progress" endpoint of the "station" service.
+func NewProgressUnauthorizedResponseBody(res *goa.ServiceError) *ProgressUnauthorizedResponseBody {
+	body := &ProgressUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewProgressForbiddenResponseBody builds the HTTP response body from the
+// result of the "progress" endpoint of the "station" service.
+func NewProgressForbiddenResponseBody(res *goa.ServiceError) *ProgressForbiddenResponseBody {
+	body := &ProgressForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewProgressNotFoundResponseBody builds the HTTP response body from the
+// result of the "progress" endpoint of the "station" service.
+func NewProgressNotFoundResponseBody(res *goa.ServiceError) *ProgressNotFoundResponseBody {
+	body := &ProgressNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewProgressBadRequestResponseBody builds the HTTP response body from the
+// result of the "progress" endpoint of the "station" service.
+func NewProgressBadRequestResponseBody(res *goa.ServiceError) *ProgressBadRequestResponseBody {
+	body := &ProgressBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewAddPayload builds a station service add endpoint payload.
 func NewAddPayload(body *AddRequestBody, auth string) *station.AddPayload {
 	v := &station.AddPayload{
@@ -1903,6 +2058,15 @@ func NewDeletePayload(stationID int32, auth string) *station.DeletePayload {
 func NewAdminSearchPayload(query string, auth string) *station.AdminSearchPayload {
 	v := &station.AdminSearchPayload{}
 	v.Query = query
+	v.Auth = auth
+
+	return v
+}
+
+// NewProgressPayload builds a station service progress endpoint payload.
+func NewProgressPayload(stationID int32, auth string) *station.ProgressPayload {
+	v := &station.ProgressPayload{}
+	v.StationID = stationID
 	v.Auth = auth
 
 	return v

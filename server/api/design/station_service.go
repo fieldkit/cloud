@@ -218,6 +218,36 @@ var PageOfStations = ResultType("application/vnd.app.stations.essential.page", f
 	})
 })
 
+var StationJob = ResultType("application/vnd.app.stations.job", func() {
+	TypeName("StationJob ")
+	Attributes(func() {
+		Attribute("title", String)
+		Attribute("startedAt", Int64)
+		Attribute("completedAt", Int64)
+		Attribute("progress", Float32)
+		Required("startedAt")
+		Required("progress")
+		Required("title")
+	})
+	View("default", func() {
+		Attribute("startedAt")
+		Attribute("completedAt")
+		Attribute("progress")
+		Attribute("title")
+	})
+})
+
+var StationProgress = ResultType("application/vnd.app.stations.progress", func() {
+	TypeName("StationProgress ")
+	Attributes(func() {
+		Attribute("jobs", ArrayOf(StationJob))
+		Required("jobs")
+	})
+	View("default", func() {
+		Attribute("jobs")
+	})
+})
+
 var _ = Service("station", func() {
 	Error("station-owner-conflict", func() {
 	})
@@ -453,6 +483,27 @@ var _ = Service("station", func() {
 			Params(func() {
 				Param("query")
 			})
+
+			httpAuthentication()
+		})
+	})
+
+	Method("progress", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("stationId", Int32)
+			Required("stationId")
+		})
+
+		Result(StationProgress)
+
+		HTTP(func() {
+			GET("stations/{stationId}/progress")
 
 			httpAuthentication()
 		})

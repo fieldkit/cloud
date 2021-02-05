@@ -325,3 +325,27 @@ func BuildAdminSearchPayload(stationAdminSearchQuery string, stationAdminSearchA
 
 	return v, nil
 }
+
+// BuildProgressPayload builds the payload for the station progress endpoint
+// from CLI flags.
+func BuildProgressPayload(stationProgressStationID string, stationProgressAuth string) (*station.ProgressPayload, error) {
+	var err error
+	var stationID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationProgressStationID, 10, 32)
+		stationID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for stationID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = stationProgressAuth
+	}
+	v := &station.ProgressPayload{}
+	v.StationID = stationID
+	v.Auth = auth
+
+	return v, nil
+}
