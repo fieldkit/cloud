@@ -560,12 +560,17 @@ func (c *StationService) Progress(ctx context.Context, payload *station.Progress
 		return nil, err
 	}
 
-	_ = r
+	jobs, err := r.QueryStationProgress(ctx, payload.StationID)
+	if err != nil {
+		return nil, err
+	}
 
-	jobs := make([]*station.StationJob, 0)
+	_ = jobs
+
+	jobsWm := make([]*station.StationJob, 0)
 
 	return &station.StationProgress{
-		Jobs: jobs,
+		Jobs: jobsWm,
 	}, nil
 }
 

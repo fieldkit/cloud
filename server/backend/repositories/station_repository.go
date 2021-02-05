@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"math"
 	"time"
@@ -13,7 +14,9 @@ import (
 
 	pbapp "github.com/fieldkit/app-protocol"
 
+	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 var (
@@ -1007,4 +1010,82 @@ func (sr *StationRepository) Delete(ctx context.Context, stationID int32) error 
 		}
 		return nil
 	})
+}
+
+type DecodeAndCheckFunc = func(ctx context.Context, tm *jobs.TransportMessage) (bool, error)
+
+func (sr *StationRepository) QueryStationProgress(ctx context.Context, stationID int32) ([]*data.StationJob, error) {
+	station, err := sr.QueryStationByID(ctx, stationID)
+	if err != nil {
+		return nil, err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	log.Infow("station-progress", "device_id", station.DeviceID, "station_id", station.ID)
+
+	queued := []*data.QueJob{}
+	if err := sr.db.SelectContext(ctx, &queued, `
+		SELECT priority, run_at, job_id, job_class, args, error_count, last_error, queue
+		FROM que_jobs
+        WHERE run_at - interval '1' hour > NOW()
+		ORDER BY run_at`); err != nil {
+		return nil, err
+	}
+
+	tests := map[string]DecodeAndCheckFunc{
+		"IngestionReceived": func(ctx context.Context, tm *jobs.TransportMessage) (bool, error) {
+			message := &messages.IngestionReceived{}
+			if err := json.Unmarshal(tm.Body, message); err != nil {
+				return false, err
+			}
+			return false, nil
+		},
+		"ExportData": func(ctx context.Context, tm *jobs.TransportMessage) (bool, error) {
+			message := &messages.ExportData{}
+			if err := json.Unmarshal(tm.Body, message); err != nil {
+				return false, err
+			}
+			return false, nil
+		},
+		"RefreshStation": func(ctx context.Context, tm *jobs.TransportMessage) (bool, error) {
+			message := &messages.RefreshStation{}
+			if err := json.Unmarshal(tm.Body, message); err != nil {
+				return false, err
+			}
+			if message.StationID == station.ID {
+				return true, nil
+			}
+			return false, nil
+		},
+		"IngestStation": func(ctx context.Context, tm *jobs.TransportMessage) (bool, error) {
+			message := &messages.IngestStation{}
+			if err := json.Unmarshal(tm.Body, message); err != nil {
+				return false, err
+			}
+			if message.StationID == station.ID {
+				return true, nil
+			}
+			return false, nil
+		},
+	}
+
+	for _, j := range queued {
+		transport := &jobs.TransportMessage{}
+		if err := json.Unmarshal([]byte(j.Args), transport); err != nil {
+			return nil, err
+		}
+
+		if check, ok := tests[j.JobClass]; !ok {
+			log.Infow("decoder-missing", "job_class", j.JobClass)
+		} else {
+			if included, err := check(ctx, transport); err != nil {
+				log.Warnw("decoder-error", "error", err)
+			} else if included {
+				log.Infow("included")
+			}
+		}
+	}
+
+	return nil, nil
 }
