@@ -96,32 +96,8 @@ func (r *MediaRepository) DeleteByURL(ctx context.Context, url string) (err erro
 	return r.files.DeleteByURL(ctx, url)
 }
 
-func (r *MediaRepository) DeleteByKey(ctx context.Context, key string) (err error) {
-	return r.files.DeleteByKey(ctx, key)
-}
-
 func (r *MediaRepository) LoadByURL(ctx context.Context, url string) (lm *LoadedMedia, err error) {
 	opened, err := r.files.OpenByURL(ctx, url)
-	if err != nil {
-		return nil, err
-	}
-
-	if opened == nil {
-		return nil, fmt.Errorf("file archive bug, nil opened file: %v", r.files)
-	}
-
-	lm = &LoadedMedia{
-		Key:      opened.Key,
-		Size:     opened.Size,
-		MimeType: opened.ContentType,
-		Reader:   opened.Body,
-	}
-
-	return
-}
-
-func (r *MediaRepository) LoadByKey(ctx context.Context, key string) (lm *LoadedMedia, err error) {
-	opened, err := r.files.OpenByKey(ctx, key)
 	if err != nil {
 		return nil, err
 	}

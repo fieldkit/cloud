@@ -95,6 +95,10 @@ func (a *localFilesArchive) OpenByURL(ctx context.Context, url string) (of *Open
 	return
 }
 
+func (a *localFilesArchive) Opened(ctx context.Context, url string, opened *OpenedFile) error {
+	return nil
+}
+
 func (a *localFilesArchive) DeleteByKey(ctx context.Context, key string) error {
 	return fmt.Errorf("unsupported")
 }

@@ -43,25 +43,6 @@ func (a *prioritizedFilesArchive) Archive(ctx context.Context, contentType strin
 	return nil, err
 }
 
-func (a *prioritizedFilesArchive) OpenByKey(ctx context.Context, key string) (of *OpenedFile, err error) {
-	var errs *multierror.Error
-	for _, a := range a.reading {
-		reader, err := a.OpenByKey(ctx, key)
-		if err == nil {
-			return reader, nil
-		}
-		errs = multierror.Append(errs, err)
-	}
-
-	err = errs.ErrorOrNil()
-
-	if err == nil {
-		return nil, errors.New("fatal file archive error")
-	}
-
-	return nil, err
-}
-
 func (a *prioritizedFilesArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFile, err error) {
 	var errs *multierror.Error
 	for _, a := range a.reading {
@@ -81,7 +62,7 @@ func (a *prioritizedFilesArchive) OpenByURL(ctx context.Context, url string) (of
 	return nil, err
 }
 
-func (a *prioritizedFilesArchive) DeleteByKey(ctx context.Context, key string) error {
+func (a *prioritizedFilesArchive) Opened(ctx context.Context, url string, opened *OpenedFile) error {
 	return nil
 }
 
