@@ -155,6 +155,7 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		Errors:          info.DataErrors > 0 || info.MetaErrors > 0,
 	}
 
+	// NOTE: We may want to adjust this to be something more... accurate than NOW().
 	if _, err := database.ExecContext(ctx, `UPDATE fieldkit.station SET ingestion_at = NOW() WHERE id = $1`, *info.StationID); err != nil {
 		return fmt.Errorf("error updating station: %v", err)
 	}

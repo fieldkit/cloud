@@ -125,8 +125,16 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 		return err
 	}
 
-	if _, err := ir.Enqueue(ctx, i.ID); err != nil {
+	if id, err := ir.Enqueue(ctx, i.ID); err != nil {
 		return err
+	} else {
+		if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
+			QueuedID: id,
+			UserID:   p.UserID(),
+			Verbose:  true,
+		}); err != nil {
+			log.Warnw("publishing", "err", err)
+		}
 	}
 
 	return nil

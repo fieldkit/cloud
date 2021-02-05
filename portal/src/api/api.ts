@@ -1098,6 +1098,24 @@ class FKApi {
         });
     }
 
+    public adminProcessUpload(ingestionId: number): Promise<void> {
+        const qp = new URLSearchParams();
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + `/data/ingestions/${ingestionId}/process?` + qp.toString(),
+        });
+    }
+
+    // Think twice before you use this. Every pending ingestion_queue should have a que_job.
+    protected adminProcessPending(): Promise<void> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + `/data/process`,
+        });
+    }
+
     public adminProcessStation(stationId: number, completely: boolean): Promise<void> {
         const qp = new URLSearchParams();
         if (completely) {
@@ -1204,6 +1222,7 @@ export interface EssentialStation {
     name: string;
     deviceId: string;
     owner: { id: number; name: string };
+    uploads: { id: number }[];
 }
 
 export interface PageOfStations {
