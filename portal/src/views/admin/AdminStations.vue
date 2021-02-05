@@ -95,13 +95,13 @@
                                         <a :href="urlForServerLogs(station)" target="_blank">10 days</a>
                                     </div>
                                     <div>
-                                        <button v-on:click="onExplore(station)" class="button">Explore Data</button>
+                                        <button v-on:click="onProcessData(station)" class="button">Process Data</button>
                                     </div>
                                     <div>
                                         <button v-on:click="onProcessRecords(station)" class="button">Process Recs</button>
                                     </div>
                                     <div>
-                                        <button v-on:click="onProcessData(station)" class="button">Process Data</button>
+                                        <button v-on:click="onExplore(station)" class="button">Explore Data</button>
                                     </div>
                                     <h3>Transfer</h3>
                                     <div>

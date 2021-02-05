@@ -34,7 +34,7 @@ func (r *IngestionRepository) QueryByID(ctx context.Context, id int64) (i *data.
 	return found[0], nil
 }
 
-func (r *IngestionRepository) QueryByStationID(ctx context.Context, id int64) (all []*data.Ingestion, err error) {
+func (r *IngestionRepository) QueryByStationID(ctx context.Context, id int32) (all []*data.Ingestion, err error) {
 	pending := []*data.Ingestion{}
 	if err := r.db.SelectContext(ctx, &pending, `
 		SELECT
