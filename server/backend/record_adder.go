@@ -289,11 +289,11 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 		stationID = &station.ID
 	}
 
+	withInfo.Infow("processed")
+
 	if err := ra.handler.OnDone(ctx); err != nil {
 		return nil, fmt.Errorf("error in done handler: %v", err)
 	}
-
-	withInfo.Infow("processed")
 
 	if err != nil {
 		newErr := fmt.Errorf("error reading collection: %v", err)
@@ -312,6 +312,8 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 		DataStart:    ra.statistics.start,
 		DataEnd:      ra.statistics.end,
 	}
+
+	withInfo.Infow("done")
 
 	return
 }

@@ -180,7 +180,7 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 
 	preciseLocation := p.UserID() == sf.Owner.ID
 
-	return transformStationFull(c.options.signer, p, sf, preciseLocation)
+	return transformStationFull(c.options.signer, p, sf, preciseLocation, false)
 }
 
 func (c *StationService) Transfer(ctx context.Context, payload *station.TransferPayload) (err error) {
@@ -270,7 +270,7 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(c.options.signer, p, sfs, true)
+	stations, err := transformAllStationFull(c.options.signer, p, sfs, true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -312,7 +312,7 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(c.options.signer, p, sfs, preciseLocation)
+	stations, err := transformAllStationFull(c.options.signer, p, sfs, preciseLocation, false)
 	if err != nil {
 		return nil, err
 	}
@@ -621,7 +621,7 @@ func transformReading(s *data.ModuleSensor) *station.SensorReading {
 	}
 }
 
-func transformConfigurations(from *data.StationFull) (to []*station.StationConfiguration) {
+func transformConfigurations(from *data.StationFull, transformAll bool) (to []*station.StationConfiguration) {
 	to = make([]*station.StationConfiguration, 0)
 	for _, v := range from.Configurations {
 		to = append(to, &station.StationConfiguration{
@@ -629,6 +629,10 @@ func transformConfigurations(from *data.StationFull) (to []*station.StationConfi
 			Time:    v.UpdatedAt.Unix() * 1000,
 			Modules: transformModules(from, v.ID),
 		})
+
+		if !transformAll {
+			break
+		}
 	}
 	return
 }
@@ -737,7 +741,7 @@ func transformLocation(sf *data.StationFull, preciseLocation bool) *station.Stat
 	return nil
 }
 
-func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, preciseLocation bool) (*station.StationFull, error) {
+func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, preciseLocation bool, transformAllConfigurations bool) (*station.StationFull, error) {
 	readOnly := true
 	if p != nil {
 		sp, err := p.ForStation(sf.Station)
@@ -748,7 +752,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		readOnly = sp.IsReadOnly()
 	}
 
-	configurations := transformConfigurations(sf)
+	configurations := transformConfigurations(sf, transformAllConfigurations)
 
 	dataSummary := transformDataSummary(sf.DataSummary)
 
@@ -820,11 +824,11 @@ func transformDataSummary(ads *data.AggregatedDataSummary) *station.StationDataS
 	}
 }
 
-func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool) ([]*station.StationFull, error) {
+func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool, transformAllConfigurations bool) ([]*station.StationFull, error) {
 	stations := make([]*station.StationFull, 0)
 
 	for _, sf := range sfs {
-		after, err := transformStationFull(signer, p, sf, preciseLocation)
+		after, err := transformStationFull(signer, p, sf, preciseLocation, transformAllConfigurations)
 		if err != nil {
 			return nil, err
 		}
