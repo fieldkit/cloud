@@ -382,6 +382,8 @@ header {
 }
 
 .list {
+    overflow-y: hidden;
+
     .data-view & {
         margin-top: 30px;
         width: 60%;
