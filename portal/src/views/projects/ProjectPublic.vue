@@ -268,6 +268,7 @@ export default {
     font-family: $font-family-light;
     margin-bottom: 9px;
     line-height: 1.5;
+    word-break: break-all;
 }
 
 .photo-container {
@@ -582,9 +583,11 @@ export default {
     display: none;
 }
 
+.location-name,
 .location-native {
     white-space: break-spaces;
     display: flex;
     align-items: baseline;
+    word-break: break-all;
 }
 </style>

@@ -33,7 +33,7 @@
                             </div>
                             <template>{{ displayProject.duration | prettyDuration }}</template>
                         </div>
-                        <div class="details-row location-native" v-if="project.location" width="12px" height="14px">
+                        <div class="details-row location-name" v-if="project.location" width="12px" height="14px">
                             <div class="details-icon-container">
                                 <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
                             </div>
@@ -388,6 +388,7 @@ export default {
 }
 .project-detail {
     font-family: $font-family-light;
+    word-break: break-all;
 
     &:not(:last-of-type) {
         padding-bottom: 6px;
@@ -400,9 +401,11 @@ export default {
     height: 35px;
 }
 
+.location-name,
 .location-native {
     white-space: break-spaces;
     display: flex;
     align-items: baseline;
+    word-break: break-all;
 }
 </style>
