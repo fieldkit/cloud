@@ -29,16 +29,15 @@ export default Vue.extend({
     data(): {
         busy: boolean;
         failed: boolean;
+        sso: boolean;
     } {
         return {
             busy: false,
             failed: false,
+            sso: this.$config.sso,
         };
     },
     computed: {
-        sso(): boolean {
-            return this.$config.sso;
-        },
         forwardAfterQuery(): { after?: string } {
             const after = toSingleValue(this.$route.query.after);
             if (after) {
@@ -48,9 +47,18 @@ export default Vue.extend({
         },
     },
     async mounted(): Promise<void> {
-        if (this.$config.sso) {
-            const url = await this.$services.api.loginUrl(null);
-            window.location.replace(url);
+        if (!this.spoofing) {
+            if (this.$config.sso) {
+                try {
+                    const url = await this.$services.api.loginUrl(null);
+                    window.location.replace(url);
+                } catch (error) {
+                    console.log(`sso-url error: ${error}`);
+                    this.sso = false;
+                }
+            }
+        } else {
+            this.sso = false;
         }
     },
     methods: {
