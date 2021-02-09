@@ -1,4 +1,4 @@
-interface SensorRange {
+export interface SensorRange {
     minimum: number;
     maximum: number;
 }
@@ -12,7 +12,7 @@ export interface ModuleSensorMeta {
     ranges: SensorRange[];
 }
 
-interface Module {
+export interface Module {
     id: number;
     key: string;
     internal: boolean;
