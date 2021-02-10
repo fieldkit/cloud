@@ -1,18 +1,20 @@
 <template>
-    <router-link :to="{ name: 'viewProject', params: { id: project.id } }" class="project-container" v-if="visible">
-        <div class="project-image-container">
-            <!--
-            <div v-if="invited" class="invited-icon">
-                Project Invite
+    <div class="project-container" v-if="visible">
+        <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
+            <div class="project-image-container">
+                <!--
+          <div v-if="invited" class="invited-icon">
+              Project Invite
+          </div>
+          -->
+                <ProjectPhoto :project="project" />
             </div>
-            -->
-            <ProjectPhoto :project="project" />
-        </div>
 
-        <img v-if="project.private" alt="Private project" src="@/assets/private.png" class="private-icon" />
+            <img v-if="project.private" alt="Private project" src="@/assets/private.png" class="private-icon" />
 
-        <div class="project-name">{{ project.name }}</div>
-        <div class="project-description">{{ project.description }}</div>
+            <div class="project-name">{{ project.name }}</div>
+            <div class="project-description">{{ project.description }}</div>
+        </router-link>
         <div class="invited-container" v-if="invited">
             <div class="accept" v-on:click.stop.prevent="onAccept">
                 <img alt="Close" src="@/assets/icon-tick-blue.svg" />
@@ -47,7 +49,7 @@
                 <span>3</span>
             </div>-->
         </div>
-    </router-link>
+    </div>
 </template>
 <script lang="ts">
 import CommonComponents from "@/views/shared";
