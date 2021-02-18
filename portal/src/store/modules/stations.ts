@@ -242,11 +242,14 @@ const getters = {
     projectsById(state: StationsState): { [index: number]: DisplayProject } {
         return _(Object.values(state.projects))
             .map((p) => {
-                const users = state.projectUsers[p.id] || [];
-                const stations = state.projectStations[p.id] || [];
-                return new DisplayProject(p, users, stations);
+                const users = state.projectUsers[p.id];
+                const stations = state.projectStations[p.id];
+                if (stations && users) {
+                    return [p.id, new DisplayProject(p, users, stations)];
+                }
+                return [p.id, null];
             })
-            .keyBy((p) => p.project.id)
+            .fromPairs()
             .value();
     },
     stationsById(state: StationsState): { [index: number]: DisplayStation } {
