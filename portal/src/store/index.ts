@@ -25,6 +25,7 @@ import * as ActionTypes from "./actions";
 export { MutationTypes, ActionTypes };
 
 export * from "./typed-actions";
+export * from "./map-types";
 
 function customizeLogger() {
     return createLogger({

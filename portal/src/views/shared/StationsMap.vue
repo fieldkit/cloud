@@ -1,10 +1,10 @@
-<template v-if="mapped.valid">
+<template v-if="mapped.valid && ready">
     <mapbox
         class="stations-map"
         :access-token="mapboxToken"
         :map-options="{
             style: 'mapbox://styles/mapbox/outdoors-v11',
-            bounds: mapped.boundsLngLat(),
+            bounds: bounds,
             zoom: 10,
         }"
         :nav-control="{
@@ -21,7 +21,7 @@ import Vue, { PropType } from "vue";
 import Mapbox from "mapbox-gl-vue";
 import Config from "@/secrets";
 import { promiseAfter } from "@/utilities";
-import { MappedStations } from "@/store";
+import { MappedStations, LngLat } from "@/store";
 
 interface ProtectedData {
     map: any;
@@ -56,6 +56,10 @@ export default Vue.extend({
         protectedData(): ProtectedData {
             return (this as unknown) as ProtectedData;
         },
+        bounds(): LngLat[] | null {
+            console.log("map: bounds", this.mapped.boundsLngLat());
+            return this.mapped.boundsLngLat();
+        },
     },
     watch: {
         layoutChanges(): void {
@@ -68,7 +72,7 @@ export default Vue.extend({
             }
         },
         mapped(): void {
-            console.log("map: mapped changed");
+            console.log("map: mapped changed", this.mapped);
             this.updateMap();
         },
     },
@@ -98,10 +102,12 @@ export default Vue.extend({
         },
         updateMap(): void {
             if (!this.protectedData.map) {
+                console.log("map: update-skip.1");
                 return;
             }
 
             if (!this.mapped || !this.mapped.valid || !this.ready) {
+                console.log("map: update-skip.2", this.mapped?.valid, this.ready);
                 return;
             }
 
@@ -151,8 +157,10 @@ export default Vue.extend({
                     console.log("map: click", id);
                     this.$emit("show-summary", { id: id });
                 });
+
+                map.fitBounds(this.mapped.boundsLngLat(), { duration: 0 });
             } else {
-                console.log("map: keeping features", this.mapped);
+                console.log("map: keeping", this.mapped);
                 map.fitBounds(this.mapped.boundsLngLat(), { duration: 0 });
             }
         },
