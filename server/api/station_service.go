@@ -297,8 +297,8 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		if err != nil {
 			return nil, err
 		}
-		if _, ok := relationships[payload.ID]; ok {
-			preciseLocation = true
+		if row, ok := relationships[payload.ID]; ok {
+			preciseLocation = row.MemberRole >= 0
 		}
 	}
 
