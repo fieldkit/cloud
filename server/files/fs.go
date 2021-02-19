@@ -158,7 +158,7 @@ func (a *localFilesArchive) Info(ctx context.Context, keyOrUrl string) (info *Fi
 func makeFileName(keyOrUrl string) string {
 	u, err := url.Parse(keyOrUrl)
 	if err != nil {
-		return path.Join(Path, fmt.Sprintf("%v.fkpb", keyOrUrl))
+		return path.Join(Path, fmt.Sprintf("%v", keyOrUrl))
 	}
-	return path.Join(Path, fmt.Sprintf("%v.fkpb", u.Path))
+	return path.Join(Path, fmt.Sprintf("%v", u.Path))
 }
