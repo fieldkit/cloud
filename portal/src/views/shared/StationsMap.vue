@@ -66,9 +66,9 @@ export default Vue.extend({
             console.log("map: layout changed");
             if (this.protectedData.map) {
                 // TODO Not a fan of this.
-                promiseAfter(250, {}).then(() => {
-                    this.protectedData.map.resize();
-                });
+              this.$nextTick(() => {
+                this.protectedData.map.resize();
+              })
             }
         },
         mapped(): void {

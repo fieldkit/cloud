@@ -66,7 +66,7 @@
 
         <div class="readings-container" v-if="readings">
             <div class="title">Latest Readings</div>
-            <LatestStationReadings :id="station.id" />
+            <LatestStationReadings :id="station.id" @layoutChange="layoutChange"/>
         </div>
 
         <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
@@ -120,6 +120,9 @@ export default Vue.extend({
         },
         wantCloseSummary() {
             this.$emit("close");
+        },
+        layoutChange() {
+            this.$emit("layoutChange");
         },
     },
 });
