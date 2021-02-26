@@ -22,6 +22,7 @@
                 @close="closeSummary"
                 :station="activeStation"
                 v-bind:key="activeStation.id"
+                @layoutChange="layoutChange"
             />
         </template>
         <div class="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
@@ -162,6 +163,9 @@ export default Vue.extend({
         },
         switchView(type: string): void {
             this.viewType = type;
+            this.layoutChanges++;
+        },
+        layoutChange() {
             this.layoutChanges++;
         },
     },

@@ -125,6 +125,7 @@ export default Vue.extend({
                 .then((sensors) => {
                     this.sensors = sensors;
                     this.loading = false;
+                    this.$emit("layoutChange");
                     return this.sensors;
                 });
         },
