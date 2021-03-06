@@ -493,14 +493,15 @@ func EncodeDeleteError(encoder func(context.Context, http.ResponseWriter) goahtt
 // *firmwareviews.FirmwareSummaryView.
 func marshalFirmwareviewsFirmwareSummaryViewToFirmwareSummaryResponseBody(v *firmwareviews.FirmwareSummaryView) *FirmwareSummaryResponseBody {
 	res := &FirmwareSummaryResponseBody{
-		ID:          *v.ID,
-		Time:        *v.Time,
-		Etag:        *v.Etag,
-		Module:      *v.Module,
-		Profile:     *v.Profile,
-		URL:         *v.URL,
-		BuildNumber: *v.BuildNumber,
-		BuildTime:   *v.BuildTime,
+		ID:             *v.ID,
+		Time:           *v.Time,
+		Etag:           *v.Etag,
+		Module:         *v.Module,
+		Profile:        *v.Profile,
+		URL:            *v.URL,
+		BuildNumber:    *v.BuildNumber,
+		BuildTime:      *v.BuildTime,
+		LogicalAddress: v.LogicalAddress,
 	}
 	if v.Meta != nil {
 		res.Meta = make(map[string]interface{}, len(v.Meta))

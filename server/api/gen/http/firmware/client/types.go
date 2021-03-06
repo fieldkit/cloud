@@ -16,11 +16,12 @@ import (
 // AddRequestBody is the type of the "firmware" service "add" endpoint HTTP
 // request body.
 type AddRequestBody struct {
-	Etag    string `form:"etag" json:"etag" xml:"etag"`
-	Module  string `form:"module" json:"module" xml:"module"`
-	Profile string `form:"profile" json:"profile" xml:"profile"`
-	URL     string `form:"url" json:"url" xml:"url"`
-	Meta    string `form:"meta" json:"meta" xml:"meta"`
+	Etag           string `form:"etag" json:"etag" xml:"etag"`
+	Module         string `form:"module" json:"module" xml:"module"`
+	Profile        string `form:"profile" json:"profile" xml:"profile"`
+	URL            string `form:"url" json:"url" xml:"url"`
+	Meta           string `form:"meta" json:"meta" xml:"meta"`
+	LogicalAddress int64  `form:"logicalAddress" json:"logicalAddress" xml:"logicalAddress"`
 }
 
 // ListResponseBody is the type of the "firmware" service "list" endpoint HTTP
@@ -323,26 +324,28 @@ type FirmwareSummaryCollectionResponseBody []*FirmwareSummaryResponseBody
 
 // FirmwareSummaryResponseBody is used to define fields on response body types.
 type FirmwareSummaryResponseBody struct {
-	ID          *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Time        *string                `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
-	Etag        *string                `form:"etag,omitempty" json:"etag,omitempty" xml:"etag,omitempty"`
-	Module      *string                `form:"module,omitempty" json:"module,omitempty" xml:"module,omitempty"`
-	Profile     *string                `form:"profile,omitempty" json:"profile,omitempty" xml:"profile,omitempty"`
-	URL         *string                `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
-	Meta        map[string]interface{} `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
-	BuildNumber *int32                 `form:"buildNumber,omitempty" json:"buildNumber,omitempty" xml:"buildNumber,omitempty"`
-	BuildTime   *int64                 `form:"buildTime,omitempty" json:"buildTime,omitempty" xml:"buildTime,omitempty"`
+	ID             *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Time           *string                `form:"time,omitempty" json:"time,omitempty" xml:"time,omitempty"`
+	Etag           *string                `form:"etag,omitempty" json:"etag,omitempty" xml:"etag,omitempty"`
+	Module         *string                `form:"module,omitempty" json:"module,omitempty" xml:"module,omitempty"`
+	Profile        *string                `form:"profile,omitempty" json:"profile,omitempty" xml:"profile,omitempty"`
+	URL            *string                `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	Meta           map[string]interface{} `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
+	BuildNumber    *int32                 `form:"buildNumber,omitempty" json:"buildNumber,omitempty" xml:"buildNumber,omitempty"`
+	BuildTime      *int64                 `form:"buildTime,omitempty" json:"buildTime,omitempty" xml:"buildTime,omitempty"`
+	LogicalAddress *int64                 `form:"logicalAddress,omitempty" json:"logicalAddress,omitempty" xml:"logicalAddress,omitempty"`
 }
 
 // NewAddRequestBody builds the HTTP request body from the payload of the "add"
 // endpoint of the "firmware" service.
 func NewAddRequestBody(p *firmware.AddPayload) *AddRequestBody {
 	body := &AddRequestBody{
-		Etag:    p.Firmware.Etag,
-		Module:  p.Firmware.Module,
-		Profile: p.Firmware.Profile,
-		URL:     p.Firmware.URL,
-		Meta:    p.Firmware.Meta,
+		Etag:           p.Firmware.Etag,
+		Module:         p.Firmware.Module,
+		Profile:        p.Firmware.Profile,
+		URL:            p.Firmware.URL,
+		Meta:           p.Firmware.Meta,
+		LogicalAddress: p.Firmware.LogicalAddress,
 	}
 	return body
 }

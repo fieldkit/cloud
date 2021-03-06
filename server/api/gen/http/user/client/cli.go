@@ -293,7 +293,7 @@ func BuildAddPayload(userAddBody string) (*user.AddPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Sed et maxime dolore.\",\n      \"meta\": \"Praesentium atque quibusdam tempora assumenda sed eos.\",\n      \"module\": \"Distinctio nesciunt aut.\",\n      \"profile\": \"Cupiditate qui repudiandae et blanditiis dolor mollitia.\",\n      \"url\": \"Quo hic a molestias culpa a pariatur.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Sed et maxime dolore.\",\n      \"logicalAddress\": 5463365086455930586,\n      \"meta\": \"Praesentium atque quibusdam tempora assumenda sed eos.\",\n      \"module\": \"Distinctio nesciunt aut.\",\n      \"profile\": \"Cupiditate qui repudiandae et blanditiis dolor mollitia.\",\n      \"url\": \"Quo hic a molestias culpa a pariatur.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {

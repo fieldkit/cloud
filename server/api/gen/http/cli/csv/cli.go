@@ -1903,11 +1903,12 @@ Add implements add.
 Example:
     `+os.Args[0]+` firmware add --body '{
       "etag": "Sed et maxime dolore.",
+      "logicalAddress": 5463365086455930586,
       "meta": "Praesentium atque quibusdam tempora assumenda sed eos.",
       "module": "Distinctio nesciunt aut.",
       "profile": "Cupiditate qui repudiandae et blanditiis dolor mollitia.",
       "url": "Quo hic a molestias culpa a pariatur."
-   }' --auth "Id debitis veritatis."
+   }' --auth "Debitis veritatis et aut culpa."
 `, os.Args[0])
 }
 
@@ -1922,7 +1923,7 @@ List implements list.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` firmware list --module "Deserunt quo." --profile "Doloribus rerum." --page-size 2004491201 --page 490921409 --auth "Ut qui magnam soluta aut."
+    `+os.Args[0]+` firmware list --module "Doloribus rerum." --profile "Molestiae aut ut qui magnam soluta aut." --page-size 1047767388 --page 335592348 --auth "Qui iure."
 `, os.Args[0])
 }
 
@@ -1934,7 +1935,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` firmware delete --firmware-id 865578418 --auth "Dolor dicta ut laudantium sed harum."
+    `+os.Args[0]+` firmware delete --firmware-id 4287912 --auth "Odit a asperiores incidunt ad expedita quo."
 `, os.Args[0])
 }
 
@@ -1962,7 +1963,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 464552195181664249 --auth "Provident ut odit a asperiores."
+    `+os.Args[0]+` following follow --id 7942372152603716786 --auth "Officiis aut."
 `, os.Args[0])
 }
 
@@ -1974,7 +1975,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 546843751292729022 --auth "Aperiam non hic doloribus officiis."
+    `+os.Args[0]+` following unfollow --id 9190019511314859053 --auth "Nostrum ab ipsam."
 `, os.Args[0])
 }
 
@@ -1986,7 +1987,7 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 6097224833815059954 --page 9190019511314859053
+    `+os.Args[0]+` following followers --id 7195426508497200133 --page 626826205740822816
 `, os.Args[0])
 }
 
@@ -2016,7 +2017,7 @@ ProcessPending implements process pending.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- pending --auth "Necessitatibus enim."
+    `+os.Args[0]+` ingestion process- pending --auth "Aliquam et fuga reprehenderit."
 `, os.Args[0])
 }
 
@@ -2027,7 +2028,7 @@ WalkEverything implements walk everything.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion walk- everything --auth "Aliquam et fuga reprehenderit."
+    `+os.Args[0]+` ingestion walk- everything --auth "Omnis quibusdam voluptas molestiae."
 `, os.Args[0])
 }
 
@@ -2040,7 +2041,7 @@ ProcessStation implements process station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- station --station-id 381220936 --completely true --auth "Molestiae assumenda minus est illum aut occaecati."
+    `+os.Args[0]+` ingestion process- station --station-id 495002195 --completely false --auth "Fuga occaecati ipsa."
 `, os.Args[0])
 }
 
@@ -2052,7 +2053,7 @@ ProcessStationIngestions implements process station ingestions.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- station- ingestions --station-id 6142871618495597190 --auth "Qui repudiandae officiis labore."
+    `+os.Args[0]+` ingestion process- station- ingestions --station-id 7377409353090687153 --auth "Quo odio aut ab odit reiciendis deleniti."
 `, os.Args[0])
 }
 
@@ -2064,7 +2065,7 @@ ProcessIngestion implements process ingestion.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- ingestion --ingestion-id 1543765903224561540 --auth "Deleniti omnis."
+    `+os.Args[0]+` ingestion process- ingestion --ingestion-id 2042349872514196428 --auth "Assumenda tempore corporis ipsa saepe."
 `, os.Args[0])
 }
 
@@ -2076,7 +2077,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion delete --ingestion-id 604561801326987800 --auth "Tempore corporis ipsa saepe quasi molestiae unde."
+    `+os.Args[0]+` ingestion delete --ingestion-id 8199539535745296508 --auth "Sint recusandae quaerat consequatur voluptas."
 `, os.Args[0])
 }
 
@@ -2198,7 +2199,7 @@ Example:
             }
          ]
       }
-   }' --station-id 1576936787 --auth "Autem voluptatibus vero voluptatem."
+   }' --station-id 543942887 --auth "Nihil tempora."
 `, os.Args[0])
 }
 
@@ -2210,7 +2211,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes get --station-id 1870003336 --auth "Vero officiis dolorum."
+    `+os.Args[0]+` notes get --station-id 2055892032 --auth "Animi illo reprehenderit iste accusantium."
 `, os.Args[0])
 }
 
@@ -2222,7 +2223,7 @@ DownloadMedia implements download media.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes download- media --media-id 205992733 --auth "Iste accusantium quam nihil sapiente quo."
+    `+os.Args[0]+` notes download- media --media-id 982472188 --auth "Eaque aut illo ratione debitis aut."
 `, os.Args[0])
 }
 
@@ -2238,7 +2239,7 @@ UploadMedia implements upload media.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` notes upload- media --station-id 1929145430 --key "Ullam vel facere et et aspernatur." --content-type "Exercitationem ut illo dolores rem tempore repellat." --content-length 2509109591793680799 --auth "Aut ut veritatis natus." --stream "goa.png"
+    `+os.Args[0]+` notes upload- media --station-id 1985131334 --key "Vitae aut ut veritatis natus assumenda rem." --content-type "Aut ut." --content-length 7737450927508038431 --auth "Corrupti consequatur." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -2266,7 +2267,7 @@ Required implements required.
     -token STRING: 
 
 Example:
-    `+os.Args[0]+` oidc required --after "Modi sed." --follow true --token "Dolor corporis est dicta repellendus."
+    `+os.Args[0]+` oidc required --after "Rem dolor." --follow false --token "Dicta repellendus impedit quia maiores."
 `, os.Args[0])
 }
 
@@ -2279,7 +2280,7 @@ URL implements url.
     -token STRING: 
 
 Example:
-    `+os.Args[0]+` oidc url --after "Eveniet et omnis." --follow true --token "Error provident odio quos et et."
+    `+os.Args[0]+` oidc url --after "In sunt error provident odio quos." --follow false --token "Corporis magnam tenetur."
 `, os.Args[0])
 }
 
@@ -2292,7 +2293,7 @@ Authenticate implements authenticate.
     -code STRING: 
 
 Example:
-    `+os.Args[0]+` oidc authenticate --state "Quis consectetur ut incidunt pariatur." --session-state "Velit rerum atque cumque omnis repellendus reprehenderit." --code "Velit quasi iste qui."
+    `+os.Args[0]+` oidc authenticate --state "Quae velit rerum." --session-state "Cumque omnis." --code "Reprehenderit aut velit quasi iste."
 `, os.Args[0])
 }
 
@@ -2339,8 +2340,8 @@ AddUpdate implements add update.
 
 Example:
     `+os.Args[0]+` project add- update --body '{
-      "body": "Dolorem deleniti consectetur."
-   }' --project-id 1627402608 --auth "Esse et."
+      "body": "Amet cumque non dolorem deleniti consectetur ducimus."
+   }' --project-id 1175585730 --auth "Et ut perspiciatis eligendi dolores commodi."
 `, os.Args[0])
 }
 
@@ -2353,7 +2354,7 @@ DeleteUpdate implements delete update.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project delete- update --project-id 1103325298 --update-id 7224030971924990168 --auth "Ad voluptatem id aspernatur quisquam."
+    `+os.Args[0]+` project delete- update --project-id 865109096 --update-id 402232007714781764 --auth "Nulla accusantium rerum."
 `, os.Args[0])
 }
 
@@ -2368,8 +2369,8 @@ ModifyUpdate implements modify update.
 
 Example:
     `+os.Args[0]+` project modify- update --body '{
-      "body": "Laudantium qui facere."
-   }' --project-id 1866557782 --update-id 1186079874130622430 --auth "Atque est debitis earum a."
+      "body": "Quia atque est debitis earum a."
+   }' --project-id 196103803 --update-id 5121236479772009392 --auth "Sint et qui sunt sit."
 `, os.Args[0])
 }
 
@@ -2380,7 +2381,7 @@ Invites implements invites.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project invites --auth "Maiores occaecati sed."
+    `+os.Args[0]+` project invites --auth "Accusantium non ipsa omnis dolor sit saepe."
 `, os.Args[0])
 }
 
@@ -2456,6 +2457,7 @@ Add implements add.
 Example:
     `+os.Args[0]+` project add --body '{
       "etag": "Sed et maxime dolore.",
+      "logicalAddress": 5463365086455930586,
       "meta": "Praesentium atque quibusdam tempora assumenda sed eos.",
       "module": "Distinctio nesciunt aut.",
       "profile": "Cupiditate qui repudiandae et blanditiis dolor mollitia.",
@@ -3184,6 +3186,7 @@ Add implements add.
 Example:
     `+os.Args[0]+` user add --body '{
       "etag": "Sed et maxime dolore.",
+      "logicalAddress": 5463365086455930586,
       "meta": "Praesentium atque quibusdam tempora assumenda sed eos.",
       "module": "Distinctio nesciunt aut.",
       "profile": "Cupiditate qui repudiandae et blanditiis dolor mollitia.",

@@ -580,14 +580,15 @@ func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 // type *FirmwareSummaryResponseBody.
 func unmarshalFirmwareSummaryResponseBodyToFirmwareviewsFirmwareSummaryView(v *FirmwareSummaryResponseBody) *firmwareviews.FirmwareSummaryView {
 	res := &firmwareviews.FirmwareSummaryView{
-		ID:          v.ID,
-		Time:        v.Time,
-		Etag:        v.Etag,
-		Module:      v.Module,
-		Profile:     v.Profile,
-		URL:         v.URL,
-		BuildNumber: v.BuildNumber,
-		BuildTime:   v.BuildTime,
+		ID:             v.ID,
+		Time:           v.Time,
+		Etag:           v.Etag,
+		Module:         v.Module,
+		Profile:        v.Profile,
+		URL:            v.URL,
+		BuildNumber:    v.BuildNumber,
+		BuildTime:      v.BuildTime,
+		LogicalAddress: v.LogicalAddress,
 	}
 	res.Meta = make(map[string]interface{}, len(v.Meta))
 	for key, val := range v.Meta {

@@ -16,11 +16,12 @@ import (
 // AddRequestBody is the type of the "firmware" service "add" endpoint HTTP
 // request body.
 type AddRequestBody struct {
-	Etag    *string `form:"etag,omitempty" json:"etag,omitempty" xml:"etag,omitempty"`
-	Module  *string `form:"module,omitempty" json:"module,omitempty" xml:"module,omitempty"`
-	Profile *string `form:"profile,omitempty" json:"profile,omitempty" xml:"profile,omitempty"`
-	URL     *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
-	Meta    *string `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
+	Etag           *string `form:"etag,omitempty" json:"etag,omitempty" xml:"etag,omitempty"`
+	Module         *string `form:"module,omitempty" json:"module,omitempty" xml:"module,omitempty"`
+	Profile        *string `form:"profile,omitempty" json:"profile,omitempty" xml:"profile,omitempty"`
+	URL            *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	Meta           *string `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
+	LogicalAddress *int64  `form:"logicalAddress,omitempty" json:"logicalAddress,omitempty" xml:"logicalAddress,omitempty"`
 }
 
 // ListResponseBody is the type of the "firmware" service "list" endpoint HTTP
@@ -323,15 +324,16 @@ type FirmwareSummaryResponseBodyCollection []*FirmwareSummaryResponseBody
 
 // FirmwareSummaryResponseBody is used to define fields on response body types.
 type FirmwareSummaryResponseBody struct {
-	ID          int32                  `form:"id" json:"id" xml:"id"`
-	Time        string                 `form:"time" json:"time" xml:"time"`
-	Etag        string                 `form:"etag" json:"etag" xml:"etag"`
-	Module      string                 `form:"module" json:"module" xml:"module"`
-	Profile     string                 `form:"profile" json:"profile" xml:"profile"`
-	URL         string                 `form:"url" json:"url" xml:"url"`
-	Meta        map[string]interface{} `form:"meta" json:"meta" xml:"meta"`
-	BuildNumber int32                  `form:"buildNumber" json:"buildNumber" xml:"buildNumber"`
-	BuildTime   int64                  `form:"buildTime" json:"buildTime" xml:"buildTime"`
+	ID             int32                  `form:"id" json:"id" xml:"id"`
+	Time           string                 `form:"time" json:"time" xml:"time"`
+	Etag           string                 `form:"etag" json:"etag" xml:"etag"`
+	Module         string                 `form:"module" json:"module" xml:"module"`
+	Profile        string                 `form:"profile" json:"profile" xml:"profile"`
+	URL            string                 `form:"url" json:"url" xml:"url"`
+	Meta           map[string]interface{} `form:"meta" json:"meta" xml:"meta"`
+	BuildNumber    int32                  `form:"buildNumber" json:"buildNumber" xml:"buildNumber"`
+	BuildTime      int64                  `form:"buildTime" json:"buildTime" xml:"buildTime"`
+	LogicalAddress *int64                 `form:"logicalAddress,omitempty" json:"logicalAddress,omitempty" xml:"logicalAddress,omitempty"`
 }
 
 // NewListResponseBody builds the HTTP response body from the result of the
@@ -582,11 +584,12 @@ func NewDownloadPayload(firmwareID int32) *firmware.DownloadPayload {
 // NewAddPayload builds a firmware service add endpoint payload.
 func NewAddPayload(body *AddRequestBody, auth *string) *firmware.AddPayload {
 	v := &firmware.AddFirmwarePayload{
-		Etag:    *body.Etag,
-		Module:  *body.Module,
-		Profile: *body.Profile,
-		URL:     *body.URL,
-		Meta:    *body.Meta,
+		Etag:           *body.Etag,
+		Module:         *body.Module,
+		Profile:        *body.Profile,
+		URL:            *body.URL,
+		Meta:           *body.Meta,
+		LogicalAddress: *body.LogicalAddress,
 	}
 	res := &firmware.AddPayload{
 		Firmware: v,
@@ -633,6 +636,9 @@ func ValidateAddRequestBody(body *AddRequestBody) (err error) {
 	}
 	if body.Meta == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("meta", "body"))
+	}
+	if body.LogicalAddress == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("logicalAddress", "body"))
 	}
 	return
 }

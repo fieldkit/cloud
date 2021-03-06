@@ -15,6 +15,8 @@ var AddFirmwarePayload = Type("AddFirmwarePayload", func() {
 	Required("url")
 	Attribute("meta")
 	Required("meta")
+	Attribute("logicalAddress", Int64)
+	Required("logicalAddress")
 })
 
 var FirmwareSummary = ResultType("application/vnd.app.firmware+json", func() {
@@ -29,6 +31,7 @@ var FirmwareSummary = ResultType("application/vnd.app.firmware+json", func() {
 		Attribute("meta", MapOf(String, Any))
 		Attribute("buildNumber", Int32)
 		Attribute("buildTime", Int64)
+		Attribute("logicalAddress", Int64)
 		Required("id")
 		Required("time")
 		Required("etag")
@@ -49,6 +52,7 @@ var FirmwareSummary = ResultType("application/vnd.app.firmware+json", func() {
 		Attribute("meta")
 		Attribute("buildNumber")
 		Attribute("buildTime")
+		Attribute("logicalAddress")
 	})
 })
 
