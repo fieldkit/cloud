@@ -50,15 +50,16 @@ func FirmwareSummaryType(fw *data.Firmware) *firmware.FirmwareSummary {
 	}
 
 	return &firmware.FirmwareSummary{
-		ID:          fw.ID,
-		Time:        fw.Time.String(),
-		Module:      fw.Module,
-		Profile:     fw.Profile,
-		Etag:        fw.ETag,
-		URL:         fw.URL,
-		Meta:        metaFields,
-		BuildNumber: buildNumber,
-		BuildTime:   buildTime,
+		ID:             fw.ID,
+		Time:           fw.Time.String(),
+		Module:         fw.Module,
+		Profile:        fw.Profile,
+		Etag:           fw.ETag,
+		URL:            fw.URL,
+		Meta:           metaFields,
+		BuildNumber:    buildNumber,
+		BuildTime:      buildTime,
+		LogicalAddress: fw.LogicalAddress,
 	}
 }
 
@@ -136,17 +137,18 @@ func (s *FirmwareService) Add(ctx context.Context, payload *firmware.AddPayload)
 	log.Infow("add firmware", "etag", payload.Firmware.Etag, "url", payload.Firmware.URL, "module", payload.Firmware.Module, "profile", payload.Firmware.Profile, "meta", metaMap)
 
 	fw := data.Firmware{
-		Time:    time.Now(),
-		Module:  payload.Firmware.Module,
-		Profile: payload.Firmware.Profile,
-		URL:     payload.Firmware.URL,
-		ETag:    payload.Firmware.Etag,
-		Meta:    []byte(payload.Firmware.Meta),
+		Time:           time.Now(),
+		Module:         payload.Firmware.Module,
+		Profile:        payload.Firmware.Profile,
+		URL:            payload.Firmware.URL,
+		ETag:           payload.Firmware.Etag,
+		Meta:           []byte(payload.Firmware.Meta),
+		LogicalAddress: &payload.Firmware.LogicalAddress,
 	}
 
 	if _, err := s.options.Database.NamedExecContext(ctx, `
-		   INSERT INTO fieldkit.firmware (time, module, profile, url, etag, meta)
-		   VALUES (:time, :module, :profile, :url, :etag, :meta)
+		   INSERT INTO fieldkit.firmware (time, module, profile, url, etag, meta, logical_address)
+		   VALUES (:time, :module, :profile, :url, :etag, :meta, :logical_address)
 		   `, fw); err != nil {
 		return err
 	}
