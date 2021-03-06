@@ -352,6 +352,11 @@ func (r *StationRepository) updateDeployedActivityFromStatus(ctx context.Context
 }
 
 func (r *StationRepository) deleteModuleSensorsExcept(ctx context.Context, moduleID int64, keeping []int64) error {
+	if len(keeping) == 0 {
+		log := Logger(ctx).Sugar()
+		log.Warnw("keeping existing module sensors")
+		return nil
+	}
 	if query, args, err := sqlx.In(`
 		DELETE FROM fieldkit.module_sensor WHERE module_id = ? AND id NOT IN (?)
 		`, moduleID, keeping); err != nil {
