@@ -143,7 +143,7 @@ func (s *FirmwareService) Add(ctx context.Context, payload *firmware.AddPayload)
 		URL:            payload.Firmware.URL,
 		ETag:           payload.Firmware.Etag,
 		Meta:           []byte(payload.Firmware.Meta),
-		LogicalAddress: &payload.Firmware.LogicalAddress,
+		LogicalAddress: payload.Firmware.LogicalAddress,
 	}
 
 	if _, err := s.options.Database.NamedExecContext(ctx, `

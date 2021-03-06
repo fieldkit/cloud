@@ -87,7 +87,7 @@ type AddFirmwarePayload struct {
 	Profile        string
 	URL            string
 	Meta           string
-	LogicalAddress int64
+	LogicalAddress *int64
 }
 
 type FirmwareSummaryCollection []*FirmwareSummary

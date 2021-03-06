@@ -21,7 +21,7 @@ type AddRequestBody struct {
 	Profile        string `form:"profile" json:"profile" xml:"profile"`
 	URL            string `form:"url" json:"url" xml:"url"`
 	Meta           string `form:"meta" json:"meta" xml:"meta"`
-	LogicalAddress int64  `form:"logicalAddress" json:"logicalAddress" xml:"logicalAddress"`
+	LogicalAddress *int64 `form:"logicalAddress,omitempty" json:"logicalAddress,omitempty" xml:"logicalAddress,omitempty"`
 }
 
 // ListResponseBody is the type of the "firmware" service "list" endpoint HTTP

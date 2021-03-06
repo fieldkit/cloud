@@ -8632,7 +8632,6 @@ definitions:
     - profile
     - url
     - meta
-    - logicalAddress
   FirmwareAddUnauthorizedResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object

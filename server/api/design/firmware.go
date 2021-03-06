@@ -16,7 +16,6 @@ var AddFirmwarePayload = Type("AddFirmwarePayload", func() {
 	Attribute("meta")
 	Required("meta")
 	Attribute("logicalAddress", Int64)
-	Required("logicalAddress")
 })
 
 var FirmwareSummary = ResultType("application/vnd.app.firmware+json", func() {

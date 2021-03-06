@@ -589,7 +589,7 @@ func NewAddPayload(body *AddRequestBody, auth *string) *firmware.AddPayload {
 		Profile:        *body.Profile,
 		URL:            *body.URL,
 		Meta:           *body.Meta,
-		LogicalAddress: *body.LogicalAddress,
+		LogicalAddress: body.LogicalAddress,
 	}
 	res := &firmware.AddPayload{
 		Firmware: v,
@@ -636,9 +636,6 @@ func ValidateAddRequestBody(body *AddRequestBody) (err error) {
 	}
 	if body.Meta == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("meta", "body"))
-	}
-	if body.LogicalAddress == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("logicalAddress", "body"))
 	}
 	return
 }
