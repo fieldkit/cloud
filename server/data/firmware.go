@@ -17,6 +17,7 @@ type Firmware struct {
 	Meta           types.JSONText `db:"meta"`
 	LogicalAddress *int64         `db:"logical_address"`
 	Available      bool           `db:"available"`
+	Hidden         bool           `db:"hidden"`
 }
 
 func (f *Firmware) GetMeta() (fields map[string]interface{}, err error) {

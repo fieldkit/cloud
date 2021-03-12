@@ -82,7 +82,7 @@ func (s *FirmwareService) Download(ctx context.Context, payload *firmware.Downlo
 
 	firmwares := []*data.Firmware{}
 	if err := s.options.Database.SelectContext(ctx, &firmwares, `
-		SELECT * FROM fieldkit.firmware WHERE id = $1
+		SELECT * FROM fieldkit.firmware WHERE id = $1 AND NOT hidden
 		`, payload.FirmwareID); err != nil {
 		return nil, nil, err
 	}
@@ -191,7 +191,7 @@ func (s *FirmwareService) List(ctx context.Context, payload *firmware.ListPayloa
 		FROM fieldkit.firmware AS f
 		WHERE (f.module = $1 OR $1 IS NULL) AND
 			  (f.profile = $2 OR $2 IS NULL) AND
-			  (f.available OR $5)
+			  (f.available OR $5) AND NOT f.hidden
 		ORDER BY time DESC LIMIT $3 OFFSET $4
 		`, payload.Module, payload.Profile, pageSize, page*pageSize, firmwareTester); err != nil {
 		return nil, err
