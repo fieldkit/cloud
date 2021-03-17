@@ -179,6 +179,28 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 		},
 		&ModuleMeta{
+			Key: "fk.water.dox",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyWaterDo,
+				AllKinds:     []uint32{ConservifyWater},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "dox",
+					FirmwareKey:   "dox",
+					UnitOfMeasure: "mg/L",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 100.0,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
 			Key: "fk.water.do",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
