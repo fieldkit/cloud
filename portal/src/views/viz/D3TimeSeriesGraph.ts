@@ -159,31 +159,41 @@ export const D3TimeSeriesGraph = Vue.extend({
             const line = svg
                 .selectAll(".d3-line")
                 .data(charts)
-                .join((enter) => {
-                    const adding = enter
-                        .append("g")
-                        .attr("class", "svg-container-responsive d3-line")
-                        .attr("clip-path", "url(#clip-" + this.viz.id + ")");
+                .join(
+                    (enter) => {
+                        const adding = enter
+                            .append("g")
+                            .attr("class", "svg-container-responsive d3-line")
+                            .attr("clip-path", "url(#clip-" + this.viz.id + ")");
 
-                    adding
-                        .append("linearGradient")
-                        .attr("id", this.viz.id + "-line-style")
-                        .attr("gradientUnits", "userSpaceOnUse")
-                        .attr("x1", 0)
-                        .attr("y1", y(dataRange[0]))
-                        .attr("x2", 0)
-                        .attr("y2", y(dataRange[1]))
-                        .selectAll("stop")
-                        .data(stops)
-                        .join((enter) =>
-                            enter
-                                .append("stop")
-                                .attr("offset", (d) => d.offset)
-                                .attr("stop-color", (d) => d.color)
-                        );
+                        const lg = adding
+                            .append("linearGradient")
+                            .attr("id", this.viz.id + "-line-style")
+                            .attr("class", "d3-line-style")
+                            .attr("gradientUnits", "userSpaceOnUse")
+                            .attr("x1", 0)
+                            .attr("y1", y(dataRange[0]))
+                            .attr("x2", 0)
+                            .attr("y2", y(dataRange[1]))
+                            .selectAll("stop")
+                            .data(stops)
+                            .join((enter) => enter.append("stop"))
+                            .attr("offset", (d) => d.offset)
+                            .attr("stop-color", (d) => d.color);
 
-                    return adding;
-                });
+                        return adding;
+                    },
+                    (update) => {
+                        update
+                            .selectAll("stop")
+                            .data(stops)
+                            .join((enter) => enter.append("stop"))
+                            .attr("offset", (d) => d.offset)
+                            .attr("stop-color", (d) => d.color);
+
+                        return update;
+                    }
+                );
 
             const lineFn = d3
                 .line()
