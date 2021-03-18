@@ -108,10 +108,13 @@ export const ViewingControls = Vue.extend({
         },
         raiseChangeSensor(node: TreeOption): void {
             const station = this.viz.chartParams.sensorParams.stations[0];
-            console.log("raising viz-change-sensors");
-            vueTickHack(() => {
-                this.$emit("viz-change-sensors", new NewParams(station, Number(node.id)));
-            });
+            console.log(node);
+            if (node.sensorParams) {
+                console.log("raising viz-change-sensors");
+                vueTickHack(() => {
+                    this.$emit("viz-change-sensors", new NewParams(station, Number(node.id)));
+                });
+            }
         },
         raiseChangeChartType(chartType: string): void {
             console.log("raising viz-change-chart");
@@ -157,8 +160,8 @@ export const ViewingControls = Vue.extend({
 			</div>
 			<div class="row row-2">
 				<div class="left tree">
-					<treeselect v-if="stationOptions.length" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" />
-					<treeselect v-if="sensorOptions.length" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" />
+					<treeselect v-if="stationOptions.length" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" />
+					<treeselect v-if="sensorOptions.length" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="1" :clearable="false" />
 					<div v-if="stationOptions.length == 0 || sensorOptions.length == 0" class="loading-options">Loading Options</div>
 				</div>
 

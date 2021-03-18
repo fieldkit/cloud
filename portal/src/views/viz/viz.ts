@@ -24,11 +24,11 @@ export interface HasSensorParams {
     readonly sensorParams: SensorParams;
 }
 
-export class TreeOption implements HasSensorParams {
+export class TreeOption {
     constructor(
         public readonly id: string | number,
         public readonly label: string,
-        public readonly sensorParams: SensorParams,
+        public readonly sensorParams: SensorParams | null,
         public readonly children: TreeOption[] | undefined = undefined
     ) {}
 }
@@ -580,11 +580,29 @@ export class Workspace {
 
     public get sensorOptions(): TreeOption[] {
         const allSensors = _.flatten(Object.values(this.stations).map((station) => station.sensors));
-        const uniqueSensors = _.uniqBy(allSensors, (sensor) => sensor.id);
-        return uniqueSensors.map((sensor) => {
-            const sp = new SensorParams([], [sensor.id]);
-            const label = i18n.tc(sensor.name) || sensor.name;
-            return new TreeOption(sensor.id, label, sp);
+        const allModulesBySensorKey = _.fromPairs(_.flatten(this.meta.modules.map((m) => m.sensors.map((s) => [s.fullKey, m]))));
+        const visibleModules = _.uniqBy(
+            allSensors.map((s) => allModulesBySensorKey[s.name]),
+            (m) => m.key
+        );
+        const sensorsByKey = _.keyBy(_.flatten(Object.values(this.stations).map((station) => station.sensors)), (s) => s.name);
+
+        return visibleModules.map((m) => {
+            const children: TreeOption[] = _.flatten(
+                m.sensors
+                    .map((sensor) => sensor.fullKey)
+                    .map((sensorKey) => {
+                        const sensor = sensorsByKey[sensorKey];
+                        if (sensor) {
+                            const sp = new SensorParams([], [sensor.id]);
+                            const label = i18n.tc(sensor.name) || sensor.name;
+                            return [new TreeOption(sensor.id, label, sp)];
+                        }
+                        return [];
+                    })
+            );
+
+            return new TreeOption(m.key, i18n.tc(m.key), null, children);
         });
     }
 

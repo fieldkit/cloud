@@ -46,9 +46,15 @@ function loadLocaleMessages(): LocaleMessages {
         .fromPairs()
         .value();
 
-    console.log(keys);
+    const moduleKeys = _((messages.en.modules as unknown) as Record<string, ModuleLocales>)
+        .map((m, moduleKey) => {
+            return ["fk." + moduleKey, m.name];
+        })
+        .fromPairs()
+        .value();
 
     Object.assign(messages.en, keys);
+    Object.assign(messages.en, moduleKeys);
 
     return messages;
 }
