@@ -46,6 +46,8 @@ function loadLocaleMessages(): LocaleMessages {
         .fromPairs()
         .value();
 
+    console.log(keys);
+
     Object.assign(messages.en, keys);
 
     return messages;

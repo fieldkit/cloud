@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
 import { Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
+import i18n from "@/i18n";
 import FKApi from "@/api/api";
 
 export * from "./common";
@@ -582,7 +583,8 @@ export class Workspace {
         const uniqueSensors = _.uniqBy(allSensors, (sensor) => sensor.id);
         return uniqueSensors.map((sensor) => {
             const sp = new SensorParams([], [sensor.id]);
-            return new TreeOption(sensor.id, sensor.name, sp);
+            const label = i18n.tc(sensor.name) || sensor.name;
+            return new TreeOption(sensor.id, label, sp);
         });
     }
 
