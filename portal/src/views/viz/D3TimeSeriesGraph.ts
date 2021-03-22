@@ -75,7 +75,26 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .domain(data.dataRange)
                 .range([layout.height - (layout.margins.bottom + layout.margins.top), layout.margins.top]);
 
-            const xAxis = d3.axisBottom(x).ticks(10);
+            const timeRangeSeconds = (timeRange[1] - timeRange[0]) / 1000 / 1;
+
+            function tickFormatter(date: Date, tick: number, els: unknown[]) {
+                if (tick == 0 || tick == els.length - 1) {
+                    return d3.timeFormat("%-m/%-d %-I:%M")(date);
+                }
+
+                const TwoDaysSeconds = 86400 * 2;
+                if (timeRangeSeconds > TwoDaysSeconds) {
+                    return d3.timeFormat("%-m/%-d %-I:%M")(date);
+                }
+
+                return d3.timeFormat("%-I:%M")(date);
+            }
+
+            const xAxis = d3
+                .axisBottom(x)
+                .ticks(11)
+                .scale(x)
+                .tickFormat(tickFormatter);
 
             const yAxis = d3.axisLeft(y).ticks(6);
 
