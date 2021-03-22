@@ -76,7 +76,7 @@ func (r *RecordRepository) AddMetaRecord(ctx context.Context, p *data.Provision,
 	metaTime := i.Time
 
 	if sr.Time > 0 {
-		metaTime = time.Unix(sr.Time, 0)
+		metaTime = time.Unix(sr.Time, 0).UTC()
 	}
 
 	metaRecord := &data.MetaRecord{
@@ -183,7 +183,7 @@ func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision,
 
 	dataTime := i.Time
 	if dr.Readings.Time > 0 {
-		dataTime = time.Unix(int64(dr.Readings.Time), 0)
+		dataTime = time.Unix(int64(dr.Readings.Time), 0).UTC()
 	}
 
 	location, err := r.findLocation(dr)
