@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	AggregateNames = []string{"24h", "12h", "6h", "1h", "30m", "10m", "1m"}
+	AggregateNames = []string{"24h", "12h", "6h", "1h", "30m", "10m", "1m", "10s"}
 )
 
 var (
@@ -26,6 +26,7 @@ var (
 		"30m": "fieldkit.aggregated_30m",
 		"10m": "fieldkit.aggregated_10m",
 		"1m":  "fieldkit.aggregated_1m",
+		"10s": "fieldkit.aggregated_10s",
 	}
 	AggregateTimeGroupThresholds = map[string]int{
 		"24h": 86400 * 2,
@@ -35,6 +36,7 @@ var (
 		"30m": 3600 * 2,
 		"10m": 30 * 60,
 		"1m":  2 * 60,
+		"10s": 30,
 	}
 	AggregateIntervals = map[string]int32{
 		"24h": 86400,
@@ -44,6 +46,7 @@ var (
 		"30m": 30 * 60,
 		"10m": 10 * 60,
 		"1m":  60,
+		"10s": 10,
 	}
 )
 
@@ -149,8 +152,15 @@ func NewAggregator(db *sqlxcache.DB, stationID int32, batchSize int) *Aggregator
 			make([]*Aggregated, 0, batchSize),
 			make([]*Aggregated, 0, batchSize),
 			make([]*Aggregated, 0, batchSize),
+			make([]*Aggregated, 0, batchSize),
 		},
 		aggregations: []*aggregation{
+			&aggregation{
+				interval: time.Second * 10,
+				name:     "10s",
+				table:    "fieldkit.aggregated_10s",
+				values:   make(map[string][]float64),
+			},
 			&aggregation{
 				interval: time.Minute * 1,
 				name:     "1m",
