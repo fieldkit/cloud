@@ -20,6 +20,12 @@
                 "do": "DO"
             }
         },
+        "water.dox": {
+            "name": "Water Dissolved Oxygen",
+            "sensors": {
+                "dox": "DO"
+            }
+        },
         "water.temp": {
             "name": "Water Temperature",
             "sensors": {
