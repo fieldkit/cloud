@@ -279,7 +279,6 @@ export default Vue.extend({
 .controls-container .row-2 {
     margin-top: 5px;
     padding: 10px;
-    align-items: top;
 }
 
 .controls-container .tree {
@@ -295,6 +294,10 @@ export default Vue.extend({
     display: flex;
     justify-content: center;
     align-items: baseline;
+}
+
+.controls-container .row-2 .right {
+    flex-basis: 10%;
 }
 
 .controls-container .right {

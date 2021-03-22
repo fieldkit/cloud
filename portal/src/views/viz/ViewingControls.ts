@@ -25,25 +25,25 @@ export const ViewingControls = Vue.extend({
         Spinner,
     },
     data(): {
-        chartTypes: { label: string; value: ChartType }[];
+        chartTypes: { label: string; id: ChartType }[];
     } {
         return {
             chartTypes: [
                 {
                     label: "Time Series",
-                    value: ChartType.TimeSeries,
+                    id: ChartType.TimeSeries,
                 },
                 {
                     label: "Histogram",
-                    value: ChartType.Histogram,
+                    id: ChartType.Histogram,
                 },
                 {
                     label: "Range",
-                    value: ChartType.Range,
+                    id: ChartType.Range,
                 },
                 {
                     label: "Map",
-                    value: ChartType.Map,
+                    id: ChartType.Map,
                 },
             ],
         };
@@ -108,7 +108,6 @@ export const ViewingControls = Vue.extend({
         },
         raiseChangeSensor(node: TreeOption): void {
             const station = this.viz.chartParams.sensorParams.stations[0];
-            console.log(node);
             if (node.sensorParams) {
                 console.log("raising viz-change-sensors");
                 vueTickHack(() => {
@@ -116,9 +115,11 @@ export const ViewingControls = Vue.extend({
                 });
             }
         },
-        raiseChangeChartType(chartType: string): void {
-            console.log("raising viz-change-chart");
-            this.$emit("viz-change-chart", Number(chartType));
+        raiseChangeChartType(option: { id: ChartType }): void {
+            console.log("raising viz-change-chart", option.id);
+            vueTickHack(() => {
+                this.$emit("viz-change-chart", Number(option.id));
+            });
         },
         raiseManualTime(fromPicker): void {
             if (fromPicker) {
@@ -166,11 +167,7 @@ export const ViewingControls = Vue.extend({
 				</div>
 
 				<div class="right chart-type">
-					<select v-on:change="(ev) => raiseChangeChartType(ev.target.value)" :value="viz.chartType">
-						<option v-for="chartOption in chartTypes" v-bind:value="chartOption.value" v-bind:key="chartOption.value">
-							{{ chartOption.label }}
-						</option>
-					</select>
+					<treeselect v-if="stationOptions.length" :options="chartTypes" :value="viz.chartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
 				</div>
 			</div>
 		</div>
