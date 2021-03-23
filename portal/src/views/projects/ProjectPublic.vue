@@ -268,7 +268,7 @@ export default {
     font-family: $font-family-light;
     margin-bottom: 9px;
     line-height: 1.5;
-    word-break: break-all;
+    overflow-wrap: anywhere;
 }
 
 .photo-container {
@@ -588,6 +588,6 @@ export default {
     white-space: break-spaces;
     display: flex;
     align-items: baseline;
-    word-break: break-all;
+    overflow-wrap: anywhere;
 }
 </style>

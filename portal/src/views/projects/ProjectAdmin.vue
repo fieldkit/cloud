@@ -388,7 +388,7 @@ export default {
 }
 .project-detail {
     font-family: $font-family-light;
-    word-break: break-all;
+    overflow-wrap: anywhere;
 
     &:not(:last-of-type) {
         padding-bottom: 6px;
@@ -406,6 +406,6 @@ export default {
     white-space: break-spaces;
     display: flex;
     align-items: baseline;
-    word-break: break-all;
+    overflow-wrap: anywhere;
 }
 </style>
