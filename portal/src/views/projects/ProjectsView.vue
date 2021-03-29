@@ -3,11 +3,11 @@
         <div class="projects-view">
             <div class="container mine">
                 <div class="header">
-                    <h1 v-if="isAuthenticated">My Projects</h1>
-                    <h1 v-if="!isAuthenticated">Projects</h1>
+                    <h1 v-if="isAuthenticated">{{ $t("projects.title.mine") }}</h1>
+                    <h1 v-if="!isAuthenticated">{{ $t("projects.title.anonymous") }}</h1>
                     <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
                         <img alt="Add project" src="@/assets/icon-plus-round.svg" />
-                        <span>Add Project</span>
+                        <span>{{ $t("projects.add") }}</span>
                     </div>
                 </div>
 
@@ -16,7 +16,7 @@
             </div>
             <div class="container community">
                 <div class="header">
-                    <h1>Community Projects</h1>
+                    <h1>{{ $t("projects.title.community") }}</h1>
                 </div>
                 <ProjectThumbnails :projects="publicProjects" />
             </div>

@@ -12,12 +12,12 @@
 
             <div class="right">
                 <div class="details-heading">
-                    <div class="title">Project Details</div>
-                    <div v-on:click="editProject" class="link">Edit Project</div>
+                    <div class="title">{{ $t("project.details.title") }}</div>
+                    <div v-on:click="editProject" class="link">{{ $t("project.edit.link") }}</div>
                 </div>
                 <div class="details-top">
                     <div class="details-left">
-                        <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
+                        <div class="project-detail" v-if="project.goal">{{ $t("project.goal", { goal: project.goal }) }}</div>
                         <div class="project-detail">{{ project.description }}</div>
                     </div>
                     <div class="details-right">
@@ -25,25 +25,25 @@
                             <div class="details-icon-container">
                                 <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" width="14px" height="14px" />
                             </div>
-                            <template>Started: {{ project.startTime | prettyDate }}</template>
+                            <template>{{ $t("project.started", { started: project.startTime }) }}</template>
                         </div>
                         <div class="details-row" v-if="displayProject.duration">
                             <div class="details-icon-container">
                                 <img alt="Location" src="@/assets/icon-time.svg" class="icon" width="14px" height="14px" />
                             </div>
-                            <template>{{ displayProject.duration | prettyDuration }}</template>
+                            <template>{{ $t("project.duration", { duration: displayProject.duration }) }}</template>
                         </div>
                         <div class="details-row location-name" v-if="project.location" width="12px" height="14px">
                             <div class="details-icon-container">
                                 <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
                             </div>
-                            <template>{{ project.location }}</template>
+                            <template>{{ $t("project.location", { location: project.location }) }}</template>
                         </div>
                         <div class="details-row location-native" v-if="displayProject.places.native">
                             <div class="details-icon-container">
                                 <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="12px" height="14px" />
                             </div>
-                            <template>Native Lands: {{ displayProject.places.native }}</template>
+                            <template>{{ $t("project.nativeLands", { nativeLands: displayProject.places.native }) }}</template>
                         </div>
                     </div>
                 </div>

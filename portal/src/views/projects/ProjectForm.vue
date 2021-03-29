@@ -1,8 +1,8 @@
 <template>
     <div class="form-edit">
         <div class="header-row">
-            <h2 v-if="!project">New Project</h2>
-            <h2 v-if="project && project.id">Edit Project</h2>
+            <h2 v-if="!project">{{ $t("project.create.title") }}</h2>
+            <h2 v-if="project && project.id">{{ $t("project.edit.title") }}</h2>
 
             <div class="close-form-button" v-on:click="closeForm">
                 <img alt="Close" src="@/assets/icon-close.svg" />
@@ -14,24 +14,24 @@
                 <TextField v-model="form.name" label="Project Name" />
 
                 <div class="validation-errors" v-if="$v.form.name.$error">
-                    <div v-if="!$v.form.name.required">Name is a required field.</div>
-                    <div v-if="!$v.form.name.maxLength">This field has a limit of 100 characters.</div>
+                    <div v-if="!$v.form.name.required">{{ $t("project.form.name.required") }}</div>
+                    <div v-if="!$v.form.name.maxLength">{{ $t("project.form.name.maxLength") }}</div>
                 </div>
             </div>
             <div class="outer-input-container">
                 <TextField v-model="form.description" label="Short Description" />
 
                 <div class="validation-errors" v-if="$v.form.description.$error">
-                    <div v-if="!$v.form.description.required">This is a required field.</div>
-                    <div v-if="!$v.form.description.maxLength">This field has a limit of 100 characters.</div>
+                    <div v-if="!$v.form.description.required">{{ $t("project.form.description.required") }}</div>
+                    <div v-if="!$v.form.description.maxLength">{{ $t("project.form.description.maxLength") }}</div>
                 </div>
             </div>
             <div class="outer-input-container">
                 <TextField v-model="form.goal" label="Project Goal" />
 
                 <div class="validation-errors" v-if="$v.form.goal.$error">
-                    <div v-if="!$v.form.goal.required">Project goal is a required field.</div>
-                    <div v-if="!$v.form.goal.maxLength">This field has a limit of 100 characters.</div>
+                    <div v-if="!$v.form.goal.required">{{ $t("project.form.goal.required") }}</div>
+                    <div v-if="!$v.form.goal.maxLength">{{ $t("project.form.goal.maxLength") }}</div>
                 </div>
             </div>
             <div class="image-container">
@@ -41,8 +41,8 @@
                 <TextField v-model="form.location" label="Location" />
 
                 <div class="validation-errors" v-if="$v.form.location.$error">
-                    <div v-if="!$v.form.location.required">Location is a required field.</div>
-                    <div v-if="!$v.form.location.maxLength">This field has a limit of 100 characters.</div>
+                    <div v-if="!$v.form.location.required">{{ $t("project.form.location.required") }}</div>
+                    <div v-if="!$v.form.location.maxLength">{{ $t("project.form.location.maxLength") }}</div>
                 </div>
             </div>
 
@@ -53,13 +53,13 @@
                     </div>
                     <v-date-picker :value="form.pickedStart" @input="updateStart" :popover="{ placement: 'auto', visibility: 'click' }">
                         <button type="button">
-                            <img alt="Calendar" src="@/assets/icon-calendar-gray.svg" />
+                            <img :alt="$t('project.form.startTime.alt')" src="@/assets/icon-calendar-gray.svg" />
                         </button>
                     </v-date-picker>
                 </div>
 
                 <div class="validation-errors" v-if="$v.form.startTime.$error">
-                    <div v-if="!$v.form.startTime.date">Please enter a valid date.</div>
+                    <div v-if="!$v.form.startTime.date">{{ $t("project.form.startTime.date") }}</div>
                 </div>
 
                 <div class="date-container">
@@ -68,14 +68,14 @@
                     </div>
                     <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'auto', visibility: 'click' }">
                         <button type="button">
-                            <img alt="Calendar" src="@/assets/icon-calendar-gray.svg" />
+                            <img :alt="$t('project.form.endTime.alt')" src="@/assets/icon-calendar-gray.svg" />
                         </button>
                     </v-date-picker>
                 </div>
 
                 <div class="validation-errors" v-if="$v.form.endTime.$error">
-                    <div v-if="!$v.form.endTime.date">Please enter a valid date.</div>
-                    <div v-if="!$v.form.endTime.minValue">Please enter a date after the start date.</div>
+                    <div v-if="!$v.form.endTime.date">{{ $t("project.form.endTime.date") }}</div>
+                    <div v-if="!$v.form.endTime.minValue">{{ $t("project.form.endTime.minValue") }}</div>
                 </div>
             </div>
 
@@ -91,13 +91,13 @@
                 />
 
                 <div class="validation-errors" v-if="$v.form.tags.$error">
-                    <div v-if="!$v.form.tags.maxLength">This field has a limit of 100 characters.</div>
+                    <div v-if="!$v.form.tags.maxLength">{{ $t("project.form.tags.maxLength") }}</div>
                 </div>
             </div>
             <div class="privacy">
                 <div class="checkbox">
                     <label>
-                        Make this project public
+                        {{ $t("project.form.makePublic") }}
                         <input type="checkbox" id="checkbox" v-model="form.public" />
                         <span class="checkbox-btn"></span>
                     </label>
@@ -107,20 +107,20 @@
                     <label class="radio">
                         <input type="radio" id="privacy" value="1" v-model="form.privacy" />
                         <span class="radio-btn"></span>
-                        Show exact location of stations
+                        {{ $t("project.form.showExact") }}
                     </label>
                     <label class="radio">
                         <input type="radio" id="privacy" value="2" v-model="form.privacy" />
                         <span class="radio-btn"></span>
-                        Show general location of stations
+                        {{ $t("project.form.showGeneral") }}
                     </label>
                 </div>
             </div>
             <div class="action-container">
-                <button class="btn" v-if="!project" type="submit">Add project</button>
-                <button class="btn" v-if="project && project.id" type="submit">Save updates</button>
+                <button class="btn" v-if="!project" type="submit">{{ $t("project.form.saveNew") }}</button>
+                <button class="btn" v-if="project && project.id" type="submit">{{ $t("project.form.saveChanges") }}</button>
                 <button v-if="project && project.id" class="btn btn-delete" type="submit" v-on:click.prevent="deleteProject">
-                    Delete Project
+                    {{ $t("project.form.delete.link") }}
                 </button>
             </div>
         </form>

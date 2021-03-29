@@ -6,9 +6,14 @@
             </div>
         </div>
         <div class="header">
-            <div class="title">Add Station</div>
+            <div class="title">{{ $t("project.stations.add") }}</div>
             <div class="search">
-                <input v-model="search" label="Search" @input="onSearch(search)" placeholder="Search Stations" />
+                <input
+                    v-model="search"
+                    :label="$t('project.stations.search')"
+                    @input="onSearch(search)"
+                    :placeholder="$t('project.stations.search')"
+                />
             </div>
         </div>
         <div class="main">
@@ -18,7 +23,7 @@
         </div>
         <PaginationControls :page="paging.number" :totalPages="totalPages()" @new-page="onNewPage" />
         <div class="footer">
-            <div class="button" v-on:click="onAdd" v-bind:class="{ enabled: selected }">Add Station</div>
+            <div class="button" v-on:click="onAdd" v-bind:class="{ enabled: selected }">{{ $t("project.stations.add") }}</div>
         </div>
     </div>
 </template>

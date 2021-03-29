@@ -4,14 +4,14 @@
             <div class="project-view" v-if="displayProject">
                 <DoubleHeader
                     :title="isAdministrator ? displayProject.name : null"
-                    :subtitle="isAdministrator ? 'Project Dashboard' : null"
-                    backTitle="Back to Dashboard"
+                    :subtitle="isAdministrator ? $t('project.dashboard') : null"
+                    :backTitle="$t('layout.backDashboard')"
                     backRoute="projects"
                     v-if="displayProject"
                 >
                     <div class="activity-button" v-if="isAdministrator" v-on:click="onActivityToggle">
                         <img alt="Notifification" src="@/assets/icon-notification.svg" class="icon" />
-                        Activity
+                        {{ $t("project.activity") }}
                     </div>
                 </DoubleHeader>
 
