@@ -35,7 +35,8 @@
                                     <button @click="deleteComment(post.id)">Delete Post</button>
                                 </div>
                             </span>
-                            <input type="text" class="body" v-model="post.body" :readonly="post.readonly" />
+                            <div v-if="post.readonly">{{ post.body }}</div>
+                            <input v-else type="text" class="body" v-model="post.body" :readonly="post.readonly" />
                             <button type="submit" class="new-comment-submit" v-if="!post.readonly" @click="saveEdit(post.id, post.body)">
                                 Save
                             </button>
@@ -59,7 +60,8 @@
                                                 <button @click="deleteComment(reply.id)">Delete Post</button>
                                             </div>
                                         </span>
-                                        <input type="text" class="body" v-model="reply.body" :readonly="reply.readonly" />
+                                        <div v-if="reply.readonly">{{ reply.body }}</div>
+                                        <input v-else type="text" class="body" v-model="reply.body" :readonly="reply.readonly" />
                                         <button
                                             type="submit"
                                             class="new-comment-submit"
