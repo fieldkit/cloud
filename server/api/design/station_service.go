@@ -280,12 +280,11 @@ var _ = Service("station", func() {
 
 	Method("get", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
 			Attribute("id", Int32)
 			Required("id")
 		})
@@ -366,6 +365,7 @@ var _ = Service("station", func() {
 
 	Method("list project", func() {
 		Security(JWTAuth, func() {
+			// Optional
 		})
 
 		Payload(func() {

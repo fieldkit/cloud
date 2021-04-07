@@ -128,7 +128,7 @@ func TestUpdateProjectWhenNotMember(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	user, err := e.AddUser()
+	nonMember, err := e.AddUser()
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)
@@ -146,7 +146,7 @@ func TestUpdateProjectWhenNotMember(t *testing.T) {
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/projects/%d", fd.Project.ID), bytes.NewReader(payload))
-	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(nonMember))
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusForbidden, rr.Code)

@@ -1972,7 +1972,7 @@ func NewAddPayload(body *AddRequestBody, auth string) *station.AddPayload {
 }
 
 // NewGetPayload builds a station service get endpoint payload.
-func NewGetPayload(id int32, auth string) *station.GetPayload {
+func NewGetPayload(id int32, auth *string) *station.GetPayload {
 	v := &station.GetPayload{}
 	v.ID = id
 	v.Auth = auth

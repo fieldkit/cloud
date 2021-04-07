@@ -94,7 +94,7 @@ type StationFull struct {
 
 // GetPayload is the payload type of the station service get method.
 type GetPayload struct {
-	Auth string
+	Auth *string
 	ID   int32
 }
 

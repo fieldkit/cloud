@@ -376,7 +376,7 @@ func ParseEndpoint(
 		projectDownloadPhotoProjectIDFlag   = projectDownloadPhotoFlags.String("project-id", "REQUIRED", "")
 		projectDownloadPhotoSizeFlag        = projectDownloadPhotoFlags.String("size", "", "")
 		projectDownloadPhotoIfNoneMatchFlag = projectDownloadPhotoFlags.String("if-none-match", "", "")
-		projectDownloadPhotoAuthFlag        = projectDownloadPhotoFlags.String("auth", "REQUIRED", "")
+		projectDownloadPhotoAuthFlag        = projectDownloadPhotoFlags.String("auth", "", "")
 
 		recordsFlags = flag.NewFlagSet("records", flag.ContinueOnError)
 
@@ -424,7 +424,7 @@ func ParseEndpoint(
 
 		stationGetFlags    = flag.NewFlagSet("get", flag.ExitOnError)
 		stationGetIDFlag   = stationGetFlags.String("id", "REQUIRED", "")
-		stationGetAuthFlag = stationGetFlags.String("auth", "REQUIRED", "")
+		stationGetAuthFlag = stationGetFlags.String("auth", "", "")
 
 		stationTransferFlags       = flag.NewFlagSet("transfer", flag.ExitOnError)
 		stationTransferIDFlag      = stationTransferFlags.String("id", "REQUIRED", "")

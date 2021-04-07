@@ -26,6 +26,19 @@ func (pr *ProjectRepository) AddDefaultProject(ctx context.Context, user *data.U
 	return pr.AddProject(ctx, user.ID, project)
 }
 
+func (pr *ProjectRepository) QueryProjectsByStationIDForPermissions(ctx context.Context, stationID int32) (projects []*data.Project, err error) {
+	projects = []*data.Project{}
+	if err := pr.db.SelectContext(ctx, &projects, `
+		SELECT p.id, p.name, p.description, p.goal, p.location, p.tags, p.privacy, p.start_time, p.end_time
+		FROM fieldkit.project AS p
+		JOIN fieldkit.project_station AS ps ON (p.id = ps.project_id)
+		WHERE ps.station_id = $1
+		`, stationID); err != nil {
+		return nil, err
+	}
+	return projects, nil
+}
+
 func (pr *ProjectRepository) AddProject(ctx context.Context, userID int32, project *data.Project) (*data.Project, error) {
 	if err := pr.db.NamedGetContext(ctx, project, `
 		INSERT INTO fieldkit.project (name, description, goal, location, tags, privacy, start_time, end_time) VALUES

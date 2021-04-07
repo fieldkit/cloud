@@ -2363,10 +2363,6 @@ paths:
       tags:
       - project
       summary: download photo project
-      description: |2-
-
-        **Required security scopes for jwt**:
-          * `api:access`
       operationId: project#download photo
       parameters:
       - name: size
@@ -2386,7 +2382,7 @@ paths:
       - name: Authorization
         in: header
         description: authentication token
-        required: true
+        required: false
         type: string
         pattern: ^Bearer [^ ]+$
       responses:
@@ -3363,10 +3359,6 @@ paths:
       tags:
       - station
       summary: get station
-      description: |2-
-
-        **Required security scopes for jwt**:
-          * `api:access`
       operationId: station#get
       parameters:
       - name: id
@@ -3377,7 +3369,7 @@ paths:
       - name: Authorization
         in: header
         description: authentication token
-        required: true
+        required: false
         type: string
         pattern: ^Bearer [^ ]+$
       responses:

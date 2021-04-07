@@ -104,26 +104,7 @@ func TestLocation_PrivateProject_AnonymousGet(t *testing.T) {
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d/stations", fd.Project.ID), nil)
 	rr := tests.ExecuteRequest(req, api)
 
-	assert.Equal(http.StatusOK, rr.Code)
-
-	ja := jsonassert.New(t)
-	ja.Assertf(rr.Body.String(), `
-	{
-		"stations": [
-			{
-				"id": "<<PRESENCE>>",
-				"updatedAt": "<<PRESENCE>>",
-				"owner": "<<PRESENCE>>",
-				"deviceId": "<<PRESENCE>>",
-				"uploads": "<<PRESENCE>>",
-				"name": "<<PRESENCE>>",
-				"photos": null,
-				"readOnly": "<<PRESENCE>>",
-				"location": {},
-				"configurations": { "all": [] }
-			}
-		]
-	}`)
+	assert.Equal(http.StatusForbidden, rr.Code)
 }
 
 func TestLocation_PrivateProject_MemberGet(t *testing.T) {

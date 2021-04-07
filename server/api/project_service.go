@@ -180,19 +180,9 @@ func (c *ProjectService) RemoveStation(ctx context.Context, payload *project.Rem
 }
 
 func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (*project.Project, error) {
+	log := Logger(ctx).Sugar()
+
 	relationships := make(map[int32]*data.UserProjectRelationship)
-
-	p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err == nil {
-		relationships, err = c.projects.QueryUserProjectRelationships(ctx, p.UserID())
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if relationships[payload.ProjectID] == nil {
-		relationships[payload.ProjectID] = &data.UserProjectRelationship{}
-	}
 
 	getting := &data.Project{}
 	if err := c.options.Database.GetContext(ctx, getting, `
@@ -202,6 +192,30 @@ func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (
 			return nil, project.MakeNotFound(errors.New("not found"))
 		}
 		return nil, err
+	}
+
+	if getting.Privacy != data.Public {
+		log.Infow("checking", "privacy", getting.Privacy)
+
+		p, err := NewPermissions(ctx, c.options).ForProject(getting)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := p.CanView(); err != nil {
+			return nil, err
+		}
+
+		relationships, err = c.projects.QueryUserProjectRelationships(ctx, p.UserID())
+		if err != nil {
+			return nil, err
+		}
+
+		if relationships[payload.ProjectID] == nil {
+			relationships[payload.ProjectID] = &data.UserProjectRelationship{}
+		}
+	} else {
+		log.Infow("allowing", "privacy", getting.Privacy)
 	}
 
 	followerSummaries := []*data.FollowersSummary{}
@@ -223,7 +237,10 @@ func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.Lis
 	relationships := make(map[int32]*data.UserProjectRelationship)
 
 	p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err == nil {
+	if err != nil {
+		return nil, err
+	}
+	if !p.Anonymous() {
 		relationships, err = c.projects.QueryUserProjectRelationships(ctx, p.UserID())
 		if err != nil {
 			return nil, err
@@ -810,11 +827,23 @@ func (s *ProjectService) UploadPhoto(ctx context.Context, payload *project.Uploa
 }
 
 func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.DownloadPhotoPayload) (*project.DownloadedPhoto, error) {
+	// TODO Maybe make a separate type with fewer columns?
 	resource := &data.Project{}
 	if err := s.options.Database.GetContext(ctx, resource, `
-		SELECT media_url, media_content_type FROM fieldkit.project WHERE id = $1
+		SELECT id, privacy, media_url, media_content_type FROM fieldkit.project WHERE id = $1
 		`, payload.ProjectID); err != nil {
 		return nil, err
+	}
+
+	if resource.Privacy != data.Public {
+		p, err := NewPermissions(ctx, s.options).ForProjectByID(payload.ProjectID)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := p.CanView(); err != nil {
+			return nil, err
+		}
 	}
 
 	if resource.MediaURL == nil || resource.MediaContentType == nil {
@@ -881,7 +910,14 @@ func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *secu
 }
 
 func ProjectType(signer *Signer, dm *data.Project, numberOfFollowers int32, userRelationship *data.UserProjectRelationship) (*project.Project, error) {
-	role := userRelationship.LookupRole()
+	readOnly := true
+	following := false // TODO Nil default?
+
+	if userRelationship != nil {
+		role := userRelationship.LookupRole()
+		readOnly = role.IsProjectReadOnly()
+		following = userRelationship.Following
+	}
 
 	var photoUrl *string
 	if dm.MediaURL != nil {
@@ -898,10 +934,10 @@ func ProjectType(signer *Signer, dm *data.Project, numberOfFollowers int32, user
 		Tags:        dm.Tags,
 		Privacy:     int32(dm.Privacy),
 		Photo:       photoUrl,
-		ReadOnly:    role.IsProjectReadOnly(),
+		ReadOnly:    readOnly,
 		Following: &project.ProjectFollowing{
 			Total:     numberOfFollowers,
-			Following: userRelationship.Following,
+			Following: following,
 		},
 	}
 
