@@ -79,6 +79,9 @@ $(BUILD)/sanitizer: server/cmd/sanitizer/*.go $(SERVER_SOURCES)
 	cd server/cmd/sanitizer && $(GO) build -o $@ *.go
 
 generate:
+ifeq (, $(shell which goa))
+$(error "No goa in PATH, please run: env GO111MODULE=on go get -u goa.design/goa/v3/...@v3")
+endif
 	cd server/api && goa gen github.com/fieldkit/cloud/server/api/design
 
 clean:
