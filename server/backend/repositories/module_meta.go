@@ -256,7 +256,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temp",
 					FirmwareKey:   "temp",
-					UnitOfMeasure: "",
+					UnitOfMeasure: "°C",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: -126.0,
