@@ -79,15 +79,15 @@ export const D3TimeSeriesGraph = Vue.extend({
 
             function tickFormatter(date: Date, tick: number, els: unknown[]) {
                 if (tick == 0 || tick == els.length - 1) {
-                    return d3.timeFormat("%-m/%-d %-I:%M")(date);
+                    return d3.timeFormat("%-m/%-d %-H:%M")(date);
                 }
 
                 const TwoDaysSeconds = 86400 * 2;
                 if (timeRangeSeconds > TwoDaysSeconds) {
-                    return d3.timeFormat("%-m/%-d %-I:%M")(date);
+                    return d3.timeFormat("%-m/%-d %-H:%M")(date);
                 }
 
-                return d3.timeFormat("%-I:%M")(date);
+                return d3.timeFormat("%-H:%M")(date);
             }
 
             const xAxis = d3

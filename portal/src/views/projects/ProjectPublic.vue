@@ -18,28 +18,28 @@
                         <div class="details-icon">
                             <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" width="12px" height="14px" />
                         </div>
-                        <template>Started: {{ project.startTime | prettyDate }}</template>
+                        <template>{{ $t("project.started", { started: project.startTime }) }}</template>
                     </div>
                     <div class="details-row" v-if="displayProject.duration">
                         <div class="details-icon">
                             <img alt="Location" src="@/assets/icon-time.svg" class="icon" width="12px" height="14px" />
                         </div>
-                        <template>{{ displayProject.duration | prettyDuration }}</template>
+                        <template>{{ $t("project.duration", { duration: displayProject.duration }) }}</template>
                     </div>
                     <div class="details-row location-name" v-if="project.location">
                         <div class="details-icon">
                             <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="13px" height="16px" />
                         </div>
-                        <template>{{ project.location }}</template>
+                        <template>{{ $t("project.location", { location: project.location }) }}</template>
                     </div>
                     <div class="details-row location-native" v-if="displayProject.places.native">
                         <div class="details-icon">
                             <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="13px" height="16px" />
                         </div>
-                        <template>Native Lands: {{ displayProject.places.native }}</template>
+                        <template>{{ $t("project.nativeLands", { nativeLands: displayProject.places.native }) }}</template>
                     </div>
                 </div>
-                <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
+                <div class="project-detail" v-if="project.goal">{{ $t("project.goal", { goal: project.goal }) }}</div>
                 <div class="project-detail">{{ project.description }}</div>
                 <div class="details-modules">
                     <img
@@ -55,11 +55,11 @@
                         <template #default="{ following, follow, unfollow }">
                             <button class="button-social" v-on:click="unfollow" v-if="following">
                                 <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
-                                Unfollow
+                                {{ $t("proejct.unfollow") }}
                             </button>
                             <button class="button-social" v-on:click="follow" v-if="!following">
                                 <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
-                                Follow
+                                {{ $t("project.follow") }}
                             </button>
                         </template>
                     </FollowControl>
@@ -110,7 +110,7 @@
             </div>
 
             <div class="recent-activity">
-                <h1>Recent Activity</h1>
+                <h1>{{ $t("project.recentActivity") }}</h1>
                 <ul>
                     <li>
                         <img src="@/assets/icon-compass.svg" width="30" />

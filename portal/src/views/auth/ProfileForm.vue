@@ -1,45 +1,47 @@
 <template>
     <div class="profile-change">
         <form @submit.prevent="saveForm">
-            <h3 class="heading">Profile Picture</h3>
+            <h3 class="heading">{{ $t("user.profile.photo.title") }}</h3>
             <div class="user-image image-container">
                 <ImageUploader :image="{ url: null }" v-if="!user.photo" @change="onImage" />
                 <ImageUploader :image="{ url: user.photo.url }" v-if="user.photo" @change="onImage" />
             </div>
             <div>
-                <TextField v-model="form.name" label="Name" />
+                <TextField v-model="form.name" :label="$t('user.profile.form.name.label')" />
 
                 <div class="validation-errors" v-if="$v.form.name.$error">
-                    <div v-if="!$v.form.name.required">Name is a required field.</div>
+                    <div v-if="!$v.form.name.required">{{ $t("user.profile.form.name.required") }}</div>
                 </div>
             </div>
             <div>
-                <TextField v-model="form.email" label="Email" />
+                <TextField v-model="form.email" :label="$t('user.profile.form.email.label')" />
 
                 <div class="validation-errors" v-if="$v.form.email.$error">
-                    <div v-if="!$v.form.email.required">Email is a required field.</div>
-                    <div v-if="!$v.form.email.email">Must be a valid email address.</div>
+                    <div v-if="!$v.form.email.required">{{ $t("user.profile.form.email.required") }}</div>
+                    <div v-if="!$v.form.email.email">{{ $t("user.profile.form.email.required") }}</div>
                     <div v-if="!$v.form.email.taken">
-                        This address appears to already be registered.
-                        <router-link :to="{ name: 'recover' }" class="recover-link">Recover Account</router-link>
+                        {{ $t("user.profile.form.email.taken") }}
+                        <router-link :to="{ name: 'recover' }" class="recover-link">
+                            {{ $t("user.profile.form.email.recover") }}
+                        </router-link>
                     </div>
                 </div>
             </div>
             <div>
-                <TextField v-model="form.bio" label="Short Description" />
+                <TextField v-model="form.bio" :label="$t('user.profile.form.bio.label')" />
 
                 <div class="validation-errors" v-if="$v.form.name.$error">
-                    <div v-if="!$v.form.bio.required">Short Description is a required field.</div>
+                    <div v-if="!$v.form.bio.required">{{ $t("user.profile.form.bio.required") }}</div>
                 </div>
             </div>
             <div class="checkbox" v-show="false">
                 <label>
-                    Make my profile public
+                    {{ $t("user.profile.form.makePublic") }}
                     <input type="checkbox" id="checkbox" v-model="form.publicProfile" />
                     <span class="checkbox-btn"></span>
                 </label>
             </div>
-            <button class="button-solid" type="submit">Update</button>
+            <button class="button-solid" type="submit">{{ $t("user.profile.form.update") }}</button>
         </form>
     </div>
 </template>

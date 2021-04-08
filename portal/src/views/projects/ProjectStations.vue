@@ -8,17 +8,17 @@
             v-if="addingStation"
         />
         <div class="section-heading stations-heading">
-            FieldKit Stations
+            {{ $t("project.stations.title") }}
             <div class="add-station" v-on:click="showStationPicker" v-if="admin">
                 <img src="@/assets/icon-plus-round.svg" class="add-station-btn" />
-                Add Station
+                {{ $t("project.stations.add") }}
             </div>
         </div>
         <div class="section-body">
             <div class="stations-panel" v-show="showStationsPanel">
                 <div v-if="projectStations.length == 0" class="project-stations-no-stations">
-                    <h3>No Stations</h3>
-                    <p>Add a station to this project to include its recent data and activities.</p>
+                    <h3>{{ $t("project.stations.none.title") }}</h3>
+                    <p>{{ $t("project.stations.none.text") }}</p>
                 </div>
                 <div v-if="projectStations.length > 0" class="stations">
                     <TinyStation

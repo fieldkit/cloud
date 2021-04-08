@@ -1,12 +1,11 @@
 <template>
     <div class="readings-container">
-        <div class="heading">Latest Readings</div>
+        <div class="heading">{{ $t("station.readings.title") }}</div>
 
         <template v-if="!stations.length">
-            <div class="empty-project">
-                There are no stations in this project.
-            </div>
+            <div class="empty-project">{{ $t("station.readings.empty") }}</div>
         </template>
+
         <template v-else>
             <div class="station-name">
                 {{ visibleStation.name }}

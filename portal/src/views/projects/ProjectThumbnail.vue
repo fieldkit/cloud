@@ -2,11 +2,6 @@
     <div class="project-container" v-if="visible">
         <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
             <div class="project-image-container">
-                <!--
-          <div v-if="invited" class="invited-icon">
-              Project Invite
-          </div>
-          -->
                 <ProjectPhoto :project="project" />
             </div>
 
@@ -18,11 +13,11 @@
         <div class="invited-container" v-if="invited">
             <div class="accept" v-on:click.stop.prevent="onAccept">
                 <img alt="Close" src="@/assets/icon-tick-blue.svg" />
-                <span>Accept Invite</span>
+                <span>{{ $t("project.invite.accept") }}</span>
             </div>
             <div class="reject" v-on:click.stop.prevent="onDecline">
                 <img alt="Close" src="@/assets/icon-close-bold.svg" />
-                <span>Decline</span>
+                <span>{{ $t("project.invite.decline") }}</span>
             </div>
         </div>
         <div class="social-container" v-else>
