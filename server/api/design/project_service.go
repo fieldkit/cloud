@@ -4,6 +4,12 @@ import (
 	. "goa.design/goa/v3/dsl"
 )
 
+var ProjectBounds = Type("ProjectBounds", func() {
+	Attribute("min", ArrayOf(Int32))
+	Attribute("max", ArrayOf(Int32))
+	Required("min", "max")
+})
+
 var AddProjectFields = Type("AddProjectFields", func() {
 	Attribute("name", String)
 	Attribute("description", String)
@@ -13,6 +19,8 @@ var AddProjectFields = Type("AddProjectFields", func() {
 	Attribute("privacy", Int32)
 	Attribute("startTime", String)
 	Attribute("endTime", String)
+	Attribute("bounds", ProjectBounds)
+	Attribute("showStations")
 	Required("name", "description")
 })
 
@@ -50,8 +58,10 @@ var Project = ResultType("application/vnd.app.project+json", func() {
 		Attribute("endTime", String)
 		Attribute("photo")
 		Attribute("readOnly", Boolean)
+		Attribute("showStations", Boolean)
+		Attribute("bounds", ProjectBounds)
 		Attribute("following", ProjectFollowing)
-		Required("id", "name", "description", "goal", "location", "privacy", "tags", "readOnly", "following")
+		Required("id", "name", "description", "goal", "location", "privacy", "tags", "readOnly", "showStations", "bounds", "following")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -65,6 +75,8 @@ var Project = ResultType("application/vnd.app.project+json", func() {
 		Attribute("endTime")
 		Attribute("photo")
 		Attribute("readOnly")
+		Attribute("showStations")
+		Attribute("bounds", ProjectBounds)
 		Attribute("following")
 	})
 })

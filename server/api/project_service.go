@@ -3,11 +3,14 @@ package api
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"time"
+
+	"github.com/jmoiron/sqlx/types"
 
 	"goa.design/goa/v3/security"
 
@@ -113,11 +116,16 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 		privacy = data.PrivacyType(*payload.Project.Privacy)
 	}
 
+	jsonBounds, err := json.Marshal(payload.Project.Bounds)
+	jsonTextBounds := types.JSONText(jsonBounds)
+
+
 	updating := &data.Project{
 		ID:          payload.ProjectID,
 		Name:        payload.Project.Name,
 		Description: payload.Project.Description,
 		Goal:        goal,
+		Bounds:		&jsonTextBounds,
 		Location:    location,
 		Tags:        tags,
 		Privacy:     privacy,
@@ -132,7 +140,7 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 
 	if err := c.options.Database.NamedGetContext(ctx, updating, `
 		UPDATE fieldkit.project SET name = :name, description = :description, goal = :goal, location = :location,
-		tags = :tags, privacy = :privacy, start_time = :start_time, end_time = :end_time WHERE id = :id RETURNING *`, updating); err != nil {
+		tags = :tags, privacy = :privacy, start_time = :start_time, end_time = :end_time, bounds = :bounds WHERE id = :id RETURNING *`, updating); err != nil {
 		return nil, err
 	}
 
@@ -889,16 +897,25 @@ func ProjectType(signer *Signer, dm *data.Project, numberOfFollowers int32, user
 		photoUrl = &url
 	}
 
+
+	var bounds project.ProjectBounds
+	err := json.Unmarshal(*dm.Bounds, &bounds)
+	if err != nil {
+		return nil, err
+	}
+
 	wm := &project.Project{
-		ID:          dm.ID,
-		Name:        dm.Name,
-		Description: dm.Description,
-		Goal:        dm.Goal,
-		Location:    dm.Location,
-		Tags:        dm.Tags,
-		Privacy:     int32(dm.Privacy),
-		Photo:       photoUrl,
-		ReadOnly:    role.IsProjectReadOnly(),
+		ID:           dm.ID,
+		Name:         dm.Name,
+		Description:  dm.Description,
+		Goal:         dm.Goal,
+		Bounds:       &bounds,
+		Location:     dm.Location,
+		Tags:         dm.Tags,
+		Privacy:      int32(dm.Privacy),
+		Photo:        photoUrl,
+		ReadOnly:     role.IsProjectReadOnly(),
+		ShowStations: dm.ShowStations,
 		Following: &project.ProjectFollowing{
 			Total:     numberOfFollowers,
 			Following: userRelationship.Following,

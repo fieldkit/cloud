@@ -3057,19 +3057,38 @@ func unmarshalProjectSummaryResponseBodyToProjectviewsProjectSummaryView(v *Proj
 // *projectviews.ProjectView from a value of type *ProjectResponseBody.
 func unmarshalProjectResponseBodyToProjectviewsProjectView(v *ProjectResponseBody) *projectviews.ProjectView {
 	res := &projectviews.ProjectView{
-		ID:          v.ID,
-		Name:        v.Name,
-		Description: v.Description,
-		Goal:        v.Goal,
-		Location:    v.Location,
-		Tags:        v.Tags,
-		Privacy:     v.Privacy,
-		StartTime:   v.StartTime,
-		EndTime:     v.EndTime,
-		Photo:       v.Photo,
-		ReadOnly:    v.ReadOnly,
+		ID:           v.ID,
+		Name:         v.Name,
+		Description:  v.Description,
+		Goal:         v.Goal,
+		Location:     v.Location,
+		Tags:         v.Tags,
+		Privacy:      v.Privacy,
+		StartTime:    v.StartTime,
+		EndTime:      v.EndTime,
+		Photo:        v.Photo,
+		ReadOnly:     v.ReadOnly,
+		ShowStations: v.ShowStations,
 	}
+	res.Bounds = unmarshalProjectBoundsResponseBodyToProjectviewsProjectBoundsView(v.Bounds)
 	res.Following = unmarshalProjectFollowingResponseBodyToProjectviewsProjectFollowingView(v.Following)
+
+	return res
+}
+
+// unmarshalProjectBoundsResponseBodyToProjectviewsProjectBoundsView builds a
+// value of type *projectviews.ProjectBoundsView from a value of type
+// *ProjectBoundsResponseBody.
+func unmarshalProjectBoundsResponseBodyToProjectviewsProjectBoundsView(v *ProjectBoundsResponseBody) *projectviews.ProjectBoundsView {
+	res := &projectviews.ProjectBoundsView{}
+	res.Min = make([]int32, len(v.Min))
+	for i, val := range v.Min {
+		res.Min[i] = val
+	}
+	res.Max = make([]int32, len(v.Max))
+	for i, val := range v.Max {
+		res.Max[i] = val
+	}
 
 	return res
 }
@@ -3081,6 +3100,54 @@ func unmarshalProjectFollowingResponseBodyToProjectviewsProjectFollowingView(v *
 	res := &projectviews.ProjectFollowingView{
 		Total:     v.Total,
 		Following: v.Following,
+	}
+
+	return res
+}
+
+// marshalProjectProjectBoundsToProjectBoundsRequestBodyRequestBody builds a
+// value of type *ProjectBoundsRequestBodyRequestBody from a value of type
+// *project.ProjectBounds.
+func marshalProjectProjectBoundsToProjectBoundsRequestBodyRequestBody(v *project.ProjectBounds) *ProjectBoundsRequestBodyRequestBody {
+	if v == nil {
+		return nil
+	}
+	res := &ProjectBoundsRequestBodyRequestBody{}
+	if v.Min != nil {
+		res.Min = make([]int32, len(v.Min))
+		for i, val := range v.Min {
+			res.Min[i] = val
+		}
+	}
+	if v.Max != nil {
+		res.Max = make([]int32, len(v.Max))
+		for i, val := range v.Max {
+			res.Max[i] = val
+		}
+	}
+
+	return res
+}
+
+// marshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds builds a
+// value of type *project.ProjectBounds from a value of type
+// *ProjectBoundsRequestBodyRequestBody.
+func marshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(v *ProjectBoundsRequestBodyRequestBody) *project.ProjectBounds {
+	if v == nil {
+		return nil
+	}
+	res := &project.ProjectBounds{}
+	if v.Min != nil {
+		res.Min = make([]int32, len(v.Min))
+		for i, val := range v.Min {
+			res.Min[i] = val
+		}
+	}
+	if v.Max != nil {
+		res.Max = make([]int32, len(v.Max))
+		for i, val := range v.Max {
+			res.Max[i] = val
+		}
 	}
 
 	return res
