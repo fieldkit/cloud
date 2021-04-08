@@ -10,6 +10,8 @@ import { layout } from "./modules/layout";
 import { exporting } from "./modules/exporting";
 import { Services } from "@/api";
 
+export * from "@/api";
+
 export * from "./modules/clock";
 export * from "./modules/user";
 export * from "./modules/stations";

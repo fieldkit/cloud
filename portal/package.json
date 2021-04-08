@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "serve": "vue-cli-service serve",
+        "serve": "vue-cli-service serve --port 8081",
         "build": "vue-cli-service build",
         "lint": "vue-cli-service lint",
         "test:unit": "vue-cli-service test:unit",
@@ -33,6 +33,7 @@
         "vue-class-component": "^7.2.3",
         "vue-confirm-dialog": "^1.0.2",
         "vue-i18n": "^8.17.0",
+        "vue-meta": "^2.4.0",
         "vue-multiselect": "^2.1.6",
         "vue-property-decorator": "^8.4.2",
         "vue-router": "^3.2.0",
