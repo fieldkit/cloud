@@ -143,7 +143,7 @@ export default Vue.extend({
         project(): Project {
             return this.displayProject.project;
         },
-        projectModules(): { name: string; url: string }[] {
+        projectModules(this: any): { name: string; url: string }[] {
             return this.displayProject.modules.map((m) => {
                 return {
                     name: m.name,
@@ -159,13 +159,13 @@ export default Vue.extend({
             }
             return null;
         },
-        openProjectNotes(): void {
+        openProjectNotes(this: any): void {
             this.$router.push({ name: "viewProjectNotes", params: { projectId: `${this.project.id}` } });
         },
-        editProject(): void {
+        editProject(this: any): void {
             this.$router.push({ name: "editProject", params: { id: `${this.project.id}` } });
         },
-        addUpdate(): void {
+        addUpdate(this: any): void {
             this.$router.push({ name: "addProjectUpdate", params: { project: `${this.project}` } });
         },
         viewProfile(): void {
