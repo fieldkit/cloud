@@ -190,6 +190,44 @@ func TestGetProjectMember(t *testing.T) {
 		}`)
 }
 
+func TestGetProjectAdministratorPublicProject(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	user, err := e.AddUser()
+	assert.NoError(err)
+
+	project, err := e.AddProjectWithPrivacy(data.Public)
+	assert.NoError(err)
+
+	err = e.AddProjectUser(project, user, data.AdministratorRole)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d", project.ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+		{
+			"id": "<<PRESENCE>>",
+			"description": "<<PRESENCE>>",
+			"tags": "<<PRESENCE>>",
+			"location": "<<PRESENCE>>",
+			"readOnly": false,
+			"privacy": 1,
+			"name": "<<PRESENCE>>",
+			"following": { "following": false, "total": 0 },
+			"goal": "<<PRESENCE>>"
+		}`)
+}
+
 func TestGetProjectAdministrator(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
