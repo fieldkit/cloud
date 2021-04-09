@@ -182,8 +182,6 @@ func (c *ProjectService) RemoveStation(ctx context.Context, payload *project.Rem
 func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (*project.Project, error) {
 	log := Logger(ctx).Sugar()
 
-	relationships := make(map[int32]*data.UserProjectRelationship)
-
 	getting := &data.Project{}
 	if err := c.options.Database.GetContext(ctx, getting, `
 		SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1
@@ -194,18 +192,20 @@ func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (
 		return nil, err
 	}
 
-	if getting.Privacy != data.Public {
-		log.Infow("checking", "privacy", getting.Privacy)
+	log.Infow("checking", "privacy", getting.Privacy)
 
-		p, err := NewPermissions(ctx, c.options).ForProject(getting)
-		if err != nil {
-			return nil, err
-		}
+	p, err := NewPermissions(ctx, c.options).ForProject(getting)
+	if err != nil {
+		return nil, err
+	}
 
-		if err := p.CanView(); err != nil {
-			return nil, err
-		}
+	if err := p.CanView(); err != nil {
+		return nil, err
+	}
 
+	relationships := make(map[int32]*data.UserProjectRelationship)
+
+	if !p.Anonymous() {
 		relationships, err = c.projects.QueryUserProjectRelationships(ctx, p.UserID())
 		if err != nil {
 			return nil, err
@@ -214,8 +214,6 @@ func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (
 		if relationships[payload.ProjectID] == nil {
 			relationships[payload.ProjectID] = &data.UserProjectRelationship{}
 		}
-	} else {
-		log.Infow("allowing", "privacy", getting.Privacy)
 	}
 
 	followerSummaries := []*data.FollowersSummary{}
