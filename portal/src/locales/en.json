@@ -148,7 +148,10 @@
                 "link": "Delete Project"
             },
             "saveNew": "Add project",
-            "saveChanges": "Save updates"
+            "saveChanges": "Save updates",
+            "showStations": "Show Stations",
+            "hideStations": "Hide Stations",
+            "mapText": "Others will see stations and exact GPS coordinates on the map"
         },
         "invite": {
             "accept": "Accept Invite",
