@@ -145,7 +145,11 @@ export default Vue.extend({
             return 0;
         },
         mapBounds() {
-            return new BoundingRectangle(this.project.bounds?.min, this.project.bounds?.max);
+            if (this.project.bounds?.min && this.project.bounds?.max) {
+                return new BoundingRectangle(this.project.bounds?.min, this.project.bounds?.max);
+            }
+
+            return MappedStations.defaultBounds();
         },
     },
     methods: {
