@@ -13,15 +13,16 @@
         }"
         @map-init="onMapInitialized"
         @map-load="onMapLoaded"
+        @zoomend="newBounds"
+        @dragend="newBounds"
     />
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import Mapbox from "mapbox-gl-vue";
 import Config from "@/secrets";
-import { promiseAfter } from "@/utilities";
-import { MappedStations, LngLat } from "@/store";
+import { MappedStations, LngLat, BoundingRectangle } from "@/store";
 
 interface ProtectedData {
     map: any;
@@ -44,7 +45,16 @@ export default Vue.extend({
     props: {
         mapped: {
             type: MappedStations,
-            required: true,
+        },
+        value: {
+            type: BoundingRectangle,
+        },
+        mapBounds: {
+            type: BoundingRectangle,
+        },
+        showStations: {
+            type: Boolean,
+            default: false,
         },
         layoutChanges: {
             type: Number,
@@ -57,8 +67,11 @@ export default Vue.extend({
             return (this as unknown) as ProtectedData;
         },
         bounds(): LngLat[] | null {
-            console.log("map: bounds", this.mapped.boundsLngLat());
-            return this.mapped.boundsLngLat();
+            if (this.value) {
+                return this.value.lngLat();
+            }
+
+            return this.mapBounds ? this.mapBounds.lngLat() : this.mapped.boundsLngLat();
         },
     },
     watch: {
@@ -66,13 +79,16 @@ export default Vue.extend({
             console.log("map: layout changed");
             if (this.protectedData.map) {
                 // TODO Not a fan of this.
-              this.$nextTick(() => {
-                this.protectedData.map.resize();
-              })
+                this.$nextTick(() => {
+                    this.protectedData.map.resize();
+                });
             }
         },
         mapped(): void {
             console.log("map: mapped changed", this.mapped);
+            this.updateMap();
+        },
+        showStations(): void {
             this.updateMap();
         },
     },
@@ -100,6 +116,10 @@ export default Vue.extend({
             this.ready = true;
             this.updateMap();
         },
+        newBounds(map) {
+            const bounds = map.getBounds();
+            this.$emit("input", new BoundingRectangle([bounds._sw.lng, bounds._sw.lat], [bounds._ne.lng, bounds._ne.lat]));
+        },
         updateMap(): void {
             if (!this.protectedData.map) {
                 console.log("map: update-skip.1");
@@ -113,7 +133,7 @@ export default Vue.extend({
 
             const map = this.protectedData.map;
 
-            if (!map.getLayer("station-markers")) {
+            if (!map.getLayer("station-markers") && this.showStations) {
                 console.log("map: updating", this.mapped);
 
                 map.addSource("stations", {
@@ -157,12 +177,11 @@ export default Vue.extend({
                     console.log("map: click", id);
                     this.$emit("show-summary", { id: id });
                 });
-
-                map.fitBounds(this.mapped.boundsLngLat(), { duration: 0 });
             } else {
                 console.log("map: keeping", this.mapped);
-                map.fitBounds(this.mapped.boundsLngLat(), { duration: 0 });
             }
+
+            map.fitBounds(this.bounds, { duration: 0 });
         },
     },
 });
