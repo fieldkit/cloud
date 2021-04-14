@@ -2540,13 +2540,13 @@ func marshalProjectviewsProjectViewToProjectResponseBody(v *projectviews.Project
 func marshalProjectviewsProjectBoundsViewToProjectBoundsResponseBody(v *projectviews.ProjectBoundsView) *ProjectBoundsResponseBody {
 	res := &ProjectBoundsResponseBody{}
 	if v.Min != nil {
-		res.Min = make([]int32, len(v.Min))
+		res.Min = make([]float64, len(v.Min))
 		for i, val := range v.Min {
 			res.Min[i] = val
 		}
 	}
 	if v.Max != nil {
-		res.Max = make([]int32, len(v.Max))
+		res.Max = make([]float64, len(v.Max))
 		for i, val := range v.Max {
 			res.Max[i] = val
 		}
@@ -2575,11 +2575,11 @@ func unmarshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(v *Proje
 		return nil
 	}
 	res := &project.ProjectBounds{}
-	res.Min = make([]int32, len(v.Min))
+	res.Min = make([]float64, len(v.Min))
 	for i, val := range v.Min {
 		res.Min[i] = val
 	}
-	res.Max = make([]int32, len(v.Max))
+	res.Max = make([]float64, len(v.Max))
 	for i, val := range v.Max {
 		res.Max[i] = val
 	}

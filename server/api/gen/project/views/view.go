@@ -101,8 +101,8 @@ type ProjectView struct {
 
 // ProjectBoundsView is a type that runs validations on a projected type.
 type ProjectBoundsView struct {
-	Min []int32
-	Max []int32
+	Min []float64
+	Max []float64
 }
 
 // ProjectFollowingView is a type that runs validations on a projected type.

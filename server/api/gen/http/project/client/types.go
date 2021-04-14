@@ -37,7 +37,7 @@ type AddRequestBody struct {
 	StartTime    *string                              `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime      *string                              `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 	Bounds       *ProjectBoundsRequestBodyRequestBody `form:"bounds,omitempty" json:"bounds,omitempty" xml:"bounds,omitempty"`
-	ShowStations *string                              `form:"showStations,omitempty" json:"showStations,omitempty" xml:"showStations,omitempty"`
+	ShowStations *bool                                `form:"showStations,omitempty" json:"showStations,omitempty" xml:"showStations,omitempty"`
 }
 
 // UpdateRequestBody is the type of the "project" service "update" endpoint
@@ -52,7 +52,7 @@ type UpdateRequestBody struct {
 	StartTime    *string                              `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
 	EndTime      *string                              `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
 	Bounds       *ProjectBoundsRequestBodyRequestBody `form:"bounds,omitempty" json:"bounds,omitempty" xml:"bounds,omitempty"`
-	ShowStations *string                              `form:"showStations,omitempty" json:"showStations,omitempty" xml:"showStations,omitempty"`
+	ShowStations *bool                                `form:"showStations,omitempty" json:"showStations,omitempty" xml:"showStations,omitempty"`
 }
 
 // InviteRequestBody is the type of the "project" service "invite" endpoint
@@ -1734,8 +1734,8 @@ type ProjectResponseBody struct {
 
 // ProjectBoundsResponseBody is used to define fields on response body types.
 type ProjectBoundsResponseBody struct {
-	Min []int32 `form:"min,omitempty" json:"min,omitempty" xml:"min,omitempty"`
-	Max []int32 `form:"max,omitempty" json:"max,omitempty" xml:"max,omitempty"`
+	Min []float64 `form:"min,omitempty" json:"min,omitempty" xml:"min,omitempty"`
+	Max []float64 `form:"max,omitempty" json:"max,omitempty" xml:"max,omitempty"`
 }
 
 // ProjectFollowingResponseBody is used to define fields on response body types.
@@ -1747,8 +1747,8 @@ type ProjectFollowingResponseBody struct {
 // ProjectBoundsRequestBodyRequestBody is used to define fields on request body
 // types.
 type ProjectBoundsRequestBodyRequestBody struct {
-	Min []int32 `form:"min" json:"min" xml:"min"`
-	Max []int32 `form:"max" json:"max" xml:"max"`
+	Min []float64 `form:"min" json:"min" xml:"min"`
+	Max []float64 `form:"max" json:"max" xml:"max"`
 }
 
 // NewAddUpdateRequestBody builds the HTTP request body from the payload of the

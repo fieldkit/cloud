@@ -290,8 +290,8 @@ type ProjectSummary struct {
 type ProjectCollection []*Project
 
 type ProjectBounds struct {
-	Min []int32
-	Max []int32
+	Min []float64
+	Max []float64
 }
 
 type ProjectFollowing struct {
@@ -309,7 +309,7 @@ type AddProjectFields struct {
 	StartTime    *string
 	EndTime      *string
 	Bounds       *ProjectBounds
-	ShowStations *string
+	ShowStations *bool
 }
 
 type InviteUserFields struct {
@@ -677,13 +677,13 @@ func transformProjectviewsProjectBoundsViewToProjectBounds(v *projectviews.Proje
 	}
 	res := &ProjectBounds{}
 	if v.Min != nil {
-		res.Min = make([]int32, len(v.Min))
+		res.Min = make([]float64, len(v.Min))
 		for i, val := range v.Min {
 			res.Min[i] = val
 		}
 	}
 	if v.Max != nil {
-		res.Max = make([]int32, len(v.Max))
+		res.Max = make([]float64, len(v.Max))
 		for i, val := range v.Max {
 			res.Max[i] = val
 		}
@@ -712,13 +712,13 @@ func transformProjectviewsProjectFollowingViewToProjectFollowing(v *projectviews
 func transformProjectBoundsToProjectviewsProjectBoundsView(v *ProjectBounds) *projectviews.ProjectBoundsView {
 	res := &projectviews.ProjectBoundsView{}
 	if v.Min != nil {
-		res.Min = make([]int32, len(v.Min))
+		res.Min = make([]float64, len(v.Min))
 		for i, val := range v.Min {
 			res.Min[i] = val
 		}
 	}
 	if v.Max != nil {
-		res.Max = make([]int32, len(v.Max))
+		res.Max = make([]float64, len(v.Max))
 		for i, val := range v.Max {
 			res.Max[i] = val
 		}
