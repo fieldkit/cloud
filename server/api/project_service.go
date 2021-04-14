@@ -58,13 +58,23 @@ func (c *ProjectService) Add(ctx context.Context, payload *project.AddPayload) (
 		privacy = data.PrivacyType(*payload.Project.Privacy)
 	}
 
+	showStations := false
+	if payload.Project.ShowStations != nil {
+		showStations = bool(*payload.Project.ShowStations)
+	}
+
+	jsonBounds, err := json.Marshal(payload.Project.Bounds)
+	jsonTextBounds := types.JSONText(jsonBounds)
+
 	newProject := &data.Project{
-		Name:        payload.Project.Name,
-		Description: payload.Project.Description,
-		Goal:        goal,
-		Location:    location,
-		Tags:        tags,
-		Privacy:     privacy,
+		Name:         payload.Project.Name,
+		Description:  payload.Project.Description,
+		Goal:         goal,
+		Bounds:       &jsonTextBounds,
+		ShowStations: showStations,
+		Location:     location,
+		Tags:         tags,
+		Privacy:      privacy,
 	}
 
 	if start, err := tryParseDate(payload.Project.StartTime); err == nil {
@@ -113,22 +123,27 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 
 	privacy := data.Private
 	if payload.Project.Privacy != nil {
-		privacy = data.PrivacyType(*payload.Project.Privacy)
+			privacy = data.PrivacyType(*payload.Project.Privacy)
+	}
+
+	showStations := false
+	if payload.Project.ShowStations != nil {
+		showStations = bool(*payload.Project.ShowStations)
 	}
 
 	jsonBounds, err := json.Marshal(payload.Project.Bounds)
 	jsonTextBounds := types.JSONText(jsonBounds)
 
-
 	updating := &data.Project{
-		ID:          payload.ProjectID,
-		Name:        payload.Project.Name,
-		Description: payload.Project.Description,
-		Goal:        goal,
-		Bounds:		&jsonTextBounds,
-		Location:    location,
-		Tags:        tags,
-		Privacy:     privacy,
+		ID:           payload.ProjectID,
+		Name:         payload.Project.Name,
+		Description:  payload.Project.Description,
+		Goal:         goal,
+		Bounds:       &jsonTextBounds,
+		ShowStations: showStations,
+		Location:     location,
+		Tags:         tags,
+		Privacy:      privacy,
 	}
 
 	if start, err := tryParseDate(payload.Project.StartTime); err == nil {
@@ -140,7 +155,7 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 
 	if err := c.options.Database.NamedGetContext(ctx, updating, `
 		UPDATE fieldkit.project SET name = :name, description = :description, goal = :goal, location = :location,
-		tags = :tags, privacy = :privacy, start_time = :start_time, end_time = :end_time, bounds = :bounds WHERE id = :id RETURNING *`, updating); err != nil {
+		tags = :tags, privacy = :privacy, start_time = :start_time, end_time = :end_time, bounds = :bounds, show_stations = :show_stations WHERE id = :id RETURNING *`, updating); err != nil {
 		return nil, err
 	}
 
@@ -897,11 +912,12 @@ func ProjectType(signer *Signer, dm *data.Project, numberOfFollowers int32, user
 		photoUrl = &url
 	}
 
-
 	var bounds project.ProjectBounds
-	err := json.Unmarshal(*dm.Bounds, &bounds)
-	if err != nil {
-		return nil, err
+	if dm.Bounds != nil {
+		err := json.Unmarshal(*dm.Bounds, &bounds)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	wm := &project.Project{

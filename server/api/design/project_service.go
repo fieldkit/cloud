@@ -5,8 +5,8 @@ import (
 )
 
 var ProjectBounds = Type("ProjectBounds", func() {
-	Attribute("min", ArrayOf(Int32))
-	Attribute("max", ArrayOf(Int32))
+	Attribute("min", ArrayOf(Float64))
+	Attribute("max", ArrayOf(Float64))
 	Required("min", "max")
 })
 
@@ -20,7 +20,7 @@ var AddProjectFields = Type("AddProjectFields", func() {
 	Attribute("startTime", String)
 	Attribute("endTime", String)
 	Attribute("bounds", ProjectBounds)
-	Attribute("showStations")
+	Attribute("showStations", Boolean)
 	Required("name", "description")
 })
 
