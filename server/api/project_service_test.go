@@ -116,7 +116,9 @@ func TestUpdateProjectWhenAdministrator(t *testing.T) {
 		"location": "",
 		"goal": "",
 		"following": { "following": false, "total": 0 },
-		"tags": ""
+		"tags": "",
+		"showStations":false,
+		"bounds":{"min":null,"max":null}
 	}`, newName)
 }
 
@@ -186,7 +188,9 @@ func TestGetProjectMember(t *testing.T) {
 			"privacy": 0,
 			"name": "<<PRESENCE>>",
 			"following": { "following": false, "total": 0 },
-			"goal": "<<PRESENCE>>"
+			"goal": "<<PRESENCE>>",
+			"showStations":false,
+			"bounds":{"min":null,"max":null}
 		}`)
 }
 
@@ -224,7 +228,9 @@ func TestGetProjectAdministrator(t *testing.T) {
 			"privacy": 0,
 			"name": "<<PRESENCE>>",
 			"following": { "following": false, "total": 0 },
-			"goal": "<<PRESENCE>>"
+			"goal": "<<PRESENCE>>",
+			"showStations":false,
+			"bounds":{"min":null,"max":null}
 		}`)
 }
 
