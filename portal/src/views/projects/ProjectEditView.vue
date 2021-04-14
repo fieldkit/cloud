@@ -7,11 +7,12 @@
 </template>
 
 <script lang="ts">
-import Vue from "@/store/strong-vue";
+import Vue from "vue";
 import StandardLayout from "../StandardLayout.vue";
 import ProjectForm from "./ProjectForm.vue";
 
-import FKApi, { Project } from "@/api/api";
+import { Project } from "@/api/api";
+import * as ActionTypes from "@/store/actions";
 
 export default Vue.extend({
     name: "ProjectEditView",
@@ -40,6 +41,11 @@ export default Vue.extend({
             await this.getProject(this.id);
         } else {
             this.loading = false;
+        }
+    },
+    beforeMount(): Promise<void> | void {
+        if (this.id) {
+            return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id });
         }
     },
     methods: {
