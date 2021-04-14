@@ -14,7 +14,13 @@
 
         <template v-if="viewType === 'map'">
             <div class="container-map">
-                <StationsMap @show-summary="showSummary" :mapped="mapped" :layoutChanges="layoutChanges" v-if="mapped" />
+                <StationsMap
+                    @show-summary="showSummary"
+                    :mapped="mapped"
+                    :layoutChanges="layoutChanges"
+                    v-if="mapped"
+                    :showStations="true"
+                />
             </div>
             <StationSummary
                 v-if="activeStation"

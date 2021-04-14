@@ -40,7 +40,13 @@
                 <img v-if="!showStationsPanel" alt="Expand List" src="@/assets/icon-tab-expand.svg" class="toggle-icon" />
             </div>
             <div class="project-stations-map-container">
-                <StationsMap @show-summary="showSummary" :mapped="mappedProject" :layoutChanges="layoutChanges" />
+                <StationsMap
+                    @show-summary="showSummary"
+                    :mapped="mappedProject"
+                    :layoutChanges="layoutChanges"
+                    :showStations="project.showStations"
+                    :mapBounds="mapBounds"
+                />
                 <StationSummary
                     v-if="activeStation"
                     :station="activeStation"
@@ -64,7 +70,7 @@ import StationsMap from "@/views/shared/StationsMap.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
 import TinyStation from "@/views/shared/TinyStation.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { DisplayStation, DisplayProject, MappedStations } from "@/store";
+import { DisplayStation, DisplayProject, MappedStations, BoundingRectangle } from "@/store";
 
 export default Vue.extend({
     name: "ProjectStations",
@@ -137,6 +143,9 @@ export default Vue.extend({
                 return Math.ceil(this.projectStations.length / this.pageSize);
             }
             return 0;
+        },
+        mapBounds() {
+            return new BoundingRectangle(this.project.bounds?.min, this.project.bounds?.max);
         },
     },
     methods: {
