@@ -35,6 +35,7 @@ type FirmwareSummaryView struct {
 	Etag           *string
 	Module         *string
 	Profile        *string
+	Version        *string
 	URL            *string
 	Meta           map[string]interface{}
 	BuildNumber    *int32
@@ -59,6 +60,7 @@ var (
 			"etag",
 			"module",
 			"profile",
+			"version",
 			"url",
 			"meta",
 			"buildNumber",
@@ -75,6 +77,7 @@ var (
 			"etag",
 			"module",
 			"profile",
+			"version",
 			"url",
 			"meta",
 			"buildNumber",

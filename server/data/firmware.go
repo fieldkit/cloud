@@ -12,6 +12,7 @@ type Firmware struct {
 	Time           time.Time      `db:"time"`
 	Module         string         `db:"module"`
 	Profile        string         `db:"profile"`
+	Version        *string        `db:"version"`
 	URL            string         `db:"url"`
 	ETag           string         `db:"etag"`
 	Meta           types.JSONText `db:"meta"`

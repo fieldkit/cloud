@@ -42,7 +42,7 @@ func BuildAddPayload(firmwareAddBody string, firmwareAddAuth string) (*firmware.
 	{
 		err = json.Unmarshal([]byte(firmwareAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Harum quasi odit in unde.\",\n      \"logicalAddress\": 8716499823258643482,\n      \"meta\": \"Aspernatur recusandae ut repellat excepturi.\",\n      \"module\": \"Aut dolores animi omnis in est repellat.\",\n      \"profile\": \"Quia maxime mollitia sunt.\",\n      \"url\": \"Et qui temporibus quia excepturi.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Harum quasi odit in unde.\",\n      \"logicalAddress\": 2738832538683135658,\n      \"meta\": \"Voluptatem esse et dolore quasi sit.\",\n      \"module\": \"Aut dolores animi omnis in est repellat.\",\n      \"profile\": \"Quia maxime mollitia sunt.\",\n      \"url\": \"Aspernatur recusandae ut repellat excepturi.\",\n      \"version\": \"Et qui temporibus quia excepturi.\"\n   }'")
 		}
 	}
 	var auth *string
@@ -55,6 +55,7 @@ func BuildAddPayload(firmwareAddBody string, firmwareAddAuth string) (*firmware.
 		Etag:           body.Etag,
 		Module:         body.Module,
 		Profile:        body.Profile,
+		Version:        body.Version,
 		URL:            body.URL,
 		Meta:           body.Meta,
 		LogicalAddress: body.LogicalAddress,

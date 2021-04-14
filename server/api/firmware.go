@@ -54,6 +54,7 @@ func FirmwareSummaryType(fw *data.Firmware) *firmware.FirmwareSummary {
 		Time:           fw.Time.String(),
 		Module:         fw.Module,
 		Profile:        fw.Profile,
+		Version:        fw.Version,
 		Etag:           fw.ETag,
 		URL:            fw.URL,
 		Meta:           metaFields,
@@ -140,6 +141,7 @@ func (s *FirmwareService) Add(ctx context.Context, payload *firmware.AddPayload)
 		Time:           time.Now(),
 		Module:         payload.Firmware.Module,
 		Profile:        payload.Firmware.Profile,
+		Version:        &payload.Firmware.Version,
 		URL:            payload.Firmware.URL,
 		ETag:           payload.Firmware.Etag,
 		Meta:           []byte(payload.Firmware.Meta),
@@ -147,8 +149,8 @@ func (s *FirmwareService) Add(ctx context.Context, payload *firmware.AddPayload)
 	}
 
 	if _, err := s.options.Database.NamedExecContext(ctx, `
-		   INSERT INTO fieldkit.firmware (time, module, profile, url, etag, meta, logical_address)
-		   VALUES (:time, :module, :profile, :url, :etag, :meta, :logical_address)
+		   INSERT INTO fieldkit.firmware (time, module, profile, url, etag, meta, logical_address, version)
+		   VALUES (:time, :module, :profile, :url, :etag, :meta, :logical_address, :version)
 		   `, fw); err != nil {
 		return err
 	}

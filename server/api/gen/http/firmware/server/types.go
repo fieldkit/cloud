@@ -19,6 +19,7 @@ type AddRequestBody struct {
 	Etag           *string `form:"etag,omitempty" json:"etag,omitempty" xml:"etag,omitempty"`
 	Module         *string `form:"module,omitempty" json:"module,omitempty" xml:"module,omitempty"`
 	Profile        *string `form:"profile,omitempty" json:"profile,omitempty" xml:"profile,omitempty"`
+	Version        *string `form:"version,omitempty" json:"version,omitempty" xml:"version,omitempty"`
 	URL            *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 	Meta           *string `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 	LogicalAddress *int64  `form:"logicalAddress,omitempty" json:"logicalAddress,omitempty" xml:"logicalAddress,omitempty"`
@@ -329,6 +330,7 @@ type FirmwareSummaryResponseBody struct {
 	Etag           string                 `form:"etag" json:"etag" xml:"etag"`
 	Module         string                 `form:"module" json:"module" xml:"module"`
 	Profile        string                 `form:"profile" json:"profile" xml:"profile"`
+	Version        *string                `form:"version,omitempty" json:"version,omitempty" xml:"version,omitempty"`
 	URL            string                 `form:"url" json:"url" xml:"url"`
 	Meta           map[string]interface{} `form:"meta" json:"meta" xml:"meta"`
 	BuildNumber    int32                  `form:"buildNumber" json:"buildNumber" xml:"buildNumber"`
@@ -587,6 +589,7 @@ func NewAddPayload(body *AddRequestBody, auth *string) *firmware.AddPayload {
 		Etag:           *body.Etag,
 		Module:         *body.Module,
 		Profile:        *body.Profile,
+		Version:        *body.Version,
 		URL:            *body.URL,
 		Meta:           *body.Meta,
 		LogicalAddress: body.LogicalAddress,
@@ -630,6 +633,9 @@ func ValidateAddRequestBody(body *AddRequestBody) (err error) {
 	}
 	if body.Profile == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("profile", "body"))
+	}
+	if body.Version == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("version", "body"))
 	}
 	if body.URL == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("url", "body"))

@@ -247,7 +247,7 @@ func uploadFirmware(ctx context.Context, fkc *FkClient, moduleOverride, profileO
 		}
 	}
 
-	log.Printf("creating database entry...")
+	log.Printf("creating database entry for %s...", version)
 
 	jsonData, err := json.Marshal(metadata.Map)
 	if err != nil {
@@ -258,6 +258,7 @@ func uploadFirmware(ctx context.Context, fkc *FkClient, moduleOverride, profileO
 		Etag:    metadata.ETag,
 		Module:  metadata.Module,
 		Profile: metadata.Profile,
+		Version: version,
 		URL:     url,
 		Meta:    string(jsonData),
 	}
@@ -412,6 +413,7 @@ type AddFirmwarePayload struct {
 	Etag    string `json"etag"`
 	Module  string `json:"module"`
 	Profile string `json:"profile"`
+	Version string `json:"version"`
 	URL     string `json:"url"`
 	Meta    string `json:"meta"`
 }

@@ -85,6 +85,7 @@ type AddFirmwarePayload struct {
 	Etag           string
 	Module         string
 	Profile        string
+	Version        string
 	URL            string
 	Meta           string
 	LogicalAddress *int64
@@ -98,6 +99,7 @@ type FirmwareSummary struct {
 	Etag           string
 	Module         string
 	Profile        string
+	Version        *string
 	URL            string
 	Meta           map[string]interface{}
 	BuildNumber    int32
@@ -198,6 +200,7 @@ func newFirmwareSummaryCollectionView(res FirmwareSummaryCollection) firmwarevie
 // FirmwareSummary.
 func newFirmwareSummary(vres *firmwareviews.FirmwareSummaryView) *FirmwareSummary {
 	res := &FirmwareSummary{
+		Version:        vres.Version,
 		LogicalAddress: vres.LogicalAddress,
 	}
 	if vres.ID != nil {
@@ -244,6 +247,7 @@ func newFirmwareSummaryView(res *FirmwareSummary) *firmwareviews.FirmwareSummary
 		Etag:           &res.Etag,
 		Module:         &res.Module,
 		Profile:        &res.Profile,
+		Version:        res.Version,
 		URL:            &res.URL,
 		BuildNumber:    &res.BuildNumber,
 		BuildTime:      &res.BuildTime,

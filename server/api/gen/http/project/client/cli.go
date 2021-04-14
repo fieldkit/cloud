@@ -267,7 +267,7 @@ func BuildAddPayload(projectAddBody string, projectAddAuth string) (*project.Add
 	{
 		err = json.Unmarshal([]byte(projectAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Harum quasi odit in unde.\",\n      \"logicalAddress\": 8716499823258643482,\n      \"meta\": \"Aspernatur recusandae ut repellat excepturi.\",\n      \"module\": \"Aut dolores animi omnis in est repellat.\",\n      \"profile\": \"Quia maxime mollitia sunt.\",\n      \"url\": \"Et qui temporibus quia excepturi.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Harum quasi odit in unde.\",\n      \"logicalAddress\": 2738832538683135658,\n      \"meta\": \"Voluptatem esse et dolore quasi sit.\",\n      \"module\": \"Aut dolores animi omnis in est repellat.\",\n      \"profile\": \"Quia maxime mollitia sunt.\",\n      \"url\": \"Aspernatur recusandae ut repellat excepturi.\",\n      \"version\": \"Et qui temporibus quia excepturi.\"\n   }'")
 		}
 		if body.Bounds != nil {
 			if err2 := ValidateProjectBoundsRequestBodyRequestBody(body.Bounds); err2 != nil {

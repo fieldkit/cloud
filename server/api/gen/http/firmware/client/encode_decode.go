@@ -585,6 +585,7 @@ func unmarshalFirmwareSummaryResponseBodyToFirmwareviewsFirmwareSummaryView(v *F
 		Etag:           v.Etag,
 		Module:         v.Module,
 		Profile:        v.Profile,
+		Version:        v.Version,
 		URL:            v.URL,
 		BuildNumber:    v.BuildNumber,
 		BuildTime:      v.BuildTime,

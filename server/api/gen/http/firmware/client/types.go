@@ -19,6 +19,7 @@ type AddRequestBody struct {
 	Etag           string `form:"etag" json:"etag" xml:"etag"`
 	Module         string `form:"module" json:"module" xml:"module"`
 	Profile        string `form:"profile" json:"profile" xml:"profile"`
+	Version        string `form:"version" json:"version" xml:"version"`
 	URL            string `form:"url" json:"url" xml:"url"`
 	Meta           string `form:"meta" json:"meta" xml:"meta"`
 	LogicalAddress *int64 `form:"logicalAddress,omitempty" json:"logicalAddress,omitempty" xml:"logicalAddress,omitempty"`
@@ -329,6 +330,7 @@ type FirmwareSummaryResponseBody struct {
 	Etag           *string                `form:"etag,omitempty" json:"etag,omitempty" xml:"etag,omitempty"`
 	Module         *string                `form:"module,omitempty" json:"module,omitempty" xml:"module,omitempty"`
 	Profile        *string                `form:"profile,omitempty" json:"profile,omitempty" xml:"profile,omitempty"`
+	Version        *string                `form:"version,omitempty" json:"version,omitempty" xml:"version,omitempty"`
 	URL            *string                `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 	Meta           map[string]interface{} `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 	BuildNumber    *int32                 `form:"buildNumber,omitempty" json:"buildNumber,omitempty" xml:"buildNumber,omitempty"`
@@ -343,6 +345,7 @@ func NewAddRequestBody(p *firmware.AddPayload) *AddRequestBody {
 		Etag:           p.Firmware.Etag,
 		Module:         p.Firmware.Module,
 		Profile:        p.Firmware.Profile,
+		Version:        p.Firmware.Version,
 		URL:            p.Firmware.URL,
 		Meta:           p.Firmware.Meta,
 		LogicalAddress: p.Firmware.LogicalAddress,

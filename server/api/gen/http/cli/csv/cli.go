@@ -1903,12 +1903,13 @@ Add implements add.
 Example:
     `+os.Args[0]+` firmware add --body '{
       "etag": "Harum quasi odit in unde.",
-      "logicalAddress": 8716499823258643482,
-      "meta": "Aspernatur recusandae ut repellat excepturi.",
+      "logicalAddress": 2738832538683135658,
+      "meta": "Voluptatem esse et dolore quasi sit.",
       "module": "Aut dolores animi omnis in est repellat.",
       "profile": "Quia maxime mollitia sunt.",
-      "url": "Et qui temporibus quia excepturi."
-   }' --auth "Esse et dolore quasi."
+      "url": "Aspernatur recusandae ut repellat excepturi.",
+      "version": "Et qui temporibus quia excepturi."
+   }' --auth "Quidem illum dolorem dolor perspiciatis."
 `, os.Args[0])
 }
 
@@ -1923,7 +1924,7 @@ List implements list.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` firmware list --module "Et dolor dicta ut laudantium sed." --profile "Aut nihil nobis minima corrupti officia." --page-size 516660055 --page 143889420 --auth "Molestiae dignissimos alias et corrupti ab provident."
+    `+os.Args[0]+` firmware list --module "Nihil nobis minima corrupti officia." --profile "Nesciunt et molestiae." --page-size 1518192203 --page 1695535122 --auth "Corrupti ab provident ut."
 `, os.Args[0])
 }
 
@@ -1935,7 +1936,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` firmware delete --firmware-id 1635902984 --auth "Non aut qui."
+    `+os.Args[0]+` firmware delete --firmware-id 1912466164 --auth "Necessitatibus enim."
 `, os.Args[0])
 }
 
@@ -1963,7 +1964,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 6663910153084380604 --auth "Hic itaque aliquam et fuga reprehenderit veritatis."
+    `+os.Args[0]+` following follow --id 9198744741789991432 --auth "Fuga reprehenderit veritatis."
 `, os.Args[0])
 }
 
@@ -2133,68 +2134,62 @@ Example:
       "notes": {
          "creating": [
             {
-               "body": "Aut vel iusto similique.",
-               "key": "Aperiam qui officiis fugiat amet.",
+               "body": "At aut amet id.",
+               "key": "Praesentium omnis optio voluptatem.",
                "mediaIds": [
-                  3377084290477354781,
-                  1252797507653743972,
-                  3879848082054255020,
-                  4820132419142245310
+                  4755469836378177211,
+                  8601584063555233804
                ]
             },
             {
-               "body": "Aut vel iusto similique.",
-               "key": "Aperiam qui officiis fugiat amet.",
+               "body": "At aut amet id.",
+               "key": "Praesentium omnis optio voluptatem.",
                "mediaIds": [
-                  3377084290477354781,
-                  1252797507653743972,
-                  3879848082054255020,
-                  4820132419142245310
+                  4755469836378177211,
+                  8601584063555233804
                ]
             },
             {
-               "body": "Aut vel iusto similique.",
-               "key": "Aperiam qui officiis fugiat amet.",
+               "body": "At aut amet id.",
+               "key": "Praesentium omnis optio voluptatem.",
                "mediaIds": [
-                  3377084290477354781,
-                  1252797507653743972,
-                  3879848082054255020,
-                  4820132419142245310
+                  4755469836378177211,
+                  8601584063555233804
                ]
             }
          ],
          "notes": [
             {
-               "body": "Voluptatibus voluptatum.",
-               "id": 616359237794450498,
-               "key": "Quia tenetur facilis voluptatum.",
+               "body": "Aut vel iusto similique.",
+               "id": 8162818601379396463,
+               "key": "Aperiam qui officiis fugiat amet.",
                "mediaIds": [
-                  978517109923934507,
-                  6991571367710903168,
-                  237751933690716782,
-                  6623664549170262319
+                  3377084290477354781,
+                  1252797507653743972,
+                  3879848082054255020,
+                  4820132419142245310
                ]
             },
             {
-               "body": "Voluptatibus voluptatum.",
-               "id": 616359237794450498,
-               "key": "Quia tenetur facilis voluptatum.",
+               "body": "Aut vel iusto similique.",
+               "id": 8162818601379396463,
+               "key": "Aperiam qui officiis fugiat amet.",
                "mediaIds": [
-                  978517109923934507,
-                  6991571367710903168,
-                  237751933690716782,
-                  6623664549170262319
+                  3377084290477354781,
+                  1252797507653743972,
+                  3879848082054255020,
+                  4820132419142245310
                ]
             },
             {
-               "body": "Voluptatibus voluptatum.",
-               "id": 616359237794450498,
-               "key": "Quia tenetur facilis voluptatum.",
+               "body": "Aut vel iusto similique.",
+               "id": 8162818601379396463,
+               "key": "Aperiam qui officiis fugiat amet.",
                "mediaIds": [
-                  978517109923934507,
-                  6991571367710903168,
-                  237751933690716782,
-                  6623664549170262319
+                  3377084290477354781,
+                  1252797507653743972,
+                  3879848082054255020,
+                  4820132419142245310
                ]
             }
          ]
@@ -2457,11 +2452,12 @@ Add implements add.
 Example:
     `+os.Args[0]+` project add --body '{
       "etag": "Harum quasi odit in unde.",
-      "logicalAddress": 8716499823258643482,
-      "meta": "Aspernatur recusandae ut repellat excepturi.",
+      "logicalAddress": 2738832538683135658,
+      "meta": "Voluptatem esse et dolore quasi sit.",
       "module": "Aut dolores animi omnis in est repellat.",
       "profile": "Quia maxime mollitia sunt.",
-      "url": "Et qui temporibus quia excepturi."
+      "url": "Aspernatur recusandae ut repellat excepturi.",
+      "version": "Et qui temporibus quia excepturi."
    }' --auth "Inventore nesciunt est maxime."
 `, os.Args[0])
 }
@@ -3201,11 +3197,12 @@ Add implements add.
 Example:
     `+os.Args[0]+` user add --body '{
       "etag": "Harum quasi odit in unde.",
-      "logicalAddress": 8716499823258643482,
-      "meta": "Aspernatur recusandae ut repellat excepturi.",
+      "logicalAddress": 2738832538683135658,
+      "meta": "Voluptatem esse et dolore quasi sit.",
       "module": "Aut dolores animi omnis in est repellat.",
       "profile": "Quia maxime mollitia sunt.",
-      "url": "Et qui temporibus quia excepturi."
+      "url": "Aspernatur recusandae ut repellat excepturi.",
+      "version": "Et qui temporibus quia excepturi."
    }'
 `, os.Args[0])
 }
