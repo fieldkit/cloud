@@ -153,7 +153,14 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 
 		for sensorKey, fn := range funcs {
 			value := fn(sampled)
-			if err := aggregator.AddSample(ctx, sampled, location.Coords, sensorKey, value); err != nil {
+			key := handlers.AggregateSensorKey{
+				SensorKey: sensorKey,
+				ModuleID:  int64(0),
+			}
+			if key.ModuleID == 0 {
+				panic("TODO")
+			}
+			if err := aggregator.AddSample(ctx, sampled, location.Coords, key, value); err != nil {
 				return err
 			}
 		}

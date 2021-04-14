@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strings"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -48,10 +49,12 @@ func NewSensorService(ctx context.Context, options *ControllerOptions) *SensorSe
 }
 
 type StationSensor struct {
+	StationID   int32  `db:"station_id" json:"stationId"`
+	StationName string `db:"station_name" json:"stationName"`
+	ModuleID    int64  `db:"module_id" json:"moduleId"`
+	ModuleKey   string `db:"module_key" json:"moduleKey"`
 	SensorID    int64  `db:"sensor_id" json:"sensorId"`
-	StationID   int32  `db:"station_id" json:"-"`
-	StationName string `db:"station_name" json:"name"`
-	Key         string `db:"key" json:"key"`
+	SensorKey   string `db:"sensor_key" json:"sensorKey"`
 }
 
 type DataRow struct {
@@ -59,6 +62,7 @@ type DataRow struct {
 	ID        *int64               `db:"id" json:"-"`
 	StationID *int32               `db:"station_id" json:"stationId,omitempty"`
 	SensorID  *int64               `db:"sensor_id" json:"sensorId,omitempty"`
+	ModuleID  *int64               `db:"module_id" json:"moduleId,omitempty"`
 	Location  *data.Location       `db:"location" json:"location,omitempty"`
 	Value     *float64             `db:"value" json:"value,omitempty"`
 	TimeGroup *int32               `db:"time_group" json:"tg,omitempty"`
@@ -71,6 +75,7 @@ func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sen
 		time,
 		station_id,
 		sensor_id,
+		module_id,
 		value
 		FROM (
 			SELECT
@@ -116,12 +121,18 @@ func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sen
 }
 
 func (c *SensorService) stationsMeta(ctx context.Context, stations []int32) (*sensor.DataResult, error) {
+	// TODO Maybe this should be a finer resolution one?
 	query, args, err := sqlx.In(fmt.Sprintf(`
-		SELECT sensor_id, station_id, s.key, station.name AS station_name
+		SELECT
+			station_id, station.name AS station_name,
+            module_id, station_module.name AS module_key,
+			sensor_id, s.key AS sensor_key
 		FROM %s AS agg
 		JOIN fieldkit.aggregated_sensor AS s ON (s.id = sensor_id)
 		JOIN fieldkit.station AS station ON (agg.station_id = station.id)
-		WHERE station_id IN (?) GROUP BY sensor_id, station_id, s.key, station.name
+		JOIN fieldkit.station_module AS station_module ON (agg.module_id = station_module.id)
+		WHERE station_id IN (?)
+		GROUP BY station_id, station.name, module_id, station_module.name, sensor_id, s.key
 		`, "fieldkit.aggregated_24h"), stations)
 	if err != nil {
 		return nil, err
@@ -138,6 +149,10 @@ func (c *SensorService) stationsMeta(ctx context.Context, stations []int32) (*se
 	}
 
 	for _, row := range rows {
+		if !strings.HasPrefix(row.ModuleKey, "fk.") {
+			row.ModuleKey = "fk." + strings.TrimPrefix(row.ModuleKey, "modules.")
+		}
+
 		byStation[row.StationID] = append(byStation[row.StationID], row)
 	}
 

@@ -33,7 +33,7 @@ func TestExportCsv(t *testing.T) {
 	assert.Nil(err)
 	assert.Nil(exporter.Export(ctx, &ExportCriteria{
 		Stations: ids,
-		Sensors:  []int64{},
+		Sensors:  []ModuleAndSensor{},
 		Start:    time.Now().Add(-24 * time.Hour),
 		End:      time.Now().Add(24 * time.Hour),
 	}, formatter, ExportProgressNoop, ioutil.Discard))

@@ -28,20 +28,26 @@ type RawQueryParams struct {
 	Resolution *int32  `json:"resolution"`
 	Stations   *string `json:"stations"`
 	Sensors    *string `json:"sensors"`
+	Modules    *string `json:"modules"`
 	Aggregate  *string `json:"aggregate"`
 	Tail       *int32  `json:"tail"`
 	Complete   *bool   `json:"complete"`
 }
 
+type ModuleAndSensor struct {
+	ModuleID int64 `json:"module_id"`
+	SensorID int64 `json:"sensor_id"`
+}
+
 type QueryParams struct {
-	Start      time.Time `json:"start"`
-	End        time.Time `json:"end"`
-	Sensors    []int64   `json:"sensors"`
-	Stations   []int32   `json:"stations"`
-	Resolution int32     `json:"resolution"`
-	Aggregate  string    `json:"aggregate"`
-	Tail       int32     `json:"tail"`
-	Complete   bool      `json:"complete"`
+	Start      time.Time         `json:"start"`
+	End        time.Time         `json:"end"`
+	Stations   []int32           `json:"stations"`
+	Sensors    []ModuleAndSensor `json:"sensors"`
+	Resolution int32             `json:"resolution"`
+	Aggregate  string            `json:"aggregate"`
+	Tail       int32             `json:"tail"`
+	Complete   bool              `json:"complete"`
 }
 
 func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
@@ -74,13 +80,29 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		return nil, errors.New("stations is required")
 	}
 
-	sensors := make([]int64, 0)
+	mixedIds := make([]int64, 0)
 	if raw.Sensors != nil {
 		parts := strings.Split(*raw.Sensors, ",")
 		for _, p := range parts {
 			if i, err := strconv.Atoi(p); err == nil {
-				sensors = append(sensors, int64(i))
+				mixedIds = append(mixedIds, int64(i))
 			}
+		}
+	}
+
+	/*
+		if len(mixedIds) == 0 || len(mixedIds)%2 != 0 {
+			return nil, errors.New("sensors is required")
+		}
+	*/
+
+	sensors := make([]ModuleAndSensor, 0)
+	if len(mixedIds)%2 == 0 {
+		for i := 0; i < len(mixedIds); i += 2 {
+			sensors = append(sensors, ModuleAndSensor{
+				ModuleID: mixedIds[i],
+				SensorID: mixedIds[i+1],
+			})
 		}
 	}
 
@@ -124,8 +146,8 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 type AggregateQueryParams struct {
 	Start              time.Time
 	End                time.Time
-	Sensors            []int64
 	Stations           []int32
+	Sensors            []ModuleAndSensor
 	Complete           bool
 	Interval           int32
 	TimeGroupThreshold int32
@@ -236,6 +258,14 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 	summaries = make(map[string]*AggregateSummary)
 	selectedAggregateName := qp.Aggregate
 
+	moduleIds := make([]int64, 0)
+	sensorIds := make([]int64, 0)
+
+	for _, mAndS := range qp.Sensors {
+		moduleIds = append(moduleIds, mAndS.ModuleID)
+		sensorIds = append(sensorIds, mAndS.SensorID)
+	}
+
 	for _, name := range handlers.AggregateNames {
 		table := handlers.AggregateTableNames[name]
 
@@ -244,8 +274,8 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 			MIN(time) AS start,
 			MAX(time) AS end,
 			COUNT(*) AS number_records
-			FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND sensor_id IN (?);
-			`, table), qp.Start, qp.End, qp.Stations, qp.Sensors)
+			FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?);
+			`, table), qp.Start, qp.End, qp.Stations, moduleIds, sensorIds)
 		if err != nil {
 			return nil, "", err
 		}
@@ -286,6 +316,14 @@ func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryPa
 	log := Logger(ctx).Sugar()
 
 	tableName := handlers.AggregateTableNames[aqp.AggregateName]
+
+	moduleIds := make([]int64, 0)
+	sensorIds := make([]int64, 0)
+
+	for _, mAndS := range aqp.Sensors {
+		moduleIds = append(moduleIds, mAndS.ModuleID)
+		sensorIds = append(sensorIds, mAndS.SensorID)
+	}
 
 	sqlQueryIncomplete := fmt.Sprintf(`
 		WITH
@@ -339,7 +377,7 @@ func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryPa
 										   LAG(time) OVER (ORDER BY time) AS previous_timestamp,
 				EXTRACT(epoch FROM (time - LAG(time) OVER (ORDER BY time))) AS time_difference
 			FROM %s
-			WHERE time >= ? AND time <= ? AND station_id IN (?) AND sensor_id IN (?)
+			WHERE time >= ? AND time <= ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?)
 			ORDER BY time
 		),
 		with_temporal_clustering AS (
@@ -383,14 +421,14 @@ func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryPa
 		FROM complete
 		`, tableName)
 
-	log.Infow("querying", "aggregate", aqp.AggregateName, "expected_records", aqp.ExpectedRecords, "sensors", aqp.Sensors, "stations", aqp.Stations,
+	log.Infow("querying", "aggregate", aqp.AggregateName, "expected_records", aqp.ExpectedRecords, "module_ids", moduleIds, "sensors_ids", sensorIds, "stations", aqp.Stations,
 		"start", aqp.Start, "end", aqp.End, "interval", aqp.Interval, "tgs", aqp.TimeGroupThreshold)
 
 	buildQuery := func() (query string, args []interface{}, err error) {
 		if aqp.Complete {
-			return sqlx.In(sqlQueryComplete, aqp.Start, aqp.End, aqp.Interval, aqp.Start, aqp.End, aqp.Stations, aqp.Sensors, aqp.TimeGroupThreshold)
+			return sqlx.In(sqlQueryComplete, aqp.Start, aqp.End, aqp.Interval, aqp.Start, aqp.End, aqp.Stations, moduleIds, sensorIds, aqp.TimeGroupThreshold)
 		}
-		return sqlx.In(sqlQueryIncomplete, aqp.Start, aqp.End, aqp.Stations, aqp.Sensors, aqp.TimeGroupThreshold)
+		return sqlx.In(sqlQueryIncomplete, aqp.Start, aqp.End, aqp.Stations, moduleIds, sensorIds, aqp.TimeGroupThreshold)
 	}
 
 	query, args, err := buildQuery()

@@ -9,7 +9,12 @@ export * from "./common";
 import { ColorScale, createSensorColorScale } from "./d3-helpers";
 
 export class SensorMeta {
-    constructor(public readonly id: number, public readonly fullKey: string, public readonly name: string) {}
+    constructor(
+        public readonly moduleId: number,
+        public readonly moduleKey: string,
+        public readonly sensorId: number,
+        public readonly sensorKey: string
+    ) {}
 }
 
 export class StationMeta {
@@ -24,12 +29,17 @@ export interface HasSensorParams {
     readonly sensorParams: SensorParams;
 }
 
-export class TreeOption {
+export class StationTreeOption {
+    constructor(public readonly id: string | number, public readonly label: string) {}
+}
+
+export class SensorTreeOption {
     constructor(
         public readonly id: string | number,
         public readonly label: string,
-        public readonly sensorParams: SensorParams | null,
-        public readonly children: TreeOption[] | undefined = undefined
+        public readonly children: SensorTreeOption[] | undefined = undefined,
+        public readonly moduleId: number,
+        public readonly sensorId: number | null
     ) {}
 }
 
@@ -161,7 +171,7 @@ export class Bookmark {
     }
 
     public get allSensors(): number[] {
-        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1] || [])));
+        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1] || [])).map((sensorAndModule) => sensorAndModule[0]));
     }
 
     public static sameAs(a: Bookmark, b: Bookmark): boolean {
@@ -189,6 +199,7 @@ export class Graph extends Viz {
 
     constructor(public chartParams: DataQueryParams) {
         super();
+        if (this.chartParams.sensors.length != 1) throw new Error(`viz: Graph too many sensors`);
     }
 
     public clone(): Viz {
@@ -498,10 +509,11 @@ export class Workspace {
             (iq) =>
                 this.querier.queryInfo(iq).then((info) => {
                     return _.map(info.stations, (info, stationId) => {
-                        const name = info[0].name;
-                        const sensors = info.map((row) => new SensorMeta(row.sensorId, row.key, row.key));
-                        const station = new StationMeta(Number(stationId), name, sensors);
+                        const stationName = info[0].stationName;
+                        const sensors = info.map((row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey));
+                        const station = new StationMeta(Number(stationId), stationName, sensors);
                         this.stations[station.id] = station;
+                        console.log("station-meta", station, info);
                         return station;
                     });
                 }) as Promise<unknown>
@@ -527,7 +539,8 @@ export class Workspace {
         }
 
         const stationId = viz.chartParams.stations[0];
-        const sensorId = viz.chartParams.sensors[0];
+        const sensor = viz.chartParams.sensors[0];
+        const sensorId = sensor[1];
 
         const station = this.stations[stationId];
         const key = keysById[sensorId].key;
@@ -571,39 +584,36 @@ export class Workspace {
         return this.addGraph(new Graph(new DataQueryParams(TimeRange.eternity, stations, sensors)));
     }
 
-    public get stationOptions(): TreeOption[] {
+    public get stationOptions(): StationTreeOption[] {
         return Object.values(this.stations).map((station) => {
-            const sp = new SensorParams([station.id], []);
-            return new TreeOption(station.id, station.name, sp);
+            return new StationTreeOption(station.id, station.name);
         });
     }
 
-    public get sensorOptions(): TreeOption[] {
+    public get sensorOptions(): SensorTreeOption[] {
         const allSensors = _.flatten(Object.values(this.stations).map((station) => station.sensors));
-        const allModulesBySensorKey = _.fromPairs(_.flatten(this.meta.modules.map((m) => m.sensors.map((s) => [s.fullKey, m]))));
-        const visibleModules = _.uniqBy(
-            allSensors.map((s) => allModulesBySensorKey[s.name]),
-            (m) => m.key
-        );
-        const sensorsByKey = _.keyBy(_.flatten(Object.values(this.stations).map((station) => station.sensors)), (s) => s.name);
+        const allModules = _.groupBy(allSensors, (s) => s.moduleId);
+        const keysById = _.fromPairs(allSensors.map((row) => [row.moduleId, row.moduleKey]));
+        const allModulesByModuleKey = _.keyBy(this.meta.modules, (m) => m.key);
 
-        return visibleModules.map((m) => {
-            const children: TreeOption[] = _.flatten(
-                m.sensors
-                    .map((sensor) => sensor.fullKey)
-                    .map((sensorKey) => {
-                        const sensor = sensorsByKey[sensorKey];
-                        if (sensor) {
-                            const sp = new SensorParams([], [sensor.id]);
-                            const label = i18n.tc(sensor.name) || sensor.name;
-                            return [new TreeOption(sensor.id, label, sp)];
-                        }
-                        return [];
+        const options = _.map(
+            allModules,
+            (value, moduleId: number): StationTreeOption => {
+                const moduleKey = keysById[moduleId];
+                const children: SensorTreeOption[] = _.flatten(
+                    value.map((row) => {
+                        const label = i18n.tc(row.sensorKey) || row.sensorKey;
+                        const optionId = `${row.moduleId}-${row.sensorId}`;
+                        return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId)];
                     })
-            );
+                );
+                return new SensorTreeOption(`${moduleKey}-${moduleId}`, i18n.tc(moduleKey), children, moduleId, null);
+            }
+        );
 
-            return new TreeOption(m.key, i18n.tc(m.key), null, children);
-        });
+        console.log("sensor-tree-options", options);
+
+        return (options as unknown) as SensorTreeOption[];
     }
 
     public remove(viz: Viz): Workspace {

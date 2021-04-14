@@ -27,8 +27,8 @@ type StationRepository struct {
 	db *sqlxcache.DB
 }
 
-func NewStationRepository(db *sqlxcache.DB) (rr *StationRepository, err error) {
-	return &StationRepository{db: db}, nil
+func NewStationRepository(db *sqlxcache.DB) (rr *StationRepository) {
+	return &StationRepository{db: db}
 }
 
 func (r *StationRepository) Add(ctx context.Context, adding *data.Station) (station *data.Station, err error) {
@@ -135,6 +135,25 @@ func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, devic
 	return stations[0], nil
 }
 
+func (r *StationRepository) QueryStationConfigurationByMetaID(ctx context.Context, metaRecordID int64) (*data.StationConfiguration, error) {
+	configurations := []*data.StationConfiguration{}
+	if err := r.db.SelectContext(ctx, &configurations, `SELECT * FROM fieldkit.station_configuration WHERE meta_record_id = $1`, metaRecordID); err != nil {
+		return nil, err
+	}
+	if len(configurations) != 1 {
+		return nil, nil
+	}
+	return configurations[0], nil
+}
+
+func (r *StationRepository) QueryStationModulesByMetaID(ctx context.Context, metaRecordID int64) ([]*data.StationModule, error) {
+	modules := []*data.StationModule{}
+	if err := r.db.SelectContext(ctx, &modules, `SELECT * FROM fieldkit.station_module WHERE configuration_id IN (SELECT id FROM fieldkit.station_configuration WHERE meta_record_id = $1)`, metaRecordID); err != nil {
+		return nil, err
+	}
+	return modules, nil
+}
+
 func (r *StationRepository) UpsertConfiguration(ctx context.Context, configuration *data.StationConfiguration) (*data.StationConfiguration, error) {
 	if configuration.SourceID != nil && configuration.MetaRecordID == nil {
 		if err := r.db.NamedGetContext(ctx, configuration, `
@@ -222,10 +241,7 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 }
 
 func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Context, station *data.Station, statusReply *pbapp.HttpReply) error {
-	pr, err := NewProvisionRepository(r.db)
-	if err != nil {
-		return err
-	}
+	pr := NewProvisionRepository(r.db)
 
 	p, err := pr.QueryOrCreateProvision(ctx, station.DeviceID, statusReply.Status.Identity.Generation)
 	if err != nil {

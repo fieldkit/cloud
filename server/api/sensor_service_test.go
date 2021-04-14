@@ -54,7 +54,7 @@ func TestGetSensorsData(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/sensors/data?sensors=%d&stations=%d", 1, 1), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/sensors/data?sensors=%s&stations=%d", fmt.Sprintf("%v,%v", 1, 1), 1), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr := tests.ExecuteRequest(req, api)
 

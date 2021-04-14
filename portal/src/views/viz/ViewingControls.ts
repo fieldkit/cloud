@@ -7,14 +7,14 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import Spinner from "@/views/shared/Spinner.vue";
 
 import { TimeRange } from "./common";
-import { Graph, HasSensorParams, SensorParams, TreeOption, Workspace, FastTime, TimeZoom, ChartType } from "./viz";
+import { Graph, HasSensorParams, SensorParams, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType } from "./viz";
 import { vueTickHack } from "@/utilities";
 
 class NewParams implements HasSensorParams {
     public readonly sensorParams: SensorParams;
 
-    constructor(stationId: number, sensorId: number) {
-        this.sensorParams = new SensorParams([stationId], [sensorId]);
+    constructor(stationId: number, sensorAndModule: [number, number]) {
+        this.sensorParams = new SensorParams([stationId], [sensorAndModule]);
     }
 }
 
@@ -59,19 +59,20 @@ export const ViewingControls = Vue.extend({
         },
     },
     computed: {
-        stationOptions(): TreeOption[] {
+        stationOptions(): StationTreeOption[] {
             this.viz.log("station-options", this.workspace.stationOptions);
             return this.workspace.stationOptions;
         },
-        sensorOptions(): TreeOption[] {
+        sensorOptions(): SensorTreeOption[] {
             this.viz.log("sensor-options", this.workspace.sensorOptions);
             return this.workspace.sensorOptions;
         },
         selectedStation(): number | null {
             return this.viz.chartParams.sensorParams.stations[0];
         },
-        selectedSensor(): number | null {
-            return this.viz.chartParams.sensorParams.sensors[0];
+        selectedSensor(): string | null {
+            const sensorAndModule = this.viz.chartParams.sensorParams.sensors[0];
+            return `${sensorAndModule[0]}-${sensorAndModule[1]}`;
         },
         manualRangeValue() {
             if (this.viz.visible.isExtreme()) {
@@ -99,21 +100,21 @@ export const ViewingControls = Vue.extend({
             console.log("raising viz-time-zoomed");
             this.$emit("viz-time-zoomed", new TimeZoom(fast, null));
         },
-        raiseChangeStation(node: TreeOption): void {
+        raiseChangeStation(node: StationTreeOption): void {
             const sensor = this.viz.chartParams.sensorParams.sensors[0];
-            console.log("raising viz-change-sensors");
+            console.log("raising viz-change-sensors", "sensor", sensor);
             vueTickHack(() => {
                 this.$emit("viz-change-sensors", new NewParams(Number(node.id), sensor));
             });
         },
-        raiseChangeSensor(node: TreeOption): void {
+        raiseChangeSensor(node: SensorTreeOption): void {
             const station = this.viz.chartParams.sensorParams.stations[0];
-            if (node.sensorParams) {
-                console.log("raising viz-change-sensors");
-                vueTickHack(() => {
-                    this.$emit("viz-change-sensors", new NewParams(station, Number(node.id)));
-                });
-            }
+            console.log("raising viz-change-sensors", "station", station);
+            vueTickHack(() => {
+                if (!node.moduleId) throw new Error();
+                if (!node.sensorId) throw new Error();
+                this.$emit("viz-change-sensors", new NewParams(station, [node.moduleId, node.sensorId]));
+            });
         },
         raiseChangeChartType(option: { id: ChartType }): void {
             console.log("raising viz-change-chart", option.id);

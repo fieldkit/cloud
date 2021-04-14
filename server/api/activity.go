@@ -34,10 +34,7 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 		pageNumber = int32(*payload.Page)
 	}
 
-	sr, err := repositories.NewStationRepository(c.options.Database)
-	if err != nil {
-		return nil, err
-	}
+	sr := repositories.NewStationRepository(c.options.Database)
 
 	station, err := sr.QueryStationByID(ctx, int32(payload.ID))
 	if err != nil {

@@ -39,6 +39,7 @@ export interface DataRow {
     time: number;
     stationId: number;
     sensorId: number;
+    moduleId: number;
     location: [number, number] | null;
     value: number;
 }
@@ -50,9 +51,12 @@ export interface SensorDataResponse {
 }
 
 interface StationInfoResponse {
+    stationId: number;
+    stationName: string;
+    moduleId: number;
+    moduleKey: string;
     sensorId: number;
-    key: string;
-    name: string;
+    sensorKey: string;
 }
 
 export interface SensorInfoResponse {

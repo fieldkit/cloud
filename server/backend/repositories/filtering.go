@@ -32,7 +32,7 @@ func NewFiltering() (f *Filtering) {
 func (f *Filtering) Apply(ctx context.Context, record *ResolvedRecord) *FilteredRecord {
 	filters := &MatchedFilters{
 		Record:   make([]string, 0),
-		Readings: make(map[string][]string),
+		Readings: make(map[SensorKey][]string),
 	}
 
 	for _, filter := range f.filters {

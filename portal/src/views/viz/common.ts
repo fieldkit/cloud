@@ -59,8 +59,11 @@ export class Sensor {
     constructor(public readonly id: number, public readonly name: string) {}
 }
 
-export type Stations = number[];
-export type Sensors = number[];
+export type StationID = number;
+export type ModuleID = number;
+export type SensorID = number;
+export type Stations = StationID[];
+export type Sensors = [ModuleID, SensorID][];
 
 export class SensorParams {
     constructor(public readonly stations: Stations, public readonly sensors: Sensors) {}

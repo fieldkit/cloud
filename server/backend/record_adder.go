@@ -19,12 +19,14 @@ import (
 )
 
 type RecordAdder struct {
-	verbose    bool
-	handler    RecordHandler
-	db         *sqlxcache.DB
-	files      files.FileArchive
-	metrics    *logging.Metrics
-	statistics *newRecordStatistics
+	verbose             bool
+	handler             RecordHandler
+	db                  *sqlxcache.DB
+	files               files.FileArchive
+	metrics             *logging.Metrics
+	stationRepository   *repositories.StationRepository
+	provisionRepository *repositories.ProvisionRepository
+	statistics          *newRecordStatistics
 }
 
 type ParsedRecord struct {
@@ -35,12 +37,14 @@ type ParsedRecord struct {
 
 func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, handler RecordHandler, verbose bool) (ra *RecordAdder) {
 	return &RecordAdder{
-		verbose:    verbose,
-		db:         db,
-		files:      files,
-		metrics:    metrics,
-		handler:    handler,
-		statistics: &newRecordStatistics{},
+		verbose:             verbose,
+		db:                  db,
+		files:               files,
+		metrics:             metrics,
+		handler:             handler,
+		stationRepository:   repositories.NewStationRepository(db),
+		provisionRepository: repositories.NewProvisionRepository(db),
+		statistics:          &newRecordStatistics{},
 	}
 }
 
@@ -71,20 +75,11 @@ func (ra *RecordAdder) tryParseSignedRecord(sr *pb.SignedRecord, dataRecord *pb.
 }
 
 func (ra *RecordAdder) tryFindStation(ctx context.Context, i *data.Ingestion) (*data.Station, error) {
-	r, err := repositories.NewStationRepository(ra.db)
-	if err != nil {
-		return nil, err
-	}
-	return r.TryQueryStationByDeviceID(ctx, i.DeviceID)
+	return ra.stationRepository.TryQueryStationByDeviceID(ctx, i.DeviceID)
 }
 
 func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*data.Provision, error) {
-	r, err := repositories.NewProvisionRepository(ra.db)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.QueryOrCreateProvision(ctx, i.DeviceID, i.GenerationID)
+	return ra.provisionRepository.QueryOrCreateProvision(ctx, i.DeviceID, i.GenerationID)
 }
 
 func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) (warning error, fatal error) {

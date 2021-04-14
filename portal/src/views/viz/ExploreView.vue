@@ -135,7 +135,7 @@ export default Vue.extend({
                     }
 
                     const stations = [stationId];
-                    const sensors = [quickSensors.stations[stationId][0].sensorId];
+                    const sensors = [[quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId]];
 
                     return workspace
                         .addStandardGraph(stations, sensors)

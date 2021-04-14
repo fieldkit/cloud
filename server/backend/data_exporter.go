@@ -35,7 +35,7 @@ type ExportCriteria struct {
 	Start    time.Time
 	End      time.Time
 	Stations []int32
-	Sensors  []int64
+	Sensors  []ModuleAndSensor
 }
 
 type Exporter struct {
@@ -78,10 +78,7 @@ func contains(ids []int64, value int64) bool {
 func (e *Exporter) Export(ctx context.Context, criteria *ExportCriteria, format ExportFormat, progressFunc ExportProgressFunc, writer io.Writer) error {
 	mr := repositories.NewModuleMetaRepository()
 
-	sr, err := repositories.NewStationRepository(e.db)
-	if err != nil {
-		return err
-	}
+	sr := repositories.NewStationRepository(e.db)
 
 	allSensors := []*data.Sensor{}
 	if err := e.db.SelectContext(ctx, &allSensors, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
@@ -91,13 +88,20 @@ func (e *Exporter) Export(ctx context.Context, criteria *ExportCriteria, format 
 	e.sensors = make([]*repositories.SensorAndModuleMeta, 0)
 	e.sensorsByID = make(map[int64]*data.Sensor)
 	for _, sensor := range allSensors {
-		if len(criteria.Sensors) == 0 || contains(criteria.Sensors, sensor.ID) {
-			sam, err := mr.FindByFullKey(sensor.Key)
-			if err != nil {
-				return err
+		//
+		//
+		//
+		//
+		//
+		if false {
+			if len(criteria.Sensors) == 0 /*|| contains(criteria.Sensors, sensor.ID)*/ {
+				sam, err := mr.FindByFullKey(sensor.Key)
+				if err != nil {
+					return err
+				}
+				e.sensorsByID[sensor.ID] = sensor
+				e.sensors = append(e.sensors, sam)
 			}
-			e.sensorsByID[sensor.ID] = sensor
-			e.sensors = append(e.sensors, sam)
 		}
 	}
 
@@ -145,10 +149,7 @@ func (e *Exporter) Export(ctx context.Context, criteria *ExportCriteria, format 
 
 func (e *Exporter) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, meta *data.MetaRecord) error {
 	if _, ok := e.byProvision[p.ID]; !ok {
-		sr, err := repositories.NewStationRepository(e.db)
-		if err != nil {
-			return err
-		}
+		sr := repositories.NewStationRepository(e.db)
 
 		station, err := sr.QueryStationByDeviceID(ctx, p.DeviceID)
 		if err != nil {
@@ -193,11 +194,17 @@ func (e *Exporter) OnData(ctx context.Context, p *data.Provision, r *pb.DataReco
 
 	sensors := make([]*repositories.ReadingValue, 0)
 	for _, sam := range e.sensors {
-		key := sam.Sensor.FullKey
-		if rv, ok := filtered.Record.Readings[key]; !ok {
+		// TODO This is slow and broken
+		appended := false
+		for key, rv := range filtered.Record.Readings {
+			if key.SensorKey == sam.Sensor.FullKey {
+				sensors = append(sensors, rv)
+				appended = true
+				break
+			}
+		}
+		if !appended {
 			sensors = append(sensors, nil)
-		} else {
-			sensors = append(sensors, rv)
 		}
 	}
 

@@ -165,7 +165,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 	}
 
 	numberOfNonVirtualModulesWithData := 0
-	readings := make(map[string]*ReadingValue)
+	readings := make(map[SensorKey]*ReadingValue)
 	for sgIndex, sensorGroup := range dataRecord.Readings.SensorGroups {
 		moduleIndex := sgIndex
 		if moduleIndex >= len(meta.Station.AllModules) {
@@ -202,7 +202,12 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 					continue
 				}
 
-				readings[sensor.Key] = &ReadingValue{
+				key := SensorKey{
+					ModuleIndex: uint32(moduleIndex),
+					SensorKey:   sensor.Key,
+				}
+
+				readings[key] = &ReadingValue{
 					Sensor: sensor,
 					Module: module,
 					Value:  float64(reading.Value),

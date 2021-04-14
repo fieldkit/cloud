@@ -103,38 +103,43 @@ type ReadingValue struct {
 	Value  float64         `json:"value"`
 }
 
+type SensorKey struct {
+	ModuleIndex uint32 `json:"module_index"`
+	SensorKey   string `json:"sensor_key"`
+}
+
 type ResolvedRecord struct {
-	ID       int64                    `json:"id"`
-	Time     int64                    `json:"time"`
-	Location []float64                `json:"location"`
-	Readings map[string]*ReadingValue `json:"readings"`
+	ID       int64                       `json:"id"`
+	Time     int64                       `json:"time"`
+	Location []float64                   `json:"location"`
+	Readings map[SensorKey]*ReadingValue `json:"-"`
 }
 
 type MatchedFilters struct {
-	Record   []string            `json:"record"`
-	Readings map[string][]string `json:"readings"`
+	Record   []string               `json:"record"`
+	Readings map[SensorKey][]string `json:"-"`
 }
 
 func (mf *MatchedFilters) AddRecord(name string) {
 	mf.Record = append(mf.Record, name)
 }
 
-func (mf *MatchedFilters) AddReading(sensor, name string) {
-	if mf.Readings[sensor] == nil {
-		mf.Readings[sensor] = make([]string, 0)
+func (mf *MatchedFilters) AddReading(key SensorKey, name string) {
+	if mf.Readings[key] == nil {
+		mf.Readings[key] = make([]string, 0)
 	}
-	mf.Readings[sensor] = append(mf.Readings[sensor], name)
+	mf.Readings[key] = append(mf.Readings[key], name)
 }
 
 func (mf *MatchedFilters) NumberOfReadingsFiltered() int {
 	return len(mf.Readings)
 }
 
-func (mf *MatchedFilters) IsFiltered(sensor string) bool {
+func (mf *MatchedFilters) IsFiltered(sensorKey SensorKey) bool {
 	if len(mf.Record) > 0 {
 		return true
 	}
-	if v, ok := mf.Readings[sensor]; ok {
+	if v, ok := mf.Readings[sensorKey]; ok {
 		if len(v) > 0 {
 			return true
 		}

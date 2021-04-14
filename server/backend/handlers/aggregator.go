@@ -50,19 +50,24 @@ var (
 	}
 )
 
+type AggregateSensorKey struct {
+	SensorKey string
+	ModuleID  int64
+}
+
 type aggregation struct {
 	opened   time.Time
 	interval time.Duration
 	name     string
 	table    string
-	values   map[string][]float64
+	values   map[AggregateSensorKey][]float64
 	location []float64
 }
 
 type Aggregated struct {
 	Time          time.Time
 	Location      []float64
-	Values        map[string]float64
+	Values        map[AggregateSensorKey]float64
 	NumberSamples int32
 }
 
@@ -74,7 +79,7 @@ func (a *aggregation) canAdd(t time.Time) bool {
 	return a.opened.IsZero() || a.opened == t
 }
 
-func (a *aggregation) add(t time.Time, key string, location []float64, value float64) error {
+func (a *aggregation) add(t time.Time, key AggregateSensorKey, location []float64, value float64) error {
 	if !a.canAdd(t) {
 		return fmt.Errorf("unable to add to aggregation")
 	}
@@ -96,7 +101,7 @@ func (a *aggregation) add(t time.Time, key string, location []float64, value flo
 }
 
 func (a *aggregation) close() (*Aggregated, error) {
-	agg := make(map[string]float64)
+	agg := make(map[AggregateSensorKey]float64)
 
 	nsamples := 0
 
@@ -159,49 +164,49 @@ func NewAggregator(db *sqlxcache.DB, stationID int32, batchSize int) *Aggregator
 				interval: time.Second * 10,
 				name:     "10s",
 				table:    "fieldkit.aggregated_10s",
-				values:   make(map[string][]float64),
+				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Minute * 1,
 				name:     "1m",
 				table:    "fieldkit.aggregated_1m",
-				values:   make(map[string][]float64),
+				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Minute * 10,
 				name:     "10m",
 				table:    "fieldkit.aggregated_10m",
-				values:   make(map[string][]float64),
+				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Minute * 30,
 				name:     "30m",
 				table:    "fieldkit.aggregated_30m",
-				values:   make(map[string][]float64),
+				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Hour * 1,
 				name:     "1h",
 				table:    "fieldkit.aggregated_1h",
-				values:   make(map[string][]float64),
+				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Hour * 6,
 				name:     "6h",
 				table:    "fieldkit.aggregated_6h",
-				values:   make(map[string][]float64),
+				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Hour * 12,
 				name:     "12h",
 				table:    "fieldkit.aggregated_12h",
-				values:   make(map[string][]float64),
+				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Hour * 24,
 				name:     "24h",
 				table:    "fieldkit.aggregated_24h",
-				values:   make(map[string][]float64),
+				values:   make(map[AggregateSensorKey][]float64),
 			},
 		},
 	}
@@ -235,21 +240,22 @@ func (v *Aggregator) upsertSingle(ctx context.Context, a *aggregation, d *Aggreg
 	keeping := make([]int64, 0)
 
 	for key, value := range d.Values {
-		if v.sensors[key] == nil {
+		if v.sensors[key.SensorKey] == nil {
 			newSensor := &data.Sensor{
-				Key: key,
+				Key: key.SensorKey,
 			}
 			if err := v.db.NamedGetContext(ctx, newSensor, `
 				INSERT INTO fieldkit.aggregated_sensor (key) VALUES (:key) RETURNING id
 				`, newSensor); err != nil {
 				return fmt.Errorf("error adding aggregated sensor: %v", err)
 			}
-			v.sensors[key] = newSensor
+			v.sensors[key.SensorKey] = newSensor
 		}
 
 		row := &data.AggregatedReading{
 			StationID:     v.stationID,
-			SensorID:      v.sensors[key].ID,
+			SensorID:      v.sensors[key.SensorKey].ID,
+			ModuleID:      &key.ModuleID,
 			Time:          data.NumericWireTime(d.Time),
 			Location:      location,
 			Value:         value,
@@ -257,9 +263,9 @@ func (v *Aggregator) upsertSingle(ctx context.Context, a *aggregation, d *Aggreg
 		}
 
 		if err := v.db.NamedGetContext(ctx, row, fmt.Sprintf(`
-			INSERT INTO %s (station_id, sensor_id, time, location, value, nsamples)
-			VALUES (:station_id, :sensor_id, :time, ST_SetSRID(ST_GeomFromText(:location), 4326), :value, :nsamples)
-			ON CONFLICT (time, station_id, sensor_id)
+			INSERT INTO %s (station_id, sensor_id, module_id, time, location, value, nsamples)
+			VALUES (:station_id, :sensor_id, :module_id, :time, ST_SetSRID(ST_GeomFromText(:location), 4326), :value, :nsamples)
+			ON CONFLICT (time, station_id, sensor_id, module_id)
 				DO UPDATE SET value = EXCLUDED.value, location = EXCLUDED.location,
 							  nsamples = EXCLUDED.nsamples
 			RETURNING id
@@ -327,7 +333,7 @@ func (v *Aggregator) DeleteEmptyAggregates(ctx context.Context) error {
 	return nil
 }
 
-func (v *Aggregator) AddSample(ctx context.Context, sampled time.Time, location []float64, sensorKey string, value float64) error {
+func (v *Aggregator) AddSample(ctx context.Context, sampled time.Time, location []float64, sensorKey AggregateSensorKey, value float64) error {
 	for _, child := range v.aggregations {
 		time := child.getTime(sampled)
 
@@ -345,7 +351,7 @@ func (v *Aggregator) AddSample(ctx context.Context, sampled time.Time, location 
 	return nil
 }
 
-func (v *Aggregator) AddMap(ctx context.Context, sampled time.Time, location []float64, data map[string]float64) error {
+func (v *Aggregator) AddMap(ctx context.Context, sampled time.Time, location []float64, data map[AggregateSensorKey]float64) error {
 	for _, child := range v.aggregations {
 		time := child.getTime(sampled)
 
