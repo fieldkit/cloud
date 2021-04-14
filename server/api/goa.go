@@ -370,6 +370,9 @@ type AuthAttempt struct {
 func VerifyToken(ctx context.Context, a AuthAttempt) (jwt.MapClaims, int32, error) {
 	token := a.Token
 
+	log := Logger(ctx).Sugar()
+	log.Infow("verify-token:")
+
 	if strings.Contains(a.Token, " ") {
 		// Remove authorization scheme prefix (e.g. "Bearer")
 		cred := strings.SplitN(a.Token, " ", 2)[1]
@@ -383,18 +386,22 @@ func VerifyToken(ctx context.Context, a AuthAttempt) (jwt.MapClaims, int32, erro
 	if err != nil {
 		// Authentication is optional if required scopes is empty.
 		if len(a.Scheme.RequiredScopes) == 0 {
+			log.Infow("verify-token: no scope")
 			return nil, 0, nil
 		}
-		return nil, 0, a.Unauthorized("invalid token")
+		log.Infow("verify-token: fail", "error", err)
+		return nil, 0, a.Unauthorized("verify: invalid token")
 	}
 
 	// Make sure this token we've been given has valid scopes.
 	if claims["scopes"] == nil {
-		return nil, 0, a.Unauthorized("invalid scopes")
+		log.Infow("verify-token: fail 2")
+		return nil, 0, a.Unauthorized("verify: invalid scopes")
 	}
 	scopes, ok := claims["scopes"].([]interface{})
 	if !ok {
-		return nil, 0, a.Unauthorized("invalid scopes")
+		log.Infow("verify-token: fail 3")
+		return nil, 0, a.Unauthorized("verify: invalid scopes")
 	}
 
 	scopesInToken := make([]string, len(scopes))
@@ -405,26 +412,27 @@ func VerifyToken(ctx context.Context, a AuthAttempt) (jwt.MapClaims, int32, erro
 	// We have a good token that has scopes, note that this does play
 	// nice with schemes that don't have any required scopes.
 	if err := a.Scheme.Validate(scopesInToken); err != nil {
-		return nil, 0, a.Unauthorized("invalid scopes")
+		log.Infow("verify-token: fail 4")
+		return nil, 0, a.Unauthorized("verify: invalid scopes")
 	}
 
 	userID := int32(claims["sub"].(float64))
 
+	log.Infow("verify-token: success, auth")
 	return claims, userID, nil
 }
 
 func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
-	claims, userID, err := VerifyToken(ctx, a)
+	withAttempt := addAuthAttemptToContext(ctx, &a)
+	claims, userID, err := VerifyToken(withAttempt, a)
 	if err != nil {
 		return nil, err
 	}
+	withLogging := logging.WithUserID(withAttempt, userID)
 	if claims == nil {
-		return ctx, nil
+		return withLogging, nil
 	}
 
-	withClaims := addClaimsToContext(ctx, claims)
-	withAttempt := addAuthAttemptToContext(withClaims, &a)
-	withLogging := logging.WithUserID(withAttempt, userID)
-
-	return withLogging, nil
+	withClaims := addClaimsToContext(withLogging, claims)
+	return withClaims, nil
 }

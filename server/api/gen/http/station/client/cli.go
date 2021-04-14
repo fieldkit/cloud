@@ -54,9 +54,11 @@ func BuildGetPayload(stationGetID string, stationGetAuth string) (*station.GetPa
 			return nil, fmt.Errorf("invalid value for id, must be INT32")
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = stationGetAuth
+		if stationGetAuth != "" {
+			auth = &stationGetAuth
+		}
 	}
 	v := &station.GetPayload{}
 	v.ID = id

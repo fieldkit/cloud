@@ -2906,8 +2906,8 @@ func EncodeDownloadPhotoRequest(encoder func(*http.Request) goahttp.Encoder) fun
 			head := *p.IfNoneMatch
 			req.Header.Set("If-None-Match", head)
 		}
-		{
-			head := p.Auth
+		if p.Auth != nil {
+			head := *p.Auth
 			if !strings.Contains(head, " ") {
 				req.Header.Set("Authorization", "Bearer "+head)
 			} else {

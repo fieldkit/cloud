@@ -140,17 +140,17 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue, { PropType } from "vue";
 import * as utils from "../../utilities";
-import * as ActionTypes from "@/store/actions";
-import FKApi from "@/api/api";
-import ProjectStations from "./ProjectStations";
-import ProjectActivity from "./ProjectActivity";
+import { ProjectModule, DisplayStation, Project, DisplayProject } from "@/store";
+import ProjectStations from "./ProjectStations.vue";
 import CommonComponents from "@/views/shared";
-import Comments from "../comments/Comments";
+import Comments from "../comments/Comments.vue";
 import FollowControl from "@/views/shared/FollowControl.vue";
+import { twitterCardMeta } from "@/social";
 
-export default {
+export default Vue.extend({
     name: "ProjectPublic",
     components: {
         Comments,
@@ -161,25 +161,35 @@ export default {
     data: () => {
         return {};
     },
+    metaInfo() {
+        return {
+            meta: twitterCardMeta(this.displayProject),
+            afterNavigation() {
+                console.log("hello: after-navigation");
+            },
+        };
+    },
     props: {
         user: {
             required: true,
         },
         userStations: {
+            type: Array as PropType<DisplayStation[]>,
             required: true,
         },
         displayProject: {
+            type: Object as PropType<DisplayProject>,
             required: true,
         },
     },
     computed: {
-        project() {
+        project(): Project {
             return this.displayProject.project;
         },
-        projectStations() {
+        projectStations(): DisplayStation[] {
             return this.$getters.projectsById[this.displayProject.id].stations;
         },
-        projectModules() {
+        projectModules(): { name: string; url: string }[] {
             return this.$getters.projectsById[this.displayProject.id].modules.map((m) => {
                 return {
                     name: m.name,
@@ -189,15 +199,16 @@ export default {
         },
     },
     methods: {
-        getModuleImg(module) {
+        getModuleImg(module: ProjectModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
         },
-        getTeamHeading() {
+        getTeamHeading(): string {
+            // TODO i18n
             const members = this.displayProject.users.length == 1 ? "member" : "members";
             return "Project Team (" + this.displayProject.users.length + " " + members + ")";
         },
     },
-};
+});
 </script>
 
 <style scoped lang="scss">

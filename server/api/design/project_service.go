@@ -569,12 +569,11 @@ var _ = Service("project", func() {
 
 	Method("download photo", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
 			Attribute("projectId", Int32)
 			Required("projectId")
 			Attribute("size", Int32)

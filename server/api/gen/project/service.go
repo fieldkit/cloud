@@ -260,7 +260,7 @@ type UploadPhotoPayload struct {
 // DownloadPhotoPayload is the payload type of the project service download
 // photo method.
 type DownloadPhotoPayload struct {
-	Auth        string
+	Auth        *string
 	ProjectID   int32
 	Size        *int32
 	IfNoneMatch *string

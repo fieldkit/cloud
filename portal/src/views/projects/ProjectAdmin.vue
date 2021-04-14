@@ -89,17 +89,20 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue, { PropType } from "vue";
+import { CurrentUser, ProjectModule, DisplayStation, Project, DisplayProject, ProjectUser } from "@/store";
 import CommonComponents from "@/views/shared";
 import ProjectStations from "./ProjectStations.vue";
 import ProjectActivity from "./ProjectActivity.vue";
 import ProjectDataFiles from "./ProjectDataFiles.vue";
 import StationsReadings from "./StationsReadings.vue";
-import Comments from "../comments/Comments";
+import Comments from "../comments/Comments.vue";
 import TeamManager from "./TeamManager.vue";
 import * as utils from "../../utilities";
+import { twitterCardMeta } from "@/social";
 
-export default {
+export default Vue.extend({
     name: "ProjectAdmin",
     components: {
         ...CommonComponents,
@@ -109,30 +112,38 @@ export default {
         TeamManager,
         Comments,
     },
+    metaInfo() {
+        return {
+            meta: twitterCardMeta(this.displayProject),
+            afterNavigation() {
+                console.log("hello: after-navigation");
+            },
+        };
+    },
     props: {
         user: {
-            type: Object,
+            type: Object as PropType<CurrentUser>,
             required: true,
         },
         displayProject: {
-            type: Object,
+            type: Object as PropType<DisplayProject>,
             required: true,
         },
         userStations: {
-            type: Array,
+            type: Array as PropType<DisplayStation[]>,
             required: true,
         },
     },
-    data: () => {
+    data: (): { viewingActivityFeed: boolean } => {
         return {
             viewingActivityFeed: false,
         };
     },
     computed: {
-        project() {
+        project(): Project {
             return this.displayProject.project;
         },
-        projectModules() {
+        projectModules(this: any): { name: string; url: string }[] {
             return this.displayProject.modules.map((m) => {
                 return {
                     name: m.name,
@@ -142,35 +153,35 @@ export default {
         },
     },
     methods: {
-        getProjectUserImage(projectUser) {
+        getProjectUserImage(projectUser: ProjectUser): string | null {
             if (projectUser.user.photo) {
                 return this.$config.baseUrl + "/" + projectUser.user.photo.url;
             }
             return null;
         },
-        openProjectNotes() {
-            return this.$router.push({ name: "viewProjectNotes", params: { projectId: this.project.id } });
+        openProjectNotes(this: any): void {
+            this.$router.push({ name: "viewProjectNotes", params: { projectId: `${this.project.id}` } });
         },
-        editProject() {
-            return this.$router.push({ name: "editProject", params: { id: this.project.id } });
+        editProject(this: any): void {
+            this.$router.push({ name: "editProject", params: { id: `${this.project.id}` } });
         },
-        addUpdate() {
-            return this.$router.push({ name: "addProjectUpdate", params: { project: this.project } });
+        addUpdate(this: any): void {
+            this.$router.push({ name: "addProjectUpdate", params: { project: `${this.project}` } });
         },
-        viewProfile() {
-            return this.$emit("viewProfile");
+        viewProfile(): void {
+            this.$emit("viewProfile");
         },
-        closeActivityFeed() {
+        closeActivityFeed(): void {
             this.viewingActivityFeed = false;
         },
-        openActivityFeed() {
+        openActivityFeed(): void {
             this.viewingActivityFeed = true;
         },
-        getModuleImg(module) {
+        getModuleImg(module: ProjectModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
         },
     },
-};
+});
 </script>
 
 <style scoped lang="scss">

@@ -34,6 +34,8 @@ type options struct {
 	Email    string
 	Password string
 
+	Version string
+
 	Module  string
 	Profile string
 
@@ -63,7 +65,7 @@ func getProfileFromFile(module, path string) (string, error) {
 	return m[0][1], nil
 }
 
-func getMetaFromEnvironment(moduleOverride, profileOverride string, file string) (metadata *Metadata, err error) {
+func getMetaFromEnvironment(moduleOverride, profileOverride, version, file string) (metadata *Metadata, err error) {
 	jobName := os.Getenv("JOB_NAME")
 	if jobName == "" {
 		return nil, fmt.Errorf("ENV[JOB_NAME] missing.")
@@ -113,6 +115,7 @@ func getMetaFromEnvironment(moduleOverride, profileOverride string, file string)
 	metadata.Map["Build-Job-Name"] = aws.String(jobName)
 	metadata.Map["Build-Module"] = aws.String(module)
 	metadata.Map["Build-Profile"] = aws.String(profile)
+	metadata.Map["Build-Version"] = aws.String(version)
 
 	return
 }
@@ -186,7 +189,7 @@ func hasFile(session *session.Session, id string) (string, error) {
 	return fmt.Sprintf("https://%s.s3.amazonaws.com/%s", bucket, id), nil
 }
 
-func uploadFirmware(ctx context.Context, fkc *FkClient, moduleOverride, profileOverride, filename string, dryRun bool) error {
+func uploadFirmware(ctx context.Context, fkc *FkClient, moduleOverride, profileOverride, version, filename string, dryRun bool) error {
 	id, err := getFileHash(filename)
 	if err != nil {
 		return fmt.Errorf("error getting file hash: %v", filename)
@@ -199,7 +202,7 @@ func uploadFirmware(ctx context.Context, fkc *FkClient, moduleOverride, profileO
 
 	defer file.Close()
 
-	metadata, err := getMetaFromEnvironment(moduleOverride, profileOverride, filename)
+	metadata, err := getMetaFromEnvironment(moduleOverride, profileOverride, version, filename)
 	if err != nil {
 		return err
 	}
@@ -282,12 +285,17 @@ func main() {
 	flag.StringVar(&o.Host, "host", "127.0.0.1:8080", "fk instance hostname")
 	flag.StringVar(&o.Email, "email", "info@conservify.org", "email")
 	flag.StringVar(&o.Password, "password", "asdfasdfasdf", "password")
+	flag.StringVar(&o.Version, "version", "", "version")
 	flag.StringVar(&o.Module, "module", "", "override module")
 	flag.StringVar(&o.Profile, "profile", "", "override profile")
 	flag.StringVar(&o.FirmwareFile, "firmware-file", "", "firmware file")
 	flag.BoolVar(&o.DryRun, "dry", false, "dry run")
 
 	flag.Parse()
+
+	if o.Version == "" {
+		log.Fatalf("version is required")
+	}
 
 	fkc := NewFkClient(o.Host, o.Scheme)
 
@@ -299,7 +307,7 @@ func main() {
 	log.Printf("authenticated as %s (%s)", o.Email, o.Host)
 
 	if o.FirmwareFile != "" {
-		err := uploadFirmware(ctx, fkc, o.Module, o.Profile, o.FirmwareFile, o.DryRun)
+		err := uploadFirmware(ctx, fkc, o.Module, o.Profile, o.Version, o.FirmwareFile, o.DryRun)
 		if err != nil {
 			log.Fatalf("error adding firmware: %v", err)
 		}

@@ -118,7 +118,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		}
 
 		return c.Get(ctx, &station.GetPayload{
-			Auth: payload.Auth,
+			Auth: &payload.Auth,
 			ID:   existing.ID,
 		})
 	}
@@ -153,7 +153,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 	}
 
 	return c.Get(ctx, &station.GetPayload{
-		Auth: payload.Auth,
+		Auth: &payload.Auth,
 		ID:   adding.ID,
 	})
 }
@@ -178,7 +178,10 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 		return nil, err
 	}
 
-	preciseLocation := p.UserID() == sf.Owner.ID
+	preciseLocation := false
+	if !p.Anonymous() {
+		preciseLocation = p.UserID() == sf.Owner.ID
+	}
 
 	return transformStationFull(c.options.signer, p, sf, preciseLocation, false)
 }
@@ -249,7 +252,7 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 	}
 
 	return c.Get(ctx, &station.GetPayload{
-		Auth: payload.Auth,
+		Auth: &payload.Auth,
 		ID:   payload.ID,
 	})
 }
@@ -290,9 +293,19 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		return nil, err
 	}
 
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(payload.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.CanView(); err != nil {
+		return nil, err
+	}
+
 	preciseLocation := project.Privacy == data.Public
-	p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err == nil {
+
+	if !p.Anonymous() {
+		// NOTE This may already be in Permissions.
 		relationships, err := pr.QueryUserProjectRelationships(ctx, p.UserID())
 		if err != nil {
 			return nil, err

@@ -157,6 +157,7 @@ export interface SimpleUser {
     bio: string;
     mediaUrl: string;
     mediaContentType: string;
+    photo: { url: string };
 }
 
 export interface ProjectUser {
@@ -187,12 +188,11 @@ export interface Project {
     readOnly: boolean;
     slug: string;
     tags: string;
-    mediaContentType: string;
-    mediaUrl: string;
     startTime?: Date;
     endTime?: Date;
     bounds?: BoundingRectangle;
     showStations: boolean;
+    photo: string;
     following: {
         following: boolean;
         total: number;

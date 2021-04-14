@@ -646,9 +646,11 @@ func BuildDownloadPhotoPayload(projectDownloadPhotoProjectID string, projectDown
 			ifNoneMatch = &projectDownloadPhotoIfNoneMatch
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = projectDownloadPhotoAuth
+		if projectDownloadPhotoAuth != "" {
+			auth = &projectDownloadPhotoAuth
+		}
 	}
 	v := &project.DownloadPhotoPayload{}
 	v.ProjectID = projectID

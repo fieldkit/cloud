@@ -219,8 +219,8 @@ func EncodeGetRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Re
 		if !ok {
 			return goahttp.ErrInvalidType("station", "get", "*station.GetPayload", v)
 		}
-		{
-			head := p.Auth
+		if p.Auth != nil {
+			head := *p.Auth
 			if !strings.Contains(head, " ") {
 				req.Header.Set("Authorization", "Bearer "+head)
 			} else {
