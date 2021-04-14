@@ -203,6 +203,10 @@ export class MappedStations {
         const centered = new BoundingRectangle().include(station.location.lngLat());
         return new MappedStations(this.stations, this.features, centered.zoomOutOrAround(DefaultLocation, DefaultMargin));
     }
+
+    public static defaultBounds(): BoundingRectangle {
+        return new BoundingRectangle().zoomOutOrAround(DefaultLocation, DefaultMargin);
+    }
 }
 
 export class DisplayProject {
