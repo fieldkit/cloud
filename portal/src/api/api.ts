@@ -4,6 +4,7 @@ import TokenStorage from "./tokens";
 import Config from "../secrets";
 import { keysToCamel, keysToCamelWithWarnings } from "@/json-tools";
 import { ExportParams } from "@/store/typed-actions";
+import { BoundingRectangle } from "@/store/map-types";
 import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { SensorsResponse } from "@/views/viz/api";
@@ -190,6 +191,8 @@ export interface Project {
     mediaUrl: string;
     startTime?: Date;
     endTime?: Date;
+    bounds?: BoundingRectangle;
+    showStations: boolean;
     following: {
         following: boolean;
         total: number;
