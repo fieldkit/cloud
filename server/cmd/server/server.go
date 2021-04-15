@@ -37,7 +37,6 @@ import (
 	_ "github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/social"
 
-	// "github.com/bgentry/que-go"
 	"github.com/govau/que-go"
 	"github.com/jackc/pgx"
 )
