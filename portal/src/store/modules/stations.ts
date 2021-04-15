@@ -216,10 +216,12 @@ export class DisplayProject {
     public readonly duration: number | null = null;
     public readonly mapped: MappedStations;
     public readonly places: { native: string | null } = { native: null };
+    public readonly bounds?: BoundingRectangle;
 
     constructor(public readonly project: Project, public readonly users: ProjectUser[], public readonly stations: DisplayStation[]) {
         this.id = project.id;
         this.name = project.name;
+        this.bounds = project.bounds;
         this.modules = _(stations)
             .filter((station) => station.configurations.all.length > 0)
             .map((station) => station.configurations.all[0].modules.filter((m) => !m.internal))

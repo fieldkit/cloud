@@ -144,7 +144,7 @@ export default Vue.extend({
             }
             return 0;
         },
-        mapBounds() {
+        mapBounds(): BoundingRectangle {
             if (this.project.bounds?.min && this.project.bounds?.max) {
                 return new BoundingRectangle(this.project.bounds?.min, this.project.bounds?.max);
             }
