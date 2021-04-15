@@ -225,6 +225,8 @@ func TestGetProjectAdministratorPublicProject(t *testing.T) {
 			"tags": "<<PRESENCE>>",
 			"location": "<<PRESENCE>>",
 			"readOnly": false,
+			"showStations": false,
+			"bounds": { "min": null, "max": null },
 			"privacy": 1,
 			"name": "<<PRESENCE>>",
 			"following": { "following": false, "total": 0 },
