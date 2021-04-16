@@ -314,7 +314,7 @@ func main() {
 
 	log := logging.Logger(ctx).Sugar()
 
-	log.With("api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain).
+	log.With("api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain, "portal_root", config.PortalRoot).
 		With("media_bucket_name", config.MediaBucketName, "streams_bucket_name", config.StreamsBucketName).
 		With("email_override", config.EmailOverride).
 		Infow("config")
@@ -347,6 +347,8 @@ func main() {
 		}
 
 		portalServer = singlePageApplication
+	} else {
+		log.Infow("portal spa disabled")
 	}
 
 	statusHandler := health.StatusHandler(ctx)

@@ -118,6 +118,8 @@ func (tw *TwitterContext) Handler(serveElse http.Handler) http.Handler {
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}", tw.SharedProject)
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", tw.SharedProject)
 
+	r.NotFoundHandler = serveElse
+
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		r.ServeHTTP(w, req)
 	})
