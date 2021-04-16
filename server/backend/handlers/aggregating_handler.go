@@ -72,6 +72,10 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 		if err != nil {
 			return err
 		}
+		if stationConfig == nil {
+			log.Warnw("missing-station-configuration", "meta_record_id", meta.ID)
+			return fmt.Errorf("missing station_configuration")
+		}
 
 		modules, err := v.stationRepository.QueryStationModulesByMetaID(ctx, meta.ID)
 		if err != nil {
