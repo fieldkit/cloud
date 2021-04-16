@@ -8,6 +8,6 @@ export FIELDKIT_ARCHIVER=default
 
 set -xe
 
-make setup server
+make setup fkdata
 
 build/fkdata "$@"
