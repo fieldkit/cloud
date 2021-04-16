@@ -11,6 +11,8 @@ import (
 
 	_ "github.com/lib/pq"
 
+	"github.com/hashicorp/go-multierror"
+
 	"github.com/conservify/sqlxcache"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -107,6 +109,8 @@ func main() {
 
 	log := logging.Logger(ctx).Sugar()
 
+	var errors *multierror.Error
+
 	if options.StationID > 0 {
 		if options.Fake {
 			if err := generateFake(ctx, db, int32(options.StationID)); err != nil {
@@ -188,14 +192,18 @@ func main() {
 		ids := []*IDRow{}
 		if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {
 			fail(ctx, err)
-		}
-
-		for _, id := range ids {
-			log.Infow("station", "station_id", id.ID)
-			if err := processStation(ctx, db, int32(id.ID), options.Recently); err != nil {
-				fail(ctx, err)
+		} else {
+			for _, id := range ids {
+				log.Infow("station", "station_id", id.ID)
+				if err := processStation(ctx, db, int32(id.ID), options.Recently); err != nil {
+					errors = multierror.Append(errors, err)
+				}
 			}
 		}
+	}
+
+	if errors.ErrorOrNil() != nil {
+		fail(ctx, errors.ErrorOrNil())
 	}
 }
 
