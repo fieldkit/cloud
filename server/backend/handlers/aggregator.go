@@ -18,16 +18,6 @@ var (
 )
 
 var (
-	AggregateTableNames = map[string]string{
-		"24h": "fieldkit.aggregated_24h",
-		"12h": "fieldkit.aggregated_12h",
-		"6h":  "fieldkit.aggregated_6h",
-		"1h":  "fieldkit.aggregated_1h",
-		"30m": "fieldkit.aggregated_30m",
-		"10m": "fieldkit.aggregated_10m",
-		"1m":  "fieldkit.aggregated_1m",
-		"10s": "fieldkit.aggregated_10s",
-	}
 	AggregateTimeGroupThresholds = map[string]int{
 		"24h": 86400 * 2,
 		"12h": 86400,
@@ -69,6 +59,10 @@ type Aggregated struct {
 	Location      []float64
 	Values        map[AggregateSensorKey]float64
 	NumberSamples int32
+}
+
+func MakeAggregateTableName(name string, suffix string) string {
+	return fmt.Sprintf("%s%s_%s", "fieldkit.aggregated", suffix, name)
 }
 
 func (a *aggregation) getTime(original time.Time) time.Time {
@@ -144,7 +138,7 @@ type Aggregator struct {
 	batches      [][]*Aggregated
 }
 
-func NewAggregator(db *sqlxcache.DB, stationID int32, batchSize int) *Aggregator {
+func NewAggregator(db *sqlxcache.DB, tableSuffix string, stationID int32, batchSize int) *Aggregator {
 	return &Aggregator{
 		db:        db,
 		stationID: stationID,
@@ -163,49 +157,49 @@ func NewAggregator(db *sqlxcache.DB, stationID int32, batchSize int) *Aggregator
 			&aggregation{
 				interval: time.Second * 10,
 				name:     "10s",
-				table:    "fieldkit.aggregated_10s",
+				table:    fmt.Sprintf("fieldkit.aggregated%s_10s", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Minute * 1,
 				name:     "1m",
-				table:    "fieldkit.aggregated_1m",
+				table:    fmt.Sprintf("fieldkit.aggregated%s_1m", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Minute * 10,
 				name:     "10m",
-				table:    "fieldkit.aggregated_10m",
+				table:    fmt.Sprintf("fieldkit.aggregated%s_10m", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Minute * 30,
 				name:     "30m",
-				table:    "fieldkit.aggregated_30m",
+				table:    fmt.Sprintf("fieldkit.aggregated%s_30m", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Hour * 1,
 				name:     "1h",
-				table:    "fieldkit.aggregated_1h",
+				table:    fmt.Sprintf("fieldkit.aggregated%s_1h", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Hour * 6,
 				name:     "6h",
-				table:    "fieldkit.aggregated_6h",
+				table:    fmt.Sprintf("fieldkit.aggregated%s_6h", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Hour * 12,
 				name:     "12h",
-				table:    "fieldkit.aggregated_12h",
+				table:    fmt.Sprintf("fieldkit.aggregated%s_12h", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 			},
 			&aggregation{
 				interval: time.Hour * 24,
 				name:     "24h",
-				table:    "fieldkit.aggregated_24h",
+				table:    fmt.Sprintf("fieldkit.aggregated%s_24h", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 			},
 		},

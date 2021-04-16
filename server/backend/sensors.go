@@ -199,7 +199,8 @@ func NewAggregateQueryParams(qp *QueryParams, selectedAggregateName string, summ
 }
 
 type DataQuerier struct {
-	db *sqlxcache.DB
+	db          *sqlxcache.DB
+	tableSuffix string
 }
 
 type SensorMeta struct {
@@ -267,7 +268,7 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 	}
 
 	for _, name := range handlers.AggregateNames {
-		table := handlers.AggregateTableNames[name]
+		table := handlers.MakeAggregateTableName(dq.tableSuffix, name)
 
 		query, args, err := sqlx.In(fmt.Sprintf(`
 			SELECT
@@ -315,7 +316,7 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryParams) (rows *sqlx.Rows, err error) {
 	log := Logger(ctx).Sugar()
 
-	tableName := handlers.AggregateTableNames[aqp.AggregateName]
+	tableName := handlers.MakeAggregateTableName(dq.tableSuffix, aqp.AggregateName)
 
 	moduleIds := make([]int64, 0)
 	sensorIds := make([]int64, 0)

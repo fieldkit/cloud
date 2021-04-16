@@ -208,7 +208,7 @@ func main() {
 }
 
 func processStation(ctx context.Context, db *sqlxcache.DB, stationID int32, recently bool) error {
-	sr, err := backend.NewStationRefresher(db)
+	sr, err := backend.NewStationRefresher(db, "_bymod")
 	if err != nil {
 		return err
 	}
@@ -233,7 +233,7 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 	end := time.Now()
 	interval := time.Minute * 1
 
-	aggregator := handlers.NewAggregator(db, stationID, 1000)
+	aggregator := handlers.NewAggregator(db, "_bymod", stationID, 1000)
 
 	sinFunc := func(period int64) SampleFunc {
 		return func(t time.Time) float64 {

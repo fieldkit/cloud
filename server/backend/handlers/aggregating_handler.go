@@ -23,10 +23,11 @@ type AggregatingHandler struct {
 	stationConfig     *data.StationConfiguration
 	stationModules    map[uint32]*data.StationModule
 	aggregator        *Aggregator
+	tableSuffix       string
 	completely        bool
 }
 
-func NewAggregatingHandler(db *sqlxcache.DB, completely bool) *AggregatingHandler {
+func NewAggregatingHandler(db *sqlxcache.DB, tableSuffix string, completely bool) *AggregatingHandler {
 	return &AggregatingHandler{
 		db:                db,
 		metaFactory:       repositories.NewMetaFactory(),
@@ -34,6 +35,7 @@ func NewAggregatingHandler(db *sqlxcache.DB, completely bool) *AggregatingHandle
 		stations:          make(map[int64]*Aggregator),
 		seen:              make(map[int32]*data.Station),
 		stationConfig:     nil,
+		tableSuffix:       tableSuffix,
 		completely:        completely,
 	}
 }
@@ -48,7 +50,7 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 			return nil
 		}
 
-		aggregator := NewAggregator(v.db, station.ID, 100)
+		aggregator := NewAggregator(v.db, v.tableSuffix, station.ID, 100)
 
 		if _, ok := v.seen[station.ID]; !ok {
 			if v.completely {

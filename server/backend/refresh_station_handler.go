@@ -24,7 +24,7 @@ func (h *RefreshStationHandler) Handle(ctx context.Context, m *messages.RefreshS
 
 	log.Infow("refreshing", "completely", m.Completely, "how_recently", m.HowRecently)
 
-	sr, err := NewStationRefresher(h.db)
+	sr, err := NewStationRefresher(h.db, "")
 	if err != nil {
 		return err
 	}
