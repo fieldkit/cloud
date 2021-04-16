@@ -18,12 +18,14 @@ import (
 type TwitterContext struct {
 	db                *sqlxcache.DB
 	projectRepository *repositories.ProjectRepository
+	baseApiUrl        string
 }
 
-func NewTwitterContext(db *sqlxcache.DB) (tw *TwitterContext) {
+func NewTwitterContext(db *sqlxcache.DB, baseApiUrl string) (tw *TwitterContext) {
 	return &TwitterContext{
 		db:                db,
 		projectRepository: repositories.NewProjectRepository(db),
+		baseApiUrl:        baseApiUrl,
 	}
 }
 
@@ -92,7 +94,7 @@ func (tw *TwitterContext) SharedProject(w http.ResponseWriter, req *http.Request
 	}
 
 	// NOTE TODO We're casually assuming https everywhere.
-	photoUrl := fmt.Sprintf("https://%s/projects/%d/media", req.Host, project.ID)
+	photoUrl := fmt.Sprintf("%s/projects/%d/media", tw.baseApiUrl, project.ID)
 
 	log.Infow("twitter-project-card", "project_id", project.ID, "url", req.URL)
 
@@ -111,14 +113,13 @@ func (tw *TwitterContext) SharedProject(w http.ResponseWriter, req *http.Request
 	}
 }
 
-func (tw *TwitterContext) Handler(serveElse http.Handler) http.Handler {
+func (tw *TwitterContext) Handler(continueServing http.Handler) http.Handler {
 	r := mux.NewRouter()
 
 	s := r.NewRoute().HeadersRegexp("User-Agent", ".*Twitterbot.*").Subrouter()
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}", tw.SharedProject)
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", tw.SharedProject)
-
-	r.NotFoundHandler = serveElse
+	r.NotFoundHandler = continueServing
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		r.ServeHTTP(w, req)

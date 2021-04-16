@@ -363,10 +363,8 @@ func main() {
 	ingesterFinal := logging.Monitoring("ingester", services.Metrics)(ingester.Handler)
 	apiFinal := logging.Monitoring("api", services.Metrics)(theApi.handler)
 
-	tw := social.NewTwitterContext(services.Database)
-	socialFinal := tw.Handler(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		portalServer.ServeHTTP(w, req)
-	}))
+	tw := social.NewTwitterContext(services.Database, config.ApiHost)
+	socialFinal := tw.Handler(portalServer)
 
 	staticFinal := logging.Monitoring("static", services.Metrics)(socialFinal)
 
