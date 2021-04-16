@@ -46,6 +46,7 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-querystring v1.0.0
 	github.com/google/uuid v1.1.2
+	github.com/gorilla/mux v1.7.4
 	github.com/govau/que-go v1.0.1
 	github.com/h2non/filetype v1.0.10
 	github.com/hashicorp/go-immutable-radix v1.0.0

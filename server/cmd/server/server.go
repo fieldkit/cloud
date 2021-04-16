@@ -35,6 +35,7 @@ import (
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/ingester"
 	_ "github.com/fieldkit/cloud/server/messages"
+	"github.com/fieldkit/cloud/server/social"
 
 	// "github.com/bgentry/que-go"
 	"github.com/govau/que-go"
@@ -59,7 +60,7 @@ type Config struct {
 	EmailOverride         string `split_words:"true" default:""`
 	Archiver              string `split_words:"true" default:"default" required:"true"`
 	PortalRoot            string `split_words:"true"`
-	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
+	Domain                string `split_words:"true" default:"fklocal.org:8080" required:"true"`
 	HttpScheme            string `split_words:"true" default:"https"`
 	ApiDomain             string `split_words:"true" default:""`
 	PortalDomain          string `split_words:"true" default:""`
@@ -359,7 +360,13 @@ func main() {
 	statusFinal := logging.Monitoring("status", services.Metrics)(statusHandler)
 	ingesterFinal := logging.Monitoring("ingester", services.Metrics)(ingester.Handler)
 	apiFinal := logging.Monitoring("api", services.Metrics)(theApi.handler)
-	staticFinal := logging.Monitoring("static", services.Metrics)(portalServer)
+
+	tw := social.NewTwitterContext(services.Database)
+	socialFinal := tw.Handler(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		portalServer.ServeHTTP(w, req)
+	}))
+
+	staticFinal := logging.Monitoring("static", services.Metrics)(socialFinal)
 
 	serveApi := func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/ingestion" {
