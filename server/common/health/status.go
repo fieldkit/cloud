@@ -16,6 +16,7 @@ type GitStatus struct {
 
 type StatusResponse struct {
 	ServerName string    `json:"server_name,omitempty"`
+	Version    string    `json:"version"`
 	Tag        string    `json:"tag"`
 	Name       string    `json:"name"`
 	Git        GitStatus `json:"git"`
@@ -38,6 +39,7 @@ func MakeStatusResponse(ctx context.Context) (sr *StatusResponse, err error) {
 		Git: GitStatus{
 			Hash: getEnv("GIT_HASH", ""),
 		},
+		Version:    getEnv("FIELDKIT_VERSION", ""),
 		ServerName: getEnv("FIELDKIT_SERVER_NAME", ""),
 		Tag:        getEnv("TAG", ""),
 		Name:       name,

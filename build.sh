@@ -65,6 +65,7 @@ done
 cp /etc/ssl/certs/ca-certificates.crt build
 
 echo export GIT_HASH=`git rev-parse HEAD` > build/static.env
+echo export FIELDKIT_VERSION=$VERSION >> build/static.env
 
 echo '.DS_Store
 Dockerfile' > build/.dockerignore

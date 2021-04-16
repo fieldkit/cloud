@@ -1,3 +1,12 @@
+VERSION_MAJOR = 0
+VERSION_MINOR = 1
+VERSION_PATCH = 0
+VERSION_PREL ?= $(BUILD_NUMBER)
+GIT_LOCAL_BRANCH ?= unknown
+GIT_HASH ?= $(shell git log -1 --format=%h)
+
+VERSION := "$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)-$(GIT_LOCAL_BRANCH).$(VERSION_PREL)-$(GIT_HASH)"
+
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
 GOARCH ?= amd64
@@ -145,7 +154,7 @@ ci-db-tests:
 
 aws-image:
 	cp portal/src/secrets.ts.aws portal/src/secrets.ts
-	WORKING_DIRECTORY=$(WORKING_DIRECTORY) DOCKER_TAG=$(DOCKER_TAG) ./build.sh
+	WORKING_DIRECTORY=$(WORKING_DIRECTORY) DOCKER_TAG=$(DOCKER_TAG) VERSION=$(VERSION) ./build.sh
 
 sanitize: sanitizer
 	mkdir -p sanitize-data
