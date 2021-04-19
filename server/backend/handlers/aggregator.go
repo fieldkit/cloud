@@ -61,7 +61,7 @@ type Aggregated struct {
 	NumberSamples int32
 }
 
-func MakeAggregateTableName(name string, suffix string) string {
+func MakeAggregateTableName(suffix string, name string) string {
 	return fmt.Sprintf("%s%s_%s", "fieldkit.aggregated", suffix, name)
 }
 
