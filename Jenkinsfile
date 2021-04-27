@@ -24,6 +24,7 @@ export PATH=$PATH:node_modules/.bin
 make clean
 make ci
 make ci-db-tests
+make aws-image
 """
 				}
             }
@@ -34,8 +35,18 @@ make ci-db-tests
 			sh "cp build/fktool ~/workspace/bin"
 		}
 
+		stage ('container') {
+            dir ('dev-ops') {
+                git branch: 'main', url: "https://github.com/conservify/dev-ops.git"
+
+                withAWS(credentials: 'AWS Default', region: 'us-east-1') {
+                    sh "cd amis && make clean && make stacks -j3"
+                }
+            }
+        }
+
         stage ('archive') {
-            archiveArtifacts artifacts: 'build/fktool'
+            archiveArtifacts artifacts: 'build/fktool, dev-ops/amis/build/*.tar'
         }
     }
 }
