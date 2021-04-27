@@ -151,7 +151,8 @@
             "saveChanges": "Save updates",
             "showStations": "Show Stations",
             "hideStations": "Hide Stations",
-            "mapText": "Others will see stations and exact GPS coordinates on the map"
+            "mapTextShow": "Others will see stations and exact GPS coordinates on the map",
+            "mapTextHide": "Stations will not be visible on the map for others"
         },
         "invite": {
             "accept": "Accept Invite",

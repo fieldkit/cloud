@@ -102,19 +102,6 @@
                         <span class="checkbox-btn"></span>
                     </label>
                 </div>
-
-                <div v-if="form.public" class="radio-container">
-                    <label class="radio">
-                        <input type="radio" id="privacy" value="1" v-model="form.privacy" />
-                        <span class="radio-btn"></span>
-                        {{ $t("project.form.showExact") }}
-                    </label>
-                    <label class="radio">
-                        <input type="radio" id="privacy" value="2" v-model="form.privacy" />
-                        <span class="radio-btn"></span>
-                        {{ $t("project.form.showGeneral") }}
-                    </label>
-                </div>
             </div>
             <div class="map-container">
                 <div class="map-stations-buttons-container">
@@ -127,7 +114,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="map-text">{{ $t("project.form.mapText") }}</div>
+                <div class="map-text">
+                    {{ form.showStations === true ? $t("project.form.mapTextShow") : $t("project.form.mapTextHide") }}
+                </div>
                 <div class="section-body">
                     <div class="project-stations-map-container">
                         <StationsMap
@@ -715,6 +704,7 @@ form > .outer-input-container {
 
 .map-text {
     margin-top: 40px;
+    margin-bottom: 20px;
     font-size: 16px;
 }
 </style>
