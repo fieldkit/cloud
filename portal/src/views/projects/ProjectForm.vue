@@ -129,7 +129,7 @@
                 </div>
                 <div class="map-hint">
                     <img src="@/assets/icon-expand-map.svg" width="15px" />
-                    <span>Pan or zoom to set map view</span>
+                    <span>{{ $t("project.form.mapHint") }}</span>
                 </div>
             </div>
             <div class="action-container">
