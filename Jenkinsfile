@@ -25,16 +25,10 @@ make clean
 make ci
 make ci-db-tests
 make aws-image
-make binaries
 """
 				}
             }
         }
-
-		stage ('update tools') {
-			sh "mkdir -p ~/workspace/bin"
-			sh "cp build/fktool ~/workspace/bin"
-		}
 
 		stage ('container') {
             dir ('dev-ops') {
@@ -42,16 +36,13 @@ make binaries
 
                 withAWS(credentials: 'AWS Default', region: 'us-east-1') {
                     sh "cd amis && make clean && make portal-stack -j3"
-					sh "pwd"
-					sh "ls -alh"
                 }
             }
         }
 
         stage ('archive') {
-			sh "pwd"
-			sh "ls -alh"
             archiveArtifacts artifacts: 'build/fktool, dev-ops/amis/build/*.tar'
+			print("fktool binary needs to be updated manually")
         }
     }
 }
