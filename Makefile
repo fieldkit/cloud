@@ -152,6 +152,9 @@ ci-db-tests:
 	cd server && FIELDKIT_POSTGRES_URL="postgres://fieldkit:password@$$IP/fieldkit?sslmode=disable" go test -p 1 -v -coverprofile=coverage.data ./...
 	docker stop fktests-pg || true
 
+write-version:
+	echo $(VERSION) > version.txt
+
 aws-image:
 	cp portal/src/secrets.ts.aws portal/src/secrets.ts
 	WORKING_DIRECTORY=$(WORKING_DIRECTORY) DOCKER_TAG=$(DOCKER_TAG) VERSION=$(VERSION) ./build.sh

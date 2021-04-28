@@ -33,10 +33,15 @@ make clean
 make ci
 make ci-db-tests
 make aws-image
+make write-version
 """
 				}
             }
         }
+
+		def version = readFile('version.txt')
+
+		currentBuild.description = version.trim()
 
 		stage ('container') {
             dir ('dev-ops') {
