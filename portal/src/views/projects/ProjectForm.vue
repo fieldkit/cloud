@@ -127,6 +127,10 @@
                         />
                     </div>
                 </div>
+                <div class="map-hint">
+                    <img src="@/assets/icon-expand-map.svg" width="15px" />
+                    <span>Pan or zoom to set map view</span>
+                </div>
             </div>
             <div class="action-container">
                 <button class="btn" v-if="!project" type="submit">{{ $t("project.form.saveNew") }}</button>
@@ -706,5 +710,16 @@ form > .outer-input-container {
     margin-top: 40px;
     margin-bottom: 20px;
     font-size: 16px;
+}
+
+.map-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+
+    img {
+        margin-right: 5px;
+    }
 }
 </style>
