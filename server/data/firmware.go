@@ -17,6 +17,7 @@ type Firmware struct {
 	ETag           string         `db:"etag"`
 	Meta           types.JSONText `db:"meta"`
 	LogicalAddress *int64         `db:"logical_address"`
+	Timestamp      *int64         `db:"timestamp"`
 	Available      bool           `db:"available"`
 	Hidden         bool           `db:"hidden"`
 }

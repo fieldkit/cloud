@@ -132,7 +132,7 @@ export default {
     font-family: $font-family-light;
     font-size: 14px;
     margin: 2px 15px 15px 15px;
-    word-break: break-all;
+    overflow-wrap: anywhere;
 }
 .project-image-container {
     height: 138px;
