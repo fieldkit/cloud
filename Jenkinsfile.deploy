@@ -1,5 +1,12 @@
 @Library('conservify') _
 
+def getStackURL(user, password, stackName) {
+	if (stackName == "portal-stack") {
+		return "https://${user}:${password}@code.conservify.org/jenkins/job/fk/job/cloud/job/main/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
+	}
+	return "https://${user}:${password}@code.conservify.org/jenkins/job/fk/job/aws-build-stacks/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
+}
+
 timestamps {
 	node () {
 		try {
@@ -14,7 +21,8 @@ timestamps {
 			stage ('deploy') {
 				withCredentials([usernamePassword(credentialsId: 'jenkins-artifact-download', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASSWORD')]) {
 					sshagent (credentials: ['ssh-fkdev-deploy']) {
-						def downloadUrl = "https://${JENKINS_USER}:${JENKINS_PASSWORD}@code.conservify.org/jenkins/job/fk/job/aws-build-stacks/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
+						def downloadUrl = getStackURL(JENKINS_USER, JENKINS_PASSWORD, stackName)
+
 						sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${params.DeployFrom}"
 						sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} wget -nv --auth-no-challenge '${downloadUrl}'"
 						sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} sudo mv ${stackName}.tar /tmp/incoming-stacks"
