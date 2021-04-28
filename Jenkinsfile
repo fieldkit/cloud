@@ -2,6 +2,14 @@
 
 conservifyProperties([ disableConcurrentBuilds() ])
 
+def getBranch(scmInfo) {
+	def (remoteOrBranch, branch) = scmInfo.GIT_BRANCH.tokenize('/')
+	if (branch) {
+		return branch;
+	}
+	return remoteOrBranch;
+}
+
 timestamps {
     node ("jenkins-aws-ubuntu") {
 		def scmInfo
@@ -10,7 +18,7 @@ timestamps {
             scmInfo = checkout scm
         }
 
-		def (remote, branch) = scm.GIT_BRANCH.tokenize('/')
+		def branch = getBranch(scmInfo)
 
         stage ('build') {
 			withEnv(["GIT_LOCAL_BRANCH=${branch}"]) {
@@ -34,9 +42,9 @@ make aws-image
             dir ('dev-ops') {
                 git branch: 'main', url: "https://github.com/conservify/dev-ops.git"
 
-                withAWS(credentials: 'AWS Default', region: 'us-east-1') {
-                    sh "cd amis && make clean && make portal-stack -j3"
-                }
+				withAWS(credentials: 'AWS Default', region: 'us-east-1') {
+					sh "cd amis && make clean && make portal-stack -j3"
+				}
             }
         }
 
