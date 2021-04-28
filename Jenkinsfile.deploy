@@ -1,10 +1,10 @@
 @Library('conservify') _
 
-def getStackURL(user, password, stackName) {
+def getStackURL(user, password, branch, stackName) {
 	if (stackName == "portal-stack") {
-		return "https://${user}:${password}@code.conservify.org/jenkins/job/fk/job/cloud/job/main/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
+		return "https://${user}:${password}@code.conservify.org/jenkins/job/fk/job/cloud/job/${branch}/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
 	}
-	return "https://${user}:${password}@code.conservify.org/jenkins/job/fk/job/aws-build-stacks/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
+	return "https://${user}:${password}@code.conservify.org/jenkins/job/fk/job/aws-build-stacks/job/${branch}/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
 }
 
 timestamps {
@@ -12,6 +12,7 @@ timestamps {
 		try {
 			def isDev = params.DeployFrom.indexOf("fkdev.org") >= 0
 			def stackName = params.DeployStack ?: "portal-stack"
+			def branchName = params.DeployBranch ?: "main"
 			def statusUrl = isDev ? "https://api.fkdev.org/status" : "https://api.fieldkit.org/status"
 
 			slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting (stack = ${stackName}) (<${env.BUILD_URL}|Open>)"
@@ -21,7 +22,7 @@ timestamps {
 			stage ('deploy') {
 				withCredentials([usernamePassword(credentialsId: 'jenkins-artifact-download', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASSWORD')]) {
 					sshagent (credentials: ['ssh-fkdev-deploy']) {
-						def downloadUrl = getStackURL(JENKINS_USER, JENKINS_PASSWORD, stackName)
+						def downloadUrl = getStackURL(JENKINS_USER, JENKINS_PASSWORD, branchName, stackName)
 
 						sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${params.DeployFrom}"
 						sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} wget -nv --auth-no-challenge '${downloadUrl}'"
