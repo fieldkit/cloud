@@ -49,12 +49,13 @@ func NewSensorService(ctx context.Context, options *ControllerOptions) *SensorSe
 }
 
 type StationSensor struct {
-	StationID   int32  `db:"station_id" json:"stationId"`
-	StationName string `db:"station_name" json:"stationName"`
-	ModuleID    int64  `db:"module_id" json:"moduleId"`
-	ModuleKey   string `db:"module_key" json:"moduleKey"`
-	SensorID    int64  `db:"sensor_id" json:"sensorId"`
-	SensorKey   string `db:"sensor_key" json:"sensorKey"`
+	StationID    int32     `db:"station_id" json:"stationId"`
+	StationName  string    `db:"station_name" json:"stationName"`
+	ModuleID     int64     `db:"module_id" json:"moduleId"`
+	ModuleKey    string    `db:"module_key" json:"moduleKey"`
+	SensorID     int64     `db:"sensor_id" json:"sensorId"`
+	SensorKey    string    `db:"sensor_key" json:"sensorKey"`
+	SensorReadAt time.Time `db:"sensor_read_at" json:"sensorReadAt"`
 }
 
 type DataRow struct {
@@ -126,14 +127,16 @@ func (c *SensorService) stationsMeta(ctx context.Context, stations []int32) (*se
 		SELECT
 			station_id, station.name AS station_name,
             module_id, station_module.name AS module_key,
-			sensor_id, s.key AS sensor_key
+			sensor_id, s.key AS sensor_key,
+            MAX(agg.time) AS sensor_read_at
 		FROM %s AS agg
 		JOIN fieldkit.aggregated_sensor AS s ON (s.id = sensor_id)
 		JOIN fieldkit.station AS station ON (agg.station_id = station.id)
 		JOIN fieldkit.station_module AS station_module ON (agg.module_id = station_module.id)
 		WHERE station_id IN (?)
 		GROUP BY station_id, station.name, module_id, station_module.name, sensor_id, s.key
-		`, "fieldkit.aggregated_24h"), stations)
+        ORDER BY sensor_read_at DESC
+		`, "fieldkit.aggregated_10m"), stations)
 	if err != nil {
 		return nil, err
 	}

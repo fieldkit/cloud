@@ -18,6 +18,7 @@ type AggregatingHandler struct {
 	metaFactory       *repositories.MetaFactory
 	stationRepository *repositories.StationRepository
 	provisionID       int64
+	metaID            int64
 	stations          map[int64]*Aggregator
 	seen              map[int32]*data.Station
 	stationConfig     *data.StationConfiguration
@@ -43,6 +44,8 @@ func NewAggregatingHandler(db *sqlxcache.DB, tableSuffix string, completely bool
 func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, meta *data.MetaRecord) error {
 	log := Logger(ctx).Sugar()
 
+	v.provisionID = p.ID
+
 	if _, ok := v.stations[p.ID]; !ok {
 		station, err := v.stationRepository.QueryStationByDeviceID(ctx, p.DeviceID)
 		if err != nil || station == nil {
@@ -67,7 +70,7 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 		v.stations[p.ID] = aggregator
 	}
 
-	if v.provisionID != p.ID {
+	if v.metaID != meta.ID {
 		stationConfig, err := v.stationRepository.QueryStationConfigurationByMetaID(ctx, meta.ID)
 		if err != nil {
 			return err
@@ -90,7 +93,7 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 			v.stationModules[sm.Index] = sm
 		}
 
-		v.provisionID = p.ID
+		v.metaID = meta.ID
 	}
 
 	if _, err := v.metaFactory.Add(ctx, meta, true); err != nil {
