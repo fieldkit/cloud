@@ -34,11 +34,12 @@ import (
 const SecondsPerWeek = int64(60 * 60 * 24 * 7)
 
 type Options struct {
-	StationID    int
-	IngestionAll bool
-	All          bool
-	Recently     bool
-	Fake         bool
+	StationID int
+	Ingestion bool
+	Aggregate bool
+	All       bool
+	Recently  bool
+	Fake      bool
 }
 
 type Config struct {
@@ -88,7 +89,8 @@ func main() {
 	options := &Options{}
 
 	flag.IntVar(&options.StationID, "station-id", 0, "station id")
-	flag.BoolVar(&options.IngestionAll, "ingestion-all", false, "ingestion for all stations")
+	flag.BoolVar(&options.Ingestion, "ingestion", false, "ingestion")
+	flag.BoolVar(&options.Aggregate, "aggregate", false, "aggregate")
 	flag.BoolVar(&options.All, "all", false, "all stations")
 	flag.BoolVar(&options.Fake, "fake", false, "create a fake data")
 	flag.BoolVar(&options.Recently, "recently", false, "recently inserted data")
@@ -111,19 +113,7 @@ func main() {
 
 	var errors *multierror.Error
 
-	if options.StationID > 0 {
-		if options.Fake {
-			if err := generateFake(ctx, db, int32(options.StationID)); err != nil {
-				fail(ctx, err)
-			}
-		} else {
-			if err := processStation(ctx, db, int32(options.StationID), options.Recently); err != nil {
-				fail(ctx, err)
-			}
-		}
-	}
-
-	if options.IngestionAll {
+	if options.Ingestion {
 		awsSessionOptions := getAwsSessionOptions(ctx, config)
 
 		awsSession, err := session.NewSessionWithOptions(awsSessionOptions)
@@ -170,33 +160,64 @@ func main() {
 
 		isHandler := backend.NewIngestStationHandler(db, fa, metrics, publisher)
 
-		ids := []*IDRow{}
-		if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {
-			fail(ctx, err)
-		}
-
-		for _, id := range ids {
-			log.Infow("station", "station_id", id.ID)
-			err := isHandler.Handle(ctx, &messages.IngestStation{
-				StationID: int32(id.ID),
-				UserID:    2,
+		process := func(ctx context.Context, id int32) error {
+			return isHandler.Handle(ctx, &messages.IngestStation{
+				StationID: id,
+				UserID:    2, // Jacob
 				Verbose:   true,
 			})
-			if err != nil {
+		}
+
+		if options.All {
+			ids := []*IDRow{}
+			if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {
 				fail(ctx, err)
 			}
-		}
-	}
 
-	if options.All {
-		ids := []*IDRow{}
-		if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {
-			fail(ctx, err)
-		} else {
 			for _, id := range ids {
 				log.Infow("station", "station_id", id.ID)
-				if err := processStation(ctx, db, int32(id.ID), options.Recently); err != nil {
+				err := process(ctx, int32(id.ID))
+				if err != nil {
 					errors = multierror.Append(errors, err)
+				}
+			}
+		} else {
+			err := process(ctx, int32(options.StationID))
+			if err != nil {
+				errors = multierror.Append(errors, err)
+			}
+		}
+
+		if errors.ErrorOrNil() != nil {
+			fail(ctx, errors.ErrorOrNil())
+		}
+
+		return
+	}
+
+	if options.Aggregate {
+		if options.All {
+			ids := []*IDRow{}
+			if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {
+				fail(ctx, err)
+			} else {
+				for _, id := range ids {
+					log.Infow("station", "station_id", id.ID)
+					if err := processStation(ctx, db, int32(id.ID), options.Recently); err != nil {
+						errors = multierror.Append(errors, err)
+					}
+				}
+			}
+		} else {
+			if options.StationID > 0 {
+				if options.Fake {
+					if err := generateFake(ctx, db, int32(options.StationID)); err != nil {
+						errors = multierror.Append(errors, err)
+					}
+				} else {
+					if err := processStation(ctx, db, int32(options.StationID), options.Recently); err != nil {
+						errors = multierror.Append(errors, err)
+					}
 				}
 			}
 		}
