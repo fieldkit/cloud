@@ -2995,7 +2995,7 @@ paths:
       description: |2-
 
         **Required security scopes for jwt**:
-          * `api:access`
+          * `api:admin`
       operationId: records#data
       parameters:
       - name: recordId
@@ -3039,7 +3039,7 @@ paths:
       description: |2-
 
         **Required security scopes for jwt**:
-          * `api:access`
+          * `api:admin`
       operationId: records#resolved
       parameters:
       - name: recordId
@@ -3083,7 +3083,7 @@ paths:
       description: |2-
 
         **Required security scopes for jwt**:
-          * `api:access`
+          * `api:admin`
       operationId: records#meta
       parameters:
       - name: recordId
