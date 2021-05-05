@@ -282,7 +282,7 @@ export default Vue.extend({
 }
 
 .controls-container .tree {
-    flex-basis: 30%;
+    flex-basis: 50%;
 }
 
 .controls-container .left {

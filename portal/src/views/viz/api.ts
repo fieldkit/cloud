@@ -57,6 +57,7 @@ interface StationInfoResponse {
     moduleKey: string;
     sensorId: number;
     sensorKey: string;
+    sensorReadAt: string;
 }
 
 export interface SensorInfoResponse {

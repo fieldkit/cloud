@@ -60,11 +60,11 @@ export const ViewingControls = Vue.extend({
     },
     computed: {
         stationOptions(): StationTreeOption[] {
-            this.viz.log("station-options", this.workspace.stationOptions);
+            this.viz.log("station-options", { options: this.workspace.stationOptions });
             return this.workspace.stationOptions;
         },
         sensorOptions(): SensorTreeOption[] {
-            this.viz.log("sensor-options", this.workspace.sensorOptions);
+            this.viz.log("sensor-options", { options: this.workspace.sensorOptions });
             return this.workspace.sensorOptions;
         },
         selectedStation(): number | null {

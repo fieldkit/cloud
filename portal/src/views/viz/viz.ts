@@ -1,4 +1,5 @@
 import _ from "lodash";
+import moment, { Moment } from "moment";
 import { SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
 import { Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
 import i18n from "@/i18n";
@@ -8,12 +9,15 @@ export * from "./common";
 
 import { ColorScale, createSensorColorScale } from "./d3-helpers";
 
+type SensorReadAtType = string;
+
 export class SensorMeta {
     constructor(
         public readonly moduleId: number,
         public readonly moduleKey: string,
         public readonly sensorId: number,
-        public readonly sensorKey: string
+        public readonly sensorKey: string,
+        public readonly sensorReadAt: SensorReadAtType
     ) {}
 }
 
@@ -39,7 +43,8 @@ export class SensorTreeOption {
         public readonly label: string,
         public readonly children: SensorTreeOption[] | undefined = undefined,
         public readonly moduleId: number,
-        public readonly sensorId: number | null
+        public readonly sensorId: number | null,
+        public readonly age: Moment
     ) {}
 }
 
@@ -510,10 +515,12 @@ export class Workspace {
                 this.querier.queryInfo(iq).then((info) => {
                     return _.map(info.stations, (info, stationId) => {
                         const stationName = info[0].stationName;
-                        const sensors = info.map((row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey));
+                        const sensors = info.map(
+                            (row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt)
+                        );
                         const station = new StationMeta(Number(stationId), stationName, sensors);
                         this.stations[station.id] = station;
-                        console.log("station-meta", station, info);
+                        console.log("station-meta", { station, info });
                         return station;
                     });
                 }) as Promise<unknown>
@@ -596,24 +603,38 @@ export class Workspace {
         const keysById = _.fromPairs(allSensors.map((row) => [row.moduleId, row.moduleKey]));
         const allModulesByModuleKey = _.keyBy(this.meta.modules, (m) => m.key);
 
+        // console.log("all-sensors", allSensors);
+        // console.log("all-modules", allModules);
+        // console.log("keys-by-id", keysById);
+        // console.log("all-modules-by-module-key", allModulesByModuleKey);
+
         const options = _.map(
             allModules,
             (value, moduleId: number): StationTreeOption => {
-                const moduleKey = keysById[moduleId];
                 const children: SensorTreeOption[] = _.flatten(
                     value.map((row) => {
+                        const age = moment.utc(row.sensorReadAt);
                         const label = i18n.tc(row.sensorKey) || row.sensorKey;
                         const optionId = `${row.moduleId}-${row.sensorId}`;
-                        return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId)];
+                        return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId, age)];
                     })
                 );
-                return new SensorTreeOption(`${moduleKey}-${moduleId}`, i18n.tc(moduleKey), children, moduleId, null);
+                const moduleKey = keysById[moduleId];
+                const moduleAge = _.max(children.map((c) => c.age));
+                if (!moduleAge) throw new Error(`expected module age: no sensors?`);
+
+                const label = i18n.tc(moduleKey) + ` (${moduleAge.fromNow()})`;
+                return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, moduleAge);
             }
         );
 
-        console.log("sensor-tree-options", options);
+        const sorted = _.sortBy((options as unknown) as SensorTreeOption[], (option) => {
+            return -option.age.valueOf();
+        });
 
-        return (options as unknown) as SensorTreeOption[];
+        console.log("sensor-tree-options", { sorted: sorted });
+
+        return sorted;
     }
 
     public remove(viz: Viz): Workspace {
