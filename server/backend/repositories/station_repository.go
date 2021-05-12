@@ -241,6 +241,8 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 }
 
 func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Context, station *data.Station, statusReply *pbapp.HttpReply) error {
+	log := Logger(ctx).Sugar()
+
 	pr := NewProvisionRepository(r.db)
 
 	p, err := pr.QueryOrCreateProvision(ctx, station.DeviceID, statusReply.Status.Identity.Generation)
@@ -326,8 +328,6 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 		return err
 	}
 
-	log := Logger(ctx).Sugar()
-
 	log.Infow("configuration", "station_id", station.ID, "configuration_id", configuration.ID, "provision_id", p.ID)
 
 	if _, err := r.db.ExecContext(ctx, `
@@ -368,18 +368,25 @@ func (r *StationRepository) updateDeployedActivityFromStatus(ctx context.Context
 }
 
 func (r *StationRepository) deleteModuleSensorsExcept(ctx context.Context, moduleID int64, keeping []int64) error {
-	if len(keeping) == 0 {
-		log := Logger(ctx).Sugar()
-		log.Warnw("keeping existing module sensors")
-		return nil
-	}
-	if query, args, err := sqlx.In(`
-		DELETE FROM fieldkit.module_sensor WHERE module_id = ? AND id NOT IN (?)
+	if len(keeping) > 0 {
+		if query, args, err := sqlx.In(`
+			DELETE FROM fieldkit.module_sensor WHERE module_id = ? AND id NOT IN (?)
 		`, moduleID, keeping); err != nil {
-		return err
-	} else {
-		if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
 			return err
+		} else {
+			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+				return err
+			}
+		}
+	} else {
+		if query, args, err := sqlx.In(`
+			DELETE FROM fieldkit.module_sensor WHERE module_id = ?
+		`, moduleID, keeping); err != nil {
+			return err
+		} else {
+			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -387,23 +394,45 @@ func (r *StationRepository) deleteModuleSensorsExcept(ctx context.Context, modul
 }
 
 func (r *StationRepository) deleteStationModulesExcept(ctx context.Context, configurationID int64, keeping []int64) error {
-	if query, args, err := sqlx.In(`
-		DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?))
+	if len(keeping) > 0 {
+		if query, args, err := sqlx.In(`
+			DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?))
 		`, configurationID, keeping); err != nil {
-		return err
-	} else {
-		if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
 			return err
+		} else {
+			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+				return err
+			}
 		}
-	}
 
-	if query, args, err := sqlx.In(`
-		DELETE FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?)
+		if query, args, err := sqlx.In(`
+			DELETE FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?)
 		`, configurationID, keeping); err != nil {
-		return err
-	} else {
-		if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
 			return err
+		} else {
+			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+				return err
+			}
+		}
+	} else {
+		if query, args, err := sqlx.In(`
+			DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = ?)
+		`, configurationID, keeping); err != nil {
+			return err
+		} else {
+			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+				return err
+			}
+		}
+
+		if query, args, err := sqlx.In(`
+			DELETE FROM fieldkit.station_module WHERE configuration_id = ?
+		`, configurationID, keeping); err != nil {
+			return err
+		} else {
+			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+				return err
+			}
 		}
 	}
 

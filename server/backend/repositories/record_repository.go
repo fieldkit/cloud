@@ -86,6 +86,7 @@ func (r *RecordRepository) AddMetaRecord(ctx context.Context, p *data.Provision,
 		PB:          pb,
 	}
 
+	// TODO Sanitize
 	if err := metaRecord.SetData(dr); err != nil {
 		return nil, fmt.Errorf("error setting meta json: %v", err)
 	}
@@ -200,6 +201,7 @@ func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision,
 		PB:           pb,
 	}
 
+	// TODO Sanitize
 	if err := dataRecord.SetData(prepareForMarshalToJson(dr)); err != nil {
 		return nil, nil, fmt.Errorf("error setting data json: %v", err)
 	}

@@ -189,7 +189,17 @@ func (e *TestEnv) NewAuthorizationHeader() string {
 	user := &data.User{
 		ID:    1,
 		Admin: false,
-		Email: "",
+		Email: "user@fieldkit.org",
+	}
+
+	return e.NewAuthorizationHeaderForUser(user)
+}
+
+func (e *TestEnv) NewAuthorizationHeaderForAdmin() string {
+	user := &data.User{
+		ID:    1,
+		Admin: true,
+		Email: "admin@fieldkit.org",
 	}
 
 	return e.NewAuthorizationHeaderForUser(user)

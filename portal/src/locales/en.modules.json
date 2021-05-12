@@ -1,5 +1,8 @@
 {
     "modules": {
+        "water": {
+            "name": "Water"
+        },
         "water.ec": {
             "name": "Water Conductivity",
             "sensors": {

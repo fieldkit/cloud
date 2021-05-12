@@ -6,7 +6,7 @@ import (
 
 var _ = Service("records", func() {
 	Security(JWTAuth, func() {
-		Scope("api:access")
+		Scope("api:admin")
 	})
 
 	Method("data", func() {
