@@ -4,8 +4,8 @@
 
         <form @submit.prevent="save(newComment)" class="new-comment">
             <UserPhoto v-if="user" :user="user"></UserPhoto>
-            <input type="text" :placeholder="placeholder" v-model="newComment.body" />
-            <button type="submit" class="new-comment-submit" v-if="newComment.body">Post</button>
+            <input type="text" :placeholder="placeholder" v-model="newComment.body" @input="$event.target.composing = false" />
+            <button type="submit" class="new-comment-submit" v-if="newComment.body.length > 0">Post</button>
         </form>
 
         <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
@@ -82,7 +82,12 @@
                                 v-if="newReply && newReply.threadId === post.id"
                             >
                                 <UserPhoto :user="user"></UserPhoto>
-                                <input type="text" placeholder="Reply to comment" v-model="newReply.body" />
+                                <input
+                                    type="text"
+                                    placeholder="Reply to comment"
+                                    v-model="newReply.body"
+                                    @input="$event.target.composing = false"
+                                />
                                 <button type="submit" class="new-comment-submit" v-if="newReply.body">Post</button>
                             </form>
                         </transition>
@@ -152,12 +157,12 @@ export default Vue.extend({
             newComment: {
                 projectId: typeof this.parentData === "number" ? this.parentData : null,
                 bookmark: null,
-                body: null,
+                body: "",
             },
             newReply: {
                 projectId: typeof this.parentData === "number" ? this.parentData : null,
                 bookmark: null,
-                body: null,
+                body: "",
                 threadId: null,
             },
             errorMessage: null,
