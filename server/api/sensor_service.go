@@ -69,6 +69,18 @@ type DataRow struct {
 	TimeGroup *int32               `db:"time_group" json:"tg,omitempty"`
 }
 
+func scanRow(queried *sqlx.Rows, row *DataRow) error {
+	if err := queried.StructScan(row); err != nil {
+		return fmt.Errorf("error scanning row: %v", err)
+	}
+
+	if row.Value != nil && math.IsNaN(*row.Value) {
+		row.Value = nil
+	}
+
+	return nil
+}
+
 func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sensor.DataResult, error) {
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT
@@ -103,7 +115,7 @@ func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sen
 
 	for queried.Next() {
 		row := &DataRow{}
-		if err = queried.StructScan(row); err != nil {
+		if err = scanRow(queried, row); err != nil {
 			return nil, err
 		}
 
@@ -222,12 +234,8 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 
 		for queried.Next() {
 			row := &DataRow{}
-			if err = queried.StructScan(row); err != nil {
+			if err = scanRow(queried, row); err != nil {
 				return nil, err
-			}
-
-			if row.Value != nil && math.IsNaN(*row.Value) {
-				row.Value = nil
 			}
 
 			rows = append(rows, row)
