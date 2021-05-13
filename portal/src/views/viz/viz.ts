@@ -1,7 +1,7 @@
 import _ from "lodash";
 import moment, { Moment } from "moment";
-import { SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
-import { Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
+import { ModuleID, SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
+import { SensorSpec, Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
 import i18n from "@/i18n";
 import FKApi from "@/api/api";
 
@@ -13,7 +13,7 @@ type SensorReadAtType = string;
 
 export class SensorMeta {
     constructor(
-        public readonly moduleId: number,
+        public readonly moduleId: ModuleID,
         public readonly moduleKey: string,
         public readonly sensorId: number,
         public readonly sensorKey: string,
@@ -42,7 +42,7 @@ export class SensorTreeOption {
         public readonly id: string | number,
         public readonly label: string,
         public readonly children: SensorTreeOption[] | undefined = undefined,
-        public readonly moduleId: number,
+        public readonly moduleId: ModuleID,
         public readonly sensorId: number | null,
         public readonly age: Moment
     ) {}
@@ -175,8 +175,8 @@ export class Bookmark {
         return _.uniq(_.flatten(this.allVizes.map((viz) => viz[0] || [])));
     }
 
-    public get allSensors(): number[] {
-        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1] || [])).map((sensorAndModule) => sensorAndModule[0]));
+    public get allSensors(): SensorSpec[] {
+        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1] || [])).map((sensorAndModule) => sensorAndModule));
     }
 
     public static sameAs(a: Bookmark, b: Bookmark): boolean {
@@ -610,7 +610,7 @@ export class Workspace {
 
         const options = _.map(
             allModules,
-            (value, moduleId: number): StationTreeOption => {
+            (value, moduleId: ModuleID): StationTreeOption => {
                 const children: SensorTreeOption[] = _.flatten(
                     value.map((row) => {
                         const age = moment.utc(row.sensorReadAt);
