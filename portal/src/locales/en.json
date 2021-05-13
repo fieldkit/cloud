@@ -130,6 +130,7 @@
                 "maxLength": "This field has a limit of 100 characters."
             },
             "tags": {
+                "help": "Press Enter to separate tags.",
                 "maxLength": "This field has a limit of 100 characters."
             },
             "startTime": {
