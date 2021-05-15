@@ -5,10 +5,13 @@ import (
 	"context"
 	"errors"
 	"io"
+	"time"
 
 	"goa.design/goa/v3/security"
 
 	ttnService "github.com/fieldkit/cloud/server/api/gen/ttn"
+
+	"github.com/fieldkit/cloud/server/data"
 )
 
 type ThingsNetworkService struct {
@@ -27,9 +30,19 @@ func (c *ThingsNetworkService) Webhook(ctx context.Context, payload *ttnService.
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(bodyReader)
-	body := buf.String()
 
-	log.Infow("webhook", "body", body)
+	message := data.ThingsNetworkMessage{
+		CreatedAt: time.Now(),
+		Body:      buf.Bytes(),
+	}
+
+	log.Infow("webhook", "body", string(message.Body))
+
+	if _, err := c.options.Database.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.ttn_messages (created_at, headers, body) VALUES (:created_at, :headers, :body)
+		`, message); err != nil {
+		return err
+	}
 
 	return nil
 }
