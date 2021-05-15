@@ -78,6 +78,9 @@ import (
 
 	oidcServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/oidc/server"
 	oidcService "github.com/fieldkit/cloud/server/api/gen/oidc"
+
+	ttnServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/ttn/server"
+	ttnService "github.com/fieldkit/cloud/server/api/gen/ttn"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -141,6 +144,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	oidcSvc := NewOidcService(ctx, options)
 	oidcEndpoints := oidcService.NewEndpoints(oidcSvc)
 
+	ttnSvc := NewThingsNetworkService(ctx, options)
+	ttnEndpoints := ttnService.NewEndpoints(ttnSvc)
+
 	for _, mw := range []func(goa.Endpoint) goa.Endpoint{jwtContext(), logErrors()} {
 		modulesEndpoints.Use(mw)
 		tasksEndpoints.Use(mw)
@@ -162,6 +168,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		discEndpoints.Use(mw)
 		discourseEndpoints.Use(mw)
 		oidcEndpoints.Use(mw)
+		ttnEndpoints.Use(mw)
 	}
 
 	samlConfig := &SamlAuthConfig{
@@ -203,6 +210,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	discServer := discServiceSvr.New(discEndpoints, mux, dec, enc, eh, nil)
 	discourseServer := discourseServiceSvr.New(discourseEndpoints, mux, dec, enc, eh, nil)
 	oidcServer := oidcServiceSvr.New(oidcEndpoints, mux, dec, enc, eh, nil)
+	ttnServer := ttnServiceSvr.New(ttnEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
@@ -224,6 +232,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	discServiceSvr.Mount(mux, discServer)
 	discourseServiceSvr.Mount(mux, discourseServer)
 	oidcServiceSvr.Mount(mux, oidcServer)
+	ttnServiceSvr.Mount(mux, ttnServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -285,6 +294,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range oidcServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range ttnServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 
