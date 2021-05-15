@@ -1,3 +1,6 @@
+import { ModuleID } from "./common";
+
+export { ModuleID };
 export interface SensorRange {
     minimum: number;
     maximum: number;
@@ -53,7 +56,7 @@ export interface SensorDataResponse {
 interface StationInfoResponse {
     stationId: number;
     stationName: string;
-    moduleId: number;
+    moduleId: ModuleID;
     moduleKey: string;
     sensorId: number;
     sensorKey: string;

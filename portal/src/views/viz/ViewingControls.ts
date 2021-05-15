@@ -7,13 +7,24 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import Spinner from "@/views/shared/Spinner.vue";
 
 import { TimeRange } from "./common";
-import { Graph, HasSensorParams, SensorParams, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType } from "./viz";
+import {
+    ModuleID,
+    Graph,
+    HasSensorParams,
+    SensorParams,
+    StationTreeOption,
+    SensorTreeOption,
+    Workspace,
+    FastTime,
+    TimeZoom,
+    ChartType,
+} from "./viz";
 import { vueTickHack } from "@/utilities";
 
 class NewParams implements HasSensorParams {
     public readonly sensorParams: SensorParams;
 
-    constructor(stationId: number, sensorAndModule: [number, number]) {
+    constructor(stationId: number, sensorAndModule: [ModuleID, number]) {
         this.sensorParams = new SensorParams([stationId], [sensorAndModule]);
     }
 }

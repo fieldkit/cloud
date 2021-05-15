@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"strconv"
@@ -35,8 +36,8 @@ type RawQueryParams struct {
 }
 
 type ModuleAndSensor struct {
-	ModuleID int64 `json:"module_id"`
-	SensorID int64 `json:"sensor_id"`
+	ModuleID string `json:"module_id"`
+	SensorID int64  `json:"sensor_id"`
 }
 
 type QueryParams struct {
@@ -80,29 +81,25 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		return nil, errors.New("stations is required")
 	}
 
-	mixedIds := make([]int64, 0)
+	sensors := make([]ModuleAndSensor, 0)
 	if raw.Sensors != nil {
 		parts := strings.Split(*raw.Sensors, ",")
-		for _, p := range parts {
-			if i, err := strconv.Atoi(p); err == nil {
-				mixedIds = append(mixedIds, int64(i))
+		if len(parts)%2 != 0 {
+			return nil, errors.New("malformed sensors")
+		}
+		for index := 0; index < len(parts); {
+			token := parts[index]
+
+			if id, err := strconv.Atoi(parts[index+1]); err != nil {
+				return nil, errors.New("malformed sensor-id")
+			} else {
+				sensors = append(sensors, ModuleAndSensor{
+					ModuleID: token,
+					SensorID: int64(id),
+				})
 			}
-		}
-	}
 
-	/*
-		if len(mixedIds) == 0 || len(mixedIds)%2 != 0 {
-			return nil, errors.New("sensors is required")
-		}
-	*/
-
-	sensors := make([]ModuleAndSensor, 0)
-	if len(mixedIds)%2 == 0 {
-		for i := 0; i < len(mixedIds); i += 2 {
-			sensors = append(sensors, ModuleAndSensor{
-				ModuleID: mixedIds[i],
-				SensorID: mixedIds[i+1],
-			})
+			index += 2
 		}
 	}
 
@@ -255,16 +252,64 @@ func (dq *DataQuerier) QueryMeta(ctx context.Context, qp *QueryParams) (qm *Quer
 	}, nil
 }
 
+type QueriedModuleId struct {
+	ModuleID int64 `db:"module_id"`
+}
+
+func (dq *DataQuerier) getIds(ctx context.Context, mas []ModuleAndSensor) ([]int64, []int64, error) {
+	moduleHardwareIds := make([][]byte, 0)
+	sensorIds := make([]int64, 0)
+
+	for _, mAndS := range mas {
+		sensorIds = append(sensorIds, mAndS.SensorID)
+
+		rawId, err := base64.StdEncoding.DecodeString(mAndS.ModuleID)
+		if err != nil {
+			return nil, nil, fmt.Errorf("error decoding: '%v'", mAndS.ModuleID)
+		}
+
+		moduleHardwareIds = append(moduleHardwareIds, rawId)
+	}
+
+	moduleIds := make([]int64, 0)
+
+	if len(moduleHardwareIds) == 0 {
+		return moduleIds, sensorIds, nil
+	}
+
+	query, args, err := sqlx.In(`SELECT id AS module_id FROM fieldkit.station_module WHERE hardware_id IN (?)`, moduleHardwareIds)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	rows := []*QueriedModuleId{}
+	if err := dq.db.SelectContext(ctx, &rows, dq.db.Rebind(query), args...); err != nil {
+		return nil, nil, err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	if len(rows) == 0 {
+		log.Infow("modules-none", "module_hardware_ids", moduleHardwareIds)
+		return nil, nil, fmt.Errorf("no-modules")
+	}
+
+	for _, row := range rows {
+		moduleIds = append(moduleIds, row.ModuleID)
+	}
+
+	log.Infow("modules", "module_hardware_ids", moduleHardwareIds, "module_ids", moduleIds)
+
+	return moduleIds, sensorIds, nil
+}
+
 func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (summaries map[string]*AggregateSummary, name string, err error) {
 	summaries = make(map[string]*AggregateSummary)
 	selectedAggregateName := qp.Aggregate
 
-	moduleIds := make([]int64, 0)
-	sensorIds := make([]int64, 0)
-
-	for _, mAndS := range qp.Sensors {
-		moduleIds = append(moduleIds, mAndS.ModuleID)
-		sensorIds = append(sensorIds, mAndS.SensorID)
+	moduleIds, sensorIds, err := dq.getIds(ctx, qp.Sensors)
+	if err != nil {
+		return nil, "", err
 	}
 
 	for _, name := range handlers.AggregateNames {
@@ -318,12 +363,9 @@ func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryPa
 
 	tableName := handlers.MakeAggregateTableName(dq.tableSuffix, aqp.AggregateName)
 
-	moduleIds := make([]int64, 0)
-	sensorIds := make([]int64, 0)
-
-	for _, mAndS := range aqp.Sensors {
-		moduleIds = append(moduleIds, mAndS.ModuleID)
-		sensorIds = append(sensorIds, mAndS.SensorID)
+	moduleIds, sensorIds, err := dq.getIds(ctx, aqp.Sensors)
+	if err != nil {
+		return nil, err
 	}
 
 	sqlQueryIncomplete := fmt.Sprintf(`

@@ -77,18 +77,46 @@ export const D3TimeSeriesGraph = Vue.extend({
 
             const timeRangeSeconds = (timeRange[1] - timeRange[0]) / 1000 / 1;
 
-            function tickFormatter(date: Date, tick: number, els: unknown[]) {
-                if (tick == 0 || tick == els.length - 1) {
-                    return d3.timeFormat("%-m/%-d %-H:%M")(date);
+            type FormatFunctionType = (date: Date) => string;
+
+            function formatTick(date: Date, tick: number, els: { __data__: Date }[], state: { f: FormatFunctionType | null }) {
+                let spec = "%-m/%-d %-H:%M";
+
+                if (tick == 0) {
+                    const allTicks = els.map((el) => el.__data__);
+                    const dateOnly = d3.timeFormat("%-m/%-d");
+                    const allDates = allTicks.map((tickDate) => dateOnly(tickDate));
+                    const timeOnly = d3.timeFormat("%-H:%M");
+                    const allTimes = allTicks.map((tickDate) => timeOnly(tickDate));
+
+                    const uniqueDates = _.uniq(allDates);
+                    const uniqueTimes = _.uniq(allTimes);
+
+                    if (uniqueTimes.length == 1) {
+                        spec = "%-m/%-d";
+                    } else if (uniqueDates.length == 1) {
+                        spec = "%-H:%M";
+                    }
                 }
 
-                const TwoDaysSeconds = 86400 * 2;
-                if (timeRangeSeconds > TwoDaysSeconds) {
-                    return d3.timeFormat("%-m/%-d %-H:%M")(date);
+                if (state.f == null) {
+                    state.f = d3.timeFormat(spec);
+                    if (state.f == null) throw new Error();
                 }
 
-                return d3.timeFormat("%-H:%M")(date);
+                return state.f(date);
             }
+
+            const createTickFormatter = () => {
+                const state = {
+                    f: null,
+                };
+                return (date: Date, tick: number, els: { __data__: Date }[]) => {
+                    return formatTick(date, tick, els, state);
+                };
+            };
+
+            const tickFormatter = createTickFormatter();
 
             const xAxis = d3
                 .axisBottom(x)

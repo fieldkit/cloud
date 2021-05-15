@@ -89,6 +89,7 @@
                     @focus="onTagsFocus"
                     placeholder=""
                 />
+                <div class="tags-help">{{ $t("project.form.tags.help") }}</div>
 
                 <div class="validation-errors" v-if="$v.form.tags.$error">
                     <div v-if="!$v.form.tags.maxLength">{{ $t("project.form.tags.maxLength") }}</div>
@@ -721,5 +722,10 @@ form > .outer-input-container {
     img {
         margin-right: 5px;
     }
+}
+
+.tags-help {
+    margin-top: 0.5em;
+    color: #6a6d71;
 }
 </style>
