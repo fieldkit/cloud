@@ -8,10 +8,11 @@ timestamps {
     node () {
         try {
 			def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
+			def branchName = params.DeployBranch ?: "main"
 
 			stage ('migrate') {
 				dir ('cloud') {
-					git branch: 'main', url: 'https://github.com/fieldkit/cloud.git'
+					git branch: branchName, url: 'https://github.com/fieldkit/cloud.git'
 
 					sh "cd migrations && make image"
 
