@@ -193,7 +193,7 @@ export default Vue.extend({
             await this.$services.api
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
-                    this.newComment.body = null;
+                    this.newComment.body = "";
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
@@ -209,7 +209,7 @@ export default Vue.extend({
                                         response.post.updatedAt
                                     )
                                 );
-                            this.newReply.body = null;
+                            this.newReply.body = "";
                         } else {
                             console.warn(`posts is null`);
                         }
@@ -226,7 +226,7 @@ export default Vue.extend({
                                     response.post.updatedAt
                                 )
                             );
-                            this.newComment.body = null;
+                            this.newComment.body = "";
                         } else {
                             console.log(`posts is null`);
                         }
@@ -245,7 +245,7 @@ export default Vue.extend({
             }
             this.errorMessage = null;
             this.newReply.threadId = post.id;
-            this.newReply.body = null;
+            this.newReply.body = "";
         },
         async getComments(): Promise<void> {
             await this.$services.api
