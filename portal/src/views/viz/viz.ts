@@ -623,7 +623,7 @@ export class Workspace {
                 const moduleAge = _.max(children.map((c) => c.age));
                 if (!moduleAge) throw new Error(`expected module age: no sensors?`);
 
-                const label = i18n.tc(moduleKey) + ` (${moduleAge.fromNow()})`;
+                const label = i18n.tc(moduleKey); //  + ` (${moduleAge.fromNow()})`;
                 return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, moduleAge);
             }
         );
