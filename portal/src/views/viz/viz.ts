@@ -610,9 +610,10 @@ export class Workspace {
 
         const options = _.map(
             allModules,
-            (value, moduleId: ModuleID): StationTreeOption => {
+            (sensors, moduleId: ModuleID): StationTreeOption => {
+                const uniqueSensors = _.uniqBy(sensors, (s) => s.sensorId);
                 const children: SensorTreeOption[] = _.flatten(
-                    value.map((row) => {
+                    uniqueSensors.map((row) => {
                         const age = moment.utc(row.sensorReadAt);
                         const label = i18n.tc(row.sensorKey) || row.sensorKey;
                         const optionId = `${row.moduleId}-${row.sensorId}`;
@@ -623,7 +624,7 @@ export class Workspace {
                 const moduleAge = _.max(children.map((c) => c.age));
                 if (!moduleAge) throw new Error(`expected module age: no sensors?`);
 
-                const label = i18n.tc(moduleKey) + ` (${moduleAge.fromNow()})`;
+                const label = i18n.tc(moduleKey); //  + ` (${moduleAge.fromNow()})`;
                 return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, moduleAge);
             }
         );

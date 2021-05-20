@@ -48,7 +48,9 @@
             </div>
         </div>
         <div class="sidebar-header sidebar-compass">
-            <img :alt="$t('layout.logo.compass.alt')" src="@/assets/logo-compass.svg" width="45" height="45" />
+            <router-link :to="{ name: 'projects' }">
+                <img :alt="$t('layout.logo.compass.alt')" src="@/assets/logo-compass.svg" width="45" height="45" />
+            </router-link>
         </div>
     </div>
 </template>
@@ -242,6 +244,7 @@ export default Vue.extend({
     @at-root .container-side.active & {
         transition: all 0.33s;
         opacity: 0;
+        visibility: hidden;
         transform: translateX(100px);
     }
 
