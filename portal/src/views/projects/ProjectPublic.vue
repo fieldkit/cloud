@@ -55,7 +55,7 @@
                         <template #default="{ following, follow, unfollow }">
                             <button class="button-social" v-on:click="unfollow" v-if="following">
                                 <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
-                                {{ $t("proejct.unfollow") }}
+                                {{ $t("project.unfollow") }}
                             </button>
                             <button class="button-social" v-on:click="follow" v-if="!following">
                                 <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
