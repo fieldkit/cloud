@@ -107,6 +107,7 @@ schema-production:
 	@echo "CREATE USER fk;" > schema-production/0.sql
 	@echo "CREATE USER server;" >> schema-production/0.sql
 	@echo "CREATE USER rdsadmin;" >> schema-production/0.sql
+	@echo "CREATE DATABASE keycloak;" >> schema-production/0.sql
 	@for f in `find schema-production -name "*.bz2"`; do              \
 		echo $$f                                                     ;\
 		bunzip2 < $$f > schema-production/1.sql                      ;\
