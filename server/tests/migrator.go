@@ -27,8 +27,6 @@ func tryMigrate(url string) error {
 	log.Printf("postgres = %s", url)
 	log.Printf("migrations = %s", migrationsDir)
 
-	if !registered {
-	}
 	files, err := filepath.Glob(filepath.Join(migrationsDir, "*.up.sql"))
 	if err != nil {
 		log.Fatal(err)

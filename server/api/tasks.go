@@ -19,7 +19,16 @@ func NewTasksService(ctx context.Context, options *ControllerOptions) *TasksServ
 	}
 }
 
+// TODO This should be authenticated.
 func (c *TasksService) Five(ctx context.Context) error {
+	log := Logger(ctx).Sugar()
+
+	if _, err := c.options.Database.ExecContext(ctx, `SELECT fk_update_community_ranking()`); err != nil {
+		return err
+	}
+
+	log.Infow("updated community rankings")
+
 	return nil
 }
 
