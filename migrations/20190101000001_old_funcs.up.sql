@@ -369,3 +369,5 @@ CREATE TABLE fieldkit.notification (
 
 CREATE UNIQUE INDEX ON fieldkit.notification (source_id);
 */
+
+SELECT NOW();

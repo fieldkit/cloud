@@ -38,12 +38,13 @@ require (
 	github.com/go-ini/ini v1.26.0
 	github.com/go-kit/kit v0.8.0
 	github.com/go-logfmt/logfmt v0.4.0
+	github.com/go-pg/pg/v10 v10.9.1
 	github.com/go-stack/stack v1.8.0
 	github.com/goadesign/goa v1.4.0
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang-migrate/migrate/v4 v4.11.0
 	github.com/golang/freetype v0.0.0-20161208064710-d9be45aaf745
-	github.com/golang/protobuf v1.4.2
+	github.com/golang/protobuf v1.4.3
 	github.com/google/go-querystring v1.0.0
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/mux v1.7.4
@@ -68,19 +69,18 @@ require (
 	github.com/llgcode/draw2d v0.0.0-20161104081029-1286d3b2030a
 	github.com/lucasb-eyer/go-colorful v0.0.0-20170223221042-c900de9dbbc7
 	github.com/manveru/faker v0.0.0-20171103152722-9fbc68a78c4d
-	github.com/mattn/go-colorable v0.1.1
-	github.com/mattn/go-isatty v0.0.7
+	github.com/mattn/go-colorable v0.1.4
+	github.com/mattn/go-isatty v0.0.8
 	github.com/montanaflynn/stats v0.5.0
 	github.com/muesli/smartcrop v0.3.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
-	github.com/onsi/ginkgo v1.8.0 // indirect
-	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/paulmach/go.geo v0.0.0-20170321183534-b160a6efed6c
 	github.com/paulmach/go.geojson v0.0.0-20170327170536-40612a87147b
 	github.com/paulmach/orb v0.1.6
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.5.0
 	github.com/pquerna/cachecontrol v0.0.0-20201205024021-ac21108117ac // indirect
+	github.com/robinjoseph08/go-pg-migrations/v3 v3.0.0
 	github.com/robinpowered/go-proto v0.0.0-20160614142341-85ea3e1f1d3d
 	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b
 	github.com/segmentio/ksuid v1.0.3
@@ -89,7 +89,7 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v1.7.1
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.6.0
 	github.com/ugorji/go v0.0.0-20190320090025-2dc34c0b8780
 	github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35
@@ -102,14 +102,14 @@ require (
 	go.uber.org/zap v1.10.0
 	goa.design/goa/v3 v3.2.4
 	goa.design/plugins/v3 v3.1.1
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b
-	golang.org/x/net v0.0.0-20201209123823-ac852fbbde11
+	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68
+	golang.org/x/sys v0.0.0-20210320140829-1e4c9ba3b0c4
 	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.0.0-20201009162240-fcf82128ed91
-	google.golang.org/appengine v1.6.5
+	google.golang.org/appengine v1.6.7
 	google.golang.org/genproto v0.0.0-20201009135657-4d944d34d83c // indirect
 	google.golang.org/grpc v1.33.0 // indirect
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0
