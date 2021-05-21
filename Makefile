@@ -134,10 +134,7 @@ run-server: server
 	./run-server.sh
 
 migrate-up:
-	migrate -path migrations -database "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" up
-
-migrate-down:
-	migrate -path migrations -database "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" down
+	cd migrations && PGURL="postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable" go run main.go migrate
 
 ci: setup binaries jstests
 

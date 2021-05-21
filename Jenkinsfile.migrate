@@ -16,7 +16,7 @@ timestamps {
 
 					sh "cd migrations && make image"
 
-					sh "docker run --rm conservify/fk-cloud-migrate --path /migrations --database '${ws.database_url.value}' up"
+					sh "docker run --rm --env 'PGURL=${ws.database_url.value}' conservify/fk-cloud-migrate migrate"
 				}
 			}
         }
