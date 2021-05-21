@@ -19,6 +19,7 @@ type Project struct {
 	MediaContentType *string         `db:"media_content_type"`
 	Bounds           *types.JSONText `db:"bounds"`
 	ShowStations     bool            `db:"show_stations"`
+	CommunityRanking int32           `db:"community_ranking"`
 }
 
 type ProjectUser struct {

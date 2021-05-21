@@ -41,8 +41,8 @@ func (pr *ProjectRepository) QueryProjectsByStationIDForPermissions(ctx context.
 
 func (pr *ProjectRepository) AddProject(ctx context.Context, userID int32, project *data.Project) (*data.Project, error) {
 	if err := pr.db.NamedGetContext(ctx, project, `
-		INSERT INTO fieldkit.project (name, description, goal, location, tags, privacy, start_time, end_time, bounds, show_stations) VALUES
-		(:name, :description, :goal, :location, :tags, :privacy, :start_time, :end_time, :bounds, :show_stations) RETURNING *`, project); err != nil {
+		INSERT INTO fieldkit.project (name, description, goal, location, tags, privacy, start_time, end_time, bounds, show_stations, community_ranking) VALUES
+		(:name, :description, :goal, :location, :tags, :privacy, :start_time, :end_time, :bounds, :show_stations, :community_ranking) RETURNING *`, project); err != nil {
 		return nil, err
 	}
 
