@@ -115,8 +115,12 @@ export default Vue.extend({
 
             this.ready = true;
             this.updateMap();
+
+            // Force model to update.
+            this.newBounds();
         },
-        newBounds(map) {
+        newBounds() {
+            const map = this.protectedData.map;
             const bounds = map.getBounds();
             this.$emit("input", new BoundingRectangle([bounds._sw.lng, bounds._sw.lat], [bounds._ne.lng, bounds._ne.lat]));
         },
@@ -181,7 +185,9 @@ export default Vue.extend({
                 console.log("map: keeping", this.mapped);
             }
 
-            map.fitBounds(this.bounds, { duration: 0 });
+            if (this.bounds) {
+                map.fitBounds(this.bounds, { duration: 0 });
+            }
         },
     },
 });

@@ -111,8 +111,8 @@ func (e *TestEnv) AddProjectWithPrivacy(privacy data.PrivacyType) (*data.Project
 	}
 
 	if err := e.DB.NamedGetContext(e.Ctx, project, `
-		INSERT INTO fieldkit.project (name, privacy)
-		VALUES (:name, :privacy)
+		INSERT INTO fieldkit.project (name, privacy, community_ranking)
+		VALUES (:name, :privacy, :community_ranking)
 		RETURNING *
 		`, project); err != nil {
 		return nil, err

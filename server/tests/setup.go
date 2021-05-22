@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/url"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -15,10 +13,6 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/conservify/sqlxcache"
-
-	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 
@@ -35,38 +29,12 @@ type TestEnv struct {
 }
 
 type TestConfig struct {
-	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" required:"true"`
+	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable" required:"true"`
 }
 
 var (
 	globalEnv *TestEnv
 )
-
-func tryMigrate(url string) error {
-	migrationsDir, err := findMigrationsDirectory()
-	if err != nil {
-		return err
-	}
-
-	log.Printf("trying to migrate...")
-	log.Printf("postgres = %s", url)
-	log.Printf("migrations = %s", migrationsDir)
-
-	migrater, err := migrate.New("file://"+migrationsDir, url)
-	if err != nil {
-		return err
-	}
-
-	migrater.Log = &MigratorLog{}
-
-	if err := migrater.Up(); err != nil {
-		if err != migrate.ErrNoChange {
-			return err
-		}
-	}
-
-	return nil
-}
 
 func NewTestEnv() (e *TestEnv, err error) {
 	if globalEnv != nil {
@@ -96,6 +64,8 @@ func NewTestEnv() (e *TestEnv, err error) {
 	}
 
 	if err := tryMigrate(testUrl); err != nil {
+		log.Printf("error migrating: %v", err)
+
 		log.Printf("creating test database")
 
 		if _, err := originalDb.ExecContext(ctx, fmt.Sprintf("DROP DATABASE IF EXISTS %s", databaseName)); err != nil {
@@ -138,35 +108,6 @@ func NewTestEnv() (e *TestEnv, err error) {
 	return
 }
 
-func changeConnectionStringDatabase(original, newDatabase string) (string, error) {
-	p, err := url.Parse(original)
-	if err != nil {
-		return "", err
-	}
-
-	p.Path = newDatabase
-
-	return p.String(), nil
-}
-
-func findMigrationsDirectory() (string, error) {
-	path, err := os.Getwd()
-	if err != nil {
-		return "", fmt.Errorf("unable to find migrations directory: %v", err)
-	}
-
-	for {
-		test := filepath.Join(path, "migrations")
-		if _, err := os.Stat(test); !os.IsNotExist(err) {
-			return test, nil
-		}
-
-		path = filepath.Dir(path)
-	}
-
-	return "", fmt.Errorf("unable to find migrations directory")
-}
-
 func (e *TestEnv) NewTokenForUser(user *data.User) string {
 	now := time.Now()
 	refreshToken, err := data.NewRefreshToken(user.ID, 20, now.Add(time.Duration(72)*time.Hour))
@@ -203,4 +144,15 @@ func (e *TestEnv) NewAuthorizationHeaderForAdmin() string {
 	}
 
 	return e.NewAuthorizationHeaderForUser(user)
+}
+
+func changeConnectionStringDatabase(original, newDatabase string) (string, error) {
+	p, err := url.Parse(original)
+	if err != nil {
+		return "", err
+	}
+
+	p.Path = newDatabase
+
+	return p.String(), nil
 }

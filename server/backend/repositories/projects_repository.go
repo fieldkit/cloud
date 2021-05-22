@@ -41,8 +41,8 @@ func (pr *ProjectRepository) QueryProjectsByStationIDForPermissions(ctx context.
 
 func (pr *ProjectRepository) AddProject(ctx context.Context, userID int32, project *data.Project) (*data.Project, error) {
 	if err := pr.db.NamedGetContext(ctx, project, `
-		INSERT INTO fieldkit.project (name, description, goal, location, tags, privacy, start_time, end_time, bounds, show_stations) VALUES
-		(:name, :description, :goal, :location, :tags, :privacy, :start_time, :end_time, :bounds, :show_stations) RETURNING *`, project); err != nil {
+		INSERT INTO fieldkit.project (name, description, goal, location, tags, privacy, start_time, end_time, bounds, show_stations, community_ranking) VALUES
+		(:name, :description, :goal, :location, :tags, :privacy, :start_time, :end_time, :bounds, :show_stations, :community_ranking) RETURNING *`, project); err != nil {
 		return nil, err
 	}
 
@@ -127,6 +127,9 @@ func (pr *ProjectRepository) Delete(outerCtx context.Context, projectID int32) e
 			return err
 		}
 		if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project_user WHERE project_id = $1`, projectID); err != nil {
+			return err
+		}
+		if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.discussion_post WHERE project_id = $1`, projectID); err != nil {
 			return err
 		}
 		if _, err := pr.db.ExecContext(ctx, `DELETE FROM fieldkit.project WHERE id = $1`, projectID); err != nil {

@@ -270,7 +270,7 @@ func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.Lis
 
 	projects := []*data.Project{}
 	if err := c.options.Database.SelectContext(ctx, &projects, `
-		SELECT p.* FROM fieldkit.project AS p WHERE p.privacy = $1 ORDER BY p.name LIMIT 10
+		SELECT p.* FROM fieldkit.project AS p WHERE p.privacy = $1 ORDER BY p.community_ranking DESC LIMIT 10
 		`, data.Public); err != nil {
 		return nil, err
 	}
@@ -278,7 +278,7 @@ func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.Lis
 	followers := []*data.FollowersSummary{}
 	if err := c.options.Database.SelectContext(ctx, &followers, `
 		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (
-			SELECT id FROM fieldkit.project WHERE privacy = $1 ORDER BY name LIMIT 10
+			SELECT id FROM fieldkit.project WHERE privacy = $1 ORDER BY community_ranking DESC LIMIT 10
 		) GROUP BY f.project_id
 		`, data.Public); err != nil {
 		return nil, err
