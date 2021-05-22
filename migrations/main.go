@@ -16,15 +16,20 @@ import (
 const directory = "migrations"
 
 type options struct {
-	Path string
+	Path       string
+	SearchPath string
 }
 
 func main() {
 	o := &options{}
 
 	flag.StringVar(&o.Path, "path", "./", "path to migrations")
+	flag.StringVar(&o.SearchPath, "search-path", "fieldkit,public", "search path to apply")
 
 	flag.Parse()
+
+	params := make(map[string]interface{})
+	params["search_path"] = o.SearchPath
 
 	options := &pg.Options{
 		Addr:     "",
