@@ -10,7 +10,7 @@ RUN ls -alhR
 RUN go get ./...
 RUN go build -o migrate *.go
 
-FROM scratch
+FROM ubuntu
 
 COPY --from=source /work/migrate /migrations/bin/
 
