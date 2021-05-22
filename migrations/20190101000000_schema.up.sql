@@ -1,6 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 
-DROP SCHEMA IF EXISTS fieldkit CASCADE;
 CREATE SCHEMA fieldkit;
 
 CREATE TABLE fieldkit.user (
