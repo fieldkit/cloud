@@ -141,6 +141,7 @@ ci: setup binaries jstests
 ci-db-tests:
 	rm -rf active-schema
 	mkdir -p active-schema
+	@echo "DROP SCHEMA fieldkit;" > active-schema/0.sql
 	docker stop fktests-pg || true
 	docker rm fktests-pg || true
 	docker network create docker_default || true
