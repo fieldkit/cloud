@@ -1,14 +1,21 @@
 @Library('conservify') _
 
-def getJobWithArtifacts(stackName) {
+def getJobWithArtifacts(stackName, branch) {
 	if (stackName == "portal-stack") {
 		return "cloud"
 	}
 	return "aws-build-stacks"
 }
 
+def getCopyArtifactsJob(stackName, branch) {
+	if (stackName == "portal-stack") {
+		return "cloud/" + branch
+	}
+	return "aws-build-stacks"
+}
+
 def getStackURL(user, password, branch, stackName) {
-	def job = getJobWithArtifacts(stackName)
+	def job = getJobWithArtifacts(stackName, branch)
 	return "https://${user}:${password}@code.conservify.org/jenkins/job/fk/job/${job}/job/${branch}/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
 }
 
@@ -25,7 +32,7 @@ timestamps {
 			print(stackName)
 
 			stage ('prepare') {
-				def job = getJobWithArtifacts(stackName)
+				def job = getCopyArtifactsJob(stackName, branch)
 				copyArtifacts(projectName: job, flatten: true)
 			}
 
