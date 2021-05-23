@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -24,7 +26,6 @@ func main() {
 	o := &options{}
 
 	flag.StringVar(&o.Path, "path", "./", "path to migrations")
-	flag.StringVar(&o.SearchPath, "search-path", "fieldkit,public", "search path to apply")
 
 	flag.Parse()
 
