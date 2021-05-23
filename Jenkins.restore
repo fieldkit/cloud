@@ -1,0 +1,56 @@
+import groovy.json.JsonSlurper
+
+@Library('conservify') _
+
+properties([
+	buildDiscarder(logRotator(numToKeepStr: '1')),
+	disableConcurrentBuilds(),
+])
+
+timestamps {
+    node () {
+        try {
+            def workEnv = "dev"
+			def branchName = params.DeployBranch ?: "main"
+            def deployFrom = params.DeployFrom ?: "app-servers.aws.fkdev.org"
+
+            def ws = conservifyTerraformWorkspace(env: workEnv)
+
+			def now = new Date()
+			def stamp = now.format("yyyyMMdd-HHmmss", TimeZone.getTimeZone('UTC'))
+
+			stage ('restoring') {
+				withCredentials([usernamePassword(credentialsId: 'jenkins-artifact-download', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASSWORD')]) {
+				    sh "rm -f *.sql*"
+
+				    copyArtifacts(projectName: 'fkprd-db-clone', flatten: true)
+
+					def pgDbUrl = "postgres://${ws.database_username.value}:${ws.database_password.value}@${ws.database_address.value}/postgres"
+
+					writeFile(file: "setup.sql", text: """
+
+SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'fk';
+ALTER DATABASE fk RENAME TO "fk-${stamp}";
+
+					""")
+
+					writeFile(file: "create.sql", text: """
+CREATE DATABASE fk;
+					""")
+
+					sh "docker run --rm -i postgres psql '${pgDbUrl}' < setup.sql"
+
+					sh "docker run --rm -i postgres psql '${pgDbUrl}' < create.sql"
+
+    				sh "bunzip2 -c db-*.sql.bz2 | docker run --rm -i postgres psql '${ws.database_url.value}'"
+
+					notifySuccess()
+				}
+			}
+        }
+        catch (Exception e) {
+			notifyFailure()
+            throw e
+        }
+    }
+}

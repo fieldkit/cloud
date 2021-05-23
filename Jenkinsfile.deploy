@@ -1,10 +1,15 @@
 @Library('conservify') _
 
-def getStackURL(user, password, branch, stackName) {
+def getJobWithArtifacts(stackName) {
 	if (stackName == "portal-stack") {
-		return "https://${user}:${password}@code.conservify.org/jenkins/job/fk/job/cloud/job/${branch}/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
+		return "cloud"
 	}
-	return "https://${user}:${password}@code.conservify.org/jenkins/job/fk/job/aws-build-stacks/job/${branch}/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
+	return "aws-build-stacks"
+}
+
+def getStackURL(user, password, branch, stackName) {
+	def job = getJobWithArtifacts(stackName)
+	return "https://${user}:${password}@code.conservify.org/jenkins/job/fk/job/${job}/job/${branch}/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
 }
 
 timestamps {
@@ -18,6 +23,11 @@ timestamps {
 			slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting (stack = ${stackName}) (<${env.BUILD_URL}|Open>)"
 
 			print(stackName)
+
+			stage ('prepare') {
+				def job = getJobWithArtifacts(stackName)
+				copyArtifacts(projectName: job, flatten: true)
+			}
 
 			stage ('deploy') {
 				withCredentials([usernamePassword(credentialsId: 'jenkins-artifact-download', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASSWORD')]) {

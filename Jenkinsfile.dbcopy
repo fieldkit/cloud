@@ -21,8 +21,11 @@ timestamps {
 			stage ('archive') {
 				archiveArtifacts(artifacts: "*.bz2")
 			}
+
+			notifySuccess()
 		}
 		catch (Exception e) {
+			notifyFailure()
 			throw e
 		}
 	}
