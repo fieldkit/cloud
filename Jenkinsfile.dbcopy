@@ -3,9 +3,6 @@
 properties([
 	buildDiscarder(logRotator(numToKeepStr: '5')),
 	disableConcurrentBuilds(),
-	parameters([
-		string(defaultValue: 'dev', name: 'WorkEnv')
-	])
 ])
 
 timestamps {
@@ -24,8 +21,11 @@ timestamps {
 			stage ('archive') {
 				archiveArtifacts(artifacts: "*.bz2")
 			}
+
+			notifySuccess()
 		}
 		catch (Exception e) {
+			notifyFailure()
 			throw e
 		}
 	}

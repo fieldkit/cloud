@@ -16,13 +16,15 @@ import (
 const directory = "migrations"
 
 type options struct {
-	Path string
+	Path       string
+	SearchPath string
 }
 
 func main() {
 	o := &options{}
 
 	flag.StringVar(&o.Path, "path", "./", "path to migrations")
+	flag.StringVar(&o.SearchPath, "search-path", "fieldkit,public", "search path to apply")
 
 	flag.Parse()
 
@@ -31,6 +33,25 @@ func main() {
 		User:     "",
 		Database: "",
 		Password: "",
+		OnConnect: func(ctx context.Context, conn *pg.Conn) error {
+			log.Printf("creating schema...")
+
+			if _, err := conn.Exec("CREATE SCHEMA IF NOT EXISTS fieldkit"); err != nil {
+				return fmt.Errorf("error creating: %v", err)
+			}
+
+			if _, err := conn.Exec("GRANT USAGE ON SCHEMA fieldkit TO fieldkit"); err != nil {
+				return fmt.Errorf("error granting: %v", err)
+			}
+
+			if _, err := conn.Exec("GRANT CREATE ON SCHEMA fieldkit TO fieldkit"); err != nil {
+				return fmt.Errorf("error granting: %v", err)
+			}
+
+			log.Printf("done creating schema...")
+
+			return nil
+		},
 	}
 
 	url := os.Getenv("PGURL")

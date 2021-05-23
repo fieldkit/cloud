@@ -1,6 +1,6 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 2
-VERSION_PATCH = 5
+VERSION_PATCH = 6
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
@@ -141,6 +141,7 @@ ci: setup binaries jstests
 ci-db-tests:
 	rm -rf active-schema
 	mkdir -p active-schema
+	@echo "DROP SCHEMA fieldkit;" > active-schema/0.sql
 	docker stop fktests-pg || true
 	docker rm fktests-pg || true
 	docker network create docker_default || true

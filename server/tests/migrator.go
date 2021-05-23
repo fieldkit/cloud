@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -63,10 +64,31 @@ func tryMigrate(url string) error {
 		return err
 	}
 
+	options.OnConnect = func(ctx context.Context, conn *pg.Conn) error {
+		log.Printf("creating schema...")
+
+		if _, err := conn.Exec("CREATE SCHEMA IF NOT EXISTS fieldkit"); err != nil {
+			return fmt.Errorf("error creating: %v", err)
+		}
+
+		if _, err := conn.Exec("GRANT USAGE ON SCHEMA fieldkit TO fieldkit"); err != nil {
+			return fmt.Errorf("error granting: %v", err)
+		}
+
+		if _, err := conn.Exec("GRANT CREATE ON SCHEMA fieldkit TO fieldkit"); err != nil {
+			return fmt.Errorf("error granting: %v", err)
+		}
+
+		log.Printf("done creating schema...")
+
+		return nil
+	}
+
 	db := pg.Connect(options)
 
 	if err := migrations.Run(db, migrationsDir, []string{"", "migrate"}); err != nil {
-		return err
+		log.Printf("migration error: %v", err)
+		return fmt.Errorf("migration error: %v", err)
 	}
 
 	return nil

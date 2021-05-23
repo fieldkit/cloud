@@ -1,9 +1,5 @@
 @Library('conservify') _
 
-properties([
-	parameters([string(defaultValue: 'dev', name: 'WorkEnv', description: '')])
-])
-
 timestamps {
     node () {
         try {
