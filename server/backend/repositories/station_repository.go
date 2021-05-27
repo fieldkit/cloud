@@ -230,11 +230,11 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 	}
 
 	if err := r.updateStationConfigurationFromStatus(ctx, s, statusReply); err != nil {
-		return err
+		return fmt.Errorf("error updating station configuration: %s", err)
 	}
 
 	if err := r.updateDeployedActivityFromStatus(ctx, s); err != nil {
-		return err
+		return fmt.Errorf("error updating deployed activity: %s", err)
 	}
 
 	return nil
@@ -379,14 +379,10 @@ func (r *StationRepository) deleteModuleSensorsExcept(ctx context.Context, modul
 			}
 		}
 	} else {
-		if query, args, err := sqlx.In(`
+		if _, err := r.db.ExecContext(ctx, `
 			DELETE FROM fieldkit.module_sensor WHERE module_id = ?
-		`, moduleID, keeping); err != nil {
+		`, moduleID); err != nil {
 			return err
-		} else {
-			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
-				return err
-			}
 		}
 	}
 
@@ -415,24 +411,16 @@ func (r *StationRepository) deleteStationModulesExcept(ctx context.Context, conf
 			}
 		}
 	} else {
-		if query, args, err := sqlx.In(`
+		if _, err := r.db.ExecContext(ctx, `
 			DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = ?)
-		`, configurationID, keeping); err != nil {
+		`, configurationID); err != nil {
 			return err
-		} else {
-			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
-				return err
-			}
 		}
 
-		if query, args, err := sqlx.In(`
+		if _, err := r.db.ExecContext(ctx, `
 			DELETE FROM fieldkit.station_module WHERE configuration_id = ?
-		`, configurationID, keeping); err != nil {
+		`, configurationID); err != nil {
 			return err
-		} else {
-			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
-				return err
-			}
 		}
 	}
 
