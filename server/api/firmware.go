@@ -182,7 +182,7 @@ func (s *FirmwareService) List(ctx context.Context, payload *firmware.ListPayloa
 	pattern := DefaultFirmwarePattern
 
 	p, err := NewPermissions(ctx, s.options).Unwrap()
-	if err == nil {
+	if err == nil && !p.Anonymous() {
 		user := &data.User{}
 		if err := s.options.Database.GetContext(ctx, user, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
 			return nil, err
