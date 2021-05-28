@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
 
 	"github.com/iancoleman/strcase"
 
@@ -52,10 +53,17 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 		return mf.byMetaID[databaseRecord.ID], nil
 	}
 
+	log := Logger(ctx).Sugar().With("meta_record_id", databaseRecord.ID)
+
 	var meta pb.DataRecord
 	err := databaseRecord.Unmarshal(&meta)
 	if err != nil {
 		return nil, err
+	}
+
+	if meta.Identity == nil {
+		log.Warnw("malformed-meta", "record", meta)
+		return nil, fmt.Errorf("malformed meta: no identity")
 	}
 
 	allModules := make([]*DataMetaModule, 0)
@@ -64,6 +72,16 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 
 	for _, module := range meta.Modules {
 		sensors := make([]*DataMetaSensor, 0)
+
+		if module.Header == nil {
+			log.Warnw("malformed-meta-module", "record", meta)
+			return nil, fmt.Errorf("malformed module meta: no header")
+		}
+
+		if module.Sensors == nil {
+			log.Warnw("malformed-meta-sensors", "record", meta)
+			return nil, fmt.Errorf("malformed sensors meta: no sensors")
+		}
 
 		hf := HeaderFields{
 			Manufacturer: module.Header.Manufacturer,
@@ -125,7 +143,6 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 	}
 
 	if numberEmptyModules > 0 {
-		log := Logger(ctx).Sugar().With("meta_record_id", databaseRecord.ID)
 		log.Warnw("empty", "number_empty_modules", numberEmptyModules)
 	}
 
