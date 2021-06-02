@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -15,7 +16,7 @@ import (
 )
 
 const (
-	Path = "./.fs"
+	Path = ".fs"
 )
 
 type localFilesArchive struct {
@@ -159,6 +160,9 @@ func makeFileName(keyOrUrl string) string {
 	u, err := url.Parse(keyOrUrl)
 	if err != nil {
 		return path.Join(Path, fmt.Sprintf("%v", keyOrUrl))
+	}
+	if strings.HasPrefix(u.Path, Path) {
+		return u.Path
 	}
 	return path.Join(Path, fmt.Sprintf("%v", u.Path))
 }
