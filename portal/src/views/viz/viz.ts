@@ -1,7 +1,7 @@
 import _ from "lodash";
 import moment, { Moment } from "moment";
-import { ModuleID, SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
-import { SensorSpec, Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
+import { SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
+import { ModuleID, SensorSpec, Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
 import i18n from "@/i18n";
 import FKApi from "@/api/api";
 

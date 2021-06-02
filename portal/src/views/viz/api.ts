@@ -1,6 +1,5 @@
 import { ModuleID } from "./common";
 
-export { ModuleID };
 export interface SensorRange {
     minimum: number;
     maximum: number;
