@@ -380,7 +380,7 @@ func (r *StationRepository) deleteModuleSensorsExcept(ctx context.Context, modul
 		}
 	} else {
 		if _, err := r.db.ExecContext(ctx, `
-			DELETE FROM fieldkit.module_sensor WHERE module_id = ?
+			DELETE FROM fieldkit.module_sensor WHERE module_id = $1
 		`, moduleID); err != nil {
 			return err
 		}
@@ -412,13 +412,13 @@ func (r *StationRepository) deleteStationModulesExcept(ctx context.Context, conf
 		}
 	} else {
 		if _, err := r.db.ExecContext(ctx, `
-			DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = ?)
+			DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = $1)
 		`, configurationID); err != nil {
 			return err
 		}
 
 		if _, err := r.db.ExecContext(ctx, `
-			DELETE FROM fieldkit.station_module WHERE configuration_id = ?
+			DELETE FROM fieldkit.station_module WHERE configuration_id = $1
 		`, configurationID); err != nil {
 			return err
 		}
