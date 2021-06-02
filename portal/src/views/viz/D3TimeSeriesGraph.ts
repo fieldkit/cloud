@@ -75,8 +75,6 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .domain(data.dataRange)
                 .range([layout.height - (layout.margins.bottom + layout.margins.top), layout.margins.top]);
 
-            const timeRangeSeconds = (timeRange[1] - timeRange[0]) / 1000 / 1;
-
             type FormatFunctionType = (date: Date) => string;
 
             function formatTick(date: Date, tick: number, els: { __data__: Date }[], state: { f: FormatFunctionType | null }) {
@@ -244,7 +242,7 @@ export const D3TimeSeriesGraph = Vue.extend({
 
             const lineFn = d3
                 .line()
-                .defined((d) => d.value)
+                .defined((d) => _.isNumber(d.value))
                 .x((d) => x(d.time))
                 .y((d) => y(d.value))
                 .curve(d3.curveBasis);
