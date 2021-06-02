@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"strings"
 	"time"
 
 	"github.com/conservify/sqlxcache"
@@ -1127,4 +1128,53 @@ func (sr *StationRepository) QueryStationProgress(ctx context.Context, stationID
 	}
 
 	return nil, nil
+}
+
+type StationSensor struct {
+	StationID    int32     `db:"station_id" json:"stationId"`
+	StationName  string    `db:"station_name" json:"stationName"`
+	ModuleID     string    `db:"module_id" json:"moduleId"`
+	ModuleKey    string    `db:"module_key" json:"moduleKey"`
+	SensorID     int64     `db:"sensor_id" json:"sensorId"`
+	SensorKey    string    `db:"sensor_key" json:"sensorKey"`
+	SensorReadAt time.Time `db:"sensor_read_at" json:"sensorReadAt"`
+}
+
+func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations []int32) (map[int32][]*StationSensor, error) {
+	query, args, err := sqlx.In(fmt.Sprintf(`
+		SELECT
+			station_id, station.name AS station_name,
+			encode(station_module.hardware_id, 'base64') AS module_id, station_module.name AS module_key,
+			sensor_id, s.key AS sensor_key,
+            MAX(agg.time) AS sensor_read_at
+		FROM %s AS agg
+		JOIN fieldkit.aggregated_sensor AS s ON (s.id = sensor_id)
+		JOIN fieldkit.station AS station ON (agg.station_id = station.id)
+		JOIN fieldkit.station_module AS station_module ON (agg.module_id = station_module.id)
+		WHERE station_id IN (?)
+		GROUP BY station_id, station.name, station_module.name, station_module.hardware_id, sensor_id, s.key
+        ORDER BY sensor_read_at DESC
+		`, "fieldkit.aggregated_10m"), stations)
+	if err != nil {
+		return nil, err
+	}
+
+	rows := []*StationSensor{}
+	if err := sr.db.SelectContext(ctx, &rows, sr.db.Rebind(query), args...); err != nil {
+		return nil, err
+	}
+
+	byStation := make(map[int32][]*StationSensor)
+	for _, id := range stations {
+		byStation[int32(id)] = make([]*StationSensor, 0)
+	}
+
+	for _, row := range rows {
+		if !strings.HasPrefix(row.ModuleKey, "fk.") {
+			row.ModuleKey = "fk." + strings.TrimPrefix(row.ModuleKey, "modules.")
+		}
+		byStation[row.StationID] = append(byStation[row.StationID], row)
+	}
+
+	return byStation, nil
 }
