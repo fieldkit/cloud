@@ -14,6 +14,7 @@
 
             <div class="workspace-container">
                 <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
+                <div class="busy" v-else><Spinner /></div>
 
                 <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="user"></Comments>
             </div>

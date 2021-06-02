@@ -152,11 +152,11 @@ export const ViewingControls = Vue.extend({
     },
     template: `
 		<div class="controls-container">
+			<div class="busy" v-if="viz.busy"><Spinner /></div>
 			<div class="row row-1">
 				<div class="left buttons">
 					<div class="button" @click="raiseCompare">Compare</div>
 					<div class="button" @click="raiseRemove" v-if="false">Remove</div>
-					<div class="busy" v-if="viz.busy"><Spinner /></div>
 				</div>
 				<div class="right time">
 					<span class="view-by">View By:</span>
