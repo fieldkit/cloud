@@ -21,14 +21,6 @@ import {
 } from "./viz";
 import { vueTickHack } from "@/utilities";
 
-class NewParams implements HasSensorParams {
-    public readonly sensorParams: SensorParams;
-
-    constructor(stationId: number, sensorAndModule: [ModuleID, number]) {
-        this.sensorParams = new SensorParams([stationId], [sensorAndModule]);
-    }
-}
-
 export const ViewingControls = Vue.extend({
     name: "ViewingControls",
     components: {
@@ -76,7 +68,11 @@ export const ViewingControls = Vue.extend({
         },
         sensorOptions(): SensorTreeOption[] {
             this.viz.log("sensor-options", { options: this.workspace.sensorOptions });
-            return this.workspace.sensorOptions;
+            const stationId = this.viz.chartParams.sensorParams.stations[0]; // this.selectedStation
+            if (stationId == null) {
+                return [];
+            }
+            return this.workspace.sensorOptions(stationId);
         },
         selectedStation(): number | null {
             return this.viz.chartParams.sensorParams.stations[0];
@@ -115,7 +111,8 @@ export const ViewingControls = Vue.extend({
             const sensor = this.viz.chartParams.sensorParams.sensors[0];
             console.log("raising viz-change-sensors", "sensor", sensor);
             vueTickHack(() => {
-                this.$emit("viz-change-sensors", new NewParams(Number(node.id), sensor));
+                const params = this.workspace.makeParamsForStationChange(Number(node.id), sensor);
+                this.$emit("viz-change-sensors", params);
             });
         },
         raiseChangeSensor(node: SensorTreeOption): void {
@@ -124,7 +121,8 @@ export const ViewingControls = Vue.extend({
             vueTickHack(() => {
                 if (!node.moduleId) throw new Error();
                 if (!node.sensorId) throw new Error();
-                this.$emit("viz-change-sensors", new NewParams(station, [node.moduleId, node.sensorId]));
+                const params = this.workspace.makeParamsForSensorChange(station, [node.moduleId, node.sensorId]);
+                this.$emit("viz-change-sensors", params);
             });
         },
         raiseChangeChartType(option: { id: ChartType }): void {
