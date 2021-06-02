@@ -47,8 +47,8 @@ type Exporter struct {
 	byProvision map[int64]*stationInfo
 	stations    []*data.Station
 	sensors     []*repositories.SensorAndModuleMeta
-	sensorsByID map[int64]*data.Sensor
-	errors      int32
+	// sensorsByID map[int64]*data.Sensor
+	errors int32
 }
 
 type stationInfo struct {
@@ -85,23 +85,29 @@ func (e *Exporter) Export(ctx context.Context, criteria *ExportCriteria, format 
 		return err
 	}
 
-	e.sensors = make([]*repositories.SensorAndModuleMeta, 0)
-	e.sensorsByID = make(map[int64]*data.Sensor)
+	allSensorsByID := make(map[int64]*data.Sensor)
 	for _, sensor := range allSensors {
-		//
-		//
-		//
-		//
-		//
-		if false {
-			if len(criteria.Sensors) == 0 /*|| contains(criteria.Sensors, sensor.ID)*/ {
-				sam, err := mr.FindByFullKey(sensor.Key)
-				if err != nil {
-					return err
-				}
-				e.sensorsByID[sensor.ID] = sensor
-				e.sensors = append(e.sensors, sam)
+		allSensorsByID[sensor.ID] = sensor
+	}
+
+	log := Logger(ctx).Sugar()
+
+	e.sensors = make([]*repositories.SensorAndModuleMeta, 0)
+	for _, moduleAndSensor := range criteria.Sensors {
+		if sensor, ok := allSensorsByID[moduleAndSensor.SensorID]; !ok {
+			return fmt.Errorf("invalid sensor")
+		} else {
+			if sensor.ID != moduleAndSensor.SensorID {
+				panic("wtf")
 			}
+
+			sam, err := mr.FindByFullKey(sensor.Key)
+			if err != nil {
+				return err
+			}
+
+			log.Infow("exporting", "lookup_key", sensor.Key, "sensor_key", sam.Sensor.FullKey, "sensor_id", moduleAndSensor.SensorID, "module_id", moduleAndSensor.ModuleID)
+			e.sensors = append(e.sensors, sam)
 		}
 	}
 
@@ -194,7 +200,6 @@ func (e *Exporter) OnData(ctx context.Context, p *data.Provision, r *pb.DataReco
 
 	sensors := make([]*repositories.ReadingValue, 0)
 	for _, sam := range e.sensors {
-		// TODO This is slow and broken
 		appended := false
 		for key, rv := range filtered.Record.Readings {
 			if key.SensorKey == sam.Sensor.FullKey {
