@@ -275,6 +275,7 @@ export default Vue.extend({
     border-bottom: 1px solid #efefef;
     margin-bottom: 5px;
     align-items: baseline;
+    min-height: 80px;
 }
 
 .controls-container .row-2 {

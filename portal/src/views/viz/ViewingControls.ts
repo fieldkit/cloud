@@ -150,12 +150,11 @@ export const ViewingControls = Vue.extend({
     },
     template: `
 		<div class="controls-container">
-			<div class="busy" v-if="viz.busy"><Spinner /></div>
 			<div class="row row-1">
-				<div class="left buttons">
+				<div class="left buttons" v-if="!viz.busy">
 					<div class="button" @click="raiseCompare">Compare</div>
-					<div class="button" @click="raiseRemove" v-if="false">Remove</div>
 				</div>
+				<div class="left busy" v-else><Spinner /></div>
 				<div class="right time">
 					<span class="view-by">View By:</span>
 					<div class="fast-time" @click="ev => raiseFastTime(ev, 1)" v-bind:class="{ selected: viz.fastTime == 1 }">Day</div>
