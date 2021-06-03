@@ -172,8 +172,9 @@ export const ViewingControls = Vue.extend({
 			<div class="row row-2">
 				<div class="left tree">
 					<treeselect v-if="stationOptions.length" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" />
+                    <div v-else class="loading-options">Loading Options</div>
 					<treeselect v-if="sensorOptions.length" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="1" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
-					<div v-if="stationOptions.length == 0 || sensorOptions.length == 0" class="loading-options">Loading Options</div>
+					<div v-else class="loading-options">Loading Options</div>
 				</div>
 
 				<div class="right chart-type">
