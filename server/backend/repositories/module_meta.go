@@ -44,11 +44,13 @@ func (r *ModuleMetaRepository) FindByFullKey(fullKey string) (mm *SensorAndModul
 
 	for _, module := range all {
 		for _, sensor := range module.Sensors {
-			mm = &SensorAndModuleMeta{
-				Module: module,
-				Sensor: sensor,
+			if sensor.FullKey == fullKey {
+				mm = &SensorAndModuleMeta{
+					Module: module,
+					Sensor: sensor,
+				}
+				return
 			}
-			return
 		}
 	}
 

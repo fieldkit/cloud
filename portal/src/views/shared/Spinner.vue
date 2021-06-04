@@ -11,6 +11,11 @@ export default Vue.extend({
 </script>
 
 <style scoped>
+.spinner {
+    margin-top: 2em;
+    margin-left: auto;
+    margin-right: auto;
+}
 .loader {
     font-size: 10px;
     text-indent: -9999em;

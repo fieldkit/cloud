@@ -48,6 +48,8 @@ func (ls *DescribeLocations) queryOther(ctx context.Context, l *Location) (name 
 
 	parsed := OtherLandResponse{}
 	if err := json.Unmarshal(body, &parsed); err != nil {
+		log := Logger(ctx).Sugar()
+		log.Warnw("location-other-parse-error", "body", string(body))
 		return nil, err
 	}
 
@@ -86,6 +88,8 @@ func (ls *DescribeLocations) queryNative(ctx context.Context, l *Location) (name
 
 	parsed := NativeLandResponse{}
 	if err := json.Unmarshal(body, &parsed); err != nil {
+		log := Logger(ctx).Sugar()
+		log.Warnw("location-native-parse-error", "body", string(body))
 		return nil, err
 	}
 
@@ -110,12 +114,12 @@ func (ls *DescribeLocations) Describe(ctx context.Context, l *Location) (ld *Loc
 
 	other, err := ls.queryOther(ctx, l)
 	if err != nil {
-		log.Warnw("error getting place names", "error", err)
+		log.Warnw("error getting other place names", "error", err)
 	}
 
 	native, err := ls.queryNative(ctx, l)
 	if err != nil {
-		log.Warnw("error getting place names", "error", err)
+		log.Warnw("error getting native place names", "error", err)
 	}
 
 	ld = &LocationDescription{

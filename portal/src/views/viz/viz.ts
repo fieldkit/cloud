@@ -1,7 +1,7 @@
 import _ from "lodash";
 import moment, { Moment } from "moment";
-import { ModuleID, SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
-import { SensorSpec, Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
+import { SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
+import { ModuleID, SensorSpec, Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
 import i18n from "@/i18n";
 import FKApi from "@/api/api";
 
@@ -444,6 +444,14 @@ export class Querier {
     }
 }
 
+class NewParams implements HasSensorParams {
+    public readonly sensorParams: SensorParams;
+
+    constructor(stationId: number, sensorAndModule: [ModuleID, number]) {
+        this.sensorParams = new SensorParams([stationId], [sensorAndModule]);
+    }
+}
+
 export class Workspace {
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
@@ -597,8 +605,13 @@ export class Workspace {
         });
     }
 
-    public get sensorOptions(): SensorTreeOption[] {
-        const allSensors = _.flatten(Object.values(this.stations).map((station) => station.sensors));
+    public sensorOptions(stationId: number): SensorTreeOption[] {
+        const station = this.stations[stationId];
+        if (!station) {
+            console.log(`no-options: no station`);
+            return [];
+        }
+        const allSensors = station.sensors;
         const allModules = _.groupBy(allSensors, (s) => s.moduleId);
         const keysById = _.fromPairs(allSensors.map((row) => [row.moduleId, row.moduleKey]));
         const allModulesByModuleKey = _.keyBy(this.meta.modules, (m) => m.key);
@@ -607,6 +620,7 @@ export class Workspace {
         // console.log("all-modules", allModules);
         // console.log("keys-by-id", keysById);
         // console.log("all-modules-by-module-key", allModulesByModuleKey);
+        // console.log(station.sensors);
 
         const options = _.map(
             allModules,
@@ -636,6 +650,19 @@ export class Workspace {
         console.log("sensor-tree-options", { sorted: sorted });
 
         return sorted;
+    }
+
+    public makeParamsForSensorChange(stationId: number, sensor: [ModuleID, number]): HasSensorParams {
+        return new NewParams(stationId, sensor);
+    }
+
+    public makeParamsForStationChange(stationId: number, sensor: [ModuleID, number]): HasSensorParams {
+        const station = this.stations[stationId];
+        if (!station) throw new Error(`no station with id: ${stationId}`);
+        const sensors = station.sensors;
+        if (sensors.length == 0) throw new Error(`no sensors on station with id: ${stationId}`);
+        const stationSensor: [ModuleID, number] = [sensors[0].moduleId, sensors[0].sensorId];
+        return new NewParams(stationId, stationSensor);
     }
 
     public remove(viz: Viz): Workspace {

@@ -253,6 +253,10 @@ func (c *ExportService) exportFormat(ctx context.Context, args *backend.RawQuery
 		return nil, err
 	}
 
+	log := Logger(ctx).Sugar()
+
+	log.Infow("adding-data-export", "format", format, "stations", args.Stations, "sensors", args.Sensors)
+
 	token := uuid.Must(uuid.NewRandom())
 	de := &data.DataExport{
 		Token:     token[:],

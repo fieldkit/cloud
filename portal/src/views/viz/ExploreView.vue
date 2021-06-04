@@ -14,6 +14,7 @@
 
             <div class="workspace-container">
                 <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
+                <div class="busy" v-else><Spinner /></div>
 
                 <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="user"></Comments>
             </div>
@@ -274,6 +275,7 @@ export default Vue.extend({
     border-bottom: 1px solid #efefef;
     margin-bottom: 5px;
     align-items: baseline;
+    min-height: 80px;
 }
 
 .controls-container .row-2 {
@@ -285,9 +287,13 @@ export default Vue.extend({
     flex-basis: 50%;
 }
 
+.controls-container .tree div {
+    flex-basis: 50%;
+}
+
 .controls-container .left {
     display: flex;
-    align-items: baseline;
+    align-items: center;
 }
 
 .controls-container .right {
@@ -360,9 +366,6 @@ export default Vue.extend({
     left: 0;
 }
 
-.viz.map {
-}
-
 .viz.map .viz-map {
     height: 400px;
     margin-bottom: 20px;
@@ -378,5 +381,10 @@ export default Vue.extend({
     z-index: 10;
     overflow-y: scroll;
     width: 30em;
+}
+
+.loading-options {
+    text-align: center;
+    color: #afafaf;
 }
 </style>
