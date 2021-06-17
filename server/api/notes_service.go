@@ -196,6 +196,8 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 }
 
 func (s *NotesService) DownloadMedia(ctx context.Context, payload *notes.DownloadMediaPayload) (*notes.DownloadMediaResult, io.ReadCloser, error) {
+	log := Logger(ctx).Sugar()
+
 	allMedia := &data.FieldNoteMedia{}
 	if err := s.options.Database.GetContext(ctx, allMedia, `
 		SELECT * FROM fieldkit.notes_media WHERE id = $1
@@ -207,6 +209,7 @@ func (s *NotesService) DownloadMedia(ctx context.Context, payload *notes.Downloa
 
 	lm, err := mr.LoadByURL(ctx, allMedia.URL)
 	if err != nil {
+		log.Error("load-by-url:error", "error", err)
 		return nil, nil, notes.MakeNotFound(errors.New("not found"))
 	}
 

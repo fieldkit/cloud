@@ -736,6 +736,8 @@ func (s *UserService) UploadPhoto(ctx context.Context, payload *user.UploadPhoto
 }
 
 func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadPhotoPayload) (*user.DownloadedPhoto, error) {
+	log := Logger(ctx).Sugar()
+
 	resource := &data.User{}
 	if err := s.options.Database.GetContext(ctx, resource, `SELECT * FROM fieldkit.user WHERE id = $1`, payload.UserID); err != nil {
 		return nil, err
@@ -762,6 +764,7 @@ func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadP
 	mr := repositories.NewMediaRepository(s.options.MediaFiles)
 	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
 	if err != nil {
+		log.Error("load-by-url:error", "error", err)
 		return nil, user.MakeNotFound(errors.New("not found"))
 	}
 

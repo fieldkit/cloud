@@ -848,6 +848,8 @@ func (s *ProjectService) UploadPhoto(ctx context.Context, payload *project.Uploa
 }
 
 func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.DownloadPhotoPayload) (*project.DownloadedPhoto, error) {
+	log := Logger(ctx).Sugar()
+
 	// TODO Maybe make a separate type with fewer columns?
 	resource := &data.Project{}
 	if err := s.options.Database.GetContext(ctx, resource, `
@@ -888,6 +890,7 @@ func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.Dow
 	mr := repositories.NewMediaRepository(s.options.MediaFiles)
 	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
 	if err != nil {
+		log.Error("load-by-url:error", "error", err)
 		return nil, project.MakeNotFound(errors.New("not found"))
 	}
 
