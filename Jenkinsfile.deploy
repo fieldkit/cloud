@@ -11,7 +11,7 @@ def getCopyArtifactsJob(stackName, branch) {
 	if (stackName == "portal-stack") {
 		return "cloud/" + branch
 	}
-	return "fk/aws-build-stacks"
+	return "aws-build-stacks/" + branch
 }
 
 def getStackURL(user, password, branch, stackName) {
@@ -34,17 +34,15 @@ timestamps {
 			stage ('prepare') {
 				def job = getCopyArtifactsJob(stackName, branchName)
 				copyArtifacts(projectName: job, flatten: true)
+				sh "ls -alh"
+				sh "ls -alh ${stackName}.tar"
 			}
 
 			stage ('deploy') {
-				withCredentials([usernamePassword(credentialsId: 'jenkins-artifact-download', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASSWORD')]) {
-					sshagent (credentials: ['ssh-fkdev-deploy']) {
-						def downloadUrl = getStackURL(JENKINS_USER, JENKINS_PASSWORD, branchName, stackName)
-
-						sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${params.DeployFrom}"
-						sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} wget -nv --auth-no-challenge '${downloadUrl}'"
-						sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} sudo mv ${stackName}.tar /tmp/incoming-stacks"
-					}
+				sshagent (credentials: ['ssh-fkdev-deploy']) {
+					sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${params.DeployFrom}"
+					sh "scp -o StrictHostKeyChecking=no ${stackName}.tar ubuntu@${params.DeployFrom}:"
+					sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} sudo mv ${stackName}.tar /tmp/incoming-stacks"
 				}
 
 				if (stackName == "portal-stack") {
