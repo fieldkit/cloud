@@ -224,6 +224,10 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 
 	bucketNames := getBucketNames(config)
 
+	log := logging.Logger(ctx).Sugar()
+
+	log.Infow("buckets", "buckets", bucketNames)
+
 	ingestionFiles, err := createFileArchive(ctx, config.Archiver, bucketNames.Streams, awsSession, metrics, files.NoPrefix)
 	if err != nil {
 		return nil, err
