@@ -11,7 +11,7 @@ def getCopyArtifactsJob(stackName, branch) {
 	if (stackName == "portal-stack") {
 		return "cloud/" + branch
 	}
-	return "aws-build-stacks"
+	return "fk/aws-build-stacks"
 }
 
 def getStackURL(user, password, branch, stackName) {
