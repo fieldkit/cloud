@@ -10,8 +10,8 @@ import (
 )
 
 type BucketNames struct {
-	Media   string
-	Streams string
+	Media   []string
+	Streams []string
 }
 
 type ApiConfiguration struct {
