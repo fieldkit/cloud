@@ -4,6 +4,7 @@ VERSION_PATCH = 10
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
+CI_CONTAINER_NAME ?= "fktests-$(GIT_LOCAL_BRANCH)"
 
 VERSION := "$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)-$(GIT_LOCAL_BRANCH).$(VERSION_PREL)-$(GIT_HASH)"
 
@@ -142,14 +143,14 @@ ci-db-tests:
 	rm -rf active-schema
 	mkdir -p active-schema
 	@echo "DROP SCHEMA fieldkit;" > active-schema/0.sql
-	docker stop fktests-pg || true
-	docker rm fktests-pg || true
+	docker stop $(CI_CONTAINER_NAME) || true
+	docker rm $(CI_CONTAINER_NAME) || true
 	docker network create docker_default || true
-	docker run --name fktests-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password --network=docker_default -d mdillon/postgis
+	docker run --name $(CI_CONTAINER_NAME) -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password --network=docker_default -d mdillon/postgis
 	sleep 5 # TODO Add a loop here to check
-	IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' fktests-pg`; \
+	IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CI_CONTAINER_NAME)`; \
 	cd server && FIELDKIT_POSTGRES_URL="postgres://fieldkit:password@$$IP/fieldkit?sslmode=disable" go test -p 1 -v -coverprofile=coverage.data ./...
-	docker stop fktests-pg || true
+	docker stop $(CI_CONTAINER_NAME) || true
 
 write-version:
 	echo $(VERSION) > version.txt
