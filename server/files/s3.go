@@ -139,12 +139,13 @@ func (a *S3FileArchive) open(ctx context.Context, bucket, key string) (of *Opene
 		Key:    aws.String(key),
 	}
 
+	log := Logger(ctx).Sugar()
+
 	obj, err := svc.GetObject(goi)
 	if err != nil {
-		return nil, fmt.Errorf("error reading object %v: %v", key, err)
+		log.Errorw("reading:s3", "bucket", bucket, "key", key)
+		return nil, fmt.Errorf("error reading object bucket=%v key=%v: %v", bucket, key, err)
 	}
-
-	log := Logger(ctx).Sugar()
 
 	contentLength := int64(0)
 	if obj.ContentLength != nil {
