@@ -3,9 +3,6 @@
 properties([
 	buildDiscarder(logRotator(numToKeepStr: '5')),
 	disableConcurrentBuilds(),
-	parameters([
-		string(defaultValue: 'dev', name: 'WorkEnv')
-	])
 ])
 
 timestamps {
@@ -18,14 +15,17 @@ timestamps {
 
 			stage ('dbcopy') {
 				sh "rm -rf *.bz2"
-				sh "docker run --rm postgres pg_dump '${ws.database_url.value}' | bzip2 > db-${stamp}.sql.bz2"
+				sh "docker run --rm postgres pg_dump -T 'fieldkit.aggregated_old_*' '${ws.database_url.value}' | bzip2 > db-${stamp}.sql.bz2"
 			}
 
 			stage ('archive') {
 				archiveArtifacts(artifacts: "*.bz2")
 			}
+
+			notifySuccess()
 		}
 		catch (Exception e) {
+			notifyFailure()
 			throw e
 		}
 	}

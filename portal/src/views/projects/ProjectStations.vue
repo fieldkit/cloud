@@ -8,17 +8,17 @@
             v-if="addingStation"
         />
         <div class="section-heading stations-heading">
-            FieldKit Stations
+            {{ $t("project.stations.title") }}
             <div class="add-station" v-on:click="showStationPicker" v-if="admin">
                 <img src="@/assets/icon-plus-round.svg" class="add-station-btn" />
-                Add Station
+                {{ $t("project.stations.add") }}
             </div>
         </div>
         <div class="section-body">
             <div class="stations-panel" v-show="showStationsPanel">
                 <div v-if="projectStations.length == 0" class="project-stations-no-stations">
-                    <h3>No Stations</h3>
-                    <p>Add a station to this project to include its recent data and activities.</p>
+                    <h3>{{ $t("project.stations.none.title") }}</h3>
+                    <p>{{ $t("project.stations.none.text") }}</p>
                 </div>
                 <div v-if="projectStations.length > 0" class="stations">
                     <TinyStation
@@ -40,7 +40,13 @@
                 <img v-if="!showStationsPanel" alt="Expand List" src="@/assets/icon-tab-expand.svg" class="toggle-icon" />
             </div>
             <div class="project-stations-map-container">
-                <StationsMap @show-summary="showSummary" :mapped="mappedProject" :layoutChanges="layoutChanges" />
+                <StationsMap
+                    @show-summary="showSummary"
+                    :mapped="mappedProject"
+                    :layoutChanges="layoutChanges"
+                    :showStations="project.showStations"
+                    :mapBounds="mapBounds"
+                />
                 <StationSummary
                     v-if="activeStation"
                     :station="activeStation"
@@ -64,7 +70,7 @@ import StationsMap from "@/views/shared/StationsMap.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
 import TinyStation from "@/views/shared/TinyStation.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { DisplayStation, DisplayProject, MappedStations } from "@/store";
+import { DisplayStation, DisplayProject, MappedStations, BoundingRectangle } from "@/store";
 
 export default Vue.extend({
     name: "ProjectStations",
@@ -137,6 +143,13 @@ export default Vue.extend({
                 return Math.ceil(this.projectStations.length / this.pageSize);
             }
             return 0;
+        },
+        mapBounds(): BoundingRectangle {
+            if (this.project.bounds?.min && this.project.bounds?.max) {
+                return new BoundingRectangle(this.project.bounds?.min, this.project.bounds?.max);
+            }
+
+            return MappedStations.defaultBounds();
         },
     },
     methods: {
@@ -233,7 +246,7 @@ export default Vue.extend({
 .section-body {
     display: flex;
     flex-direction: row;
-    height: 372px;
+    height: 420px;
 }
 .stations-container {
     display: flex;
@@ -341,7 +354,7 @@ export default Vue.extend({
 
 ::v-deep .station-hover-summary {
     width: 359px;
-    top: 30px;
+    top: 20px;
     left: 122px;
 }
 </style>

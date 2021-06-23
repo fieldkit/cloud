@@ -1,8 +1,8 @@
 <template>
     <div class="form-edit">
         <div class="header-row">
-            <h2 v-if="!project">New Project</h2>
-            <h2 v-if="project && project.id">Edit Project</h2>
+            <h2 v-if="!project">{{ $t("project.create.title") }}</h2>
+            <h2 v-if="project && project.id">{{ $t("project.edit.title") }}</h2>
 
             <div class="close-form-button" v-on:click="closeForm">
                 <img alt="Close" src="@/assets/icon-close.svg" />
@@ -14,24 +14,24 @@
                 <TextField v-model="form.name" label="Project Name" />
 
                 <div class="validation-errors" v-if="$v.form.name.$error">
-                    <div v-if="!$v.form.name.required">Name is a required field.</div>
-                    <div v-if="!$v.form.name.maxLength">This field has a limit of 100 characters.</div>
+                    <div v-if="!$v.form.name.required">{{ $t("project.form.name.required") }}</div>
+                    <div v-if="!$v.form.name.maxLength">{{ $t("project.form.name.maxLength") }}</div>
                 </div>
             </div>
             <div class="outer-input-container">
                 <TextField v-model="form.description" label="Short Description" />
 
                 <div class="validation-errors" v-if="$v.form.description.$error">
-                    <div v-if="!$v.form.description.required">This is a required field.</div>
-                    <div v-if="!$v.form.description.maxLength">This field has a limit of 100 characters.</div>
+                    <div v-if="!$v.form.description.required">{{ $t("project.form.description.required") }}</div>
+                    <div v-if="!$v.form.description.maxLength">{{ $t("project.form.description.maxLength") }}</div>
                 </div>
             </div>
             <div class="outer-input-container">
                 <TextField v-model="form.goal" label="Project Goal" />
 
                 <div class="validation-errors" v-if="$v.form.goal.$error">
-                    <div v-if="!$v.form.goal.required">Project goal is a required field.</div>
-                    <div v-if="!$v.form.goal.maxLength">This field has a limit of 100 characters.</div>
+                    <div v-if="!$v.form.goal.required">{{ $t("project.form.goal.required") }}</div>
+                    <div v-if="!$v.form.goal.maxLength">{{ $t("project.form.goal.maxLength") }}</div>
                 </div>
             </div>
             <div class="image-container">
@@ -41,8 +41,8 @@
                 <TextField v-model="form.location" label="Location" />
 
                 <div class="validation-errors" v-if="$v.form.location.$error">
-                    <div v-if="!$v.form.location.required">Location is a required field.</div>
-                    <div v-if="!$v.form.location.maxLength">This field has a limit of 100 characters.</div>
+                    <div v-if="!$v.form.location.required">{{ $t("project.form.location.required") }}</div>
+                    <div v-if="!$v.form.location.maxLength">{{ $t("project.form.location.maxLength") }}</div>
                 </div>
             </div>
 
@@ -53,13 +53,13 @@
                     </div>
                     <v-date-picker :value="form.pickedStart" @input="updateStart" :popover="{ placement: 'auto', visibility: 'click' }">
                         <button type="button">
-                            <img alt="Calendar" src="@/assets/icon-calendar-gray.svg" />
+                            <img :alt="$t('project.form.startTime.alt')" src="@/assets/icon-calendar-gray.svg" />
                         </button>
                     </v-date-picker>
                 </div>
 
                 <div class="validation-errors" v-if="$v.form.startTime.$error">
-                    <div v-if="!$v.form.startTime.date">Please enter a valid date.</div>
+                    <div v-if="!$v.form.startTime.date">{{ $t("project.form.startTime.date") }}</div>
                 </div>
 
                 <div class="date-container">
@@ -68,14 +68,14 @@
                     </div>
                     <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'auto', visibility: 'click' }">
                         <button type="button">
-                            <img alt="Calendar" src="@/assets/icon-calendar-gray.svg" />
+                            <img :alt="$t('project.form.endTime.alt')" src="@/assets/icon-calendar-gray.svg" />
                         </button>
                     </v-date-picker>
                 </div>
 
                 <div class="validation-errors" v-if="$v.form.endTime.$error">
-                    <div v-if="!$v.form.endTime.date">Please enter a valid date.</div>
-                    <div v-if="!$v.form.endTime.minValue">Please enter a date after the start date.</div>
+                    <div v-if="!$v.form.endTime.date">{{ $t("project.form.endTime.date") }}</div>
+                    <div v-if="!$v.form.endTime.minValue">{{ $t("project.form.endTime.minValue") }}</div>
                 </div>
             </div>
 
@@ -89,38 +89,55 @@
                     @focus="onTagsFocus"
                     placeholder=""
                 />
+                <div class="tags-help">{{ $t("project.form.tags.help") }}</div>
 
                 <div class="validation-errors" v-if="$v.form.tags.$error">
-                    <div v-if="!$v.form.tags.maxLength">This field has a limit of 100 characters.</div>
+                    <div v-if="!$v.form.tags.maxLength">{{ $t("project.form.tags.maxLength") }}</div>
                 </div>
             </div>
             <div class="privacy">
                 <div class="checkbox">
                     <label>
-                        Make this project public
+                        {{ $t("project.form.makePublic") }}
                         <input type="checkbox" id="checkbox" v-model="form.public" />
                         <span class="checkbox-btn"></span>
                     </label>
                 </div>
-
-                <div v-if="form.public" class="radio-container">
-                    <label class="radio">
-                        <input type="radio" id="privacy" value="1" v-model="form.privacy" />
-                        <span class="radio-btn"></span>
-                        Show exact location of stations
-                    </label>
-                    <label class="radio">
-                        <input type="radio" id="privacy" value="2" v-model="form.privacy" />
-                        <span class="radio-btn"></span>
-                        Show general location of stations
-                    </label>
+            </div>
+            <div class="map-container">
+                <div class="map-stations-buttons-container">
+                    <div class="map-stations-buttons-body">
+                        <div class="map-stations-button" :class="form.showStations ? 'active' : ''" @click="form.showStations = true">
+                            {{ $t("project.form.showStations") }}
+                        </div>
+                        <div class="map-stations-button" :class="form.showStations ? '' : 'active'" @click="form.showStations = false">
+                            {{ $t("project.form.hideStations") }}
+                        </div>
+                    </div>
+                </div>
+                <div class="map-text">
+                    {{ form.showStations === true ? $t("project.form.mapTextShow") : $t("project.form.mapTextHide") }}
+                </div>
+                <div class="section-body">
+                    <div class="project-stations-map-container">
+                        <StationsMap
+                            v-if="mappedStations"
+                            :mapped="mappedStations"
+                            v-model="form.bounds"
+                            :showStations="form.showStations"
+                        />
+                    </div>
+                </div>
+                <div class="map-hint">
+                    <img src="@/assets/icon-expand-map.svg" width="15px" />
+                    <span>{{ $t("project.form.mapHint") }}</span>
                 </div>
             </div>
             <div class="action-container">
-                <button class="btn" v-if="!project" type="submit">Add project</button>
-                <button class="btn" v-if="project && project.id" type="submit">Save updates</button>
+                <button class="btn" v-if="!project" type="submit">{{ $t("project.form.saveNew") }}</button>
+                <button class="btn" v-if="project && project.id" type="submit">{{ $t("project.form.saveChanges") }}</button>
                 <button v-if="project && project.id" class="btn btn-delete" type="submit" v-on:click.prevent="deleteProject">
-                    Delete Project
+                    {{ $t("project.form.delete.link") }}
                 </button>
             </div>
         </form>
@@ -130,18 +147,20 @@
 <script lang="ts">
 import _ from "lodash";
 import moment from "moment";
-import Vue from "@/store/strong-vue";
-import StandardLayout from "../StandardLayout.vue";
+import Vue from "vue";
+import { BoundingRectangle, GlobalState, LngLat, MappedStations } from "@/store";
 import CommonComponents from "@/views/shared";
 import VueTagsInput from "@johmun/vue-tags-input";
 import { UploadedImage } from "@/views/shared/ImageUploader.vue";
 import { tryParseTags } from "@/utilities";
 
-import { helpers, required, email, minValue, maxLength, minLength } from "vuelidate/lib/validators";
+import { helpers, required, maxLength } from "vuelidate/lib/validators";
 
 import * as ActionTypes from "@/store/actions";
 
 import PlaceholderImage from "@/assets/image-placeholder.svg";
+import { mapState } from "vuex";
+import StationsMap from "@/views/shared/StationsMap.vue";
 
 const afterOtherDate = (afterOtherDate) =>
     helpers.withParams({ type: "afterOtherDate", after: afterOtherDate }, function (this: any, value, parentVm) {
@@ -159,6 +178,7 @@ export default Vue.extend({
     name: "ProjectForm",
     components: {
         VueTagsInput,
+        StationsMap,
         ...CommonComponents,
     },
     props: {
@@ -184,6 +204,8 @@ export default Vue.extend({
             privacy: number;
             pickedStart: number | null;
             pickedEnd: number | null;
+            showStations: boolean;
+            bounds: BoundingRectangle;
         };
     } {
         return {
@@ -203,6 +225,8 @@ export default Vue.extend({
                 privacy: 1,
                 pickedStart: null,
                 pickedEnd: null,
+                showStations: false,
+                bounds: MappedStations.defaultBounds(),
             },
         };
     },
@@ -263,6 +287,8 @@ export default Vue.extend({
                 privacy: this.project.privacy == 0 ? 1 : this.project.privacy,
                 pickedStart: null,
                 pickedEnd: null,
+                showStations: this.project.showStations,
+                bounds: new BoundingRectangle(this.project.bounds?.min, this.project.bounds?.max),
                 tag: "",
             };
         }
@@ -277,6 +303,12 @@ export default Vue.extend({
             }
             return null;
         },
+        ...mapState({
+            stations: (s: GlobalState) => Object.values(s.stations.user.stations),
+            mappedStations(): MappedStations | null {
+                return this.project ? this.$getters.projectsById[this.project.id]?.mapped : MappedStations.make([]);
+            },
+        }),
     },
     methods: {
         onTagsFocus(): void {
@@ -316,6 +348,8 @@ export default Vue.extend({
                 startTime: makeLocalTime(this.form.startTime),
                 endTime: makeLocalTime(this.form.endTime),
                 tags: JSON.stringify(this.form.tags.map((tag) => tag.text)),
+                showStations: this.form.showStations,
+                bounds: this.form.bounds,
             });
         },
         async addProject(): Promise<void> {
@@ -612,5 +646,86 @@ form > .outer-input-container {
 }
 ::v-deep .has-float-label input {
     padding-bottom: 4px;
+}
+.map-container {
+    box-sizing: border-box;
+    border: 1px solid #d8dce0;
+    background: white;
+    width: 700px;
+    max-width: 100%;
+    position: relative;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.section-body {
+    display: flex;
+    flex-direction: row;
+    height: 420px;
+}
+.project-stations-map-container {
+    transition: width 0.5s;
+    position: relative;
+    flex: 2;
+    height: 100%;
+}
+
+#map {
+    height: 100%;
+}
+
+.map-stations-buttons-container {
+    position: absolute;
+    top: -20px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    font-size: 14px;
+}
+
+.map-stations-buttons-body {
+    border: 1px solid #d8dce0;
+    border-radius: 100px;
+    display: flex;
+    background-color: white;
+}
+
+.map-stations-button {
+    cursor: pointer;
+    padding: 10px 35px;
+    border-radius: 100px;
+    color: #6a6d71;
+    line-height: 21px;
+
+    &:nth-of-type(1) {
+        margin-right: -20px;
+    }
+
+    &.active {
+        color: white;
+        background-color: #2c3e50;
+    }
+}
+
+.map-text {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.map-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+
+    img {
+        margin-right: 5px;
+    }
+}
+
+.tags-help {
+    margin-top: 0.5em;
+    color: #6a6d71;
 }
 </style>

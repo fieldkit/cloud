@@ -1,3 +1,13 @@
+VERSION_MAJOR = 0
+VERSION_MINOR = 2
+VERSION_PATCH = 10
+VERSION_PREL ?= $(BUILD_NUMBER)
+GIT_LOCAL_BRANCH ?= unknown
+GIT_HASH ?= $(shell git log -1 --format=%h)
+CI_CONTAINER_NAME ?= "fktests-$(GIT_LOCAL_BRANCH)"
+
+VERSION := "$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)-$(GIT_LOCAL_BRANCH).$(VERSION_PREL)-$(GIT_HASH)"
+
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
 GOARCH ?= amd64
@@ -79,6 +89,11 @@ $(BUILD)/sanitizer: server/cmd/sanitizer/*.go $(SERVER_SOURCES)
 	cd server/cmd/sanitizer && $(GO) build -o $@ *.go
 
 generate:
+ifeq (, $(shell which goa))
+ifeq (, $(BUILD_NUMBER))
+$(error "No goa in PATH, please run: env GO111MODULE=on go get -u goa.design/goa/v3/...@v3")
+endif
+endif
 	cd server/api && goa gen github.com/fieldkit/cloud/server/api/design
 
 clean:
@@ -93,6 +108,7 @@ schema-production:
 	@echo "CREATE USER fk;" > schema-production/0.sql
 	@echo "CREATE USER server;" >> schema-production/0.sql
 	@echo "CREATE USER rdsadmin;" >> schema-production/0.sql
+	@echo "CREATE DATABASE keycloak;" >> schema-production/0.sql
 	@for f in `find schema-production -name "*.bz2"`; do              \
 		echo $$f                                                     ;\
 		bunzip2 < $$f > schema-production/1.sql                      ;\
@@ -119,28 +135,29 @@ run-server: server
 	./run-server.sh
 
 migrate-up:
-	migrate -path migrations -database "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" up
-
-migrate-down:
-	migrate -path migrations -database "postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable&search_path=public" down
+	cd migrations && PGURL="postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable" go run main.go migrate
 
 ci: setup binaries jstests
 
 ci-db-tests:
 	rm -rf active-schema
 	mkdir -p active-schema
-	docker stop fktests-pg || true
-	docker rm fktests-pg || true
+	@echo "DROP SCHEMA fieldkit;" > active-schema/0.sql
+	docker stop $(CI_CONTAINER_NAME) || true
+	docker rm $(CI_CONTAINER_NAME) || true
 	docker network create docker_default || true
-	docker run --name fktests-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password --network=docker_default -d mdillon/postgis
+	docker run --name $(CI_CONTAINER_NAME) -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password --network=docker_default -d mdillon/postgis
 	sleep 5 # TODO Add a loop here to check
-	IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' fktests-pg`; \
+	IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CI_CONTAINER_NAME)`; \
 	cd server && FIELDKIT_POSTGRES_URL="postgres://fieldkit:password@$$IP/fieldkit?sslmode=disable" go test -p 1 -v -coverprofile=coverage.data ./...
-	docker stop fktests-pg || true
+	docker stop $(CI_CONTAINER_NAME) || true
+
+write-version:
+	echo $(VERSION) > version.txt
 
 aws-image:
 	cp portal/src/secrets.ts.aws portal/src/secrets.ts
-	WORKING_DIRECTORY=$(WORKING_DIRECTORY) DOCKER_TAG=$(DOCKER_TAG) ./build.sh
+	WORKING_DIRECTORY=$(WORKING_DIRECTORY) DOCKER_TAG=$(DOCKER_TAG) VERSION=$(VERSION) ./build.sh
 
 sanitize: sanitizer
 	mkdir -p sanitize-data

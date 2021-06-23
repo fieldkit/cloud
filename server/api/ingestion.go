@@ -60,6 +60,7 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 			QueuedID: q.ID,
 			UserID:   p.UserID(),
 			Verbose:  true,
+			Refresh:  false,
 		}); err != nil {
 			log.Warnw("publishing", "err", err)
 		}
@@ -98,6 +99,28 @@ func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestio
 	return nil
 }
 
+func (c *IngestionService) ProcessStationIngestions(ctx context.Context, payload *ingestion.ProcessStationIngestionsPayload) (err error) {
+	log := Logger(ctx).Sugar()
+
+	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.StationID))
+	if err != nil {
+		return err
+	}
+
+	if err := p.CanModify(); err != nil {
+		return err
+	}
+
+	if err := c.options.Publisher.Publish(ctx, &messages.IngestStation{
+		StationID: int32(payload.StationID),
+		UserID:    p.UserID(),
+		Verbose:   true,
+	}); err != nil {
+		log.Errorw("publishing", "err", err)
+	}
+	return nil
+}
+
 func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingestion.ProcessIngestionPayload) (err error) {
 	log := Logger(ctx).Sugar()
 
@@ -125,8 +148,17 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 		return err
 	}
 
-	if _, err := ir.Enqueue(ctx, i.ID); err != nil {
+	if id, err := ir.Enqueue(ctx, i.ID); err != nil {
 		return err
+	} else {
+		if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
+			QueuedID: id,
+			UserID:   p.UserID(),
+			Verbose:  true,
+			Refresh:  true,
+		}); err != nil {
+			log.Warnw("publishing", "err", err)
+		}
 	}
 
 	return nil

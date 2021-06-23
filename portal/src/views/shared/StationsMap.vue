@@ -1,10 +1,10 @@
-<template v-if="mapped.valid">
+<template v-if="mapped.valid && ready">
     <mapbox
         class="stations-map"
         :access-token="mapboxToken"
         :map-options="{
             style: 'mapbox://styles/mapbox/outdoors-v11',
-            bounds: mapped.boundsLngLat(),
+            bounds: bounds,
             zoom: 10,
         }"
         :nav-control="{
@@ -13,15 +13,16 @@
         }"
         @map-init="onMapInitialized"
         @map-load="onMapLoaded"
+        @zoomend="newBounds"
+        @dragend="newBounds"
     />
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import Mapbox from "mapbox-gl-vue";
 import Config from "@/secrets";
-import { promiseAfter } from "@/utilities";
-import { MappedStations } from "@/store";
+import { MappedStations, LngLat, BoundingRectangle } from "@/store";
 
 interface ProtectedData {
     map: any;
@@ -37,14 +38,23 @@ export default Vue.extend({
         ready: boolean;
     } {
         return {
-            mapboxToken: Config.MAPBOX_ACCESS_TOKEN,
+            mapboxToken: Config.mapbox.token,
             ready: false,
         };
     },
     props: {
         mapped: {
             type: MappedStations,
-            required: true,
+        },
+        value: {
+            type: BoundingRectangle,
+        },
+        mapBounds: {
+            type: BoundingRectangle,
+        },
+        showStations: {
+            type: Boolean,
+            default: false,
         },
         layoutChanges: {
             type: Number,
@@ -56,19 +66,29 @@ export default Vue.extend({
         protectedData(): ProtectedData {
             return (this as unknown) as ProtectedData;
         },
+        bounds(): LngLat[] | null {
+            if (this.value) {
+                return this.value.lngLat();
+            }
+
+            return this.mapBounds ? this.mapBounds.lngLat() : this.mapped.boundsLngLat();
+        },
     },
     watch: {
         layoutChanges(): void {
             console.log("map: layout changed");
             if (this.protectedData.map) {
                 // TODO Not a fan of this.
-                promiseAfter(250, {}).then(() => {
+                this.$nextTick(() => {
                     this.protectedData.map.resize();
                 });
             }
         },
         mapped(): void {
-            console.log("map: mapped changed");
+            console.log("map: mapped changed", this.mapped);
+            this.updateMap();
+        },
+        showStations(): void {
             this.updateMap();
         },
     },
@@ -95,19 +115,29 @@ export default Vue.extend({
 
             this.ready = true;
             this.updateMap();
+
+            // Force model to update.
+            this.newBounds();
+        },
+        newBounds() {
+            const map = this.protectedData.map;
+            const bounds = map.getBounds();
+            this.$emit("input", new BoundingRectangle([bounds._sw.lng, bounds._sw.lat], [bounds._ne.lng, bounds._ne.lat]));
         },
         updateMap(): void {
             if (!this.protectedData.map) {
+                console.log("map: update-skip.1");
                 return;
             }
 
             if (!this.mapped || !this.mapped.valid || !this.ready) {
+                console.log("map: update-skip.2", this.mapped?.valid, this.ready);
                 return;
             }
 
             const map = this.protectedData.map;
 
-            if (!map.getLayer("station-markers")) {
+            if (!map.getLayer("station-markers") && this.showStations) {
                 console.log("map: updating", this.mapped);
 
                 map.addSource("stations", {
@@ -152,8 +182,11 @@ export default Vue.extend({
                     this.$emit("show-summary", { id: id });
                 });
             } else {
-                console.log("map: keeping features", this.mapped);
-                map.fitBounds(this.mapped.boundsLngLat(), { duration: 0 });
+                console.log("map: keeping", this.mapped);
+            }
+
+            if (this.bounds) {
+                map.fitBounds(this.bounds, { duration: 0 });
             }
         },
     },

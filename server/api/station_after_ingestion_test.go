@@ -67,12 +67,14 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 		QueuedID: queuedMeta.ID,
 		UserID:   user.ID,
 		Verbose:  true,
+		Refresh:  true,
 	}))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
 		QueuedID: queuedData.ID,
 		UserID:   user.ID,
 		Verbose:  true,
+		Refresh:  true,
 	}))
 
 	req, _ = http.NewRequest("GET", "/user/stations", nil)
@@ -92,7 +94,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": {

@@ -22,6 +22,8 @@ type Service interface {
 	WalkEverything(context.Context, *WalkEverythingPayload) (err error)
 	// ProcessStation implements process station.
 	ProcessStation(context.Context, *ProcessStationPayload) (err error)
+	// ProcessStationIngestions implements process station ingestions.
+	ProcessStationIngestions(context.Context, *ProcessStationIngestionsPayload) (err error)
 	// ProcessIngestion implements process ingestion.
 	ProcessIngestion(context.Context, *ProcessIngestionPayload) (err error)
 	// Delete implements delete.
@@ -42,7 +44,7 @@ const ServiceName = "ingestion"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [5]string{"process pending", "walk everything", "process station", "process ingestion", "delete"}
+var MethodNames = [6]string{"process pending", "walk everything", "process station", "process station ingestions", "process ingestion", "delete"}
 
 // ProcessPendingPayload is the payload type of the ingestion service process
 // pending method.
@@ -62,6 +64,13 @@ type ProcessStationPayload struct {
 	Auth       string
 	StationID  int32
 	Completely *bool
+}
+
+// ProcessStationIngestionsPayload is the payload type of the ingestion service
+// process station ingestions method.
+type ProcessStationIngestionsPayload struct {
+	Auth      string
+	StationID int64
 }
 
 // ProcessIngestionPayload is the payload type of the ingestion service process

@@ -2,8 +2,8 @@
     <div v-if="!image || (!image.url && !preview)" class="placeholder-container">
         <img alt="Image" :src="placeholderImage" />
         <div class="upload-trigger">
-            <label for="imageInput" class="upload-trigger">Choose File</label>
-            <span class="upload-trigger-msg">No file chosen</span>
+            <label for="imageInput" class="upload-trigger">{{ $t("user.profile.photo.choose") }}</label>
+            <span class="upload-trigger-msg">{{ $t("user.profile.photo.noFile") }}</span>
         </div>
         <input id="imageInput" type="file" accept="image/gif, image/jpeg, image/png" @change="upload" />
     </div>
@@ -12,7 +12,7 @@
         <img alt="Image" :src="photo" class="img" v-if="photo && !preview" />
         <img alt="Image" :src="preview" class="img" v-if="preview" />
         <label for="imageInput" class="upload-trigger-change">
-            <template>Change Image</template>
+            <template>{{ $t("user.profile.photo.change") }}</template>
         </label>
         <input id="imageInput" type="file" accept="image/gif, image/jpeg, image/png" @change="upload" />
     </div>

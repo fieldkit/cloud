@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
+	_ "strings"
 
 	"github.com/conservify/sqlxcache"
 
@@ -13,35 +14,46 @@ import (
 )
 
 type AggregatingHandler struct {
-	db          *sqlxcache.DB
-	metaFactory *repositories.MetaFactory
-	stations    map[int64]*Aggregator
-	seen        map[int32]*data.Station
-	aggregator  *Aggregator
-	completely  bool
+	db                *sqlxcache.DB
+	metaFactory       *repositories.MetaFactory
+	stationRepository *repositories.StationRepository
+	provisionID       int64
+	metaID            int64
+	stations          map[int64]*Aggregator
+	seen              map[int32]*data.Station
+	stationConfig     *data.StationConfiguration
+	stationModules    map[uint32]*data.StationModule
+	aggregator        *Aggregator
+	tableSuffix       string
+	completely        bool
 }
 
-func NewAggregatingHandler(db *sqlxcache.DB, completely bool) *AggregatingHandler {
+func NewAggregatingHandler(db *sqlxcache.DB, tableSuffix string, completely bool) *AggregatingHandler {
 	return &AggregatingHandler{
-		db:          db,
-		metaFactory: repositories.NewMetaFactory(),
-		stations:    make(map[int64]*Aggregator),
-		seen:        make(map[int32]*data.Station),
-		completely:  completely,
+		db:                db,
+		metaFactory:       repositories.NewMetaFactory(),
+		stationRepository: repositories.NewStationRepository(db),
+		stations:          make(map[int64]*Aggregator),
+		seen:              make(map[int32]*data.Station),
+		stationConfig:     nil,
+		tableSuffix:       tableSuffix,
+		completely:        completely,
 	}
 }
 
 func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, meta *data.MetaRecord) error {
-	if _, ok := v.stations[p.ID]; !ok {
-		sr := repositories.NewStationRepository(v.db)
+	log := Logger(ctx).Sugar()
 
-		station, err := sr.QueryStationByDeviceID(ctx, p.DeviceID)
+	v.provisionID = p.ID
+
+	if _, ok := v.stations[p.ID]; !ok {
+		station, err := v.stationRepository.QueryStationByDeviceID(ctx, p.DeviceID)
 		if err != nil || station == nil {
 			// TODO Mark giving up?
 			return nil
 		}
 
-		aggregator := NewAggregator(v.db, station.ID, 100)
+		aggregator := NewAggregator(v.db, v.tableSuffix, station.ID, 100)
 
 		if _, ok := v.seen[station.ID]; !ok {
 			if v.completely {
@@ -58,8 +70,33 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 		v.stations[p.ID] = aggregator
 	}
 
-	_, err := v.metaFactory.Add(ctx, meta, true)
-	if err != nil {
+	if v.metaID != meta.ID {
+		stationConfig, err := v.stationRepository.QueryStationConfigurationByMetaID(ctx, meta.ID)
+		if err != nil {
+			return err
+		}
+		if stationConfig == nil {
+			log.Warnw("missing-station-configuration", "meta_record_id", meta.ID)
+			return fmt.Errorf("missing station_configuration")
+		}
+
+		modules, err := v.stationRepository.QueryStationModulesByMetaID(ctx, meta.ID)
+		if err != nil {
+			return err
+		}
+
+		log.Infow("station-modules", "meta_record_id", meta.ID, "station_configuration_id", stationConfig.ID, "provision_id", p.ID, "modules", modules)
+
+		v.stationConfig = stationConfig
+		v.stationModules = make(map[uint32]*data.StationModule)
+		for _, sm := range modules {
+			v.stationModules[sm.Index] = sm
+		}
+
+		v.metaID = meta.ID
+	}
+
+	if _, err := v.metaFactory.Add(ctx, meta, true); err != nil {
 		return err
 	}
 
@@ -67,9 +104,15 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 }
 
 func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+	log := Logger(ctx).Sugar()
+
 	aggregator := v.stations[p.ID]
 	if aggregator == nil {
 		return fmt.Errorf("no aggregator for provision: %d", p.ID)
+	}
+
+	if v.stationConfig == nil {
+		return fmt.Errorf("no station configuration for provision: %d", p.ID)
 	}
 
 	filtered, err := v.metaFactory.Resolve(ctx, db, false, true)
@@ -85,9 +128,18 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 	}
 
 	for key, value := range filtered.Record.Readings {
-		if !filtered.Filters.IsFiltered(key) {
-			if err := aggregator.AddSample(ctx, db.Time, filtered.Record.Location, key, value.Value); err != nil {
-				return fmt.Errorf("error adding: %v", err)
+		if sm, ok := v.stationModules[key.ModuleIndex]; !ok {
+			log.Warnw("missing-station-module", "data_record_id", db.ID, "provision_id", p.ID, "meta_record_id", db.MetaRecordID, "nmodules", len(v.stationModules))
+			return fmt.Errorf("missing station module")
+		} else {
+			if !filtered.Filters.IsFiltered(key) {
+				ask := AggregateSensorKey{
+					SensorKey: key.SensorKey,
+					ModuleID:  sm.ID,
+				}
+				if err := aggregator.AddSample(ctx, db.Time, filtered.Record.Location, ask, value.Value); err != nil {
+					return fmt.Errorf("error adding: %v", err)
+				}
 			}
 		}
 	}

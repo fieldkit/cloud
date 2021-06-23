@@ -1,5 +1,8 @@
 {
     "modules": {
+        "water": {
+            "name": "Water"
+        },
         "water.ec": {
             "name": "Water Conductivity",
             "sensors": {
@@ -18,6 +21,12 @@
             "name": "Water Dissolved Oxygen",
             "sensors": {
                 "do": "DO"
+            }
+        },
+        "water.dox": {
+            "name": "Water Dissolved Oxygen",
+            "sensors": {
+                "dox": "DO"
             }
         },
         "water.temp": {

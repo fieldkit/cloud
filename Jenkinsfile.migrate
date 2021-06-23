@@ -1,21 +1,18 @@
 @Library('conservify') _
 
-properties([
-	parameters([string(defaultValue: 'dev', name: 'WorkEnv', description: '')])
-])
-
 timestamps {
     node () {
         try {
 			def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
+			def branchName = params.DeployBranch ?: "main"
 
 			stage ('migrate') {
 				dir ('cloud') {
-					git branch: 'main', url: 'https://github.com/fieldkit/cloud.git'
+					git branch: branchName, url: 'https://github.com/fieldkit/cloud.git'
 
 					sh "cd migrations && make image"
 
-					sh "docker run --rm conservify/fk-cloud-migrate --path /migrations --database '${ws.database_url.value}' up"
+					sh "docker run --rm --env 'PGURL=${ws.database_url.value}' conservify/fk-cloud-migrate migrate"
 				}
 			}
         }

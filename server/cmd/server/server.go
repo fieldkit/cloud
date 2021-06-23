@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	_ "net/http"
 	_ "net/http/pprof"
+
+	"github.com/spf13/viper"
 
 	"github.com/pkg/profile"
 
@@ -32,8 +35,8 @@ import (
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/ingester"
 	_ "github.com/fieldkit/cloud/server/messages"
+	"github.com/fieldkit/cloud/server/social"
 
-	// "github.com/bgentry/que-go"
 	"github.com/govau/que-go"
 	"github.com/jackc/pgx"
 )
@@ -45,29 +48,48 @@ type Options struct {
 }
 
 type Config struct {
-	Addr                  string `split_words:"true" default:"127.0.0.1:8080" required:"true"`
-	PostgresURL           string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
-	SessionKey            string `split_words:"true"`
-	MapboxToken           string `split_words:"true"`
-	TwitterConsumerKey    string `split_words:"true"`
-	TwitterConsumerSecret string `split_words:"true"`
-	AWSProfile            string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
-	Emailer               string `split_words:"true" default:"default" required:"true"`
-	EmailOverride         string `split_words:"true" default:""`
-	Archiver              string `split_words:"true" default:"default" required:"true"`
-	PortalRoot            string `split_words:"true"`
-	Domain                string `split_words:"true" default:"fieldkit.org" required:"true"`
-	HttpScheme            string `split_words:"true" default:"https"`
-	ApiDomain             string `split_words:"true" default:""`
-	PortalDomain          string `split_words:"true" default:""`
-	ApiHost               string `split_words:"true" default:""`
-	MediaBucketName       string `split_words:"true" default:""`
-	StreamsBucketName     string `split_words:"true" default:""`
-	AwsId                 string `split_words:"true" default:""`
-	AwsSecret             string `split_words:"true" default:""`
-	StatsdAddress         string `split_words:"true" default:""`
-	Production            bool   `envconfig:"production"`
-	LoggingFull           bool   `envconfig:"logging_full"`
+	Addr                  string   `split_words:"true" default:"127.0.0.1:8080" required:"true"`
+	PostgresURL           string   `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
+	SessionKey            string   `split_words:"true"`
+	MapboxToken           string   `split_words:"true"`
+	TwitterConsumerKey    string   `split_words:"true"`
+	TwitterConsumerSecret string   `split_words:"true"`
+	AWSProfile            string   `envconfig:"aws_profile" default:"fieldkit" required:"true"`
+	Emailer               string   `split_words:"true" default:"default" required:"true"`
+	EmailOverride         string   `split_words:"true" default:""`
+	Archiver              string   `split_words:"true" default:"default" required:"true"`
+	PortalRoot            string   `split_words:"true"`
+	Domain                string   `split_words:"true" default:"fklocal.org:8080" required:"true"`
+	HttpScheme            string   `split_words:"true" default:"https"`
+	ApiDomain             string   `split_words:"true" default:""`
+	PortalDomain          string   `split_words:"true" default:""`
+	ApiHost               string   `split_words:"true" default:""`
+	MediaBucketName       string   `split_words:"true" default:""` // Deprecated
+	StreamsBucketName     string   `split_words:"true" default:""` // Deprecated
+	MediaBuckets          []string `split_words:"true" default:""`
+	StreamsBuckets        []string `split_words:"true" default:""`
+	AwsId                 string   `split_words:"true" default:""`
+	AwsSecret             string   `split_words:"true" default:""`
+	StatsdAddress         string   `split_words:"true" default:""`
+	Production            bool     `envconfig:"production"`
+	LoggingFull           bool     `envconfig:"logging_full"`
+}
+
+func getBucketNames(config *Config) *api.BucketNames {
+	media := config.MediaBuckets
+	if len(media) == 0 && config.MediaBucketName != "" {
+		media = []string{config.MediaBucketName}
+	}
+
+	streams := config.StreamsBuckets
+	if len(streams) == 0 && config.StreamsBucketName != "" {
+		streams = []string{config.StreamsBucketName}
+	}
+
+	return &api.BucketNames{
+		Media:   media,
+		Streams: streams,
+	}
 }
 
 func loadConfiguration() (*Config, *Options, error) {
@@ -87,6 +109,48 @@ func loadConfiguration() (*Config, *Options, error) {
 	}
 
 	if err := envconfig.Process("FIELDKIT", config); err != nil {
+		return nil, nil, err
+	}
+
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	viper.SetConfigName("fkserver.json")
+	viper.AddConfigPath("$HOME/")
+	viper.AddConfigPath(".")
+	viper.SetEnvPrefix("FIELDKIT")
+
+	viper.SetDefault("SAML.CERT", "fk-saml.cert")
+	viper.SetDefault("SAML.KEY", "fk-saml.key")
+	viper.SetDefault("SAML.SP_URL", "http://127.0.0.1:8080")
+	viper.SetDefault("SAML.LOGIN_URL", "http://127.0.0.1:8081/login/%s")
+	viper.SetDefault("SAML.IPD_META", "http://127.0.0.1:8090/auth/realms/fk/protocol/saml/descriptor")
+
+	// viper.SetDefault("KEYCLOAK.URL", "http://127.0.0.1:8090")
+	viper.SetDefault("KEYCLOAK.REALM", "fk")
+	viper.SetDefault("KEYCLOAK.API.USER", "admin")
+	viper.SetDefault("KEYCLOAK.API.PASSWORD", "admin")
+	viper.SetDefault("KEYCLOAK.API.REALM", "master")
+
+	viper.SetDefault("OIDC.CLIENT_ID", "portal")
+	viper.SetDefault("OIDC.CLIENT_SECRET", "9144cc7d-e9ba-4920-8e47-9a41dfbe4301")
+	// viper.SetDefault("OIDC.CONFIG_URL", "http://127.0.0.1:8090/auth/realms/fk")
+	viper.SetDefault("OIDC.REDIRECT_URL", "http://127.0.0.1:8081/login/keycloak")
+
+	// NOTE This is the same secret used in the real world example.
+	// https://meta.discourse.org/t/discourseconnect-official-single-sign-on-for-discourse-sso/13045
+	viper.SetDefault("DISCOURSE.SECRET", "d836444a9e4084d5b224a60c208dce14")
+	viper.SetDefault("DISCOURSE.REDIRECT_URL", "https://community.fieldkit.org/session/sso_login?sso=%s&sig=%s")
+	viper.SetDefault("DISCOURSE.ADMIN_KEY", "")
+
+	viper.AutomaticEnv()
+
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return nil, nil, err
+		}
+	}
+
+	if err := viper.WriteConfigAs("fkserver.json"); err != nil {
 		return nil, nil, err
 	}
 
@@ -158,17 +222,23 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		return nil, err
 	}
 
-	ingestionFiles, err := createFileArchive(ctx, config.Archiver, config.StreamsBucketName, awsSession, metrics, files.NoPrefix)
+	bucketNames := getBucketNames(config)
+
+	log := logging.Logger(ctx).Sugar()
+
+	log.Infow("buckets", "buckets", bucketNames)
+
+	ingestionFiles, err := createFileArchive(ctx, config.Archiver, bucketNames.Streams, awsSession, metrics, files.NoPrefix)
 	if err != nil {
 		return nil, err
 	}
 
-	mediaFiles, err := createFileArchive(ctx, config.Archiver, config.MediaBucketName, awsSession, metrics, files.NoPrefix)
+	mediaFiles, err := createFileArchive(ctx, config.Archiver, bucketNames.Media, awsSession, metrics, files.NoPrefix)
 	if err != nil {
 		return nil, err
 	}
 
-	exportedFiles, err := createFileArchive(ctx, config.Archiver, config.MediaBucketName, awsSession, metrics, "exported/")
+	exportedFiles, err := createFileArchive(ctx, config.Archiver, bucketNames.Media, awsSession, metrics, "exported/")
 	if err != nil {
 		return nil, err
 	}
@@ -206,10 +276,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Domain:        config.Domain,
 		PortalDomain:  config.PortalDomain,
 		EmailOverride: config.EmailOverride,
-		Buckets: &api.BucketNames{
-			Media:   config.MediaBucketName,
-			Streams: config.StreamsBucketName,
-		},
+		Buckets:       bucketNames,
 	}
 
 	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc)
@@ -268,8 +335,8 @@ func main() {
 
 	log := logging.Logger(ctx).Sugar()
 
-	log.With("api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain).
-		With("media_bucket_name", config.MediaBucketName, "streams_bucket_name", config.StreamsBucketName).
+	log.With("api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain, "portal_root", config.PortalRoot).
+		With("media_buckets", config.MediaBuckets, "streams_buckets", config.StreamsBuckets).
 		With("email_override", config.EmailOverride).
 		Infow("config")
 
@@ -301,6 +368,8 @@ func main() {
 		}
 
 		portalServer = singlePageApplication
+	} else {
+		log.Infow("portal spa disabled")
 	}
 
 	statusHandler := health.StatusHandler(ctx)
@@ -314,7 +383,11 @@ func main() {
 	statusFinal := logging.Monitoring("status", services.Metrics)(statusHandler)
 	ingesterFinal := logging.Monitoring("ingester", services.Metrics)(ingester.Handler)
 	apiFinal := logging.Monitoring("api", services.Metrics)(theApi.handler)
-	staticFinal := logging.Monitoring("static", services.Metrics)(portalServer)
+
+	tw := social.NewTwitterContext(services.Database, config.ApiHost)
+	socialFinal := tw.Handler(portalServer)
+
+	staticFinal := logging.Monitoring("static", services.Metrics)(socialFinal)
 
 	serveApi := func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path == "/ingestion" {
@@ -348,7 +421,7 @@ func main() {
 	}
 }
 
-func createFileArchive(ctx context.Context, archiver, bucketName string, awsSession *session.Session, metrics *logging.Metrics, prefix string) (files.FileArchive, error) {
+func createFileArchive(ctx context.Context, archiver string, buckets []string, awsSession *session.Session, metrics *logging.Metrics, prefix string) (files.FileArchive, error) {
 	log := logging.Logger(ctx).Sugar()
 
 	reading := make([]files.FileArchive, 0)
@@ -356,7 +429,11 @@ func createFileArchive(ctx context.Context, archiver, bucketName string, awsSess
 
 	switch archiver {
 	case "default":
-		if bucketName != "" {
+		fs := files.NewLocalFilesArchive()
+		reading = append(reading, fs)
+		writing = append(writing, fs)
+
+		for _, bucketName := range buckets {
 			s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, prefix)
 			if err != nil {
 				return nil, err
@@ -364,21 +441,22 @@ func createFileArchive(ctx context.Context, archiver, bucketName string, awsSess
 			reading = append(reading, s3)
 		}
 
-		fs := files.NewLocalFilesArchive()
-		reading = append(reading, fs)
-		writing = append(writing, fs)
 		break
 	case "aws":
-		s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, prefix)
-		if err != nil {
-			return nil, err
+		for _, bucketName := range buckets {
+			s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, prefix)
+			if err != nil {
+				return nil, err
+			}
+			reading = append(reading, s3)
+			if len(writing) == 0 {
+				writing = append(writing, s3)
+			}
 		}
-		reading = append(reading, s3)
-		writing = append(writing, s3)
 		break
 	}
 
-	log.Infow("files", "archiver", archiver, "bucket_name", bucketName, "reading", toListOfStrings(reading), "writing", toListOfStrings(writing))
+	log.Infow("files", "archiver", archiver, "bucket_names", buckets, "reading", toListOfStrings(reading), "writing", toListOfStrings(writing))
 
 	if len(reading) == 0 || len(writing) == 0 {
 		return nil, fmt.Errorf("no file archives available")

@@ -38,28 +38,32 @@ type StationPermissions interface {
 type Permissions interface {
 	Unwrap() (permissions Permissions, err error)
 	UserID() int32
+	Anonymous() bool
+	MaybeUserID() *int32
 	RefreshToken() string
 	RequireAdmin() error
 	IsAdmin() bool
 	ForProjectByID(id int32) (permissions ProjectPermissions, err error)
 	ForCollectionByID(id int32) (permissions CollectionPermissions, err error)
+	ForProject(project *data.Project) (permissions ProjectPermissions, err error)
 	ForStationByID(id int) (permissions StationPermissions, err error)
 	ForStationByDeviceID(id []byte) (permissions StationPermissions, err error)
 	ForStation(station *data.Station) (permissions StationPermissions, err error)
 }
 
 type unwrappedPermissions struct {
-	userID       int32
-	authAttempt  *AuthAttempt
+	userID       *int32
 	scopes       []string
 	admin        bool
 	refreshToken string
 }
 
 type defaultPermissions struct {
-	context   context.Context
-	options   *ControllerOptions
-	unwrapped *unwrappedPermissions
+	context     context.Context
+	options     *ControllerOptions
+	authAttempt *AuthAttempt
+	unwrapped   *unwrappedPermissions
+	anonymous   bool
 }
 
 func NewPermissions(ctx context.Context, options *ControllerOptions) Permissions {
@@ -95,24 +99,24 @@ func getClaims(ctx context.Context) (jwtgo.MapClaims, bool) {
 }
 
 func (p *defaultPermissions) unauthorized(m string) error {
-	if p.unwrapped == nil || p.unwrapped.authAttempt == nil || p.unwrapped.authAttempt.Unauthorized == nil {
+	if p.authAttempt == nil || p.authAttempt.Unauthorized == nil {
 		return fmt.Errorf("unable to make unauthorized error (%v)", m)
 	}
-	return p.unwrapped.authAttempt.Unauthorized(m)
+	return p.authAttempt.Unauthorized(m)
 }
 
 func (p *defaultPermissions) forbidden(m string) error {
-	if p.unwrapped == nil || p.unwrapped.authAttempt == nil || p.unwrapped.authAttempt.Forbidden == nil {
+	if p.authAttempt == nil || p.authAttempt.Forbidden == nil {
 		return fmt.Errorf("unable to make forbidden error (%v)", m)
 	}
-	return p.unwrapped.authAttempt.Forbidden(m)
+	return p.authAttempt.Forbidden(m)
 }
 
 func (p *defaultPermissions) notFound(m string) error {
-	if p.unwrapped == nil || p.unwrapped.authAttempt == nil || p.unwrapped.authAttempt.NotFound == nil {
+	if p.authAttempt == nil || p.authAttempt.NotFound == nil {
 		return fmt.Errorf("unable to make not-found error (%v)", m)
 	}
-	return p.unwrapped.authAttempt.NotFound(m)
+	return p.authAttempt.NotFound(m)
 }
 
 func (p *defaultPermissions) getClaims() (jwtgo.MapClaims, error) {
@@ -128,23 +132,25 @@ func (p *defaultPermissions) getClaims() (jwtgo.MapClaims, error) {
 
 	authAttempt := getAuthAttempt(p.context)
 	if authAttempt == nil {
-		return nil, fmt.Errorf("invalid auth attempted")
+		return nil, fmt.Errorf("forbidden (no attempt)")
 	}
 
 	return nil, authAttempt.Unauthorized("unauthorized")
 }
 
 func (p *defaultPermissions) unwrap() error {
-	if p.unwrapped != nil {
+	if p.unwrapped != nil || p.anonymous {
 		return nil
 	}
 
+	authAttempt := getAuthAttempt(p.context)
+	p.authAttempt = authAttempt
+
 	claims, err := p.getClaims()
 	if err != nil {
-		return err
+		p.anonymous = true
+		return nil
 	}
-
-	authAttempt := getAuthAttempt(p.context)
 
 	userID := int32(claims["sub"].(float64))
 	scopesRaw, ok := claims["scopes"].([]interface{})
@@ -161,8 +167,7 @@ func (p *defaultPermissions) unwrap() error {
 	}
 
 	p.unwrapped = &unwrappedPermissions{
-		authAttempt:  authAttempt,
-		userID:       userID,
+		userID:       &userID,
 		scopes:       scopesArray,
 		admin:        admin,
 		refreshToken: claims["refresh_token"].(string),
@@ -175,11 +180,25 @@ func (p *defaultPermissions) RefreshToken() string {
 	return p.unwrapped.refreshToken
 }
 
-func (p *defaultPermissions) UserID() int32 {
+func (p *defaultPermissions) Anonymous() bool {
+	return p.anonymous
+}
+
+func (p *defaultPermissions) MaybeUserID() *int32 {
+	if p.anonymous {
+		return nil
+	}
 	return p.unwrapped.userID
 }
 
+func (p *defaultPermissions) UserID() int32 {
+	return *p.unwrapped.userID
+}
+
 func (p *defaultPermissions) IsAdmin() bool {
+	if p.anonymous {
+		return false
+	}
 	return p.unwrapped.admin
 }
 
@@ -198,6 +217,33 @@ func (p *defaultPermissions) Unwrap() (Permissions, error) {
 	return p, nil
 }
 
+func (p *defaultPermissions) ForProject(project *data.Project) (permissions ProjectPermissions, err error) {
+	if err := p.unwrap(); err != nil {
+		return nil, err
+	}
+
+	var projectUser *data.ProjectUser = nil
+	if !p.Anonymous() {
+		projectUser = &data.ProjectUser{}
+		if err := p.options.Database.GetContext(p.context, projectUser, `
+			SELECT p.* FROM fieldkit.project_user AS p WHERE p.user_id = $1 AND p.project_id = $2
+			`, p.UserID(), project.ID); err != nil {
+			if err != sql.ErrNoRows {
+				return nil, err
+			}
+			projectUser = nil
+		}
+	}
+
+	permissions = &projectPermissions{
+		defaultPermissions: *p,
+		project:            project,
+		projectUser:        projectUser,
+	}
+
+	return
+}
+
 func (p *defaultPermissions) ForProjectByID(id int32) (permissions ProjectPermissions, err error) {
 	if err := p.unwrap(); err != nil {
 		return nil, err
@@ -208,21 +254,7 @@ func (p *defaultPermissions) ForProjectByID(id int32) (permissions ProjectPermis
 		return nil, p.notFound(fmt.Sprintf("project not found: %v", err))
 	}
 
-	projectUser := &data.ProjectUser{}
-	if err := p.options.Database.GetContext(p.context, projectUser, "SELECT p.* FROM fieldkit.project_user AS p WHERE p.user_id = $1 AND p.project_id = $2", p.UserID(), id); err != nil {
-		if err != sql.ErrNoRows {
-			return nil, err
-		}
-		projectUser = nil
-	}
-
-	permissions = &projectPermissions{
-		defaultPermissions: *p,
-		project:            project,
-		projectUser:        projectUser,
-	}
-
-	return
+	return p.ForProject(project)
 }
 
 func (p *defaultPermissions) ForCollectionByID(id int32) (permissions CollectionPermissions, err error) {
@@ -248,16 +280,24 @@ func (p *defaultPermissions) ForStationByID(id int) (permissions StationPermissi
 		return nil, err
 	}
 
-	r := repositories.NewStationRepository(p.options.Database)
+	sr := repositories.NewStationRepository(p.options.Database)
 
-	station, err := r.QueryStationByID(p.context, int32(id))
+	station, err := sr.QueryStationByID(p.context, int32(id))
 	if err != nil {
 		return nil, p.notFound(fmt.Sprintf("station not found"))
+	}
+
+	pr := repositories.NewProjectRepository(p.options.Database)
+
+	projects, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
+	if err != nil {
+		return nil, err
 	}
 
 	permissions = &stationPermissions{
 		defaultPermissions: *p,
 		station:            station,
+		projects:           projects,
 	}
 
 	return
@@ -268,16 +308,24 @@ func (p *defaultPermissions) ForStationByDeviceID(id []byte) (permissions Statio
 		return nil, err
 	}
 
-	r := repositories.NewStationRepository(p.options.Database)
+	sr := repositories.NewStationRepository(p.options.Database)
 
-	station, err := r.QueryStationByDeviceID(p.context, id)
+	station, err := sr.QueryStationByDeviceID(p.context, id)
 	if err != nil {
 		return nil, p.notFound(fmt.Sprintf("station not found"))
+	}
+
+	pr := repositories.NewProjectRepository(p.options.Database)
+
+	projects, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
+	if err != nil {
+		return nil, err
 	}
 
 	permissions = &stationPermissions{
 		defaultPermissions: *p,
 		station:            station,
+		projects:           projects,
 	}
 
 	return
@@ -288,9 +336,17 @@ func (p *defaultPermissions) ForStation(station *data.Station) (permissions Stat
 		return nil, err
 	}
 
+	pr := repositories.NewProjectRepository(p.options.Database)
+
+	projects, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	permissions = &stationPermissions{
 		defaultPermissions: *p,
 		station:            station,
+		projects:           projects,
 	}
 
 	return
@@ -298,7 +354,8 @@ func (p *defaultPermissions) ForStation(station *data.Station) (permissions Stat
 
 type stationPermissions struct {
 	defaultPermissions
-	station *data.Station
+	station  *data.Station
+	projects []*data.Project
 }
 
 func (p *stationPermissions) Station() *data.Station {
@@ -306,7 +363,31 @@ func (p *stationPermissions) Station() *data.Station {
 }
 
 func (p *stationPermissions) CanView() error {
-	return nil
+	if p.IsAdmin() {
+		return nil
+	}
+
+	// Owners can always see their stations.
+	if !p.Anonymous() {
+		if p.station.OwnerID == p.UserID() {
+			return nil
+		}
+	}
+
+	// We don't know until we check the projects the station is a part
+	// of, one of them has to be public.
+	for _, project := range p.projects {
+		subPermissions, err := NewPermissions(p.context, p.options).ForProjectByID(project.ID)
+		if err != nil {
+			return err
+		}
+
+		if err := subPermissions.CanView(); err == nil {
+			return nil
+		}
+	}
+
+	return p.forbidden("forbidden")
 }
 
 func (p *stationPermissions) CanModify() error {
@@ -322,6 +403,9 @@ func (p *stationPermissions) CanModify() error {
 }
 
 func (p *stationPermissions) IsReadOnly() bool {
+	if p.anonymous {
+		return true
+	}
 	return p.station.OwnerID != p.UserID()
 }
 
@@ -336,6 +420,23 @@ func (p *projectPermissions) Project() *data.Project {
 }
 
 func (p *projectPermissions) CanView() error {
+	if p.IsAdmin() {
+		return nil
+	}
+
+	if p.project.Privacy == data.Public {
+		return nil
+	}
+
+	if p.projectUser == nil {
+		return p.forbidden("forbidden")
+	}
+
+	role := p.projectUser.LookupRole()
+	if role == nil {
+		return p.forbidden("forbidden")
+	}
+
 	return nil
 }
 

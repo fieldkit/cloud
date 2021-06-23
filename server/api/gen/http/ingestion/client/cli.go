@@ -76,6 +76,28 @@ func BuildProcessStationPayload(ingestionProcessStationStationID string, ingesti
 	return v, nil
 }
 
+// BuildProcessStationIngestionsPayload builds the payload for the ingestion
+// process station ingestions endpoint from CLI flags.
+func BuildProcessStationIngestionsPayload(ingestionProcessStationIngestionsStationID string, ingestionProcessStationIngestionsAuth string) (*ingestion.ProcessStationIngestionsPayload, error) {
+	var err error
+	var stationID int64
+	{
+		stationID, err = strconv.ParseInt(ingestionProcessStationIngestionsStationID, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for stationID, must be INT64")
+		}
+	}
+	var auth string
+	{
+		auth = ingestionProcessStationIngestionsAuth
+	}
+	v := &ingestion.ProcessStationIngestionsPayload{}
+	v.StationID = stationID
+	v.Auth = auth
+
+	return v, nil
+}
+
 // BuildProcessIngestionPayload builds the payload for the ingestion process
 // ingestion endpoint from CLI flags.
 func BuildProcessIngestionPayload(ingestionProcessIngestionIngestionID string, ingestionProcessIngestionAuth string) (*ingestion.ProcessIngestionPayload, error) {

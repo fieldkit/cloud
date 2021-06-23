@@ -55,5 +55,177 @@
     "random.random_6": "Random 6",
     "random.random_7": "Random 7",
     "random.random_8": "Random 8",
-    "random.random_9": "Random 9"
+    "random.random_9": "Random 9",
+    "layout": {
+        "logo": {
+            "alt": "FieldKit Logo",
+            "compass": {
+                "alt": "FieldKit Compass Logo"
+            }
+        },
+        "side": {
+            "projects": {
+                "title": "Projects"
+            },
+            "stations": {
+                "title": "Stations",
+                "empty": "No stations added"
+            }
+        },
+        "header": {
+            "login": "Log in",
+            "logout": "Log out",
+            "admin": "Admin",
+            "myAccount": "My Account"
+        },
+        "backDashboard": "Back to Dashboard",
+        "backProject": "Back to {name}"
+    },
+    "projects": {
+        "title": {
+            "mine": "My Projects",
+            "community": "Community Projects",
+            "anonymous": "Projects"
+        },
+        "add": "Add Project"
+    },
+    "project": {
+        "details": {
+            "title": "Project Details"
+        },
+        "started": "Started: {started, date}",
+        "location": "{location}",
+        "duration": "{duration, projectDuration}",
+        "goal": "{goal}",
+        "nativeLands": "Native Lands: {nativeLands}",
+        "recentActivity": "Recent Activity",
+        "follow": "Follow",
+        "unfollow": "Unfollow",
+        "activity": "Activity",
+        "dashboard": "Project Dashboard",
+        "stations": {
+            "title": "FieldKit Stations",
+            "add": "Add Station",
+            "search": "Search",
+            "none": {
+                "title": "No Stations",
+                "text": "Add a station to this project to include its recent data and activities."
+            }
+        },
+        "form": {
+            "name": {
+                "required": "Name is a required field.",
+                "maxLength": "This field has a limit of 100 characters."
+            },
+            "description": {
+                "required": "Description is a required field.",
+                "maxLength": "This field has a limit of 100 characters."
+            },
+            "goal": {
+                "required": "Goal is a required field.",
+                "maxLength": "This field has a limit of 100 characters."
+            },
+            "location": {
+                "required": "Location is a required field.",
+                "maxLength": "This field has a limit of 100 characters."
+            },
+            "tags": {
+                "help": "Press Enter to separate tags.",
+                "maxLength": "This field has a limit of 100 characters."
+            },
+            "startTime": {
+                "date": "Please enter a valid date.",
+                "alt": "Calendar"
+            },
+            "endTime": {
+                "date": "Please enter a valid date.",
+                "minValue": "Please enter a date after the start date.",
+                "alt": "Calendar"
+            },
+            "makePublic": "Make this project public",
+            "showExact": "Show exact location of stations",
+            "showGeneral": "Show general location of stations",
+            "delete": {
+                "link": "Delete Project"
+            },
+            "saveNew": "Add project",
+            "saveChanges": "Save updates",
+            "showStations": "Show Stations",
+            "hideStations": "Hide Stations",
+            "mapTextShow": "Others will see stations and exact GPS coordinates on the map",
+            "mapTextHide": "Stations will not be visible on the map for others",
+            "mapHint": "Pan or zoom to set map view"
+        },
+        "invite": {
+            "accept": "Accept Invite",
+            "decline": "Decline"
+        },
+        "create": {
+            "title": "New Project"
+        },
+        "edit": {
+            "title": "Edit Project",
+            "link": "Edit Project"
+        }
+    },
+    "station": {
+        "readings": {
+            "title": "Latest Readings",
+            "empty": "There are no stations in this project."
+        }
+    },
+    "user": {
+        "profile": {
+            "title": "My Account",
+            "saved": "Profile saved.",
+            "password": {
+                "changed": "Password changed.",
+                "failed": "Please check your password and try again."
+            },
+            "photo": {
+                "title": "Profile Photo",
+                "change": "Change Image",
+                "choose": "Choose File",
+                "noFile": "No file chosen"
+            },
+            "form": {
+                "name": {
+                    "label": "Name",
+                    "required": "Name is a required field."
+                },
+                "bio": {
+                    "label": "Short Description",
+                    "required": "Short Description is a required field."
+                },
+                "email": {
+                    "label": "Email",
+                    "required": "Email is a required field.",
+                    "email": "Must be a valid email address.",
+                    "taken": "This address appears to already be registered.",
+                    "recover": "Recover Account"
+                },
+                "makePublic": "Make my profile public",
+                "update": "Update",
+                "password": {
+                    "title": "Change Password",
+                    "existing": {
+                        "label": "Current password",
+                        "required": "This is a required field.",
+                        "min": "Password must be at least 10 characters."
+                    },
+                    "password": {
+                        "label": "New password",
+                        "required": "This is a required field.",
+                        "min": "Password must be at least 10 characters."
+                    },
+                    "confirmation": {
+                        "label": "Confirm new password",
+                        "required": "Confirmation is a required field.",
+                        "sameAsPassword": "Passwords must match."
+                    },
+                    "update": "Update"
+                }
+            }
+        }
+    }
 }

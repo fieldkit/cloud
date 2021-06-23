@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"io"
+	"math"
 	"strings"
 	"time"
 
@@ -37,6 +39,8 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 
 	sr := repositories.NewStationRepository(c.options.Database)
 
+	station.UpdatedAt = time.Now()
+
 	if rawStatusPb != nil {
 		log.Infow("updating station from status", "station_id", station.ID)
 
@@ -58,9 +62,9 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 				station.PlaceNative = names.NativeLandName
 			}
 		}
-	}
 
-	station.UpdatedAt = time.Now()
+		station.SyncedAt = &station.UpdatedAt
+	}
 
 	if err := sr.Update(ctx, station); err != nil {
 		return err
@@ -108,17 +112,19 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		}
 
 		return c.Get(ctx, &station.GetPayload{
-			Auth: payload.Auth,
+			Auth: &payload.Auth,
 			ID:   existing.ID,
 		})
 	}
 
+	now := time.Now()
 	adding := &data.Station{
 		OwnerID:      p.UserID(),
 		Name:         payload.Name,
 		DeviceID:     deviceId,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
+		CreatedAt:    now,
+		UpdatedAt:    now,
+		SyncedAt:     &now,
 		LocationName: payload.LocationName,
 	}
 
@@ -141,7 +147,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 	}
 
 	return c.Get(ctx, &station.GetPayload{
-		Auth: payload.Auth,
+		Auth: &payload.Auth,
 		ID:   adding.ID,
 	})
 }
@@ -156,16 +162,19 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 		return nil, err
 	}
 
-	r := repositories.NewStationRepository(c.options.Database)
+	sr := repositories.NewStationRepository(c.options.Database)
+
+	sf, err := sr.QueryStationFull(ctx, payload.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	sf, err := r.QueryStationFull(ctx, payload.ID)
+	preciseLocation := false
+	if !p.Anonymous() {
+		preciseLocation = p.UserID() == sf.Owner.ID
+	}
 
-	preciseLocation := p.UserID() == sf.Owner.ID
-
-	return transformStationFull(c.options.signer, p, sf, preciseLocation)
+	return transformStationFull(c.options.signer, p, sf, preciseLocation, false)
 }
 
 func (c *StationService) Transfer(ctx context.Context, payload *station.TransferPayload) (err error) {
@@ -200,9 +209,6 @@ func (c *StationService) Transfer(ctx context.Context, payload *station.Transfer
 
 func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
 	sr := repositories.NewStationRepository(c.options.Database)
-	if err != nil {
-		return nil, err
-	}
 
 	updating, err := sr.QueryStationByID(ctx, payload.ID)
 	if err != nil {
@@ -231,7 +237,7 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 	}
 
 	return c.Get(ctx, &station.GetPayload{
-		Auth: payload.Auth,
+		Auth: &payload.Auth,
 		ID:   payload.ID,
 	})
 }
@@ -242,17 +248,14 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 		return nil, err
 	}
 
-	r := repositories.NewStationRepository(c.options.Database)
+	sr := repositories.NewStationRepository(c.options.Database)
+
+	sfs, err := sr.QueryStationFullByOwnerID(ctx, p.UserID())
 	if err != nil {
 		return nil, err
 	}
 
-	sfs, err := r.QueryStationFullByOwnerID(ctx, p.UserID())
-	if err != nil {
-		return nil, err
-	}
-
-	stations, err := transformAllStationFull(c.options.signer, p, sfs, true)
+	stations, err := transformAllStationFull(c.options.signer, p, sfs, true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -272,26 +275,36 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		return nil, err
 	}
 
-	preciseLocation := project.Privacy == data.Public
-	p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err == nil {
-		relationships, err := pr.QueryUserProjectRelationships(ctx, p.UserID())
-		if err != nil {
-			return nil, err
-		}
-		if _, ok := relationships[payload.ID]; ok {
-			preciseLocation = true
-		}
-	}
-
-	r := repositories.NewStationRepository(c.options.Database)
-
-	sfs, err := r.QueryStationFullByProjectID(ctx, payload.ID)
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(payload.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(c.options.signer, p, sfs, preciseLocation)
+	if err := p.CanView(); err != nil {
+		return nil, err
+	}
+
+	preciseLocation := project.Privacy == data.Public
+
+	if !p.Anonymous() {
+		// NOTE This may already be in Permissions.
+		relationships, err := pr.QueryUserProjectRelationships(ctx, p.UserID())
+		if err != nil {
+			return nil, err
+		}
+		if row, ok := relationships[payload.ID]; ok {
+			preciseLocation = row.MemberRole >= 0
+		}
+	}
+
+	sr := repositories.NewStationRepository(c.options.Database)
+
+	sfs, err := sr.QueryStationFullByProjectID(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	stations, err := transformAllStationFull(c.options.signer, p, sfs, preciseLocation, false)
 	if err != nil {
 		return nil, err
 	}
@@ -382,6 +395,15 @@ func (c *StationService) Delete(ctx context.Context, payload *station.DeletePayl
 	return sr.Delete(ctx, payload.StationID)
 }
 
+func findImage(media []*data.FieldNoteMedia) *data.FieldNoteMedia {
+	for _, m := range media {
+		if m.ContentType != "image/gif" {
+			return m
+		}
+	}
+	return nil
+}
+
 func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.DownloadPhotoPayload) (*station.DownloadedPhoto, error) {
 	x := uint(124)
 	y := uint(100)
@@ -397,7 +419,13 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 		return defaultPhoto(payload.StationID)
 	}
 
-	media := allMedia[0]
+	haveGif := false
+	media := findImage(allMedia)
+	if media == nil {
+		// Must be a gif, pick the first one.
+		media = allMedia[0]
+		haveGif = true
+	}
 
 	etag := quickHash(media.URL)
 	if payload.Size != nil {
@@ -420,11 +448,26 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 		return nil, err
 	}
 
+	if haveGif {
+		buffer := make([]byte, lm.Size)
+		_, err := io.ReadFull(lm.Reader, buffer)
+		if err != nil {
+			return nil, err
+		}
+		return &station.DownloadedPhoto{
+			Length:      lm.Size,
+			ContentType: media.ContentType,
+			Etag:        etag,
+			Body:        buffer,
+		}, nil
+	}
+
 	original, _, err := image.Decode(lm.Reader)
 	if err != nil {
 		log := Logger(ctx).Sugar()
-		log.Warnw("image-error", "error", err, "station_id", payload.StationID)
-		return defaultPhoto(payload.StationID)
+		log.Warnw("image-error", "error", err, "station_id", payload.StationID, "content_type", media.ContentType)
+		// return defaultPhoto(payload.StationID)
+		return nil, station.MakeNotFound(fmt.Errorf("not-found"))
 	}
 
 	data := []byte{}
@@ -485,6 +528,32 @@ func (c *StationService) AdminSearch(ctx context.Context, payload *station.Admin
 	return c.queriedToPage(queried)
 }
 
+func (c *StationService) Progress(ctx context.Context, payload *station.ProgressPayload) (response *station.StationProgress, err error) {
+	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.StationID))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.CanView(); err != nil {
+		return nil, err
+	}
+
+	sr := repositories.NewStationRepository(c.options.Database)
+
+	jobs, err := sr.QueryStationProgress(ctx, payload.StationID)
+	if err != nil {
+		return nil, err
+	}
+
+	_ = jobs
+
+	jobsWm := make([]*station.StationJob, 0)
+
+	return &station.StationProgress{
+		Jobs: jobsWm,
+	}, nil
+}
+
 func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
 		Token:        token,
@@ -517,6 +586,10 @@ func transformReading(s *data.ModuleSensor) *station.SensorReading {
 		return nil
 	}
 
+	if math.IsNaN(*s.ReadingValue) {
+		return nil
+	}
+
 	time := int64(0)
 	if s.ReadingTime != nil {
 		time = s.ReadingTime.Unix() * 1000
@@ -528,7 +601,7 @@ func transformReading(s *data.ModuleSensor) *station.SensorReading {
 	}
 }
 
-func transformConfigurations(from *data.StationFull) (to []*station.StationConfiguration) {
+func transformConfigurations(from *data.StationFull, transformAll bool) (to []*station.StationConfiguration) {
 	to = make([]*station.StationConfiguration, 0)
 	for _, v := range from.Configurations {
 		to = append(to, &station.StationConfiguration{
@@ -536,6 +609,10 @@ func transformConfigurations(from *data.StationFull) (to []*station.StationConfi
 			Time:    v.UpdatedAt.Unix() * 1000,
 			Modules: transformModules(from, v.ID),
 		})
+
+		if !transformAll {
+			break
+		}
 	}
 	return
 }
@@ -644,7 +721,7 @@ func transformLocation(sf *data.StationFull, preciseLocation bool) *station.Stat
 	return nil
 }
 
-func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, preciseLocation bool) (*station.StationFull, error) {
+func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, preciseLocation bool, transformAllConfigurations bool) (*station.StationFull, error) {
 	readOnly := true
 	if p != nil {
 		sp, err := p.ForStation(sf.Station)
@@ -655,7 +732,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		readOnly = sp.IsReadOnly()
 	}
 
-	configurations := transformConfigurations(sf)
+	configurations := transformConfigurations(sf, transformAllConfigurations)
 
 	dataSummary := transformDataSummary(sf.DataSummary)
 
@@ -665,6 +742,13 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 	if sf.Station.RecordingStartedAt != nil {
 		unix := sf.Station.RecordingStartedAt.Unix() * 1000
 		recordingStartedAt = &unix
+	}
+
+	var photos *station.StationPhotos
+	if sf.HasImages {
+		photos = &station.StationPhotos{
+			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
+		}
 	}
 
 	return &station.StationFull{
@@ -683,6 +767,8 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		FirmwareNumber:     sf.Station.FirmwareNumber,
 		FirmwareTime:       sf.Station.FirmwareTime,
 		UpdatedAt:          sf.Station.UpdatedAt.Unix() * 1000,
+		SyncedAt:           optionalTime(sf.Station.SyncedAt),
+		IngestionAt:        optionalTime(sf.Station.IngestionAt),
 		LocationName:       sf.Station.LocationName,
 		PlaceNameOther:     sf.Station.PlaceOther,
 		PlaceNameNative:    sf.Station.PlaceNative,
@@ -692,10 +778,16 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			ID:   sf.Owner.ID,
 			Name: sf.Owner.Name,
 		},
-		Photos: &station.StationPhotos{
-			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
-		},
+		Photos: photos,
 	}, nil
+}
+
+func optionalTime(t *time.Time) *int64 {
+	if t == nil {
+		return nil
+	}
+	value := t.Unix() * 1000
+	return &value
 }
 
 func transformDataSummary(ads *data.AggregatedDataSummary) *station.StationDataSummary {
@@ -712,11 +804,11 @@ func transformDataSummary(ads *data.AggregatedDataSummary) *station.StationDataS
 	}
 }
 
-func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool) ([]*station.StationFull, error) {
+func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool, transformAllConfigurations bool) ([]*station.StationFull, error) {
 	stations := make([]*station.StationFull, 0)
 
 	for _, sf := range sfs {
-		after, err := transformStationFull(signer, p, sf, preciseLocation)
+		after, err := transformStationFull(signer, p, sf, preciseLocation, transformAllConfigurations)
 		if err != nil {
 			return nil, err
 		}

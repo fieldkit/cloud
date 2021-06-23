@@ -116,6 +116,10 @@ func (c *CopierTool) copyGeneration(ctx context.Context, id string, force bool) 
 	return nil
 }
 
+func makeUploadURL(key string) string {
+	panic("unimplemented")
+}
+
 func (c *CopierTool) copyIngestion(ctx context.Context, id int64, force bool) (err error) {
 	log := logging.Logger(ctx).Sugar()
 
@@ -138,7 +142,7 @@ func (c *CopierTool) copyIngestion(ctx context.Context, id int64, force bool) (e
 	log.Infow("copying", "ingestion_id", ingestion.ID, "file_id", ingestion.UploadID, "info", info)
 
 	if force {
-		reading, err := c.Source.Files.OpenByKey(ctx, ingestion.UploadID)
+		reading, err := c.Source.Files.OpenByURL(ctx, makeUploadURL(ingestion.UploadID))
 		if err != nil {
 			return err
 		}

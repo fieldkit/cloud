@@ -2,30 +2,32 @@
     <form @submit.prevent="saveForm">
         <h3 class="heading">Change Password</h3>
         <div>
-            <TextField v-model="form.existing" label="Current password" type="password" />
+            <TextField v-model="form.existing" :label="$t('user.profile.form.password.existing.label')" type="password" />
 
             <div class="validation-errors" v-if="$v.form.existing.$error">
-                <div v-if="!$v.form.existing.required">This is a required field.</div>
-                <div v-if="!$v.form.existing.min">Password must be at least 10 characters.</div>
+                <div v-if="!$v.form.existing.required">{{ $t("user.profile.form.password.existing.required") }}</div>
+                <div v-if="!$v.form.existing.min">{{ $t("user.profile.form.password.existing.min") }}</div>
             </div>
         </div>
         <div>
-            <TextField v-model="form.password" label="New password" type="password" />
+            <TextField v-model="form.password" :label="$t('user.profile.form.password.password.label')" type="password" />
 
             <div class="validation-errors" v-if="$v.form.password.$error">
-                <div v-if="!$v.form.password.required">This is a required field.</div>
-                <div v-if="!$v.form.password.min">Password must be at least 10 characters.</div>
+                <div v-if="!$v.form.password.required">{{ $t("user.profile.form.password.password.required") }}</div>
+                <div v-if="!$v.form.password.min">{{ $t("user.profile.form.password.password.min") }}</div>
             </div>
         </div>
         <div>
-            <TextField v-model="form.passwordConfirmation" label="Confirm new password" type="password" />
+            <TextField v-model="form.passwordConfirmation" :label="$t('user.profile.form.password.confirmation.label')" type="password" />
 
             <div class="validation-errors" v-if="$v.form.passwordConfirmation.$error">
-                <div v-if="!$v.form.passwordConfirmation.required">Confirmation is a required field.</div>
-                <div v-if="!$v.form.passwordConfirmation.sameAsPassword">Passwords must match.</div>
+                <div v-if="!$v.form.passwordConfirmation.required">{{ $t("user.profile.form.password.confirmation.required") }}</div>
+                <div v-if="!$v.form.passwordConfirmation.sameAsPassword">
+                    {{ $t("user.profile.form.password.confirmation.sameAsPassword") }}
+                </div>
             </div>
         </div>
-        <button class="button-solid" type="submit">Change password</button>
+        <button class="button-solid" type="submit">{{ $t("user.profile.form.password.update") }}</button>
     </form>
 </template>
 
@@ -84,8 +86,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/global';
-@import '../../scss/mixins';
+@import "../../scss/global";
+@import "../../scss/mixins";
 
 .main-panel {
     display: flex;
@@ -138,5 +140,4 @@ form {
         width: 100%;
     }
 }
-
 </style>

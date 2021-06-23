@@ -23,9 +23,10 @@ import (
 
 const (
 	GoodPassword = "goodgoodgood"
+	BadPassword  = "badbadbadbad"
 )
 
-type FakeStations struct {
+type FakeProjectStations struct {
 	Owner      *data.User
 	Project    *data.Project
 	Collection *data.Collection
@@ -121,8 +122,8 @@ func (e *TestEnv) AddCollection(ownerID int32) (*data.Collection, error) {
 
 func (e *TestEnv) SaveProject(project *data.Project) (*data.Project, error) {
 	if err := e.DB.NamedGetContext(e.Ctx, project, `
-		INSERT INTO fieldkit.project (name, privacy, start_time, end_time)
-		VALUES (:name, :privacy, :start_time, :end_time)
+		INSERT INTO fieldkit.project (name, privacy, start_time, end_time, community_ranking)
+		VALUES (:name, :privacy, :start_time, :end_time, :community_ranking)
 		RETURNING *
 		`, project); err != nil {
 		return nil, err
@@ -132,11 +133,15 @@ func (e *TestEnv) SaveProject(project *data.Project) (*data.Project, error) {
 }
 
 func (e *TestEnv) AddProject() (*data.Project, error) {
+	return e.AddProjectWithPrivacy(data.Private)
+}
+
+func (e *TestEnv) AddProjectWithPrivacy(privacy data.PrivacyType) (*data.Project, error) {
 	name := faker.Name()
 
 	project := &data.Project{
 		Name:    name + " Project",
-		Privacy: data.Private,
+		Privacy: privacy,
 	}
 
 	return e.SaveProject(project)
@@ -152,26 +157,15 @@ func (e *TestEnv) AddProjectUser(p *data.Project, u *data.User, r *data.Role) er
 	return nil
 }
 
-func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
-	owner, err := e.AddUser()
+func (e *TestEnv) AddStationOwnedBy(owner *data.User) (*data.Station, error) {
+	stations, err := e.AddStationsOwnedBy(owner, 1)
 	if err != nil {
 		return nil, err
 	}
+	return stations[0], nil
+}
 
-	collection, err := e.AddCollection(owner.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	project, err := e.AddProject()
-	if err != nil {
-		return nil, err
-	}
-
-	if err := e.AddProjectUser(project, owner, data.AdministratorRole); err != nil {
-		return nil, err
-	}
-
+func (e *TestEnv) AddStationsOwnedBy(owner *data.User, number int) ([]*data.Station, error) {
 	stations := []*data.Station{}
 
 	for i := 0; i < number; i += 1 {
@@ -193,18 +187,30 @@ func (e *TestEnv) AddStations(number int) (*FakeStations, error) {
 			return nil, err
 		}
 
-		if err := e.AddStationToProject(station, project, nil); err != nil {
-			return nil, err
-		}
-
 		stations = append(stations, station)
 	}
 
-	return &FakeStations{
-		Owner:      owner,
-		Project:    project,
-		Collection: collection,
-		Stations:   stations,
+	return stations, nil
+}
+
+func (e *TestEnv) AddStationsToProject(project *data.Project, owner *data.User, number int) (*FakeProjectStations, error) {
+	stations, err := e.AddStationsOwnedBy(owner, number)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, station := range stations {
+		if _, err := e.DB.ExecContext(e.Ctx, `
+			INSERT INTO fieldkit.project_station (project_id, station_id, created_at) VALUES ($1, $2, NOW())
+			`, project.ID, station.ID); err != nil {
+			return nil, err
+		}
+	}
+
+	return &FakeProjectStations{
+		Owner:    owner,
+		Project:  project,
+		Stations: stations,
 	}, nil
 }
 
@@ -253,6 +259,36 @@ func (e *TestEnv) AddStationOwner(station *data.Station, userID int32, start, en
 
 func (e *TestEnv) AddStation(owner *data.User) (*data.Station, error) {
 	return e.SaveStation(e.NewStation(owner))
+}
+
+func (e *TestEnv) AddStations(number int) (*FakeProjectStations, error) {
+	owner, err := e.AddUser()
+	if err != nil {
+		return nil, err
+	}
+
+	collection, err := e.AddCollection(owner.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	project, err := e.AddProject()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := e.AddProjectUser(project, owner, data.AdministratorRole); err != nil {
+		return nil, err
+	}
+
+	fd, err := e.AddStationsToProject(project, owner, number)
+	if err != nil {
+		return nil, err
+	}
+
+	fd.Collection = collection
+
+	return fd, nil
 }
 
 func (e *TestEnv) NewStation(owner *data.User) *data.Station {

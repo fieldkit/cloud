@@ -59,6 +59,7 @@
                                                 <th>Size</th>
                                                 <th>Blocks</th>
                                                 <th>URL</th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody v-for="upload in focused.uploads" v-bind:key="upload.id">
@@ -69,6 +70,7 @@
                                                 <td>{{ upload.size }}</td>
                                                 <td>{{ upload.blocks }}</td>
                                                 <td>{{ upload.url }}</td>
+                                                <td><button v-on:click="onProcessUpload(upload)" class="button">Process</button></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -93,10 +95,13 @@
                                         <a :href="urlForServerLogs(station)" target="_blank">10 days</a>
                                     </div>
                                     <div>
-                                        <button v-on:click="onExplore(station)" class="button">Explore Data</button>
+                                        <button v-on:click="onProcessData(station)" class="button">Process Data</button>
                                     </div>
                                     <div>
-                                        <button v-on:click="onProcess(station)" class="button">Process Data</button>
+                                        <button v-on:click="onProcessRecords(station)" class="button">Process Recs</button>
+                                    </div>
+                                    <div>
+                                        <button v-on:click="onExplore(station)" class="button">Explore Data</button>
                                     </div>
                                     <h3>Transfer</h3>
                                     <div>
@@ -192,16 +197,44 @@ export default Vue.extend({
             const query = `device_id:("${deviceIdBase64}" or "${deviceIdHex}")`;
             return "https://code.conservify.org/logs-viewer/?range=864000&query=" + encodeURIComponent(query);
         },
-        async onProcess(station: EssentialStation): Promise<void> {
+        async onProcessUpload(upload: { id: number }): Promise<void> {
+            await this.$confirm({
+                message: `Are you sure? This could take a while for certain files.`,
+                button: {
+                    no: "No",
+                    yes: "Yes",
+                },
+                callback: async (confirm) => {
+                    if (confirm) {
+                        await this.$services.api.adminProcessUpload(upload.id);
+                    }
+                },
+            });
+        },
+        async onProcessData(station: EssentialStation): Promise<void> {
             await this.$confirm({
                 message: `Are you sure? This could take a while for certain stations.`,
                 button: {
                     no: "No",
                     yes: "Yes",
                 },
-                callback: (confirm) => {
+                callback: async (confirm) => {
                     if (confirm) {
-                        return this.$services.api.adminProcessStation(station.id, true);
+                        await this.$services.api.adminProcessStationData(station.id);
+                    }
+                },
+            });
+        },
+        async onProcessRecords(station: EssentialStation): Promise<void> {
+            await this.$confirm({
+                message: `Are you sure? This could take a while for certain stations.`,
+                button: {
+                    no: "No",
+                    yes: "Yes",
+                },
+                callback: async (confirm) => {
+                    if (confirm) {
+                        await this.$services.api.adminProcessStation(station.id, true);
                     }
                 },
             });

@@ -3,11 +3,14 @@ package api
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"time"
+
+	"github.com/jmoiron/sqlx/types"
 
 	"goa.design/goa/v3/security"
 
@@ -55,13 +58,23 @@ func (c *ProjectService) Add(ctx context.Context, payload *project.AddPayload) (
 		privacy = data.PrivacyType(*payload.Project.Privacy)
 	}
 
+	showStations := false
+	if payload.Project.ShowStations != nil {
+		showStations = bool(*payload.Project.ShowStations)
+	}
+
+	jsonBounds, err := json.Marshal(payload.Project.Bounds)
+	jsonTextBounds := types.JSONText(jsonBounds)
+
 	newProject := &data.Project{
-		Name:        payload.Project.Name,
-		Description: payload.Project.Description,
-		Goal:        goal,
-		Location:    location,
-		Tags:        tags,
-		Privacy:     privacy,
+		Name:         payload.Project.Name,
+		Description:  payload.Project.Description,
+		Goal:         goal,
+		Bounds:       &jsonTextBounds,
+		ShowStations: showStations,
+		Location:     location,
+		Tags:         tags,
+		Privacy:      privacy,
 	}
 
 	if start, err := tryParseDate(payload.Project.StartTime); err == nil {
@@ -113,14 +126,24 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 		privacy = data.PrivacyType(*payload.Project.Privacy)
 	}
 
+	showStations := false
+	if payload.Project.ShowStations != nil {
+		showStations = bool(*payload.Project.ShowStations)
+	}
+
+	jsonBounds, err := json.Marshal(payload.Project.Bounds)
+	jsonTextBounds := types.JSONText(jsonBounds)
+
 	updating := &data.Project{
-		ID:          payload.ProjectID,
-		Name:        payload.Project.Name,
-		Description: payload.Project.Description,
-		Goal:        goal,
-		Location:    location,
-		Tags:        tags,
-		Privacy:     privacy,
+		ID:           payload.ProjectID,
+		Name:         payload.Project.Name,
+		Description:  payload.Project.Description,
+		Goal:         goal,
+		Bounds:       &jsonTextBounds,
+		ShowStations: showStations,
+		Location:     location,
+		Tags:         tags,
+		Privacy:      privacy,
 	}
 
 	if start, err := tryParseDate(payload.Project.StartTime); err == nil {
@@ -132,7 +155,7 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 
 	if err := c.options.Database.NamedGetContext(ctx, updating, `
 		UPDATE fieldkit.project SET name = :name, description = :description, goal = :goal, location = :location,
-		tags = :tags, privacy = :privacy, start_time = :start_time, end_time = :end_time WHERE id = :id RETURNING *`, updating); err != nil {
+		tags = :tags, privacy = :privacy, start_time = :start_time, end_time = :end_time, bounds = :bounds, show_stations = :show_stations WHERE id = :id RETURNING *`, updating); err != nil {
 		return nil, err
 	}
 
@@ -180,19 +203,7 @@ func (c *ProjectService) RemoveStation(ctx context.Context, payload *project.Rem
 }
 
 func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (*project.Project, error) {
-	relationships := make(map[int32]*data.UserProjectRelationship)
-
-	p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err == nil {
-		relationships, err = c.projects.QueryUserProjectRelationships(ctx, p.UserID())
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if relationships[payload.ProjectID] == nil {
-		relationships[payload.ProjectID] = &data.UserProjectRelationship{}
-	}
+	log := Logger(ctx).Sugar()
 
 	getting := &data.Project{}
 	if err := c.options.Database.GetContext(ctx, getting, `
@@ -202,6 +213,30 @@ func (c *ProjectService) Get(ctx context.Context, payload *project.GetPayload) (
 			return nil, project.MakeNotFound(errors.New("not found"))
 		}
 		return nil, err
+	}
+
+	log.Infow("checking", "privacy", getting.Privacy)
+
+	p, err := NewPermissions(ctx, c.options).ForProject(getting)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.CanView(); err != nil {
+		return nil, err
+	}
+
+	relationships := make(map[int32]*data.UserProjectRelationship)
+
+	if !p.Anonymous() {
+		relationships, err = c.projects.QueryUserProjectRelationships(ctx, p.UserID())
+		if err != nil {
+			return nil, err
+		}
+
+		if relationships[payload.ProjectID] == nil {
+			relationships[payload.ProjectID] = &data.UserProjectRelationship{}
+		}
 	}
 
 	followerSummaries := []*data.FollowersSummary{}
@@ -223,7 +258,10 @@ func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.Lis
 	relationships := make(map[int32]*data.UserProjectRelationship)
 
 	p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err == nil {
+	if err != nil {
+		return nil, err
+	}
+	if !p.Anonymous() {
 		relationships, err = c.projects.QueryUserProjectRelationships(ctx, p.UserID())
 		if err != nil {
 			return nil, err
@@ -232,7 +270,7 @@ func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.Lis
 
 	projects := []*data.Project{}
 	if err := c.options.Database.SelectContext(ctx, &projects, `
-		SELECT p.* FROM fieldkit.project AS p WHERE p.privacy = $1 ORDER BY p.name LIMIT 10
+		SELECT p.* FROM fieldkit.project AS p WHERE p.privacy = $1 ORDER BY p.community_ranking DESC LIMIT 10
 		`, data.Public); err != nil {
 		return nil, err
 	}
@@ -240,7 +278,7 @@ func (c *ProjectService) ListCommunity(ctx context.Context, payload *project.Lis
 	followers := []*data.FollowersSummary{}
 	if err := c.options.Database.SelectContext(ctx, &followers, `
 		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (
-			SELECT id FROM fieldkit.project WHERE privacy = $1 ORDER BY name LIMIT 10
+			SELECT id FROM fieldkit.project WHERE privacy = $1 ORDER BY community_ranking DESC LIMIT 10
 		) GROUP BY f.project_id
 		`, data.Public); err != nil {
 		return nil, err
@@ -810,11 +848,25 @@ func (s *ProjectService) UploadPhoto(ctx context.Context, payload *project.Uploa
 }
 
 func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.DownloadPhotoPayload) (*project.DownloadedPhoto, error) {
+	log := Logger(ctx).Sugar()
+
+	// TODO Maybe make a separate type with fewer columns?
 	resource := &data.Project{}
 	if err := s.options.Database.GetContext(ctx, resource, `
-		SELECT media_url, media_content_type FROM fieldkit.project WHERE id = $1
+		SELECT id, privacy, media_url, media_content_type FROM fieldkit.project WHERE id = $1
 		`, payload.ProjectID); err != nil {
 		return nil, err
+	}
+
+	if resource.Privacy != data.Public {
+		p, err := NewPermissions(ctx, s.options).ForProjectByID(payload.ProjectID)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := p.CanView(); err != nil {
+			return nil, err
+		}
 	}
 
 	if resource.MediaURL == nil || resource.MediaContentType == nil {
@@ -838,6 +890,7 @@ func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.Dow
 	mr := repositories.NewMediaRepository(s.options.MediaFiles)
 	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
 	if err != nil {
+		log.Error("load-by-url:error", "error", err)
 		return nil, project.MakeNotFound(errors.New("not found"))
 	}
 
@@ -881,7 +934,14 @@ func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *secu
 }
 
 func ProjectType(signer *Signer, dm *data.Project, numberOfFollowers int32, userRelationship *data.UserProjectRelationship) (*project.Project, error) {
-	role := userRelationship.LookupRole()
+	readOnly := true
+	following := false // TODO Nil default?
+
+	if userRelationship != nil {
+		role := userRelationship.LookupRole()
+		readOnly = role.IsProjectReadOnly()
+		following = userRelationship.Following
+	}
 
 	var photoUrl *string
 	if dm.MediaURL != nil {
@@ -889,19 +949,29 @@ func ProjectType(signer *Signer, dm *data.Project, numberOfFollowers int32, user
 		photoUrl = &url
 	}
 
+	var bounds project.ProjectBounds
+	if dm.Bounds != nil {
+		err := json.Unmarshal(*dm.Bounds, &bounds)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	wm := &project.Project{
-		ID:          dm.ID,
-		Name:        dm.Name,
-		Description: dm.Description,
-		Goal:        dm.Goal,
-		Location:    dm.Location,
-		Tags:        dm.Tags,
-		Privacy:     int32(dm.Privacy),
-		Photo:       photoUrl,
-		ReadOnly:    role.IsProjectReadOnly(),
+		ID:           dm.ID,
+		Name:         dm.Name,
+		Description:  dm.Description,
+		Goal:         dm.Goal,
+		Location:     dm.Location,
+		Tags:         dm.Tags,
+		Privacy:      int32(dm.Privacy),
+		Photo:        photoUrl,
+		ReadOnly:     readOnly,
+		Bounds:       &bounds,
+		ShowStations: dm.ShowStations,
 		Following: &project.ProjectFollowing{
 			Total:     numberOfFollowers,
-			Following: userRelationship.Following,
+			Following: following,
 		},
 	}
 

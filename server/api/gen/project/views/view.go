@@ -83,18 +83,26 @@ type ProjectCollectionView []*ProjectView
 
 // ProjectView is a type that runs validations on a projected type.
 type ProjectView struct {
-	ID          *int32
-	Name        *string
-	Description *string
-	Goal        *string
-	Location    *string
-	Tags        *string
-	Privacy     *int32
-	StartTime   *string
-	EndTime     *string
-	Photo       *string
-	ReadOnly    *bool
-	Following   *ProjectFollowingView
+	ID           *int32
+	Name         *string
+	Description  *string
+	Goal         *string
+	Location     *string
+	Tags         *string
+	Privacy      *int32
+	StartTime    *string
+	EndTime      *string
+	Photo        *string
+	ReadOnly     *bool
+	ShowStations *bool
+	Bounds       *ProjectBoundsView
+	Following    *ProjectFollowingView
+}
+
+// ProjectBoundsView is a type that runs validations on a projected type.
+type ProjectBoundsView struct {
+	Min []float64
+	Max []float64
 }
 
 // ProjectFollowingView is a type that runs validations on a projected type.
@@ -148,6 +156,8 @@ var (
 			"endTime",
 			"photo",
 			"readOnly",
+			"showStations",
+			"bounds",
 			"following",
 		},
 	}
@@ -183,6 +193,8 @@ var (
 			"endTime",
 			"photo",
 			"readOnly",
+			"showStations",
+			"bounds",
 			"following",
 		},
 	}
@@ -353,13 +365,35 @@ func ValidateProjectView(result *ProjectView) (err error) {
 	if result.ReadOnly == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("readOnly", "result"))
 	}
+	if result.ShowStations == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("showStations", "result"))
+	}
+	if result.Bounds == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bounds", "result"))
+	}
 	if result.Following == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("following", "result"))
+	}
+	if result.Bounds != nil {
+		if err2 := ValidateProjectBoundsView(result.Bounds); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	if result.Following != nil {
 		if err2 := ValidateProjectFollowingView(result.Following); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateProjectBoundsView runs the validations defined on ProjectBoundsView.
+func ValidateProjectBoundsView(result *ProjectBoundsView) (err error) {
+	if result.Min == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("min", "result"))
+	}
+	if result.Max == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("max", "result"))
 	}
 	return
 }

@@ -365,6 +365,11 @@ func ValidateUserView(result *UserView) (err error) {
 	if result.Email != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("result.email", *result.Email, goa.FormatEmail))
 	}
+	if result.Email != nil {
+		if utf8.RuneCountInString(*result.Email) > 40 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("result.email", *result.Email, utf8.RuneCountInString(*result.Email), 40, false))
+		}
+	}
 	return
 }
 

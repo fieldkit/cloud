@@ -1,8 +1,8 @@
 <template>
     <div class="readings-simple">
         <template v-if="!loading">
-            <div v-for="sensor in sensors" v-bind:key="sensor.key" class="reading-container">
-                <div class="reading">
+            <div v-for="sensor in sensors" v-bind:key="sensor.labelKey" class="reading-container">
+                <div :class="'reading ' + sensor.classes">
                     <div class="name">{{ $t(sensor.labelKey) }}</div>
                     <div class="value">{{ sensor | prettyReading }}</div>
                     <div class="uom">{{ sensor.unitOfMeasure }}</div>
@@ -17,7 +17,7 @@
 <script lang="ts">
 import _ from "lodash";
 import Vue from "vue";
-import { SensorsResponse } from "@/api";
+import { SensorsResponse, Module } from "@/api";
 
 export enum TrendType {
     Downward,
@@ -28,10 +28,16 @@ export enum TrendType {
 export class SensorReading {
     constructor(
         public readonly labelKey: string,
+        public readonly classes: string,
         public readonly unitOfMeasure: string,
         public readonly reading: number,
-        public readonly trend: TrendType
+        public readonly trend: TrendType,
+        public readonly sensorModule: Module
     ) {}
+
+    public get internal(): boolean {
+        return this.sensorModule.internal;
+    }
 }
 
 export default Vue.extend({
@@ -75,18 +81,22 @@ export default Vue.extend({
 
             return Promise.all([data(), this.allSensorsMemoized()])
                 .then(([data, meta]) => {
+                    const sensorsToModule = _.fromPairs(
+                        _.flatten(meta.modules.map((module) => module.sensors.map((sensor) => [sensor.fullKey, module])))
+                    );
+
                     const idsToKey = _.mapValues(
                         _.keyBy(meta.sensors, (k) => k.id),
                         (v) => v.key
                     );
+
                     const idsToValue = _.mapValues(
                         _.keyBy(data.data, (r) => r.sensorId),
                         (r) => r.value
                     );
+
                     const keysToValue = _(idsToValue)
-                        .map((value, id) => {
-                            return [idsToKey[id], value];
-                        })
+                        .map((value, id) => [idsToKey[id], value])
                         .fromPairs()
                         .value();
 
@@ -96,19 +106,26 @@ export default Vue.extend({
                         .keyBy((s) => s.fullKey)
                         .value();
 
-                    return _(keysToValue)
+                    const readings = _(keysToValue)
                         .map((value, key) => {
                             const sensor = sensorsByKey[key];
-                            if (!sensor) {
-                                throw new Error("no sensor meta");
+                            if (!sensor) throw new Error("no sensor meta");
+                            const classes = [key.replaceAll(".", "-")];
+                            if (sensor.unitOfMeasure == "°") {
+                                classes.push("degrees");
                             }
-                            return new SensorReading(key, sensor.unitOfMeasure, value, TrendType.Steady);
+                            const sensorModule = sensorsToModule[key];
+                            if (!sensorModule) throw new Error("no sensor module");
+                            return new SensorReading(key, classes.join(" "), sensor.unitOfMeasure, value, TrendType.Steady, sensorModule);
                         })
                         .value();
+
+                    return readings.filter((sr) => !sr.internal);
                 })
                 .then((sensors) => {
                     this.sensors = sensors;
                     this.loading = false;
+                    this.$emit("layoutChange");
                     return this.sensors;
                 });
         },
@@ -156,5 +173,9 @@ export default Vue.extend({
 .reading .uom {
     font-size: 10px;
     margin-bottom: -3px;
+}
+.reading.degrees .uom {
+    align-self: start;
+    padding-top: 5px;
 }
 </style>

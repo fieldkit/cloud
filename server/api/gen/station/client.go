@@ -25,10 +25,11 @@ type Client struct {
 	ListAllEndpoint       goa.Endpoint
 	DeleteEndpoint        goa.Endpoint
 	AdminSearchEndpoint   goa.Endpoint
+	ProgressEndpoint      goa.Endpoint
 }
 
 // NewClient initializes a "station" service client given the endpoints.
-func NewClient(add, get, transfer, update, listMine, listProject, downloadPhoto, listAll, delete_, adminSearch goa.Endpoint) *Client {
+func NewClient(add, get, transfer, update, listMine, listProject, downloadPhoto, listAll, delete_, adminSearch, progress goa.Endpoint) *Client {
 	return &Client{
 		AddEndpoint:           add,
 		GetEndpoint:           get,
@@ -40,6 +41,7 @@ func NewClient(add, get, transfer, update, listMine, listProject, downloadPhoto,
 		ListAllEndpoint:       listAll,
 		DeleteEndpoint:        delete_,
 		AdminSearchEndpoint:   adminSearch,
+		ProgressEndpoint:      progress,
 	}
 }
 
@@ -133,4 +135,14 @@ func (c *Client) AdminSearch(ctx context.Context, p *AdminSearchPayload) (res *P
 		return
 	}
 	return ires.(*PageOfStations), nil
+}
+
+// Progress calls the "progress" endpoint of the "station" service.
+func (c *Client) Progress(ctx context.Context, p *ProgressPayload) (res *StationProgress, err error) {
+	var ires interface{}
+	ires, err = c.ProgressEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*StationProgress), nil
 }

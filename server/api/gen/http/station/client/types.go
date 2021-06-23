@@ -52,6 +52,8 @@ type AddResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	SyncedAt           *int64                             `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                             `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -77,6 +79,8 @@ type GetResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	SyncedAt           *int64                             `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                             `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -102,6 +106,8 @@ type UpdateResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	SyncedAt           *int64                             `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                             `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -138,6 +144,12 @@ type ListAllResponseBody struct {
 type AdminSearchResponseBody struct {
 	Stations []*EssentialStationResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
 	Total    *int32                          `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
+}
+
+// ProgressResponseBody is the type of the "station" service "progress"
+// endpoint HTTP response body.
+type ProgressResponseBody struct {
+	Jobs []*StationJobResponseBody `form:"jobs,omitempty" json:"jobs,omitempty" xml:"jobs,omitempty"`
 }
 
 // AddStationOwnerConflictResponseBody is the type of the "station" service
@@ -878,6 +890,78 @@ type AdminSearchBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// ProgressUnauthorizedResponseBody is the type of the "station" service
+// "progress" endpoint HTTP response body for the "unauthorized" error.
+type ProgressUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ProgressForbiddenResponseBody is the type of the "station" service
+// "progress" endpoint HTTP response body for the "forbidden" error.
+type ProgressForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ProgressNotFoundResponseBody is the type of the "station" service "progress"
+// endpoint HTTP response body for the "not-found" error.
+type ProgressNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ProgressBadRequestResponseBody is the type of the "station" service
+// "progress" endpoint HTTP response body for the "bad-request" error.
+type ProgressBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
 	ID   *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -998,6 +1082,8 @@ type StationFullResponseBody struct {
 	PlaceNameOther     *string                            `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                            `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
 	Location           *StationLocationResponseBody       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	SyncedAt           *int64                             `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                             `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody    `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
@@ -1016,6 +1102,14 @@ type EssentialStationResponseBody struct {
 	FirmwareTime       *int64                       `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
 	Location           *StationLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	LastIngestionAt    *int64                       `form:"lastIngestionAt,omitempty" json:"lastIngestionAt,omitempty" xml:"lastIngestionAt,omitempty"`
+}
+
+// StationJobResponseBody is used to define fields on response body types.
+type StationJobResponseBody struct {
+	Title       *string  `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
+	StartedAt   *int64   `form:"startedAt,omitempty" json:"startedAt,omitempty" xml:"startedAt,omitempty"`
+	CompletedAt *int64   `form:"completedAt,omitempty" json:"completedAt,omitempty" xml:"completedAt,omitempty"`
+	Progress    *float32 `form:"progress,omitempty" json:"progress,omitempty" xml:"progress,omitempty"`
 }
 
 // NewAddRequestBody builds the HTTP request body from the payload of the "add"
@@ -1059,6 +1153,8 @@ func NewAddStationFullOK(body *AddResponseBody) *stationviews.StationFullView {
 		LocationName:       body.LocationName,
 		PlaceNameOther:     body.PlaceNameOther,
 		PlaceNameNative:    body.PlaceNameNative,
+		SyncedAt:           body.SyncedAt,
+		IngestionAt:        body.IngestionAt,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -1166,6 +1262,8 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 		LocationName:       body.LocationName,
 		PlaceNameOther:     body.PlaceNameOther,
 		PlaceNameNative:    body.PlaceNameNative,
+		SyncedAt:           body.SyncedAt,
+		IngestionAt:        body.IngestionAt,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -1318,6 +1416,8 @@ func NewUpdateStationFullOK(body *UpdateResponseBody) *stationviews.StationFullV
 		LocationName:       body.LocationName,
 		PlaceNameOther:     body.PlaceNameOther,
 		PlaceNameNative:    body.PlaceNameNative,
+		SyncedAt:           body.SyncedAt,
+		IngestionAt:        body.IngestionAt,
 	}
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Uploads = make([]*stationviews.StationUploadView, len(body.Uploads))
@@ -1805,6 +1905,78 @@ func NewAdminSearchNotFound(body *AdminSearchNotFoundResponseBody) *goa.ServiceE
 // NewAdminSearchBadRequest builds a station service admin search endpoint
 // bad-request error.
 func NewAdminSearchBadRequest(body *AdminSearchBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewProgressStationProgressOK builds a "station" service "progress" endpoint
+// result from a HTTP "OK" response.
+func NewProgressStationProgressOK(body *ProgressResponseBody) *stationviews.StationProgressView {
+	v := &stationviews.StationProgressView{}
+	v.Jobs = make([]*stationviews.StationJobView, len(body.Jobs))
+	for i, val := range body.Jobs {
+		v.Jobs[i] = unmarshalStationJobResponseBodyToStationviewsStationJobView(val)
+	}
+
+	return v
+}
+
+// NewProgressUnauthorized builds a station service progress endpoint
+// unauthorized error.
+func NewProgressUnauthorized(body *ProgressUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewProgressForbidden builds a station service progress endpoint forbidden
+// error.
+func NewProgressForbidden(body *ProgressForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewProgressNotFound builds a station service progress endpoint not-found
+// error.
+func NewProgressNotFound(body *ProgressNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewProgressBadRequest builds a station service progress endpoint bad-request
+// error.
+func NewProgressBadRequest(body *ProgressBadRequestResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -2801,6 +2973,102 @@ func ValidateAdminSearchBadRequestResponseBody(body *AdminSearchBadRequestRespon
 	return
 }
 
+// ValidateProgressUnauthorizedResponseBody runs the validations defined on
+// progress_unauthorized_response_body
+func ValidateProgressUnauthorizedResponseBody(body *ProgressUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateProgressForbiddenResponseBody runs the validations defined on
+// progress_forbidden_response_body
+func ValidateProgressForbiddenResponseBody(body *ProgressForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateProgressNotFoundResponseBody runs the validations defined on
+// progress_not-found_response_body
+func ValidateProgressNotFoundResponseBody(body *ProgressNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateProgressBadRequestResponseBody runs the validations defined on
+// progress_bad-request_response_body
+func ValidateProgressBadRequestResponseBody(body *ProgressBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
 // ValidateStationOwnerResponseBody runs the validations defined on
 // StationOwnerResponseBody
 func ValidateStationOwnerResponseBody(body *StationOwnerResponseBody) (err error) {
@@ -3129,6 +3397,21 @@ func ValidateEssentialStationResponseBody(body *EssentialStationResponseBody) (e
 		if err2 := ValidateStationLocationResponseBody(body.Location); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateStationJobResponseBody runs the validations defined on StationJob
+// ResponseBody
+func ValidateStationJobResponseBody(body *StationJobResponseBody) (err error) {
+	if body.StartedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("startedAt", "body"))
+	}
+	if body.Progress == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("progress", "body"))
+	}
+	if body.Title == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("title", "body"))
 	}
 	return
 }

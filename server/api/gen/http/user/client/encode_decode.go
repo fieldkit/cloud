@@ -998,6 +998,139 @@ func DecodeRecoveryResponse(decoder func(*http.Response) goahttp.Decoder, restor
 	}
 }
 
+// BuildResumeRequest instantiates a HTTP request object with method and path
+// set to call the "user" service "resume" endpoint
+func (c *Client) BuildResumeRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ResumeUserPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("user", "resume", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeResumeRequest returns an encoder for requests sent to the user resume
+// server.
+func EncodeResumeRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*user.ResumePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("user", "resume", "*user.ResumePayload", v)
+		}
+		body := p
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("user", "resume", err)
+		}
+		return nil
+	}
+}
+
+// DecodeResumeResponse returns a decoder for responses returned by the user
+// resume endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeResumeResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeResumeResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusNoContent:
+			var (
+				authorization string
+				err           error
+			)
+			authorizationRaw := resp.Header.Get("Authorization")
+			if authorizationRaw == "" {
+				err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+			}
+			authorization = authorizationRaw
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "resume", err)
+			}
+			res := NewResumeResultNoContent(authorization)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body ResumeUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "resume", err)
+			}
+			err = ValidateResumeUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "resume", err)
+			}
+			return nil, NewResumeUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ResumeForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "resume", err)
+			}
+			err = ValidateResumeForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "resume", err)
+			}
+			return nil, NewResumeForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ResumeNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "resume", err)
+			}
+			err = ValidateResumeNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "resume", err)
+			}
+			return nil, NewResumeNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ResumeBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "resume", err)
+			}
+			err = ValidateResumeBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "resume", err)
+			}
+			return nil, NewResumeBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("user", "resume", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildLogoutRequest instantiates a HTTP request object with method and path
 // set to call the "user" service "logout" endpoint
 func (c *Client) BuildLogoutRequest(ctx context.Context, v interface{}) (*http.Request, error) {

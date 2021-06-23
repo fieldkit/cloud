@@ -1,12 +1,24 @@
 import _ from "lodash";
+import moment, { Moment } from "moment";
 import { SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
-import { Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
+import { ModuleID, SensorSpec, Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
+import i18n from "@/i18n";
 import FKApi from "@/api/api";
+
+export * from "./common";
 
 import { ColorScale, createSensorColorScale } from "./d3-helpers";
 
+type SensorReadAtType = string;
+
 export class SensorMeta {
-    constructor(public readonly id: number, public readonly fullKey: string, public readonly name: string) {}
+    constructor(
+        public readonly moduleId: ModuleID,
+        public readonly moduleKey: string,
+        public readonly sensorId: number,
+        public readonly sensorKey: string,
+        public readonly sensorReadAt: SensorReadAtType
+    ) {}
 }
 
 export class StationMeta {
@@ -17,12 +29,22 @@ export class StationMeta {
     }
 }
 
-export class TreeOption {
+export interface HasSensorParams {
+    readonly sensorParams: SensorParams;
+}
+
+export class StationTreeOption {
+    constructor(public readonly id: string | number, public readonly label: string) {}
+}
+
+export class SensorTreeOption {
     constructor(
-        public readonly id: string,
+        public readonly id: string | number,
         public readonly label: string,
-        public readonly sensorParams: SensorParams,
-        public readonly children: TreeOption[] | undefined = undefined
+        public readonly children: SensorTreeOption[] | undefined = undefined,
+        public readonly moduleId: ModuleID,
+        public readonly sensorId: number | null,
+        public readonly age: Moment
     ) {}
 }
 
@@ -70,7 +92,7 @@ export class QueriedData {
 }
 
 export class VizInfo {
-    constructor(public readonly colorScale: ColorScale, public readonly station: { name: string }) {}
+    constructor(public readonly key: string, public readonly colorScale: ColorScale, public readonly station: { name: string }) {}
 }
 
 export abstract class Viz {
@@ -153,8 +175,8 @@ export class Bookmark {
         return _.uniq(_.flatten(this.allVizes.map((viz) => viz[0] || [])));
     }
 
-    public get allSensors(): number[] {
-        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1] || [])));
+    public get allSensors(): SensorSpec[] {
+        return _.uniq(_.flatten(this.allVizes.map((viz) => viz[1] || [])).map((sensorAndModule) => sensorAndModule));
     }
 
     public static sameAs(a: Bookmark, b: Bookmark): boolean {
@@ -180,8 +202,16 @@ export class Graph extends Viz {
     public fastTime: FastTime = FastTime.All;
     public geo: GeoZoom | null = null;
 
+    public get visibleTimeRange(): TimeRange {
+        if (this.graphing) {
+            return new TimeRange(this.graphing.timeRange[0], this.graphing.timeRange[1]);
+        }
+        return this.visible;
+    }
+
     constructor(public chartParams: DataQueryParams) {
         super();
+        if (this.chartParams.sensors.length != 1) throw new Error(`viz: Graph too many sensors`);
     }
 
     public clone(): Viz {
@@ -234,7 +264,8 @@ export class Graph extends Viz {
         this.chartType = chartType;
     }
 
-    public changeSensors(option: TreeOption) {
+    public changeSensors(option: HasSensorParams) {
+        console.log(`changing-sensors`, option);
         const sensorParams = option.sensorParams;
         this.chartParams = new DataQueryParams(this.chartParams.when, sensorParams.stations, sensorParams.sensors);
         this.all = null;
@@ -408,13 +439,6 @@ export class Querier {
         return new FKApi()
             .sensorData(queryParams)
             .then((sdr: SensorDataResponse) => {
-                // eslint-disable-next-line
-                if (false) {
-                    console.log(
-                        `queried-data`,
-                        sdr.data.filter((r) => _.isNumber(r.value)).map((r) => r.value)
-                    );
-                }
                 const queried = new QueriedData(params.when, sdr);
                 this.data[key] = queried;
                 return queried;
@@ -427,14 +451,18 @@ export class Querier {
     }
 }
 
+class NewParams implements HasSensorParams {
+    public readonly sensorParams: SensorParams;
+
+    constructor(stationId: number, sensorAndModule: [ModuleID, number]) {
+        this.sensorParams = new SensorParams([stationId], [sensorAndModule]);
+    }
+}
+
 export class Workspace {
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
-    private _options: TreeOption[] = [];
-
-    public get options(): TreeOption[] {
-        return this._options;
-    }
+    public version = 0;
 
     public get empty(): boolean {
         return this.allVizes.length === 0;
@@ -501,10 +529,13 @@ export class Workspace {
             (iq) =>
                 this.querier.queryInfo(iq).then((info) => {
                     return _.map(info.stations, (info, stationId) => {
-                        const name = info[0].name;
-                        const sensors = info.map((row) => new SensorMeta(row.sensorId, row.key, row.key));
-                        const station = new StationMeta(Number(stationId), name, sensors);
+                        const stationName = info[0].stationName;
+                        const sensors = info.map(
+                            (row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt)
+                        );
+                        const station = new StationMeta(Number(stationId), stationName, sensors);
                         this.stations[station.id] = station;
+                        console.log("station-meta", { station, info });
                         return station;
                     });
                 }) as Promise<unknown>
@@ -512,7 +543,8 @@ export class Workspace {
 
         const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq) as Promise<unknown>);
         return Promise.all([...pendingInfo, ...pendingData]).then(() => {
-            this._options = this.updateOptions();
+            // Update options here if doing so lazily.
+            this.version++;
         });
     }
 
@@ -529,14 +561,15 @@ export class Workspace {
         }
 
         const stationId = viz.chartParams.stations[0];
-        const sensorId = viz.chartParams.sensors[0];
+        const sensor = viz.chartParams.sensors[0];
+        const sensorId = sensor[1];
 
         const station = this.stations[stationId];
         const key = keysById[sensorId].key;
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
 
-        return new VizInfo(scale, station);
+        return new VizInfo(key, scale, station);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {
@@ -573,56 +606,70 @@ export class Workspace {
         return this.addGraph(new Graph(new DataQueryParams(TimeRange.eternity, stations, sensors)));
     }
 
-    private updateOptions(): TreeOption[] {
-        console.log("workspace: stations:", this.stations);
+    public get stationOptions(): StationTreeOption[] {
+        return Object.values(this.stations).map((station) => {
+            return new StationTreeOption(station.id, station.name);
+        });
+    }
 
-        const allSensors = _(Object.values(this.stations))
-            .map((station: StationMeta) =>
-                station.sensors.map((sensor) => {
-                    return {
-                        station: station,
-                        sensor: sensor,
-                    };
-                })
-            )
-            .flatten()
-            .value();
+    public sensorOptions(stationId: number): SensorTreeOption[] {
+        const station = this.stations[stationId];
+        if (!station) {
+            console.log(`no-options: no station`);
+            return [];
+        }
+        const allSensors = station.sensors;
+        const allModules = _.groupBy(allSensors, (s) => s.moduleId);
+        const keysById = _.fromPairs(allSensors.map((row) => [row.moduleId, row.moduleKey]));
+        const allModulesByModuleKey = _.keyBy(this.meta.modules, (m) => m.key);
 
-        const options = _(allSensors)
-            .groupBy((s) => s.sensor.fullKey)
-            .values()
-            .map((value) => {
-                const sensor = value[0].sensor;
-                const stations = _(value)
-                    .map((v) => v.station)
-                    .value();
+        // console.log("all-sensors", allSensors);
+        // console.log("all-modules", allModules);
+        // console.log("keys-by-id", keysById);
+        // console.log("all-modules-by-module-key", allModulesByModuleKey);
+        // console.log(station.sensors);
 
-                const label = sensor.fullKey;
-                const stationIds = stations.map((station) => station.id);
-                const sensorIds = [sensor.id];
-                const sensorParams = new SensorParams(sensorIds, stationIds);
-                const children = stations
-                    .map((station) => {
-                        const label = station.name;
-                        const sensorParams = new SensorParams(sensorIds, [station.id]);
-                        return new TreeOption(sensorParams.id, label, sensorParams);
+        const options = _.map(
+            allModules,
+            (sensors, moduleId: ModuleID): StationTreeOption => {
+                const uniqueSensors = _.uniqBy(sensors, (s) => s.sensorId);
+                const children: SensorTreeOption[] = _.flatten(
+                    uniqueSensors.map((row) => {
+                        const age = moment.utc(row.sensorReadAt);
+                        const label = i18n.tc(row.sensorKey) || row.sensorKey;
+                        const optionId = `${row.moduleId}-${row.sensorId}`;
+                        return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId, age)];
                     })
-                    .filter((child) => {
-                        return child.id != sensorParams.id;
-                    });
+                );
+                const moduleKey = keysById[moduleId];
+                const moduleAge = _.max(children.map((c) => c.age));
+                if (!moduleAge) throw new Error(`expected module age: no sensors?`);
 
-                if (children.length == 0) {
-                    const stationName = _.first(stations.map((station) => station.name));
-                    return new TreeOption(sensorParams.id, stationName + " : " + label, sensorParams);
-                }
+                const label = i18n.tc(moduleKey); //  + ` (${moduleAge.fromNow()})`;
+                return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, moduleAge);
+            }
+        );
 
-                return new TreeOption(sensorParams.id, label, sensorParams, children);
-            })
-            .value();
+        const sorted = _.sortBy((options as unknown) as SensorTreeOption[], (option) => {
+            return -option.age.valueOf();
+        });
 
-        console.log("workspace: options:", { options: options });
+        console.log("sensor-tree-options", { sorted: sorted });
 
-        return options;
+        return sorted;
+    }
+
+    public makeParamsForSensorChange(stationId: number, sensor: [ModuleID, number]): HasSensorParams {
+        return new NewParams(stationId, sensor);
+    }
+
+    public makeParamsForStationChange(stationId: number, sensor: [ModuleID, number]): HasSensorParams {
+        const station = this.stations[stationId];
+        if (!station) throw new Error(`no station with id: ${stationId}`);
+        const sensors = station.sensors;
+        if (sensors.length == 0) throw new Error(`no sensors on station with id: ${stationId}`);
+        const stationSensor: [ModuleID, number] = [sensors[0].moduleId, sensors[0].sensorId];
+        return new NewParams(stationId, stationSensor);
     }
 
     public remove(viz: Viz): Workspace {
@@ -644,9 +691,10 @@ export class Workspace {
         return this;
     }
 
-    public changeSensors(viz: Viz, option: TreeOption): Workspace {
+    public changeSensors(viz: Viz, hasParams: HasSensorParams): Workspace {
+        console.log("changing sensors", viz, hasParams);
         if (viz instanceof Graph) {
-            viz.changeSensors(option);
+            viz.changeSensors(hasParams);
         }
         return this;
     }

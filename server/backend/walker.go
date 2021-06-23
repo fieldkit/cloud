@@ -85,10 +85,10 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 
 	rw.statistics = ws
 
-	if ws.Records == 0 {
+	if ws.Records == 0 || ws.Start == nil || ws.End == nil {
 		log.Infow("empty")
 	} else {
-		log.Infow("statistics", "start", ws.Start, "end", ws.End, "records", ws.Records)
+		log.Infow("statistics", "start", *ws.Start, "end", *ws.End, "records", ws.Records)
 	}
 
 	var errors *multierror.Error
@@ -317,6 +317,13 @@ func (rw *RecordWalker) loadProvision(ctx context.Context, id int64) (*data.Prov
 
 func (rw *RecordWalker) loadMeta(ctx context.Context, provision *data.Provision, id int64, handler RecordHandler) (meta *data.MetaRecord, err error) {
 	if rw.metas[id] != nil {
+		// We used to skip this call only we can actually flip flop
+		// between them in rare cases so better be safe and give the
+		// handler a chance to make sure things are still expecting
+		// this meta information.
+		if err := handler.OnMeta(ctx, provision, nil, rw.metas[id]); err != nil {
+			return nil, err
+		}
 		return rw.metas[id], nil
 	}
 

@@ -47,21 +47,27 @@ func NewSensorService(ctx context.Context, options *ControllerOptions) *SensorSe
 	}
 }
 
-type StationSensor struct {
-	SensorID    int64  `db:"sensor_id" json:"sensorId"`
-	StationID   int32  `db:"station_id" json:"-"`
-	StationName string `db:"station_name" json:"name"`
-	Key         string `db:"key" json:"key"`
-}
-
 type DataRow struct {
 	Time      data.NumericWireTime `db:"time" json:"time"`
 	ID        *int64               `db:"id" json:"-"`
 	StationID *int32               `db:"station_id" json:"stationId,omitempty"`
 	SensorID  *int64               `db:"sensor_id" json:"sensorId,omitempty"`
+	ModuleID  *int64               `db:"module_id" json:"moduleId,omitempty"`
 	Location  *data.Location       `db:"location" json:"location,omitempty"`
 	Value     *float64             `db:"value" json:"value,omitempty"`
 	TimeGroup *int32               `db:"time_group" json:"tg,omitempty"`
+}
+
+func scanRow(queried *sqlx.Rows, row *DataRow) error {
+	if err := queried.StructScan(row); err != nil {
+		return fmt.Errorf("error scanning row: %v", err)
+	}
+
+	if row.Value != nil && math.IsNaN(*row.Value) {
+		row.Value = nil
+	}
+
+	return nil
 }
 
 func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sensor.DataResult, error) {
@@ -71,6 +77,7 @@ func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sen
 		time,
 		station_id,
 		sensor_id,
+		module_id,
 		value
 		FROM (
 			SELECT
@@ -97,7 +104,7 @@ func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sen
 
 	for queried.Next() {
 		row := &DataRow{}
-		if err = queried.StructScan(row); err != nil {
+		if err = scanRow(queried, row); err != nil {
 			return nil, err
 		}
 
@@ -116,33 +123,15 @@ func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sen
 }
 
 func (c *SensorService) stationsMeta(ctx context.Context, stations []int32) (*sensor.DataResult, error) {
-	query, args, err := sqlx.In(fmt.Sprintf(`
-		SELECT sensor_id, station_id, s.key, station.name AS station_name
-		FROM %s AS agg
-		JOIN fieldkit.aggregated_sensor AS s ON (s.id = sensor_id)
-		JOIN fieldkit.station AS station ON (agg.station_id = station.id)
-		WHERE station_id IN (?) GROUP BY sensor_id, station_id, s.key, station.name
-		`, "fieldkit.aggregated_24h"), stations)
+	sr := repositories.NewStationRepository(c.db)
+
+	byStation, err := sr.QueryStationSensors(ctx, stations)
 	if err != nil {
 		return nil, err
 	}
 
-	rows := []*StationSensor{}
-	if err := c.db.SelectContext(ctx, &rows, c.db.Rebind(query), args...); err != nil {
-		return nil, err
-	}
-
-	byStation := make(map[int32][]*StationSensor)
-	for _, id := range stations {
-		byStation[int32(id)] = make([]*StationSensor, 0)
-	}
-
-	for _, row := range rows {
-		byStation[row.StationID] = append(byStation[row.StationID], row)
-	}
-
 	data := struct {
-		Stations map[int32][]*StationSensor `json:"stations"`
+		Stations map[int32][]*repositories.StationSensor `json:"stations"`
 	}{
 		byStation,
 	}
@@ -204,12 +193,8 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 
 		for queried.Next() {
 			row := &DataRow{}
-			if err = queried.StructScan(row); err != nil {
+			if err = scanRow(queried, row); err != nil {
 				return nil, err
-			}
-
-			if row.Value != nil && math.IsNaN(*row.Value) {
-				row.Value = nil
 			}
 
 			rows = append(rows, row)

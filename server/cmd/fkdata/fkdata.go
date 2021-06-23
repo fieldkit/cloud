@@ -11,25 +11,43 @@ import (
 
 	_ "github.com/lib/pq"
 
+	"github.com/hashicorp/go-multierror"
+
 	"github.com/conservify/sqlxcache"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+
+	"github.com/govau/que-go"
+	"github.com/jackc/pgx"
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/handlers"
 	"github.com/fieldkit/cloud/server/common/errors"
+	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
+	"github.com/fieldkit/cloud/server/files"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 const SecondsPerWeek = int64(60 * 60 * 24 * 7)
 
 type Options struct {
 	StationID int
+	Ingestion bool
+	Aggregate bool
 	All       bool
 	Recently  bool
 	Fake      bool
 }
 
 type Config struct {
-	PostgresURL string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
+	PostgresURL       string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
+	AwsProfile        string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
+	AwsId             string `split_words:"true" default:""`
+	AwsSecret         string `split_words:"true" default:""`
+	StreamsBucketName string `split_words:"true" default:""`
 }
 
 func fail(ctx context.Context, err error) {
@@ -41,12 +59,38 @@ func fail(ctx context.Context, err error) {
 	panic(err)
 }
 
+func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
+	log := logging.Logger(ctx).Sugar()
+
+	if config.AwsId == "" || config.AwsSecret == "" {
+		log.Infow("using aws profile")
+		return session.Options{
+			Profile: config.AwsProfile,
+			Config: aws.Config{
+				Region:                        aws.String("us-east-1"),
+				CredentialsChainVerboseErrors: aws.Bool(true),
+			},
+		}
+	}
+	log.Infow("using aws credentials")
+	return session.Options{
+		Profile: config.AwsProfile,
+		Config: aws.Config{
+			Region:                        aws.String("us-east-1"),
+			Credentials:                   credentials.NewStaticCredentials(config.AwsId, config.AwsSecret, ""),
+			CredentialsChainVerboseErrors: aws.Bool(true),
+		},
+	}
+}
+
 func main() {
 	ctx := context.Background()
 
 	options := &Options{}
 
 	flag.IntVar(&options.StationID, "station-id", 0, "station id")
+	flag.BoolVar(&options.Ingestion, "ingestion", false, "ingestion")
+	flag.BoolVar(&options.Aggregate, "aggregate", false, "aggregate")
 	flag.BoolVar(&options.All, "all", false, "all stations")
 	flag.BoolVar(&options.Fake, "fake", false, "create a fake data")
 	flag.BoolVar(&options.Recently, "recently", false, "recently inserted data")
@@ -67,35 +111,125 @@ func main() {
 
 	log := logging.Logger(ctx).Sugar()
 
-	if options.StationID > 0 {
-		if options.Fake {
-			if err := generateFake(ctx, db, int32(options.StationID)); err != nil {
+	var errors *multierror.Error
+
+	if options.Ingestion {
+		awsSessionOptions := getAwsSessionOptions(ctx, config)
+
+		awsSession, err := session.NewSessionWithOptions(awsSessionOptions)
+		if err != nil {
+			fail(ctx, err)
+		}
+
+		metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
+			Prefix:  "fk.service",
+			Address: "",
+		})
+
+		reading := make([]files.FileArchive, 0)
+		writing := make([]files.FileArchive, 0)
+
+		fs := files.NewLocalFilesArchive()
+		reading = append(reading, fs)
+		writing = append(writing, fs)
+
+		s3, err := files.NewS3FileArchive(awsSession, metrics, config.StreamsBucketName, files.NoPrefix)
+		if err != nil {
+			fail(ctx, err)
+		}
+
+		reading = append(reading, s3)
+
+		pgxcfg, err := pgx.ParseURI(config.PostgresURL)
+		if err != nil {
+			fail(ctx, err)
+		}
+
+		pgxpool, err := pgx.NewConnPool(pgx.ConnPoolConfig{
+			ConnConfig:   pgxcfg,
+			AfterConnect: que.PrepareStatements,
+		})
+		if err != nil {
+			fail(ctx, err)
+		}
+
+		fa := files.NewPrioritizedFilesArchive(reading, writing)
+
+		qc := que.NewClient(pgxpool)
+		publisher := jobs.NewQueMessagePublisher(metrics, qc)
+
+		isHandler := backend.NewIngestStationHandler(db, fa, metrics, publisher)
+
+		process := func(ctx context.Context, id int32) error {
+			return isHandler.Handle(ctx, &messages.IngestStation{
+				StationID: id,
+				UserID:    2, // Jacob
+				Verbose:   true,
+			})
+		}
+
+		if options.All {
+			ids := []*IDRow{}
+			if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {
 				fail(ctx, err)
 			}
+
+			for _, id := range ids {
+				log.Infow("station", "station_id", id.ID)
+				err := process(ctx, int32(id.ID))
+				if err != nil {
+					errors = multierror.Append(errors, err)
+				}
+			}
 		} else {
-			if err := processStation(ctx, db, int32(options.StationID), options.Recently); err != nil {
+			err := process(ctx, int32(options.StationID))
+			if err != nil {
+				errors = multierror.Append(errors, err)
+			}
+		}
+
+		if errors.ErrorOrNil() != nil {
+			fail(ctx, errors.ErrorOrNil())
+		}
+
+		return
+	}
+
+	if options.Aggregate {
+		if options.All {
+			ids := []*IDRow{}
+			if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {
 				fail(ctx, err)
+			} else {
+				for _, id := range ids {
+					log.Infow("station", "station_id", id.ID)
+					if err := processStation(ctx, db, int32(id.ID), options.Recently); err != nil {
+						errors = multierror.Append(errors, err)
+					}
+				}
+			}
+		} else {
+			if options.StationID > 0 {
+				if options.Fake {
+					if err := generateFake(ctx, db, int32(options.StationID)); err != nil {
+						errors = multierror.Append(errors, err)
+					}
+				} else {
+					if err := processStation(ctx, db, int32(options.StationID), options.Recently); err != nil {
+						errors = multierror.Append(errors, err)
+					}
+				}
 			}
 		}
 	}
 
-	if options.All {
-		ids := []*IDRow{}
-		if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {
-			fail(ctx, err)
-		}
-
-		for _, id := range ids {
-			log.Infow("station", "station_id", id.ID)
-			if err := processStation(ctx, db, int32(id.ID), options.Recently); err != nil {
-				fail(ctx, err)
-			}
-		}
+	if errors.ErrorOrNil() != nil {
+		fail(ctx, errors.ErrorOrNil())
 	}
 }
 
 func processStation(ctx context.Context, db *sqlxcache.DB, stationID int32, recently bool) error {
-	sr, err := backend.NewStationRefresher(db)
+	sr, err := backend.NewStationRefresher(db, "")
 	if err != nil {
 		return err
 	}
@@ -120,7 +254,7 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 	end := time.Now()
 	interval := time.Minute * 1
 
-	aggregator := handlers.NewAggregator(db, stationID, 1000)
+	aggregator := handlers.NewAggregator(db, "", stationID, 1000)
 
 	sinFunc := func(period int64) SampleFunc {
 		return func(t time.Time) float64 {
@@ -153,7 +287,14 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 
 		for sensorKey, fn := range funcs {
 			value := fn(sampled)
-			if err := aggregator.AddSample(ctx, sampled, location.Coords, sensorKey, value); err != nil {
+			key := handlers.AggregateSensorKey{
+				SensorKey: sensorKey,
+				ModuleID:  int64(0),
+			}
+			if key.ModuleID == 0 {
+				panic("TODO")
+			}
+			if err := aggregator.AddSample(ctx, sampled, location.Coords, key, value); err != nil {
 				return err
 			}
 		}

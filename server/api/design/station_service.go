@@ -139,6 +139,9 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("location", StationLocation)
 		Required("updatedAt")
 
+		Attribute("syncedAt", Int64)
+		Attribute("ingestionAt", Int64)
+
 		Attribute("data", StationDataSummary)
 	})
 	View("default", func() {
@@ -163,6 +166,9 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("locationName")
 		Attribute("placeNameOther")
 		Attribute("placeNameNative")
+
+		Attribute("syncedAt", Int64)
+		Attribute("ingestionAt", Int64)
 
 		Attribute("data")
 	})
@@ -212,6 +218,36 @@ var PageOfStations = ResultType("application/vnd.app.stations.essential.page", f
 	})
 })
 
+var StationJob = ResultType("application/vnd.app.stations.job", func() {
+	TypeName("StationJob ")
+	Attributes(func() {
+		Attribute("title", String)
+		Attribute("startedAt", Int64)
+		Attribute("completedAt", Int64)
+		Attribute("progress", Float32)
+		Required("startedAt")
+		Required("progress")
+		Required("title")
+	})
+	View("default", func() {
+		Attribute("startedAt")
+		Attribute("completedAt")
+		Attribute("progress")
+		Attribute("title")
+	})
+})
+
+var StationProgress = ResultType("application/vnd.app.stations.progress", func() {
+	TypeName("StationProgress ")
+	Attributes(func() {
+		Attribute("jobs", ArrayOf(StationJob))
+		Required("jobs")
+	})
+	View("default", func() {
+		Attribute("jobs")
+	})
+})
+
 var _ = Service("station", func() {
 	Error("station-owner-conflict", func() {
 	})
@@ -244,12 +280,11 @@ var _ = Service("station", func() {
 
 	Method("get", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
 			Attribute("id", Int32)
 			Required("id")
 		})
@@ -330,6 +365,7 @@ var _ = Service("station", func() {
 
 	Method("list project", func() {
 		Security(JWTAuth, func() {
+			// Optional
 		})
 
 		Payload(func() {
@@ -447,6 +483,27 @@ var _ = Service("station", func() {
 			Params(func() {
 				Param("query")
 			})
+
+			httpAuthentication()
+		})
+	})
+
+	Method("progress", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("stationId", Int32)
+			Required("stationId")
+		})
+
+		Result(StationProgress)
+
+		HTTP(func() {
+			GET("stations/{stationId}/progress")
 
 			httpAuthentication()
 		})

@@ -16,11 +16,12 @@ import (
 
 // Endpoints wraps the "ingestion" service endpoints.
 type Endpoints struct {
-	ProcessPending   goa.Endpoint
-	WalkEverything   goa.Endpoint
-	ProcessStation   goa.Endpoint
-	ProcessIngestion goa.Endpoint
-	Delete           goa.Endpoint
+	ProcessPending           goa.Endpoint
+	WalkEverything           goa.Endpoint
+	ProcessStation           goa.Endpoint
+	ProcessStationIngestions goa.Endpoint
+	ProcessIngestion         goa.Endpoint
+	Delete                   goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "ingestion" service with endpoints.
@@ -28,11 +29,12 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		ProcessPending:   NewProcessPendingEndpoint(s, a.JWTAuth),
-		WalkEverything:   NewWalkEverythingEndpoint(s, a.JWTAuth),
-		ProcessStation:   NewProcessStationEndpoint(s, a.JWTAuth),
-		ProcessIngestion: NewProcessIngestionEndpoint(s, a.JWTAuth),
-		Delete:           NewDeleteEndpoint(s, a.JWTAuth),
+		ProcessPending:           NewProcessPendingEndpoint(s, a.JWTAuth),
+		WalkEverything:           NewWalkEverythingEndpoint(s, a.JWTAuth),
+		ProcessStation:           NewProcessStationEndpoint(s, a.JWTAuth),
+		ProcessStationIngestions: NewProcessStationIngestionsEndpoint(s, a.JWTAuth),
+		ProcessIngestion:         NewProcessIngestionEndpoint(s, a.JWTAuth),
+		Delete:                   NewDeleteEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -41,6 +43,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ProcessPending = m(e.ProcessPending)
 	e.WalkEverything = m(e.WalkEverything)
 	e.ProcessStation = m(e.ProcessStation)
+	e.ProcessStationIngestions = m(e.ProcessStationIngestions)
 	e.ProcessIngestion = m(e.ProcessIngestion)
 	e.Delete = m(e.Delete)
 }
@@ -99,6 +102,25 @@ func NewProcessStationEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.En
 			return nil, err
 		}
 		return nil, s.ProcessStation(ctx, p)
+	}
+}
+
+// NewProcessStationIngestionsEndpoint returns an endpoint function that calls
+// the method "process station ingestions" of service "ingestion".
+func NewProcessStationIngestionsEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*ProcessStationIngestionsPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:admin"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.ProcessStationIngestions(ctx, p)
 	}
 }
 

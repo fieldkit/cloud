@@ -63,6 +63,25 @@ var _ = Service("ingestion", func() {
 		})
 	})
 
+	Method("process station ingestions", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("stationId", Int64)
+			Required("stationId")
+		})
+
+		HTTP(func() {
+			POST("data/stations/{stationId}/ingestions/process")
+
+			httpAuthentication()
+		})
+	})
+
 	Method("process ingestion", func() {
 		Security(JWTAuth, func() {
 			Scope("api:admin")

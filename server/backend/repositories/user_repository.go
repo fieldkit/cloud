@@ -2,6 +2,8 @@ package repositories
 
 import (
 	"context"
+	"database/sql"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 
@@ -24,6 +26,28 @@ func (r *UserRepository) QueryByID(ctx context.Context, id int32) (*data.User, e
 	return user, nil
 }
 
+func (r *UserRepository) QueryAdminByEmail(ctx context.Context, email string) (*data.User, error) {
+	user := &data.User{}
+	err := r.db.GetContext(ctx, user, `SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1) AND u.admin`, email)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (r *UserRepository) QueryByEmail(ctx context.Context, email string) (*data.User, error) {
+	user := &data.User{}
+	err := r.db.GetContext(ctx, user, `SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1)`, email)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (r *UserRepository) Search(ctx context.Context, query string) ([]*data.User, error) {
 	likeQuery := "%" + query + "%"
 	users := make([]*data.User, 0)
@@ -31,6 +55,37 @@ func (r *UserRepository) Search(ctx context.Context, query string) ([]*data.User
 		return nil, err
 	}
 	return users, nil
+}
+
+func (r *UserRepository) NewRecoveryToken(ctx context.Context, user *data.User, duration time.Duration) (*data.RecoveryToken, error) {
+	now := time.Now().UTC()
+
+	recoveryToken, err := data.NewRecoveryToken(user.ID, 20, now.Add(duration))
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.recovery_token WHERE user_id = $1`, user.ID); err != nil {
+		return nil, err
+	}
+
+	if _, err := r.db.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.recovery_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
+		`, recoveryToken); err != nil {
+		return nil, err
+	}
+
+	return recoveryToken, nil
+}
+
+func (r *UserRepository) Add(ctx context.Context, user *data.User) error {
+	if err := r.db.NamedGetContext(ctx, user, `
+		INSERT INTO fieldkit.user (name, username, email, password, bio, created_at, updated_at)
+		VALUES (:name, :email, :email, :password, :bio, NOW(), NOW()) RETURNING *
+		`, user); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *UserRepository) Delete(outerCtx context.Context, id int32) (err error) {

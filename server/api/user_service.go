@@ -10,6 +10,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/viper"
+
+	"github.com/Nerzal/gocloak/v7"
+
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"goa.design/goa/v3/security"
 
@@ -19,17 +23,52 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+var (
+	ErrNoConfig = errors.New("insufficient config")
+)
+
+const (
+	KeycloakPortalIDAttribute = "portal_id"
+	OurAudience               = ""
+)
+
 type UserService struct {
 	options *ControllerOptions
 }
 
 func NewUserService(ctx context.Context, options *ControllerOptions) *UserService {
+	config := NewKeycloakConfig()
+	log := Logger(ctx).Sugar()
+	log.Infow("keycloak", "realm", config.Realm, "url", config.URL)
 	return &UserService{options: options}
 }
 
-func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*user.LoginResult, error) {
-	now := time.Now()
+func (s *UserService) loggedInReturnToken(ctx context.Context, authed *data.User) (string, error) {
+	now := time.Now().UTC()
 
+	refreshToken, err := data.NewRefreshToken(authed.ID, 20, now.Add(data.RefreshTokenTtl))
+	if err != nil {
+		return "", err
+	}
+
+	if _, err := s.options.Database.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.refresh_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
+		`, refreshToken); err != nil {
+		return "", user.MakeUnauthorized(errors.New("invalid email or password"))
+	}
+
+	token := authed.NewToken(now, refreshToken)
+	signedToken, err := token.SignedString(s.options.JWTHMACKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to sign token: %s", err) // internal error
+	}
+
+	s.options.Metrics.AuthSuccess()
+
+	return signedToken, nil
+}
+
+func (s *UserService) loginForUser(ctx context.Context, payload *user.LoginPayload) (*data.User, error) {
 	s.options.Metrics.AuthTry()
 
 	authed, err := s.authenticateOrSpoof(ctx, payload.Login.Email, payload.Login.Password)
@@ -46,24 +85,19 @@ func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*u
 		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
 	}
 
-	refreshToken, err := data.NewRefreshToken(authed.ID, 20, now.Add(data.RefreshTokenTtl))
+	return authed, nil
+}
+
+func (s *UserService) Login(ctx context.Context, payload *user.LoginPayload) (*user.LoginResult, error) {
+	authed, err := s.loginForUser(ctx, payload)
 	if err != nil {
 		return nil, err
 	}
 
-	if _, err := s.options.Database.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.refresh_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
-		`, refreshToken); err != nil {
-		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
-	}
-
-	token := authed.NewToken(now, refreshToken)
-	signedToken, err := token.SignedString(s.options.JWTHMACKey)
+	signedToken, err := s.loggedInReturnToken(ctx, authed)
 	if err != nil {
-		return nil, fmt.Errorf("failed to sign token: %s", err) // internal error
+		return nil, err
 	}
-
-	s.options.Metrics.AuthSuccess()
 
 	return &user.LoginResult{
 		Authorization: "Bearer " + signedToken,
@@ -105,14 +139,13 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 		return nil, err
 	}
 
-	if err := s.options.Database.NamedGetContext(ctx, user, `
-		INSERT INTO fieldkit.user (name, username, email, password, bio, created_at, updated_at)
-		VALUES (:name, :email, :email, :password, :bio, NOW(), NOW()) RETURNING *
-		`, user); err != nil {
+	ur := repositories.NewUserRepository(s.options.Database)
+
+	if err := ur.Add(ctx, user); err != nil {
 		return nil, err
 	}
 
-	validationToken, err := data.NewValidationToken(user.ID, 20, time.Now().Add(data.ValidationTokenTtl))
+	validationToken, err := data.NewValidationToken(user.ID, 20, time.Now().UTC().Add(data.ValidationTokenTtl))
 	if err != nil {
 		return nil, err
 	}
@@ -121,6 +154,17 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 		INSERT INTO fieldkit.validation_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
 		`, validationToken); err != nil {
 		return nil, err
+	}
+
+	if as, err := NewAuthServer(); err != nil {
+		if err != ErrNoConfig {
+			return nil, err
+		}
+		log.Infow("keycloak-no-config", "error", err)
+	} else {
+		if err := as.UpdateAuthentication(ctx, user, payload.User.Password); err != nil {
+			log.Errorw("keycloak-update-authentication", "user_id", user.ID, "error", err)
+		}
 	}
 
 	if err := s.options.Emailer.SendValidationToken(user, validationToken); err != nil {
@@ -197,6 +241,17 @@ func (s *UserService) ChangePassword(ctx context.Context, payload *user.ChangePa
 		return nil, err
 	}
 
+	if as, err := NewAuthServer(); err != nil {
+		if err != ErrNoConfig {
+			return nil, err
+		}
+		log.Infow("keycloak-no-config", "error", err)
+	} else {
+		if err := as.UpdateAuthentication(ctx, updating, payload.Change.NewPassword); err != nil {
+			log.Errorw("keycloak-update-authentication", "user_id", updating.ID, "error", err)
+		}
+	}
+
 	if err := s.options.Database.NamedGetContext(ctx, updating, `
 		UPDATE fieldkit.user SET password = :password WHERE id = :id RETURNING *
 		`, updating); err != nil {
@@ -253,6 +308,51 @@ func (s *UserService) ProjectRoles(ctx context.Context) (user.ProjectRoleCollect
 	return roles, nil
 }
 
+func (s *UserService) Resume(ctx context.Context, payload *user.ResumePayload) (*user.ResumeResult, error) {
+	log := Logger(ctx).Sugar()
+
+	token := data.Token{}
+	if err := token.UnmarshalText([]byte(payload.Token)); err != nil {
+		return nil, err
+	}
+
+	log.Infow("resume", "token_raw", payload.Token, "token", token)
+
+	recoveryToken := &data.RecoveryToken{}
+	err := s.options.Database.GetContext(ctx, recoveryToken, `SELECT * FROM fieldkit.recovery_token WHERE token = $1`, token)
+	if err == sql.ErrNoRows {
+		log.Infow("recovery, token bad")
+		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	now := time.Now().UTC()
+	if now.After(recoveryToken.Expires) {
+		log.Infow("recovery, token expired", "token_expires", recoveryToken.Expires, "now", now)
+		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
+	}
+
+	trying := &data.User{}
+	err = s.options.Database.GetContext(ctx, trying, `SELECT * FROM fieldkit.user WHERE id = $1`, recoveryToken.UserID)
+	if err == sql.ErrNoRows {
+		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	signedToken, err := s.loggedInReturnToken(ctx, trying)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user.ResumeResult{
+		Authorization: "Bearer " + signedToken,
+	}, nil
+}
+
 func (s *UserService) Recovery(ctx context.Context, payload *user.RecoveryPayload) error {
 	log := Logger(ctx).Sugar()
 
@@ -280,9 +380,7 @@ func (s *UserService) Recovery(ctx context.Context, payload *user.RecoveryPayloa
 	}
 
 	trying := &data.User{}
-	err = s.options.Database.GetContext(ctx, trying, `
-		SELECT * FROM fieldkit.user WHERE id = $1
-		`, recoveryToken.UserID)
+	err = s.options.Database.GetContext(ctx, trying, `SELECT * FROM fieldkit.user WHERE id = $1`, recoveryToken.UserID)
 	if err == sql.ErrNoRows {
 		return nil
 	}
@@ -323,21 +421,11 @@ func (s *UserService) RecoveryLookup(ctx context.Context, payload *user.Recovery
 		return nil
 	}
 
-	now := time.Now().UTC()
-
-	recoveryToken, err := data.NewRecoveryToken(trying.ID, 20, now.Add(data.RecoveryTokenTtl))
+	users := repositories.NewUserRepository(s.options.Database)
+	recoveryToken, err := users.NewRecoveryToken(ctx, trying, data.RecoveryTokenTtl)
 	if err != nil {
-		return err
-	}
-
-	if _, err := s.options.Database.ExecContext(ctx, `DELETE FROM fieldkit.recovery_token WHERE user_id = $1`, trying.ID); err != nil {
-		return err
-	}
-
-	if _, err := s.options.Database.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.recovery_token (token, user_id, expires) VALUES (:token, :user_id, :expires)
-		`, recoveryToken); err != nil {
-		return err
+		log.Errorw("recovery", "error", err)
+		return nil
 	}
 
 	if err := s.options.Emailer.SendRecoveryToken(trying, recoveryToken); err != nil {
@@ -352,16 +440,20 @@ func (s *UserService) RecoveryLookup(ctx context.Context, payload *user.Recovery
 }
 
 func (s *UserService) Refresh(ctx context.Context, payload *user.RefreshPayload) (*user.RefreshResult, error) {
+	log := Logger(ctx).Sugar()
+
 	s.options.Metrics.AuthRefreshTry()
 
 	token := data.Token{}
 	if err := token.UnmarshalText([]byte(payload.RefreshToken)); err != nil {
+		log.Infow("refresh-error-unmarshal")
 		return nil, err
 	}
 
 	refreshToken := &data.RefreshToken{}
 	err := s.options.Database.GetContext(ctx, refreshToken, `SELECT * FROM fieldkit.refresh_token WHERE token = $1`, token)
 	if err == sql.ErrNoRows {
+		log.Infow("refresh-unknown-token")
 		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
 	}
 	if err != nil {
@@ -369,13 +461,15 @@ func (s *UserService) Refresh(ctx context.Context, payload *user.RefreshPayload)
 	}
 
 	now := time.Now().UTC()
-	if now.After(refreshToken.Expires) {
+	if now.After(refreshToken.Expires.UTC()) {
+		log.Infow("refresh-expired", "expires", refreshToken.Expires.UTC(), "now", now)
 		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
 	}
 
 	trying := &data.User{}
 	err = s.options.Database.GetContext(ctx, trying, `SELECT * FROM fieldkit.user WHERE id = $1`, refreshToken.UserID)
 	if err == sql.ErrNoRows {
+		log.Infow("refresh-no-user")
 		return nil, user.MakeUnauthorized(errors.New("unauthorized"))
 	}
 	if err != nil {
@@ -424,7 +518,7 @@ func (s *UserService) SendValidation(ctx context.Context, payload *user.SendVali
 
 	// TODO Rate limit the number of these we can send?
 	if !updating.Valid {
-		validationToken, err := data.NewValidationToken(updating.ID, 20, time.Now().Add(data.ValidationTokenTtl))
+		validationToken, err := data.NewValidationToken(updating.ID, 20, time.Now().UTC().Add(data.ValidationTokenTtl))
 		if err != nil {
 			return err
 		}
@@ -642,6 +736,8 @@ func (s *UserService) UploadPhoto(ctx context.Context, payload *user.UploadPhoto
 }
 
 func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadPhotoPayload) (*user.DownloadedPhoto, error) {
+	log := Logger(ctx).Sugar()
+
 	resource := &data.User{}
 	if err := s.options.Database.GetContext(ctx, resource, `SELECT * FROM fieldkit.user WHERE id = $1`, payload.UserID); err != nil {
 		return nil, err
@@ -668,6 +764,7 @@ func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadP
 	mr := repositories.NewMediaRepository(s.options.MediaFiles)
 	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
 	if err != nil {
+		log.Error("load-by-url:error", "error", err)
 		return nil, user.MakeNotFound(errors.New("not found"))
 	}
 
@@ -800,25 +897,28 @@ func (s *UserService) userExists(ctx context.Context, email string) (bool, error
 }
 
 func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password string) (*data.User, error) {
-	user := &data.User{}
-	err := s.options.Database.GetContext(ctx, user, `SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1)`, email)
-	if err == sql.ErrNoRows {
-		return nil, data.IncorrectPasswordError
-	}
+	users := repositories.NewUserRepository(s.options.Database)
+
+	user, err := users.QueryByEmail(ctx, email)
 	if err != nil {
 		return nil, err
 	}
+	if user == nil {
+		return nil, data.IncorrectPasswordError
+	}
+
+	log := Logger(ctx).Sugar()
 
 	parts := strings.Split(password, " ")
 	if len(parts) == 2 {
-		log := Logger(ctx).Sugar()
-
 		// NOTE Not logging password here, may be a real one.
 		log.Infow("spoofing", "email", email)
 
-		adminUser := &data.User{}
-		err := s.options.Database.GetContext(ctx, adminUser, `SELECT u.* FROM fieldkit.user AS u WHERE LOWER(u.email) = LOWER($1) AND u.admin`, parts[0])
-		if err == nil {
+		adminUser, err := users.QueryAdminByEmail(ctx, parts[0])
+		if err != nil {
+			return nil, err
+		}
+		if adminUser != nil {
 			// We can safely log the user doing the spoofing here.
 			err = adminUser.CheckPassword(parts[1])
 			if err == nil {
@@ -838,9 +938,184 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 		return nil, err
 	}
 
+	if as, err := NewAuthServer(); err != nil {
+		if err != ErrNoConfig {
+			return nil, err
+		}
+		log.Infow("keycloak-no-config", "error", err)
+	} else {
+		if err := as.UpdateAuthentication(ctx, user, password); err != nil {
+			log.Errorw("keycloak-update-authentication", "user_id", user.ID, "error", err)
+		}
+
+		if false {
+			if _, err := as.Login(ctx, user.Email, password); err != nil {
+				log.Errorw("keycloak-login", "user_id", user.ID, "error", err)
+			}
+		}
+	}
+
 	if !user.Valid {
 		return nil, data.UnverifiedUserError
 	}
 
 	return user, nil
+}
+
+func splitName(name string) (first string, last string) {
+	parts := strings.SplitN(name, " ", 2)
+	if len(parts) == 2 {
+		return parts[0], parts[1]
+	}
+	return name, ""
+}
+
+type AuthServer struct {
+	config *KeycloakConfig
+	kc     gocloak.GoCloak
+}
+
+func NewAuthServer() (*AuthServer, error) {
+	config := NewKeycloakConfig()
+
+	if !config.Valid() {
+		return nil, ErrNoConfig
+	}
+
+	kc := gocloak.NewClient(config.URL)
+
+	return &AuthServer{
+		config: config,
+		kc:     kc,
+	}, nil
+}
+
+func (as *AuthServer) Login(ctx context.Context, email, password string) (*gocloak.JWT, error) {
+	log := Logger(ctx).Sugar()
+
+	oidcConfig := NewOidcAuthConfig()
+
+	token, err := as.kc.Login(ctx, oidcConfig.ClientID, oidcConfig.ClientSecret, as.config.Realm, email, password)
+	if err != nil {
+		return nil, err
+	}
+
+	t, d, err := as.kc.DecodeAccessToken(ctx, token.AccessToken, as.config.Realm, OurAudience)
+	if err != nil {
+		return nil, err
+	}
+
+	// log.Infow("oidc", "token", t)
+	// log.Infow("oidc", "decoded", d)
+
+	_ = log
+	_ = t
+	_ = d
+
+	return token, nil
+}
+
+type KeycloakConfig struct {
+	Realm       string
+	URL         string
+	ApiUser     string
+	ApiPassword string
+	ApiRealm    string
+}
+
+func NewKeycloakConfig() *KeycloakConfig {
+	return &KeycloakConfig{
+		URL:         viper.GetString("KEYCLOAK.URL"),
+		Realm:       viper.GetString("KEYCLOAK.REALM"),
+		ApiUser:     viper.GetString("KEYCLOAK.API.USER"),
+		ApiPassword: viper.GetString("KEYCLOAK.API.PASSWORD"),
+		ApiRealm:    viper.GetString("KEYCLOAK.API.REALM"),
+	}
+}
+
+func (c *KeycloakConfig) Valid() bool {
+	return !(c.URL == "" || c.Realm == "" || c.ApiUser == "" || c.ApiPassword == "" || c.ApiRealm == "")
+}
+
+func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User, password string) error {
+	log := Logger(ctx).Sugar().With("user_id", user.ID)
+
+	config := NewKeycloakConfig()
+
+	if !config.Valid() {
+		log.Infow("keycloak-skipping-no-config")
+		return nil
+	}
+
+	client := gocloak.NewClient(as.config.URL)
+	token, err := client.LoginAdmin(ctx, as.config.ApiUser, as.config.ApiPassword, as.config.ApiRealm)
+	if err != nil {
+		return fmt.Errorf("keycloak-login: %v", err)
+	}
+
+	params := gocloak.GetUsersParams{
+		Email: &user.Email,
+	}
+
+	users, err := client.GetUsers(ctx, token.AccessToken, as.config.Realm, params)
+	if err != nil {
+		return fmt.Errorf("keycloak-get-users: %v", err)
+	}
+
+	if len(users) > 1 {
+		log.Infow("keycloak-too-many-users", "number_users", len(users), "email", user.Email)
+		return nil
+	}
+
+	updated := false
+
+	first, last := splitName(user.Name)
+
+	attrs := map[string][]string{
+		KeycloakPortalIDAttribute: []string{fmt.Sprintf("%d", user.ID)},
+	}
+
+	for _, ku := range users {
+		ku.FirstName = gocloak.StringP(first)
+		ku.LastName = gocloak.StringP(last)
+		ku.Email = gocloak.StringP(user.Email)
+		ku.Username = gocloak.StringP(user.Email)
+		ku.EmailVerified = gocloak.BoolP(true)
+		ku.Attributes = &attrs
+
+		if err := client.UpdateUser(ctx, token.AccessToken, as.config.Realm, *ku); err != nil {
+			return fmt.Errorf("keycloak-update: %v", err)
+		}
+		if err = client.SetPassword(ctx, token.AccessToken, *ku.ID, as.config.Realm, password, false); err != nil {
+			return fmt.Errorf("keycloak-setpw: %v", err)
+		}
+		updated = true
+		log.Infow("updated", "keycloak_user_id", ku.ID)
+		break
+	}
+
+	if !updated {
+		cloaked := gocloak.User{
+			FirstName:     gocloak.StringP(first),
+			LastName:      gocloak.StringP(last),
+			Email:         gocloak.StringP(user.Email),
+			Username:      gocloak.StringP(user.Email),
+			EmailVerified: gocloak.BoolP(true),
+			Enabled:       gocloak.BoolP(true),
+			Attributes:    &attrs,
+		}
+
+		createdID, err := client.CreateUser(ctx, token.AccessToken, as.config.Realm, cloaked)
+		if err != nil {
+			return fmt.Errorf("keycloak-create: %v", err)
+		}
+
+		if err = client.SetPassword(ctx, token.AccessToken, createdID, as.config.Realm, password, false); err != nil {
+			return fmt.Errorf("keycloak-setpw: %v", err)
+		}
+
+		log.Infow("created", "keycloak_user_id", createdID)
+	}
+
+	return nil
 }

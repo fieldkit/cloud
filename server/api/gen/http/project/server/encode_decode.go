@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 
+	project "github.com/fieldkit/cloud/server/api/gen/project"
 	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -2368,7 +2369,7 @@ func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) g
 			projectID   int32
 			size        *int32
 			ifNoneMatch *string
-			auth        string
+			auth        *string
 			err         error
 
 			params = mux.Vars(r)
@@ -2396,18 +2397,20 @@ func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) g
 		if ifNoneMatchRaw != "" {
 			ifNoneMatch = &ifNoneMatchRaw
 		}
-		auth = r.Header.Get("Authorization")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		authRaw := r.Header.Get("Authorization")
+		if authRaw != "" {
+			auth = &authRaw
 		}
 		if err != nil {
 			return nil, err
 		}
 		payload := NewDownloadPhotoPayload(projectID, size, ifNoneMatch, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
+		if payload.Auth != nil {
+			if strings.Contains(*payload.Auth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
+				payload.Auth = &cred
+			}
 		}
 
 		return payload, nil
@@ -2510,20 +2513,45 @@ func marshalProjectviewsProjectSummaryViewToProjectSummaryResponseBody(v *projec
 // *ProjectResponseBody from a value of type *projectviews.ProjectView.
 func marshalProjectviewsProjectViewToProjectResponseBody(v *projectviews.ProjectView) *ProjectResponseBody {
 	res := &ProjectResponseBody{
-		ID:          *v.ID,
-		Name:        *v.Name,
-		Description: *v.Description,
-		Goal:        *v.Goal,
-		Location:    *v.Location,
-		Tags:        *v.Tags,
-		Privacy:     *v.Privacy,
-		StartTime:   v.StartTime,
-		EndTime:     v.EndTime,
-		Photo:       v.Photo,
-		ReadOnly:    *v.ReadOnly,
+		ID:           *v.ID,
+		Name:         *v.Name,
+		Description:  *v.Description,
+		Goal:         *v.Goal,
+		Location:     *v.Location,
+		Tags:         *v.Tags,
+		Privacy:      *v.Privacy,
+		StartTime:    v.StartTime,
+		EndTime:      v.EndTime,
+		Photo:        v.Photo,
+		ReadOnly:     *v.ReadOnly,
+		ShowStations: *v.ShowStations,
+	}
+	if v.Bounds != nil {
+		res.Bounds = marshalProjectviewsProjectBoundsViewToProjectBoundsResponseBody(v.Bounds)
 	}
 	if v.Following != nil {
 		res.Following = marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(v.Following)
+	}
+
+	return res
+}
+
+// marshalProjectviewsProjectBoundsViewToProjectBoundsResponseBody builds a
+// value of type *ProjectBoundsResponseBody from a value of type
+// *projectviews.ProjectBoundsView.
+func marshalProjectviewsProjectBoundsViewToProjectBoundsResponseBody(v *projectviews.ProjectBoundsView) *ProjectBoundsResponseBody {
+	res := &ProjectBoundsResponseBody{}
+	if v.Min != nil {
+		res.Min = make([]float64, len(v.Min))
+		for i, val := range v.Min {
+			res.Min[i] = val
+		}
+	}
+	if v.Max != nil {
+		res.Max = make([]float64, len(v.Max))
+		for i, val := range v.Max {
+			res.Max[i] = val
+		}
 	}
 
 	return res
@@ -2536,6 +2564,26 @@ func marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(v *pr
 	res := &ProjectFollowingResponseBody{
 		Total:     *v.Total,
 		Following: *v.Following,
+	}
+
+	return res
+}
+
+// unmarshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds builds a
+// value of type *project.ProjectBounds from a value of type
+// *ProjectBoundsRequestBodyRequestBody.
+func unmarshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(v *ProjectBoundsRequestBodyRequestBody) *project.ProjectBounds {
+	if v == nil {
+		return nil
+	}
+	res := &project.ProjectBounds{}
+	res.Min = make([]float64, len(v.Min))
+	for i, val := range v.Min {
+		res.Min[i] = val
+	}
+	res.Max = make([]float64, len(v.Max))
+	for i, val := range v.Max {
+		res.Max[i] = val
 	}
 
 	return res

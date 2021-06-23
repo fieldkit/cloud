@@ -37,6 +37,8 @@ type Service interface {
 	Delete(context.Context, *DeletePayload) (err error)
 	// AdminSearch implements admin search.
 	AdminSearch(context.Context, *AdminSearchPayload) (res *PageOfStations, err error)
+	// Progress implements progress.
+	Progress(context.Context, *ProgressPayload) (res *StationProgress, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -53,7 +55,7 @@ const ServiceName = "station"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [10]string{"add", "get", "transfer", "update", "list mine", "list project", "download photo", "list all", "delete", "admin search"}
+var MethodNames = [11]string{"add", "get", "transfer", "update", "list mine", "list project", "download photo", "list all", "delete", "admin search", "progress"}
 
 // AddPayload is the payload type of the station service add method.
 type AddPayload struct {
@@ -85,12 +87,14 @@ type StationFull struct {
 	PlaceNameOther     *string
 	PlaceNameNative    *string
 	Location           *StationLocation
+	SyncedAt           *int64
+	IngestionAt        *int64
 	Data               *StationDataSummary
 }
 
 // GetPayload is the payload type of the station service get method.
 type GetPayload struct {
-	Auth string
+	Auth *string
 	ID   int32
 }
 
@@ -172,6 +176,17 @@ type DeletePayload struct {
 type AdminSearchPayload struct {
 	Auth  string
 	Query string
+}
+
+// ProgressPayload is the payload type of the station service progress method.
+type ProgressPayload struct {
+	Auth      string
+	StationID int32
+}
+
+// StationProgress is the result type of the station service progress method.
+type StationProgress struct {
+	Jobs []*StationJob
 }
 
 type StationOwner struct {
@@ -272,6 +287,13 @@ type EssentialStation struct {
 	LastIngestionAt    *int64
 }
 
+type StationJob struct {
+	Title       string
+	StartedAt   int64
+	CompletedAt *int64
+	Progress    float32
+}
+
 // MakeStationOwnerConflict builds a goa.ServiceError from an error.
 func MakeStationOwnerConflict(err error) *goa.ServiceError {
 	return &goa.ServiceError{
@@ -369,6 +391,19 @@ func NewViewedPageOfStations(res *PageOfStations, view string) *stationviews.Pag
 	return &stationviews.PageOfStations{Projected: p, View: "default"}
 }
 
+// NewStationProgress initializes result type StationProgress from viewed
+// result type StationProgress.
+func NewStationProgress(vres *stationviews.StationProgress) *StationProgress {
+	return newStationProgress(vres.Projected)
+}
+
+// NewViewedStationProgress initializes viewed result type StationProgress from
+// result type StationProgress using the given view.
+func NewViewedStationProgress(res *StationProgress, view string) *stationviews.StationProgress {
+	p := newStationProgressView(res)
+	return &stationviews.StationProgress{Projected: p, View: "default"}
+}
+
 // newStationFull converts projected type StationFull to service type
 // StationFull.
 func newStationFull(vres *stationviews.StationFullView) *StationFull {
@@ -382,6 +417,8 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 		LocationName:       vres.LocationName,
 		PlaceNameOther:     vres.PlaceNameOther,
 		PlaceNameNative:    vres.PlaceNameNative,
+		SyncedAt:           vres.SyncedAt,
+		IngestionAt:        vres.IngestionAt,
 	}
 	if vres.ID != nil {
 		res.ID = *vres.ID
@@ -440,6 +477,8 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		LocationName:       res.LocationName,
 		PlaceNameOther:     res.PlaceNameOther,
 		PlaceNameNative:    res.PlaceNameNative,
+		SyncedAt:           res.SyncedAt,
+		IngestionAt:        res.IngestionAt,
 	}
 	if res.Owner != nil {
 		vres.Owner = transformStationOwnerToStationviewsStationOwnerView(res.Owner)
@@ -604,6 +643,61 @@ func newPageOfStationsView(res *PageOfStations) *stationviews.PageOfStationsView
 		for i, val := range res.Stations {
 			vres.Stations[i] = transformEssentialStationToStationviewsEssentialStationView(val)
 		}
+	}
+	return vres
+}
+
+// newStationProgress converts projected type StationProgress to service type
+// StationProgress.
+func newStationProgress(vres *stationviews.StationProgressView) *StationProgress {
+	res := &StationProgress{}
+	if vres.Jobs != nil {
+		res.Jobs = make([]*StationJob, len(vres.Jobs))
+		for i, val := range vres.Jobs {
+			res.Jobs[i] = transformStationviewsStationJobViewToStationJob(val)
+		}
+	}
+	return res
+}
+
+// newStationProgressView projects result type StationProgress to projected
+// type StationProgressView using the "default" view.
+func newStationProgressView(res *StationProgress) *stationviews.StationProgressView {
+	vres := &stationviews.StationProgressView{}
+	if res.Jobs != nil {
+		vres.Jobs = make([]*stationviews.StationJobView, len(res.Jobs))
+		for i, val := range res.Jobs {
+			vres.Jobs[i] = transformStationJobToStationviewsStationJobView(val)
+		}
+	}
+	return vres
+}
+
+// newStationJob converts projected type StationJob to service type StationJob.
+func newStationJob(vres *stationviews.StationJobView) *StationJob {
+	res := &StationJob{
+		CompletedAt: vres.CompletedAt,
+	}
+	if vres.StartedAt != nil {
+		res.StartedAt = *vres.StartedAt
+	}
+	if vres.Progress != nil {
+		res.Progress = *vres.Progress
+	}
+	if vres.Title != nil {
+		res.Title = *vres.Title
+	}
+	return res
+}
+
+// newStationJobView projects result type StationJob to projected type
+// StationJobView using the "default" view.
+func newStationJobView(res *StationJob) *stationviews.StationJobView {
+	vres := &stationviews.StationJobView{
+		Title:       &res.Title,
+		StartedAt:   &res.StartedAt,
+		CompletedAt: res.CompletedAt,
+		Progress:    &res.Progress,
 	}
 	return vres
 }
@@ -1100,6 +1194,35 @@ func transformStationLocationToStationviewsStationLocationView(v *StationLocatio
 		for i, val := range v.Regions {
 			res.Regions[i] = transformStationRegionToStationviewsStationRegionView(val)
 		}
+	}
+
+	return res
+}
+
+// transformStationviewsStationJobViewToStationJob builds a value of type
+// *StationJob from a value of type *stationviews.StationJobView.
+func transformStationviewsStationJobViewToStationJob(v *stationviews.StationJobView) *StationJob {
+	if v == nil {
+		return nil
+	}
+	res := &StationJob{
+		Title:       *v.Title,
+		StartedAt:   *v.StartedAt,
+		CompletedAt: v.CompletedAt,
+		Progress:    *v.Progress,
+	}
+
+	return res
+}
+
+// transformStationJobToStationviewsStationJobView builds a value of type
+// *stationviews.StationJobView from a value of type *StationJob.
+func transformStationJobToStationviewsStationJobView(v *StationJob) *stationviews.StationJobView {
+	res := &stationviews.StationJobView{
+		Title:       &v.Title,
+		StartedAt:   &v.StartedAt,
+		CompletedAt: v.CompletedAt,
+		Progress:    &v.Progress,
 	}
 
 	return res

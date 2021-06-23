@@ -146,7 +146,7 @@ func TestIngestionRepositoryQueryByStationID(t *testing.T) {
 	r, err := repositories.NewIngestionRepository(e.DB)
 	assert.NoError(err)
 
-	sf, err := r.QueryByStationID(e.Ctx, int64(fd.Stations[0].ID))
+	sf, err := r.QueryByStationID(e.Ctx, fd.Stations[0].ID)
 	assert.NoError(err)
 
 	assert.NotNil(sf)

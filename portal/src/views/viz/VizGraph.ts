@@ -84,7 +84,7 @@ export const VizGraph = Vue.extend({
     },
     template: `
 		<div class="viz graph">
-			<ViewingControls :viz="viz" :workspace="workspace"
+			<ViewingControls :viz="viz" :workspace="workspace" v-bind:key="workspace.version"
 				@viz-remove="raiseRemove"
 				@viz-compare="raiseCompare"
 				@viz-fast-time="raiseFastTime"

@@ -65,8 +65,8 @@ func (c *RecordsService) Data(ctx context.Context, payload *records.DataPayload)
 		Data *data.DataRecord `json:"data"`
 		Meta *data.MetaRecord `json:"meta"`
 	}{
-		dataRecords[0],
-		metaRecords[0],
+		data.SanitizeDataRecord(dataRecords[0]),
+		data.SanitizeMetaRecord(metaRecords[0]),
 	}
 
 	return &records.DataResult{
@@ -94,7 +94,7 @@ func (c *RecordsService) Meta(ctx context.Context, payload *records.MetaPayload)
 	obj := struct {
 		Meta *data.MetaRecord `json:"meta"`
 	}{
-		metaRecords[0],
+		data.SanitizeMetaRecord(metaRecords[0]),
 	}
 
 	return &records.MetaResult{
@@ -146,8 +146,8 @@ func (c *RecordsService) Resolved(ctx context.Context, payload *records.Resolved
 		Meta     *data.MetaRecord             `json:"meta"`
 		Filtered *repositories.FilteredRecord `json:"filtered"`
 	}{
-		dbDatas[0],
-		dbMetas[0],
+		data.SanitizeDataRecord(dbDatas[0]),
+		data.SanitizeMetaRecord(dbMetas[0]),
 		filtered,
 	}
 

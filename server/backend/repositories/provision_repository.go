@@ -13,7 +13,7 @@ type ProvisionRepository struct {
 	db *sqlxcache.DB
 }
 
-func NewProvisionRepository(db *sqlxcache.DB) *ProvisionRepository {
+func NewProvisionRepository(db *sqlxcache.DB) (r *ProvisionRepository) {
 	return &ProvisionRepository{db: db}
 }
 

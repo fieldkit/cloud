@@ -46,6 +46,11 @@ func RecoveryUserPath() string {
 	return "/user/recovery"
 }
 
+// ResumeUserPath returns the URL path to the user service resume HTTP endpoint.
+func ResumeUserPath() string {
+	return "/user/resume"
+}
+
 // LogoutUserPath returns the URL path to the user service logout HTTP endpoint.
 func LogoutUserPath() string {
 	return "/logout"

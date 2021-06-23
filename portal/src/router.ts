@@ -3,6 +3,8 @@ import Router from "vue-router";
 import VueBodyClass from "vue-body-class";
 
 import LoginView from "./views/auth/LoginView.vue";
+import DiscourseView from "./views/auth/DiscourseView.vue";
+import ResumeView from "./views/auth/ResumeView.vue";
 import CreateAccountView from "./views/auth/CreateAccountView.vue";
 import RecoverAccountView from "./views/auth/RecoverAccountView.vue";
 import ResetPasswordView from "./views/auth/ResetPasswordView.vue";
@@ -34,6 +36,31 @@ const routes = [
         component: LoginView,
         meta: {
             bodyClass: "blue-background",
+            secured: false,
+        },
+    },
+    {
+        path: "/login/discourse",
+        name: "discourseLogin",
+        component: DiscourseView,
+        meta: {
+            bodyClass: "blue-background",
+            secured: false,
+        },
+    },
+    {
+        path: "/login/keycloak",
+        name: "loginKeycloak",
+        component: ResumeView,
+        meta: {
+            secured: false,
+        },
+    },
+    {
+        path: "/login/:token",
+        name: "loginResume",
+        component: ResumeView,
+        meta: {
             secured: false,
         },
     },
@@ -395,6 +422,9 @@ export default function routerFactory(store) {
         mode: "history",
         base: process.env.BASE_URL,
         routes: routes,
+        scrollBehavior(to, from, savedPosition) {
+            return { x: 0, y: 0 };
+        },
     });
 
     const vueBodyClass = new VueBodyClass(routes);

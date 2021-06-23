@@ -23,6 +23,7 @@ type Client struct {
 	LoginEndpoint                  goa.Endpoint
 	RecoveryLookupEndpoint         goa.Endpoint
 	RecoveryEndpoint               goa.Endpoint
+	ResumeEndpoint                 goa.Endpoint
 	LogoutEndpoint                 goa.Endpoint
 	RefreshEndpoint                goa.Endpoint
 	SendValidationEndpoint         goa.Endpoint
@@ -39,7 +40,7 @@ type Client struct {
 }
 
 // NewClient initializes a "user" service client given the endpoints.
-func NewClient(roles, delete_, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, logout, refresh, sendValidation, validate, add, update, changePassword, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminDelete, adminSearch goa.Endpoint) *Client {
+func NewClient(roles, delete_, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, resume, logout, refresh, sendValidation, validate, add, update, changePassword, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminDelete, adminSearch goa.Endpoint) *Client {
 	return &Client{
 		RolesEndpoint:                  roles,
 		DeleteEndpoint:                 delete_,
@@ -48,6 +49,7 @@ func NewClient(roles, delete_, uploadPhoto, downloadPhoto, login, recoveryLookup
 		LoginEndpoint:                  login,
 		RecoveryLookupEndpoint:         recoveryLookup,
 		RecoveryEndpoint:               recovery,
+		ResumeEndpoint:                 resume,
 		LogoutEndpoint:                 logout,
 		RefreshEndpoint:                refresh,
 		SendValidationEndpoint:         sendValidation,
@@ -116,6 +118,16 @@ func (c *Client) RecoveryLookup(ctx context.Context, p *RecoveryLookupPayload) (
 func (c *Client) Recovery(ctx context.Context, p *RecoveryPayload) (err error) {
 	_, err = c.RecoveryEndpoint(ctx, p)
 	return
+}
+
+// Resume calls the "resume" endpoint of the "user" service.
+func (c *Client) Resume(ctx context.Context, p *ResumePayload) (res *ResumeResult, err error) {
+	var ires interface{}
+	ires, err = c.ResumeEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*ResumeResult), nil
 }
 
 // Logout calls the "logout" endpoint of the "user" service.

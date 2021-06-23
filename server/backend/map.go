@@ -7,7 +7,6 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
-	// "github.com/bgentry/que-go"
 	"github.com/govau/que-go"
 
 	"github.com/fieldkit/cloud/server/common/jobs"
@@ -81,6 +80,16 @@ func exportData(ctx context.Context, j *que.Job, services *BackgroundServices, t
 	return handler.Handle(ctx, message)
 }
 
+func ingestStation(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+	message := &messages.IngestStation{}
+	if err := json.Unmarshal(tm.Body, message); err != nil {
+		return err
+	}
+	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
+	handler := NewIngestStationHandler(services.database, services.fileArchives.Ingestion, services.metrics, publisher)
+	return handler.Handle(ctx, message)
+}
+
 func CreateMap(services *BackgroundServices) que.WorkMap {
 	return que.WorkMap{
 		"Example":           wrapContext(wrapTransportMessage(services, exampleJob)),
@@ -88,6 +97,7 @@ func CreateMap(services *BackgroundServices) que.WorkMap {
 		"IngestionReceived": wrapContext(wrapTransportMessage(services, ingestionReceived)),
 		"RefreshStation":    wrapContext(wrapTransportMessage(services, refreshStation)),
 		"ExportData":        wrapContext(wrapTransportMessage(services, exportData)),
+		"IngestStation":     wrapContext(wrapTransportMessage(services, ingestStation)),
 	}
 }
 

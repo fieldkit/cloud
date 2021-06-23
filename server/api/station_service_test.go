@@ -14,6 +14,7 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/tests"
 )
 
@@ -45,7 +46,7 @@ func TestGetStationsMine(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -57,7 +58,7 @@ func TestGetStationsMine(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -69,7 +70,7 @@ func TestGetStationsMine(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -81,7 +82,7 @@ func TestGetStationsMine(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -93,7 +94,7 @@ func TestGetStationsMine(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -102,7 +103,7 @@ func TestGetStationsMine(t *testing.T) {
 	}`)
 }
 
-func TestGetStation(t *testing.T) {
+func TestGetStationAsOwner(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -128,26 +129,191 @@ func TestGetStation(t *testing.T) {
 		"deviceId": "<<PRESENCE>>",
 		"uploads": "<<PRESENCE>>",
 		"name": "<<PRESENCE>>",
-		"photos": "<<PRESENCE>>",
+		"photos": null,
 		"readOnly": "<<PRESENCE>>",
 		"location": "<<PRESENCE>>",
 		"configurations": { "all": [] }
 	}`)
 }
 
-func TestGetStationsProject(t *testing.T) {
+func TestGetStationNoProjectAsAnonymous(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
-	fd, err := e.AddStations(5)
+	owner, err := e.AddUser()
+	assert.NoError(err)
+
+	stations, err := e.AddStationsOwnedBy(owner, 1)
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/stations/%d", stations[0].ID), nil)
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusForbidden, rr.Code)
+}
+
+func TestGetStationPrivateProjectAsNonMember(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	project, err := e.AddProjectWithPrivacy(data.Private)
+	assert.NoError(err)
+
+	owner, err := e.AddUser()
+	assert.NoError(err)
+
+	fd, err := e.AddStationsToProject(project, owner, 5)
+	assert.NoError(err)
+
+	nonMember, err := e.AddUser()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(nonMember))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusForbidden, rr.Code)
+}
+
+func TestGetStationPrivateProjectAsMember(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	project, err := e.AddProjectWithPrivacy(data.Private)
+	assert.NoError(err)
+
+	owner, err := e.AddUser()
+	assert.NoError(err)
+
+	fd, err := e.AddStationsToProject(project, owner, 5)
+	assert.NoError(err)
+
+	member, err := e.AddUser()
+	assert.NoError(err)
+
+	err = e.AddProjectUser(project, member, data.MemberRole)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(member))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+	{
+		"id": "<<PRESENCE>>",
+		"updatedAt": "<<PRESENCE>>",
+		"owner": "<<PRESENCE>>",
+		"deviceId": "<<PRESENCE>>",
+		"uploads": "<<PRESENCE>>",
+		"name": "<<PRESENCE>>",
+		"photos": null,
+		"readOnly": "<<PRESENCE>>",
+		"location": "<<PRESENCE>>",
+		"configurations": { "all": [] }
+	}`)
+}
+
+func TestGetStationPrivateProjectAsAnonymous(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	project, err := e.AddProjectWithPrivacy(data.Private)
+	assert.NoError(err)
+
+	owner, err := e.AddUser()
+	assert.NoError(err)
+
+	fd, err := e.AddStationsToProject(project, owner, 5)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/stations/%d", fd.Stations[0].ID), nil)
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusForbidden, rr.Code)
+}
+
+func TestGetStationsPrivateProjectAsNonMember(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	nonMember, err := e.AddUser()
+	assert.NoError(err)
+
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d/stations", fd.Project.ID), nil)
-	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(nonMember))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusForbidden, rr.Code)
+}
+
+func TestGetStationsPrivateProjectAsAnonymous(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	member, err := e.AddUser()
+	assert.NoError(err)
+
+	err = e.AddProjectUser(fd.Project, member, data.MemberRole)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d/stations", fd.Project.ID), nil)
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusForbidden, rr.Code)
+}
+
+func TestGetStationsPrivateProjectAsMember(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	member, err := e.AddUser()
+	assert.NoError(err)
+
+	err = e.AddProjectUser(fd.Project, member, data.MemberRole)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d/stations", fd.Project.ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(member))
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusOK, rr.Code)
@@ -163,7 +329,49 @@ func TestGetStationsProject(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
+				"readOnly": "<<PRESENCE>>",
+				"location": "<<PRESENCE>>",
+				"configurations": { "all": [] }
+			}
+		]
+	}`)
+}
+
+func TestGetStationsPublicProjectAsAnonymous(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	project, err := e.AddProjectWithPrivacy(data.Public)
+	assert.NoError(err)
+
+	owner, err := e.AddUser()
+	assert.NoError(err)
+
+	fd, err := e.AddStationsToProject(project, owner, 5)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d/stations", fd.Project.ID), nil)
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+	{
+		"stations": [
+			{
+				"id": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
+				"owner": "<<PRESENCE>>",
+				"deviceId": "<<PRESENCE>>",
+				"uploads": "<<PRESENCE>>",
+				"name": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -175,7 +383,7 @@ func TestGetStationsProject(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -187,7 +395,7 @@ func TestGetStationsProject(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -199,7 +407,7 @@ func TestGetStationsProject(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -211,7 +419,7 @@ func TestGetStationsProject(t *testing.T) {
 				"deviceId": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
-				"photos": "<<PRESENCE>>",
+				"photos": null,
 				"readOnly": "<<PRESENCE>>",
 				"location": "<<PRESENCE>>",
 				"configurations": { "all": [] }
@@ -487,7 +695,7 @@ func TestGetStationUpdatedWithProtobufStatus(t *testing.T) {
 		"deviceId": "<<PRESENCE>>",
 		"uploads": "<<PRESENCE>>",
 		"name": "<<PRESENCE>>",
-		"photos": "<<PRESENCE>>",
+		"photos": null,
 		"readOnly": "<<PRESENCE>>",
 		"battery": "<<PRESENCE>>",
 		"location": "<<PRESENCE>>",
@@ -709,5 +917,32 @@ func TestAdminSearchStationsBasic(t *testing.T) {
 	{
 		"stations": [ "<<PRESENCE>>" ],
 		"total": 1
+	}`)
+}
+
+func TestStationGetProgress(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	fd, err := e.AddStations(5)
+	assert.NoError(err)
+
+	adminUser, err := e.AddAdminUser()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/stations/%d/progress", fd.Stations[0].ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(adminUser))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+	{
+		"jobs": []
 	}`)
 }

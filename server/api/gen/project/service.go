@@ -166,18 +166,20 @@ type AddPayload struct {
 
 // Project is the result type of the project service add method.
 type Project struct {
-	ID          int32
-	Name        string
-	Description string
-	Goal        string
-	Location    string
-	Tags        string
-	Privacy     int32
-	StartTime   *string
-	EndTime     *string
-	Photo       *string
-	ReadOnly    bool
-	Following   *ProjectFollowing
+	ID           int32
+	Name         string
+	Description  string
+	Goal         string
+	Location     string
+	Tags         string
+	Privacy      int32
+	StartTime    *string
+	EndTime      *string
+	Photo        *string
+	ReadOnly     bool
+	ShowStations bool
+	Bounds       *ProjectBounds
+	Following    *ProjectFollowing
 }
 
 // UpdatePayload is the payload type of the project service update method.
@@ -258,7 +260,7 @@ type UploadPhotoPayload struct {
 // DownloadPhotoPayload is the payload type of the project service download
 // photo method.
 type DownloadPhotoPayload struct {
-	Auth        string
+	Auth        *string
 	ProjectID   int32
 	Size        *int32
 	IfNoneMatch *string
@@ -287,20 +289,27 @@ type ProjectSummary struct {
 
 type ProjectCollection []*Project
 
+type ProjectBounds struct {
+	Min []float64
+	Max []float64
+}
+
 type ProjectFollowing struct {
 	Total     int32
 	Following bool
 }
 
 type AddProjectFields struct {
-	Name        string
-	Description string
-	Goal        *string
-	Location    *string
-	Tags        *string
-	Privacy     *int32
-	StartTime   *string
-	EndTime     *string
+	Name         string
+	Description  string
+	Goal         *string
+	Location     *string
+	Tags         *string
+	Privacy      *int32
+	StartTime    *string
+	EndTime      *string
+	Bounds       *ProjectBounds
+	ShowStations *bool
 }
 
 type InviteUserFields struct {
@@ -518,6 +527,12 @@ func newProject(vres *projectviews.ProjectView) *Project {
 	if vres.ReadOnly != nil {
 		res.ReadOnly = *vres.ReadOnly
 	}
+	if vres.ShowStations != nil {
+		res.ShowStations = *vres.ShowStations
+	}
+	if vres.Bounds != nil {
+		res.Bounds = transformProjectviewsProjectBoundsViewToProjectBounds(vres.Bounds)
+	}
 	if vres.Following != nil {
 		res.Following = transformProjectviewsProjectFollowingViewToProjectFollowing(vres.Following)
 	}
@@ -528,17 +543,21 @@ func newProject(vres *projectviews.ProjectView) *Project {
 // using the "default" view.
 func newProjectView(res *Project) *projectviews.ProjectView {
 	vres := &projectviews.ProjectView{
-		ID:          &res.ID,
-		Name:        &res.Name,
-		Description: &res.Description,
-		Goal:        &res.Goal,
-		Location:    &res.Location,
-		Tags:        &res.Tags,
-		Privacy:     &res.Privacy,
-		StartTime:   res.StartTime,
-		EndTime:     res.EndTime,
-		Photo:       res.Photo,
-		ReadOnly:    &res.ReadOnly,
+		ID:           &res.ID,
+		Name:         &res.Name,
+		Description:  &res.Description,
+		Goal:         &res.Goal,
+		Location:     &res.Location,
+		Tags:         &res.Tags,
+		Privacy:      &res.Privacy,
+		StartTime:    res.StartTime,
+		EndTime:      res.EndTime,
+		Photo:        res.Photo,
+		ReadOnly:     &res.ReadOnly,
+		ShowStations: &res.ShowStations,
+	}
+	if res.Bounds != nil {
+		vres.Bounds = transformProjectBoundsToProjectviewsProjectBoundsView(res.Bounds)
 	}
 	if res.Following != nil {
 		vres.Following = transformProjectFollowingToProjectviewsProjectFollowingView(res.Following)
@@ -650,6 +669,29 @@ func transformProjectSummaryToProjectviewsProjectSummaryView(v *ProjectSummary) 
 	return res
 }
 
+// transformProjectviewsProjectBoundsViewToProjectBounds builds a value of type
+// *ProjectBounds from a value of type *projectviews.ProjectBoundsView.
+func transformProjectviewsProjectBoundsViewToProjectBounds(v *projectviews.ProjectBoundsView) *ProjectBounds {
+	if v == nil {
+		return nil
+	}
+	res := &ProjectBounds{}
+	if v.Min != nil {
+		res.Min = make([]float64, len(v.Min))
+		for i, val := range v.Min {
+			res.Min[i] = val
+		}
+	}
+	if v.Max != nil {
+		res.Max = make([]float64, len(v.Max))
+		for i, val := range v.Max {
+			res.Max[i] = val
+		}
+	}
+
+	return res
+}
+
 // transformProjectviewsProjectFollowingViewToProjectFollowing builds a value
 // of type *ProjectFollowing from a value of type
 // *projectviews.ProjectFollowingView.
@@ -660,6 +702,26 @@ func transformProjectviewsProjectFollowingViewToProjectFollowing(v *projectviews
 	res := &ProjectFollowing{
 		Total:     *v.Total,
 		Following: *v.Following,
+	}
+
+	return res
+}
+
+// transformProjectBoundsToProjectviewsProjectBoundsView builds a value of type
+// *projectviews.ProjectBoundsView from a value of type *ProjectBounds.
+func transformProjectBoundsToProjectviewsProjectBoundsView(v *ProjectBounds) *projectviews.ProjectBoundsView {
+	res := &projectviews.ProjectBoundsView{}
+	if v.Min != nil {
+		res.Min = make([]float64, len(v.Min))
+		for i, val := range v.Min {
+			res.Min[i] = val
+		}
+	}
+	if v.Max != nil {
+		res.Max = make([]float64, len(v.Max))
+		for i, val := range v.Max {
+			res.Max[i] = val
+		}
 	}
 
 	return res

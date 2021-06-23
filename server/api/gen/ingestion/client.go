@@ -15,21 +15,23 @@ import (
 
 // Client is the "ingestion" service client.
 type Client struct {
-	ProcessPendingEndpoint   goa.Endpoint
-	WalkEverythingEndpoint   goa.Endpoint
-	ProcessStationEndpoint   goa.Endpoint
-	ProcessIngestionEndpoint goa.Endpoint
-	DeleteEndpoint           goa.Endpoint
+	ProcessPendingEndpoint           goa.Endpoint
+	WalkEverythingEndpoint           goa.Endpoint
+	ProcessStationEndpoint           goa.Endpoint
+	ProcessStationIngestionsEndpoint goa.Endpoint
+	ProcessIngestionEndpoint         goa.Endpoint
+	DeleteEndpoint                   goa.Endpoint
 }
 
 // NewClient initializes a "ingestion" service client given the endpoints.
-func NewClient(processPending, walkEverything, processStation, processIngestion, delete_ goa.Endpoint) *Client {
+func NewClient(processPending, walkEverything, processStation, processStationIngestions, processIngestion, delete_ goa.Endpoint) *Client {
 	return &Client{
-		ProcessPendingEndpoint:   processPending,
-		WalkEverythingEndpoint:   walkEverything,
-		ProcessStationEndpoint:   processStation,
-		ProcessIngestionEndpoint: processIngestion,
-		DeleteEndpoint:           delete_,
+		ProcessPendingEndpoint:           processPending,
+		WalkEverythingEndpoint:           walkEverything,
+		ProcessStationEndpoint:           processStation,
+		ProcessStationIngestionsEndpoint: processStationIngestions,
+		ProcessIngestionEndpoint:         processIngestion,
+		DeleteEndpoint:                   delete_,
 	}
 }
 
@@ -51,6 +53,13 @@ func (c *Client) WalkEverything(ctx context.Context, p *WalkEverythingPayload) (
 // service.
 func (c *Client) ProcessStation(ctx context.Context, p *ProcessStationPayload) (err error) {
 	_, err = c.ProcessStationEndpoint(ctx, p)
+	return
+}
+
+// ProcessStationIngestions calls the "process station ingestions" endpoint of
+// the "ingestion" service.
+func (c *Client) ProcessStationIngestions(ctx context.Context, p *ProcessStationIngestionsPayload) (err error) {
+	_, err = c.ProcessStationIngestionsEndpoint(ctx, p)
 	return
 }
 

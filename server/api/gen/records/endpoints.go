@@ -48,7 +48,7 @@ func NewDataEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 		sc := security.JWTScheme{
 			Name:           "jwt",
 			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
+			RequiredScopes: []string{"api:admin"},
 		}
 		var token string
 		if p.Auth != nil {
@@ -71,7 +71,7 @@ func NewMetaEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 		sc := security.JWTScheme{
 			Name:           "jwt",
 			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
+			RequiredScopes: []string{"api:admin"},
 		}
 		var token string
 		if p.Auth != nil {
@@ -94,7 +94,7 @@ func NewResolvedEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint
 		sc := security.JWTScheme{
 			Name:           "jwt",
 			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
+			RequiredScopes: []string{"api:admin"},
 		}
 		var token string
 		if p.Auth != nil {

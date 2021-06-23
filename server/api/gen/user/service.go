@@ -32,6 +32,8 @@ type Service interface {
 	RecoveryLookup(context.Context, *RecoveryLookupPayload) (err error)
 	// Recovery implements recovery.
 	Recovery(context.Context, *RecoveryPayload) (err error)
+	// Resume implements resume.
+	Resume(context.Context, *ResumePayload) (res *ResumeResult, err error)
 	// Logout implements logout.
 	Logout(context.Context, *LogoutPayload) (err error)
 	// Refresh implements refresh.
@@ -74,7 +76,7 @@ const ServiceName = "user"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [20]string{"roles", "delete", "upload photo", "download photo", "login", "recovery lookup", "recovery", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "get current", "list by project", "issue transmission token", "project roles", "admin delete", "admin search"}
+var MethodNames = [21]string{"roles", "delete", "upload photo", "download photo", "login", "recovery lookup", "recovery", "resume", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "get current", "list by project", "issue transmission token", "project roles", "admin delete", "admin search"}
 
 // RolesPayload is the payload type of the user service roles method.
 type RolesPayload struct {
@@ -135,6 +137,16 @@ type RecoveryLookupPayload struct {
 // RecoveryPayload is the payload type of the user service recovery method.
 type RecoveryPayload struct {
 	Recovery *RecoveryFields
+}
+
+// ResumePayload is the payload type of the user service resume method.
+type ResumePayload struct {
+	Token string
+}
+
+// ResumeResult is the result type of the user service resume method.
+type ResumeResult struct {
+	Authorization string
 }
 
 // LogoutPayload is the payload type of the user service logout method.

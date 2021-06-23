@@ -30,15 +30,17 @@ type FirmwareSummaryCollectionView []*FirmwareSummaryView
 
 // FirmwareSummaryView is a type that runs validations on a projected type.
 type FirmwareSummaryView struct {
-	ID          *int32
-	Time        *string
-	Etag        *string
-	Module      *string
-	Profile     *string
-	URL         *string
-	Meta        map[string]interface{}
-	BuildNumber *int32
-	BuildTime   *int64
+	ID             *int32
+	Time           *string
+	Etag           *string
+	Module         *string
+	Profile        *string
+	Version        *string
+	URL            *string
+	Meta           map[string]interface{}
+	BuildNumber    *int32
+	BuildTime      *int64
+	LogicalAddress *int64
 }
 
 var (
@@ -58,10 +60,12 @@ var (
 			"etag",
 			"module",
 			"profile",
+			"version",
 			"url",
 			"meta",
 			"buildNumber",
 			"buildTime",
+			"logicalAddress",
 		},
 	}
 	// FirmwareSummaryMap is a map of attribute names in result type
@@ -73,10 +77,12 @@ var (
 			"etag",
 			"module",
 			"profile",
+			"version",
 			"url",
 			"meta",
 			"buildNumber",
 			"buildTime",
+			"logicalAddress",
 		},
 	}
 )

@@ -18,28 +18,28 @@
                         <div class="details-icon">
                             <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" width="12px" height="14px" />
                         </div>
-                        <template>Started: {{ project.startTime | prettyDate }}</template>
+                        <template>{{ $t("project.started", { started: project.startTime }) }}</template>
                     </div>
                     <div class="details-row" v-if="displayProject.duration">
                         <div class="details-icon">
                             <img alt="Location" src="@/assets/icon-time.svg" class="icon" width="12px" height="14px" />
                         </div>
-                        <template>{{ displayProject.duration | prettyDuration }}</template>
+                        <template>{{ $t("project.duration", { duration: displayProject.duration }) }}</template>
                     </div>
-                    <div class="details-row" v-if="project.location">
+                    <div class="details-row location-name" v-if="project.location">
                         <div class="details-icon">
                             <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="13px" height="16px" />
                         </div>
-                        <template>{{ project.location }}</template>
+                        <template>{{ $t("project.location", { location: project.location }) }}</template>
                     </div>
-                    <div class="details-row" v-if="displayProject.places.native">
+                    <div class="details-row location-native" v-if="displayProject.places.native">
                         <div class="details-icon">
                             <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="13px" height="16px" />
                         </div>
-                        <template>Native Lands: {{ displayProject.places.native }}</template>
+                        <template>{{ $t("project.nativeLands", { nativeLands: displayProject.places.native }) }}</template>
                     </div>
                 </div>
-                <div class="project-detail" v-if="project.goal">Project Goal: {{ project.goal }}</div>
+                <div class="project-detail" v-if="project.goal">{{ $t("project.goal", { goal: project.goal }) }}</div>
                 <div class="project-detail">{{ project.description }}</div>
                 <div class="details-modules">
                     <img
@@ -55,11 +55,11 @@
                         <template #default="{ following, follow, unfollow }">
                             <button class="button-social" v-on:click="unfollow" v-if="following">
                                 <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
-                                Unfollow
+                                {{ $t("project.unfollow") }}
                             </button>
                             <button class="button-social" v-on:click="follow" v-if="!following">
                                 <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
-                                Follow
+                                {{ $t("project.follow") }}
                             </button>
                         </template>
                     </FollowControl>
@@ -110,7 +110,7 @@
             </div>
 
             <div class="recent-activity">
-                <h1>Recent Activity</h1>
+                <h1>{{ $t("project.recentActivity") }}</h1>
                 <ul>
                     <li>
                         <img src="@/assets/icon-compass.svg" width="30" />
@@ -136,21 +136,21 @@
             </div>
         </div>
 
-        <Comments :parentData="displayProject.id" :user="user"></Comments>
+        <Comments :parentData="displayProject.id" :user="user" v-if="user"></Comments>
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue, { PropType } from "vue";
 import * as utils from "../../utilities";
-import * as ActionTypes from "@/store/actions";
-import FKApi from "@/api/api";
-import ProjectStations from "./ProjectStations";
-import ProjectActivity from "./ProjectActivity";
+import { ProjectModule, DisplayStation, Project, DisplayProject } from "@/store";
+import ProjectStations from "./ProjectStations.vue";
 import CommonComponents from "@/views/shared";
-import Comments from "../comments/Comments";
+import Comments from "../comments/Comments.vue";
 import FollowControl from "@/views/shared/FollowControl.vue";
+import { twitterCardMeta } from "@/social";
 
-export default {
+export default Vue.extend({
     name: "ProjectPublic",
     components: {
         Comments,
@@ -161,25 +161,35 @@ export default {
     data: () => {
         return {};
     },
+    metaInfo() {
+        return {
+            meta: twitterCardMeta(this.displayProject),
+            afterNavigation() {
+                console.log("hello: after-navigation");
+            },
+        };
+    },
     props: {
         user: {
             required: true,
         },
         userStations: {
+            type: Array as PropType<DisplayStation[]>,
             required: true,
         },
         displayProject: {
+            type: Object as PropType<DisplayProject>,
             required: true,
         },
     },
     computed: {
-        project() {
+        project(): Project {
             return this.displayProject.project;
         },
-        projectStations() {
+        projectStations(): DisplayStation[] {
             return this.$getters.projectsById[this.displayProject.id].stations;
         },
-        projectModules() {
+        projectModules(): { name: string; url: string }[] {
             return this.$getters.projectsById[this.displayProject.id].modules.map((m) => {
                 return {
                     name: m.name,
@@ -189,15 +199,16 @@ export default {
         },
     },
     methods: {
-        getModuleImg(module) {
+        getModuleImg(module: ProjectModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
         },
-        getTeamHeading() {
+        getTeamHeading(): string {
+            // TODO i18n
             const members = this.displayProject.users.length == 1 ? "member" : "members";
             return "Project Team (" + this.displayProject.users.length + " " + members + ")";
         },
     },
-};
+});
 </script>
 
 <style scoped lang="scss">
@@ -268,6 +279,7 @@ export default {
     font-family: $font-family-light;
     margin-bottom: 9px;
     line-height: 1.5;
+    overflow-wrap: anywhere;
 }
 
 .photo-container {
@@ -346,6 +358,7 @@ export default {
 
 .details-icon {
     width: 23px;
+    flex-shrink: 0;
 }
 
 .right-actions {
@@ -579,5 +592,13 @@ export default {
 
 .todo-disabled {
     display: none;
+}
+
+.location-name,
+.location-native {
+    white-space: break-spaces;
+    display: flex;
+    align-items: baseline;
+    overflow-wrap: anywhere;
 }
 </style>

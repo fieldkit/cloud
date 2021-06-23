@@ -10,12 +10,14 @@ import (
 )
 
 type StationRefresher struct {
-	db *sqlxcache.DB
+	db          *sqlxcache.DB
+	tableSuffix string
 }
 
-func NewStationRefresher(db *sqlxcache.DB) (sr *StationRefresher, err error) {
+func NewStationRefresher(db *sqlxcache.DB, tableSuffix string) (sr *StationRefresher, err error) {
 	return &StationRefresher{
-		db: db,
+		db:          db,
+		tableSuffix: tableSuffix,
 	}, nil
 }
 
@@ -39,7 +41,7 @@ func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRec
 
 func (sr *StationRefresher) walk(ctx context.Context, walkParams *WalkParameters, completely bool) error {
 	rw := NewRecordWalker(sr.db)
-	handler := handlers.NewAggregatingHandler(sr.db, completely)
+	handler := handlers.NewAggregatingHandler(sr.db, sr.tableSuffix, completely)
 	if err := rw.WalkStation(ctx, handler, WalkerProgressNoop, walkParams); err != nil {
 		return err
 	}

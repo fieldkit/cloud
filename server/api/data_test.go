@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/kinbiko/jsonassert"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/fieldkit/cloud/server/tests"
@@ -29,4 +30,24 @@ func TestGetDeviceSummary(t *testing.T) {
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+	{
+		"provisions": [{
+            "generation": "<<PRESENCE>>",
+            "created": "<<PRESENCE>>",
+            "updated": "<<PRESENCE>>",
+            "meta": {
+				"size": 0,
+				"first": 1,
+				"last": 100
+			},
+            "data": {
+				"size": 0,
+				"first": 1,
+				"last": 100
+			}
+		}]
+	}`)
 }

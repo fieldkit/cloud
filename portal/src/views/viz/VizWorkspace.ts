@@ -1,8 +1,7 @@
 import _ from "lodash";
 import Vue from "vue";
 
-import { TimeRange } from "./common";
-import { Workspace, Group, Viz, TreeOption, FastTime, ChartType, TimeZoom, GeoZoom, Bookmark } from "./viz";
+import { Workspace, Group, Viz, HasSensorParams, FastTime, ChartType, TimeZoom, GeoZoom, Bookmark } from "./viz";
 import { VizGroup } from "./VizGroup";
 
 export const VizWorkspace = Vue.extend({
@@ -63,10 +62,10 @@ export const VizWorkspace = Vue.extend({
                 .with((this as any).signal)
                 .query();
         },
-        onChangeSensors(group: Group, viz: Viz, option: TreeOption) {
-            viz.log("sensors", option);
+        onChangeSensors(group: Group, viz: Viz, params: HasSensorParams) {
+            viz.log("has-params", params);
             return this.workspace
-                .changeSensors(viz, option)
+                .changeSensors(viz, params)
                 .with((this as any).signal)
                 .query();
         },

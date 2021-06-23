@@ -23,6 +23,7 @@ func TestGetStationActivity(t *testing.T) {
 
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
+	assert.NotNil(api)
 
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/stations/%d/activity", fd.Stations[0].ID), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))

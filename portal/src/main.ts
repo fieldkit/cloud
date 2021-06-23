@@ -2,6 +2,7 @@ import _ from "lodash";
 import Vue from "vue";
 import Vuex from "vuex";
 import Vuelidate from "vuelidate";
+import VueMeta from "vue-meta";
 import VCalendar from "v-calendar";
 import VueConfirmDialog from "vue-confirm-dialog";
 import Multiselect from "vue-multiselect";
@@ -49,6 +50,9 @@ Object.defineProperty(Vue.prototype, "$state", {
 
 Vue.use(ConfigurationPlugin, Config);
 Vue.use(AssetsPlugin, Config);
+Vue.use(VueMeta, {
+    refreshOnceOnNavigation: true,
+});
 Vue.use(VCalendar, {});
 Vue.use(Vuex);
 Vue.use(Vuelidate);

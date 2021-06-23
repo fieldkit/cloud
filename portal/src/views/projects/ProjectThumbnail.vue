@@ -1,26 +1,23 @@
 <template>
-    <router-link :to="{ name: 'viewProject', params: { id: project.id } }" class="project-container" v-if="visible">
-        <div class="project-image-container">
-            <!--
-            <div v-if="invited" class="invited-icon">
-                Project Invite
+    <div class="project-container" v-if="visible">
+        <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
+            <div class="project-image-container">
+                <ProjectPhoto :project="project" />
             </div>
-            -->
-            <ProjectPhoto :project="project" />
-        </div>
 
-        <img v-if="project.private" alt="Private project" src="@/assets/private.png" class="private-icon" />
+            <img v-if="project.private" alt="Private project" src="@/assets/private.png" class="private-icon" />
 
-        <div class="project-name">{{ project.name }}</div>
-        <div class="project-description">{{ project.description }}</div>
+            <div class="project-name">{{ project.name }}</div>
+            <div class="project-description">{{ project.description }}</div>
+        </router-link>
         <div class="invited-container" v-if="invited">
             <div class="accept" v-on:click.stop.prevent="onAccept">
                 <img alt="Close" src="@/assets/icon-tick-blue.svg" />
-                <span>Accept Invite</span>
+                <span>{{ $t("project.invite.accept") }}</span>
             </div>
             <div class="reject" v-on:click.stop.prevent="onDecline">
                 <img alt="Close" src="@/assets/icon-close-bold.svg" />
-                <span>Decline</span>
+                <span>{{ $t("project.invite.decline") }}</span>
             </div>
         </div>
         <div class="social-container" v-else>
@@ -47,7 +44,7 @@
                 <span>3</span>
             </div>-->
         </div>
-    </router-link>
+    </div>
 </template>
 <script lang="ts">
 import CommonComponents from "@/views/shared";
@@ -135,6 +132,7 @@ export default {
     font-family: $font-family-light;
     font-size: 14px;
     margin: 2px 15px 15px 15px;
+    overflow-wrap: anywhere;
 }
 .project-image-container {
     height: 138px;
@@ -199,6 +197,7 @@ export default {
     border-radius: 3px;
     border: solid 1px #cccdcf;
     white-space: nowrap;
+    flex-grow: 1;
     @include flex(center);
 }
 .invited-container .reject {
@@ -206,6 +205,7 @@ export default {
     font-size: 14px;
     color: #2c3e50;
     white-space: nowrap;
+    flex-grow: 1;
     @include flex(center);
 
     span {

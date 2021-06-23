@@ -35,8 +35,8 @@ export default Vue.extend({
     methods: {
         async refresh(): Promise<void> {
             if (this.project.photo) {
-                await this.$services.api.loadMedia(this.project.photo, { size: 800 }).then((photo) => {
-                    this.photo = photo;
+                this.photo = await this.$services.api.loadMedia(this.project.photo, { size: 800 }).catch((e) => {
+                    this.photo = null;
                 });
             } else {
                 this.photo = null;

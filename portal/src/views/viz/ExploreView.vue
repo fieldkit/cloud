@@ -14,6 +14,7 @@
 
             <div class="workspace-container">
                 <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
+                <div class="busy" v-else><Spinner /></div>
 
                 <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="user"></Comments>
             </div>
@@ -135,7 +136,7 @@ export default Vue.extend({
                     }
 
                     const stations = [stationId];
-                    const sensors = [quickSensors.stations[stationId][0].sensorId];
+                    const sensors = [[quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId]];
 
                     return workspace
                         .addStandardGraph(stations, sensors)
@@ -274,27 +275,35 @@ export default Vue.extend({
     border-bottom: 1px solid #efefef;
     margin-bottom: 5px;
     align-items: baseline;
+    min-height: 80px;
 }
 
 .controls-container .row-2 {
     margin-top: 5px;
     padding: 10px;
-    align-items: top;
 }
 
 .controls-container .tree {
-    flex-basis: 30%;
+    flex-basis: 50%;
+}
+
+.controls-container .tree div {
+    flex-basis: 50%;
 }
 
 .controls-container .left {
     display: flex;
-    align-items: baseline;
+    align-items: center;
 }
 
 .controls-container .right {
     display: flex;
     justify-content: center;
     align-items: baseline;
+}
+
+.controls-container .row-2 .right {
+    flex-basis: 10%;
 }
 
 .controls-container .right {
@@ -357,9 +366,6 @@ export default Vue.extend({
     left: 0;
 }
 
-.viz.map {
-}
-
 .viz.map .viz-map {
     height: 400px;
     margin-bottom: 20px;
@@ -375,5 +381,10 @@ export default Vue.extend({
     z-index: 10;
     overflow-y: scroll;
     width: 30em;
+}
+
+.loading-options {
+    text-align: center;
+    color: #afafaf;
 }
 </style>

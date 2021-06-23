@@ -2,13 +2,13 @@
     <StandardLayout>
         <div class="main-panel">
             <div class="form-edit" v-if="user">
-                <h2>My Account</h2>
-                <div class="notification success" v-if="notifySaved">Profile saved.</div>
+                <h2>{{ $t("user.profile.title") }}</h2>
+                <div class="notification success" v-if="notifySaved">{{ $t("user.profile.saved") }}</div>
 
                 <ProfileForm :user="user" @save="saveForm" />
 
-                <div class="notification success" v-if="notifyPasswordChanged">Password changed.</div>
-                <div class="notification failed" v-if="!passwordOk">Please check your password and try again.</div>
+                <div class="notification success" v-if="notifyPasswordChanged">{{ $t("user.profile.password.changed") }}</div>
+                <div class="notification failed" v-if="!passwordOk">{{ $t("user.profile.password.failed") }}</div>
 
                 <ChangePasswordForm :user="user" @save="changePassword" />
             </div>

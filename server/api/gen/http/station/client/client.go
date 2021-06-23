@@ -53,6 +53,10 @@ type Client struct {
 	// search endpoint.
 	AdminSearchDoer goahttp.Doer
 
+	// Progress Doer is the HTTP client used to make requests to the progress
+	// endpoint.
+	ProgressDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -86,6 +90,7 @@ func NewClient(
 		ListAllDoer:         doer,
 		DeleteDoer:          doer,
 		AdminSearchDoer:     doer,
+		ProgressDoer:        doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -330,6 +335,30 @@ func (c *Client) AdminSearch() goa.Endpoint {
 		resp, err := c.AdminSearchDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("station", "admin search", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Progress returns an endpoint that makes HTTP requests to the station service
+// progress server.
+func (c *Client) Progress() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeProgressRequest(c.encoder)
+		decodeResponse = DecodeProgressResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildProgressRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ProgressDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "progress", err)
 		}
 		return decodeResponse(resp)
 	}

@@ -60,3 +60,8 @@ func DeleteStationPath(stationID int32) string {
 func AdminSearchStationPath() string {
 	return "/admin/stations/search"
 }
+
+// ProgressStationPath returns the URL path to the station service progress HTTP endpoint.
+func ProgressStationPath(stationID int32) string {
+	return fmt.Sprintf("/stations/%v/progress", stationID)
+}

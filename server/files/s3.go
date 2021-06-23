@@ -93,10 +93,6 @@ func (a *S3FileArchive) Archive(ctx context.Context, contentType string, meta ma
 	return ss, err
 }
 
-func (a *S3FileArchive) OpenByKey(ctx context.Context, key string) (of *OpenedFile, err error) {
-	return a.open(ctx, a.bucket, key)
-}
-
 func (a *S3FileArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFile, err error) {
 	log := Logger(ctx).Sugar()
 
@@ -110,20 +106,8 @@ func (a *S3FileArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFi
 	return a.open(ctx, object.Bucket, object.Key)
 }
 
-func (a *S3FileArchive) DeleteByKey(ctx context.Context, key string) (err error) {
-	svc := s3.New(a.session)
-
-	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(a.bucket), Key: aws.String(key)})
-	if err != nil {
-		return fmt.Errorf("unable to delete object %q from bucket %q, %v", key, a.bucket, err)
-	}
-
-	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
-		Bucket: aws.String(a.bucket),
-		Key:    aws.String(key),
-	})
-
-	return err
+func (a *S3FileArchive) Opened(ctx context.Context, url string, opened *OpenedFile) (reopened *OpenedFile, err error) {
+	return nil, nil
 }
 
 func (a *S3FileArchive) DeleteByURL(ctx context.Context, url string) (err error) {
@@ -132,7 +116,19 @@ func (a *S3FileArchive) DeleteByURL(ctx context.Context, url string) (err error)
 		return fmt.Errorf("error parsing url: %v", err)
 	}
 
-	return a.DeleteByKey(ctx, object.Key)
+	svc := s3.New(a.session)
+
+	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(object.Bucket), Key: aws.String(object.Key)})
+	if err != nil {
+		return fmt.Errorf("unable to delete object %q from bucket %q, %v", object.Key, object.Bucket, err)
+	}
+
+	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+		Bucket: aws.String(object.Bucket),
+		Key:    aws.String(object.Key),
+	})
+
+	return err
 }
 
 func (a *S3FileArchive) open(ctx context.Context, bucket, key string) (of *OpenedFile, err error) {
@@ -143,12 +139,13 @@ func (a *S3FileArchive) open(ctx context.Context, bucket, key string) (of *Opene
 		Key:    aws.String(key),
 	}
 
+	log := Logger(ctx).Sugar()
+
 	obj, err := svc.GetObject(goi)
 	if err != nil {
-		return nil, fmt.Errorf("error reading object %v: %v", key, err)
+		log.Errorw("reading:s3", "bucket", bucket, "key", key)
+		return nil, fmt.Errorf("error reading object bucket=%v key=%v: %v", bucket, key, err)
 	}
-
-	log := Logger(ctx).Sugar()
 
 	contentLength := int64(0)
 	if obj.ContentLength != nil {

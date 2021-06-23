@@ -20,7 +20,7 @@ func TestGetMissingDataRecord(t *testing.T) {
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/data/%d", 0), nil)
-	req.Header.Add("Authorization", e.NewAuthorizationHeader())
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForAdmin())
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusNotFound, rr.Code)
@@ -41,7 +41,7 @@ func TestGetMetaRecord(t *testing.T) {
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/meta/%d", ar.Meta.Records[0].ID), nil)
-	req.Header.Add("Authorization", e.NewAuthorizationHeader())
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForAdmin())
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusOK, rr.Code)
@@ -75,7 +75,7 @@ func TestGetDataRecord(t *testing.T) {
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/data/%d", ar.Data.Records[0].ID), nil)
-	req.Header.Add("Authorization", e.NewAuthorizationHeader())
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForAdmin())
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusOK, rr.Code)
@@ -94,7 +94,7 @@ func TestGetDataRecord(t *testing.T) {
 		"data": {
 			"time": "<<PRESENCE>>",
 			"id": "<<PRESENCE>>",
-			"location": "<<PRESENCE>>",
+			"location": null,
 			"meta_record_id": "<<PRESENCE>>",
 			"number": "<<PRESENCE>>",
 			"provision_id": "<<PRESENCE>>",
@@ -119,7 +119,7 @@ func TestGetDataRecordResolved(t *testing.T) {
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/data/%d/resolved", ar.Data.Records[0].ID), nil)
-	req.Header.Add("Authorization", e.NewAuthorizationHeader())
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForAdmin())
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusOK, rr.Code)
@@ -142,7 +142,7 @@ func TestGetDataRecordResolved(t *testing.T) {
 		"data": {
 			"time": "<<PRESENCE>>",
 			"id": "<<PRESENCE>>",
-			"location": "<<PRESENCE>>",
+			"location": null,
 			"meta_record_id": "<<PRESENCE>>",
 			"number": "<<PRESENCE>>",
 			"provision_id": "<<PRESENCE>>",

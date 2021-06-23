@@ -28,7 +28,7 @@ func TestGetVisibilityNoProjectsNoCollections(t *testing.T) {
 
 	user1, err := e.AddUser()
 	assert.NoError(err)
-	s1, err := e.AddStation(user1)
+	s1, err := e.AddStationOwnedBy(user1)
 	assert.NoError(err)
 
 	vs := NewVisibilitySlicer(e.DB)
@@ -59,7 +59,7 @@ func TestGetVisibilityPrivateProject(t *testing.T) {
 
 	user1, err := e.AddUser()
 	assert.NoError(err)
-	s1, err := e.AddStation(user1)
+	s1, err := e.AddStationOwnedBy(user1)
 	assert.NoError(err)
 	p1, err := e.SaveProject(&data.Project{
 		Name:      "Private Project",
@@ -104,7 +104,7 @@ func TestGetVisibilityPublicProject(t *testing.T) {
 
 	user1, err := e.AddUser()
 	assert.NoError(err)
-	s1, err := e.AddStation(user1)
+	s1, err := e.AddStationOwnedBy(user1)
 	assert.NoError(err)
 	p1, err := e.SaveProject(&data.Project{
 		Name:      "Public Project",
@@ -148,7 +148,7 @@ func TestGetVisibilityStationPassesThroughTwoProjects(t *testing.T) {
 
 	user1, err := e.AddUser()
 	assert.NoError(err)
-	s1, err := e.AddStation(user1)
+	s1, err := e.AddStationOwnedBy(user1)
 	assert.NoError(err)
 	p1, err := e.SaveProject(&data.Project{
 		Name:      "Public Project",
@@ -212,7 +212,7 @@ func TestVisibilityMergeBrandNew(t *testing.T) {
 
 	user1, err := e.AddUser()
 	assert.NoError(err)
-	s1, err := e.AddStation(user1)
+	s1, err := e.AddStationOwnedBy(user1)
 	assert.NoError(err)
 	p1, err := e.SaveProject(&data.Project{
 		Name:      "Public Project",
@@ -251,7 +251,7 @@ func TestVisibilityMergeTwiceIsNoop(t *testing.T) {
 
 	user1, err := e.AddUser()
 	assert.NoError(err)
-	s1, err := e.AddStation(user1)
+	s1, err := e.AddStationOwnedBy(user1)
 	assert.NoError(err)
 	p1, err := e.SaveProject(&data.Project{
 		Name:      "Public Project",

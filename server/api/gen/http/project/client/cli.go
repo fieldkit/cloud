@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	project "github.com/fieldkit/cloud/server/api/gen/project"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildAddUpdatePayload builds the payload for the project add update endpoint
@@ -23,7 +24,7 @@ func BuildAddUpdatePayload(projectAddUpdateBody string, projectAddUpdateProjectI
 	{
 		err = json.Unmarshal([]byte(projectAddUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Dicta officiis.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Voluptatem quo non quae voluptatem cumque eius.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -88,7 +89,7 @@ func BuildModifyUpdatePayload(projectModifyUpdateBody string, projectModifyUpdat
 	{
 		err = json.Unmarshal([]byte(projectModifyUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Amet ut suscipit quis sunt.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Rerum dolor consequatur perspiciatis expedita quo.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -268,20 +269,32 @@ func BuildAddPayload(projectAddBody string, projectAddAuth string) (*project.Add
 		if err != nil {
 			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Eveniet nobis consequatur.\",\n      \"name\": \"Minima cum et quia occaecati aut qui.\",\n      \"private\": false,\n      \"tags\": \"Cumque aut.\"\n   }'")
 		}
+		if body.Bounds != nil {
+			if err2 := ValidateProjectBoundsRequestBodyRequestBody(body.Bounds); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+		if err != nil {
+			return nil, err
+		}
 	}
 	var auth string
 	{
 		auth = projectAddAuth
 	}
 	v := &project.AddProjectFields{
-		Name:        body.Name,
-		Description: body.Description,
-		Goal:        body.Goal,
-		Location:    body.Location,
-		Tags:        body.Tags,
-		Privacy:     body.Privacy,
-		StartTime:   body.StartTime,
-		EndTime:     body.EndTime,
+		Name:         body.Name,
+		Description:  body.Description,
+		Goal:         body.Goal,
+		Location:     body.Location,
+		Tags:         body.Tags,
+		Privacy:      body.Privacy,
+		StartTime:    body.StartTime,
+		EndTime:      body.EndTime,
+		ShowStations: body.ShowStations,
+	}
+	if body.Bounds != nil {
+		v.Bounds = marshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(body.Bounds)
 	}
 	res := &project.AddPayload{
 		Project: v,
@@ -301,6 +314,14 @@ func BuildUpdatePayload(projectUpdateBody string, projectUpdateProjectID string,
 		if err != nil {
 			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Et qui et modi.\",\n      \"name\": \"Laudantium officiis consequatur.\",\n      \"private\": false,\n      \"tags\": \"Rerum eaque tempore tenetur nemo.\"\n   }'")
 		}
+		if body.Bounds != nil {
+			if err2 := ValidateProjectBoundsRequestBodyRequestBody(body.Bounds); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+		if err != nil {
+			return nil, err
+		}
 	}
 	var projectID int32
 	{
@@ -316,14 +337,18 @@ func BuildUpdatePayload(projectUpdateBody string, projectUpdateProjectID string,
 		auth = projectUpdateAuth
 	}
 	v := &project.AddProjectFields{
-		Name:        body.Name,
-		Description: body.Description,
-		Goal:        body.Goal,
-		Location:    body.Location,
-		Tags:        body.Tags,
-		Privacy:     body.Privacy,
-		StartTime:   body.StartTime,
-		EndTime:     body.EndTime,
+		Name:         body.Name,
+		Description:  body.Description,
+		Goal:         body.Goal,
+		Location:     body.Location,
+		Tags:         body.Tags,
+		Privacy:      body.Privacy,
+		StartTime:    body.StartTime,
+		EndTime:      body.EndTime,
+		ShowStations: body.ShowStations,
+	}
+	if body.Bounds != nil {
+		v.Bounds = marshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(body.Bounds)
 	}
 	res := &project.UpdatePayload{
 		Project: v,
@@ -396,7 +421,7 @@ func BuildInvitePayload(projectInviteBody string, projectInviteProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectInviteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Ratione atque.\",\n      \"role\": 739722382\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Saepe facilis non ratione sequi at.\",\n      \"role\": 271575001\n   }'")
 		}
 	}
 	var projectID int32
@@ -433,7 +458,7 @@ func BuildRemoveUserPayload(projectRemoveUserBody string, projectRemoveUserProje
 	{
 		err = json.Unmarshal([]byte(projectRemoveUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Sint dolorem laboriosam quia est dicta.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Voluptatem iusto dolor deleniti quisquam perferendis autem.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -621,9 +646,11 @@ func BuildDownloadPhotoPayload(projectDownloadPhotoProjectID string, projectDown
 			ifNoneMatch = &projectDownloadPhotoIfNoneMatch
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = projectDownloadPhotoAuth
+		if projectDownloadPhotoAuth != "" {
+			auth = &projectDownloadPhotoAuth
+		}
 	}
 	v := &project.DownloadPhotoPayload{}
 	v.ProjectID = projectID

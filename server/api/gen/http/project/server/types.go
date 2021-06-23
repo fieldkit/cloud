@@ -28,27 +28,31 @@ type ModifyUpdateRequestBody struct {
 // AddRequestBody is the type of the "project" service "add" endpoint HTTP
 // request body.
 type AddRequestBody struct {
-	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
-	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
-	Location    *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-	Tags        *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Privacy     *int32  `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
-	StartTime   *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime     *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Name         *string                              `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Description  *string                              `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Goal         *string                              `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
+	Location     *string                              `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Tags         *string                              `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
+	Privacy      *int32                               `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
+	StartTime    *string                              `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime      *string                              `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Bounds       *ProjectBoundsRequestBodyRequestBody `form:"bounds,omitempty" json:"bounds,omitempty" xml:"bounds,omitempty"`
+	ShowStations *bool                                `form:"showStations,omitempty" json:"showStations,omitempty" xml:"showStations,omitempty"`
 }
 
 // UpdateRequestBody is the type of the "project" service "update" endpoint
 // HTTP request body.
 type UpdateRequestBody struct {
-	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
-	Goal        *string `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
-	Location    *string `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-	Tags        *string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Privacy     *int32  `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
-	StartTime   *string `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime     *string `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Name         *string                              `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Description  *string                              `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Goal         *string                              `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
+	Location     *string                              `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Tags         *string                              `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
+	Privacy      *int32                               `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
+	StartTime    *string                              `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime      *string                              `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Bounds       *ProjectBoundsRequestBodyRequestBody `form:"bounds,omitempty" json:"bounds,omitempty" xml:"bounds,omitempty"`
+	ShowStations *bool                                `form:"showStations,omitempty" json:"showStations,omitempty" xml:"showStations,omitempty"`
 }
 
 // InviteRequestBody is the type of the "project" service "invite" endpoint
@@ -95,52 +99,58 @@ type LookupInviteResponseBody struct {
 // AddResponseBody is the type of the "project" service "add" endpoint HTTP
 // response body.
 type AddResponseBody struct {
-	ID          int32                         `form:"id" json:"id" xml:"id"`
-	Name        string                        `form:"name" json:"name" xml:"name"`
-	Description string                        `form:"description" json:"description" xml:"description"`
-	Goal        string                        `form:"goal" json:"goal" xml:"goal"`
-	Location    string                        `form:"location" json:"location" xml:"location"`
-	Tags        string                        `form:"tags" json:"tags" xml:"tags"`
-	Privacy     int32                         `form:"privacy" json:"privacy" xml:"privacy"`
-	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly    bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
-	Following   *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
+	ID           int32                         `form:"id" json:"id" xml:"id"`
+	Name         string                        `form:"name" json:"name" xml:"name"`
+	Description  string                        `form:"description" json:"description" xml:"description"`
+	Goal         string                        `form:"goal" json:"goal" xml:"goal"`
+	Location     string                        `form:"location" json:"location" xml:"location"`
+	Tags         string                        `form:"tags" json:"tags" xml:"tags"`
+	Privacy      int32                         `form:"privacy" json:"privacy" xml:"privacy"`
+	StartTime    *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime      *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo        *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly     bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	ShowStations bool                          `form:"showStations" json:"showStations" xml:"showStations"`
+	Bounds       *ProjectBoundsResponseBody    `form:"bounds" json:"bounds" xml:"bounds"`
+	Following    *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
 }
 
 // UpdateResponseBody is the type of the "project" service "update" endpoint
 // HTTP response body.
 type UpdateResponseBody struct {
-	ID          int32                         `form:"id" json:"id" xml:"id"`
-	Name        string                        `form:"name" json:"name" xml:"name"`
-	Description string                        `form:"description" json:"description" xml:"description"`
-	Goal        string                        `form:"goal" json:"goal" xml:"goal"`
-	Location    string                        `form:"location" json:"location" xml:"location"`
-	Tags        string                        `form:"tags" json:"tags" xml:"tags"`
-	Privacy     int32                         `form:"privacy" json:"privacy" xml:"privacy"`
-	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly    bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
-	Following   *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
+	ID           int32                         `form:"id" json:"id" xml:"id"`
+	Name         string                        `form:"name" json:"name" xml:"name"`
+	Description  string                        `form:"description" json:"description" xml:"description"`
+	Goal         string                        `form:"goal" json:"goal" xml:"goal"`
+	Location     string                        `form:"location" json:"location" xml:"location"`
+	Tags         string                        `form:"tags" json:"tags" xml:"tags"`
+	Privacy      int32                         `form:"privacy" json:"privacy" xml:"privacy"`
+	StartTime    *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime      *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo        *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly     bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	ShowStations bool                          `form:"showStations" json:"showStations" xml:"showStations"`
+	Bounds       *ProjectBoundsResponseBody    `form:"bounds" json:"bounds" xml:"bounds"`
+	Following    *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
 }
 
 // GetResponseBody is the type of the "project" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
-	ID          int32                         `form:"id" json:"id" xml:"id"`
-	Name        string                        `form:"name" json:"name" xml:"name"`
-	Description string                        `form:"description" json:"description" xml:"description"`
-	Goal        string                        `form:"goal" json:"goal" xml:"goal"`
-	Location    string                        `form:"location" json:"location" xml:"location"`
-	Tags        string                        `form:"tags" json:"tags" xml:"tags"`
-	Privacy     int32                         `form:"privacy" json:"privacy" xml:"privacy"`
-	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly    bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
-	Following   *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
+	ID           int32                         `form:"id" json:"id" xml:"id"`
+	Name         string                        `form:"name" json:"name" xml:"name"`
+	Description  string                        `form:"description" json:"description" xml:"description"`
+	Goal         string                        `form:"goal" json:"goal" xml:"goal"`
+	Location     string                        `form:"location" json:"location" xml:"location"`
+	Tags         string                        `form:"tags" json:"tags" xml:"tags"`
+	Privacy      int32                         `form:"privacy" json:"privacy" xml:"privacy"`
+	StartTime    *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime      *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo        *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly     bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	ShowStations bool                          `form:"showStations" json:"showStations" xml:"showStations"`
+	Bounds       *ProjectBoundsResponseBody    `form:"bounds" json:"bounds" xml:"bounds"`
+	Following    *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
 }
 
 // ListCommunityResponseBody is the type of the "project" service "list
@@ -1704,24 +1714,39 @@ type ProjectResponseBodyCollection []*ProjectResponseBody
 
 // ProjectResponseBody is used to define fields on response body types.
 type ProjectResponseBody struct {
-	ID          int32                         `form:"id" json:"id" xml:"id"`
-	Name        string                        `form:"name" json:"name" xml:"name"`
-	Description string                        `form:"description" json:"description" xml:"description"`
-	Goal        string                        `form:"goal" json:"goal" xml:"goal"`
-	Location    string                        `form:"location" json:"location" xml:"location"`
-	Tags        string                        `form:"tags" json:"tags" xml:"tags"`
-	Privacy     int32                         `form:"privacy" json:"privacy" xml:"privacy"`
-	StartTime   *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime     *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo       *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly    bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
-	Following   *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
+	ID           int32                         `form:"id" json:"id" xml:"id"`
+	Name         string                        `form:"name" json:"name" xml:"name"`
+	Description  string                        `form:"description" json:"description" xml:"description"`
+	Goal         string                        `form:"goal" json:"goal" xml:"goal"`
+	Location     string                        `form:"location" json:"location" xml:"location"`
+	Tags         string                        `form:"tags" json:"tags" xml:"tags"`
+	Privacy      int32                         `form:"privacy" json:"privacy" xml:"privacy"`
+	StartTime    *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime      *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo        *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly     bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	ShowStations bool                          `form:"showStations" json:"showStations" xml:"showStations"`
+	Bounds       *ProjectBoundsResponseBody    `form:"bounds" json:"bounds" xml:"bounds"`
+	Following    *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
+}
+
+// ProjectBoundsResponseBody is used to define fields on response body types.
+type ProjectBoundsResponseBody struct {
+	Min []float64 `form:"min" json:"min" xml:"min"`
+	Max []float64 `form:"max" json:"max" xml:"max"`
 }
 
 // ProjectFollowingResponseBody is used to define fields on response body types.
 type ProjectFollowingResponseBody struct {
 	Total     int32 `form:"total" json:"total" xml:"total"`
 	Following bool  `form:"following" json:"following" xml:"following"`
+}
+
+// ProjectBoundsRequestBodyRequestBody is used to define fields on request body
+// types.
+type ProjectBoundsRequestBodyRequestBody struct {
+	Min []float64 `form:"min,omitempty" json:"min,omitempty" xml:"min,omitempty"`
+	Max []float64 `form:"max,omitempty" json:"max,omitempty" xml:"max,omitempty"`
 }
 
 // NewAddUpdateResponseBody builds the HTTP response body from the result of
@@ -1786,17 +1811,21 @@ func NewLookupInviteResponseBody(res *projectviews.PendingInvitesView) *LookupIn
 // "add" endpoint of the "project" service.
 func NewAddResponseBody(res *projectviews.ProjectView) *AddResponseBody {
 	body := &AddResponseBody{
-		ID:          *res.ID,
-		Name:        *res.Name,
-		Description: *res.Description,
-		Goal:        *res.Goal,
-		Location:    *res.Location,
-		Tags:        *res.Tags,
-		Privacy:     *res.Privacy,
-		StartTime:   res.StartTime,
-		EndTime:     res.EndTime,
-		Photo:       res.Photo,
-		ReadOnly:    *res.ReadOnly,
+		ID:           *res.ID,
+		Name:         *res.Name,
+		Description:  *res.Description,
+		Goal:         *res.Goal,
+		Location:     *res.Location,
+		Tags:         *res.Tags,
+		Privacy:      *res.Privacy,
+		StartTime:    res.StartTime,
+		EndTime:      res.EndTime,
+		Photo:        res.Photo,
+		ReadOnly:     *res.ReadOnly,
+		ShowStations: *res.ShowStations,
+	}
+	if res.Bounds != nil {
+		body.Bounds = marshalProjectviewsProjectBoundsViewToProjectBoundsResponseBody(res.Bounds)
 	}
 	if res.Following != nil {
 		body.Following = marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(res.Following)
@@ -1808,17 +1837,21 @@ func NewAddResponseBody(res *projectviews.ProjectView) *AddResponseBody {
 // "update" endpoint of the "project" service.
 func NewUpdateResponseBody(res *projectviews.ProjectView) *UpdateResponseBody {
 	body := &UpdateResponseBody{
-		ID:          *res.ID,
-		Name:        *res.Name,
-		Description: *res.Description,
-		Goal:        *res.Goal,
-		Location:    *res.Location,
-		Tags:        *res.Tags,
-		Privacy:     *res.Privacy,
-		StartTime:   res.StartTime,
-		EndTime:     res.EndTime,
-		Photo:       res.Photo,
-		ReadOnly:    *res.ReadOnly,
+		ID:           *res.ID,
+		Name:         *res.Name,
+		Description:  *res.Description,
+		Goal:         *res.Goal,
+		Location:     *res.Location,
+		Tags:         *res.Tags,
+		Privacy:      *res.Privacy,
+		StartTime:    res.StartTime,
+		EndTime:      res.EndTime,
+		Photo:        res.Photo,
+		ReadOnly:     *res.ReadOnly,
+		ShowStations: *res.ShowStations,
+	}
+	if res.Bounds != nil {
+		body.Bounds = marshalProjectviewsProjectBoundsViewToProjectBoundsResponseBody(res.Bounds)
 	}
 	if res.Following != nil {
 		body.Following = marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(res.Following)
@@ -1830,17 +1863,21 @@ func NewUpdateResponseBody(res *projectviews.ProjectView) *UpdateResponseBody {
 // "get" endpoint of the "project" service.
 func NewGetResponseBody(res *projectviews.ProjectView) *GetResponseBody {
 	body := &GetResponseBody{
-		ID:          *res.ID,
-		Name:        *res.Name,
-		Description: *res.Description,
-		Goal:        *res.Goal,
-		Location:    *res.Location,
-		Tags:        *res.Tags,
-		Privacy:     *res.Privacy,
-		StartTime:   res.StartTime,
-		EndTime:     res.EndTime,
-		Photo:       res.Photo,
-		ReadOnly:    *res.ReadOnly,
+		ID:           *res.ID,
+		Name:         *res.Name,
+		Description:  *res.Description,
+		Goal:         *res.Goal,
+		Location:     *res.Location,
+		Tags:         *res.Tags,
+		Privacy:      *res.Privacy,
+		StartTime:    res.StartTime,
+		EndTime:      res.EndTime,
+		Photo:        res.Photo,
+		ReadOnly:     *res.ReadOnly,
+		ShowStations: *res.ShowStations,
+	}
+	if res.Bounds != nil {
+		body.Bounds = marshalProjectviewsProjectBoundsViewToProjectBoundsResponseBody(res.Bounds)
 	}
 	if res.Following != nil {
 		body.Following = marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(res.Following)
@@ -3168,14 +3205,18 @@ func NewRejectInvitePayload(id int64, token *string, auth string) *project.Rejec
 // NewAddPayload builds a project service add endpoint payload.
 func NewAddPayload(body *AddRequestBody, auth string) *project.AddPayload {
 	v := &project.AddProjectFields{
-		Name:        *body.Name,
-		Description: *body.Description,
-		Goal:        body.Goal,
-		Location:    body.Location,
-		Tags:        body.Tags,
-		Privacy:     body.Privacy,
-		StartTime:   body.StartTime,
-		EndTime:     body.EndTime,
+		Name:         *body.Name,
+		Description:  *body.Description,
+		Goal:         body.Goal,
+		Location:     body.Location,
+		Tags:         body.Tags,
+		Privacy:      body.Privacy,
+		StartTime:    body.StartTime,
+		EndTime:      body.EndTime,
+		ShowStations: body.ShowStations,
+	}
+	if body.Bounds != nil {
+		v.Bounds = unmarshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(body.Bounds)
 	}
 	res := &project.AddPayload{
 		Project: v,
@@ -3188,14 +3229,18 @@ func NewAddPayload(body *AddRequestBody, auth string) *project.AddPayload {
 // NewUpdatePayload builds a project service update endpoint payload.
 func NewUpdatePayload(body *UpdateRequestBody, projectID int32, auth string) *project.UpdatePayload {
 	v := &project.AddProjectFields{
-		Name:        *body.Name,
-		Description: *body.Description,
-		Goal:        body.Goal,
-		Location:    body.Location,
-		Tags:        body.Tags,
-		Privacy:     body.Privacy,
-		StartTime:   body.StartTime,
-		EndTime:     body.EndTime,
+		Name:         *body.Name,
+		Description:  *body.Description,
+		Goal:         body.Goal,
+		Location:     body.Location,
+		Tags:         body.Tags,
+		Privacy:      body.Privacy,
+		StartTime:    body.StartTime,
+		EndTime:      body.EndTime,
+		ShowStations: body.ShowStations,
+	}
+	if body.Bounds != nil {
+		v.Bounds = unmarshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(body.Bounds)
 	}
 	res := &project.UpdatePayload{
 		Project: v,
@@ -3304,7 +3349,7 @@ func NewUploadPhotoPayload(projectID int32, contentType string, contentLength in
 
 // NewDownloadPhotoPayload builds a project service download photo endpoint
 // payload.
-func NewDownloadPhotoPayload(projectID int32, size *int32, ifNoneMatch *string, auth string) *project.DownloadPhotoPayload {
+func NewDownloadPhotoPayload(projectID int32, size *int32, ifNoneMatch *string, auth *string) *project.DownloadPhotoPayload {
 	v := &project.DownloadPhotoPayload{}
 	v.ProjectID = projectID
 	v.Size = size
@@ -3340,6 +3385,11 @@ func ValidateAddRequestBody(body *AddRequestBody) (err error) {
 	if body.Description == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("description", "body"))
 	}
+	if body.Bounds != nil {
+		if err2 := ValidateProjectBoundsRequestBodyRequestBody(body.Bounds); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
 	return
 }
 
@@ -3350,6 +3400,11 @@ func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
 	}
 	if body.Description == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("description", "body"))
+	}
+	if body.Bounds != nil {
+		if err2 := ValidateProjectBoundsRequestBodyRequestBody(body.Bounds); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }
@@ -3370,6 +3425,18 @@ func ValidateInviteRequestBody(body *InviteRequestBody) (err error) {
 func ValidateRemoveUserRequestBody(body *RemoveUserRequestBody) (err error) {
 	if body.Email == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
+	}
+	return
+}
+
+// ValidateProjectBoundsRequestBodyRequestBody runs the validations defined on
+// ProjectBoundsRequestBodyRequestBody
+func ValidateProjectBoundsRequestBodyRequestBody(body *ProjectBoundsRequestBodyRequestBody) (err error) {
+	if body.Min == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("min", "body"))
+	}
+	if body.Max == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("max", "body"))
 	}
 	return
 }

@@ -9,4 +9,4 @@ dump:
 	docker rm temp
 
 migrate:
-	docker run --rm conservify/fk-cloud-migrate --path /migrations --database "$(DATABASE_URL)"
+	docker run --rm --env 'PGURL=${DATABASE_URL}' conservify/fk-cloud-migrate migrate

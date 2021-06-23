@@ -6,11 +6,14 @@ import (
 	"encoding/base64"
 	"io"
 	"net/http"
+	"strings"
 
 	goa "goa.design/goa/v3/pkg"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"goa.design/goa/v3/security"
+
+	"github.com/spf13/viper"
 
 	goahttp "goa.design/goa/v3/http"
 
@@ -72,6 +75,15 @@ import (
 
 	discService "github.com/fieldkit/cloud/server/api/gen/discussion"
 	discServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/discussion/server"
+
+	discourseService "github.com/fieldkit/cloud/server/api/gen/discourse"
+	discourseServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/discourse/server"
+
+	oidcServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/oidc/server"
+	oidcService "github.com/fieldkit/cloud/server/api/gen/oidc"
+
+	ttnServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/ttn/server"
+	ttnService "github.com/fieldkit/cloud/server/api/gen/ttn"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -132,6 +144,15 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	discSvc := NewDiscussionService(ctx, options)
 	discEndpoints := discService.NewEndpoints(discSvc)
 
+	discourseSvc := NewDiscourseService(ctx, options)
+	discourseEndpoints := discourseService.NewEndpoints(discourseSvc)
+
+	oidcSvc := NewOidcService(ctx, options)
+	oidcEndpoints := oidcService.NewEndpoints(oidcSvc)
+
+	ttnSvc := NewThingsNetworkService(ctx, options)
+	ttnEndpoints := ttnService.NewEndpoints(ttnSvc)
+
 	for _, mw := range []func(goa.Endpoint) goa.Endpoint{jwtContext(), logErrors()} {
 		modulesEndpoints.Use(mw)
 		tasksEndpoints.Use(mw)
@@ -152,7 +173,19 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		exportEndpoints.Use(mw)
 		collectionEndpoints.Use(mw)
 		discEndpoints.Use(mw)
+		discourseEndpoints.Use(mw)
+		oidcEndpoints.Use(mw)
+		ttnEndpoints.Use(mw)
 	}
+
+	samlConfig := &SamlAuthConfig{
+		CertPath:           viper.GetString("SAML.CERT"),
+		KeyPath:            viper.GetString("SAML.KEY"),
+		ServiceProviderURL: viper.GetString("SAML.SP_URL"),
+		IDPMetaURL:         viper.GetString("SAML.IPD_META"),
+		LoginURLTemplate:   viper.GetString("SAML.LOGIN_URL"),
+	}
+	saml := NewSamlAuth(options, samlConfig)
 
 	// Provide the transport specific request decoder and response encoder.
 	// The goa http package has built-in support for JSON, XML and gob.
@@ -183,6 +216,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	exportServer := exportServiceSvr.New(exportEndpoints, mux, dec, enc, eh, nil)
 	collectionServer := collectionSvr.New(collectionEndpoints, mux, dec, enc, eh, nil)
 	discServer := discServiceSvr.New(discEndpoints, mux, dec, enc, eh, nil)
+	discourseServer := discourseServiceSvr.New(discourseEndpoints, mux, dec, enc, eh, nil)
+	oidcServer := oidcServiceSvr.New(oidcEndpoints, mux, dec, enc, eh, nil)
+	ttnServer := ttnServiceSvr.New(ttnEndpoints, mux, dec, enc, eh, nil)
 
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
@@ -203,6 +239,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	exportServiceSvr.Mount(mux, exportServer)
 	collectionSvr.Mount(mux, collectionServer)
 	discServiceSvr.Mount(mux, discServer)
+	discourseServiceSvr.Mount(mux, discourseServer)
+	oidcServiceSvr.Mount(mux, oidcServer)
+	ttnServiceSvr.Mount(mux, ttnServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -263,16 +302,39 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	for _, m := range discServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
+	for _, m := range discourseServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range oidcServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range ttnServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
 
-	return mux, nil
+	withSamlMethods, err := saml.Mount(ctx, mux)
+	if err != nil {
+		log.Errorw("saml-error", "error", err)
+	} else {
+		log.Infow("mount", "saml", true)
+	}
+
+	return withSamlMethods, nil
 }
 
 func errorHandler() func(context.Context, http.ResponseWriter, error) {
 	return func(ctx context.Context, w http.ResponseWriter, err error) {
 		log := Logger(ctx).Sugar()
 		id := logging.FindTaskID(ctx)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("[" + id + "] encoding: " + err.Error()))
+		// What's super annoying is that when we end up here, it's
+		// usually a problem encoding the response. Typically a NaN in
+		// JSON or something, by then the headers are already on their
+		// way. No real way to avoid that issue w/o buffering the JSON
+		// into memory.
+		if false {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("[" + id + "] encoding: " + err.Error()))
+		}
 		log.Errorw("fatal", "id", id, "message", err.Error())
 	}
 }
@@ -329,31 +391,41 @@ type AuthAttempt struct {
 	NotFound     GenerateError
 }
 
-func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
+func VerifyToken(ctx context.Context, a AuthAttempt) (jwt.MapClaims, int32, error) {
+	token := a.Token
+
+	log := Logger(ctx).Sugar()
+	log.Infow("verify-token:")
+
+	if strings.Contains(a.Token, " ") {
+		// Remove authorization scheme prefix (e.g. "Bearer")
+		cred := strings.SplitN(a.Token, " ", 2)[1]
+		token = cred
+	}
+
 	claims := make(jwt.MapClaims)
-	_, err := jwt.ParseWithClaims(a.Token, claims, func(t *jwt.Token) (interface{}, error) {
+	_, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
 		return a.Key, nil
 	})
 	if err != nil {
 		// Authentication is optional if required scopes is empty.
 		if len(a.Scheme.RequiredScopes) == 0 {
-			return ctx, nil
+			log.Infow("verify-token: no scope")
+			return nil, 0, nil
 		}
-		return ctx, a.Unauthorized("invalid token")
+		log.Infow("verify-token: fail", "error", err)
+		return nil, 0, a.Unauthorized("verify: invalid token")
 	}
 
 	// Make sure this token we've been given has valid scopes.
 	if claims["scopes"] == nil {
-		return ctx, a.Unauthorized("invalid scopes")
+		log.Infow("verify-token: fail 2")
+		return nil, 0, a.Unauthorized("verify: invalid scopes")
 	}
 	scopes, ok := claims["scopes"].([]interface{})
 	if !ok {
-		return ctx, a.Unauthorized("invalid scopes")
-	}
-
-	if false {
-		log := Logger(ctx).Sugar()
-		log.Infow("auth", "user_id", claims["sub"])
+		log.Infow("verify-token: fail 3")
+		return nil, 0, a.Unauthorized("verify: invalid scopes")
 	}
 
 	scopesInToken := make([]string, len(scopes))
@@ -364,14 +436,27 @@ func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
 	// We have a good token that has scopes, note that this does play
 	// nice with schemes that don't have any required scopes.
 	if err := a.Scheme.Validate(scopesInToken); err != nil {
-		return ctx, a.Unauthorized("invalid scopes")
+		log.Infow("verify-token: fail 4")
+		return nil, 0, a.Unauthorized("verify: invalid scopes")
 	}
 
 	userID := int32(claims["sub"].(float64))
 
-	withClaims := addClaimsToContext(ctx, claims)
-	withAttempt := addAuthAttemptToContext(withClaims, &a)
-	withLogging := logging.WithUserID(withAttempt, userID)
+	log.Infow("verify-token: success, auth")
+	return claims, userID, nil
+}
 
-	return withLogging, nil
+func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
+	withAttempt := addAuthAttemptToContext(ctx, &a)
+	claims, userID, err := VerifyToken(withAttempt, a)
+	if err != nil {
+		return nil, err
+	}
+	withLogging := logging.WithUserID(withAttempt, userID)
+	if claims == nil {
+		return withLogging, nil
+	}
+
+	withClaims := addClaimsToContext(withLogging, claims)
+	return withClaims, nil
 }

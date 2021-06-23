@@ -63,6 +63,7 @@ type User struct {
 	MediaContentType *string   `db:"media_content_type"`
 	Admin            bool      `db:"admin"`
 	FirmwareTester   bool      `db:"firmware_tester"`
+	FirmwarePattern  *string   `db:"firmware_pattern"`
 	CreatedAt        time.Time `db:"created_at"`
 	UpdatedAt        time.Time `db:"updated_at"`
 }

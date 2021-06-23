@@ -113,7 +113,8 @@ import { GlobalState } from "@/store/modules/global";
 
 import { serializePromiseChain } from "@/utilities";
 
-import { Notes, mergeNotes } from "./model";
+import { PortalStationNotesReply, Notes, mergeNotes } from "./model";
+import { DisplayStation, DisplayProject } from "@/store";
 
 export default Vue.extend({
     name: "NotesView",
@@ -137,7 +138,14 @@ export default Vue.extend({
             required: false,
         },
     },
-    data: () => {
+    data(): {
+        notes: { [stationId: number]: PortalStationNotesReply };
+        dirty: boolean;
+        loading: boolean;
+        success: boolean;
+        failed: boolean;
+        mobileView: boolean;
+    } {
         return {
             notes: {},
             dirty: false,
@@ -154,16 +162,16 @@ export default Vue.extend({
             stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
         }),
-        hasStations(this: any) {
+        hasStations(): boolean {
             return this.visibleStations.length > 0;
         },
-        project() {
+        project(): DisplayProject | null {
             if (this.projectId) {
                 return this.$getters.projectsById[this.projectId];
             }
             return null;
         },
-        visibleStations() {
+        visibleStations(): DisplayStation[] {
             if (this.projectId) {
                 const project = this.$getters.projectsById[this.projectId];
                 if (project) {
@@ -173,7 +181,7 @@ export default Vue.extend({
             }
             return this.$store.state.stations.user.stations;
         },
-        selectedStation() {
+        selectedStation(): DisplayStation | null {
             if (this.stationId) {
                 const station = this.$getters.stationsById[this.stationId];
                 if (station) {
@@ -182,7 +190,7 @@ export default Vue.extend({
             }
             return null;
         },
-        selectedNotes() {
+        selectedNotes(): PortalStationNotesReply | null {
             if (this.stationId && this.notes) {
                 return this.notes[this.stationId];
             }
@@ -190,11 +198,11 @@ export default Vue.extend({
         },
     },
     watch: {
-        stationId(this: any) {
-            return this.loadNotes(this.stationId);
+        async stationId(): Promise<void> {
+            await this.loadNotes(this.stationId);
         },
     },
-    mounted(this: any) {
+    async mounted(): Promise<void> {
         const desktopBreakpoint = 768;
         const windowAny: any = window;
         const resizeObserver = new windowAny.ResizeObserver((entries) => {
@@ -217,33 +225,33 @@ export default Vue.extend({
         if (this.stationId) {
             pending.push(this.loadNotes(this.stationId));
         }
-        return Promise.all(pending);
+        await Promise.all(pending);
     },
-    beforeRouteUpdate(this: any, to, from, next) {
+    beforeRouteUpdate(to: never, from: never, next: any) {
         console.log("router: update");
         if (this.maybeConfirmLeave()) {
             next();
         }
     },
-    beforeRouteLeave(this: any, to, from, next) {
+    beforeRouteLeave(to: never, from: never, next: any) {
         console.log("router: leave");
         if (this.maybeConfirmLeave()) {
             next();
         }
     },
     methods: {
-        loadNotes(this: any, stationId: number) {
+        async loadNotes(stationId: number): Promise<void> {
             this.success = false;
             this.failed = false;
-            Vue.set(this, "loading", true);
-            return this.$services.api.getStationNotes(stationId).then((notes) => {
+            this.loading = true;
+            await this.$services.api.getStationNotes(stationId).then((notes) => {
                 Vue.set(this.notes, stationId, notes);
-                Vue.set(this, "loading", false);
+                this.loading = false;
             });
         },
-        onSelected(station) {
+        async onSelected(station): Promise<void> {
             if (this.stationId != station.id) {
-                return this.$router.push({
+                await this.$router.push({
                     name: this.projectId ? "viewProjectStationNotes" : "viewStationNotes",
                     params: {
                         projectId: this.projectId.toString(),
@@ -252,10 +260,10 @@ export default Vue.extend({
                 });
             }
         },
-        onChange() {
+        onChange(): void {
             this.dirty = true;
         },
-        maybeConfirmLeave() {
+        maybeConfirmLeave(): boolean {
             if (this.dirty) {
                 if (window.confirm("You may have unsaved changes, are you sure you'd like to leave?")) {
                     this.dirty = false;
@@ -266,11 +274,11 @@ export default Vue.extend({
             }
             return true;
         },
-        saveForm(this: any, formNotes: Notes) {
+        async saveForm(formNotes: Notes): Promise<void> {
             this.success = false;
             this.failed = false;
 
-            return serializePromiseChain(formNotes.addedPhotos, (photo) => {
+            await serializePromiseChain(formNotes.addedPhotos, (photo) => {
                 return this.$services.api.uploadStationMedia(this.stationId, photo.key, photo.file).then((media) => {
                     console.log(media);
                     return [];
@@ -290,7 +298,7 @@ export default Vue.extend({
                 );
             });
         },
-        isMobileView() {
+        isMobileView(): boolean {
             return this.$data.mobileView;
         },
     },

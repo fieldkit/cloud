@@ -311,3 +311,86 @@ type RecordRangeMeta struct {
 	EndTime   time.Time `db:"end_time" json:"end_time"`
 	Flags     uint32    `db:"flags" json:"flags"`
 }
+
+func sanitizeProtobufData(bytes []byte) ([]byte, types.JSONText, error) {
+	if bytes == nil {
+		return nil, nil, nil
+	}
+
+	buffer := proto.NewBuffer(bytes)
+	parsed := &pb.DataRecord{}
+	if err := buffer.Unmarshal(parsed); err != nil {
+		return nil, nil, err
+	}
+
+	if parsed.Network != nil && parsed.Network.Networks != nil {
+		for _, n := range parsed.Network.Networks {
+			if n.Ssid != "" || n.Password != "" {
+				n.Ssid = "<sensitive>"
+				n.Password = "<sensitive>"
+			}
+		}
+	}
+
+	if parsed.Lora != nil {
+		if parsed.Lora.AppKey != nil {
+			parsed.Lora.AppKey = []byte("<sensitive>")
+		}
+		if parsed.Lora.NetworkSessionKey != nil {
+			parsed.Lora.NetworkSessionKey = []byte("<sensitive>")
+		}
+		if parsed.Lora.AppSessionKey != nil {
+			parsed.Lora.AppSessionKey = []byte("<sensitive>")
+		}
+	}
+
+	if parsed.Transmission != nil && parsed.Transmission.Wifi != nil {
+		if parsed.Transmission.Wifi.Token != "" {
+			parsed.Transmission.Wifi.Token = "<sensitive>"
+		}
+	}
+
+	newBytes := proto.NewBuffer(make([]byte, 0))
+	newBytes.EncodeMessage(parsed)
+
+	newJson, err := json.Marshal(parsed)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return newBytes.Bytes(), newJson, nil
+}
+
+func SanitizeMetaRecord(r *MetaRecord) *MetaRecord {
+	newBytes, newJson, err := sanitizeProtobufData(r.PB)
+	if err != nil {
+		return nil
+	}
+
+	return &MetaRecord{
+		ID:          r.ID,
+		ProvisionID: r.ProvisionID,
+		Time:        r.Time,
+		Number:      r.Number,
+		Data:        newJson,
+		PB:          newBytes,
+	}
+}
+
+func SanitizeDataRecord(r *DataRecord) *DataRecord {
+	newBytes, newJson, err := sanitizeProtobufData(r.PB)
+	if err != nil {
+		return nil
+	}
+
+	return &DataRecord{
+		ID:           r.ID,
+		ProvisionID:  r.ProvisionID,
+		Time:         r.Time,
+		Number:       r.Number,
+		MetaRecordID: r.MetaRecordID,
+		Location:     nil,
+		Data:         newJson,
+		PB:           newBytes,
+	}
+}

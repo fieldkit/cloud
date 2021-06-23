@@ -3,7 +3,10 @@ package repositories
 import (
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
+	"math"
+	"strings"
 	"time"
 
 	"github.com/conservify/sqlxcache"
@@ -12,7 +15,9 @@ import (
 
 	pbapp "github.com/fieldkit/app-protocol"
 
+	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 var (
@@ -23,16 +28,16 @@ type StationRepository struct {
 	db *sqlxcache.DB
 }
 
-func NewStationRepository(db *sqlxcache.DB) *StationRepository {
+func NewStationRepository(db *sqlxcache.DB) (rr *StationRepository) {
 	return &StationRepository{db: db}
 }
 
 func (r *StationRepository) Add(ctx context.Context, adding *data.Station) (station *data.Station, err error) {
 	if err := r.db.NamedGetContext(ctx, adding, `
 		INSERT INTO fieldkit.station
-		(name, device_id, owner_id, created_at, updated_at, location, location_name, place_other, place_native,
+		(name, device_id, owner_id, created_at, updated_at, synced_at, ingestion_at, location, location_name, place_other, place_native,
 		 battery, memory_used, memory_available, firmware_number, firmware_time, recording_started_at) VALUES
-		(:name, :device_id, :owner_id, :created_at, :updated_at, ST_SetSRID(ST_GeomFromText(:location), 4326), :location_name, :place_other, :place_native,
+		(:name, :device_id, :owner_id, :created_at, :updated_at, :synced_at, :ingestion_at, ST_SetSRID(ST_GeomFromText(:location), 4326), :location_name, :place_other, :place_native,
          :battery, :memory_used, :memory_available, :firmware_number, :firmware_time, :recording_started_at)
 		RETURNING id
 		`, adding); err != nil {
@@ -56,7 +61,9 @@ func (r *StationRepository) Update(ctx context.Context, station *data.Station) (
 			   memory_used = :memory_used,
 			   firmware_number = :firmware_number,
 			   firmware_time = :firmware_time,
-			   updated_at = :updated_at
+			   updated_at = :updated_at,
+			   synced_at = :synced_at,
+			   ingestion_at = :ingestion_at
 		WHERE id = :id
 		`, station); err != nil {
 		return err
@@ -148,6 +155,25 @@ func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, devic
 	return stations[0], nil
 }
 
+func (r *StationRepository) QueryStationConfigurationByMetaID(ctx context.Context, metaRecordID int64) (*data.StationConfiguration, error) {
+	configurations := []*data.StationConfiguration{}
+	if err := r.db.SelectContext(ctx, &configurations, `SELECT * FROM fieldkit.station_configuration WHERE meta_record_id = $1`, metaRecordID); err != nil {
+		return nil, err
+	}
+	if len(configurations) != 1 {
+		return nil, nil
+	}
+	return configurations[0], nil
+}
+
+func (r *StationRepository) QueryStationModulesByMetaID(ctx context.Context, metaRecordID int64) ([]*data.StationModule, error) {
+	modules := []*data.StationModule{}
+	if err := r.db.SelectContext(ctx, &modules, `SELECT * FROM fieldkit.station_module WHERE configuration_id IN (SELECT id FROM fieldkit.station_configuration WHERE meta_record_id = $1)`, metaRecordID); err != nil {
+		return nil, err
+	}
+	return modules, nil
+}
+
 func (r *StationRepository) UpsertConfiguration(ctx context.Context, configuration *data.StationConfiguration) (*data.StationConfiguration, error) {
 	if configuration.SourceID != nil && configuration.MetaRecordID == nil {
 		if err := r.db.NamedGetContext(ctx, configuration, `
@@ -224,17 +250,19 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 	}
 
 	if err := r.updateStationConfigurationFromStatus(ctx, s, statusReply); err != nil {
-		return err
+		return fmt.Errorf("error updating station configuration: %s", err)
 	}
 
 	if err := r.updateDeployedActivityFromStatus(ctx, s); err != nil {
-		return err
+		return fmt.Errorf("error updating deployed activity: %s", err)
 	}
 
 	return nil
 }
 
 func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Context, station *data.Station, statusReply *pbapp.HttpReply) error {
+	log := Logger(ctx).Sugar()
+
 	pr := NewProvisionRepository(r.db)
 
 	p, err := pr.QueryOrCreateProvision(ctx, station.DeviceID, statusReply.Status.Identity.Generation)
@@ -271,9 +299,13 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 
 				for sensorIndex, lrs := range lrm.Readings {
 					s := lrs.Sensor
-					value := float64(lrs.Value)
+					value64 := float64(lrs.Value)
+					value := &value64
+					if math.IsNaN(value64) {
+						value = nil
+					}
 
-					sensor := newModuleSensor(s, module, configuration, uint32(sensorIndex), &time, &value)
+					sensor := newModuleSensor(s, module, configuration, uint32(sensorIndex), &time, value)
 					if _, err := r.UpsertModuleSensor(ctx, sensor); err != nil {
 						return err
 					}
@@ -315,8 +347,6 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 	if err := r.deleteStationModulesExcept(ctx, configuration.ID, keepingModules); err != nil {
 		return err
 	}
-
-	log := Logger(ctx).Sugar()
 
 	log.Infow("configuration", "station_id", station.ID, "configuration_id", configuration.ID, "provision_id", p.ID)
 
@@ -367,12 +397,20 @@ func (r *StationRepository) updateDeployedActivityFromStatus(ctx context.Context
 }
 
 func (r *StationRepository) deleteModuleSensorsExcept(ctx context.Context, moduleID int64, keeping []int64) error {
-	if query, args, err := sqlx.In(`
-		DELETE FROM fieldkit.module_sensor WHERE module_id = ? AND id NOT IN (?)
+	if len(keeping) > 0 {
+		if query, args, err := sqlx.In(`
+			DELETE FROM fieldkit.module_sensor WHERE module_id = ? AND id NOT IN (?)
 		`, moduleID, keeping); err != nil {
-		return err
+			return err
+		} else {
+			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+				return err
+			}
+		}
 	} else {
-		if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+		if _, err := r.db.ExecContext(ctx, `
+			DELETE FROM fieldkit.module_sensor WHERE module_id = $1
+		`, moduleID); err != nil {
 			return err
 		}
 	}
@@ -381,22 +419,36 @@ func (r *StationRepository) deleteModuleSensorsExcept(ctx context.Context, modul
 }
 
 func (r *StationRepository) deleteStationModulesExcept(ctx context.Context, configurationID int64, keeping []int64) error {
-	if query, args, err := sqlx.In(`
-		DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?))
+	if len(keeping) > 0 {
+		if query, args, err := sqlx.In(`
+			DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?))
 		`, configurationID, keeping); err != nil {
-		return err
+			return err
+		} else {
+			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+				return err
+			}
+		}
+
+		if query, args, err := sqlx.In(`
+			DELETE FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?)
+		`, configurationID, keeping); err != nil {
+			return err
+		} else {
+			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+				return err
+			}
+		}
 	} else {
-		if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+		if _, err := r.db.ExecContext(ctx, `
+			DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = $1)
+		`, configurationID); err != nil {
 			return err
 		}
-	}
 
-	if query, args, err := sqlx.In(`
-		DELETE FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?)
-		`, configurationID, keeping); err != nil {
-		return err
-	} else {
-		if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+		if _, err := r.db.ExecContext(ctx, `
+			DELETE FROM fieldkit.station_module WHERE configuration_id = $1
+		`, configurationID); err != nil {
 			return err
 		}
 	}
@@ -434,8 +486,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 			ST_AsBinary(c.geom) AS geometry
 		FROM fieldkit.station AS s
 		JOIN fieldkit.counties AS c ON (ST_Contains(c.geom, s.location))
-		WHERE s.id = $1
-		  AND s.location IS NOT NULL
+		WHERE s.id = $1 AND s.location IS NOT NULL
 		`, id); err != nil {
 		return nil, err
 	}
@@ -448,6 +499,14 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		WHERE station_id IN ($1)
 		GROUP BY a.station_id
 	`, stations[0].ID); err != nil {
+		return nil, err
+	}
+
+	media := []*data.FieldNoteMedia{}
+	if err := r.db.SelectContext(ctx, &media, `
+		SELECT id, user_id, content_type, created_at, url, key, station_id
+		FROM fieldkit.notes_media WHERE station_id = $1 ORDER BY created_at ASC
+		`, id); err != nil {
 		return nil, err
 	}
 
@@ -505,7 +564,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	all, err := r.toStationFull(stations, owners, areas, dataSummaries, ingestions, provisions, configurations, modules, sensors)
+	all, err := r.toStationFull(stations, owners, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 	if err != nil {
 		return nil, err
 	}
@@ -553,6 +612,14 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)
 		GROUP BY a.station_id
 	`, id); err != nil {
+		return nil, err
+	}
+
+	media := []*data.FieldNoteMedia{}
+	if err := r.db.SelectContext(ctx, &media, `
+		SELECT id, user_id, content_type, created_at, url, key, station_id
+		FROM fieldkit.notes_media WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1) ORDER BY created_at ASC
+		`, id); err != nil {
 		return nil, err
 	}
 
@@ -628,7 +695,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, areas, dataSummaries, ingestions, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, owners, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 }
 
 func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id int32) ([]*data.StationFull, error) {
@@ -673,6 +740,14 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		WHERE station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
 		GROUP BY a.station_id
 	`, id); err != nil {
+		return nil, err
+	}
+
+	media := []*data.FieldNoteMedia{}
+	if err := r.db.SelectContext(ctx, &media, `
+		SELECT id, user_id, content_type, created_at, url, key, station_id
+		FROM fieldkit.notes_media WHERE station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1) ORDER BY created_at ASC
+		`, id); err != nil {
 		return nil, err
 	}
 
@@ -765,11 +840,11 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, areas, dataSummaries, ingestions, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, owners, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 }
 
-func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, areas []*data.StationArea, dataSummaries []*data.AggregatedDataSummary, ingestions []*data.Ingestion,
-	provisions []*data.Provision, configurations []*data.StationConfiguration,
+func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, areas []*data.StationArea, dataSummaries []*data.AggregatedDataSummary,
+	media []*data.FieldNoteMedia, ingestions []*data.Ingestion, provisions []*data.Provision, configurations []*data.StationConfiguration,
 	modules []*data.StationModule, sensors []*data.ModuleSensor) ([]*data.StationFull, error) {
 	ownersByID := make(map[int32]*data.User)
 	ingestionsByDeviceID := make(map[string][]*data.Ingestion)
@@ -800,6 +875,10 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 
 	for _, v := range dataSummaries {
 		summariesByStationID[v.StationID] = v
+	}
+
+	for _, v := range media {
+		mediaByStationID[v.StationID] = append(mediaByStationID[v.StationID], v)
 	}
 
 	for _, v := range ingestions {
@@ -851,6 +930,7 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 			Modules:        modulesByStationID[station.ID],
 			Sensors:        sensorsByStationID[station.ID],
 			DataSummary:    summariesByStationID[station.ID],
+			HasImages:      len(mediaByStationID[station.ID]) > 0,
 		})
 	}
 
@@ -981,6 +1061,7 @@ func (sr *StationRepository) Delete(ctx context.Context, stationID int32) error 
 		`DELETE FROM fieldkit.aggregated_30m WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.aggregated_10m WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.aggregated_1m WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.aggregated_10s WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.visible_configuration WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.notes_media WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.notes WHERE station_id IN ($1)`,
@@ -997,4 +1078,131 @@ func (sr *StationRepository) Delete(ctx context.Context, stationID int32) error 
 		}
 		return nil
 	})
+}
+
+type DecodeAndCheckFunc = func(ctx context.Context, tm *jobs.TransportMessage) (bool, error)
+
+func (sr *StationRepository) QueryStationProgress(ctx context.Context, stationID int32) ([]*data.StationJob, error) {
+	station, err := sr.QueryStationByID(ctx, stationID)
+	if err != nil {
+		return nil, err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	log.Infow("station-progress", "device_id", station.DeviceID, "station_id", station.ID)
+
+	queued := []*data.QueJob{}
+	if err := sr.db.SelectContext(ctx, &queued, `
+		SELECT priority, run_at, job_id, job_class, args, error_count, last_error, queue
+		FROM que_jobs
+        WHERE run_at - interval '1' hour > NOW()
+		ORDER BY run_at`); err != nil {
+		return nil, err
+	}
+
+	tests := map[string]DecodeAndCheckFunc{
+		"IngestionReceived": func(ctx context.Context, tm *jobs.TransportMessage) (bool, error) {
+			message := &messages.IngestionReceived{}
+			if err := json.Unmarshal(tm.Body, message); err != nil {
+				return false, err
+			}
+			return false, nil
+		},
+		"ExportData": func(ctx context.Context, tm *jobs.TransportMessage) (bool, error) {
+			message := &messages.ExportData{}
+			if err := json.Unmarshal(tm.Body, message); err != nil {
+				return false, err
+			}
+			return false, nil
+		},
+		"RefreshStation": func(ctx context.Context, tm *jobs.TransportMessage) (bool, error) {
+			message := &messages.RefreshStation{}
+			if err := json.Unmarshal(tm.Body, message); err != nil {
+				return false, err
+			}
+			if message.StationID == station.ID {
+				return true, nil
+			}
+			return false, nil
+		},
+		"IngestStation": func(ctx context.Context, tm *jobs.TransportMessage) (bool, error) {
+			message := &messages.IngestStation{}
+			if err := json.Unmarshal(tm.Body, message); err != nil {
+				return false, err
+			}
+			if message.StationID == station.ID {
+				return true, nil
+			}
+			return false, nil
+		},
+	}
+
+	for _, j := range queued {
+		transport := &jobs.TransportMessage{}
+		if err := json.Unmarshal([]byte(j.Args), transport); err != nil {
+			return nil, err
+		}
+
+		if check, ok := tests[j.JobClass]; !ok {
+			log.Infow("decoder-missing", "job_class", j.JobClass)
+		} else {
+			if included, err := check(ctx, transport); err != nil {
+				log.Warnw("decoder-error", "error", err)
+			} else if included {
+				log.Infow("included")
+			}
+		}
+	}
+
+	return nil, nil
+}
+
+type StationSensor struct {
+	StationID    int32     `db:"station_id" json:"stationId"`
+	StationName  string    `db:"station_name" json:"stationName"`
+	ModuleID     string    `db:"module_id" json:"moduleId"`
+	ModuleKey    string    `db:"module_key" json:"moduleKey"`
+	SensorID     int64     `db:"sensor_id" json:"sensorId"`
+	SensorKey    string    `db:"sensor_key" json:"sensorKey"`
+	SensorReadAt time.Time `db:"sensor_read_at" json:"sensorReadAt"`
+}
+
+func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations []int32) (map[int32][]*StationSensor, error) {
+	query, args, err := sqlx.In(fmt.Sprintf(`
+		SELECT
+			station_id, station.name AS station_name,
+			encode(station_module.hardware_id, 'base64') AS module_id, station_module.name AS module_key,
+			sensor_id, s.key AS sensor_key,
+            MAX(agg.time) AS sensor_read_at
+		FROM %s AS agg
+		JOIN fieldkit.aggregated_sensor AS s ON (s.id = sensor_id)
+		JOIN fieldkit.station AS station ON (agg.station_id = station.id)
+		JOIN fieldkit.station_module AS station_module ON (agg.module_id = station_module.id)
+		WHERE station_id IN (?)
+		GROUP BY station_id, station.name, station_module.name, station_module.hardware_id, sensor_id, s.key
+        ORDER BY sensor_read_at DESC
+		`, "fieldkit.aggregated_10m"), stations)
+	if err != nil {
+		return nil, err
+	}
+
+	rows := []*StationSensor{}
+	if err := sr.db.SelectContext(ctx, &rows, sr.db.Rebind(query), args...); err != nil {
+		return nil, err
+	}
+
+	byStation := make(map[int32][]*StationSensor)
+	for _, id := range stations {
+		byStation[int32(id)] = make([]*StationSensor, 0)
+	}
+
+	for _, row := range rows {
+		if !strings.HasPrefix(row.ModuleKey, "fk.") {
+			row.ModuleKey = "fk." + strings.TrimPrefix(row.ModuleKey, "modules.")
+		}
+		byStation[row.StationID] = append(byStation[row.StationID], row)
+	}
+
+	return byStation, nil
 }

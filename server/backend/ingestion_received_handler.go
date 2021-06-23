@@ -91,28 +91,31 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		}
 
 		if info.StationID != nil {
-			now := time.Now()
-			howFarBack := time.Hour * 48
-			if !info.DataStart.IsZero() {
-				if now.After(info.DataStart) {
-					howFarBack += now.Sub(info.DataStart)
-					if howFarBack < 0 {
-						log.Infow("refreshing-error", "how_far_back", howFarBack, "data_end", info.DataEnd, "now", now)
-						howFarBack = time.Hour * 48
+			if m.Refresh {
+				now := time.Now()
+				howFarBack := time.Hour * 48
+				if !info.DataStart.IsZero() {
+					if now.After(info.DataStart) {
+						howFarBack += now.Sub(info.DataStart)
+						if howFarBack < 0 {
+							log.Infow("refreshing-error", "how_far_back", howFarBack, "data_end", info.DataEnd, "now", now)
+							howFarBack = time.Hour * 48
+						} else {
+							log.Infow("refreshing", "how_far_back", howFarBack, "data_end", info.DataEnd, "now", now)
+						}
 					} else {
-						log.Infow("refreshing", "how_far_back", howFarBack, "data_end", info.DataEnd, "now", now)
+						log.Warnw("data-after-now", "data_start", info.DataStart, "data_end", info.DataEnd, "now", now)
 					}
-				} else {
-					log.Warnw("data-after-now", "data_start", info.DataStart, "data_end", info.DataEnd, "now", now)
 				}
-			}
-			if err := h.publisher.Publish(ctx, &messages.RefreshStation{
-				StationID:   *info.StationID,
-				HowRecently: howFarBack,
-				Completely:  false,
-				UserID:      i.UserID,
-			}); err != nil {
-				return err
+
+				if err := h.publisher.Publish(ctx, &messages.RefreshStation{
+					StationID:   *info.StationID,
+					HowRecently: howFarBack,
+					Completely:  false,
+					UserID:      i.UserID,
+				}); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -153,6 +156,11 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		DataIngestionID: info.IngestionID,
 		DataRecords:     info.DataRecords,
 		Errors:          info.DataErrors > 0 || info.MetaErrors > 0,
+	}
+
+	// NOTE: We may want to adjust this to be something more... accurate than NOW().
+	if _, err := database.ExecContext(ctx, `UPDATE fieldkit.station SET ingestion_at = NOW() WHERE id = $1`, *info.StationID); err != nil {
+		return fmt.Errorf("error updating station: %v", err)
 	}
 
 	if err := database.NamedGetContext(ctx, activity, `

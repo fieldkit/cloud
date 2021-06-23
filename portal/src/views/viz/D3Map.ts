@@ -23,7 +23,7 @@ export const D3Map = Vue.extend({
         refreshed: boolean;
     } {
         return {
-            mapboxToken: Config.MAPBOX_ACCESS_TOKEN,
+            mapboxToken: Config.mapbox.token,
             refreshed: false,
         };
     },

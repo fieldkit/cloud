@@ -75,7 +75,52 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .domain(data.dataRange)
                 .range([layout.height - (layout.margins.bottom + layout.margins.top), layout.margins.top]);
 
-            const xAxis = d3.axisBottom(x).ticks(10);
+            type FormatFunctionType = (date: Date) => string;
+
+            function formatTick(date: Date, tick: number, els: { __data__: Date }[], state: { f: FormatFunctionType | null }) {
+                let spec = "%-m/%-d %-H:%M";
+
+                if (tick == 0) {
+                    const allTicks = els.map((el) => el.__data__);
+                    const dateOnly = d3.timeFormat("%-m/%-d");
+                    const allDates = allTicks.map((tickDate) => dateOnly(tickDate));
+                    const timeOnly = d3.timeFormat("%-H:%M");
+                    const allTimes = allTicks.map((tickDate) => timeOnly(tickDate));
+
+                    const uniqueDates = _.uniq(allDates);
+                    const uniqueTimes = _.uniq(allTimes);
+
+                    if (uniqueTimes.length == 1) {
+                        spec = "%-m/%-d";
+                    } else if (uniqueDates.length == 1) {
+                        spec = "%-H:%M";
+                    }
+                }
+
+                if (state.f == null) {
+                    state.f = d3.timeFormat(spec);
+                    if (state.f == null) throw new Error();
+                }
+
+                return state.f(date);
+            }
+
+            const createTickFormatter = () => {
+                const state = {
+                    f: null,
+                };
+                return (date: Date, tick: number, els: { __data__: Date }[]) => {
+                    return formatTick(date, tick, els, state);
+                };
+            };
+
+            const tickFormatter = createTickFormatter();
+
+            const xAxis = d3
+                .axisBottom(x)
+                .ticks(11)
+                .scale(x)
+                .tickFormat(tickFormatter);
 
             const yAxis = d3.axisLeft(y).ticks(6);
 
@@ -159,35 +204,45 @@ export const D3TimeSeriesGraph = Vue.extend({
             const line = svg
                 .selectAll(".d3-line")
                 .data(charts)
-                .join((enter) => {
-                    const adding = enter
-                        .append("g")
-                        .attr("class", "svg-container-responsive d3-line")
-                        .attr("clip-path", "url(#clip-" + this.viz.id + ")");
+                .join(
+                    (enter) => {
+                        const adding = enter
+                            .append("g")
+                            .attr("class", "svg-container-responsive d3-line")
+                            .attr("clip-path", "url(#clip-" + this.viz.id + ")");
 
-                    adding
-                        .append("linearGradient")
-                        .attr("id", this.viz.id + "-line-style")
-                        .attr("gradientUnits", "userSpaceOnUse")
-                        .attr("x1", 0)
-                        .attr("y1", y(dataRange[0]))
-                        .attr("x2", 0)
-                        .attr("y2", y(dataRange[1]))
-                        .selectAll("stop")
-                        .data(stops)
-                        .join((enter) =>
-                            enter
-                                .append("stop")
-                                .attr("offset", (d) => d.offset)
-                                .attr("stop-color", (d) => d.color)
-                        );
+                        const lg = adding
+                            .append("linearGradient")
+                            .attr("id", this.viz.id + "-line-style")
+                            .attr("class", "d3-line-style")
+                            .attr("gradientUnits", "userSpaceOnUse")
+                            .attr("x1", 0)
+                            .attr("y1", y(dataRange[0]))
+                            .attr("x2", 0)
+                            .attr("y2", y(dataRange[1]))
+                            .selectAll("stop")
+                            .data(stops)
+                            .join((enter) => enter.append("stop"))
+                            .attr("offset", (d) => d.offset)
+                            .attr("stop-color", (d) => d.color);
 
-                    return adding;
-                });
+                        return adding;
+                    },
+                    (update) => {
+                        update
+                            .selectAll("stop")
+                            .data(stops)
+                            .join((enter) => enter.append("stop"))
+                            .attr("offset", (d) => d.offset)
+                            .attr("stop-color", (d) => d.color);
+
+                        return update;
+                    }
+                );
 
             const lineFn = d3
                 .line()
-                .defined((d) => d.value)
+                .defined((d) => _.isNumber(d.value))
                 .x((d) => x(d.time))
                 .y((d) => y(d.value))
                 .curve(d3.curveBasis);

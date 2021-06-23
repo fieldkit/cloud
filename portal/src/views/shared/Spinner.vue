@@ -3,15 +3,19 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 
 export default Vue.extend({
     name: "Spinner",
-    props: {},
 });
 </script>
 
 <style scoped>
+.spinner {
+    margin-top: 2em;
+    margin-left: auto;
+    margin-right: auto;
+}
 .loader {
     font-size: 10px;
     text-indent: -9999em;

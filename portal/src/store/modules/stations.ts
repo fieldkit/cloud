@@ -203,6 +203,10 @@ export class MappedStations {
         const centered = new BoundingRectangle().include(station.location.lngLat());
         return new MappedStations(this.stations, this.features, centered.zoomOutOrAround(DefaultLocation, DefaultMargin));
     }
+
+    public static defaultBounds(): BoundingRectangle {
+        return new BoundingRectangle().zoomOutOrAround(DefaultLocation, DefaultMargin);
+    }
 }
 
 export class DisplayProject {
@@ -212,10 +216,12 @@ export class DisplayProject {
     public readonly duration: number | null = null;
     public readonly mapped: MappedStations;
     public readonly places: { native: string | null } = { native: null };
+    public readonly bounds?: BoundingRectangle;
 
     constructor(public readonly project: Project, public readonly users: ProjectUser[], public readonly stations: DisplayStation[]) {
         this.id = project.id;
         this.name = project.name;
+        this.bounds = project.bounds;
         this.modules = _(stations)
             .filter((station) => station.configurations.all.length > 0)
             .map((station) => station.configurations.all[0].modules.filter((m) => !m.internal))
@@ -242,11 +248,14 @@ const getters = {
     projectsById(state: StationsState): { [index: number]: DisplayProject } {
         return _(Object.values(state.projects))
             .map((p) => {
-                const users = state.projectUsers[p.id] || [];
-                const stations = state.projectStations[p.id] || [];
-                return new DisplayProject(p, users, stations);
+                const users = state.projectUsers[p.id];
+                const stations = state.projectStations[p.id];
+                if (stations && users) {
+                    return [p.id, new DisplayProject(p, users, stations)];
+                }
+                return [p.id, null];
             })
-            .keyBy((p) => p.project.id)
+            .fromPairs()
             .value();
     },
     stationsById(state: StationsState): { [index: number]: DisplayStation } {

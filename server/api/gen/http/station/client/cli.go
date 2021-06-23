@@ -23,7 +23,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"deviceId\": \"Occaecati libero.\",\n      \"locationName\": \"Dolores eius.\",\n      \"name\": \"Eos labore.\",\n      \"statusPb\": \"Blanditiis est nemo odit aliquid est vero.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"deviceId\": \"Cumque vel quis omnis distinctio qui.\",\n      \"locationName\": \"Consequuntur cum suscipit.\",\n      \"name\": \"Pariatur dolor qui deserunt dolor beatae.\",\n      \"statusPb\": \"Voluptatem dolor qui nesciunt veniam ea dolorum.\"\n   }'")
 		}
 	}
 	var auth string
@@ -54,9 +54,11 @@ func BuildGetPayload(stationGetID string, stationGetAuth string) (*station.GetPa
 			return nil, fmt.Errorf("invalid value for id, must be INT32")
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = stationGetAuth
+		if stationGetAuth != "" {
+			auth = &stationGetAuth
+		}
 	}
 	v := &station.GetPayload{}
 	v.ID = id
@@ -107,7 +109,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Beatae consequatur cumque vel.\",\n      \"name\": \"Accusantium nostrum nihil pariatur dolor qui deserunt.\",\n      \"statusPb\": \"Omnis distinctio qui illo.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Veniam dicta quia laboriosam et repellat.\",\n      \"name\": \"Officiis rerum unde aut voluptas provident.\",\n      \"statusPb\": \"Omnis quam reiciendis autem ut.\"\n   }'")
 		}
 	}
 	var id int32
@@ -321,6 +323,30 @@ func BuildAdminSearchPayload(stationAdminSearchQuery string, stationAdminSearchA
 	}
 	v := &station.AdminSearchPayload{}
 	v.Query = query
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildProgressPayload builds the payload for the station progress endpoint
+// from CLI flags.
+func BuildProgressPayload(stationProgressStationID string, stationProgressAuth string) (*station.ProgressPayload, error) {
+	var err error
+	var stationID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationProgressStationID, 10, 32)
+		stationID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for stationID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = stationProgressAuth
+	}
+	v := &station.ProgressPayload{}
+	v.StationID = stationID
 	v.Auth = auth
 
 	return v, nil

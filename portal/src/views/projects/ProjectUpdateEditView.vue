@@ -4,11 +4,10 @@
             <router-link :to="{ name: 'viewProject', params: { id: project.id } }" v-if="project">
                 <div class="projects-link">
                     <span class="small-arrow">&lt;</span>
-                    Back to {{ project.name }}
+                    {{ $t("layout.backProject", { name: project.name }) }}
                 </div>
             </router-link>
             <div id="inner-container">
-                <!-- add or update a project update -->
                 <ProjectUpdateForm :projectUpdate="activeUpdate" :project="project" @updating="onProjectUpdate" />
             </div>
         </div>

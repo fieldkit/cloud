@@ -116,7 +116,9 @@ func TestUpdateProjectWhenAdministrator(t *testing.T) {
 		"location": "",
 		"goal": "",
 		"following": { "following": false, "total": 0 },
-		"tags": ""
+		"tags": "",
+		"showStations":false,
+		"bounds":{"min":null,"max":null}
 	}`, newName)
 }
 
@@ -128,7 +130,7 @@ func TestUpdateProjectWhenNotMember(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	user, err := e.AddUser()
+	nonMember, err := e.AddUser()
 	assert.NoError(err)
 
 	api, err := NewTestableApi(e)
@@ -146,7 +148,7 @@ func TestUpdateProjectWhenNotMember(t *testing.T) {
 	assert.NoError(err)
 
 	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/projects/%d", fd.Project.ID), bytes.NewReader(payload))
-	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(nonMember))
 	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusForbidden, rr.Code)
@@ -184,6 +186,48 @@ func TestGetProjectMember(t *testing.T) {
 			"location": "<<PRESENCE>>",
 			"readOnly": true,
 			"privacy": 0,
+			"name": "<<PRESENCE>>",
+			"following": { "following": false, "total": 0 },
+			"goal": "<<PRESENCE>>",
+			"showStations":false,
+			"bounds":{"min":null,"max":null}
+		}`)
+}
+
+func TestGetProjectAdministratorPublicProject(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	user, err := e.AddUser()
+	assert.NoError(err)
+
+	project, err := e.AddProjectWithPrivacy(data.Public)
+	assert.NoError(err)
+
+	err = e.AddProjectUser(project, user, data.AdministratorRole)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d", project.ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+		{
+			"id": "<<PRESENCE>>",
+			"description": "<<PRESENCE>>",
+			"tags": "<<PRESENCE>>",
+			"location": "<<PRESENCE>>",
+			"readOnly": false,
+			"showStations": false,
+			"bounds": { "min": null, "max": null },
+			"privacy": 1,
 			"name": "<<PRESENCE>>",
 			"following": { "following": false, "total": 0 },
 			"goal": "<<PRESENCE>>"
@@ -224,7 +268,9 @@ func TestGetProjectAdministrator(t *testing.T) {
 			"privacy": 0,
 			"name": "<<PRESENCE>>",
 			"following": { "following": false, "total": 0 },
-			"goal": "<<PRESENCE>>"
+			"goal": "<<PRESENCE>>",
+			"showStations":false,
+			"bounds":{"min":null,"max":null}
 		}`)
 }
 

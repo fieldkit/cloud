@@ -26,6 +26,7 @@ type Endpoints struct {
 	ListAll       goa.Endpoint
 	Delete        goa.Endpoint
 	AdminSearch   goa.Endpoint
+	Progress      goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "station" service with endpoints.
@@ -43,6 +44,7 @@ func NewEndpoints(s Service) *Endpoints {
 		ListAll:       NewListAllEndpoint(s, a.JWTAuth),
 		Delete:        NewDeleteEndpoint(s, a.JWTAuth),
 		AdminSearch:   NewAdminSearchEndpoint(s, a.JWTAuth),
+		Progress:      NewProgressEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -58,6 +60,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ListAll = m(e.ListAll)
 	e.Delete = m(e.Delete)
 	e.AdminSearch = m(e.AdminSearch)
+	e.Progress = m(e.Progress)
 }
 
 // NewAddEndpoint returns an endpoint function that calls the method "add" of
@@ -93,9 +96,13 @@ func NewGetEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 		sc := security.JWTScheme{
 			Name:           "jwt",
 			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
+			RequiredScopes: []string{},
 		}
-		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		var token string
+		if p.Auth != nil {
+			token = *p.Auth
+		}
+		ctx, err = authJWTFn(ctx, token, &sc)
 		if err != nil {
 			return nil, err
 		}
@@ -290,6 +297,30 @@ func NewAdminSearchEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpo
 			return nil, err
 		}
 		vres := NewViewedPageOfStations(res, "default")
+		return vres, nil
+	}
+}
+
+// NewProgressEndpoint returns an endpoint function that calls the method
+// "progress" of service "station".
+func NewProgressEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*ProgressPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.Progress(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedStationProgress(res, "default")
 		return vres, nil
 	}
 }

@@ -58,6 +58,8 @@ type Station struct {
 	OwnerID            int32      `db:"owner_id,omitempty"`
 	CreatedAt          time.Time  `db:"created_at,omitempty"`
 	UpdatedAt          time.Time  `db:"updated_at,omitempty"`
+	SyncedAt           *time.Time `db:"synced_at"`
+	IngestionAt        *time.Time `db:"ingestion_at"`
 	Battery            *float32   `db:"battery"`
 	Location           *Location  `db:"location"`
 	LocationName       *string    `db:"location_name"`
@@ -103,7 +105,20 @@ func (s *Station) UpdateFromStatus(ctx context.Context, raw string) error {
 		status := record.Status
 
 		if status.Identity != nil {
-			log.Infow("identity", "identity", status.Identity)
+			log.Infow("identity", "identity",
+				struct {
+					Name         string `json:"name"`
+					DeviceID     string `json:"device_id"`
+					GenerationID string `json:"generation"`
+					Firmware     string `json:"firmware"`
+					Build        string `json:"build"`
+				}{
+					Name:         status.Identity.Name,
+					DeviceID:     hex.EncodeToString(status.Identity.DeviceId),
+					GenerationID: hex.EncodeToString(status.Identity.Generation),
+					Firmware:     status.Identity.Firmware,
+					Build:        status.Identity.Build,
+				})
 
 			if status.Identity.Name != "" {
 				s.Name = status.Identity.Name
@@ -196,6 +211,7 @@ type StationFull struct {
 	Modules        []*StationModule
 	Sensors        []*ModuleSensor
 	DataSummary    *AggregatedDataSummary
+	HasImages      bool
 }
 
 type EssentialStation struct {

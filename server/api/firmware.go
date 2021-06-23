@@ -50,15 +50,17 @@ func FirmwareSummaryType(fw *data.Firmware) *firmware.FirmwareSummary {
 	}
 
 	return &firmware.FirmwareSummary{
-		ID:          fw.ID,
-		Time:        fw.Time.String(),
-		Module:      fw.Module,
-		Profile:     fw.Profile,
-		Etag:        fw.ETag,
-		URL:         fw.URL,
-		Meta:        metaFields,
-		BuildNumber: buildNumber,
-		BuildTime:   buildTime,
+		ID:             fw.ID,
+		Time:           fw.Time.String(),
+		Module:         fw.Module,
+		Profile:        fw.Profile,
+		Version:        fw.Version,
+		Etag:           fw.ETag,
+		URL:            fw.URL,
+		Meta:           metaFields,
+		BuildNumber:    buildNumber,
+		BuildTime:      buildTime,
+		LogicalAddress: fw.LogicalAddress,
 	}
 }
 
@@ -81,7 +83,7 @@ func (s *FirmwareService) Download(ctx context.Context, payload *firmware.Downlo
 
 	firmwares := []*data.Firmware{}
 	if err := s.options.Database.SelectContext(ctx, &firmwares, `
-		SELECT * FROM fieldkit.firmware WHERE id = $1
+		SELECT * FROM fieldkit.firmware WHERE id = $1 AND NOT hidden
 		`, payload.FirmwareID); err != nil {
 		return nil, nil, err
 	}
@@ -133,20 +135,35 @@ func (s *FirmwareService) Add(ctx context.Context, payload *firmware.AddPayload)
 		return err
 	}
 
-	log.Infow("add firmware", "etag", payload.Firmware.Etag, "url", payload.Firmware.URL, "module", payload.Firmware.Module, "profile", payload.Firmware.Profile, "meta", metaMap)
+	timestamp := int64(0)
+
+	if raw, ok := metaMap["Build-Time"]; ok {
+		if p, err := time.Parse("20060102_150405", raw); err == nil {
+			timestamp = p.Unix()
+		}
+	}
+
+	if timestamp == 0 {
+		return fmt.Errorf("meta[Build-Time] is required")
+	}
+
+	log.Infow("add firmware", "etag", payload.Firmware.Etag, "url", payload.Firmware.URL, "module", payload.Firmware.Module, "profile", payload.Firmware.Profile, "meta", metaMap, "firmware_timestamp", timestamp)
 
 	fw := data.Firmware{
-		Time:    time.Now(),
-		Module:  payload.Firmware.Module,
-		Profile: payload.Firmware.Profile,
-		URL:     payload.Firmware.URL,
-		ETag:    payload.Firmware.Etag,
-		Meta:    []byte(payload.Firmware.Meta),
+		Time:           time.Now(),
+		Module:         payload.Firmware.Module,
+		Profile:        payload.Firmware.Profile,
+		Version:        &payload.Firmware.Version,
+		URL:            payload.Firmware.URL,
+		ETag:           payload.Firmware.Etag,
+		Meta:           []byte(payload.Firmware.Meta),
+		LogicalAddress: payload.Firmware.LogicalAddress,
+		Timestamp:      &timestamp,
 	}
 
 	if _, err := s.options.Database.NamedExecContext(ctx, `
-		   INSERT INTO fieldkit.firmware (time, module, profile, url, etag, meta)
-		   VALUES (:time, :module, :profile, :url, :etag, :meta)
+		   INSERT INTO fieldkit.firmware (time, module, profile, url, etag, meta, logical_address, version, timestamp)
+		   VALUES (:time, :module, :profile, :url, :etag, :meta, :logical_address, :version, :timestamp)
 		   `, fw); err != nil {
 		return err
 	}
@@ -154,21 +171,30 @@ func (s *FirmwareService) Add(ctx context.Context, payload *firmware.AddPayload)
 	return nil
 }
 
+const (
+	DefaultFirmwarePattern = "^(.+main.+)$"
+)
+
 func (s *FirmwareService) List(ctx context.Context, payload *firmware.ListPayload) (*firmware.Firmwares, error) {
 	log := Logger(ctx).Sugar()
 
-	firmwareTester := false
+	tester := false
+	pattern := DefaultFirmwarePattern
 
 	p, err := NewPermissions(ctx, s.options).Unwrap()
-	if err == nil {
+	if err == nil && !p.Anonymous() {
 		user := &data.User{}
 		if err := s.options.Database.GetContext(ctx, user, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
 			return nil, err
 		}
 
-		log.Infow("firmware", "user", user.ID, "firmware_tester", user.FirmwareTester)
+		tester = user.FirmwareTester
 
-		firmwareTester = user.FirmwareTester
+		if user.FirmwarePattern != nil {
+			pattern = *user.FirmwarePattern
+		}
+
+		log.Infow("firmware", "user", user.ID, "firmware_tester", tester, "firmware_pattern", pattern)
 	} else {
 		log.Infow("firmware", "user", "anonymous")
 	}
@@ -189,9 +215,12 @@ func (s *FirmwareService) List(ctx context.Context, payload *firmware.ListPayloa
 		FROM fieldkit.firmware AS f
 		WHERE (f.module = $1 OR $1 IS NULL) AND
 			  (f.profile = $2 OR $2 IS NULL) AND
-			  (f.available OR $5)
-		ORDER BY time DESC LIMIT $3 OFFSET $4
-		`, payload.Module, payload.Profile, pageSize, page*pageSize, firmwareTester); err != nil {
+			  (f.available OR $3) AND
+			  (f.version ~ $4) AND
+			  NOT f.hidden
+		ORDER BY time DESC
+		LIMIT $5 OFFSET $6
+		`, payload.Module, payload.Profile, tester, pattern, pageSize, page*pageSize); err != nil {
 		return nil, err
 	}
 

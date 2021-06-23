@@ -43,6 +43,14 @@ type PageOfStations struct {
 	View string
 }
 
+// StationProgress is the viewed result type that is projected based on a view.
+type StationProgress struct {
+	// Type to project
+	Projected *StationProgressView
+	// View to render
+	View string
+}
+
 // StationFullView is a type that runs validations on a projected type.
 type StationFullView struct {
 	ID                 *int32
@@ -64,6 +72,8 @@ type StationFullView struct {
 	PlaceNameOther     *string
 	PlaceNameNative    *string
 	Location           *StationLocationView
+	SyncedAt           *int64
+	IngestionAt        *int64
 	Data               *StationDataSummaryView
 }
 
@@ -200,6 +210,19 @@ type EssentialStationView struct {
 	LastIngestionAt    *int64
 }
 
+// StationProgressView is a type that runs validations on a projected type.
+type StationProgressView struct {
+	Jobs []*StationJobView
+}
+
+// StationJobView is a type that runs validations on a projected type.
+type StationJobView struct {
+	Title       *string
+	StartedAt   *int64
+	CompletedAt *int64
+	Progress    *float32
+}
+
 var (
 	// StationFullMap is a map of attribute names in result type StationFull
 	// indexed by view name.
@@ -224,6 +247,8 @@ var (
 			"locationName",
 			"placeNameOther",
 			"placeNameNative",
+			"syncedAt",
+			"ingestionAt",
 			"data",
 		},
 	}
@@ -250,6 +275,13 @@ var (
 		"default": []string{
 			"stations",
 			"total",
+		},
+	}
+	// StationProgressMap is a map of attribute names in result type
+	// StationProgress indexed by view name.
+	StationProgressMap = map[string][]string{
+		"default": []string{
+			"jobs",
 		},
 	}
 	// StationLocationMap is a map of attribute names in result type
@@ -284,7 +316,19 @@ var (
 			"locationName",
 			"placeNameOther",
 			"placeNameNative",
+			"syncedAt",
+			"ingestionAt",
 			"data",
+		},
+	}
+	// StationJobMap is a map of attribute names in result type StationJob indexed
+	// by view name.
+	StationJobMap = map[string][]string{
+		"default": []string{
+			"startedAt",
+			"completedAt",
+			"progress",
+			"title",
 		},
 	}
 )
@@ -331,6 +375,18 @@ func ValidatePageOfStations(result *PageOfStations) (err error) {
 	switch result.View {
 	case "default", "":
 		err = ValidatePageOfStationsView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateStationProgress runs the validations defined on the viewed result
+// type StationProgress.
+func ValidateStationProgress(result *StationProgress) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateStationProgressView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
 	}
@@ -701,6 +757,37 @@ func ValidateEssentialStationView(result *EssentialStationView) (err error) {
 		if err2 := ValidateStationLocationView(result.Location); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateStationProgressView runs the validations defined on
+// StationProgressView using the "default" view.
+func ValidateStationProgressView(result *StationProgressView) (err error) {
+	if result.Jobs == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("jobs", "result"))
+	}
+	for _, e := range result.Jobs {
+		if e != nil {
+			if err2 := ValidateStationJobView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateStationJobView runs the validations defined on StationJobView using
+// the "default" view.
+func ValidateStationJobView(result *StationJobView) (err error) {
+	if result.StartedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("startedAt", "result"))
+	}
+	if result.Progress == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("progress", "result"))
+	}
+	if result.Title == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("title", "result"))
 	}
 	return
 }

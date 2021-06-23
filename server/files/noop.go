@@ -41,12 +41,12 @@ func (a *nopFilesArchive) Archive(ctx context.Context, contentType string, meta 
 	return ss, nil
 }
 
-func (a *nopFilesArchive) OpenByKey(ctx context.Context, key string) (of *OpenedFile, err error) {
+func (a *nopFilesArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFile, err error) {
 	return nil, fmt.Errorf("unsupported")
 }
 
-func (a *nopFilesArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFile, err error) {
-	return nil, fmt.Errorf("unsupported")
+func (a *nopFilesArchive) Opened(ctx context.Context, url string, opened *OpenedFile) (reopened *OpenedFile, err error) {
+	return nil, nil
 }
 
 func (a *nopFilesArchive) DeleteByKey(ctx context.Context, key string) (err error) {

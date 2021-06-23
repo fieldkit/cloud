@@ -66,7 +66,7 @@ func BuildPostMessagePayload(discussionPostMessageBody string, discussionPostMes
 	{
 		err = json.Unmarshal([]byte(discussionPostMessageBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"post\": {\n         \"body\": \"Ut eaque similique.\",\n         \"bookmark\": \"Et id.\",\n         \"projectId\": 94760602,\n         \"threadId\": 2297857148288545669\n      }\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"post\": {\n         \"body\": \"Omnis error blanditiis dolor.\",\n         \"bookmark\": \"Ipsum commodi dolorum minus aut nulla.\",\n         \"projectId\": 1018441120,\n         \"threadId\": 6851964469600833384\n      }\n   }'")
 		}
 		if body.Post == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("post", "body"))
@@ -96,7 +96,7 @@ func BuildUpdateMessagePayload(discussionUpdateMessageBody string, discussionUpd
 	{
 		err = json.Unmarshal([]byte(discussionUpdateMessageBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Et maxime dolore et distinctio nesciunt aut.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Quasi odit in.\"\n   }'")
 		}
 	}
 	var postID int64

@@ -61,6 +61,14 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import "../../scss/mixins";
 
+.note-editor {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 1em;
+    border: 1px solid #d8dce0;
+    border-radius: 4px;
+}
+
 .field {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -75,7 +83,7 @@ export default Vue.extend({
     display: flex;
     align-items: baseline;
     margin-bottom: 10px;
-    border: 2px solid #d8dce0;
+    border: 1px solid #d8dce0;
     border-radius: 4px;
     background-color: #fcfcfc;
     padding: 8px;

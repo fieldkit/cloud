@@ -33,10 +33,9 @@ type OpenedFile struct {
 
 type FileArchive interface {
 	Archive(ctx context.Context, contentType string, meta map[string]string, read io.Reader) (*ArchivedFile, error)
-	OpenByKey(ctx context.Context, key string) (f *OpenedFile, err error)
 	OpenByURL(ctx context.Context, url string) (f *OpenedFile, err error)
-	DeleteByKey(ctx context.Context, key string) (err error)
 	DeleteByURL(ctx context.Context, url string) (err error)
+	Opened(ctx context.Context, url string, opened *OpenedFile) (reopened *OpenedFile, err error)
 	Info(ctx context.Context, key string) (info *FileInfo, err error)
 	String() string
 }

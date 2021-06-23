@@ -42,6 +42,9 @@ type Client struct {
 	// endpoint.
 	RecoveryDoer goahttp.Doer
 
+	// Resume Doer is the HTTP client used to make requests to the resume endpoint.
+	ResumeDoer goahttp.Doer
+
 	// Logout Doer is the HTTP client used to make requests to the logout endpoint.
 	LogoutDoer goahttp.Doer
 
@@ -121,6 +124,7 @@ func NewClient(
 		LoginDoer:                  doer,
 		RecoveryLookupDoer:         doer,
 		RecoveryDoer:               doer,
+		ResumeDoer:                 doer,
 		LogoutDoer:                 doer,
 		RefreshDoer:                doer,
 		SendValidationDoer:         doer,
@@ -306,6 +310,30 @@ func (c *Client) Recovery() goa.Endpoint {
 		resp, err := c.RecoveryDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("user", "recovery", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Resume returns an endpoint that makes HTTP requests to the user service
+// resume server.
+func (c *Client) Resume() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeResumeRequest(c.encoder)
+		decodeResponse = DecodeResumeResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildResumeRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ResumeDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("user", "resume", err)
 		}
 		return decodeResponse(resp)
 	}

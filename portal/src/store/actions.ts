@@ -2,6 +2,9 @@ export const INITIALIZE = "INITIALIZE";
 export const LOGIN = "LOGIN";
 export const AUTHENTICATED = "AUTHENTICATED";
 export const LOGOUT = "LOGOUT";
+export const LOGIN_RESUME = "LOGIN_RESUME";
+export const LOGIN_OIDC = "LOGIN_OIDC";
+export const LOGIN_DISCOURSE = "LOGIN_DISCOURSE";
 
 export const NEED_COMMON = "NEED_COMMON";
 export const NEED_PROJECTS = "NEED_PROJECTS";

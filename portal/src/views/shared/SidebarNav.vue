@@ -2,7 +2,7 @@
     <div class="container-side" v-bind:class="{ active: !sidebar.narrow }">
         <div class="sidebar-header">
             <router-link :to="{ name: 'projects' }">
-                <img alt="FieldKit Logo" id="header-logo" src="@/assets/logo-fieldkit.svg" />
+                <img :alt="$t('layout.logo.alt')" id="header-logo" src="@/assets/logo-fieldkit.svg" />
             </router-link>
         </div>
         <a class="sidebar-trigger" v-on:click="toggleSidebar">
@@ -13,7 +13,7 @@
                 <router-link :to="{ name: 'projects' }">
                     <div class="nav-label">
                         <img alt="Projects" src="@/assets/icon-projects.svg" />
-                        <span v-bind:class="{ selected: viewingProjects }">Projects</span>
+                        <span v-bind:class="{ selected: viewingProjects }">{{ $t("layout.side.projects.title") }}</span>
                     </div>
                 </router-link>
                 <div v-for="project in projects" v-bind:key="project.id">
@@ -32,7 +32,7 @@
                 <router-link :to="{ name: 'mapAllStations' }">
                     <div class="nav-label">
                         <img alt="Stations" src="@/assets/icon-stations.svg" />
-                        <span v-bind:class="{ selected: viewingStations }">Stations</span>
+                        <span v-bind:class="{ selected: viewingStations }">{{ $t("layout.side.stations.title") }}</span>
                     </div>
                 </router-link>
                 <div v-for="station in stations" v-bind:key="station.id">
@@ -44,11 +44,13 @@
                         {{ station.name }}
                     </span>
                 </div>
-                <div v-if="isAuthenticated && stations.length == 0" class="nav-link">No stations added</div>
+                <div v-if="isAuthenticated && stations.length == 0" class="nav-link">{{ $t("layout.side.stations.empty") }}</div>
             </div>
         </div>
         <div class="sidebar-header sidebar-compass">
-            <img alt="FieldKit Compass Logo" src="@/assets/logo-compass.svg" width="45" height="45" />
+            <router-link :to="{ name: 'projects' }">
+                <img :alt="$t('layout.logo.compass.alt')" src="@/assets/logo-compass.svg" width="45" height="45" />
+            </router-link>
         </div>
     </div>
 </template>
@@ -242,6 +244,7 @@ export default Vue.extend({
     @at-root .container-side.active & {
         transition: all 0.33s;
         opacity: 0;
+        visibility: hidden;
         transform: translateX(100px);
     }
 

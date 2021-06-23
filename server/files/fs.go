@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -14,7 +16,7 @@ import (
 )
 
 const (
-	Path = "./.fs"
+	Path = ".fs"
 )
 
 type localFilesArchive struct {
@@ -68,16 +70,14 @@ func (a *localFilesArchive) Archive(ctx context.Context, contentType string, met
 
 }
 
-func (a *localFilesArchive) OpenByKey(ctx context.Context, key string) (of *OpenedFile, err error) {
-	return a.OpenByURL(ctx, makeFileName(key))
-}
-
 func (a *localFilesArchive) OpenByURL(ctx context.Context, url string) (of *OpenedFile, err error) {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("opening", "url", url)
+	fn := makeFileName(url)
 
-	file, err := os.Open(url)
+	log.Infow("opening", "url", url, "filename", fn)
+
+	file, err := os.Open(fn)
 	if err != nil {
 		return nil, err
 	}
@@ -95,8 +95,39 @@ func (a *localFilesArchive) OpenByURL(ctx context.Context, url string) (of *Open
 	return
 }
 
-func (a *localFilesArchive) DeleteByKey(ctx context.Context, key string) error {
-	return fmt.Errorf("unsupported")
+func (a *localFilesArchive) Opened(ctx context.Context, url string, opened *OpenedFile) (reopened *OpenedFile, err error) {
+	log := Logger(ctx).Sugar()
+
+	fn := makeFileName(url)
+
+	if _, err := os.Stat(fn); os.IsNotExist(err) {
+		log.Infow("opened, resaving", "url", url, "fn", fn)
+
+		file, err := os.OpenFile(fn, os.O_RDWR|os.O_CREATE, 0666)
+		if err != nil {
+			return nil, err
+		}
+
+		defer file.Close()
+
+		_, err = io.Copy(file, opened.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		rof, err := a.OpenByURL(ctx, url)
+		if err != nil {
+			return nil, err
+		}
+		if rof == nil {
+			panic("wtf")
+		}
+		return rof, nil
+	} else {
+		log.Infow("opened, skipped", "url", url, "fn", fn)
+	}
+
+	return nil, nil
 }
 
 func (a *localFilesArchive) DeleteByURL(ctx context.Context, url string) error {
@@ -125,6 +156,13 @@ func (a *localFilesArchive) Info(ctx context.Context, keyOrUrl string) (info *Fi
 	return nil, fmt.Errorf("file not found: %s", keyOrUrl)
 }
 
-func makeFileName(key string) string {
-	return path.Join(Path, fmt.Sprintf("%v.fkpb", key))
+func makeFileName(keyOrUrl string) string {
+	u, err := url.Parse(keyOrUrl)
+	if err != nil {
+		return path.Join(Path, fmt.Sprintf("%v", keyOrUrl))
+	}
+	if strings.HasPrefix(u.Path, Path) {
+		return u.Path
+	}
+	return path.Join(Path, fmt.Sprintf("%v", u.Path))
 }

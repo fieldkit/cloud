@@ -1,7 +1,7 @@
 <template>
     <div class="header">
         <router-link :to="{ name: 'projects' }">
-            <img alt="FieldKit Logo" id="header-logo" src="@/assets/logo-fieldkit.svg" />
+            <img :alt="$t('layout.logo.alt')" id="header-logo" src="@/assets/logo-fieldkit.svg" />
         </router-link>
         <div
             class="header-account"
@@ -12,12 +12,12 @@
             <UserPhoto v-if="user" :user="user" />
             <a v-if="user" class="header-account-name">{{ firstName }}</a>
             <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
-                Log in
+                {{ $t("layout.header.login") }}
             </router-link>
             <div class="header-account-menu" v-bind:class="{ active: isAccountHovered }">
-                <router-link v-if="user" :to="{ name: 'editUser' }">My Account</router-link>
-                <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">Admin</router-link>
-                <a class="log-out" v-if="isAuthenticated" v-on:click="logout">Log out</a>
+                <router-link v-if="user" :to="{ name: 'editUser' }">{{ $t("layout.header.myAccount") }}</router-link>
+                <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">{{ $t("layout.header.admin") }}</router-link>
+                <a class="log-out" v-if="isAuthenticated" v-on:click="logout">{{ $t("layout.header.logout") }}</a>
             </div>
         </div>
     </div>
@@ -53,7 +53,7 @@ export default Vue.extend({
     methods: {
         async logout(): Promise<void> {
             await this.$store.dispatch(ActionTypes.LOGOUT).then(() => {
-                return this.$router.push({ name: "login" });
+                // Action handles where we go after.
             });
         },
         onAccountHover(event: Event): void {

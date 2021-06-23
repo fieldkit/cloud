@@ -4,10 +4,10 @@ import TokenStorage from "./tokens";
 import Config from "../secrets";
 import { keysToCamel, keysToCamelWithWarnings } from "@/json-tools";
 import { ExportParams } from "@/store/typed-actions";
-import { NewComment } from '@/views/comments/model';
-import { Comment } from '@/views/comments/model';
+import { BoundingRectangle } from "@/store/map-types";
+import { NewComment } from "@/views/comments/model";
+import { Comment } from "@/views/comments/model";
 import { SensorsResponse } from "@/views/viz/api";
-
 
 export class ApiError extends Error {
     constructor(message) {
@@ -157,6 +157,7 @@ export interface SimpleUser {
     bio: string;
     mediaUrl: string;
     mediaContentType: string;
+    photo: { url: string };
 }
 
 export interface ProjectUser {
@@ -187,10 +188,11 @@ export interface Project {
     readOnly: boolean;
     slug: string;
     tags: string;
-    mediaContentType: string;
-    mediaUrl: string;
     startTime?: Date;
     endTime?: Date;
+    bounds?: BoundingRectangle;
+    showStations: boolean;
+    photo: string;
     following: {
         following: boolean;
         total: number;
@@ -292,7 +294,7 @@ export interface StationsResponse {
 export function makeAuthenticatedApiUrl(url) {
     const tokens = new TokenStorage();
     const token = tokens.getToken();
-    return Config.API_HOST + url + "?token=" + token;
+    return Config.baseUrl + url + "?token=" + token;
 }
 
 export enum Auth {
@@ -312,7 +314,7 @@ export interface InvokeParams {
 }
 
 class FKApi {
-    private readonly baseUrl: string = Config.API_HOST;
+    private readonly baseUrl: string = Config.baseUrl;
     private readonly token: TokenStorage = new TokenStorage();
     private refreshing: Promise<any> | null = null;
 
@@ -444,7 +446,7 @@ class FKApi {
         }
     }
 
-    public login(email, password) {
+    public login(email: string, password: string): Promise<any> {
         return axios({
             method: "POST",
             url: this.baseUrl + "/login",
@@ -452,6 +454,95 @@ class FKApi {
             data: {
                 email: email,
                 password: password,
+            },
+        }).then((response) => this.handleLogin(response));
+    }
+
+    public loginDiscourse(
+        token: string | null,
+        email: string | null,
+        password: string | null,
+        sso: string,
+        sig: string
+    ): Promise<{ token: string; location: string; header: string }> {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        if (token) {
+            headers["Authorization"] = "Bearer " + token;
+        }
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/discourse/auth",
+            headers: headers,
+            data: {
+                email: email,
+                password: password,
+                sso: sso,
+                sig: sig,
+            },
+        })
+            .then((response) => {
+                return response.data as { token: string; location: string; header: string };
+            })
+            .then((response) => {
+                this.token.setToken(response.header);
+                return response;
+            });
+    }
+
+    public loginOidc(
+        token: string | null,
+        params: {
+            state: string;
+            sessionState: string;
+            code: string;
+        }
+    ): Promise<{ token: string; location: string; header: string }> {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        if (token) {
+            headers["Authorization"] = "Bearer " + token;
+        }
+        const qp = new URLSearchParams();
+        qp.append("state", params.state);
+        qp.append("session_state", params.sessionState);
+        qp.append("code", params.code);
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/oidc/auth?" + qp.toString(),
+            headers: headers,
+        })
+            .then((response) => {
+                return response.data as { token: string; location: string; header: string };
+            })
+            .then((response) => {
+                this.token.setToken(response.header);
+                return response;
+            });
+    }
+
+    public loginUrl(after: string | null): Promise<string> {
+        const qp = new URLSearchParams();
+        if (after) {
+            qp.append("after", after);
+        }
+        return axios({
+            method: "GET",
+            url: this.baseUrl + "/oidc/url?" + qp.toString(),
+        }).then((response) => {
+            return response.data.location;
+        });
+    }
+
+    public loginResume(token: string): Promise<any> {
+        return axios({
+            method: "POST",
+            url: this.baseUrl + "/user/resume",
+            headers: { "Content-Type": "application/json" },
+            data: {
+                token: token,
             },
         }).then((response) => this.handleLogin(response));
     }
@@ -476,13 +567,13 @@ class FKApi {
                 return Promise.resolve();
             }
             if (!discardToken) {
-            const token = this.token.getHeader();
-            const headers = { "Content-Type": "application/json", Authorization: token };
-            await axios({
-                method: "POST",
-                url: this.baseUrl + "/logout",
-                headers: headers,
-            });
+                const token = this.token.getHeader();
+                const headers = { "Content-Type": "application/json", Authorization: token };
+                await axios({
+                    method: "POST",
+                    url: this.baseUrl + "/logout",
+                    headers: headers,
+                });
             }
         } catch (err) {
             console.log("api: logout error:", err, err.stack);
@@ -1010,6 +1101,32 @@ class FKApi {
         });
     }
 
+    public adminProcessStationData(stationId: number): Promise<void> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + `/data/stations/${stationId}/ingestions/process`,
+        });
+    }
+
+    public adminProcessUpload(ingestionId: number): Promise<void> {
+        const qp = new URLSearchParams();
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + `/data/ingestions/${ingestionId}/process?` + qp.toString(),
+        });
+    }
+
+    // Think twice before you use this. Every pending ingestion_queue should have a que_job.
+    protected adminProcessPending(): Promise<void> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + `/data/process`,
+        });
+    }
+
     public adminProcessStation(stationId: number, completely: boolean): Promise<void> {
         const qp = new URLSearchParams();
         if (completely) {
@@ -1061,10 +1178,10 @@ class FKApi {
         });
     }
 
-    public getComments(projectIDOrBookmark: number | string): Promise<{posts: []}> {
+    public getComments(projectIDOrBookmark: number | string): Promise<{ posts: Comment[] }> {
         let apiURL;
 
-        if (typeof projectIDOrBookmark === 'number') {
+        if (typeof projectIDOrBookmark === "number") {
             apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
         } else {
             apiURL = this.baseUrl + "/discussion?bookmark=" + JSON.stringify(projectIDOrBookmark);
@@ -1077,12 +1194,29 @@ class FKApi {
         });
     }
 
-    public postComment(comment: NewComment): Promise<{post: Comment}> {
+    public postComment(comment: NewComment): Promise<{ post: Comment }> {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/discussion",
             data: { post: comment },
+        });
+    }
+
+    public deleteComment(commentID: number): Promise<boolean> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/discussion/" + commentID,
+        });
+    }
+
+    public editComment(commentID: number, body: string): Promise<boolean> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/discussion/" + commentID,
+            data: { body: body },
         });
     }
 }
@@ -1099,6 +1233,7 @@ export interface EssentialStation {
     name: string;
     deviceId: string;
     owner: { id: number; name: string };
+    uploads: { id: number }[];
 }
 
 export interface PageOfStations {

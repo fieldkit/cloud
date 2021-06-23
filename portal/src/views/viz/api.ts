@@ -1,4 +1,6 @@
-interface SensorRange {
+import { ModuleID } from "./common";
+
+export interface SensorRange {
     minimum: number;
     maximum: number;
 }
@@ -12,7 +14,7 @@ export interface ModuleSensorMeta {
     ranges: SensorRange[];
 }
 
-interface Module {
+export interface Module {
     id: number;
     key: string;
     internal: boolean;
@@ -39,6 +41,7 @@ export interface DataRow {
     time: number;
     stationId: number;
     sensorId: number;
+    moduleId: number;
     location: [number, number] | null;
     value: number;
 }
@@ -50,9 +53,13 @@ export interface SensorDataResponse {
 }
 
 interface StationInfoResponse {
+    stationId: number;
+    stationName: string;
+    moduleId: ModuleID;
+    moduleKey: string;
     sensorId: number;
-    key: string;
-    name: string;
+    sensorKey: string;
+    sensorReadAt: string;
 }
 
 export interface SensorInfoResponse {

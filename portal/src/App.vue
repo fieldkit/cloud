@@ -10,12 +10,14 @@ import * as ActionTypes from "@/store/actions";
 import { AuthenticationRequiredError } from "@/api";
 
 export default Vue.extend({
-    mounted() {
-        return this.$store.dispatch(ActionTypes.INITIALIZE).catch((err) => {
+    async mounted(): Promise<void> {
+        try {
+            await this.$store.dispatch(ActionTypes.INITIALIZE);
+        } catch (err) {
             console.log("initialize error", err, err.stack);
-        });
+        }
     },
-    errorCaptured(err, vm, info) {
+    errorCaptured(err, vm, info): boolean {
         console.log("vuejs:error-captured", JSON.stringify(err));
         if (AuthenticationRequiredError.isInstance(err)) {
             this.$router.push({ name: "login", query: { after: this.$route.path } });

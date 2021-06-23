@@ -52,11 +52,13 @@ func BuildAddPayload(firmwareAddBody string, firmwareAddAuth string) (*firmware.
 		}
 	}
 	v := &firmware.AddFirmwarePayload{
-		Etag:    body.Etag,
-		Module:  body.Module,
-		Profile: body.Profile,
-		URL:     body.URL,
-		Meta:    body.Meta,
+		Etag:           body.Etag,
+		Module:         body.Module,
+		Profile:        body.Profile,
+		Version:        body.Version,
+		URL:            body.URL,
+		Meta:           body.Meta,
+		LogicalAddress: body.LogicalAddress,
 	}
 	res := &firmware.AddPayload{
 		Firmware: v,

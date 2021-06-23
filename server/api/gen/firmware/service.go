@@ -82,25 +82,29 @@ type DeletePayload struct {
 }
 
 type AddFirmwarePayload struct {
-	Etag    string
-	Module  string
-	Profile string
-	URL     string
-	Meta    string
+	Etag           string
+	Module         string
+	Profile        string
+	Version        string
+	URL            string
+	Meta           string
+	LogicalAddress *int64
 }
 
 type FirmwareSummaryCollection []*FirmwareSummary
 
 type FirmwareSummary struct {
-	ID          int32
-	Time        string
-	Etag        string
-	Module      string
-	Profile     string
-	URL         string
-	Meta        map[string]interface{}
-	BuildNumber int32
-	BuildTime   int64
+	ID             int32
+	Time           string
+	Etag           string
+	Module         string
+	Profile        string
+	Version        *string
+	URL            string
+	Meta           map[string]interface{}
+	BuildNumber    int32
+	BuildTime      int64
+	LogicalAddress *int64
 }
 
 // MakeUnauthorized builds a goa.ServiceError from an error.
@@ -195,7 +199,10 @@ func newFirmwareSummaryCollectionView(res FirmwareSummaryCollection) firmwarevie
 // newFirmwareSummary converts projected type FirmwareSummary to service type
 // FirmwareSummary.
 func newFirmwareSummary(vres *firmwareviews.FirmwareSummaryView) *FirmwareSummary {
-	res := &FirmwareSummary{}
+	res := &FirmwareSummary{
+		Version:        vres.Version,
+		LogicalAddress: vres.LogicalAddress,
+	}
 	if vres.ID != nil {
 		res.ID = *vres.ID
 	}
@@ -235,14 +242,16 @@ func newFirmwareSummary(vres *firmwareviews.FirmwareSummaryView) *FirmwareSummar
 // type FirmwareSummaryView using the "default" view.
 func newFirmwareSummaryView(res *FirmwareSummary) *firmwareviews.FirmwareSummaryView {
 	vres := &firmwareviews.FirmwareSummaryView{
-		ID:          &res.ID,
-		Time:        &res.Time,
-		Etag:        &res.Etag,
-		Module:      &res.Module,
-		Profile:     &res.Profile,
-		URL:         &res.URL,
-		BuildNumber: &res.BuildNumber,
-		BuildTime:   &res.BuildTime,
+		ID:             &res.ID,
+		Time:           &res.Time,
+		Etag:           &res.Etag,
+		Module:         &res.Module,
+		Profile:        &res.Profile,
+		Version:        res.Version,
+		URL:            &res.URL,
+		BuildNumber:    &res.BuildNumber,
+		BuildTime:      &res.BuildTime,
+		LogicalAddress: res.LogicalAddress,
 	}
 	if res.Meta != nil {
 		vres.Meta = make(map[string]interface{}, len(res.Meta))
