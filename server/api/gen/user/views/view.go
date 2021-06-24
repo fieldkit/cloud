@@ -63,6 +63,15 @@ type ProjectRoleCollection struct {
 	View string
 }
 
+// MentionableOptions is the viewed result type that is projected based on a
+// view.
+type MentionableOptions struct {
+	// Type to project
+	Projected *MentionableOptionsView
+	// View to render
+	View string
+}
+
 // AvailableRolesView is a type that runs validations on a projected type.
 type AvailableRolesView struct {
 	Roles []*AvailableRoleView
@@ -133,6 +142,22 @@ type ProjectRoleView struct {
 	Name *string
 }
 
+// MentionableOptionsView is a type that runs validations on a projected type.
+type MentionableOptionsView struct {
+	Users MentionableUserCollectionView
+}
+
+// MentionableUserCollectionView is a type that runs validations on a projected
+// type.
+type MentionableUserCollectionView []*MentionableUserView
+
+// MentionableUserView is a type that runs validations on a projected type.
+type MentionableUserView struct {
+	ID    *int32
+	Name  *string
+	Photo *UserPhotoView
+}
+
 var (
 	// AvailableRolesMap is a map of attribute names in result type AvailableRoles
 	// indexed by view name.
@@ -186,6 +211,13 @@ var (
 			"name",
 		},
 	}
+	// MentionableOptionsMap is a map of attribute names in result type
+	// MentionableOptions indexed by view name.
+	MentionableOptionsMap = map[string][]string{
+		"default": []string{
+			"users",
+		},
+	}
 	// ProjectUserCollectionMap is a map of attribute names in result type
 	// ProjectUserCollection indexed by view name.
 	ProjectUserCollectionMap = map[string][]string{
@@ -216,6 +248,24 @@ var (
 		"default": []string{
 			"id",
 			"name",
+		},
+	}
+	// MentionableUserCollectionMap is a map of attribute names in result type
+	// MentionableUserCollection indexed by view name.
+	MentionableUserCollectionMap = map[string][]string{
+		"default": []string{
+			"id",
+			"name",
+			"photo",
+		},
+	}
+	// MentionableUserMap is a map of attribute names in result type
+	// MentionableUser indexed by view name.
+	MentionableUserMap = map[string][]string{
+		"default": []string{
+			"id",
+			"name",
+			"photo",
 		},
 	}
 )
@@ -285,6 +335,18 @@ func ValidateProjectRoleCollection(result ProjectRoleCollection) (err error) {
 	switch result.View {
 	case "default", "":
 		err = ValidateProjectRoleCollectionView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateMentionableOptions runs the validations defined on the viewed result
+// type MentionableOptions.
+func ValidateMentionableOptions(result *MentionableOptions) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateMentionableOptionsView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
 	}
@@ -454,6 +516,41 @@ func ValidateProjectRoleCollectionView(result ProjectRoleCollectionView) (err er
 // ValidateProjectRoleView runs the validations defined on ProjectRoleView
 // using the "default" view.
 func ValidateProjectRoleView(result *ProjectRoleView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	return
+}
+
+// ValidateMentionableOptionsView runs the validations defined on
+// MentionableOptionsView using the "default" view.
+func ValidateMentionableOptionsView(result *MentionableOptionsView) (err error) {
+
+	if result.Users != nil {
+		if err2 := ValidateMentionableUserCollectionView(result.Users); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateMentionableUserCollectionView runs the validations defined on
+// MentionableUserCollectionView using the "default" view.
+func ValidateMentionableUserCollectionView(result MentionableUserCollectionView) (err error) {
+	for _, item := range result {
+		if err2 := ValidateMentionableUserView(item); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateMentionableUserView runs the validations defined on
+// MentionableUserView using the "default" view.
+func ValidateMentionableUserView(result *MentionableUserView) (err error) {
 	if result.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
 	}

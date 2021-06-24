@@ -60,6 +60,8 @@ type Service interface {
 	AdminDelete(context.Context, *AdminDeletePayload) (err error)
 	// AdminSearch implements admin search.
 	AdminSearch(context.Context, *AdminSearchPayload) (res *AdminSearchResult, err error)
+	// Mentionables implements mentionables.
+	Mentionables(context.Context, *MentionablesPayload) (res *MentionableOptions, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -76,7 +78,7 @@ const ServiceName = "user"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [21]string{"roles", "delete", "upload photo", "download photo", "login", "recovery lookup", "recovery", "resume", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "get current", "list by project", "issue transmission token", "project roles", "admin delete", "admin search"}
+var MethodNames = [22]string{"roles", "delete", "upload photo", "download photo", "login", "recovery lookup", "recovery", "resume", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "get current", "list by project", "issue transmission token", "project roles", "admin delete", "admin search", "mentionables"}
 
 // RolesPayload is the payload type of the user service roles method.
 type RolesPayload struct {
@@ -264,6 +266,20 @@ type AdminSearchResult struct {
 	Users UserCollection
 }
 
+// MentionablesPayload is the payload type of the user service mentionables
+// method.
+type MentionablesPayload struct {
+	Auth      string
+	ProjectID *int32
+	Bookmark  *string
+}
+
+// MentionableOptions is the result type of the user service mentionables
+// method.
+type MentionableOptions struct {
+	Users MentionableUserCollection
+}
+
 type AvailableRole struct {
 	ID   int32
 	Name string
@@ -327,6 +343,14 @@ type AdminDeleteFields struct {
 }
 
 type UserCollection []*User
+
+type MentionableUserCollection []*MentionableUser
+
+type MentionableUser struct {
+	ID    int32
+	Name  string
+	Photo *UserPhoto
+}
 
 // MakeUserUnverified builds a goa.ServiceError from an error.
 func MakeUserUnverified(err error) *goa.ServiceError {
@@ -458,6 +482,19 @@ func NewProjectRoleCollection(vres userviews.ProjectRoleCollection) ProjectRoleC
 func NewViewedProjectRoleCollection(res ProjectRoleCollection, view string) userviews.ProjectRoleCollection {
 	p := newProjectRoleCollectionView(res)
 	return userviews.ProjectRoleCollection{Projected: p, View: "default"}
+}
+
+// NewMentionableOptions initializes result type MentionableOptions from viewed
+// result type MentionableOptions.
+func NewMentionableOptions(vres *userviews.MentionableOptions) *MentionableOptions {
+	return newMentionableOptions(vres.Projected)
+}
+
+// NewViewedMentionableOptions initializes viewed result type
+// MentionableOptions from result type MentionableOptions using the given view.
+func NewViewedMentionableOptions(res *MentionableOptions, view string) *userviews.MentionableOptions {
+	p := newMentionableOptionsView(res)
+	return &userviews.MentionableOptions{Projected: p, View: "default"}
 }
 
 // newAvailableRoles converts projected type AvailableRoles to service type
@@ -703,6 +740,76 @@ func newProjectRoleView(res *ProjectRole) *userviews.ProjectRoleView {
 	vres := &userviews.ProjectRoleView{
 		ID:   &res.ID,
 		Name: &res.Name,
+	}
+	return vres
+}
+
+// newMentionableOptions converts projected type MentionableOptions to service
+// type MentionableOptions.
+func newMentionableOptions(vres *userviews.MentionableOptionsView) *MentionableOptions {
+	res := &MentionableOptions{}
+	if vres.Users != nil {
+		res.Users = newMentionableUserCollection(vres.Users)
+	}
+	return res
+}
+
+// newMentionableOptionsView projects result type MentionableOptions to
+// projected type MentionableOptionsView using the "default" view.
+func newMentionableOptionsView(res *MentionableOptions) *userviews.MentionableOptionsView {
+	vres := &userviews.MentionableOptionsView{}
+	if res.Users != nil {
+		vres.Users = newMentionableUserCollectionView(res.Users)
+	}
+	return vres
+}
+
+// newMentionableUserCollection converts projected type
+// MentionableUserCollection to service type MentionableUserCollection.
+func newMentionableUserCollection(vres userviews.MentionableUserCollectionView) MentionableUserCollection {
+	res := make(MentionableUserCollection, len(vres))
+	for i, n := range vres {
+		res[i] = newMentionableUser(n)
+	}
+	return res
+}
+
+// newMentionableUserCollectionView projects result type
+// MentionableUserCollection to projected type MentionableUserCollectionView
+// using the "default" view.
+func newMentionableUserCollectionView(res MentionableUserCollection) userviews.MentionableUserCollectionView {
+	vres := make(userviews.MentionableUserCollectionView, len(res))
+	for i, n := range res {
+		vres[i] = newMentionableUserView(n)
+	}
+	return vres
+}
+
+// newMentionableUser converts projected type MentionableUser to service type
+// MentionableUser.
+func newMentionableUser(vres *userviews.MentionableUserView) *MentionableUser {
+	res := &MentionableUser{}
+	if vres.ID != nil {
+		res.ID = *vres.ID
+	}
+	if vres.Name != nil {
+		res.Name = *vres.Name
+	}
+	if vres.Photo != nil {
+		res.Photo = transformUserviewsUserPhotoViewToUserPhoto(vres.Photo)
+	}
+	return res
+}
+
+// newMentionableUserView projects result type MentionableUser to projected
+// type MentionableUserView using the "default" view.
+func newMentionableUserView(res *MentionableUser) *userviews.MentionableUserView {
+	vres := &userviews.MentionableUserView{
+		ID:   &res.ID,
+		Name: &res.Name,
+	}
+	if res.Photo != nil {
+		vres.Photo = transformUserPhotoToUserviewsUserPhotoView(res.Photo)
 	}
 	return vres
 }

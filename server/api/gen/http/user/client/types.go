@@ -158,6 +158,12 @@ type AdminSearchResponseBody struct {
 	Users UserCollectionResponseBody `form:"users,omitempty" json:"users,omitempty" xml:"users,omitempty"`
 }
 
+// MentionablesResponseBody is the type of the "user" service "mentionables"
+// endpoint HTTP response body.
+type MentionablesResponseBody struct {
+	Users MentionableUserCollectionResponseBody `form:"users,omitempty" json:"users,omitempty" xml:"users,omitempty"`
+}
+
 // RolesUnauthorizedResponseBody is the type of the "user" service "roles"
 // endpoint HTTP response body for the "unauthorized" error.
 type RolesUnauthorizedResponseBody struct {
@@ -1710,6 +1716,78 @@ type AdminSearchBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// MentionablesUnauthorizedResponseBody is the type of the "user" service
+// "mentionables" endpoint HTTP response body for the "unauthorized" error.
+type MentionablesUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// MentionablesForbiddenResponseBody is the type of the "user" service
+// "mentionables" endpoint HTTP response body for the "forbidden" error.
+type MentionablesForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// MentionablesNotFoundResponseBody is the type of the "user" service
+// "mentionables" endpoint HTTP response body for the "not-found" error.
+type MentionablesNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// MentionablesBadRequestResponseBody is the type of the "user" service
+// "mentionables" endpoint HTTP response body for the "bad-request" error.
+type MentionablesBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
 // AvailableRoleResponseBody is used to define fields on response body types.
 type AvailableRoleResponseBody struct {
 	ID   *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -1754,6 +1832,17 @@ type ProjectRoleResponse struct {
 
 // UserCollectionResponseBody is used to define fields on response body types.
 type UserCollectionResponseBody []*UserResponseBody
+
+// MentionableUserCollectionResponseBody is used to define fields on response
+// body types.
+type MentionableUserCollectionResponseBody []*MentionableUserResponseBody
+
+// MentionableUserResponseBody is used to define fields on response body types.
+type MentionableUserResponseBody struct {
+	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+}
 
 // NewLoginRequestBody builds the HTTP request body from the payload of the
 // "login" endpoint of the "user" service.
@@ -3262,6 +3351,78 @@ func NewAdminSearchNotFound(body *AdminSearchNotFoundResponseBody) *goa.ServiceE
 // NewAdminSearchBadRequest builds a user service admin search endpoint
 // bad-request error.
 func NewAdminSearchBadRequest(body *AdminSearchBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewMentionablesMentionableOptionsOK builds a "user" service "mentionables"
+// endpoint result from a HTTP "OK" response.
+func NewMentionablesMentionableOptionsOK(body *MentionablesResponseBody) *userviews.MentionableOptionsView {
+	v := &userviews.MentionableOptionsView{}
+	v.Users = make([]*userviews.MentionableUserView, len(body.Users))
+	for i, val := range body.Users {
+		v.Users[i] = unmarshalMentionableUserResponseBodyToUserviewsMentionableUserView(val)
+	}
+
+	return v
+}
+
+// NewMentionablesUnauthorized builds a user service mentionables endpoint
+// unauthorized error.
+func NewMentionablesUnauthorized(body *MentionablesUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewMentionablesForbidden builds a user service mentionables endpoint
+// forbidden error.
+func NewMentionablesForbidden(body *MentionablesForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewMentionablesNotFound builds a user service mentionables endpoint
+// not-found error.
+func NewMentionablesNotFound(body *MentionablesNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewMentionablesBadRequest builds a user service mentionables endpoint
+// bad-request error.
+func NewMentionablesBadRequest(body *MentionablesBadRequestResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -5350,6 +5511,102 @@ func ValidateAdminSearchBadRequestResponseBody(body *AdminSearchBadRequestRespon
 	return
 }
 
+// ValidateMentionablesUnauthorizedResponseBody runs the validations defined on
+// mentionables_unauthorized_response_body
+func ValidateMentionablesUnauthorizedResponseBody(body *MentionablesUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateMentionablesForbiddenResponseBody runs the validations defined on
+// mentionables_forbidden_response_body
+func ValidateMentionablesForbiddenResponseBody(body *MentionablesForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateMentionablesNotFoundResponseBody runs the validations defined on
+// mentionables_not-found_response_body
+func ValidateMentionablesNotFoundResponseBody(body *MentionablesNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateMentionablesBadRequestResponseBody runs the validations defined on
+// mentionables_bad-request_response_body
+func ValidateMentionablesBadRequestResponseBody(body *MentionablesBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
 // ValidateAvailableRoleResponseBody runs the validations defined on
 // AvailableRoleResponseBody
 func ValidateAvailableRoleResponseBody(body *AvailableRoleResponseBody) (err error) {
@@ -5464,6 +5721,31 @@ func ValidateUserCollectionResponseBody(body UserCollectionResponseBody) (err er
 				err = goa.MergeErrors(err, err2)
 			}
 		}
+	}
+	return
+}
+
+// ValidateMentionableUserCollectionResponseBody runs the validations defined
+// on MentionableUserCollectionResponseBody
+func ValidateMentionableUserCollectionResponseBody(body MentionableUserCollectionResponseBody) (err error) {
+	for _, e := range body {
+		if e != nil {
+			if err2 := ValidateMentionableUserResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateMentionableUserResponseBody runs the validations defined on
+// MentionableUserResponseBody
+func ValidateMentionableUserResponseBody(body *MentionableUserResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
 	return
 }

@@ -514,3 +514,37 @@ func BuildAdminSearchPayload(userAdminSearchQuery string, userAdminSearchAuth st
 
 	return v, nil
 }
+
+// BuildMentionablesPayload builds the payload for the user mentionables
+// endpoint from CLI flags.
+func BuildMentionablesPayload(userMentionablesProjectID string, userMentionablesBookmark string, userMentionablesAuth string) (*user.MentionablesPayload, error) {
+	var err error
+	var projectID *int32
+	{
+		if userMentionablesProjectID != "" {
+			var v int64
+			v, err = strconv.ParseInt(userMentionablesProjectID, 10, 32)
+			val := int32(v)
+			projectID = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+			}
+		}
+	}
+	var bookmark *string
+	{
+		if userMentionablesBookmark != "" {
+			bookmark = &userMentionablesBookmark
+		}
+	}
+	var auth string
+	{
+		auth = userMentionablesAuth
+	}
+	v := &user.MentionablesPayload{}
+	v.ProjectID = projectID
+	v.Bookmark = bookmark
+	v.Auth = auth
+
+	return v, nil
+}

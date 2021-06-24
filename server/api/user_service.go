@@ -803,6 +803,10 @@ func (c *UserService) AdminSearch(ctx context.Context, payload *user.AdminSearch
 	}, nil
 }
 
+func (c *UserService) Mentionables(ctx context.Context, payload *user.MentionablesPayload) (*user.MentionableOptions, error) {
+	return &user.MentionableOptions{Users: []*user.MentionableUser{}}, nil
+}
+
 func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
 		Token:        token,
