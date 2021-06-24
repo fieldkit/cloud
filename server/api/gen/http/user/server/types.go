@@ -3481,10 +3481,11 @@ func NewAdminSearchPayload(query string, auth string) *user.AdminSearchPayload {
 }
 
 // NewMentionablesPayload builds a user service mentionables endpoint payload.
-func NewMentionablesPayload(projectID *int32, bookmark *string, auth string) *user.MentionablesPayload {
+func NewMentionablesPayload(projectID *int32, bookmark *string, query string, auth string) *user.MentionablesPayload {
 	v := &user.MentionablesPayload{}
 	v.ProjectID = projectID
 	v.Bookmark = bookmark
+	v.Query = query
 	v.Auth = auth
 
 	return v

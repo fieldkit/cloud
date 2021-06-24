@@ -272,6 +272,7 @@ type MentionablesPayload struct {
 	Auth      string
 	ProjectID *int32
 	Bookmark  *string
+	Query     string
 }
 
 // MentionableOptions is the result type of the user service mentionables

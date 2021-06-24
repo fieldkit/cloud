@@ -128,7 +128,7 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userLoginBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"cpp\",\n      \"password\": \"s42\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"mpn\",\n      \"password\": \"frc\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
@@ -161,7 +161,7 @@ func BuildRecoveryLookupPayload(userRecoveryLookupBody string) (*user.RecoveryLo
 	{
 		err = json.Unmarshal([]byte(userRecoveryLookupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Qui et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Deleniti sit est perspiciatis.\"\n   }'")
 		}
 	}
 	v := &user.RecoveryLookupFields{
@@ -182,7 +182,7 @@ func BuildRecoveryPayload(userRecoveryBody string) (*user.RecoveryPayload, error
 	{
 		err = json.Unmarshal([]byte(userRecoveryBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"password\": \"p04\",\n      \"token\": \"Deserunt sed.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"password\": \"vwk\",\n      \"token\": \"Qui consequuntur tenetur illum ut.\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Password) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 10, true))
@@ -212,7 +212,7 @@ func BuildResumePayload(userResumeBody string) (*user.ResumePayload, error) {
 	{
 		err = json.Unmarshal([]byte(userResumeBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"token\": \"Voluptatem velit qui et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"token\": \"Quae aut dolorum quae ut.\"\n   }'")
 		}
 	}
 	v := &user.ResumePayload{}
@@ -244,7 +244,7 @@ func BuildRefreshPayload(userRefreshBody string) (*user.RefreshPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userRefreshBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"refreshToken\": \"Omnis autem eos non asperiores exercitationem.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"refreshToken\": \"Aut voluptatum adipisci qui.\"\n   }'")
 		}
 	}
 	v := &user.RefreshPayload{
@@ -293,7 +293,7 @@ func BuildAddPayload(userAddBody string) (*user.AddPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Harum quasi odit in unde.\",\n      \"logicalAddress\": 2738832538683135658,\n      \"meta\": \"Voluptatem esse et dolore quasi sit.\",\n      \"module\": \"Aut dolores animi omnis in est repellat.\",\n      \"profile\": \"Quia maxime mollitia sunt.\",\n      \"url\": \"Aspernatur recusandae ut repellat excepturi.\",\n      \"version\": \"Et qui temporibus quia excepturi.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"A voluptatem esse.\",\n      \"logicalAddress\": 6520585861198141873,\n      \"meta\": \"Nesciunt et molestiae.\",\n      \"module\": \"Dolore quasi sit quos accusamus quidem.\",\n      \"profile\": \"Dolorem dolor perspiciatis non modi fugit esse.\",\n      \"url\": \"Aut nihil nobis minima corrupti officia.\",\n      \"version\": \"Et dolor dicta ut laudantium sed.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -332,7 +332,7 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateUserID string, userUpda
 	{
 		err = json.Unmarshal([]byte(userUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bounds\": {\n         \"max\": [\n            0.6205698768688566,\n            0.5654653809935689,\n            0.21908501784083473,\n            0.4533327929462147\n         ],\n         \"min\": [\n            0.11082831489913238,\n            0.7203669076508735,\n            0.9493163230994661,\n            0.44276874652914855\n         ]\n      },\n      \"description\": \"Culpa dicta quo pariatur cum quisquam.\",\n      \"endTime\": \"Id cumque deserunt incidunt.\",\n      \"goal\": \"Temporibus impedit totam.\",\n      \"location\": \"Aperiam maiores exercitationem placeat qui doloremque eum.\",\n      \"name\": \"At quod voluptas.\",\n      \"privacy\": 582294506,\n      \"showStations\": false,\n      \"startTime\": \"Distinctio cumque ut.\",\n      \"tags\": \"Qui eum omnis.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bounds\": {\n         \"max\": [\n            0.0702774182753866,\n            0.04702208499526844,\n            0.7090494170088115\n         ],\n         \"min\": [\n            0.3405263781847104,\n            0.3429390355284833\n         ]\n      },\n      \"description\": \"Nemo sed sed temporibus vel.\",\n      \"endTime\": \"Dolores mollitia debitis suscipit facilis vel.\",\n      \"goal\": \"Omnis hic est dolor voluptatum aut.\",\n      \"location\": \"Et et odio laborum asperiores est.\",\n      \"name\": \"Rerum vel sunt nihil et voluptates voluptates.\",\n      \"privacy\": 796200972,\n      \"showStations\": false,\n      \"startTime\": \"Dolores earum.\",\n      \"tags\": \"Molestiae autem labore qui consequatur.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -382,7 +382,7 @@ func BuildChangePasswordPayload(userChangePasswordBody string, userChangePasswor
 	{
 		err = json.Unmarshal([]byte(userChangePasswordBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"newPassword\": \"23c\",\n      \"oldPassword\": \"td7\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"newPassword\": \"6v0\",\n      \"oldPassword\": \"i7j\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.OldPassword) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.oldPassword", body.OldPassword, utf8.RuneCountInString(body.OldPassword), 10, true))
@@ -517,7 +517,7 @@ func BuildAdminSearchPayload(userAdminSearchQuery string, userAdminSearchAuth st
 
 // BuildMentionablesPayload builds the payload for the user mentionables
 // endpoint from CLI flags.
-func BuildMentionablesPayload(userMentionablesProjectID string, userMentionablesBookmark string, userMentionablesAuth string) (*user.MentionablesPayload, error) {
+func BuildMentionablesPayload(userMentionablesProjectID string, userMentionablesBookmark string, userMentionablesQuery string, userMentionablesAuth string) (*user.MentionablesPayload, error) {
 	var err error
 	var projectID *int32
 	{
@@ -537,6 +537,10 @@ func BuildMentionablesPayload(userMentionablesProjectID string, userMentionables
 			bookmark = &userMentionablesBookmark
 		}
 	}
+	var query string
+	{
+		query = userMentionablesQuery
+	}
 	var auth string
 	{
 		auth = userMentionablesAuth
@@ -544,6 +548,7 @@ func BuildMentionablesPayload(userMentionablesProjectID string, userMentionables
 	v := &user.MentionablesPayload{}
 	v.ProjectID = projectID
 	v.Bookmark = bookmark
+	v.Query = query
 	v.Auth = auth
 
 	return v, nil
