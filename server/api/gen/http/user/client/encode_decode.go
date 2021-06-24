@@ -2949,6 +2949,7 @@ func EncodeMentionablesRequest(encoder func(*http.Request) goahttp.Encoder) func
 		if p.Bookmark != nil {
 			values.Add("bookmark", *p.Bookmark)
 		}
+		values.Add("query", p.Query)
 		req.URL.RawQuery = values.Encode()
 		return nil
 	}

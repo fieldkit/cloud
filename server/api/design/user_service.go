@@ -464,6 +464,8 @@ var _ = Service("user", func() {
 			Required("auth")
 			Attribute("projectId", Int32)
 			Attribute("bookmark", String)
+			Attribute("query", String)
+			Required("query")
 		})
 
 		Result(MentionableOptions)
@@ -474,6 +476,7 @@ var _ = Service("user", func() {
 			Params(func() {
 				Param("projectId")
 				Param("bookmark")
+				Param("query")
 			})
 
 			httpAuthentication()

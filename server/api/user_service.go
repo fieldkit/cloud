@@ -804,7 +804,27 @@ func (c *UserService) AdminSearch(ctx context.Context, payload *user.AdminSearch
 }
 
 func (c *UserService) Mentionables(ctx context.Context, payload *user.MentionablesPayload) (*user.MentionableOptions, error) {
-	return &user.MentionableOptions{Users: []*user.MentionableUser{}}, nil
+	sr := repositories.NewUserRepository(c.options.Database)
+
+	users, err := sr.Search(ctx, payload.Query)
+	if err != nil {
+		return nil, err
+	}
+
+	wms := make([]*user.User, 0)
+	for _, user := range users {
+		wm, err := MentionableUserType(c.options.signer, user)
+		if err != nil {
+			return nil, err
+		}
+		wms = append(wms, wm)
+	}
+
+	return &user.MentionableOptions{
+		Users: []*user.MentionableUser{
+			//
+		},
+	}, nil
 }
 
 func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {

@@ -2271,6 +2271,7 @@ func DecodeMentionablesRequest(mux goahttp.Muxer, decoder func(*http.Request) go
 		var (
 			projectID *int32
 			bookmark  *string
+			query     string
 			auth      string
 			err       error
 		)
@@ -2289,6 +2290,10 @@ func DecodeMentionablesRequest(mux goahttp.Muxer, decoder func(*http.Request) go
 		if bookmarkRaw != "" {
 			bookmark = &bookmarkRaw
 		}
+		query = r.URL.Query().Get("query")
+		if query == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("query", "query string"))
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -2296,7 +2301,7 @@ func DecodeMentionablesRequest(mux goahttp.Muxer, decoder func(*http.Request) go
 		if err != nil {
 			return nil, err
 		}
-		payload := NewMentionablesPayload(projectID, bookmark, auth)
+		payload := NewMentionablesPayload(projectID, bookmark, query, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
