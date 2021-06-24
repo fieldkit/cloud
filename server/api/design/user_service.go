@@ -454,6 +454,32 @@ var _ = Service("user", func() {
 		})
 	})
 
+	Method("mentionables", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("projectId", Int32)
+			Attribute("bookmark", String)
+		})
+
+		Result(MentionableOptions)
+
+		HTTP(func() {
+			GET("mentionables")
+
+			Params(func() {
+				Param("projectId")
+				Param("bookmark")
+			})
+
+			httpAuthentication()
+		})
+	})
+
 	commonOptions()
 })
 
@@ -579,6 +605,33 @@ var ProjectUsers = ResultType("application/vnd.app.users+json", func() {
 	TypeName("ProjectUsers")
 	Attributes(func() {
 		Attribute("users", CollectionOf(ProjectUser))
+		Required("users")
+	})
+	View("default", func() {
+		Attribute("users")
+	})
+})
+
+var MentionableUser = ResultType("application/vnd.app.mentionable.user+json", func() {
+	TypeName("MentionableUser")
+	Attributes(func() {
+		Attribute("id", Int32)
+		Attribute("name", String)
+		Attribute("photo", UserPhoto)
+		Required("id")
+		Required("name")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("name")
+		Attribute("photo")
+	})
+})
+
+var MentionableOptions = ResultType("application/vnd.app.mentionables+json", func() {
+	TypeName("MentionableOptions")
+	Attributes(func() {
+		Attribute("users", CollectionOf(MentionableUser))
 		Required("users")
 	})
 	View("default", func() {

@@ -63,22 +63,22 @@ station (add|get|transfer|update|list- mine|list- project|download- photo|list- 
 tasks five
 test (get|error|email)
 ttn webhook
-user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery|resume|logout|refresh|send- validation|validate|add|update|change- password|get- current|list- by- project|issue- transmission- token|project- roles|admin- delete|admin- search)
+user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery|resume|logout|refresh|send- validation|validate|add|update|change- password|get- current|list- by- project|issue- transmission- token|project- roles|admin- delete|admin- search|mentionables)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` csv noop` + "\n" +
-		os.Args[0] + ` activity station --id 2893910879317896143 --page 3541722404399629938 --auth "Quia quia veritatis."` + "\n" +
-		os.Args[0] + ` data device- summary --device-id "Sunt quam ratione nam itaque ipsa." --auth "Maiores labore ipsam."` + "\n" +
+		os.Args[0] + ` activity station --id 3346645633111306673 --page 5483770782961441532 --auth "Iusto dicta."` + "\n" +
+		os.Args[0] + ` data device- summary --device-id "Quaerat inventore." --auth "At fugiat facilis eligendi."` + "\n" +
 		os.Args[0] + ` discourse authenticate --body '{
-      "email": "Sed dignissimos vero dolorem.",
-      "password": "s67",
-      "sig": "Unde provident ut perspiciatis perspiciatis.",
-      "sso": "Officiis itaque nihil ipsam."
-   }' --token "Autem alias suscipit vero repellat."` + "\n" +
-		os.Args[0] + ` discussion project --project-id 1685719866 --auth "Ea nobis et eligendi optio."` + "\n" +
+      "email": "Suscipit vero.",
+      "password": "l3z",
+      "sig": "Ut voluptatem veritatis autem.",
+      "sso": "Dolorem autem."
+   }' --token "Et quia occaecati aut qui."` + "\n" +
+		os.Args[0] + ` discussion project --project-id 1948856641 --auth "Optio voluptatem eos quod molestias et."` + "\n" +
 		""
 }
 
@@ -570,6 +570,11 @@ func ParseEndpoint(
 		userAdminSearchFlags     = flag.NewFlagSet("admin- search", flag.ExitOnError)
 		userAdminSearchQueryFlag = userAdminSearchFlags.String("query", "REQUIRED", "")
 		userAdminSearchAuthFlag  = userAdminSearchFlags.String("auth", "REQUIRED", "")
+
+		userMentionablesFlags         = flag.NewFlagSet("mentionables", flag.ExitOnError)
+		userMentionablesProjectIDFlag = userMentionablesFlags.String("project-id", "", "")
+		userMentionablesBookmarkFlag  = userMentionablesFlags.String("bookmark", "", "")
+		userMentionablesAuthFlag      = userMentionablesFlags.String("auth", "REQUIRED", "")
 	)
 	csvFlags.Usage = csvUsage
 	csvNoopFlags.Usage = csvNoopUsage
@@ -713,6 +718,7 @@ func ParseEndpoint(
 	userProjectRolesFlags.Usage = userProjectRolesUsage
 	userAdminDeleteFlags.Usage = userAdminDeleteUsage
 	userAdminSearchFlags.Usage = userAdminSearchUsage
+	userMentionablesFlags.Usage = userMentionablesUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -1171,6 +1177,9 @@ func ParseEndpoint(
 			case "admin- search":
 				epf = userAdminSearchFlags
 
+			case "mentionables":
+				epf = userMentionablesFlags
+
 			}
 
 		}
@@ -1591,6 +1600,9 @@ func ParseEndpoint(
 			case "admin- search":
 				endpoint = c.AdminSearch()
 				data, err = userc.BuildAdminSearchPayload(*userAdminSearchQueryFlag, *userAdminSearchAuthFlag)
+			case "mentionables":
+				endpoint = c.Mentionables()
+				data, err = userc.BuildMentionablesPayload(*userMentionablesProjectIDFlag, *userMentionablesBookmarkFlag, *userMentionablesAuthFlag)
 			}
 		}
 	}
@@ -1647,7 +1659,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 2893910879317896143 --page 3541722404399629938 --auth "Quia quia veritatis."
+    `+os.Args[0]+` activity station --id 3346645633111306673 --page 5483770782961441532 --auth "Iusto dicta."
 `, os.Args[0])
 }
 
@@ -1660,7 +1672,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 1909184865736898721 --page 9146962393226410315 --auth "Et itaque aliquid."
+    `+os.Args[0]+` activity project --id 3644686380830934289 --page 1922698662079060347 --auth "Nobis repellat debitis enim."
 `, os.Args[0])
 }
 
@@ -1685,7 +1697,7 @@ DeviceSummary implements device summary.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` data device- summary --device-id "Sunt quam ratione nam itaque ipsa." --auth "Maiores labore ipsam."
+    `+os.Args[0]+` data device- summary --device-id "Quaerat inventore." --auth "At fugiat facilis eligendi."
 `, os.Args[0])
 }
 
@@ -1712,11 +1724,11 @@ Authenticate implements authenticate.
 
 Example:
     `+os.Args[0]+` discourse authenticate --body '{
-      "email": "Sed dignissimos vero dolorem.",
-      "password": "s67",
-      "sig": "Unde provident ut perspiciatis perspiciatis.",
-      "sso": "Officiis itaque nihil ipsam."
-   }' --token "Autem alias suscipit vero repellat."
+      "email": "Suscipit vero.",
+      "password": "l3z",
+      "sig": "Ut voluptatem veritatis autem.",
+      "sso": "Dolorem autem."
+   }' --token "Et quia occaecati aut qui."
 `, os.Args[0])
 }
 
@@ -1746,7 +1758,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` discussion project --project-id 1685719866 --auth "Ea nobis et eligendi optio."
+    `+os.Args[0]+` discussion project --project-id 1948856641 --auth "Optio voluptatem eos quod molestias et."
 `, os.Args[0])
 }
 
@@ -3092,6 +3104,7 @@ COMMAND:
     project- roles: ProjectRoles implements project roles.
     admin- delete: AdminDelete implements admin delete.
     admin- search: AdminSearch implements admin search.
+    mentionables: Mentionables implements mentionables.
 
 Additional help:
     %s user COMMAND --help
@@ -3387,5 +3400,18 @@ AdminSearch implements admin search.
 
 Example:
     `+os.Args[0]+` user admin- search --query "Sed aut." --auth "Voluptatem veritatis repudiandae soluta cum alias earum."
+`, os.Args[0])
+}
+
+func userMentionablesUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] user mentionables -project-id INT32 -bookmark STRING -auth STRING
+
+Mentionables implements mentionables.
+    -project-id INT32: 
+    -bookmark STRING: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` user mentionables --project-id 1385075885 --bookmark "Est magnam ducimus nisi." --auth "Non ut ex voluptas."
 `, os.Args[0])
 }

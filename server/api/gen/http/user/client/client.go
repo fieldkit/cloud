@@ -94,6 +94,10 @@ type Client struct {
 	// search endpoint.
 	AdminSearchDoer goahttp.Doer
 
+	// Mentionables Doer is the HTTP client used to make requests to the
+	// mentionables endpoint.
+	MentionablesDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -138,6 +142,7 @@ func NewClient(
 		ProjectRolesDoer:           doer,
 		AdminDeleteDoer:            doer,
 		AdminSearchDoer:            doer,
+		MentionablesDoer:           doer,
 		CORSDoer:                   doer,
 		RestoreResponseBody:        restoreBody,
 		scheme:                     scheme,
@@ -636,6 +641,30 @@ func (c *Client) AdminSearch() goa.Endpoint {
 		resp, err := c.AdminSearchDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("user", "admin search", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Mentionables returns an endpoint that makes HTTP requests to the user
+// service mentionables server.
+func (c *Client) Mentionables() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeMentionablesRequest(c.encoder)
+		decodeResponse = DecodeMentionablesResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildMentionablesRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.MentionablesDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("user", "mentionables", err)
 		}
 		return decodeResponse(resp)
 	}
