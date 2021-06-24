@@ -806,24 +806,30 @@ func (c *UserService) AdminSearch(ctx context.Context, payload *user.AdminSearch
 func (c *UserService) Mentionables(ctx context.Context, payload *user.MentionablesPayload) (*user.MentionableOptions, error) {
 	sr := repositories.NewUserRepository(c.options.Database)
 
-	users, err := sr.Search(ctx, payload.Query)
+	users, err := sr.QueryMentionables(ctx, payload.Query)
 	if err != nil {
 		return nil, err
 	}
 
-	wms := make([]*user.User, 0)
-	for _, user := range users {
-		wm, err := MentionableUserType(c.options.signer, user)
-		if err != nil {
-			return nil, err
+	wms := make([]*user.MentionableUser, 0)
+	for _, dm := range users {
+		wm := &user.MentionableUser{
+			ID:   dm.ID,
+			Name: dm.Name,
 		}
+
+		if dm.MediaURL != nil {
+			url := fmt.Sprintf("/user/%d/media", dm.ID)
+			wm.Photo = &user.UserPhoto{
+				URL: &url,
+			}
+		}
+
 		wms = append(wms, wm)
 	}
 
 	return &user.MentionableOptions{
-		Users: []*user.MentionableUser{
-			//
-		},
+		Users: wms,
 	}, nil
 }
 
