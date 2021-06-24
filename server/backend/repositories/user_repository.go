@@ -48,6 +48,15 @@ func (r *UserRepository) QueryByEmail(ctx context.Context, email string) (*data.
 	return user, nil
 }
 
+func (r *UserRepository) QueryMentionables(ctx context.Context, query string) ([]*data.User, error) {
+	likeQuery := query + "%"
+	users := make([]*data.User, 0)
+	if err := r.db.SelectContext(ctx, &users, `SELECT * FROM fieldkit.user WHERE taggable AND (LOWER(name) LIKE LOWER($1) OR LOWER(email) LIKE LOWER($1))`, likeQuery); err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func (r *UserRepository) Search(ctx context.Context, query string) ([]*data.User, error) {
 	likeQuery := "%" + query + "%"
 	users := make([]*data.User, 0)
