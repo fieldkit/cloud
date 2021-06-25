@@ -1073,6 +1073,16 @@ class FKApi {
         });
     }
 
+    public mentionables(query: string): Promise<{ users: MentionableUser[] }> {
+        const qp = new URLSearchParams();
+        qp.append("query", query);
+        return this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + "/mentionables?" + qp.toString(),
+        });
+    }
+
     public adminSearchUsers(query: string): Promise<{ users: SimpleUser[] }> {
         const qp = new URLSearchParams();
         qp.append("query", query);
@@ -1239,6 +1249,12 @@ export interface EssentialStation {
 export interface PageOfStations {
     stations: EssentialStation[];
     total: number;
+}
+
+export interface MentionableUser {
+    id: number;
+    name: string;
+    photo: { url: string };
 }
 
 export default FKApi;

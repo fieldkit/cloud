@@ -4,8 +4,10 @@
 
         <form @submit.prevent="save(newComment)" class="new-comment">
             <UserPhoto v-if="user" :user="user"></UserPhoto>
-            <input type="text" :placeholder="placeholder" v-model="newComment.body" @input="$event.target.composing = false" />
-            <button type="submit" class="new-comment-submit" v-if="newComment.body.length > 0">Post</button>
+            <vue-tribute :options="tributeOptions" class="tribute-wrapper">
+                <input type="text" :placeholder="placeholder" v-model="newComment.body" @input="$event.target.composing = false" />
+                <button type="submit" class="new-comment-submit" v-if="newComment.body.length > 0">Post</button>
+            </vue-tribute>
         </form>
 
         <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
@@ -36,10 +38,17 @@
                                 </div>
                             </span>
                             <div v-if="post.readonly">{{ post.body }}</div>
-                            <input v-else type="text" class="body" v-model="post.body" :readonly="post.readonly" />
-                            <button type="submit" class="new-comment-submit" v-if="!post.readonly" @click="saveEdit(post.id, post.body)">
-                                Save
-                            </button>
+                            <vue-tribute v-else :options="tributeOptions" class="tribute-wrapper">
+                                <input type="text" class="body" v-model="post.body" :readonly="post.readonly" />
+                                <button
+                                    type="submit"
+                                    class="new-comment-submit"
+                                    v-if="!post.readonly"
+                                    @click="saveEdit(post.id, post.body)"
+                                >
+                                    Save
+                                </button>
+                            </vue-tribute>
                         </div>
                     </div>
                     <div class="column">
@@ -61,15 +70,17 @@
                                             </div>
                                         </span>
                                         <div v-if="reply.readonly">{{ reply.body }}</div>
-                                        <input v-else type="text" class="body" v-model="reply.body" :readonly="reply.readonly" />
-                                        <button
-                                            type="submit"
-                                            class="new-comment-submit"
-                                            v-if="!reply.readonly"
-                                            @click="saveEdit(reply.id, reply.body)"
-                                        >
-                                            Save
-                                        </button>
+                                        <vue-tribute v-else :options="tributeOptions" class="tribute-wrapper">
+                                            <input type="text" class="body" v-model="reply.body" :readonly="reply.readonly" />
+                                            <button
+                                                type="submit"
+                                                class="new-comment-submit"
+                                                v-if="!reply.readonly"
+                                                @click="saveEdit(reply.id, reply.body)"
+                                            >
+                                                Save
+                                            </button>
+                                        </vue-tribute>
                                     </div>
                                 </div>
                             </div>
@@ -82,12 +93,14 @@
                                 v-if="newReply && newReply.threadId === post.id"
                             >
                                 <UserPhoto :user="user"></UserPhoto>
-                                <input
-                                    type="text"
-                                    placeholder="Reply to comment"
-                                    v-model="newReply.body"
-                                    @input="$event.target.composing = false"
-                                />
+                                <vue-tribute :options="tributeOptions" class="tribute-wrapper">
+                                    <input
+                                        type="text"
+                                        placeholder="Reply to comment"
+                                        v-model="newReply.body"
+                                        @input="$event.target.composing = false"
+                                    />
+                                </vue-tribute>
                                 <button type="submit" class="new-comment-submit" v-if="newReply.body">Post</button>
                             </form>
                         </transition>
@@ -117,11 +130,14 @@ import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
+import VueTribute from "vue-tribute";
+import { Services, MentionableUser } from "@/api";
 
 export default Vue.extend({
     name: "Comments",
     components: {
         ...CommonComponents,
+        VueTribute,
     },
     props: {
         user: {
@@ -134,6 +150,11 @@ export default Vue.extend({
         },
     },
     data(): {
+        tributeOptions: {
+            values: (text, cb) => void;
+            lookup: string;
+            fillAttr: string;
+        };
         posts: Comment[];
         placeholder: string | null;
         viewType: string;
@@ -151,6 +172,20 @@ export default Vue.extend({
         errorMessage: string | null;
     } {
         return {
+            tributeOptions: {
+                values: (text, cb) => {
+                    if (text.length > 0) {
+                        this.$services.api.mentionables(text).then((mentionables) => {
+                            console.log("mentionables", mentionables);
+                            cb(mentionables.users);
+                        });
+                    } else {
+                        cb([]);
+                    }
+                },
+                lookup: "name",
+                fillAttr: "name",
+            },
             posts: [],
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
@@ -326,7 +361,7 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "../../scss/global";
 
 button {
@@ -629,5 +664,43 @@ header {
 .error {
     color: $color-danger;
     margin-bottom: 10px;
+}
+
+.tribute-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: auto;
+    max-height: 300px;
+    max-width: 500px;
+    overflow: auto;
+    display: block;
+    z-index: 999999;
+}
+.tribute-container ul {
+    margin: 0;
+    margin-top: 2px;
+    padding: 0;
+    list-style: none;
+    background: #efefef;
+}
+.tribute-container li {
+    padding: 5px 5px;
+    cursor: pointer;
+}
+.tribute-container li.highlight {
+    background: #ddd;
+}
+.tribute-container li span {
+    font-weight: bold;
+}
+.tribute-container li.no-match {
+    cursor: default;
+}
+.tribute-container .menu-highlighted {
+    font-weight: bold;
+}
+.tribute-wrapper {
+    width: 100%;
 }
 </style>
