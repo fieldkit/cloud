@@ -348,9 +348,10 @@ type UserCollection []*User
 type MentionableUserCollection []*MentionableUser
 
 type MentionableUser struct {
-	ID    int32
-	Name  string
-	Photo *UserPhoto
+	ID      int32
+	Name    string
+	Mention string
+	Photo   *UserPhoto
 }
 
 // MakeUserUnverified builds a goa.ServiceError from an error.
@@ -796,6 +797,9 @@ func newMentionableUser(vres *userviews.MentionableUserView) *MentionableUser {
 	if vres.Name != nil {
 		res.Name = *vres.Name
 	}
+	if vres.Mention != nil {
+		res.Mention = *vres.Mention
+	}
 	if vres.Photo != nil {
 		res.Photo = transformUserviewsUserPhotoViewToUserPhoto(vres.Photo)
 	}
@@ -806,8 +810,9 @@ func newMentionableUser(vres *userviews.MentionableUserView) *MentionableUser {
 // type MentionableUserView using the "default" view.
 func newMentionableUserView(res *MentionableUser) *userviews.MentionableUserView {
 	vres := &userviews.MentionableUserView{
-		ID:   &res.ID,
-		Name: &res.Name,
+		ID:      &res.ID,
+		Name:    &res.Name,
+		Mention: &res.Mention,
 	}
 	if res.Photo != nil {
 		vres.Photo = transformUserPhotoToUserviewsUserPhotoView(res.Photo)

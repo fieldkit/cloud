@@ -1839,9 +1839,10 @@ type MentionableUserResponseBodyCollection []*MentionableUserResponseBody
 
 // MentionableUserResponseBody is used to define fields on response body types.
 type MentionableUserResponseBody struct {
-	ID    int32                  `form:"id" json:"id" xml:"id"`
-	Name  string                 `form:"name" json:"name" xml:"name"`
-	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ID      int32                  `form:"id" json:"id" xml:"id"`
+	Name    string                 `form:"name" json:"name" xml:"name"`
+	Mention string                 `form:"mention" json:"mention" xml:"mention"`
+	Photo   *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 }
 
 // NewRolesResponseBody builds the HTTP response body from the result of the

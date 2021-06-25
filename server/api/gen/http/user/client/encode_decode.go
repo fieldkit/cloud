@@ -3165,8 +3165,9 @@ func unmarshalUserPhotoResponseBodyToUserUserPhoto(v *UserPhotoResponseBody) *us
 // *MentionableUserResponseBody.
 func unmarshalMentionableUserResponseBodyToUserviewsMentionableUserView(v *MentionableUserResponseBody) *userviews.MentionableUserView {
 	res := &userviews.MentionableUserView{
-		ID:   v.ID,
-		Name: v.Name,
+		ID:      v.ID,
+		Name:    v.Name,
+		Mention: v.Mention,
 	}
 	if v.Photo != nil {
 		res.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(v.Photo)

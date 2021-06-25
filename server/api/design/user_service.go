@@ -620,13 +620,16 @@ var MentionableUser = ResultType("application/vnd.app.mentionable.user+json", fu
 	Attributes(func() {
 		Attribute("id", Int32)
 		Attribute("name", String)
+		Attribute("mention", String)
 		Attribute("photo", UserPhoto)
 		Required("id")
 		Required("name")
+		Required("mention")
 	})
 	View("default", func() {
 		Attribute("id")
 		Attribute("name")
+		Attribute("mention")
 		Attribute("photo")
 	})
 })

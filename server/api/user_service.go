@@ -814,8 +814,9 @@ func (c *UserService) Mentionables(ctx context.Context, payload *user.Mentionabl
 	wms := make([]*user.MentionableUser, 0)
 	for _, dm := range users {
 		wm := &user.MentionableUser{
-			ID:   dm.ID,
-			Name: dm.Name,
+			ID:      dm.ID,
+			Mention: strings.ReplaceAll(dm.Name, " ", ""),
+			Name:    dm.Name,
 		}
 
 		if dm.MediaURL != nil {

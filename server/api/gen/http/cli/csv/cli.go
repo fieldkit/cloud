@@ -70,15 +70,15 @@ user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` csv noop` + "\n" +
-		os.Args[0] + ` activity station --id 4745074070502495205 --page 2290641972317059772 --auth "Et sapiente ab ad esse."` + "\n" +
-		os.Args[0] + ` data device- summary --device-id "Magnam at fugiat facilis eligendi molestiae amet." --auth "Nulla consequatur iusto provident."` + "\n" +
+		os.Args[0] + ` activity station --id 4868313379871957650 --page 939124020991307015 --auth "Ad esse cum accusantium nesciunt."` + "\n" +
+		os.Args[0] + ` data device- summary --device-id "Facilis eligendi." --auth "Amet aperiam nulla consequatur iusto provident dolor."` + "\n" +
 		os.Args[0] + ` discourse authenticate --body '{
-      "email": "Qui ea.",
-      "password": "8xd",
-      "sig": "Aperiam minima cum et quia occaecati.",
-      "sso": "Autem alias suscipit vero repellat."
-   }' --token "Aut in."` + "\n" +
-		os.Args[0] + ` discussion project --project-id 2046017937 --auth "Molestiae sunt quae id inventore libero."` + "\n" +
+      "email": "Quia occaecati.",
+      "password": "4y7",
+      "sig": "Et aperiam minima cum.",
+      "sso": "Suscipit vero."
+   }' --token "Consequatur cum cumque aut in corporis eaque."` + "\n" +
+		os.Args[0] + ` discussion project --project-id 2028379412 --auth "Iste a mollitia cupiditate nulla veritatis."` + "\n" +
 		""
 }
 
@@ -1660,7 +1660,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 4745074070502495205 --page 2290641972317059772 --auth "Et sapiente ab ad esse."
+    `+os.Args[0]+` activity station --id 4868313379871957650 --page 939124020991307015 --auth "Ad esse cum accusantium nesciunt."
 `, os.Args[0])
 }
 
@@ -1673,7 +1673,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 1922698662079060347 --page 5606803604272221271 --auth "Repellat debitis enim suscipit."
+    `+os.Args[0]+` activity project --id 4242001953256788122 --page 6433662332792610362 --auth "Vel accusamus."
 `, os.Args[0])
 }
 
@@ -1698,7 +1698,7 @@ DeviceSummary implements device summary.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` data device- summary --device-id "Magnam at fugiat facilis eligendi molestiae amet." --auth "Nulla consequatur iusto provident."
+    `+os.Args[0]+` data device- summary --device-id "Facilis eligendi." --auth "Amet aperiam nulla consequatur iusto provident dolor."
 `, os.Args[0])
 }
 
@@ -1725,11 +1725,11 @@ Authenticate implements authenticate.
 
 Example:
     `+os.Args[0]+` discourse authenticate --body '{
-      "email": "Qui ea.",
-      "password": "8xd",
-      "sig": "Aperiam minima cum et quia occaecati.",
-      "sso": "Autem alias suscipit vero repellat."
-   }' --token "Aut in."
+      "email": "Quia occaecati.",
+      "password": "4y7",
+      "sig": "Et aperiam minima cum.",
+      "sso": "Suscipit vero."
+   }' --token "Consequatur cum cumque aut in corporis eaque."
 `, os.Args[0])
 }
 
@@ -1759,7 +1759,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` discussion project --project-id 2046017937 --auth "Molestiae sunt quae id inventore libero."
+    `+os.Args[0]+` discussion project --project-id 2028379412 --auth "Iste a mollitia cupiditate nulla veritatis."
 `, os.Args[0])
 }
 
@@ -1771,7 +1771,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` discussion data --bookmark "Occaecati quae est." --auth "Ut ratione necessitatibus sapiente maxime."
+    `+os.Args[0]+` discussion data --bookmark "Ut ratione necessitatibus sapiente maxime." --auth "Aut repellendus distinctio saepe dicta."
 `, os.Args[0])
 }
 
@@ -1790,7 +1790,7 @@ Example:
          "projectId": 209345384,
          "threadId": 3734826980729944185
       }
-   }' --auth "Consequatur quibusdam nostrum sit ut hic."
+   }' --auth "Dignissimos omnis voluptates natus ea nostrum fugiat."
 `, os.Args[0])
 }
 
@@ -1804,8 +1804,8 @@ UpdateMessage implements update message.
 
 Example:
     `+os.Args[0]+` discussion update- message --body '{
-      "body": "Sapiente amet doloribus corporis ut asperiores maiores."
-   }' --post-id 1537188922285798026 --auth "Iusto non commodi alias in est."
+      "body": "Eius unde iusto non commodi alias in."
+   }' --post-id 6624215615959951568 --auth "Perferendis et maiores eius assumenda enim omnis."
 `, os.Args[0])
 }
 
@@ -1817,7 +1817,7 @@ DeleteMessage implements delete message.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` discussion delete- message --post-id 1884988574372308681 --auth "Fugiat maiores sunt."
+    `+os.Args[0]+` discussion delete- message --post-id 6370814556865888733 --auth "Totam est quasi."
 `, os.Args[0])
 }
 
@@ -1845,7 +1845,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` export list- mine --auth "Laboriosam dolorum quo eum est laudantium consectetur."
+    `+os.Args[0]+` export list- mine --auth "Voluptatem ut quo quia."
 `, os.Args[0])
 }
 
