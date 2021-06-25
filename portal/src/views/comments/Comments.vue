@@ -132,6 +132,7 @@ import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
 import VueTribute from "vue-tribute";
 import { Services, MentionableUser } from "@/api";
+import { makeTributeOptions, TributeOptions } from "@/views/shared/mentions";
 
 export default Vue.extend({
     name: "Comments",
@@ -150,11 +151,7 @@ export default Vue.extend({
         },
     },
     data(): {
-        tributeOptions: {
-            values: (text, cb) => void;
-            lookup: string;
-            fillAttr: string;
-        };
+        tributeOptions: TributeOptions;
         posts: Comment[];
         placeholder: string | null;
         viewType: string;
@@ -171,21 +168,10 @@ export default Vue.extend({
         };
         errorMessage: string | null;
     } {
+        const tributeOptions = makeTributeOptions(this.$config, this.$services);
+
         return {
-            tributeOptions: {
-                values: (text, cb) => {
-                    if (text.length > 0) {
-                        this.$services.api.mentionables(text).then((mentionables) => {
-                            console.log("mentionables", mentionables);
-                            cb(mentionables.users);
-                        });
-                    } else {
-                        cb([]);
-                    }
-                },
-                lookup: "name",
-                fillAttr: "name",
-            },
+            tributeOptions: tributeOptions,
             posts: [],
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
@@ -664,43 +650,5 @@ header {
 .error {
     color: $color-danger;
     margin-bottom: 10px;
-}
-
-.tribute-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: auto;
-    max-height: 300px;
-    max-width: 500px;
-    overflow: auto;
-    display: block;
-    z-index: 999999;
-}
-.tribute-container ul {
-    margin: 0;
-    margin-top: 2px;
-    padding: 0;
-    list-style: none;
-    background: #efefef;
-}
-.tribute-container li {
-    padding: 5px 5px;
-    cursor: pointer;
-}
-.tribute-container li.highlight {
-    background: #ddd;
-}
-.tribute-container li span {
-    font-weight: bold;
-}
-.tribute-container li.no-match {
-    cursor: default;
-}
-.tribute-container .menu-highlighted {
-    font-weight: bold;
-}
-.tribute-wrapper {
-    width: 100%;
 }
 </style>
