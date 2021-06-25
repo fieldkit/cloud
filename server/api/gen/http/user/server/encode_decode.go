@@ -2484,8 +2484,9 @@ func marshalUserUserPhotoToUserPhotoResponseBody(v *user.UserPhoto) *UserPhotoRe
 // *userviews.MentionableUserView.
 func marshalUserviewsMentionableUserViewToMentionableUserResponseBody(v *userviews.MentionableUserView) *MentionableUserResponseBody {
 	res := &MentionableUserResponseBody{
-		ID:   *v.ID,
-		Name: *v.Name,
+		ID:      *v.ID,
+		Name:    *v.Name,
+		Mention: *v.Mention,
 	}
 	if v.Photo != nil {
 		res.Photo = marshalUserviewsUserPhotoViewToUserPhotoResponseBody(v.Photo)

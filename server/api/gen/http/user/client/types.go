@@ -1839,9 +1839,10 @@ type MentionableUserCollectionResponseBody []*MentionableUserResponseBody
 
 // MentionableUserResponseBody is used to define fields on response body types.
 type MentionableUserResponseBody struct {
-	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ID      *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name    *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Mention *string                `form:"mention,omitempty" json:"mention,omitempty" xml:"mention,omitempty"`
+	Photo   *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 }
 
 // NewLoginRequestBody builds the HTTP request body from the payload of the
@@ -5746,6 +5747,9 @@ func ValidateMentionableUserResponseBody(body *MentionableUserResponseBody) (err
 	}
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Mention == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("mention", "body"))
 	}
 	return
 }

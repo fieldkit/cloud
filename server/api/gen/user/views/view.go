@@ -153,9 +153,10 @@ type MentionableUserCollectionView []*MentionableUserView
 
 // MentionableUserView is a type that runs validations on a projected type.
 type MentionableUserView struct {
-	ID    *int32
-	Name  *string
-	Photo *UserPhotoView
+	ID      *int32
+	Name    *string
+	Mention *string
+	Photo   *UserPhotoView
 }
 
 var (
@@ -256,6 +257,7 @@ var (
 		"default": []string{
 			"id",
 			"name",
+			"mention",
 			"photo",
 		},
 	}
@@ -265,6 +267,7 @@ var (
 		"default": []string{
 			"id",
 			"name",
+			"mention",
 			"photo",
 		},
 	}
@@ -556,6 +559,9 @@ func ValidateMentionableUserView(result *MentionableUserView) (err error) {
 	}
 	if result.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	if result.Mention == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("mention", "result"))
 	}
 	return
 }
