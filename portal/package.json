@@ -17,6 +17,7 @@
         "@riophae/vue-treeselect": "^0.4.0",
         "@tiptap/extension-character-count": "^2.0.0-beta.12",
         "@tiptap/extension-mention": "^2.0.0-beta.61",
+        "@tiptap/extension-placeholder": "^2.0.0-beta.25",
         "@tiptap/starter-kit": "^2.0.0-beta.81",
         "@tiptap/vue-2": "^2.0.0-beta.39",
         "@types/mapbox-gl": "^1.12.2",
