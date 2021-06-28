@@ -4,10 +4,7 @@
 
         <form @submit.prevent="save(newComment)" class="new-comment">
             <UserPhoto v-if="user" :user="user"></UserPhoto>
-            <vue-tribute :options="tributeOptions" class="tribute-wrapper">
-                <input type="text" :placeholder="placeholder" v-model="newComment.body" @input="$event.target.composing = false" />
-                <button type="submit" class="new-comment-submit" v-if="newComment.body.length > 0">Post</button>
-            </vue-tribute>
+            <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
         </form>
 
         <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
@@ -37,18 +34,7 @@
                                     <button @click="deleteComment(post.id)">Delete Post</button>
                                 </div>
                             </span>
-                            <div v-if="post.readonly">{{ post.body }}</div>
-                            <vue-tribute v-else :options="tributeOptions" class="tribute-wrapper">
-                                <input type="text" class="body" v-model="post.body" :readonly="post.readonly" />
-                                <button
-                                    type="submit"
-                                    class="new-comment-submit"
-                                    v-if="!post.readonly"
-                                    @click="saveEdit(post.id, post.body)"
-                                >
-                                    Save
-                                </button>
-                            </vue-tribute>
+                            <Tiptap v-model="post.body" :readonly="post.readonly" saveLabel="Save" @save="saveEdit(post.id, post.body)" />
                         </div>
                     </div>
                     <div class="column">
@@ -69,18 +55,12 @@
                                                 <button @click="deleteComment(reply.id)">Delete Post</button>
                                             </div>
                                         </span>
-                                        <div v-if="reply.readonly">{{ reply.body }}</div>
-                                        <vue-tribute v-else :options="tributeOptions" class="tribute-wrapper">
-                                            <input type="text" class="body" v-model="reply.body" :readonly="reply.readonly" />
-                                            <button
-                                                type="submit"
-                                                class="new-comment-submit"
-                                                v-if="!reply.readonly"
-                                                @click="saveEdit(reply.id, reply.body)"
-                                            >
-                                                Save
-                                            </button>
-                                        </vue-tribute>
+                                        <Tiptap
+                                            v-model="reply.body"
+                                            :readonly="reply.readonly"
+                                            saveLabel="Save"
+                                            @save="saveEdit(reply.id, reply.body)"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -93,15 +73,7 @@
                                 v-if="newReply && newReply.threadId === post.id"
                             >
                                 <UserPhoto :user="user"></UserPhoto>
-                                <vue-tribute :options="tributeOptions" class="tribute-wrapper">
-                                    <input
-                                        type="text"
-                                        placeholder="Reply to comment"
-                                        v-model="newReply.body"
-                                        @input="$event.target.composing = false"
-                                    />
-                                </vue-tribute>
-                                <button type="submit" class="new-comment-submit" v-if="newReply.body">Post</button>
+                                <Tiptap v-model="newReply.body" placeholder="Reply to comment" @save="save(newReply)" saveLabel="Post" />
                             </form>
                         </transition>
 
@@ -130,15 +102,14 @@ import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
-import VueTribute from "vue-tribute";
 import { Services, MentionableUser } from "@/api";
-import { makeTributeOptions, TributeOptions } from "@/views/shared/mentions";
+import Tiptap from "@/views/shared/Tiptap.vue";
 
 export default Vue.extend({
     name: "Comments",
     components: {
         ...CommonComponents,
-        VueTribute,
+        Tiptap,
     },
     props: {
         user: {
@@ -151,7 +122,6 @@ export default Vue.extend({
         },
     },
     data(): {
-        tributeOptions: TributeOptions;
         posts: Comment[];
         placeholder: string | null;
         viewType: string;
@@ -168,10 +138,7 @@ export default Vue.extend({
         };
         errorMessage: string | null;
     } {
-        const tributeOptions = makeTributeOptions(this.$config, this.$services);
-
         return {
-            tributeOptions: tributeOptions,
             posts: [],
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
@@ -329,7 +296,7 @@ export default Vue.extend({
         startEditing(post: Comment) {
             post.readonly = false;
         },
-        saveEdit(commentID: number, body: string) {
+        saveEdit(commentID: number, body: Record<string, unknown>) {
             this.$services.api
                 .editComment(commentID, body)
                 .then((response) => {
@@ -419,7 +386,7 @@ header {
 }
 
 .new-comment {
-    @include flex(center);
+    @include flex(top);
     padding: 22px 0;
     position: relative;
 
@@ -569,6 +536,8 @@ header {
     }
 
     .column {
+        /* padding-top: 1em; */
+
         &:nth-of-type(2) {
             padding-left: 42px;
         }
