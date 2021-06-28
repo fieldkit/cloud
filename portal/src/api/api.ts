@@ -1188,7 +1188,25 @@ class FKApi {
         });
     }
 
-    public getComments(projectIDOrBookmark: number | string): Promise<{ posts: Comment[] }> {
+    private parseBody(post: Comment): Comment {
+        try {
+            return _.extend(post, {
+                body: JSON.parse(post.body),
+                replies: this.parseBodies(post.replies),
+            });
+        } catch (error) {
+            console.log("comments-malformed", post);
+            return post;
+        }
+    }
+
+    private parseBodies(posts: Comment[]): Comment[] {
+        return posts.map((c) => {
+            return this.parseBody(c);
+        });
+    }
+
+    public async getComments(projectIDOrBookmark: number | string): Promise<{ posts: Comment[] }> {
         let apiURL;
 
         if (typeof projectIDOrBookmark === "number") {
@@ -1197,37 +1215,61 @@ class FKApi {
             apiURL = this.baseUrl + "/discussion?bookmark=" + JSON.stringify(projectIDOrBookmark);
         }
 
-        return this.invoke({
+        const returned = await this.invoke({
             auth: Auth.Required,
             method: "GET",
             url: apiURL,
         });
+
+        const fixed = this.parseBodies(returned.posts);
+
+        console.log("comments", returned);
+
+        return {
+            posts: fixed,
+        };
     }
 
-    public postComment(comment: NewComment): Promise<{ post: Comment }> {
-        return this.invoke({
+    public async postComment(comment: NewComment): Promise<{ post: Comment }> {
+        console.log("save-comment", comment);
+
+        const returned = await this.invoke({
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/discussion",
-            data: { post: comment },
+            data: {
+                post: _.extend({}, comment, {
+                    body: JSON.stringify(comment.body),
+                }),
+            },
         });
+
+        console.log("comments", returned);
+
+        return {
+            post: this.parseBody(returned.post),
+        };
     }
 
-    public deleteComment(commentID: number): Promise<boolean> {
-        return this.invoke({
+    public async deleteComment(commentID: number): Promise<boolean> {
+        return await this.invoke({
             auth: Auth.Required,
             method: "DELETE",
             url: this.baseUrl + "/discussion/" + commentID,
         });
     }
 
-    public editComment(commentID: number, body: string): Promise<boolean> {
-        return this.invoke({
+    public async editComment(commentID: number, body: Record<string, unknown>): Promise<boolean> {
+        const returned = await this.invoke({
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/discussion/" + commentID,
-            data: { body: body },
+            data: { body: JSON.stringify(body) },
         });
+
+        console.log("edit", returned);
+
+        return returned;
     }
 }
 
