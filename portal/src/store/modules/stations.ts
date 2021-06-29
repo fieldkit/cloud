@@ -270,6 +270,7 @@ const actions = (services: Services) => {
     return {
         [ActionTypes.INITIALIZE]: async ({ dispatch }: { dispatch: any }) => {
             await dispatch(ActionTypes.NEED_COMMON);
+            await services.api.listen();
         },
         [ActionTypes.AUTHENTICATED]: async ({ dispatch }: { dispatch: any }) => {
             await dispatch(ActionTypes.NEED_COMMON);

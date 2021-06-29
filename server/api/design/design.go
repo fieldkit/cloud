@@ -17,6 +17,20 @@ var JWTAuth = JWTSecurity("jwt", func() {
 	Scope("api:ingestion", "Ingestion access")
 })
 
+var Origins = []string{
+	"https://fieldkit.org:8080",
+	"https://*.fieldkit.org:8080",
+	"https://fieldkit.org",
+	"https://*.fieldkit.org",
+	"https://fkdev.org",
+	"https://*.fkdev.org",
+	"/(.+[.])?192.168.\\d+.\\d+:\\d+/", // Dev
+	"/(.+[.])?127.0.0.1:\\d+/",         // Dev
+	"/(.+[.])?localhost:\\d+/",         // Dev
+	"/(.+[.])?fieldkit.org:\\d+/",      // Dev
+	"/(.+[.])?local.fkdev.org:\\d+/",   // Dev
+}
+
 func commonOptions() {
 	corsRules := func() {
 		cors.Headers("Authorization", "Content-Type")
@@ -24,17 +38,9 @@ func commonOptions() {
 		cors.Methods("GET", "OPTIONS", "POST", "DELETE", "PATCH", "PUT")
 	}
 
-	cors.Origin("https://fieldkit.org:8080", corsRules)
-	cors.Origin("https://*.fieldkit.org:8080", corsRules)
-	cors.Origin("https://fieldkit.org", corsRules)
-	cors.Origin("https://*.fieldkit.org", corsRules)
-	cors.Origin("https://fkdev.org", corsRules)
-	cors.Origin("https://*.fkdev.org", corsRules)
-	cors.Origin("/(.+[.])?192.168.\\d+.\\d+:\\d+/", corsRules) // Dev
-	cors.Origin("/(.+[.])?127.0.0.1:\\d+/", corsRules)         // Dev
-	cors.Origin("/(.+[.])?localhost:\\d+/", corsRules)         // Dev
-	cors.Origin("/(.+[.])?fieldkit.org:\\d+/", corsRules)      // Dev
-	cors.Origin("/(.+[.])?local.fkdev.org:\\d+/", corsRules)   // Dev
+	for _, origin := range Origins {
+		cors.Origin(origin, corsRules)
+	}
 
 	Error("unauthorized", func() {})
 	Error("forbidden", func() {})

@@ -6,11 +6,27 @@ import (
 
 var _ = Service("notifications", func() {
 	Method("listen", func() {
+		/*
+			Security(JWTAuth, func() {
+				Scope("api:access")
+			})
+
+			Payload(func() {
+				Token("token", String, func() {
+					Description("JWT used for authentication")
+				})
+
+				Required("token")
+			})
+		*/
+
 		HTTP(func() {
 			GET("notifications")
 		})
 
-		StreamingResult(Notification)
+		StreamingResult(MapOf(String, Any))
+
+		StreamingPayload(MapOf(String, Any))
 	})
 
 	Error("unauthorized", String, "credentials are invalid")
