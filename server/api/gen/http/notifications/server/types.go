@@ -9,15 +9,8 @@ package server
 
 import (
 	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
-	notificationsviews "github.com/fieldkit/cloud/server/api/gen/notifications/views"
 	goa "goa.design/goa/v3/pkg"
 )
-
-// ListenResponseBody is the type of the "notifications" service "listen"
-// endpoint HTTP response body.
-type ListenResponseBody struct {
-	ID int64 `form:"id" json:"id" xml:"id"`
-}
 
 // ListenForbiddenResponseBody is the type of the "notifications" service
 // "listen" endpoint HTTP response body for the "forbidden" error.
@@ -76,15 +69,6 @@ type ListenBadRequestResponseBody struct {
 // ListenUnauthorizedResponseBody is the type of the "notifications" service
 // "listen" endpoint HTTP response body for the "unauthorized" error.
 type ListenUnauthorizedResponseBody string
-
-// NewListenResponseBody builds the HTTP response body from the result of the
-// "listen" endpoint of the "notifications" service.
-func NewListenResponseBody(res *notificationsviews.NotificationView) *ListenResponseBody {
-	body := &ListenResponseBody{
-		ID: *res.ID,
-	}
-	return body
-}
 
 // NewListenForbiddenResponseBody builds the HTTP response body from the result
 // of the "listen" endpoint of the "notifications" service.

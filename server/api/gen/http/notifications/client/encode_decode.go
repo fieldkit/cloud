@@ -14,8 +14,6 @@ import (
 	"net/http"
 	"net/url"
 
-	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
-	notificationsviews "github.com/fieldkit/cloud/server/api/gen/notifications/views"
 	goahttp "goa.design/goa/v3/http"
 )
 
@@ -67,21 +65,14 @@ func DecodeListenResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body ListenResponseBody
+				body map[string]interface{}
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("notifications", "listen", err)
 			}
-			p := NewListenNotificationOK(&body)
-			view := "default"
-			vres := &notificationsviews.Notification{Projected: p, View: view}
-			if err = notificationsviews.ValidateNotification(vres); err != nil {
-				return nil, goahttp.ErrValidationError("notifications", "listen", err)
-			}
-			res := notifications.NewNotification(vres)
-			return res, nil
+			return body, nil
 		case http.StatusForbidden:
 			var (
 				body ListenForbiddenResponseBody

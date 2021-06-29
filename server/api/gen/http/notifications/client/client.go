@@ -10,9 +10,7 @@ package client
 import (
 	"context"
 	"net/http"
-	"time"
 
-	"github.com/gorilla/websocket"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -88,15 +86,6 @@ func (c *Client) Listen() goa.Endpoint {
 		if c.configurer.ListenFn != nil {
 			conn = c.configurer.ListenFn(conn, cancel)
 		}
-		go func() {
-			<-ctx.Done()
-			conn.WriteControl(
-				websocket.CloseMessage,
-				websocket.FormatCloseMessage(websocket.CloseNormalClosure, "client closing connection"),
-				time.Now().Add(time.Second),
-			)
-			conn.Close()
-		}()
 		stream := &ListenClientStream{conn: conn}
 		return stream, nil
 	}

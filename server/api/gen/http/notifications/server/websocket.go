@@ -9,11 +9,11 @@ package server
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"sync"
 	"time"
 
-	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
 	"github.com/gorilla/websocket"
 	goahttp "goa.design/goa/v3/http"
 )
@@ -50,9 +50,9 @@ func NewConnConfigurer(fn goahttp.ConnConfigureFunc) *ConnConfigurer {
 	}
 }
 
-// Send streams instances of "notifications.Notification" to the "listen"
-// endpoint websocket connection.
-func (s *ListenServerStream) Send(v *notifications.Notification) error {
+// Send streams instances of "map[string]interface{}" to the "listen" endpoint
+// websocket connection.
+func (s *ListenServerStream) Send(v map[string]interface{}) error {
 	var err error
 	// Upgrade the HTTP connection to a websocket connection only once. Connection
 	// upgrade is done here so that authorization logic in the endpoint is executed
@@ -71,9 +71,42 @@ func (s *ListenServerStream) Send(v *notifications.Notification) error {
 	if err != nil {
 		return err
 	}
-	res := notifications.NewViewedNotification(v, "default")
-	body := NewListenResponseBody(res.Projected)
-	return s.conn.WriteJSON(body)
+	res := v
+	return s.conn.WriteJSON(res)
+}
+
+// Recv reads instances of "map[string]interface{}" from the "listen" endpoint
+// websocket connection.
+func (s *ListenServerStream) Recv() (map[string]interface{}, error) {
+	var (
+		rv   map[string]interface{}
+		body map[string]interface{}
+		err  error
+	)
+	// Upgrade the HTTP connection to a websocket connection only once. Connection
+	// upgrade is done here so that authorization logic in the endpoint is executed
+	// before calling the actual service method which may call Recv().
+	s.once.Do(func() {
+		var conn *websocket.Conn
+		conn, err = s.upgrader.Upgrade(s.w, s.r, nil)
+		if err != nil {
+			return
+		}
+		if s.configurer != nil {
+			conn = s.configurer(conn, s.cancel)
+		}
+		s.conn = conn
+	})
+	if err != nil {
+		return rv, err
+	}
+	if err = s.conn.ReadJSON(&body); err != nil {
+		return rv, err
+	}
+	if body == nil {
+		return rv, io.EOF
+	}
+	return body, nil
 }
 
 // Close closes the "listen" endpoint websocket connection.
