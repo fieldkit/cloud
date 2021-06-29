@@ -10,8 +10,6 @@ package client
 import (
 	"io"
 
-	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
-	notificationsviews "github.com/fieldkit/cloud/server/api/gen/notifications/views"
 	"github.com/gorilla/websocket"
 	goahttp "goa.design/goa/v3/http"
 )
@@ -36,26 +34,36 @@ func NewConnConfigurer(fn goahttp.ConnConfigureFunc) *ConnConfigurer {
 	}
 }
 
-// Recv reads instances of "notifications.Notification" from the "listen"
-// endpoint websocket connection.
-func (s *ListenClientStream) Recv() (*notifications.Notification, error) {
+// Recv reads instances of "map[string]interface{}" from the "listen" endpoint
+// websocket connection.
+func (s *ListenClientStream) Recv() (map[string]interface{}, error) {
 	var (
-		rv   *notifications.Notification
-		body ListenResponseBody
+		rv   map[string]interface{}
+		body map[string]interface{}
 		err  error
 	)
 	err = s.conn.ReadJSON(&body)
 	if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
-		s.conn.Close()
 		return rv, io.EOF
 	}
 	if err != nil {
 		return rv, err
 	}
-	res := NewListenNotificationOK(&body)
-	vres := &notificationsviews.Notification{res, "default"}
-	if err := notificationsviews.ValidateNotification(vres); err != nil {
-		return rv, goahttp.ErrValidationError("notifications", "listen", err)
+	return body, nil
+}
+
+// Send streams instances of "map[string]interface{}" to the "listen" endpoint
+// websocket connection.
+func (s *ListenClientStream) Send(v map[string]interface{}) error {
+	return s.conn.WriteJSON(v)
+}
+
+// Close closes the "listen" endpoint websocket connection.
+func (s *ListenClientStream) Close() error {
+	var err error
+	// Send a nil payload to the server implying client closing connection.
+	if err = s.conn.WriteJSON(nil); err != nil {
+		return err
 	}
-	return notifications.NewNotification(vres), nil
+	return s.conn.Close()
 }

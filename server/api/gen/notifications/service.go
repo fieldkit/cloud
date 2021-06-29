@@ -10,7 +10,6 @@ package notifications
 import (
 	"context"
 
-	notificationsviews "github.com/fieldkit/cloud/server/api/gen/notifications/views"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -33,8 +32,10 @@ var MethodNames = [1]string{"listen"}
 // ListenServerStream is the interface a "listen" endpoint server stream must
 // satisfy.
 type ListenServerStream interface {
-	// Send streams instances of "Notification".
-	Send(*Notification) error
+	// Send streams instances of "map[string]interface{}".
+	Send(map[string]interface{}) error
+	// Recv reads instances of "map[string]interface{}" from the stream.
+	Recv() (map[string]interface{}, error)
 	// Close closes the stream.
 	Close() error
 }
@@ -42,13 +43,12 @@ type ListenServerStream interface {
 // ListenClientStream is the interface a "listen" endpoint client stream must
 // satisfy.
 type ListenClientStream interface {
-	// Recv reads instances of "Notification" from the stream.
-	Recv() (*Notification, error)
-}
-
-// Notification is the result type of the notifications service listen method.
-type Notification struct {
-	ID int64
+	// Send streams instances of "map[string]interface{}".
+	Send(map[string]interface{}) error
+	// Recv reads instances of "map[string]interface{}" from the stream.
+	Recv() (map[string]interface{}, error)
+	// Close closes the stream.
+	Close() error
 }
 
 // credentials are invalid
@@ -98,36 +98,4 @@ func MakeBadRequest(err error) *goa.ServiceError {
 		ID:      goa.NewErrorID(),
 		Message: err.Error(),
 	}
-}
-
-// NewNotification initializes result type Notification from viewed result type
-// Notification.
-func NewNotification(vres *notificationsviews.Notification) *Notification {
-	return newNotification(vres.Projected)
-}
-
-// NewViewedNotification initializes viewed result type Notification from
-// result type Notification using the given view.
-func NewViewedNotification(res *Notification, view string) *notificationsviews.Notification {
-	p := newNotificationView(res)
-	return &notificationsviews.Notification{Projected: p, View: "default"}
-}
-
-// newNotification converts projected type Notification to service type
-// Notification.
-func newNotification(vres *notificationsviews.NotificationView) *Notification {
-	res := &Notification{}
-	if vres.ID != nil {
-		res.ID = *vres.ID
-	}
-	return res
-}
-
-// newNotificationView projects result type Notification to projected type
-// NotificationView using the "default" view.
-func newNotificationView(res *Notification) *notificationsviews.NotificationView {
-	vres := &notificationsviews.NotificationView{
-		ID: &res.ID,
-	}
-	return vres
 }
