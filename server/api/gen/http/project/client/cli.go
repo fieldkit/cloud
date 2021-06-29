@@ -24,7 +24,7 @@ func BuildAddUpdatePayload(projectAddUpdateBody string, projectAddUpdateProjectI
 	{
 		err = json.Unmarshal([]byte(projectAddUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Amet exercitationem atque ut possimus est sint.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Debitis quidem ipsam.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -89,7 +89,7 @@ func BuildModifyUpdatePayload(projectModifyUpdateBody string, projectModifyUpdat
 	{
 		err = json.Unmarshal([]byte(projectModifyUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Dolores accusantium ut inventore.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Voluptatibus pariatur eveniet non est et.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -312,7 +312,7 @@ func BuildUpdatePayload(projectUpdateBody string, projectUpdateProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bounds\": {\n         \"max\": [\n            0.0702774182753866,\n            0.04702208499526844,\n            0.7090494170088115\n         ],\n         \"min\": [\n            0.3405263781847104,\n            0.3429390355284833\n         ]\n      },\n      \"description\": \"Nemo sed sed temporibus vel.\",\n      \"endTime\": \"Dolores mollitia debitis suscipit facilis vel.\",\n      \"goal\": \"Omnis hic est dolor voluptatum aut.\",\n      \"location\": \"Et et odio laborum asperiores est.\",\n      \"name\": \"Rerum vel sunt nihil et voluptates voluptates.\",\n      \"privacy\": 796200972,\n      \"showStations\": false,\n      \"startTime\": \"Dolores earum.\",\n      \"tags\": \"Molestiae autem labore qui consequatur.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bounds\": {\n         \"max\": [\n            0.8784677594599163,\n            0.36490765287867255,\n            0.24892459816956164,\n            0.7126731889811246\n         ],\n         \"min\": [\n            0.39705284967253324,\n            0.85002723671336\n         ]\n      },\n      \"description\": \"Voluptatum aut temporibus et et odio laborum.\",\n      \"endTime\": \"Voluptas quo temporibus impedit perferendis laudantium dolores.\",\n      \"goal\": \"Est perspiciatis molestiae autem labore qui.\",\n      \"location\": \"Ut cumque.\",\n      \"name\": \"Sed temporibus vel recusandae omnis hic est.\",\n      \"privacy\": 1862540501,\n      \"showStations\": true,\n      \"startTime\": \"Vel eius cumque.\",\n      \"tags\": \"Earum non dolores mollitia debitis.\"\n   }'")
 		}
 		if body.Bounds != nil {
 			if err2 := ValidateProjectBoundsRequestBodyRequestBody(body.Bounds); err2 != nil {
@@ -421,7 +421,7 @@ func BuildInvitePayload(projectInviteBody string, projectInviteProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectInviteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Et harum sunt rerum modi.\",\n      \"role\": 246980433\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Consectetur sit.\",\n      \"role\": 990436063\n   }'")
 		}
 	}
 	var projectID int32
@@ -458,7 +458,7 @@ func BuildRemoveUserPayload(projectRemoveUserBody string, projectRemoveUserProje
 	{
 		err = json.Unmarshal([]byte(projectRemoveUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Reprehenderit iusto consequatur alias est.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Voluptatem ipsam.\"\n   }'")
 		}
 	}
 	var projectID int32
