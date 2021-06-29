@@ -6,8 +6,10 @@ import (
 	"encoding/base64"
 	"io"
 	"net/http"
+	"regexp"
 	"strings"
 
+	"github.com/gorilla/websocket"
 	goa "goa.design/goa/v3/pkg"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -16,6 +18,9 @@ import (
 	"github.com/spf13/viper"
 
 	goahttp "goa.design/goa/v3/http"
+
+	"github.com/fieldkit/cloud/server/api/design"
+	"goa.design/plugins/v3/cors"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 
@@ -81,6 +86,9 @@ import (
 
 	ttnServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/ttn/server"
 	ttnService "github.com/fieldkit/cloud/server/api/gen/ttn"
+
+	notificationsServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/notifications/server"
+	notificationsService "github.com/fieldkit/cloud/server/api/gen/notifications"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -147,6 +155,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	ttnSvc := NewThingsNetworkService(ctx, options)
 	ttnEndpoints := ttnService.NewEndpoints(ttnSvc)
 
+	notificationsSvc := NewNotificationsService(ctx, options)
+	notificationsEndpoints := notificationsService.NewEndpoints(notificationsSvc)
+
 	for _, mw := range []func(goa.Endpoint) goa.Endpoint{jwtContext(), logErrors()} {
 		modulesEndpoints.Use(mw)
 		tasksEndpoints.Use(mw)
@@ -169,6 +180,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		discourseEndpoints.Use(mw)
 		oidcEndpoints.Use(mw)
 		ttnEndpoints.Use(mw)
+		notificationsEndpoints.Use(mw)
 	}
 
 	samlConfig := &SamlAuthConfig{
@@ -212,6 +224,32 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	oidcServer := oidcServiceSvr.New(oidcEndpoints, mux, dec, enc, eh, nil)
 	ttnServer := ttnServiceSvr.New(ttnEndpoints, mux, dec, enc, eh, nil)
 
+	upgrader := &websocket.Upgrader{}
+	upgrader.CheckOrigin = func(r *http.Request) bool {
+		// TODO Precompiling expressions.
+		origin := r.Header.Get("Origin")
+		for _, pattern := range design.Origins {
+			if strings.HasPrefix(pattern, "/") && strings.HasSuffix(pattern, "/") {
+				spec := regexp.MustCompile(strings.Trim(pattern, "/"))
+				if cors.MatchOriginRegexp(origin, spec) {
+					return true
+				}
+			} else {
+				if cors.MatchOrigin(origin, pattern) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+
+	configurer := notificationsServiceSvr.NewConnConfigurer(func(conn *websocket.Conn, cancel context.CancelFunc) *websocket.Conn {
+		Logger(ctx).Sugar().Infow("configure-new-connection")
+		return conn
+	})
+
+	notificationsServer := notificationsServiceSvr.New(notificationsEndpoints, mux, dec, enc, eh, nil, upgrader, configurer)
+
 	tasksSvr.Mount(mux, tasksServer)
 	testSvr.Mount(mux, testServer)
 	modulesSvr.Mount(mux, modulesServer)
@@ -233,6 +271,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	discourseServiceSvr.Mount(mux, discourseServer)
 	oidcServiceSvr.Mount(mux, oidcServer)
 	ttnServiceSvr.Mount(mux, ttnServer)
+	notificationsServiceSvr.Mount(mux, notificationsServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -297,6 +336,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range ttnServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range notificationsServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 

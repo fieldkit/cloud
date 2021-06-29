@@ -8,6 +8,7 @@ import { BoundingRectangle } from "@/store/map-types";
 import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { SensorsResponse } from "@/views/viz/api";
+import { promiseAfter } from "@/utilities";
 
 export class ApiError extends Error {
     constructor(message) {
@@ -1270,6 +1271,29 @@ class FKApi {
         console.log("edit", returned);
 
         return returned;
+    }
+
+    public async listen(): Promise<void> {
+        const wsBase = this.baseUrl.replace("https", "ws").replace("http", "ws");
+        const socket = new WebSocket(wsBase + "/notifications");
+        const token = this.token.getHeader();
+
+        socket.addEventListener("open", (event) => {
+            console.log("connection: connected");
+            socket.send(JSON.stringify({ token: token }));
+        });
+
+        socket.addEventListener("message", (event) => {
+            console.log("connection:", JSON.parse(event.data));
+        });
+
+        socket.addEventListener("close", async (event) => {
+            console.log("connection: closed");
+            await promiseAfter(1000);
+            await this.listen();
+        });
+
+        return await Promise.resolve();
     }
 }
 
