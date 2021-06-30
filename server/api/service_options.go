@@ -41,6 +41,9 @@ type ControllerOptions struct {
 	signer    *Signer
 	locations *data.DescribeLocations
 	que       *que.Client
+
+	// Subscribed listeners
+	subscriptions *Subscriptions
 }
 
 func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
@@ -58,21 +61,22 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 	locations := data.NewDescribeLocations(config.MapboxToken)
 
 	controllerOptions = &ControllerOptions{
-		Session:      awsSession,
-		Database:     database,
-		Querier:      data.NewQuerier(database),
-		Backend:      be,
-		Emailer:      emailer,
-		JWTHMACKey:   jwtHMACKey,
-		Domain:       config.Domain,
-		PortalDomain: config.PortalDomain,
-		Metrics:      metrics,
-		Config:       config,
-		Publisher:    publisher,
-		MediaFiles:   mediaFiles,
-		signer:       NewSigner(jwtHMACKey),
-		locations:    locations,
-		que:          que,
+		Session:       awsSession,
+		Database:      database,
+		Querier:       data.NewQuerier(database),
+		Backend:       be,
+		Emailer:       emailer,
+		JWTHMACKey:    jwtHMACKey,
+		Domain:        config.Domain,
+		PortalDomain:  config.PortalDomain,
+		Metrics:       metrics,
+		Config:        config,
+		Publisher:     publisher,
+		MediaFiles:    mediaFiles,
+		signer:        NewSigner(jwtHMACKey),
+		locations:     locations,
+		que:           que,
+		subscriptions: NewSubscriptions(),
 	}
 
 	return
