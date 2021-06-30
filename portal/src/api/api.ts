@@ -1278,17 +1278,17 @@ class FKApi {
         const socket = new WebSocket(wsBase + "/notifications");
         const token = this.token.getHeader();
 
-        socket.addEventListener("open", (event) => {
-            console.log("connection: connected");
+        socket.addEventListener("open", () => {
+            console.log("ws: connected");
             socket.send(JSON.stringify({ token: token }));
         });
 
         socket.addEventListener("message", (event) => {
-            console.log("connection:", JSON.parse(event.data));
+            console.log("ws:", JSON.parse(event.data));
         });
 
-        socket.addEventListener("close", async (event) => {
-            console.log("connection: closed");
+        socket.addEventListener("close", async () => {
+            console.log("ws: closed");
             await promiseAfter(1000);
             await this.listen();
         });

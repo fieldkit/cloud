@@ -13,6 +13,7 @@ import (
 
 	discService "github.com/fieldkit/cloud/server/api/gen/discussion"
 
+	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -85,6 +86,8 @@ func (c *DiscussionService) Data(ctx context.Context, payload *discService.DataP
 }
 
 func (c *DiscussionService) PostMessage(ctx context.Context, payload *discService.PostMessagePayload) (*discService.PostMessageResult, error) {
+	log := Logger(ctx).Sugar()
+
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
 		return nil, err
@@ -132,6 +135,14 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 		return nil, err
 	}
 
+	mentions, err := backend.DiscoverMentions(ctx, post.ID, post.Body)
+	if err != nil {
+		return nil, err
+	}
+	if len(mentions) > 0 {
+		log.Infow("mentions", "mentions", mentions)
+	}
+
 	users := map[int32]*data.User{
 		user.ID: user,
 	}
@@ -147,6 +158,8 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 }
 
 func (c *DiscussionService) UpdateMessage(ctx context.Context, payload *discService.UpdateMessagePayload) (*discService.UpdateMessageResult, error) {
+	log := Logger(ctx).Sugar()
+
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
 		return nil, err
@@ -173,6 +186,14 @@ func (c *DiscussionService) UpdateMessage(ctx context.Context, payload *discServ
 
 	if _, err := dr.UpdatePostByID(ctx, post); err != nil {
 		return nil, err
+	}
+
+	mentions, err := backend.DiscoverMentions(ctx, post.ID, post.Body)
+	if err != nil {
+		return nil, err
+	}
+	if len(mentions) > 0 {
+		log.Infow("mentions", "mentions", mentions)
 	}
 
 	users := map[int32]*data.User{
