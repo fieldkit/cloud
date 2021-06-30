@@ -43,10 +43,6 @@ type ControllerOptions struct {
 	que       *que.Client
 }
 
-func (o *ControllerOptions) Close() error {
-	return nil
-}
-
 func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
 	awsSession *session.Session, metrics *logging.Metrics, que *que.Client) (controllerOptions *ControllerOptions, err error) {
 	emailer, err := createEmailer(awsSession, config)
@@ -80,4 +76,8 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 	}
 
 	return
+}
+
+func (o *ControllerOptions) Close() error {
+	return nil
 }
