@@ -29,8 +29,7 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 	for done := false; !done; {
 		select {
 		case outgoing := <-listener.published:
-			log.Infow("incoming", "message", outgoing)
-
+			log.Infow("ws:incoming", "message", outgoing)
 			if err := stream.Send(outgoing); err != nil {
 				return err
 			}
@@ -44,6 +43,8 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 			done = true
 		}
 	}
+
+	log.Infow("ws:closing")
 
 	return stream.Close()
 }

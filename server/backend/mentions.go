@@ -9,8 +9,8 @@ import (
 )
 
 type Mention struct {
-	UserID int32
-	PostID int64
+	UserID int32 `json:"user_id"`
+	PostID int64 `json:"post_id"`
 }
 
 func findTipTapMentions(ctx context.Context, value interface{}) []int32 {

@@ -245,8 +245,11 @@ func (c *DiscussionService) notifyMentions(ctx context.Context, post *data.Discu
 			if saved, err := nr.AddNotification(ctx, notif); err != nil {
 				return err
 			} else {
-				// TODO notify
-				log.Infow("notification", "notification", saved)
+				message := saved.ToMap()
+				log.Infow("notification", "notification", message)
+				if err := c.options.subscriptions.Publish(ctx, notif.UserID, message); err != nil {
+					log.Errorw("notification", "error", err)
+				}
 			}
 		}
 	}
