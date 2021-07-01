@@ -86,8 +86,6 @@ func (c *DiscussionService) Data(ctx context.Context, payload *discService.DataP
 }
 
 func (c *DiscussionService) PostMessage(ctx context.Context, payload *discService.PostMessagePayload) (*discService.PostMessageResult, error) {
-	log := Logger(ctx).Sugar()
-
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
 		return nil, err
@@ -135,12 +133,8 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 		return nil, err
 	}
 
-	mentions, err := backend.DiscoverMentions(ctx, post.ID, post.Body)
-	if err != nil {
+	if err := c.notifyMentions(ctx, post); err != nil {
 		return nil, err
-	}
-	if len(mentions) > 0 {
-		log.Infow("mentions", "mentions", mentions)
 	}
 
 	users := map[int32]*data.User{
@@ -158,8 +152,6 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 }
 
 func (c *DiscussionService) UpdateMessage(ctx context.Context, payload *discService.UpdateMessagePayload) (*discService.UpdateMessageResult, error) {
-	log := Logger(ctx).Sugar()
-
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
 		return nil, err
@@ -188,12 +180,8 @@ func (c *DiscussionService) UpdateMessage(ctx context.Context, payload *discServ
 		return nil, err
 	}
 
-	mentions, err := backend.DiscoverMentions(ctx, post.ID, post.Body)
-	if err != nil {
+	if err := c.notifyMentions(ctx, post); err != nil {
 		return nil, err
-	}
-	if len(mentions) > 0 {
-		log.Infow("mentions", "mentions", mentions)
 	}
 
 	users := map[int32]*data.User{
@@ -226,11 +214,42 @@ func (c *DiscussionService) DeleteMessage(ctx context.Context, payload *discServ
 		return discService.MakeForbidden(errors.New("unauthorized"))
 	}
 
+	nr := repositories.NewNotificationRepository(c.db)
+	if err := nr.DeleteByPostID(ctx, payload.PostID); err != nil {
+		return err
+	}
+
 	if err := dr.DeletePostByID(ctx, payload.PostID); err != nil {
 		return err
 	}
 
 	_ = post
+
+	return nil
+}
+
+func (c *DiscussionService) notifyMentions(ctx context.Context, post *data.DiscussionPost) error {
+	log := Logger(ctx).Sugar()
+
+	mentions, err := backend.DiscoverMentions(ctx, post.ID, post.Body)
+	if err != nil {
+		return err
+	}
+	if len(mentions) > 0 {
+		log.Infow("mentions", "mentions", mentions)
+
+		nr := repositories.NewNotificationRepository(c.db)
+
+		notifications := backend.NotifyMentions(mentions)
+		for _, notif := range notifications {
+			if saved, err := nr.AddNotification(ctx, notif); err != nil {
+				return err
+			} else {
+				// TODO notify
+				log.Infow("notification", "notification", saved)
+			}
+		}
+	}
 
 	return nil
 }
