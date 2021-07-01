@@ -13,7 +13,7 @@ import (
 )
 
 type Subscriptions struct {
-	lock      sync.Mutex
+	lock      sync.RWMutex
 	listeners map[int32][]*Listener
 }
 
@@ -23,8 +23,25 @@ func NewSubscriptions() (s *Subscriptions) {
 	}
 }
 
+func (s *Subscriptions) Remove(ctx context.Context, userID int32, listener *Listener) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("ws:removing-any", "user_id", userID)
+	s.lock.Lock()
+	if listeners, ok := s.listeners[userID]; ok {
+		for i, value := range listeners {
+			if value == listener {
+				log.Infow("ws:removing-listener", "user_id", userID)
+				s.listeners[userID] = append(listeners[:i], listeners[i+1:]...)
+				break
+			}
+		}
+	}
+	s.lock.Unlock()
+	return nil
+}
+
 func (s *Subscriptions) Add(ctx context.Context, userID int32, listener *Listener) error {
-	// TODO Rwlock?
 	s.lock.Lock()
 	if _, ok := s.listeners[userID]; !ok {
 		s.listeners[userID] = make([]*Listener, 0)
@@ -34,14 +51,33 @@ func (s *Subscriptions) Add(ctx context.Context, userID int32, listener *Listene
 	return nil
 }
 
-func (s *Subscriptions) Publish(ctx context.Context, userID int32, data map[string]interface{}) error {
-	s.lock.Lock()
+func (s *Subscriptions) getListeners(ctx context.Context, userID int32) ([]*Listener, error) {
+	s.lock.RLock()
 	if listeners, ok := s.listeners[userID]; ok {
-		for _, l := range listeners {
-			l.published <- data
-		}
+		copied := make([]*Listener, len(listeners))
+		copy(copied, listeners)
+		s.lock.RUnlock()
+		return copied, nil
 	}
-	s.lock.Unlock()
+	s.lock.RUnlock()
+
+	return []*Listener{}, nil
+}
+
+func (s *Subscriptions) Publish(ctx context.Context, userID int32, data map[string]interface{}) error {
+	log := Logger(ctx).Sugar()
+
+	listeners, err := s.getListeners(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("listeners", "user_id", userID, "total", len(listeners))
+
+	for _, l := range listeners {
+		l.published <- data
+	}
+
 	return nil
 }
 
@@ -75,7 +111,7 @@ func (l *Listener) service(ctx context.Context) {
 			}
 			close(l.errors)
 			close(l.published)
-			return
+			break
 		}
 
 		token, ok := dictionary["token"].(string)
@@ -84,7 +120,7 @@ func (l *Listener) service(ctx context.Context) {
 			l.errors <- fmt.Errorf("unauthenticated")
 			close(l.errors)
 			close(l.published)
-			return
+			break
 		}
 
 		userID, err := l.authenticate(ctx, token)
@@ -92,7 +128,7 @@ func (l *Listener) service(ctx context.Context) {
 			l.errors <- err
 			close(l.errors)
 			close(l.published)
-			return
+			break
 		}
 
 		log.Infow("ws:authenticated", "user_id", userID)
@@ -104,7 +140,14 @@ func (l *Listener) service(ctx context.Context) {
 			l.errors <- err
 			close(l.errors)
 			close(l.published)
-			return
+			break
+		}
+	}
+
+	if l.userID != nil {
+		log.Infow("ws:removing", "user_id", l.userID)
+		if err := l.options.subscriptions.Remove(ctx, *l.userID, l); err != nil {
+			log.Errorw("ws", "error", err)
 		}
 	}
 }
