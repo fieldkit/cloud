@@ -1,4 +1,4 @@
-CREATE TABLE fieldkit.notifications (
+CREATE TABLE fieldkit.notification (
   id serial PRIMARY KEY,
   created_at timestamp NOT NULL DEFAULT NOW(),
   user_id integer REFERENCES fieldkit.user(id) NOT NULL,
