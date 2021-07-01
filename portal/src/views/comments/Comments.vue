@@ -2,10 +2,10 @@
     <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
-        <form @submit.prevent="save(newComment)" class="new-comment">
+        <div class="new-comment">
             <UserPhoto v-if="user" :user="user"></UserPhoto>
             <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
-        </form>
+        </div>
 
         <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
 
@@ -67,14 +67,10 @@
                         </transition-group>
 
                         <transition name="fade">
-                            <form
-                                @submit.prevent="save(newReply)"
-                                class="new-comment reply"
-                                v-if="newReply && newReply.threadId === post.id"
-                            >
+                            <div class="new-comment reply" v-if="newReply && newReply.threadId === post.id">
                                 <UserPhoto :user="user"></UserPhoto>
                                 <Tiptap v-model="newReply.body" placeholder="Reply to comment" @save="save(newReply)" saveLabel="Post" />
-                            </form>
+                            </div>
                         </transition>
 
                         <div class="actions">
