@@ -53,3 +53,9 @@ export class LoginDiscourseAction {
         public readonly discourse: DiscourseParams
     ) {}
 }
+
+export class MarkNotificationsSeen {
+    type = ActionTypes.NOTIFICATIONS_SEEN;
+
+    constructor(public readonly ids: number[]) {}
+}
