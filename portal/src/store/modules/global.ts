@@ -4,6 +4,7 @@ import { MapState } from "./map";
 import { UserState } from "./user";
 import { LayoutState } from "./layout";
 import { ExportingState } from "./exporting";
+import { NotificationsState } from "./notifications";
 
 export interface RouteState {
     name: string | null;
@@ -24,6 +25,7 @@ export interface GlobalState {
     readonly user: UserState;
     readonly exporting: ExportingState;
     readonly layout: LayoutState;
+    readonly notifications: NotificationsState;
 }
 
 export interface GlobalGetters {

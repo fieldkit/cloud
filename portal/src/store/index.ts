@@ -8,6 +8,7 @@ import { map } from "./modules/map";
 import { progress } from "./modules/progress";
 import { layout } from "./modules/layout";
 import { exporting } from "./modules/exporting";
+import { notifications } from "./modules/notifications";
 import { Services } from "@/api";
 
 export * from "@/api";
@@ -19,6 +20,7 @@ export * from "./modules/exporting";
 export * from "./modules/map";
 export * from "./modules/progress";
 export * from "./modules/layout";
+export * from "./modules/notifications";
 export * from "./modules/global";
 
 import * as MutationTypes from "./mutations";
@@ -64,6 +66,7 @@ export default function(services: Services) {
         modules: {
             clock: clock(services),
             exporting: exporting(services),
+            notifications: notifications(services),
             user: user(services),
             stations: stations(services),
             map: map(services),
