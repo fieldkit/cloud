@@ -64,7 +64,7 @@ func (s *Subscriptions) getListeners(ctx context.Context, userID int32) ([]*List
 	return []*Listener{}, nil
 }
 
-func (s *Subscriptions) Publish(ctx context.Context, userID int32, data map[string]interface{}) error {
+func (s *Subscriptions) Publish(ctx context.Context, userID int32, data []map[string]interface{}) error {
 	log := Logger(ctx).Sugar()
 
 	listeners, err := s.getListeners(ctx, userID)
@@ -84,19 +84,23 @@ func (s *Subscriptions) Publish(ctx context.Context, userID int32, data map[stri
 type Listener struct {
 	options       *ControllerOptions
 	stream        notifications.ListenServerStream
+	afterAuth     AfterAuthenticationFunc
 	authenticated bool
 	userID        *int32
 	errors        chan error
-	published     chan map[string]interface{}
+	published     chan []map[string]interface{}
 }
 
-func NewListener(options *ControllerOptions, stream notifications.ListenServerStream) (l *Listener) {
+type AfterAuthenticationFunc func(ctx context.Context, userID int32) error
+
+func NewListener(options *ControllerOptions, stream notifications.ListenServerStream, afterAuth AfterAuthenticationFunc) (l *Listener) {
 	return &Listener{
 		options:       options,
 		stream:        stream,
 		authenticated: false,
+		afterAuth:     afterAuth,
 		errors:        make(chan error),
-		published:     make(chan map[string]interface{}),
+		published:     make(chan []map[string]interface{}),
 	}
 }
 
@@ -114,33 +118,42 @@ func (l *Listener) service(ctx context.Context) {
 			break
 		}
 
-		token, ok := dictionary["token"].(string)
-		if token == "" || !ok {
-			log.Infow("ws:unknown", "raw", dictionary)
-			l.errors <- fmt.Errorf("unauthenticated")
-			close(l.errors)
-			close(l.published)
-			break
-		}
+		if !l.authenticated {
+			token, ok := dictionary["token"].(string)
+			if token == "" || !ok {
+				log.Infow("ws:unknown", "raw", dictionary)
+				l.errors <- fmt.Errorf("unauthenticated")
+				close(l.errors)
+				close(l.published)
+				break
+			}
 
-		userID, err := l.authenticate(ctx, token)
-		if err != nil {
-			l.errors <- err
-			close(l.errors)
-			close(l.published)
-			break
-		}
+			userID, err := l.authenticate(ctx, token)
+			if err != nil {
+				l.errors <- err
+				close(l.errors)
+				close(l.published)
+				break
+			}
 
-		log.Infow("ws:authenticated", "user_id", userID)
+			log.Infow("ws:authenticated", "user_id", userID)
 
-		l.userID = &userID
-		l.authenticated = true
+			l.userID = &userID
+			l.authenticated = true
 
-		if err := l.options.subscriptions.Add(ctx, userID, l); err != nil {
-			l.errors <- err
-			close(l.errors)
-			close(l.published)
-			break
+			if err := l.options.subscriptions.Add(ctx, userID, l); err != nil {
+				l.errors <- err
+				close(l.errors)
+				close(l.published)
+				break
+			}
+
+			if err := l.afterAuth(ctx, userID); err != nil {
+				l.errors <- err
+				close(l.errors)
+				close(l.published)
+				break
+			}
 		}
 	}
 
