@@ -21,7 +21,7 @@
             <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
                 {{ $t("layout.header.login") }}
             </router-link>
-            <div class="header-account-menu" v-bind:class="{ active: isAccountHovered }">
+            <div class="header-account-menu" v-bind:class="{ active: isAccountHovered && !hiding }">
                 <router-link v-if="user" :to="{ name: 'editUser' }">{{ $t("layout.header.myAccount") }}</router-link>
                 <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">{{ $t("layout.header.admin") }}</router-link>
                 <a class="log-out" v-if="isAuthenticated" v-on:click="logout">{{ $t("layout.header.logout") }}</a>
@@ -42,9 +42,10 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
     },
-    data(): { isAccountHovered: boolean } {
+    data(): { isAccountHovered: boolean; hiding: boolean } {
         return {
             isAccountHovered: false,
+            hiding: false,
         };
     },
     computed: {
@@ -64,13 +65,21 @@ export default Vue.extend({
             });
         },
         onAccountHover(event: Event): void {
+            console.log("hover", this.hiding, this.isAccountHovered);
+
+            if (this.hiding && this.isAccountHovered) {
+                this.isAccountHovered = false;
+                this.hiding = false;
+                return;
+            }
+
             if (window.screen.availWidth < 768 && event.type == "mouseenter") {
                 return;
             }
             this.isAccountHovered = !this.isAccountHovered;
         },
         onAccountClick(): void {
-            this.isAccountHovered = !this.isAccountHovered;
+            this.hiding = true;
         },
     },
 });
