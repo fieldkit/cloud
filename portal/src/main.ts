@@ -6,6 +6,7 @@ import VueMeta from "vue-meta";
 import VCalendar from "v-calendar";
 import VueConfirmDialog from "vue-confirm-dialog";
 import Multiselect from "vue-multiselect";
+import { BadgePlugin } from "bootstrap-vue";
 
 import prettyBytes from "pretty-bytes";
 import moment from "moment";
@@ -59,6 +60,7 @@ Vue.use(Vuelidate);
 Vue.use(VueConfirmDialog);
 Vue.component("vue-confirm-dialog", VueConfirmDialog.default);
 Vue.component("multiselect", Multiselect);
+Vue.use(BadgePlugin);
 
 Vue.config.productionTip = false;
 

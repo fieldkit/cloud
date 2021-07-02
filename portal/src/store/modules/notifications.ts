@@ -13,19 +13,30 @@ export class NotificationsState {
     constructor(public readonly notifications: Notification[]) {}
 }
 
-const getters = {};
+const getters = {
+    numberOfUnseenNotifications(state: NotificationsState): number {
+        return state.notifications.length;
+    },
+};
+
+const NOTIFIED = "NOTIFIED";
 
 const actions = (services: Services) => {
     return {
-        [ActionTypes.INITIALIZE]: async ({ dispatch }: { dispatch: any }) => {
+        [ActionTypes.INITIALIZE]: async ({ dispatch, commit }: { dispatch: any; commit: any }) => {
             await services.api.listen(async (message: unknown) => {
+                commit(NOTIFIED, message as Notification);
                 return await Promise.resolve();
             });
         },
     };
 };
 
-const mutations = {};
+const mutations = {
+    [NOTIFIED]: (state: NotificationsState, payload: Notification) => {
+        state.notifications.push(payload);
+    },
+};
 
 export const notifications = (services: Services) => {
     const state = () => new NotificationsState([]);
