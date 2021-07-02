@@ -7,6 +7,8 @@ import (
 	"goa.design/goa/v3/security"
 
 	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
+
+	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
 type NotificationsService struct {
@@ -22,7 +24,19 @@ func NewNotificationsService(ctx context.Context, options *ControllerOptions) *N
 func (c *NotificationsService) Listen(ctx context.Context, stream notifications.ListenServerStream) error {
 	log := Logger(ctx).Sugar()
 
-	listener := NewListener(c.options, stream)
+	listener := NewListener(c.options, stream, func(ctx context.Context, userID int32) error {
+		nr := repositories.NewNotificationRepository(c.options.Database)
+		notifications, err := nr.QueryByUserID(ctx, userID)
+		if err != nil {
+			return err
+		}
+		for _, n := range notifications {
+			if err := stream.Send(n.ToMap()); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 
 	go listener.service(ctx)
 
@@ -30,8 +44,10 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 		select {
 		case outgoing := <-listener.published:
 			log.Infow("ws:incoming", "message", outgoing)
-			if err := stream.Send(outgoing); err != nil {
-				return err
+			for _, value := range outgoing {
+				if err := stream.Send(value); err != nil {
+					return err
+				}
 			}
 		case err := <-listener.errors:
 			log.Errorw("ws:error", "error", err)
