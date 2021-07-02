@@ -25,6 +25,9 @@
                 <router-link v-if="user" :to="{ name: 'editUser' }">{{ $t("layout.header.myAccount") }}</router-link>
                 <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">{{ $t("layout.header.admin") }}</router-link>
                 <a class="log-out" v-if="isAuthenticated" v-on:click="logout">{{ $t("layout.header.logout") }}</a>
+                <a class="mark-all-as-seen" v-if="numberOfUnseenNotifications > 0" v-on:click="markAllSeen">
+                    {{ $t("layout.header.markAllSeen") }}
+                </a>
             </div>
         </div>
     </div>
@@ -79,6 +82,9 @@ export default Vue.extend({
             this.isAccountHovered = !this.isAccountHovered;
         },
         onAccountClick(): void {
+            this.hiding = true;
+        },
+        markAllSeen(): void {
             this.hiding = true;
         },
     },

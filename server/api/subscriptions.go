@@ -154,6 +154,8 @@ func (l *Listener) service(ctx context.Context) {
 				close(l.published)
 				break
 			}
+		} else {
+			log.Infow("ws:received", "raw", dictionary)
 		}
 	}
 

@@ -289,6 +289,8 @@ export interface StationsResponse {
     stations: Station[];
 }
 
+export type SendFunction = (message: unknown) => Promise<void>;
+
 // Intentionally keeping this synchronous since it'll get used in
 // VueJS stuff quite often to make URLs that don't require custom
 // headers for authentication.
@@ -1273,7 +1275,7 @@ class FKApi {
         return returned;
     }
 
-    public async listen(callback: (message: unknown) => Promise<void>): Promise<void> {
+    public async listen(callback: (message: unknown) => Promise<void>): Promise<SendFunction> {
         const wsBase = this.baseUrl.replace("https", "ws").replace("http", "ws");
         const socket = new WebSocket(wsBase + "/notifications");
         const token = this.token.getHeader();
@@ -1295,7 +1297,11 @@ class FKApi {
             await this.listen(callback);
         });
 
-        return await Promise.resolve();
+        return await Promise.resolve(async (message: unknown) => {
+            // TODO Does this need to queue before open?
+            socket.send(JSON.stringify(message));
+            return await Promise.resolve();
+        });
     }
 }
 
