@@ -133,7 +133,7 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 		return nil, err
 	}
 
-	if err := c.notifyMentions(ctx, post); err != nil {
+	if err := c.notifyMentionsAndReplies(ctx, post); err != nil {
 		return nil, err
 	}
 
@@ -180,7 +180,7 @@ func (c *DiscussionService) UpdateMessage(ctx context.Context, payload *discServ
 		return nil, err
 	}
 
-	if err := c.notifyMentions(ctx, post); err != nil {
+	if err := c.notifyMentionsAndReplies(ctx, post); err != nil {
 		return nil, err
 	}
 
@@ -228,8 +228,19 @@ func (c *DiscussionService) DeleteMessage(ctx context.Context, payload *discServ
 	return nil
 }
 
-func (c *DiscussionService) notifyMentions(ctx context.Context, post *data.DiscussionPost) error {
+func (c *DiscussionService) notifyMentionsAndReplies(ctx context.Context, post *data.DiscussionPost) error {
 	log := Logger(ctx).Sugar()
+
+	notifications := make([]*data.Notification, 0)
+
+	if post.ThreadID != nil {
+		dr := repositories.NewDiscussionRepository(c.db)
+		replying, err := dr.QueryPostByID(ctx, *post.ThreadID)
+		if err != nil {
+			return err
+		}
+		notifications = append(notifications, data.NewReplyNotification(replying.UserID, post.ID))
+	}
 
 	mentions, err := backend.DiscoverMentions(ctx, post.ID, post.Body)
 	if err != nil {
@@ -237,19 +248,18 @@ func (c *DiscussionService) notifyMentions(ctx context.Context, post *data.Discu
 	}
 	if len(mentions) > 0 {
 		log.Infow("mentions", "mentions", mentions)
+		notifications = append(notifications, backend.NotifyMentions(mentions)...)
+	}
 
-		nr := repositories.NewNotificationRepository(c.db)
-
-		notifications := backend.NotifyMentions(mentions)
-		for _, notif := range notifications {
-			if saved, err := nr.AddNotification(ctx, notif); err != nil {
-				return err
-			} else {
-				message := saved.ToMap()
-				log.Infow("notification", "notification", message)
-				if err := c.options.subscriptions.Publish(ctx, notif.UserID, message); err != nil {
-					log.Errorw("notification", "error", err)
-				}
+	nr := repositories.NewNotificationRepository(c.db)
+	for _, notif := range notifications {
+		if saved, err := nr.AddNotification(ctx, notif); err != nil {
+			return err
+		} else {
+			message := saved.ToMap()
+			log.Infow("notification", "notification", message)
+			if err := c.options.subscriptions.Publish(ctx, notif.UserID, message); err != nil {
+				log.Errorw("notification", "error", err)
 			}
 		}
 	}

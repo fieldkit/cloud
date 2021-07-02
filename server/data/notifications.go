@@ -20,6 +20,7 @@ type Notification struct {
 
 const (
 	MentionNotification = "mention"
+	ReplyNotification   = "reply"
 )
 
 func NewMentionNotification(userID int32, postID int64) *Notification {
@@ -30,6 +31,18 @@ func NewMentionNotification(userID int32, postID int64) *Notification {
 		PostID:    &postID,
 		Key:       fmt.Sprintf("mention://%d", postID),
 		Kind:      MentionNotification,
+		Seen:      false,
+	}
+}
+
+func NewReplyNotification(userID int32, postID int64) *Notification {
+	return &Notification{
+		ID:        0,
+		CreatedAt: time.Now(),
+		UserID:    userID,
+		PostID:    &postID,
+		Key:       fmt.Sprintf("reply://%d", postID),
+		Kind:      ReplyNotification,
 		Seen:      false,
 	}
 }
