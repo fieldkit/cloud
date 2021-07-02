@@ -1273,7 +1273,7 @@ class FKApi {
         return returned;
     }
 
-    public async listen(): Promise<void> {
+    public async listen(callback: (message: unknown) => Promise<void>): Promise<void> {
         const wsBase = this.baseUrl.replace("https", "ws").replace("http", "ws");
         const socket = new WebSocket(wsBase + "/notifications");
         const token = this.token.getHeader();
@@ -1284,13 +1284,15 @@ class FKApi {
         });
 
         socket.addEventListener("message", (event) => {
-            console.log("ws:", JSON.parse(event.data));
+            const message = JSON.parse(event.data);
+            console.log("ws:", message);
+            void callback(message);
         });
 
         socket.addEventListener("close", async () => {
             console.log("ws: closed");
             await promiseAfter(1000);
-            await this.listen();
+            await this.listen(callback);
         });
 
         return await Promise.resolve();
