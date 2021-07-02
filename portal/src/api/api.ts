@@ -1285,7 +1285,7 @@ class FKApi {
 
         socket.addEventListener("message", (event) => {
             const message = JSON.parse(event.data);
-            console.log("ws:", message);
+            // console.log("ws:", message);
             void callback(message);
         });
 
