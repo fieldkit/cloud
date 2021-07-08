@@ -1,11 +1,11 @@
 <template>
     <div v-if="!image || (!image.url && !preview)" class="placeholder-container">
-        <img alt="Image" :src="placeholderImage" />
+        <img alt="Image" :src="placeholderImage" @click="imageInputClick" />
         <div class="upload-trigger">
             <label for="imageInput" class="upload-trigger">{{ $t("user.profile.photo.choose") }}</label>
             <span class="upload-trigger-msg">{{ $t("user.profile.photo.noFile") }}</span>
         </div>
-        <input id="imageInput" type="file" accept="image/gif, image/jpeg, image/png" @change="upload" />
+        <input id="imageInput" ref="imageInput" type="file" accept="image/gif, image/jpeg, image/png" @change="upload" />
     </div>
 
     <div class="image-container" v-else>
@@ -103,6 +103,9 @@ export default Vue.extend({
             };
 
             this.$emit("change", uploaded);
+        },
+        imageInputClick() {
+            (this.$refs.imageInput as HTMLElement).click();
         },
     },
 });
