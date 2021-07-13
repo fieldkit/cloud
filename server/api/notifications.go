@@ -51,8 +51,13 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 			}
 		case err := <-listener.errors:
 			log.Errorw("ws:error", "error", err)
-			if err != nil {
-				return err
+			if err := stream.Send(map[string]interface{}{
+				"error": map[string]interface{}{
+					"code":    401,
+					"message": "unauthenticated",
+				},
+			}); err != nil {
+				log.Errorw("ws:error:send", "error", err)
 			}
 			done = true
 		case <-ctx.Done():
