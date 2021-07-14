@@ -49,12 +49,12 @@ func NewReplyNotification(userID int32, postID int64) *Notification {
 
 func (n *Notification) ToMap() map[string]interface{} {
 	return map[string]interface{}{
-		"notification_id": n.ID,
-		"created_at":      n.CreatedAt,
-		"user_id":         n.UserID,
-		"post_id":         n.PostID,
-		"key":             n.Key,
-		"body":            n.Body,
-		"seen":            n.Seen,
+		"notificationId": n.ID,
+		"createdAt":      n.CreatedAt,
+		"userId":         n.UserID,
+		"postId":         n.PostID,
+		"key":            n.Key,
+		"body":           n.Body,
+		"seen":           n.Seen,
 	}
 }
