@@ -1317,7 +1317,7 @@ class FKApi {
 
     private listening = false;
 
-    public async listen(
+    public async listenForNotifications(
         callback: (message: unknown) => Promise<void>,
         status: (connected: boolean) => Promise<void>
     ): Promise<SendFunction> {
@@ -1325,7 +1325,11 @@ class FKApi {
             this.listening = true;
             void this.establish(callback, status);
         }
-        return this.send;
+        return this.send.bind(this);
+    }
+
+    public async markNotificationsRead(ids: number[]): Promise<void> {
+        return;
     }
 }
 

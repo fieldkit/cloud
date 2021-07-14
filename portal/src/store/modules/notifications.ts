@@ -5,7 +5,7 @@ import { MarkNotificationsSeen } from "../typed-actions";
 import { promiseAfter } from "@/utilities";
 
 export interface Notification {
-    id: number;
+    notificationId: number;
     userId: number;
     postId: number;
     kind: string;
@@ -32,7 +32,7 @@ const getters = {
 const actions = (services: Services) => {
     return {
         [ActionTypes.INITIALIZE]: async ({ dispatch, commit }: ActionParameters) => {
-            const send = await services.api.listen(
+            const send = await services.api.listenForNotifications(
                 async (message: { error?: unknown }) => {
                     if (message.error) {
                         console.log("error", message.error);
@@ -54,7 +54,12 @@ const actions = (services: Services) => {
         },
         [ActionTypes.NOTIFICATIONS_SEEN]: async ({ dispatch, commit, state }: ActionParameters, payload: MarkNotificationsSeen) => {
             if (state.send) {
-                await state.send(payload);
+                if (payload.ids.length == 0) {
+                    await state.send(new MarkNotificationsSeen(state.notifications.map((n) => n.notificationId)));
+                } else {
+                    await state.send(payload);
+                }
+                commit(SEEN);
             } else {
                 // TODO Queue?
             }
@@ -72,8 +77,8 @@ const mutations = {
     [NOTIFIED]: (state: NotificationsState, payload: Notification) => {
         state.notifications.push(payload);
     },
-    [SEEN]: (state: NotificationsState, payload: Notification) => {
-        // state.notifications.push(payload);
+    [SEEN]: (state: NotificationsState) => {
+        state.notifications.length = 0;
     },
 };
 

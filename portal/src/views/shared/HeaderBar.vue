@@ -37,6 +37,7 @@
 import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
+import { MarkNotificationsSeen } from "@/store";
 import CommonComponents from "@/views/shared";
 import { GlobalState } from "@/store/modules/global";
 
@@ -84,9 +85,9 @@ export default Vue.extend({
         onAccountClick(): void {
             this.hiding = true;
         },
-        markAllSeen(): void {
+        async markAllSeen(): Promise<void> {
             this.hiding = true;
-            console.log(`mark-all-seen`);
+            await this.$store.dispatch(new MarkNotificationsSeen([]));
         },
     },
 });
