@@ -1275,33 +1275,57 @@ class FKApi {
         return returned;
     }
 
-    public async listen(callback: (message: unknown) => Promise<void>): Promise<SendFunction> {
-        const wsBase = this.baseUrl.replace("https", "ws").replace("http", "ws");
-        const socket = new WebSocket(wsBase + "/notifications");
-        const token = this.token.getHeader();
+    private socket: WebSocket | null = null;
 
-        socket.addEventListener("open", () => {
-            console.log("ws: connected");
-            socket.send(JSON.stringify({ token: token }));
-        });
+    private async send(message: unknown) {
+        if (!this.socket) {
+            throw new Error("disconnected");
+        }
+        // TODO Does this need to queue before open?
+        this.socket.send(JSON.stringify(message));
+        return await Promise.resolve();
+    }
 
-        socket.addEventListener("message", (event) => {
-            const message = JSON.parse(event.data);
-            // console.log("ws:", message);
-            void callback(message);
-        });
+    private async establish(callback: (message: unknown) => Promise<void>, status: (connected: boolean) => Promise<void>) {
+        while (this.listening) {
+            if (this.token.authenticated() && !this.socket) {
+                const wsBase = this.baseUrl.replace("https", "ws").replace("http", "ws");
+                this.socket = new WebSocket(wsBase + "/notifications");
 
-        socket.addEventListener("close", async () => {
-            console.log("ws: closed");
-            await promiseAfter(1000);
-            await this.listen(callback);
-        });
+                this.socket.addEventListener("open", () => {
+                    console.log("ws: connected");
+                    if (!this.socket) throw new Error("disconnected");
+                    const token = this.token.getHeader();
+                    this.socket.send(JSON.stringify({ token: token }));
+                });
 
-        return await Promise.resolve(async (message: unknown) => {
-            // TODO Does this need to queue before open?
-            socket.send(JSON.stringify(message));
-            return await Promise.resolve();
-        });
+                this.socket.addEventListener("message", (event) => {
+                    const message = JSON.parse(event.data);
+                    void callback(message);
+                });
+
+                this.socket.addEventListener("close", async () => {
+                    console.log("ws: closed");
+                    void status(false);
+                    this.socket = null;
+                });
+            } else {
+                await promiseAfter(1000);
+            }
+        }
+    }
+
+    private listening = false;
+
+    public async listen(
+        callback: (message: unknown) => Promise<void>,
+        status: (connected: boolean) => Promise<void>
+    ): Promise<SendFunction> {
+        if (!this.listening) {
+            this.listening = true;
+            void this.establish(callback, status);
+        }
+        return this.send;
     }
 }
 
