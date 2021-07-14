@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/gorilla/websocket"
 	"goa.design/goa/v3/security"
 
 	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
@@ -50,6 +51,11 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 				}
 			}
 		case err := <-listener.errors:
+			if ce, ok := err.(*websocket.CloseError); ok {
+				log.Infow("ws:closed", "close-code", ce.Code)
+				return nil
+			}
+
 			log.Errorw("ws:error", "error", err)
 			if err := stream.Send(map[string]interface{}{
 				"error": map[string]interface{}{
@@ -57,7 +63,7 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 					"message": "unauthenticated",
 				},
 			}); err != nil {
-				log.Errorw("ws:error:send", "error", err)
+				log.Warnw("ws:error:send", "error", err)
 			}
 			done = true
 		case <-ctx.Done():
@@ -67,7 +73,12 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 
 	log.Infow("ws:closing")
 
-	return stream.Close()
+	err := stream.Close()
+	if err != nil {
+		log.Warnw("ws:error:close", "error", err)
+	}
+
+	return nil
 }
 
 func (s *NotificationsService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {

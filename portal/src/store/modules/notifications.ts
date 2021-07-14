@@ -13,6 +13,7 @@ export interface Notification {
 }
 
 const CONNECTED = "CONNECTED";
+const DISCONNECTED = "DISCONNECTED";
 const NOTIFIED = "NOTIFIED";
 const SEEN = "SEEN";
 
@@ -31,10 +32,23 @@ const getters = {
 const actions = (services: Services) => {
     return {
         [ActionTypes.INITIALIZE]: async ({ dispatch, commit }: ActionParameters) => {
-            const send = await services.api.listen(async (message: unknown) => {
-                commit(NOTIFIED, message as Notification);
-                return await Promise.resolve();
-            });
+            const send = await services.api.listen(
+                async (message: { error?: unknown }) => {
+                    if (message.error) {
+                        console.log("error", message.error);
+                    } else {
+                        commit(NOTIFIED, message as Notification);
+                    }
+                    return await Promise.resolve();
+                },
+                async (connected) => {
+                    if (!connected) {
+                        commit(DISCONNECTED);
+                    }
+                    await promiseAfter(5000);
+                    return await Promise.resolve();
+                }
+            );
 
             commit(CONNECTED, send);
         },
@@ -49,6 +63,9 @@ const actions = (services: Services) => {
 };
 
 const mutations = {
+    [DISCONNECTED]: (state: NotificationsState, send: SendFunction) => {
+        state.send = null;
+    },
     [CONNECTED]: (state: NotificationsState, send: SendFunction) => {
         state.send = send;
     },
