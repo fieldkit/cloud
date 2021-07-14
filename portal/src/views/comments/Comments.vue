@@ -20,7 +20,7 @@
                 <div class="comment comment-first-level" v-for="post in posts" v-bind:key="post.id">
                     <div class="comment-main">
                         <UserPhoto :user="post.author"></UserPhoto>
-                        <div class="column">
+                        <div class="column-post">
                             <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
                             <span class="author">
                                 {{ post.author.name }}
@@ -42,7 +42,7 @@
                             <div class="comment" v-for="reply in post.replies" v-bind:key="reply.id">
                                 <div class="comment-main">
                                     <UserPhoto :user="reply.author"></UserPhoto>
-                                    <div class="column">
+                                    <div class="column-reply">
                                         <span class="author">
                                             {{ reply.author.name }}
                                             <i
@@ -566,7 +566,9 @@ header {
     }
 }
 
-.column {
+.column,
+.column-post,
+.column-reply {
     @include flex(flex-start);
     width: 100%;
     flex-direction: column;
