@@ -13,7 +13,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
+	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
 	goahttp "goa.design/goa/v3/http"
 )
 
@@ -128,6 +130,130 @@ func DecodeListenResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("notifications", "listen", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildSeenRequest instantiates a HTTP request object with method and path set
+// to call the "notifications" service "seen" endpoint
+func (c *Client) BuildSeenRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: SeenNotificationsPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("notifications", "seen", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeSeenRequest returns an encoder for requests sent to the notifications
+// seen server.
+func EncodeSeenRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*notifications.SeenPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("notifications", "seen", "*notifications.SeenPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		body := NewSeenRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("notifications", "seen", err)
+		}
+		return nil
+	}
+}
+
+// DecodeSeenResponse returns a decoder for responses returned by the
+// notifications seen endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeSeenResponse may return the following errors:
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- "unauthorized" (type notifications.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeSeenResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusNoContent:
+			return nil, nil
+		case http.StatusForbidden:
+			var (
+				body SeenForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notifications", "seen", err)
+			}
+			err = ValidateSeenForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notifications", "seen", err)
+			}
+			return nil, NewSeenForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body SeenNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notifications", "seen", err)
+			}
+			err = ValidateSeenNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notifications", "seen", err)
+			}
+			return nil, NewSeenNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body SeenBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notifications", "seen", err)
+			}
+			err = ValidateSeenBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notifications", "seen", err)
+			}
+			return nil, NewSeenBadRequest(&body)
+		case http.StatusUnauthorized:
+			var (
+				body SeenUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notifications", "seen", err)
+			}
+			return nil, NewSeenUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("notifications", "seen", resp.StatusCode, string(body))
 		}
 	}
 }

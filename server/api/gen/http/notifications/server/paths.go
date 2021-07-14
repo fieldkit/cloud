@@ -11,3 +11,8 @@ package server
 func ListenNotificationsPath() string {
 	return "/notifications"
 }
+
+// SeenNotificationsPath returns the URL path to the notifications service seen HTTP endpoint.
+func SeenNotificationsPath() string {
+	return "/notifications/seen"
+}

@@ -81,6 +81,12 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 	return nil
 }
 
+func (c *NotificationsService) Seen(ctx context.Context, payload *notifications.SeenPayload) error {
+	log := Logger(ctx).Sugar()
+	log.Infow("seen", "ids", payload.Ids)
+	return nil
+}
+
 func (s *NotificationsService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, AuthAttempt{
 		Token:        token,

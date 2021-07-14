@@ -11,12 +11,21 @@ import (
 	"context"
 
 	goa "goa.design/goa/v3/pkg"
+	"goa.design/goa/v3/security"
 )
 
 // Service is the notifications service interface.
 type Service interface {
 	// Listen implements listen.
 	Listen(context.Context, ListenServerStream) (err error)
+	// Seen implements seen.
+	Seen(context.Context, *SeenPayload) (err error)
+}
+
+// Auther defines the authorization functions to be implemented by the service.
+type Auther interface {
+	// JWTAuth implements the authorization logic for the JWT security scheme.
+	JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -27,7 +36,7 @@ const ServiceName = "notifications"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"listen"}
+var MethodNames = [2]string{"listen", "seen"}
 
 // ListenServerStream is the interface a "listen" endpoint server stream must
 // satisfy.
@@ -49,6 +58,12 @@ type ListenClientStream interface {
 	Recv() (map[string]interface{}, error)
 	// Close closes the stream.
 	Close() error
+}
+
+// SeenPayload is the payload type of the notifications service seen method.
+type SeenPayload struct {
+	Auth string
+	Ids  []int64
 }
 
 // credentials are invalid

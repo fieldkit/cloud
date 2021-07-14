@@ -86,6 +86,7 @@ export default Vue.extend({
         },
         markAllSeen(): void {
             this.hiding = true;
+            console.log(`mark-all-seen`);
         },
     },
 });

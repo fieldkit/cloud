@@ -12,6 +12,12 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// SeenRequestBody is the type of the "notifications" service "seen" endpoint
+// HTTP request body.
+type SeenRequestBody struct {
+	Ids []int64 `form:"ids,omitempty" json:"ids,omitempty" xml:"ids,omitempty"`
+}
+
 // ListenForbiddenResponseBody is the type of the "notifications" service
 // "listen" endpoint HTTP response body for the "forbidden" error.
 type ListenForbiddenResponseBody struct {
@@ -70,6 +76,64 @@ type ListenBadRequestResponseBody struct {
 // "listen" endpoint HTTP response body for the "unauthorized" error.
 type ListenUnauthorizedResponseBody string
 
+// SeenForbiddenResponseBody is the type of the "notifications" service "seen"
+// endpoint HTTP response body for the "forbidden" error.
+type SeenForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// SeenNotFoundResponseBody is the type of the "notifications" service "seen"
+// endpoint HTTP response body for the "not-found" error.
+type SeenNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// SeenBadRequestResponseBody is the type of the "notifications" service "seen"
+// endpoint HTTP response body for the "bad-request" error.
+type SeenBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// SeenUnauthorizedResponseBody is the type of the "notifications" service
+// "seen" endpoint HTTP response body for the "unauthorized" error.
+type SeenUnauthorizedResponseBody string
+
 // NewListenForbiddenResponseBody builds the HTTP response body from the result
 // of the "listen" endpoint of the "notifications" service.
 func NewListenForbiddenResponseBody(res *goa.ServiceError) *ListenForbiddenResponseBody {
@@ -117,4 +181,73 @@ func NewListenBadRequestResponseBody(res *goa.ServiceError) *ListenBadRequestRes
 func NewListenUnauthorizedResponseBody(res notifications.Unauthorized) ListenUnauthorizedResponseBody {
 	body := ListenUnauthorizedResponseBody(res)
 	return body
+}
+
+// NewSeenForbiddenResponseBody builds the HTTP response body from the result
+// of the "seen" endpoint of the "notifications" service.
+func NewSeenForbiddenResponseBody(res *goa.ServiceError) *SeenForbiddenResponseBody {
+	body := &SeenForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewSeenNotFoundResponseBody builds the HTTP response body from the result of
+// the "seen" endpoint of the "notifications" service.
+func NewSeenNotFoundResponseBody(res *goa.ServiceError) *SeenNotFoundResponseBody {
+	body := &SeenNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewSeenBadRequestResponseBody builds the HTTP response body from the result
+// of the "seen" endpoint of the "notifications" service.
+func NewSeenBadRequestResponseBody(res *goa.ServiceError) *SeenBadRequestResponseBody {
+	body := &SeenBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewSeenUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "seen" endpoint of the "notifications" service.
+func NewSeenUnauthorizedResponseBody(res notifications.Unauthorized) SeenUnauthorizedResponseBody {
+	body := SeenUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewSeenPayload builds a notifications service seen endpoint payload.
+func NewSeenPayload(body *SeenRequestBody, auth string) *notifications.SeenPayload {
+	v := &notifications.SeenPayload{}
+	v.Ids = make([]int64, len(body.Ids))
+	for i, val := range body.Ids {
+		v.Ids[i] = val
+	}
+	v.Auth = auth
+
+	return v
+}
+
+// ValidateSeenRequestBody runs the validations defined on SeenRequestBody
+func ValidateSeenRequestBody(body *SeenRequestBody) (err error) {
+	if body.Ids == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("ids", "body"))
+	}
+	return
 }

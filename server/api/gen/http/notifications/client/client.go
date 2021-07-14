@@ -20,6 +20,9 @@ type Client struct {
 	// Listen Doer is the HTTP client used to make requests to the listen endpoint.
 	ListenDoer goahttp.Doer
 
+	// Seen Doer is the HTTP client used to make requests to the seen endpoint.
+	SeenDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -52,6 +55,7 @@ func NewClient(
 	}
 	return &Client{
 		ListenDoer:          doer,
+		SeenDoer:            doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -88,5 +92,29 @@ func (c *Client) Listen() goa.Endpoint {
 		}
 		stream := &ListenClientStream{conn: conn}
 		return stream, nil
+	}
+}
+
+// Seen returns an endpoint that makes HTTP requests to the notifications
+// service seen server.
+func (c *Client) Seen() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeSeenRequest(c.encoder)
+		decodeResponse = DecodeSeenResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildSeenRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.SeenDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("notifications", "seen", err)
+		}
+		return decodeResponse(resp)
 	}
 }

@@ -16,12 +16,14 @@ import (
 // Client is the "notifications" service client.
 type Client struct {
 	ListenEndpoint goa.Endpoint
+	SeenEndpoint   goa.Endpoint
 }
 
 // NewClient initializes a "notifications" service client given the endpoints.
-func NewClient(listen goa.Endpoint) *Client {
+func NewClient(listen, seen goa.Endpoint) *Client {
 	return &Client{
 		ListenEndpoint: listen,
+		SeenEndpoint:   seen,
 	}
 }
 
@@ -33,4 +35,10 @@ func (c *Client) Listen(ctx context.Context) (res ListenClientStream, err error)
 		return
 	}
 	return ires.(ListenClientStream), nil
+}
+
+// Seen calls the "seen" endpoint of the "notifications" service.
+func (c *Client) Seen(ctx context.Context, p *SeenPayload) (err error) {
+	_, err = c.SeenEndpoint(ctx, p)
+	return
 }
