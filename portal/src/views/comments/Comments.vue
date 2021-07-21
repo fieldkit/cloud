@@ -98,7 +98,6 @@ import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
-import { Services, MentionableUser } from "@/api";
 import Tiptap from "@/views/shared/Tiptap.vue";
 
 export default Vue.extend({

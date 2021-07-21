@@ -2,7 +2,7 @@ import _ from "lodash";
 import axios from "axios";
 import TokenStorage from "./tokens";
 import Config from "../secrets";
-import { keysToCamel, keysToCamelWithWarnings } from "@/json-tools";
+import { keysToCamel } from "@/json-tools";
 import { ExportParams } from "@/store/typed-actions";
 import { BoundingRectangle } from "@/store/map-types";
 import { NewComment } from "@/views/comments/model";
@@ -86,7 +86,7 @@ export interface ExportStatus {
     statusUrl: string;
     downloadUrl: string | null;
     progress: number;
-    args: any;
+    args: Record<string, unknown>;
 }
 
 export interface UserExports {
@@ -269,7 +269,6 @@ export interface Station {
     owner: Owner;
     deviceId: string;
     uploads: Upload[];
-    images: any[];
     photos: Photos;
     readOnly: boolean;
     configurations: Configurations;
@@ -310,7 +309,7 @@ export interface InvokeParams {
     auth: Auth;
     method: string;
     url: string;
-    data?: any;
+    data?: Record<string, unknown>;
     contentType?: string;
     refreshed?: boolean | null;
     blob?: boolean | null;
@@ -420,7 +419,7 @@ class FKApi {
         })
             .then(
                 (response) => this.handleLogin(response),
-                (error) => this.logout(true).then(() => Promise.reject(new AuthenticationRequiredError()))
+                () => this.logout(true).then(() => Promise.reject(new AuthenticationRequiredError()))
             )
             .finally(() => {
                 this.refreshing = null;
@@ -1176,7 +1175,7 @@ class FKApi {
             url: getUrl(),
         }).then((blob) => {
             const reader = new FileReader();
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 reader.onloadend = () => resolve(reader.result as string);
                 reader.readAsDataURL(blob);
             });
@@ -1328,9 +1327,11 @@ class FKApi {
         return this.send.bind(this);
     }
 
+    /*
     public async markNotificationsRead(ids: number[]): Promise<void> {
         return;
     }
+	*/
 }
 
 export interface PortalDeployStatus {

@@ -1,4 +1,4 @@
-import { ActionContext, Module } from "vuex";
+import { ActionContext } from "vuex";
 import { Services, SendFunction } from "@/api";
 import * as ActionTypes from "../actions";
 import { MarkNotificationsSeen } from "../typed-actions";
@@ -31,7 +31,7 @@ const getters = {
 
 const actions = (services: Services) => {
     return {
-        [ActionTypes.INITIALIZE]: async ({ dispatch, commit }: ActionParameters) => {
+        [ActionTypes.INITIALIZE]: async ({ commit }: ActionParameters) => {
             const send = await services.api.listenForNotifications(
                 async (message: { error?: unknown }) => {
                     if (message.error) {
@@ -52,7 +52,7 @@ const actions = (services: Services) => {
 
             commit(CONNECTED, send);
         },
-        [ActionTypes.NOTIFICATIONS_SEEN]: async ({ dispatch, commit, state }: ActionParameters, payload: MarkNotificationsSeen) => {
+        [ActionTypes.NOTIFICATIONS_SEEN]: async ({ commit, state }: ActionParameters, payload: MarkNotificationsSeen) => {
             if (state.send) {
                 if (payload.ids.length == 0) {
                     await state.send(new MarkNotificationsSeen(state.notifications.map((n) => n.notificationId)));
@@ -68,7 +68,7 @@ const actions = (services: Services) => {
 };
 
 const mutations = {
-    [DISCONNECTED]: (state: NotificationsState, send: SendFunction) => {
+    [DISCONNECTED]: (state: NotificationsState) => {
         state.send = null;
     },
     [CONNECTED]: (state: NotificationsState, send: SendFunction) => {
