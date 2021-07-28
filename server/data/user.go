@@ -66,6 +66,7 @@ type User struct {
 	FirmwarePattern  *string   `db:"firmware_pattern"`
 	CreatedAt        time.Time `db:"created_at"`
 	UpdatedAt        time.Time `db:"updated_at"`
+	TncDate          time.Time `db:"tnc_date"`
 }
 
 func (user *User) SetPassword(password string) error {

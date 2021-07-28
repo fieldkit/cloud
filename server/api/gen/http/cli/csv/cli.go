@@ -63,14 +63,14 @@ station (add|get|transfer|update|list- mine|list- project|download- photo|list- 
 tasks five
 test (get|error|email)
 ttn webhook
-user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery|resume|logout|refresh|send- validation|validate|add|update|change- password|get- current|list- by- project|issue- transmission- token|project- roles|admin- delete|admin- search)
+user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery|resume|logout|refresh|send- validation|validate|add|update|change- password|accept- tnc|get- current|list- by- project|issue- transmission- token|project- roles|admin- delete|admin- search)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` csv noop` + "\n" +
-		os.Args[0] + ` activity station --id 2893910879317896143 --page 3541722404399629938 --auth "Quia quia veritatis."` + "\n" +
+		os.Args[0] + ` activity station --id 5080771037774328695 --page 8473653304907584689 --auth "Quos blanditiis."` + "\n" +
 		os.Args[0] + ` data device- summary --device-id "Sunt quam ratione nam itaque ipsa." --auth "Maiores labore ipsam."` + "\n" +
 		os.Args[0] + ` discourse authenticate --body '{
       "email": "Sed dignissimos vero dolorem.",
@@ -551,6 +551,11 @@ func ParseEndpoint(
 		userChangePasswordUserIDFlag = userChangePasswordFlags.String("user-id", "REQUIRED", "")
 		userChangePasswordAuthFlag   = userChangePasswordFlags.String("auth", "REQUIRED", "")
 
+		userAcceptTncFlags      = flag.NewFlagSet("accept- tnc", flag.ExitOnError)
+		userAcceptTncBodyFlag   = userAcceptTncFlags.String("body", "REQUIRED", "")
+		userAcceptTncUserIDFlag = userAcceptTncFlags.String("user-id", "REQUIRED", "")
+		userAcceptTncAuthFlag   = userAcceptTncFlags.String("auth", "REQUIRED", "")
+
 		userGetCurrentFlags    = flag.NewFlagSet("get- current", flag.ExitOnError)
 		userGetCurrentAuthFlag = userGetCurrentFlags.String("auth", "REQUIRED", "")
 
@@ -707,6 +712,7 @@ func ParseEndpoint(
 	userAddFlags.Usage = userAddUsage
 	userUpdateFlags.Usage = userUpdateUsage
 	userChangePasswordFlags.Usage = userChangePasswordUsage
+	userAcceptTncFlags.Usage = userAcceptTncUsage
 	userGetCurrentFlags.Usage = userGetCurrentUsage
 	userListByProjectFlags.Usage = userListByProjectUsage
 	userIssueTransmissionTokenFlags.Usage = userIssueTransmissionTokenUsage
@@ -1153,6 +1159,9 @@ func ParseEndpoint(
 			case "change- password":
 				epf = userChangePasswordFlags
 
+			case "accept- tnc":
+				epf = userAcceptTncFlags
+
 			case "get- current":
 				epf = userGetCurrentFlags
 
@@ -1573,6 +1582,9 @@ func ParseEndpoint(
 			case "change- password":
 				endpoint = c.ChangePassword()
 				data, err = userc.BuildChangePasswordPayload(*userChangePasswordBodyFlag, *userChangePasswordUserIDFlag, *userChangePasswordAuthFlag)
+			case "accept- tnc":
+				endpoint = c.AcceptTnc()
+				data, err = userc.BuildAcceptTncPayload(*userAcceptTncBodyFlag, *userAcceptTncUserIDFlag, *userAcceptTncAuthFlag)
 			case "get- current":
 				endpoint = c.GetCurrent()
 				data, err = userc.BuildGetCurrentPayload(*userGetCurrentAuthFlag)
@@ -1647,7 +1659,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 2893910879317896143 --page 3541722404399629938 --auth "Quia quia veritatis."
+    `+os.Args[0]+` activity station --id 5080771037774328695 --page 8473653304907584689 --auth "Quos blanditiis."
 `, os.Args[0])
 }
 
@@ -1660,7 +1672,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 1909184865736898721 --page 9146962393226410315 --auth "Et itaque aliquid."
+    `+os.Args[0]+` activity project --id 3014536428484387735 --page 7500213985746988571 --auth "Quibusdam quas esse et itaque aliquid."
 `, os.Args[0])
 }
 
@@ -3086,6 +3098,7 @@ COMMAND:
     add: Add implements add.
     update: Update implements update.
     change- password: ChangePassword implements change password.
+    accept- tnc: AcceptTnc implements accept tnc.
     get- current: GetCurrent implements get current.
     list- by- project: ListByProject implements list by project.
     issue- transmission- token: IssueTransmissionToken implements issue transmission token.
@@ -3299,7 +3312,7 @@ Example:
       "showStations": false,
       "startTime": "Distinctio cumque ut.",
       "tags": "Qui eum omnis."
-   }' --user-id 2137506553 --auth "Ducimus eos eum quis incidunt minima."
+   }' --user-id 1599520030 --auth "Eos eum quis incidunt minima."
 `, os.Args[0])
 }
 
@@ -3313,9 +3326,24 @@ ChangePassword implements change password.
 
 Example:
     `+os.Args[0]+` user change- password --body '{
-      "newPassword": "23c",
-      "oldPassword": "td7"
-   }' --user-id 732054312 --auth "Est quod occaecati velit saepe fugiat iusto."
+      "newPassword": "3c7",
+      "oldPassword": "d7x"
+   }' --user-id 2029430873 --auth "Quod occaecati."
+`, os.Args[0])
+}
+
+func userAcceptTncUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] user accept- tnc -body JSON -user-id INT32 -auth STRING
+
+AcceptTnc implements accept tnc.
+    -body JSON: 
+    -user-id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` user accept- tnc --body '{
+      "accept": false
+   }' --user-id 1184752509 --auth "Amet hic."
 `, os.Args[0])
 }
 
@@ -3326,7 +3354,7 @@ GetCurrent implements get current.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user get- current --auth "Quia aliquam amet hic ut ut."
+    `+os.Args[0]+` user get- current --auth "Fugit sed illo modi necessitatibus ea."
 `, os.Args[0])
 }
 
@@ -3338,7 +3366,7 @@ ListByProject implements list by project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user list- by- project --project-id 1883678996 --auth "Et consequatur ipsum expedita."
+    `+os.Args[0]+` user list- by- project --project-id 1451223991 --auth "Blanditiis a et hic omnis."
 `, os.Args[0])
 }
 
@@ -3349,7 +3377,7 @@ IssueTransmissionToken implements issue transmission token.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user issue- transmission- token --auth "Libero non est sed et et blanditiis."
+    `+os.Args[0]+` user issue- transmission- token --auth "Et commodi ad blanditiis et."
 `, os.Args[0])
 }
 
@@ -3372,9 +3400,9 @@ AdminDelete implements admin delete.
 
 Example:
     `+os.Args[0]+` user admin- delete --body '{
-      "email": "Et temporibus aspernatur itaque.",
-      "password": "Adipisci eum deserunt aut dignissimos."
-   }' --auth "Voluptatem laboriosam."
+      "email": "Eum deserunt.",
+      "password": "Dignissimos atque doloremque aut veniam officia culpa."
+   }' --auth "Quidem possimus ullam est magnam ducimus nisi."
 `, os.Args[0])
 }
 
@@ -3386,6 +3414,6 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user admin- search --query "Sed aut." --auth "Voluptatem veritatis repudiandae soluta cum alias earum."
+    `+os.Args[0]+` user admin- search --query "Autem et inventore et quo quod." --auth "Quas sit sint."
 `, os.Args[0])
 }
