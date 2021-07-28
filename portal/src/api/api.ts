@@ -176,6 +176,7 @@ export class CurrentUser {
     name: string;
     bio: string;
     mediaUrl: string;
+    tncDate: number;
 }
 
 export interface Project {
@@ -605,6 +606,15 @@ class FKApi {
             method: "PATCH",
             url: this.baseUrl + "/users/" + data.userId + "/password",
             data: { newPassword: data.newPassword, oldPassword: data.oldPassword },
+        });
+    }
+
+    accept(userId) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "PATCH",
+            url: this.baseUrl + "/users/" + userId + "/accept-tnc",
+            data: { accept: true },
         });
     }
 

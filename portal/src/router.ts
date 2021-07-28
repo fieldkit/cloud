@@ -26,6 +26,7 @@ import AdminStations from "./views/admin/AdminStations.vue";
 import Playground from "./views/admin/Playground.vue";
 
 import { Bookmark } from "./views/viz/viz";
+import TermsView from "@/views/auth/TermsView.vue";
 
 Vue.use(Router);
 
@@ -102,6 +103,14 @@ const routes = [
         component: ResetPasswordView,
         meta: {
             bodyClass: "blue-background",
+            secured: false,
+        },
+    },
+    {
+        path: "/terms",
+        name: "terms",
+        component: TermsView,
+        meta: {
             secured: false,
         },
     },
@@ -437,7 +446,11 @@ export default function routerFactory(store) {
         if (from.name === null && (to.name === null || to.name == "login")) {
             console.log("nav", "authenticated", store.getters.isAuthenticated);
             if (store.getters.isAuthenticated) {
-                next("/dashboard");
+                if (store.getters.isTncValid != undefined && !store.getters.isTncValid && to.name != "login") {
+                    next("/terms");
+                } else {
+                    next("/dashboard");
+                }
             } else {
                 if (to.name === "login") {
                     next();
@@ -447,12 +460,16 @@ export default function routerFactory(store) {
             }
         } else if (to.matched.some((record) => record.meta.secured)) {
             if (store.getters.isAuthenticated) {
-                next();
-                return;
+                if (store.getters.isTncValid != undefined && !store.getters.isTncValid && to.name != "login") {
+                    next("/terms");
+                } else {
+                    next();
+                }
+            } else {
+                const queryParams = new URLSearchParams();
+                queryParams.append("after", to.fullPath);
+                next("/login?" + queryParams.toString());
             }
-            const queryParams = new URLSearchParams();
-            queryParams.append("after", to.fullPath);
-            next("/login?" + queryParams.toString());
         } else {
             if (to.name === null) {
                 if (store.getters.isAuthenticated) {
