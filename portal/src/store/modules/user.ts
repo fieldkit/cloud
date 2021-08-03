@@ -18,7 +18,7 @@ const getters = {
         return state.token !== null;
     },
     isTncValid: (state: UserState) => {
-        return state?.user?.tncDate && state.user.tncDate >= Config.tncDate;
+        return state?.user?.tncDate != undefined && state.user.tncDate >= Config.tncDate;
     },
 };
 

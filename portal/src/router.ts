@@ -446,7 +446,7 @@ export default function routerFactory(store) {
         if (from.name === null && (to.name === null || to.name == "login")) {
             console.log("nav", "authenticated", store.getters.isAuthenticated);
             if (store.getters.isAuthenticated) {
-                if (store.getters.isTncValid != undefined && !store.getters.isTncValid && to.name != "login") {
+                if (!store.getters.isTncValid && to.name != "login") {
                     next("/terms");
                 } else {
                     next("/dashboard");
@@ -460,7 +460,7 @@ export default function routerFactory(store) {
             }
         } else if (to.matched.some((record) => record.meta.secured)) {
             if (store.getters.isAuthenticated) {
-                if (store.getters.isTncValid != undefined && !store.getters.isTncValid && to.name != "login") {
+                if (!store.getters.isTncValid && to.name != "login") {
                     next("/terms");
                 } else {
                     next();
