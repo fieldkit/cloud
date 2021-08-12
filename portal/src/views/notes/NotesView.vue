@@ -13,7 +13,7 @@
                                 class="tab"
                                 v-for="station in stations"
                                 v-bind:key="station.id"
-                                v-bind:class="{ active: selectedStation.id === station.id }"
+                                v-bind:class="{ active: isStationSelected && selectedStation.id === station.id }"
                                 v-on:click="onSelected(station)"
                             >
                                 <div class="tab-wrap">
@@ -145,6 +145,7 @@ export default Vue.extend({
         success: boolean;
         failed: boolean;
         mobileView: boolean;
+        isStationSelected: boolean;
     } {
         return {
             notes: {},
@@ -153,6 +154,7 @@ export default Vue.extend({
             success: false,
             failed: false,
             mobileView: window.screen.availWidth < 1040,
+            isStationSelected: true,
         };
     },
     computed: {
@@ -258,6 +260,12 @@ export default Vue.extend({
                         stationId: station.id,
                     },
                 });
+                this.isStationSelected = true;
+                return;
+            }
+            // allows collapsing of selected station tab on mobile
+            if (this.isMobileView()) {
+                this.isStationSelected = false;
             }
         },
         onChange(): void {
