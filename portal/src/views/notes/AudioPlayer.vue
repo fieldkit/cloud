@@ -1,7 +1,5 @@
 <template>
-    <div class="">
-        <VueAudio :file="loaded" v-if="loaded" />
-    </div>
+    <VueAudio :file="loaded" v-if="loaded" />
 </template>
 
 <script lang="ts">
@@ -32,4 +30,20 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+@import "../../scss/mixins";
+
+.vue-sound-wrapper {
+    flex: 1;
+}
+
+::v-deep .vue-sound__player {
+    @include flex(center);
+}
+
+::v-deep .vue-sound__playback-time-wrapper {
+    display: flex !important;
+    flex: 1;
+    width: auto !important;
+}
+</style>

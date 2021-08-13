@@ -2096,6 +2096,159 @@ func DecodeChangePasswordResponse(decoder func(*http.Response) goahttp.Decoder, 
 	}
 }
 
+// BuildAcceptTncRequest instantiates a HTTP request object with method and
+// path set to call the "user" service "accept tnc" endpoint
+func (c *Client) BuildAcceptTncRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		userID int32
+	)
+	{
+		p, ok := v.(*user.AcceptTncPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("user", "accept tnc", "*user.AcceptTncPayload", v)
+		}
+		userID = p.UserID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AcceptTncUserPath(userID)}
+	req, err := http.NewRequest("PATCH", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("user", "accept tnc", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeAcceptTncRequest returns an encoder for requests sent to the user
+// accept tnc server.
+func EncodeAcceptTncRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*user.AcceptTncPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("user", "accept tnc", "*user.AcceptTncPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		body := NewAcceptTncRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("user", "accept tnc", err)
+		}
+		return nil
+	}
+}
+
+// DecodeAcceptTncResponse returns a decoder for responses returned by the user
+// accept tnc endpoint. restoreBody controls whether the response body should
+// be restored after having been read.
+// DecodeAcceptTncResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeAcceptTncResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body AcceptTncResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "accept tnc", err)
+			}
+			p := NewAcceptTncUserOK(&body)
+			view := "default"
+			vres := &userviews.User{Projected: p, View: view}
+			if err = userviews.ValidateUser(vres); err != nil {
+				return nil, goahttp.ErrValidationError("user", "accept tnc", err)
+			}
+			res := user.NewUser(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body AcceptTncUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "accept tnc", err)
+			}
+			err = ValidateAcceptTncUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "accept tnc", err)
+			}
+			return nil, NewAcceptTncUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body AcceptTncForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "accept tnc", err)
+			}
+			err = ValidateAcceptTncForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "accept tnc", err)
+			}
+			return nil, NewAcceptTncForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body AcceptTncNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "accept tnc", err)
+			}
+			err = ValidateAcceptTncNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "accept tnc", err)
+			}
+			return nil, NewAcceptTncNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body AcceptTncBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "accept tnc", err)
+			}
+			err = ValidateAcceptTncBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "accept tnc", err)
+			}
+			return nil, NewAcceptTncBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("user", "accept tnc", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildGetCurrentRequest instantiates a HTTP request object with method and
 // path set to call the "user" service "get current" endpoint
 func (c *Client) BuildGetCurrentRequest(ctx context.Context, v interface{}) (*http.Request, error) {
@@ -3110,6 +3263,7 @@ func unmarshalUserResponseBodyToUserviewsUserView(v *UserResponseBody) *userview
 		Bio:       v.Bio,
 		Admin:     v.Admin,
 		UpdatedAt: v.UpdatedAt,
+		TncDate:   v.TncDate,
 	}
 	if v.Photo != nil {
 		res.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(v.Photo)
@@ -3139,6 +3293,7 @@ func unmarshalUserResponseBodyToUserUser(v *UserResponseBody) *user.User {
 		Bio:       *v.Bio,
 		Admin:     *v.Admin,
 		UpdatedAt: *v.UpdatedAt,
+		TncDate:   *v.TncDate,
 	}
 	if v.Photo != nil {
 		res.Photo = unmarshalUserPhotoResponseBodyToUserUserPhoto(v.Photo)

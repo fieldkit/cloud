@@ -65,7 +65,7 @@ station (add|get|transfer|update|list- mine|list- project|download- photo|list- 
 tasks five
 test (get|error|email)
 ttn webhook
-user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery|resume|logout|refresh|send- validation|validate|add|update|change- password|get- current|list- by- project|issue- transmission- token|project- roles|admin- delete|admin- search|mentionables)
+user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery|resume|logout|refresh|send- validation|validate|add|update|change- password|accept- tnc|get- current|list- by- project|issue- transmission- token|project- roles|admin- delete|admin- search|mentionables)
 `
 }
 
@@ -563,6 +563,11 @@ func ParseEndpoint(
 		userChangePasswordUserIDFlag = userChangePasswordFlags.String("user-id", "REQUIRED", "")
 		userChangePasswordAuthFlag   = userChangePasswordFlags.String("auth", "REQUIRED", "")
 
+		userAcceptTncFlags      = flag.NewFlagSet("accept- tnc", flag.ExitOnError)
+		userAcceptTncBodyFlag   = userAcceptTncFlags.String("body", "REQUIRED", "")
+		userAcceptTncUserIDFlag = userAcceptTncFlags.String("user-id", "REQUIRED", "")
+		userAcceptTncAuthFlag   = userAcceptTncFlags.String("auth", "REQUIRED", "")
+
 		userGetCurrentFlags    = flag.NewFlagSet("get- current", flag.ExitOnError)
 		userGetCurrentAuthFlag = userGetCurrentFlags.String("auth", "REQUIRED", "")
 
@@ -729,6 +734,7 @@ func ParseEndpoint(
 	userAddFlags.Usage = userAddUsage
 	userUpdateFlags.Usage = userUpdateUsage
 	userChangePasswordFlags.Usage = userChangePasswordUsage
+	userAcceptTncFlags.Usage = userAcceptTncUsage
 	userGetCurrentFlags.Usage = userGetCurrentUsage
 	userListByProjectFlags.Usage = userListByProjectUsage
 	userIssueTransmissionTokenFlags.Usage = userIssueTransmissionTokenUsage
@@ -1188,6 +1194,9 @@ func ParseEndpoint(
 			case "change- password":
 				epf = userChangePasswordFlags
 
+			case "accept- tnc":
+				epf = userAcceptTncFlags
+
 			case "get- current":
 				epf = userGetCurrentFlags
 
@@ -1621,6 +1630,9 @@ func ParseEndpoint(
 			case "change- password":
 				endpoint = c.ChangePassword()
 				data, err = userc.BuildChangePasswordPayload(*userChangePasswordBodyFlag, *userChangePasswordUserIDFlag, *userChangePasswordAuthFlag)
+			case "accept- tnc":
+				endpoint = c.AcceptTnc()
+				data, err = userc.BuildAcceptTncPayload(*userAcceptTncBodyFlag, *userAcceptTncUserIDFlag, *userAcceptTncAuthFlag)
 			case "get- current":
 				endpoint = c.GetCurrent()
 				data, err = userc.BuildGetCurrentPayload(*userGetCurrentAuthFlag)
@@ -3192,6 +3204,7 @@ COMMAND:
     add: Add implements add.
     update: Update implements update.
     change- password: ChangePassword implements change password.
+    accept- tnc: AcceptTnc implements accept tnc.
     get- current: GetCurrent implements get current.
     list- by- project: ListByProject implements list by project.
     issue- transmission- token: IssueTransmissionToken implements issue transmission token.
@@ -3405,7 +3418,7 @@ Example:
       "showStations": true,
       "startTime": "Ut et repellendus corrupti sequi nemo doloribus.",
       "tags": "Quo aut."
-   }' --user-id 925207966 --auth "Dolor dolorem reiciendis fugiat enim."
+   }' --user-id 1988513198 --auth "Reiciendis fugiat enim dolor."
 `, os.Args[0])
 }
 
@@ -3419,9 +3432,24 @@ ChangePassword implements change password.
 
 Example:
     `+os.Args[0]+` user change- password --body '{
-      "newPassword": "igc",
-      "oldPassword": "0ph"
-   }' --user-id 268731315 --auth "Vel consequatur aperiam eum consequatur voluptatem facilis."
+      "newPassword": "gcu",
+      "oldPassword": "phj"
+   }' --user-id 11867531 --auth "Consequatur aperiam eum consequatur voluptatem facilis."
+`, os.Args[0])
+}
+
+func userAcceptTncUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] user accept- tnc -body JSON -user-id INT32 -auth STRING
+
+AcceptTnc implements accept tnc.
+    -body JSON: 
+    -user-id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` user accept- tnc --body '{
+      "accept": false
+   }' --user-id 1946626874 --auth "Ipsum est dolorem."
 `, os.Args[0])
 }
 
@@ -3432,7 +3460,7 @@ GetCurrent implements get current.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user get- current --auth "Facilis corporis laborum porro ipsum est."
+    `+os.Args[0]+` user get- current --auth "Beatae qui dolores."
 `, os.Args[0])
 }
 
@@ -3444,7 +3472,7 @@ ListByProject implements list by project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user list- by- project --project-id 913348811 --auth "Quo accusamus."
+    `+os.Args[0]+` user list- by- project --project-id 1352657203 --auth "Nam aperiam architecto repudiandae."
 `, os.Args[0])
 }
 
@@ -3455,7 +3483,7 @@ IssueTransmissionToken implements issue transmission token.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user issue- transmission- token --auth "Iste sed corrupti atque explicabo dolorem."
+    `+os.Args[0]+` user issue- transmission- token --auth "Quae quasi praesentium consectetur numquam."
 `, os.Args[0])
 }
 
@@ -3480,7 +3508,7 @@ Example:
     `+os.Args[0]+` user admin- delete --body '{
       "email": "Placeat autem voluptates delectus aut non.",
       "password": "Et et."
-   }' --auth "Nobis temporibus inventore nemo."
+   }' --auth "Corrupti non."
 `, os.Args[0])
 }
 
@@ -3492,7 +3520,7 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user admin- search --query "Earum vero eligendi eos." --auth "Est repellendus quia alias qui dolorem."
+    `+os.Args[0]+` user admin- search --query "Ex ut aperiam eos." --auth "Similique nobis consequatur."
 `, os.Args[0])
 }
 
@@ -3506,6 +3534,6 @@ Mentionables implements mentionables.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user mentionables --project-id 94382824 --bookmark "Vero iusto quis architecto et iusto." --query "Beatae in." --auth "Deserunt dolorem eum ex ut aperiam eos."
+    `+os.Args[0]+` user mentionables --project-id 1948593912 --bookmark "Velit suscipit sit et." --query "Debitis quibusdam quia maiores." --auth "Eum dignissimos."
 `, os.Args[0])
 }

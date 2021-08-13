@@ -86,6 +86,11 @@ func ChangePasswordUserPath(userID int32) string {
 	return fmt.Sprintf("/users/%v/password", userID)
 }
 
+// AcceptTncUserPath returns the URL path to the user service accept tnc HTTP endpoint.
+func AcceptTncUserPath(userID int32) string {
+	return fmt.Sprintf("/users/%v/accept-tnc", userID)
+}
+
 // GetCurrentUserPath returns the URL path to the user service get current HTTP endpoint.
 func GetCurrentUserPath() string {
 	return "/user"

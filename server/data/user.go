@@ -67,6 +67,7 @@ type User struct {
 	Taggable         bool      `db:"taggable"`
 	CreatedAt        time.Time `db:"created_at"`
 	UpdatedAt        time.Time `db:"updated_at"`
+	TncDate          time.Time `db:"tnc_date"`
 }
 
 func (user *User) SetPassword(password string) error {

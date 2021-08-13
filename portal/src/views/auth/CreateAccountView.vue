@@ -1,66 +1,90 @@
 <template>
     <div class="form-container">
         <div class="form-wrap">
-            <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
+            <img class="form-header-logo" :alt="$t('layout.logo.alt')" src="@/assets/FieldKit_Logo_White.png" />
             <form v-if="!created" class="form" @submit.prevent="save">
-                <h1 class="form-title">Create Your Account</h1>
+                <h1 class="form-title">{{ $t("createAccount.form.title") }}</h1>
                 <div class="form-group">
-                    <TextField v-model="form.name" label="Name" />
+                    <TextField v-model="form.name" :label="$t('createAccount.form.name.label')" />
 
                     <div class="form-errors" v-if="$v.form.name.$error">
-                        <div v-if="!$v.form.name.required">Name is a required field.</div>
+                        <div v-if="!$v.form.name.required">{{ $t("createAccount.form.name.required") }}</div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <TextField v-model="form.email" label="Email" keyboardType="email" />
+                    <TextField v-model="form.email" :label="$t('createAccount.form.email.label')" keyboardType="email" />
 
                     <div class="form-errors" v-if="$v.form.email.$error">
-                        <div v-if="!$v.form.email.required">Email is a required field.</div>
-                        <div v-if="!$v.form.email.email">Must be a valid email address.</div>
+                        <div v-if="!$v.form.email.required">{{ $t("createAccount.form.email.required") }}</div>
+                        <div v-if="!$v.form.email.email">{{ $t("createAccount.form.email.valid") }}</div>
                         <div v-if="!$v.form.email.taken">
-                            This address appears to already be registered.
-                            <router-link :to="{ name: 'recover' }" class="form-link recover">Recover Account</router-link>
+                            {{ $t("createAccount.form.email.taken") }}
+                            <router-link :to="{ name: 'recover' }" class="form-link recover">
+                                {{ $t("createAccount.form.recover") }}
+                            </router-link>
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <TextField v-model="form.password" label="Password" type="password" />
+                    <TextField v-model="form.password" :label="$t('createAccount.form.password.label')" type="password" />
 
                     <div class="form-errors" v-if="$v.form.password.$error">
-                        <div v-if="!$v.form.password.required">This is a required field.</div>
-                        <div v-if="!$v.form.password.min">Password must be at least 10 characters.</div>
+                        <div v-if="!$v.form.password.required">{{ $t("createAccount.form.password.required") }}</div>
+                        <div v-if="!$v.form.password.min">{{ $t("createAccount.form.password.valid") }}</div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <TextField v-model="form.passwordConfirmation" label="Confirm password" type="password" />
+                    <TextField
+                        v-model="form.passwordConfirmation"
+                        :label="$t('createAccount.form.passwordConfirmation.label')"
+                        type="password"
+                    />
 
                     <div class="form-errors" v-if="$v.form.passwordConfirmation.$error">
-                        <div v-if="!$v.form.passwordConfirmation.required">Confirmation is a required field.</div>
-                        <div v-if="!$v.form.passwordConfirmation.sameAsPassword">Passwords must match.</div>
-                    </div>
-                    <div class="form-policy">
-                        By creating an account you agree to our
-                        <span class="bold">Privacy Policy</span>
-                        and
-                        <span class="bold">Terms of Use.</span>
+                        <div v-if="!$v.form.passwordConfirmation.required">
+                            {{ $t("createAccount.form.passwordConfirmation.required") }}
+                        </div>
+                        <div v-if="!$v.form.passwordConfirmation.sameAsPassword">
+                            {{ $t("createAccount.form.passwordConfirmation.valid") }}
+                        </div>
                     </div>
                 </div>
-                <button class="form-submit" type="submit">Create Account</button>
+                <div class="checkbox">
+                    <div>
+                        <label>
+                            <span>
+                                {{ $t("createAccount.form.terms.label") }}
+                                <router-link to="terms" class="bold">{{ $t("createAccount.form.terms.labelLink") }}</router-link>
+                            </span>
+                            <input type="checkbox" id="checkbox" v-model="form.tncAccept" />
+                            <span class="checkbox-btn"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-errors" v-if="$v.form.tncAccept.$error">
+                    <div v-if="!$v.form.tncAccept.required">{{ $t("createAccount.form.terms.required") }}</div>
+                </div>
+                <button class="form-submit" type="submit">{{ $t("createAccount.form.createAccountButton") }}</button>
                 <div>
-                    <router-link :to="{ name: 'login' }" class="form-link">Back to Log In</router-link>
+                    <router-link :to="{ name: 'login' }" class="form-link">{{ $t("createAccount.form.backButton") }}</router-link>
                 </div>
             </form>
             <form class="form" v-if="created">
                 <template v-if="!resending">
                     <img src="@/assets/icon-success.svg" alt="Success" class="form-header-icon" width="57px" />
-                    <h1 class="form-title">Account Created</h1>
-                    <h2 class="form-subtitle">We sent you an account validation email.</h2>
-                    <button class="form-submit" v-on:click="resend">Resend Email</button>
-                    <router-link :to="{ name: 'login' }" class="form-link">Back to Log In</router-link>
+                    <h1 class="form-title">{{ $t("createAccount.form.created.title") }}</h1>
+                    <h2 class="form-subtitle">{{ $t("createAccount.form.created.subtitle") }}</h2>
+                    <button class="form-submit" v-on:click="resend">{{ $t("createAccount.form.created.resendButton") }}</button>
+                    <router-link :to="{ name: 'login' }" class="form-link">{{ $t("createAccount.form.backButton") }}</router-link>
                 </template>
                 <template v-if="resending">
-                    <img src="@/assets/Icon_Syncing2.png" alt="Resending" class="form-header-icon" width="57px" />
-                    <p class="form-link">Resending</p>
+                    <img
+                        src="@/assets/Icon_Syncing2.png"
+                        :alt="$t('createAccount.form.resendMessage')"
+                        class="form-header-icon"
+                        width="57px"
+                    />
+                    <p class="form-link">{{ $t("createAccount.form.resendMessage") }}</p>
                 </template>
             </form>
         </div>
@@ -85,6 +109,7 @@ export default Vue.extend({
             email: string;
             password: string;
             passwordConfirmation: string;
+            tncAccept: boolean;
         };
         available: boolean;
         creating: boolean;
@@ -97,6 +122,7 @@ export default Vue.extend({
                 email: "",
                 password: "",
                 passwordConfirmation: "",
+                tncAccept: false,
             },
             available: true,
             creating: true,
@@ -118,6 +144,7 @@ export default Vue.extend({
             },
             password: { required, min: minLength(10) },
             passwordConfirmation: { required, min: minLength(10), sameAsPassword: sameAs("password") },
+            tncAccept: { checked: (value) => value === true },
         },
     },
     methods: {
@@ -157,5 +184,14 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms.scss";
+@import "../../scss/forms";
+@import "../../scss/global";
+
+.checkbox {
+    margin-top: 25px;
+    span {
+        text-align: left;
+        float: left;
+    }
+}
 </style>

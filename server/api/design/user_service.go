@@ -338,6 +338,31 @@ var _ = Service("user", func() {
 		})
 	})
 
+	Method("accept tnc", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("userId", Int32)
+			Required("userId")
+			Attribute("accept", AcceptTncFields)
+			Required("accept")
+		})
+
+		Result(User)
+
+		HTTP(func() {
+			PATCH("users/{userId}/accept-tnc")
+
+			Body("accept")
+
+			httpAuthentication()
+		})
+	})
+
 	Method("get current", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -499,6 +524,7 @@ var AddUserFields = Type("AddUserFields", func() {
 		MinLength(10)
 	})
 	Attribute("invite_token", String)
+	Attribute("tncAccept", Boolean)
 	Required("name", "email", "password")
 })
 
@@ -518,6 +544,11 @@ var UpdateUserPasswordFields = Type("UpdateUserPasswordFields", func() {
 		MinLength(10)
 	})
 	Required("oldPassword", "newPassword")
+})
+
+var AcceptTncFields = Type("AcceptTncFields", func() {
+	Attribute("accept", Boolean)
+	Required("accept")
 })
 
 var LoginFields = Type("LoginFields", func() {
@@ -557,7 +588,8 @@ var User = ResultType("application/vnd.app.user+json", func() {
 		Attribute("photo", UserPhoto)
 		Attribute("admin", Boolean)
 		Attribute("updatedAt", Int64)
-		Required("id", "name", "email", "bio", "admin", "updatedAt")
+		Attribute("tncDate", Int64)
+		Required("id", "name", "email", "bio", "admin", "updatedAt", "tncDate")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -567,6 +599,7 @@ var User = ResultType("application/vnd.app.user+json", func() {
 		Attribute("photo")
 		Attribute("admin")
 		Attribute("updatedAt")
+		Attribute("tncDate")
 	})
 })
 

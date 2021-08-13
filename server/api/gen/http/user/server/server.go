@@ -36,6 +36,7 @@ type Server struct {
 	Add                    http.Handler
 	Update                 http.Handler
 	ChangePassword         http.Handler
+	AcceptTnc              http.Handler
 	GetCurrent             http.Handler
 	ListByProject          http.Handler
 	IssueTransmissionToken http.Handler
@@ -94,6 +95,7 @@ func New(
 			{"Add", "POST", "/users"},
 			{"Update", "PATCH", "/users/{userId}"},
 			{"ChangePassword", "PATCH", "/users/{userId}/password"},
+			{"AcceptTnc", "PATCH", "/users/{userId}/accept-tnc"},
 			{"GetCurrent", "GET", "/user"},
 			{"ListByProject", "GET", "/users/project/{projectId}"},
 			{"IssueTransmissionToken", "GET", "/user/transmission-token"},
@@ -116,6 +118,7 @@ func New(
 			{"CORS", "OPTIONS", "/users"},
 			{"CORS", "OPTIONS", "/users/{userId}"},
 			{"CORS", "OPTIONS", "/users/{userId}/password"},
+			{"CORS", "OPTIONS", "/users/{userId}/accept-tnc"},
 			{"CORS", "OPTIONS", "/user"},
 			{"CORS", "OPTIONS", "/users/project/{projectId}"},
 			{"CORS", "OPTIONS", "/user/transmission-token"},
@@ -139,6 +142,7 @@ func New(
 		Add:                    NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
 		Update:                 NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
 		ChangePassword:         NewChangePasswordHandler(e.ChangePassword, mux, decoder, encoder, errhandler, formatter),
+		AcceptTnc:              NewAcceptTncHandler(e.AcceptTnc, mux, decoder, encoder, errhandler, formatter),
 		GetCurrent:             NewGetCurrentHandler(e.GetCurrent, mux, decoder, encoder, errhandler, formatter),
 		ListByProject:          NewListByProjectHandler(e.ListByProject, mux, decoder, encoder, errhandler, formatter),
 		IssueTransmissionToken: NewIssueTransmissionTokenHandler(e.IssueTransmissionToken, mux, decoder, encoder, errhandler, formatter),
@@ -170,6 +174,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Add = m(s.Add)
 	s.Update = m(s.Update)
 	s.ChangePassword = m(s.ChangePassword)
+	s.AcceptTnc = m(s.AcceptTnc)
 	s.GetCurrent = m(s.GetCurrent)
 	s.ListByProject = m(s.ListByProject)
 	s.IssueTransmissionToken = m(s.IssueTransmissionToken)
@@ -197,6 +202,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountAddHandler(mux, h.Add)
 	MountUpdateHandler(mux, h.Update)
 	MountChangePasswordHandler(mux, h.ChangePassword)
+	MountAcceptTncHandler(mux, h.AcceptTnc)
 	MountGetCurrentHandler(mux, h.GetCurrent)
 	MountListByProjectHandler(mux, h.ListByProject)
 	MountIssueTransmissionTokenHandler(mux, h.IssueTransmissionToken)
@@ -973,6 +979,57 @@ func NewChangePasswordHandler(
 	})
 }
 
+// MountAcceptTncHandler configures the mux to serve the "user" service "accept
+// tnc" endpoint.
+func MountAcceptTncHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleUserOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("PATCH", "/users/{userId}/accept-tnc", f)
+}
+
+// NewAcceptTncHandler creates a HTTP handler which loads the HTTP request and
+// calls the "user" service "accept tnc" endpoint.
+func NewAcceptTncHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeAcceptTncRequest(mux, decoder)
+		encodeResponse = EncodeAcceptTncResponse(encoder)
+		encodeError    = EncodeAcceptTncError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "accept tnc")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountGetCurrentHandler configures the mux to serve the "user" service "get
 // current" endpoint.
 func MountGetCurrentHandler(mux goahttp.Muxer, h http.Handler) {
@@ -1348,6 +1405,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/users", f)
 	mux.Handle("OPTIONS", "/users/{userId}", f)
 	mux.Handle("OPTIONS", "/users/{userId}/password", f)
+	mux.Handle("OPTIONS", "/users/{userId}/accept-tnc", f)
 	mux.Handle("OPTIONS", "/user", f)
 	mux.Handle("OPTIONS", "/users/project/{projectId}", f)
 	mux.Handle("OPTIONS", "/user/transmission-token", f)

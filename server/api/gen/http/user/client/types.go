@@ -48,6 +48,7 @@ type AddRequestBody struct {
 	Email       string  `form:"email" json:"email" xml:"email"`
 	Password    string  `form:"password" json:"password" xml:"password"`
 	InviteToken *string `form:"invite_token,omitempty" json:"invite_token,omitempty" xml:"invite_token,omitempty"`
+	TncAccept   *bool   `form:"tncAccept,omitempty" json:"tncAccept,omitempty" xml:"tncAccept,omitempty"`
 }
 
 // UpdateRequestBody is the type of the "user" service "update" endpoint HTTP
@@ -63,6 +64,12 @@ type UpdateRequestBody struct {
 type ChangePasswordRequestBody struct {
 	OldPassword string `form:"oldPassword" json:"oldPassword" xml:"oldPassword"`
 	NewPassword string `form:"newPassword" json:"newPassword" xml:"newPassword"`
+}
+
+// AcceptTncRequestBody is the type of the "user" service "accept tnc" endpoint
+// HTTP request body.
+type AcceptTncRequestBody struct {
+	Accept bool `form:"accept" json:"accept" xml:"accept"`
 }
 
 // AdminDeleteRequestBody is the type of the "user" service "admin delete"
@@ -97,6 +104,7 @@ type AddResponseBody struct {
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
 	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	TncDate   *int64                 `form:"tncDate,omitempty" json:"tncDate,omitempty" xml:"tncDate,omitempty"`
 }
 
 // UpdateResponseBody is the type of the "user" service "update" endpoint HTTP
@@ -109,6 +117,7 @@ type UpdateResponseBody struct {
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
 	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	TncDate   *int64                 `form:"tncDate,omitempty" json:"tncDate,omitempty" xml:"tncDate,omitempty"`
 }
 
 // ChangePasswordResponseBody is the type of the "user" service "change
@@ -121,6 +130,20 @@ type ChangePasswordResponseBody struct {
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
 	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	TncDate   *int64                 `form:"tncDate,omitempty" json:"tncDate,omitempty" xml:"tncDate,omitempty"`
+}
+
+// AcceptTncResponseBody is the type of the "user" service "accept tnc"
+// endpoint HTTP response body.
+type AcceptTncResponseBody struct {
+	ID        *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name      *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email     *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Bio       *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
+	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	TncDate   *int64                 `form:"tncDate,omitempty" json:"tncDate,omitempty" xml:"tncDate,omitempty"`
 }
 
 // GetCurrentResponseBody is the type of the "user" service "get current"
@@ -133,6 +156,7 @@ type GetCurrentResponseBody struct {
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
 	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	TncDate   *int64                 `form:"tncDate,omitempty" json:"tncDate,omitempty" xml:"tncDate,omitempty"`
 }
 
 // ListByProjectResponseBody is the type of the "user" service "list by
@@ -1280,6 +1304,78 @@ type ChangePasswordBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// AcceptTncUnauthorizedResponseBody is the type of the "user" service "accept
+// tnc" endpoint HTTP response body for the "unauthorized" error.
+type AcceptTncUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// AcceptTncForbiddenResponseBody is the type of the "user" service "accept
+// tnc" endpoint HTTP response body for the "forbidden" error.
+type AcceptTncForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// AcceptTncNotFoundResponseBody is the type of the "user" service "accept tnc"
+// endpoint HTTP response body for the "not-found" error.
+type AcceptTncNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// AcceptTncBadRequestResponseBody is the type of the "user" service "accept
+// tnc" endpoint HTTP response body for the "bad-request" error.
+type AcceptTncBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
 // GetCurrentUnauthorizedResponseBody is the type of the "user" service "get
 // current" endpoint HTTP response body for the "unauthorized" error.
 type GetCurrentUnauthorizedResponseBody struct {
@@ -1822,6 +1918,7 @@ type UserResponseBody struct {
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
 	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	TncDate   *int64                 `form:"tncDate,omitempty" json:"tncDate,omitempty" xml:"tncDate,omitempty"`
 }
 
 // ProjectRoleResponse is used to define fields on response body types.
@@ -1891,6 +1988,7 @@ func NewAddRequestBody(p *user.AddPayload) *AddRequestBody {
 		Email:       p.User.Email,
 		Password:    p.User.Password,
 		InviteToken: p.User.InviteToken,
+		TncAccept:   p.User.TncAccept,
 	}
 	return body
 }
@@ -1912,6 +2010,15 @@ func NewChangePasswordRequestBody(p *user.ChangePasswordPayload) *ChangePassword
 	body := &ChangePasswordRequestBody{
 		OldPassword: p.Change.OldPassword,
 		NewPassword: p.Change.NewPassword,
+	}
+	return body
+}
+
+// NewAcceptTncRequestBody builds the HTTP request body from the payload of the
+// "accept tnc" endpoint of the "user" service.
+func NewAcceptTncRequestBody(p *user.AcceptTncPayload) *AcceptTncRequestBody {
+	body := &AcceptTncRequestBody{
+		Accept: p.Accept.Accept,
 	}
 	return body
 }
@@ -2709,6 +2816,7 @@ func NewAddUserOK(body *AddResponseBody) *userviews.UserView {
 		Bio:       body.Bio,
 		Admin:     body.Admin,
 		UpdatedAt: body.UpdatedAt,
+		TncDate:   body.TncDate,
 	}
 	if body.Photo != nil {
 		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
@@ -2798,6 +2906,7 @@ func NewUpdateUserOK(body *UpdateResponseBody) *userviews.UserView {
 		Bio:       body.Bio,
 		Admin:     body.Admin,
 		UpdatedAt: body.UpdatedAt,
+		TncDate:   body.TncDate,
 	}
 	if body.Photo != nil {
 		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
@@ -2873,6 +2982,7 @@ func NewChangePasswordUserOK(body *ChangePasswordResponseBody) *userviews.UserVi
 		Bio:       body.Bio,
 		Admin:     body.Admin,
 		UpdatedAt: body.UpdatedAt,
+		TncDate:   body.TncDate,
 	}
 	if body.Photo != nil {
 		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
@@ -2941,6 +3051,85 @@ func NewChangePasswordBadRequest(body *ChangePasswordBadRequestResponseBody) *go
 	return v
 }
 
+// NewAcceptTncUserOK builds a "user" service "accept tnc" endpoint result from
+// a HTTP "OK" response.
+func NewAcceptTncUserOK(body *AcceptTncResponseBody) *userviews.UserView {
+	v := &userviews.UserView{
+		ID:        body.ID,
+		Name:      body.Name,
+		Email:     body.Email,
+		Bio:       body.Bio,
+		Admin:     body.Admin,
+		UpdatedAt: body.UpdatedAt,
+		TncDate:   body.TncDate,
+	}
+	if body.Photo != nil {
+		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
+	}
+
+	return v
+}
+
+// NewAcceptTncUnauthorized builds a user service accept tnc endpoint
+// unauthorized error.
+func NewAcceptTncUnauthorized(body *AcceptTncUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewAcceptTncForbidden builds a user service accept tnc endpoint forbidden
+// error.
+func NewAcceptTncForbidden(body *AcceptTncForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewAcceptTncNotFound builds a user service accept tnc endpoint not-found
+// error.
+func NewAcceptTncNotFound(body *AcceptTncNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewAcceptTncBadRequest builds a user service accept tnc endpoint bad-request
+// error.
+func NewAcceptTncBadRequest(body *AcceptTncBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
 // NewGetCurrentUserOK builds a "user" service "get current" endpoint result
 // from a HTTP "OK" response.
 func NewGetCurrentUserOK(body *GetCurrentResponseBody) *userviews.UserView {
@@ -2951,6 +3140,7 @@ func NewGetCurrentUserOK(body *GetCurrentResponseBody) *userviews.UserView {
 		Bio:       body.Bio,
 		Admin:     body.Admin,
 		UpdatedAt: body.UpdatedAt,
+		TncDate:   body.TncDate,
 	}
 	if body.Photo != nil {
 		v.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(body.Photo)
@@ -4936,6 +5126,102 @@ func ValidateChangePasswordBadRequestResponseBody(body *ChangePasswordBadRequest
 	return
 }
 
+// ValidateAcceptTncUnauthorizedResponseBody runs the validations defined on
+// accept tnc_unauthorized_response_body
+func ValidateAcceptTncUnauthorizedResponseBody(body *AcceptTncUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateAcceptTncForbiddenResponseBody runs the validations defined on
+// accept tnc_forbidden_response_body
+func ValidateAcceptTncForbiddenResponseBody(body *AcceptTncForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateAcceptTncNotFoundResponseBody runs the validations defined on accept
+// tnc_not-found_response_body
+func ValidateAcceptTncNotFoundResponseBody(body *AcceptTncNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateAcceptTncBadRequestResponseBody runs the validations defined on
+// accept tnc_bad-request_response_body
+func ValidateAcceptTncBadRequestResponseBody(body *AcceptTncBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
 // ValidateGetCurrentUnauthorizedResponseBody runs the validations defined on
 // get current_unauthorized_response_body
 func ValidateGetCurrentUnauthorizedResponseBody(body *GetCurrentUnauthorizedResponseBody) (err error) {
@@ -5681,6 +5967,9 @@ func ValidateUserResponseBody(body *UserResponseBody) (err error) {
 	}
 	if body.UpdatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "body"))
+	}
+	if body.TncDate == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("tncDate", "body"))
 	}
 	if body.Name != nil {
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", *body.Name, "\\S"))

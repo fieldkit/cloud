@@ -70,6 +70,10 @@ type Client struct {
 	// password endpoint.
 	ChangePasswordDoer goahttp.Doer
 
+	// AcceptTnc Doer is the HTTP client used to make requests to the accept tnc
+	// endpoint.
+	AcceptTncDoer goahttp.Doer
+
 	// GetCurrent Doer is the HTTP client used to make requests to the get current
 	// endpoint.
 	GetCurrentDoer goahttp.Doer
@@ -136,6 +140,7 @@ func NewClient(
 		AddDoer:                    doer,
 		UpdateDoer:                 doer,
 		ChangePasswordDoer:         doer,
+		AcceptTncDoer:              doer,
 		GetCurrentDoer:             doer,
 		ListByProjectDoer:          doer,
 		IssueTransmissionTokenDoer: doer,
@@ -502,6 +507,30 @@ func (c *Client) ChangePassword() goa.Endpoint {
 		resp, err := c.ChangePasswordDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("user", "change password", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// AcceptTnc returns an endpoint that makes HTTP requests to the user service
+// accept tnc server.
+func (c *Client) AcceptTnc() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAcceptTncRequest(c.encoder)
+		decodeResponse = DecodeAcceptTncResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildAcceptTncRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AcceptTncDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("user", "accept tnc", err)
 		}
 		return decodeResponse(resp)
 	}
