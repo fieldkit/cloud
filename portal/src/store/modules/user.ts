@@ -17,6 +17,9 @@ const getters = {
     isAuthenticated: (state: UserState) => {
         return state.token !== null;
     },
+    isTncValid: (state: UserState) => {
+        return state?.user?.tncDate != undefined && state.user.tncDate >= Config.tncDate;
+    },
 };
 
 type ActionParameters = { commit: any; dispatch: any; state: UserState };

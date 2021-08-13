@@ -128,10 +128,17 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 		return nil, user.MakeUserEmailRegistered(errors.New("email registered"))
 	}
 
+	tncDate := time.Time{}
+
+	if *payload.User.TncAccept == true {
+		tncDate = time.Now()
+	}
+
 	user := &data.User{
 		Name:     data.Name(payload.User.Name),
 		Email:    payload.User.Email,
 		Username: payload.User.Email,
+		TncDate:  tncDate,
 		Bio:      "",
 	}
 
@@ -256,6 +263,42 @@ func (s *UserService) ChangePassword(ctx context.Context, payload *user.ChangePa
 		UPDATE fieldkit.user SET password = :password WHERE id = :id RETURNING *
 		`, updating); err != nil {
 		return nil, err
+	}
+
+	return UserType(s.options.signer, updating)
+}
+
+
+func (s *UserService) AcceptTnc(ctx context.Context, payload *user.AcceptTncPayload) (*user.User, error) {
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	log.Infow("accept-tnc", "authorized_user_id", p.UserID(), "user_id", payload.UserID)
+
+	updating := &data.User{}
+	err = s.options.Database.GetContext(ctx, updating, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID())
+	if err == sql.ErrNoRows {
+		return nil, user.MakeBadRequest(errors.New("bad request"))
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if updating.ID != payload.UserID {
+		return nil, user.MakeForbidden(errors.New("forbidden"))
+	}
+
+	if payload.Accept.Accept == true {
+		updating.TncDate = time.Now()
+		if err := s.options.Database.NamedGetContext(ctx, updating, `
+		UPDATE fieldkit.user SET tnc_date = :tnc_date WHERE id = :id RETURNING *
+		`, updating); err != nil {
+			return nil, err
+		}
 	}
 
 	return UserType(s.options.signer, updating)
@@ -822,6 +865,7 @@ func UserType(signer *Signer, dm *data.User) (*user.User, error) {
 		Bio:       dm.Bio,
 		Admin:     dm.Admin,
 		UpdatedAt: dm.UpdatedAt.Unix() * 1000,
+		TncDate:   dm.TncDate.Unix() * 1000,
 	}
 
 	if dm.MediaURL != nil {

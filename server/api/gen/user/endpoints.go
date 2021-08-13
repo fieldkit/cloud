@@ -32,6 +32,7 @@ type Endpoints struct {
 	Add                    goa.Endpoint
 	Update                 goa.Endpoint
 	ChangePassword         goa.Endpoint
+	AcceptTnc              goa.Endpoint
 	GetCurrent             goa.Endpoint
 	ListByProject          goa.Endpoint
 	IssueTransmissionToken goa.Endpoint
@@ -69,6 +70,7 @@ func NewEndpoints(s Service) *Endpoints {
 		Add:                    NewAddEndpoint(s),
 		Update:                 NewUpdateEndpoint(s, a.JWTAuth),
 		ChangePassword:         NewChangePasswordEndpoint(s, a.JWTAuth),
+		AcceptTnc:              NewAcceptTncEndpoint(s, a.JWTAuth),
 		GetCurrent:             NewGetCurrentEndpoint(s, a.JWTAuth),
 		ListByProject:          NewListByProjectEndpoint(s, a.JWTAuth),
 		IssueTransmissionToken: NewIssueTransmissionTokenEndpoint(s, a.JWTAuth),
@@ -95,6 +97,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Add = m(e.Add)
 	e.Update = m(e.Update)
 	e.ChangePassword = m(e.ChangePassword)
+	e.AcceptTnc = m(e.AcceptTnc)
 	e.GetCurrent = m(e.GetCurrent)
 	e.ListByProject = m(e.ListByProject)
 	e.IssueTransmissionToken = m(e.IssueTransmissionToken)
@@ -315,6 +318,30 @@ func NewChangePasswordEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.En
 			return nil, err
 		}
 		res, err := s.ChangePassword(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedUser(res, "default")
+		return vres, nil
+	}
+}
+
+// NewAcceptTncEndpoint returns an endpoint function that calls the method
+// "accept tnc" of service "user".
+func NewAcceptTncEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*AcceptTncPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.AcceptTnc(ctx, p)
 		if err != nil {
 			return nil, err
 		}

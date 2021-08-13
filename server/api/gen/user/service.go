@@ -48,6 +48,8 @@ type Service interface {
 	Update(context.Context, *UpdatePayload) (res *User, err error)
 	// ChangePassword implements change password.
 	ChangePassword(context.Context, *ChangePasswordPayload) (res *User, err error)
+	// AcceptTnc implements accept tnc.
+	AcceptTnc(context.Context, *AcceptTncPayload) (res *User, err error)
 	// GetCurrent implements get current.
 	GetCurrent(context.Context, *GetCurrentPayload) (res *User, err error)
 	// ListByProject implements list by project.
@@ -76,7 +78,7 @@ const ServiceName = "user"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [21]string{"roles", "delete", "upload photo", "download photo", "login", "recovery lookup", "recovery", "resume", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "get current", "list by project", "issue transmission token", "project roles", "admin delete", "admin search"}
+var MethodNames = [22]string{"roles", "delete", "upload photo", "download photo", "login", "recovery lookup", "recovery", "resume", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "accept tnc", "get current", "list by project", "issue transmission token", "project roles", "admin delete", "admin search"}
 
 // RolesPayload is the payload type of the user service roles method.
 type RolesPayload struct {
@@ -194,6 +196,7 @@ type User struct {
 	Photo     *UserPhoto
 	Admin     bool
 	UpdatedAt int64
+	TncDate   int64
 }
 
 // UpdatePayload is the payload type of the user service update method.
@@ -209,6 +212,13 @@ type ChangePasswordPayload struct {
 	Auth   string
 	UserID int32
 	Change *UpdateUserPasswordFields
+}
+
+// AcceptTncPayload is the payload type of the user service accept tnc method.
+type AcceptTncPayload struct {
+	Auth   string
+	UserID int32
+	Accept *AcceptTncFields
 }
 
 // GetCurrentPayload is the payload type of the user service get current method.
@@ -288,6 +298,7 @@ type AddUserFields struct {
 	Email       string
 	Password    string
 	InviteToken *string
+	TncAccept   *bool
 }
 
 type UserPhoto struct {
@@ -303,6 +314,10 @@ type UpdateUserFields struct {
 type UpdateUserPasswordFields struct {
 	OldPassword string
 	NewPassword string
+}
+
+type AcceptTncFields struct {
+	Accept bool
 }
 
 type ProjectUserCollection []*ProjectUser
@@ -537,6 +552,9 @@ func newUser(vres *userviews.UserView) *User {
 	if vres.UpdatedAt != nil {
 		res.UpdatedAt = *vres.UpdatedAt
 	}
+	if vres.TncDate != nil {
+		res.TncDate = *vres.TncDate
+	}
 	if vres.Photo != nil {
 		res.Photo = transformUserviewsUserPhotoViewToUserPhoto(vres.Photo)
 	}
@@ -553,6 +571,7 @@ func newUserView(res *User) *userviews.UserView {
 		Bio:       &res.Bio,
 		Admin:     &res.Admin,
 		UpdatedAt: &res.UpdatedAt,
+		TncDate:   &res.TncDate,
 	}
 	if res.Photo != nil {
 		vres.Photo = transformUserPhotoToUserviewsUserPhotoView(res.Photo)

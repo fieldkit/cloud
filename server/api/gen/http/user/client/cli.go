@@ -316,6 +316,7 @@ func BuildAddPayload(userAddBody string) (*user.AddPayload, error) {
 		Email:       body.Email,
 		Password:    body.Password,
 		InviteToken: body.InviteToken,
+		TncAccept:   body.TncAccept,
 	}
 	res := &user.AddPayload{
 		User: v,
@@ -382,7 +383,7 @@ func BuildChangePasswordPayload(userChangePasswordBody string, userChangePasswor
 	{
 		err = json.Unmarshal([]byte(userChangePasswordBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"newPassword\": \"23c\",\n      \"oldPassword\": \"td7\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"newPassword\": \"3c7\",\n      \"oldPassword\": \"d7x\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.OldPassword) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.oldPassword", body.OldPassword, utf8.RuneCountInString(body.OldPassword), 10, true))
@@ -413,6 +414,42 @@ func BuildChangePasswordPayload(userChangePasswordBody string, userChangePasswor
 	}
 	res := &user.ChangePasswordPayload{
 		Change: v,
+	}
+	res.UserID = userID
+	res.Auth = auth
+
+	return res, nil
+}
+
+// BuildAcceptTncPayload builds the payload for the user accept tnc endpoint
+// from CLI flags.
+func BuildAcceptTncPayload(userAcceptTncBody string, userAcceptTncUserID string, userAcceptTncAuth string) (*user.AcceptTncPayload, error) {
+	var err error
+	var body AcceptTncRequestBody
+	{
+		err = json.Unmarshal([]byte(userAcceptTncBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"accept\": false\n   }'")
+		}
+	}
+	var userID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(userAcceptTncUserID, 10, 32)
+		userID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for userID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = userAcceptTncAuth
+	}
+	v := &user.AcceptTncFields{
+		Accept: body.Accept,
+	}
+	res := &user.AcceptTncPayload{
+		Accept: v,
 	}
 	res.UserID = userID
 	res.Auth = auth
@@ -478,7 +515,7 @@ func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth str
 	{
 		err = json.Unmarshal([]byte(userAdminDeleteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Et temporibus aspernatur itaque.\",\n      \"password\": \"Adipisci eum deserunt aut dignissimos.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Eum deserunt.\",\n      \"password\": \"Dignissimos atque doloremque aut veniam officia culpa.\"\n   }'")
 		}
 	}
 	var auth string

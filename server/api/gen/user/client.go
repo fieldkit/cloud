@@ -31,6 +31,7 @@ type Client struct {
 	AddEndpoint                    goa.Endpoint
 	UpdateEndpoint                 goa.Endpoint
 	ChangePasswordEndpoint         goa.Endpoint
+	AcceptTncEndpoint              goa.Endpoint
 	GetCurrentEndpoint             goa.Endpoint
 	ListByProjectEndpoint          goa.Endpoint
 	IssueTransmissionTokenEndpoint goa.Endpoint
@@ -40,7 +41,7 @@ type Client struct {
 }
 
 // NewClient initializes a "user" service client given the endpoints.
-func NewClient(roles, delete_, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, resume, logout, refresh, sendValidation, validate, add, update, changePassword, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminDelete, adminSearch goa.Endpoint) *Client {
+func NewClient(roles, delete_, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, resume, logout, refresh, sendValidation, validate, add, update, changePassword, acceptTnc, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminDelete, adminSearch goa.Endpoint) *Client {
 	return &Client{
 		RolesEndpoint:                  roles,
 		DeleteEndpoint:                 delete_,
@@ -57,6 +58,7 @@ func NewClient(roles, delete_, uploadPhoto, downloadPhoto, login, recoveryLookup
 		AddEndpoint:                    add,
 		UpdateEndpoint:                 update,
 		ChangePasswordEndpoint:         changePassword,
+		AcceptTncEndpoint:              acceptTnc,
 		GetCurrentEndpoint:             getCurrent,
 		ListByProjectEndpoint:          listByProject,
 		IssueTransmissionTokenEndpoint: issueTransmissionToken,
@@ -186,6 +188,16 @@ func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *User, err e
 func (c *Client) ChangePassword(ctx context.Context, p *ChangePasswordPayload) (res *User, err error) {
 	var ires interface{}
 	ires, err = c.ChangePasswordEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*User), nil
+}
+
+// AcceptTnc calls the "accept tnc" endpoint of the "user" service.
+func (c *Client) AcceptTnc(ctx context.Context, p *AcceptTncPayload) (res *User, err error) {
+	var ires interface{}
+	ires, err = c.AcceptTncEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
