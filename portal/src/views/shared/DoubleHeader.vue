@@ -36,10 +36,14 @@ export default Vue.extend({
             type: String,
             default: null,
         },
+        backRouteParams: {
+            type: Object,
+            default: undefined,
+        },
     },
     methods: {
         onBack() {
-            this.$router.push({ name: this.backRoute });
+            this.$router.push({ name: this.backRoute, params: this.backRouteParams });
         },
     },
 });
