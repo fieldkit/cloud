@@ -19,6 +19,10 @@ export default Vue.extend({
         StationPicker,
     },
     props: {
+        title: {
+          type: String,
+          required: true,
+        },
         stations: {
             type: Array as PropType<DisplayStation[]>,
             required: true,

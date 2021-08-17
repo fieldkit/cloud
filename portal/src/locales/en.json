@@ -106,6 +106,7 @@
         "stations": {
             "title": "FieldKit Stations",
             "add": "Add Station",
+            "edit": "Edit",
             "search": "Search",
             "none": {
                 "title": "No Stations",

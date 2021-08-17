@@ -9,9 +9,14 @@
         />
         <div class="section-heading stations-heading">
             {{ $t("project.stations.title") }}
-            <div class="add-station" v-on:click="showStationPicker" v-if="admin">
-                <img src="@/assets/icon-plus-round.svg" class="add-station-btn" />
-                {{ $t("project.stations.add") }}
+            <div class="stations-cta-container" v-on:click="showStationPicker" v-if="admin">
+                <div class="stations-cta">
+                    <img src="@/assets/icon-plus-round.svg" />
+                    {{ $t("project.stations.add") }}
+                </div>
+                <div class="stations-cta">
+                    {{ $t("project.stations.edit") }}
+                </div>
             </div>
         </div>
         <div class="section-body">
@@ -256,17 +261,24 @@ export default Vue.extend({
     font-size: 14px;
     cursor: pointer;
 }
-.add-station {
+.stations-cta-container {
     margin-left: auto;
     font-size: 14px;
     margin-right: 1em;
-    cursor: pointer;
-    display: flex;
+    @include flex(center);
+
+    img {
+        margin-right: 7px;
+        width: 18px;
+    }
 }
-.add-station-btn {
-    width: 18px;
-    vertical-align: text-top;
-    margin-right: 7px;
+.stations-cta {
+    cursor: pointer;
+    @include flex(center);
+
+    &:not(:last-of-type) {
+        margin-right: 35px;
+    }
 }
 .last-seen {
     font-size: 12px;
