@@ -101,23 +101,42 @@ export default Vue.extend({
             console.log("map: loaded");
             this.protectedData.map = map;
 
-            if (!map.hasImage("dot")) {
-                const compass = this.$loadAsset("Icon_Map_Dot.png");
-                map.loadImage(compass, (error, image) => {
-                    if (error) throw error;
-                    if (!map.hasImage("dot")) {
-                        map.addImage("dot", image);
-                    }
+            this.loadCompassImage(map)
+                .then(() => {
+                    setTimeout(() => {
+                        console.log("ressize");
+                        map.resize();
+
+                        this.ready = true;
+                        this.updateMap();
+
+                        // Force model to update.
+                        this.newBounds();
+                    }, 100);
+                })
+                .catch((error) => {
+                    throw error;
                 });
-            }
-
-            map.resize();
-
-            this.ready = true;
-            this.updateMap();
-
-            // Force model to update.
-            this.newBounds();
+        },
+        loadCompassImage(map) {
+            // return new Promise((resolve => resolve()));
+            return new Promise((resolve, reject) => {
+                console.log('map.hasImage("dot")', map.hasImage("dot"));
+                if (!map.hasImage("dot")) {
+                    const compass = this.$loadAsset("Icon_Map_Dot.png");
+                    map.loadImage(compass, (error, image) => {
+                        console.log("loaded", image);
+                        console.log("loaded e", error);
+                        if (error) reject(error);
+                        if (!map.hasImage("dot")) {
+                            console.log("adding img");
+                            map.addImage("dot", image);
+                            resolve();
+                        }
+                    });
+                }
+                resolve();
+            });
         },
         newBounds() {
             const map = this.protectedData.map;
