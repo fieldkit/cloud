@@ -67,7 +67,7 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 		station.SyncedAt = &station.UpdatedAt
 	}
 
-	if err := sr.Update(ctx, station); err != nil {
+	if err := sr.UpdateStation(ctx, station); err != nil {
 		return err
 	}
 
@@ -130,7 +130,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		LocationName: payload.LocationName,
 	}
 
-	added, err := sr.Add(ctx, adding)
+	added, err := sr.AddStation(ctx, adding)
 	if err != nil {
 		return nil, err
 	}

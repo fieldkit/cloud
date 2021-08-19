@@ -32,7 +32,7 @@ func NewStationRepository(db *sqlxcache.DB) (rr *StationRepository) {
 	return &StationRepository{db: db}
 }
 
-func (r *StationRepository) Add(ctx context.Context, adding *data.Station) (station *data.Station, err error) {
+func (r *StationRepository) AddStation(ctx context.Context, adding *data.Station) (station *data.Station, err error) {
 	if err := r.db.NamedGetContext(ctx, adding, `
 		INSERT INTO fieldkit.station
 		(name, device_id, owner_id, model_id, created_at, updated_at, synced_at, ingestion_at, location, location_name, place_other, place_native,
@@ -47,7 +47,7 @@ func (r *StationRepository) Add(ctx context.Context, adding *data.Station) (stat
 	return adding, nil
 }
 
-func (r *StationRepository) Update(ctx context.Context, station *data.Station) (err error) {
+func (r *StationRepository) UpdateStation(ctx context.Context, station *data.Station) (err error) {
 	if _, err := r.db.NamedExecContext(ctx, `
 		UPDATE fieldkit.station SET
 			   name = :name,
