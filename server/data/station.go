@@ -14,6 +14,10 @@ import (
 	pb "github.com/fieldkit/app-protocol"
 )
 
+const (
+	FieldKitModelID = int32(1)
+)
+
 type StationArea struct {
 	ID       int32        `db:"id,omitempty"`
 	Name     string       `db:"name"`
@@ -56,6 +60,7 @@ type Station struct {
 	Name               string     `db:"name"`
 	DeviceID           []byte     `db:"device_id"`
 	OwnerID            int32      `db:"owner_id,omitempty"`
+	ModelID            int32      `db:"model_id"`
 	CreatedAt          time.Time  `db:"created_at,omitempty"`
 	UpdatedAt          time.Time  `db:"updated_at,omitempty"`
 	SyncedAt           *time.Time `db:"synced_at"`

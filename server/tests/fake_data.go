@@ -142,17 +142,18 @@ func (e *TestEnv) AddStationsOwnedBy(owner *data.User, number int) ([]*data.Stat
 		deviceID := hasher.Sum(nil)
 
 		station := &data.Station{
-			OwnerID:   owner.ID,
-			Name:      name,
 			DeviceID:  deviceID,
+			OwnerID:   owner.ID,
+			ModelID:   data.FieldKitModelID,
+			Name:      name,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			Location:  data.NewLocation([]float64{36.9053064, -117.5297165}),
 		}
 
 		if err := e.DB.NamedGetContext(e.Ctx, station, `
-			INSERT INTO fieldkit.station (name, device_id, owner_id, created_at, updated_at, location)
-			VALUES (:name, :device_id, :owner_id, :created_at, :updated_at, ST_SetSRID(ST_GeomFromText(:location), 4326))
+			INSERT INTO fieldkit.station (name, device_id, owner_id, model_id, created_at, updated_at, location)
+			VALUES (:name, :device_id, :owner_id, :model_id, :created_at, :updated_at, ST_SetSRID(ST_GeomFromText(:location), 4326))
 			RETURNING id
 		`, station); err != nil {
 			return nil, err

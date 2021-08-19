@@ -123,6 +123,7 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		OwnerID:      p.UserID(),
 		Name:         payload.Name,
 		DeviceID:     deviceId,
+		ModelID:      data.FieldKitModelID,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 		SyncedAt:     &now,
