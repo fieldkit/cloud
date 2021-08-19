@@ -77,7 +77,8 @@
             "logout": "Log out",
             "admin": "Admin",
             "myAccount": "My Account",
-            "markAllSeen": "Mark All As Read"
+            "markAllSeen": "Mark All As Read",
+            "notifications": "Notifications"
         },
         "backDashboard": "Back to Dashboard",
         "backProject": "Back to {name}"

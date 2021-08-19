@@ -9,13 +9,12 @@
             v-on:mouseenter="onAccountHover($event)"
             v-on:mouseleave="onAccountHover($event)"
         >
-            <UserPhoto v-if="user" :user="user">
-                <b-badge variant="light">
+            <UserPhoto v-if="user" :user="user" />
+            <a v-if="user" class="header-account-name">
+                <b-badge>
                     {{ numberOfUnseenNotifications }}
                     <span class="sr-only" style="display: none">unread notifications.</span>
                 </b-badge>
-            </UserPhoto>
-            <a v-if="user" class="header-account-name">
                 {{ firstName }}
             </a>
             <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
@@ -25,9 +24,20 @@
                 <router-link v-if="user" :to="{ name: 'editUser' }">{{ $t("layout.header.myAccount") }}</router-link>
                 <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">{{ $t("layout.header.admin") }}</router-link>
                 <a class="log-out" v-if="isAuthenticated" v-on:click="logout">{{ $t("layout.header.logout") }}</a>
-                <a class="mark-all-as-seen" v-if="numberOfUnseenNotifications > 0" v-on:click="markAllSeen">
-                    {{ $t("layout.header.markAllSeen") }}
-                </a>
+
+                <div v-if="numberOfUnseenNotifications > 0">
+                    <div class="menu-item menu-heading">{{ $t("layout.header.notifications") }}</div>
+                    <a
+                        v-for="notification in notifications"
+                        :key="notification.notificationId"
+                        v-on:click="(ev) => notificationNavigate(ev, notification)"
+                    >
+                        {{ notificationDisplay(notification) }}
+                    </a>
+                    <a class="mark-all-as-seen" v-on:click="markAllSeen">
+                        {{ $t("layout.header.markAllSeen") }}
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -53,7 +63,11 @@ export default Vue.extend({
         };
     },
     computed: {
-        ...mapGetters({ isAuthenticated: "isAuthenticated", numberOfUnseenNotifications: "numberOfUnseenNotifications" }),
+        ...mapGetters({
+            isAuthenticated: "isAuthenticated",
+            notifications: "notifications",
+            numberOfUnseenNotifications: "numberOfUnseenNotifications",
+        }),
         ...mapState({ user: (s: GlobalState) => s.user.user }),
         firstName(): string {
             if (!this.user) {
@@ -88,6 +102,13 @@ export default Vue.extend({
         async markAllSeen(): Promise<void> {
             this.hiding = true;
             await this.$store.dispatch(new MarkNotificationsSeen([]));
+        },
+        notificationNavigate(ev: Event, notification: Notification): Promise<void> {
+            console.log("notification", notification);
+            return Promise.resolve();
+        },
+        notificationDisplay(notification: Notification): string {
+            return "Notification";
         },
     },
 });
@@ -175,13 +196,12 @@ export default Vue.extend({
 
         &-menu {
             overflow: hidden;
-            padding: 8px;
             background: #fff;
             transition: opacity 0.25s, max-height 0.33s;
             opacity: 0;
             visibility: hidden;
             text-align: left;
-            min-width: 143px;
+            min-width: 183px;
             box-sizing: border-box;
             box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
             z-index: -1;
@@ -198,11 +218,18 @@ export default Vue.extend({
                 z-index: initial;
             }
 
-            a {
+            a,
+            .menu-item {
                 padding: 8px 17px;
                 font-size: 14px;
                 display: block;
                 user-select: none;
+                padding: 12px;
+            }
+
+            .menu-heading {
+                font-weight: bold;
+                background-color: #efefef;
             }
         }
     }
@@ -239,5 +266,23 @@ export default Vue.extend({
     @include bp-up($md) {
         display: none;
     }
+}
+
+.badge-secondary {
+    color: #fff;
+    background-color: #dc3545;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.5em 0.5em 0.5em 0.5em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 </style>

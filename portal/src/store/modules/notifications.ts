@@ -24,6 +24,9 @@ export class NotificationsState {
 type ActionParameters = ActionContext<NotificationsState, never>;
 
 const getters = {
+    notifications(state: NotificationsState): Notification[] {
+        return state.notifications;
+    },
     numberOfUnseenNotifications(state: NotificationsState): number {
         return state.notifications.length;
     },
