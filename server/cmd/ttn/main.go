@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"flag"
 
 	_ "github.com/lib/pq"
@@ -29,20 +28,11 @@ func process(ctx context.Context, options *Options) error {
 		return err
 	}
 
-	repository := ttn.NewThingsNetworkRepository(db)
+	ingestion := ttn.NewThingsNetworkIngestion(db)
 
-	batch := &ttn.MessageBatch{}
+	if err := ingestion.ProcessAll(ctx); err != nil {
+		return err
 
-	for {
-		err := repository.QueryBatchForProcessing(ctx, batch)
-		if err != nil {
-			if err == sql.ErrNoRows {
-				return nil
-			}
-			return err
-		}
-
-		log.Infow("batch")
 	}
 
 	return nil
