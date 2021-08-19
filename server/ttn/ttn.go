@@ -1,4 +1,4 @@
-package data
+package ttn
 
 import (
 	"time"

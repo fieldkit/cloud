@@ -221,7 +221,7 @@ func (c *IngestionService) Delete(ctx context.Context, payload *ingestion.Delete
 }
 
 func (s *IngestionService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

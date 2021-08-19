@@ -1,4 +1,4 @@
-package api
+package ttn
 
 import (
 	"bytes"
@@ -9,16 +9,16 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	ttnService "github.com/fieldkit/cloud/server/api/gen/ttn"
+	"github.com/fieldkit/cloud/server/common"
 
-	"github.com/fieldkit/cloud/server/data"
+	ttnService "github.com/fieldkit/cloud/server/api/gen/ttn"
 )
 
 type ThingsNetworkService struct {
-	options *ControllerOptions
+	options *common.ServiceOptions
 }
 
-func NewThingsNetworkService(ctx context.Context, options *ControllerOptions) *ThingsNetworkService {
+func NewThingsNetworkService(ctx context.Context, options *common.ServiceOptions) *ThingsNetworkService {
 	return &ThingsNetworkService{
 		options: options,
 	}
@@ -31,14 +31,14 @@ func (c *ThingsNetworkService) Webhook(ctx context.Context, payload *ttnService.
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(bodyReader)
 
-	message := data.ThingsNetworkMessage{
+	message := ThingsNetworkMessage{
 		CreatedAt: time.Now(),
 		Body:      buf.Bytes(),
 	}
 
 	log.Infow("webhook", "body", string(message.Body))
 
-	if _, err := c.options.Database.NamedExecContext(ctx, `
+	if _, err := c.options.DB.NamedExecContext(ctx, `
 		INSERT INTO fieldkit.ttn_messages (created_at, headers, body) VALUES (:created_at, :headers, :body)
 		`, message); err != nil {
 		return err
@@ -48,7 +48,7 @@ func (c *ThingsNetworkService) Webhook(ctx context.Context, payload *ttnService.
 }
 
 func (s *ThingsNetworkService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return s.options.Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

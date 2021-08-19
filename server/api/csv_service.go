@@ -9,6 +9,8 @@ import (
 	"goa.design/goa/v3/security"
 
 	csvService "github.com/fieldkit/cloud/server/api/gen/csv"
+
+	"github.com/fieldkit/cloud/server/common"
 )
 
 type CsvService struct {
@@ -28,7 +30,7 @@ func (s *CsvService) Noop(ctx context.Context) error {
 }
 
 func (s *CsvService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

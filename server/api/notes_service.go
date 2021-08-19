@@ -14,6 +14,7 @@ import (
 	notes "github.com/fieldkit/cloud/server/api/gen/notes"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -290,7 +291,7 @@ func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMed
 }
 
 func (s *NotesService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

@@ -18,6 +18,7 @@ import (
 	userService "github.com/fieldkit/cloud/server/api/gen/user"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -167,7 +168,7 @@ func (s *DiscourseService) validate(ctx context.Context, payload *discourse.Auth
 		RequiredScopes: []string{"api:admin"},
 	}
 
-	claims, userID, err := VerifyToken(ctx, AuthAttempt{
+	claims, userID, err := VerifyToken(ctx, common.AuthAttempt{
 		Token:        *payload.Token,
 		Scheme:       &scheme,
 		Key:          s.options.JWTHMACKey,
