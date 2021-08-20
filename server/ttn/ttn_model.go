@@ -15,9 +15,10 @@ import (
 const (
 	ThingsNetworkDefaultModelID = 2
 	// TODO This should start as map in the database from "application id" to the owner.
-	ThingsNetworkDefaultUserID = 2
-	ThingsNetworkSourceID      = int32(0)
-	ThingsNetworkSensorPrefix  = "ttn.floodnet"
+	ThingsNetworkDefaultUserID     = 2
+	ThingsNetworkSourceID          = int32(0)
+	ThingsNetworkSensorPrefix      = "ttn.floodnet"
+	ThingsNetworkDefaultModuleName = "ttn.floodnet"
 )
 
 type ThingsNetworkModel struct {
@@ -96,7 +97,7 @@ func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*Thin
 		Index:           0,
 		Position:        0,
 		Flags:           0,
-		Name:            pm.deviceName,
+		Name:            ThingsNetworkDefaultModuleName,
 		Manufacturer:    0,
 		Kind:            0,
 		Version:         0,
