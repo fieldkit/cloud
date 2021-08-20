@@ -81,6 +81,12 @@ function loadLocaleMessages(): LocaleMessages {
                                 .replace("2M", "2m")
                         )
                         .join(".");
+
+                        if (moduleKey.indexOf("ttn.") == 0) {
+                            const fullKey = [moduleKey, normalizedKey].join(".");
+                            return [fullKey, sensorName];
+                        }
+
                     const fullKey = ["fk", moduleKey, normalizedKey].join(".");
                     return [fullKey, sensorName];
                 })

@@ -818,6 +818,59 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				},
 			},
 		},
+		&ModuleMeta{
+			Key: "ttn.floodnet",
+			Header: ModuleHeader{
+				Manufacturer: 0,
+				Kind:         0,
+				AllKinds:     []uint32{},
+				Version:      0,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "humidity",
+					FirmwareKey:   "humidity",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "pressure",
+					FirmwareKey:   "pressure",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "altitude",
+					FirmwareKey:   "altitude",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "battery",
+					FirmwareKey:   "battery",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "distance",
+					FirmwareKey:   "distance",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "temperature",
+					FirmwareKey:   "temperature",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+				&SensorMeta{
+					Key:           "sdError",
+					FirmwareKey:   "sdError",
+					UnitOfMeasure: "",
+					Ranges:        []SensorRanges{},
+				},
+			},
+		},
 	}
 
 	for _, m := range mm {
