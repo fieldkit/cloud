@@ -11,12 +11,12 @@ const (
 	BatchSize = 100
 )
 
-type ThingsNetworkRepository struct {
+type ThingsNetworkMessagesRepository struct {
 	db *sqlxcache.DB
 }
 
-func NewThingsNetworkRepository(db *sqlxcache.DB) (rr *ThingsNetworkRepository) {
-	return &ThingsNetworkRepository{db: db}
+func NewThingsNetworkMessagesRepository(db *sqlxcache.DB) (rr *ThingsNetworkMessagesRepository) {
+	return &ThingsNetworkMessagesRepository{db: db}
 }
 
 type MessageBatch struct {
@@ -24,7 +24,7 @@ type MessageBatch struct {
 	page     int32
 }
 
-func (rr *ThingsNetworkRepository) QueryBatchForProcessing(ctx context.Context, batch *MessageBatch) (err error) {
+func (rr *ThingsNetworkMessagesRepository) QueryBatchForProcessing(ctx context.Context, batch *MessageBatch) (err error) {
 	batch.Messages = nil
 
 	rows := []*ThingsNetworkMessage{}

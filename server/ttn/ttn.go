@@ -2,7 +2,9 @@ package ttn
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -13,11 +15,12 @@ type ThingsNetworkMessage struct {
 	Body      []byte    `db:"body"`
 }
 
-type parsedMessage struct {
+type ParsedMessage struct {
 	original   *ThingsNetworkMessage
-	deviceID   string
+	deviceID   []byte
 	deviceName string
 	data       map[string]interface{}
+	receivedAt time.Time
 }
 
 type LatestThingsNetworkApplicationIDs struct {
@@ -44,7 +47,7 @@ type LatestThingsNetwork struct {
 	UplinkMessage LatestThingsNetworkUplinkMessage `json:"uplink_message"`
 }
 
-func (m *ThingsNetworkMessage) Parse(ctx context.Context) (p *parsedMessage, err error) {
+func (m *ThingsNetworkMessage) Parse(ctx context.Context) (p *ParsedMessage, err error) {
 	// My plan here is to grow the number of structs that we're attempting to
 	// parse against as a means for versioning these. So, eventually there may
 	// be a loop here or a series of Unmarshal attempts.
@@ -53,10 +56,26 @@ func (m *ThingsNetworkMessage) Parse(ctx context.Context) (p *parsedMessage, err
 		return nil, err
 	}
 
-	return &parsedMessage{
+	deviceID, err := hex.DecodeString(raw.EndDeviceIDs.DeviceEUI)
+	if err != nil {
+		return nil, fmt.Errorf("malformed device eui: %s", raw.EndDeviceIDs.DeviceEUI)
+	}
+
+	if raw.EndDeviceIDs.DeviceID == "" {
+		return nil, fmt.Errorf("empty device id (station name)")
+	}
+
+	// "received_at": "2021-08-18T22:17:18.803716242Z",
+	receivedAt, err := time.Parse("2006-01-02T15:04:05.999999999Z", raw.UplinkMessage.ReceivedAt)
+	if err != nil {
+		return nil, fmt.Errorf("malformed received at (%s)", raw.UplinkMessage.ReceivedAt)
+	}
+
+	return &ParsedMessage{
 		original:   m,
-		deviceID:   raw.EndDeviceIDs.DeviceEUI,
+		deviceID:   deviceID,
 		deviceName: raw.EndDeviceIDs.DeviceID,
 		data:       raw.UplinkMessage.DecodedPayload,
+		receivedAt: receivedAt,
 	}, nil
 }

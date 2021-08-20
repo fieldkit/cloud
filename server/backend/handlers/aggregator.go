@@ -345,7 +345,7 @@ func (v *Aggregator) AddSample(ctx context.Context, sampled time.Time, location 
 	return nil
 }
 
-func (v *Aggregator) AddMap(ctx context.Context, sampled time.Time, location []float64, data map[AggregateSensorKey]float64) error {
+func (v *Aggregator) addMap(ctx context.Context, sampled time.Time, location []float64, data map[AggregateSensorKey]float64) error {
 	for _, child := range v.aggregations {
 		time := child.getTime(sampled)
 
