@@ -71,6 +71,11 @@ func EncodeWebhookRequest(encoder func(*http.Request) goahttp.Encoder) func(*htt
 				req.Header.Set("Authorization", head)
 			}
 		}
+		values := req.URL.Query()
+		if p.Token != nil {
+			values.Add("token", *p.Token)
+		}
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }
