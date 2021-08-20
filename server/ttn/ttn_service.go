@@ -36,10 +36,25 @@ func (c *ThingsNetworkService) Webhook(ctx context.Context, payload *ttnService.
 		Body:      buf.Bytes(),
 	}
 
-	log.Infow("webhook", "body", string(message.Body))
+	if payload.Token != nil {
+		schemas := []*ThingsNetworkSchema{}
+		if err := c.options.DB.SelectContext(ctx, &schemas, `SELECT * FROM fieldkit.ttn_schema WHERE token = $1`, payload.Token); err != nil {
+			return err
+		}
+
+		if len(schemas) == 1 {
+			message.SchemaID = &schemas[0].ID
+		}
+	}
+
+	if message.SchemaID == nil {
+		log.Warnw("webhook", "body", string(message.Body), "schema_missing", true)
+	} else {
+		log.Infow("webhook", "body", string(message.Body), "schema_id", message.SchemaID)
+	}
 
 	if _, err := c.options.DB.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.ttn_messages (created_at, headers, body) VALUES (:created_at, :headers, :body)
+		INSERT INTO fieldkit.ttn_messages (created_at, headers, body, schema_id) VALUES (:created_at, :headers, :body, :schema_id)
 		`, message); err != nil {
 		return err
 	}

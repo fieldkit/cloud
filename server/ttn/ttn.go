@@ -8,9 +8,18 @@ import (
 	"time"
 )
 
+type ThingsNetworkSchema struct {
+	ID      int32  `db:"id"`
+	OwnerID int32  `db:"owner_id"`
+	Name    string `db:"name"`
+	Token   []byte `db:"token"`
+	Body    []byte `db:"body"`
+}
+
 type ThingsNetworkMessage struct {
 	ID        int32     `db:"id"`
 	CreatedAt time.Time `db:"created_at"`
+	SchemaID  *int32    `db:"schema_id"`
 	Headers   *string   `db:"headers"`
 	Body      []byte    `db:"body"`
 }
