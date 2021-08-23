@@ -235,7 +235,7 @@ func (d *MetaRecord) Unmarshal(r *pb.DataRecord) error {
 }
 
 func DecodeBinaryString(s string) ([]byte, error) {
-	if s[8] == '-' {
+	if len(s) > 8 && s[8] == '-' {
 		uid, err := uuid.Parse(s)
 		if err == nil {
 			return uid[:], nil

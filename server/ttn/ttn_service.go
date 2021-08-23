@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"time"
 
 	"goa.design/goa/v3/security"
 
 	"github.com/fieldkit/cloud/server/common"
+	"github.com/fieldkit/cloud/server/data"
 
 	ttnService "github.com/fieldkit/cloud/server/api/gen/ttn"
 )
@@ -37,14 +39,21 @@ func (c *ThingsNetworkService) Webhook(ctx context.Context, payload *ttnService.
 	}
 
 	if payload.Token != nil {
-		schemas := []*ThingsNetworkSchemaRegistration{}
-		if err := c.options.DB.SelectContext(ctx, &schemas, `SELECT * FROM fieldkit.ttn_schema WHERE token = $1`, payload.Token); err != nil {
-			return err
+		token, err := data.DecodeBinaryString(*payload.Token)
+		if err != nil {
+			return ttnService.MakeBadRequest(err)
 		}
 
-		if len(schemas) == 1 {
-			message.SchemaID = &schemas[0].ID
+		schemas := []*ThingsNetworkSchemaRegistration{}
+		if err := c.options.DB.SelectContext(ctx, &schemas, `SELECT * FROM fieldkit.ttn_schema WHERE token = $1`, token); err != nil {
+			return ttnService.MakeBadRequest(err)
 		}
+
+		if len(schemas) != 1 {
+			return ttnService.MakeBadRequest(fmt.Errorf("invalid schema token"))
+		}
+
+		message.SchemaID = &schemas[0].ID
 	}
 
 	if message.SchemaID == nil {

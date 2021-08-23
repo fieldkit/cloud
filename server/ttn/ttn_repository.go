@@ -26,18 +26,13 @@ type MessageBatch struct {
 	page     int32
 }
 
-func (rr *ThingsNetworkMessagesRepository) QueryBatchForProcessing(ctx context.Context, batch *MessageBatch) (err error) {
+func (rr *ThingsNetworkMessagesRepository) processQuery(ctx context.Context, batch *MessageBatch, messages []*ThingsNetworkMessage) error {
 	log := Logger(ctx).Named("ttn").Sugar()
 
 	batch.Messages = nil
 
 	if batch.Schemas == nil {
 		batch.Schemas = make(map[int32]*ThingsNetworkSchemaRegistration)
-	}
-
-	messages := []*ThingsNetworkMessage{}
-	if err := rr.db.SelectContext(ctx, &messages, `SELECT * FROM fieldkit.ttn_messages WHERE schema_id IS NOT NULL ORDER BY id LIMIT $1 OFFSET $2`, BatchSize, batch.page*BatchSize); err != nil {
-		return err
 	}
 
 	if len(messages) == 0 {
@@ -66,4 +61,20 @@ func (rr *ThingsNetworkMessagesRepository) QueryBatchForProcessing(ctx context.C
 	batch.page += 1
 
 	return nil
+}
+
+func (rr *ThingsNetworkMessagesRepository) QueryBatchForProcessing(ctx context.Context, batch *MessageBatch) error {
+	messages := []*ThingsNetworkMessage{}
+	if err := rr.db.SelectContext(ctx, &messages, `SELECT * FROM fieldkit.ttn_messages WHERE schema_id IS NOT NULL ORDER BY created_at LIMIT $1 OFFSET $2`, BatchSize, batch.page*BatchSize); err != nil {
+		return err
+	}
+	return rr.processQuery(ctx, batch, messages)
+}
+
+func (rr *ThingsNetworkMessagesRepository) QueryBatchBySchemaIDForProcessing(ctx context.Context, batch *MessageBatch, schemaID int32) error {
+	messages := []*ThingsNetworkMessage{}
+	if err := rr.db.SelectContext(ctx, &messages, `SELECT * FROM fieldkit.ttn_messages WHERE schema_id = $1 ORDER BY created_at LIMIT $2 OFFSET $3`, schemaID, BatchSize, batch.page*BatchSize); err != nil {
+		return err
+	}
+	return rr.processQuery(ctx, batch, messages)
 }
