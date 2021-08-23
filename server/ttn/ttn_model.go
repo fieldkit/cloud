@@ -13,12 +13,8 @@ import (
 )
 
 const (
-	ThingsNetworkDefaultModelID = 2
-	// TODO This should start as map in the database from "application id" to the owner.
-	ThingsNetworkDefaultUserID     = 2
-	ThingsNetworkSourceID          = int32(0)
-	ThingsNetworkSensorPrefix      = "ttn.floodnet"
-	ThingsNetworkDefaultModuleName = "ttn.floodnet"
+	ThingsNetworkSourceID     = int32(0)
+	ThingsNetworkSensorPrefix = "ttn"
 )
 
 type ThingsNetworkModel struct {
@@ -36,6 +32,7 @@ type ThingsNetworkStation struct {
 	Configuration *data.StationConfiguration
 	Station       *data.Station
 	Module        *data.StationModule
+	SensorPrefix  string
 }
 
 func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*ThingsNetworkStation, error) {
@@ -49,14 +46,19 @@ func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*Thin
 		}
 	}
 
-	// Add or create the station.
+	// Add or create the station, this may also mean creating the station model for this schema.
 	station := updating
 	if updating == nil {
+		model, err := sr.FindOrCreateStationModel(ctx, pm.schemaID, pm.schema.Station.Model)
+		if err != nil {
+			return nil, err
+		}
+
 		updating = &data.Station{
 			DeviceID:  pm.deviceID,
 			Name:      pm.deviceName,
-			OwnerID:   ThingsNetworkDefaultUserID,
-			ModelID:   ThingsNetworkDefaultModelID,
+			OwnerID:   pm.ownerID,
+			ModelID:   model.ID,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		}
@@ -90,26 +92,38 @@ func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*Thin
 		return nil, err
 	}
 
-	// Add or create the station module..
-	module := &data.StationModule{
-		ConfigurationID: configuration.ID,
-		HardwareID:      pm.deviceID,
-		Index:           0,
-		Position:        0,
-		Flags:           0,
-		Name:            ThingsNetworkDefaultModuleName,
-		Manufacturer:    0,
-		Kind:            0,
-		Version:         0,
-	}
-	if _, err := sr.UpsertStationModule(ctx, module); err != nil {
-		return nil, err
+	if len(pm.schema.Station.Modules) != 1 {
+		return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
 	}
 
-	return &ThingsNetworkStation{
-		Provision:     provision,
-		Configuration: configuration,
-		Station:       station,
-		Module:        module,
-	}, nil
+	for _, moduleSchema := range pm.schema.Station.Modules {
+		sensorPrefix := fmt.Sprintf("%s.%s", ThingsNetworkSensorPrefix, moduleSchema.Key)
+
+		// Add or create the station module..
+		module := &data.StationModule{
+			ConfigurationID: configuration.ID,
+			HardwareID:      pm.deviceID,
+			Index:           0,
+			Position:        0,
+			Flags:           0,
+			Name:            sensorPrefix,
+			Manufacturer:    0,
+			Kind:            0,
+			Version:         0,
+		}
+
+		if _, err := sr.UpsertStationModule(ctx, module); err != nil {
+			return nil, err
+		}
+
+		return &ThingsNetworkStation{
+			SensorPrefix:  sensorPrefix,
+			Provision:     provision,
+			Configuration: configuration,
+			Station:       station,
+			Module:        module,
+		}, nil
+	}
+
+	return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
 }

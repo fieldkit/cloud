@@ -37,7 +37,7 @@ func (c *ThingsNetworkService) Webhook(ctx context.Context, payload *ttnService.
 	}
 
 	if payload.Token != nil {
-		schemas := []*ThingsNetworkSchema{}
+		schemas := []*ThingsNetworkSchemaRegistration{}
 		if err := c.options.DB.SelectContext(ctx, &schemas, `SELECT * FROM fieldkit.ttn_schema WHERE token = $1`, payload.Token); err != nil {
 			return err
 		}

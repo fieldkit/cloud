@@ -46,7 +46,7 @@ func (i *ThingsNetworkIngestion) ProcessAll(ctx context.Context) error {
 		log.Infow("batch")
 
 		for _, row := range batch.Messages {
-			parsed, err := row.Parse(ctx)
+			parsed, err := row.Parse(ctx, batch.Schemas)
 			if err != nil {
 				log.Infow("ttn:skipping", "reason", err)
 			} else {
@@ -69,7 +69,7 @@ func (i *ThingsNetworkIngestion) ProcessAll(ctx context.Context) error {
 					for key, maybeValue := range parsed.data {
 						if value, ok := maybeValue.(float64); ok {
 							ask := handlers.AggregateSensorKey{
-								SensorKey: fmt.Sprintf("%s.%s", ThingsNetworkSensorPrefix, key),
+								SensorKey: fmt.Sprintf("%s.%s", ttns.SensorPrefix, key),
 								ModuleID:  ttns.Module.ID,
 							}
 							if err := aggregator.AddSample(ctx, parsed.receivedAt, nil, ask, value); err != nil {

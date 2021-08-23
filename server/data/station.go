@@ -55,6 +55,12 @@ func (l *MultiPolygon) Scan(data interface{}) error {
 	return nil
 }
 
+type StationModel struct {
+	ID                    int32  `db:"id,omitempty"`
+	Name                  string `db:"name"`
+	ThingsNetworkSchemaID *int32 `db:"ttn_schema_id"`
+}
+
 type Station struct {
 	ID                 int32      `db:"id,omitempty"`
 	Name               string     `db:"name"`

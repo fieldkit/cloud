@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"database/sql"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -30,6 +31,23 @@ type StationRepository struct {
 
 func NewStationRepository(db *sqlxcache.DB) (rr *StationRepository) {
 	return &StationRepository{db: db}
+}
+
+func (r *StationRepository) FindOrCreateStationModel(ctx context.Context, ttnSchemaID int32, name string) (model *data.StationModel, err error) {
+	model = &data.StationModel{}
+	if err := r.db.GetContext(ctx, model, `SELECT id, name FROM fieldkit.station_model WHERE ttn_schema_id = $1`, ttnSchemaID); err != nil {
+		if err == sql.ErrNoRows {
+			model = &data.StationModel{}
+			model.Name = name
+			model.ThingsNetworkSchemaID = &ttnSchemaID
+			if err := r.db.NamedGetContext(ctx, model, `INSERT INTO fieldkit.station_model (ttn_schema_id, name) VALUES (:ttn_schema_id, :name) RETURNING id`, model); err != nil {
+				return nil, err
+			}
+			return model, nil
+		}
+		return nil, err
+	}
+	return model, nil
 }
 
 func (r *StationRepository) AddStation(ctx context.Context, adding *data.Station) (station *data.Station, err error) {
