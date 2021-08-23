@@ -9,7 +9,7 @@ import (
 )
 
 type ThingsNetworkMessage struct {
-	ID        int32     `db:"id"`
+	ID        int64     `db:"id"`
 	CreatedAt time.Time `db:"created_at"`
 	SchemaID  *int32    `db:"schema_id"`
 	Headers   *string   `db:"headers"`
@@ -131,4 +131,9 @@ func (r *ThingsNetworkSchemaRegistration) Parse() (*ThingsNetworkSchema, error) 
 		return nil, err
 	}
 	return s, nil
+}
+
+type ThingsNetworkMessageReceived struct {
+	SchemaID  int32 `json:"ttn_schema_id"`
+	MessageID int64 `json:"ttn_message_id"`
 }

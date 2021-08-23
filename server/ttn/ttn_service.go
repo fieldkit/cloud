@@ -53,10 +53,19 @@ func (c *ThingsNetworkService) Webhook(ctx context.Context, payload *ttnService.
 		log.Infow("webhook", "body", string(message.Body), "schema_id", message.SchemaID)
 	}
 
-	if _, err := c.options.DB.NamedExecContext(ctx, `
-		INSERT INTO fieldkit.ttn_messages (created_at, headers, body, schema_id) VALUES (:created_at, :headers, :body, :schema_id)
-		`, message); err != nil {
+	if err := c.options.DB.NamedGetContext(ctx, &message, `
+		INSERT INTO fieldkit.ttn_messages (created_at, headers, body, schema_id) VALUES (:created_at, :headers, :body, :schema_id) RETURNING id
+		`, &message); err != nil {
 		return err
+	}
+
+	if message.SchemaID != nil {
+		if err := c.options.Publisher.Publish(ctx, &ThingsNetworkMessageReceived{
+			MessageID: message.ID,
+			SchemaID:  *message.SchemaID,
+		}); err != nil {
+			return err
+		}
 	}
 
 	return nil

@@ -150,6 +150,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	commonOptions := &common.ServiceOptions{
 		DB:           options.Database,
 		JWTHMACKey:   options.JWTHMACKey,
+		Publisher:    options.Publisher,
 		Authenticate: Authenticate,
 	}
 

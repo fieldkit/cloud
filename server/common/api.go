@@ -11,7 +11,7 @@ import (
 
 	_ "github.com/govau/que-go"
 
-	_ "github.com/fieldkit/cloud/server/common/jobs"
+	"github.com/fieldkit/cloud/server/common/jobs"
 	_ "github.com/fieldkit/cloud/server/common/logging"
 )
 
@@ -32,4 +32,5 @@ type ServiceOptions struct {
 	DB           *sqlxcache.DB
 	JWTHMACKey   []byte
 	Authenticate Authenticator
+	Publisher    jobs.MessagePublisher
 }
