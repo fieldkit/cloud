@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	BatchSize = 100
+	BatchSize = 1000
 )
 
 type ThingsNetworkMessagesRepository struct {

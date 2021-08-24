@@ -10,6 +10,10 @@ import (
 	"github.com/fieldkit/cloud/server/backend/handlers"
 )
 
+const (
+	AggregatingBatchSize = 100
+)
+
 type ThingsNetworkIngestion struct {
 	db *sqlxcache.DB
 }
@@ -20,10 +24,23 @@ func NewThingsNetworkIngestion(db *sqlxcache.DB) *ThingsNetworkIngestion {
 	}
 }
 
+func (i *ThingsNetworkIngestion) ProcessSchema(ctx context.Context, schemaID int32) error {
+	repository := NewThingsNetworkMessagesRepository(i.db)
+	return i.processBatches(ctx, func(ctx context.Context, batch *MessageBatch) error {
+		return repository.QueryBatchBySchemaIDForProcessing(ctx, batch, schemaID)
+	})
+}
+
 func (i *ThingsNetworkIngestion) ProcessAll(ctx context.Context) error {
+	repository := NewThingsNetworkMessagesRepository(i.db)
+	return i.processBatches(ctx, func(ctx context.Context, batch *MessageBatch) error {
+		return repository.QueryBatchForProcessing(ctx, batch)
+	})
+}
+
+func (i *ThingsNetworkIngestion) processBatches(ctx context.Context, query func(ctx context.Context, batch *MessageBatch) error) error {
 	log := Logger(ctx).Sugar()
 
-	repository := NewThingsNetworkMessagesRepository(i.db)
 	model := NewThingsNetworkModel(i.db)
 
 	batch := &MessageBatch{}
@@ -31,8 +48,7 @@ func (i *ThingsNetworkIngestion) ProcessAll(ctx context.Context) error {
 	aggregators := make(map[int32]*handlers.Aggregator)
 
 	for {
-		err := repository.QueryBatchForProcessing(ctx, batch)
-		if err != nil {
+		if err := query(ctx, batch); err != nil {
 			if err == sql.ErrNoRows {
 				return nil
 			}
@@ -58,7 +74,7 @@ func (i *ThingsNetworkIngestion) ProcessAll(ctx context.Context) error {
 					return err
 				} else {
 					if aggregators[ttns.Station.ID] == nil {
-						aggregators[ttns.Station.ID] = handlers.NewAggregator(i.db, "", ttns.Station.ID, 100)
+						aggregators[ttns.Station.ID] = handlers.NewAggregator(i.db, "", ttns.Station.ID, AggregatingBatchSize)
 					}
 					aggregator := aggregators[ttns.Station.ID]
 

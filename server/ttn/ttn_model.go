@@ -19,11 +19,15 @@ const (
 
 type ThingsNetworkModel struct {
 	db *sqlxcache.DB
+	pr *repositories.ProvisionRepository
+	sr *repositories.StationRepository
 }
 
 func NewThingsNetworkModel(db *sqlxcache.DB) (m *ThingsNetworkModel) {
 	return &ThingsNetworkModel{
 		db: db,
+		pr: repositories.NewProvisionRepository(db),
+		sr: repositories.NewStationRepository(db),
 	}
 }
 
@@ -36,10 +40,7 @@ type ThingsNetworkStation struct {
 }
 
 func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*ThingsNetworkStation, error) {
-	pr := repositories.NewProvisionRepository(m.db)
-	sr := repositories.NewStationRepository(m.db)
-
-	updating, err := sr.QueryStationByDeviceID(ctx, pm.deviceID)
+	updating, err := m.sr.QueryStationByDeviceID(ctx, pm.deviceID)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			return nil, fmt.Errorf("querying station: %v", err)
@@ -49,7 +50,7 @@ func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*Thin
 	// Add or create the station, this may also mean creating the station model for this schema.
 	station := updating
 	if updating == nil {
-		model, err := sr.FindOrCreateStationModel(ctx, pm.schemaID, pm.schema.Station.Model)
+		model, err := m.sr.FindOrCreateStationModel(ctx, pm.schemaID, pm.schema.Station.Model)
 		if err != nil {
 			return nil, err
 		}
@@ -63,7 +64,7 @@ func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*Thin
 			UpdatedAt: time.Now(),
 		}
 
-		added, err := sr.AddStation(ctx, updating)
+		added, err := m.sr.AddStation(ctx, updating)
 		if err != nil {
 			return nil, err
 		}
@@ -75,14 +76,14 @@ func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*Thin
 
 	// Add or create the provision.
 	defaultGenerationID := pm.deviceID // TODO
-	provision, err := pr.QueryOrCreateProvision(ctx, pm.deviceID, defaultGenerationID)
+	provision, err := m.pr.QueryOrCreateProvision(ctx, pm.deviceID, defaultGenerationID)
 	if err != nil {
 		return nil, err
 	}
 
 	// Add or create the station configuration..
 	sourceID := ThingsNetworkSourceID
-	configuration, err := sr.UpsertConfiguration(ctx,
+	configuration, err := m.sr.UpsertConfiguration(ctx,
 		&data.StationConfiguration{
 			ProvisionID: provision.ID,
 			SourceID:    &sourceID,
@@ -112,7 +113,7 @@ func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*Thin
 			Version:         0,
 		}
 
-		if _, err := sr.UpsertStationModule(ctx, module); err != nil {
+		if _, err := m.sr.UpsertStationModule(ctx, module); err != nil {
 			return nil, err
 		}
 
