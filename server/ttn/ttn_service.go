@@ -57,9 +57,9 @@ func (c *ThingsNetworkService) Webhook(ctx context.Context, payload *ttnService.
 	}
 
 	if message.SchemaID == nil {
-		log.Warnw("webhook", "body", string(message.Body), "schema_missing", true)
+		log.Warnw("webhook", "schema_missing", true)
 	} else {
-		log.Infow("webhook", "body", string(message.Body), "schema_id", message.SchemaID)
+		log.Infow("webhook", "schema_id", message.SchemaID)
 	}
 
 	if err := c.options.DB.NamedGetContext(ctx, &message, `
