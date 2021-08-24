@@ -3,6 +3,7 @@ package ttn
 import (
 	"context"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -17,17 +18,23 @@ const (
 	ThingsNetworkSensorPrefix = "ttn"
 )
 
+type cacheEntry struct {
+	station *ThingsNetworkStation
+}
+
 type ThingsNetworkModel struct {
-	db *sqlxcache.DB
-	pr *repositories.ProvisionRepository
-	sr *repositories.StationRepository
+	db    *sqlxcache.DB
+	pr    *repositories.ProvisionRepository
+	sr    *repositories.StationRepository
+	cache map[string]*cacheEntry
 }
 
 func NewThingsNetworkModel(db *sqlxcache.DB) (m *ThingsNetworkModel) {
 	return &ThingsNetworkModel{
-		db: db,
-		pr: repositories.NewProvisionRepository(db),
-		sr: repositories.NewStationRepository(db),
+		db:    db,
+		pr:    repositories.NewProvisionRepository(db),
+		sr:    repositories.NewStationRepository(db),
+		cache: make(map[string]*cacheEntry),
 	}
 }
 
@@ -40,6 +47,13 @@ type ThingsNetworkStation struct {
 }
 
 func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*ThingsNetworkStation, error) {
+	deviceKey := hex.EncodeToString(pm.deviceID)
+
+	cached, ok := m.cache[deviceKey]
+	if ok {
+		return cached.station, nil
+	}
+
 	updating, err := m.sr.QueryStationByDeviceID(ctx, pm.deviceID)
 	if err != nil {
 		if err != sql.ErrNoRows {
@@ -117,13 +131,19 @@ func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*Thin
 			return nil, err
 		}
 
-		return &ThingsNetworkStation{
+		ttnStation := &ThingsNetworkStation{
 			SensorPrefix:  sensorPrefix,
 			Provision:     provision,
 			Configuration: configuration,
 			Station:       station,
 			Module:        module,
-		}, nil
+		}
+
+		m.cache[deviceKey] = &cacheEntry{
+			station: ttnStation,
+		}
+
+		return ttnStation, nil
 	}
 
 	return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
