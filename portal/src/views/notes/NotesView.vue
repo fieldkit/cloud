@@ -1,7 +1,14 @@
 <template>
     <StandardLayout>
         <div class="container-wrap notes-view">
-            <DoubleHeader :title="project.name" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="project" />
+            <DoubleHeader
+                :title="project.name"
+                subtitle="Field Notes"
+                backTitle="Back to Project Dashboard"
+                backRoute="viewProject"
+                :backRouteParams="{ id: projectId }"
+                v-if="project"
+            />
             <DoubleHeader title="My Stations" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="!project" />
 
             <div class="lower">

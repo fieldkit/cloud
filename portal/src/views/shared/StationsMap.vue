@@ -111,13 +111,15 @@ export default Vue.extend({
                 });
             }
 
-            map.resize();
+            setTimeout(() => {
+                map.resize();
 
-            this.ready = true;
-            this.updateMap();
+                this.ready = true;
+                this.updateMap();
 
-            // Force model to update.
-            this.newBounds();
+                // Force model to update.
+                this.newBounds();
+            }, 100);
         },
         newBounds() {
             const map = this.protectedData.map;

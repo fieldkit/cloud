@@ -111,6 +111,18 @@
                 "sin": "Sin(x)",
                 "saw.weekly": "Saw(x)"
             }
+        },
+        "ttn.floodnet": {
+            "name": "FloodNet",
+            "sensors": {
+                "altitude": "Altitude",
+                "temperature": "Temperature",
+                "pressure": "Pressure",
+                "battery": "Battery",
+                "sdError": "SD Error",
+                "humidity": "Humidity",
+                "distance": "Distance"
+            }
         }
     }
 }

@@ -1,0 +1,32 @@
+{
+    "station": {
+        "model": "FloodNet v1",
+        "modules": [
+            {
+                "key": "floodnet",
+                "sensors": {
+                    "distance": {
+                        "decoded_key": "distance",
+                        "ranges": []
+                    },
+                    "battery": {
+                        "decoded_key": "battery",
+                        "ranges": []
+                    },
+                    "temperature": {
+                        "decoded_key": "temperature",
+                        "ranges": []
+                    },
+                    "altitude": {
+                        "decoded_key": "altitude",
+                        "ranges": []
+                    },
+                    "humidity": {
+                        "decoded_key": "humidity",
+                        "ranges": []
+                    }
+                }
+            }
+        ]
+    }
+}

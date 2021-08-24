@@ -20,6 +20,7 @@ import (
 	user "github.com/fieldkit/cloud/server/api/gen/user"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -267,7 +268,6 @@ func (s *UserService) ChangePassword(ctx context.Context, payload *user.ChangePa
 
 	return UserType(s.options.signer, updating)
 }
-
 
 func (s *UserService) AcceptTnc(ctx context.Context, payload *user.AcceptTncPayload) (*user.User, error) {
 	p, err := NewPermissions(ctx, s.options).Unwrap()
@@ -878,7 +878,7 @@ func (c *UserService) Mentionables(ctx context.Context, payload *user.Mentionabl
 }
 
 func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

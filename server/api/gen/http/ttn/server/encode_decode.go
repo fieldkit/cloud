@@ -32,11 +32,16 @@ func EncodeWebhookResponse(encoder func(context.Context, http.ResponseWriter) go
 func DecodeWebhookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
+			token         *string
 			contentType   string
 			contentLength int64
 			auth          *string
 			err           error
 		)
+		tokenRaw := r.URL.Query().Get("token")
+		if tokenRaw != "" {
+			token = &tokenRaw
+		}
 		contentType = r.Header.Get("Content-Type")
 		if contentType == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Content-Type", "header"))
@@ -59,7 +64,7 @@ func DecodeWebhookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 		if err != nil {
 			return nil, err
 		}
-		payload := NewWebhookPayload(contentType, contentLength, auth)
+		payload := NewWebhookPayload(token, contentType, contentLength, auth)
 		if payload.Auth != nil {
 			if strings.Contains(*payload.Auth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")

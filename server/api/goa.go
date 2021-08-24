@@ -13,7 +13,6 @@ import (
 	goa "goa.design/goa/v3/pkg"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"goa.design/goa/v3/security"
 
 	"github.com/spf13/viper"
 
@@ -22,7 +21,9 @@ import (
 	"github.com/fieldkit/cloud/server/api/design"
 	"goa.design/plugins/v3/cors"
 
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/common/logging"
+	"github.com/fieldkit/cloud/server/ttn"
 
 	testSvr "github.com/fieldkit/cloud/server/api/gen/http/test/server"
 	test "github.com/fieldkit/cloud/server/api/gen/test"
@@ -152,7 +153,16 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	oidcSvc := NewOidcService(ctx, options)
 	oidcEndpoints := oidcService.NewEndpoints(oidcSvc)
 
-	ttnSvc := NewThingsNetworkService(ctx, options)
+	// We're moving to this extra-package options struct so we can start to move
+	// away from the functional separation we're using package wise.
+	commonOptions := &common.ServiceOptions{
+		DB:           options.Database,
+		JWTHMACKey:   options.JWTHMACKey,
+		Publisher:    options.Publisher,
+		Authenticate: Authenticate,
+	}
+
+	ttnSvc := ttn.NewThingsNetworkService(ctx, commonOptions)
 	ttnEndpoints := ttnService.NewEndpoints(ttnSvc)
 
 	notificationsSvc := NewNotificationsService(ctx, options)
@@ -410,18 +420,7 @@ func jwtContext() func(goa.Endpoint) goa.Endpoint {
 	}
 }
 
-type GenerateError func(string) error
-
-type AuthAttempt struct {
-	Token        string
-	Scheme       *security.JWTScheme
-	Key          []byte
-	Unauthorized GenerateError
-	Forbidden    GenerateError
-	NotFound     GenerateError
-}
-
-func VerifyToken(ctx context.Context, a AuthAttempt) (jwt.MapClaims, int32, error) {
+func VerifyToken(ctx context.Context, a common.AuthAttempt) (jwt.MapClaims, int32, error) {
 	token := a.Token
 
 	log := Logger(ctx).Sugar()
@@ -476,7 +475,7 @@ func VerifyToken(ctx context.Context, a AuthAttempt) (jwt.MapClaims, int32, erro
 	return claims, userID, nil
 }
 
-func Authenticate(ctx context.Context, a AuthAttempt) (context.Context, error) {
+func Authenticate(ctx context.Context, a common.AuthAttempt) (context.Context, error) {
 	withAttempt := addAuthAttemptToContext(ctx, &a)
 	claims, userID, err := VerifyToken(withAttempt, a)
 	if err != nil {

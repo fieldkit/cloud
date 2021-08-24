@@ -9,6 +9,7 @@ import (
 
 	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
 
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
@@ -88,7 +89,7 @@ func (c *NotificationsService) Seen(ctx context.Context, payload *notifications.
 }
 
 func (s *NotificationsService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

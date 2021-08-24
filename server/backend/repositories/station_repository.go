@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"database/sql"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -32,12 +33,29 @@ func NewStationRepository(db *sqlxcache.DB) (rr *StationRepository) {
 	return &StationRepository{db: db}
 }
 
-func (r *StationRepository) Add(ctx context.Context, adding *data.Station) (station *data.Station, err error) {
+func (r *StationRepository) FindOrCreateStationModel(ctx context.Context, ttnSchemaID int32, name string) (model *data.StationModel, err error) {
+	model = &data.StationModel{}
+	if err := r.db.GetContext(ctx, model, `SELECT id, name FROM fieldkit.station_model WHERE ttn_schema_id = $1`, ttnSchemaID); err != nil {
+		if err == sql.ErrNoRows {
+			model = &data.StationModel{}
+			model.Name = name
+			model.ThingsNetworkSchemaID = &ttnSchemaID
+			if err := r.db.NamedGetContext(ctx, model, `INSERT INTO fieldkit.station_model (ttn_schema_id, name) VALUES (:ttn_schema_id, :name) RETURNING id`, model); err != nil {
+				return nil, err
+			}
+			return model, nil
+		}
+		return nil, err
+	}
+	return model, nil
+}
+
+func (r *StationRepository) AddStation(ctx context.Context, adding *data.Station) (station *data.Station, err error) {
 	if err := r.db.NamedGetContext(ctx, adding, `
 		INSERT INTO fieldkit.station
-		(name, device_id, owner_id, created_at, updated_at, synced_at, ingestion_at, location, location_name, place_other, place_native,
+		(name, device_id, owner_id, model_id, created_at, updated_at, synced_at, ingestion_at, location, location_name, place_other, place_native,
 		 battery, memory_used, memory_available, firmware_number, firmware_time, recording_started_at) VALUES
-		(:name, :device_id, :owner_id, :created_at, :updated_at, :synced_at, :ingestion_at, ST_SetSRID(ST_GeomFromText(:location), 4326), :location_name, :place_other, :place_native,
+		(:name, :device_id, :owner_id, :model_id, :created_at, :updated_at, :synced_at, :ingestion_at, ST_SetSRID(ST_GeomFromText(:location), 4326), :location_name, :place_other, :place_native,
          :battery, :memory_used, :memory_available, :firmware_number, :firmware_time, :recording_started_at)
 		RETURNING id
 		`, adding); err != nil {
@@ -47,7 +65,7 @@ func (r *StationRepository) Add(ctx context.Context, adding *data.Station) (stat
 	return adding, nil
 }
 
-func (r *StationRepository) Update(ctx context.Context, station *data.Station) (err error) {
+func (r *StationRepository) UpdateStation(ctx context.Context, station *data.Station) (err error) {
 	if _, err := r.db.NamedExecContext(ctx, `
 		UPDATE fieldkit.station SET
 			   name = :name,

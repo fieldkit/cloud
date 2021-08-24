@@ -9,6 +9,7 @@ import (
 	records "github.com/fieldkit/cloud/server/api/gen/records"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	serrors "github.com/fieldkit/cloud/server/common/errors"
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -157,7 +158,7 @@ func (c *RecordsService) Resolved(ctx context.Context, payload *records.Resolved
 }
 
 func (s *RecordsService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

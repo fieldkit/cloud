@@ -15,6 +15,7 @@ var _ = Service("ttn", func() {
 			Required("contentLength")
 			Attribute("contentType", String)
 			Required("contentType")
+			Attribute("token", String)
 		})
 
 		HTTP(func() {
@@ -22,6 +23,10 @@ var _ = Service("ttn", func() {
 
 			Header("contentType:Content-Type")
 			Header("contentLength:Content-Length")
+
+			Params(func() {
+				Param("token")
+			})
 
 			SkipRequestBodyEncodeDecode()
 

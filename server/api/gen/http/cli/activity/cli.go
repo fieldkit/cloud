@@ -501,6 +501,7 @@ func ParseEndpoint(
 		ttnFlags = flag.NewFlagSet("ttn", flag.ContinueOnError)
 
 		ttnWebhookFlags             = flag.NewFlagSet("webhook", flag.ExitOnError)
+		ttnWebhookTokenFlag         = ttnWebhookFlags.String("token", "", "")
 		ttnWebhookContentTypeFlag   = ttnWebhookFlags.String("content-type", "REQUIRED", "")
 		ttnWebhookContentLengthFlag = ttnWebhookFlags.String("content-length", "REQUIRED", "")
 		ttnWebhookAuthFlag          = ttnWebhookFlags.String("auth", "", "")
@@ -1574,7 +1575,7 @@ func ParseEndpoint(
 			switch epn {
 			case "webhook":
 				endpoint = c.Webhook()
-				data, err = ttnc.BuildWebhookPayload(*ttnWebhookContentTypeFlag, *ttnWebhookContentLengthFlag, *ttnWebhookAuthFlag)
+				data, err = ttnc.BuildWebhookPayload(*ttnWebhookTokenFlag, *ttnWebhookContentTypeFlag, *ttnWebhookContentLengthFlag, *ttnWebhookAuthFlag)
 				if err == nil {
 					data, err = ttnc.BuildWebhookStreamPayload(data, *ttnWebhookStreamFlag)
 				}
@@ -3169,16 +3170,17 @@ Additional help:
 `, os.Args[0], os.Args[0])
 }
 func ttnWebhookUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] ttn webhook -content-type STRING -content-length INT64 -auth STRING -stream STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] ttn webhook -token STRING -content-type STRING -content-length INT64 -auth STRING -stream STRING
 
 Webhook implements webhook.
+    -token STRING: 
     -content-type STRING: 
     -content-length INT64: 
     -auth STRING: 
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` ttn webhook --content-type "Ipsa atque quaerat est odio ullam." --content-length 5617639514360233890 --auth "Aliquid a enim." --stream "goa.png"
+    `+os.Args[0]+` ttn webhook --token "Ipsa atque quaerat est odio ullam." --content-type "Omnis aliquid a enim deserunt culpa odit." --content-length 923876092495852391 --auth "Autem quibusdam distinctio nisi maiores aspernatur." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -3224,7 +3226,7 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Vel pariatur."
+    `+os.Args[0]+` user roles --auth "Eum illo corrupti ea iusto impedit eum."
 `, os.Args[0])
 }
 
@@ -3236,7 +3238,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user delete --user-id 1334868813 --auth "Culpa id rerum nam libero placeat nostrum."
+    `+os.Args[0]+` user delete --user-id 807250747 --auth "Laborum veniam."
 `, os.Args[0])
 }
 
@@ -3250,7 +3252,7 @@ UploadPhoto implements upload photo.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` user upload- photo --content-type "Quia explicabo et." --content-length 1985841906559356187 --auth "Qui reprehenderit aut." --stream "goa.png"
+    `+os.Args[0]+` user upload- photo --content-type "Voluptatem distinctio omnis quia debitis esse." --content-length 4576500773712406007 --auth "A delectus autem cum sapiente." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -3263,7 +3265,7 @@ DownloadPhoto implements download photo.
     -if-none-match STRING: 
 
 Example:
-    `+os.Args[0]+` user download- photo --user-id 1752662289 --size 128166444 --if-none-match "Ut consequatur voluptatem est."
+    `+os.Args[0]+` user download- photo --user-id 1897789957 --size 1473365169 --if-none-match "Natus expedita qui."
 `, os.Args[0])
 }
 
@@ -3275,8 +3277,8 @@ Login implements login.
 
 Example:
     `+os.Args[0]+` user login --body '{
-      "email": "bt5",
-      "password": "slm"
+      "email": "6nc",
+      "password": "774"
    }'
 `, os.Args[0])
 }
@@ -3289,7 +3291,7 @@ RecoveryLookup implements recovery lookup.
 
 Example:
     `+os.Args[0]+` user recovery- lookup --body '{
-      "email": "Atque illo doloremque autem."
+      "email": "Facere rerum perferendis nostrum alias ad."
    }'
 `, os.Args[0])
 }
@@ -3302,8 +3304,8 @@ Recovery implements recovery.
 
 Example:
     `+os.Args[0]+` user recovery --body '{
-      "password": "iep",
-      "token": "Quibusdam reprehenderit sit."
+      "password": "3sy",
+      "token": "Et aut quibusdam qui et quo."
    }'
 `, os.Args[0])
 }
@@ -3316,7 +3318,7 @@ Resume implements resume.
 
 Example:
     `+os.Args[0]+` user resume --body '{
-      "token": "Ab quam cumque quibusdam similique."
+      "token": "At facere amet tempora aut sit."
    }'
 `, os.Args[0])
 }
@@ -3328,7 +3330,7 @@ Logout implements logout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user logout --auth "Voluptatem nesciunt eum voluptas nihil maxime."
+    `+os.Args[0]+` user logout --auth "Ab corrupti dicta est."
 `, os.Args[0])
 }
 
@@ -3340,7 +3342,7 @@ Refresh implements refresh.
 
 Example:
     `+os.Args[0]+` user refresh --body '{
-      "refreshToken": "Quia ab corrupti dicta est."
+      "refreshToken": "Non architecto."
    }'
 `, os.Args[0])
 }
@@ -3352,7 +3354,7 @@ SendValidation implements send validation.
     -user-id INT32: 
 
 Example:
-    `+os.Args[0]+` user send- validation --user-id 1119019727
+    `+os.Args[0]+` user send- validation --user-id 249134500
 `, os.Args[0])
 }
 
@@ -3363,7 +3365,7 @@ Validate implements validate.
     -token STRING: 
 
 Example:
-    `+os.Args[0]+` user validate --token "Ut voluptatibus voluptatem neque dolor veritatis ut."
+    `+os.Args[0]+` user validate --token "Omnis nobis et."
 `, os.Args[0])
 }
 
@@ -3418,7 +3420,7 @@ Example:
       "showStations": true,
       "startTime": "Ut et repellendus corrupti sequi nemo doloribus.",
       "tags": "Quo aut."
-   }' --user-id 1988513198 --auth "Reiciendis fugiat enim dolor."
+   }' --user-id 1449458050 --auth "Aperiam dolorum eum unde quia."
 `, os.Args[0])
 }
 
@@ -3432,9 +3434,9 @@ ChangePassword implements change password.
 
 Example:
     `+os.Args[0]+` user change- password --body '{
-      "newPassword": "gcu",
-      "oldPassword": "phj"
-   }' --user-id 11867531 --auth "Consequatur aperiam eum consequatur voluptatem facilis."
+      "newPassword": "ax4",
+      "oldPassword": "qx9"
+   }' --user-id 519431835 --auth "Nobis consectetur."
 `, os.Args[0])
 }
 
@@ -3449,7 +3451,7 @@ AcceptTnc implements accept tnc.
 Example:
     `+os.Args[0]+` user accept- tnc --body '{
       "accept": false
-   }' --user-id 1946626874 --auth "Ipsum est dolorem."
+   }' --user-id 1708741861 --auth "Quas similique quasi optio animi maxime ut."
 `, os.Args[0])
 }
 
@@ -3460,7 +3462,7 @@ GetCurrent implements get current.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user get- current --auth "Beatae qui dolores."
+    `+os.Args[0]+` user get- current --auth "Voluptatem facilis quos labore ducimus."
 `, os.Args[0])
 }
 
@@ -3472,7 +3474,7 @@ ListByProject implements list by project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user list- by- project --project-id 1352657203 --auth "Nam aperiam architecto repudiandae."
+    `+os.Args[0]+` user list- by- project --project-id 373682490 --auth "Aut modi ipsa cumque quis nobis soluta."
 `, os.Args[0])
 }
 
@@ -3483,7 +3485,7 @@ IssueTransmissionToken implements issue transmission token.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user issue- transmission- token --auth "Quae quasi praesentium consectetur numquam."
+    `+os.Args[0]+` user issue- transmission- token --auth "Nemo qui corrupti ab vero rem sed."
 `, os.Args[0])
 }
 
@@ -3508,7 +3510,7 @@ Example:
     `+os.Args[0]+` user admin- delete --body '{
       "email": "Placeat autem voluptates delectus aut non.",
       "password": "Et et."
-   }' --auth "Corrupti non."
+   }' --auth "Aperiam labore."
 `, os.Args[0])
 }
 
@@ -3520,7 +3522,7 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user admin- search --query "Ex ut aperiam eos." --auth "Similique nobis consequatur."
+    `+os.Args[0]+` user admin- search --query "Maiores est eum dignissimos qui aut." --auth "Quasi molestiae quasi corrupti cumque et."
 `, os.Args[0])
 }
 
@@ -3534,6 +3536,6 @@ Mentionables implements mentionables.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user mentionables --project-id 1948593912 --bookmark "Velit suscipit sit et." --query "Debitis quibusdam quia maiores." --auth "Eum dignissimos."
+    `+os.Args[0]+` user mentionables --project-id 341155980 --bookmark "Autem doloremque ipsum voluptatem et velit quas." --query "Doloremque nihil nihil culpa corporis." --auth "Modi alias laudantium."
 `, os.Args[0])
 }

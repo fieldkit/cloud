@@ -10,6 +10,7 @@ import (
 	information "github.com/fieldkit/cloud/server/api/gen/information"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -89,7 +90,7 @@ func (c *InformationService) FirmwareStatistics(ctx context.Context, payload *in
 }
 
 func (s *InformationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

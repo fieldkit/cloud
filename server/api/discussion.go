@@ -15,6 +15,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -268,7 +269,7 @@ func (c *DiscussionService) notifyMentionsAndReplies(ctx context.Context, post *
 }
 
 func (s *DiscussionService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

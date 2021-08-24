@@ -120,8 +120,9 @@ func NewWebhookUnauthorizedResponseBody(res ttn.Unauthorized) WebhookUnauthorize
 }
 
 // NewWebhookPayload builds a ttn service webhook endpoint payload.
-func NewWebhookPayload(contentType string, contentLength int64, auth *string) *ttn.WebhookPayload {
+func NewWebhookPayload(token *string, contentType string, contentLength int64, auth *string) *ttn.WebhookPayload {
 	v := &ttn.WebhookPayload{}
+	v.Token = token
 	v.ContentType = contentType
 	v.ContentLength = contentLength
 	v.Auth = auth
