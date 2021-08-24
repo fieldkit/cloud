@@ -20,8 +20,8 @@ export default Vue.extend({
     },
     props: {
         title: {
-          type: String,
-          required: true,
+            type: String,
+            required: true,
         },
         stations: {
             type: Array as PropType<DisplayStation[]>,
@@ -54,12 +54,14 @@ export default Vue.extend({
 }
 
 .modal-container {
-    width: 870px;
+    width: 840px;
+    max-width: 80%;
     margin: 0px auto;
-    padding: 20px 30px;
+    padding: 70px 45px 35px;
     background-color: #fff;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.24);
+    border: solid 1px #f4f5f7;
     border-radius: 2px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
     transition: all 0.3s ease;
     font-family: Helvetica, Arial, sans-serif;
 }

@@ -107,7 +107,7 @@
             "title": "FieldKit Stations",
             "add": "Add Station",
             "edit": "Edit",
-            "search": "Search",
+            "search": "Search Stations",
             "none": {
                 "title": "No Stations",
                 "text": "Add a station to this project to include its recent data and activities."

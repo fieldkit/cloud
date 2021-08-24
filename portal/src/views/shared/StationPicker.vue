@@ -2,19 +2,18 @@
     <div class="station-picker">
         <div class="dialog">
             <div class="close-button" v-on:click="onClose">
-                <img alt="Close" src="../../assets/close.png" />
+                <img alt="Close" src="@/assets/icon-close.svg" />
             </div>
         </div>
         <div class="header">
             <div class="title">{{ $t("project.stations.add") }}</div>
-            <div class="search">
-                <input
-                    v-model="search"
-                    :label="$t('project.stations.search')"
-                    @input="onSearch(search)"
-                    :placeholder="$t('project.stations.search')"
-                />
-            </div>
+            <input
+                class="search"
+                v-model="search"
+                :label="$t('project.stations.search')"
+                @input="onSearch(search)"
+                :placeholder="$t('project.stations.search')"
+            />
         </div>
         <div class="main">
             <div class="child" v-for="station in visible" v-bind:key="station.id">
@@ -23,7 +22,7 @@
         </div>
         <PaginationControls :page="paging.number" :totalPages="totalPages()" @new-page="onNewPage" />
         <div class="footer">
-            <div class="button" v-on:click="onAdd" v-bind:class="{ enabled: selected }">{{ $t("project.stations.add") }}</div>
+            <button class="button-solid" v-on:click="onAdd" v-bind:class="{ enabled: selected }">{{ $t("project.stations.add") }}</button>
         </div>
     </div>
 </template>
@@ -110,20 +109,29 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../scss/mixins";
+@import "../../scss/global";
+
 .station-picker {
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 .station-picker .dialog {
     display: flex;
+    @include position(absolute, -48px 0 null null);
 }
 .dialog .close-button {
     margin-left: auto;
     cursor: pointer;
+
+    img {
+        height: 19px;
+    }
 }
 .station-picker .header {
-    display: flex;
+    @include flex(center, space-between);
 }
 .header .title {
     font-weight: 500;
@@ -131,7 +139,10 @@ export default Vue.extend({
     color: #2c3e50;
 }
 .header .search {
-    margin-left: auto;
+    font-size: 14px;
+    width: 247px;
+    padding: 7px 10px;
+    border: solid 1px #cccdcf;
 }
 .station-picker .main {
     display: flex;
@@ -140,13 +151,15 @@ export default Vue.extend({
     min-height: 164px; /* Eh */
 }
 .main .child {
-    margin-bottom: 10px;
+    margin-bottom: 23px;
 }
 .station-picker .pagination {
     display: flex;
+    margin-top: 40px;
 }
 .station-picker .footer {
-    display: flex;
+    @include flex(center, center);
+    margin-top: 35px;
 }
 .footer .button {
     font-size: 18px;
