@@ -13,6 +13,7 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/messages"
+	"github.com/fieldkit/cloud/server/ttn"
 )
 
 type OurWorkFunc func(ctx context.Context, j *que.Job) error
@@ -90,14 +91,25 @@ func ingestStation(ctx context.Context, j *que.Job, services *BackgroundServices
 	return handler.Handle(ctx, message)
 }
 
+func thingsNetworkMessageRececived(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+	message := &ttn.ThingsNetworkMessageReceived{}
+	if err := json.Unmarshal(tm.Body, message); err != nil {
+		return err
+	}
+	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
+	handler := ttn.NewThingsNetworkMessageRececivedHandler(services.database, services.metrics, publisher)
+	return handler.Handle(ctx, message)
+}
+
 func CreateMap(services *BackgroundServices) que.WorkMap {
 	return que.WorkMap{
-		"Example":           wrapContext(wrapTransportMessage(services, exampleJob)),
-		"WalkEverything":    wrapContext(wrapTransportMessage(services, walkEverything)),
-		"IngestionReceived": wrapContext(wrapTransportMessage(services, ingestionReceived)),
-		"RefreshStation":    wrapContext(wrapTransportMessage(services, refreshStation)),
-		"ExportData":        wrapContext(wrapTransportMessage(services, exportData)),
-		"IngestStation":     wrapContext(wrapTransportMessage(services, ingestStation)),
+		"Example":                      wrapContext(wrapTransportMessage(services, exampleJob)),
+		"WalkEverything":               wrapContext(wrapTransportMessage(services, walkEverything)),
+		"IngestionReceived":            wrapContext(wrapTransportMessage(services, ingestionReceived)),
+		"RefreshStation":               wrapContext(wrapTransportMessage(services, refreshStation)),
+		"ExportData":                   wrapContext(wrapTransportMessage(services, exportData)),
+		"IngestStation":                wrapContext(wrapTransportMessage(services, ingestStation)),
+		"ThingsNetworkMessageReceived": wrapContext(wrapTransportMessage(services, thingsNetworkMessageRececived)),
 	}
 }
 

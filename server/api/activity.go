@@ -14,6 +14,7 @@ import (
 	activity "github.com/fieldkit/cloud/server/api/gen/activity"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -224,7 +225,7 @@ func (c *ActivityService) Project(ctx context.Context, payload *activity.Project
 }
 
 func (s *ActivityService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

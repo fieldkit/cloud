@@ -42,6 +42,7 @@ type WebhookPayload struct {
 	Auth          *string
 	ContentLength int64
 	ContentType   string
+	Token         *string
 }
 
 // credentials are invalid

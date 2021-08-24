@@ -489,6 +489,7 @@ func ParseEndpoint(
 		ttnFlags = flag.NewFlagSet("ttn", flag.ContinueOnError)
 
 		ttnWebhookFlags             = flag.NewFlagSet("webhook", flag.ExitOnError)
+		ttnWebhookTokenFlag         = ttnWebhookFlags.String("token", "", "")
 		ttnWebhookContentTypeFlag   = ttnWebhookFlags.String("content-type", "REQUIRED", "")
 		ttnWebhookContentLengthFlag = ttnWebhookFlags.String("content-length", "REQUIRED", "")
 		ttnWebhookAuthFlag          = ttnWebhookFlags.String("auth", "", "")
@@ -1526,7 +1527,7 @@ func ParseEndpoint(
 			switch epn {
 			case "webhook":
 				endpoint = c.Webhook()
-				data, err = ttnc.BuildWebhookPayload(*ttnWebhookContentTypeFlag, *ttnWebhookContentLengthFlag, *ttnWebhookAuthFlag)
+				data, err = ttnc.BuildWebhookPayload(*ttnWebhookTokenFlag, *ttnWebhookContentTypeFlag, *ttnWebhookContentLengthFlag, *ttnWebhookAuthFlag)
 				if err == nil {
 					data, err = ttnc.BuildWebhookStreamPayload(data, *ttnWebhookStreamFlag)
 				}
@@ -3063,16 +3064,17 @@ Additional help:
 `, os.Args[0], os.Args[0])
 }
 func ttnWebhookUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] ttn webhook -content-type STRING -content-length INT64 -auth STRING -stream STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] ttn webhook -token STRING -content-type STRING -content-length INT64 -auth STRING -stream STRING
 
 Webhook implements webhook.
+    -token STRING: 
     -content-type STRING: 
     -content-length INT64: 
     -auth STRING: 
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` ttn webhook --content-type "Quia et qui enim at consequatur." --content-length 4069084501423469154 --auth "Illo deleniti." --stream "goa.png"
+    `+os.Args[0]+` ttn webhook --token "Quia et qui enim at consequatur." --content-type "Perferendis illo deleniti itaque autem." --content-length 4853011782303772529 --auth "Odit sequi sunt reiciendis." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -3117,7 +3119,7 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Voluptatum quo rerum sunt hic rem."
+    `+os.Args[0]+` user roles --auth "Qui eos architecto quo quia."
 `, os.Args[0])
 }
 
@@ -3129,7 +3131,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user delete --user-id 1671860302 --auth "Earum sint aut eligendi."
+    `+os.Args[0]+` user delete --user-id 1564070345 --auth "Molestias natus dolorem a possimus rem."
 `, os.Args[0])
 }
 
@@ -3143,7 +3145,7 @@ UploadPhoto implements upload photo.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` user upload- photo --content-type "At inventore voluptatibus et accusantium eum laborum." --content-length 1343102538312532722 --auth "Aut et assumenda vel corporis omnis." --stream "goa.png"
+    `+os.Args[0]+` user upload- photo --content-type "Laborum aliquam sit aut." --content-length 5165871924844260708 --auth "Vel corporis omnis quasi." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -3156,7 +3158,7 @@ DownloadPhoto implements download photo.
     -if-none-match STRING: 
 
 Example:
-    `+os.Args[0]+` user download- photo --user-id 1549380355 --size 892158867 --if-none-match "Illum culpa."
+    `+os.Args[0]+` user download- photo --user-id 892158867 --size 1195536444 --if-none-match "Culpa ducimus sunt facere."
 `, os.Args[0])
 }
 
@@ -3168,8 +3170,8 @@ Login implements login.
 
 Example:
     `+os.Args[0]+` user login --body '{
-      "email": "cpp",
-      "password": "s42"
+      "email": "u3i",
+      "password": "ppm"
    }'
 `, os.Args[0])
 }
@@ -3182,7 +3184,7 @@ RecoveryLookup implements recovery lookup.
 
 Example:
     `+os.Args[0]+` user recovery- lookup --body '{
-      "email": "Qui et."
+      "email": "Iusto autem est consequuntur et."
    }'
 `, os.Args[0])
 }
@@ -3195,8 +3197,8 @@ Recovery implements recovery.
 
 Example:
     `+os.Args[0]+` user recovery --body '{
-      "password": "p04",
-      "token": "Deserunt sed."
+      "password": "4p0",
+      "token": "Est perspiciatis deserunt."
    }'
 `, os.Args[0])
 }

@@ -7,6 +7,7 @@ import (
 	"goa.design/goa/v3/security"
 
 	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
+	"github.com/fieldkit/cloud/server/common"
 )
 
 type TasksService struct {
@@ -33,7 +34,7 @@ func (c *TasksService) Five(ctx context.Context) error {
 }
 
 func (s *TasksService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

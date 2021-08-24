@@ -16,8 +16,14 @@ import (
 
 // BuildWebhookPayload builds the payload for the ttn webhook endpoint from CLI
 // flags.
-func BuildWebhookPayload(ttnWebhookContentType string, ttnWebhookContentLength string, ttnWebhookAuth string) (*ttn.WebhookPayload, error) {
+func BuildWebhookPayload(ttnWebhookToken string, ttnWebhookContentType string, ttnWebhookContentLength string, ttnWebhookAuth string) (*ttn.WebhookPayload, error) {
 	var err error
+	var token *string
+	{
+		if ttnWebhookToken != "" {
+			token = &ttnWebhookToken
+		}
+	}
 	var contentType string
 	{
 		contentType = ttnWebhookContentType
@@ -36,6 +42,7 @@ func BuildWebhookPayload(ttnWebhookContentType string, ttnWebhookContentLength s
 		}
 	}
 	v := &ttn.WebhookPayload{}
+	v.Token = token
 	v.ContentType = contentType
 	v.ContentLength = contentLength
 	v.Auth = auth

@@ -21,6 +21,7 @@ import (
 	station "github.com/fieldkit/cloud/server/api/gen/station"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -66,7 +67,7 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 		station.SyncedAt = &station.UpdatedAt
 	}
 
-	if err := sr.Update(ctx, station); err != nil {
+	if err := sr.UpdateStation(ctx, station); err != nil {
 		return err
 	}
 
@@ -122,13 +123,14 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 		OwnerID:      p.UserID(),
 		Name:         payload.Name,
 		DeviceID:     deviceId,
+		ModelID:      data.FieldKitModelID,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 		SyncedAt:     &now,
 		LocationName: payload.LocationName,
 	}
 
-	added, err := sr.Add(ctx, adding)
+	added, err := sr.AddStation(ctx, adding)
 	if err != nil {
 		return nil, err
 	}
@@ -555,7 +557,7 @@ func (c *StationService) Progress(ctx context.Context, payload *station.Progress
 }
 
 func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

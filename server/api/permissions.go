@@ -10,6 +10,7 @@ import (
 	"github.com/goadesign/goa/middleware/security/jwt"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -53,7 +54,7 @@ type unwrappedPermissions struct {
 type defaultPermissions struct {
 	context     context.Context
 	options     *ControllerOptions
-	authAttempt *AuthAttempt
+	authAttempt *common.AuthAttempt
 	unwrapped   *unwrappedPermissions
 	anonymous   bool
 }
@@ -66,13 +67,13 @@ func NewPermissions(ctx context.Context, options *ControllerOptions) Permissions
 	}
 }
 
-func addAuthAttemptToContext(ctx context.Context, aa *AuthAttempt) context.Context {
+func addAuthAttemptToContext(ctx context.Context, aa *common.AuthAttempt) context.Context {
 	newCtx := context.WithValue(ctx, "authAttempt", aa)
 	return newCtx
 }
 
-func getAuthAttempt(ctx context.Context) *AuthAttempt {
-	if v, ok := ctx.Value("authAttempt").(*AuthAttempt); ok {
+func getAuthAttempt(ctx context.Context) *common.AuthAttempt {
+	if v, ok := ctx.Value("authAttempt").(*common.AuthAttempt); ok {
 		return v
 	}
 	return nil
