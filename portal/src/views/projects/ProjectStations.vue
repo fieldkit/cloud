@@ -3,19 +3,32 @@
         <StationPickerModal
             :stations="userStations"
             :filter="pickFilter"
-            @add="onAddStation"
-            @close="onCloseStationPicker"
+            :actionType="StationPickerActionType.add"
+            :title="$t('project.stations.add.title')"
+            :ctaText="$t('project.stations.add.cta')"
+            @add="onStationCtaClick"
+            @close="onCloseAddStationModal"
             v-if="addingStation"
+        />
+        <StationPickerModal
+            :stations="userStations"
+            :filter="pickFilter"
+            :actionType="StationPickerActionType.remove"
+            :title="$t('project.stations.edit.title')"
+            :ctaText="$t('project.stations.edit.cta')"
+            @remove="onStationCtaClick"
+            @close="onCloseEditStationModal"
+            v-if="editingStation"
         />
         <div class="section-heading stations-heading">
             {{ $t("project.stations.title") }}
-            <div class="stations-cta-container" v-on:click="showStationPicker" v-if="admin">
-                <div class="stations-cta">
+            <div class="stations-cta-container" v-if="admin">
+                <div class="stations-cta" v-on:click="showAddStationPicker">
                     <img src="@/assets/icon-plus-round.svg" />
-                    {{ $t("project.stations.add") }}
+                    {{ $t("project.stations.add.title") }}
                 </div>
-                <div class="stations-cta">
-                    {{ $t("project.stations.edit") }}
+                <div class="stations-cta" v-on:click="showEditStationPicker">
+                    {{ $t("project.stations.edit.trigger") }}
                 </div>
             </div>
         </div>
@@ -67,15 +80,14 @@
 <script lang="ts">
 import _ from "lodash";
 import Vue from "vue";
-import * as utils from "../../utilities";
 import * as ActionTypes from "@/store/actions";
-import FKApi from "@/api/api";
 import StationSummary from "@/views/shared/StationSummary.vue";
 import StationsMap from "@/views/shared/StationsMap.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
 import TinyStation from "@/views/shared/TinyStation.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { DisplayStation, DisplayProject, MappedStations, BoundingRectangle } from "@/store";
+import { BoundingRectangle, DisplayProject, DisplayStation, MappedStations } from "@/store";
+import { StationPickerActionType } from "@/views/shared/StationPicker.vue";
 
 export default Vue.extend({
     name: "ProjectStations",
@@ -91,16 +103,20 @@ export default Vue.extend({
         layoutChanges: number;
         showStationsPanel: boolean;
         addingStation: boolean;
+        editingStation: boolean;
         page: number;
         pageSize: number;
+        StationPickerActionType: any;
     } {
         return {
             activeStationId: null,
             layoutChanges: 0,
             showStationsPanel: true,
             addingStation: false,
+            editingStation: false,
             page: 0,
             pageSize: 4,
+            StationPickerActionType: StationPickerActionType,
         };
     },
     props: {
@@ -166,19 +182,38 @@ export default Vue.extend({
             // All parameters are strings.
             return this.$router.push({ name: "mapStation", params: { id: String(station.id) } });
         },
-        showStationPicker(): void {
+        showAddStationPicker(): void {
             this.addingStation = true;
         },
-        onAddStation(stationId: number): Promise<any> {
-            this.addingStation = false;
-            const payload = {
-                projectId: this.project.id,
-                stationId: stationId,
-            };
-            return this.$store.dispatch(ActionTypes.STATION_PROJECT_ADD, payload);
+        showEditStationPicker(): void {
+            this.editingStation = true;
         },
-        onCloseStationPicker(): void {
+        onStationCtaClick(stationIds: number[], eventType: StationPickerActionType): void {
+            console.log("CLICK", stationIds, eventType);
+            if (eventType === StationPickerActionType.add) {
+                this.addingStation = false;
+            }
+            if (eventType === StationPickerActionType.remove) {
+                this.editingStation = false;
+            }
+            stationIds.forEach((stationId) => {
+                const payload = {
+                    projectId: this.project.id,
+                    stationId: stationId,
+                };
+                if (eventType === StationPickerActionType.add) {
+                    this.$store.dispatch(ActionTypes.STATION_PROJECT_ADD, payload);
+                }
+                if (eventType === StationPickerActionType.remove) {
+                    this.$store.dispatch(ActionTypes.STATION_PROJECT_REMOVE, payload);
+                }
+            });
+        },
+        onCloseAddStationModal(): void {
             this.addingStation = false;
+        },
+        onCloseEditStationModal(): void {
+            this.editingStation = false;
         },
         showSummary(station: DisplayStation): void {
             console.log("showSummay", station);

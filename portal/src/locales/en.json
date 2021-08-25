@@ -105,8 +105,15 @@
         "dashboard": "Project Dashboard",
         "stations": {
             "title": "FieldKit Stations",
-            "add": "Add Station",
-            "edit": "Edit",
+            "add": {
+                "title": "Add Station",
+                "cta": "Add"
+            },
+            "edit": {
+                "trigger": "Edit",
+                "title": "Edit Stations",
+                "cta": "Remove"
+            },
             "search": "Search Stations",
             "none": {
                 "title": "No Stations",

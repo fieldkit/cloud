@@ -30,9 +30,6 @@ export default Vue.extend({
             default: false,
         },
     },
-    mounted() {
-        console.log("Stt", this.station);
-    },
     computed: {
         location(this: any) {
             const gps = [this.station.location?.latitude, this.station.location?.longitude]
@@ -64,12 +61,22 @@ export default Vue.extend({
 
 .sps.selected {
     border: 2px solid #1b80c9;
+
+    &:after {
+        @include position(absolute, -6px -6px null null);
+        content: "";
+        background: url("../../assets/icon-success-blue.svg") no-repeat center center;
+        background-size: contain;
+        width: 19px;
+        height: 19px;
+    }
 }
 .sps {
     display: flex;
     min-width: 267px;
     border: 1px solid #d8dce0;
     border-radius: 3px;
+    position: relative;
 
     @include bp-down($xs) {
         min-width: 220px;

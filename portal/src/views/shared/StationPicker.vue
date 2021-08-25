@@ -6,7 +6,7 @@
             </div>
         </div>
         <div class="header">
-            <div class="title">{{ $t("project.stations.add") }}</div>
+            <div class="title">{{ title }}</div>
             <input
                 class="search"
                 v-model="search"
@@ -17,12 +17,16 @@
         </div>
         <div class="main">
             <div class="child" v-for="station in visible" v-bind:key="station.id">
-                <StationPickerStation :station="station" :selected="selected === station.id" @selected="(ev) => onSelected(station)" />
+                <StationPickerStation
+                    :station="station"
+                    :selected="selected.includes(station.id)"
+                    @selected="(ev) => onSelected(station)"
+                />
             </div>
         </div>
         <PaginationControls :page="paging.number" :totalPages="totalPages()" @new-page="onNewPage" />
         <div class="footer">
-            <button class="button-solid" v-on:click="onAdd" v-bind:class="{ enabled: selected }">{{ $t("project.stations.add") }}</button>
+            <button class="button-solid" v-on:click="onCtaClick" v-bind:class="{ enabled: selected }">{{ ctaText }}</button>
         </div>
     </div>
 </template>
@@ -35,6 +39,11 @@ import StationPickerStation from "./StationPickerStation.vue";
 import PaginationControls from "./PaginationControls.vue";
 import { DisplayStation } from "@/store";
 
+export enum StationPickerActionType {
+    add = "add",
+    remove = "remove",
+}
+
 export default Vue.extend({
     name: "StationPicker",
     components: {
@@ -43,6 +52,18 @@ export default Vue.extend({
         PaginationControls,
     },
     props: {
+        title: {
+            type: String,
+            required: true,
+        },
+        actionType: {
+            type: String,
+            required: true,
+        },
+        ctaText: {
+            type: String,
+            required: true,
+        },
         stations: {
             type: Array as PropType<DisplayStation[]>,
             required: true,
@@ -53,7 +74,7 @@ export default Vue.extend({
         },
     },
     data(): {
-        selected: any | null;
+        selected: number[];
         paging: {
             number: number;
             size: number;
@@ -61,7 +82,7 @@ export default Vue.extend({
         search: string;
     } {
         return {
-            selected: null,
+            selected: [],
             paging: {
                 number: 0,
                 size: 6,
@@ -84,6 +105,7 @@ export default Vue.extend({
             return _.filter(
                 this.stations.filter((station) => this.filter(station)),
                 (station) => {
+                    console.log("fff", station);
                     return station.name.toLowerCase().indexOf(this.search.toLowerCase()) >= 0;
                 }
             );
@@ -92,15 +114,21 @@ export default Vue.extend({
             return Math.ceil(this.filteredStations().length / this.paging.size);
         },
         onSelected(station: DisplayStation): void {
-            this.selected = station.id;
+            const idAtIndex = this.selected.findIndex((value) => value === station.id);
+            if (idAtIndex > -1) {
+                this.selected.splice(idAtIndex, 1);
+            } else {
+                this.selected.push(station.id);
+            }
         },
         onClose(): void {
             this.$emit("close");
         },
-        onAdd(): void {
-            if (this.selected) {
-                this.$emit("add", this.selected);
+        onCtaClick(): void {
+            if (!this.selected) {
+                return;
             }
+            this.$emit("ctaClick", this.selected);
         },
         onNewPage(page: number): void {
             this.paging.number = page;

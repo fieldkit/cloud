@@ -2,7 +2,15 @@
     <div class="modal-mask">
         <div class="modal-wrapper">
             <div class="modal-container">
-                <StationPicker :stations="stations" :filter="filter" @add="(id) => $emit('add', id)" @close="$emit('close')" />
+                <StationPicker
+                    :title="title"
+                    :ctaText="ctaText"
+                    :stations="stations"
+                    :filter="filter"
+                    :actionType="actionType"
+                    @ctaClick="test"
+                    @close="$emit('close')"
+                />
             </div>
         </div>
     </div>
@@ -12,6 +20,7 @@
 import Vue, { PropType } from "vue";
 import StationPicker from "./StationPicker.vue";
 import { DisplayStation } from "@/store";
+import { StationPickerActionType } from "@/views/shared/StationPicker.vue";
 
 export default Vue.extend({
     name: "StationPickerModal",
@@ -23,6 +32,14 @@ export default Vue.extend({
             type: String,
             required: true,
         },
+        ctaType: {
+            type: Object,
+            required: true,
+        },
+        ctaText: {
+            type: String,
+            required: true,
+        },
         stations: {
             type: Array as PropType<DisplayStation[]>,
             required: true,
@@ -30,6 +47,12 @@ export default Vue.extend({
         filter: {
             type: Function as PropType<(station: DisplayStation) => boolean>,
             default: (station) => true,
+        },
+    },
+    methods: {
+        test(event, ids): void {
+            console.log("reg click", event, ids);
+            this.$emit(event, ids);
         },
     },
 });
