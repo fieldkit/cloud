@@ -686,11 +686,6 @@ func (s *UserService) Roles(ctx context.Context, payload *user.RolesPayload) (*u
 	}, nil
 }
 
-func (s *UserService) Delete(ctx context.Context, payload *user.DeletePayload) error {
-	r := repositories.NewUserRepository(s.options.Database)
-	return r.Delete(ctx, payload.UserID)
-}
-
 func (s *UserService) UploadPhoto(ctx context.Context, payload *user.UploadPhotoPayload, body io.ReadCloser) error {
 	p, err := NewPermissions(ctx, s.options).Unwrap()
 	if err != nil {

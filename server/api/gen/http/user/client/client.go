@@ -20,9 +20,6 @@ type Client struct {
 	// Roles Doer is the HTTP client used to make requests to the roles endpoint.
 	RolesDoer goahttp.Doer
 
-	// Delete Doer is the HTTP client used to make requests to the delete endpoint.
-	DeleteDoer goahttp.Doer
-
 	// UploadPhoto Doer is the HTTP client used to make requests to the upload
 	// photo endpoint.
 	UploadPhotoDoer goahttp.Doer
@@ -126,7 +123,6 @@ func NewClient(
 ) *Client {
 	return &Client{
 		RolesDoer:                   doer,
-		DeleteDoer:                  doer,
 		UploadPhotoDoer:             doer,
 		DownloadPhotoDoer:           doer,
 		LoginDoer:                   doer,
@@ -176,30 +172,6 @@ func (c *Client) Roles() goa.Endpoint {
 		resp, err := c.RolesDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("user", "roles", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
-// Delete returns an endpoint that makes HTTP requests to the user service
-// delete server.
-func (c *Client) Delete() goa.Endpoint {
-	var (
-		encodeRequest  = EncodeDeleteRequest(c.encoder)
-		decodeResponse = DecodeDeleteResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildDeleteRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.DeleteDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("user", "delete", err)
 		}
 		return decodeResponse(resp)
 	}

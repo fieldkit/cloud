@@ -260,78 +260,6 @@ type RolesBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// DeleteUnauthorizedResponseBody is the type of the "user" service "delete"
-// endpoint HTTP response body for the "unauthorized" error.
-type DeleteUnauthorizedResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// DeleteForbiddenResponseBody is the type of the "user" service "delete"
-// endpoint HTTP response body for the "forbidden" error.
-type DeleteForbiddenResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// DeleteNotFoundResponseBody is the type of the "user" service "delete"
-// endpoint HTTP response body for the "not-found" error.
-type DeleteNotFoundResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// DeleteBadRequestResponseBody is the type of the "user" service "delete"
-// endpoint HTTP response body for the "bad-request" error.
-type DeleteBadRequestResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
 // UploadPhotoUnauthorizedResponseBody is the type of the "user" service
 // "upload photo" endpoint HTTP response body for the "unauthorized" error.
 type UploadPhotoUnauthorizedResponseBody struct {
@@ -2151,62 +2079,6 @@ func NewRolesBadRequestResponseBody(res *goa.ServiceError) *RolesBadRequestRespo
 	return body
 }
 
-// NewDeleteUnauthorizedResponseBody builds the HTTP response body from the
-// result of the "delete" endpoint of the "user" service.
-func NewDeleteUnauthorizedResponseBody(res *goa.ServiceError) *DeleteUnauthorizedResponseBody {
-	body := &DeleteUnauthorizedResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewDeleteForbiddenResponseBody builds the HTTP response body from the result
-// of the "delete" endpoint of the "user" service.
-func NewDeleteForbiddenResponseBody(res *goa.ServiceError) *DeleteForbiddenResponseBody {
-	body := &DeleteForbiddenResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewDeleteNotFoundResponseBody builds the HTTP response body from the result
-// of the "delete" endpoint of the "user" service.
-func NewDeleteNotFoundResponseBody(res *goa.ServiceError) *DeleteNotFoundResponseBody {
-	body := &DeleteNotFoundResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewDeleteBadRequestResponseBody builds the HTTP response body from the
-// result of the "delete" endpoint of the "user" service.
-func NewDeleteBadRequestResponseBody(res *goa.ServiceError) *DeleteBadRequestResponseBody {
-	body := &DeleteBadRequestResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
 // NewUploadPhotoUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "upload photo" endpoint of the "user" service.
 func NewUploadPhotoUnauthorizedResponseBody(res *goa.ServiceError) *UploadPhotoUnauthorizedResponseBody {
@@ -3422,15 +3294,6 @@ func NewAdminSearchBadRequestResponseBody(res *goa.ServiceError) *AdminSearchBad
 // NewRolesPayload builds a user service roles endpoint payload.
 func NewRolesPayload(auth string) *user.RolesPayload {
 	v := &user.RolesPayload{}
-	v.Auth = auth
-
-	return v
-}
-
-// NewDeletePayload builds a user service delete endpoint payload.
-func NewDeletePayload(userID int32, auth string) *user.DeletePayload {
-	v := &user.DeletePayload{}
-	v.UserID = userID
 	v.Auth = auth
 
 	return v

@@ -20,8 +20,6 @@ import (
 type Service interface {
 	// Roles implements roles.
 	Roles(context.Context, *RolesPayload) (res *AvailableRoles, err error)
-	// Delete implements delete.
-	Delete(context.Context, *DeletePayload) (err error)
 	// UploadPhoto implements upload photo.
 	UploadPhoto(context.Context, *UploadPhotoPayload, io.ReadCloser) (err error)
 	// DownloadPhoto implements download photo.
@@ -80,7 +78,7 @@ const ServiceName = "user"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [23]string{"roles", "delete", "upload photo", "download photo", "login", "recovery lookup", "recovery", "resume", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "accept tnc", "get current", "list by project", "issue transmission token", "project roles", "admin terms and conditions", "admin delete", "admin search"}
+var MethodNames = [22]string{"roles", "upload photo", "download photo", "login", "recovery lookup", "recovery", "resume", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "accept tnc", "get current", "list by project", "issue transmission token", "project roles", "admin terms and conditions", "admin delete", "admin search"}
 
 // RolesPayload is the payload type of the user service roles method.
 type RolesPayload struct {
@@ -90,12 +88,6 @@ type RolesPayload struct {
 // AvailableRoles is the result type of the user service roles method.
 type AvailableRoles struct {
 	Roles []*AvailableRole
-}
-
-// DeletePayload is the payload type of the user service delete method.
-type DeletePayload struct {
-	Auth   string
-	UserID int32
 }
 
 // UploadPhotoPayload is the payload type of the user service upload photo

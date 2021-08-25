@@ -16,11 +16,6 @@ func RolesUserPath() string {
 	return "/roles"
 }
 
-// DeleteUserPath returns the URL path to the user service delete HTTP endpoint.
-func DeleteUserPath(userID int32) string {
-	return fmt.Sprintf("/admin/users/%v", userID)
-}
-
 // UploadPhotoUserPath returns the URL path to the user service upload photo HTTP endpoint.
 func UploadPhotoUserPath() string {
 	return "/user/media"

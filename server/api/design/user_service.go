@@ -47,25 +47,6 @@ var _ = Service("user", func() {
 		})
 	})
 
-	Method("delete", func() {
-		Security(JWTAuth, func() {
-			Scope("api:admin")
-		})
-
-		Payload(func() {
-			Token("auth")
-			Required("auth")
-			Attribute("userId", Int32)
-			Required("userId")
-		})
-
-		HTTP(func() {
-			DELETE("admin/users/{userId}")
-
-			httpAuthentication()
-		})
-	})
-
 	Method("upload photo", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")

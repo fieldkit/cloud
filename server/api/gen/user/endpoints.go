@@ -18,7 +18,6 @@ import (
 // Endpoints wraps the "user" service endpoints.
 type Endpoints struct {
 	Roles                   goa.Endpoint
-	Delete                  goa.Endpoint
 	UploadPhoto             goa.Endpoint
 	DownloadPhoto           goa.Endpoint
 	Login                   goa.Endpoint
@@ -57,7 +56,6 @@ func NewEndpoints(s Service) *Endpoints {
 	a := s.(Auther)
 	return &Endpoints{
 		Roles:                   NewRolesEndpoint(s, a.JWTAuth),
-		Delete:                  NewDeleteEndpoint(s, a.JWTAuth),
 		UploadPhoto:             NewUploadPhotoEndpoint(s, a.JWTAuth),
 		DownloadPhoto:           NewDownloadPhotoEndpoint(s),
 		Login:                   NewLoginEndpoint(s),
@@ -85,7 +83,6 @@ func NewEndpoints(s Service) *Endpoints {
 // Use applies the given middleware to all the "user" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Roles = m(e.Roles)
-	e.Delete = m(e.Delete)
 	e.UploadPhoto = m(e.UploadPhoto)
 	e.DownloadPhoto = m(e.DownloadPhoto)
 	e.Login = m(e.Login)
@@ -130,25 +127,6 @@ func NewRolesEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 		}
 		vres := NewViewedAvailableRoles(res, "default")
 		return vres, nil
-	}
-}
-
-// NewDeleteEndpoint returns an endpoint function that calls the method
-// "delete" of service "user".
-func NewDeleteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
-	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*DeletePayload)
-		var err error
-		sc := security.JWTScheme{
-			Name:           "jwt",
-			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:admin"},
-		}
-		ctx, err = authJWTFn(ctx, p.Auth, &sc)
-		if err != nil {
-			return nil, err
-		}
-		return nil, s.Delete(ctx, p)
 	}
 }
 
