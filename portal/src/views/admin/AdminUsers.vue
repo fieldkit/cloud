@@ -13,20 +13,38 @@
                 <form id="delete-user-form" @submit.prevent="deleteUser">
                     <h2>Delete User</h2>
                     <div>
-                        <TextField v-model="form.email" label="Buh-bye Email" />
-                        <div class="validation-errors" v-if="$v.form.email.$error">
-                            <div v-if="!$v.form.email.required">Email is a required field.</div>
-                            <div v-if="!$v.form.email.email">Must be a valid email address.</div>
+                        <TextField v-model="deletionForm.email" label="Buh-bye Email" />
+                        <div class="validation-errors" v-if="$v.deletionForm.email.$error">
+                            <div v-if="!$v.deletionForm.email.required">Email is a required field.</div>
+                            <div v-if="!$v.deletionForm.email.email">Must be a valid email address.</div>
                         </div>
                     </div>
                     <div>
-                        <TextField v-model="form.password" label="Your Password" type="password" />
-                        <div class="validation-errors" v-if="$v.form.password.$error">
-                            <div v-if="!$v.form.password.required">This is a required field.</div>
-                            <div v-if="!$v.form.password.min">Password must be at least 10 characters.</div>
+                        <TextField v-model="deletionForm.password" label="Your Password" type="password" />
+                        <div class="validation-errors" v-if="$v.deletionForm.password.$error">
+                            <div v-if="!$v.deletionForm.password.required">This is a required field.</div>
+                            <div v-if="!$v.deletionForm.password.min">Password must be at least 10 characters.</div>
                         </div>
                     </div>
                     <button class="form-save-button" type="submit">Bye bye bye</button>
+                </form>
+            </div>
+
+            <div class="clear-tnc">
+                <div v-if="tnc.failed" class="notification failed">Oops, there was a problem.</div>
+
+                <div v-if="tnc.success" class="notification success">Done, cleared that user's TNC status.</div>
+
+                <form id="clear-tnc-form" @submit.prevent="clearTermsAndConditions">
+                    <h2>Clear TNC</h2>
+                    <div>
+                        <TextField v-model="tncForm.email" label="Email" />
+                        <div class="validation-errors" v-if="$v.tncForm.email.$error">
+                            <div v-if="!$v.tncForm.email.required">Email is a required field.</div>
+                            <div v-if="!$v.tncForm.email.email">Must be a valid email address.</div>
+                        </div>
+                    </div>
+                    <button class="form-save-button" type="submit">Clear Terms and Conditions</button>
                 </form>
             </div>
         </div>
@@ -49,18 +67,25 @@ export default Vue.extend({
     props: {},
     data: () => {
         return {
-            form: {
+            deletionForm: {
                 email: "",
                 password: "",
             },
+            tncForm: {
+                email: "",
+            },
             deletion: {
+                success: false,
+                failed: false,
+            },
+            tnc: {
                 success: false,
                 failed: false,
             },
         };
     },
     validations: {
-        form: {
+        deletionForm: {
             email: {
                 required,
                 email,
@@ -70,11 +95,17 @@ export default Vue.extend({
                 min: minLength(10),
             },
         },
+        tncForm: {
+            email: {
+                required,
+                email,
+            },
+        },
     },
     methods: {
         deleteUser(this: any) {
-            this.$v.form.$touch();
-            if (this.$v.form.$pending || this.$v.form.$error) {
+            this.$v.deletionForm.$touch();
+            if (this.$v.deletionForm.$pending || this.$v.deletionForm.$error) {
                 return;
             }
 
@@ -94,6 +125,34 @@ export default Vue.extend({
                             () => {
                                 this.deletion.failed = true;
                                 this.deletion.success = false;
+                            }
+                        );
+                    }
+                },
+            });
+        },
+        clearTermsAndConditions(this: any) {
+            this.$v.tncForm.$touch();
+            if (this.$v.tncForm.$pending || this.$v.tncForm.$error) {
+                return;
+            }
+
+            return this.$confirm({
+                message: `Are you sure? This operation cannot be undone.`,
+                button: {
+                    no: "No",
+                    yes: "Yes",
+                },
+                callback: (confirm) => {
+                    if (confirm) {
+                        return this.$services.api.adminClearTermsAndConditions(this.tncForm).then(
+                            () => {
+                                this.tnc.success = true;
+                                this.tnc.failed = false;
+                            },
+                            () => {
+                                this.tnc.failed = true;
+                                this.tnc.success = false;
                             }
                         );
                     }

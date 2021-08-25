@@ -63,22 +63,22 @@ station (add|get|transfer|update|list- mine|list- project|download- photo|list- 
 tasks five
 test (get|error|email)
 ttn webhook
-user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery|resume|logout|refresh|send- validation|validate|add|update|change- password|accept- tnc|get- current|list- by- project|issue- transmission- token|project- roles|admin- delete|admin- search)
+user (roles|delete|upload- photo|download- photo|login|recovery- lookup|recovery|resume|logout|refresh|send- validation|validate|add|update|change- password|accept- tnc|get- current|list- by- project|issue- transmission- token|project- roles|admin- terms- and- conditions|admin- delete|admin- search)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` csv noop` + "\n" +
-		os.Args[0] + ` activity station --id 5080771037774328695 --page 8473653304907584689 --auth "Quos blanditiis."` + "\n" +
-		os.Args[0] + ` data device- summary --device-id "Sunt quam ratione nam itaque ipsa." --auth "Maiores labore ipsam."` + "\n" +
+		os.Args[0] + ` activity station --id 5483770782961441532 --page 555685954327232446 --auth "Dicta rerum."` + "\n" +
+		os.Args[0] + ` data device- summary --device-id "Quaerat inventore." --auth "At fugiat facilis eligendi."` + "\n" +
 		os.Args[0] + ` discourse authenticate --body '{
-      "email": "Sed dignissimos vero dolorem.",
-      "password": "s67",
-      "sig": "Unde provident ut perspiciatis perspiciatis.",
-      "sso": "Officiis itaque nihil ipsam."
-   }' --token "Autem alias suscipit vero repellat."` + "\n" +
-		os.Args[0] + ` discussion project --project-id 1685719866 --auth "Ea nobis et eligendi optio."` + "\n" +
+      "email": "Suscipit vero.",
+      "password": "l3z",
+      "sig": "Ut voluptatem veritatis autem.",
+      "sso": "Dolorem autem."
+   }' --token "Et quia occaecati aut qui."` + "\n" +
+		os.Args[0] + ` discussion project --project-id 1948856641 --auth "Optio voluptatem eos quod molestias et."` + "\n" +
 		""
 }
 
@@ -569,6 +569,10 @@ func ParseEndpoint(
 
 		userProjectRolesFlags = flag.NewFlagSet("project- roles", flag.ExitOnError)
 
+		userAdminTermsAndConditionsFlags    = flag.NewFlagSet("admin- terms- and- conditions", flag.ExitOnError)
+		userAdminTermsAndConditionsBodyFlag = userAdminTermsAndConditionsFlags.String("body", "REQUIRED", "")
+		userAdminTermsAndConditionsAuthFlag = userAdminTermsAndConditionsFlags.String("auth", "REQUIRED", "")
+
 		userAdminDeleteFlags    = flag.NewFlagSet("admin- delete", flag.ExitOnError)
 		userAdminDeleteBodyFlag = userAdminDeleteFlags.String("body", "REQUIRED", "")
 		userAdminDeleteAuthFlag = userAdminDeleteFlags.String("auth", "REQUIRED", "")
@@ -718,6 +722,7 @@ func ParseEndpoint(
 	userListByProjectFlags.Usage = userListByProjectUsage
 	userIssueTransmissionTokenFlags.Usage = userIssueTransmissionTokenUsage
 	userProjectRolesFlags.Usage = userProjectRolesUsage
+	userAdminTermsAndConditionsFlags.Usage = userAdminTermsAndConditionsUsage
 	userAdminDeleteFlags.Usage = userAdminDeleteUsage
 	userAdminSearchFlags.Usage = userAdminSearchUsage
 
@@ -1175,6 +1180,9 @@ func ParseEndpoint(
 			case "project- roles":
 				epf = userProjectRolesFlags
 
+			case "admin- terms- and- conditions":
+				epf = userAdminTermsAndConditionsFlags
+
 			case "admin- delete":
 				epf = userAdminDeleteFlags
 
@@ -1598,6 +1606,9 @@ func ParseEndpoint(
 			case "project- roles":
 				endpoint = c.ProjectRoles()
 				data = nil
+			case "admin- terms- and- conditions":
+				endpoint = c.AdminTermsAndConditions()
+				data, err = userc.BuildAdminTermsAndConditionsPayload(*userAdminTermsAndConditionsBodyFlag, *userAdminTermsAndConditionsAuthFlag)
 			case "admin- delete":
 				endpoint = c.AdminDelete()
 				data, err = userc.BuildAdminDeletePayload(*userAdminDeleteBodyFlag, *userAdminDeleteAuthFlag)
@@ -1660,7 +1671,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 5080771037774328695 --page 8473653304907584689 --auth "Quos blanditiis."
+    `+os.Args[0]+` activity station --id 5483770782961441532 --page 555685954327232446 --auth "Dicta rerum."
 `, os.Args[0])
 }
 
@@ -1673,7 +1684,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 3014536428484387735 --page 7500213985746988571 --auth "Quibusdam quas esse et itaque aliquid."
+    `+os.Args[0]+` activity project --id 3644686380830934289 --page 1922698662079060347 --auth "Nobis repellat debitis enim."
 `, os.Args[0])
 }
 
@@ -1698,7 +1709,7 @@ DeviceSummary implements device summary.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` data device- summary --device-id "Sunt quam ratione nam itaque ipsa." --auth "Maiores labore ipsam."
+    `+os.Args[0]+` data device- summary --device-id "Quaerat inventore." --auth "At fugiat facilis eligendi."
 `, os.Args[0])
 }
 
@@ -1725,11 +1736,11 @@ Authenticate implements authenticate.
 
 Example:
     `+os.Args[0]+` discourse authenticate --body '{
-      "email": "Sed dignissimos vero dolorem.",
-      "password": "s67",
-      "sig": "Unde provident ut perspiciatis perspiciatis.",
-      "sso": "Officiis itaque nihil ipsam."
-   }' --token "Autem alias suscipit vero repellat."
+      "email": "Suscipit vero.",
+      "password": "l3z",
+      "sig": "Ut voluptatem veritatis autem.",
+      "sso": "Dolorem autem."
+   }' --token "Et quia occaecati aut qui."
 `, os.Args[0])
 }
 
@@ -1759,7 +1770,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` discussion project --project-id 1685719866 --auth "Ea nobis et eligendi optio."
+    `+os.Args[0]+` discussion project --project-id 1948856641 --auth "Optio voluptatem eos quod molestias et."
 `, os.Args[0])
 }
 
@@ -3105,6 +3116,7 @@ COMMAND:
     list- by- project: ListByProject implements list by project.
     issue- transmission- token: IssueTransmissionToken implements issue transmission token.
     project- roles: ProjectRoles implements project roles.
+    admin- terms- and- conditions: AdminTermsAndConditions implements admin terms and conditions.
     admin- delete: AdminDelete implements admin delete.
     admin- search: AdminSearch implements admin search.
 
@@ -3393,6 +3405,20 @@ Example:
 `, os.Args[0])
 }
 
+func userAdminTermsAndConditionsUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] user admin- terms- and- conditions -body JSON -auth STRING
+
+AdminTermsAndConditions implements admin terms and conditions.
+    -body JSON: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` user admin- terms- and- conditions --body '{
+      "email": "Eum deserunt."
+   }' --auth "Quidem possimus ullam est magnam ducimus nisi."
+`, os.Args[0])
+}
+
 func userAdminDeleteUsage() {
 	fmt.Fprintf(os.Stderr, `%s [flags] user admin- delete -body JSON -auth STRING
 
@@ -3402,9 +3428,9 @@ AdminDelete implements admin delete.
 
 Example:
     `+os.Args[0]+` user admin- delete --body '{
-      "email": "Eum deserunt.",
-      "password": "Dignissimos atque doloremque aut veniam officia culpa."
-   }' --auth "Quidem possimus ullam est magnam ducimus nisi."
+      "email": "Dicta repellat.",
+      "password": "Voluptatibus quaerat."
+   }' --auth "Autem et inventore et quo quod."
 `, os.Args[0])
 }
 
@@ -3416,6 +3442,6 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user admin- search --query "Autem et inventore et quo quod." --auth "Quas sit sint."
+    `+os.Args[0]+` user admin- search --query "Et nulla eum." --auth "Est autem."
 `, os.Args[0])
 }

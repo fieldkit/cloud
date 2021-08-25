@@ -1044,6 +1044,15 @@ class FKApi {
         });
     }
 
+    public adminClearTermsAndConditions(payload) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/admin/user/tnc",
+            data: payload,
+        });
+    }
+
     public getStationNotes(stationId: number): Promise<any> {
         return this.invoke({
             auth: Auth.Required,

@@ -430,6 +430,27 @@ var _ = Service("user", func() {
 		})
 	})
 
+	Method("admin terms and conditions", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("update", AdminTermsAndConditionsFields)
+			Required("update")
+		})
+
+		HTTP(func() {
+			DELETE("admin/user/tnc")
+
+			Body("update")
+
+			httpAuthentication()
+		})
+	})
+
 	Method("admin delete", func() {
 		Security(JWTAuth, func() {
 			Scope("api:admin")
@@ -641,10 +662,12 @@ var AdminDeleteFields = ResultType("application/vnd.app.admin.user.delete+json",
 		Attribute("password", String)
 		Required("password")
 	})
-	/*
-		View("default", func() {
-			Attribute("email")
-			Attribute("password")
-		})
-	*/
+})
+
+var AdminTermsAndConditionsFields = ResultType("application/vnd.app.admin.user.tnc.update+json", func() {
+	TypeName("AdminTermsAndConditionsFields")
+	Attributes(func() {
+		Attribute("email", String)
+		Required("email")
+	})
 })

@@ -90,6 +90,10 @@ type Client struct {
 	// roles endpoint.
 	ProjectRolesDoer goahttp.Doer
 
+	// AdminTermsAndConditions Doer is the HTTP client used to make requests to the
+	// admin terms and conditions endpoint.
+	AdminTermsAndConditionsDoer goahttp.Doer
+
 	// AdminDelete Doer is the HTTP client used to make requests to the admin
 	// delete endpoint.
 	AdminDeleteDoer goahttp.Doer
@@ -121,34 +125,35 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		RolesDoer:                  doer,
-		DeleteDoer:                 doer,
-		UploadPhotoDoer:            doer,
-		DownloadPhotoDoer:          doer,
-		LoginDoer:                  doer,
-		RecoveryLookupDoer:         doer,
-		RecoveryDoer:               doer,
-		ResumeDoer:                 doer,
-		LogoutDoer:                 doer,
-		RefreshDoer:                doer,
-		SendValidationDoer:         doer,
-		ValidateDoer:               doer,
-		AddDoer:                    doer,
-		UpdateDoer:                 doer,
-		ChangePasswordDoer:         doer,
-		AcceptTncDoer:              doer,
-		GetCurrentDoer:             doer,
-		ListByProjectDoer:          doer,
-		IssueTransmissionTokenDoer: doer,
-		ProjectRolesDoer:           doer,
-		AdminDeleteDoer:            doer,
-		AdminSearchDoer:            doer,
-		CORSDoer:                   doer,
-		RestoreResponseBody:        restoreBody,
-		scheme:                     scheme,
-		host:                       host,
-		decoder:                    dec,
-		encoder:                    enc,
+		RolesDoer:                   doer,
+		DeleteDoer:                  doer,
+		UploadPhotoDoer:             doer,
+		DownloadPhotoDoer:           doer,
+		LoginDoer:                   doer,
+		RecoveryLookupDoer:          doer,
+		RecoveryDoer:                doer,
+		ResumeDoer:                  doer,
+		LogoutDoer:                  doer,
+		RefreshDoer:                 doer,
+		SendValidationDoer:          doer,
+		ValidateDoer:                doer,
+		AddDoer:                     doer,
+		UpdateDoer:                  doer,
+		ChangePasswordDoer:          doer,
+		AcceptTncDoer:               doer,
+		GetCurrentDoer:              doer,
+		ListByProjectDoer:           doer,
+		IssueTransmissionTokenDoer:  doer,
+		ProjectRolesDoer:            doer,
+		AdminTermsAndConditionsDoer: doer,
+		AdminDeleteDoer:             doer,
+		AdminSearchDoer:             doer,
+		CORSDoer:                    doer,
+		RestoreResponseBody:         restoreBody,
+		scheme:                      scheme,
+		host:                        host,
+		decoder:                     dec,
+		encoder:                     enc,
 	}
 }
 
@@ -617,6 +622,30 @@ func (c *Client) ProjectRoles() goa.Endpoint {
 		resp, err := c.ProjectRolesDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("user", "project roles", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// AdminTermsAndConditions returns an endpoint that makes HTTP requests to the
+// user service admin terms and conditions server.
+func (c *Client) AdminTermsAndConditions() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAdminTermsAndConditionsRequest(c.encoder)
+		decodeResponse = DecodeAdminTermsAndConditionsResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildAdminTermsAndConditionsRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AdminTermsAndConditionsDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("user", "admin terms and conditions", err)
 		}
 		return decodeResponse(resp)
 	}

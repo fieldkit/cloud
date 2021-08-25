@@ -17,28 +17,29 @@ import (
 
 // Endpoints wraps the "user" service endpoints.
 type Endpoints struct {
-	Roles                  goa.Endpoint
-	Delete                 goa.Endpoint
-	UploadPhoto            goa.Endpoint
-	DownloadPhoto          goa.Endpoint
-	Login                  goa.Endpoint
-	RecoveryLookup         goa.Endpoint
-	Recovery               goa.Endpoint
-	Resume                 goa.Endpoint
-	Logout                 goa.Endpoint
-	Refresh                goa.Endpoint
-	SendValidation         goa.Endpoint
-	Validate               goa.Endpoint
-	Add                    goa.Endpoint
-	Update                 goa.Endpoint
-	ChangePassword         goa.Endpoint
-	AcceptTnc              goa.Endpoint
-	GetCurrent             goa.Endpoint
-	ListByProject          goa.Endpoint
-	IssueTransmissionToken goa.Endpoint
-	ProjectRoles           goa.Endpoint
-	AdminDelete            goa.Endpoint
-	AdminSearch            goa.Endpoint
+	Roles                   goa.Endpoint
+	Delete                  goa.Endpoint
+	UploadPhoto             goa.Endpoint
+	DownloadPhoto           goa.Endpoint
+	Login                   goa.Endpoint
+	RecoveryLookup          goa.Endpoint
+	Recovery                goa.Endpoint
+	Resume                  goa.Endpoint
+	Logout                  goa.Endpoint
+	Refresh                 goa.Endpoint
+	SendValidation          goa.Endpoint
+	Validate                goa.Endpoint
+	Add                     goa.Endpoint
+	Update                  goa.Endpoint
+	ChangePassword          goa.Endpoint
+	AcceptTnc               goa.Endpoint
+	GetCurrent              goa.Endpoint
+	ListByProject           goa.Endpoint
+	IssueTransmissionToken  goa.Endpoint
+	ProjectRoles            goa.Endpoint
+	AdminTermsAndConditions goa.Endpoint
+	AdminDelete             goa.Endpoint
+	AdminSearch             goa.Endpoint
 }
 
 // UploadPhotoRequestData holds both the payload and the HTTP request body
@@ -55,28 +56,29 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Roles:                  NewRolesEndpoint(s, a.JWTAuth),
-		Delete:                 NewDeleteEndpoint(s, a.JWTAuth),
-		UploadPhoto:            NewUploadPhotoEndpoint(s, a.JWTAuth),
-		DownloadPhoto:          NewDownloadPhotoEndpoint(s),
-		Login:                  NewLoginEndpoint(s),
-		RecoveryLookup:         NewRecoveryLookupEndpoint(s),
-		Recovery:               NewRecoveryEndpoint(s),
-		Resume:                 NewResumeEndpoint(s),
-		Logout:                 NewLogoutEndpoint(s, a.JWTAuth),
-		Refresh:                NewRefreshEndpoint(s),
-		SendValidation:         NewSendValidationEndpoint(s),
-		Validate:               NewValidateEndpoint(s),
-		Add:                    NewAddEndpoint(s),
-		Update:                 NewUpdateEndpoint(s, a.JWTAuth),
-		ChangePassword:         NewChangePasswordEndpoint(s, a.JWTAuth),
-		AcceptTnc:              NewAcceptTncEndpoint(s, a.JWTAuth),
-		GetCurrent:             NewGetCurrentEndpoint(s, a.JWTAuth),
-		ListByProject:          NewListByProjectEndpoint(s, a.JWTAuth),
-		IssueTransmissionToken: NewIssueTransmissionTokenEndpoint(s, a.JWTAuth),
-		ProjectRoles:           NewProjectRolesEndpoint(s),
-		AdminDelete:            NewAdminDeleteEndpoint(s, a.JWTAuth),
-		AdminSearch:            NewAdminSearchEndpoint(s, a.JWTAuth),
+		Roles:                   NewRolesEndpoint(s, a.JWTAuth),
+		Delete:                  NewDeleteEndpoint(s, a.JWTAuth),
+		UploadPhoto:             NewUploadPhotoEndpoint(s, a.JWTAuth),
+		DownloadPhoto:           NewDownloadPhotoEndpoint(s),
+		Login:                   NewLoginEndpoint(s),
+		RecoveryLookup:          NewRecoveryLookupEndpoint(s),
+		Recovery:                NewRecoveryEndpoint(s),
+		Resume:                  NewResumeEndpoint(s),
+		Logout:                  NewLogoutEndpoint(s, a.JWTAuth),
+		Refresh:                 NewRefreshEndpoint(s),
+		SendValidation:          NewSendValidationEndpoint(s),
+		Validate:                NewValidateEndpoint(s),
+		Add:                     NewAddEndpoint(s),
+		Update:                  NewUpdateEndpoint(s, a.JWTAuth),
+		ChangePassword:          NewChangePasswordEndpoint(s, a.JWTAuth),
+		AcceptTnc:               NewAcceptTncEndpoint(s, a.JWTAuth),
+		GetCurrent:              NewGetCurrentEndpoint(s, a.JWTAuth),
+		ListByProject:           NewListByProjectEndpoint(s, a.JWTAuth),
+		IssueTransmissionToken:  NewIssueTransmissionTokenEndpoint(s, a.JWTAuth),
+		ProjectRoles:            NewProjectRolesEndpoint(s),
+		AdminTermsAndConditions: NewAdminTermsAndConditionsEndpoint(s, a.JWTAuth),
+		AdminDelete:             NewAdminDeleteEndpoint(s, a.JWTAuth),
+		AdminSearch:             NewAdminSearchEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -102,6 +104,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ListByProject = m(e.ListByProject)
 	e.IssueTransmissionToken = m(e.IssueTransmissionToken)
 	e.ProjectRoles = m(e.ProjectRoles)
+	e.AdminTermsAndConditions = m(e.AdminTermsAndConditions)
 	e.AdminDelete = m(e.AdminDelete)
 	e.AdminSearch = m(e.AdminSearch)
 }
@@ -432,6 +435,25 @@ func NewProjectRolesEndpoint(s Service) goa.Endpoint {
 		}
 		vres := NewViewedProjectRoleCollection(res, "default")
 		return vres, nil
+	}
+}
+
+// NewAdminTermsAndConditionsEndpoint returns an endpoint function that calls
+// the method "admin terms and conditions" of service "user".
+func NewAdminTermsAndConditionsEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*AdminTermsAndConditionsPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:admin"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.AdminTermsAndConditions(ctx, p)
 	}
 }
 

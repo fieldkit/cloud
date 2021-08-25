@@ -507,6 +507,32 @@ func BuildIssueTransmissionTokenPayload(userIssueTransmissionTokenAuth string) (
 	return v, nil
 }
 
+// BuildAdminTermsAndConditionsPayload builds the payload for the user admin
+// terms and conditions endpoint from CLI flags.
+func BuildAdminTermsAndConditionsPayload(userAdminTermsAndConditionsBody string, userAdminTermsAndConditionsAuth string) (*user.AdminTermsAndConditionsPayload, error) {
+	var err error
+	var body AdminTermsAndConditionsRequestBody
+	{
+		err = json.Unmarshal([]byte(userAdminTermsAndConditionsBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Eum deserunt.\"\n   }'")
+		}
+	}
+	var auth string
+	{
+		auth = userAdminTermsAndConditionsAuth
+	}
+	v := &user.AdminTermsAndConditionsFields{
+		Email: body.Email,
+	}
+	res := &user.AdminTermsAndConditionsPayload{
+		Update: v,
+	}
+	res.Auth = auth
+
+	return res, nil
+}
+
 // BuildAdminDeletePayload builds the payload for the user admin delete
 // endpoint from CLI flags.
 func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth string) (*user.AdminDeletePayload, error) {
@@ -515,7 +541,7 @@ func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth str
 	{
 		err = json.Unmarshal([]byte(userAdminDeleteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Eum deserunt.\",\n      \"password\": \"Dignissimos atque doloremque aut veniam officia culpa.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Dicta repellat.\",\n      \"password\": \"Voluptatibus quaerat.\"\n   }'")
 		}
 	}
 	var auth string

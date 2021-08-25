@@ -2796,6 +2796,135 @@ func DecodeProjectRolesResponse(decoder func(*http.Response) goahttp.Decoder, re
 	}
 }
 
+// BuildAdminTermsAndConditionsRequest instantiates a HTTP request object with
+// method and path set to call the "user" service "admin terms and conditions"
+// endpoint
+func (c *Client) BuildAdminTermsAndConditionsRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AdminTermsAndConditionsUserPath()}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("user", "admin terms and conditions", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeAdminTermsAndConditionsRequest returns an encoder for requests sent to
+// the user admin terms and conditions server.
+func EncodeAdminTermsAndConditionsRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*user.AdminTermsAndConditionsPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("user", "admin terms and conditions", "*user.AdminTermsAndConditionsPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		body := NewAdminTermsAndConditionsRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("user", "admin terms and conditions", err)
+		}
+		return nil
+	}
+}
+
+// DecodeAdminTermsAndConditionsResponse returns a decoder for responses
+// returned by the user admin terms and conditions endpoint. restoreBody
+// controls whether the response body should be restored after having been read.
+// DecodeAdminTermsAndConditionsResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeAdminTermsAndConditionsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusNoContent:
+			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body AdminTermsAndConditionsUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "admin terms and conditions", err)
+			}
+			err = ValidateAdminTermsAndConditionsUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "admin terms and conditions", err)
+			}
+			return nil, NewAdminTermsAndConditionsUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body AdminTermsAndConditionsForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "admin terms and conditions", err)
+			}
+			err = ValidateAdminTermsAndConditionsForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "admin terms and conditions", err)
+			}
+			return nil, NewAdminTermsAndConditionsForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body AdminTermsAndConditionsNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "admin terms and conditions", err)
+			}
+			err = ValidateAdminTermsAndConditionsNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "admin terms and conditions", err)
+			}
+			return nil, NewAdminTermsAndConditionsNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body AdminTermsAndConditionsBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "admin terms and conditions", err)
+			}
+			err = ValidateAdminTermsAndConditionsBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "admin terms and conditions", err)
+			}
+			return nil, NewAdminTermsAndConditionsBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("user", "admin terms and conditions", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildAdminDeleteRequest instantiates a HTTP request object with method and
 // path set to call the "user" service "admin delete" endpoint
 func (c *Client) BuildAdminDeleteRequest(ctx context.Context, v interface{}) (*http.Request, error) {

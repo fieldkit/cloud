@@ -111,6 +111,11 @@ func ProjectRolesUserPath() string {
 	return "/projects/roles"
 }
 
+// AdminTermsAndConditionsUserPath returns the URL path to the user service admin terms and conditions HTTP endpoint.
+func AdminTermsAndConditionsUserPath() string {
+	return "/admin/user/tnc"
+}
+
 // AdminDeleteUserPath returns the URL path to the user service admin delete HTTP endpoint.
 func AdminDeleteUserPath() string {
 	return "/admin/user"
