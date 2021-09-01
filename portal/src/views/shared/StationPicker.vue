@@ -7,26 +7,29 @@
         </div>
         <div class="header">
             <div class="title">{{ title }}</div>
-            <input
-                class="search"
-                v-model="search"
-                :label="$t('project.stations.search')"
-                @input="onSearch(search)"
-                :placeholder="$t('project.stations.search')"
-            />
-        </div>
-        <div class="main">
-            <div class="child" v-for="station in visible" v-bind:key="station.id">
-                <StationPickerStation
-                    :station="station"
-                    :selected="selected.includes(station.id)"
-                    @selected="(ev) => onSelected(station)"
+            <div>
+                <span class="selected-counter">{{ $t("selected") }} ({{ selected.length }})</span>
+                <input
+                    class="search"
+                    v-model="search"
+                    :label="$t('project.stations.search')"
+                    @input="onSearch(search)"
+                    :placeholder="$t('project.stations.search')"
                 />
             </div>
         </div>
+        <div class="main">
+            <StationPickerStation
+                v-for="station in visible"
+                v-bind:key="station.id"
+                :station="station"
+                :selected="selected.includes(station.id)"
+                @selected="(ev) => onSelected(station)"
+            />
+        </div>
         <PaginationControls :page="paging.number" :totalPages="totalPages()" @new-page="onNewPage" />
         <div class="footer">
-            <button class="button-solid" v-on:click="onCtaClick" v-bind:class="{ enabled: selected }">{{ ctaText }}</button>
+            <button class="button-solid" v-on:click="onCtaClick" v-bind:class="{ enabled: selected }">{{ actionText }}</button>
         </div>
     </div>
 </template>
@@ -60,7 +63,7 @@ export default Vue.extend({
             type: String,
             required: true,
         },
-        ctaText: {
+        actionText: {
             type: String,
             required: true,
         },
@@ -85,7 +88,7 @@ export default Vue.extend({
             selected: [],
             paging: {
                 number: 0,
-                size: 6,
+                size: window.screen.availWidth > 500 ? 6 : 3,
             },
             search: "",
         };
@@ -148,7 +151,11 @@ export default Vue.extend({
 }
 .station-picker .dialog {
     display: flex;
-    @include position(absolute, -48px 0 null null);
+    @include position(absolute, -48px -1px null null);
+
+    @include bp-down($xs) {
+        @include position(absolute, -25px -1px null null);
+    }
 }
 .dialog .close-button {
     margin-left: auto;
@@ -159,31 +166,57 @@ export default Vue.extend({
     }
 }
 .station-picker .header {
+    margin-bottom: 1em;
+    flex-wrap: wrap;
     @include flex(center, space-between);
 }
 .header .title {
     font-weight: 500;
     font-size: 20px;
     color: #2c3e50;
+
+    @include bp-down($xs) {
+        flex-basis: 100%;
+        margin-bottom: 10px;
+    }
+
+    ~ div {
+        @include bp-down($xs) {
+            width: 100%;
+            @include flex(center);
+        }
+    }
 }
 .header .search {
     font-size: 14px;
     width: 247px;
     padding: 7px 10px;
     border: solid 1px #cccdcf;
+
+    @include bp-down($xs) {
+        width: unset;
+        flex: 1;
+    }
 }
 .station-picker .main {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    min-height: 164px; /* Eh */
-}
-.main .child {
-    margin-bottom: 23px;
+    padding-bottom: 5px;
+    margin: 0 -8px;
+    width: calc(100% + 19px);
+
+    @include bp-down($xs) {
+        width: 100%;
+        margin: 0;
+    }
 }
 .station-picker .pagination {
     display: flex;
     margin-top: 40px;
+
+    @include bp-down($xs) {
+        margin-top: 0;
+    }
 }
 .station-picker .footer {
     @include flex(center, center);
@@ -211,7 +244,9 @@ input {
     border: 2px solid #efefef;
     border-radius: 3px;
 }
-.header {
-    margin-bottom: 1em;
+
+.selected-counter {
+    font-size: 14px;
+    margin-right: 17px;
 }
 </style>

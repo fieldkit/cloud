@@ -106,6 +106,7 @@
         "stations": {
             "title": "FieldKit Stations",
             "add": {
+                "trigger": "Add",
                 "title": "Add Station",
                 "cta": "Add"
             },
@@ -306,5 +307,6 @@
         "title": "Terms and Conditions",
         "body": "Content goes here. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus id urna quam. Suspendisse porttitor sed justo at laoreet. Donec blandit venenatis lorem iaculis fermentum. Etiam sagittis arcu id dui congue, in venenatis dolor mattis. Curabitur luctus a neque non feugiat. Morbi eget mauris ac sapien ornare maximus. Cras interdum sed felis in interdum. Quisque dignissim erat quis bibendum viverra. Integer ut suscipit mauris, nec commodo sapien. In molestie ac sem auctor viverra. Donec sed metus eros. Nullam eu augue mollis, euismod dui ut, laoreet nunc. Vivamus commodo vestibulum dui quis elementum. Nunc varius gravida neque. Vivamus imperdiet euismod sodales. Nam faucibus tortor nisl, at sagittis sapien vestibulum at. Phasellus ullamcorper efficitur risus, non feugiat lorem pharetra a. Nunc nec dolor ut neque imperdiet egestas. Phasellus dapibus pulvinar nunc in feugiat. Phasellus ultricies, urna a gravida finibus, diam ligula porta velit, venenatis venenatis est felis id purus. Quisque ultricies odio elit, sed eleifend lectus ullamcorper in. Morbi eu venenatis velit. Quisque a placerat eros. Mauris consequat lobortis dictum. Suspendisse lacus sapien, venenatis et sollicitudin sit amet, efficitur vel orci. Etiam maximus mollis eros ut laoreet. Donec convallis rhoncus felis sit amet porta. Cras ullamcorper efficitur arcu, et iaculis orci varius sit amet. Suspendisse potenti. In hac habitasse platea dictumst. Vivamus ut egestas est. Nullam elit mauris, luctus et cursus egestas, convallis malesuada risus. Pellentesque a orci a arcu scelerisque aliquet. Phasellus sed sapien id ligula porta consequat nec quis tortor. Quisque vulputate dolor magna, eget lacinia libero luctus non. Donec rutrum id purus vitae ornare. Duis id ante in urna facilisis vehicula. Curabitur et turpis eleifend, vulputate ligula quis, pretium mauris. Nam sit amet nulla odio. Aenean tincidunt sapien eget mi tempus condimentum. In ultricies justo magna, nec euismod diam bibendum.",
         "agreeButton": "Agree"
-    }
+    },
+    "selected": "Selected"
 }

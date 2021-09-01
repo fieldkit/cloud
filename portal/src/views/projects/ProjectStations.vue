@@ -5,18 +5,17 @@
             :filter="pickFilter"
             :actionType="StationPickerActionType.add"
             :title="$t('project.stations.add.title')"
-            :ctaText="$t('project.stations.add.cta')"
-            @add="onStationCtaClick"
+            :actionText="$t('project.stations.add.cta')"
+            @add="onStationAdd"
             @close="onCloseAddStationModal"
             v-if="addingStation"
         />
         <StationPickerModal
-            :stations="userStations"
-            :filter="pickFilter"
+            :stations="visibleStations"
             :actionType="StationPickerActionType.remove"
             :title="$t('project.stations.edit.title')"
-            :ctaText="$t('project.stations.edit.cta')"
-            @remove="onStationCtaClick"
+            :actionText="$t('project.stations.edit.cta')"
+            @remove="onStationRemove"
             @close="onCloseEditStationModal"
             v-if="editingStation"
         />
@@ -25,7 +24,7 @@
             <div class="stations-cta-container" v-if="admin">
                 <div class="stations-cta" v-on:click="showAddStationPicker">
                     <img src="@/assets/icon-plus-round.svg" />
-                    {{ $t("project.stations.add.title") }}
+                    {{ $t("project.stations.add.trigger") }}
                 </div>
                 <div class="stations-cta" v-on:click="showEditStationPicker">
                     {{ $t("project.stations.edit.trigger") }}
@@ -188,25 +187,24 @@ export default Vue.extend({
         showEditStationPicker(): void {
             this.editingStation = true;
         },
-        onStationCtaClick(stationIds: number[], eventType: StationPickerActionType): void {
-            console.log("CLICK", stationIds, eventType);
-            if (eventType === StationPickerActionType.add) {
-                this.addingStation = false;
-            }
-            if (eventType === StationPickerActionType.remove) {
-                this.editingStation = false;
-            }
+        onStationAdd(stationIds): void {
+            this.addingStation = false;
             stationIds.forEach((stationId) => {
                 const payload = {
                     projectId: this.project.id,
                     stationId: stationId,
                 };
-                if (eventType === StationPickerActionType.add) {
-                    this.$store.dispatch(ActionTypes.STATION_PROJECT_ADD, payload);
-                }
-                if (eventType === StationPickerActionType.remove) {
-                    this.$store.dispatch(ActionTypes.STATION_PROJECT_REMOVE, payload);
-                }
+                this.$store.dispatch(ActionTypes.STATION_PROJECT_ADD, payload);
+            });
+        },
+        onStationRemove(stationIds): void {
+            this.editingStation = false;
+            stationIds.forEach((stationId) => {
+                const payload = {
+                    projectId: this.project.id,
+                    stationId: stationId,
+                };
+                this.$store.dispatch(ActionTypes.STATION_PROJECT_REMOVE, payload);
             });
         },
         onCloseAddStationModal(): void {
@@ -313,6 +311,10 @@ export default Vue.extend({
 
     &:not(:last-of-type) {
         margin-right: 35px;
+
+        @include bp-down($xs) {
+          margin-right: 15px;
+        }
     }
 }
 .last-seen {

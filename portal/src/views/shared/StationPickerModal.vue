@@ -4,11 +4,11 @@
             <div class="modal-container">
                 <StationPicker
                     :title="title"
-                    :ctaText="ctaText"
+                    :actionText="actionText"
                     :stations="stations"
                     :filter="filter"
                     :actionType="actionType"
-                    @ctaClick="test"
+                    @ctaClick="emitAction"
                     @close="$emit('close')"
                 />
             </div>
@@ -20,7 +20,6 @@
 import Vue, { PropType } from "vue";
 import StationPicker from "./StationPicker.vue";
 import { DisplayStation } from "@/store";
-import { StationPickerActionType } from "@/views/shared/StationPicker.vue";
 
 export default Vue.extend({
     name: "StationPickerModal",
@@ -32,11 +31,11 @@ export default Vue.extend({
             type: String,
             required: true,
         },
-        ctaType: {
-            type: Object,
+        actionType: {
+            type: String,
             required: true,
         },
-        ctaText: {
+        actionText: {
             type: String,
             required: true,
         },
@@ -50,15 +49,16 @@ export default Vue.extend({
         },
     },
     methods: {
-        test(event, ids): void {
-            console.log("reg click", event, ids);
-            this.$emit(event, ids);
+        emitAction(ids): void {
+            this.$emit(this.actionType, ids);
         },
     },
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../scss/mixins";
+
 .modal-mask {
     position: fixed;
     z-index: 9998;
@@ -77,6 +77,7 @@ export default Vue.extend({
 }
 
 .modal-container {
+    box-sizing: border-box;
     width: 840px;
     max-width: 80%;
     margin: 0px auto;
@@ -87,6 +88,20 @@ export default Vue.extend({
     border-radius: 2px;
     transition: all 0.3s ease;
     font-family: Helvetica, Arial, sans-serif;
+
+    @include bp-down($md) {
+        width: unset;
+    }
+
+    @include bp-down($sm) {
+        width: unset;
+        padding: 60px 30px 35px;
+    }
+
+    @include bp-down($xs) {
+        max-width: 100%;
+        padding: 40px 15px 35px;
+    }
 }
 
 .modal-header h3 {

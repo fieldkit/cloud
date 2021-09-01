@@ -61,6 +61,7 @@ export default Vue.extend({
 
 .sps.selected {
     border: 2px solid #1b80c9;
+    min-width: 265px;
 
     &:after {
         @include position(absolute, -6px -6px null null);
@@ -73,13 +74,19 @@ export default Vue.extend({
 }
 .sps {
     display: flex;
-    min-width: 267px;
     border: 1px solid #d8dce0;
     border-radius: 3px;
     position: relative;
+    margin: 0 8px 23px 8px;
+    flex: 0 0 calc(33% - 16px);
+
+    @include bp-down($sm) {
+        flex: 0 0 calc(50% - 18px);
+    }
 
     @include bp-down($xs) {
-        min-width: 220px;
+        flex: 0 0 100%;
+        margin: 0 0 10px;
     }
 }
 .sps .standard {
