@@ -2,13 +2,15 @@
     <div class="station-picker">
         <div class="dialog">
             <div class="close-button" v-on:click="onClose">
-                <img alt="Close" src="../../assets/close.png" />
+                <img alt="Close" src="@/assets/icon-close.svg" />
             </div>
         </div>
         <div class="header">
-            <div class="title">{{ $t("project.stations.add") }}</div>
-            <div class="search">
+            <div class="title">{{ title }}</div>
+            <div>
+                <span class="selected-counter">{{ $t("selected") }} ({{ selected.length }})</span>
                 <input
+                    class="search"
                     v-model="search"
                     :label="$t('project.stations.search')"
                     @input="onSearch(search)"
@@ -17,13 +19,17 @@
             </div>
         </div>
         <div class="main">
-            <div class="child" v-for="station in visible" v-bind:key="station.id">
-                <StationPickerStation :station="station" :selected="selected === station.id" @selected="(ev) => onSelected(station)" />
-            </div>
+            <StationPickerStation
+                v-for="station in visible"
+                v-bind:key="station.id"
+                :station="station"
+                :selected="selected.includes(station.id)"
+                @selected="(ev) => onSelected(station)"
+            />
         </div>
         <PaginationControls :page="paging.number" :totalPages="totalPages()" @new-page="onNewPage" />
         <div class="footer">
-            <div class="button" v-on:click="onAdd" v-bind:class="{ enabled: selected }">{{ $t("project.stations.add") }}</div>
+            <button class="button-solid" v-on:click="onCtaClick" v-bind:class="{ enabled: selected }">{{ actionText }}</button>
         </div>
     </div>
 </template>
@@ -36,6 +42,11 @@ import StationPickerStation from "./StationPickerStation.vue";
 import PaginationControls from "./PaginationControls.vue";
 import { DisplayStation } from "@/store";
 
+export enum StationPickerActionType {
+    add = "add",
+    remove = "remove",
+}
+
 export default Vue.extend({
     name: "StationPicker",
     components: {
@@ -44,6 +55,18 @@ export default Vue.extend({
         PaginationControls,
     },
     props: {
+        title: {
+            type: String,
+            required: true,
+        },
+        actionType: {
+            type: String,
+            required: true,
+        },
+        actionText: {
+            type: String,
+            required: true,
+        },
         stations: {
             type: Array as PropType<DisplayStation[]>,
             required: true,
@@ -54,7 +77,7 @@ export default Vue.extend({
         },
     },
     data(): {
-        selected: any | null;
+        selected: number[];
         paging: {
             number: number;
             size: number;
@@ -62,10 +85,10 @@ export default Vue.extend({
         search: string;
     } {
         return {
-            selected: null,
+            selected: [],
             paging: {
                 number: 0,
-                size: 6,
+                size: window.screen.availWidth > 500 ? 6 : 3,
             },
             search: "",
         };
@@ -85,6 +108,7 @@ export default Vue.extend({
             return _.filter(
                 this.stations.filter((station) => this.filter(station)),
                 (station) => {
+                    console.log("fff", station);
                     return station.name.toLowerCase().indexOf(this.search.toLowerCase()) >= 0;
                 }
             );
@@ -93,15 +117,21 @@ export default Vue.extend({
             return Math.ceil(this.filteredStations().length / this.paging.size);
         },
         onSelected(station: DisplayStation): void {
-            this.selected = station.id;
+            const idAtIndex = this.selected.findIndex((value) => value === station.id);
+            if (idAtIndex > -1) {
+                this.selected.splice(idAtIndex, 1);
+            } else {
+                this.selected.push(station.id);
+            }
         },
         onClose(): void {
             this.$emit("close");
         },
-        onAdd(): void {
-            if (this.selected) {
-                this.$emit("add", this.selected);
+        onCtaClick(): void {
+            if (!this.selected) {
+                return;
             }
+            this.$emit("ctaClick", this.selected);
         },
         onNewPage(page: number): void {
             this.paging.number = page;
@@ -110,43 +140,87 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../scss/mixins";
+@import "../../scss/global";
+
 .station-picker {
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 .station-picker .dialog {
     display: flex;
+    @include position(absolute, -48px -1px null null);
+
+    @include bp-down($xs) {
+        @include position(absolute, -25px -1px null null);
+    }
 }
 .dialog .close-button {
     margin-left: auto;
     cursor: pointer;
+
+    img {
+        height: 19px;
+    }
 }
 .station-picker .header {
-    display: flex;
+    margin-bottom: 1em;
+    flex-wrap: wrap;
+    @include flex(center, space-between);
 }
 .header .title {
     font-weight: 500;
     font-size: 20px;
     color: #2c3e50;
+
+    @include bp-down($xs) {
+        flex-basis: 100%;
+        margin-bottom: 10px;
+    }
+
+    ~ div {
+        @include bp-down($xs) {
+            width: 100%;
+            @include flex(center);
+        }
+    }
 }
 .header .search {
-    margin-left: auto;
+    font-size: 14px;
+    width: 247px;
+    padding: 7px 10px;
+    border: solid 1px #cccdcf;
+
+    @include bp-down($xs) {
+        width: unset;
+        flex: 1;
+    }
 }
 .station-picker .main {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    min-height: 164px; /* Eh */
-}
-.main .child {
-    margin-bottom: 10px;
+    padding-bottom: 5px;
+    margin: 0 -8px;
+    width: calc(100% + 19px);
+
+    @include bp-down($xs) {
+        width: 100%;
+        margin: 0;
+    }
 }
 .station-picker .pagination {
     display: flex;
+    margin-top: 40px;
+
+    @include bp-down($xs) {
+        margin-top: 0;
+    }
 }
 .station-picker .footer {
-    display: flex;
+    @include flex(center, center);
+    margin-top: 35px;
 }
 .footer .button {
     font-size: 18px;
@@ -170,7 +244,9 @@ input {
     border: 2px solid #efefef;
     border-radius: 3px;
 }
-.header {
-    margin-bottom: 1em;
+
+.selected-counter {
+    font-size: 14px;
+    margin-right: 17px;
 }
 </style>
