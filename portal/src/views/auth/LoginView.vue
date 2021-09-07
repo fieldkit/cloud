@@ -1,12 +1,11 @@
 <template>
     <div class="form-container" v-if="!sso">
-        <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
+        <img class="form-header-logo" :alt="$t('layout.logo.alt')" src="@/assets/FieldKit_Logo_White.png" />
         <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="spoofing" :failed="failed" @login="save" />
     </div>
 </template>
 
 <script lang="ts">
-import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import LoginForm from "./LoginForm.vue";
@@ -81,9 +80,13 @@ export default Vue.extend({
         async leaveAfterAuth(): Promise<void> {
             const after = this.forwardAfterQuery;
             if (after.after) {
-                await this.$router.push(after.after);
+                await this.$router.push(after.after).catch((e) => {
+                    console.log(e);
+                });
             } else {
-                await this.$router.push({ name: "projects" });
+                await this.$router.push({ name: "projects" }).catch((e) => {
+                    console.log(e);
+                });
             }
         },
     },

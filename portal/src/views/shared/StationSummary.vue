@@ -16,7 +16,7 @@
                 </div>
                 <div class="station-battery">
                     <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
-                    <span class="small-light" v-if="false">{{ station.battery }}</span>
+                    <span class="small-light">{{ station.battery }}</span>
                 </div>
                 <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
                     <img v-if="!module.internal" alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
@@ -66,7 +66,7 @@
 
         <div class="readings-container" v-if="readings">
             <div class="title">Latest Readings</div>
-            <LatestStationReadings :id="station.id" @layoutChange="layoutChange"/>
+            <LatestStationReadings :id="station.id" @layoutChange="layoutChange" />
         </div>
 
         <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>

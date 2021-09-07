@@ -202,6 +202,13 @@ export class Graph extends Viz {
     public fastTime: FastTime = FastTime.All;
     public geo: GeoZoom | null = null;
 
+    public get visibleTimeRange(): TimeRange {
+        if (this.graphing) {
+            return new TimeRange(this.graphing.timeRange[0], this.graphing.timeRange[1]);
+        }
+        return this.visible;
+    }
+
     constructor(public chartParams: DataQueryParams) {
         super();
         if (this.chartParams.sensors.length != 1) throw new Error(`viz: Graph too many sensors`);

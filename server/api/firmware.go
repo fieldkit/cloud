@@ -15,7 +15,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 
 	"github.com/fieldkit/cloud/server/backend"
-	_ "github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 
@@ -293,7 +292,7 @@ func (s *FirmwareService) Delete(ctx context.Context, payload *firmware.DeletePa
 }
 
 func (s *FirmwareService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

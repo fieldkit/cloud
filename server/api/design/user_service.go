@@ -47,25 +47,6 @@ var _ = Service("user", func() {
 		})
 	})
 
-	Method("delete", func() {
-		Security(JWTAuth, func() {
-			Scope("api:admin")
-		})
-
-		Payload(func() {
-			Token("auth")
-			Required("auth")
-			Attribute("userId", Int32)
-			Required("userId")
-		})
-
-		HTTP(func() {
-			DELETE("admin/users/{userId}")
-
-			httpAuthentication()
-		})
-	})
-
 	Method("upload photo", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -338,6 +319,31 @@ var _ = Service("user", func() {
 		})
 	})
 
+	Method("accept tnc", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("userId", Int32)
+			Required("userId")
+			Attribute("accept", AcceptTncFields)
+			Required("accept")
+		})
+
+		Result(User)
+
+		HTTP(func() {
+			PATCH("users/{userId}/accept-tnc")
+
+			Body("accept")
+
+			httpAuthentication()
+		})
+	})
+
 	Method("get current", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
@@ -402,6 +408,27 @@ var _ = Service("user", func() {
 
 		HTTP(func() {
 			GET("projects/roles")
+		})
+	})
+
+	Method("admin terms and conditions", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("update", AdminTermsAndConditionsFields)
+			Required("update")
+		})
+
+		HTTP(func() {
+			DELETE("admin/user/tnc")
+
+			Body("update")
+
+			httpAuthentication()
 		})
 	})
 
@@ -470,6 +497,7 @@ var AddUserFields = Type("AddUserFields", func() {
 		MinLength(10)
 	})
 	Attribute("invite_token", String)
+	Attribute("tncAccept", Boolean)
 	Required("name", "email", "password")
 })
 
@@ -489,6 +517,11 @@ var UpdateUserPasswordFields = Type("UpdateUserPasswordFields", func() {
 		MinLength(10)
 	})
 	Required("oldPassword", "newPassword")
+})
+
+var AcceptTncFields = Type("AcceptTncFields", func() {
+	Attribute("accept", Boolean)
+	Required("accept")
 })
 
 var LoginFields = Type("LoginFields", func() {
@@ -528,7 +561,8 @@ var User = ResultType("application/vnd.app.user+json", func() {
 		Attribute("photo", UserPhoto)
 		Attribute("admin", Boolean)
 		Attribute("updatedAt", Int64)
-		Required("id", "name", "email", "bio", "admin", "updatedAt")
+		Attribute("tncDate", Int64)
+		Required("id", "name", "email", "bio", "admin", "updatedAt", "tncDate")
 	})
 	View("default", func() {
 		Attribute("id")
@@ -538,6 +572,7 @@ var User = ResultType("application/vnd.app.user+json", func() {
 		Attribute("photo")
 		Attribute("admin")
 		Attribute("updatedAt")
+		Attribute("tncDate")
 	})
 })
 
@@ -608,10 +643,12 @@ var AdminDeleteFields = ResultType("application/vnd.app.admin.user.delete+json",
 		Attribute("password", String)
 		Required("password")
 	})
-	/*
-		View("default", func() {
-			Attribute("email")
-			Attribute("password")
-		})
-	*/
+})
+
+var AdminTermsAndConditionsFields = ResultType("application/vnd.app.admin.user.tnc.update+json", func() {
+	TypeName("AdminTermsAndConditionsFields")
+	Attributes(func() {
+		Attribute("email", String)
+		Required("email")
+	})
 })

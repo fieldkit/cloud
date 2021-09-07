@@ -16,53 +16,55 @@ import (
 
 // Client is the "user" service client.
 type Client struct {
-	RolesEndpoint                  goa.Endpoint
-	DeleteEndpoint                 goa.Endpoint
-	UploadPhotoEndpoint            goa.Endpoint
-	DownloadPhotoEndpoint          goa.Endpoint
-	LoginEndpoint                  goa.Endpoint
-	RecoveryLookupEndpoint         goa.Endpoint
-	RecoveryEndpoint               goa.Endpoint
-	ResumeEndpoint                 goa.Endpoint
-	LogoutEndpoint                 goa.Endpoint
-	RefreshEndpoint                goa.Endpoint
-	SendValidationEndpoint         goa.Endpoint
-	ValidateEndpoint               goa.Endpoint
-	AddEndpoint                    goa.Endpoint
-	UpdateEndpoint                 goa.Endpoint
-	ChangePasswordEndpoint         goa.Endpoint
-	GetCurrentEndpoint             goa.Endpoint
-	ListByProjectEndpoint          goa.Endpoint
-	IssueTransmissionTokenEndpoint goa.Endpoint
-	ProjectRolesEndpoint           goa.Endpoint
-	AdminDeleteEndpoint            goa.Endpoint
-	AdminSearchEndpoint            goa.Endpoint
+	RolesEndpoint                   goa.Endpoint
+	UploadPhotoEndpoint             goa.Endpoint
+	DownloadPhotoEndpoint           goa.Endpoint
+	LoginEndpoint                   goa.Endpoint
+	RecoveryLookupEndpoint          goa.Endpoint
+	RecoveryEndpoint                goa.Endpoint
+	ResumeEndpoint                  goa.Endpoint
+	LogoutEndpoint                  goa.Endpoint
+	RefreshEndpoint                 goa.Endpoint
+	SendValidationEndpoint          goa.Endpoint
+	ValidateEndpoint                goa.Endpoint
+	AddEndpoint                     goa.Endpoint
+	UpdateEndpoint                  goa.Endpoint
+	ChangePasswordEndpoint          goa.Endpoint
+	AcceptTncEndpoint               goa.Endpoint
+	GetCurrentEndpoint              goa.Endpoint
+	ListByProjectEndpoint           goa.Endpoint
+	IssueTransmissionTokenEndpoint  goa.Endpoint
+	ProjectRolesEndpoint            goa.Endpoint
+	AdminTermsAndConditionsEndpoint goa.Endpoint
+	AdminDeleteEndpoint             goa.Endpoint
+	AdminSearchEndpoint             goa.Endpoint
 }
 
 // NewClient initializes a "user" service client given the endpoints.
-func NewClient(roles, delete_, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, resume, logout, refresh, sendValidation, validate, add, update, changePassword, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminDelete, adminSearch goa.Endpoint) *Client {
+func NewClient(roles, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, resume, logout, refresh, sendValidation, validate, add, update, changePassword, acceptTnc, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminTermsAndConditions, adminDelete, adminSearch goa.Endpoint) *Client {
 	return &Client{
-		RolesEndpoint:                  roles,
-		DeleteEndpoint:                 delete_,
-		UploadPhotoEndpoint:            uploadPhoto,
-		DownloadPhotoEndpoint:          downloadPhoto,
-		LoginEndpoint:                  login,
-		RecoveryLookupEndpoint:         recoveryLookup,
-		RecoveryEndpoint:               recovery,
-		ResumeEndpoint:                 resume,
-		LogoutEndpoint:                 logout,
-		RefreshEndpoint:                refresh,
-		SendValidationEndpoint:         sendValidation,
-		ValidateEndpoint:               validate,
-		AddEndpoint:                    add,
-		UpdateEndpoint:                 update,
-		ChangePasswordEndpoint:         changePassword,
-		GetCurrentEndpoint:             getCurrent,
-		ListByProjectEndpoint:          listByProject,
-		IssueTransmissionTokenEndpoint: issueTransmissionToken,
-		ProjectRolesEndpoint:           projectRoles,
-		AdminDeleteEndpoint:            adminDelete,
-		AdminSearchEndpoint:            adminSearch,
+		RolesEndpoint:                   roles,
+		UploadPhotoEndpoint:             uploadPhoto,
+		DownloadPhotoEndpoint:           downloadPhoto,
+		LoginEndpoint:                   login,
+		RecoveryLookupEndpoint:          recoveryLookup,
+		RecoveryEndpoint:                recovery,
+		ResumeEndpoint:                  resume,
+		LogoutEndpoint:                  logout,
+		RefreshEndpoint:                 refresh,
+		SendValidationEndpoint:          sendValidation,
+		ValidateEndpoint:                validate,
+		AddEndpoint:                     add,
+		UpdateEndpoint:                  update,
+		ChangePasswordEndpoint:          changePassword,
+		AcceptTncEndpoint:               acceptTnc,
+		GetCurrentEndpoint:              getCurrent,
+		ListByProjectEndpoint:           listByProject,
+		IssueTransmissionTokenEndpoint:  issueTransmissionToken,
+		ProjectRolesEndpoint:            projectRoles,
+		AdminTermsAndConditionsEndpoint: adminTermsAndConditions,
+		AdminDeleteEndpoint:             adminDelete,
+		AdminSearchEndpoint:             adminSearch,
 	}
 }
 
@@ -74,12 +76,6 @@ func (c *Client) Roles(ctx context.Context, p *RolesPayload) (res *AvailableRole
 		return
 	}
 	return ires.(*AvailableRoles), nil
-}
-
-// Delete calls the "delete" endpoint of the "user" service.
-func (c *Client) Delete(ctx context.Context, p *DeletePayload) (err error) {
-	_, err = c.DeleteEndpoint(ctx, p)
-	return
 }
 
 // UploadPhoto calls the "upload photo" endpoint of the "user" service.
@@ -192,6 +188,16 @@ func (c *Client) ChangePassword(ctx context.Context, p *ChangePasswordPayload) (
 	return ires.(*User), nil
 }
 
+// AcceptTnc calls the "accept tnc" endpoint of the "user" service.
+func (c *Client) AcceptTnc(ctx context.Context, p *AcceptTncPayload) (res *User, err error) {
+	var ires interface{}
+	ires, err = c.AcceptTncEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*User), nil
+}
+
 // GetCurrent calls the "get current" endpoint of the "user" service.
 func (c *Client) GetCurrent(ctx context.Context, p *GetCurrentPayload) (res *User, err error) {
 	var ires interface{}
@@ -231,6 +237,13 @@ func (c *Client) ProjectRoles(ctx context.Context) (res ProjectRoleCollection, e
 		return
 	}
 	return ires.(ProjectRoleCollection), nil
+}
+
+// AdminTermsAndConditions calls the "admin terms and conditions" endpoint of
+// the "user" service.
+func (c *Client) AdminTermsAndConditions(ctx context.Context, p *AdminTermsAndConditionsPayload) (err error) {
+	_, err = c.AdminTermsAndConditionsEndpoint(ctx, p)
+	return
 }
 
 // AdminDelete calls the "admin delete" endpoint of the "user" service.

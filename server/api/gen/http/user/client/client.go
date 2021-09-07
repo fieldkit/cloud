@@ -20,9 +20,6 @@ type Client struct {
 	// Roles Doer is the HTTP client used to make requests to the roles endpoint.
 	RolesDoer goahttp.Doer
 
-	// Delete Doer is the HTTP client used to make requests to the delete endpoint.
-	DeleteDoer goahttp.Doer
-
 	// UploadPhoto Doer is the HTTP client used to make requests to the upload
 	// photo endpoint.
 	UploadPhotoDoer goahttp.Doer
@@ -70,6 +67,10 @@ type Client struct {
 	// password endpoint.
 	ChangePasswordDoer goahttp.Doer
 
+	// AcceptTnc Doer is the HTTP client used to make requests to the accept tnc
+	// endpoint.
+	AcceptTncDoer goahttp.Doer
+
 	// GetCurrent Doer is the HTTP client used to make requests to the get current
 	// endpoint.
 	GetCurrentDoer goahttp.Doer
@@ -85,6 +86,10 @@ type Client struct {
 	// ProjectRoles Doer is the HTTP client used to make requests to the project
 	// roles endpoint.
 	ProjectRolesDoer goahttp.Doer
+
+	// AdminTermsAndConditions Doer is the HTTP client used to make requests to the
+	// admin terms and conditions endpoint.
+	AdminTermsAndConditionsDoer goahttp.Doer
 
 	// AdminDelete Doer is the HTTP client used to make requests to the admin
 	// delete endpoint.
@@ -117,33 +122,34 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		RolesDoer:                  doer,
-		DeleteDoer:                 doer,
-		UploadPhotoDoer:            doer,
-		DownloadPhotoDoer:          doer,
-		LoginDoer:                  doer,
-		RecoveryLookupDoer:         doer,
-		RecoveryDoer:               doer,
-		ResumeDoer:                 doer,
-		LogoutDoer:                 doer,
-		RefreshDoer:                doer,
-		SendValidationDoer:         doer,
-		ValidateDoer:               doer,
-		AddDoer:                    doer,
-		UpdateDoer:                 doer,
-		ChangePasswordDoer:         doer,
-		GetCurrentDoer:             doer,
-		ListByProjectDoer:          doer,
-		IssueTransmissionTokenDoer: doer,
-		ProjectRolesDoer:           doer,
-		AdminDeleteDoer:            doer,
-		AdminSearchDoer:            doer,
-		CORSDoer:                   doer,
-		RestoreResponseBody:        restoreBody,
-		scheme:                     scheme,
-		host:                       host,
-		decoder:                    dec,
-		encoder:                    enc,
+		RolesDoer:                   doer,
+		UploadPhotoDoer:             doer,
+		DownloadPhotoDoer:           doer,
+		LoginDoer:                   doer,
+		RecoveryLookupDoer:          doer,
+		RecoveryDoer:                doer,
+		ResumeDoer:                  doer,
+		LogoutDoer:                  doer,
+		RefreshDoer:                 doer,
+		SendValidationDoer:          doer,
+		ValidateDoer:                doer,
+		AddDoer:                     doer,
+		UpdateDoer:                  doer,
+		ChangePasswordDoer:          doer,
+		AcceptTncDoer:               doer,
+		GetCurrentDoer:              doer,
+		ListByProjectDoer:           doer,
+		IssueTransmissionTokenDoer:  doer,
+		ProjectRolesDoer:            doer,
+		AdminTermsAndConditionsDoer: doer,
+		AdminDeleteDoer:             doer,
+		AdminSearchDoer:             doer,
+		CORSDoer:                    doer,
+		RestoreResponseBody:         restoreBody,
+		scheme:                      scheme,
+		host:                        host,
+		decoder:                     dec,
+		encoder:                     enc,
 	}
 }
 
@@ -166,30 +172,6 @@ func (c *Client) Roles() goa.Endpoint {
 		resp, err := c.RolesDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("user", "roles", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
-// Delete returns an endpoint that makes HTTP requests to the user service
-// delete server.
-func (c *Client) Delete() goa.Endpoint {
-	var (
-		encodeRequest  = EncodeDeleteRequest(c.encoder)
-		decodeResponse = DecodeDeleteResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildDeleteRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.DeleteDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("user", "delete", err)
 		}
 		return decodeResponse(resp)
 	}
@@ -502,6 +484,30 @@ func (c *Client) ChangePassword() goa.Endpoint {
 	}
 }
 
+// AcceptTnc returns an endpoint that makes HTTP requests to the user service
+// accept tnc server.
+func (c *Client) AcceptTnc() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAcceptTncRequest(c.encoder)
+		decodeResponse = DecodeAcceptTncResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildAcceptTncRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AcceptTncDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("user", "accept tnc", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
 // GetCurrent returns an endpoint that makes HTTP requests to the user service
 // get current server.
 func (c *Client) GetCurrent() goa.Endpoint {
@@ -588,6 +594,30 @@ func (c *Client) ProjectRoles() goa.Endpoint {
 		resp, err := c.ProjectRolesDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("user", "project roles", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// AdminTermsAndConditions returns an endpoint that makes HTTP requests to the
+// user service admin terms and conditions server.
+func (c *Client) AdminTermsAndConditions() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAdminTermsAndConditionsRequest(c.encoder)
+		decodeResponse = DecodeAdminTermsAndConditionsResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildAdminTermsAndConditionsRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AdminTermsAndConditionsDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("user", "admin terms and conditions", err)
 		}
 		return decodeResponse(resp)
 	}

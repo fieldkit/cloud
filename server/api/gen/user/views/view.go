@@ -91,6 +91,7 @@ type UserView struct {
 	Photo     *UserPhotoView
 	Admin     *bool
 	UpdatedAt *int64
+	TncDate   *int64
 }
 
 // UserPhotoView is a type that runs validations on a projected type.
@@ -161,6 +162,7 @@ var (
 			"photo",
 			"admin",
 			"updatedAt",
+			"tncDate",
 		},
 	}
 	// ProjectUsersMap is a map of attribute names in result type ProjectUsers
@@ -353,6 +355,9 @@ func ValidateUserView(result *UserView) (err error) {
 	}
 	if result.UpdatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "result"))
+	}
+	if result.TncDate == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("tncDate", "result"))
 	}
 	if result.Name != nil {
 		err = goa.MergeErrors(err, goa.ValidatePattern("result.name", *result.Name, "\\S"))

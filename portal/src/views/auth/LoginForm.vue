@@ -2,35 +2,35 @@
     <form class="form" @submit.prevent="save">
         <h1 class="form-title">Log In to Your Account</h1>
         <div class="form-group" v-if="spoofing">
-            <TextField v-model="form.spoofEmail" label="Spoof Email" />
+            <TextField v-model="form.spoofEmail" :label="$t('login.form.spoofEmail.label')" />
             <div class="form-errors" v-if="$v.form.spoofEmail.$error">
-                <div v-if="!$v.form.spoofEmail.required">Spoof Email is a required field.</div>
-                <div v-if="!$v.form.spoofEmail.email">Must be a valid email address.</div>
+                <div v-if="!$v.form.spoofEmail.required">{{$t('login.form.spoofEmail.required')}}</div>
+                <div v-if="!$v.form.spoofEmail.email">{{$t('login.form.spoofEmail.valid')}}</div>
             </div>
         </div>
         <div class="form-group">
-            <TextField v-model="form.email" label="Email" />
+            <TextField v-model="form.email" :label="$t('login.form.email.label')" />
             <div class="form-errors" v-if="$v.form.email.$error">
-                <div v-if="!$v.form.email.required">Email is a required field.</div>
-                <div v-if="!$v.form.email.email">Must be a valid email address.</div>
+                <div v-if="!$v.form.email.required">{{$t('login.form.email.required')}}</div>
+                <div v-if="!$v.form.email.email">{{$t('login.form.email.valid')}}</div>
             </div>
         </div>
         <div class="form-group">
-            <TextField v-model="form.password" label="Password" type="password" />
+            <TextField v-model="form.password" :label="$t('login.form.password.label')" type="password" />
             <div class="form-errors" v-if="$v.form.password.$error">
-                <div v-if="!$v.form.password.required">This is a required field.</div>
-                <div v-if="!$v.form.password.min">Password must be at least 10 characters.</div>
+                <div v-if="!$v.form.password.required">{{$t('login.form.password.required')}}</div>
+                <div v-if="!$v.form.password.min">{{$t('login.form.password.valid')}}</div>
             </div>
         </div>
         <div class="form-link-recover">
-            <router-link :to="{ name: 'recover', query: forwardAfterQuery }" class="form-link">Reset password</router-link>
+            <router-link :to="{ name: 'recover', query: forwardAfterQuery }" class="form-link">{{$t('login.resetLink')}}</router-link>
         </div>
         <div v-if="failed" class="login-failed">
-            Unfortunately we were unable to log you in. Please check your credentials and try again.
+          {{$t('login.loginFailed')}}
         </div>
-        <button class="form-submit" type="submit">Log In</button>
+        <button class="form-submit" type="submit">{{$t('login.loginButton')}}</button>
         <div>
-            <router-link :to="{ name: 'register', query: forwardAfterQuery }" class="form-link">Create an account</router-link>
+            <router-link :to="{ name: 'register', query: forwardAfterQuery }" class="form-link">{{$t('login.createAccountLink')}}</router-link>
         </div>
     </form>
 </template>

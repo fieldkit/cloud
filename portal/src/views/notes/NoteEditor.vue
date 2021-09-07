@@ -81,6 +81,7 @@ export default Vue.extend({
 
 .attached-audio {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
     margin-bottom: 10px;
     border: 1px solid #d8dce0;
@@ -93,6 +94,10 @@ export default Vue.extend({
     font-size: 14px;
     font-weight: 500;
     margin-right: 10px;
+
+    @include bp-down($xs) {
+        flex-basis: 100%;
+    }
 }
 
 .title {

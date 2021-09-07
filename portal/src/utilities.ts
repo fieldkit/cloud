@@ -84,7 +84,11 @@ export function getModuleImg(module) {
     }
 }
 
-export function getBatteryIcon(percentage: number): string {
+export function getBatteryIcon(percentage: number | undefined): string {
+    if (!percentage) {
+        return "battery/0.svg";
+    }
+
     if (percentage == 0) {
         return "battery/0.svg";
     } else if (percentage <= 20) {

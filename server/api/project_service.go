@@ -17,6 +17,7 @@ import (
 	project "github.com/fieldkit/cloud/server/api/gen/project"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -848,6 +849,8 @@ func (s *ProjectService) UploadPhoto(ctx context.Context, payload *project.Uploa
 }
 
 func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.DownloadPhotoPayload) (*project.DownloadedPhoto, error) {
+	log := Logger(ctx).Sugar()
+
 	// TODO Maybe make a separate type with fewer columns?
 	resource := &data.Project{}
 	if err := s.options.Database.GetContext(ctx, resource, `
@@ -888,6 +891,7 @@ func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.Dow
 	mr := repositories.NewMediaRepository(s.options.MediaFiles)
 	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
 	if err != nil {
+		log.Error("load-by-url:error", "error", err)
 		return nil, project.MakeNotFound(errors.New("not found"))
 	}
 
@@ -920,7 +924,7 @@ func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.Dow
 }
 
 func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

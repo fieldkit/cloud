@@ -20,6 +20,7 @@ import (
 	user "github.com/fieldkit/cloud/server/api/gen/user"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -128,10 +129,17 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 		return nil, user.MakeUserEmailRegistered(errors.New("email registered"))
 	}
 
+	tncDate := time.Time{}
+
+	if *payload.User.TncAccept == true {
+		tncDate = time.Now()
+	}
+
 	user := &data.User{
 		Name:     data.Name(payload.User.Name),
 		Email:    payload.User.Email,
 		Username: payload.User.Email,
+		TncDate:  tncDate,
 		Bio:      "",
 	}
 
@@ -256,6 +264,41 @@ func (s *UserService) ChangePassword(ctx context.Context, payload *user.ChangePa
 		UPDATE fieldkit.user SET password = :password WHERE id = :id RETURNING *
 		`, updating); err != nil {
 		return nil, err
+	}
+
+	return UserType(s.options.signer, updating)
+}
+
+func (s *UserService) AcceptTnc(ctx context.Context, payload *user.AcceptTncPayload) (*user.User, error) {
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	log.Infow("accept-tnc", "authorized_user_id", p.UserID(), "user_id", payload.UserID)
+
+	updating := &data.User{}
+	err = s.options.Database.GetContext(ctx, updating, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID())
+	if err == sql.ErrNoRows {
+		return nil, user.MakeBadRequest(errors.New("bad request"))
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if updating.ID != payload.UserID {
+		return nil, user.MakeForbidden(errors.New("forbidden"))
+	}
+
+	if payload.Accept.Accept == true {
+		updating.TncDate = time.Now()
+		if err := s.options.Database.NamedGetContext(ctx, updating, `
+		UPDATE fieldkit.user SET tnc_date = :tnc_date WHERE id = :id RETURNING *
+		`, updating); err != nil {
+			return nil, err
+		}
 	}
 
 	return UserType(s.options.signer, updating)
@@ -628,6 +671,93 @@ func (s *UserService) IssueTransmissionToken(ctx context.Context, payload *user.
 	}, nil
 }
 
+func (s *UserService) Roles(ctx context.Context, payload *user.RolesPayload) (*user.AvailableRoles, error) {
+	roles := make([]*user.AvailableRole, 0)
+
+	for _, r := range data.AvailableRoles {
+		roles = append(roles, &user.AvailableRole{
+			ID:   r.ID,
+			Name: r.Name,
+		})
+	}
+
+	return &user.AvailableRoles{
+		Roles: roles,
+	}, nil
+}
+
+func (s *UserService) UploadPhoto(ctx context.Context, payload *user.UploadPhotoPayload, body io.ReadCloser) error {
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	mr := repositories.NewMediaRepository(s.options.MediaFiles)
+	saved, err := mr.Save(ctx, body, payload.ContentLength, payload.ContentType)
+	if err != nil {
+		return err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	log.Infow("media", "content_type", saved.MimeType, "user_id", p.UserID())
+
+	user := &data.User{}
+	if err := s.options.Database.GetContext(ctx, user, `
+		UPDATE fieldkit.user SET media_url = $1, media_content_type = $2, updated_at = NOW() WHERE id = $3 RETURNING *
+		`, saved.URL, saved.MimeType, p.UserID()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadPhotoPayload) (*user.DownloadedPhoto, error) {
+	log := Logger(ctx).Sugar()
+
+	resource := &data.User{}
+	if err := s.options.Database.GetContext(ctx, resource, `SELECT * FROM fieldkit.user WHERE id = $1`, payload.UserID); err != nil {
+		return nil, err
+	}
+
+	if resource.MediaURL == nil || resource.MediaContentType == nil {
+		return nil, user.MakeNotFound(errors.New("not found"))
+	}
+
+	etag := quickHash(*resource.MediaURL) + ""
+	if payload.Size != nil {
+		etag += fmt.Sprintf(":%d", *payload.Size)
+	}
+
+	if payload.IfNoneMatch != nil {
+		if *payload.IfNoneMatch == fmt.Sprintf(`"%s"`, etag) {
+			return &user.DownloadedPhoto{
+				Etag: etag,
+				Body: []byte{},
+			}, nil
+		}
+	}
+
+	mr := repositories.NewMediaRepository(s.options.MediaFiles)
+	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
+	if err != nil {
+		log.Error("load-by-url:error", "error", err)
+		return nil, user.MakeNotFound(errors.New("not found"))
+	}
+
+	data, err := ioutil.ReadAll(lm.Reader)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user.DownloadedPhoto{
+		Length:      int64(lm.Size),
+		ContentType: *resource.MediaContentType,
+		Etag:        etag,
+		Body:        data,
+	}, nil
+}
+
 func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminDeletePayload) error {
 	log := Logger(outerCtx).Sugar()
 
@@ -689,93 +819,23 @@ func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminD
 	})
 }
 
-func (s *UserService) Roles(ctx context.Context, payload *user.RolesPayload) (*user.AvailableRoles, error) {
-	roles := make([]*user.AvailableRole, 0)
-
-	for _, r := range data.AvailableRoles {
-		roles = append(roles, &user.AvailableRole{
-			ID:   r.ID,
-			Name: r.Name,
-		})
-	}
-
-	return &user.AvailableRoles{
-		Roles: roles,
-	}, nil
-}
-
-func (s *UserService) Delete(ctx context.Context, payload *user.DeletePayload) error {
-	r := repositories.NewUserRepository(s.options.Database)
-	return r.Delete(ctx, payload.UserID)
-}
-
-func (s *UserService) UploadPhoto(ctx context.Context, payload *user.UploadPhotoPayload, body io.ReadCloser) error {
-	p, err := NewPermissions(ctx, s.options).Unwrap()
-	if err != nil {
-		return err
-	}
-
-	mr := repositories.NewMediaRepository(s.options.MediaFiles)
-	saved, err := mr.Save(ctx, body, payload.ContentLength, payload.ContentType)
-	if err != nil {
-		return err
-	}
-
+func (c *UserService) AdminTermsAndConditions(ctx context.Context, payload *user.AdminTermsAndConditionsPayload) error {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("media", "content_type", saved.MimeType, "user_id", p.UserID())
+	updating := &data.User{}
+	if err := c.options.Database.GetContext(ctx, updating, `SELECT * FROM fieldkit.user WHERE LOWER(email) = LOWER($1)`, payload.Update.Email); err != nil {
+		return user.MakeForbidden(errors.New("forbidden"))
+	}
 
-	user := &data.User{}
-	if err := s.options.Database.GetContext(ctx, user, `
-		UPDATE fieldkit.user SET media_url = $1, media_content_type = $2, updated_at = NOW() WHERE id = $3 RETURNING *
-		`, saved.URL, saved.MimeType, p.UserID()); err != nil {
-		return err
+	log.Infow("resetting:tnc", "user_id", updating.ID)
+
+	impossiblyEarlyTermsAndConditionsDate := time.Date(2010, 1, 1, 0, 0, 0, 0, time.UTC)
+
+	if _, err := c.options.Database.ExecContext(ctx, `UPDATE fieldkit.user SET tnc_date = $1 WHERE id = $2`, impossiblyEarlyTermsAndConditionsDate, updating.ID); err != nil {
+		return user.MakeForbidden(errors.New("forbidden"))
 	}
 
 	return nil
-}
-
-func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadPhotoPayload) (*user.DownloadedPhoto, error) {
-	resource := &data.User{}
-	if err := s.options.Database.GetContext(ctx, resource, `SELECT * FROM fieldkit.user WHERE id = $1`, payload.UserID); err != nil {
-		return nil, err
-	}
-
-	if resource.MediaURL == nil || resource.MediaContentType == nil {
-		return nil, user.MakeNotFound(errors.New("not found"))
-	}
-
-	etag := quickHash(*resource.MediaURL) + ""
-	if payload.Size != nil {
-		etag += fmt.Sprintf(":%d", *payload.Size)
-	}
-
-	if payload.IfNoneMatch != nil {
-		if *payload.IfNoneMatch == fmt.Sprintf(`"%s"`, etag) {
-			return &user.DownloadedPhoto{
-				Etag: etag,
-				Body: []byte{},
-			}, nil
-		}
-	}
-
-	mr := repositories.NewMediaRepository(s.options.MediaFiles)
-	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
-	if err != nil {
-		return nil, user.MakeNotFound(errors.New("not found"))
-	}
-
-	data, err := ioutil.ReadAll(lm.Reader)
-	if err != nil {
-		return nil, err
-	}
-
-	return &user.DownloadedPhoto{
-		Length:      int64(lm.Size),
-		ContentType: *resource.MediaContentType,
-		Etag:        etag,
-		Body:        data,
-	}, nil
 }
 
 func (c *UserService) AdminSearch(ctx context.Context, payload *user.AdminSearchPayload) (*user.AdminSearchResult, error) {
@@ -801,7 +861,7 @@ func (c *UserService) AdminSearch(ctx context.Context, payload *user.AdminSearch
 }
 
 func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,
@@ -819,6 +879,7 @@ func UserType(signer *Signer, dm *data.User) (*user.User, error) {
 		Bio:       dm.Bio,
 		Admin:     dm.Admin,
 		UpdatedAt: dm.UpdatedAt.Unix() * 1000,
+		TncDate:   dm.TncDate.Unix() * 1000,
 	}
 
 	if dm.MediaURL != nil {

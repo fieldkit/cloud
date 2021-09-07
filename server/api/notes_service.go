@@ -14,6 +14,7 @@ import (
 	notes "github.com/fieldkit/cloud/server/api/gen/notes"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -196,6 +197,8 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 }
 
 func (s *NotesService) DownloadMedia(ctx context.Context, payload *notes.DownloadMediaPayload) (*notes.DownloadMediaResult, io.ReadCloser, error) {
+	log := Logger(ctx).Sugar()
+
 	allMedia := &data.FieldNoteMedia{}
 	if err := s.options.Database.GetContext(ctx, allMedia, `
 		SELECT * FROM fieldkit.notes_media WHERE id = $1
@@ -207,6 +210,7 @@ func (s *NotesService) DownloadMedia(ctx context.Context, payload *notes.Downloa
 
 	lm, err := mr.LoadByURL(ctx, allMedia.URL)
 	if err != nil {
+		log.Error("load-by-url:error", "error", err)
 		return nil, nil, notes.MakeNotFound(errors.New("not found"))
 	}
 
@@ -287,7 +291,7 @@ func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMed
 }
 
 func (s *NotesService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

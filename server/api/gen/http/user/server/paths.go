@@ -16,11 +16,6 @@ func RolesUserPath() string {
 	return "/roles"
 }
 
-// DeleteUserPath returns the URL path to the user service delete HTTP endpoint.
-func DeleteUserPath(userID int32) string {
-	return fmt.Sprintf("/admin/users/%v", userID)
-}
-
 // UploadPhotoUserPath returns the URL path to the user service upload photo HTTP endpoint.
 func UploadPhotoUserPath() string {
 	return "/user/media"
@@ -86,6 +81,11 @@ func ChangePasswordUserPath(userID int32) string {
 	return fmt.Sprintf("/users/%v/password", userID)
 }
 
+// AcceptTncUserPath returns the URL path to the user service accept tnc HTTP endpoint.
+func AcceptTncUserPath(userID int32) string {
+	return fmt.Sprintf("/users/%v/accept-tnc", userID)
+}
+
 // GetCurrentUserPath returns the URL path to the user service get current HTTP endpoint.
 func GetCurrentUserPath() string {
 	return "/user"
@@ -104,6 +104,11 @@ func IssueTransmissionTokenUserPath() string {
 // ProjectRolesUserPath returns the URL path to the user service project roles HTTP endpoint.
 func ProjectRolesUserPath() string {
 	return "/projects/roles"
+}
+
+// AdminTermsAndConditionsUserPath returns the URL path to the user service admin terms and conditions HTTP endpoint.
+func AdminTermsAndConditionsUserPath() string {
+	return "/admin/user/tnc"
 }
 
 // AdminDeleteUserPath returns the URL path to the user service admin delete HTTP endpoint.

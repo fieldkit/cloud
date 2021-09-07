@@ -48,29 +48,48 @@ type Options struct {
 }
 
 type Config struct {
-	Addr                  string `split_words:"true" default:"127.0.0.1:8080" required:"true"`
-	PostgresURL           string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
-	SessionKey            string `split_words:"true"`
-	MapboxToken           string `split_words:"true"`
-	TwitterConsumerKey    string `split_words:"true"`
-	TwitterConsumerSecret string `split_words:"true"`
-	AWSProfile            string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
-	Emailer               string `split_words:"true" default:"default" required:"true"`
-	EmailOverride         string `split_words:"true" default:""`
-	Archiver              string `split_words:"true" default:"default" required:"true"`
-	PortalRoot            string `split_words:"true"`
-	Domain                string `split_words:"true" default:"fklocal.org:8080" required:"true"`
-	HttpScheme            string `split_words:"true" default:"https"`
-	ApiDomain             string `split_words:"true" default:""`
-	PortalDomain          string `split_words:"true" default:""`
-	ApiHost               string `split_words:"true" default:""`
-	MediaBucketName       string `split_words:"true" default:""`
-	StreamsBucketName     string `split_words:"true" default:""`
-	AwsId                 string `split_words:"true" default:""`
-	AwsSecret             string `split_words:"true" default:""`
-	StatsdAddress         string `split_words:"true" default:""`
-	Production            bool   `envconfig:"production"`
-	LoggingFull           bool   `envconfig:"logging_full"`
+	Addr                  string   `split_words:"true" default:"127.0.0.1:8080" required:"true"`
+	PostgresURL           string   `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
+	SessionKey            string   `split_words:"true"`
+	MapboxToken           string   `split_words:"true"`
+	TwitterConsumerKey    string   `split_words:"true"`
+	TwitterConsumerSecret string   `split_words:"true"`
+	AWSProfile            string   `envconfig:"aws_profile" default:"fieldkit" required:"true"`
+	Emailer               string   `split_words:"true" default:"default" required:"true"`
+	EmailOverride         string   `split_words:"true" default:""`
+	Archiver              string   `split_words:"true" default:"default" required:"true"`
+	PortalRoot            string   `split_words:"true"`
+	Domain                string   `split_words:"true" default:"fklocal.org:8080" required:"true"`
+	HttpScheme            string   `split_words:"true" default:"https"`
+	ApiDomain             string   `split_words:"true" default:""`
+	PortalDomain          string   `split_words:"true" default:""`
+	ApiHost               string   `split_words:"true" default:""`
+	MediaBucketName       string   `split_words:"true" default:""` // Deprecated
+	StreamsBucketName     string   `split_words:"true" default:""` // Deprecated
+	MediaBuckets          []string `split_words:"true" default:""`
+	StreamsBuckets        []string `split_words:"true" default:""`
+	AwsId                 string   `split_words:"true" default:""`
+	AwsSecret             string   `split_words:"true" default:""`
+	StatsdAddress         string   `split_words:"true" default:""`
+	Production            bool     `envconfig:"production"`
+	LoggingFull           bool     `envconfig:"logging_full"`
+}
+
+func getBucketNames(config *Config) *api.BucketNames {
+	media := config.MediaBuckets
+	if len(media) == 0 && config.MediaBucketName != "" {
+		media = []string{config.MediaBucketName}
+	}
+
+	streams := config.StreamsBuckets
+	if len(streams) == 0 && config.StreamsBucketName != "" {
+		streams = []string{config.StreamsBucketName}
+	}
+
+	return &api.BucketNames{
+		Media:   media,
+		Streams: streams,
+	}
 }
 
 func loadConfiguration() (*Config, *Options, error) {
@@ -203,17 +222,23 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		return nil, err
 	}
 
-	ingestionFiles, err := createFileArchive(ctx, config.Archiver, config.StreamsBucketName, awsSession, metrics, files.NoPrefix)
+	bucketNames := getBucketNames(config)
+
+	log := logging.Logger(ctx).Sugar()
+
+	log.Infow("buckets", "buckets", bucketNames)
+
+	ingestionFiles, err := createFileArchive(ctx, config.Archiver, bucketNames.Streams, awsSession, metrics, files.NoPrefix)
 	if err != nil {
 		return nil, err
 	}
 
-	mediaFiles, err := createFileArchive(ctx, config.Archiver, config.MediaBucketName, awsSession, metrics, files.NoPrefix)
+	mediaFiles, err := createFileArchive(ctx, config.Archiver, bucketNames.Media, awsSession, metrics, files.NoPrefix)
 	if err != nil {
 		return nil, err
 	}
 
-	exportedFiles, err := createFileArchive(ctx, config.Archiver, config.MediaBucketName, awsSession, metrics, "exported/")
+	exportedFiles, err := createFileArchive(ctx, config.Archiver, bucketNames.Media, awsSession, metrics, "exported/")
 	if err != nil {
 		return nil, err
 	}
@@ -251,10 +276,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Domain:        config.Domain,
 		PortalDomain:  config.PortalDomain,
 		EmailOverride: config.EmailOverride,
-		Buckets: &api.BucketNames{
-			Media:   config.MediaBucketName,
-			Streams: config.StreamsBucketName,
-		},
+		Buckets:       bucketNames,
 	}
 
 	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc)
@@ -314,7 +336,7 @@ func main() {
 	log := logging.Logger(ctx).Sugar()
 
 	log.With("api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain, "portal_root", config.PortalRoot).
-		With("media_bucket_name", config.MediaBucketName, "streams_bucket_name", config.StreamsBucketName).
+		With("media_buckets", config.MediaBuckets, "streams_buckets", config.StreamsBuckets).
 		With("email_override", config.EmailOverride).
 		Infow("config")
 
@@ -399,7 +421,7 @@ func main() {
 	}
 }
 
-func createFileArchive(ctx context.Context, archiver, bucketName string, awsSession *session.Session, metrics *logging.Metrics, prefix string) (files.FileArchive, error) {
+func createFileArchive(ctx context.Context, archiver string, buckets []string, awsSession *session.Session, metrics *logging.Metrics, prefix string) (files.FileArchive, error) {
 	log := logging.Logger(ctx).Sugar()
 
 	reading := make([]files.FileArchive, 0)
@@ -411,25 +433,30 @@ func createFileArchive(ctx context.Context, archiver, bucketName string, awsSess
 		reading = append(reading, fs)
 		writing = append(writing, fs)
 
-		if bucketName != "" {
+		for _, bucketName := range buckets {
 			s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, prefix)
 			if err != nil {
 				return nil, err
 			}
 			reading = append(reading, s3)
 		}
+
 		break
 	case "aws":
-		s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, prefix)
-		if err != nil {
-			return nil, err
+		for _, bucketName := range buckets {
+			s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, prefix)
+			if err != nil {
+				return nil, err
+			}
+			reading = append(reading, s3)
+			if len(writing) == 0 {
+				writing = append(writing, s3)
+			}
 		}
-		reading = append(reading, s3)
-		writing = append(writing, s3)
 		break
 	}
 
-	log.Infow("files", "archiver", archiver, "bucket_name", bucketName, "reading", toListOfStrings(reading), "writing", toListOfStrings(writing))
+	log.Infow("files", "archiver", archiver, "bucket_names", buckets, "reading", toListOfStrings(reading), "writing", toListOfStrings(writing))
 
 	if len(reading) == 0 || len(writing) == 0 {
 		return nil, fmt.Errorf("no file archives available")

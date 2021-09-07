@@ -7,6 +7,7 @@ import (
 
 	"goa.design/goa/v3/security"
 
+	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
 
 	datas "github.com/fieldkit/cloud/server/api/gen/data"
@@ -101,7 +102,7 @@ func (s *DataService) DeviceSummary(ctx context.Context, payload *datas.DeviceSu
 }
 
 func (s *DataService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
-	return Authenticate(ctx, AuthAttempt{
+	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
 		Scheme:       scheme,
 		Key:          s.options.JWTHMACKey,

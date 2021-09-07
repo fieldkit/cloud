@@ -111,6 +111,7 @@ export default Vue.extend({
     display: flex;
     background: #fcfcfc;
     position: relative;
+    width: 100%;
 }
 .scrolling-disabled {
     overflow-y: hidden;

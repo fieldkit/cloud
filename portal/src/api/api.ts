@@ -176,6 +176,7 @@ export class CurrentUser {
     name: string;
     bio: string;
     mediaUrl: string;
+    tncDate: number;
 }
 
 export interface Project {
@@ -608,6 +609,15 @@ class FKApi {
         });
     }
 
+    accept(userId) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "PATCH",
+            url: this.baseUrl + "/users/" + userId + "/accept-tnc",
+            data: { accept: true },
+        });
+    }
+
     sendResetPasswordEmail(email) {
         return this.invoke({
             auth: Auth.None,
@@ -1030,6 +1040,15 @@ class FKApi {
             auth: Auth.Required,
             method: "DELETE",
             url: this.baseUrl + "/admin/user",
+            data: payload,
+        });
+    }
+
+    public adminClearTermsAndConditions(payload) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/admin/user/tnc",
             data: payload,
         });
     }

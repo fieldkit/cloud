@@ -30,30 +30,6 @@ func BuildRolesPayload(userRolesAuth string) (*user.RolesPayload, error) {
 	return v, nil
 }
 
-// BuildDeletePayload builds the payload for the user delete endpoint from CLI
-// flags.
-func BuildDeletePayload(userDeleteUserID string, userDeleteAuth string) (*user.DeletePayload, error) {
-	var err error
-	var userID int32
-	{
-		var v int64
-		v, err = strconv.ParseInt(userDeleteUserID, 10, 32)
-		userID = int32(v)
-		if err != nil {
-			return nil, fmt.Errorf("invalid value for userID, must be INT32")
-		}
-	}
-	var auth string
-	{
-		auth = userDeleteAuth
-	}
-	v := &user.DeletePayload{}
-	v.UserID = userID
-	v.Auth = auth
-
-	return v, nil
-}
-
 // BuildUploadPhotoPayload builds the payload for the user upload photo
 // endpoint from CLI flags.
 func BuildUploadPhotoPayload(userUploadPhotoContentType string, userUploadPhotoContentLength string, userUploadPhotoAuth string) (*user.UploadPhotoPayload, error) {
@@ -128,7 +104,7 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userLoginBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"cpp\",\n      \"password\": \"s42\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"q05\",\n      \"password\": \"ja3\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
@@ -161,7 +137,7 @@ func BuildRecoveryLookupPayload(userRecoveryLookupBody string) (*user.RecoveryLo
 	{
 		err = json.Unmarshal([]byte(userRecoveryLookupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Qui et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Error ea.\"\n   }'")
 		}
 	}
 	v := &user.RecoveryLookupFields{
@@ -182,7 +158,7 @@ func BuildRecoveryPayload(userRecoveryBody string) (*user.RecoveryPayload, error
 	{
 		err = json.Unmarshal([]byte(userRecoveryBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"password\": \"p04\",\n      \"token\": \"Deserunt sed.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"password\": \"gz3\",\n      \"token\": \"Recusandae quo aut ab unde similique.\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Password) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 10, true))
@@ -212,7 +188,7 @@ func BuildResumePayload(userResumeBody string) (*user.ResumePayload, error) {
 	{
 		err = json.Unmarshal([]byte(userResumeBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"token\": \"Voluptatem velit qui et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"token\": \"Tenetur illum ut sed distinctio vero.\"\n   }'")
 		}
 	}
 	v := &user.ResumePayload{}
@@ -244,7 +220,7 @@ func BuildRefreshPayload(userRefreshBody string) (*user.RefreshPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userRefreshBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"refreshToken\": \"Omnis autem eos non asperiores exercitationem.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"refreshToken\": \"Voluptatem ex laboriosam unde.\"\n   }'")
 		}
 	}
 	v := &user.RefreshPayload{
@@ -316,6 +292,7 @@ func BuildAddPayload(userAddBody string) (*user.AddPayload, error) {
 		Email:       body.Email,
 		Password:    body.Password,
 		InviteToken: body.InviteToken,
+		TncAccept:   body.TncAccept,
 	}
 	res := &user.AddPayload{
 		User: v,
@@ -382,7 +359,7 @@ func BuildChangePasswordPayload(userChangePasswordBody string, userChangePasswor
 	{
 		err = json.Unmarshal([]byte(userChangePasswordBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"newPassword\": \"23c\",\n      \"oldPassword\": \"td7\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"newPassword\": \"0xq\",\n      \"oldPassword\": \"5zh\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.OldPassword) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.oldPassword", body.OldPassword, utf8.RuneCountInString(body.OldPassword), 10, true))
@@ -413,6 +390,42 @@ func BuildChangePasswordPayload(userChangePasswordBody string, userChangePasswor
 	}
 	res := &user.ChangePasswordPayload{
 		Change: v,
+	}
+	res.UserID = userID
+	res.Auth = auth
+
+	return res, nil
+}
+
+// BuildAcceptTncPayload builds the payload for the user accept tnc endpoint
+// from CLI flags.
+func BuildAcceptTncPayload(userAcceptTncBody string, userAcceptTncUserID string, userAcceptTncAuth string) (*user.AcceptTncPayload, error) {
+	var err error
+	var body AcceptTncRequestBody
+	{
+		err = json.Unmarshal([]byte(userAcceptTncBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"accept\": true\n   }'")
+		}
+	}
+	var userID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(userAcceptTncUserID, 10, 32)
+		userID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for userID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = userAcceptTncAuth
+	}
+	v := &user.AcceptTncFields{
+		Accept: body.Accept,
+	}
+	res := &user.AcceptTncPayload{
+		Accept: v,
 	}
 	res.UserID = userID
 	res.Auth = auth
@@ -470,6 +483,32 @@ func BuildIssueTransmissionTokenPayload(userIssueTransmissionTokenAuth string) (
 	return v, nil
 }
 
+// BuildAdminTermsAndConditionsPayload builds the payload for the user admin
+// terms and conditions endpoint from CLI flags.
+func BuildAdminTermsAndConditionsPayload(userAdminTermsAndConditionsBody string, userAdminTermsAndConditionsAuth string) (*user.AdminTermsAndConditionsPayload, error) {
+	var err error
+	var body AdminTermsAndConditionsRequestBody
+	{
+		err = json.Unmarshal([]byte(userAdminTermsAndConditionsBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Eum deserunt.\"\n   }'")
+		}
+	}
+	var auth string
+	{
+		auth = userAdminTermsAndConditionsAuth
+	}
+	v := &user.AdminTermsAndConditionsFields{
+		Email: body.Email,
+	}
+	res := &user.AdminTermsAndConditionsPayload{
+		Update: v,
+	}
+	res.Auth = auth
+
+	return res, nil
+}
+
 // BuildAdminDeletePayload builds the payload for the user admin delete
 // endpoint from CLI flags.
 func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth string) (*user.AdminDeletePayload, error) {
@@ -478,7 +517,7 @@ func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth str
 	{
 		err = json.Unmarshal([]byte(userAdminDeleteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Et temporibus aspernatur itaque.\",\n      \"password\": \"Adipisci eum deserunt aut dignissimos.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Dicta repellat.\",\n      \"password\": \"Voluptatibus quaerat.\"\n   }'")
 		}
 	}
 	var auth string

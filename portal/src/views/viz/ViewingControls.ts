@@ -7,18 +7,7 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import Spinner from "@/views/shared/Spinner.vue";
 
 import { TimeRange } from "./common";
-import {
-    ModuleID,
-    Graph,
-    HasSensorParams,
-    SensorParams,
-    StationTreeOption,
-    SensorTreeOption,
-    Workspace,
-    FastTime,
-    TimeZoom,
-    ChartType,
-} from "./viz";
+import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType } from "./viz";
 import { vueTickHack } from "@/utilities";
 
 export const ViewingControls = Vue.extend({
@@ -81,16 +70,17 @@ export const ViewingControls = Vue.extend({
             const sensorAndModule = this.viz.chartParams.sensorParams.sensors[0];
             return `${sensorAndModule[0]}-${sensorAndModule[1]}`;
         },
-        manualRangeValue() {
-            if (this.viz.visible.isExtreme()) {
+        manualRangeValue(): { start: Date; end: Date } | null {
+            console.log(`manualRangeValue:`, this.viz.visible, this.viz.visibleTimeRange);
+            if (this.viz.visibleTimeRange.isExtreme()) {
                 // TODO This happens initially cause we query for
                 // eternity... probably best if this isn't set until
                 // we get that data back and know the range.
                 return null;
             }
             return {
-                start: new Date(this.viz.visible.start),
-                end: new Date(this.viz.visible.end),
+                start: new Date(this.viz.visibleTimeRange.start),
+                end: new Date(this.viz.visibleTimeRange.end),
             };
         },
     },
