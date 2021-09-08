@@ -1,0 +1,1 @@
+ALTER TABLE fieldkit.ttn_schema ADD COLUMN received_at TIMESTAMP;

@@ -69,6 +69,10 @@ func (c *ThingsNetworkService) Webhook(ctx context.Context, payload *ttnService.
 	}
 
 	if message.SchemaID != nil {
+		if _, err := c.options.DB.ExecContext(ctx, `UPDATE fieldkit.ttn_schema SET received_at = NOW() WHERE id = ?`, message.SchemaID); err != nil {
+			return err
+		}
+
 		if err := c.options.Publisher.Publish(ctx, &ThingsNetworkMessageReceived{
 			MessageID: message.ID,
 			SchemaID:  *message.SchemaID,
