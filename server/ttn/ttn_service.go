@@ -28,7 +28,6 @@ func NewThingsNetworkService(ctx context.Context, options *common.ServiceOptions
 
 func (c *ThingsNetworkService) Webhook(ctx context.Context, payload *ttnService.WebhookPayload, bodyReader io.ReadCloser) error {
 	log := Logger(ctx).Named("ttn").Sugar()
-	log.Infow("webhook")
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(bodyReader)
