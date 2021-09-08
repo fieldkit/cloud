@@ -26,6 +26,11 @@ func NewThingsNetworkIngestion(db *sqlxcache.DB) *ThingsNetworkIngestion {
 
 func (i *ThingsNetworkIngestion) ProcessSchema(ctx context.Context, schemaID int32) error {
 	repository := NewThingsNetworkMessagesRepository(i.db)
+
+	if err := repository.StartProcessingSchema(ctx, schemaID); err != nil {
+		return err
+	}
+
 	return i.processBatches(ctx, func(ctx context.Context, batch *MessageBatch) error {
 		return repository.QueryBatchBySchemaIDForProcessing(ctx, batch, schemaID)
 	})

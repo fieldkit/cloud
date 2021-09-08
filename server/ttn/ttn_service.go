@@ -69,15 +69,20 @@ func (c *ThingsNetworkService) Webhook(ctx context.Context, payload *ttnService.
 	}
 
 	if message.SchemaID != nil {
-		if _, err := c.options.DB.ExecContext(ctx, `UPDATE fieldkit.ttn_schema SET received_at = NOW() WHERE id = ?`, message.SchemaID); err != nil {
+		if _, err := c.options.DB.ExecContext(ctx, `UPDATE fieldkit.ttn_schema SET received_at = NOW() WHERE id = $1`, message.SchemaID); err != nil {
 			return err
 		}
 
-		if err := c.options.Publisher.Publish(ctx, &ThingsNetworkMessageReceived{
-			MessageID: message.ID,
-			SchemaID:  *message.SchemaID,
-		}); err != nil {
-			return err
+		// TODO If the process_interval of the schema is 0 then we can use that
+		// to indicate we should process this as they come in. For now, we'll be
+		// doing the intervals for everything.
+		if false {
+			if err := c.options.Publisher.Publish(ctx, &ThingsNetworkMessageReceived{
+				MessageID: message.ID,
+				SchemaID:  *message.SchemaID,
+			}); err != nil {
+				return err
+			}
 		}
 	}
 

@@ -101,6 +101,16 @@ func thingsNetworkMessageRececived(ctx context.Context, j *que.Job, services *Ba
 	return handler.Handle(ctx, message)
 }
 
+func processSchema(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+	message := &ttn.ProcessSchema{}
+	if err := json.Unmarshal(tm.Body, message); err != nil {
+		return err
+	}
+	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
+	handler := ttn.NewProcessSchemaHandler(services.database, services.metrics, publisher)
+	return handler.Handle(ctx, message)
+}
+
 func CreateMap(services *BackgroundServices) que.WorkMap {
 	return que.WorkMap{
 		"Example":                      wrapContext(wrapTransportMessage(services, exampleJob)),
@@ -110,6 +120,7 @@ func CreateMap(services *BackgroundServices) que.WorkMap {
 		"ExportData":                   wrapContext(wrapTransportMessage(services, exportData)),
 		"IngestStation":                wrapContext(wrapTransportMessage(services, ingestStation)),
 		"ThingsNetworkMessageReceived": wrapContext(wrapTransportMessage(services, thingsNetworkMessageRececived)),
+		"ProcessSchema":                wrapContext(wrapTransportMessage(services, processSchema)),
 	}
 }
 
