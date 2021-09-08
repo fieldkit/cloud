@@ -382,7 +382,6 @@ func VerifyToken(ctx context.Context, a common.AuthAttempt) (jwt.MapClaims, int3
 	token := a.Token
 
 	log := Logger(ctx).Sugar()
-	log.Infow("verify-token:")
 
 	if strings.Contains(a.Token, " ") {
 		// Remove authorization scheme prefix (e.g. "Bearer")
