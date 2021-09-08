@@ -168,7 +168,6 @@ export default Vue.extend({
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
-            stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
         }),
         hasStations(): boolean {
@@ -179,6 +178,9 @@ export default Vue.extend({
                 return this.$getters.projectsById[this.projectId];
             }
             return null;
+        },
+        stations(): DisplayStation[] {
+            return this.$getters.projectsById[this.projectId].stations;
         },
         visibleStations(): DisplayStation[] {
             if (this.projectId) {
