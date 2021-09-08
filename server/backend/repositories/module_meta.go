@@ -291,7 +291,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temperature1",
 					FirmwareKey:   "temperature_1",
-					UnitOfMeasure: "C",
+					UnitOfMeasure: "°C",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: -100.0,
@@ -313,7 +313,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temperature2",
 					FirmwareKey:   "temperature_2",
-					UnitOfMeasure: "C",
+					UnitOfMeasure: "°C",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: -100.0,
@@ -481,7 +481,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temperature1",
 					FirmwareKey:   "temperature_1",
-					UnitOfMeasure: "C",
+					UnitOfMeasure: "°C",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: -100.0,
@@ -503,7 +503,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temperature2",
 					FirmwareKey:   "temperature_2",
-					UnitOfMeasure: "C",
+					UnitOfMeasure: "°C",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: -100.0,
@@ -698,7 +698,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temperature",
 					FirmwareKey:   "temperature",
-					UnitOfMeasure: "C",
+					UnitOfMeasure: "°C",
 					Ranges:        []SensorRanges{},
 				},
 			},
