@@ -118,11 +118,14 @@ type ThingsNetworkSchema struct {
 }
 
 type ThingsNetworkSchemaRegistration struct {
-	ID      int32  `db:"id"`
-	OwnerID int32  `db:"owner_id"`
-	Name    string `db:"name"`
-	Token   []byte `db:"token"`
-	Body    []byte `db:"body"`
+	ID              int32      `db:"id"`
+	OwnerID         int32      `db:"owner_id"`
+	Name            string     `db:"name"`
+	Token           []byte     `db:"token"`
+	Body            []byte     `db:"body"`
+	ReceivedAt      *time.Time `db:"received_at"`
+	ProcessedAt     *time.Time `db:"processed_at"`
+	ProcessInterval *int32     `db:"process_interval"`
 }
 
 func (r *ThingsNetworkSchemaRegistration) Parse() (*ThingsNetworkSchema, error) {
@@ -136,4 +139,8 @@ func (r *ThingsNetworkSchemaRegistration) Parse() (*ThingsNetworkSchema, error) 
 type ThingsNetworkMessageReceived struct {
 	SchemaID  int32 `json:"ttn_schema_id"`
 	MessageID int64 `json:"ttn_message_id"`
+}
+
+type ProcessSchema struct {
+	SchemaID int32 `json:"schema_id"`
 }

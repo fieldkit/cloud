@@ -26,6 +26,33 @@ type MessageBatch struct {
 	page     int32
 }
 
+func (rr *ThingsNetworkMessagesRepository) QuerySchemasPendingProcessing(ctx context.Context) ([]*ThingsNetworkSchemaRegistration, error) {
+	schemas := []*ThingsNetworkSchemaRegistration{}
+	if err := rr.db.SelectContext(ctx, &schemas, `
+		SELECT * FROM fieldkit.ttn_schema WHERE 
+			received_at IS NOT NULL AND
+			process_interval > 0 AND
+			(
+				processed_at IS NULL OR
+				(
+					NOW() > (processed_at + (process_interval * interval '1 second')) AND
+					received_at > processed_at
+				)
+			)
+	`); err != nil {
+		return nil, err
+	}
+	return schemas, nil
+}
+
+func (rr *ThingsNetworkMessagesRepository) StartProcessingSchema(ctx context.Context, schemaID int32) error {
+	schemas := []*ThingsNetworkSchemaRegistration{}
+	if err := rr.db.SelectContext(ctx, &schemas, `UPDATE fieldkit.ttn_schema SET processed_at = NOW() WHERE id = $1`, schemaID); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (rr *ThingsNetworkMessagesRepository) processQuery(ctx context.Context, batch *MessageBatch, messages []*ThingsNetworkMessage) error {
 	log := Logger(ctx).Named("ttn").Sugar()
 

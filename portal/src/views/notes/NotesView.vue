@@ -21,9 +21,8 @@
                                 v-for="station in stations"
                                 v-bind:key="station.id"
                                 v-bind:class="{ active: isStationSelected && selectedStation.id === station.id }"
-                                v-on:click="onSelected(station)"
                             >
-                                <div class="tab-wrap">
+                                <div class="tab-wrap" v-on:click="onSelected(station)">
                                     <div class="name">{{ station.name }}</div>
                                     <div v-if="station.deployedAt" class="deployed">Deployed</div>
                                     <div v-else class="undeployed">Not Deployed</div>
@@ -168,7 +167,6 @@ export default Vue.extend({
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
-            stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
         }),
         hasStations(): boolean {
@@ -179,6 +177,9 @@ export default Vue.extend({
                 return this.$getters.projectsById[this.projectId];
             }
             return null;
+        },
+        stations(): DisplayStation[] {
+            return this.$getters.projectsById[this.projectId].stations;
         },
         visibleStations(): DisplayStation[] {
             if (this.projectId) {
@@ -272,7 +273,7 @@ export default Vue.extend({
             }
             // allows collapsing of selected station tab on mobile
             if (this.isMobileView()) {
-                this.isStationSelected = false;
+                this.isStationSelected = !this.isStationSelected;
             }
         },
         onChange(): void {

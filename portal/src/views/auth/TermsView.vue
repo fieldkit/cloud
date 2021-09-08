@@ -3,8 +3,7 @@
         <img class="terms-header-logo" :alt="$t('layout.logo.alt')" src="@/assets/FieldKit_Logo_White.png" />
         <div class="terms-content">
             <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="goBack" />
-            <p class="terms-title">{{ $t("terms.title") }}</p>
-            <p class="terms-body">{{ $t("terms.body") }}</p>
+            <div v-html="$t('terms.html')"></div>
             <form v-if="tncOutdated" @submit.prevent="save">
                 <button class="form-submit" type="submit">{{ $t("terms.agreeButton") }}</button>
             </form>
@@ -98,15 +97,24 @@ export default Vue.extend({
         background-color: white;
         padding: 25px 45px 45px 45px;
     }
-    &-title {
-        font-size: 36px;
-        font-weight: 900;
-    }
 
     &-body {
-        font-size: 16px;
+        font-size: 14px;
         line-height: 1.5;
     }
+}
+
+::v-deep h2 {
+    font-size: 26px;
+}
+::v-deep h4 {
+    font-size: 18px;
+}
+::v-deep h5 {
+    font-size: 16px;
+}
+::v-deep {
+    font-size: 14px;
 }
 
 .close-button {

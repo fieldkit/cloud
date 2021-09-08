@@ -72,7 +72,7 @@ export const ViewingControls = Vue.extend({
         },
         manualRangeValue(): { start: Date; end: Date } | null {
             console.log(`manualRangeValue:`, this.viz.visible, this.viz.visibleTimeRange);
-            if (this.viz.visibleTimeRange.isExtreme()) {
+            if (!this.viz.visibleTimeRange || this.viz.visibleTimeRange.isExtreme()) {
                 // TODO This happens initially cause we query for
                 // eternity... probably best if this isn't set until
                 // we get that data back and know the range.
