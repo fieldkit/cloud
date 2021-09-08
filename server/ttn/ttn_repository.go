@@ -34,7 +34,10 @@ func (rr *ThingsNetworkMessagesRepository) QuerySchemasPendingProcessing(ctx con
 			process_interval > 0 AND
 			(
 				processed_at IS NULL OR
-				NOW() > (processed_at + (process_interval * interval '1 second'))
+				(
+					NOW() > (processed_at + (process_interval * interval '1 second')) AND
+					received_at > processed_at
+				)
 			)
 	`); err != nil {
 		return nil, err
