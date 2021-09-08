@@ -272,7 +272,7 @@ export default Vue.extend({
             }
             // allows collapsing of selected station tab on mobile
             if (this.isMobileView()) {
-                this.isStationSelected = false;
+              this.isStationSelected = !this.isStationSelected;
             }
         },
         onChange(): void {
