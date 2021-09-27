@@ -1,4 +1,4 @@
-package ttn
+package webhook
 
 import (
 	"context"
@@ -14,18 +14,18 @@ const (
 	AggregatingBatchSize = 100
 )
 
-type ThingsNetworkIngestion struct {
+type WebHookIngestion struct {
 	db *sqlxcache.DB
 }
 
-func NewThingsNetworkIngestion(db *sqlxcache.DB) *ThingsNetworkIngestion {
-	return &ThingsNetworkIngestion{
+func NewWebHookIngestion(db *sqlxcache.DB) *WebHookIngestion {
+	return &WebHookIngestion{
 		db: db,
 	}
 }
 
-func (i *ThingsNetworkIngestion) ProcessSchema(ctx context.Context, schemaID int32) error {
-	repository := NewThingsNetworkMessagesRepository(i.db)
+func (i *WebHookIngestion) ProcessSchema(ctx context.Context, schemaID int32) error {
+	repository := NewWebHookMessagesRepository(i.db)
 
 	if err := repository.StartProcessingSchema(ctx, schemaID); err != nil {
 		return err
@@ -36,15 +36,15 @@ func (i *ThingsNetworkIngestion) ProcessSchema(ctx context.Context, schemaID int
 	})
 }
 
-func (i *ThingsNetworkIngestion) ProcessAll(ctx context.Context) error {
-	repository := NewThingsNetworkMessagesRepository(i.db)
+func (i *WebHookIngestion) ProcessAll(ctx context.Context) error {
+	repository := NewWebHookMessagesRepository(i.db)
 	return i.processBatches(ctx, func(ctx context.Context, batch *MessageBatch) error {
 		return repository.QueryBatchForProcessing(ctx, batch)
 	})
 }
 
-func (i *ThingsNetworkIngestion) processBatches(ctx context.Context, query func(ctx context.Context, batch *MessageBatch) error) error {
-	model := NewThingsNetworkModel(i.db)
+func (i *WebHookIngestion) processBatches(ctx context.Context, query func(ctx context.Context, batch *MessageBatch) error) error {
+	model := NewWebHookModel(i.db)
 
 	batch := &MessageBatch{}
 
@@ -67,23 +67,23 @@ func (i *ThingsNetworkIngestion) processBatches(ctx context.Context, query func(
 		batchLog.Infow("batch")
 
 		for _, row := range batch.Messages {
-			rowLog := Logger(ctx).Sugar().With("ttn_schema_id", row.SchemaID).With("ttn_message_id", row.ID)
+			rowLog := Logger(ctx).Sugar().With("schema_id", row.SchemaID).With("message_id", row.ID)
 
 			parsed, err := row.Parse(ctx, batch.Schemas)
 			if err != nil {
-				rowLog.Infow("ttn:skipping", "reason", err)
+				rowLog.Infow("wh:skipping", "reason", err)
 			} else {
 				if true {
-					rowLog.Infow("ttn:parsed", "received_at", parsed.receivedAt, "device_name", parsed.deviceName, "data", parsed.data)
+					rowLog.Infow("wh:parsed", "received_at", parsed.receivedAt, "device_name", parsed.deviceName, "data", parsed.data)
 				}
 
-				if ttns, err := model.Save(ctx, parsed); err != nil {
+				if saved, err := model.Save(ctx, parsed); err != nil {
 					return err
 				} else {
-					if aggregators[ttns.Station.ID] == nil {
-						aggregators[ttns.Station.ID] = handlers.NewAggregator(i.db, "", ttns.Station.ID, AggregatingBatchSize)
+					if aggregators[saved.Station.ID] == nil {
+						aggregators[saved.Station.ID] = handlers.NewAggregator(i.db, "", saved.Station.ID, AggregatingBatchSize)
 					}
-					aggregator := aggregators[ttns.Station.ID]
+					aggregator := aggregators[saved.Station.ID]
 
 					if err := aggregator.NextTime(ctx, parsed.receivedAt); err != nil {
 						return fmt.Errorf("error adding: %v", err)
@@ -92,14 +92,14 @@ func (i *ThingsNetworkIngestion) processBatches(ctx context.Context, query func(
 					for key, maybeValue := range parsed.data {
 						if value, ok := maybeValue.(float64); ok {
 							ask := handlers.AggregateSensorKey{
-								SensorKey: fmt.Sprintf("%s.%s", ttns.SensorPrefix, key),
-								ModuleID:  ttns.Module.ID,
+								SensorKey: fmt.Sprintf("%s.%s", saved.SensorPrefix, key),
+								ModuleID:  saved.Module.ID,
 							}
 							if err := aggregator.AddSample(ctx, parsed.receivedAt, nil, ask, value); err != nil {
 								return fmt.Errorf("error adding: %v", err)
 							}
 						} else {
-							rowLog.Warnw("ttn:skipping", "reason", "non-numeric sensor value", "key", key, "value", maybeValue)
+							rowLog.Warnw("wh:skipping", "reason", "non-numeric sensor value", "key", key, "value", maybeValue)
 						}
 					}
 				}

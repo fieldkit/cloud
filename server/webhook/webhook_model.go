@@ -1,4 +1,4 @@
-package ttn
+package webhook
 
 import (
 	"context"
@@ -14,23 +14,23 @@ import (
 )
 
 const (
-	ThingsNetworkSourceID     = int32(0)
-	ThingsNetworkSensorPrefix = "ttn"
+	WebHookSourceID     = int32(0)
+	WebHookSensorPrefix = "wh"
 )
 
 type cacheEntry struct {
-	station *ThingsNetworkStation
+	station *WebHookStation
 }
 
-type ThingsNetworkModel struct {
+type WebHookModel struct {
 	db    *sqlxcache.DB
 	pr    *repositories.ProvisionRepository
 	sr    *repositories.StationRepository
 	cache map[string]*cacheEntry
 }
 
-func NewThingsNetworkModel(db *sqlxcache.DB) (m *ThingsNetworkModel) {
-	return &ThingsNetworkModel{
+func NewWebHookModel(db *sqlxcache.DB) (m *WebHookModel) {
+	return &WebHookModel{
 		db:    db,
 		pr:    repositories.NewProvisionRepository(db),
 		sr:    repositories.NewStationRepository(db),
@@ -38,7 +38,7 @@ func NewThingsNetworkModel(db *sqlxcache.DB) (m *ThingsNetworkModel) {
 	}
 }
 
-type ThingsNetworkStation struct {
+type WebHookStation struct {
 	Provision     *data.Provision
 	Configuration *data.StationConfiguration
 	Station       *data.Station
@@ -46,7 +46,7 @@ type ThingsNetworkStation struct {
 	SensorPrefix  string
 }
 
-func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*ThingsNetworkStation, error) {
+func (m *WebHookModel) Save(ctx context.Context, pm *ParsedMessage) (*WebHookStation, error) {
 	deviceKey := hex.EncodeToString(pm.deviceID)
 
 	cached, ok := m.cache[deviceKey]
@@ -96,7 +96,7 @@ func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*Thin
 	}
 
 	// Add or create the station configuration..
-	sourceID := ThingsNetworkSourceID
+	sourceID := WebHookSourceID
 	configuration, err := m.sr.UpsertConfiguration(ctx,
 		&data.StationConfiguration{
 			ProvisionID: provision.ID,
@@ -112,7 +112,7 @@ func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*Thin
 	}
 
 	for _, moduleSchema := range pm.schema.Station.Modules {
-		sensorPrefix := fmt.Sprintf("%s.%s", ThingsNetworkSensorPrefix, moduleSchema.Key)
+		sensorPrefix := fmt.Sprintf("%s.%s", WebHookSensorPrefix, moduleSchema.Key)
 
 		// Add or create the station module..
 		module := &data.StationModule{
@@ -131,7 +131,7 @@ func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*Thin
 			return nil, err
 		}
 
-		ttnStation := &ThingsNetworkStation{
+		whStation := &WebHookStation{
 			SensorPrefix:  sensorPrefix,
 			Provision:     provision,
 			Configuration: configuration,
@@ -140,10 +140,10 @@ func (m *ThingsNetworkModel) Save(ctx context.Context, pm *ParsedMessage) (*Thin
 		}
 
 		m.cache[deviceKey] = &cacheEntry{
-			station: ttnStation,
+			station: whStation,
 		}
 
-		return ttnStation, nil
+		return whStation, nil
 	}
 
 	return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")

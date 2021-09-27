@@ -1,4 +1,4 @@
-package ttn
+package webhook
 
 import (
 	"testing"

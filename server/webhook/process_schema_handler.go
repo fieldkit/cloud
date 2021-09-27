@@ -1,4 +1,4 @@
-package ttn
+package webhook
 
 import (
 	"context"
@@ -20,7 +20,7 @@ func NewProcessSchemaHandler(db *sqlxcache.DB, metrics *logging.Metrics, publish
 }
 
 func (h *ProcessSchemaHandler) Handle(ctx context.Context, m *ProcessSchema) error {
-	ingestion := NewThingsNetworkIngestion(h.db)
+	ingestion := NewWebHookIngestion(h.db)
 
 	if err := ingestion.ProcessSchema(ctx, m.SchemaID); err != nil {
 		return err

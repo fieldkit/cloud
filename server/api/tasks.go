@@ -8,7 +8,7 @@ import (
 
 	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
 	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/ttn"
+	"github.com/fieldkit/cloud/server/webhook"
 )
 
 type TasksService struct {
@@ -31,7 +31,7 @@ func (c *TasksService) Five(ctx context.Context) error {
 
 	log.Infow("updated community rankings")
 
-	rr := ttn.NewThingsNetworkMessagesRepository(c.options.Database)
+	rr := webhook.NewWebHookMessagesRepository(c.options.Database)
 	schemas, err := rr.QuerySchemasPendingProcessing(ctx)
 	if err != nil {
 		return err
@@ -40,7 +40,7 @@ func (c *TasksService) Five(ctx context.Context) error {
 	for _, schema := range schemas {
 		log.Infow("processing", "schema_id", schema.ID)
 
-		if err := c.options.Publisher.Publish(ctx, &ttn.ProcessSchema{
+		if err := c.options.Publisher.Publish(ctx, &webhook.ProcessSchema{
 			SchemaID: schema.ID,
 		}); err != nil {
 			return err

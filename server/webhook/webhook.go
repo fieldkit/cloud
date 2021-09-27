@@ -1,4 +1,4 @@
-package ttn
+package webhook
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/elgs/gojq"
 )
 
-type ThingsNetworkMessage struct {
+type WebHookMessage struct {
 	ID        int64     `db:"id"`
 	CreatedAt time.Time `db:"created_at"`
 	SchemaID  *int32    `db:"schema_id"`
@@ -19,17 +19,17 @@ type ThingsNetworkMessage struct {
 }
 
 type ParsedMessage struct {
-	original   *ThingsNetworkMessage
+	original   *WebHookMessage
 	deviceID   []byte
 	deviceName string
 	data       map[string]interface{}
 	receivedAt time.Time
-	schema     *ThingsNetworkSchema
+	schema     *WebHookSchema
 	schemaID   int32
 	ownerID    int32
 }
 
-func (m *ThingsNetworkMessage) evaluate(parser *gojq.JQ, query string) (value interface{}, err error) {
+func (m *WebHookMessage) evaluate(parser *gojq.JQ, query string) (value interface{}, err error) {
 	if query == "" {
 		return "", fmt.Errorf("empty query")
 	}
@@ -41,7 +41,7 @@ func (m *ThingsNetworkMessage) evaluate(parser *gojq.JQ, query string) (value in
 	return raw, nil
 }
 
-func (m *ThingsNetworkMessage) Parse(ctx context.Context, schemas map[int32]*ThingsNetworkSchemaRegistration) (p *ParsedMessage, err error) {
+func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSchemaRegistration) (p *ParsedMessage, err error) {
 	if m.SchemaID == nil {
 		return nil, fmt.Errorf("missing schema")
 	}
@@ -131,7 +131,7 @@ func (m *ThingsNetworkMessage) Parse(ctx context.Context, schemas map[int32]*Thi
 
 // Messages
 
-type ThingsNetworkMessageReceived struct {
+type WebHookMessageReceived struct {
 	SchemaID  int32 `json:"ttn_schema_id"`
 	MessageID int64 `json:"ttn_message_id"`
 }
@@ -142,32 +142,32 @@ type ProcessSchema struct {
 
 // Schema
 
-type ThingsNetworkSchemaSensor struct {
+type WebHookSchemaSensor struct {
 	Key        string `json:"key"`
 	Name       string `json:"name"`
 	Expression string `json:"expression"`
 }
 
-type ThingsNetworkSchemaModule struct {
+type WebHookSchemaModule struct {
 	Key     string                       `json:"key"`
 	Name    string                       `json:"name"`
-	Sensors []*ThingsNetworkSchemaSensor `json:"sensors"`
+	Sensors []*WebHookSchemaSensor `json:"sensors"`
 }
 
-type ThingsNetworkSchemaStation struct {
+type WebHookSchemaStation struct {
 	Key                  string                       `json:"key"`
 	Model                string                       `json:"model"`
 	IdentifierExpression string                       `json:"identifier"`
 	NameExpression       string                       `json:"name"`
 	ReceivedExpression   string                       `json:"received"`
-	Modules              []*ThingsNetworkSchemaModule `json:"modules"`
+	Modules              []*WebHookSchemaModule `json:"modules"`
 }
 
-type ThingsNetworkSchema struct {
-	Station ThingsNetworkSchemaStation `json:"station"`
+type WebHookSchema struct {
+	Station WebHookSchemaStation `json:"station"`
 }
 
-type ThingsNetworkSchemaRegistration struct {
+type WebHookSchemaRegistration struct {
 	ID              int32      `db:"id"`
 	OwnerID         int32      `db:"owner_id"`
 	Name            string     `db:"name"`
@@ -178,8 +178,8 @@ type ThingsNetworkSchemaRegistration struct {
 	ProcessInterval *int32     `db:"process_interval"`
 }
 
-func (r *ThingsNetworkSchemaRegistration) Parse() (*ThingsNetworkSchema, error) {
-	s := &ThingsNetworkSchema{}
+func (r *WebHookSchemaRegistration) Parse() (*WebHookSchema, error) {
+	s := &WebHookSchema{}
 	if err := json.Unmarshal(r.Body, s); err != nil {
 		return nil, err
 	}
