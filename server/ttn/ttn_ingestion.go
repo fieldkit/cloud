@@ -73,7 +73,7 @@ func (i *ThingsNetworkIngestion) processBatches(ctx context.Context, query func(
 			if err != nil {
 				rowLog.Infow("ttn:skipping", "reason", err)
 			} else {
-				if false {
+				if true {
 					rowLog.Infow("ttn:parsed", "received_at", parsed.receivedAt, "device_name", parsed.deviceName, "data", parsed.data)
 				}
 

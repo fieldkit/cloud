@@ -33,6 +33,8 @@ require (
 	github.com/disintegration/gift v1.2.1 // indirect
 	github.com/disintegration/imageorient v0.0.0-20180920195336-8147d86e83ec
 	github.com/dropbox/godropbox v0.0.0-20190501155911-5749d3b71cbe // indirect
+	github.com/elgs/gojq v0.0.0-20201120033525-b5293fef2759
+	github.com/elgs/gosplitargs v0.0.0-20161028071935-a491c5eeb3c8 // indirect
 	github.com/fieldkit/app-protocol v0.0.0-20200515173549-e0925480073d
 	github.com/fieldkit/data-protocol v0.0.0-20200825203301-d452c6499956
 	github.com/go-ini/ini v1.26.0

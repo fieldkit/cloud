@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/elgs/gojq"
 )
 
 type ThingsNetworkMessage struct {
@@ -27,69 +29,99 @@ type ParsedMessage struct {
 	ownerID    int32
 }
 
-type LatestThingsNetworkApplicationIDs struct {
-	ApplicationID string `json:"application_id"`
-}
+func (m *ThingsNetworkMessage) evaluate(parser *gojq.JQ, query string) (value interface{}, err error) {
+	if query == "" {
+		return "", fmt.Errorf("empty query")
+	}
+	raw, err := parser.Query(query)
+	if err != nil {
+		return "", fmt.Errorf("error querying '%s': %v", query, err)
+	}
 
-type LatestThingsNetworkDeviceIDs struct {
-	ApplicationIDs LatestThingsNetworkApplicationIDs `json:"application_ids"`
-	DeviceID       string                            `json:"device_id"`
-	DeviceEUI      string                            `json:"dev_eui"`
-	DeviceAddress  string                            `json:"dev_addr"`
-}
-
-type LatestThingsNetworkUplinkMessage struct {
-	Port            int32                  `json:"f_port"`
-	Counter         int32                  `json:"f_cnt"`
-	DecodedPayload  map[string]interface{} `json:"decoded_payload"`
-	ReceivedAt      string                 `json:"received_at"`
-	ConsumedAirtime string                 `json:"consumed_airtime"`
-}
-
-type LatestThingsNetwork struct {
-	EndDeviceIDs  LatestThingsNetworkDeviceIDs     `json:"end_device_ids"`
-	UplinkMessage LatestThingsNetworkUplinkMessage `json:"uplink_message"`
+	return raw, nil
 }
 
 func (m *ThingsNetworkMessage) Parse(ctx context.Context, schemas map[int32]*ThingsNetworkSchemaRegistration) (p *ParsedMessage, err error) {
-	// My plan here is to grow the number of structs that we're attempting to
-	// parse against as a means for versioning these. So, eventually there may
-	// be a loop here or a series of Unmarshal attempts.
-	raw := LatestThingsNetwork{}
-	if err := json.Unmarshal(m.Body, &raw); err != nil {
-		return nil, err
-	}
-
-	deviceID, err := hex.DecodeString(raw.EndDeviceIDs.DeviceEUI)
-	if err != nil {
-		return nil, fmt.Errorf("malformed device eui: %s", raw.EndDeviceIDs.DeviceEUI)
-	}
-
-	if raw.EndDeviceIDs.DeviceID == "" {
-		return nil, fmt.Errorf("empty device id (station name)")
-	}
-
-	receivedAt, err := time.Parse("2006-01-02T15:04:05.999999999Z", raw.UplinkMessage.ReceivedAt)
-	if err != nil {
-		return nil, fmt.Errorf("malformed received at (%s)", raw.UplinkMessage.ReceivedAt)
-	}
-
 	if m.SchemaID == nil {
 		return nil, fmt.Errorf("missing schema")
 	}
 
-	schemaRegistration := schemas[*m.SchemaID]
+	schemaRegistration, ok := schemas[*m.SchemaID]
+	if !ok {
+		return nil, fmt.Errorf("missing schema")
+	}
+
 	schema, err := schemaRegistration.Parse()
 	if err != nil {
 		return nil, fmt.Errorf("error parsing schema: %s", err)
+	}
 
+	parser, err := gojq.NewStringQuery(string(m.Body))
+	if err != nil {
+		return nil, fmt.Errorf("error creating body parser: %v", err)
+	}
+
+	deviceIDRaw, err := m.evaluate(parser, schema.Station.IdentifierExpression)
+	if err != nil {
+		return nil, fmt.Errorf("evaluating identifier-expression: %v", err)
+	}
+
+	deviceNameRaw, err := m.evaluate(parser, schema.Station.NameExpression)
+	if err != nil {
+		return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
+	}
+
+	deviceNameString, ok := deviceNameRaw.(string)
+	if !ok {
+		return nil, fmt.Errorf("unexpected device-name value: %v", deviceNameString)
+	}
+
+	receivedAtRaw, err := m.evaluate(parser, schema.Station.ReceivedExpression)
+	if err != nil {
+		return nil, fmt.Errorf("evaluating received-at-expression: %v", err)
+	}
+
+	receivedAtString, ok := receivedAtRaw.(string)
+	if !ok {
+		return nil, fmt.Errorf("unexpected received-at value: %v", receivedAtRaw)
+	}
+
+	receivedAt, err := time.Parse("2006-01-02T15:04:05.999999999Z", receivedAtString)
+	if err != nil {
+		return nil, fmt.Errorf("malformed received at (%s)", receivedAtRaw)
+	}
+
+	deviceIDString, ok := deviceIDRaw.(string)
+	if !ok {
+		return nil, fmt.Errorf("unexpected device-id value: %v", receivedAtRaw)
+	}
+
+	deviceID, err := hex.DecodeString(deviceIDString)
+	if err != nil {
+		return nil, fmt.Errorf("malformed device eui: %s", deviceIDRaw)
+	}
+
+	data := make(map[string]interface{})
+
+	for _, module := range schema.Station.Modules {
+		for _, sensor := range module.Sensors {
+			value, err := m.evaluate(parser, sensor.Expression)
+			if err != nil {
+				return nil, fmt.Errorf("evaluating sensor expression '%s': %v", sensor.Name, err)
+			}
+
+			if sensor.Key != "" {
+				data[sensor.Key] = value
+			} else {
+				data[sensor.Name] = value
+			}
+		}
 	}
 
 	return &ParsedMessage{
-		original:   m,
 		deviceID:   deviceID,
-		deviceName: raw.EndDeviceIDs.DeviceID,
-		data:       raw.UplinkMessage.DecodedPayload,
+		deviceName: deviceNameString,
+		data:       data,
 		receivedAt: receivedAt,
 		ownerID:    schemaRegistration.OwnerID,
 		schemaID:   schemaRegistration.ID,
@@ -97,20 +129,38 @@ func (m *ThingsNetworkMessage) Parse(ctx context.Context, schemas map[int32]*Thi
 	}, nil
 }
 
+// Messages
+
+type ThingsNetworkMessageReceived struct {
+	SchemaID  int32 `json:"ttn_schema_id"`
+	MessageID int64 `json:"ttn_message_id"`
+}
+
+type ProcessSchema struct {
+	SchemaID int32 `json:"schema_id"`
+}
+
+// Schema
+
 type ThingsNetworkSchemaSensor struct {
-	DecodedKey string `json:"decoded_key"`
+	Key        string `json:"key"`
+	Name       string `json:"name"`
+	Expression string `json:"expression"`
 }
 
 type ThingsNetworkSchemaModule struct {
-	Key     string                               `json:"key"`
-	Name    string                               `json:"name"`
-	Sensors map[string]ThingsNetworkSchemaSensor `json:"sensors"`
+	Key     string                       `json:"key"`
+	Name    string                       `json:"name"`
+	Sensors []*ThingsNetworkSchemaSensor `json:"sensors"`
 }
 
 type ThingsNetworkSchemaStation struct {
-	Key     string                      `json:"key"`
-	Model   string                      `json:"model"`
-	Modules []ThingsNetworkSchemaModule `json:"modules"`
+	Key                  string                       `json:"key"`
+	Model                string                       `json:"model"`
+	IdentifierExpression string                       `json:"identifier"`
+	NameExpression       string                       `json:"name"`
+	ReceivedExpression   string                       `json:"received"`
+	Modules              []*ThingsNetworkSchemaModule `json:"modules"`
 }
 
 type ThingsNetworkSchema struct {
@@ -134,13 +184,4 @@ func (r *ThingsNetworkSchemaRegistration) Parse() (*ThingsNetworkSchema, error) 
 		return nil, err
 	}
 	return s, nil
-}
-
-type ThingsNetworkMessageReceived struct {
-	SchemaID  int32 `json:"ttn_schema_id"`
-	MessageID int64 `json:"ttn_message_id"`
-}
-
-type ProcessSchema struct {
-	SchemaID int32 `json:"schema_id"`
 }
