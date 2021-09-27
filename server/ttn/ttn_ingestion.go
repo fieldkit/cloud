@@ -44,8 +44,6 @@ func (i *ThingsNetworkIngestion) ProcessAll(ctx context.Context) error {
 }
 
 func (i *ThingsNetworkIngestion) processBatches(ctx context.Context, query func(ctx context.Context, batch *MessageBatch) error) error {
-	log := Logger(ctx).Sugar()
-
 	model := NewThingsNetworkModel(i.db)
 
 	batch := &MessageBatch{}
@@ -53,6 +51,8 @@ func (i *ThingsNetworkIngestion) processBatches(ctx context.Context, query func(
 	aggregators := make(map[int32]*handlers.Aggregator)
 
 	for {
+		batchLog := Logger(ctx).Sugar()
+
 		if err := query(ctx, batch); err != nil {
 			if err == sql.ErrNoRows {
 				return nil
@@ -64,15 +64,17 @@ func (i *ThingsNetworkIngestion) processBatches(ctx context.Context, query func(
 			return fmt.Errorf("no messages")
 		}
 
-		log.Infow("batch")
+		batchLog.Infow("batch")
 
 		for _, row := range batch.Messages {
+			rowLog := Logger(ctx).Sugar().With("ttn_schema_id", row.SchemaID).With("ttn_message_id", row.ID)
+
 			parsed, err := row.Parse(ctx, batch.Schemas)
 			if err != nil {
-				log.Infow("ttn:skipping", "reason", err)
+				rowLog.Infow("ttn:skipping", "reason", err)
 			} else {
 				if false {
-					log.Infow("ttn:parsed", "received_at", parsed.receivedAt, "device_name", parsed.deviceName, "data", parsed.data)
+					rowLog.Infow("ttn:parsed", "received_at", parsed.receivedAt, "device_name", parsed.deviceName, "data", parsed.data)
 				}
 
 				if ttns, err := model.Save(ctx, parsed); err != nil {
@@ -97,7 +99,7 @@ func (i *ThingsNetworkIngestion) processBatches(ctx context.Context, query func(
 								return fmt.Errorf("error adding: %v", err)
 							}
 						} else {
-							log.Warnw("ttn:skipping", "reason", "non-numeric sensor value", "key", key, "value", maybeValue)
+							rowLog.Warnw("ttn:skipping", "reason", "non-numeric sensor value", "key", key, "value", maybeValue)
 						}
 					}
 				}

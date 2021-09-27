@@ -55,16 +55,16 @@ func (c *ThingsNetworkService) Webhook(ctx context.Context, payload *ttnService.
 		message.SchemaID = &schemas[0].ID
 	}
 
-	if message.SchemaID == nil {
-		log.Warnw("webhook", "schema_missing", true)
-	} else {
-		log.Infow("webhook", "schema_id", message.SchemaID)
-	}
-
 	if err := c.options.DB.NamedGetContext(ctx, &message, `
 		INSERT INTO fieldkit.ttn_messages (created_at, headers, body, schema_id) VALUES (:created_at, :headers, :body, :schema_id) RETURNING id
 		`, &message); err != nil {
 		return err
+	}
+
+	if message.SchemaID == nil {
+		log.Warnw("webhook", "ttn_message_id", message.ID, "schema_missing", true)
+	} else {
+		log.Infow("webhook", "ttn_message_id", message.ID, "schema_id", message.SchemaID)
 	}
 
 	if message.SchemaID != nil {
