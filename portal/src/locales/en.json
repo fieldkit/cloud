@@ -111,8 +111,8 @@
                 "cta": "Add"
             },
             "edit": {
-                "trigger": "Edit",
-                "title": "Edit Stations",
+                "trigger": "Remove",
+                "title": "Remove Stations",
                 "cta": "Remove"
             },
             "search": "Search Stations",
