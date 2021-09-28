@@ -53,45 +53,58 @@ func toFloat(x interface{}) (float64, bool) {
 	}
 }
 
-func (m *WebHookMessage) evaluate(ctx context.Context, source interface{}, query string) (value interface{}, err error) {
+type JqCache struct {
+	compiled map[string]*gojq.Code
+}
+
+func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source interface{}, query string) (value interface{}, err error) {
 	if query == "" {
 		return "", fmt.Errorf("empty query")
 	}
 
-	parsed, err := gojq.Parse(query)
-	if err != nil {
-		return "", fmt.Errorf("error parsing query '%s': %v", query, err)
-	}
+	compiled, ok := cache.compiled[query]
+	if !ok {
+		parsed, err := gojq.Parse(query)
+		if err != nil {
+			return "", fmt.Errorf("error parsing query '%s': %v", query, err)
+		}
 
-	compiled, err := gojq.Compile(parsed,
-		gojq.WithFunction("clamp", 0, 3, func(x interface{}, xs []interface{}) interface{} {
-			if x, ok := toFloat(x); ok {
-				if len(xs) == 0 {
-					if x < 0 {
-						return 0
-					}
-					if x > 100 {
-						return 100
-					}
-					return x
-				}
-				if min, ok := toFloat(xs[0]); ok {
-					if max, ok := toFloat(xs[1]); ok {
-						if x < min {
-							return min
+		compiled, err = gojq.Compile(parsed,
+			gojq.WithFunction("clamp", 0, 3, func(x interface{}, xs []interface{}) interface{} {
+				if x, ok := toFloat(x); ok {
+					if len(xs) == 0 {
+						if x < 0 {
+							return 0
 						}
-						if x > max {
-							return max
+						if x > 100 {
+							return 100
 						}
 						return x
 					}
+					if min, ok := toFloat(xs[0]); ok {
+						if max, ok := toFloat(xs[1]); ok {
+							if x < min {
+								return min
+							}
+							if x > max {
+								return max
+							}
+							return x
+						}
+					}
 				}
-			}
-			return fmt.Errorf("clamp cannot be applied to: %v, %v", x, xs)
-		}),
-	)
-	if err != nil {
-		return "", fmt.Errorf("error compiling query '%s': %v", query, err)
+				return fmt.Errorf("clamp cannot be applied to: %v, %v", x, xs)
+			}),
+		)
+		if err != nil {
+			return "", fmt.Errorf("error compiling query '%s': %v", query, err)
+		}
+
+		if cache.compiled == nil {
+			cache.compiled = make(map[string]*gojq.Code)
+		}
+
+		cache.compiled[query] = compiled
 	}
 
 	iter := compiled.Run(source)
@@ -113,7 +126,7 @@ func (m *WebHookMessage) evaluate(ctx context.Context, source interface{}, query
 	return "", fmt.Errorf("query returned nothing '%s': %v", query, err)
 }
 
-func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSchemaRegistration) (p *ParsedMessage, err error) {
+func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[int32]*WebHookSchemaRegistration) (p *ParsedMessage, err error) {
 	if m.SchemaID == nil {
 		return nil, fmt.Errorf("missing schema")
 	}
@@ -133,12 +146,12 @@ func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSc
 		return nil, fmt.Errorf("error parsing message: %v", err)
 	}
 
-	deviceIDRaw, err := m.evaluate(ctx, source, schema.Station.IdentifierExpression)
+	deviceIDRaw, err := m.evaluate(ctx, cache, source, schema.Station.IdentifierExpression)
 	if err != nil {
 		return nil, fmt.Errorf("evaluating identifier-expression: %v", err)
 	}
 
-	deviceNameRaw, err := m.evaluate(ctx, source, schema.Station.NameExpression)
+	deviceNameRaw, err := m.evaluate(ctx, cache, source, schema.Station.NameExpression)
 	if err != nil {
 		return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
 	}
@@ -148,7 +161,7 @@ func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSc
 		return nil, fmt.Errorf("unexpected device-name value: %v", deviceNameString)
 	}
 
-	receivedAtRaw, err := m.evaluate(ctx, source, schema.Station.ReceivedExpression)
+	receivedAtRaw, err := m.evaluate(ctx, cache, source, schema.Station.ReceivedExpression)
 	if err != nil {
 		return nil, fmt.Errorf("evaluating received-at-expression: %v", err)
 	}
@@ -177,7 +190,7 @@ func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSc
 
 	for _, module := range schema.Station.Modules {
 		for _, sensor := range module.Sensors {
-			maybeValue, err := m.evaluate(ctx, source, sensor.Expression)
+			maybeValue, err := m.evaluate(ctx, cache, source, sensor.Expression)
 			if err != nil {
 				return nil, fmt.Errorf("evaluating sensor expression '%s': %v", sensor.Name, err)
 			}

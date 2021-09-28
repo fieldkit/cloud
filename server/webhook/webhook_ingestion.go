@@ -48,6 +48,8 @@ func (i *WebHookIngestion) processBatches(ctx context.Context, query func(ctx co
 
 	batch := &MessageBatch{}
 
+	jqCache := &JqCache{}
+
 	aggregators := make(map[int32]*handlers.Aggregator)
 
 	for {
@@ -69,7 +71,7 @@ func (i *WebHookIngestion) processBatches(ctx context.Context, query func(ctx co
 		for _, row := range batch.Messages {
 			rowLog := Logger(ctx).Sugar().With("schema_id", row.SchemaID).With("message_id", row.ID)
 
-			parsed, err := row.Parse(ctx, batch.Schemas)
+			parsed, err := row.Parse(ctx, jqCache, batch.Schemas)
 			if err != nil {
 				rowLog.Infow("wh:skipping", "reason", err)
 			} else {
