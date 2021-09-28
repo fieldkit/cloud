@@ -157,13 +157,19 @@ func (m *WebHookModel) updateLinkedFields(ctx context.Context, station *WebHookS
 			// TODO This is very wasteful when doing bulk processing.
 			battery := float32(parsedReading.Value)
 			station.Station.Battery = &battery
-			if err := m.sr.UpdateStation(ctx, station.Station); err != nil {
-				return nil, fmt.Errorf("error updating station linked fields: %v", err)
-			}
 		}
 		if parsedReading.Location {
 			Logger(ctx).Sugar().Warnw("location parsing unimplemented")
 		}
+	}
+
+	now := time.Now()
+
+	station.Station.IngestionAt = &now
+	station.Station.UpdatedAt = now
+
+	if err := m.sr.UpdateStation(ctx, station.Station); err != nil {
+		return nil, fmt.Errorf("error updating station linked fields: %v", err)
 	}
 
 	return station, nil
