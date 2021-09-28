@@ -89,17 +89,21 @@ func (i *WebHookIngestion) processBatches(ctx context.Context, query func(ctx co
 						return fmt.Errorf("error adding: %v", err)
 					}
 
-					for key, maybeValue := range parsed.data {
-						if value, ok := maybeValue.(float64); ok {
-							ask := handlers.AggregateSensorKey{
-								SensorKey: fmt.Sprintf("%s.%s", saved.SensorPrefix, key),
-								ModuleID:  saved.Module.ID,
-							}
-							if err := aggregator.AddSample(ctx, parsed.receivedAt, nil, ask, value); err != nil {
-								return fmt.Errorf("error adding: %v", err)
-							}
-						} else {
-							rowLog.Warnw("wh:skipping", "reason", "non-numeric sensor value", "key", key, "value", maybeValue)
+					for _, parsedSensor := range parsed.data {
+						key := parsedSensor.Key
+						if key == "" {
+							key = parsedSensor.Name
+						}
+						if key == "" {
+							return fmt.Errorf("parsed-sensor missing has no sensor key")
+						}
+
+						ask := handlers.AggregateSensorKey{
+							SensorKey: fmt.Sprintf("%s.%s", saved.SensorPrefix, key),
+							ModuleID:  saved.Module.ID,
+						}
+						if err := aggregator.AddSample(ctx, parsed.receivedAt, nil, ask, parsedSensor.Value); err != nil {
+							return fmt.Errorf("error adding: %v", err)
 						}
 					}
 				}

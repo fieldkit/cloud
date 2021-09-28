@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -9,6 +10,8 @@ type WebHookSchemaSensor struct {
 	Key        string `json:"key"`
 	Name       string `json:"name"`
 	Expression string `json:"expression"`
+	Battery    bool   `json:"battery"`
+	Location   bool   `json:"location"`
 }
 
 type WebHookSchemaModule struct {
@@ -44,7 +47,7 @@ type WebHookSchemaRegistration struct {
 func (r *WebHookSchemaRegistration) Parse() (*WebHookSchema, error) {
 	s := &WebHookSchema{}
 	if err := json.Unmarshal(r.Body, s); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error parsing schema-id %d: %v", r.ID, err)
 	}
 	return s, nil
 }

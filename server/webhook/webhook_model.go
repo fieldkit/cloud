@@ -51,7 +51,7 @@ func (m *WebHookModel) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 
 	cached, ok := m.cache[deviceKey]
 	if ok {
-		return cached.station, nil
+		return m.updateLinkedFields(ctx, cached.station, pm)
 	}
 
 	updating, err := m.sr.QueryStationByDeviceID(ctx, pm.deviceID)
@@ -143,8 +143,28 @@ func (m *WebHookModel) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			station: whStation,
 		}
 
-		return whStation, nil
+		Logger(ctx).Sugar().Infow("wh:loaded-station", "station_id", station.ID)
+
+		return m.updateLinkedFields(ctx, whStation, pm)
 	}
 
 	return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
+}
+
+func (m *WebHookModel) updateLinkedFields(ctx context.Context, station *WebHookStation, pm *ParsedMessage) (*WebHookStation, error) {
+	for _, parsedReading := range pm.data {
+		if parsedReading.Battery {
+			// TODO This is very wasteful when doing bulk processing.
+			battery := float32(parsedReading.Value)
+			station.Station.Battery = &battery
+			if err := m.sr.UpdateStation(ctx, station.Station); err != nil {
+				return nil, fmt.Errorf("error updating station linked fields: %v", err)
+			}
+		}
+		if parsedReading.Location {
+			Logger(ctx).Sugar().Warnw("location parsing unimplemented")
+		}
+	}
+
+	return station, nil
 }

@@ -17,11 +17,19 @@ type WebHookMessage struct {
 	Body      []byte    `db:"body"`
 }
 
+type ParsedReading struct {
+	Name     string  `json:"name"`
+	Key      string  `json:"key"`
+	Value    float64 `json:"value"`
+	Battery  bool    `json:"battery"`
+	Location bool    `json:"location"`
+}
+
 type ParsedMessage struct {
 	original   *WebHookMessage
 	deviceID   []byte
 	deviceName string
-	data       map[string]interface{}
+	data       []*ParsedReading
 	receivedAt time.Time
 	schema     *WebHookSchema
 	schemaID   int32
@@ -100,19 +108,27 @@ func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSc
 		return nil, fmt.Errorf("malformed device eui: %s", deviceIDRaw)
 	}
 
-	data := make(map[string]interface{})
+	sensors := make([]*ParsedReading, 0)
 
 	for _, module := range schema.Station.Modules {
 		for _, sensor := range module.Sensors {
-			value, err := m.evaluate(parser, sensor.Expression)
+			maybeValue, err := m.evaluate(parser, sensor.Expression)
 			if err != nil {
 				return nil, fmt.Errorf("evaluating sensor expression '%s': %v", sensor.Name, err)
 			}
 
-			if sensor.Key != "" {
-				data[sensor.Key] = value
+			if value, ok := maybeValue.(float64); ok {
+				reading := &ParsedReading{
+					Name:     sensor.Name,
+					Key:      sensor.Key,
+					Battery:  sensor.Battery,
+					Location: sensor.Location,
+					Value:    value,
+				}
+
+				sensors = append(sensors, reading)
 			} else {
-				data[sensor.Name] = value
+				return nil, fmt.Errorf("non-numeric sensor value '%s'/'%s': %v", sensor.Name, sensor.Expression, maybeValue)
 			}
 		}
 	}
@@ -120,7 +136,7 @@ func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSc
 	return &ParsedMessage{
 		deviceID:   deviceID,
 		deviceName: deviceNameString,
-		data:       data,
+		data:       sensors,
 		receivedAt: receivedAt,
 		ownerID:    schemaRegistration.OwnerID,
 		schemaID:   schemaRegistration.ID,
