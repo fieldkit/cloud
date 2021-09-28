@@ -433,6 +433,10 @@ export default function routerFactory(store) {
         base: process.env.BASE_URL,
         routes: routes,
         scrollBehavior(to, from, savedPosition) {
+            if (to.name == from.name) {
+                return null;
+            }
+            console.log("scrolling-to-top");
             return { x: 0, y: 0 };
         },
     });
