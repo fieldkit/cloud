@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math/big"
+	"strconv"
 	"time"
 
 	"github.com/itchyny/gojq"
@@ -37,14 +39,59 @@ type ParsedMessage struct {
 	ownerID    int32
 }
 
+func toFloat(x interface{}) (float64, bool) {
+	switch x := x.(type) {
+	case int:
+		return float64(x), true
+	case float64:
+		return x, true
+	case *big.Int:
+		f, err := strconv.ParseFloat(x.String(), 64)
+		return f, err == nil
+	default:
+		return 0.0, false
+	}
+}
+
 func (m *WebHookMessage) evaluate(ctx context.Context, source interface{}, query string) (value interface{}, err error) {
 	if query == "" {
 		return "", fmt.Errorf("empty query")
 	}
 
-	compiled, err := gojq.Parse(query)
+	parsed, err := gojq.Parse(query)
 	if err != nil {
 		return "", fmt.Errorf("error parsing query '%s': %v", query, err)
+	}
+
+	compiled, err := gojq.Compile(parsed,
+		gojq.WithFunction("clamp", 0, 3, func(x interface{}, xs []interface{}) interface{} {
+			if x, ok := toFloat(x); ok {
+				if len(xs) == 0 {
+					if x < 0 {
+						return 0
+					}
+					if x > 100 {
+						return 100
+					}
+					return x
+				}
+				if min, ok := toFloat(xs[0]); ok {
+					if max, ok := toFloat(xs[1]); ok {
+						if x < min {
+							return min
+						}
+						if x > max {
+							return max
+						}
+						return x
+					}
+				}
+			}
+			return fmt.Errorf("clamp cannot be applied to: %v, %v", x, xs)
+		}),
+	)
+	if err != nil {
+		return "", fmt.Errorf("error compiling query '%s': %v", query, err)
 	}
 
 	iter := compiled.Run(source)
@@ -135,7 +182,7 @@ func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSc
 				return nil, fmt.Errorf("evaluating sensor expression '%s': %v", sensor.Name, err)
 			}
 
-			if value, ok := maybeValue.(float64); ok {
+			if value, ok := toFloat(maybeValue); ok {
 				reading := &ParsedReading{
 					Name:     sensor.Name,
 					Key:      sensor.Key,
