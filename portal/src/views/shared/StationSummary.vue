@@ -6,11 +6,11 @@
             </div>
             <div class="station-details">
                 <div class="station-name">{{ station.name }}</div>
-                <div class="station-seen">
+                <div class="station-seen" v-if="station.uploadedAt">
                     Last Seen
                     <span class="small-light">{{ station.uploadedAt | prettyDate }}</span>
                 </div>
-                <div class="station-battery">
+                <div class="station-battery" v-if="station.battery">
                     <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
                     <span class="small-light">{{ station.battery }}</span>
                 </div>
