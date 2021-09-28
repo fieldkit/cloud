@@ -75,7 +75,7 @@ func (i *WebHookIngestion) processBatches(ctx context.Context, query func(ctx co
 			if err != nil {
 				rowLog.Infow("wh:skipping", "reason", err)
 			} else {
-				if true {
+				if false {
 					rowLog.Infow("wh:parsed", "received_at", parsed.receivedAt, "device_name", parsed.deviceName, "data", parsed.data)
 				}
 
