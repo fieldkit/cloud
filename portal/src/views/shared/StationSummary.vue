@@ -6,13 +6,9 @@
             </div>
             <div class="station-details">
                 <div class="station-name">{{ station.name }}</div>
-                <div class="station-synced">
-                    Last Upload
+                <div class="station-seen">
+                    Last Seen
                     <span class="small-light">{{ station.uploadedAt | prettyDate }}</span>
-                </div>
-                <div class="station-synced">
-                    Last Synced
-                    <span class="small-light">{{ station.updatedAt | prettyDate }}</span>
                 </div>
                 <div class="station-battery">
                     <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
