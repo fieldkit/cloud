@@ -82,7 +82,7 @@ export const D3TimeSeriesGraph = Vue.extend({
 
                 if (tick == 0) {
                     const allTicks = els.map((el) => el.__data__);
-                    const dateOnly = d3.timeFormat("%-m/%-d");
+                    const dateOnly = d3.timeFormat("%-m/%-d/%-Y");
                     const allDates = allTicks.map((tickDate) => dateOnly(tickDate));
                     const timeOnly = d3.timeFormat("%-H:%M");
                     const allTimes = allTicks.map((tickDate) => timeOnly(tickDate));
@@ -91,7 +91,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                     const uniqueTimes = _.uniq(allTimes);
 
                     if (uniqueTimes.length == 1) {
-                        spec = "%-m/%-d";
+                        spec = "%-m/%-d/%-Y";
                     } else if (uniqueDates.length == 1) {
                         spec = "%-H:%M";
                     }
