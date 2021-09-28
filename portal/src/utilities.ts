@@ -79,7 +79,7 @@ export function getModuleImg(module) {
         case "modules.water.unknown":
         case "water.unknown":
             return "modules/icon-module-water.svg";
-        case "ttn.floodnet":
+        case "wh.floodnet":
             return "modules/icon-module-floodnet.png";
         default:
             return "modules/icon-module-generic.svg";
