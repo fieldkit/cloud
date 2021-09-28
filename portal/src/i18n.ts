@@ -82,10 +82,10 @@ function loadLocaleMessages(): LocaleMessages {
                         )
                         .join(".");
 
-                        if (moduleKey.indexOf("ttn.") == 0) {
-                            const fullKey = [moduleKey, normalizedKey].join(".");
-                            return [fullKey, sensorName];
-                        }
+                    if (moduleKey.indexOf("wh.") == 0) {
+                        const fullKey = [moduleKey, normalizedKey].join(".");
+                        return [fullKey, sensorName];
+                    }
 
                     const fullKey = ["fk", moduleKey, normalizedKey].join(".");
                     return [fullKey, sensorName];
