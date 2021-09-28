@@ -75,7 +75,7 @@
         </div>
 
         <div class="row-section data-readings">
-            <div class="project-data">
+            <div class="project-data" v-if="false">
                 <ProjectDataFiles :projectStations="displayProject.stations" />
             </div>
             <div class="project-readings">
