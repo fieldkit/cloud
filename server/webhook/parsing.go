@@ -3,10 +3,11 @@ package webhook
 import (
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"time"
 
-	"github.com/elgs/gojq"
+	"github.com/itchyny/gojq"
 )
 
 type WebHookMessage struct {
@@ -36,16 +37,33 @@ type ParsedMessage struct {
 	ownerID    int32
 }
 
-func (m *WebHookMessage) evaluate(parser *gojq.JQ, query string) (value interface{}, err error) {
+func (m *WebHookMessage) evaluate(ctx context.Context, source interface{}, query string) (value interface{}, err error) {
 	if query == "" {
 		return "", fmt.Errorf("empty query")
 	}
-	raw, err := parser.Query(query)
+
+	compiled, err := gojq.Parse(query)
 	if err != nil {
-		return "", fmt.Errorf("error querying '%s': %v", query, err)
+		return "", fmt.Errorf("error parsing query '%s': %v", query, err)
 	}
 
-	return raw, nil
+	iter := compiled.Run(source)
+	for {
+		v, ok := iter.Next()
+		if !ok {
+			break
+		}
+
+		if err, ok := v.(error); ok {
+			return "", fmt.Errorf("query returned error '%s': %v", query, err)
+		}
+
+		if v != nil {
+			return v, nil
+		}
+	}
+
+	return "", fmt.Errorf("query returned nothing '%s': %v", query, err)
 }
 
 func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSchemaRegistration) (p *ParsedMessage, err error) {
@@ -60,20 +78,20 @@ func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSc
 
 	schema, err := schemaRegistration.Parse()
 	if err != nil {
-		return nil, fmt.Errorf("error parsing schema: %s", err)
+		return nil, fmt.Errorf("error parsing schema: %v", err)
 	}
 
-	parser, err := gojq.NewStringQuery(string(m.Body))
-	if err != nil {
-		return nil, fmt.Errorf("error creating body parser: %v", err)
+	var source interface{}
+	if err := json.Unmarshal(m.Body, &source); err != nil {
+		return nil, fmt.Errorf("error parsing message: %v", err)
 	}
 
-	deviceIDRaw, err := m.evaluate(parser, schema.Station.IdentifierExpression)
+	deviceIDRaw, err := m.evaluate(ctx, source, schema.Station.IdentifierExpression)
 	if err != nil {
 		return nil, fmt.Errorf("evaluating identifier-expression: %v", err)
 	}
 
-	deviceNameRaw, err := m.evaluate(parser, schema.Station.NameExpression)
+	deviceNameRaw, err := m.evaluate(ctx, source, schema.Station.NameExpression)
 	if err != nil {
 		return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
 	}
@@ -83,7 +101,7 @@ func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSc
 		return nil, fmt.Errorf("unexpected device-name value: %v", deviceNameString)
 	}
 
-	receivedAtRaw, err := m.evaluate(parser, schema.Station.ReceivedExpression)
+	receivedAtRaw, err := m.evaluate(ctx, source, schema.Station.ReceivedExpression)
 	if err != nil {
 		return nil, fmt.Errorf("evaluating received-at-expression: %v", err)
 	}
@@ -95,7 +113,7 @@ func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSc
 
 	receivedAt, err := time.Parse("2006-01-02T15:04:05.999999999Z", receivedAtString)
 	if err != nil {
-		return nil, fmt.Errorf("malformed received at (%s)", receivedAtRaw)
+		return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
 	}
 
 	deviceIDString, ok := deviceIDRaw.(string)
@@ -105,14 +123,14 @@ func (m *WebHookMessage) Parse(ctx context.Context, schemas map[int32]*WebHookSc
 
 	deviceID, err := hex.DecodeString(deviceIDString)
 	if err != nil {
-		return nil, fmt.Errorf("malformed device eui: %s", deviceIDRaw)
+		return nil, fmt.Errorf("malformed device eui: %v", deviceIDRaw)
 	}
 
 	sensors := make([]*ParsedReading, 0)
 
 	for _, module := range schema.Station.Modules {
 		for _, sensor := range module.Sensors {
-			maybeValue, err := m.evaluate(parser, sensor.Expression)
+			maybeValue, err := m.evaluate(ctx, source, sensor.Expression)
 			if err != nil {
 				return nil, fmt.Errorf("evaluating sensor expression '%s': %v", sensor.Name, err)
 			}
