@@ -27,6 +27,7 @@
                     {{ $t("project.stations.add.trigger") }}
                 </div>
                 <div class="stations-cta" v-on:click="showEditStationPicker">
+                    <img src="@/assets/icon-minus-round.svg" />
                     {{ $t("project.stations.edit.trigger") }}
                 </div>
             </div>
@@ -313,7 +314,7 @@ export default Vue.extend({
         margin-right: 35px;
 
         @include bp-down($xs) {
-          margin-right: 15px;
+            margin-right: 15px;
         }
     }
 }
