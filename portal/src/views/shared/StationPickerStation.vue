@@ -59,26 +59,16 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import "../../scss/mixins";
 
-.sps.selected {
-    border: 2px solid #1b80c9;
-    min-width: 265px;
-
-    &:after {
-        @include position(absolute, -6px -6px null null);
-        content: "";
-        background: url("../../assets/icon-success-blue.svg") no-repeat center center;
-        background-size: contain;
-        width: 19px;
-        height: 19px;
-    }
-}
 .sps {
     display: flex;
     border: 1px solid #d8dce0;
+    padding: 1px;
     border-radius: 3px;
     position: relative;
     margin: 0 8px 23px 8px;
     flex: 0 0 calc(33% - 16px);
+    box-sizing: border-box;
+    cursor: pointer;
 
     @include bp-down($sm) {
         flex: 0 0 calc(50% - 18px);
@@ -87,6 +77,19 @@ export default Vue.extend({
     @include bp-down($xs) {
         flex: 0 0 100%;
         margin: 0 0 10px;
+    }
+}
+.sps.selected {
+    border: 2px solid #1b80c9;
+    padding: 0;
+
+    &:after {
+        @include position(absolute, -6px -6px null null);
+        content: "";
+        background: url("../../assets/icon-success-blue.svg") no-repeat center center;
+        background-size: contain;
+        width: 19px;
+        height: 19px;
     }
 }
 .sps .standard {
