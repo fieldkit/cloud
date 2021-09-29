@@ -104,7 +104,7 @@
         "activity": "Activity",
         "dashboard": "Project Dashboard",
         "stations": {
-            "title": "FieldKit Stations",
+            "title": "Stations",
             "add": {
                 "trigger": "Add",
                 "title": "Add Station",
