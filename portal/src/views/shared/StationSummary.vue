@@ -6,9 +6,9 @@
             </div>
             <div class="station-details">
                 <div class="station-name">{{ station.name }}</div>
-                <div class="station-seen" v-if="station.uploadedAt">
+                <div class="station-seen" v-if="station.updatedAt">
                     Last Seen
-                    <span class="small-light">{{ station.uploadedAt | prettyDate }}</span>
+                    <span class="small-light">{{ station.updatedAt | prettyDate }}</span>
                 </div>
                 <div class="station-battery" v-if="station.battery">
                     <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />

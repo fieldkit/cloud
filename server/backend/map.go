@@ -13,7 +13,7 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/messages"
-	"github.com/fieldkit/cloud/server/ttn"
+	"github.com/fieldkit/cloud/server/webhook"
 )
 
 type OurWorkFunc func(ctx context.Context, j *que.Job) error
@@ -92,22 +92,22 @@ func ingestStation(ctx context.Context, j *que.Job, services *BackgroundServices
 }
 
 func thingsNetworkMessageRececived(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
-	message := &ttn.ThingsNetworkMessageReceived{}
+	message := &webhook.WebHookMessageReceived{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
 	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := ttn.NewThingsNetworkMessageRececivedHandler(services.database, services.metrics, publisher)
+	handler := webhook.NewWebHookMessageRececivedHandler(services.database, services.metrics, publisher)
 	return handler.Handle(ctx, message)
 }
 
 func processSchema(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
-	message := &ttn.ProcessSchema{}
+	message := &webhook.ProcessSchema{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
 	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := ttn.NewProcessSchemaHandler(services.database, services.metrics, publisher)
+	handler := webhook.NewProcessSchemaHandler(services.database, services.metrics, publisher)
 	return handler.Handle(ctx, message)
 }
 

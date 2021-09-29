@@ -11,7 +11,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/ttn"
+	"github.com/fieldkit/cloud/server/webhook"
 )
 
 type Options struct {
@@ -28,7 +28,7 @@ func process(ctx context.Context, options *Options) error {
 		return err
 	}
 
-	ingestion := ttn.NewThingsNetworkIngestion(db)
+	ingestion := webhook.NewWebHookIngestion(db)
 
 	if err := ingestion.ProcessAll(ctx); err != nil {
 		return err
@@ -44,7 +44,7 @@ func main() {
 
 	flag.Parse()
 
-	logging.Configure(false, "ttn")
+	logging.Configure(false, "webhook")
 
 	log := logging.Logger(ctx).Sugar()
 

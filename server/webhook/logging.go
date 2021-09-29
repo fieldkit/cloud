@@ -1,4 +1,4 @@
-package ttn
+package webhook
 
 import (
 	"context"
@@ -9,5 +9,5 @@ import (
 )
 
 func Logger(ctx context.Context) *zap.Logger {
-	return logging.Logger(ctx).Named("ttn")
+	return logging.Logger(ctx).Named("webhook")
 }

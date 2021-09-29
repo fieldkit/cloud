@@ -112,7 +112,7 @@
                 "saw.weekly": "Saw(x)"
             }
         },
-        "ttn.floodnet": {
+        "wh.floodnet": {
             "name": "FloodNet",
             "sensors": {
                 "altitude": "Altitude",
