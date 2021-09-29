@@ -11,7 +11,7 @@
             v-if="addingStation"
         />
         <StationPickerModal
-            :stations="visibleStations"
+            :stations="projectStations"
             :actionType="StationPickerActionType.remove"
             :title="$t('project.stations.edit.title')"
             :actionText="$t('project.stations.edit.cta')"
