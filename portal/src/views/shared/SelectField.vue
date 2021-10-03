@@ -1,6 +1,6 @@
 <template>
     <select :value="selectedIndex" class="select-css" @change="onChange">
-        <option v-for="(option, index) in options" v-bind:value="index" v-bind:key="index">
+        <option v-for="(option, index) in options" v-bind:value="index" v-bind:key="index" :disabled="option.disabled">
             {{ option.label }}
         </option>
     </select>
@@ -23,6 +23,7 @@ export default Vue.extend({
     },
     computed: {
         selectedIndex(this: any) {
+          console.log("options", this.options);
             return _.first(
                 this.options
                     .map((option, index) => {

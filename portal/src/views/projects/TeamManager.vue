@@ -18,7 +18,14 @@
                         <div class="email">{{ projectUser.user.email }}</div>
                     </div>
                 </div>
-                <div class="cell">{{ projectUser.role }}</div>
+
+                <div v-if="user.admin && projectUser.user.id !== user.id" class="cell role">
+                    <SelectField :options="roleOptions" :value="projectUser.role" />
+                </div>
+                <div v-else class="cell">
+                    <div>{{ projectUser.role }}</div>
+                </div>
+
                 <div class="cell invite-status">
                     <template v-if="projectUser.invited">
                         Invite pending
@@ -57,7 +64,7 @@
                     </div>
                 </div>
                 <div class="cell role">
-                    <SelectField :options="roleOptions" v-model="form.selectedRole" />
+                    <SelectField :options="roleOptions" v-model="form.selectedRole" :value="-1" />
                 </div>
                 <div class="cell">
                     <button class="invite-button" v-on:click="sendInvite">Invite</button>
@@ -76,6 +83,8 @@ import { required, email } from "vuelidate/lib/validators";
 
 import * as ActionTypes from "@/store/actions";
 import FKApi from "@/api/api";
+import { mapGetters, mapState } from "vuex";
+import { GlobalState } from "@/store";
 
 export default Vue.extend({
     name: "TeamManager",
@@ -100,6 +109,7 @@ export default Vue.extend({
                 {
                     value: -1,
                     label: "Select Role",
+                    disabled: true,
                 },
                 {
                     value: 0,
@@ -111,6 +121,9 @@ export default Vue.extend({
                 },
             ],
         };
+    },
+    computed: {
+        ...mapState({ user: (s: GlobalState) => s.user.user }),
     },
     validations: {
         form: {
@@ -175,7 +188,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 
 .manage-team-container {
     margin-top: 25px;
@@ -283,7 +296,6 @@ export default Vue.extend({
 
     &:nth-of-type(2),
     &:nth-of-type(3) {
-
         @include bp-down($sm) {
             padding-left: 41px;
         }
