@@ -98,7 +98,7 @@ Vue.filter("prettyCoordinate", (value) => {
     if (!value) {
         return "--";
     }
-    return value.toFixed(3);
+    return value.toFixed(3) + '°';
 });
 
 Vue.filter("prettyDuration", (value) => {

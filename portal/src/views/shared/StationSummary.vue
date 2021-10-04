@@ -12,7 +12,7 @@
                 </div>
                 <div class="station-battery" v-if="station.battery">
                     <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
-                    <span class="small-light">{{ station.battery }}</span>
+                    <span class="small-light">{{ station.battery }} %</span>
                 </div>
                 <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
                     <img v-if="!module.internal" alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
@@ -161,7 +161,9 @@ export default Vue.extend({
     font-size: 14px;
 }
 .station-battery {
-    margin: 3px 0 5px;
+    margin: 5px 0 7px;
+    display: flex;
+    line-height: 13px;
 }
 .battery {
     width: 20px;

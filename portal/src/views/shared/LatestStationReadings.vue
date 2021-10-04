@@ -162,13 +162,13 @@ export default Vue.extend({
 }
 .reading .name {
     font-size: 12px;
-    line-height: 20px;
     margin-right: 5px;
 }
 .reading .value {
     margin-left: auto;
     margin-right: 2px;
     font-size: 16px;
+    white-space: nowrap;
 }
 .reading .uom {
     font-size: 10px;
