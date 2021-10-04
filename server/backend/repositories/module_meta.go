@@ -818,8 +818,9 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				},
 			},
 		},
+		// TODO This should move to the schema definition.
 		&ModuleMeta{
-			Key: "ttn.floodnet",
+			Key: "wh.floodnet",
 			Header: ModuleHeader{
 				Manufacturer: 0,
 				Kind:         0,

@@ -149,7 +149,7 @@ export default Vue.extend({
 });
 </script>
 
-<style>
+<style lang="scss">
 .graph .x-axis {
     color: #7f7f7f;
 }
@@ -386,5 +386,14 @@ export default Vue.extend({
 .loading-options {
     text-align: center;
     color: #afafaf;
+}
+
+.button.compare {
+    display: flex;
+    align-items: center;
+
+    div {
+        padding-left: 1em;
+    }
 }
 </style>
