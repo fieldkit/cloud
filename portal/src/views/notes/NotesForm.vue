@@ -9,22 +9,33 @@
         </div>
         <div class="site-notes">
             <form id="form">
-                <NoteEditor v-model="form.studyObjective" :v="$v.form.studyObjective" @change="onChange" />
-                <NoteEditor v-model="form.sitePurpose" :v="$v.form.sitePurpose" @change="onChange" />
-                <NoteEditor v-model="form.siteCriteria" :v="$v.form.siteCriteria" @change="onChange" />
-                <NoteEditor v-model="form.siteDescription" :v="$v.form.siteDescription" @change="onChange" />
+                <NoteEditor v-model="form.studyObjective" :v="$v.form.studyObjective" :readonly="readonly" @change="onChange" />
+                <NoteEditor v-model="form.sitePurpose" :v="$v.form.sitePurpose" :readonly="readonly" @change="onChange" />
+                <NoteEditor v-model="form.siteCriteria" :v="$v.form.siteCriteria" :readonly="readonly" @change="onChange" />
+                <NoteEditor v-model="form.siteDescription" :v="$v.form.siteDescription" :readonly="readonly" @change="onChange" />
             </form>
         </div>
-        <div class="photos">
-            <div class="title">Photos</div>
-            <div class="photo" v-for="photo in photos" v-bind:key="photo.key">
-                <AuthenticatedPhoto :url="photo.url" />
+        <template v-if="readonly">
+            <div class="photos">
+                <div class="title">Photos</div>
+                <div v-if="photos.length === 0" class="no-data-yet">No photos yet.</div>
+                <div class="photo" v-for="photo in photos" v-bind:key="photo.key">
+                    <AuthenticatedPhoto :url="photo.url" />
+                </div>
             </div>
-            <div class="photo" v-for="photo in form.addedPhotos" v-bind:key="photo.key">
-                <img :src="photo.image" />
+        </template>
+        <template v-if="!readonly">
+            <div class="photos">
+                <div class="title">Photos</div>
+                <div class="photo" v-for="photo in photos" v-bind:key="photo.key">
+                    <AuthenticatedPhoto :url="photo.url" />
+                </div>
+                <div class="photo" v-for="photo in form.addedPhotos" v-bind:key="photo.key">
+                    <img :src="photo.image" />
+                </div>
+                <ImageUploader @change="onImage" :placeholder="placeholder" :allowPreview="false" />
             </div>
-            <ImageUploader @change="onImage" :placeholder="placeholder" :allowPreview="false" />
-        </div>
+        </template>
     </div>
 </template>
 
@@ -53,6 +64,10 @@ export default Vue.extend({
         notes: {
             type: Object,
             required: true,
+        },
+        readonly: {
+            type: Boolean,
+            default: false,
         },
     },
     validations: {

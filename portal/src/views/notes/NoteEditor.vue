@@ -1,11 +1,18 @@
 <template>
     <div class="note-editor">
         <div class="title">{{ note.help.title }}</div>
-        <div class="field" v-if="!readOnly">
+        <div class="field" v-if="!readonly">
             <TextAreaField v-model="body" @input="v.$touch()" />
         </div>
-        <div class="field" v-if="readOnly">
-            {{ note.body }}
+        <div class="field" v-if="readonly">
+            <template v-if="note.body">
+                {{ note.body }}
+            </template>
+            <template v-if="!note.body">
+                <span class="no-data-yet">
+                    Nothing added yet.
+                </span>
+            </template>
         </div>
         <div class="attached-audio" v-for="audio in note.audio" v-bind:key="audio.key">
             <div class="audio-title">
@@ -32,7 +39,7 @@ export default Vue.extend({
         AudioPlayer,
     },
     props: {
-        readOnly: {
+        readonly: {
             type: Boolean,
             default: false,
         },
