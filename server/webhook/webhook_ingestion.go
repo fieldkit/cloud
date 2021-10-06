@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 
@@ -24,29 +25,34 @@ func NewWebHookIngestion(db *sqlxcache.DB) *WebHookIngestion {
 	}
 }
 
-func (i *WebHookIngestion) ProcessSchema(ctx context.Context, schemaID int32) error {
+func (i *WebHookIngestion) ProcessSchema(ctx context.Context, schemaID int32, startTime time.Time) error {
 	repository := NewWebHookMessagesRepository(i.db)
 
 	if err := repository.StartProcessingSchema(ctx, schemaID); err != nil {
 		return err
 	}
 
-	return i.processBatches(ctx, func(ctx context.Context, batch *MessageBatch) error {
+	batch := &MessageBatch{
+		StartTime: startTime,
+	}
+
+	return i.processBatches(ctx, batch, func(ctx context.Context, batch *MessageBatch) error {
 		return repository.QueryBatchBySchemaIDForProcessing(ctx, batch, schemaID)
 	})
 }
 
 func (i *WebHookIngestion) ProcessAll(ctx context.Context) error {
 	repository := NewWebHookMessagesRepository(i.db)
-	return i.processBatches(ctx, func(ctx context.Context, batch *MessageBatch) error {
+
+	batch := &MessageBatch{}
+
+	return i.processBatches(ctx, batch, func(ctx context.Context, batch *MessageBatch) error {
 		return repository.QueryBatchForProcessing(ctx, batch)
 	})
 }
 
-func (i *WebHookIngestion) processBatches(ctx context.Context, query func(ctx context.Context, batch *MessageBatch) error) error {
+func (i *WebHookIngestion) processBatches(ctx context.Context, batch *MessageBatch, query func(ctx context.Context, batch *MessageBatch) error) error {
 	model := NewWebHookModel(i.db)
-
-	batch := &MessageBatch{}
 
 	jqCache := &JqCache{}
 
