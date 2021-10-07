@@ -66,7 +66,7 @@ export default Vue.extend({
     data(): {
         workspace: Workspace | null;
         showNoSensors: boolean;
-        stationId: number;
+        stationId: number | null;
     } {
         return {
             workspace: null,
