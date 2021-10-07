@@ -3,7 +3,7 @@
         <img class="terms-header-logo" :alt="$t('layout.logo.alt')" src="@/assets/FieldKit_Logo_White.png" />
         <div class="terms-content">
             <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="goBack" />
-            <div v-html="$t('terms.html')"></div>
+            <div v-html="$t('terms.html')" class="terms-content-html"></div>
             <form v-if="tncOutdated" @submit.prevent="save">
                 <button class="form-submit" type="submit">{{ $t("terms.agreeButton") }}</button>
             </form>
@@ -73,7 +73,7 @@ export default Vue.extend({
 }
 
 .terms {
-    background-image: linear-gradient(#52b5e4, #1b80c9);
+    background-image: linear-gradient(rgba(82, 181, 228, 0.6), rgba(27, 128, 201, 0.6));
     padding: 40px 0;
     flex-direction: column;
     box-sizing: border-box;
@@ -92,10 +92,26 @@ export default Vue.extend({
         }
     }
     &-content {
-        width: 60%;
+        width: 80%;
+        max-width: 800px;
         text-align: justify;
         background-color: white;
         padding: 25px 45px 45px 45px;
+        box-sizing: border-box;
+
+        @include bp-down($sm) {
+            width: calc(100% - 40px);
+          padding: 22px 20px;
+        }
+
+        @include bp-down($xs) {
+            width: calc(100% - 20px);
+            padding: 22px 14px;
+        }
+
+        &-html {
+            margin-top: 30px;
+        }
     }
 
     &-body {
