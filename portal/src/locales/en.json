@@ -78,7 +78,8 @@
             "admin": "Admin",
             "myAccount": "My Account"
         },
-        "backDashboard": "Back to Dashboard",
+        "backProjects": "Back to Projects",
+        "backProjectDashboard": "Back to Project Dashboard",
         "backProject": "Back to {name}"
     },
     "projects": {
