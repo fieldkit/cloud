@@ -36,7 +36,6 @@ export default Vue.extend({
     },
     methods: {
         async agree(): Promise<void> {
-            console.log("user RADOI", this.user);
             if (this.user) {
                 const payload = {
                     id: this.user?.id,
