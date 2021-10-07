@@ -64,7 +64,9 @@
                 <div class="form-errors" v-if="$v.form.tncAccept.$error">
                     <div v-if="!$v.form.tncAccept.required">{{ $t("createAccount.form.terms.required") }}</div>
                 </div>
-                <button class="form-submit" type="submit">{{ $t("createAccount.form.createAccountButton") }}</button>
+                <button class="form-submit" type="submit" :disabled="!form.tncAccept">
+                    {{ $t("createAccount.form.createAccountButton") }}
+                </button>
                 <div>
                     <router-link :to="{ name: 'login' }" class="form-link">{{ $t("createAccount.form.backButton") }}</router-link>
                 </div>
@@ -138,7 +140,7 @@ export default Vue.extend({
             email: {
                 required,
                 email,
-                taken: function (this: any) {
+                taken: function(this: any) {
                     return this.available;
                 },
             },

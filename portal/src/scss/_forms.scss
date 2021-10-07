@@ -104,6 +104,10 @@
         @include bp-down($xs) {
             max-width: unset;
         }
+
+        &:disabled {
+            background: $color-border;
+        }
     }
 
     &-link {
