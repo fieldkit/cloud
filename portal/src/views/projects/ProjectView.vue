@@ -5,7 +5,7 @@
                 <DoubleHeader
                     :title="isAdministrator ? displayProject.name : null"
                     :subtitle="isAdministrator ? $t('project.dashboard') : null"
-                    :backTitle="$t('layout.backDashboard')"
+                    :backTitle="isAdministrator ? $t('layout.backProjects') : $t('layout.backProjectDashboard')"
                     backRoute="projects"
                     v-if="displayProject"
                 >

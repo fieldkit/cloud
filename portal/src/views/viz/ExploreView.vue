@@ -3,7 +3,12 @@
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closeExports" />
         <div class="explore-view">
             <div class="explore-header">
-                <DoubleHeader title="Data View">
+                <DoubleHeader
+                    title="Data View"
+                    :backTitle="$t('layout.backToPrevious')"
+                    backRoute="mapStation"
+                    :backRouteParams="{ id: stationId }"
+                >
                     <div class="button" @click="openExports">Export</div>
                 </DoubleHeader>
             </div>
@@ -61,10 +66,12 @@ export default Vue.extend({
     data(): {
         workspace: Workspace | null;
         showNoSensors: boolean;
+        stationId: number;
     } {
         return {
             workspace: null,
             showNoSensors: false,
+            stationId: null,
         };
     },
     computed: {
@@ -123,6 +130,7 @@ export default Vue.extend({
         },
         async showStation(stationId: number): Promise<void> {
             console.log("viz: show-station", stationId);
+            this.stationId = stationId;
 
             return this.createWorkspaceIfNecessary().then((workspace) => {
                 return this.$services.api.getQuickSensors([stationId]).then((quickSensors) => {
