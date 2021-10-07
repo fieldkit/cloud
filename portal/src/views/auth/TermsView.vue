@@ -2,11 +2,12 @@
     <div class="terms">
         <img class="terms-header-logo" :alt="$t('layout.logo.alt')" src="@/assets/FieldKit_Logo_White.png" />
         <div class="terms-content">
-            <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="goBack" />
+            <img v-if="!tncOutdated" alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="goBack" />
             <div v-html="$t('terms.html')" class="terms-content-html"></div>
-            <form v-if="tncOutdated" @submit.prevent="save">
-                <button class="form-submit" type="submit">{{ $t("terms.agreeButton") }}</button>
-            </form>
+            <div v-if="tncOutdated" class="terms-buttons">
+                <button class="form-submit btn-outline" @click="disagree">{{ $t("terms.disagreeButton") }}</button>
+                <button class="form-submit" @click="agree">{{ $t("terms.agreeButton") }}</button>
+            </div>
         </div>
     </div>
 </template>
@@ -34,7 +35,8 @@ export default Vue.extend({
         },
     },
     methods: {
-        async save(): Promise<void> {
+        async agree(): Promise<void> {
+            console.log("user RADOI", this.user);
             if (this.user) {
                 const payload = {
                     id: this.user?.id,
@@ -138,5 +140,9 @@ export default Vue.extend({
 .close-button {
     cursor: pointer;
     float: right;
+}
+.terms-buttons {
+    display: flex;
+    justify-content: space-between;
 }
 </style>

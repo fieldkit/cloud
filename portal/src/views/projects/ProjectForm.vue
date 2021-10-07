@@ -136,7 +136,7 @@
             <div class="action-container">
                 <button class="btn" v-if="!project" type="submit">{{ $t("project.form.saveNew") }}</button>
                 <button class="btn" v-if="project && project.id" type="submit">{{ $t("project.form.saveChanges") }}</button>
-                <button v-if="project && project.id" class="btn btn-delete" type="submit" v-on:click.prevent="deleteProject">
+                <button v-if="project && project.id" class="btn btn-outline btn-delete" type="submit" v-on:click.prevent="deleteProject">
                     {{ $t("project.form.delete.link") }}
                 </button>
             </div>
@@ -567,11 +567,8 @@ form > .outer-input-container {
     }
 
     &-delete {
-        background: #fff;
         width: 215px;
         height: 45px;
-        border: 1px solid #ce596b;
-        color: #ce596b;
     }
 }
 
