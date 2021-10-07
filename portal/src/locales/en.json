@@ -80,6 +80,7 @@
         },
         "backProjects": "Back to Projects",
         "backProjectDashboard": "Back to Project Dashboard",
+        "backToPrevious": "Back to Previous",
         "backProject": "Back to {name}"
     },
     "projects": {
