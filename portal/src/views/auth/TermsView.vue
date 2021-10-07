@@ -94,14 +94,13 @@ export default Vue.extend({
     &-content {
         width: 80%;
         max-width: 800px;
-        text-align: justify;
         background-color: white;
         padding: 25px 45px 45px 45px;
         box-sizing: border-box;
 
         @include bp-down($sm) {
             width: calc(100% - 40px);
-          padding: 22px 20px;
+            padding: 22px 20px;
         }
 
         @include bp-down($xs) {
@@ -111,6 +110,9 @@ export default Vue.extend({
 
         &-html {
             margin-top: 30px;
+            p {
+                text-align: justify;
+            }
         }
     }
 
