@@ -99,8 +99,8 @@ func (rr *WebHookMessagesRepository) QueryBatchForProcessing(ctx context.Context
 
 	messages := []*WebHookMessage{}
 	if err := rr.db.SelectContext(ctx, &messages, `
-	SELECT * FROM fieldkit.ttn_messages
-	WHERE schema_id IS NOT NULL
+	SELECT id, created_at, schema_id, headers, body FROM fieldkit.ttn_messages
+	WHERE schema_id IS NOT NULL AND NOT ignored
 	ORDER BY created_at LIMIT $1 OFFSET $2
 	`, BatchSize, batch.page*BatchSize); err != nil {
 		return err
@@ -115,8 +115,8 @@ func (rr *WebHookMessagesRepository) QueryBatchBySchemaIDForProcessing(ctx conte
 
 	messages := []*WebHookMessage{}
 	if err := rr.db.SelectContext(ctx, &messages, `
-	SELECT * FROM fieldkit.ttn_messages
-	WHERE (schema_id = $1) AND (created_at >= $4)
+	SELECT id, created_at, schema_id, headers, body FROM fieldkit.ttn_messages
+	WHERE (schema_id = $1) AND (created_at >= $4) AND NOT ignored
 	ORDER BY created_at ASC LIMIT $2 OFFSET $3
 	`, schemaID, BatchSize, batch.page*BatchSize, batch.StartTime); err != nil {
 		return err
