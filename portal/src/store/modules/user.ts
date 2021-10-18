@@ -78,23 +78,27 @@ const actions = (services: Services) => {
                 });
         },
         [ActionTypes.LOGOUT]: async ({ commit }: { commit: any }) => {
-            try {
-                await services.api.logout();
-                if (Config.sso && Config.auth && Config.auth.logoutUrl) {
-                    window.location.replace(Config.auth.logoutUrl);
-                } else {
-                    window.location.replace("/login");
-                }
-            } finally {
-                commit(UPDATE_TOKEN, null);
-                commit(CURRENT_USER, null);
+            await services.api.logout();
+
+            commit(UPDATE_TOKEN, null);
+            commit(CURRENT_USER, null);
+
+            if (Config.sso && Config.auth && Config.auth.logoutUrl) {
+                window.location.replace(Config.auth.logoutUrl);
+            } else {
+                window.location.replace("/login");
             }
         },
         [ActionTypes.REFRESH_CURRENT_USER]: async ({ commit, dispatch, state }: ActionParameters) => {
-            await services.api.getCurrentUser().then((user) => {
-                commit(CURRENT_USER, user);
-                return user;
-            });
+            try {
+                await services.api.getCurrentUser().then((user) => {
+                    commit(CURRENT_USER, user);
+                    return user;
+                });
+            } catch (error) {
+                console.log("refreshing-user-error", error);
+                await dispatch(ActionTypes.LOGOUT);
+            }
         },
         [ActionTypes.UPLOAD_USER_PHOTO]: async ({ commit, dispatch, state }: ActionParameters, payload: any) => {
             await services.api.uploadUserImage({ type: payload.type, file: payload.file }).then(() => {
