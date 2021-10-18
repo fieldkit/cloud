@@ -288,7 +288,7 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 
 	preciseLocation := project.Privacy == data.Public
 
-	if !p.Anonymous() {
+	if !p.Anonymous() && !preciseLocation {
 		// NOTE This may already be in Permissions.
 		relationships, err := pr.QueryUserProjectRelationships(ctx, p.UserID())
 		if err != nil {
