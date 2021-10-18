@@ -831,7 +831,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "humidity",
 					FirmwareKey:   "humidity",
-					UnitOfMeasure: "",
+					UnitOfMeasure: "%",
 					Ranges:        []SensorRanges{
 					    SensorRanges{
                             Minimum: 0.0,
@@ -842,7 +842,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "pressure",
 					FirmwareKey:   "pressure",
-					UnitOfMeasure: "",
+					UnitOfMeasure: "kPa",
 					Ranges:        []SensorRanges{
 					    SensorRanges{
                             Minimum: 1.0,
@@ -853,7 +853,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "altitude",
 					FirmwareKey:   "altitude",
-					UnitOfMeasure: "",
+					UnitOfMeasure: "m",
 					Ranges:        []SensorRanges{
 					SensorRanges{
                             Minimum: 3000,
@@ -864,7 +864,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "battery",
 					FirmwareKey:   "battery",
-					UnitOfMeasure: "",
+					UnitOfMeasure: "%",
 					Ranges:        []SensorRanges{
 					    SensorRanges{
                             Minimum: 0,
@@ -875,7 +875,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "distance",
 					FirmwareKey:   "distance",
-					UnitOfMeasure: "",
+					UnitOfMeasure: "mm",
 					Ranges:        []SensorRanges{
 					    SensorRanges{
                             Minimum: 0.0,
@@ -886,7 +886,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temperature",
 					FirmwareKey:   "temperature",
-					UnitOfMeasure: "",
+					UnitOfMeasure: "°C",
 					Ranges:        []SensorRanges{
                         SensorRanges{
                                 Minimum: -100.0,
