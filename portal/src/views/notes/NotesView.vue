@@ -315,6 +315,9 @@ export default Vue.extend({
     @include bp-down($md) {
         max-width: 600px;
     }
+    @include bp-down($xs) {
+        padding-bottom: 100px;
+    }
 }
 .notes-view .lower {
     display: flex;
@@ -439,7 +442,7 @@ export default Vue.extend({
             overflow: hidden;
 
             @at-root .tab.active & {
-                max-height: 1000px;
+                max-height: unset;
             }
         }
     }
