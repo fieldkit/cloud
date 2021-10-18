@@ -27,7 +27,7 @@ func NewWebHookService(ctx context.Context, options *common.ServiceOptions) *Web
 }
 
 func (c *WebHookService) Webhook(ctx context.Context, payload *whService.WebhookPayload, bodyReader io.ReadCloser) error {
-	log := Logger(ctx).Named("webhook").Sugar()
+	log := Logger(ctx).Sugar()
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(bodyReader)

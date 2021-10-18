@@ -1,0 +1,1 @@
+ALTER TABLE fieldkit.ttn_messages ADD COLUMN ignored BOOL DEFAULT false;

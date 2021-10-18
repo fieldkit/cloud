@@ -821,7 +821,7 @@ func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User, numberD
 
 	for m := 0; m < 1; m += 1 {
 		meta := e.NewMetaLayout(metaNumber)
-		metaRecord, err := recordRepository.AddMetaRecord(e.Ctx, p, mi, meta.Signed, meta.Data, meta.Bytes)
+		metaRecord, err := recordRepository.AddSignedMetaRecord(e.Ctx, p, mi, meta.Signed, meta.Data, meta.Bytes)
 		if err != nil {
 			return nil, err
 		}

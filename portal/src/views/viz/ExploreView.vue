@@ -3,7 +3,12 @@
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closeExports" />
         <div class="explore-view">
             <div class="explore-header">
-                <DoubleHeader title="Data View">
+                <DoubleHeader
+                    title="Data View"
+                    :backTitle="backRoute === 'viewProject' ? $t('layout.backToProject') : $t('layout.backToStations')"
+                    :backRoute="backRoute"
+                    :backRouteParams="backRouteParams"
+                >
                     <div class="button" @click="openExports">Export</div>
                 </DoubleHeader>
             </div>
@@ -30,8 +35,6 @@ import StandardLayout from "../StandardLayout.vue";
 import ExportPanel from "./ExportPanel.vue";
 
 import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "@/store/actions";
-import { ExportDataAction } from "@/store/typed-actions";
 import { GlobalState } from "@/store/modules/global";
 
 import { Workspace, Bookmark } from "./viz";
@@ -58,13 +61,25 @@ export default Vue.extend({
             default: false,
         },
     },
+    beforeRouteEnter(to, from, next) {
+        next((vm: any) => {
+            vm.backRoute = from.name ? from.name : "mapAllStations";
+            vm.backRouteParams.id = from.params.id;
+        });
+    },
     data(): {
         workspace: Workspace | null;
         showNoSensors: boolean;
+        stationId: number | null;
+        backRoute: string | null;
+        backRouteParams: object;
     } {
         return {
             workspace: null,
             showNoSensors: false,
+            stationId: null,
+            backRoute: null,
+            backRouteParams: { id: null },
         };
     },
     computed: {
@@ -123,6 +138,7 @@ export default Vue.extend({
         },
         async showStation(stationId: number): Promise<void> {
             console.log("viz: show-station", stationId);
+            this.stationId = stationId;
 
             return this.createWorkspaceIfNecessary().then((workspace) => {
                 return this.$services.api.getQuickSensors([stationId]).then((quickSensors) => {

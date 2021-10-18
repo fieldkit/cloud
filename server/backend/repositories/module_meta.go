@@ -831,44 +831,79 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "humidity",
 					FirmwareKey:   "humidity",
-					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
+					UnitOfMeasure: "%",
+					Ranges:        []SensorRanges{
+					    SensorRanges{
+                            Minimum: 0.0,
+                            Maximum: 100.0,
+                        },
+					},
 				},
 				&SensorMeta{
 					Key:           "pressure",
 					FirmwareKey:   "pressure",
-					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
+					UnitOfMeasure: "kPa",
+					Ranges:        []SensorRanges{
+					    SensorRanges{
+                            Minimum: 1.0,
+                            Maximum: 200000.0,
+                        },
+					},
 				},
 				&SensorMeta{
 					Key:           "altitude",
 					FirmwareKey:   "altitude",
-					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
+					UnitOfMeasure: "m",
+					Ranges:        []SensorRanges{
+					SensorRanges{
+                            Minimum: 3000,
+                            Maximum: -500,
+                        },
+                    },
 				},
 				&SensorMeta{
 					Key:           "battery",
 					FirmwareKey:   "battery",
-					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
+					UnitOfMeasure: "%",
+					Ranges:        []SensorRanges{
+					    SensorRanges{
+                            Minimum: 0,
+                            Maximum: 100,
+                        },
+                    },
 				},
 				&SensorMeta{
 					Key:           "distance",
 					FirmwareKey:   "distance",
-					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
+					UnitOfMeasure: "mm",
+					Ranges:        []SensorRanges{
+					    SensorRanges{
+                            Minimum: 0.0,
+                            Maximum: 4999.0,
+                        },
+					},
 				},
 				&SensorMeta{
 					Key:           "temperature",
 					FirmwareKey:   "temperature",
-					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
+					UnitOfMeasure: "°C",
+					Ranges:        []SensorRanges{
+                        SensorRanges{
+                                Minimum: -100.0,
+                                Maximum: 200.0,
+                        },
+                    },
 				},
 				&SensorMeta{
 					Key:           "sdError",
 					FirmwareKey:   "sdError",
 					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
+					Ranges:        []SensorRanges{
+					    SensorRanges{
+                                Minimum: 0,
+                                Maximum: 200.0,
+                        },
+					},
 				},
 			},
 		},
