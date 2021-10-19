@@ -48,6 +48,8 @@ type Service interface {
 	ListMine(context.Context, *ListMinePayload) (res *Projects, err error)
 	// Invite implements invite.
 	Invite(context.Context, *InvitePayload) (err error)
+	// EditUser implements edit user.
+	EditUser(context.Context, *EditUserPayload) (err error)
 	// RemoveUser implements remove user.
 	RemoveUser(context.Context, *RemoveUserPayload) (err error)
 	// AddStation implements add station.
@@ -76,7 +78,7 @@ const ServiceName = "project"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [21]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept project invite", "reject project invite", "accept invite", "reject invite", "add", "update", "get", "list community", "list mine", "invite", "remove user", "add station", "remove station", "delete", "upload photo", "download photo"}
+var MethodNames = [22]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept project invite", "reject project invite", "accept invite", "reject invite", "add", "update", "get", "list community", "list mine", "invite", "edit user", "remove user", "add station", "remove station", "delete", "upload photo", "download photo"}
 
 // AddUpdatePayload is the payload type of the project service add update
 // method.
@@ -218,6 +220,13 @@ type InvitePayload struct {
 	Invite    *InviteUserFields
 }
 
+// EditUserPayload is the payload type of the project service edit user method.
+type EditUserPayload struct {
+	Auth      string
+	ProjectID int32
+	Edit      *EditUserFields
+}
+
 // RemoveUserPayload is the payload type of the project service remove user
 // method.
 type RemoveUserPayload struct {
@@ -313,6 +322,11 @@ type AddProjectFields struct {
 }
 
 type InviteUserFields struct {
+	Email string
+	Role  int32
+}
+
+type EditUserFields struct {
 	Email string
 	Role  int32
 }
