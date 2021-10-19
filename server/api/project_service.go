@@ -376,6 +376,24 @@ func (c *ProjectService) Invite(ctx context.Context, payload *project.InvitePayl
 	return nil
 }
 
+func (c *ProjectService) EditUser(ctx context.Context, payload *project.EditUserPayload) error {
+	p, err := NewPermissions(ctx, c.options).ForProjectByID(payload.ProjectID)
+	if err != nil {
+		return err
+	}
+
+	if err := p.CanModify(); err != nil {
+		return err
+	}
+
+    if _, err := c.options.Database.ExecContext(ctx, `
+        UPDATE fieldkit.project_user SET role = $1 WHERE project_id = $2 AND user_id IN (SELECT u.id FROM fieldkit.user AS u WHERE u.email = $3)`, payload.Edit.Role, payload.ProjectID, payload.Edit.Email); err != nil {
+        return err
+    }
+
+	return nil
+}
+
 func (c *ProjectService) RemoveUser(ctx context.Context, payload *project.RemoveUserPayload) error {
 	p, err := NewPermissions(ctx, c.options).ForProjectByID(payload.ProjectID)
 	if err != nil {
