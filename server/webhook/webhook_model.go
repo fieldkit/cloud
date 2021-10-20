@@ -14,8 +14,9 @@ import (
 )
 
 const (
-	WebHookSourceID     = int32(0)
-	WebHookSensorPrefix = "wh"
+	WebHookSourceID          = int32(0)
+	WebHookSensorPrefix      = "wh"
+	WebHookRecentWindowHours = 48
 )
 
 type cacheEntry struct {

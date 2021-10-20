@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 )
@@ -21,9 +22,10 @@ func NewWebHookMessagesRepository(db *sqlxcache.DB) (rr *WebHookMessagesReposito
 }
 
 type MessageBatch struct {
-	Messages []*WebHookMessage
-	Schemas  map[int32]*WebHookSchemaRegistration
-	page     int32
+	Messages  []*WebHookMessage
+	Schemas   map[int32]*WebHookSchemaRegistration
+	StartTime time.Time
+	page      int32
 }
 
 func (rr *WebHookMessagesRepository) QuerySchemasPendingProcessing(ctx context.Context) ([]*WebHookSchemaRegistration, error) {
@@ -54,7 +56,7 @@ func (rr *WebHookMessagesRepository) StartProcessingSchema(ctx context.Context, 
 }
 
 func (rr *WebHookMessagesRepository) processQuery(ctx context.Context, batch *MessageBatch, messages []*WebHookMessage) error {
-	log := Logger(ctx).Named("webhook").Sugar()
+	log := Logger(ctx).Sugar()
 
 	batch.Messages = nil
 
@@ -91,16 +93,32 @@ func (rr *WebHookMessagesRepository) processQuery(ctx context.Context, batch *Me
 }
 
 func (rr *WebHookMessagesRepository) QueryBatchForProcessing(ctx context.Context, batch *MessageBatch) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("querying", "start", batch.StartTime, "page", batch.page)
+
 	messages := []*WebHookMessage{}
-	if err := rr.db.SelectContext(ctx, &messages, `SELECT * FROM fieldkit.ttn_messages WHERE schema_id IS NOT NULL ORDER BY created_at LIMIT $1 OFFSET $2`, BatchSize, batch.page*BatchSize); err != nil {
+	if err := rr.db.SelectContext(ctx, &messages, `
+	SELECT * FROM fieldkit.ttn_messages
+	WHERE schema_id IS NOT NULL
+	ORDER BY created_at LIMIT $1 OFFSET $2
+	`, BatchSize, batch.page*BatchSize); err != nil {
 		return err
 	}
 	return rr.processQuery(ctx, batch, messages)
 }
 
 func (rr *WebHookMessagesRepository) QueryBatchBySchemaIDForProcessing(ctx context.Context, batch *MessageBatch, schemaID int32) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("querying", "start", batch.StartTime, "page", batch.page)
+
 	messages := []*WebHookMessage{}
-	if err := rr.db.SelectContext(ctx, &messages, `SELECT * FROM fieldkit.ttn_messages WHERE schema_id = $1 ORDER BY created_at LIMIT $2 OFFSET $3`, schemaID, BatchSize, batch.page*BatchSize); err != nil {
+	if err := rr.db.SelectContext(ctx, &messages, `
+	SELECT * FROM fieldkit.ttn_messages
+	WHERE (schema_id = $1) AND (created_at >= $4)
+	ORDER BY created_at ASC LIMIT $2 OFFSET $3
+	`, schemaID, BatchSize, batch.page*BatchSize, batch.StartTime); err != nil {
 		return err
 	}
 	return rr.processQuery(ctx, batch, messages)

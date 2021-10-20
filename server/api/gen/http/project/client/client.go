@@ -73,6 +73,10 @@ type Client struct {
 	// Invite Doer is the HTTP client used to make requests to the invite endpoint.
 	InviteDoer goahttp.Doer
 
+	// EditUser Doer is the HTTP client used to make requests to the edit user
+	// endpoint.
+	EditUserDoer goahttp.Doer
+
 	// RemoveUser Doer is the HTTP client used to make requests to the remove user
 	// endpoint.
 	RemoveUserDoer goahttp.Doer
@@ -134,6 +138,7 @@ func NewClient(
 		ListCommunityDoer:       doer,
 		ListMineDoer:            doer,
 		InviteDoer:              doer,
+		EditUserDoer:            doer,
 		RemoveUserDoer:          doer,
 		AddStationDoer:          doer,
 		RemoveStationDoer:       doer,
@@ -504,6 +509,30 @@ func (c *Client) Invite() goa.Endpoint {
 		resp, err := c.InviteDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("project", "invite", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// EditUser returns an endpoint that makes HTTP requests to the project service
+// edit user server.
+func (c *Client) EditUser() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeEditUserRequest(c.encoder)
+		decodeResponse = DecodeEditUserResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildEditUserRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.EditUserDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "edit user", err)
 		}
 		return decodeResponse(resp)
 	}

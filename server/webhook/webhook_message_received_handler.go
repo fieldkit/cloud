@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"context"
+	"time"
 
 	"github.com/conservify/sqlxcache"
 
@@ -22,7 +23,9 @@ func NewWebHookMessageRececivedHandler(db *sqlxcache.DB, metrics *logging.Metric
 func (h *WebHookMessageRececivedHandler) Handle(ctx context.Context, m *WebHookMessageReceived) error {
 	ingestion := NewWebHookIngestion(h.db)
 
-	if err := ingestion.ProcessSchema(ctx, m.SchemaID); err != nil {
+	startTime := time.Now().Add(time.Hour * -WebHookRecentWindowHours)
+
+	if err := ingestion.ProcessSchema(ctx, m.SchemaID, startTime); err != nil {
 		return err
 
 	}

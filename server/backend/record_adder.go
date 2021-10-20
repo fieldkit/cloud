@@ -33,6 +33,7 @@ type ParsedRecord struct {
 	SignedRecord *pb.SignedRecord
 	DataRecord   *pb.DataRecord
 	Bytes        []byte
+	RecordNumber int64
 }
 
 func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, handler RecordHandler, verbose bool) (ra *RecordAdder) {
@@ -97,7 +98,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 	}
 
 	if pr.SignedRecord != nil {
-		metaRecord, err := recordRepository.AddMetaRecord(ctx, provision, i, pr.SignedRecord, pr.DataRecord, pr.Bytes)
+		metaRecord, err := recordRepository.AddSignedMetaRecord(ctx, provision, i, pr.SignedRecord, pr.DataRecord, pr.Bytes)
 		if err != nil {
 			return nil, err
 		}
@@ -106,25 +107,36 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 			return nil, err
 		}
 	} else if pr.DataRecord != nil {
-		dataRecord, metaRecord, err := recordRepository.AddDataRecord(ctx, provision, i, pr.DataRecord, pr.Bytes)
-		if err != nil {
-			if err == repositories.ErrMalformedRecord {
-				verboseLog.Infow("data reading missing readings", "record", pr.DataRecord)
-				ra.metrics.DataErrorsUnknown()
-				return err, nil
+		if pr.DataRecord.Metadata != nil {
+			metaRecord, err := recordRepository.AddMetaRecord(ctx, provision, i, pr.RecordNumber, pr.DataRecord, pr.Bytes)
+			if err != nil {
+				return nil, err
 			}
-			if err == repositories.ErrMetaMissing {
-				verboseLog.Errorw("error finding meta record", "provision_id", provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta)
-				ra.metrics.DataErrorsMissingMeta()
-				return err, nil
+
+			if err := ra.handler.OnMeta(ctx, provision, pr.DataRecord, metaRecord); err != nil {
+				return nil, err
 			}
-			return nil, err
-		}
+		} else {
+			dataRecord, metaRecord, err := recordRepository.AddDataRecord(ctx, provision, i, pr.DataRecord, pr.Bytes)
+			if err != nil {
+				if err == repositories.ErrMalformedRecord {
+					verboseLog.Infow("data reading missing readings", "record", pr.DataRecord)
+					ra.metrics.DataErrorsUnknown()
+					return err, nil
+				}
+				if err == repositories.ErrMetaMissing {
+					verboseLog.Errorw("error finding meta record", "provision_id", provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta)
+					ra.metrics.DataErrorsMissingMeta()
+					return err, nil
+				}
+				return nil, err
+			}
 
-		ra.statistics.addTime(dataRecord.Time)
+			ra.statistics.addTime(dataRecord.Time)
 
-		if err := ra.handler.OnData(ctx, provision, pr.DataRecord, dataRecord, metaRecord); err != nil {
-			return nil, err
+			if err := ra.handler.OnData(ctx, provision, pr.DataRecord, dataRecord, metaRecord); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -176,6 +188,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 	metaProcessed := 0
 	metaErrors := 0
 	records := 0
+	recordNumber := int64(0)
 
 	unmarshalFunc := UnmarshalFunc(func(b []byte) (proto.Message, error) {
 		var unmarshalError error
@@ -201,7 +214,11 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 						records = 0
 					}
 				} else {
-					warning, fatal := ra.Handle(ctx, i, &ParsedRecord{DataRecord: &dataRecord, Bytes: b})
+					warning, fatal := ra.Handle(ctx, i, &ParsedRecord{
+						RecordNumber: recordNumber,
+						DataRecord:   &dataRecord,
+						Bytes:        b,
+					})
 					if fatal != nil {
 						return nil, fatal
 					}
@@ -239,6 +256,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 				}
 
 				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{
+					RecordNumber: recordNumber, // This will never be used but we fill this in to be thorough until we can nuke this code path.
 					SignedRecord: &signedRecord,
 					DataRecord:   &dataRecord,
 					Bytes:        bytes,
@@ -258,6 +276,9 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 				}
 			}
 		}
+
+		// Only used with the new single file uploads.
+		recordNumber += 1
 
 		// Parsing either one failed, otherwise this would have been set. So return the error.
 		if !meta && !data {

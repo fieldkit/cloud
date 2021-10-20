@@ -674,8 +674,8 @@ class FKApi {
     sendInvite(data) {
         return this.invoke({
             auth: Auth.Required,
-            method: "POST",
-            url: this.baseUrl + "/projects/" + data.projectId + "/invite",
+            method: "PATCH",
+            url: this.baseUrl + "/projects/" + data.projectId + "/roles",
             data: { email: data.email, role: data.role },
         });
     }
