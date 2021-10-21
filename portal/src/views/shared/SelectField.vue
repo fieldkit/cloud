@@ -13,6 +13,7 @@ export default Vue.extend({
     name: "SelectField",
     props: {
         selectedLabel: {
+            type: String,
             required: true,
         },
         options: {
