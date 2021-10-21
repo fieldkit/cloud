@@ -1,9 +1,9 @@
 <template v-if="mapped.valid && ready">
     <mapbox
         class="stations-map"
-        :access-token="mapboxToken"
+        :access-token="mapbox.token"
         :map-options="{
-            style: 'mapbox://styles/mapbox/outdoors-v11',
+            style: mapbox.style,
             bounds: bounds,
             zoom: 10,
         }"
@@ -34,11 +34,11 @@ export default Vue.extend({
         Mapbox,
     },
     data(): {
-        mapboxToken: string;
+        mapbox: { token: string; style: string };
         ready: boolean;
     } {
         return {
-            mapboxToken: Config.mapbox.token,
+            mapbox: Config.mapbox,
             ready: false,
         };
     },
