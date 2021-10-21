@@ -671,11 +671,20 @@ class FKApi {
         });
     }
 
-    sendInvite(data) {
+    editRole(data) {
         return this.invoke({
             auth: Auth.Required,
             method: "PATCH",
             url: this.baseUrl + "/projects/" + data.projectId + "/roles",
+            data: { email: data.email, role: data.role },
+        });
+    }
+
+    sendInvite(data) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/projects/" + data.projectId + "/invite",
             data: { email: data.email, role: data.role },
         });
     }

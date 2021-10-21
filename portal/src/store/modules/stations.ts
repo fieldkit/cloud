@@ -376,6 +376,14 @@ const actions = (services: Services) => {
             const usersReply = await services.api.getUsersByProject(payload.projectId);
             commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
         },
+        [ActionTypes.PROJECT_EDIT_ROLE]: async (
+            { commit, dispatch }: { commit: any; dispatch: any },
+            payload: { projectId: number; email: string; role: string }
+        ) => {
+            await services.api.editRole(payload);
+            const usersReply = await services.api.getUsersByProject(payload.projectId);
+            commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
+        },
         [ActionTypes.ACCEPT_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
             await services.api.acceptProjectInvite(payload);
 
