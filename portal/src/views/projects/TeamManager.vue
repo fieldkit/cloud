@@ -89,11 +89,7 @@ import Vue from "vue";
 import UserPhoto from "@/views/shared/UserPhoto.vue";
 import SelectField from "@/views/shared/SelectField.vue";
 import { required, email } from "vuelidate/lib/validators";
-
 import * as ActionTypes from "@/store/actions";
-import FKApi from "@/api/api";
-import { mapGetters, mapState } from "vuex";
-import { GlobalState } from "@/store";
 
 export default Vue.extend({
     name: "TeamManager",
@@ -134,9 +130,6 @@ export default Vue.extend({
                 role: null,
             },
         };
-    },
-    computed: {
-        ...mapState({ user: (s: GlobalState) => s.user.user }),
     },
     validations: {
         form: {
