@@ -378,7 +378,7 @@ const actions = (services: Services) => {
         },
         [ActionTypes.PROJECT_EDIT_ROLE]: async (
             { commit, dispatch }: { commit: any; dispatch: any },
-            payload: { projectId: number; email: string; role: string }
+            payload: { projectId: number; email: string; role: number }
         ) => {
             await services.api.editRole(payload);
             const usersReply = await services.api.getUsersByProject(payload.projectId);

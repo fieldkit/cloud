@@ -90,6 +90,8 @@ import UserPhoto from "@/views/shared/UserPhoto.vue";
 import SelectField from "@/views/shared/SelectField.vue";
 import { required, email } from "vuelidate/lib/validators";
 import * as ActionTypes from "@/store/actions";
+import { mapState } from "vuex";
+import { GlobalState } from "@/store";
 
 export default Vue.extend({
     name: "TeamManager",
@@ -103,7 +105,22 @@ export default Vue.extend({
             required: true,
         },
     },
-    data: () => {
+    data: (): {
+        form: {
+            inviteEmail: string;
+            inviteDuplicate: boolean;
+            selectedRole: number;
+        };
+        roleOptions: {
+            value: number;
+            label: string;
+            disabled?: boolean;
+        }[];
+        edited: {
+            email: string | null;
+            role: number | null;
+        };
+    } => {
         return {
             form: {
                 inviteEmail: "",
@@ -139,24 +156,29 @@ export default Vue.extend({
             },
         },
     },
+    computed: {
+        ...mapState({
+            user: (s: GlobalState) => s.user.user,
+        }),
+    },
     methods: {
         checkEmail(this: any) {
             this.$v.form.$touch();
             return !(this.$v.form.$pending || this.$v.form.$error);
         },
-        onEditMemberRole(role, email) {
+        onEditMemberRole(role: number, email: string): void {
             this.edited = {
                 role,
                 email,
             };
         },
-        submitEditMemberRole() {
+        submitEditMemberRole(): Promise<any> {
             const payload = {
                 projectId: this.displayProject.id,
                 role: this.edited.role,
                 email: this.edited.email,
             };
-            return this.$store.dispatch(ActionTypes.PROJECT_EDIT_ROLE, payload).then((response) => {
+            return this.$store.dispatch(ActionTypes.PROJECT_EDIT_ROLE, payload).then(() => {
                 this.edited.email = null;
                 this.edited.role = null;
             });

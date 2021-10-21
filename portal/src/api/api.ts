@@ -671,7 +671,7 @@ class FKApi {
         });
     }
 
-    editRole(data) {
+    editRole(data: { projectId: number; email: string; role: number }) {
         return this.invoke({
             auth: Auth.Required,
             method: "PATCH",
