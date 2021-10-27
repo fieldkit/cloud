@@ -671,6 +671,15 @@ class FKApi {
         });
     }
 
+    editRole(data: { projectId: number; email: string; role: number }) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "PATCH",
+            url: this.baseUrl + "/projects/" + data.projectId + "/roles",
+            data: { email: data.email, role: data.role },
+        });
+    }
+
     sendInvite(data) {
         return this.invoke({
             auth: Auth.Required,

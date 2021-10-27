@@ -1,19 +1,19 @@
 <template>
-    <select :value="selectedIndex" class="select-css" @change="onChange">
-        <option v-for="(option, index) in options" v-bind:value="index" v-bind:key="index">
+    <select :value="selectedLabel" class="select-css" @change="onChange">
+        <option v-for="option in options" v-bind:key="option.value" :disabled="option.disabled">
             {{ option.label }}
         </option>
     </select>
 </template>
 
 <script lang="ts">
-import _ from "lodash";
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 
 export default Vue.extend({
     name: "SelectField",
     props: {
-        value: {
+        selectedLabel: {
+            type: String,
             required: true,
         },
         options: {
@@ -21,21 +21,13 @@ export default Vue.extend({
             required: true,
         },
     },
-    computed: {
-        selectedIndex(this: any) {
-            return _.first(
-                this.options
-                    .map((option, index) => {
-                        return option.value == this.value ? index : null;
-                    })
-                    .filter((v) => v !== null)
-            );
-        },
-    },
     methods: {
-        onChange(this: any, ev) {
-            const index = Number(ev.target.value);
-            this.$emit("input", this.options[index].value);
+        onChange(this: any, ev: Event): void {
+            if (!ev) {
+                return;
+            }
+            const selectedOption = this.options.filter((option) => option.label === ev.target.value)[0];
+            this.$emit("input", selectedOption.value);
         },
     },
 });
@@ -67,12 +59,15 @@ export default Vue.extend({
     background-position: right 0.7em top 50%, 0 0;
     background-size: 0.65em auto, 100%;
 }
+
 .select-css::-ms-expand {
     display: none;
 }
+
 .select-css:hover {
     border-color: #888;
 }
+
 .select-css:focus {
     border-color: #aaa;
     box-shadow: 0 0 1px 3px rgba(59, 153, 252, 0.7);
@@ -80,6 +75,7 @@ export default Vue.extend({
     color: #222;
     outline: none;
 }
+
 .select-css option {
     font-weight: normal;
 }
