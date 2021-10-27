@@ -23,11 +23,16 @@ export default Vue.extend({
     },
     methods: {
         onChange(this: any, ev: Event): void {
-            if (!ev) {
-                return;
+            const selectedOption = this.options.filter((option) => {
+                if (!ev || !ev.target) {
+                    return false;
+                }
+                const t = ev.target as HTMLSelectElement;
+                return option.label === t.value;
+            });
+            if (selectedOption.length > 0) {
+                this.$emit("input", selectedOption[0].value);
             }
-            const selectedOption = this.options.filter((option) => option.label === ev.target.value)[0];
-            this.$emit("input", selectedOption.value);
         },
     },
 });
