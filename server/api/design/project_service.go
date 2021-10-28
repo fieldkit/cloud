@@ -31,6 +31,13 @@ var InviteUserFields = Type("InviteUserFields", func() {
 	Required("role")
 })
 
+var EditUserFields = Type("EditUserFields", func() {
+	Attribute("email", String)
+	Required("email")
+	Attribute("role", Int32)
+	Required("role")
+})
+
 var RemoveUserFields = Type("RemoveUserFields", func() {
 	Attribute("email", String)
 	Required("email")
@@ -454,6 +461,27 @@ var _ = Service("project", func() {
 			POST("projects/{projectId}/invite")
 
 			Body("invite")
+		})
+	})
+
+	Method("edit user", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("projectId", Int32)
+			Required("projectId")
+			Attribute("edit", EditUserFields)
+			Required("edit")
+		})
+
+		HTTP(func() {
+			PATCH("projects/{projectId}/roles")
+            Body("edit")
+			httpAuthentication()
 		})
 	})
 

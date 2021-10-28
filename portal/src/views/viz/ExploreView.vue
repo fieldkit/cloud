@@ -5,7 +5,7 @@
             <div class="explore-header">
                 <DoubleHeader
                     title="Data View"
-                    :backTitle="backRoute === 'viewProject' ? $t('layout.backToProject') : $t('layout.backToStations')"
+                    :backTitle="backRoute === 'viewProject' ? $t('layout.backProjectDashboard') : $t('layout.backToStations')"
                     :backRoute="backRoute"
                     :backRouteParams="backRouteParams"
                 >

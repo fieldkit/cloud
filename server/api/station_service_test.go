@@ -428,6 +428,68 @@ func TestGetStationsPublicProjectAsAnonymous(t *testing.T) {
 	}`)
 }
 
+func TestGetStationsPublicProjectAsMember(t *testing.T) {
+    assert := assert.New(t)
+    e, err := tests.NewTestEnv()
+    assert.NoError(err)
+
+    project, err := e.AddProjectWithPrivacy(data.Public)
+    assert.NoError(err)
+
+    owner, err := e.AddUser()
+    assert.NoError(err)
+
+    fd, err := e.AddStationsToProject(project, owner, 2)
+    assert.NoError(err)
+
+
+    api, err := NewTestableApi(e)
+    assert.NoError(err)
+
+    member, err := e.AddUser()
+    assert.NoError(err)
+
+    err = e.AddProjectUser(project, member, data.MemberRole)
+    assert.NoError(err)
+
+    req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d/stations", fd.Project.ID), nil)
+    req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(member))
+    rr := tests.ExecuteRequest(req, api)
+
+    assert.Equal(http.StatusOK, rr.Code)
+
+    ja := jsonassert.New(t)
+    ja.Assertf(rr.Body.String(), `
+    {
+        "stations": [
+            {
+                "id": "<<PRESENCE>>",
+                "updatedAt": "<<PRESENCE>>",
+                "owner": "<<PRESENCE>>",
+                "deviceId": "<<PRESENCE>>",
+                "uploads": "<<PRESENCE>>",
+                "name": "<<PRESENCE>>",
+                "photos": null,
+                "readOnly": "<<PRESENCE>>",
+                "location": "<<PRESENCE>>",
+                "configurations": { "all": [] }
+            },
+            {
+                "id": "<<PRESENCE>>",
+                "updatedAt": "<<PRESENCE>>",
+                "owner": "<<PRESENCE>>",
+                "deviceId": "<<PRESENCE>>",
+                "uploads": "<<PRESENCE>>",
+                "name": "<<PRESENCE>>",
+                "photos": null,
+                "readOnly": "<<PRESENCE>>",
+                "location": "<<PRESENCE>>",
+                "configurations": { "all": [] }
+            }
+        ]
+    }`)
+}
+
 func TestAddNewStation(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()

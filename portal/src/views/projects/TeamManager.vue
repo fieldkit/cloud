@@ -18,14 +18,30 @@
                         <div class="email">{{ projectUser.user.email }}</div>
                     </div>
                 </div>
-                <div class="cell">{{ projectUser.role }}</div>
-                <div class="cell invite-status">
+
+                <div v-if="projectUser.user.id !== user.id && !projectUser.invited" class="cell role">
+                    <SelectField
+                        :options="roleOptions"
+                        :selected-label="projectUser.role"
+                        @input="onEditMemberRole($event, projectUser.user.email)"
+                    />
+                </div>
+                <div v-else class="cell">
+                    <div>{{ projectUser.role }}</div>
+                </div>
+
+                <div class="cell" v-if="edited.email === projectUser.user.email">
+                    <button class="invite-button" v-on:click="submitEditMemberRole()">Edit role</button>
+                </div>
+                <div class="cell invite-status" v-else>
                     <template v-if="projectUser.invited">
                         Invite pending
                     </template>
                 </div>
+
                 <div class="cell">
                     <img
+                        v-if="projectUser.user.id !== user.id"
                         alt="Remove user"
                         src="@/assets/icon-close-bold.svg"
                         class="remove-button"
@@ -57,7 +73,7 @@
                     </div>
                 </div>
                 <div class="cell role">
-                    <SelectField :options="roleOptions" v-model="form.selectedRole" />
+                    <SelectField :options="roleOptions" v-model="form.selectedRole" :selected-label="'Select Role'" />
                 </div>
                 <div class="cell">
                     <button class="invite-button" v-on:click="sendInvite">Invite</button>
@@ -73,9 +89,9 @@ import Vue from "vue";
 import UserPhoto from "@/views/shared/UserPhoto.vue";
 import SelectField from "@/views/shared/SelectField.vue";
 import { required, email } from "vuelidate/lib/validators";
-
 import * as ActionTypes from "@/store/actions";
-import FKApi from "@/api/api";
+import { mapState } from "vuex";
+import { GlobalState } from "@/store";
 
 export default Vue.extend({
     name: "TeamManager",
@@ -89,7 +105,22 @@ export default Vue.extend({
             required: true,
         },
     },
-    data: () => {
+    data: (): {
+        form: {
+            inviteEmail: string;
+            inviteDuplicate: boolean;
+            selectedRole: number;
+        };
+        roleOptions: {
+            value: number;
+            label: string;
+            disabled?: boolean;
+        }[];
+        edited: {
+            email: string | null;
+            role: number | null;
+        };
+    } => {
         return {
             form: {
                 inviteEmail: "",
@@ -100,6 +131,7 @@ export default Vue.extend({
                 {
                     value: -1,
                     label: "Select Role",
+                    disabled: true,
                 },
                 {
                     value: 0,
@@ -110,6 +142,10 @@ export default Vue.extend({
                     label: "Administrator",
                 },
             ],
+            edited: {
+                email: null,
+                role: null,
+            },
         };
     },
     validations: {
@@ -120,14 +156,35 @@ export default Vue.extend({
             },
         },
     },
+    computed: {
+        ...mapState({
+            user: (s: GlobalState) => s.user.user,
+        }),
+    },
     methods: {
         checkEmail(this: any) {
             this.$v.form.$touch();
             return !(this.$v.form.$pending || this.$v.form.$error);
         },
+        onEditMemberRole(role: number, email: string): void {
+            this.edited = {
+                role,
+                email,
+            };
+        },
+        submitEditMemberRole(): Promise<any> {
+            const payload = {
+                projectId: this.displayProject.id,
+                role: this.edited.role,
+                email: this.edited.email,
+            };
+            return this.$store.dispatch(ActionTypes.PROJECT_EDIT_ROLE, payload).then(() => {
+                this.edited.email = null;
+                this.edited.role = null;
+            });
+        },
         sendInvite(this: any) {
             if (this.checkEmail()) {
-                console.log(this.form.selectedRole);
                 if (this.form.selectedRole === -1) {
                     this.form.selectedRole = 0;
                 }
@@ -175,7 +232,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 
 .manage-team-container {
     margin-top: 25px;
@@ -283,7 +340,6 @@ export default Vue.extend({
 
     &:nth-of-type(2),
     &:nth-of-type(3) {
-
         @include bp-down($sm) {
             padding-left: 41px;
         }
@@ -299,6 +355,9 @@ export default Vue.extend({
     color: #818181;
     padding: 4px 0 4px 42px;
     font-size: 13px;
+    display: flex;
+    flex: 1;
+    padding-right: 10px;
 }
 .cell .validation-error {
     color: #c42c44;
