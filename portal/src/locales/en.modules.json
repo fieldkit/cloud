@@ -115,13 +115,14 @@
         "wh.floodnet": {
             "name": "FloodNet",
             "sensors": {
+                "battery": "Battery",
+                "distance": "Distance",
+                "depth": "Depth",
                 "altitude": "Altitude",
                 "temperature": "Temperature",
                 "pressure": "Pressure",
-                "battery": "Battery",
                 "sdError": "SD Error",
-                "humidity": "Humidity",
-                "distance": "Distance"
+                "humidity": "Humidity"
             }
         }
     }
