@@ -11,8 +11,8 @@ export interface SensorDetails {
     ranges: { minimum: number; maximum: number }[];
 }
 
-export function createSensorColorScale(sensor: SensorDetails): ColorScale {
-    if (sensor.ranges.length == 0) {
+export function createSensorColorScale(sensor: SensorDetails | null): ColorScale {
+    if (sensor == null || sensor.ranges.length == 0) {
         return d3
             .scaleSequential()
             .domain([0, 1])
