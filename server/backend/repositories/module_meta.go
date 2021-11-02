@@ -865,6 +865,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Key:           "humidity",
 					FirmwareKey:   "humidity",
 					UnitOfMeasure: "%",
+					Internal:      true,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -876,6 +877,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Key:           "pressure",
 					FirmwareKey:   "pressure",
 					UnitOfMeasure: "kPa",
+					Internal:      true,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 1.0,
@@ -887,6 +889,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Key:           "altitude",
 					FirmwareKey:   "altitude",
 					UnitOfMeasure: "m",
+					Internal:      true,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 3000,
@@ -898,6 +901,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Key:           "temperature",
 					FirmwareKey:   "temperature",
 					UnitOfMeasure: "°C",
+					Internal:      true,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: -100.0,
@@ -909,6 +913,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Key:           "sdError",
 					FirmwareKey:   "sdError",
 					UnitOfMeasure: "",
+					Internal:      true,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0,

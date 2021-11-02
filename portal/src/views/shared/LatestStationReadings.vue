@@ -32,12 +32,9 @@ export class SensorReading {
         public readonly unitOfMeasure: string,
         public readonly reading: number,
         public readonly trend: TrendType,
+        public readonly internal: boolean,
         public readonly sensorModule: Module
     ) {}
-
-    public get internal(): boolean {
-        return this.sensorModule.internal;
-    }
 }
 
 export default Vue.extend({
@@ -116,7 +113,15 @@ export default Vue.extend({
                             }
                             const sensorModule = sensorsToModule[key];
                             if (!sensorModule) throw new Error("no sensor module");
-                            return new SensorReading(key, classes.join(" "), sensor.unitOfMeasure, value, TrendType.Steady, sensorModule);
+                            return new SensorReading(
+                                key,
+                                classes.join(" "),
+                                sensor.unitOfMeasure,
+                                value,
+                                TrendType.Steady,
+                                sensor.internal,
+                                sensorModule
+                            );
                         })
                         .value();
 
