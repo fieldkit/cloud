@@ -192,7 +192,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "dox",
 					FirmwareKey:   "dox",
-					UnitOfMeasure: "mg/L",
+					UnitOfMeasure: "%",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -214,7 +214,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "do",
 					FirmwareKey:   "do",
-					UnitOfMeasure: "mg/L",
+					UnitOfMeasure: "%",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
