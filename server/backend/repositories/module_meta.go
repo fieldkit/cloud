@@ -157,12 +157,12 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					FirmwareKey:   "tds",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{
-						/*
+
 							SensorRanges{
 								Minimum: 0.0,
 								Maximum: 0.0,
 							},
-						*/
+
 					},
 				},
 				&SensorMeta{
@@ -170,12 +170,10 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					FirmwareKey:   "salinity",
 					UnitOfMeasure: "",
 					Ranges:        []SensorRanges{
-						/*
 							SensorRanges{
 								Minimum: 0.0,
 								Maximum: 0.0,
 							},
-						*/
 					},
 				},
 			},
