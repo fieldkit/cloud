@@ -19,7 +19,7 @@
                     </div>
                 </div>
 
-                <div v-if="projectUser.user.id !== user.id && !projectUser.invited" class="cell role">
+                <div v-if="!projectUser.invited" class="cell role">
                     <SelectField
                         :options="roleOptions"
                         :selected-label="projectUser.role"
@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="cell" v-if="edited.email === projectUser.user.email">
-                    <button class="invite-button" v-on:click="submitEditMemberRole()">Edit role</button>
+                    <button class="invite-button" v-on:click="submitEditMemberRole()">Update Role</button>
                 </div>
                 <div class="cell invite-status" v-else>
                     <template v-if="projectUser.invited">
