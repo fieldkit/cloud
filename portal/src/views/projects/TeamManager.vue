@@ -19,7 +19,7 @@
                     </div>
                 </div>
 
-                <div v-if="!projectUser.invited" class="cell role">
+                <div v-if="projectUser.user.id !== user.id && !projectUser.invited" class="cell role">
                     <SelectField
                         :options="roleOptions"
                         :selected-label="projectUser.role"
