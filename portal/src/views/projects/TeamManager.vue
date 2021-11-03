@@ -258,7 +258,7 @@ export default Vue.extend({
     }
 }
 .invite-button {
-    width: 80px;
+    padding: 0 20px;
     height: 28px;
     border-radius: 3px;
     border: 1px solid #cccdcf;
