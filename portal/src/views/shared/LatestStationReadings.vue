@@ -29,6 +29,7 @@ export class SensorReading {
     constructor(
         public readonly labelKey: string,
         public readonly classes: string,
+        public readonly order: number,
         public readonly unitOfMeasure: string,
         public readonly reading: number,
         public readonly trend: TrendType,
@@ -113,9 +114,11 @@ export default Vue.extend({
                             }
                             const sensorModule = sensorsToModule[key];
                             if (!sensorModule) throw new Error("no sensor module");
+                            console.log(`sensor:`, sensor);
                             return new SensorReading(
                                 key,
                                 classes.join(" "),
+                                sensor.order,
                                 sensor.unitOfMeasure,
                                 value,
                                 TrendType.Steady,
@@ -125,9 +128,13 @@ export default Vue.extend({
                         })
                         .value();
 
-                    return readings.filter((sr) => !sr.internal);
+                    return _.orderBy(
+                        readings.filter((sr) => !sr.internal),
+                        (sr) => sr.order
+                    );
                 })
                 .then((sensors) => {
+                    console.log(`sensors`, sensors);
                     this.sensors = sensors;
                     this.loading = false;
                     this.$emit("layoutChange");

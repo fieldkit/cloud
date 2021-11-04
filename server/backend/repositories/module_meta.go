@@ -156,24 +156,23 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Key:           "tds",
 					FirmwareKey:   "tds",
 					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{
+					Ranges: []SensorRanges{
 
-							SensorRanges{
-								Minimum: 0.0,
-								Maximum: 0.0,
-							},
-
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 0.0,
+						},
 					},
 				},
 				&SensorMeta{
 					Key:           "salinity",
 					FirmwareKey:   "salinity",
 					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{
-							SensorRanges{
-								Minimum: 0.0,
-								Maximum: 0.0,
-							},
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 0.0,
+						},
 					},
 				},
 			},
@@ -827,13 +826,13 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 			Sensors: []*SensorMeta{
 				&SensorMeta{
-					Key:           "battery",
-					FirmwareKey:   "battery",
-					UnitOfMeasure: "%",
+					Key:           "depth",
+					FirmwareKey:   "depth",
+					UnitOfMeasure: "mm",
 					Ranges: []SensorRanges{
 						SensorRanges{
-							Minimum: 0,
-							Maximum: 100,
+							Minimum: 0.0,
+							Maximum: 4999.0,
 						},
 					},
 				},
@@ -849,13 +848,13 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					},
 				},
 				&SensorMeta{
-					Key:           "depth",
-					FirmwareKey:   "depth",
-					UnitOfMeasure: "mm",
+					Key:           "battery",
+					FirmwareKey:   "battery",
+					UnitOfMeasure: "%",
 					Ranges: []SensorRanges{
 						SensorRanges{
-							Minimum: 0.0,
-							Maximum: 4999.0,
+							Minimum: 0,
+							Maximum: 100,
 						},
 					},
 				},
@@ -924,7 +923,8 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 	}
 
 	for _, m := range mm {
-		for _, s := range m.Sensors {
+		for sensorIndex, s := range m.Sensors {
+			s.Order = sensorIndex
 			s.FullKey = m.Key + "." + s.Key
 		}
 	}

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"sort"
 	"strings"
 	"time"
 
@@ -1148,7 +1149,7 @@ func (sr *StationRepository) QueryStationProgress(ctx context.Context, stationID
 	return nil, nil
 }
 
-type StationSensor struct {
+type StationSensorRow struct {
 	StationID    int32     `db:"station_id" json:"stationId"`
 	StationName  string    `db:"station_name" json:"stationName"`
 	ModuleID     string    `db:"module_id" json:"moduleId"`
@@ -1157,6 +1158,23 @@ type StationSensor struct {
 	SensorKey    string    `db:"sensor_key" json:"sensorKey"`
 	SensorReadAt time.Time `db:"sensor_read_at" json:"sensorReadAt"`
 }
+
+type StationSensor struct {
+	StationID    int32     `json:"stationId"`
+	StationName  string    `json:"stationName"`
+	ModuleID     string    `json:"moduleId"`
+	ModuleKey    string    `json:"moduleKey"`
+	SensorID     int64     `json:"sensorId"`
+	SensorKey    string    `json:"sensorKey"`
+	SensorReadAt time.Time `json:"sensorReadAt"`
+	Order        int32     `json:"order"`
+}
+
+type StationSensorByOrder []*StationSensor
+
+func (a StationSensorByOrder) Len() int           { return len(a) }
+func (a StationSensorByOrder) Less(i, j int) bool { return a[i].Order < a[j].Order }
+func (a StationSensorByOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations []int32) (map[int32][]*StationSensor, error) {
 	query, args, err := sqlx.In(fmt.Sprintf(`
@@ -1177,7 +1195,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 		return nil, err
 	}
 
-	rows := []*StationSensor{}
+	rows := []*StationSensorRow{}
 	if err := sr.db.SelectContext(ctx, &rows, sr.db.Rebind(query), args...); err != nil {
 		return nil, err
 	}
@@ -1187,11 +1205,31 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 		byStation[int32(id)] = make([]*StationSensor, 0)
 	}
 
+	metaRepository := NewModuleMetaRepository()
+
 	for _, row := range rows {
 		if !strings.HasPrefix(row.ModuleKey, "fk.") {
 			row.ModuleKey = "fk." + strings.TrimPrefix(row.ModuleKey, "modules.")
 		}
-		byStation[row.StationID] = append(byStation[row.StationID], row)
+		moduleAndSensor, _ := metaRepository.FindByFullKey(row.SensorKey)
+		order := 0
+		if moduleAndSensor != nil {
+			order = moduleAndSensor.Sensor.Order
+		}
+		byStation[row.StationID] = append(byStation[row.StationID], &StationSensor{
+			StationID:    row.StationID,
+			StationName:  row.StationName,
+			ModuleID:     row.ModuleID,
+			ModuleKey:    row.ModuleKey,
+			SensorID:     row.SensorID,
+			SensorKey:    row.SensorKey,
+			SensorReadAt: row.SensorReadAt,
+			Order:        int32(order),
+		})
+	}
+
+	for _, sensors := range byStation {
+		sort.Sort(StationSensorByOrder(sensors))
 	}
 
 	return byStation, nil
