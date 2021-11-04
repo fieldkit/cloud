@@ -174,7 +174,7 @@ export default Vue.extend({
                         "text-allow-overlap": true,
                         "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
                         "text-offset": [0, 0.75],
-                        "text-variable-anchor": ["top", "bottom", "left"],
+                        "text-variable-anchor": ["top", "right", "bottom", "left"],
                     },
                 });
 
