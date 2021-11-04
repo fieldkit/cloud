@@ -32,84 +32,12 @@ type HeaderFields struct {
 type ModuleMetaRepository struct {
 }
 
-func NewModuleMetaRepository() *ModuleMetaRepository {
-	return &ModuleMetaRepository{}
-}
+var (
+	moduleMeta []*ModuleMeta
+)
 
-func (r *ModuleMetaRepository) FindByFullKey(fullKey string) (mm *SensorAndModuleMeta, err error) {
-	all, err := r.FindAllModulesMeta()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, module := range all {
-		for _, sensor := range module.Sensors {
-			if sensor.FullKey == fullKey {
-				mm = &SensorAndModuleMeta{
-					Module: module,
-					Sensor: sensor,
-				}
-				return
-			}
-		}
-	}
-
-	return nil, fmt.Errorf("unknown sensor: %s", fullKey)
-}
-
-func (r *ModuleMetaRepository) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, err error) {
-	all, err := r.FindAllModulesMeta()
-	if err != nil {
-		return nil, err
-	}
-	for _, module := range all {
-		if module.Header.Manufacturer == m.Manufacturer && module.Header.Kind == m.Kind {
-			return module, nil
-		}
-	}
-
-	message := fmt.Sprintf("missing sensor meta (%v, %v)", m.Manufacturer, m.Kind)
-	return nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind)
-}
-
-func (r *ModuleMetaRepository) FindSensorMeta(m *HeaderFields, sensor string) (mm *ModuleMeta, sm *SensorMeta, err error) {
-	all, err := r.FindAllModulesMeta()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// Very old firmware keys. We should sanitize these earlier in the process.
-	weNeedToCleanThisUp := strings.ReplaceAll(strings.ReplaceAll(sensor, " ", "_"), "-", "_")
-
-	for _, module := range all {
-		sameKind := module.Header.Kind == m.Kind
-		if !sameKind {
-			for _, k := range module.Header.AllKinds {
-				if m.Kind == k {
-					sameKind = true
-					break
-				}
-			}
-		}
-
-		if module.Header.Manufacturer == m.Manufacturer && sameKind {
-			for _, s := range module.Sensors {
-				if s.Key == sensor || s.FirmwareKey == sensor {
-					return module, s, nil
-				}
-				if s.Key == weNeedToCleanThisUp || s.FirmwareKey == weNeedToCleanThisUp {
-					return module, s, nil
-				}
-			}
-		}
-	}
-
-	message := fmt.Sprintf("missing sensor meta (%v, %v, %v)", m.Manufacturer, m.Kind, sensor)
-	return nil, nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
-}
-
-func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error) {
-	mm = []*ModuleMeta{
+func init() {
+	moduleMeta = []*ModuleMeta{
 		&ModuleMeta{
 			Key: "fk.water.ph",
 			Header: ModuleHeader{
@@ -922,12 +850,90 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 		},
 	}
 
-	for _, m := range mm {
+	for _, m := range moduleMeta {
 		for sensorIndex, s := range m.Sensors {
 			s.Order = sensorIndex
 			s.FullKey = m.Key + "." + s.Key
 		}
 	}
+}
 
-	return
+func NewModuleMetaRepository() *ModuleMetaRepository {
+	return &ModuleMetaRepository{}
+}
+
+func (r *ModuleMetaRepository) FindByFullKey(fullKey string) (mm *SensorAndModuleMeta, err error) {
+	all, err := r.FindAllModulesMeta()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, module := range all {
+		for _, sensor := range module.Sensors {
+			if sensor.FullKey == fullKey {
+				mm = &SensorAndModuleMeta{
+					Module: module,
+					Sensor: sensor,
+				}
+				return
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("unknown sensor: %s", fullKey)
+}
+
+func (r *ModuleMetaRepository) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, err error) {
+	all, err := r.FindAllModulesMeta()
+	if err != nil {
+		return nil, err
+	}
+	for _, module := range all {
+		if module.Header.Manufacturer == m.Manufacturer && module.Header.Kind == m.Kind {
+			return module, nil
+		}
+	}
+
+	message := fmt.Sprintf("missing sensor meta (%v, %v)", m.Manufacturer, m.Kind)
+	return nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind)
+}
+
+func (r *ModuleMetaRepository) FindSensorMeta(m *HeaderFields, sensor string) (mm *ModuleMeta, sm *SensorMeta, err error) {
+	all, err := r.FindAllModulesMeta()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Very old firmware keys. We should sanitize these earlier in the process.
+	weNeedToCleanThisUp := strings.ReplaceAll(strings.ReplaceAll(sensor, " ", "_"), "-", "_")
+
+	for _, module := range all {
+		sameKind := module.Header.Kind == m.Kind
+		if !sameKind {
+			for _, k := range module.Header.AllKinds {
+				if m.Kind == k {
+					sameKind = true
+					break
+				}
+			}
+		}
+
+		if module.Header.Manufacturer == m.Manufacturer && sameKind {
+			for _, s := range module.Sensors {
+				if s.Key == sensor || s.FirmwareKey == sensor {
+					return module, s, nil
+				}
+				if s.Key == weNeedToCleanThisUp || s.FirmwareKey == weNeedToCleanThisUp {
+					return module, s, nil
+				}
+			}
+		}
+	}
+
+	message := fmt.Sprintf("missing sensor meta (%v, %v, %v)", m.Manufacturer, m.Kind, sensor)
+	return nil, nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
+}
+
+func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error) {
+	return moduleMeta, nil
 }
