@@ -171,10 +171,10 @@ export default Vue.extend({
                         "text-field": "{title}",
                         "icon-ignore-placement": true,
                         "icon-allow-overlap": true,
-                        "text-allow-overlap": false,
+                        "text-allow-overlap": true,
                         "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
                         "text-offset": [0, 0.75],
-                        "text-anchor": "top",
+                        "text-variable-anchor": ["top", "right", "bottom", "left"],
                     },
                 });
 
