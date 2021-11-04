@@ -151,6 +151,8 @@ export default Vue.extend({
                         });
                     }
 
+                    console.log("quick-sensors", quickSensors);
+
                     const stations = [stationId];
                     const sensors = [[quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId]];
 

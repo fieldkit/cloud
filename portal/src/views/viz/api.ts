@@ -11,6 +11,7 @@ export interface ModuleSensorMeta {
     firmwareKey: string;
     unitOfMeasure: string;
     internal: boolean;
+    order: number;
     ranges: SensorRange[];
 }
 

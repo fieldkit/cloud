@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="cell" v-if="edited.email === projectUser.user.email">
-                    <button class="invite-button" v-on:click="submitEditMemberRole()">Edit role</button>
+                    <button class="invite-button" v-on:click="submitEditMemberRole()">Update Role</button>
                 </div>
                 <div class="cell invite-status" v-else>
                     <template v-if="projectUser.invited">
@@ -258,7 +258,7 @@ export default Vue.extend({
     }
 }
 .invite-button {
-    width: 80px;
+    padding: 0 20px;
     height: 28px;
     border-radius: 3px;
     border: 1px solid #cccdcf;

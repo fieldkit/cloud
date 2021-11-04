@@ -19,11 +19,11 @@ export const D3Map = Vue.extend({
         Mapbox,
     },
     data(): {
-        mapboxToken: string;
+        mapbox: { token: string; style: string };
         refreshed: boolean;
     } {
         return {
-            mapboxToken: Config.mapbox.token,
+            mapbox: Config.mapbox,
             refreshed: false,
         };
     },
@@ -264,10 +264,10 @@ export const D3Map = Vue.extend({
 	<div class="viz map">
         <mapbox
             class="viz-map"
-            :access-token="mapboxToken"
+            :access-token="mapbox.token"
             :map-options="{
                 container: this.viz.id + '-map',
-                style: 'mapbox://styles/mapbox/light-v10',
+                style: mapbox.style,
                 zoom: 10,
             }"
             :nav-control="{
