@@ -171,8 +171,17 @@ export default Vue.extend({
 .graph .x-axis {
     color: #7f7f7f;
 }
+
 .graph .y-axis {
     color: #7f7f7f;
+}
+
+.graph .x-axis text {
+    font-size: 7pt;
+}
+
+.graph .y-axis text {
+    font-size: 7pt;
 }
 
 .explore-view {

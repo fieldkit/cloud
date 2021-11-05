@@ -78,7 +78,7 @@ export const D3TimeSeriesGraph = Vue.extend({
             type FormatFunctionType = (date: Date) => string;
 
             function formatTick(date: Date, tick: number, els: { __data__: Date }[], state: { f: FormatFunctionType | null }) {
-                let spec = "%-m/%-d %-H:%M";
+                let spec = "%-m/%-d/%-Y %-H:%M";
 
                 if (tick == 0) {
                     const allTicks = els.map((el) => el.__data__);
