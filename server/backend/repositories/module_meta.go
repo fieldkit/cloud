@@ -768,6 +768,7 @@ func init() {
 					Key:           "distance",
 					FirmwareKey:   "distance",
 					UnitOfMeasure: "mm",
+					Internal:      true,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
