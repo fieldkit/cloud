@@ -3,7 +3,7 @@
         <vue-confirm-dialog />
 
         <div class="section-heading">Manage Team</div>
-        <div class="users-container" v-if="users">
+        <div class="users-container">
             <div class="user-row">
                 <div class="cell-heading">Members ({{ displayProject.users.length }})</div>
                 <div class="cell-heading">Role</div>
