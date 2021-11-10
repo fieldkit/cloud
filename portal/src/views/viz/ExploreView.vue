@@ -63,6 +63,9 @@ export default Vue.extend({
     },
     beforeRouteEnter(to, from, next) {
         next((vm: any) => {
+            if (from.name === "exploreBookmark" || from.name === "exportBookmark") {
+                return;
+            }
             vm.backRoute = from.name ? from.name : "mapAllStations";
             vm.backRouteParams.id = from.params.id;
         });
