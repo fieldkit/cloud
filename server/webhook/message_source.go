@@ -2,7 +2,6 @@ package webhook
 
 import (
 	"context"
-	"encoding/csv"
 	"io"
 
 	"github.com/conservify/sqlxcache"
@@ -10,26 +9,6 @@ import (
 
 type MessageSource interface {
 	NextBatch(ctx context.Context, batch *MessageBatch) error
-}
-
-type CsvMessageSource struct {
-	path     string
-	schemaID int32
-	file     io.Reader
-	reader   *csv.Reader
-	columns  []string
-	verbose  bool
-}
-
-func NewCsvMessageSource(path string, schemaID int32) *CsvMessageSource {
-	return &CsvMessageSource{
-		path:     path,
-		schemaID: schemaID,
-	}
-}
-
-func (s *CsvMessageSource) NextBatch(ctx context.Context, batch *MessageBatch) error {
-	return io.EOF
 }
 
 type DatabaseMessageSource struct {

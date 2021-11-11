@@ -64,6 +64,11 @@ func main() {
 
 	flag.Parse()
 
+	if options.File != "" && options.SchemaID == 0 {
+		flag.PrintDefaults()
+		return
+	}
+
 	logging.Configure(false, "webhook")
 
 	log := logging.Logger(ctx).Sugar()

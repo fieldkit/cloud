@@ -13,6 +13,14 @@ const (
 	BatchSize = 1000
 )
 
+type WebHookMessage struct {
+	ID        int64     `db:"id" json:"id"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	SchemaID  *int32    `db:"schema_id" json:"schema_id"`
+	Headers   *string   `db:"headers" json:"headers"`
+	Body      []byte    `db:"body" json:"body"`
+}
+
 type WebHookMessagesRepository struct {
 	db *sqlxcache.DB
 }

@@ -12,14 +12,6 @@ import (
 	"github.com/itchyny/gojq"
 )
 
-type WebHookMessage struct {
-	ID        int64     `db:"id"`
-	CreatedAt time.Time `db:"created_at"`
-	SchemaID  *int32    `db:"schema_id"`
-	Headers   *string   `db:"headers"`
-	Body      []byte    `db:"body"`
-}
-
 type ParsedReading struct {
 	Name     string  `json:"name"`
 	Key      string  `json:"key"`
@@ -45,6 +37,9 @@ func toFloat(x interface{}) (float64, bool) {
 		return float64(x), true
 	case float64:
 		return x, true
+	case string:
+		f, err := strconv.ParseFloat(x, 64)
+		return f, err == nil
 	case *big.Int:
 		f, err := strconv.ParseFloat(x.String(), 64)
 		return f, err == nil
