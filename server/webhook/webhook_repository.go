@@ -63,28 +63,22 @@ func (rr *WebHookMessagesRepository) StartProcessingSchema(ctx context.Context, 
 	return nil
 }
 
-func (rr *WebHookMessagesRepository) processQuery(ctx context.Context, batch *MessageBatch, messages []*WebHookMessage) error {
+func (rr *WebHookMessagesRepository) QuerySchemas(ctx context.Context, batch *MessageBatch) (map[int32]*WebHookSchemaRegistration, error) {
 	log := Logger(ctx).Sugar()
-
-	batch.Messages = nil
 
 	if batch.Schemas == nil {
 		batch.Schemas = make(map[int32]*WebHookSchemaRegistration)
 	}
 
-	if len(messages) == 0 {
-		return sql.ErrNoRows
-	}
-
-	for _, m := range messages {
+	for _, m := range batch.Messages {
 		if _, ok := batch.Schemas[*m.SchemaID]; !ok {
 			schemas := []*WebHookSchemaRegistration{}
 			if err := rr.db.SelectContext(ctx, &schemas, `SELECT * FROM fieldkit.ttn_schema WHERE id = $1`, m.SchemaID); err != nil {
-				return err
+				return nil, err
 			}
 
 			if len(schemas) != 1 {
-				return fmt.Errorf("unexpected number of schema registrations")
+				return nil, fmt.Errorf("unexpected number of schema registrations")
 			}
 
 			for _, schema := range schemas {
@@ -94,8 +88,23 @@ func (rr *WebHookMessagesRepository) processQuery(ctx context.Context, batch *Me
 		}
 	}
 
+	return batch.Schemas, nil
+}
+
+func (rr *WebHookMessagesRepository) processQuery(ctx context.Context, batch *MessageBatch, messages []*WebHookMessage) error {
+	batch.Messages = nil
+
+	if len(messages) == 0 {
+		return sql.ErrNoRows
+	}
+
 	batch.Messages = messages
 	batch.page += 1
+
+	_, err := rr.QuerySchemas(ctx, batch)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

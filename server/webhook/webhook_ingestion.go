@@ -43,6 +43,8 @@ func (i *WebHookIngestion) processBatches(ctx context.Context, batch *MessageBat
 
 	aggregators := make(map[int32]*handlers.Aggregator)
 
+	mr := NewWebHookMessagesRepository(i.db)
+
 	for {
 		batchLog := Logger(ctx).Sugar()
 
@@ -59,6 +61,11 @@ func (i *WebHookIngestion) processBatches(ctx context.Context, batch *MessageBat
 		}
 
 		batchLog.Infow("batch")
+
+		_, err := mr.QuerySchemas(ctx, batch)
+		if err != nil {
+			return fmt.Errorf("message schemas (%v)", err)
+		}
 
 		for _, row := range batch.Messages {
 			rowLog := Logger(ctx).Sugar().With("schema_id", row.SchemaID).With("message_id", row.ID)

@@ -41,6 +41,7 @@ func (s *CsvMessageSource) NextBatch(ctx context.Context, batch *MessageBatch) e
 	}
 
 	if batch.Messages == nil {
+		batch.Schemas = make(map[int32]*WebHookSchemaRegistration)
 		batch.Messages = make([]*WebHookMessage, 0)
 	} else {
 		batch.Messages = batch.Messages[:0]
@@ -66,6 +67,10 @@ func (s *CsvMessageSource) NextBatch(ctx context.Context, batch *MessageBatch) e
 			jsonMap[column] = row[i]
 		}
 
+		if s.verbose {
+			log.Infow("json", "json", jsonMap)
+		}
+
 		body, err := json.Marshal(jsonMap)
 		if err != nil {
 			return fmt.Errorf("marshal json (%v)", err)
@@ -79,14 +84,14 @@ func (s *CsvMessageSource) NextBatch(ctx context.Context, batch *MessageBatch) e
 			Body:      body,
 		}
 
+		if s.verbose {
+			log.Infow("csv", "message", message)
+		}
+
 		batch.Messages = append(batch.Messages, message)
 
 		if len(batch.Messages) == AggregatingBatchSize {
 			break
-		}
-
-		if false {
-			log.Infow("csv", "message", message)
 		}
 	}
 
