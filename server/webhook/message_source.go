@@ -26,7 +26,7 @@ func NewDatabaseMessageSource(db *sqlxcache.DB, schemaID int32) *DatabaseMessage
 
 func (s *DatabaseMessageSource) NextBatch(ctx context.Context, batch *MessageBatch) error {
 	schemas := NewMessageSchemaRepository(s.db)
-	messages := NewWebHookMessagesRepository(s.db)
+	messages := NewMessagesRepository(s.db)
 
 	if s.schemaID > 0 {
 		if !s.started {

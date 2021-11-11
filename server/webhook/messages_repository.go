@@ -20,12 +20,12 @@ type WebHookMessage struct {
 	Body      []byte    `db:"body" json:"body"`
 }
 
-type WebHookMessagesRepository struct {
+type MessagesRepository struct {
 	db *sqlxcache.DB
 }
 
-func NewWebHookMessagesRepository(db *sqlxcache.DB) (rr *WebHookMessagesRepository) {
-	return &WebHookMessagesRepository{db: db}
+func NewMessagesRepository(db *sqlxcache.DB) (rr *MessagesRepository) {
+	return &MessagesRepository{db: db}
 }
 
 type MessageBatch struct {
@@ -35,7 +35,7 @@ type MessageBatch struct {
 	page      int32
 }
 
-func (rr *WebHookMessagesRepository) processQuery(ctx context.Context, batch *MessageBatch, messages []*WebHookMessage) error {
+func (rr *MessagesRepository) processQuery(ctx context.Context, batch *MessageBatch, messages []*WebHookMessage) error {
 	batch.Messages = nil
 
 	if len(messages) == 0 {
@@ -54,7 +54,7 @@ func (rr *WebHookMessagesRepository) processQuery(ctx context.Context, batch *Me
 	return nil
 }
 
-func (rr *WebHookMessagesRepository) QueryBatchForProcessing(ctx context.Context, batch *MessageBatch) error {
+func (rr *MessagesRepository) QueryBatchForProcessing(ctx context.Context, batch *MessageBatch) error {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("querying", "start", batch.StartTime, "page", batch.page)
@@ -70,7 +70,7 @@ func (rr *WebHookMessagesRepository) QueryBatchForProcessing(ctx context.Context
 	return rr.processQuery(ctx, batch, messages)
 }
 
-func (rr *WebHookMessagesRepository) QueryBatchBySchemaIDForProcessing(ctx context.Context, batch *MessageBatch, schemaID int32) error {
+func (rr *MessagesRepository) QueryBatchBySchemaIDForProcessing(ctx context.Context, batch *MessageBatch, schemaID int32) error {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("querying", "start", batch.StartTime, "page", batch.page)
