@@ -123,7 +123,7 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 
 func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[int32]*WebHookSchemaRegistration) (p *ParsedMessage, err error) {
 	if m.SchemaID == nil {
-		return nil, fmt.Errorf("missing schema")
+		return nil, fmt.Errorf("missing schema id")
 	}
 
 	schemaRegistration, ok := schemas[*m.SchemaID]
@@ -168,7 +168,10 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 
 	receivedAt, err := time.Parse("2006-01-02T15:04:05.999999999Z", receivedAtString)
 	if err != nil {
-		return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+		receivedAt, err = time.Parse("2006-01-02 15:04:05.999999999+00:00", receivedAtString)
+		if err != nil {
+			return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+		}
 	}
 
 	deviceIDString, ok := deviceIDRaw.(string)
@@ -176,9 +179,16 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 		return nil, fmt.Errorf("unexpected device-id value: %v", receivedAtRaw)
 	}
 
+	if len(deviceIDString) == 0 {
+		return nil, fmt.Errorf("malformed device eui: %v", deviceIDRaw)
+	}
+
 	deviceID, err := hex.DecodeString(deviceIDString)
 	if err != nil {
-		return nil, fmt.Errorf("malformed device eui: %v", deviceIDRaw)
+		if false {
+			return nil, fmt.Errorf("malformed device eui: %v", deviceIDRaw)
+		}
+		deviceID = []byte(deviceIDString)
 	}
 
 	sensors := make([]*ParsedReading, 0)
