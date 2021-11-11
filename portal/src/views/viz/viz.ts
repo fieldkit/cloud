@@ -92,7 +92,12 @@ export class QueriedData {
 }
 
 export class VizInfo {
-    constructor(public readonly key: string, public readonly colorScale: ColorScale, public readonly station: { name: string }) {}
+    constructor(
+        public readonly key: string,
+        public readonly colorScale: ColorScale,
+        public readonly station: { name: string },
+        public readonly unitOfMeasure: string
+    ) {}
 }
 
 export abstract class Viz {
@@ -530,6 +535,7 @@ export class Workspace {
                 this.querier.queryInfo(iq).then((info) => {
                     return _.map(info.stations, (info, stationId) => {
                         const stationName = info[0].stationName;
+                        console.log("ROWWWWW RADOI", info);
                         const sensors = info.map(
                             (row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt)
                         );
@@ -549,6 +555,7 @@ export class Workspace {
     }
 
     public vizInfo(viz: Graph): VizInfo {
+        console.log("RADOI META", this.meta);
         const sensorDetailsByKey = _.keyBy(_.flatten(this.meta.modules.map((m) => m.sensors)), (s) => s.fullKey);
         const keysById = _.keyBy(this.meta.sensors, (s) => s.id);
 
@@ -569,7 +576,7 @@ export class Workspace {
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
 
-        return new VizInfo(key, scale, station);
+        return new VizInfo(key, scale, station, details.unitOfMeasure);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {
@@ -614,6 +621,7 @@ export class Workspace {
 
     public sensorOptions(stationId: number): SensorTreeOption[] {
         const station = this.stations[stationId];
+        console.log("Radoi st", station);
         if (!station) {
             console.log(`no-options: no station`);
             return [];
