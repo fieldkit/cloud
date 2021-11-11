@@ -4,6 +4,7 @@ import * as d3 from "d3";
 
 import { Time, TimeRange, Margins, ChartLayout } from "./common";
 import { Graph, QueriedData, Workspace } from "./viz";
+import {appendUnitOfMeasureLabel} from '@/views/viz/d3-helpers';
 
 export const D3Range = Vue.extend({
     name: "D3Range",
@@ -123,6 +124,16 @@ export const D3Range = Vue.extend({
                 )
                 .call(yAxis);
 
+            svg.select("#uom").remove();
+            svg.append("text")
+                .attr("id", "uom")
+                .attr("text-anchor", "middle")
+                .attr("transform", "rotate(-90)")
+                .attr("fill", "#2C3E50")
+                .attr("y", 17)
+                .attr("x", vizInfo.unitOfMeasure.length / 2 - (layout.height - (layout.margins.bottom + layout.margins.top)) / 2)
+                .text(vizInfo.unitOfMeasure);
+
             const defs = svg
                 .selectAll("defs")
                 .data(charts)
@@ -188,6 +199,8 @@ export const D3Range = Vue.extend({
                     const min = d.length > 0 ? -MinimumHeight : 0;
                     return -(height ? height : min);
                 });
+
+            appendUnitOfMeasureLabel(svg, vizInfo.unitOfMeasure, layout);
         },
     },
     template: `<div class="viz histogram"><div class="chart"></div></div>`,

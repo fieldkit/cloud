@@ -92,7 +92,12 @@ export class QueriedData {
 }
 
 export class VizInfo {
-    constructor(public readonly key: string, public readonly colorScale: ColorScale, public readonly station: { name: string }) {}
+    constructor(
+        public readonly key: string,
+        public readonly colorScale: ColorScale,
+        public readonly station: { name: string },
+        public readonly unitOfMeasure: string
+    ) {}
 }
 
 export abstract class Viz {
@@ -569,7 +574,7 @@ export class Workspace {
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
 
-        return new VizInfo(key, scale, station);
+        return new VizInfo(key, scale, station, details.unitOfMeasure);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {
