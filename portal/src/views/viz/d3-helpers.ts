@@ -34,8 +34,9 @@ export function appendUnitOfMeasureLabel(svg: d3, unitOfMeasure: string, layout:
         .attr("id", "uom")
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
-        .attr("fill", "#2C3E50")
-        .attr("y", 17)
+        .attr("fill", "#7F7F7F")
+        .style("font-size", "10px")
+        .attr("y", 19)
         .attr("x", unitOfMeasure.length / 2 - (layout.height - (layout.margins.bottom + layout.margins.top)) / 2)
         .text(unitOfMeasure);
 }
