@@ -26,7 +26,7 @@ type ParsedMessage struct {
 	deviceName string
 	data       []*ParsedReading
 	receivedAt time.Time
-	schema     *WebHookSchema
+	schema     *MessageSchema
 	schemaID   int32
 	ownerID    int32
 }
@@ -121,7 +121,7 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 	return "", fmt.Errorf("query returned nothing '%s': %v", query, err)
 }
 
-func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[int32]*WebHookSchemaRegistration) (p *ParsedMessage, err error) {
+func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[int32]*MessageSchemaRegistration) (p *ParsedMessage, err error) {
 	if m.SchemaID == nil {
 		return nil, fmt.Errorf("missing schema id")
 	}

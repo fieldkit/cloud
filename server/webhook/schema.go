@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type WebHookSchemaSensor struct {
+type MessageSchemaSensor struct {
 	Key        string `json:"key"`
 	Name       string `json:"name"`
 	Expression string `json:"expression"`
@@ -14,26 +14,26 @@ type WebHookSchemaSensor struct {
 	Location   bool   `json:"location"`
 }
 
-type WebHookSchemaModule struct {
+type MessageSchemaModule struct {
 	Key     string                 `json:"key"`
 	Name    string                 `json:"name"`
-	Sensors []*WebHookSchemaSensor `json:"sensors"`
+	Sensors []*MessageSchemaSensor `json:"sensors"`
 }
 
-type WebHookSchemaStation struct {
+type MessageSchemaStation struct {
 	Key                  string                 `json:"key"`
 	Model                string                 `json:"model"`
 	IdentifierExpression string                 `json:"identifier"`
 	NameExpression       string                 `json:"name"`
 	ReceivedExpression   string                 `json:"received"`
-	Modules              []*WebHookSchemaModule `json:"modules"`
+	Modules              []*MessageSchemaModule `json:"modules"`
 }
 
-type WebHookSchema struct {
-	Station WebHookSchemaStation `json:"station"`
+type MessageSchema struct {
+	Station MessageSchemaStation `json:"station"`
 }
 
-type WebHookSchemaRegistration struct {
+type MessageSchemaRegistration struct {
 	ID              int32      `db:"id"`
 	OwnerID         int32      `db:"owner_id"`
 	Name            string     `db:"name"`
@@ -44,8 +44,8 @@ type WebHookSchemaRegistration struct {
 	ProcessInterval *int32     `db:"process_interval"`
 }
 
-func (r *WebHookSchemaRegistration) Parse() (*WebHookSchema, error) {
-	s := &WebHookSchema{}
+func (r *MessageSchemaRegistration) Parse() (*MessageSchema, error) {
+	s := &MessageSchema{}
 	if err := json.Unmarshal(r.Body, s); err != nil {
 		return nil, fmt.Errorf("error parsing schema-id %d: %v", r.ID, err)
 	}

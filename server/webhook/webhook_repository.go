@@ -30,7 +30,7 @@ func NewWebHookMessagesRepository(db *sqlxcache.DB) (rr *WebHookMessagesReposito
 
 type MessageBatch struct {
 	Messages  []*WebHookMessage
-	Schemas   map[int32]*WebHookSchemaRegistration
+	Schemas   map[int32]*MessageSchemaRegistration
 	StartTime time.Time
 	page      int32
 }

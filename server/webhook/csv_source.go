@@ -41,7 +41,7 @@ func (s *CsvMessageSource) NextBatch(ctx context.Context, batch *MessageBatch) e
 	}
 
 	if batch.Messages == nil {
-		batch.Schemas = make(map[int32]*WebHookSchemaRegistration)
+		batch.Schemas = make(map[int32]*MessageSchemaRegistration)
 		batch.Messages = make([]*WebHookMessage, 0)
 	} else {
 		batch.Messages = batch.Messages[:0]
