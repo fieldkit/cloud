@@ -25,20 +25,21 @@ func NewDatabaseMessageSource(db *sqlxcache.DB, schemaID int32) *DatabaseMessage
 }
 
 func (s *DatabaseMessageSource) NextBatch(ctx context.Context, batch *MessageBatch) error {
-	repository := NewWebHookMessagesRepository(s.db)
+	schemas := NewMessageSchemaRepository(s.db)
+	messages := NewWebHookMessagesRepository(s.db)
 
 	if s.schemaID > 0 {
 		if !s.started {
-			if err := repository.StartProcessingSchema(ctx, s.schemaID); err != nil {
+			if err := schemas.StartProcessingSchema(ctx, s.schemaID); err != nil {
 				return err
 			}
 			s.started = true
 		}
 
-		return repository.QueryBatchBySchemaIDForProcessing(ctx, batch, s.schemaID)
+		return messages.QueryBatchBySchemaIDForProcessing(ctx, batch, s.schemaID)
 	}
 
-	return repository.QueryBatchForProcessing(ctx, batch)
+	return messages.QueryBatchForProcessing(ctx, batch)
 }
 
 type EmptySource struct {

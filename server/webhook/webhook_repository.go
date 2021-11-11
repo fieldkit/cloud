@@ -3,7 +3,6 @@ package webhook
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/conservify/sqlxcache"
@@ -36,61 +35,6 @@ type MessageBatch struct {
 	page      int32
 }
 
-func (rr *WebHookMessagesRepository) QuerySchemasPendingProcessing(ctx context.Context) ([]*WebHookSchemaRegistration, error) {
-	schemas := []*WebHookSchemaRegistration{}
-	if err := rr.db.SelectContext(ctx, &schemas, `
-		SELECT * FROM fieldkit.ttn_schema WHERE 
-			received_at IS NOT NULL AND
-			process_interval > 0 AND
-			(
-				processed_at IS NULL OR
-				(
-					NOW() > (processed_at + (process_interval * interval '1 second')) AND
-					received_at > processed_at
-				)
-			)
-	`); err != nil {
-		return nil, err
-	}
-	return schemas, nil
-}
-
-func (rr *WebHookMessagesRepository) StartProcessingSchema(ctx context.Context, schemaID int32) error {
-	schemas := []*WebHookSchemaRegistration{}
-	if err := rr.db.SelectContext(ctx, &schemas, `UPDATE fieldkit.ttn_schema SET processed_at = NOW() WHERE id = $1`, schemaID); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (rr *WebHookMessagesRepository) QuerySchemas(ctx context.Context, batch *MessageBatch) (map[int32]*WebHookSchemaRegistration, error) {
-	log := Logger(ctx).Sugar()
-
-	if batch.Schemas == nil {
-		batch.Schemas = make(map[int32]*WebHookSchemaRegistration)
-	}
-
-	for _, m := range batch.Messages {
-		if _, ok := batch.Schemas[*m.SchemaID]; !ok {
-			schemas := []*WebHookSchemaRegistration{}
-			if err := rr.db.SelectContext(ctx, &schemas, `SELECT * FROM fieldkit.ttn_schema WHERE id = $1`, m.SchemaID); err != nil {
-				return nil, err
-			}
-
-			if len(schemas) != 1 {
-				return nil, fmt.Errorf("unexpected number of schema registrations")
-			}
-
-			for _, schema := range schemas {
-				batch.Schemas[schema.ID] = schema
-				log.Infow("loading schema", "schema_id", schema.ID)
-			}
-		}
-	}
-
-	return batch.Schemas, nil
-}
-
 func (rr *WebHookMessagesRepository) processQuery(ctx context.Context, batch *MessageBatch, messages []*WebHookMessage) error {
 	batch.Messages = nil
 
@@ -101,7 +45,8 @@ func (rr *WebHookMessagesRepository) processQuery(ctx context.Context, batch *Me
 	batch.Messages = messages
 	batch.page += 1
 
-	_, err := rr.QuerySchemas(ctx, batch)
+	schemas := NewMessageSchemaRepository(rr.db)
+	_, err := schemas.QuerySchemas(ctx, batch)
 	if err != nil {
 		return err
 	}

@@ -43,7 +43,7 @@ func (i *WebHookIngestion) processBatches(ctx context.Context, batch *MessageBat
 
 	aggregators := make(map[int32]*handlers.Aggregator)
 
-	mr := NewWebHookMessagesRepository(i.db)
+	schemas := NewMessageSchemaRepository(i.db)
 
 	for {
 		batchLog := Logger(ctx).Sugar()
@@ -62,7 +62,7 @@ func (i *WebHookIngestion) processBatches(ctx context.Context, batch *MessageBat
 
 		batchLog.Infow("batch")
 
-		_, err := mr.QuerySchemas(ctx, batch)
+		_, err := schemas.QuerySchemas(ctx, batch)
 		if err != nil {
 			return fmt.Errorf("message schemas (%v)", err)
 		}
