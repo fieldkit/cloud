@@ -91,7 +91,7 @@ import SelectField from "@/views/shared/SelectField.vue";
 import { required, email } from "vuelidate/lib/validators";
 import * as ActionTypes from "@/store/actions";
 import { mapState } from "vuex";
-import {CurrentUser, GlobalState} from "@/store";
+import { CurrentUser, GlobalState } from "@/store";
 
 export default Vue.extend({
     name: "TeamManager",
@@ -161,8 +161,8 @@ export default Vue.extend({
             user: (s: GlobalState) => s.user.user,
         }),
         users(): CurrentUser[] {
-            const loggedInUser = this.displayProject.users.filter((user) => user.user.id === this.user.id)[0];
-            const otherUsers = this.displayProject.users.filter((user) => user.user.id !== this.user.id);
+            const loggedInUser = this.displayProject.users.filter((user) => user.user.id === this.user?.id)[0];
+            const otherUsers = this.displayProject.users.filter((user) => user.user.id !== this.user?.id);
             return [loggedInUser, ...otherUsers];
         },
     },
