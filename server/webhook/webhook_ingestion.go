@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/conservify/sqlxcache"
@@ -25,29 +26,13 @@ func NewWebHookIngestion(db *sqlxcache.DB) *WebHookIngestion {
 	}
 }
 
-func (i *WebHookIngestion) ProcessSchema(ctx context.Context, schemaID int32, startTime time.Time) error {
-	repository := NewWebHookMessagesRepository(i.db)
-
-	if err := repository.StartProcessingSchema(ctx, schemaID); err != nil {
-		return err
-	}
-
+func (i *WebHookIngestion) ProcessSource(ctx context.Context, source MessageSource, startTime time.Time) error {
 	batch := &MessageBatch{
 		StartTime: startTime,
 	}
 
 	return i.processBatches(ctx, batch, func(ctx context.Context, batch *MessageBatch) error {
-		return repository.QueryBatchBySchemaIDForProcessing(ctx, batch, schemaID)
-	})
-}
-
-func (i *WebHookIngestion) ProcessAll(ctx context.Context) error {
-	repository := NewWebHookMessagesRepository(i.db)
-
-	batch := &MessageBatch{}
-
-	return i.processBatches(ctx, batch, func(ctx context.Context, batch *MessageBatch) error {
-		return repository.QueryBatchForProcessing(ctx, batch)
+		return source.NextBatch(ctx, batch)
 	})
 }
 
@@ -62,7 +47,8 @@ func (i *WebHookIngestion) processBatches(ctx context.Context, batch *MessageBat
 		batchLog := Logger(ctx).Sugar()
 
 		if err := query(ctx, batch); err != nil {
-			if err == sql.ErrNoRows {
+			if err == sql.ErrNoRows || err == io.EOF {
+				batchLog.Infow("eof")
 				return nil
 			}
 			return err
