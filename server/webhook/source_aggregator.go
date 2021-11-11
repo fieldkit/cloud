@@ -37,7 +37,7 @@ func (i *SourceAggregator) ProcessSource(ctx context.Context, source MessageSour
 }
 
 func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBatch, query func(ctx context.Context, batch *MessageBatch) error) error {
-	model := NewWebHookModel(i.db)
+	model := NewModelAdapter(i.db)
 
 	jqCache := &JqCache{}
 

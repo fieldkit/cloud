@@ -23,15 +23,15 @@ type cacheEntry struct {
 	station *WebHookStation
 }
 
-type WebHookModel struct {
+type ModelAdapter struct {
 	db    *sqlxcache.DB
 	pr    *repositories.ProvisionRepository
 	sr    *repositories.StationRepository
 	cache map[string]*cacheEntry
 }
 
-func NewWebHookModel(db *sqlxcache.DB) (m *WebHookModel) {
-	return &WebHookModel{
+func NewModelAdapter(db *sqlxcache.DB) (m *ModelAdapter) {
+	return &ModelAdapter{
 		db:    db,
 		pr:    repositories.NewProvisionRepository(db),
 		sr:    repositories.NewStationRepository(db),
@@ -47,7 +47,7 @@ type WebHookStation struct {
 	SensorPrefix  string
 }
 
-func (m *WebHookModel) Save(ctx context.Context, pm *ParsedMessage) (*WebHookStation, error) {
+func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookStation, error) {
 	deviceKey := hex.EncodeToString(pm.deviceID)
 
 	cached, ok := m.cache[deviceKey]
@@ -152,7 +152,7 @@ func (m *WebHookModel) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
 }
 
-func (m *WebHookModel) updateLinkedFields(ctx context.Context, station *WebHookStation, pm *ParsedMessage) (*WebHookStation, error) {
+func (m *ModelAdapter) updateLinkedFields(ctx context.Context, station *WebHookStation, pm *ParsedMessage) (*WebHookStation, error) {
 	for _, parsedReading := range pm.data {
 		if parsedReading.Battery {
 			// TODO This is very wasteful when doing bulk processing.
