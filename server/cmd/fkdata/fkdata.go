@@ -257,7 +257,7 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 	end := time.Now()
 	interval := time.Minute * 1
 
-	aggregator := handlers.NewAggregator(db, "", stationID, 1000)
+	aggregator := handlers.NewAggregator(db, "", stationID, 1000, handlers.NewDefaultAggregatorConfig())
 
 	sinFunc := func(period int64) SampleFunc {
 		return func(t time.Time) float64 {

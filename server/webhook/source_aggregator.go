@@ -41,6 +41,8 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 
 	jqCache := &JqCache{}
 
+	config := handlers.NewDefaultAggregatorConfig()
+
 	aggregators := make(map[int32]*handlers.Aggregator)
 
 	schemas := NewMessageSchemaRepository(i.db)
@@ -82,7 +84,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 					return err
 				} else {
 					if aggregators[saved.Station.ID] == nil {
-						aggregators[saved.Station.ID] = handlers.NewAggregator(i.db, "", saved.Station.ID, AggregatingBatchSize)
+						aggregators[saved.Station.ID] = handlers.NewAggregator(i.db, "", saved.Station.ID, AggregatingBatchSize, config)
 					}
 					aggregator := aggregators[saved.Station.ID]
 

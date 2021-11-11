@@ -40,6 +40,24 @@ var (
 	}
 )
 
+type AggregationFunction interface {
+	Apply(values []float64) (float64, error)
+}
+
+type AverageFunction struct {
+}
+
+func (f *AverageFunction) Apply(values []float64) (float64, error) {
+	return stats.Mean(values)
+}
+
+type MaximumFunction struct {
+}
+
+func (f *MaximumFunction) Apply(values []float64) (float64, error) {
+	return stats.Mean(values)
+}
+
 type AggregateSensorKey struct {
 	SensorKey string
 	ModuleID  int64
@@ -52,6 +70,7 @@ type aggregation struct {
 	table    string
 	values   map[AggregateSensorKey][]float64
 	location []float64
+	config   AggregatorConfig
 }
 
 type Aggregated struct {
@@ -101,12 +120,12 @@ func (a *aggregation) close() (*Aggregated, error) {
 
 	for key, values := range a.values {
 		if len(values) > 0 {
-			mean, err := stats.Mean(values)
+			aggregated_value, err := a.config.Apply(key, values)
 			if err != nil {
 				return nil, fmt.Errorf("error taking mean: %v", err)
 			}
 
-			agg[key] = mean
+			agg[key] = aggregated_value
 
 			if len(values) > nsamples {
 				nsamples = len(values)
@@ -138,7 +157,21 @@ type Aggregator struct {
 	batches      [][]*Aggregated
 }
 
-func NewAggregator(db *sqlxcache.DB, tableSuffix string, stationID int32, batchSize int) *Aggregator {
+type AggregatorConfig interface {
+	Apply(sensorKey AggregateSensorKey, values []float64) (float64, error)
+}
+
+type defaultAggregatorConfig struct{}
+
+func NewDefaultAggregatorConfig() *defaultAggregatorConfig {
+	return &defaultAggregatorConfig{}
+}
+
+func (c *defaultAggregatorConfig) Apply(sensorKey AggregateSensorKey, values []float64) (float64, error) {
+	return stats.Mean(values)
+}
+
+func NewAggregator(db *sqlxcache.DB, tableSuffix string, stationID int32, batchSize int, config AggregatorConfig) *Aggregator {
 	return &Aggregator{
 		db:        db,
 		stationID: stationID,
@@ -159,48 +192,56 @@ func NewAggregator(db *sqlxcache.DB, tableSuffix string, stationID int32, batchS
 				name:     "10s",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_10s", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
+				config:   config,
 			},
 			&aggregation{
 				interval: time.Minute * 1,
 				name:     "1m",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_1m", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
+				config:   config,
 			},
 			&aggregation{
 				interval: time.Minute * 10,
 				name:     "10m",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_10m", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
+				config:   config,
 			},
 			&aggregation{
 				interval: time.Minute * 30,
 				name:     "30m",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_30m", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
+				config:   config,
 			},
 			&aggregation{
 				interval: time.Hour * 1,
 				name:     "1h",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_1h", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
+				config:   config,
 			},
 			&aggregation{
 				interval: time.Hour * 6,
 				name:     "6h",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_6h", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
+				config:   config,
 			},
 			&aggregation{
 				interval: time.Hour * 12,
 				name:     "12h",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_12h", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
+				config:   config,
 			},
 			&aggregation{
 				interval: time.Hour * 24,
 				name:     "24h",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_24h", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
+				config:   config,
 			},
 		},
 	}
