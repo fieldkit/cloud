@@ -17,8 +17,8 @@ import (
 
 type Options struct {
 	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
+	File        string
 	SchemaID    int
-	Recently    bool
 }
 
 func process(ctx context.Context, options *Options) error {
@@ -31,16 +31,23 @@ func process(ctx context.Context, options *Options) error {
 		return err
 	}
 
-	ingestion := webhook.NewWebHookIngestion(db)
+	source_aggregator := webhook.NewSourceAggregator(db)
+	startTime := time.Time{}
 
-	if options.SchemaID > 0 {
-		startTime := time.Now().Add(time.Hour * -webhook.WebHookRecentWindowHours)
+	var source webhook.MessageSource
 
-		if err := ingestion.ProcessSchema(ctx, int32(options.SchemaID), startTime); err != nil {
-			return err
-		}
+	if options.File != "" && options.SchemaID > 0 {
+		source = webhook.NewCsvMessageSource(options.File, int32(options.SchemaID))
 	} else {
-		if err := ingestion.ProcessAll(ctx); err != nil {
+		if options.SchemaID > 0 {
+			source = webhook.NewDatabaseMessageSource(db, int32(options.SchemaID))
+		} else {
+			source = webhook.NewDatabaseMessageSource(db, int32(-1))
+		}
+	}
+
+	if source != nil {
+		if err := source_aggregator.ProcessSource(ctx, source, startTime); err != nil {
 			return err
 		}
 	}
@@ -52,10 +59,15 @@ func main() {
 	ctx := context.Background()
 	options := &Options{}
 
-	flag.BoolVar(&options.Recently, "recently", false, "recently inserted data")
+	flag.StringVar(&options.File, "file", "", "csv file")
 	flag.IntVar(&options.SchemaID, "schema-id", 0, "schema id to process")
 
 	flag.Parse()
+
+	if options.File != "" && options.SchemaID == 0 {
+		flag.PrintDefaults()
+		return
+	}
 
 	logging.Configure(false, "webhook")
 

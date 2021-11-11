@@ -21,11 +21,13 @@ func NewProcessSchemaHandler(db *sqlxcache.DB, metrics *logging.Metrics, publish
 }
 
 func (h *ProcessSchemaHandler) Handle(ctx context.Context, m *ProcessSchema) error {
-	ingestion := NewWebHookIngestion(h.db)
+	source_aggregator := NewSourceAggregator(h.db)
 
 	startTime := time.Now().Add(time.Hour * -WebHookRecentWindowHours)
 
-	if err := ingestion.ProcessSchema(ctx, m.SchemaID, startTime); err != nil {
+	source := NewDatabaseMessageSource(h.db, m.SchemaID)
+
+	if err := source_aggregator.ProcessSource(ctx, source, startTime); err != nil {
 		return err
 
 	}

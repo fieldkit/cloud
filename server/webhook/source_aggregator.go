@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/conservify/sqlxcache"
@@ -15,54 +16,41 @@ const (
 	AggregatingBatchSize = 100
 )
 
-type WebHookIngestion struct {
+type SourceAggregator struct {
 	db *sqlxcache.DB
 }
 
-func NewWebHookIngestion(db *sqlxcache.DB) *WebHookIngestion {
-	return &WebHookIngestion{
+func NewSourceAggregator(db *sqlxcache.DB) *SourceAggregator {
+	return &SourceAggregator{
 		db: db,
 	}
 }
 
-func (i *WebHookIngestion) ProcessSchema(ctx context.Context, schemaID int32, startTime time.Time) error {
-	repository := NewWebHookMessagesRepository(i.db)
-
-	if err := repository.StartProcessingSchema(ctx, schemaID); err != nil {
-		return err
-	}
-
+func (i *SourceAggregator) ProcessSource(ctx context.Context, source MessageSource, startTime time.Time) error {
 	batch := &MessageBatch{
 		StartTime: startTime,
 	}
 
 	return i.processBatches(ctx, batch, func(ctx context.Context, batch *MessageBatch) error {
-		return repository.QueryBatchBySchemaIDForProcessing(ctx, batch, schemaID)
+		return source.NextBatch(ctx, batch)
 	})
 }
 
-func (i *WebHookIngestion) ProcessAll(ctx context.Context) error {
-	repository := NewWebHookMessagesRepository(i.db)
-
-	batch := &MessageBatch{}
-
-	return i.processBatches(ctx, batch, func(ctx context.Context, batch *MessageBatch) error {
-		return repository.QueryBatchForProcessing(ctx, batch)
-	})
-}
-
-func (i *WebHookIngestion) processBatches(ctx context.Context, batch *MessageBatch, query func(ctx context.Context, batch *MessageBatch) error) error {
-	model := NewWebHookModel(i.db)
+func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBatch, query func(ctx context.Context, batch *MessageBatch) error) error {
+	model := NewModelAdapter(i.db)
 
 	jqCache := &JqCache{}
 
 	aggregators := make(map[int32]*handlers.Aggregator)
 
+	schemas := NewMessageSchemaRepository(i.db)
+
 	for {
 		batchLog := Logger(ctx).Sugar()
 
 		if err := query(ctx, batch); err != nil {
-			if err == sql.ErrNoRows {
+			if err == sql.ErrNoRows || err == io.EOF {
+				batchLog.Infow("eof")
 				return nil
 			}
 			return err
@@ -73,6 +61,11 @@ func (i *WebHookIngestion) processBatches(ctx context.Context, batch *MessageBat
 		}
 
 		batchLog.Infow("batch")
+
+		_, err := schemas.QuerySchemas(ctx, batch)
+		if err != nil {
+			return fmt.Errorf("message schemas (%v)", err)
+		}
 
 		for _, row := range batch.Messages {
 			rowLog := Logger(ctx).Sugar().With("schema_id", row.SchemaID).With("message_id", row.ID)

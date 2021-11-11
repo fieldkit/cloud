@@ -31,8 +31,8 @@ func (c *TasksService) Five(ctx context.Context) error {
 
 	log.Infow("updated community rankings")
 
-	rr := webhook.NewWebHookMessagesRepository(c.options.Database)
-	schemas, err := rr.QuerySchemasPendingProcessing(ctx)
+	sr := webhook.NewMessageSchemaRepository(c.options.Database)
+	schemas, err := sr.QuerySchemasPendingProcessing(ctx)
 	if err != nil {
 		return err
 	}
