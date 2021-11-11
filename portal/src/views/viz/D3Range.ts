@@ -124,16 +124,6 @@ export const D3Range = Vue.extend({
                 )
                 .call(yAxis);
 
-            svg.select("#uom").remove();
-            svg.append("text")
-                .attr("id", "uom")
-                .attr("text-anchor", "middle")
-                .attr("transform", "rotate(-90)")
-                .attr("fill", "#2C3E50")
-                .attr("y", 17)
-                .attr("x", vizInfo.unitOfMeasure.length / 2 - (layout.height - (layout.margins.bottom + layout.margins.top)) / 2)
-                .text(vizInfo.unitOfMeasure);
-
             const defs = svg
                 .selectAll("defs")
                 .data(charts)
