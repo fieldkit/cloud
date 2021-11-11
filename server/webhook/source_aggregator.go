@@ -5,9 +5,12 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/conservify/sqlxcache"
+
+	"github.com/montanaflynn/stats"
 
 	"github.com/fieldkit/cloud/server/backend/handlers"
 )
@@ -18,6 +21,33 @@ const (
 
 type SourceAggregator struct {
 	db *sqlxcache.DB
+}
+
+type sourceAggregatorConfig struct {
+}
+
+func NewSourceAggregatorConfig() *sourceAggregatorConfig {
+	return &sourceAggregatorConfig{}
+}
+
+func MaxValue(values []float64) float64 {
+	max := values[0]
+	for _, v := range values[1:] {
+		if v > max {
+			max = v
+		}
+	}
+	return max
+}
+
+func (c *sourceAggregatorConfig) Apply(key handlers.AggregateSensorKey, values []float64) (float64, error) {
+	if strings.HasSuffix(key.SensorKey, ".depth") {
+		if len(values) == 0 {
+			return 0, fmt.Errorf("aggregating empty slice")
+		}
+		return MaxValue(values), nil
+	}
+	return stats.Mean(values)
 }
 
 func NewSourceAggregator(db *sqlxcache.DB) *SourceAggregator {
@@ -41,7 +71,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 
 	jqCache := &JqCache{}
 
-	config := handlers.NewDefaultAggregatorConfig()
+	config := NewSourceAggregatorConfig()
 
 	aggregators := make(map[int32]*handlers.Aggregator)
 
