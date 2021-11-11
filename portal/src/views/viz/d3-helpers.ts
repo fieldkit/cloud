@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import { ChartLayout } from "@/views/viz/common";
 
 export type ColorScale = any;
 
@@ -25,4 +26,17 @@ export function createSensorColorScale(sensor: SensorDetails | null): ColorScale
         .scaleSequential()
         .domain([range.minimum, range.maximum])
         .interpolator(d3.interpolatePlasma);
+}
+
+export function appendUnitOfMeasureLabel(svg: d3, unitOfMeasure: string, layout: ChartLayout): void {
+    svg.select("#uom").remove();
+    svg.append("text")
+        .attr("id", "uom")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("fill", "#7F7F7F")
+        .style("font-size", "10px")
+        .attr("y", 19)
+        .attr("x", unitOfMeasure.length / 2 - (layout.height - (layout.margins.bottom + layout.margins.top)) / 2)
+        .text(unitOfMeasure);
 }

@@ -756,7 +756,7 @@ func init() {
 				&SensorMeta{
 					Key:           "depth",
 					FirmwareKey:   "depth",
-					UnitOfMeasure: "mm",
+					UnitOfMeasure: "inches",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -768,6 +768,7 @@ func init() {
 					Key:           "distance",
 					FirmwareKey:   "distance",
 					UnitOfMeasure: "mm",
+					Internal:      true,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,

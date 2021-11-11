@@ -4,6 +4,7 @@ import * as d3 from "d3";
 
 import { TimeRange, Margins, ChartLayout } from "./common";
 import { Graph, QueriedData, Workspace, FastTime, TimeZoom } from "./viz";
+import { appendUnitOfMeasureLabel } from "./d3-helpers";
 
 export const D3TimeSeriesGraph = Vue.extend({
     name: "D3TimeSeriesGraph",
@@ -78,7 +79,7 @@ export const D3TimeSeriesGraph = Vue.extend({
             type FormatFunctionType = (date: Date) => string;
 
             function formatTick(date: Date, tick: number, els: { __data__: Date }[], state: { f: FormatFunctionType | null }) {
-                let spec = "%-m/%-d %-H:%M";
+                let spec = "%-m/%-d/%-Y %-H:%M";
 
                 if (tick == 0) {
                     const allTicks = els.map((el) => el.__data__);
@@ -295,6 +296,8 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .attr("cx", (d) => x(d.time))
                 .attr("cy", (d) => y(d.value))
                 .attr("fill", (d) => colors(d.value));
+
+            appendUnitOfMeasureLabel(svg, vizInfo.unitOfMeasure, layout);
         },
     },
     template: `<div class="viz time-series-graph"><div class="chart" @dblclick="onDouble"></div></div>`,

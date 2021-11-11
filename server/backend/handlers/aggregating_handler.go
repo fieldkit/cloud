@@ -53,7 +53,7 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 			return nil
 		}
 
-		aggregator := NewAggregator(v.db, v.tableSuffix, station.ID, 100)
+		aggregator := NewAggregator(v.db, v.tableSuffix, station.ID, 100, NewDefaultAggregatorConfig())
 
 		if _, ok := v.seen[station.ID]; !ok {
 			if v.completely {

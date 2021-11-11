@@ -63,6 +63,9 @@ export default Vue.extend({
     },
     beforeRouteEnter(to, from, next) {
         next((vm: any) => {
+            if (from.name === "exploreBookmark" || from.name === "exportBookmark") {
+                return;
+            }
             vm.backRoute = from.name ? from.name : "mapAllStations";
             vm.backRouteParams.id = from.params.id;
         });
@@ -171,8 +174,17 @@ export default Vue.extend({
 .graph .x-axis {
     color: #7f7f7f;
 }
+
 .graph .y-axis {
     color: #7f7f7f;
+}
+
+.graph .x-axis text {
+    font-size: 7pt;
+}
+
+.graph .y-axis text {
+    font-size: 7pt;
 }
 
 .explore-view {

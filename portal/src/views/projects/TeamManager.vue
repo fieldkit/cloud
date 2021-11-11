@@ -10,7 +10,7 @@
                 <div class="cell-heading"></div>
                 <div class="cell"></div>
             </div>
-            <div class="user-row" v-for="projectUser in displayProject.users" v-bind:key="projectUser.user.email">
+            <div class="user-row" v-for="projectUser in users" v-bind:key="projectUser.user.email">
                 <div class="cell">
                     <UserPhoto :user="projectUser.user" />
                     <div>
@@ -91,7 +91,7 @@ import SelectField from "@/views/shared/SelectField.vue";
 import { required, email } from "vuelidate/lib/validators";
 import * as ActionTypes from "@/store/actions";
 import { mapState } from "vuex";
-import { GlobalState } from "@/store";
+import { CurrentUser, GlobalState } from "@/store";
 
 export default Vue.extend({
     name: "TeamManager",
@@ -160,6 +160,11 @@ export default Vue.extend({
         ...mapState({
             user: (s: GlobalState) => s.user.user,
         }),
+        users(): CurrentUser[] {
+            const loggedInUser = this.displayProject.users.filter((user) => user.user.id === this.user?.id)[0];
+            const otherUsers = this.displayProject.users.filter((user) => user.user.id !== this.user?.id);
+            return [loggedInUser, ...otherUsers];
+        },
     },
     methods: {
         checkEmail(this: any) {
@@ -267,6 +272,7 @@ export default Vue.extend({
     background-color: #ffffff;
     cursor: pointer;
 }
+
 .user-row {
     display: grid;
     font-size: 13px;
@@ -334,6 +340,7 @@ export default Vue.extend({
         }
     }
 }
+
 .user-row .cell {
     @include flex(center);
     line-height: 1.23;
@@ -345,10 +352,12 @@ export default Vue.extend({
         }
     }
 }
+
 .invite-status {
     color: #0a67aa;
     font-family: $font-family-normal !important;
 }
+
 .cell .text-input {
     border: none;
     border-radius: 5px;
@@ -359,6 +368,7 @@ export default Vue.extend({
     flex: 1;
     padding-right: 10px;
 }
+
 .cell .validation-error {
     color: #c42c44;
     display: block;
@@ -367,9 +377,11 @@ export default Vue.extend({
         padding: 0 0 8px 42px;
     }
 }
+
 .cell .remove-button {
     cursor: pointer;
 }
+
 ::v-deep .cell.role {
     margin-right: 1em;
 
@@ -378,12 +390,15 @@ export default Vue.extend({
         font-size: 13px;
     }
 }
+
 .users-container .user-icon {
     float: left;
 }
+
 .name {
     font-size: 14px;
 }
+
 .email {
     color: #818181;
 }
