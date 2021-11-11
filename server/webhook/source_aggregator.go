@@ -16,17 +16,17 @@ const (
 	AggregatingBatchSize = 100
 )
 
-type WebHookIngestion struct {
+type SourceAggregator struct {
 	db *sqlxcache.DB
 }
 
-func NewWebHookIngestion(db *sqlxcache.DB) *WebHookIngestion {
-	return &WebHookIngestion{
+func NewSourceAggregator(db *sqlxcache.DB) *SourceAggregator {
+	return &SourceAggregator{
 		db: db,
 	}
 }
 
-func (i *WebHookIngestion) ProcessSource(ctx context.Context, source MessageSource, startTime time.Time) error {
+func (i *SourceAggregator) ProcessSource(ctx context.Context, source MessageSource, startTime time.Time) error {
 	batch := &MessageBatch{
 		StartTime: startTime,
 	}
@@ -36,7 +36,7 @@ func (i *WebHookIngestion) ProcessSource(ctx context.Context, source MessageSour
 	})
 }
 
-func (i *WebHookIngestion) processBatches(ctx context.Context, batch *MessageBatch, query func(ctx context.Context, batch *MessageBatch) error) error {
+func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBatch, query func(ctx context.Context, batch *MessageBatch) error) error {
 	model := NewWebHookModel(i.db)
 
 	jqCache := &JqCache{}

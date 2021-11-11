@@ -31,7 +31,7 @@ func process(ctx context.Context, options *Options) error {
 		return err
 	}
 
-	ingestion := webhook.NewWebHookIngestion(db)
+	source_aggregator := webhook.NewSourceAggregator(db)
 	startTime := time.Time{}
 
 	var source webhook.MessageSource
@@ -47,7 +47,7 @@ func process(ctx context.Context, options *Options) error {
 	}
 
 	if source != nil {
-		if err := ingestion.ProcessSource(ctx, source, startTime); err != nil {
+		if err := source_aggregator.ProcessSource(ctx, source, startTime); err != nil {
 			return err
 		}
 	}
