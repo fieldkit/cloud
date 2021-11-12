@@ -246,7 +246,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .defined((d) => _.isNumber(d.value))
                 .x((d) => x(d.time))
                 .y((d) => y(d.value))
-                .curve(d3.curveBasis);
+                .curve(d3.curveMonotoneX);
 
             line.selectAll(".bkgd-line")
                 .data(charts)
