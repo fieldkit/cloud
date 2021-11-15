@@ -37,8 +37,8 @@
                             </template>
                         </td>
                         <td class="location">
-                            <div v-if="station.location">
-                                {{ station.location.latitude | prettyCoordinate }}, {{ station.location.longitude | prettyCoordinate }}
+                            <div v-if="station.location && station.location.precise">
+                                {{ station.location.precise[1] | prettyCoordinate }}, {{ station.location.precise[0] | prettyCoordinate }}
                             </div>
                         </td>
                         <td>
