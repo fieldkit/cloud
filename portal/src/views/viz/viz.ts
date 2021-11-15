@@ -708,17 +708,13 @@ export class Workspace {
         const group = this.findGroup(viz);
         if (group.vizes.length > 1) {
             group.remove(viz);
-            this.groups.forEach((groupItem, index) => {
+            this.groups.forEach((groupItem, groupIndex) => {
                 if (groupItem.id === group.id) {
                     if (this.groups.length === 1) {
-                        this.groups.unshift(new Group([viz]));
-                        return;
-                    }
-                    if (index === this.groups.length - 1 && groupItem.vizes.length > 1) {
                         this.groups.push(new Group([viz]));
                         return;
                     }
-                    this.groups.splice(index + 1, 0, new Group([viz]));
+                    this.groups.splice(groupIndex + 1, 0, new Group([viz]));
                 }
             });
         } else {
