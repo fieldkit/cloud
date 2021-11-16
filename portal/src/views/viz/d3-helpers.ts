@@ -40,3 +40,16 @@ export function appendUnitOfMeasureLabel(svg: d3, unitOfMeasure: string, layout:
         .attr("x", unitOfMeasure.length / 2 - (layout.height - (layout.margins.bottom + layout.margins.top)) / 2)
         .text(unitOfMeasure);
 }
+
+export function appendTimeLabel(svg: d3, layout: ChartLayout): void {
+    const text = 'Time (Days)'
+    svg.select("#time").remove();
+    svg.append("text")
+        .attr("id", "time")
+        .attr("text-anchor", "middle")
+        .attr("fill", "#7F7F7F")
+        .style("font-size", "10px")
+        .attr("y", layout.height - 17)
+        .attr("x", (layout.width - 0) / 2)
+        .text(text);
+}
