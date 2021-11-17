@@ -4,7 +4,7 @@ import * as d3 from "d3";
 
 import { TimeRange, Margins, ChartLayout } from "./common";
 import { Graph, QueriedData, Workspace, FastTime, TimeZoom } from "./viz";
-import { appendTimeLabel, appendUnitOfMeasureLabel, getMaxDigitsForData } from "./d3-helpers";
+import { appendXAxisLabel, appendYAxisLabel, getMaxDigitsForData } from "./d3-helpers";
 
 export const D3TimeSeriesGraph = Vue.extend({
     name: "D3TimeSeriesGraph",
@@ -303,8 +303,9 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .attr("cy", (d) => y(d.value))
                 .attr("fill", (d) => colors(d.value));
 
-            appendUnitOfMeasureLabel(svg, vizInfo.unitOfMeasure, layout);
-            appendTimeLabel(svg, layout);
+            const yLabel = _.capitalize(vizInfo.firmwareKey) + ' (' + _.capitalize(vizInfo.unitOfMeasure) + ')';
+            appendYAxisLabel(svg, yLabel, layout);
+            appendXAxisLabel(svg, layout);
         },
     },
     template: `<div class="viz time-series-graph"><div class="chart" @dblclick="onDouble"></div></div>`,

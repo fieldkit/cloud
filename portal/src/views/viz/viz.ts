@@ -96,7 +96,8 @@ export class VizInfo {
         public readonly key: string,
         public readonly colorScale: ColorScale,
         public readonly station: { name: string },
-        public readonly unitOfMeasure: string
+        public readonly unitOfMeasure: string,
+        public readonly firmwareKey: string
     ) {}
 }
 
@@ -573,9 +574,8 @@ export class Workspace {
         const key = keysById[sensorId].key;
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
-        const unitOfMeasure = details.fullKey === 'wh.floodnet.depth' ? 'Water Depth (inches)' : details.unitOfMeasure;
 
-        return new VizInfo(key, scale, station, unitOfMeasure);
+        return new VizInfo(key, scale, station, details.unitOfMeasure, details.firmwareKey);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {

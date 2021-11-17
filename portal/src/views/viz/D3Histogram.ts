@@ -4,7 +4,7 @@ import * as d3 from "d3";
 
 import { Time, TimeRange, Margins, ChartLayout } from "./common";
 import { Graph, QueriedData, Workspace } from "./viz";
-import { appendTimeLabel, appendUnitOfMeasureLabel, getMaxDigitsForData } from "@/views/viz/d3-helpers";
+import { appendXAxisLabel, appendYAxisLabel, getMaxDigitsForData } from "@/views/viz/d3-helpers";
 
 export const D3Histogram = Vue.extend({
     name: "D3Histogram",
@@ -145,8 +145,6 @@ export const D3Histogram = Vue.extend({
                 .attr("height", (d) => {
                     return d.length == 0 ? 0 : layout.height - y(d.length) - layout.margins.bottom - layout.margins.top;
                 });
-
-            appendUnitOfMeasureLabel(svg, vizInfo.unitOfMeasure, layout);
         },
     },
     template: `<div class="viz histogram"><div class="chart"></div></div>`,
