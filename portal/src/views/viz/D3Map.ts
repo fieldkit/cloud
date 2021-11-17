@@ -6,7 +6,7 @@ import { LngLatBounds } from "mapbox-gl";
 import * as d3 from "d3";
 
 import { Time, TimeRange, Margins, ChartLayout } from "./common";
-import { Graph, QueriedData, Workspace, GeoZoom } from "./viz";
+import { Graph, QueriedData, Workspace, GeoZoom, VizInfo } from "./viz";
 import { MapStore, Map } from "./MapStore";
 
 import Config from "@/secrets";
@@ -72,34 +72,47 @@ export const D3Map = Vue.extend({
             if (!this.getMap()) {
                 return false;
             }
-
-            const viewableData = this.data.data.filter((d) => d.location && d.location.length);
-
-            if (viewableData.length == 0) {
-                return false;
-            }
-
             return true;
+        },
+        getLocatedData(vizInfo: VizInfo): { value: number; location: [number, number] }[] {
+            const located = this.data?.data.filter((row) => row.location && row.location.length) as {
+                value: number;
+                location: [number, number];
+            }[];
+            if (located.length > 0) {
+                return located;
+            }
+            if (!vizInfo.station.location) {
+                return [];
+            }
+            return this.data?.data.map((row) => _.extend({}, row, { location: vizInfo.station.location })) as {
+                value: number;
+                location: [number, number];
+            }[];
         },
         refresh() {
             if (!this.ready()) {
                 return;
             }
+
             const map = this.getMap();
             if (!map) {
                 return;
             }
+
             const data = this.data?.data;
             if (!data) {
                 return;
             }
-            const located = data.filter((row) => row.location && row.location.length) as {
-                value: number;
-                location: [number, number];
-            }[];
+
             const vizInfo = this.workspace.vizInfo(this.viz);
+            const located = this.getLocatedData(vizInfo);
+            if (located.length == 0) {
+                console.log(`map-empty`);
+                return;
+            }
+
             const colors = vizInfo.colorScale;
-            const enabled = true;
 
             this.viz.log("map", map);
             this.viz.log("map-refresh: data", located.length);

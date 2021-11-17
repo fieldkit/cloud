@@ -22,7 +22,12 @@ export class SensorMeta {
 }
 
 export class StationMeta {
-    constructor(public readonly id: number, public readonly name: string, public readonly sensors: SensorMeta[]) {
+    constructor(
+        public readonly id: number,
+        public readonly name: string,
+        public readonly location: [number, number],
+        public readonly sensors: SensorMeta[]
+    ) {
         if (!this.id) throw new Error("id is required");
         if (!this.name) throw new Error("name is required");
         if (!this.sensors) throw new Error("sensors is required");
@@ -95,7 +100,7 @@ export class VizInfo {
     constructor(
         public readonly key: string,
         public readonly colorScale: ColorScale,
-        public readonly station: { name: string },
+        public readonly station: { name: string; location: [number, number] },
         public readonly unitOfMeasure: string
     ) {}
 }
@@ -538,7 +543,7 @@ export class Workspace {
                         const sensors = info.map(
                             (row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt)
                         );
-                        const station = new StationMeta(Number(stationId), stationName, sensors);
+                        const station = new StationMeta(Number(stationId), stationName, info[0].stationLocation, sensors);
                         this.stations[station.id] = station;
                         console.log("station-meta", { station, info });
                         return station;
