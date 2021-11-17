@@ -28,7 +28,7 @@ export function createSensorColorScale(sensor: SensorDetails | null): ColorScale
         .interpolator(d3.interpolatePlasma);
 }
 
-export function appendUnitOfMeasureLabel(svg: d3, unitOfMeasure: string, layout: ChartLayout): void {
+export function appendYAxisLabel(svg: d3, unitOfMeasure: string, layout: ChartLayout): void {
     const svgId = "d3-uom";
     svg.select("#" + svgId).remove();
     svg.append("text")
@@ -42,7 +42,7 @@ export function appendUnitOfMeasureLabel(svg: d3, unitOfMeasure: string, layout:
         .text(unitOfMeasure);
 }
 
-export function appendTimeLabel(svg: d3, layout: ChartLayout): void {
+export function appendXAxisLabel(svg: d3, layout: ChartLayout): void {
     const svgId = "d3-time";
     svg.select("#" + svgId).remove();
     svg.append("text")
@@ -52,7 +52,7 @@ export function appendTimeLabel(svg: d3, layout: ChartLayout): void {
         .style("font-size", "10px")
         .attr("y", layout.height - 20)
         .attr("x", layout.width / 2)
-        .text("Time (Days)");
+        .text("Time");
 }
 
 export function getMaxDigitsForData(dataRange: number[]) {
