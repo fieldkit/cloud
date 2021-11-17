@@ -573,8 +573,9 @@ export class Workspace {
         const key = keysById[sensorId].key;
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
+        const unitOfMeasure = details.fullKey === 'wh.floodnet.depth' ? 'Water Depth (inches)' : details.unitOfMeasure;
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure);
+        return new VizInfo(key, scale, station, unitOfMeasure);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {
