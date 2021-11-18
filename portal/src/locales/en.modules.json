@@ -118,6 +118,7 @@
                 "battery": "Battery",
                 "distance": "Distance",
                 "depth": "Depth",
+                "depth_unfiltered": "Depth (Unfiltered)",
                 "altitude": "Altitude",
                 "temperature": "Temperature",
                 "pressure": "Pressure",
