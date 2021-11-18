@@ -52,10 +52,18 @@ export const D3TimeSeriesGraph = Vue.extend({
         },
         refresh() {
             if (!this.data) {
+                this.viz.log("refresh: nothing");
                 return;
+            } else {
+                this.viz.log("refresh: data");
             }
 
-            d3.selectAll("svg").remove();
+            // Before this was a d3.selectAll().remove and would remove all the
+            // svg nodes in the DOM. This just removes the one here, though...
+            // why do we do this at all?
+            d3.select(this.$el)
+                .selectAll("svg")
+                .remove();
 
             const vizInfo = this.workspace.vizInfo(this.viz);
             const data = this.data;
@@ -71,6 +79,8 @@ export const D3TimeSeriesGraph = Vue.extend({
                     layout: layout,
                 },
             ];
+
+            console.log("viz-info", vizInfo);
 
             const x = d3
                 .scaleTime()
@@ -208,6 +218,8 @@ export const D3TimeSeriesGraph = Vue.extend({
                 { offset: "100%", color: colors(dataRange[1]) },
             ];
 
+            this.viz.log("distance", distance, stops);
+
             const line = svg
                 .selectAll(".d3-line")
                 .data(charts)
@@ -303,7 +315,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .attr("cy", (d) => y(d.value))
                 .attr("fill", (d) => colors(d.value));
 
-            const yLabel = _.capitalize(vizInfo.firmwareKey) + ' (' + _.capitalize(vizInfo.unitOfMeasure) + ')';
+            const yLabel = _.capitalize(vizInfo.firmwareKey) + " (" + _.capitalize(vizInfo.unitOfMeasure) + ")";
             appendYAxisLabel(svg, yLabel, layout);
             appendXAxisLabel(svg, layout);
         },
