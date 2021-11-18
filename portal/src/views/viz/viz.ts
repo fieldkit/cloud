@@ -101,7 +101,8 @@ export class VizInfo {
         public readonly key: string,
         public readonly colorScale: ColorScale,
         public readonly station: { name: string; location: [number, number] },
-        public readonly unitOfMeasure: string
+        public readonly unitOfMeasure: string,
+        public readonly firmwareKey: string
     ) {}
 }
 
@@ -580,7 +581,7 @@ export class Workspace {
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure);
+        return new VizInfo(key, scale, station, details.unitOfMeasure, details.firmwareKey);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {

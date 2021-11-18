@@ -28,10 +28,11 @@ export function createSensorColorScale(sensor: SensorDetails | null): ColorScale
         .interpolator(d3.interpolatePlasma);
 }
 
-export function appendUnitOfMeasureLabel(svg: d3, unitOfMeasure: string, layout: ChartLayout): void {
-    svg.select("#uom").remove();
+export function appendYAxisLabel(svg: d3, unitOfMeasure: string, layout: ChartLayout): void {
+    const svgId = "d3-uom";
+    svg.select("#" + svgId).remove();
     svg.append("text")
-        .attr("id", "uom")
+        .attr("id", svgId)
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
         .attr("fill", "#7F7F7F")
@@ -39,4 +40,21 @@ export function appendUnitOfMeasureLabel(svg: d3, unitOfMeasure: string, layout:
         .attr("y", 19)
         .attr("x", unitOfMeasure.length / 2 - (layout.height - (layout.margins.bottom + layout.margins.top)) / 2)
         .text(unitOfMeasure);
+}
+
+export function appendXAxisLabel(svg: d3, layout: ChartLayout): void {
+    const svgId = "d3-time";
+    svg.select("#" + svgId).remove();
+    svg.append("text")
+        .attr("id", svgId)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#7F7F7F")
+        .style("font-size", "10px")
+        .attr("y", layout.height - 20)
+        .attr("x", layout.width / 2)
+        .text("Time");
+}
+
+export function getMaxDigitsForData(dataRange: number[]) {
+    return Math.ceil(Math.log10(Math.floor(Math.abs(dataRange[1])) + 1));
 }

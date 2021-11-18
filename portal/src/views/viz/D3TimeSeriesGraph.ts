@@ -4,7 +4,7 @@ import * as d3 from "d3";
 
 import { TimeRange, Margins, ChartLayout } from "./common";
 import { Graph, QueriedData, Workspace, FastTime, TimeZoom } from "./viz";
-import { appendUnitOfMeasureLabel } from "./d3-helpers";
+import { appendXAxisLabel, appendYAxisLabel, getMaxDigitsForData } from "./d3-helpers";
 
 export const D3TimeSeriesGraph = Vue.extend({
     name: "D3TimeSeriesGraph",
@@ -55,11 +55,17 @@ export const D3TimeSeriesGraph = Vue.extend({
                 return;
             }
 
+            d3.selectAll("svg").remove();
+
             const vizInfo = this.workspace.vizInfo(this.viz);
-            const layout = new ChartLayout(1050, 340, new Margins({ top: 5, bottom: 50, left: 50, right: 0 }));
             const data = this.data;
             const timeRange = data.timeRange;
             const dataRange = data.dataRange;
+            const layout = new ChartLayout(
+                1050,
+                340,
+                new Margins({ top: 5, bottom: 50, left: 42 + 5 * getMaxDigitsForData(data.dataRange), right: 0 })
+            );
             const charts = [
                 {
                     layout: layout,
@@ -297,7 +303,9 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .attr("cy", (d) => y(d.value))
                 .attr("fill", (d) => colors(d.value));
 
-            appendUnitOfMeasureLabel(svg, vizInfo.unitOfMeasure, layout);
+            const yLabel = _.capitalize(vizInfo.firmwareKey) + ' (' + _.capitalize(vizInfo.unitOfMeasure) + ')';
+            appendYAxisLabel(svg, yLabel, layout);
+            appendXAxisLabel(svg, layout);
         },
     },
     template: `<div class="viz time-series-graph"><div class="chart" @dblclick="onDouble"></div></div>`,
