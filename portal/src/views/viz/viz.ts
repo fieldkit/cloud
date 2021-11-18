@@ -642,16 +642,23 @@ export class Workspace {
         const options = _.map(
             allModules,
             (sensors, moduleId: ModuleID): StationTreeOption => {
+                const moduleKey = keysById[moduleId];
+                const moduleMeta = allModulesByModuleKey[moduleKey];
                 const uniqueSensors = _.uniqBy(sensors, (s) => s.sensorId);
                 const children: SensorTreeOption[] = _.flatten(
                     uniqueSensors.map((row) => {
                         const age = moment.utc(row.sensorReadAt);
                         const label = i18n.tc(row.sensorKey) || row.sensorKey;
                         const optionId = `${row.moduleId}-${row.sensorId}`;
+                        const sensor = moduleMeta.sensors.filter((s) => s.fullKey == row.sensorKey);
+                        if (sensor.length) {
+                            if (sensor[0].internal) {
+                                return [];
+                            }
+                        }
                         return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId, age)];
                     })
                 );
-                const moduleKey = keysById[moduleId];
                 const moduleAge = _.max(children.map((c) => c.age));
                 if (!moduleAge) throw new Error(`expected module age: no sensors?`);
 

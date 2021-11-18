@@ -1210,7 +1210,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 	metaRepository := NewModuleMetaRepository()
 
 	for _, row := range rows {
-		if !strings.HasPrefix(row.ModuleKey, "fk.") {
+		if !strings.HasPrefix(row.ModuleKey, "fk.") && !strings.HasPrefix(row.ModuleKey, "wh.") {
 			row.ModuleKey = "fk." + strings.TrimPrefix(row.ModuleKey, "modules.")
 		}
 		moduleAndSensor, _ := metaRepository.FindByFullKey(row.SensorKey)
