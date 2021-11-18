@@ -1,7 +1,7 @@
 import _ from "lodash";
 import moment, { Moment } from "moment";
-import { SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
-import { ModuleID, SensorSpec, Ids, TimeRange, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
+import { SensorsResponse, SensorDataResponse, SensorInfoResponse, VizConfig } from "./api";
+import { ModuleID, SensorSpec, Ids, TimeRange, StationID, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
 import i18n from "@/i18n";
 import FKApi from "@/api/api";
 
@@ -102,7 +102,8 @@ export class VizInfo {
         public readonly colorScale: ColorScale,
         public readonly station: { name: string; location: [number, number] },
         public readonly unitOfMeasure: string,
-        public readonly firmwareKey: string
+        public readonly firmwareKey: string,
+        public readonly viz: VizConfig[]
     ) {}
 }
 
@@ -428,7 +429,9 @@ export class Querier {
         if (this.info[key]) {
             return Promise.resolve(this.info[key]);
         }
-        return new FKApi().sensorData(queryParams).then((info: SensorInfoResponse) => {
+
+        const api = new FKApi();
+        return api.sensorData(queryParams).then((info: SensorInfoResponse) => {
             this.info[key] = info;
             return info;
         });
@@ -471,7 +474,7 @@ class NewParams implements HasSensorParams {
 }
 
 export class Workspace {
-    private stationIds: number[] = [];
+    private stationIds: StationID[] = [];
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
     public version = 0;
@@ -480,7 +483,13 @@ export class Workspace {
         return this.allVizes.length === 0;
     }
 
-    constructor(private readonly meta: SensorsResponse, private groups: Group[] = []) {}
+    public get allStationIds(): StationID[] {
+        return this.stationIds;
+    }
+
+    constructor(private readonly meta: SensorsResponse, private groups: Group[] = []) {
+        this.refreshStationIds();
+    }
 
     private get allVizes(): Viz[] {
         return _(this.groups)
@@ -581,7 +590,7 @@ export class Workspace {
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure, details.firmwareKey);
+        return new VizInfo(key, scale, station, details.unitOfMeasure, details.firmwareKey, details.viz || []);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {
@@ -617,7 +626,12 @@ export class Workspace {
         const group = new Group();
         group.add(graph);
         this.groups.unshift(group);
+        this.refreshStationIds();
         return this;
+    }
+
+    private refreshStationIds() {
+        this.stationIds = _.flatten(_.flatten(this.groups.map((g) => g.vizes.map((v) => (v as Graph).chartParams.stations))));
     }
 
     public addStandardGraph(stations: Stations, sensors: Sensors): Workspace {
