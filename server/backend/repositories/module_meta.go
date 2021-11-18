@@ -760,7 +760,7 @@ func init() {
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
-							Maximum: 4999.0,
+							Maximum: 40.0,
 						},
 					},
 				},
@@ -772,7 +772,7 @@ func init() {
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
-							Maximum: 4999.0,
+							Maximum: 40.0,
 						},
 					},
 				},
