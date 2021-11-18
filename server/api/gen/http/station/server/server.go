@@ -20,19 +20,20 @@ import (
 
 // Server lists the station service endpoint HTTP handlers.
 type Server struct {
-	Mounts        []*MountPoint
-	Add           http.Handler
-	Get           http.Handler
-	Transfer      http.Handler
-	Update        http.Handler
-	ListMine      http.Handler
-	ListProject   http.Handler
-	DownloadPhoto http.Handler
-	ListAll       http.Handler
-	Delete        http.Handler
-	AdminSearch   http.Handler
-	Progress      http.Handler
-	CORS          http.Handler
+	Mounts         []*MountPoint
+	Add            http.Handler
+	Get            http.Handler
+	Transfer       http.Handler
+	Update         http.Handler
+	ListMine       http.Handler
+	ListProject    http.Handler
+	ListAssociated http.Handler
+	DownloadPhoto  http.Handler
+	ListAll        http.Handler
+	Delete         http.Handler
+	AdminSearch    http.Handler
+	Progress       http.Handler
+	CORS           http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -74,6 +75,7 @@ func New(
 			{"Update", "PATCH", "/stations/{id}"},
 			{"ListMine", "GET", "/user/stations"},
 			{"ListProject", "GET", "/projects/{id}/stations"},
+			{"ListAssociated", "GET", "/stations/{id}/associated"},
 			{"DownloadPhoto", "GET", "/stations/{stationId}/photo"},
 			{"ListAll", "GET", "/admin/stations"},
 			{"Delete", "DELETE", "/admin/stations/{stationId}"},
@@ -84,24 +86,26 @@ func New(
 			{"CORS", "OPTIONS", "/stations/{id}/transfer/{ownerId}"},
 			{"CORS", "OPTIONS", "/user/stations"},
 			{"CORS", "OPTIONS", "/projects/{id}/stations"},
+			{"CORS", "OPTIONS", "/stations/{id}/associated"},
 			{"CORS", "OPTIONS", "/stations/{stationId}/photo"},
 			{"CORS", "OPTIONS", "/admin/stations"},
 			{"CORS", "OPTIONS", "/admin/stations/{stationId}"},
 			{"CORS", "OPTIONS", "/admin/stations/search"},
 			{"CORS", "OPTIONS", "/stations/{stationId}/progress"},
 		},
-		Add:           NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
-		Get:           NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
-		Transfer:      NewTransferHandler(e.Transfer, mux, decoder, encoder, errhandler, formatter),
-		Update:        NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
-		ListMine:      NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
-		ListProject:   NewListProjectHandler(e.ListProject, mux, decoder, encoder, errhandler, formatter),
-		DownloadPhoto: NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
-		ListAll:       NewListAllHandler(e.ListAll, mux, decoder, encoder, errhandler, formatter),
-		Delete:        NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
-		AdminSearch:   NewAdminSearchHandler(e.AdminSearch, mux, decoder, encoder, errhandler, formatter),
-		Progress:      NewProgressHandler(e.Progress, mux, decoder, encoder, errhandler, formatter),
-		CORS:          NewCORSHandler(),
+		Add:            NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
+		Get:            NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		Transfer:       NewTransferHandler(e.Transfer, mux, decoder, encoder, errhandler, formatter),
+		Update:         NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
+		ListMine:       NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
+		ListProject:    NewListProjectHandler(e.ListProject, mux, decoder, encoder, errhandler, formatter),
+		ListAssociated: NewListAssociatedHandler(e.ListAssociated, mux, decoder, encoder, errhandler, formatter),
+		DownloadPhoto:  NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
+		ListAll:        NewListAllHandler(e.ListAll, mux, decoder, encoder, errhandler, formatter),
+		Delete:         NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
+		AdminSearch:    NewAdminSearchHandler(e.AdminSearch, mux, decoder, encoder, errhandler, formatter),
+		Progress:       NewProgressHandler(e.Progress, mux, decoder, encoder, errhandler, formatter),
+		CORS:           NewCORSHandler(),
 	}
 }
 
@@ -116,6 +120,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Update = m(s.Update)
 	s.ListMine = m(s.ListMine)
 	s.ListProject = m(s.ListProject)
+	s.ListAssociated = m(s.ListAssociated)
 	s.DownloadPhoto = m(s.DownloadPhoto)
 	s.ListAll = m(s.ListAll)
 	s.Delete = m(s.Delete)
@@ -132,6 +137,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountUpdateHandler(mux, h.Update)
 	MountListMineHandler(mux, h.ListMine)
 	MountListProjectHandler(mux, h.ListProject)
+	MountListAssociatedHandler(mux, h.ListAssociated)
 	MountDownloadPhotoHandler(mux, h.DownloadPhoto)
 	MountListAllHandler(mux, h.ListAll)
 	MountDeleteHandler(mux, h.Delete)
@@ -446,6 +452,57 @@ func NewListProjectHandler(
 	})
 }
 
+// MountListAssociatedHandler configures the mux to serve the "station" service
+// "list associated" endpoint.
+func MountListAssociatedHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleStationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/stations/{id}/associated", f)
+}
+
+// NewListAssociatedHandler creates a HTTP handler which loads the HTTP request
+// and calls the "station" service "list associated" endpoint.
+func NewListAssociatedHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeListAssociatedRequest(mux, decoder)
+		encodeResponse = EncodeListAssociatedResponse(encoder)
+		encodeError    = EncodeListAssociatedError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "list associated")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountDownloadPhotoHandler configures the mux to serve the "station" service
 // "download photo" endpoint.
 func MountDownloadPhotoHandler(mux goahttp.Muxer, h http.Handler) {
@@ -716,6 +773,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/stations/{id}/transfer/{ownerId}", f)
 	mux.Handle("OPTIONS", "/user/stations", f)
 	mux.Handle("OPTIONS", "/projects/{id}/stations", f)
+	mux.Handle("OPTIONS", "/stations/{id}/associated", f)
 	mux.Handle("OPTIONS", "/stations/{stationId}/photo", f)
 	mux.Handle("OPTIONS", "/admin/stations", f)
 	mux.Handle("OPTIONS", "/admin/stations/{stationId}", f)
