@@ -1,6 +1,6 @@
 import _ from "lodash";
 import moment, { Moment } from "moment";
-import { SensorsResponse, SensorDataResponse, SensorInfoResponse } from "./api";
+import { SensorsResponse, SensorDataResponse, SensorInfoResponse, VizConfig } from "./api";
 import { ModuleID, SensorSpec, Ids, TimeRange, StationID, Stations, Sensors, SensorParams, DataQueryParams } from "./common";
 import i18n from "@/i18n";
 import FKApi from "@/api/api";
@@ -102,7 +102,8 @@ export class VizInfo {
         public readonly colorScale: ColorScale,
         public readonly station: { name: string; location: [number, number] },
         public readonly unitOfMeasure: string,
-        public readonly firmwareKey: string
+        public readonly firmwareKey: string,
+        public readonly viz: VizConfig[]
     ) {}
 }
 
@@ -589,7 +590,7 @@ export class Workspace {
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure, details.firmwareKey);
+        return new VizInfo(key, scale, station, details.unitOfMeasure, details.firmwareKey, details.viz || []);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {

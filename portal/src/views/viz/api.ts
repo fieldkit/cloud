@@ -5,6 +5,11 @@ export interface SensorRange {
     maximum: number;
 }
 
+export interface VizConfig {
+    name: string;
+    disabled: boolean;
+}
+
 export interface ModuleSensorMeta {
     key: string;
     fullKey: string;
@@ -13,6 +18,7 @@ export interface ModuleSensorMeta {
     internal: boolean;
     order: number;
     ranges: SensorRange[];
+    viz: VizConfig[];
 }
 
 export interface Module {
