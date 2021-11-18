@@ -470,6 +470,7 @@ class NewParams implements HasSensorParams {
 }
 
 export class Workspace {
+    private stationIds: number[] = [];
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
     public version = 0;
@@ -495,7 +496,7 @@ export class Workspace {
         // is especially important to do from here because we may have
         // been instantiated from a Bookmark. Right now we just query
         // for information on all the stations involved.
-        const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz).map((viz) => viz.chartParams.stations)));
+        const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz).map((viz) => viz.chartParams.stations)).concat(this.stationIds));
         const infoQueries = allStationIds.length ? [new InfoQuery(allStationIds)] : [];
 
         // Second step is to query to fill in any required scrubbers. I
@@ -595,6 +596,12 @@ export class Workspace {
     public groupZoomed(group: Group, zoom: TimeZoom): Workspace {
         group.timeZoomed(zoom);
         return this;
+    }
+
+    public async addStationIds(ids: number[]): Promise<Workspace> {
+        this.stationIds = [...this.stationIds, ...ids];
+        console.log("viz:workspace-add-station-ids", this.stationIds);
+        return this.query();
     }
 
     private findGroup(viz: Viz): Group {
