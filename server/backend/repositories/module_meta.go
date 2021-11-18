@@ -765,6 +765,18 @@ func init() {
 					},
 				},
 				&SensorMeta{
+					Key:           "depthUnfiltered",
+					FirmwareKey:   "depth_unfiltered",
+					UnitOfMeasure: "inches",
+					Internal:      true,
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 4999.0,
+						},
+					},
+				},
+				&SensorMeta{
 					Key:           "distance",
 					FirmwareKey:   "distance",
 					UnitOfMeasure: "mm",

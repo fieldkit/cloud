@@ -123,6 +123,12 @@ type ListProjectResponseBody struct {
 	Stations StationFullResponseBodyCollection `form:"stations" json:"stations" xml:"stations"`
 }
 
+// ListAssociatedResponseBody is the type of the "station" service "list
+// associated" endpoint HTTP response body.
+type ListAssociatedResponseBody struct {
+	Stations StationFullResponseBodyCollection `form:"stations" json:"stations" xml:"stations"`
+}
+
 // DownloadPhotoResponseBody is the type of the "station" service "download
 // photo" endpoint HTTP response body.
 type DownloadPhotoResponseBody struct {
@@ -587,6 +593,78 @@ type ListProjectNotFoundResponseBody struct {
 // ListProjectBadRequestResponseBody is the type of the "station" service "list
 // project" endpoint HTTP response body for the "bad-request" error.
 type ListProjectBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListAssociatedUnauthorizedResponseBody is the type of the "station" service
+// "list associated" endpoint HTTP response body for the "unauthorized" error.
+type ListAssociatedUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListAssociatedForbiddenResponseBody is the type of the "station" service
+// "list associated" endpoint HTTP response body for the "forbidden" error.
+type ListAssociatedForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListAssociatedNotFoundResponseBody is the type of the "station" service
+// "list associated" endpoint HTTP response body for the "not-found" error.
+type ListAssociatedNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListAssociatedBadRequestResponseBody is the type of the "station" service
+// "list associated" endpoint HTTP response body for the "bad-request" error.
+type ListAssociatedBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -1273,6 +1351,19 @@ func NewListProjectResponseBody(res *stationviews.StationsFullView) *ListProject
 	return body
 }
 
+// NewListAssociatedResponseBody builds the HTTP response body from the result
+// of the "list associated" endpoint of the "station" service.
+func NewListAssociatedResponseBody(res *stationviews.StationsFullView) *ListAssociatedResponseBody {
+	body := &ListAssociatedResponseBody{}
+	if res.Stations != nil {
+		body.Stations = make([]*StationFullResponseBody, len(res.Stations))
+		for i, val := range res.Stations {
+			body.Stations[i] = marshalStationviewsStationFullViewToStationFullResponseBody(val)
+		}
+	}
+	return body
+}
+
 // NewDownloadPhotoResponseBody builds the HTTP response body from the result
 // of the "download photo" endpoint of the "station" service.
 func NewDownloadPhotoResponseBody(res *stationviews.DownloadedPhotoView) *DownloadPhotoResponseBody {
@@ -1678,6 +1769,62 @@ func NewListProjectBadRequestResponseBody(res *goa.ServiceError) *ListProjectBad
 	return body
 }
 
+// NewListAssociatedUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "list associated" endpoint of the "station" service.
+func NewListAssociatedUnauthorizedResponseBody(res *goa.ServiceError) *ListAssociatedUnauthorizedResponseBody {
+	body := &ListAssociatedUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListAssociatedForbiddenResponseBody builds the HTTP response body from
+// the result of the "list associated" endpoint of the "station" service.
+func NewListAssociatedForbiddenResponseBody(res *goa.ServiceError) *ListAssociatedForbiddenResponseBody {
+	body := &ListAssociatedForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListAssociatedNotFoundResponseBody builds the HTTP response body from the
+// result of the "list associated" endpoint of the "station" service.
+func NewListAssociatedNotFoundResponseBody(res *goa.ServiceError) *ListAssociatedNotFoundResponseBody {
+	body := &ListAssociatedNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListAssociatedBadRequestResponseBody builds the HTTP response body from
+// the result of the "list associated" endpoint of the "station" service.
+func NewListAssociatedBadRequestResponseBody(res *goa.ServiceError) *ListAssociatedBadRequestResponseBody {
+	body := &ListAssociatedBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewDownloadPhotoUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "download photo" endpoint of the "station" service.
 func NewDownloadPhotoUnauthorizedResponseBody(res *goa.ServiceError) *DownloadPhotoUnauthorizedResponseBody {
@@ -2014,6 +2161,16 @@ func NewListMinePayload(auth string) *station.ListMinePayload {
 // NewListProjectPayload builds a station service list project endpoint payload.
 func NewListProjectPayload(id int32, auth *string) *station.ListProjectPayload {
 	v := &station.ListProjectPayload{}
+	v.ID = id
+	v.Auth = auth
+
+	return v
+}
+
+// NewListAssociatedPayload builds a station service list associated endpoint
+// payload.
+func NewListAssociatedPayload(id int32, auth string) *station.ListAssociatedPayload {
+	v := &station.ListAssociatedPayload{}
 	v.ID = id
 	v.Auth = auth
 

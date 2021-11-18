@@ -162,7 +162,16 @@ export default Vue.extend({
                     return workspace
                         .addStandardGraph(stations, sensors)
                         .eventually((ws) => this.onChange(ws.bookmark()))
-                        .then((ws) => ws.query());
+                        .then((ws) => {
+                            return Promise.all([
+                                ws.query(),
+                                this.$services.api.getAssociatedStations(stationId).then((associated) => {
+                                    console.log("quick-sensors-associated", associated);
+                                    const ids = associated.stations.map((s) => s.id);
+                                    return ws.addStationIds(ids);
+                                }),
+                            ]);
+                        });
                 });
             });
         },

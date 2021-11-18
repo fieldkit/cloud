@@ -22,7 +22,12 @@ export class SensorMeta {
 }
 
 export class StationMeta {
-    constructor(public readonly id: number, public readonly name: string, public readonly sensors: SensorMeta[]) {
+    constructor(
+        public readonly id: number,
+        public readonly name: string,
+        public readonly location: [number, number],
+        public readonly sensors: SensorMeta[]
+    ) {
         if (!this.id) throw new Error("id is required");
         if (!this.name) throw new Error("name is required");
         if (!this.sensors) throw new Error("sensors is required");
@@ -95,8 +100,9 @@ export class VizInfo {
     constructor(
         public readonly key: string,
         public readonly colorScale: ColorScale,
-        public readonly station: { name: string },
-        public readonly unitOfMeasure: string
+        public readonly station: { name: string; location: [number, number] },
+        public readonly unitOfMeasure: string,
+        public readonly firmwareKey: string
     ) {}
 }
 
@@ -465,6 +471,7 @@ class NewParams implements HasSensorParams {
 }
 
 export class Workspace {
+    private stationIds: number[] = [];
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
     public version = 0;
@@ -490,7 +497,7 @@ export class Workspace {
         // is especially important to do from here because we may have
         // been instantiated from a Bookmark. Right now we just query
         // for information on all the stations involved.
-        const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz).map((viz) => viz.chartParams.stations)));
+        const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz).map((viz) => viz.chartParams.stations)).concat(this.stationIds));
         const infoQueries = allStationIds.length ? [new InfoQuery(allStationIds)] : [];
 
         // Second step is to query to fill in any required scrubbers. I
@@ -538,7 +545,7 @@ export class Workspace {
                         const sensors = info.map(
                             (row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt)
                         );
-                        const station = new StationMeta(Number(stationId), stationName, sensors);
+                        const station = new StationMeta(Number(stationId), stationName, info[0].stationLocation, sensors);
                         this.stations[station.id] = station;
                         console.log("station-meta", { station, info });
                         return station;
@@ -574,7 +581,7 @@ export class Workspace {
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure);
+        return new VizInfo(key, scale, station, details.unitOfMeasure, details.firmwareKey);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {
@@ -590,6 +597,12 @@ export class Workspace {
     public groupZoomed(group: Group, zoom: TimeZoom): Workspace {
         group.timeZoomed(zoom);
         return this;
+    }
+
+    public async addStationIds(ids: number[]): Promise<Workspace> {
+        this.stationIds = [...this.stationIds, ...ids];
+        console.log("viz:workspace-add-station-ids", this.stationIds);
+        return this.query();
     }
 
     private findGroup(viz: Viz): Group {
@@ -637,16 +650,23 @@ export class Workspace {
         const options = _.map(
             allModules,
             (sensors, moduleId: ModuleID): StationTreeOption => {
+                const moduleKey = keysById[moduleId];
+                const moduleMeta = allModulesByModuleKey[moduleKey];
                 const uniqueSensors = _.uniqBy(sensors, (s) => s.sensorId);
                 const children: SensorTreeOption[] = _.flatten(
                     uniqueSensors.map((row) => {
                         const age = moment.utc(row.sensorReadAt);
                         const label = i18n.tc(row.sensorKey) || row.sensorKey;
                         const optionId = `${row.moduleId}-${row.sensorId}`;
+                        const sensor = moduleMeta.sensors.filter((s) => s.fullKey == row.sensorKey);
+                        if (sensor.length) {
+                            if (sensor[0].internal) {
+                                return [];
+                            }
+                        }
                         return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId, age)];
                     })
                 );
-                const moduleKey = keysById[moduleId];
                 const moduleAge = _.max(children.map((c) => c.age));
                 if (!moduleAge) throw new Error(`expected module age: no sensors?`);
 
@@ -708,17 +728,13 @@ export class Workspace {
         const group = this.findGroup(viz);
         if (group.vizes.length > 1) {
             group.remove(viz);
-            this.groups.forEach((groupItem, index) => {
+            this.groups.forEach((groupItem, groupIndex) => {
                 if (groupItem.id === group.id) {
                     if (this.groups.length === 1) {
-                        this.groups.unshift(new Group([viz]));
-                        return;
-                    }
-                    if (index === this.groups.length - 1 && groupItem.vizes.length > 1) {
                         this.groups.push(new Group([viz]));
                         return;
                     }
-                    this.groups.splice(index + 1, 0, new Group([viz]));
+                    this.groups.splice(groupIndex + 1, 0, new Group([viz]));
                 }
             });
         } else {

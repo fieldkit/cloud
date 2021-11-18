@@ -655,6 +655,13 @@ class FKApi {
         });
     }
 
+    getAssociatedStations(id: number): Promise<StationsResponse> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + `/stations/${id}/associated`,
+        });
+    }
     getCurrentUser(): Promise<CurrentUser> {
         return this.invoke({
             auth: Auth.Required,

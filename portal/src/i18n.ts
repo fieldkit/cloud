@@ -98,6 +98,10 @@ function loadLocaleMessages(): LocaleMessages {
 
     const moduleKeys = _((messages.en.modules as unknown) as Record<string, ModuleLocales>)
         .map((m, moduleKey) => {
+            if (moduleKey.startsWith("wh.")) {
+                // HACK
+                return [moduleKey, m.name];
+            }
             return ["fk." + moduleKey, m.name];
         })
         .fromPairs()

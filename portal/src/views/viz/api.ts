@@ -56,6 +56,7 @@ export interface SensorDataResponse {
 interface StationInfoResponse {
     stationId: number;
     stationName: string;
+    stationLocation: [number, number];
     moduleId: ModuleID;
     moduleKey: string;
     sensorId: number;

@@ -1150,24 +1150,26 @@ func (sr *StationRepository) QueryStationProgress(ctx context.Context, stationID
 }
 
 type StationSensorRow struct {
-	StationID    int32     `db:"station_id" json:"stationId"`
-	StationName  string    `db:"station_name" json:"stationName"`
-	ModuleID     string    `db:"module_id" json:"moduleId"`
-	ModuleKey    string    `db:"module_key" json:"moduleKey"`
-	SensorID     int64     `db:"sensor_id" json:"sensorId"`
-	SensorKey    string    `db:"sensor_key" json:"sensorKey"`
-	SensorReadAt time.Time `db:"sensor_read_at" json:"sensorReadAt"`
+	StationID       int32          `db:"station_id" json:"stationId"`
+	StationName     string         `db:"station_name" json:"stationName"`
+	StationLocation *data.Location `db:"station_location" json:"stationLocation"`
+	ModuleID        string         `db:"module_id" json:"moduleId"`
+	ModuleKey       string         `db:"module_key" json:"moduleKey"`
+	SensorID        int64          `db:"sensor_id" json:"sensorId"`
+	SensorKey       string         `db:"sensor_key" json:"sensorKey"`
+	SensorReadAt    time.Time      `db:"sensor_read_at" json:"sensorReadAt"`
 }
 
 type StationSensor struct {
-	StationID    int32     `json:"stationId"`
-	StationName  string    `json:"stationName"`
-	ModuleID     string    `json:"moduleId"`
-	ModuleKey    string    `json:"moduleKey"`
-	SensorID     int64     `json:"sensorId"`
-	SensorKey    string    `json:"sensorKey"`
-	SensorReadAt time.Time `json:"sensorReadAt"`
-	Order        int32     `json:"order"`
+	StationID       int32          `json:"stationId"`
+	StationName     string         `json:"stationName"`
+	StationLocation *data.Location `json:"stationLocation"`
+	ModuleID        string         `json:"moduleId"`
+	ModuleKey       string         `json:"moduleKey"`
+	SensorID        int64          `json:"sensorId"`
+	SensorKey       string         `json:"sensorKey"`
+	SensorReadAt    time.Time      `json:"sensorReadAt"`
+	Order           int32          `json:"order"`
 }
 
 type StationSensorByOrder []*StationSensor
@@ -1179,7 +1181,7 @@ func (a StationSensorByOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations []int32) (map[int32][]*StationSensor, error) {
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT
-			station_id, station.name AS station_name,
+			station_id, station.name AS station_name, ST_AsBinary(station.location) AS station_location,
 			encode(station_module.hardware_id, 'base64') AS module_id, station_module.name AS module_key,
 			sensor_id, s.key AS sensor_key,
             MAX(agg.time) AS sensor_read_at
@@ -1188,7 +1190,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 		JOIN fieldkit.station AS station ON (agg.station_id = station.id)
 		JOIN fieldkit.station_module AS station_module ON (agg.module_id = station_module.id)
 		WHERE station_id IN (?)
-		GROUP BY station_id, station.name, station_module.name, station_module.hardware_id, sensor_id, s.key
+		GROUP BY station_id, station.name, station.location, station_module.name, station_module.hardware_id, sensor_id, s.key
         ORDER BY sensor_read_at DESC
 		`, "fieldkit.aggregated_10m"), stations)
 	if err != nil {
@@ -1208,7 +1210,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 	metaRepository := NewModuleMetaRepository()
 
 	for _, row := range rows {
-		if !strings.HasPrefix(row.ModuleKey, "fk.") {
+		if !strings.HasPrefix(row.ModuleKey, "fk.") && !strings.HasPrefix(row.ModuleKey, "wh.") {
 			row.ModuleKey = "fk." + strings.TrimPrefix(row.ModuleKey, "modules.")
 		}
 		moduleAndSensor, _ := metaRepository.FindByFullKey(row.SensorKey)
@@ -1217,14 +1219,15 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 			order = moduleAndSensor.Sensor.Order
 		}
 		byStation[row.StationID] = append(byStation[row.StationID], &StationSensor{
-			StationID:    row.StationID,
-			StationName:  row.StationName,
-			ModuleID:     row.ModuleID,
-			ModuleKey:    row.ModuleKey,
-			SensorID:     row.SensorID,
-			SensorKey:    row.SensorKey,
-			SensorReadAt: row.SensorReadAt,
-			Order:        int32(order),
+			StationID:       row.StationID,
+			StationName:     row.StationName,
+			StationLocation: row.StationLocation,
+			ModuleID:        row.ModuleID,
+			ModuleKey:       row.ModuleKey,
+			SensorID:        row.SensorID,
+			SensorKey:       row.SensorKey,
+			SensorReadAt:    row.SensorReadAt,
+			Order:           int32(order),
 		})
 	}
 

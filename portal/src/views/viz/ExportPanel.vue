@@ -18,12 +18,16 @@
                 <div class="created">{{ de.createdAt | prettyTime }}</div>
                 <div class="busy" v-if="!de.downloadUrl">{{ de.progress | prettyPercentage }}</div>
                 <div class="size" v-if="de.downloadUrl">{{ de.size | prettyBytes }}</div>
-                <div class="download" v-if="de.downloadUrl" v-bind:class="{ downloaded: false }">
-                    <a :href="$config.baseUrl + de.downloadUrl" @click="(ev) => onDownload(ev, de)">
-                        <template v-if="isDownloaded(de.id)">Downloaded</template>
-                        <template v-else>Download</template>
-                    </a>
-                </div>
+                <a
+                    class="download"
+                    v-if="de.downloadUrl"
+                    v-bind:class="{ downloaded: false }"
+                    :href="$config.baseUrl + de.downloadUrl"
+                    @click="(ev) => onDownload(ev, de)"
+                >
+                    <template v-if="isDownloaded(de.id)">Downloaded</template>
+                    <template v-else>Download</template>
+                </a>
             </div>
         </div>
     </div>

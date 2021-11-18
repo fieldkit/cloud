@@ -318,6 +318,45 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 	return
 }
 
+func (c *StationService) ListAssociated(ctx context.Context, payload *station.ListAssociatedPayload) (response *station.StationsFull, err error) {
+	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.CanView(); err != nil {
+		return nil, err
+	}
+
+	pr := repositories.NewProjectRepository(c.options.Database)
+
+	projects, err := pr.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	stations := make([]*station.StationFull, 0)
+
+	for _, project := range projects {
+		projectStations, err := c.ListProject(ctx, &station.ListProjectPayload{
+			ID: project.ID,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		for _, s := range projectStations.Stations {
+			stations = append(stations, s)
+		}
+	}
+
+	response = &station.StationsFull{
+		Stations: stations,
+	}
+
+	return
+}
+
 func (c *StationService) queriedToPage(queried *repositories.QueriedEssential) (*station.PageOfStations, error) {
 	stationsWm := make([]*station.EssentialStation, 0)
 

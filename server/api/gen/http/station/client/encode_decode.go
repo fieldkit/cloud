@@ -912,6 +912,155 @@ func DecodeListProjectResponse(decoder func(*http.Response) goahttp.Decoder, res
 	}
 }
 
+// BuildListAssociatedRequest instantiates a HTTP request object with method
+// and path set to call the "station" service "list associated" endpoint
+func (c *Client) BuildListAssociatedRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id int32
+	)
+	{
+		p, ok := v.(*station.ListAssociatedPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("station", "list associated", "*station.ListAssociatedPayload", v)
+		}
+		id = p.ID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListAssociatedStationPath(id)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "list associated", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeListAssociatedRequest returns an encoder for requests sent to the
+// station list associated server.
+func EncodeListAssociatedRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.ListAssociatedPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "list associated", "*station.ListAssociatedPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeListAssociatedResponse returns a decoder for responses returned by the
+// station list associated endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeListAssociatedResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeListAssociatedResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ListAssociatedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list associated", err)
+			}
+			p := NewListAssociatedStationsFullOK(&body)
+			view := "default"
+			vres := &stationviews.StationsFull{Projected: p, View: view}
+			if err = stationviews.ValidateStationsFull(vres); err != nil {
+				return nil, goahttp.ErrValidationError("station", "list associated", err)
+			}
+			res := station.NewStationsFull(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body ListAssociatedUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list associated", err)
+			}
+			err = ValidateListAssociatedUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "list associated", err)
+			}
+			return nil, NewListAssociatedUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ListAssociatedForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list associated", err)
+			}
+			err = ValidateListAssociatedForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "list associated", err)
+			}
+			return nil, NewListAssociatedForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ListAssociatedNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list associated", err)
+			}
+			err = ValidateListAssociatedNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "list associated", err)
+			}
+			return nil, NewListAssociatedNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ListAssociatedBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list associated", err)
+			}
+			err = ValidateListAssociatedBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "list associated", err)
+			}
+			return nil, NewListAssociatedBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "list associated", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildDownloadPhotoRequest instantiates a HTTP request object with method and
 // path set to call the "station" service "download photo" endpoint
 func (c *Client) BuildDownloadPhotoRequest(ctx context.Context, v interface{}) (*http.Request, error) {
