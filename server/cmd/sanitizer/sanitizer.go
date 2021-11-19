@@ -40,7 +40,7 @@ func sanitize(ctx context.Context, options *Options) error {
 	for _, user := range users {
 		user.SetPassword("asdfasdfasdf")
 
-		if !strings.Contains(user.Email, "@conservify.org") {
+		if !strings.Contains(user.Email, "@conservify.org") && !strings.Contains(user.Email, "@fieldkit.org") {
 			user.Name = faker.Name()
 			user.Bio = faker.Sentence()
 			user.Email = faker.Email()
