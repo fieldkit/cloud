@@ -37,9 +37,12 @@ var (
 )
 
 func init() {
-	timeSeriesOnly := []VizConfig{
+	mapAndTimesSeriesOnly := []VizConfig{
 		VizConfig{
 			Name: "D3TimeSeriesGraph",
+		},
+		VizConfig{
+			Name: "D3Map",
 		},
 	}
 
