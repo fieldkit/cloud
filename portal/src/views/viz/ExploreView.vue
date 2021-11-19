@@ -68,7 +68,7 @@ export default Vue.extend({
                 return;
             }
             vm.backRoute = from.name ? from.name : "mapAllStations";
-            vm.backRouteParams.id = from.params.id;
+            vm.backRouteParams = from.params;
         });
     },
     data(): {
@@ -76,14 +76,14 @@ export default Vue.extend({
         showNoSensors: boolean;
         stationId: number | null;
         backRoute: string | null;
-        backRouteParams: object;
+        backRouteParams: { bounds: string | null; id: number | null };
     } {
         return {
             workspace: null,
             showNoSensors: false,
             stationId: null,
             backRoute: null,
-            backRouteParams: { id: null },
+            backRouteParams: { bounds: null, id: null },
         };
     },
     computed: {

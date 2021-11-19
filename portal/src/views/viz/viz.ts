@@ -329,6 +329,10 @@ export class Group {
         return new Group(this.vizes.map((v) => v.clone()));
     }
 
+    public cloneForCompare(): Group {
+        return new Group([this.vizes[0]].map((v) => v.clone()));
+    }
+
     public add(viz: Viz) {
         this.vizes.push(viz);
         return this;
@@ -718,7 +722,7 @@ export class Workspace {
 
     public compare(viz: Viz): Workspace {
         if (this.groups.length > 0) {
-            this.groups.unshift(this.groups[0].clone());
+            this.groups.unshift(this.groups[0].cloneForCompare());
         }
         return this;
     }

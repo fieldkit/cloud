@@ -88,7 +88,7 @@ export interface ReadingLike {
 }
 
 Vue.filter("prettyReading", (sensor: ReadingLike) => {
-    if (!sensor.reading) {
+    if (!_.isNumber(sensor.reading)) {
         return "--";
     }
     return sensor.reading.toFixed(1);
@@ -98,7 +98,7 @@ Vue.filter("prettyCoordinate", (value) => {
     if (!value) {
         return "--";
     }
-    return value.toFixed(3) + '°';
+    return value.toFixed(3) + "°";
 });
 
 Vue.filter("prettyDuration", (value) => {

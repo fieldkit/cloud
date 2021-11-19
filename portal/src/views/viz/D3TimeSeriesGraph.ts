@@ -139,7 +139,10 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .scale(x)
                 .tickFormat(tickFormatter);
 
-            const yAxis = d3.axisLeft(y).ticks(6);
+            const yAxis = d3
+                .axisLeft(y)
+                .ticks(6)
+                .tickSizeOuter(0);
 
             const svg = d3
                 .select(this.$el)

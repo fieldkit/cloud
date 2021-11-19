@@ -37,9 +37,12 @@ var (
 )
 
 func init() {
-	timeSeriesOnly := []VizConfig{
+	mapAndTimesSeriesOnly := []VizConfig{
 		VizConfig{
 			Name: "D3TimeSeriesGraph",
+		},
+		VizConfig{
+			Name: "D3Map",
 		},
 	}
 
@@ -763,7 +766,7 @@ func init() {
 					Key:           "depth",
 					FirmwareKey:   "depth",
 					UnitOfMeasure: "inches",
-					VizConfigs:    timeSeriesOnly,
+					VizConfigs:    mapAndTimesSeriesOnly,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -776,7 +779,7 @@ func init() {
 					FirmwareKey:   "depth_unfiltered",
 					UnitOfMeasure: "inches",
 					Internal:      true,
-					VizConfigs:    timeSeriesOnly,
+					VizConfigs:    mapAndTimesSeriesOnly,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -789,7 +792,7 @@ func init() {
 					FirmwareKey:   "distance",
 					UnitOfMeasure: "mm",
 					Internal:      true,
-					VizConfigs:    timeSeriesOnly,
+					VizConfigs:    mapAndTimesSeriesOnly,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -801,7 +804,7 @@ func init() {
 					Key:           "battery",
 					FirmwareKey:   "battery",
 					UnitOfMeasure: "%",
-					VizConfigs:    timeSeriesOnly,
+					VizConfigs:    mapAndTimesSeriesOnly,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0,
@@ -814,7 +817,7 @@ func init() {
 					FirmwareKey:   "humidity",
 					UnitOfMeasure: "%",
 					Internal:      true,
-					VizConfigs:    timeSeriesOnly,
+					VizConfigs:    mapAndTimesSeriesOnly,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -827,7 +830,7 @@ func init() {
 					FirmwareKey:   "pressure",
 					UnitOfMeasure: "kPa",
 					Internal:      true,
-					VizConfigs:    timeSeriesOnly,
+					VizConfigs:    mapAndTimesSeriesOnly,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 1.0,
@@ -840,7 +843,7 @@ func init() {
 					FirmwareKey:   "altitude",
 					UnitOfMeasure: "m",
 					Internal:      true,
-					VizConfigs:    timeSeriesOnly,
+					VizConfigs:    mapAndTimesSeriesOnly,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 3000,
@@ -853,7 +856,7 @@ func init() {
 					FirmwareKey:   "temperature",
 					UnitOfMeasure: "°C",
 					Internal:      true,
-					VizConfigs:    timeSeriesOnly,
+					VizConfigs:    mapAndTimesSeriesOnly,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: -100.0,
@@ -866,7 +869,7 @@ func init() {
 					FirmwareKey:   "sdError",
 					UnitOfMeasure: "",
 					Internal:      true,
-					VizConfigs:    timeSeriesOnly,
+					VizConfigs:    mapAndTimesSeriesOnly,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0,
