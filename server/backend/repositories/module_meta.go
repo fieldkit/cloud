@@ -10,13 +10,13 @@ import (
 const (
 	ManufacturerConservify = 0x01
 	ConservifyWeather      = 0x01
-	ConservifyWater        = 0x02
+	ConservifyAtlas        = 0x02
 	ConservifyDistance     = 0x03
-	ConservifyWaterPh      = 0x04
-	ConservifyWaterEc      = 0x05
-	ConservifyWaterDo      = 0x06
-	ConservifyWaterTemp    = 0x07
-	ConservifyWaterOrp     = 0x08
+	ConservifyAtlasPh      = 0x04
+	ConservifyAtlasEc      = 0x05
+	ConservifyAtlasDo      = 0x06
+	ConservifyAtlasTemp    = 0x07
+	ConservifyAtlasOrp     = 0x08
 	ConservifyRandom       = 0xa0
 	ConservifyDiagnostics  = 0xa1
 
@@ -51,8 +51,8 @@ func init() {
 			Key: "fk.water.ph",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterPh,
-				AllKinds:     []uint32{ConservifyWater},
+				Kind:         ConservifyAtlasPh,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -73,8 +73,8 @@ func init() {
 			Key: "fk.water.ec",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterEc,
-				AllKinds:     []uint32{ConservifyWater},
+				Kind:         ConservifyAtlasEc,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -118,8 +118,8 @@ func init() {
 			Key: "fk.water.dox",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterDo,
-				AllKinds:     []uint32{ConservifyWater},
+				Kind:         ConservifyAtlasDo,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -140,8 +140,8 @@ func init() {
 			Key: "fk.water.do",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterDo,
-				AllKinds:     []uint32{ConservifyWater},
+				Kind:         ConservifyAtlasDo,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -162,8 +162,8 @@ func init() {
 			Key: "fk.water.orp",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterOrp,
-				AllKinds:     []uint32{ConservifyWater},
+				Kind:         ConservifyAtlasOrp,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -184,8 +184,8 @@ func init() {
 			Key: "fk.water.temp",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterTemp,
-				AllKinds:     []uint32{ConservifyWater},
+				Kind:         ConservifyAtlasTemp,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -713,7 +713,7 @@ func init() {
 			Key: "fk.water",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWater,
+				Kind:         ConservifyAtlas,
 				AllKinds:     []uint32{},
 				Version:      0x1,
 			},
