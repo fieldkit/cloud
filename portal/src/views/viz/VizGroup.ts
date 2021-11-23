@@ -1,7 +1,6 @@
 import _ from "lodash";
 import Vue from "vue";
 
-import { TimeRange } from "./common";
 import { Workspace, Viz, Group, TimeZoom } from "./viz";
 import { VizGraph } from "./VizGraph";
 import { D3Scrubber } from "./D3Scrubber";
@@ -28,11 +27,6 @@ export const VizGroup = Vue.extend({
     data() {
         return {};
     },
-    computed: {
-        linked(this: any) {
-            return this.group.vizes.length > 1;
-        },
-    },
     methods: {
         raiseGroupZoomed(zoom: TimeZoom, ...args) {
             return this.$emit("group-time-zoomed", zoom, ...args);
@@ -58,14 +52,21 @@ export const VizGroup = Vue.extend({
         raiseChangeLinkage(...args) {
             return this.$emit("viz-change-linkage", ...args);
         },
+        isLinked(index: number): boolean {
+            if (index == 0) {
+                return false;
+            }
+            return this.group.vizes.length > 1;
+        },
     },
     template: `
 		<div class="">
 			<div class="group-container">
 				<template v-for="(viz, index) in group.vizes" :key="viz.id">
-					<div class="icons-container" v-if="!topGroup || index > 0" v-bind:class="{ 'linked': linked, 'unlinked': !linked }">
+                    <div style="display: none;">Group:{{group.id}} Viz:{{viz.id}} {{isLinked(index)}} {{index}} {{topGroup}}</div>
+					<div class="icons-container" v-if="!topGroup || index > 0" v-bind:class="{ 'linked': isLinked(index), 'unlinked': !isLinked(index) }">
 						<div class="invisible-spacing-icon"></div>
-						<div class="icon" v-on:click="(ev) => raiseChangeLinkage(viz)" v-bind:class="{ 'link-icon': !linked, 'unlink-icon': linked }"></div>
+						<div class="icon" v-on:click="(ev) => raiseChangeLinkage(viz, !isLinked(index))" v-bind:class="{ 'link-icon': !linked, 'unlink-icon': linked }"></div>
 						<div class="icon remove-icon" v-on:click="(ev) => raiseRemove(viz)"></div>
 					</div>
 

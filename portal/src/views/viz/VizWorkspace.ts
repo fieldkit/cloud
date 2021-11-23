@@ -76,10 +76,10 @@ export const VizWorkspace = Vue.extend({
                 .with((this as any).signal)
                 .query();
         },
-        onChangeLinkage(group: Group, viz: Viz) {
+        onChangeLinkage(group: Group, viz: Viz, linking: boolean) {
             viz.log("linkage");
             return this.workspace
-                .changeLinkage(viz)
+                .changeLinkage(viz, linking)
                 .with((this as any).signal)
                 .query();
         },

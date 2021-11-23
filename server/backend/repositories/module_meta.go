@@ -10,13 +10,18 @@ import (
 const (
 	ManufacturerConservify = 0x01
 	ConservifyWeather      = 0x01
-	ConservifyWater        = 0x02
+	ConservifyAtlas        = 0x02
 	ConservifyDistance     = 0x03
-	ConservifyWaterPh      = 0x04
-	ConservifyWaterEc      = 0x05
-	ConservifyWaterDo      = 0x06
-	ConservifyWaterTemp    = 0x07
-	ConservifyWaterOrp     = 0x08
+	ConservifyAtlasPh      = 0x04
+	ConservifyAtlasEc      = 0x05
+	ConservifyAtlasDo      = 0x06
+	ConservifyAtlasTemp    = 0x07
+	ConservifyAtlasOrp     = 0x08
+	ConservifyWaterPh      = 0x09
+	ConservifyWaterEc      = 0x10
+	ConservifyWaterDo      = 0x11
+	ConservifyWaterTemp    = 0x12
+	ConservifyWaterOrp     = 0x13
 	ConservifyRandom       = 0xa0
 	ConservifyDiagnostics  = 0xa1
 
@@ -52,7 +57,7 @@ func init() {
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWaterPh,
-				AllKinds:     []uint32{ConservifyWater},
+				AllKinds:     []uint32{},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -74,7 +79,139 @@ func init() {
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWaterEc,
-				AllKinds:     []uint32{ConservifyWater},
+				AllKinds:     []uint32{},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "ec",
+					FirmwareKey:   "ec",
+					UnitOfMeasure: "μS/cm",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 500000.0,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "fk.water.do",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyWaterDo,
+				AllKinds:     []uint32{},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "do",
+					FirmwareKey:   "do",
+					UnitOfMeasure: "%",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 100.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "pressure",
+					FirmwareKey:   "pressure",
+					UnitOfMeasure: "kPa",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 1.0,
+							Maximum: 200000.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "temperature",
+					FirmwareKey:   "temperature",
+					UnitOfMeasure: "°C",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: -100.0,
+							Maximum: 200.0,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "fk.water.temp",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyWaterTemp,
+				AllKinds:     []uint32{},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "temp",
+					FirmwareKey:   "temp",
+					UnitOfMeasure: "°C",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: -126.0,
+							Maximum: 1254.0,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "fk.water.orp",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyWaterOrp,
+				AllKinds:     []uint32{},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "orp",
+					FirmwareKey:   "orp",
+					UnitOfMeasure: "mV",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: -1019.9,
+							Maximum: 1019.9,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "fk.water.ph",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyAtlasPh,
+				AllKinds:     []uint32{ConservifyAtlas},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "ph",
+					FirmwareKey:   "ph",
+					UnitOfMeasure: "",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 14.0,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "fk.water.ec",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyAtlasEc,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -118,8 +255,8 @@ func init() {
 			Key: "fk.water.dox",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterDo,
-				AllKinds:     []uint32{ConservifyWater},
+				Kind:         ConservifyAtlasDo,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -140,8 +277,8 @@ func init() {
 			Key: "fk.water.do",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterDo,
-				AllKinds:     []uint32{ConservifyWater},
+				Kind:         ConservifyAtlasDo,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -159,33 +296,11 @@ func init() {
 			},
 		},
 		&ModuleMeta{
-			Key: "fk.water.orp",
-			Header: ModuleHeader{
-				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterOrp,
-				AllKinds:     []uint32{ConservifyWater},
-				Version:      0x1,
-			},
-			Sensors: []*SensorMeta{
-				&SensorMeta{
-					Key:           "orp",
-					FirmwareKey:   "orp",
-					UnitOfMeasure: "mV",
-					Ranges: []SensorRanges{
-						SensorRanges{
-							Minimum: -1019.9,
-							Maximum: 1019.9,
-						},
-					},
-				},
-			},
-		},
-		&ModuleMeta{
 			Key: "fk.water.temp",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterTemp,
-				AllKinds:     []uint32{ConservifyWater},
+				Kind:         ConservifyAtlasTemp,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -197,6 +312,28 @@ func init() {
 						SensorRanges{
 							Minimum: -126.0,
 							Maximum: 1254.0,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "fk.water.orp",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyAtlasOrp,
+				AllKinds:     []uint32{ConservifyAtlas},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "orp",
+					FirmwareKey:   "orp",
+					UnitOfMeasure: "mV",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: -1019.9,
+							Maximum: 1019.9,
 						},
 					},
 				},
@@ -713,7 +850,7 @@ func init() {
 			Key: "fk.water",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWater,
+				Kind:         ConservifyAtlas,
 				AllKinds:     []uint32{},
 				Version:      0x1,
 			},
