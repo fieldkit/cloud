@@ -333,6 +333,19 @@ export class Group {
         return new Group([this.vizes[0]].map((v) => v.clone()));
     }
 
+    public unlinkAt(viz: Viz): Group {
+        const index = _.indexOf(this.vizes, viz);
+        if (index < 0) throw new Error("unlinking of mismatched group/viz");
+        console.log("unlink-at:index", index);
+        const removing = this.vizes.slice(index);
+        console.log("unlink-at:removing", removing);
+        this.vizes = this.vizes.filter((viz) => {
+            return _.indexOf(removing, viz) < 0;
+        });
+        console.log("unlink-at:after", this.vizes);
+        return new Group(removing);
+    }
+
     public add(viz: Viz) {
         this.vizes.push(viz);
         return this;
@@ -742,20 +755,10 @@ export class Workspace {
         return this;
     }
 
-    public changeLinkage(viz: Viz): Workspace {
+    public changeLinkage(viz: Viz, linking: boolean): Workspace {
         const group = this.findGroup(viz);
-        if (group.vizes.length > 1) {
-            group.remove(viz);
-            this.groups.forEach((groupItem, groupIndex) => {
-                if (groupItem.id === group.id) {
-                    if (this.groups.length === 1) {
-                        this.groups.push(new Group([viz]));
-                        return;
-                    }
-                    this.groups.splice(groupIndex + 1, 0, new Group([viz]));
-                }
-            });
-        } else {
+        if (linking) {
+            console.log("linkage-link", viz.id, group.id, viz, group);
             this.groups.reduce((previous: Group | null, iter: Group): Group => {
                 if (iter == group) {
                     if (previous == null) {
@@ -766,6 +769,11 @@ export class Workspace {
                 }
                 return iter;
             }, null);
+        } else {
+            console.log("linkage-unlink", viz.id, group.id, viz, group);
+            const newGroup = group.unlinkAt(viz);
+            const groupIndex = _.indexOf(this.groups, group);
+            this.groups.splice(groupIndex + 1, 0, newGroup);
         }
         return this;
     }
