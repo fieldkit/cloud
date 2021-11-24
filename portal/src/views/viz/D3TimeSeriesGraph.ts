@@ -303,9 +303,25 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .attr("cy", (d) => y(d.value))
                 .attr("fill", (d) => colors(d.value));
 
-            const yLabel = _.capitalize(vizInfo.firmwareKey) + ' (' + _.capitalize(vizInfo.unitOfMeasure) + ')';
+            const yLabel = _.capitalize(vizInfo.firmwareKey) + " (" + _.capitalize(vizInfo.unitOfMeasure) + ")";
             appendYAxisLabel(svg, yLabel, layout);
             appendXAxisLabel(svg, layout);
+
+            svg.selectAll(".x-axis .tick text").call(function(text) {
+                text.each(function(this) {
+                    const self = d3.select(this);
+                    const s = self.text().split(" ");
+                    self.text("");
+                    self.append("tspan")
+                        .attr("x", 0)
+                        .attr("dy", "1em")
+                        .text(s[0]);
+                    self.append("tspan")
+                        .attr("x", 0)
+                        .attr("dy", "1em")
+                        .text(s[1]);
+                });
+            });
         },
     },
     template: `<div class="viz time-series-graph"><div class="chart" @dblclick="onDouble"></div></div>`,
