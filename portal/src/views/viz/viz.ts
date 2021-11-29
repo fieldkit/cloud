@@ -607,7 +607,7 @@ export class Workspace {
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure, details.firmwareKey, details.viz || []);
+        return new VizInfo(key, scale, station, details.unitOfMeasure, key, details.viz || []);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {

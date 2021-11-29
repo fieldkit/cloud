@@ -1,6 +1,7 @@
 import _ from "lodash";
 import Vue from "vue";
 import * as d3 from "d3";
+import i18n from "@/i18n";
 
 import { TimeRange, Margins, ChartLayout } from "./common";
 import { Graph, QueriedData, Workspace, FastTime, TimeZoom } from "./viz";
@@ -318,7 +319,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .attr("cy", (d) => y(d.value))
                 .attr("fill", (d) => colors(d.value));
 
-            const yLabel = _.capitalize(vizInfo.firmwareKey) + " (" + _.capitalize(vizInfo.unitOfMeasure) + ")";
+            const yLabel = i18n.tc(vizInfo.firmwareKey) + " (" + _.capitalize(vizInfo.unitOfMeasure) + ")";
             appendYAxisLabel(svg, yLabel, layout);
             appendXAxisLabel(svg, layout);
         },
