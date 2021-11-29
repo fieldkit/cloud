@@ -50,7 +50,7 @@ export function appendXAxisLabel(svg: d3, layout: ChartLayout): void {
         .attr("text-anchor", "middle")
         .attr("fill", "#7F7F7F")
         .style("font-size", "10px")
-        .attr("y", layout.height - 20)
+        .attr("y", layout.height - 15)
         .attr("x", layout.width / 2)
         .text("Time");
 }

@@ -78,7 +78,7 @@
                                 v-bind:key="stationId"
                                 :station="selectedStation"
                                 :notes="selectedNotes"
-                                :readonly="!project.project.readOnly"
+                                :readonly="project.project.readOnly"
                                 @save="saveForm"
                                 @change="onChange"
                             />
