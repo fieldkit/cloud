@@ -277,8 +277,8 @@ export class Graph extends Viz {
     }
 
     public changeSensors(option: HasSensorParams) {
-        console.log(`changing-sensors`, option);
         const sensorParams = option.sensorParams;
+        this.log(`changing-sensors`, option);
         this.chartParams = new DataQueryParams(this.chartParams.when, sensorParams.stations, sensorParams.sensors);
         this.all = null;
     }
@@ -568,10 +568,11 @@ export class Workspace {
                 this.querier.queryInfo(iq).then((info) => {
                     return _.map(info.stations, (info, stationId) => {
                         const stationName = info[0].stationName;
+                        const stationLocation = info[0].stationLocation;
                         const sensors = info.map(
                             (row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt)
                         );
-                        const station = new StationMeta(Number(stationId), stationName, info[0].stationLocation, sensors);
+                        const station = new StationMeta(Number(stationId), stationName, stationLocation, sensors);
                         this.stations[station.id] = station;
                         console.log("station-meta", { station, info });
                         return station;
@@ -582,6 +583,7 @@ export class Workspace {
         const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq) as Promise<unknown>);
         return Promise.all([...pendingInfo, ...pendingData]).then(() => {
             // Update options here if doing so lazily.
+            console.log("workspace: query done ");
             this.version++;
         });
     }

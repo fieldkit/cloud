@@ -52,14 +52,14 @@ export const D3Map = Vue.extend({
         },
     },
     mounted() {
-        this.viz.log("mounted");
+        this.viz.log("mounted, refreshing");
         this.refresh();
+    },
+    updated() {
+        this.viz.log("updated, refreshing");
     },
     destroyed() {
         mapStore.remove(this.viz.id);
-    },
-    updated() {
-        this.viz.log("updated");
     },
     methods: {
         getMap(): Map | null {
@@ -108,13 +108,12 @@ export const D3Map = Vue.extend({
             const vizInfo = this.workspace.vizInfo(this.viz);
             const located = this.getLocatedData(vizInfo);
             if (located.length == 0) {
-                console.log(`map-empty`);
+                this.viz.log(`map-empty`);
                 return;
             }
 
             const colors = vizInfo.colorScale;
 
-            this.viz.log("map", map);
             this.viz.log("map-refresh: data", located.length);
 
             const geojson = {
