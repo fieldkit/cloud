@@ -436,7 +436,11 @@ class VizQuery {
 }
 
 class InfoQuery {
-    constructor(public readonly params: Stations) {}
+    constructor(public readonly params: Stations, public readonly vizes: Viz[]) {}
+
+    public howBusy(d: number): any {
+        return this.vizes.map((v) => v.howBusy(d));
+    }
 }
 
 export class Querier {
@@ -455,11 +459,18 @@ export class Querier {
             return Promise.resolve(this.info[key]);
         }
 
+        iq.howBusy(1);
+
         const api = new FKApi();
-        return api.sensorData(queryParams).then((info: SensorInfoResponse) => {
-            this.info[key] = info;
-            return info;
-        });
+        return api
+            .sensorData(queryParams)
+            .then((info: SensorInfoResponse) => {
+                this.info[key] = info;
+                return info;
+            })
+            .finally(() => {
+                iq.howBusy(-1);
+            });
     }
 
     public queryData(vq: VizQuery): Promise<QueriedData> {
@@ -482,8 +493,10 @@ export class Querier {
                 this.data[key] = queried;
                 return queried;
             })
-            .then((data) => {
+            .finally(() => {
                 vq.howBusy(-1);
+            })
+            .then((data) => {
                 vq.resolve(data);
                 return data;
             });
@@ -531,8 +544,8 @@ export class Workspace {
         // is especially important to do from here because we may have
         // been instantiated from a Bookmark. Right now we just query
         // for information on all the stations involved.
-        const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz).map((viz) => viz.chartParams.stations)).concat(this.stationIds));
-        const infoQueries = allStationIds.length ? [new InfoQuery(allStationIds)] : [];
+        const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz.chartParams.stations)).concat(this.stationIds));
+        const infoQueries = allStationIds.length ? [new InfoQuery(allStationIds, allGraphs)] : [];
 
         // Second step is to query to fill in any required scrubbers. I
         // have tried in previous iterations to be clever about this
