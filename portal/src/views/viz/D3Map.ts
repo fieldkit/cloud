@@ -152,18 +152,20 @@ export const D3Map = Vue.extend({
                     "line-width": 3,
                 },
             });
-            const geoDots = located.map((row) => {
-                return {
-                    type: "Feature",
-                    properties: {
-                        color: colors(row.value),
-                    },
-                    geometry: {
-                        type: "Point",
-                        coordinates: row.location,
-                    },
-                };
-            });
+            const geoDots = located
+                .filter((row) => _.isNumber(row.value))
+                .map((row) => {
+                    return {
+                        type: "Feature",
+                        properties: {
+                            color: colors(row.value),
+                        },
+                        geometry: {
+                            type: "Point",
+                            coordinates: row.location,
+                        },
+                    };
+                });
             map.addSource("points", {
                 type: "geojson",
                 data: {
@@ -195,11 +197,8 @@ export const D3Map = Vue.extend({
                     "symbol-placement": "line",
                     "symbol-spacing": 100,
                     "icon-allow-overlap": true,
-                    "icon-image": "arrow",
                     "icon-size": 0.75,
                     visibility: "visible",
-                    // to reverse them:
-                    // "icon-rotate": 180,
                 },
             });
 
