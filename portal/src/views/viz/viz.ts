@@ -279,6 +279,14 @@ export class Graph extends Viz {
     public changeSensors(option: HasSensorParams) {
         const sensorParams = option.sensorParams;
         this.log(`changing-sensors`, option);
+
+        if (_.difference(sensorParams.stations, this.chartParams.stations)) {
+            if (this.geo) {
+                this.log(`changing-sensors`, "clearing-geo");
+                this.geo = null;
+            }
+        }
+
         this.chartParams = new DataQueryParams(this.chartParams.when, sensorParams.stations, sensorParams.sensors);
         this.all = null;
     }
@@ -515,7 +523,7 @@ export class Workspace {
             .value();
     }
 
-    public query(): Promise<any> {
+    public async query(): Promise<any> {
         const allGraphs = this.allVizes.map((viz) => viz as Graph).filter((viz) => viz);
 
         // First we may need some data for making the UI useful and
@@ -579,6 +587,8 @@ export class Workspace {
                     });
                 }) as Promise<unknown>
         );
+
+        await Promise.all([...pendingInfo]);
 
         const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq) as Promise<unknown>);
         return Promise.all([...pendingInfo, ...pendingData]).then(() => {
@@ -750,7 +760,6 @@ export class Workspace {
     }
 
     public changeSensors(viz: Viz, hasParams: HasSensorParams): Workspace {
-        console.log("changing sensors", viz, hasParams);
         if (viz instanceof Graph) {
             viz.changeSensors(hasParams);
         }

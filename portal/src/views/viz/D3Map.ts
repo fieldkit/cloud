@@ -5,7 +5,7 @@ import { LngLatBounds } from "mapbox-gl";
 
 import * as d3 from "d3";
 
-import { Time, TimeRange, Margins, ChartLayout } from "./common";
+import { Time, TimeRange, Margins, ChartLayout, DataQueryParams } from "./common";
 import { Graph, QueriedData, Workspace, GeoZoom, VizInfo } from "./viz";
 import { MapStore, Map } from "./MapStore";
 
@@ -75,20 +75,27 @@ export const D3Map = Vue.extend({
             return true;
         },
         getLocatedData(vizInfo: VizInfo): { value: number; location: [number, number] }[] {
-            const located = this.data?.data.filter((row) => row.location && row.location.length) as {
-                value: number;
-                location: [number, number];
-            }[];
-            if (located.length > 0) {
-                return located;
+            try {
+                const located = this.data?.data.filter((row) => row.location && row.location.length) as {
+                    value: number;
+                    location: [number, number];
+                }[];
+                if (located.length > 0) {
+                    return located;
+                }
+                if (!vizInfo.station || !vizInfo.station.location) {
+                    this.viz.log("viz-info", vizInfo);
+                    return [];
+                }
+                return this.data?.data.map((row) => _.extend({}, row, { location: vizInfo.station.location })) as {
+                    value: number;
+                    location: [number, number];
+                }[];
+            } catch (error) {
+                this.viz.log("vizInfo", vizInfo);
+                this.viz.log("data", this.data);
+                throw error;
             }
-            if (!vizInfo.station.location) {
-                return [];
-            }
-            return this.data?.data.map((row) => _.extend({}, row, { location: vizInfo.station.location })) as {
-                value: number;
-                location: [number, number];
-            }[];
         },
         refresh() {
             if (!this.ready()) {
@@ -230,6 +237,9 @@ export const D3Map = Vue.extend({
             this.refreshed = true;
         },
         removePreviousMapped(map) {
+            if (!map.style) {
+                return;
+            }
             if (map.getLayer("arrow-layer")) {
                 map.removeLayer("arrow-layer");
             }
