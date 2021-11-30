@@ -1,0 +1,11 @@
+{
+    "files.exclude": {
+        "build": true,
+        "node_modules": true,
+        "portal/build": true,
+        "portal/node_modules": true,
+        "server/api/gen": true,
+        "server/api/goa*": true,
+        "server/gen": true
+    }
+}
