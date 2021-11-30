@@ -10,10 +10,11 @@ import (
 	"time"
 
 	"github.com/itchyny/gojq"
+
+	"github.com/iancoleman/strcase"
 )
 
 type ParsedReading struct {
-	Name     string  `json:"name"`
 	Key      string  `json:"key"`
 	Value    float64 `json:"value"`
 	Battery  bool    `json:"battery"`
@@ -170,7 +171,11 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 	if err != nil {
 		receivedAt, err = time.Parse("2006-01-02 15:04:05.999999999+00:00", receivedAtString)
 		if err != nil {
-			return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+			// NOTE: NOAA Tidal data was missing seconds.
+			receivedAt, err = time.Parse("2006-01-02 15:04+00:00", receivedAtString)
+			if err != nil {
+				return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+			}
 		}
 	}
 
@@ -195,6 +200,14 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 
 	for _, module := range schema.Station.Modules {
 		for _, sensor := range module.Sensors {
+			expectedKey := strcase.ToLowerCamel(sensor.Key)
+			if sensor.Key == "" {
+				return nil, fmt.Errorf("empty sensor-key")
+			}
+			if expectedKey != sensor.Key {
+				return nil, fmt.Errorf("unexpected sensor-key formatting '%s' (expected '%s')", sensor.Key, expectedKey)
+			}
+
 			maybeValue, err := m.evaluate(ctx, cache, source, sensor.Expression)
 			if err != nil {
 				return nil, fmt.Errorf("evaluating sensor expression '%s': %v", sensor.Name, err)
@@ -202,7 +215,6 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 
 			if value, ok := toFloat(maybeValue); ok {
 				reading := &ParsedReading{
-					Name:     sensor.Name,
 					Key:      sensor.Key,
 					Battery:  sensor.Battery,
 					Location: sensor.Location,

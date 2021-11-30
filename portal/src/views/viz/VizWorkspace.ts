@@ -18,7 +18,7 @@ export const VizWorkspace = Vue.extend({
         return {};
     },
     mounted() {
-        console.log("workspace: mounted", this.workspace);
+        // console.log("workspace: mounted", this.workspace);
         return this.workspace.query();
     },
     methods: {
@@ -63,7 +63,7 @@ export const VizWorkspace = Vue.extend({
                 .query();
         },
         onChangeSensors(group: Group, viz: Viz, params: HasSensorParams) {
-            viz.log("has-params", params);
+            viz.log("change-sensors", params);
             return this.workspace
                 .changeSensors(viz, params)
                 .with((this as any).signal)

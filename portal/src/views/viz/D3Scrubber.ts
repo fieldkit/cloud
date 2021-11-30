@@ -26,20 +26,20 @@ export const D3Scrubber = Vue.extend({
     },
     watch: {
         visible(newValue, oldValue) {
-            console.log("d3scrubber graphing (visible)");
+            // console.log("d3scrubber graphing (visible)");
             this.refresh();
         },
         data(newValue, oldValue) {
-            console.log("d3scrubber graphing (data)");
+            // console.log("d3scrubber graphing (data)");
             this.refresh();
         },
     },
     mounted() {
-        console.log("d3scrubber mounted");
+        // console.log("d3scrubber mounted");
         this.refresh();
     },
     updated() {
-        console.log("d3scrubber updated");
+        // console.log("d3scrubber updated");
     },
     methods: {
         raiseTimeZoomed(newTimes) {

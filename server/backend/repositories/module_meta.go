@@ -950,6 +950,19 @@ func init() {
 					},
 				},
 				&SensorMeta{
+					Key:           "tideFeet",
+					FirmwareKey:   "tide_feet",
+					UnitOfMeasure: "inches",
+					Internal:      false,
+					VizConfigs:    mapAndTimesSeriesOnly,
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 4999.0,
+						},
+					},
+				},
+				&SensorMeta{
 					Key:           "humidity",
 					FirmwareKey:   "humidity",
 					UnitOfMeasure: "%",

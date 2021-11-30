@@ -277,8 +277,16 @@ export class Graph extends Viz {
     }
 
     public changeSensors(option: HasSensorParams) {
-        console.log(`changing-sensors`, option);
         const sensorParams = option.sensorParams;
+        this.log(`changing-sensors`, option);
+
+        if (_.difference(sensorParams.stations, this.chartParams.stations)) {
+            if (this.geo) {
+                this.log(`changing-sensors`, "clearing-geo");
+                this.geo = null;
+            }
+        }
+
         this.chartParams = new DataQueryParams(this.chartParams.when, sensorParams.stations, sensorParams.sensors);
         this.all = null;
     }
@@ -428,7 +436,11 @@ class VizQuery {
 }
 
 class InfoQuery {
-    constructor(public readonly params: Stations) {}
+    constructor(public readonly params: Stations, public readonly vizes: Viz[]) {}
+
+    public howBusy(d: number): any {
+        return this.vizes.map((v) => v.howBusy(d));
+    }
 }
 
 export class Querier {
@@ -447,11 +459,18 @@ export class Querier {
             return Promise.resolve(this.info[key]);
         }
 
+        iq.howBusy(1);
+
         const api = new FKApi();
-        return api.sensorData(queryParams).then((info: SensorInfoResponse) => {
-            this.info[key] = info;
-            return info;
-        });
+        return api
+            .sensorData(queryParams)
+            .then((info: SensorInfoResponse) => {
+                this.info[key] = info;
+                return info;
+            })
+            .finally(() => {
+                iq.howBusy(-1);
+            });
     }
 
     public queryData(vq: VizQuery): Promise<QueriedData> {
@@ -474,8 +493,10 @@ export class Querier {
                 this.data[key] = queried;
                 return queried;
             })
-            .then((data) => {
+            .finally(() => {
                 vq.howBusy(-1);
+            })
+            .then((data) => {
                 vq.resolve(data);
                 return data;
             });
@@ -515,7 +536,7 @@ export class Workspace {
             .value();
     }
 
-    public query(): Promise<any> {
+    public async query(): Promise<any> {
         const allGraphs = this.allVizes.map((viz) => viz as Graph).filter((viz) => viz);
 
         // First we may need some data for making the UI useful and
@@ -523,8 +544,8 @@ export class Workspace {
         // is especially important to do from here because we may have
         // been instantiated from a Bookmark. Right now we just query
         // for information on all the stations involved.
-        const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz).map((viz) => viz.chartParams.stations)).concat(this.stationIds));
-        const infoQueries = allStationIds.length ? [new InfoQuery(allStationIds)] : [];
+        const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz.chartParams.stations)).concat(this.stationIds));
+        const infoQueries = allStationIds.length ? [new InfoQuery(allStationIds, allGraphs)] : [];
 
         // Second step is to query to fill in any required scrubbers. I
         // have tried in previous iterations to be clever about this
@@ -568,10 +589,11 @@ export class Workspace {
                 this.querier.queryInfo(iq).then((info) => {
                     return _.map(info.stations, (info, stationId) => {
                         const stationName = info[0].stationName;
+                        const stationLocation = info[0].stationLocation;
                         const sensors = info.map(
                             (row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt)
                         );
-                        const station = new StationMeta(Number(stationId), stationName, info[0].stationLocation, sensors);
+                        const station = new StationMeta(Number(stationId), stationName, stationLocation, sensors);
                         this.stations[station.id] = station;
                         console.log("station-meta", { station, info });
                         return station;
@@ -579,9 +601,12 @@ export class Workspace {
                 }) as Promise<unknown>
         );
 
+        await Promise.all([...pendingInfo]);
+
         const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq) as Promise<unknown>);
         return Promise.all([...pendingInfo, ...pendingData]).then(() => {
             // Update options here if doing so lazily.
+            console.log("workspace: query done ");
             this.version++;
         });
     }
@@ -607,7 +632,7 @@ export class Workspace {
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure, details.firmwareKey, details.viz || []);
+        return new VizInfo(key, scale, station, details.unitOfMeasure, key, details.viz || []);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {
@@ -748,7 +773,6 @@ export class Workspace {
     }
 
     public changeSensors(viz: Viz, hasParams: HasSensorParams): Workspace {
-        console.log("changing sensors", viz, hasParams);
         if (viz instanceof Graph) {
             viz.changeSensors(hasParams);
         }
