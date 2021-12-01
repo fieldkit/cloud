@@ -133,7 +133,7 @@ export class ProjectModule {
 export class MapFeature {
     public readonly type = "Feature";
     public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
-    public readonly properties: { title: string; icon: string; id: number } | null = null;
+    public readonly properties: { icon: string; id: number } | null = null;
 
     constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
@@ -142,7 +142,6 @@ export class MapFeature {
         };
         this.properties = {
             id: station.id,
-            title: station.name,
             icon: "marker",
         };
     }
@@ -373,6 +372,14 @@ const actions = (services: Services) => {
             payload: { projectId: number; email: string }
         ) => {
             await services.api.removeUserFromProject(payload);
+            const usersReply = await services.api.getUsersByProject(payload.projectId);
+            commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
+        },
+        [ActionTypes.PROJECT_EDIT_ROLE]: async (
+            { commit, dispatch }: { commit: any; dispatch: any },
+            payload: { projectId: number; email: string; role: number }
+        ) => {
+            await services.api.editRole(payload);
             const usersReply = await services.api.getUsersByProject(payload.projectId);
             commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
         },

@@ -122,116 +122,6 @@ func EncodeRolesError(encoder func(context.Context, http.ResponseWriter) goahttp
 	}
 }
 
-// EncodeDeleteResponse returns an encoder for responses returned by the user
-// delete endpoint.
-func EncodeDeleteResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
-	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		w.WriteHeader(http.StatusNoContent)
-		return nil
-	}
-}
-
-// DecodeDeleteRequest returns a decoder for requests sent to the user delete
-// endpoint.
-func DecodeDeleteRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
-	return func(r *http.Request) (interface{}, error) {
-		var (
-			userID int32
-			auth   string
-			err    error
-
-			params = mux.Vars(r)
-		)
-		{
-			userIDRaw := params["userId"]
-			v, err2 := strconv.ParseInt(userIDRaw, 10, 32)
-			if err2 != nil {
-				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("userID", userIDRaw, "integer"))
-			}
-			userID = int32(v)
-		}
-		auth = r.Header.Get("Authorization")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
-		}
-		if err != nil {
-			return nil, err
-		}
-		payload := NewDeletePayload(userID, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
-		}
-
-		return payload, nil
-	}
-}
-
-// EncodeDeleteError returns an encoder for errors returned by the delete user
-// endpoint.
-func EncodeDeleteError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
-	encodeError := goahttp.ErrorEncoder(encoder, formatter)
-	return func(ctx context.Context, w http.ResponseWriter, v error) error {
-		en, ok := v.(ErrorNamer)
-		if !ok {
-			return encodeError(ctx, w, v)
-		}
-		switch en.ErrorName() {
-		case "unauthorized":
-			res := v.(*goa.ServiceError)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewDeleteUnauthorizedResponseBody(res)
-			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
-			return enc.Encode(body)
-		case "forbidden":
-			res := v.(*goa.ServiceError)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewDeleteForbiddenResponseBody(res)
-			}
-			w.Header().Set("goa-error", "forbidden")
-			w.WriteHeader(http.StatusForbidden)
-			return enc.Encode(body)
-		case "not-found":
-			res := v.(*goa.ServiceError)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewDeleteNotFoundResponseBody(res)
-			}
-			w.Header().Set("goa-error", "not-found")
-			w.WriteHeader(http.StatusNotFound)
-			return enc.Encode(body)
-		case "bad-request":
-			res := v.(*goa.ServiceError)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewDeleteBadRequestResponseBody(res)
-			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
-		default:
-			return encodeError(ctx, w, v)
-		}
-	}
-}
-
 // EncodeUploadPhotoResponse returns an encoder for responses returned by the
 // user upload photo endpoint.
 func EncodeUploadPhotoResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
@@ -2149,6 +2039,120 @@ func EncodeProjectRolesError(encoder func(context.Context, http.ResponseWriter) 
 				body = formatter(res)
 			} else {
 				body = NewProjectRolesBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeAdminTermsAndConditionsResponse returns an encoder for responses
+// returned by the user admin terms and conditions endpoint.
+func EncodeAdminTermsAndConditionsResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		w.WriteHeader(http.StatusNoContent)
+		return nil
+	}
+}
+
+// DecodeAdminTermsAndConditionsRequest returns a decoder for requests sent to
+// the user admin terms and conditions endpoint.
+func DecodeAdminTermsAndConditionsRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body AdminTermsAndConditionsRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateAdminTermsAndConditionsRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+
+		var (
+			auth string
+		)
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewAdminTermsAndConditionsPayload(&body, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeAdminTermsAndConditionsError returns an encoder for errors returned by
+// the admin terms and conditions user endpoint.
+func EncodeAdminTermsAndConditionsError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAdminTermsAndConditionsUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAdminTermsAndConditionsForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAdminTermsAndConditionsNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewAdminTermsAndConditionsBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)

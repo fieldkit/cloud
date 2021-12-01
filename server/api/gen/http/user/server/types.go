@@ -72,6 +72,12 @@ type AcceptTncRequestBody struct {
 	Accept *bool `form:"accept,omitempty" json:"accept,omitempty" xml:"accept,omitempty"`
 }
 
+// AdminTermsAndConditionsRequestBody is the type of the "user" service "admin
+// terms and conditions" endpoint HTTP request body.
+type AdminTermsAndConditionsRequestBody struct {
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+}
+
 // AdminDeleteRequestBody is the type of the "user" service "admin delete"
 // endpoint HTTP request body.
 type AdminDeleteRequestBody struct {
@@ -245,78 +251,6 @@ type RolesNotFoundResponseBody struct {
 // RolesBadRequestResponseBody is the type of the "user" service "roles"
 // endpoint HTTP response body for the "bad-request" error.
 type RolesBadRequestResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// DeleteUnauthorizedResponseBody is the type of the "user" service "delete"
-// endpoint HTTP response body for the "unauthorized" error.
-type DeleteUnauthorizedResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// DeleteForbiddenResponseBody is the type of the "user" service "delete"
-// endpoint HTTP response body for the "forbidden" error.
-type DeleteForbiddenResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// DeleteNotFoundResponseBody is the type of the "user" service "delete"
-// endpoint HTTP response body for the "not-found" error.
-type DeleteNotFoundResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// DeleteBadRequestResponseBody is the type of the "user" service "delete"
-// endpoint HTTP response body for the "bad-request" error.
-type DeleteBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -1668,6 +1602,82 @@ type ProjectRolesBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// AdminTermsAndConditionsUnauthorizedResponseBody is the type of the "user"
+// service "admin terms and conditions" endpoint HTTP response body for the
+// "unauthorized" error.
+type AdminTermsAndConditionsUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AdminTermsAndConditionsForbiddenResponseBody is the type of the "user"
+// service "admin terms and conditions" endpoint HTTP response body for the
+// "forbidden" error.
+type AdminTermsAndConditionsForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AdminTermsAndConditionsNotFoundResponseBody is the type of the "user"
+// service "admin terms and conditions" endpoint HTTP response body for the
+// "not-found" error.
+type AdminTermsAndConditionsNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AdminTermsAndConditionsBadRequestResponseBody is the type of the "user"
+// service "admin terms and conditions" endpoint HTTP response body for the
+// "bad-request" error.
+type AdminTermsAndConditionsBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // AdminDeleteUnauthorizedResponseBody is the type of the "user" service "admin
 // delete" endpoint HTTP response body for the "unauthorized" error.
 type AdminDeleteUnauthorizedResponseBody struct {
@@ -2162,62 +2172,6 @@ func NewRolesNotFoundResponseBody(res *goa.ServiceError) *RolesNotFoundResponseB
 // of the "roles" endpoint of the "user" service.
 func NewRolesBadRequestResponseBody(res *goa.ServiceError) *RolesBadRequestResponseBody {
 	body := &RolesBadRequestResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewDeleteUnauthorizedResponseBody builds the HTTP response body from the
-// result of the "delete" endpoint of the "user" service.
-func NewDeleteUnauthorizedResponseBody(res *goa.ServiceError) *DeleteUnauthorizedResponseBody {
-	body := &DeleteUnauthorizedResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewDeleteForbiddenResponseBody builds the HTTP response body from the result
-// of the "delete" endpoint of the "user" service.
-func NewDeleteForbiddenResponseBody(res *goa.ServiceError) *DeleteForbiddenResponseBody {
-	body := &DeleteForbiddenResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewDeleteNotFoundResponseBody builds the HTTP response body from the result
-// of the "delete" endpoint of the "user" service.
-func NewDeleteNotFoundResponseBody(res *goa.ServiceError) *DeleteNotFoundResponseBody {
-	body := &DeleteNotFoundResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewDeleteBadRequestResponseBody builds the HTTP response body from the
-// result of the "delete" endpoint of the "user" service.
-func NewDeleteBadRequestResponseBody(res *goa.ServiceError) *DeleteBadRequestResponseBody {
-	body := &DeleteBadRequestResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -3268,6 +3222,66 @@ func NewProjectRolesBadRequestResponseBody(res *goa.ServiceError) *ProjectRolesB
 	return body
 }
 
+// NewAdminTermsAndConditionsUnauthorizedResponseBody builds the HTTP response
+// body from the result of the "admin terms and conditions" endpoint of the
+// "user" service.
+func NewAdminTermsAndConditionsUnauthorizedResponseBody(res *goa.ServiceError) *AdminTermsAndConditionsUnauthorizedResponseBody {
+	body := &AdminTermsAndConditionsUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAdminTermsAndConditionsForbiddenResponseBody builds the HTTP response
+// body from the result of the "admin terms and conditions" endpoint of the
+// "user" service.
+func NewAdminTermsAndConditionsForbiddenResponseBody(res *goa.ServiceError) *AdminTermsAndConditionsForbiddenResponseBody {
+	body := &AdminTermsAndConditionsForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAdminTermsAndConditionsNotFoundResponseBody builds the HTTP response body
+// from the result of the "admin terms and conditions" endpoint of the "user"
+// service.
+func NewAdminTermsAndConditionsNotFoundResponseBody(res *goa.ServiceError) *AdminTermsAndConditionsNotFoundResponseBody {
+	body := &AdminTermsAndConditionsNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAdminTermsAndConditionsBadRequestResponseBody builds the HTTP response
+// body from the result of the "admin terms and conditions" endpoint of the
+// "user" service.
+func NewAdminTermsAndConditionsBadRequestResponseBody(res *goa.ServiceError) *AdminTermsAndConditionsBadRequestResponseBody {
+	body := &AdminTermsAndConditionsBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewAdminDeleteUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "admin delete" endpoint of the "user" service.
 func NewAdminDeleteUnauthorizedResponseBody(res *goa.ServiceError) *AdminDeleteUnauthorizedResponseBody {
@@ -3439,15 +3453,6 @@ func NewMentionablesBadRequestResponseBody(res *goa.ServiceError) *MentionablesB
 // NewRolesPayload builds a user service roles endpoint payload.
 func NewRolesPayload(auth string) *user.RolesPayload {
 	v := &user.RolesPayload{}
-	v.Auth = auth
-
-	return v
-}
-
-// NewDeletePayload builds a user service delete endpoint payload.
-func NewDeletePayload(userID int32, auth string) *user.DeletePayload {
-	v := &user.DeletePayload{}
-	v.UserID = userID
 	v.Auth = auth
 
 	return v
@@ -3648,6 +3653,20 @@ func NewIssueTransmissionTokenPayload(auth string) *user.IssueTransmissionTokenP
 	return v
 }
 
+// NewAdminTermsAndConditionsPayload builds a user service admin terms and
+// conditions endpoint payload.
+func NewAdminTermsAndConditionsPayload(body *AdminTermsAndConditionsRequestBody, auth string) *user.AdminTermsAndConditionsPayload {
+	v := &user.AdminTermsAndConditionsFields{
+		Email: *body.Email,
+	}
+	res := &user.AdminTermsAndConditionsPayload{
+		Update: v,
+	}
+	res.Auth = auth
+
+	return res
+}
+
 // NewAdminDeletePayload builds a user service admin delete endpoint payload.
 func NewAdminDeletePayload(body *AdminDeleteRequestBody, auth string) *user.AdminDeletePayload {
 	v := &user.AdminDeleteFields{
@@ -3832,6 +3851,15 @@ func ValidateChangePasswordRequestBody(body *ChangePasswordRequestBody) (err err
 func ValidateAcceptTncRequestBody(body *AcceptTncRequestBody) (err error) {
 	if body.Accept == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("accept", "body"))
+	}
+	return
+}
+
+// ValidateAdminTermsAndConditionsRequestBody runs the validations defined on
+// Admin Terms And ConditionsRequestBody
+func ValidateAdminTermsAndConditionsRequestBody(body *AdminTermsAndConditionsRequestBody) (err error) {
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
 	}
 	return
 }

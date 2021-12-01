@@ -20,31 +20,31 @@ import (
 
 // Server lists the user service endpoint HTTP handlers.
 type Server struct {
-	Mounts                 []*MountPoint
-	Roles                  http.Handler
-	Delete                 http.Handler
-	UploadPhoto            http.Handler
-	DownloadPhoto          http.Handler
-	Login                  http.Handler
-	RecoveryLookup         http.Handler
-	Recovery               http.Handler
-	Resume                 http.Handler
-	Logout                 http.Handler
-	Refresh                http.Handler
-	SendValidation         http.Handler
-	Validate               http.Handler
-	Add                    http.Handler
-	Update                 http.Handler
-	ChangePassword         http.Handler
-	AcceptTnc              http.Handler
-	GetCurrent             http.Handler
-	ListByProject          http.Handler
-	IssueTransmissionToken http.Handler
-	ProjectRoles           http.Handler
-	AdminDelete            http.Handler
-	AdminSearch            http.Handler
-	Mentionables           http.Handler
-	CORS                   http.Handler
+	Mounts                  []*MountPoint
+	Roles                   http.Handler
+	UploadPhoto             http.Handler
+	DownloadPhoto           http.Handler
+	Login                   http.Handler
+	RecoveryLookup          http.Handler
+	Recovery                http.Handler
+	Resume                  http.Handler
+	Logout                  http.Handler
+	Refresh                 http.Handler
+	SendValidation          http.Handler
+	Validate                http.Handler
+	Add                     http.Handler
+	Update                  http.Handler
+	ChangePassword          http.Handler
+	AcceptTnc               http.Handler
+	GetCurrent              http.Handler
+	ListByProject           http.Handler
+	IssueTransmissionToken  http.Handler
+	ProjectRoles            http.Handler
+	AdminTermsAndConditions http.Handler
+	AdminDelete             http.Handler
+	AdminSearch             http.Handler
+	Mentionables            http.Handler
+	CORS                    http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -81,7 +81,6 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"Roles", "GET", "/roles"},
-			{"Delete", "DELETE", "/admin/users/{userId}"},
 			{"UploadPhoto", "POST", "/user/media"},
 			{"DownloadPhoto", "GET", "/user/{userId}/media"},
 			{"Login", "POST", "/login"},
@@ -100,11 +99,11 @@ func New(
 			{"ListByProject", "GET", "/users/project/{projectId}"},
 			{"IssueTransmissionToken", "GET", "/user/transmission-token"},
 			{"ProjectRoles", "GET", "/projects/roles"},
+			{"AdminTermsAndConditions", "DELETE", "/admin/user/tnc"},
 			{"AdminDelete", "DELETE", "/admin/user"},
 			{"AdminSearch", "POST", "/admin/users/search"},
 			{"Mentionables", "GET", "/mentionables"},
 			{"CORS", "OPTIONS", "/roles"},
-			{"CORS", "OPTIONS", "/admin/users/{userId}"},
 			{"CORS", "OPTIONS", "/user/media"},
 			{"CORS", "OPTIONS", "/user/{userId}/media"},
 			{"CORS", "OPTIONS", "/login"},
@@ -123,34 +122,35 @@ func New(
 			{"CORS", "OPTIONS", "/users/project/{projectId}"},
 			{"CORS", "OPTIONS", "/user/transmission-token"},
 			{"CORS", "OPTIONS", "/projects/roles"},
+			{"CORS", "OPTIONS", "/admin/user/tnc"},
 			{"CORS", "OPTIONS", "/admin/user"},
 			{"CORS", "OPTIONS", "/admin/users/search"},
 			{"CORS", "OPTIONS", "/mentionables"},
 		},
-		Roles:                  NewRolesHandler(e.Roles, mux, decoder, encoder, errhandler, formatter),
-		Delete:                 NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
-		UploadPhoto:            NewUploadPhotoHandler(e.UploadPhoto, mux, decoder, encoder, errhandler, formatter),
-		DownloadPhoto:          NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
-		Login:                  NewLoginHandler(e.Login, mux, decoder, encoder, errhandler, formatter),
-		RecoveryLookup:         NewRecoveryLookupHandler(e.RecoveryLookup, mux, decoder, encoder, errhandler, formatter),
-		Recovery:               NewRecoveryHandler(e.Recovery, mux, decoder, encoder, errhandler, formatter),
-		Resume:                 NewResumeHandler(e.Resume, mux, decoder, encoder, errhandler, formatter),
-		Logout:                 NewLogoutHandler(e.Logout, mux, decoder, encoder, errhandler, formatter),
-		Refresh:                NewRefreshHandler(e.Refresh, mux, decoder, encoder, errhandler, formatter),
-		SendValidation:         NewSendValidationHandler(e.SendValidation, mux, decoder, encoder, errhandler, formatter),
-		Validate:               NewValidateHandler(e.Validate, mux, decoder, encoder, errhandler, formatter),
-		Add:                    NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
-		Update:                 NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
-		ChangePassword:         NewChangePasswordHandler(e.ChangePassword, mux, decoder, encoder, errhandler, formatter),
-		AcceptTnc:              NewAcceptTncHandler(e.AcceptTnc, mux, decoder, encoder, errhandler, formatter),
-		GetCurrent:             NewGetCurrentHandler(e.GetCurrent, mux, decoder, encoder, errhandler, formatter),
-		ListByProject:          NewListByProjectHandler(e.ListByProject, mux, decoder, encoder, errhandler, formatter),
-		IssueTransmissionToken: NewIssueTransmissionTokenHandler(e.IssueTransmissionToken, mux, decoder, encoder, errhandler, formatter),
-		ProjectRoles:           NewProjectRolesHandler(e.ProjectRoles, mux, decoder, encoder, errhandler, formatter),
-		AdminDelete:            NewAdminDeleteHandler(e.AdminDelete, mux, decoder, encoder, errhandler, formatter),
-		AdminSearch:            NewAdminSearchHandler(e.AdminSearch, mux, decoder, encoder, errhandler, formatter),
-		Mentionables:           NewMentionablesHandler(e.Mentionables, mux, decoder, encoder, errhandler, formatter),
-		CORS:                   NewCORSHandler(),
+		Roles:                   NewRolesHandler(e.Roles, mux, decoder, encoder, errhandler, formatter),
+		UploadPhoto:             NewUploadPhotoHandler(e.UploadPhoto, mux, decoder, encoder, errhandler, formatter),
+		DownloadPhoto:           NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
+		Login:                   NewLoginHandler(e.Login, mux, decoder, encoder, errhandler, formatter),
+		RecoveryLookup:          NewRecoveryLookupHandler(e.RecoveryLookup, mux, decoder, encoder, errhandler, formatter),
+		Recovery:                NewRecoveryHandler(e.Recovery, mux, decoder, encoder, errhandler, formatter),
+		Resume:                  NewResumeHandler(e.Resume, mux, decoder, encoder, errhandler, formatter),
+		Logout:                  NewLogoutHandler(e.Logout, mux, decoder, encoder, errhandler, formatter),
+		Refresh:                 NewRefreshHandler(e.Refresh, mux, decoder, encoder, errhandler, formatter),
+		SendValidation:          NewSendValidationHandler(e.SendValidation, mux, decoder, encoder, errhandler, formatter),
+		Validate:                NewValidateHandler(e.Validate, mux, decoder, encoder, errhandler, formatter),
+		Add:                     NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
+		Update:                  NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
+		ChangePassword:          NewChangePasswordHandler(e.ChangePassword, mux, decoder, encoder, errhandler, formatter),
+		AcceptTnc:               NewAcceptTncHandler(e.AcceptTnc, mux, decoder, encoder, errhandler, formatter),
+		GetCurrent:              NewGetCurrentHandler(e.GetCurrent, mux, decoder, encoder, errhandler, formatter),
+		ListByProject:           NewListByProjectHandler(e.ListByProject, mux, decoder, encoder, errhandler, formatter),
+		IssueTransmissionToken:  NewIssueTransmissionTokenHandler(e.IssueTransmissionToken, mux, decoder, encoder, errhandler, formatter),
+		ProjectRoles:            NewProjectRolesHandler(e.ProjectRoles, mux, decoder, encoder, errhandler, formatter),
+		AdminTermsAndConditions: NewAdminTermsAndConditionsHandler(e.AdminTermsAndConditions, mux, decoder, encoder, errhandler, formatter),
+		AdminDelete:             NewAdminDeleteHandler(e.AdminDelete, mux, decoder, encoder, errhandler, formatter),
+		AdminSearch:             NewAdminSearchHandler(e.AdminSearch, mux, decoder, encoder, errhandler, formatter),
+		Mentionables:            NewMentionablesHandler(e.Mentionables, mux, decoder, encoder, errhandler, formatter),
+		CORS:                    NewCORSHandler(),
 	}
 }
 
@@ -160,7 +160,6 @@ func (s *Server) Service() string { return "user" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Roles = m(s.Roles)
-	s.Delete = m(s.Delete)
 	s.UploadPhoto = m(s.UploadPhoto)
 	s.DownloadPhoto = m(s.DownloadPhoto)
 	s.Login = m(s.Login)
@@ -179,6 +178,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.ListByProject = m(s.ListByProject)
 	s.IssueTransmissionToken = m(s.IssueTransmissionToken)
 	s.ProjectRoles = m(s.ProjectRoles)
+	s.AdminTermsAndConditions = m(s.AdminTermsAndConditions)
 	s.AdminDelete = m(s.AdminDelete)
 	s.AdminSearch = m(s.AdminSearch)
 	s.Mentionables = m(s.Mentionables)
@@ -188,7 +188,6 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 // Mount configures the mux to serve the user endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountRolesHandler(mux, h.Roles)
-	MountDeleteHandler(mux, h.Delete)
 	MountUploadPhotoHandler(mux, h.UploadPhoto)
 	MountDownloadPhotoHandler(mux, h.DownloadPhoto)
 	MountLoginHandler(mux, h.Login)
@@ -207,6 +206,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountListByProjectHandler(mux, h.ListByProject)
 	MountIssueTransmissionTokenHandler(mux, h.IssueTransmissionToken)
 	MountProjectRolesHandler(mux, h.ProjectRoles)
+	MountAdminTermsAndConditionsHandler(mux, h.AdminTermsAndConditions)
 	MountAdminDeleteHandler(mux, h.AdminDelete)
 	MountAdminSearchHandler(mux, h.AdminSearch)
 	MountMentionablesHandler(mux, h.Mentionables)
@@ -243,57 +243,6 @@ func NewRolesHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "roles")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			errhandler(ctx, w, err)
-		}
-	})
-}
-
-// MountDeleteHandler configures the mux to serve the "user" service "delete"
-// endpoint.
-func MountDeleteHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := handleUserOrigin(h).(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("DELETE", "/admin/users/{userId}", f)
-}
-
-// NewDeleteHandler creates a HTTP handler which loads the HTTP request and
-// calls the "user" service "delete" endpoint.
-func NewDeleteHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeDeleteRequest(mux, decoder)
-		encodeResponse = EncodeDeleteResponse(encoder)
-		encodeError    = EncodeDeleteError(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "delete")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -1227,6 +1176,58 @@ func NewProjectRolesHandler(
 	})
 }
 
+// MountAdminTermsAndConditionsHandler configures the mux to serve the "user"
+// service "admin terms and conditions" endpoint.
+func MountAdminTermsAndConditionsHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleUserOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("DELETE", "/admin/user/tnc", f)
+}
+
+// NewAdminTermsAndConditionsHandler creates a HTTP handler which loads the
+// HTTP request and calls the "user" service "admin terms and conditions"
+// endpoint.
+func NewAdminTermsAndConditionsHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeAdminTermsAndConditionsRequest(mux, decoder)
+		encodeResponse = EncodeAdminTermsAndConditionsResponse(encoder)
+		encodeError    = EncodeAdminTermsAndConditionsError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "admin terms and conditions")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountAdminDeleteHandler configures the mux to serve the "user" service
 // "admin delete" endpoint.
 func MountAdminDeleteHandler(mux goahttp.Muxer, h http.Handler) {
@@ -1391,7 +1392,6 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("OPTIONS", "/roles", f)
-	mux.Handle("OPTIONS", "/admin/users/{userId}", f)
 	mux.Handle("OPTIONS", "/user/media", f)
 	mux.Handle("OPTIONS", "/user/{userId}/media", f)
 	mux.Handle("OPTIONS", "/login", f)
@@ -1410,6 +1410,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/users/project/{projectId}", f)
 	mux.Handle("OPTIONS", "/user/transmission-token", f)
 	mux.Handle("OPTIONS", "/projects/roles", f)
+	mux.Handle("OPTIONS", "/admin/user/tnc", f)
 	mux.Handle("OPTIONS", "/admin/user", f)
 	mux.Handle("OPTIONS", "/admin/users/search", f)
 	mux.Handle("OPTIONS", "/mentionables", f)

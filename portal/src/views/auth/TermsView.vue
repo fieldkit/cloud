@@ -2,12 +2,12 @@
     <div class="terms">
         <img class="terms-header-logo" :alt="$t('layout.logo.alt')" src="@/assets/FieldKit_Logo_White.png" />
         <div class="terms-content">
-            <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="goBack" />
-            <p class="terms-title">{{ $t("terms.title") }}</p>
-            <p class="terms-body">{{ $t("terms.body") }}</p>
-            <form v-if="tncOutdated" @submit.prevent="save">
-                <button class="form-submit" type="submit">{{ $t("terms.agreeButton") }}</button>
-            </form>
+            <img v-if="!tncOutdated" alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="goBack" />
+            <div v-html="$t('terms.html')" class="terms-content-html"></div>
+            <div v-if="tncOutdated" class="terms-buttons">
+                <button class="form-submit btn-outline" @click="disagree">{{ $t("terms.disagreeButton") }}</button>
+                <button class="form-submit" @click="agree">{{ $t("terms.agreeButton") }}</button>
+            </div>
         </div>
     </div>
 </template>
@@ -35,7 +35,7 @@ export default Vue.extend({
         },
     },
     methods: {
-        async save(): Promise<void> {
+        async agree(): Promise<void> {
             if (this.user) {
                 const payload = {
                     id: this.user?.id,
@@ -74,7 +74,7 @@ export default Vue.extend({
 }
 
 .terms {
-    background-image: linear-gradient(#52b5e4, #1b80c9);
+    background-image: linear-gradient(rgba(82, 181, 228, 0.6), rgba(27, 128, 201, 0.6));
     padding: 40px 0;
     flex-direction: column;
     box-sizing: border-box;
@@ -93,24 +93,55 @@ export default Vue.extend({
         }
     }
     &-content {
-        width: 60%;
-        text-align: justify;
+        width: 80%;
+        max-width: 800px;
         background-color: white;
         padding: 25px 45px 45px 45px;
-    }
-    &-title {
-        font-size: 36px;
-        font-weight: 900;
+        box-sizing: border-box;
+
+        @include bp-down($sm) {
+            width: calc(100% - 40px);
+            padding: 22px 20px;
+        }
+
+        @include bp-down($xs) {
+            width: calc(100% - 20px);
+            padding: 22px 14px;
+        }
+
+        &-html {
+            margin-top: 30px;
+            p {
+                text-align: justify;
+            }
+        }
     }
 
     &-body {
-        font-size: 16px;
+        font-size: 14px;
         line-height: 1.5;
     }
+}
+
+::v-deep h2 {
+    font-size: 26px;
+}
+::v-deep h4 {
+    font-size: 18px;
+}
+::v-deep h5 {
+    font-size: 16px;
+}
+::v-deep {
+    font-size: 14px;
 }
 
 .close-button {
     cursor: pointer;
     float: right;
+}
+.terms-buttons {
+    display: flex;
+    justify-content: space-between;
 }
 </style>

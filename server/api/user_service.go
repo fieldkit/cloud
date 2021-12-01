@@ -671,67 +671,6 @@ func (s *UserService) IssueTransmissionToken(ctx context.Context, payload *user.
 	}, nil
 }
 
-func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminDeletePayload) error {
-	log := Logger(outerCtx).Sugar()
-
-	return s.options.Database.WithNewTransaction(outerCtx, func(ctx context.Context) error {
-		p, err := NewPermissions(ctx, s.options).Unwrap()
-		if err != nil {
-			return err
-		}
-
-		admin := &data.User{}
-		if err := s.options.Database.GetContext(ctx, admin, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
-			return user.MakeForbidden(errors.New("forbidden"))
-		}
-
-		err = admin.CheckPassword(payload.Delete.Password)
-		if err != nil {
-			return user.MakeForbidden(errors.New("forbidden"))
-		}
-
-		deleting := &data.User{}
-		if err = s.options.Database.GetContext(ctx, deleting, `SELECT * FROM fieldkit.user WHERE LOWER(email) = LOWER($1)`, payload.Delete.Email); err != nil {
-			return user.MakeForbidden(errors.New("forbidden"))
-		}
-
-		log.Infow("deleting", "user_id", deleting.ID)
-
-		queries := []string{
-			`DELETE FROM fieldkit.project_invite WHERE user_id = $1`,
-			`DELETE FROM fieldkit.project_follower WHERE follower_id = $1`,
-			`DELETE FROM fieldkit.project_user WHERE user_id = $1`,
-
-			`DELETE FROM fieldkit.notes_media WHERE user_id = $1`,
-			`DELETE FROM fieldkit.notes WHERE author_id = $1`,
-			`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.notes_media WHERE id IN (SELECT media_id FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)))`,
-			`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))`,
-			`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_24h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_12h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_6h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_1h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_30m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_10m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_1m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.visible_configuration WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.project_station WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.station_activity WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.station_ingestion WHERE uploader_id = $1`,
-			`DELETE FROM fieldkit.station WHERE owner_id = $1`,
-			`DELETE FROM fieldkit.user WHERE id = $1`,
-		}
-
-		for _, query := range queries {
-			if _, err := s.options.Database.ExecContext(ctx, query, deleting.ID); err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-}
-
 func (s *UserService) Roles(ctx context.Context, payload *user.RolesPayload) (*user.AvailableRoles, error) {
 	roles := make([]*user.AvailableRole, 0)
 
@@ -745,11 +684,6 @@ func (s *UserService) Roles(ctx context.Context, payload *user.RolesPayload) (*u
 	return &user.AvailableRoles{
 		Roles: roles,
 	}, nil
-}
-
-func (s *UserService) Delete(ctx context.Context, payload *user.DeletePayload) error {
-	r := repositories.NewUserRepository(s.options.Database)
-	return r.Delete(ctx, payload.UserID)
 }
 
 func (s *UserService) UploadPhoto(ctx context.Context, payload *user.UploadPhotoPayload, body io.ReadCloser) error {
@@ -822,6 +756,86 @@ func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadP
 		Etag:        etag,
 		Body:        data,
 	}, nil
+}
+
+func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminDeletePayload) error {
+	log := Logger(outerCtx).Sugar()
+
+	return s.options.Database.WithNewTransaction(outerCtx, func(ctx context.Context) error {
+		p, err := NewPermissions(ctx, s.options).Unwrap()
+		if err != nil {
+			return err
+		}
+
+		admin := &data.User{}
+		if err := s.options.Database.GetContext(ctx, admin, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
+			return user.MakeForbidden(errors.New("forbidden"))
+		}
+
+		err = admin.CheckPassword(payload.Delete.Password)
+		if err != nil {
+			return user.MakeForbidden(errors.New("forbidden"))
+		}
+
+		deleting := &data.User{}
+		if err = s.options.Database.GetContext(ctx, deleting, `SELECT * FROM fieldkit.user WHERE LOWER(email) = LOWER($1)`, payload.Delete.Email); err != nil {
+			return user.MakeForbidden(errors.New("forbidden"))
+		}
+
+		log.Infow("deleting", "user_id", deleting.ID)
+
+		queries := []string{
+			`DELETE FROM fieldkit.project_invite WHERE user_id = $1`,
+			`DELETE FROM fieldkit.project_follower WHERE follower_id = $1`,
+			`DELETE FROM fieldkit.project_user WHERE user_id = $1`,
+
+			`DELETE FROM fieldkit.notes_media WHERE user_id = $1`,
+			`DELETE FROM fieldkit.notes WHERE author_id = $1`,
+			`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.notes_media WHERE id IN (SELECT media_id FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)))`,
+			`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))`,
+			`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_24h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_12h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_6h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_1h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_30m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_10m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.aggregated_1m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.visible_configuration WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.project_station WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.station_activity WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+			`DELETE FROM fieldkit.station_ingestion WHERE uploader_id = $1`,
+			`DELETE FROM fieldkit.station WHERE owner_id = $1`,
+			`DELETE FROM fieldkit.user WHERE id = $1`,
+		}
+
+		for _, query := range queries {
+			if _, err := s.options.Database.ExecContext(ctx, query, deleting.ID); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+func (c *UserService) AdminTermsAndConditions(ctx context.Context, payload *user.AdminTermsAndConditionsPayload) error {
+	log := Logger(ctx).Sugar()
+
+	updating := &data.User{}
+	if err := c.options.Database.GetContext(ctx, updating, `SELECT * FROM fieldkit.user WHERE LOWER(email) = LOWER($1)`, payload.Update.Email); err != nil {
+		return user.MakeForbidden(errors.New("forbidden"))
+	}
+
+	log.Infow("resetting:tnc", "user_id", updating.ID)
+
+	impossiblyEarlyTermsAndConditionsDate := time.Date(2010, 1, 1, 0, 0, 0, 0, time.UTC)
+
+	if _, err := c.options.Database.ExecContext(ctx, `UPDATE fieldkit.user SET tnc_date = $1 WHERE id = $2`, impossiblyEarlyTermsAndConditionsDate, updating.ID); err != nil {
+		return user.MakeForbidden(errors.New("forbidden"))
+	}
+
+	return nil
 }
 
 func (c *UserService) AdminSearch(ctx context.Context, payload *user.AdminSearchPayload) (*user.AdminSearchResult, error) {

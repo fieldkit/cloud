@@ -82,10 +82,10 @@ function loadLocaleMessages(): LocaleMessages {
                         )
                         .join(".");
 
-                        if (moduleKey.indexOf("ttn.") == 0) {
-                            const fullKey = [moduleKey, normalizedKey].join(".");
-                            return [fullKey, sensorName];
-                        }
+                    if (moduleKey.indexOf("wh.") == 0) {
+                        const fullKey = [moduleKey, normalizedKey].join(".");
+                        return [fullKey, sensorName];
+                    }
 
                     const fullKey = ["fk", moduleKey, normalizedKey].join(".");
                     return [fullKey, sensorName];
@@ -98,6 +98,10 @@ function loadLocaleMessages(): LocaleMessages {
 
     const moduleKeys = _((messages.en.modules as unknown) as Record<string, ModuleLocales>)
         .map((m, moduleKey) => {
+            if (moduleKey.startsWith("wh.")) {
+                // HACK
+                return [moduleKey, m.name];
+            }
             return ["fk." + moduleKey, m.name];
         })
         .fromPairs()

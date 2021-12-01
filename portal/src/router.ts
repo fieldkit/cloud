@@ -27,6 +27,7 @@ import Playground from "./views/admin/Playground.vue";
 
 import { Bookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
+import { ActionTypes } from "@/store";
 
 Vue.use(Router);
 
@@ -432,6 +433,10 @@ export default function routerFactory(store) {
         base: process.env.BASE_URL,
         routes: routes,
         scrollBehavior(to, from, savedPosition) {
+            if (to.name == from.name) {
+                return null;
+            }
+            console.log("scrolling-to-top");
             return { x: 0, y: 0 };
         },
     });
@@ -441,13 +446,19 @@ export default function routerFactory(store) {
         vueBodyClass.guard(to, next);
     });
 
-    router.beforeEach((to, from, next) => {
+    router.beforeEach(async (to, from, next) => {
         console.log("nav", from.name, "->", to.name);
         if (from.name === null && (to.name === null || to.name == "login")) {
             console.log("nav", "authenticated", store.getters.isAuthenticated);
             if (store.getters.isAuthenticated) {
                 if (!store.getters.isTncValid && to.name != "login") {
-                    next("/terms");
+                    await store.dispatch(ActionTypes.REFRESH_CURRENT_USER);
+
+                    if (!store.getters.isTncValid) {
+                        next("/terms");
+                    } else {
+                        next("/dashboard");
+                    }
                 } else {
                     next("/dashboard");
                 }
@@ -461,7 +472,13 @@ export default function routerFactory(store) {
         } else if (to.matched.some((record) => record.meta.secured)) {
             if (store.getters.isAuthenticated) {
                 if (!store.getters.isTncValid && to.name != "login") {
-                    next("/terms");
+                    await store.dispatch(ActionTypes.REFRESH_CURRENT_USER);
+
+                    if (!store.getters.isTncValid) {
+                        next("/terms");
+                    } else {
+                        next();
+                    }
                 } else {
                     next();
                 }

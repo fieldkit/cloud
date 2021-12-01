@@ -5,13 +5,20 @@ export interface SensorRange {
     maximum: number;
 }
 
+export interface VizConfig {
+    name: string;
+    disabled: boolean;
+}
+
 export interface ModuleSensorMeta {
     key: string;
     fullKey: string;
     firmwareKey: string;
     unitOfMeasure: string;
     internal: boolean;
+    order: number;
     ranges: SensorRange[];
+    viz: VizConfig[];
 }
 
 export interface Module {
@@ -55,6 +62,7 @@ export interface SensorDataResponse {
 interface StationInfoResponse {
     stationId: number;
     stationName: string;
+    stationLocation: [number, number];
     moduleId: ModuleID;
     moduleKey: string;
     sensorId: number;

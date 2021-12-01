@@ -657,6 +657,13 @@ class FKApi {
         });
     }
 
+    getAssociatedStations(id: number): Promise<StationsResponse> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + `/stations/${id}/associated`,
+        });
+    }
     getCurrentUser(): Promise<CurrentUser> {
         return this.invoke({
             auth: Auth.Required,
@@ -670,6 +677,15 @@ class FKApi {
             auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/users/project/" + projectId,
+        });
+    }
+
+    editRole(data: { projectId: number; email: string; role: number }) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "PATCH",
+            url: this.baseUrl + "/projects/" + data.projectId + "/roles",
+            data: { email: data.email, role: data.role },
         });
     }
 
@@ -1042,6 +1058,15 @@ class FKApi {
             auth: Auth.Required,
             method: "DELETE",
             url: this.baseUrl + "/admin/user",
+            data: payload,
+        });
+    }
+
+    public adminClearTermsAndConditions(payload) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/admin/user/tnc",
             data: payload,
         });
     }

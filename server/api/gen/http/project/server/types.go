@@ -62,6 +62,13 @@ type InviteRequestBody struct {
 	Role  *int32  `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
 }
 
+// EditUserRequestBody is the type of the "project" service "edit user"
+// endpoint HTTP request body.
+type EditUserRequestBody struct {
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Role  *int32  `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
+}
+
 // RemoveUserRequestBody is the type of the "project" service "remove user"
 // endpoint HTTP request body.
 type RemoveUserRequestBody struct {
@@ -1247,6 +1254,78 @@ type InviteNotFoundResponseBody struct {
 // InviteBadRequestResponseBody is the type of the "project" service "invite"
 // endpoint HTTP response body for the "bad-request" error.
 type InviteBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// EditUserUnauthorizedResponseBody is the type of the "project" service "edit
+// user" endpoint HTTP response body for the "unauthorized" error.
+type EditUserUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// EditUserForbiddenResponseBody is the type of the "project" service "edit
+// user" endpoint HTTP response body for the "forbidden" error.
+type EditUserForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// EditUserNotFoundResponseBody is the type of the "project" service "edit
+// user" endpoint HTTP response body for the "not-found" error.
+type EditUserNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// EditUserBadRequestResponseBody is the type of the "project" service "edit
+// user" endpoint HTTP response body for the "bad-request" error.
+type EditUserBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -2771,6 +2850,62 @@ func NewInviteBadRequestResponseBody(res *goa.ServiceError) *InviteBadRequestRes
 	return body
 }
 
+// NewEditUserUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "edit user" endpoint of the "project" service.
+func NewEditUserUnauthorizedResponseBody(res *goa.ServiceError) *EditUserUnauthorizedResponseBody {
+	body := &EditUserUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewEditUserForbiddenResponseBody builds the HTTP response body from the
+// result of the "edit user" endpoint of the "project" service.
+func NewEditUserForbiddenResponseBody(res *goa.ServiceError) *EditUserForbiddenResponseBody {
+	body := &EditUserForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewEditUserNotFoundResponseBody builds the HTTP response body from the
+// result of the "edit user" endpoint of the "project" service.
+func NewEditUserNotFoundResponseBody(res *goa.ServiceError) *EditUserNotFoundResponseBody {
+	body := &EditUserNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewEditUserBadRequestResponseBody builds the HTTP response body from the
+// result of the "edit user" endpoint of the "project" service.
+func NewEditUserBadRequestResponseBody(res *goa.ServiceError) *EditUserBadRequestResponseBody {
+	body := &EditUserBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewRemoveUserUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "remove user" endpoint of the "project" service.
 func NewRemoveUserUnauthorizedResponseBody(res *goa.ServiceError) *RemoveUserUnauthorizedResponseBody {
@@ -3292,6 +3427,21 @@ func NewInvitePayload(body *InviteRequestBody, projectID int32, auth string) *pr
 	return res
 }
 
+// NewEditUserPayload builds a project service edit user endpoint payload.
+func NewEditUserPayload(body *EditUserRequestBody, projectID int32, auth string) *project.EditUserPayload {
+	v := &project.EditUserFields{
+		Email: *body.Email,
+		Role:  *body.Role,
+	}
+	res := &project.EditUserPayload{
+		Edit: v,
+	}
+	res.ProjectID = projectID
+	res.Auth = auth
+
+	return res
+}
+
 // NewRemoveUserPayload builds a project service remove user endpoint payload.
 func NewRemoveUserPayload(body *RemoveUserRequestBody, projectID int32, auth string) *project.RemoveUserPayload {
 	v := &project.RemoveUserFields{
@@ -3411,6 +3561,18 @@ func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
 
 // ValidateInviteRequestBody runs the validations defined on InviteRequestBody
 func ValidateInviteRequestBody(body *InviteRequestBody) (err error) {
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
+	}
+	if body.Role == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("role", "body"))
+	}
+	return
+}
+
+// ValidateEditUserRequestBody runs the validations defined on Edit
+// UserRequestBody
+func ValidateEditUserRequestBody(body *EditUserRequestBody) (err error) {
 	if body.Email == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
 	}

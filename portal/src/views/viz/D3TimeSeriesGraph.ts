@@ -1,9 +1,11 @@
 import _ from "lodash";
 import Vue from "vue";
 import * as d3 from "d3";
+import i18n from "@/i18n";
 
 import { TimeRange, Margins, ChartLayout } from "./common";
 import { Graph, QueriedData, Workspace, FastTime, TimeZoom } from "./viz";
+import { appendXAxisLabel, appendYAxisLabel, getMaxDigitsForData } from "./d3-helpers";
 
 export const D3TimeSeriesGraph = Vue.extend({
     name: "D3TimeSeriesGraph",
@@ -51,19 +53,35 @@ export const D3TimeSeriesGraph = Vue.extend({
         },
         refresh() {
             if (!this.data) {
+                this.viz.log("refresh: nothing");
                 return;
+            } else {
+                this.viz.log("refresh: data");
             }
 
+            // Before this was a d3.selectAll().remove and would remove all the
+            // svg nodes in the DOM. This just removes the one here, though...
+            // why do we do this at all?
+            d3.select(this.$el)
+                .selectAll("svg")
+                .remove();
+
             const vizInfo = this.workspace.vizInfo(this.viz);
-            const layout = new ChartLayout(1050, 340, new Margins({ top: 5, bottom: 50, left: 50, right: 0 }));
             const data = this.data;
             const timeRange = data.timeRange;
             const dataRange = data.dataRange;
+            const layout = new ChartLayout(
+                1050,
+                340,
+                new Margins({ top: 5, bottom: 50, left: 42 + 5 * getMaxDigitsForData(data.dataRange), right: 0 })
+            );
             const charts = [
                 {
                     layout: layout,
                 },
             ];
+
+            console.log("viz-info", vizInfo);
 
             const x = d3
                 .scaleTime()
@@ -78,11 +96,11 @@ export const D3TimeSeriesGraph = Vue.extend({
             type FormatFunctionType = (date: Date) => string;
 
             function formatTick(date: Date, tick: number, els: { __data__: Date }[], state: { f: FormatFunctionType | null }) {
-                let spec = "%-m/%-d %-H:%M";
+                let spec = "%-m/%-d/%-Y %-H:%M";
 
                 if (tick == 0) {
                     const allTicks = els.map((el) => el.__data__);
-                    const dateOnly = d3.timeFormat("%-m/%-d");
+                    const dateOnly = d3.timeFormat("%-m/%-d/%-Y");
                     const allDates = allTicks.map((tickDate) => dateOnly(tickDate));
                     const timeOnly = d3.timeFormat("%-H:%M");
                     const allTimes = allTicks.map((tickDate) => timeOnly(tickDate));
@@ -91,7 +109,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                     const uniqueTimes = _.uniq(allTimes);
 
                     if (uniqueTimes.length == 1) {
-                        spec = "%-m/%-d";
+                        spec = "%-m/%-d/%-Y";
                     } else if (uniqueDates.length == 1) {
                         spec = "%-H:%M";
                     }
@@ -122,7 +140,10 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .scale(x)
                 .tickFormat(tickFormatter);
 
-            const yAxis = d3.axisLeft(y).ticks(6);
+            const yAxis = d3
+                .axisLeft(y)
+                .ticks(6)
+                .tickSizeOuter(0);
 
             const svg = d3
                 .select(this.$el)
@@ -201,6 +222,8 @@ export const D3TimeSeriesGraph = Vue.extend({
                 { offset: "100%", color: colors(dataRange[1]) },
             ];
 
+            this.viz.log("distance", distance, stops);
+
             const line = svg
                 .selectAll(".d3-line")
                 .data(charts)
@@ -245,7 +268,7 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .defined((d) => _.isNumber(d.value))
                 .x((d) => x(d.time))
                 .y((d) => y(d.value))
-                .curve(d3.curveBasis);
+                .curve(d3.curveMonotoneX);
 
             line.selectAll(".bkgd-line")
                 .data(charts)
@@ -295,6 +318,26 @@ export const D3TimeSeriesGraph = Vue.extend({
                 .attr("cx", (d) => x(d.time))
                 .attr("cy", (d) => y(d.value))
                 .attr("fill", (d) => colors(d.value));
+
+            const yLabel = i18n.tc(vizInfo.firmwareKey) + " (" + _.capitalize(vizInfo.unitOfMeasure) + ")";
+            appendYAxisLabel(svg, yLabel, layout);
+            appendXAxisLabel(svg, layout);
+
+            svg.selectAll(".x-axis .tick text").call(function(text) {
+                text.each(function(this) {
+                    const self = d3.select(this);
+                    const s = self.text().split(" ");
+                    self.text("");
+                    self.append("tspan")
+                        .attr("x", 0)
+                        .attr("dy", "1em")
+                        .text(s[0]);
+                    self.append("tspan")
+                        .attr("x", 0)
+                        .attr("dy", "1em")
+                        .text(s[1]);
+                });
+            });
         },
     },
     template: `<div class="viz time-series-graph"><div class="chart" @dblclick="onDouble"></div></div>`,

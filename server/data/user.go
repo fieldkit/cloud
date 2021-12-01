@@ -19,11 +19,11 @@ var (
 )
 
 var (
-	// RefreshTokenTtl = 2 * time.Minute
+	// RefreshTokenTtl = 20 * time.Minute
 	// LoginTokenTtl   = 1 * time.Minute
 
-	RefreshTokenTtl = 72 * time.Hour
-	LoginTokenTtl   = 168 * time.Hour
+	RefreshTokenTtl = 365 * 24 * time.Hour
+	LoginTokenTtl   = 24 * time.Hour
 
 	RecoveryTokenTtl     = 1 * time.Hour
 	ValidationTokenTtl   = 72 * time.Hour

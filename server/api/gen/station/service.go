@@ -29,6 +29,8 @@ type Service interface {
 	ListMine(context.Context, *ListMinePayload) (res *StationsFull, err error)
 	// ListProject implements list project.
 	ListProject(context.Context, *ListProjectPayload) (res *StationsFull, err error)
+	// ListAssociated implements list associated.
+	ListAssociated(context.Context, *ListAssociatedPayload) (res *StationsFull, err error)
 	// DownloadPhoto implements download photo.
 	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadedPhoto, err error)
 	// ListAll implements list all.
@@ -55,7 +57,7 @@ const ServiceName = "station"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [11]string{"add", "get", "transfer", "update", "list mine", "list project", "download photo", "list all", "delete", "admin search", "progress"}
+var MethodNames = [12]string{"add", "get", "transfer", "update", "list mine", "list project", "list associated", "download photo", "list all", "delete", "admin search", "progress"}
 
 // AddPayload is the payload type of the station service add method.
 type AddPayload struct {
@@ -128,6 +130,13 @@ type StationsFull struct {
 // method.
 type ListProjectPayload struct {
 	Auth *string
+	ID   int32
+}
+
+// ListAssociatedPayload is the payload type of the station service list
+// associated method.
+type ListAssociatedPayload struct {
+	Auth string
 	ID   int32
 }
 

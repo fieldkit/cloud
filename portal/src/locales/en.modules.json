@@ -20,7 +20,9 @@
         "water.do": {
             "name": "Water Dissolved Oxygen",
             "sensors": {
-                "do": "DO"
+                "do": "DO",
+                "temperature": "Temperature",
+                "pressure": "Pressure"
             }
         },
         "water.dox": {
@@ -112,16 +114,19 @@
                 "saw.weekly": "Saw(x)"
             }
         },
-        "ttn.floodnet": {
+        "wh.floodnet": {
             "name": "FloodNet",
             "sensors": {
+                "battery": "Battery",
+                "distance": "Distance",
+                "depth": "Depth",
+                "depthUnfiltered": "Depth (Unfiltered)",
+                "tideFeet": "Tide Level",
                 "altitude": "Altitude",
                 "temperature": "Temperature",
                 "pressure": "Pressure",
-                "battery": "Battery",
                 "sdError": "SD Error",
-                "humidity": "Humidity",
-                "distance": "Distance"
+                "humidity": "Humidity"
             }
         }
     }

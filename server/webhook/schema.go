@@ -1,0 +1,53 @@
+package webhook
+
+import (
+	"encoding/json"
+	"fmt"
+	"time"
+)
+
+type MessageSchemaSensor struct {
+	Key        string `json:"key"`
+	Name       string `json:"name"`
+	Expression string `json:"expression"`
+	Battery    bool   `json:"battery"`
+	Location   bool   `json:"location"`
+}
+
+type MessageSchemaModule struct {
+	Key     string                 `json:"key"`
+	Name    string                 `json:"name"`
+	Sensors []*MessageSchemaSensor `json:"sensors"`
+}
+
+type MessageSchemaStation struct {
+	Key                  string                 `json:"key"`
+	Model                string                 `json:"model"`
+	IdentifierExpression string                 `json:"identifier"`
+	NameExpression       string                 `json:"name"`
+	ReceivedExpression   string                 `json:"received"`
+	Modules              []*MessageSchemaModule `json:"modules"`
+}
+
+type MessageSchema struct {
+	Station MessageSchemaStation `json:"station"`
+}
+
+type MessageSchemaRegistration struct {
+	ID              int32      `db:"id"`
+	OwnerID         int32      `db:"owner_id"`
+	Name            string     `db:"name"`
+	Token           []byte     `db:"token"`
+	Body            []byte     `db:"body"`
+	ReceivedAt      *time.Time `db:"received_at"`
+	ProcessedAt     *time.Time `db:"processed_at"`
+	ProcessInterval *int32     `db:"process_interval"`
+}
+
+func (r *MessageSchemaRegistration) Parse() (*MessageSchema, error) {
+	s := &MessageSchema{}
+	if err := json.Unmarshal(r.Body, s); err != nil {
+		return nil, fmt.Errorf("error parsing schema-id %d: %v", r.ID, err)
+	}
+	return s, nil
+}

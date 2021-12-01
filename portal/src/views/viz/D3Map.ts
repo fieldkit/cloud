@@ -5,8 +5,8 @@ import { LngLatBounds } from "mapbox-gl";
 
 import * as d3 from "d3";
 
-import { Time, TimeRange, Margins, ChartLayout } from "./common";
-import { Graph, QueriedData, Workspace, GeoZoom } from "./viz";
+import { Time, TimeRange, Margins, ChartLayout, DataQueryParams } from "./common";
+import { Graph, QueriedData, Workspace, GeoZoom, VizInfo } from "./viz";
 import { MapStore, Map } from "./MapStore";
 
 import Config from "@/secrets";
@@ -19,11 +19,11 @@ export const D3Map = Vue.extend({
         Mapbox,
     },
     data(): {
-        mapboxToken: string;
+        mapbox: { token: string; style: string };
         refreshed: boolean;
     } {
         return {
-            mapboxToken: Config.mapbox.token,
+            mapbox: Config.mapbox,
             refreshed: false,
         };
     },
@@ -52,14 +52,14 @@ export const D3Map = Vue.extend({
         },
     },
     mounted() {
-        this.viz.log("mounted");
+        this.viz.log("mounted, refreshing");
         this.refresh();
+    },
+    updated() {
+        this.viz.log("updated, refreshing");
     },
     destroyed() {
         mapStore.remove(this.viz.id);
-    },
-    updated() {
-        this.viz.log("updated");
     },
     methods: {
         getMap(): Map | null {
@@ -72,36 +72,55 @@ export const D3Map = Vue.extend({
             if (!this.getMap()) {
                 return false;
             }
-
-            const viewableData = this.data.data.filter((d) => d.location && d.location.length);
-
-            if (viewableData.length == 0) {
-                return false;
-            }
-
             return true;
+        },
+        getLocatedData(vizInfo: VizInfo): { value: number; location: [number, number] }[] {
+            try {
+                const located = this.data?.data.filter((row) => row.location && row.location.length) as {
+                    value: number;
+                    location: [number, number];
+                }[];
+                if (located.length > 0) {
+                    return located;
+                }
+                if (!vizInfo.station || !vizInfo.station.location) {
+                    this.viz.log("viz-info", vizInfo);
+                    return [];
+                }
+                return this.data?.data.map((row) => _.extend({}, row, { location: vizInfo.station.location })) as {
+                    value: number;
+                    location: [number, number];
+                }[];
+            } catch (error) {
+                this.viz.log("vizInfo", vizInfo);
+                this.viz.log("data", this.data);
+                throw error;
+            }
         },
         refresh() {
             if (!this.ready()) {
                 return;
             }
+
             const map = this.getMap();
             if (!map) {
                 return;
             }
+
             const data = this.data?.data;
             if (!data) {
                 return;
             }
-            const located = data.filter((row) => row.location && row.location.length) as {
-                value: number;
-                location: [number, number];
-            }[];
-            const vizInfo = this.workspace.vizInfo(this.viz);
-            const colors = vizInfo.colorScale;
-            const enabled = true;
 
-            this.viz.log("map", map);
+            const vizInfo = this.workspace.vizInfo(this.viz);
+            const located = this.getLocatedData(vizInfo);
+            if (located.length == 0) {
+                this.viz.log(`map-empty`);
+                return;
+            }
+
+            const colors = vizInfo.colorScale;
+
             this.viz.log("map-refresh: data", located.length);
 
             const geojson = {
@@ -133,18 +152,20 @@ export const D3Map = Vue.extend({
                     "line-width": 3,
                 },
             });
-            const geoDots = located.map((row) => {
-                return {
-                    type: "Feature",
-                    properties: {
-                        color: colors(row.value),
-                    },
-                    geometry: {
-                        type: "Point",
-                        coordinates: row.location,
-                    },
-                };
-            });
+            const geoDots = located
+                .filter((row) => _.isNumber(row.value))
+                .map((row) => {
+                    return {
+                        type: "Feature",
+                        properties: {
+                            color: colors(row.value),
+                        },
+                        geometry: {
+                            type: "Point",
+                            coordinates: row.location,
+                        },
+                    };
+                });
             map.addSource("points", {
                 type: "geojson",
                 data: {
@@ -176,11 +197,8 @@ export const D3Map = Vue.extend({
                     "symbol-placement": "line",
                     "symbol-spacing": 100,
                     "icon-allow-overlap": true,
-                    "icon-image": "arrow",
                     "icon-size": 0.75,
                     visibility: "visible",
-                    // to reverse them:
-                    // "icon-rotate": 180,
                 },
             });
 
@@ -218,6 +236,9 @@ export const D3Map = Vue.extend({
             this.refreshed = true;
         },
         removePreviousMapped(map) {
+            if (!map.style) {
+                return;
+            }
             if (map.getLayer("arrow-layer")) {
                 map.removeLayer("arrow-layer");
             }
@@ -264,10 +285,10 @@ export const D3Map = Vue.extend({
 	<div class="viz map">
         <mapbox
             class="viz-map"
-            :access-token="mapboxToken"
+            :access-token="mapbox.token"
             :map-options="{
                 container: this.viz.id + '-map',
-                style: 'mapbox://styles/mapbox/light-v10',
+                style: mapbox.style,
                 zoom: 10,
             }"
             :nav-control="{

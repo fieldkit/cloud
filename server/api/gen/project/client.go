@@ -31,6 +31,7 @@ type Client struct {
 	ListCommunityEndpoint       goa.Endpoint
 	ListMineEndpoint            goa.Endpoint
 	InviteEndpoint              goa.Endpoint
+	EditUserEndpoint            goa.Endpoint
 	RemoveUserEndpoint          goa.Endpoint
 	AddStationEndpoint          goa.Endpoint
 	RemoveStationEndpoint       goa.Endpoint
@@ -40,7 +41,7 @@ type Client struct {
 }
 
 // NewClient initializes a "project" service client given the endpoints.
-func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptProjectInvite, rejectProjectInvite, acceptInvite, rejectInvite, add, update, get, listCommunity, listMine, invite, removeUser, addStation, removeStation, delete_, uploadPhoto, downloadPhoto goa.Endpoint) *Client {
+func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptProjectInvite, rejectProjectInvite, acceptInvite, rejectInvite, add, update, get, listCommunity, listMine, invite, editUser, removeUser, addStation, removeStation, delete_, uploadPhoto, downloadPhoto goa.Endpoint) *Client {
 	return &Client{
 		AddUpdateEndpoint:           addUpdate,
 		DeleteUpdateEndpoint:        deleteUpdate,
@@ -57,6 +58,7 @@ func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acc
 		ListCommunityEndpoint:       listCommunity,
 		ListMineEndpoint:            listMine,
 		InviteEndpoint:              invite,
+		EditUserEndpoint:            editUser,
 		RemoveUserEndpoint:          removeUser,
 		AddStationEndpoint:          addStation,
 		RemoveStationEndpoint:       removeStation,
@@ -191,6 +193,12 @@ func (c *Client) ListMine(ctx context.Context, p *ListMinePayload) (res *Project
 // Invite calls the "invite" endpoint of the "project" service.
 func (c *Client) Invite(ctx context.Context, p *InvitePayload) (err error) {
 	_, err = c.InviteEndpoint(ctx, p)
+	return
+}
+
+// EditUser calls the "edit user" endpoint of the "project" service.
+func (c *Client) EditUser(ctx context.Context, p *EditUserPayload) (err error) {
+	_, err = c.EditUserEndpoint(ctx, p)
 	return
 }
 

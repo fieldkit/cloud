@@ -3,7 +3,12 @@
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closeExports" />
         <div class="explore-view">
             <div class="explore-header">
-                <DoubleHeader title="Data View">
+                <DoubleHeader
+                    title="Data View"
+                    :backTitle="backRoute === 'viewProject' ? $t('layout.backProjectDashboard') : $t('layout.backToStations')"
+                    :backRoute="backRoute"
+                    :backRouteParams="backRouteParams"
+                >
                     <div class="button" @click="openExports">Export</div>
                 </DoubleHeader>
             </div>
@@ -30,10 +35,9 @@ import StandardLayout from "../StandardLayout.vue";
 import ExportPanel from "./ExportPanel.vue";
 
 import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "@/store/actions";
-import { ExportDataAction } from "@/store/typed-actions";
 import { GlobalState } from "@/store/modules/global";
 
+import { SensorsResponse } from "./api";
 import { Workspace, Bookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 
@@ -58,13 +62,28 @@ export default Vue.extend({
             default: false,
         },
     },
+    beforeRouteEnter(to, from, next) {
+        next((vm: any) => {
+            if (from.name === "exploreBookmark" || from.name === "exportBookmark") {
+                return;
+            }
+            vm.backRoute = from.name ? from.name : "mapAllStations";
+            vm.backRouteParams = from.params;
+        });
+    },
     data(): {
         workspace: Workspace | null;
         showNoSensors: boolean;
+        stationId: number | null;
+        backRoute: string | null;
+        backRouteParams: { bounds: string | null; id: number | null };
     } {
         return {
             workspace: null,
             showNoSensors: false,
+            stationId: null,
+            backRoute: null,
+            backRouteParams: { bounds: null, id: null },
         };
     },
     computed: {
@@ -86,9 +105,12 @@ export default Vue.extend({
     async beforeMount(): Promise<void> {
         if (this.bookmark) {
             await this.$services.api.getAllSensors().then(async (sensorKeys) => {
+                // Check for a bookmark that is just to a station with no groups.
                 if (this.bookmark.s.length > 0) {
+                    console.log("viz-before-show-station", this.bookmark);
                     return this.showStation(this.bookmark.s[0]);
                 }
+                console.log("viz-before-create-workspace", this.bookmark);
                 await this.createWorkspaceIfNecessary();
             });
         }
@@ -112,17 +134,32 @@ export default Vue.extend({
             if (this.workspace) {
                 return this.workspace;
             }
-            return await this.$services.api.getAllSensors().then((sensorKeys) => {
-                if (this.bookmark) {
-                    this.workspace = Workspace.fromBookmark(sensorKeys, this.bookmark);
-                } else {
-                    this.workspace = new Workspace(sensorKeys);
-                }
-                return this.workspace;
+
+            const allSensors: SensorsResponse = await this.$services.api.getAllSensors();
+            if (this.bookmark) {
+                this.workspace = Workspace.fromBookmark(allSensors, this.bookmark);
+                void this.includeAssociatedStations(this.workspace);
+            } else {
+                this.workspace = new Workspace(allSensors);
+            }
+
+            return this.workspace;
+        },
+        async includeAssociatedStations(ws: Workspace): Promise<void> {
+            console.log(`include-associated`, ws.allStationIds);
+            if (ws.allStationIds.length != 1) {
+                return;
+            }
+
+            return this.$services.api.getAssociatedStations(ws.allStationIds[0]).then((associated) => {
+                console.log("quick-sensors-associated", associated);
+                const ids = associated.stations.map((s) => s.id);
+                return ws.addStationIds(ids);
             });
         },
         async showStation(stationId: number): Promise<void> {
             console.log("viz: show-station", stationId);
+            this.stationId = stationId;
 
             return this.createWorkspaceIfNecessary().then((workspace) => {
                 return this.$services.api.getQuickSensors([stationId]).then((quickSensors) => {
@@ -135,13 +172,15 @@ export default Vue.extend({
                         });
                     }
 
+                    console.log("quick-sensors", quickSensors);
+
                     const stations = [stationId];
                     const sensors = [[quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId]];
 
                     return workspace
                         .addStandardGraph(stations, sensors)
                         .eventually((ws) => this.onChange(ws.bookmark()))
-                        .then((ws) => ws.query());
+                        .then((ws) => Promise.all([ws.query(), this.includeAssociatedStations(workspace)]));
                 });
             });
         },
@@ -149,12 +188,21 @@ export default Vue.extend({
 });
 </script>
 
-<style>
+<style lang="scss">
 .graph .x-axis {
     color: #7f7f7f;
 }
+
 .graph .y-axis {
     color: #7f7f7f;
+}
+
+.graph .x-axis text {
+    font-size: 7pt;
+}
+
+.graph .y-axis text {
+    font-size: 7pt;
 }
 
 .explore-view {
@@ -386,5 +434,14 @@ export default Vue.extend({
 .loading-options {
     text-align: center;
     color: #afafaf;
+}
+
+.button.compare {
+    display: flex;
+    align-items: center;
+
+    div {
+        padding-left: 1em;
+    }
 }
 </style>

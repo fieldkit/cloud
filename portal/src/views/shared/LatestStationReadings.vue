@@ -29,15 +29,13 @@ export class SensorReading {
     constructor(
         public readonly labelKey: string,
         public readonly classes: string,
+        public readonly order: number,
         public readonly unitOfMeasure: string,
         public readonly reading: number,
         public readonly trend: TrendType,
+        public readonly internal: boolean,
         public readonly sensorModule: Module
     ) {}
-
-    public get internal(): boolean {
-        return this.sensorModule.internal;
-    }
 }
 
 export default Vue.extend({
@@ -116,13 +114,27 @@ export default Vue.extend({
                             }
                             const sensorModule = sensorsToModule[key];
                             if (!sensorModule) throw new Error("no sensor module");
-                            return new SensorReading(key, classes.join(" "), sensor.unitOfMeasure, value, TrendType.Steady, sensorModule);
+                            console.log(`sensor:`, sensor);
+                            return new SensorReading(
+                                key,
+                                classes.join(" "),
+                                sensor.order,
+                                sensor.unitOfMeasure,
+                                value,
+                                TrendType.Steady,
+                                sensor.internal,
+                                sensorModule
+                            );
                         })
                         .value();
 
-                    return readings.filter((sr) => !sr.internal);
+                    return _.orderBy(
+                        readings.filter((sr) => !sr.internal),
+                        (sr) => sr.order
+                    );
                 })
                 .then((sensors) => {
+                    console.log(`sensors`, sensors);
                     this.sensors = sensors;
                     this.loading = false;
                     this.$emit("layoutChange");
@@ -162,13 +174,13 @@ export default Vue.extend({
 }
 .reading .name {
     font-size: 12px;
-    line-height: 20px;
     margin-right: 5px;
 }
 .reading .value {
     margin-left: auto;
     margin-right: 2px;
     font-size: 16px;
+    white-space: nowrap;
 }
 .reading .uom {
     font-size: 10px;

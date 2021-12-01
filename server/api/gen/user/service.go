@@ -20,8 +20,6 @@ import (
 type Service interface {
 	// Roles implements roles.
 	Roles(context.Context, *RolesPayload) (res *AvailableRoles, err error)
-	// Delete implements delete.
-	Delete(context.Context, *DeletePayload) (err error)
 	// UploadPhoto implements upload photo.
 	UploadPhoto(context.Context, *UploadPhotoPayload, io.ReadCloser) (err error)
 	// DownloadPhoto implements download photo.
@@ -58,6 +56,8 @@ type Service interface {
 	IssueTransmissionToken(context.Context, *IssueTransmissionTokenPayload) (res *TransmissionToken, err error)
 	// ProjectRoles implements project roles.
 	ProjectRoles(context.Context) (res ProjectRoleCollection, err error)
+	// AdminTermsAndConditions implements admin terms and conditions.
+	AdminTermsAndConditions(context.Context, *AdminTermsAndConditionsPayload) (err error)
 	// AdminDelete implements admin delete.
 	AdminDelete(context.Context, *AdminDeletePayload) (err error)
 	// AdminSearch implements admin search.
@@ -80,7 +80,7 @@ const ServiceName = "user"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [23]string{"roles", "delete", "upload photo", "download photo", "login", "recovery lookup", "recovery", "resume", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "accept tnc", "get current", "list by project", "issue transmission token", "project roles", "admin delete", "admin search", "mentionables"}
+var MethodNames = [23]string{"roles", "upload photo", "download photo", "login", "recovery lookup", "recovery", "resume", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "accept tnc", "get current", "list by project", "issue transmission token", "project roles", "admin terms and conditions", "admin delete", "admin search", "mentionables"}
 
 // RolesPayload is the payload type of the user service roles method.
 type RolesPayload struct {
@@ -90,12 +90,6 @@ type RolesPayload struct {
 // AvailableRoles is the result type of the user service roles method.
 type AvailableRoles struct {
 	Roles []*AvailableRole
-}
-
-// DeletePayload is the payload type of the user service delete method.
-type DeletePayload struct {
-	Auth   string
-	UserID int32
 }
 
 // UploadPhotoPayload is the payload type of the user service upload photo
@@ -257,6 +251,13 @@ type TransmissionToken struct {
 // method.
 type ProjectRoleCollection []*ProjectRole
 
+// AdminTermsAndConditionsPayload is the payload type of the user service admin
+// terms and conditions method.
+type AdminTermsAndConditionsPayload struct {
+	Auth   string
+	Update *AdminTermsAndConditionsFields
+}
+
 // AdminDeletePayload is the payload type of the user service admin delete
 // method.
 type AdminDeletePayload struct {
@@ -351,6 +352,10 @@ type ProjectUser struct {
 type ProjectRole struct {
 	ID   int32
 	Name string
+}
+
+type AdminTermsAndConditionsFields struct {
+	Email string
 }
 
 type AdminDeleteFields struct {

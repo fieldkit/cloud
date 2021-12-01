@@ -32,6 +32,7 @@ type Endpoints struct {
 	ListCommunity       goa.Endpoint
 	ListMine            goa.Endpoint
 	Invite              goa.Endpoint
+	EditUser            goa.Endpoint
 	RemoveUser          goa.Endpoint
 	AddStation          goa.Endpoint
 	RemoveStation       goa.Endpoint
@@ -69,6 +70,7 @@ func NewEndpoints(s Service) *Endpoints {
 		ListCommunity:       NewListCommunityEndpoint(s, a.JWTAuth),
 		ListMine:            NewListMineEndpoint(s, a.JWTAuth),
 		Invite:              NewInviteEndpoint(s, a.JWTAuth),
+		EditUser:            NewEditUserEndpoint(s, a.JWTAuth),
 		RemoveUser:          NewRemoveUserEndpoint(s, a.JWTAuth),
 		AddStation:          NewAddStationEndpoint(s, a.JWTAuth),
 		RemoveStation:       NewRemoveStationEndpoint(s, a.JWTAuth),
@@ -95,6 +97,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ListCommunity = m(e.ListCommunity)
 	e.ListMine = m(e.ListMine)
 	e.Invite = m(e.Invite)
+	e.EditUser = m(e.EditUser)
 	e.RemoveUser = m(e.RemoveUser)
 	e.AddStation = m(e.AddStation)
 	e.RemoveStation = m(e.RemoveStation)
@@ -438,6 +441,25 @@ func NewInviteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 			return nil, err
 		}
 		return nil, s.Invite(ctx, p)
+	}
+}
+
+// NewEditUserEndpoint returns an endpoint function that calls the method "edit
+// user" of service "project".
+func NewEditUserEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*EditUserPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.EditUser(ctx, p)
 	}
 }
 

@@ -10,13 +10,18 @@ import (
 const (
 	ManufacturerConservify = 0x01
 	ConservifyWeather      = 0x01
-	ConservifyWater        = 0x02
+	ConservifyAtlas        = 0x02
 	ConservifyDistance     = 0x03
-	ConservifyWaterPh      = 0x04
-	ConservifyWaterEc      = 0x05
-	ConservifyWaterDo      = 0x06
-	ConservifyWaterTemp    = 0x07
-	ConservifyWaterOrp     = 0x08
+	ConservifyAtlasPh      = 0x04
+	ConservifyAtlasEc      = 0x05
+	ConservifyAtlasDo      = 0x06
+	ConservifyAtlasTemp    = 0x07
+	ConservifyAtlasOrp     = 0x08
+	ConservifyWaterPh      = 0x09
+	ConservifyWaterEc      = 0x10
+	ConservifyWaterDo      = 0x11
+	ConservifyWaterTemp    = 0x12
+	ConservifyWaterOrp     = 0x13
 	ConservifyRandom       = 0xa0
 	ConservifyDiagnostics  = 0xa1
 
@@ -32,90 +37,27 @@ type HeaderFields struct {
 type ModuleMetaRepository struct {
 }
 
-func NewModuleMetaRepository() *ModuleMetaRepository {
-	return &ModuleMetaRepository{}
-}
+var (
+	moduleMeta []*ModuleMeta
+)
 
-func (r *ModuleMetaRepository) FindByFullKey(fullKey string) (mm *SensorAndModuleMeta, err error) {
-	all, err := r.FindAllModulesMeta()
-	if err != nil {
-		return nil, err
+func init() {
+	mapAndTimesSeriesOnly := []VizConfig{
+		VizConfig{
+			Name: "D3TimeSeriesGraph",
+		},
+		VizConfig{
+			Name: "D3Map",
+		},
 	}
 
-	for _, module := range all {
-		for _, sensor := range module.Sensors {
-			if sensor.FullKey == fullKey {
-				mm = &SensorAndModuleMeta{
-					Module: module,
-					Sensor: sensor,
-				}
-				return
-			}
-		}
-	}
-
-	return nil, fmt.Errorf("unknown sensor: %s", fullKey)
-}
-
-func (r *ModuleMetaRepository) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, err error) {
-	all, err := r.FindAllModulesMeta()
-	if err != nil {
-		return nil, err
-	}
-	for _, module := range all {
-		if module.Header.Manufacturer == m.Manufacturer && module.Header.Kind == m.Kind {
-			return module, nil
-		}
-	}
-
-	message := fmt.Sprintf("missing sensor meta (%v, %v)", m.Manufacturer, m.Kind)
-	return nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind)
-}
-
-func (r *ModuleMetaRepository) FindSensorMeta(m *HeaderFields, sensor string) (mm *ModuleMeta, sm *SensorMeta, err error) {
-	all, err := r.FindAllModulesMeta()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// Very old firmware keys. We should sanitize these earlier in the process.
-	weNeedToCleanThisUp := strings.ReplaceAll(strings.ReplaceAll(sensor, " ", "_"), "-", "_")
-
-	for _, module := range all {
-		sameKind := module.Header.Kind == m.Kind
-		if !sameKind {
-			for _, k := range module.Header.AllKinds {
-				if m.Kind == k {
-					sameKind = true
-					break
-				}
-			}
-		}
-
-		if module.Header.Manufacturer == m.Manufacturer && sameKind {
-			for _, s := range module.Sensors {
-				if s.Key == sensor || s.FirmwareKey == sensor {
-					return module, s, nil
-				}
-				if s.Key == weNeedToCleanThisUp || s.FirmwareKey == weNeedToCleanThisUp {
-					return module, s, nil
-				}
-			}
-		}
-	}
-
-	message := fmt.Sprintf("missing sensor meta (%v, %v, %v)", m.Manufacturer, m.Kind, sensor)
-	return nil, nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
-}
-
-func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error) {
-	mm = []*ModuleMeta{
+	moduleMeta = []*ModuleMeta{
 		&ModuleMeta{
 			Key: "fk.water.ph",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWaterPh,
-				AllKinds:     []uint32{ConservifyWater},
+				AllKinds:     []uint32{},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -137,7 +79,139 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
 				Kind:         ConservifyWaterEc,
-				AllKinds:     []uint32{ConservifyWater},
+				AllKinds:     []uint32{},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "ec",
+					FirmwareKey:   "ec",
+					UnitOfMeasure: "μS/cm",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 500000.0,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "fk.water.do",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyWaterDo,
+				AllKinds:     []uint32{},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "do",
+					FirmwareKey:   "do",
+					UnitOfMeasure: "%",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 100.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "pressure",
+					FirmwareKey:   "pressure",
+					UnitOfMeasure: "kPa",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 1.0,
+							Maximum: 200000.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "temperature",
+					FirmwareKey:   "temperature",
+					UnitOfMeasure: "°C",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: -100.0,
+							Maximum: 200.0,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "fk.water.temp",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyWaterTemp,
+				AllKinds:     []uint32{},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "temp",
+					FirmwareKey:   "temp",
+					UnitOfMeasure: "°C",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: -126.0,
+							Maximum: 1254.0,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "fk.water.orp",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyWaterOrp,
+				AllKinds:     []uint32{},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "orp",
+					FirmwareKey:   "orp",
+					UnitOfMeasure: "mV",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: -1019.9,
+							Maximum: 1019.9,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "fk.water.ph",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyAtlasPh,
+				AllKinds:     []uint32{ConservifyAtlas},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "ph",
+					FirmwareKey:   "ph",
+					UnitOfMeasure: "",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 14.0,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "fk.water.ec",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyAtlasEc,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -156,26 +230,23 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 					Key:           "tds",
 					FirmwareKey:   "tds",
 					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{
-						/*
-							SensorRanges{
-								Minimum: 0.0,
-								Maximum: 0.0,
-							},
-						*/
+					Ranges: []SensorRanges{
+
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 0.0,
+						},
 					},
 				},
 				&SensorMeta{
 					Key:           "salinity",
 					FirmwareKey:   "salinity",
 					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{
-						/*
-							SensorRanges{
-								Minimum: 0.0,
-								Maximum: 0.0,
-							},
-						*/
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 0.0,
+						},
 					},
 				},
 			},
@@ -184,15 +255,15 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Key: "fk.water.dox",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterDo,
-				AllKinds:     []uint32{ConservifyWater},
+				Kind:         ConservifyAtlasDo,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
 				&SensorMeta{
 					Key:           "dox",
 					FirmwareKey:   "dox",
-					UnitOfMeasure: "mg/L",
+					UnitOfMeasure: "%",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -206,15 +277,15 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Key: "fk.water.do",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterDo,
-				AllKinds:     []uint32{ConservifyWater},
+				Kind:         ConservifyAtlasDo,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
 				&SensorMeta{
 					Key:           "do",
 					FirmwareKey:   "do",
-					UnitOfMeasure: "mg/L",
+					UnitOfMeasure: "%",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
@@ -225,33 +296,11 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 		},
 		&ModuleMeta{
-			Key: "fk.water.orp",
-			Header: ModuleHeader{
-				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterOrp,
-				AllKinds:     []uint32{ConservifyWater},
-				Version:      0x1,
-			},
-			Sensors: []*SensorMeta{
-				&SensorMeta{
-					Key:           "orp",
-					FirmwareKey:   "orp",
-					UnitOfMeasure: "mV",
-					Ranges: []SensorRanges{
-						SensorRanges{
-							Minimum: -1019.9,
-							Maximum: 1019.9,
-						},
-					},
-				},
-			},
-		},
-		&ModuleMeta{
 			Key: "fk.water.temp",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWaterTemp,
-				AllKinds:     []uint32{ConservifyWater},
+				Kind:         ConservifyAtlasTemp,
+				AllKinds:     []uint32{ConservifyAtlas},
 				Version:      0x1,
 			},
 			Sensors: []*SensorMeta{
@@ -263,6 +312,28 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 						SensorRanges{
 							Minimum: -126.0,
 							Maximum: 1254.0,
+						},
+					},
+				},
+			},
+		},
+		&ModuleMeta{
+			Key: "fk.water.orp",
+			Header: ModuleHeader{
+				Manufacturer: ManufacturerConservify,
+				Kind:         ConservifyAtlasOrp,
+				AllKinds:     []uint32{ConservifyAtlas},
+				Version:      0x1,
+			},
+			Sensors: []*SensorMeta{
+				&SensorMeta{
+					Key:           "orp",
+					FirmwareKey:   "orp",
+					UnitOfMeasure: "mV",
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: -1019.9,
+							Maximum: 1019.9,
 						},
 					},
 				},
@@ -291,7 +362,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temperature1",
 					FirmwareKey:   "temperature_1",
-					UnitOfMeasure: "C",
+					UnitOfMeasure: "°C",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: -100.0,
@@ -313,7 +384,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temperature2",
 					FirmwareKey:   "temperature_2",
-					UnitOfMeasure: "C",
+					UnitOfMeasure: "°C",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: -100.0,
@@ -481,7 +552,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temperature1",
 					FirmwareKey:   "temperature_1",
-					UnitOfMeasure: "C",
+					UnitOfMeasure: "°C",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: -100.0,
@@ -503,7 +574,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temperature2",
 					FirmwareKey:   "temperature_2",
-					UnitOfMeasure: "C",
+					UnitOfMeasure: "°C",
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: -100.0,
@@ -698,7 +769,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				&SensorMeta{
 					Key:           "temperature",
 					FirmwareKey:   "temperature",
-					UnitOfMeasure: "C",
+					UnitOfMeasure: "°C",
 					Ranges:        []SensorRanges{},
 				},
 			},
@@ -779,7 +850,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			Key: "fk.water",
 			Header: ModuleHeader{
 				Manufacturer: ManufacturerConservify,
-				Kind:         ConservifyWater,
+				Kind:         ConservifyAtlas,
 				AllKinds:     []uint32{},
 				Version:      0x1,
 			},
@@ -818,8 +889,9 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 				},
 			},
 		},
+		// TODO This should move to the schema definition.
 		&ModuleMeta{
-			Key: "ttn.floodnet",
+			Key: "wh.floodnet",
 			Header: ModuleHeader{
 				Manufacturer: 0,
 				Kind:         0,
@@ -828,56 +900,221 @@ func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error
 			},
 			Sensors: []*SensorMeta{
 				&SensorMeta{
-					Key:           "humidity",
-					FirmwareKey:   "humidity",
-					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
+					Key:           "depth",
+					FirmwareKey:   "depth",
+					UnitOfMeasure: "inches",
+					VizConfigs:    mapAndTimesSeriesOnly,
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 40.0,
+						},
+					},
 				},
 				&SensorMeta{
-					Key:           "pressure",
-					FirmwareKey:   "pressure",
-					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
-				},
-				&SensorMeta{
-					Key:           "altitude",
-					FirmwareKey:   "altitude",
-					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
-				},
-				&SensorMeta{
-					Key:           "battery",
-					FirmwareKey:   "battery",
-					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
+					Key:           "depthUnfiltered",
+					FirmwareKey:   "depth_unfiltered",
+					UnitOfMeasure: "inches",
+					Internal:      true,
+					VizConfigs:    mapAndTimesSeriesOnly,
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 40.0,
+						},
+					},
 				},
 				&SensorMeta{
 					Key:           "distance",
 					FirmwareKey:   "distance",
-					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
+					UnitOfMeasure: "mm",
+					Internal:      true,
+					VizConfigs:    mapAndTimesSeriesOnly,
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 4999.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "battery",
+					FirmwareKey:   "battery",
+					UnitOfMeasure: "%",
+					VizConfigs:    mapAndTimesSeriesOnly,
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0,
+							Maximum: 100,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "tideFeet",
+					FirmwareKey:   "tide_feet",
+					UnitOfMeasure: "inches",
+					Internal:      false,
+					VizConfigs:    mapAndTimesSeriesOnly,
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 4999.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "humidity",
+					FirmwareKey:   "humidity",
+					UnitOfMeasure: "%",
+					Internal:      true,
+					VizConfigs:    mapAndTimesSeriesOnly,
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0.0,
+							Maximum: 100.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "pressure",
+					FirmwareKey:   "pressure",
+					UnitOfMeasure: "kPa",
+					Internal:      true,
+					VizConfigs:    mapAndTimesSeriesOnly,
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 1.0,
+							Maximum: 200000.0,
+						},
+					},
+				},
+				&SensorMeta{
+					Key:           "altitude",
+					FirmwareKey:   "altitude",
+					UnitOfMeasure: "m",
+					Internal:      true,
+					VizConfigs:    mapAndTimesSeriesOnly,
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 3000,
+							Maximum: -500,
+						},
+					},
 				},
 				&SensorMeta{
 					Key:           "temperature",
 					FirmwareKey:   "temperature",
-					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
+					UnitOfMeasure: "°C",
+					Internal:      true,
+					VizConfigs:    mapAndTimesSeriesOnly,
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: -100.0,
+							Maximum: 200.0,
+						},
+					},
 				},
 				&SensorMeta{
 					Key:           "sdError",
 					FirmwareKey:   "sdError",
 					UnitOfMeasure: "",
-					Ranges:        []SensorRanges{},
+					Internal:      true,
+					VizConfigs:    mapAndTimesSeriesOnly,
+					Ranges: []SensorRanges{
+						SensorRanges{
+							Minimum: 0,
+							Maximum: 200.0,
+						},
+					},
 				},
 			},
 		},
 	}
 
-	for _, m := range mm {
-		for _, s := range m.Sensors {
+	for _, m := range moduleMeta {
+		for sensorIndex, s := range m.Sensors {
+			s.Order = sensorIndex
 			s.FullKey = m.Key + "." + s.Key
 		}
 	}
+}
 
-	return
+func NewModuleMetaRepository() *ModuleMetaRepository {
+	return &ModuleMetaRepository{}
+}
+
+func (r *ModuleMetaRepository) FindByFullKey(fullKey string) (mm *SensorAndModuleMeta, err error) {
+	all, err := r.FindAllModulesMeta()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, module := range all {
+		for _, sensor := range module.Sensors {
+			if sensor.FullKey == fullKey {
+				mm = &SensorAndModuleMeta{
+					Module: module,
+					Sensor: sensor,
+				}
+				return
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("unknown sensor: %s", fullKey)
+}
+
+func (r *ModuleMetaRepository) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, err error) {
+	all, err := r.FindAllModulesMeta()
+	if err != nil {
+		return nil, err
+	}
+	for _, module := range all {
+		if module.Header.Manufacturer == m.Manufacturer && module.Header.Kind == m.Kind {
+			return module, nil
+		}
+	}
+
+	message := fmt.Sprintf("missing sensor meta (%v, %v)", m.Manufacturer, m.Kind)
+	return nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind)
+}
+
+func (r *ModuleMetaRepository) FindSensorMeta(m *HeaderFields, sensor string) (mm *ModuleMeta, sm *SensorMeta, err error) {
+	all, err := r.FindAllModulesMeta()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Very old firmware keys. We should sanitize these earlier in the process.
+	weNeedToCleanThisUp := strings.ReplaceAll(strings.ReplaceAll(sensor, " ", "_"), "-", "_")
+
+	for _, module := range all {
+		sameKind := module.Header.Kind == m.Kind
+		if !sameKind {
+			for _, k := range module.Header.AllKinds {
+				if m.Kind == k {
+					sameKind = true
+					break
+				}
+			}
+		}
+
+		if module.Header.Manufacturer == m.Manufacturer && sameKind {
+			for _, s := range module.Sensors {
+				if s.Key == sensor || s.FirmwareKey == sensor {
+					return module, s, nil
+				}
+				if s.Key == weNeedToCleanThisUp || s.FirmwareKey == weNeedToCleanThisUp {
+					return module, s, nil
+				}
+			}
+		}
+	}
+
+	message := fmt.Sprintf("missing sensor meta (%v, %v, %v)", m.Manufacturer, m.Kind, sensor)
+	return nil, nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
+}
+
+func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error) {
+	return moduleMeta, nil
 }

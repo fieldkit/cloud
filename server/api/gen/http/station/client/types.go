@@ -123,6 +123,12 @@ type ListProjectResponseBody struct {
 	Stations StationFullCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
 }
 
+// ListAssociatedResponseBody is the type of the "station" service "list
+// associated" endpoint HTTP response body.
+type ListAssociatedResponseBody struct {
+	Stations StationFullCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
+}
+
 // DownloadPhotoResponseBody is the type of the "station" service "download
 // photo" endpoint HTTP response body.
 type DownloadPhotoResponseBody struct {
@@ -587,6 +593,78 @@ type ListProjectNotFoundResponseBody struct {
 // ListProjectBadRequestResponseBody is the type of the "station" service "list
 // project" endpoint HTTP response body for the "bad-request" error.
 type ListProjectBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListAssociatedUnauthorizedResponseBody is the type of the "station" service
+// "list associated" endpoint HTTP response body for the "unauthorized" error.
+type ListAssociatedUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListAssociatedForbiddenResponseBody is the type of the "station" service
+// "list associated" endpoint HTTP response body for the "forbidden" error.
+type ListAssociatedForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListAssociatedNotFoundResponseBody is the type of the "station" service
+// "list associated" endpoint HTTP response body for the "not-found" error.
+type ListAssociatedNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListAssociatedBadRequestResponseBody is the type of the "station" service
+// "list associated" endpoint HTTP response body for the "bad-request" error.
+type ListAssociatedBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -1638,6 +1716,78 @@ func NewListProjectBadRequest(body *ListProjectBadRequestResponseBody) *goa.Serv
 	return v
 }
 
+// NewListAssociatedStationsFullOK builds a "station" service "list associated"
+// endpoint result from a HTTP "OK" response.
+func NewListAssociatedStationsFullOK(body *ListAssociatedResponseBody) *stationviews.StationsFullView {
+	v := &stationviews.StationsFullView{}
+	v.Stations = make([]*stationviews.StationFullView, len(body.Stations))
+	for i, val := range body.Stations {
+		v.Stations[i] = unmarshalStationFullResponseBodyToStationviewsStationFullView(val)
+	}
+
+	return v
+}
+
+// NewListAssociatedUnauthorized builds a station service list associated
+// endpoint unauthorized error.
+func NewListAssociatedUnauthorized(body *ListAssociatedUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListAssociatedForbidden builds a station service list associated endpoint
+// forbidden error.
+func NewListAssociatedForbidden(body *ListAssociatedForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListAssociatedNotFound builds a station service list associated endpoint
+// not-found error.
+func NewListAssociatedNotFound(body *ListAssociatedNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListAssociatedBadRequest builds a station service list associated
+// endpoint bad-request error.
+func NewListAssociatedBadRequest(body *ListAssociatedBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
 // NewDownloadPhotoDownloadedPhotoOK builds a "station" service "download
 // photo" endpoint result from a HTTP "OK" response.
 func NewDownloadPhotoDownloadedPhotoOK(body *DownloadPhotoResponseBody) *stationviews.DownloadedPhotoView {
@@ -2568,6 +2718,102 @@ func ValidateListProjectNotFoundResponseBody(body *ListProjectNotFoundResponseBo
 // ValidateListProjectBadRequestResponseBody runs the validations defined on
 // list project_bad-request_response_body
 func ValidateListProjectBadRequestResponseBody(body *ListProjectBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListAssociatedUnauthorizedResponseBody runs the validations defined
+// on list associated_unauthorized_response_body
+func ValidateListAssociatedUnauthorizedResponseBody(body *ListAssociatedUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListAssociatedForbiddenResponseBody runs the validations defined on
+// list associated_forbidden_response_body
+func ValidateListAssociatedForbiddenResponseBody(body *ListAssociatedForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListAssociatedNotFoundResponseBody runs the validations defined on
+// list associated_not-found_response_body
+func ValidateListAssociatedNotFoundResponseBody(body *ListAssociatedNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListAssociatedBadRequestResponseBody runs the validations defined on
+// list associated_bad-request_response_body
+func ValidateListAssociatedBadRequestResponseBody(body *ListAssociatedBadRequestResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}

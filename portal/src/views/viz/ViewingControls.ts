@@ -16,29 +16,8 @@ export const ViewingControls = Vue.extend({
         Treeselect,
         Spinner,
     },
-    data(): {
-        chartTypes: { label: string; id: ChartType }[];
-    } {
-        return {
-            chartTypes: [
-                {
-                    label: "Time Series",
-                    id: ChartType.TimeSeries,
-                },
-                {
-                    label: "Histogram",
-                    id: ChartType.Histogram,
-                },
-                {
-                    label: "Range",
-                    id: ChartType.Range,
-                },
-                {
-                    label: "Map",
-                    id: ChartType.Map,
-                },
-            ],
-        };
+    data(): {} {
+        return {};
     },
     props: {
         viz: {
@@ -51,6 +30,39 @@ export const ViewingControls = Vue.extend({
         },
     },
     computed: {
+        compareIcon() {
+            return this.$loadAsset("icon-compare.svg");
+        },
+        chartTypes(): { label: string; id: ChartType }[] {
+            const vizInfo = this.workspace.vizInfo(this.viz);
+            const allTypes = [
+                {
+                    label: "Time Series",
+                    id: ChartType.TimeSeries,
+                    vueName: "D3TimeSeriesGraph",
+                },
+                {
+                    label: "Histogram",
+                    id: ChartType.Histogram,
+                    vueName: "D3Histogram",
+                },
+                {
+                    label: "Range",
+                    id: ChartType.Range,
+                    vueName: "D3Range",
+                },
+                {
+                    label: "Map",
+                    id: ChartType.Map,
+                    vueName: "D3Map",
+                },
+            ];
+            if (vizInfo.viz.length == 0) {
+                return allTypes;
+            }
+            const names = vizInfo.viz.map((vc) => vc.name);
+            return allTypes.filter((type) => _.some(names, (name) => name == type.vueName));
+        },
         stationOptions(): StationTreeOption[] {
             this.viz.log("station-options", { options: this.workspace.stationOptions });
             return this.workspace.stationOptions;
@@ -71,8 +83,8 @@ export const ViewingControls = Vue.extend({
             return `${sensorAndModule[0]}-${sensorAndModule[1]}`;
         },
         manualRangeValue(): { start: Date; end: Date } | null {
-            console.log(`manualRangeValue:`, this.viz.visible, this.viz.visibleTimeRange);
-            if (this.viz.visibleTimeRange.isExtreme()) {
+            // console.log(`manual-range-value:`, this.viz.visible, this.viz.visibleTimeRange);
+            if (!this.viz.visibleTimeRange || this.viz.visibleTimeRange.isExtreme()) {
                 // TODO This happens initially cause we query for
                 // eternity... probably best if this isn't set until
                 // we get that data back and know the range.
@@ -138,11 +150,12 @@ export const ViewingControls = Vue.extend({
             }
         },
     },
+
     template: `
 		<div class="controls-container">
 			<div class="row row-1">
 				<div class="left buttons" v-if="!viz.busy">
-					<div class="button" @click="raiseCompare">Compare</div>
+					<div class="button compare" @click="raiseCompare" alt="Compare"> <img :src="compareIcon" /><div>Compare Sensor Graphs</div></div>
 				</div>
 				<div class="left busy" v-else><Spinner /></div>
 				<div class="right time">
@@ -166,7 +179,7 @@ export const ViewingControls = Vue.extend({
 					<div v-else class="loading-options">Loading Options</div>
 				</div>
 
-				<div class="right chart-type">
+				<div class="right chart-type" v-if="chartTypes.length > 1">
 					<treeselect v-if="stationOptions.length" :options="chartTypes" :value="viz.chartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
 				</div>
 			</div>

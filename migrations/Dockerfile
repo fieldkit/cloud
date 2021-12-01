@@ -1,4 +1,4 @@
-FROM golang AS source
+FROM golang:1.16.4-buster AS source
 
 WORKDIR /work
 
@@ -10,7 +10,7 @@ RUN ls -alhR
 RUN go get ./...
 RUN go build -o migrate *.go
 
-FROM ubuntu
+FROM ubuntu:18.04
 
 COPY --from=source /work/migrate /migrations/bin/
 

@@ -16,17 +16,18 @@ import (
 
 // Endpoints wraps the "station" service endpoints.
 type Endpoints struct {
-	Add           goa.Endpoint
-	Get           goa.Endpoint
-	Transfer      goa.Endpoint
-	Update        goa.Endpoint
-	ListMine      goa.Endpoint
-	ListProject   goa.Endpoint
-	DownloadPhoto goa.Endpoint
-	ListAll       goa.Endpoint
-	Delete        goa.Endpoint
-	AdminSearch   goa.Endpoint
-	Progress      goa.Endpoint
+	Add            goa.Endpoint
+	Get            goa.Endpoint
+	Transfer       goa.Endpoint
+	Update         goa.Endpoint
+	ListMine       goa.Endpoint
+	ListProject    goa.Endpoint
+	ListAssociated goa.Endpoint
+	DownloadPhoto  goa.Endpoint
+	ListAll        goa.Endpoint
+	Delete         goa.Endpoint
+	AdminSearch    goa.Endpoint
+	Progress       goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "station" service with endpoints.
@@ -34,17 +35,18 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Add:           NewAddEndpoint(s, a.JWTAuth),
-		Get:           NewGetEndpoint(s, a.JWTAuth),
-		Transfer:      NewTransferEndpoint(s, a.JWTAuth),
-		Update:        NewUpdateEndpoint(s, a.JWTAuth),
-		ListMine:      NewListMineEndpoint(s, a.JWTAuth),
-		ListProject:   NewListProjectEndpoint(s, a.JWTAuth),
-		DownloadPhoto: NewDownloadPhotoEndpoint(s, a.JWTAuth),
-		ListAll:       NewListAllEndpoint(s, a.JWTAuth),
-		Delete:        NewDeleteEndpoint(s, a.JWTAuth),
-		AdminSearch:   NewAdminSearchEndpoint(s, a.JWTAuth),
-		Progress:      NewProgressEndpoint(s, a.JWTAuth),
+		Add:            NewAddEndpoint(s, a.JWTAuth),
+		Get:            NewGetEndpoint(s, a.JWTAuth),
+		Transfer:       NewTransferEndpoint(s, a.JWTAuth),
+		Update:         NewUpdateEndpoint(s, a.JWTAuth),
+		ListMine:       NewListMineEndpoint(s, a.JWTAuth),
+		ListProject:    NewListProjectEndpoint(s, a.JWTAuth),
+		ListAssociated: NewListAssociatedEndpoint(s, a.JWTAuth),
+		DownloadPhoto:  NewDownloadPhotoEndpoint(s, a.JWTAuth),
+		ListAll:        NewListAllEndpoint(s, a.JWTAuth),
+		Delete:         NewDeleteEndpoint(s, a.JWTAuth),
+		AdminSearch:    NewAdminSearchEndpoint(s, a.JWTAuth),
+		Progress:       NewProgressEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -56,6 +58,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Update = m(e.Update)
 	e.ListMine = m(e.ListMine)
 	e.ListProject = m(e.ListProject)
+	e.ListAssociated = m(e.ListAssociated)
 	e.DownloadPhoto = m(e.DownloadPhoto)
 	e.ListAll = m(e.ListAll)
 	e.Delete = m(e.Delete)
@@ -202,6 +205,30 @@ func NewListProjectEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpo
 			return nil, err
 		}
 		res, err := s.ListProject(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedStationsFull(res, "default")
+		return vres, nil
+	}
+}
+
+// NewListAssociatedEndpoint returns an endpoint function that calls the method
+// "list associated" of service "station".
+func NewListAssociatedEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*ListAssociatedPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.ListAssociated(ctx, p)
 		if err != nil {
 			return nil, err
 		}

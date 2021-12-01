@@ -383,6 +383,27 @@ var _ = Service("station", func() {
 		})
 	})
 
+	Method("list associated", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("id", Int32)
+			Required("id")
+		})
+
+		Result(StationsFull)
+
+		HTTP(func() {
+			GET("stations/{id}/associated")
+
+			httpAuthentication()
+		})
+	})
+
 	Method("download photo", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")

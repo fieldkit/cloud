@@ -72,7 +72,33 @@ func (r *RecordRepository) QueryDevice(ctx context.Context, deviceId string, pag
 	return
 }
 
-func (r *RecordRepository) AddMetaRecord(ctx context.Context, p *data.Provision, i *data.Ingestion, sr *pb.SignedRecord, dr *pb.DataRecord, pb []byte) (*data.MetaRecord, error) {
+func (r *RecordRepository) AddMetaRecord(ctx context.Context, p *data.Provision, i *data.Ingestion, recordNumber int64, dr *pb.DataRecord, pb []byte) (*data.MetaRecord, error) {
+	metaTime := i.Time
+
+	metaRecord := &data.MetaRecord{
+		ProvisionID: p.ID,
+		Time:        metaTime,
+		Number:      recordNumber,
+		PB:          pb,
+	}
+
+	// TODO Sanitize
+	if err := metaRecord.SetData(dr); err != nil {
+		return nil, fmt.Errorf("error setting meta json: %v", err)
+	}
+
+	if err := r.db.NamedGetContext(ctx, metaRecord, `
+		INSERT INTO fieldkit.meta_record (provision_id, time, number, raw, pb) VALUES (:provision_id, :time, :number, :raw, :pb)
+		ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, pb = EXCLUDED.pb
+		RETURNING *
+		`, metaRecord); err != nil {
+		return nil, err
+	}
+
+	return metaRecord, nil
+}
+
+func (r *RecordRepository) AddSignedMetaRecord(ctx context.Context, p *data.Provision, i *data.Ingestion, sr *pb.SignedRecord, dr *pb.DataRecord, pb []byte) (*data.MetaRecord, error) {
 	metaTime := i.Time
 
 	if sr.Time > 0 {

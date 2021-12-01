@@ -8,6 +8,7 @@ import (
 
 	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
 	"github.com/fieldkit/cloud/server/common"
+	"github.com/fieldkit/cloud/server/webhook"
 )
 
 type TasksService struct {
@@ -29,6 +30,22 @@ func (c *TasksService) Five(ctx context.Context) error {
 	}
 
 	log.Infow("updated community rankings")
+
+	sr := webhook.NewMessageSchemaRepository(c.options.Database)
+	schemas, err := sr.QuerySchemasPendingProcessing(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, schema := range schemas {
+		log.Infow("processing", "schema_id", schema.ID)
+
+		if err := c.options.Publisher.Publish(ctx, &webhook.ProcessSchema{
+			SchemaID: schema.ID,
+		}); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

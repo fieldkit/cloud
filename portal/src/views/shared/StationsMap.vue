@@ -1,9 +1,9 @@
 <template v-if="mapped.valid && ready">
     <mapbox
         class="stations-map"
-        :access-token="mapboxToken"
+        :access-token="mapbox.token"
         :map-options="{
-            style: 'mapbox://styles/mapbox/outdoors-v11',
+            style: mapbox.style,
             bounds: bounds,
             zoom: 10,
         }"
@@ -34,11 +34,11 @@ export default Vue.extend({
         Mapbox,
     },
     data(): {
-        mapboxToken: string;
+        mapbox: { token: string; style: string };
         ready: boolean;
     } {
         return {
-            mapboxToken: Config.mapbox.token,
+            mapbox: Config.mapbox,
             ready: false,
         };
     },
@@ -171,10 +171,10 @@ export default Vue.extend({
                         "text-field": "{title}",
                         "icon-ignore-placement": true,
                         "icon-allow-overlap": true,
-                        "text-allow-overlap": false,
+                        "text-allow-overlap": true,
                         "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
                         "text-offset": [0, 0.75],
-                        "text-anchor": "top",
+                        "text-variable-anchor": ["top", "right", "bottom", "left"],
                     },
                 });
 

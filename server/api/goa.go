@@ -23,7 +23,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/ttn"
+	"github.com/fieldkit/cloud/server/webhook"
 
 	testSvr "github.com/fieldkit/cloud/server/api/gen/http/test/server"
 	test "github.com/fieldkit/cloud/server/api/gen/test"
@@ -162,8 +162,8 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		Authenticate: Authenticate,
 	}
 
-	ttnSvc := ttn.NewThingsNetworkService(ctx, commonOptions)
-	ttnEndpoints := ttnService.NewEndpoints(ttnSvc)
+	webhookService := webhook.NewWebHookService(ctx, commonOptions)
+	ttnEndpoints := ttnService.NewEndpoints(webhookService)
 
 	notificationsSvc := NewNotificationsService(ctx, options)
 	notificationsEndpoints := notificationsService.NewEndpoints(notificationsSvc)
@@ -424,7 +424,6 @@ func VerifyToken(ctx context.Context, a common.AuthAttempt) (jwt.MapClaims, int3
 	token := a.Token
 
 	log := Logger(ctx).Sugar()
-	log.Infow("verify-token:")
 
 	if strings.Contains(a.Token, " ") {
 		// Remove authorization scheme prefix (e.g. "Bearer")

@@ -21,9 +21,8 @@
                                 v-for="station in stations"
                                 v-bind:key="station.id"
                                 v-bind:class="{ active: isStationSelected && selectedStation.id === station.id }"
-                                v-on:click="onSelected(station)"
                             >
-                                <div class="tab-wrap">
+                                <div class="tab-wrap" v-on:click="onSelected(station)">
                                     <div class="name">{{ station.name }}</div>
                                     <div v-if="station.deployedAt" class="deployed">Deployed</div>
                                     <div v-else class="undeployed">Not Deployed</div>
@@ -37,18 +36,12 @@
 
                                         <div v-if="success" class="notification success">Saved.</div>
                                     </div>
-                                    <NotesViewer
-                                        :station="selectedStation"
-                                        :notes="selectedNotes"
-                                        v-bind:key="stationId"
-                                        v-if="project.project.readOnly"
-                                    />
                                     <NotesForm
-                                        v-else
+                                        v-bind:key="stationId"
                                         :station="selectedStation"
                                         :notes="selectedNotes"
+                                        :readonly="project.project.readOnly"
                                         @save="saveForm"
-                                        v-bind:key="stationId"
                                         @change="onChange"
                                     />
                                 </div>
@@ -81,18 +74,12 @@
 
                                 <div v-if="success" class="notification success">Saved.</div>
                             </div>
-                            <NotesViewer
-                                :station="selectedStation"
-                                :notes="selectedNotes"
-                                v-bind:key="stationId"
-                                v-if="project.project.readOnly"
-                            />
                             <NotesForm
-                                v-else
+                                v-bind:key="stationId"
                                 :station="selectedStation"
                                 :notes="selectedNotes"
+                                :readonly="project.project.readOnly"
                                 @save="saveForm"
-                                v-bind:key="stationId"
                                 @change="onChange"
                             />
                         </div>
@@ -112,7 +99,6 @@ import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 import StationTabs from "./StationTabs.vue";
 import NotesForm from "./NotesForm.vue";
-import NotesViewer from "./NotesViewer.vue";
 
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
@@ -129,7 +115,6 @@ export default Vue.extend({
         ...CommonComponents,
         StandardLayout,
         NotesForm,
-        NotesViewer,
     },
     props: {
         projectId: {
@@ -168,7 +153,6 @@ export default Vue.extend({
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
-            stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
         }),
         hasStations(): boolean {
@@ -176,9 +160,13 @@ export default Vue.extend({
         },
         project(): DisplayProject | null {
             if (this.projectId) {
+                console.log("aici", this.$getters.projectsById[this.projectId]);
                 return this.$getters.projectsById[this.projectId];
             }
             return null;
+        },
+        stations(): DisplayStation[] {
+            return this.$getters.projectsById[this.projectId].stations;
         },
         visibleStations(): DisplayStation[] {
             if (this.projectId) {
@@ -272,7 +260,7 @@ export default Vue.extend({
             }
             // allows collapsing of selected station tab on mobile
             if (this.isMobileView()) {
-                this.isStationSelected = false;
+                this.isStationSelected = !this.isStationSelected;
             }
         },
         onChange(): void {
@@ -326,6 +314,9 @@ export default Vue.extend({
 .notes-view {
     @include bp-down($md) {
         max-width: 600px;
+    }
+    @include bp-down($xs) {
+        padding-bottom: 100px;
     }
 }
 .notes-view .lower {
@@ -451,7 +442,7 @@ export default Vue.extend({
             overflow: hidden;
 
             @at-root .tab.active & {
-                max-height: 1000px;
+                max-height: unset;
             }
         }
     }
@@ -492,5 +483,9 @@ export default Vue.extend({
     @include bp-down($xs) {
         font-size: 12px !important;
     }
+}
+::v-deep .no-data-yet {
+    color: #6a6d71;
+    font-size: 13px;
 }
 </style>

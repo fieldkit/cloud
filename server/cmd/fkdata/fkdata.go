@@ -43,11 +43,12 @@ type Options struct {
 }
 
 type Config struct {
-	PostgresURL       string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
-	AwsProfile        string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
-	AwsId             string `split_words:"true" default:""`
-	AwsSecret         string `split_words:"true" default:""`
-	StreamsBucketName string `split_words:"true" default:""`
+	PostgresURL    string   `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
+	AwsProfile     string   `envconfig:"aws_profile" default:"fieldkit" required:"true"`
+	AwsId          string   `split_words:"true" default:""`
+	AwsSecret      string   `split_words:"true" default:""`
+	MediaBuckets   []string `split_words:"true" default:""`
+	StreamsBuckets []string `split_words:"true" default:""`
 }
 
 func fail(ctx context.Context, err error) {
@@ -133,12 +134,14 @@ func main() {
 		reading = append(reading, fs)
 		writing = append(writing, fs)
 
-		s3, err := files.NewS3FileArchive(awsSession, metrics, config.StreamsBucketName, files.NoPrefix)
-		if err != nil {
-			fail(ctx, err)
-		}
+		for _, bucketName := range config.StreamsBuckets {
+			s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, files.NoPrefix)
+			if err != nil {
+				fail(ctx, err)
+			}
 
-		reading = append(reading, s3)
+			reading = append(reading, s3)
+		}
 
 		pgxcfg, err := pgx.ParseURI(config.PostgresURL)
 		if err != nil {
@@ -254,7 +257,7 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 	end := time.Now()
 	interval := time.Minute * 1
 
-	aggregator := handlers.NewAggregator(db, "", stationID, 1000)
+	aggregator := handlers.NewAggregator(db, "", stationID, 1000, handlers.NewDefaultAggregatorConfig())
 
 	sinFunc := func(period int64) SampleFunc {
 		return func(t time.Time) float64 {

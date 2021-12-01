@@ -86,6 +86,11 @@ func InviteProjectPath(projectID int32) string {
 	return fmt.Sprintf("/projects/%v/invite", projectID)
 }
 
+// EditUserProjectPath returns the URL path to the project service edit user HTTP endpoint.
+func EditUserProjectPath(projectID int32) string {
+	return fmt.Sprintf("/projects/%v/roles", projectID)
+}
+
 // RemoveUserProjectPath returns the URL path to the project service remove user HTTP endpoint.
 func RemoveUserProjectPath(projectID int32) string {
 	return fmt.Sprintf("/projects/%v/members", projectID)

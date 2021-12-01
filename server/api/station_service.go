@@ -288,7 +288,7 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 
 	preciseLocation := project.Privacy == data.Public
 
-	if !p.Anonymous() {
+	if !p.Anonymous() && !preciseLocation {
 		// NOTE This may already be in Permissions.
 		relationships, err := pr.QueryUserProjectRelationships(ctx, p.UserID())
 		if err != nil {
@@ -309,6 +309,45 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 	stations, err := transformAllStationFull(c.options.signer, p, sfs, preciseLocation, false)
 	if err != nil {
 		return nil, err
+	}
+
+	response = &station.StationsFull{
+		Stations: stations,
+	}
+
+	return
+}
+
+func (c *StationService) ListAssociated(ctx context.Context, payload *station.ListAssociatedPayload) (response *station.StationsFull, err error) {
+	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.CanView(); err != nil {
+		return nil, err
+	}
+
+	pr := repositories.NewProjectRepository(c.options.Database)
+
+	projects, err := pr.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	stations := make([]*station.StationFull, 0)
+
+	for _, project := range projects {
+		projectStations, err := c.ListProject(ctx, &station.ListProjectPayload{
+			ID: project.ID,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		for _, s := range projectStations.Stations {
+			stations = append(stations, s)
+		}
 	}
 
 	response = &station.StationsFull{
