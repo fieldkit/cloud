@@ -131,7 +131,7 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 
 	tncDate := time.Time{}
 
-	if *payload.User.TncAccept == true {
+	if payload.User.TncAccept != nil && *payload.User.TncAccept {
 		tncDate = time.Now()
 	}
 
