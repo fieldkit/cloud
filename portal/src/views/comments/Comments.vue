@@ -25,15 +25,11 @@
                             <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
                             <span class="author">
                                 {{ post.author.name }}
-                                <i
-                                    class="icon-ellipsis options-trigger"
+                                <ListItemOptions
                                     v-if="user.id === post.author.id || user.admin"
-                                    @click="showCommentOptions($event)"
-                                ></i>
-                                <div class="options-btns">
-                                    <button @click="startEditing(post)" v-if="user.id == post.author.id">Edit Post</button>
-                                    <button @click="deleteComment(post.id)">Delete Post</button>
-                                </div>
+                                    @listItemOptionClick="onListItemOptionClick($event, post)"
+                                    :options="getCommentOptions(post)"
+                                ></ListItemOptions>
                             </span>
                             <div v-if="post.readonly">{{ post.body }}</div>
                             <input v-else type="text" class="body" v-model="post.body" :readonly="post.readonly" />
@@ -50,15 +46,11 @@
                                     <div class="column">
                                         <span class="author">
                                             {{ reply.author.name }}
-                                            <i
-                                                class="icon-ellipsis options-trigger"
-                                                v-if="user.id === reply.author.id || user.admin"
-                                                @click="showCommentOptions($event)"
-                                            ></i>
-                                            <div class="options-btns">
-                                                <button @click="startEditing(reply)" v-if="user.id == reply.author.id">Edit Post</button>
-                                                <button @click="deleteComment(reply.id)">Delete Post</button>
-                                            </div>
+                                            <ListItemOptions
+                                                v-if="user.id === post.author.id || user.admin"
+                                                @listItemOptionClick="onListItemOptionClick($event, reply)"
+                                                :options="getCommentOptions(post)"
+                                            ></ListItemOptions>
                                         </span>
                                         <div v-if="reply.readonly">{{ reply.body }}</div>
                                         <input v-else type="text" class="body" v-model="reply.body" :readonly="reply.readonly" />
@@ -117,11 +109,13 @@ import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
+import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 
 export default Vue.extend({
     name: "Comments",
     components: {
         ...CommonComponents,
+        ListItemOptions,
     },
     props: {
         user: {
@@ -177,6 +171,7 @@ export default Vue.extend({
         this.placeholder = this.getNewCommentPlaceholder();
         return this.getComments();
     },
+
     methods: {
         getNewCommentPlaceholder(): string {
             if (this.viewType === "project") {
@@ -277,10 +272,10 @@ export default Vue.extend({
 
                 if (!(optionsMenu as HTMLElement).classList.contains("visible")) {
                     (optionsMenu as HTMLElement).classList.add("visible");
-                    setTimeout(function () {
+                    setTimeout(function() {
                         document.addEventListener(
                             "click",
-                            function () {
+                            function() {
                                 (optionsMenu as HTMLElement).classList.remove("visible");
                             },
                             {
@@ -322,6 +317,35 @@ export default Vue.extend({
                     this.errorMessage = CommentsErrorsEnum.editComment;
                 });
         },
+        onListItemOptionClick(event: string, post: Comment): void {
+            if (event === "edit-comment") {
+                this.startEditing(post);
+            }
+            if (event === "delete-comment") {
+                this.deleteComment(post.id);
+            }
+        },
+        getCommentOptions(post: Comment): { label: string; event: string }[] {
+            if (this.user.id === post.author.id) {
+                return [
+                    {
+                        label: "Edit post",
+                        event: "edit-comment",
+                    },
+                    {
+                        label: "Delete post",
+                        event: "delete-comment",
+                    },
+                ];
+            }
+
+            return [
+                {
+                    label: "Delete post",
+                    event: "delete-comment",
+                },
+            ];
+        },
     },
 });
 </script>
@@ -342,6 +366,7 @@ button {
     box-sizing: border-box;
     font-size: 14px;
 }
+
 .hide {
     display: none;
 }
@@ -472,41 +497,9 @@ header {
     position: relative;
 }
 
-.options {
-    &-trigger {
-        @include position(absolute, 0 -40px null null);
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.33s;
-    }
-
-    &-btns {
-        @include position(absolute, 0 calc(-100px - 50px) null null);
-        opacity: 0;
-        visibility: hidden;
-        padding: 10px;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-        background: #fff;
-        z-index: $z-index-top;
-        transition: opacity 0.33s;
-        width: 100px;
-
-        &.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        > * {
-            display: block;
-            white-space: nowrap;
-            font-family: $font-family-bold;
-            cursor: pointer;
-
-            &:not(:last-of-type) {
-                margin-bottom: 10px;
-            }
-        }
-    }
+::v-deep .options-trigger {
+    opacity: 0;
+    visibility: hidden;
 }
 
 .body {
@@ -573,7 +566,7 @@ header {
     flex: 100%;
 
     @include attention() {
-        .options-trigger {
+        ::v-deep .options-trigger {
             opacity: 1;
             visibility: visible;
         }
@@ -626,6 +619,7 @@ header {
         font-family: $font-family-bold;
     }
 }
+
 .error {
     color: $color-danger;
     margin-bottom: 10px;
