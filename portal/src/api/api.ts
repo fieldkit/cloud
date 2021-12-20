@@ -1205,6 +1205,14 @@ class FKApi {
         });
     }
 
+    deleteMedia(mediaId: number) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/notes/media/" + mediaId,
+        });
+    }
+
     public getStatus(): Promise<PortalDeployStatus> {
         return this.invoke({
             auth: Auth.None,

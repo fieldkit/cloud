@@ -160,7 +160,6 @@ export default Vue.extend({
         },
         project(): DisplayProject | null {
             if (this.projectId) {
-                console.log("aici", this.$getters.projectsById[this.projectId]);
                 return this.$getters.projectsById[this.projectId];
             }
             return null;

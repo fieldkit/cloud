@@ -1,5 +1,6 @@
 <template>
     <div class="notes-form">
+        <vue-confirm-dialog />
         <div class="header">
             <div class="name">{{ station.name }}</div>
             <div class="completed">{{ completed }}% Complete</div>
@@ -19,7 +20,7 @@
             <div class="photos">
                 <div class="title">Photos</div>
                 <div v-if="photos.length === 0" class="no-data-yet">No photos yet.</div>
-                <div class="photo" v-for="photo in photos" v-bind:key="photo.key">
+                <div class="photo-container" v-for="photo in photos" v-bind:key="photo.key">
                     <AuthenticatedPhoto :url="photo.url" />
                 </div>
             </div>
@@ -27,11 +28,13 @@
         <template v-if="!readonly">
             <div class="photos">
                 <div class="title">Photos</div>
-                <div class="photo" v-for="photo in photos" v-bind:key="photo.key">
+                <div class="photo-container" v-for="photo in photos" v-bind:key="photo.key">
                     <AuthenticatedPhoto :url="photo.url" />
+                    <ListItemOptions @listItemOptionClick="onPhotoOptionClick($event, photo)" :options="photoOptions"></ListItemOptions>
                 </div>
-                <div class="photo" v-for="photo in form.addedPhotos" v-bind:key="photo.key">
+                <div class="photo-container" v-for="photo in form.addedPhotos" v-bind:key="photo.key">
                     <img :src="photo.image" />
+                    <ListItemOptions @listItemOptionClick="onPhotoOptionClick($event, photo)" :options="photoOptions"></ListItemOptions>
                 </div>
                 <ImageUploader @change="onImage" :placeholder="placeholder" :allowPreview="false" />
             </div>
@@ -48,13 +51,16 @@ import NewPhoto from "../../assets/image-placeholder.svg";
 
 import { required } from "vuelidate/lib/validators";
 
-import { Notes, AddedPhoto, NoteMedia } from "./model";
+import { Notes, AddedPhoto, NoteMedia, PortalNoteMedia } from "./model";
+import ListItemOptions from "@/views/shared/ListItemOptions.vue";
+import * as ActionTypes from "@/store/actions";
 
 export default Vue.extend({
     name: "NotesForm",
     components: {
         ...CommonComponents,
         NoteEditor,
+        ListItemOptions,
     },
     props: {
         station: {
@@ -82,6 +88,16 @@ export default Vue.extend({
         return {
             form: new Notes(),
             placeholder: NewPhoto,
+            photoOptions: [
+                /*{
+                    label: "Use as Station Image",
+                    event: "use-as-station-image",
+                },*/
+                {
+                    label: "Delete Image",
+                    event: "delete-media",
+                },
+            ],
         };
     },
     computed: {
@@ -119,12 +135,50 @@ export default Vue.extend({
         onChange() {
             this.$emit("change", this.form);
         },
+        async onPhotoOptionClick(event: string, photo: AddedPhoto | PortalNoteMedia) {
+            if (event === "delete-media") {
+                await this.$confirm({
+                    message: `Are you sure you want to delete this image?`,
+                    button: {
+                        no: "Cancel",
+                        yes: "Delete",
+                    },
+                    callback: async (confirm) => {
+                        if (confirm) {
+                            if (photo.id) {
+                                await this.$services.api.deleteMedia(photo.id);
+                                this.notes.media = this.notes.media.filter((media) => media.id !== photo.id);
+                                return;
+                            }
+                            const photoIndex = this.form.addedPhotos.findIndex((addedPhoto) => addedPhoto.key === photo.key);
+                            this.form.addedPhotos.splice(photoIndex, 1);
+                            return;
+                        }
+                    },
+                });
+            }
+
+            if (event === "use-as-station-image") {
+                // TODO: add use as station functionality
+            }
+        },
+        async deleteMedia(photo: PortalNoteMedia): Promise<void> {
+            if (photo.id) {
+                await this.$services.api.deleteMedia(photo.id);
+                this.notes.media = this.notes.media.filter((media) => media.id !== photo.id);
+                return;
+            }
+            const photoIndex = this.form.addedPhotos.findIndex((addedPhoto) => addedPhoto.key === photo.key);
+            this.form.addedPhotos.splice(photoIndex, 1);
+            return;
+        },
     },
 });
 </script>
 
 <style scoped lang="scss">
 @import "../../scss/mixins";
+@import "../../scss/global";
 
 .notes-form {
     text-align: left;
@@ -139,6 +193,7 @@ export default Vue.extend({
         border-bottom: 1px solid #d8dce0;
     }
 }
+
 .header {
     @include flex(center);
     padding-bottom: 11px;
@@ -149,21 +204,25 @@ export default Vue.extend({
         padding: 0;
     }
 }
+
 .header .name {
     color: #2c3e50;
     font-size: 20px;
     font-weight: 500;
 }
+
 .header .completed {
     margin-left: 10px;
     color: #0a67aa;
     font-size: 14px;
     font-weight: 600;
 }
+
 .header .buttons {
     margin-left: auto;
     display: flex;
 }
+
 .site-notes {
     margin-top: 26px;
 
@@ -171,6 +230,7 @@ export default Vue.extend({
         margin-top: 18px;
     }
 }
+
 .button {
     padding: 0;
     width: 80px;
@@ -187,8 +247,11 @@ export default Vue.extend({
     @include flex(center, center);
 }
 
-.photo {
+.photo-container {
     @include flex(flex-start);
+    position: relative;
+    margin-right: 55px;
+    margin-bottom: 12px;
 }
 
 .photos {
@@ -216,8 +279,6 @@ export default Vue.extend({
     }
 
     ::v-deep img {
-        margin-right: 27px;
-        margin-bottom: 12px;
         border-radius: 3px;
         object-fit: contain;
         max-height: 200px;

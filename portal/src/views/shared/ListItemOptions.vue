@@ -51,6 +51,19 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import "../../scss/global";
 
+.icon-ellipsis {
+    display: block;
+    cursor: pointer;
+
+    &:after {
+        @include flex(flex-end);
+        content: "...";
+        height: 17px;
+        font-size: 32px;
+        font-family: $font-family-bold;
+    }
+}
+
 button {
     padding: 0;
     border: 0;
@@ -75,7 +88,7 @@ button {
         background: #fff;
         z-index: $z-index-top;
         transition: opacity 0.33s;
-        width: 100px;
+        min-width: 100px;
 
         &.visible {
             opacity: 1;

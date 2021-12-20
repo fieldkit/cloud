@@ -607,19 +607,6 @@ header {
     transition: opacity 0.25s ease-in-out;
 }
 
-.icon-ellipsis {
-    display: block;
-    cursor: pointer;
-
-    &:after {
-        @include flex(flex-end);
-        content: "...";
-        height: 17px;
-        font-size: 32px;
-        font-family: $font-family-bold;
-    }
-}
-
 .error {
     color: $color-danger;
     margin-bottom: 10px;
