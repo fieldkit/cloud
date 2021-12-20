@@ -290,6 +290,21 @@ func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMed
 	}, nil
 }
 
+func (s *NotesService) DeleteMedia(ctx context.Context, payload *notes.DeleteMediaPayload) error {
+	_, err := NewPermissions(ctx, s.options).Unwrap()
+    if err != nil {
+        return err
+    }
+
+	if _, err := s.options.Database.ExecContext(ctx, `
+		DELETE FROM fieldkit.notes_media WHERE id = $1
+		`, payload.MediaID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *NotesService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
