@@ -2,7 +2,7 @@
     <label class="has-float-label">
         <ResizeAuto>
             <template v-slot:default="{}">
-                <textarea rows="2" :value="value" :type="type" :placeholder="placeholder || label" @input="(ev) => onInput(ev)" />
+                <textarea rows="1" :value="value" :type="type" :placeholder="placeholder || label" @input="(ev) => onInput(ev)" />
             </template>
         </ResizeAuto>
         <span v-if="label">{{ label }}</span>
@@ -11,6 +11,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import { initial } from "lodash";
 
 const ResizeAuto = Vue.extend({
     name: "ResizeAuto",
@@ -23,16 +24,9 @@ const ResizeAuto = Vue.extend({
     mounted() {
         this.$nextTick(() => {
             const el: any = this.$el;
-            el.setAttribute("style", "height:" + (this.$el.scrollHeight - 10) + "px");
+            el.setAttribute("style", "height:" + (this.$el.scrollHeight) + "px");
         });
-
         this.$el.addEventListener("input", this.resize);
-    },
-    updated() {
-        this.$nextTick(() => {
-            const el: any = this.$el;
-            el.setAttribute("style", "height:" + (this.$el.scrollHeight - 0) + "px");
-        });
     },
     beforeDestroy() {
         this.$el.removeEventListener("input", this.resize);
@@ -91,5 +85,12 @@ export default Vue.extend({
 .has-float-label textarea:focus {
     outline: none;
     border-color: rgba(0, 0, 0, 0.5);
+}
+
+.shadow {
+    max-height: 0;
+    pointer-events: none;
+    opacity: 0;
+    margin: 0;
 }
 </style>

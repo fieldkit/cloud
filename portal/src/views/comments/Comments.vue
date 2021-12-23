@@ -4,11 +4,11 @@
 
         <form @submit.prevent="save(newComment)" class="new-comment">
             <UserPhoto v-if="user" :user="user"></UserPhoto>
-            <input type="text" :placeholder="placeholder" v-model="newComment.body" @input="$event.target.composing = false" />
+            <TextAreaField class="new-comment-input" :placeholder="placeholder" v-model="newComment.body" />
             <button type="submit" class="new-comment-submit" v-if="newComment.body.length > 0">Post</button>
         </form>
 
-        <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
+        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
         <div v-if="posts.length === 0">There are no comments yet.</div>
 
@@ -31,8 +31,8 @@
                                     :options="getCommentOptions(post)"
                                 ></ListItemOptions>
                             </span>
-                            <div v-if="post.readonly">{{ post.body }}</div>
-                            <input v-else type="text" class="body" v-model="post.body" :readonly="post.readonly" />
+                            <div class="break-word" v-if="post.readonly">{{ post.body }}</div>
+                            <TextAreaField v-else class="body" v-model="post.body" />
                             <button type="submit" class="new-comment-submit" v-if="!post.readonly" @click="saveEdit(post.id, post.body)">
                                 Save
                             </button>
@@ -53,7 +53,7 @@
                                             ></ListItemOptions>
                                         </span>
                                         <div v-if="reply.readonly">{{ reply.body }}</div>
-                                        <input v-else type="text" class="body" v-model="reply.body" :readonly="reply.readonly" />
+                                        <TextAreaField v-else class="body" v-model="reply.body" />
                                         <button
                                             type="submit"
                                             class="new-comment-submit"
@@ -74,12 +74,7 @@
                                 v-if="newReply && newReply.threadId === post.id"
                             >
                                 <UserPhoto :user="user"></UserPhoto>
-                                <input
-                                    type="text"
-                                    placeholder="Reply to comment"
-                                    v-model="newReply.body"
-                                    @input="$event.target.composing = false"
-                                />
+                                <TextAreaField class="body" placeholder="Reply to comment" v-model="newReply.body" />
                                 <button type="submit" class="new-comment-submit" v-if="newReply.body">Post</button>
                             </form>
                         </transition>
@@ -346,6 +341,9 @@ export default Vue.extend({
                 },
             ];
         },
+        test(event: any) {
+            console.log("COMPSOING", event.target.composing);
+        },
     },
 });
 </script>
@@ -373,7 +371,7 @@ button {
 
 .container {
     margin-top: 20px;
-    padding: 0 25px 30px 20px;
+    padding: 0 20px 30px 20px;
     background: #fff;
     border-radius: 1px;
     border: 1px solid $color-border;
@@ -382,15 +380,19 @@ button {
     &.data-view {
         margin-top: 0;
         padding-top: 45px;
-        padding-bottom: 22px;
         box-shadow: none;
         border: 0;
+    }
+
+    @include bp-down($xs) {
+        margin: 20px -10px 0;
+        padding: 0 10px 30px 10px;
     }
 }
 
 header {
     @include flex(center, space-between);
-    height: 52px;
+    padding: 13px 0;
     border-bottom: 1px solid $color-border;
     font-size: 20px;
     font-weight: 500;
@@ -410,15 +412,18 @@ header {
 
     .data-view & {
         border-top: none;
+        padding: 0;
     }
 }
 
 .list {
-    overflow-y: hidden;
+    overflow: hidden;
 
     .data-view & {
         margin-top: 30px;
-        width: 60%;
+        @include bp-down($xs) {
+            margin-top: 10px;
+        }
     }
 }
 
@@ -427,25 +432,26 @@ header {
     padding: 22px 0;
     position: relative;
 
+    @include bp-down($xs) {
+        margin: 0 -10px;
+        padding: 15px 10px 15px 10px;
+    }
+
     .container.data-view & {
         &:not(.reply) {
             background-color: rgba(#f4f5f7, 0.55);
             padding: 18px 23px 17px 15px;
 
             .new-comment-submit {
-                right: 30px;
+                right: 25px;
             }
         }
     }
 
     &.reply {
-        padding: 0;
-        margin-top: 10px;
+        padding: 0 0 0;
+        margin: 10px 0 0 0;
         width: 100%;
-
-        input {
-            height: 35px;
-        }
     }
 
     img {
@@ -458,20 +464,37 @@ header {
         img {
             width: 46px;
             height: 46px;
+
+            @include bp-down($xs) {
+                width: 42px;
+                height: 42px;
+            }
         }
     }
 
-    input {
-        height: 45px;
-        padding: 14px 72px 12px 13px;
-        border-radius: 2px;
-        border: solid 1px $color-border;
-        outline: none;
+    &-input {
         width: 100%;
-        font-weight: 500;
+        display: flex;
 
-        &::placeholder {
-            color: #cccdcf;
+        ::v-deep textarea {
+            margin: 0;
+            box-sizing: border-box;
+            padding: 14px 72px 14px 13px;
+            border-radius: 2px;
+            border: solid 1px $color-border;
+            outline: none;
+            width: 100%;
+            font-weight: 500;
+            resize: none;
+            overflow: hidden;
+
+            &::placeholder {
+                color: #cccdcf;
+            }
+
+            @include bp-down($xs) {
+                padding: 7px 40px 7px 7px;
+            }
         }
     }
 
@@ -482,6 +505,11 @@ header {
         padding: 0 10px;
         transform: translateY(-50%);
         font-weight: 900;
+
+        .data-view &,
+        .reply & {
+            right: 0;
+        }
     }
 }
 
@@ -507,7 +535,6 @@ header {
     font-family: $font-family-light;
     outline: none;
     border: solid 1px $color-border;
-    min-height: 35px;
     width: calc(100% - 40px);
     overflow-wrap: break-word;
 
@@ -517,9 +544,10 @@ header {
         min-height: unset;
     }
 
-    + .new-comment-submit {
-        transform: translateY(calc(-50% + 12px));
-        right: -10px;
+    ::v-deep textarea {
+        border: 0;
+        margin: 0;
+        padding: 7px 45px 0 7px;
     }
 }
 
@@ -542,7 +570,7 @@ header {
 
     .column {
         &:nth-of-type(2) {
-            padding-left: 42px;
+            padding-left: 36px;
         }
     }
 
@@ -564,6 +592,7 @@ header {
 .comment-main {
     display: flex;
     flex: 100%;
+    overflow-wrap: break-word;
 
     @include attention() {
         ::v-deep .options-trigger {
@@ -578,6 +607,10 @@ header {
     width: 100%;
     flex-direction: column;
     position: relative;
+
+    > * {
+        overflow-wrap: anywhere;
+    }
 }
 
 .actions {
@@ -610,5 +643,10 @@ header {
 .error {
     color: $color-danger;
     margin-bottom: 10px;
+}
+
+::v-deep textarea {
+    overflow-y: hidden;
+    resize: none;
 }
 </style>
