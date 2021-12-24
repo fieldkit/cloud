@@ -24,6 +24,7 @@ type Server struct {
 	Add            http.Handler
 	Get            http.Handler
 	Transfer       http.Handler
+	DefaultPhoto   http.Handler
 	Update         http.Handler
 	ListMine       http.Handler
 	ListProject    http.Handler
@@ -72,6 +73,7 @@ func New(
 			{"Add", "POST", "/stations"},
 			{"Get", "GET", "/stations/{id}"},
 			{"Transfer", "POST", "/stations/{id}/transfer/{ownerId}"},
+			{"DefaultPhoto", "POST", "/stations/{id}/photo/{photoId}"},
 			{"Update", "PATCH", "/stations/{id}"},
 			{"ListMine", "GET", "/user/stations"},
 			{"ListProject", "GET", "/projects/{id}/stations"},
@@ -84,6 +86,7 @@ func New(
 			{"CORS", "OPTIONS", "/stations"},
 			{"CORS", "OPTIONS", "/stations/{id}"},
 			{"CORS", "OPTIONS", "/stations/{id}/transfer/{ownerId}"},
+			{"CORS", "OPTIONS", "/stations/{id}/photo/{photoId}"},
 			{"CORS", "OPTIONS", "/user/stations"},
 			{"CORS", "OPTIONS", "/projects/{id}/stations"},
 			{"CORS", "OPTIONS", "/stations/{id}/associated"},
@@ -96,6 +99,7 @@ func New(
 		Add:            NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
 		Get:            NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
 		Transfer:       NewTransferHandler(e.Transfer, mux, decoder, encoder, errhandler, formatter),
+		DefaultPhoto:   NewDefaultPhotoHandler(e.DefaultPhoto, mux, decoder, encoder, errhandler, formatter),
 		Update:         NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
 		ListMine:       NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
 		ListProject:    NewListProjectHandler(e.ListProject, mux, decoder, encoder, errhandler, formatter),
@@ -117,6 +121,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Add = m(s.Add)
 	s.Get = m(s.Get)
 	s.Transfer = m(s.Transfer)
+	s.DefaultPhoto = m(s.DefaultPhoto)
 	s.Update = m(s.Update)
 	s.ListMine = m(s.ListMine)
 	s.ListProject = m(s.ListProject)
@@ -134,6 +139,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountAddHandler(mux, h.Add)
 	MountGetHandler(mux, h.Get)
 	MountTransferHandler(mux, h.Transfer)
+	MountDefaultPhotoHandler(mux, h.DefaultPhoto)
 	MountUpdateHandler(mux, h.Update)
 	MountListMineHandler(mux, h.ListMine)
 	MountListProjectHandler(mux, h.ListProject)
@@ -278,6 +284,57 @@ func NewTransferHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "transfer")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountDefaultPhotoHandler configures the mux to serve the "station" service
+// "default photo" endpoint.
+func MountDefaultPhotoHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleStationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/stations/{id}/photo/{photoId}", f)
+}
+
+// NewDefaultPhotoHandler creates a HTTP handler which loads the HTTP request
+// and calls the "station" service "default photo" endpoint.
+func NewDefaultPhotoHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDefaultPhotoRequest(mux, decoder)
+		encodeResponse = EncodeDefaultPhotoResponse(encoder)
+		encodeError    = EncodeDefaultPhotoError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "default photo")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -771,6 +828,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/stations", f)
 	mux.Handle("OPTIONS", "/stations/{id}", f)
 	mux.Handle("OPTIONS", "/stations/{id}/transfer/{ownerId}", f)
+	mux.Handle("OPTIONS", "/stations/{id}/photo/{photoId}", f)
 	mux.Handle("OPTIONS", "/user/stations", f)
 	mux.Handle("OPTIONS", "/projects/{id}/stations", f)
 	mux.Handle("OPTIONS", "/stations/{id}/associated", f)
