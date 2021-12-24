@@ -200,6 +200,7 @@ func (s *NotesService) DownloadMedia(ctx context.Context, payload *notes.Downloa
 	log := Logger(ctx).Sugar()
 
 	allMedia := &data.FieldNoteMedia{}
+
 	if err := s.options.Database.GetContext(ctx, allMedia, `
 		SELECT * FROM fieldkit.notes_media WHERE id = $1
 		`, payload.MediaID); err != nil {
@@ -293,6 +294,13 @@ func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMed
 func (s *NotesService) DeleteMedia(ctx context.Context, payload *notes.DeleteMediaPayload) error {
 	_, err := NewPermissions(ctx, s.options).Unwrap()
     if err != nil {
+        return err
+    }
+
+    if _, err := s.options.Database.ExecContext(ctx, `
+        UPDATE fieldkit.station SET photo_id = NULL
+                WHERE photo_id = $1
+        `, payload.MediaID); err != nil {
         return err
     }
 
