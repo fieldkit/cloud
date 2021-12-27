@@ -261,26 +261,6 @@ export default Vue.extend({
                 this.$emit("viewDataClicked", JSON.parse(post.bookmark));
             }
         },
-        showCommentOptions(event: MouseEvent) {
-            if (event.target) {
-                const optionsMenu = (event.target as HTMLElement).nextElementSibling;
-
-                if (!(optionsMenu as HTMLElement).classList.contains("visible")) {
-                    (optionsMenu as HTMLElement).classList.add("visible");
-                    setTimeout(function() {
-                        document.addEventListener(
-                            "click",
-                            function() {
-                                (optionsMenu as HTMLElement).classList.remove("visible");
-                            },
-                            {
-                                once: true,
-                            }
-                        );
-                    }, 1);
-                }
-            }
-        },
         deleteComment(commentID: number) {
             this.$services.api
                 .deleteComment(commentID)
@@ -340,9 +320,6 @@ export default Vue.extend({
                     event: "delete-comment",
                 },
             ];
-        },
-        test(event: any) {
-            console.log("COMPSOING", event.target.composing);
         },
     },
 });
@@ -478,7 +455,6 @@ header {
 
         ::v-deep textarea {
             margin: 0;
-            box-sizing: border-box;
             padding: 14px 72px 14px 13px;
             border-radius: 2px;
             border: solid 1px $color-border;

@@ -23,8 +23,11 @@ const ResizeAuto = Vue.extend({
     },
     mounted() {
         this.$nextTick(() => {
-            const el: any = this.$el;
-            el.setAttribute("style", "height:" + (this.$el.scrollHeight) + "px");
+            // workaround since $el.scrollHeight does not have the correct value without timeout
+            setTimeout(() => {
+                const el: any = this.$el;
+                el.setAttribute("style", "height:" + this.$el.scrollHeight + "px");
+            }, 200);
         });
         this.$el.addEventListener("input", this.resize);
     },
@@ -74,10 +77,10 @@ export default Vue.extend({
 .has-float-label textarea {
     width: 100%;
     font-family: "Avenir", Helvetica, Arial, sans-serif;
-    box-sizing: border-box;
     font-size: inherit;
     padding-top: 0.5em;
     margin-bottom: 2px;
+    box-sizing: border-box;
     border: 0;
     border-radius: 0;
     border-bottom: 2px solid rgba(0, 0, 0, 0.1);
@@ -85,12 +88,5 @@ export default Vue.extend({
 .has-float-label textarea:focus {
     outline: none;
     border-color: rgba(0, 0, 0, 0.5);
-}
-
-.shadow {
-    max-height: 0;
-    pointer-events: none;
-    opacity: 0;
-    margin: 0;
 }
 </style>
