@@ -471,6 +471,142 @@ func DecodeTransferResponse(decoder func(*http.Response) goahttp.Decoder, restor
 	}
 }
 
+// BuildDefaultPhotoRequest instantiates a HTTP request object with method and
+// path set to call the "station" service "default photo" endpoint
+func (c *Client) BuildDefaultPhotoRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id      int32
+		photoID int32
+	)
+	{
+		p, ok := v.(*station.DefaultPhotoPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("station", "default photo", "*station.DefaultPhotoPayload", v)
+		}
+		id = p.ID
+		photoID = p.PhotoID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DefaultPhotoStationPath(id, photoID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "default photo", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeDefaultPhotoRequest returns an encoder for requests sent to the
+// station default photo server.
+func EncodeDefaultPhotoRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.DefaultPhotoPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "default photo", "*station.DefaultPhotoPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeDefaultPhotoResponse returns a decoder for responses returned by the
+// station default photo endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeDefaultPhotoResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeDefaultPhotoResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusNoContent:
+			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body DefaultPhotoUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "default photo", err)
+			}
+			err = ValidateDefaultPhotoUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "default photo", err)
+			}
+			return nil, NewDefaultPhotoUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body DefaultPhotoForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "default photo", err)
+			}
+			err = ValidateDefaultPhotoForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "default photo", err)
+			}
+			return nil, NewDefaultPhotoForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body DefaultPhotoNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "default photo", err)
+			}
+			err = ValidateDefaultPhotoNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "default photo", err)
+			}
+			return nil, NewDefaultPhotoNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body DefaultPhotoBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "default photo", err)
+			}
+			err = ValidateDefaultPhotoBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "default photo", err)
+			}
+			return nil, NewDefaultPhotoBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "default photo", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildUpdateRequest instantiates a HTTP request object with method and path
 // set to call the "station" service "update" endpoint
 func (c *Client) BuildUpdateRequest(ctx context.Context, v interface{}) (*http.Request, error) {

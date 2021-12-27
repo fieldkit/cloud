@@ -18,39 +18,39 @@ paths:
         allowEmptyValue: true
         schema:
           type: integer
-          example: 1205716828
+          example: 103768115
           format: int32
-        example: 959260616
+        example: 1838521395
       - name: pageSize
         in: query
         allowEmptyValue: true
         schema:
           type: integer
-          example: 463834403
+          example: 365205932
           format: int32
-        example: 894913619
+        example: 1306505815
       - name: ownerId
         in: query
         allowEmptyValue: true
         schema:
           type: integer
-          example: 103768115
+          example: 102261778
           format: int32
-        example: 1838521395
+        example: 49579320
       - name: query
         in: query
         allowEmptyValue: true
         schema:
           type: string
-          example: Nemo officiis id eum.
-        example: Dolore id ab ducimus illo.
+          example: Et dolore id ab ducimus illo quidem.
+        example: Quos nobis dolorem dicta.
       - name: sortBy
         in: query
         allowEmptyValue: true
         schema:
           type: string
-          example: Numquam quos nobis dolorem dicta quod ut.
-        example: Aspernatur temporibus doloribus suscipit corrupti.
+          example: Ut perspiciatis aspernatur.
+        example: Doloribus suscipit corrupti inventore minus aut.
       responses:
         "200":
           description: ""
@@ -60,12 +60,12 @@ paths:
                 $ref: '#/components/schemas/PageOfStations'
               example:
                 stations:
-                - createdAt: 659828976115940646
-                  deviceId: Soluta beatae voluptatem dolores eligendi voluptatem quod.
-                  firmwareNumber: 741377152
-                  firmwareTime: 3539012563059886564
-                  id: 3369766317313738144
-                  lastIngestionAt: 6215018029907335113
+                - createdAt: 5387655588755808170
+                  deviceId: Dicta quia laboriosam et repellat cum.
+                  firmwareNumber: 186084729
+                  firmwareTime: 6596063804157784843
+                  id: 4592033324369980555
+                  lastIngestionAt: 6515241642281454558
                   location:
                     precise:
                     - 0.9523603096922911
@@ -250,20 +250,20 @@ paths:
                           - 0.23953689284147475
                           - 0.5813385444404998
                     url: Soluta placeat deleniti nihil.
-                  memoryAvailable: 1069166074
-                  memoryUsed: 911211648
-                  name: Officiis officiis rerum.
+                  memoryAvailable: 2072949638
+                  memoryUsed: 1737526125
+                  name: Quam reiciendis autem ut voluptatem.
                   owner:
                     id: 989315217
                     name: Voluptas suscipit totam ut.
-                  recordingStartedAt: 7512899811816533076
-                  updatedAt: 5248056863086295382
-                - createdAt: 659828976115940646
-                  deviceId: Soluta beatae voluptatem dolores eligendi voluptatem quod.
-                  firmwareNumber: 741377152
-                  firmwareTime: 3539012563059886564
-                  id: 3369766317313738144
-                  lastIngestionAt: 6215018029907335113
+                  recordingStartedAt: 6628457166662642729
+                  updatedAt: 3131588709258940720
+                - createdAt: 5387655588755808170
+                  deviceId: Dicta quia laboriosam et repellat cum.
+                  firmwareNumber: 186084729
+                  firmwareTime: 6596063804157784843
+                  id: 4592033324369980555
+                  lastIngestionAt: 6515241642281454558
                   location:
                     precise:
                     - 0.9523603096922911
@@ -448,15 +448,213 @@ paths:
                           - 0.23953689284147475
                           - 0.5813385444404998
                     url: Soluta placeat deleniti nihil.
-                  memoryAvailable: 1069166074
-                  memoryUsed: 911211648
-                  name: Officiis officiis rerum.
+                  memoryAvailable: 2072949638
+                  memoryUsed: 1737526125
+                  name: Quam reiciendis autem ut voluptatem.
                   owner:
                     id: 989315217
                     name: Voluptas suscipit totam ut.
-                  recordingStartedAt: 7512899811816533076
-                  updatedAt: 5248056863086295382
-                total: 1755466851
+                  recordingStartedAt: 6628457166662642729
+                  updatedAt: 3131588709258940720
+                - createdAt: 5387655588755808170
+                  deviceId: Dicta quia laboriosam et repellat cum.
+                  firmwareNumber: 186084729
+                  firmwareTime: 6596063804157784843
+                  id: 4592033324369980555
+                  lastIngestionAt: 6515241642281454558
+                  location:
+                    precise:
+                    - 0.9523603096922911
+                    - 0.6464235490957773
+                    - 0.009903531833012496
+                    - 0.41361161977428434
+                    regions:
+                    - name: Nihil velit consectetur voluptatem porro placeat est.
+                      shape:
+                      - - - 0.10358272217777047
+                          - 0.9468901898062644
+                          - 0.5454139295493888
+                        - - 0.285390427214416
+                          - 0.1535166509691608
+                        - - 0.6694400757889921
+                          - 0.2840521153989648
+                          - 0.4430961724081562
+                        - - 0.6227535042997755
+                          - 0.9944040410577589
+                          - 0.27619837141392806
+                      - - - 0.39921269297632667
+                          - 0.8825517780937658
+                          - 0.11306484930813702
+                          - 0.30786792545031366
+                        - - 0.2403696194634339
+                          - 0.6380249748176038
+                          - 0.7540512592194769
+                          - 0.20676248796613172
+                        - - 0.4871578799778801
+                          - 0.9821126682727863
+                      - - - 0.3828726571344306
+                          - 0.10133093035434247
+                          - 0.24502149422848776
+                          - 0.017945601254848925
+                        - - 0.32191906173833906
+                          - 0.9101151306159769
+                          - 0.8381539032317361
+                        - - 0.6078910328447814
+                          - 0.015512545217778643
+                          - 0.6552131033878341
+                      - - - 0.9087491875332683
+                          - 0.17771372145521305
+                          - 0.9392851465683034
+                          - 0.18416350653711097
+                        - - 0.03544478199930557
+                          - 0.4988919806153254
+                          - 0.2016860291744843
+                          - 0.35847844087921527
+                        - - 0.48698044855283723
+                          - 0.23953689284147475
+                          - 0.5813385444404998
+                    - name: Nihil velit consectetur voluptatem porro placeat est.
+                      shape:
+                      - - - 0.10358272217777047
+                          - 0.9468901898062644
+                          - 0.5454139295493888
+                        - - 0.285390427214416
+                          - 0.1535166509691608
+                        - - 0.6694400757889921
+                          - 0.2840521153989648
+                          - 0.4430961724081562
+                        - - 0.6227535042997755
+                          - 0.9944040410577589
+                          - 0.27619837141392806
+                      - - - 0.39921269297632667
+                          - 0.8825517780937658
+                          - 0.11306484930813702
+                          - 0.30786792545031366
+                        - - 0.2403696194634339
+                          - 0.6380249748176038
+                          - 0.7540512592194769
+                          - 0.20676248796613172
+                        - - 0.4871578799778801
+                          - 0.9821126682727863
+                      - - - 0.3828726571344306
+                          - 0.10133093035434247
+                          - 0.24502149422848776
+                          - 0.017945601254848925
+                        - - 0.32191906173833906
+                          - 0.9101151306159769
+                          - 0.8381539032317361
+                        - - 0.6078910328447814
+                          - 0.015512545217778643
+                          - 0.6552131033878341
+                      - - - 0.9087491875332683
+                          - 0.17771372145521305
+                          - 0.9392851465683034
+                          - 0.18416350653711097
+                        - - 0.03544478199930557
+                          - 0.4988919806153254
+                          - 0.2016860291744843
+                          - 0.35847844087921527
+                        - - 0.48698044855283723
+                          - 0.23953689284147475
+                          - 0.5813385444404998
+                    - name: Nihil velit consectetur voluptatem porro placeat est.
+                      shape:
+                      - - - 0.10358272217777047
+                          - 0.9468901898062644
+                          - 0.5454139295493888
+                        - - 0.285390427214416
+                          - 0.1535166509691608
+                        - - 0.6694400757889921
+                          - 0.2840521153989648
+                          - 0.4430961724081562
+                        - - 0.6227535042997755
+                          - 0.9944040410577589
+                          - 0.27619837141392806
+                      - - - 0.39921269297632667
+                          - 0.8825517780937658
+                          - 0.11306484930813702
+                          - 0.30786792545031366
+                        - - 0.2403696194634339
+                          - 0.6380249748176038
+                          - 0.7540512592194769
+                          - 0.20676248796613172
+                        - - 0.4871578799778801
+                          - 0.9821126682727863
+                      - - - 0.3828726571344306
+                          - 0.10133093035434247
+                          - 0.24502149422848776
+                          - 0.017945601254848925
+                        - - 0.32191906173833906
+                          - 0.9101151306159769
+                          - 0.8381539032317361
+                        - - 0.6078910328447814
+                          - 0.015512545217778643
+                          - 0.6552131033878341
+                      - - - 0.9087491875332683
+                          - 0.17771372145521305
+                          - 0.9392851465683034
+                          - 0.18416350653711097
+                        - - 0.03544478199930557
+                          - 0.4988919806153254
+                          - 0.2016860291744843
+                          - 0.35847844087921527
+                        - - 0.48698044855283723
+                          - 0.23953689284147475
+                          - 0.5813385444404998
+                    - name: Nihil velit consectetur voluptatem porro placeat est.
+                      shape:
+                      - - - 0.10358272217777047
+                          - 0.9468901898062644
+                          - 0.5454139295493888
+                        - - 0.285390427214416
+                          - 0.1535166509691608
+                        - - 0.6694400757889921
+                          - 0.2840521153989648
+                          - 0.4430961724081562
+                        - - 0.6227535042997755
+                          - 0.9944040410577589
+                          - 0.27619837141392806
+                      - - - 0.39921269297632667
+                          - 0.8825517780937658
+                          - 0.11306484930813702
+                          - 0.30786792545031366
+                        - - 0.2403696194634339
+                          - 0.6380249748176038
+                          - 0.7540512592194769
+                          - 0.20676248796613172
+                        - - 0.4871578799778801
+                          - 0.9821126682727863
+                      - - - 0.3828726571344306
+                          - 0.10133093035434247
+                          - 0.24502149422848776
+                          - 0.017945601254848925
+                        - - 0.32191906173833906
+                          - 0.9101151306159769
+                          - 0.8381539032317361
+                        - - 0.6078910328447814
+                          - 0.015512545217778643
+                          - 0.6552131033878341
+                      - - - 0.9087491875332683
+                          - 0.17771372145521305
+                          - 0.9392851465683034
+                          - 0.18416350653711097
+                        - - 0.03544478199930557
+                          - 0.4988919806153254
+                          - 0.2016860291744843
+                          - 0.35847844087921527
+                        - - 0.48698044855283723
+                          - 0.23953689284147475
+                          - 0.5813385444404998
+                    url: Soluta placeat deleniti nihil.
+                  memoryAvailable: 2072949638
+                  memoryUsed: 1737526125
+                  name: Quam reiciendis autem ut voluptatem.
+                  owner:
+                    id: 989315217
+                    name: Voluptas suscipit totam ut.
+                  recordingStartedAt: 6628457166662642729
+                  updatedAt: 3131588709258940720
+                total: 592529917
         "400":
           description: ""
           content:
@@ -477,11 +675,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
         "403":
           description: ""
@@ -495,7 +693,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
         "404":
           description: ""
           content:
@@ -503,7 +701,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -526,9 +724,9 @@ paths:
         required: true
         schema:
           type: integer
-          example: 1525246277
+          example: 98664026
           format: int32
-        example: 1437087746
+        example: 456451274
       responses:
         "204":
           description: ""
@@ -542,7 +740,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -559,8 +757,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
         "403":
           description: ""
           content:
@@ -581,12 +779,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
       security:
       - jwt_header_Authorization:
         - api:access
@@ -605,8 +803,8 @@ paths:
         required: true
         schema:
           type: string
-          example: Quasi est aliquid et qui.
-        example: Porro laudantium itaque quas enim.
+          example: Et qui cumque porro laudantium.
+        example: Quas enim sit quos eum quas et.
       responses:
         "200":
           description: ""
@@ -616,12 +814,12 @@ paths:
                 $ref: '#/components/schemas/PageOfStations'
               example:
                 stations:
-                - createdAt: 659828976115940646
-                  deviceId: Soluta beatae voluptatem dolores eligendi voluptatem quod.
-                  firmwareNumber: 741377152
-                  firmwareTime: 3539012563059886564
-                  id: 3369766317313738144
-                  lastIngestionAt: 6215018029907335113
+                - createdAt: 5387655588755808170
+                  deviceId: Dicta quia laboriosam et repellat cum.
+                  firmwareNumber: 186084729
+                  firmwareTime: 6596063804157784843
+                  id: 4592033324369980555
+                  lastIngestionAt: 6515241642281454558
                   location:
                     precise:
                     - 0.9523603096922911
@@ -806,20 +1004,20 @@ paths:
                           - 0.23953689284147475
                           - 0.5813385444404998
                     url: Soluta placeat deleniti nihil.
-                  memoryAvailable: 1069166074
-                  memoryUsed: 911211648
-                  name: Officiis officiis rerum.
+                  memoryAvailable: 2072949638
+                  memoryUsed: 1737526125
+                  name: Quam reiciendis autem ut voluptatem.
                   owner:
                     id: 989315217
                     name: Voluptas suscipit totam ut.
-                  recordingStartedAt: 7512899811816533076
-                  updatedAt: 5248056863086295382
-                - createdAt: 659828976115940646
-                  deviceId: Soluta beatae voluptatem dolores eligendi voluptatem quod.
-                  firmwareNumber: 741377152
-                  firmwareTime: 3539012563059886564
-                  id: 3369766317313738144
-                  lastIngestionAt: 6215018029907335113
+                  recordingStartedAt: 6628457166662642729
+                  updatedAt: 3131588709258940720
+                - createdAt: 5387655588755808170
+                  deviceId: Dicta quia laboriosam et repellat cum.
+                  firmwareNumber: 186084729
+                  firmwareTime: 6596063804157784843
+                  id: 4592033324369980555
+                  lastIngestionAt: 6515241642281454558
                   location:
                     precise:
                     - 0.9523603096922911
@@ -1004,20 +1202,20 @@ paths:
                           - 0.23953689284147475
                           - 0.5813385444404998
                     url: Soluta placeat deleniti nihil.
-                  memoryAvailable: 1069166074
-                  memoryUsed: 911211648
-                  name: Officiis officiis rerum.
+                  memoryAvailable: 2072949638
+                  memoryUsed: 1737526125
+                  name: Quam reiciendis autem ut voluptatem.
                   owner:
                     id: 989315217
                     name: Voluptas suscipit totam ut.
-                  recordingStartedAt: 7512899811816533076
-                  updatedAt: 5248056863086295382
-                - createdAt: 659828976115940646
-                  deviceId: Soluta beatae voluptatem dolores eligendi voluptatem quod.
-                  firmwareNumber: 741377152
-                  firmwareTime: 3539012563059886564
-                  id: 3369766317313738144
-                  lastIngestionAt: 6215018029907335113
+                  recordingStartedAt: 6628457166662642729
+                  updatedAt: 3131588709258940720
+                - createdAt: 5387655588755808170
+                  deviceId: Dicta quia laboriosam et repellat cum.
+                  firmwareNumber: 186084729
+                  firmwareTime: 6596063804157784843
+                  id: 4592033324369980555
+                  lastIngestionAt: 6515241642281454558
                   location:
                     precise:
                     - 0.9523603096922911
@@ -1202,15 +1400,15 @@ paths:
                           - 0.23953689284147475
                           - 0.5813385444404998
                     url: Soluta placeat deleniti nihil.
-                  memoryAvailable: 1069166074
-                  memoryUsed: 911211648
-                  name: Officiis officiis rerum.
+                  memoryAvailable: 2072949638
+                  memoryUsed: 1737526125
+                  name: Quam reiciendis autem ut voluptatem.
                   owner:
                     id: 989315217
                     name: Voluptas suscipit totam ut.
-                  recordingStartedAt: 7512899811816533076
-                  updatedAt: 5248056863086295382
-                total: 1579131484
+                  recordingStartedAt: 6628457166662642729
+                  updatedAt: 3131588709258940720
+                total: 1287391495
         "400":
           description: ""
           content:
@@ -1222,7 +1420,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: true
         "401":
           description: ""
@@ -1235,8 +1433,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: true
+                temporary: false
+                timeout: false
         "403":
           description: ""
           content:
@@ -1249,7 +1447,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: true
+                timeout: false
         "404":
           description: ""
           content:
@@ -1261,7 +1459,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
       security:
       - jwt_header_Authorization:
@@ -1296,12 +1494,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
         "401":
           description: ""
           content:
@@ -1309,12 +1507,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: false
+                temporary: false
+                timeout: true
         "403":
           description: ""
           content:
@@ -1322,12 +1520,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: false
+                timeout: true
         "404":
           description: ""
           content:
@@ -1335,12 +1533,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: false
+                temporary: true
+                timeout: true
       security:
       - jwt_header_Authorization:
         - api:access
@@ -1377,7 +1575,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: true
         "401":
           description: ""
@@ -1390,8 +1588,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
         "403":
           description: ""
           content:
@@ -1399,11 +1597,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: false
         "404":
           description: ""
@@ -1412,7 +1610,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -1436,8 +1634,8 @@ paths:
         required: true
         schema:
           type: string
-          example: Non eius.
-        example: Molestiae ex eveniet cum exercitationem.
+          example: Ea non sunt sed aspernatur aut asperiores.
+        example: Reprehenderit expedita doloribus reprehenderit autem excepturi architecto.
       responses:
         "200":
           description: ""
@@ -1494,8 +1692,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: false
+                temporary: false
+                timeout: true
         "401":
           description: ""
           content:
@@ -1516,11 +1714,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: true
         "404":
           description: ""
@@ -1533,7 +1731,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: false
       security:
       - jwt_header_Authorization:
@@ -4570,8 +4768,8 @@ paths:
             schema:
               $ref: '#/components/schemas/LoginFields'
             example:
-              email: cpp
-              password: s42
+              email: amp
+              password: tfr
       responses:
         "204":
           description: ""
@@ -4580,8 +4778,8 @@ paths:
               required: true
               schema:
                 type: string
-                example: Aut qui sequi ab expedita.
-              example: Et aut voluptas odit asperiores.
+                example: Voluptas odit asperiores pariatur minus culpa dignissimos.
+              example: Minima repellendus.
           content:
             application/json:
               example: {}
@@ -4592,7 +4790,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -4605,11 +4803,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
         "403":
           description: ""
@@ -4618,11 +4816,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
         "404":
           description: ""
@@ -4631,12 +4829,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
   /logout:
     post:
       tags:
@@ -4656,12 +4854,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: true
+                timeout: false
         "401":
           description: ""
           content:
@@ -4669,12 +4867,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: true
+                timeout: false
         "403":
           description: ""
           content:
@@ -4682,11 +4880,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: false
         "404":
           description: ""
@@ -4699,7 +4897,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
       security:
       - jwt_header_Authorization:
@@ -5757,9 +5955,9 @@ paths:
         required: true
         schema:
           type: integer
-          example: 563614720
+          example: 615279750
           format: int32
-        example: 674901563
+        example: 1804899598
       responses:
         "200":
           description: ""
@@ -7203,7 +7401,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
         "401":
           description: ""
           content:
@@ -7215,8 +7413,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: false
+                temporary: false
+                timeout: true
         "403":
           description: ""
           content:
@@ -7237,12 +7435,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: false
+                temporary: false
+                timeout: true
       security:
       - jwt_header_Authorization:
         - api:access
@@ -9198,7 +9396,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -9216,7 +9414,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
         "403":
           description: ""
           content:
@@ -9242,7 +9440,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: false
+                timeout: true
   /records/data/{recordId}:
     get:
       tags:
@@ -9502,7 +9700,7 @@ paths:
             schema:
               $ref: '#/components/schemas/RefreshRequestBody'
             example:
-              refreshToken: Omnis autem eos non asperiores exercitationem.
+              refreshToken: Aut voluptatum adipisci qui.
       responses:
         "204":
           description: ""
@@ -9511,8 +9709,8 @@ paths:
               required: true
               schema:
                 type: string
-                example: Exercitationem impedit alias distinctio dolor neque harum.
-              example: Molestiae praesentium assumenda aut qui rerum.
+                example: Qui nobis quod dolor soluta.
+              example: Quo cum nulla repellendus reiciendis deleniti.
           content:
             application/json:
               example: {}
@@ -9523,11 +9721,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
         "401":
           description: ""
@@ -9540,8 +9738,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: false
+                temporary: true
+                timeout: true
         "403":
           description: ""
           content:
@@ -9562,7 +9760,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -9583,14 +9781,10 @@ paths:
                 $ref: '#/components/schemas/AvailableRoles'
               example:
                 roles:
-                - id: 1183568884
-                  name: Natus dolorem.
-                - id: 1183568884
-                  name: Natus dolorem.
-                - id: 1183568884
-                  name: Natus dolorem.
-                - id: 1183568884
-                  name: Natus dolorem.
+                - id: 1729058233
+                  name: Dolor at.
+                - id: 1729058233
+                  name: Dolor at.
         "400":
           description: ""
           content:
@@ -9611,12 +9805,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: false
+                temporary: true
+                timeout: true
         "403":
           description: ""
           content:
@@ -9624,12 +9818,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
         "404":
           description: ""
           content:
@@ -9642,7 +9836,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
       security:
       - jwt_header_Authorization:
         - api:access
@@ -12283,9 +12477,9 @@ paths:
         required: true
         schema:
           type: integer
-          example: 1931558526
+          example: 772337916
           format: int32
-        example: 2086795092
+        example: 1689080660
       requestBody:
         required: true
         content:
@@ -12293,9 +12487,9 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateRequestBody2'
             example:
-              locationName: Odio quia fugit sit.
-              name: Sit neque rem laudantium sunt.
-              statusPb: Quaerat id omnis.
+              locationName: Omnis a.
+              name: Harum omnis impedit reiciendis porro hic quia.
+              statusPb: Sunt rerum iure sed ab.
       responses:
         "200":
           description: ""
@@ -12304,7 +12498,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StationFull'
               example:
-                battery: 0.809146
+                battery: 0.2724959
                 configurations:
                   all:
                   - id: 1229996180783880681
@@ -13211,11 +13405,11 @@ paths:
                   end: 7423406940783004460
                   numberOfSamples: 5183052307335260459
                   start: 2605931272540378458
-                deviceId: A alias sunt rerum.
-                firmwareNumber: 218072178
-                firmwareTime: 3275678776937900235
-                id: 1367319252
-                ingestionAt: 8931546148592257536
+                deviceId: Molestiae rerum cum quos sunt perferendis.
+                firmwareNumber: 2079537638
+                firmwareTime: 3301882252895591199
+                id: 585536228
+                ingestionAt: 6556167432920427180
                 location:
                   precise:
                   - 0.9523603096922911
@@ -13400,21 +13594,21 @@ paths:
                         - 0.23953689284147475
                         - 0.5813385444404998
                   url: Soluta placeat deleniti nihil.
-                locationName: Et sed fugiat in alias velit.
-                memoryAvailable: 1152892589
-                memoryUsed: 1628392336
-                name: Hic quia commodi.
+                locationName: Qui sed ratione.
+                memoryAvailable: 1685506512
+                memoryUsed: 489092557
+                name: In alias.
                 owner:
                   id: 989315217
                   name: Voluptas suscipit totam ut.
                 photos:
                   small: Fugiat soluta ipsam maiores id autem ut.
-                placeNameNative: Perferendis in aliquam nisi qui eos.
-                placeNameOther: Rerum cum quos.
+                placeNameNative: Neque consequatur vero aspernatur vitae ipsum.
+                placeNameOther: Consectetur expedita.
                 readOnly: true
-                recordingStartedAt: 1829484613921547621
-                syncedAt: 7239195348504785816
-                updatedAt: 3248574637062164652
+                recordingStartedAt: 3272075034029029812
+                syncedAt: 1446020299395805631
+                updatedAt: 2963475879380607811
                 uploads:
                 - blocks:
                   - 3124998036131050703
@@ -13454,8 +13648,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: false
+                temporary: false
+                timeout: true
         "401":
           description: ""
           content:
@@ -13463,7 +13657,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -13480,8 +13674,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
         "404":
           description: ""
           content:
@@ -13489,12 +13683,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
       security:
       - jwt_header_Authorization:
         - api:access
@@ -13647,9 +13841,9 @@ paths:
         required: true
         schema:
           type: integer
-          example: 772337916
+          example: 1995967159
           format: int32
-        example: 1689080660
+        example: 1270041914
       responses:
         "200":
           description: ""
@@ -15093,7 +15287,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: true
+                timeout: false
         "401":
           description: ""
           content:
@@ -15105,8 +15299,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: true
+                temporary: false
+                timeout: false
         "403":
           description: ""
           content:
@@ -15127,11 +15321,97 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
+                timeout: false
+      security:
+      - jwt_header_Authorization:
+        - api:access
+        - api:admin
+        - api:ingestion
+  /stations/{id}/photo/{photoId}:
+    post:
+      tags:
+      - station
+      summary: default photo station
+      operationId: station#default photo
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 1931558526
+          format: int32
+        example: 2086795092
+      - name: photoId
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 563614720
+          format: int32
+        example: 674901563
+      responses:
+        "204":
+          description: ""
+          content:
+            application/json:
+              example: {}
+        "400":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: true
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: false
+                timeout: true
+        "401":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: false
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: false
+                timeout: false
+        "403":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: false
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: true
+                timeout: true
+        "404":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: false
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: false
                 timeout: true
       security:
       - jwt_header_Authorization:
@@ -15746,24 +16026,24 @@ paths:
         allowEmptyValue: true
         schema:
           type: integer
-          example: 615279750
+          example: 1455490905
           format: int32
-        example: 1804899598
+        example: 1048244333
       - name: stationId
         in: path
         required: true
         schema:
           type: integer
-          example: 1995967159
+          example: 981611296
           format: int32
-        example: 1270041914
+        example: 830296295
       - name: If-None-Match
         in: header
         allowEmptyValue: true
         schema:
           type: string
-          example: Animi ipsa ad impedit dolorem.
-        example: Aut illum explicabo.
+          example: Dolorem qui aut illum.
+        example: Quaerat ad assumenda animi.
       responses:
         "200":
           description: ""
@@ -15773,52 +16053,23 @@ paths:
                 $ref: '#/components/schemas/DownloadedPhoto'
               example:
                 body:
-                - 69
-                - 116
-                - 32
-                - 108
-                - 97
-                - 98
+                - 80
                 - 111
                 - 114
-                - 105
-                - 111
-                - 115
-                - 97
-                - 109
-                - 32
-                - 105
-                - 112
-                - 115
-                - 97
-                - 32
-                - 100
-                - 111
-                - 108
-                - 111
                 - 114
-                - 101
-                - 115
-                - 32
-                - 99
                 - 111
+                - 32
                 - 110
-                - 115
-                - 101
+                - 117
+                - 109
                 - 113
                 - 117
                 - 97
-                - 116
-                - 117
-                - 114
-                - 32
-                - 97
-                - 117
-                - 116
+                - 109
                 - 46
-                contentType: Qui magnam ut beatae incidunt sed eum.
-                etag: Soluta adipisci nihil facere non a dolorum.
-                length: 6327661977771840028
+                contentType: Placeat eum.
+                etag: Labore ducimus dolorum sapiente consequatur voluptas provident.
+                length: 4915928563661831521
         "400":
           description: ""
           content:
@@ -15826,11 +16077,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
         "401":
           description: ""
@@ -15843,7 +16094,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
         "403":
           description: ""
@@ -15865,12 +16116,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
       security:
       - jwt_header_Authorization:
         - api:access
@@ -15888,9 +16139,9 @@ paths:
         required: true
         schema:
           type: integer
-          example: 1397260594
+          example: 102249006
           format: int32
-        example: 1641344627
+        example: 624178480
       responses:
         "200":
           description: ""
@@ -15915,26 +16166,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
-                id: 123abc
-                message: parameter 'p' must be an integer
-                name: bad_request
-                temporary: false
-                timeout: false
-        "401":
-          description: ""
-          content:
-            application/vnd.goa.error:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
                 fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: false
-        "403":
+                timeout: true
+        "401":
           description: ""
           content:
             application/vnd.goa.error:
@@ -15947,7 +16185,7 @@ paths:
                 name: bad_request
                 temporary: false
                 timeout: true
-        "404":
+        "403":
           description: ""
           content:
             application/vnd.goa.error:
@@ -15959,6 +16197,19 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
+                timeout: false
+        "404":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: false
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: true
                 timeout: true
       security:
       - jwt_header_Authorization:
@@ -15996,7 +16247,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Impedit natus quam et.
+              example: Earum sint ut veritatis est optio.
         "403":
           description: ""
           content:
@@ -16008,8 +16259,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
         "404":
           description: ""
           content:
@@ -16021,8 +16272,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: false
+                temporary: false
+                timeout: true
   /test/{id}:
     get:
       tags:
@@ -16035,9 +16286,9 @@ paths:
         required: true
         schema:
           type: integer
-          example: 1371579908072682814
+          example: 2968152850494589412
           format: int64
-        example: 9091352227413846625
+        example: 5192495233860402308
       responses:
         "204":
           description: ""
@@ -16055,7 +16306,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
         "401":
           description: ""
@@ -16063,7 +16314,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Veritatis est optio velit eum in dolores.
+              example: Sequi a et sit libero tempora.
         "403":
           description: ""
           content:
@@ -16084,12 +16335,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: false
+                temporary: true
+                timeout: true
   /test/email:
     get:
       tags:
@@ -16103,8 +16354,8 @@ paths:
         required: true
         schema:
           type: string
-          example: Culpa rerum reprehenderit ut itaque saepe.
-        example: Iste voluptatibus porro rerum totam.
+          example: Saepe placeat iste voluptatibus porro rerum totam.
+        example: Illum et et assumenda.
       responses:
         "204":
           description: ""
@@ -16118,33 +16369,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
         "401":
           description: ""
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Et qui enim at consequatur et.
+              example: Ullam odit sequi sunt reiciendis sint.
         "403":
-          description: ""
-          content:
-            application/vnd.goa.error:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                fault: true
-                id: 123abc
-                message: parameter 'p' must be an integer
-                name: bad_request
-                temporary: true
-                timeout: false
-        "404":
           description: ""
           content:
             application/vnd.goa.error:
@@ -16156,6 +16394,19 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
+                timeout: true
+        "404":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: true
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: true
                 timeout: false
       security:
       - jwt_header_Authorization:
@@ -16186,14 +16437,14 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
         "401":
           description: ""
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Et sit libero.
+              example: Nisi sit autem pariatur.
         "403":
           description: ""
           content:
@@ -16205,7 +16456,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
         "404":
           description: ""
@@ -16219,7 +16470,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
   /ttn/webhook:
     post:
       tags:
@@ -16232,25 +16483,25 @@ paths:
         allowEmptyValue: true
         schema:
           type: string
-          example: Illum et et assumenda.
-        example: Voluptate consequatur.
+          example: Voluptate consequatur.
+        example: Et nam voluptatem vero earum et dolor.
       - name: Content-Type
         in: header
         allowEmptyValue: true
         required: true
         schema:
           type: string
-          example: Et nam voluptatem vero earum et dolor.
-        example: Ab fugit praesentium.
+          example: Ab fugit praesentium.
+        example: Enim asperiores dolor omnis cumque.
       - name: Content-Length
         in: header
         allowEmptyValue: true
         required: true
         schema:
           type: integer
-          example: 1656222289310608902
+          example: 3017141024539267707
           format: int64
-        example: 8721496615254621604
+        example: 6163538262948877411
       responses:
         "204":
           description: ""
@@ -16268,7 +16519,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: true
         "401":
           description: ""
@@ -16276,7 +16527,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Sit est eaque perspiciatis atque enim harum.
+              example: Aut qui voluptas excepturi ab.
         "403":
           description: ""
           content:
@@ -16297,11 +16548,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: true
       security:
       - jwt_header_Authorization:
@@ -16323,14 +16574,14 @@ paths:
                 $ref: '#/components/schemas/User'
               example:
                 admin: false
-                bio: Officia est explicabo omnis dolores.
-                email: x0q
-                id: 982094502
-                name: 30j
+                bio: Labore quod rerum ab magnam veritatis consequuntur.
+                email: 9b0
+                id: 770410532
+                name: 5ee
                 photo:
-                  url: Iste optio omnis quia minima ipsum et.
-                tncDate: 902474562045414293
-                updatedAt: 6399056632513251662
+                  url: Beatae quia est sunt libero accusamus.
+                tncDate: 7493065218156409299
+                updatedAt: 7910121241402205710
         "400":
           description: ""
           content:
@@ -16338,7 +16589,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -16351,12 +16602,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: false
+                temporary: false
+                timeout: true
         "403":
           description: ""
           content:
@@ -16369,7 +16620,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: true
+                timeout: false
         "404":
           description: ""
           content:
@@ -16382,7 +16633,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: true
+                timeout: false
       security:
       - jwt_header_Authorization:
         - api:access
@@ -16400,24 +16651,24 @@ paths:
         allowEmptyValue: true
         schema:
           type: integer
-          example: 307810697
+          example: 1793051200
           format: int32
-        example: 582840602
+        example: 821820022
       - name: userId
         in: path
         required: true
         schema:
           type: integer
-          example: 1018876720
+          example: 1463097782
           format: int32
-        example: 1426853430
+        example: 514940844
       - name: If-None-Match
         in: header
         allowEmptyValue: true
         schema:
           type: string
-          example: Enim atque voluptatem quo.
-        example: Impedit occaecati sunt ut perferendis natus.
+          example: Ut perferendis natus cumque aut qui.
+        example: Ab expedita architecto et.
       responses:
         "200":
           description: ""
@@ -16427,32 +16678,61 @@ paths:
                 $ref: '#/components/schemas/DownloadedPhoto'
               example:
                 body:
-                - 83
+                - 86
                 - 105
                 - 116
-                - 32
-                - 112
-                - 111
-                - 114
-                - 114
-                - 111
-                - 32
-                - 115
+                - 97
                 - 101
-                - 100
                 - 32
-                - 118
+                - 99
                 - 111
-                - 108
-                - 117
+                - 114
                 - 112
+                - 111
+                - 114
+                - 105
+                - 115
+                - 32
+                - 101
+                - 116
+                - 32
+                - 110
+                - 101
+                - 99
+                - 101
+                - 115
+                - 115
+                - 105
                 - 116
                 - 97
+                - 116
+                - 105
+                - 98
+                - 117
+                - 115
+                - 32
+                - 116
+                - 101
+                - 110
+                - 101
+                - 116
+                - 117
+                - 114
+                - 32
+                - 98
+                - 108
+                - 97
+                - 110
+                - 100
+                - 105
+                - 116
+                - 105
+                - 105
                 - 115
                 - 46
-                contentType: Facere nam aliquid.
-                etag: Ex saepe ut occaecati reiciendis.
-                length: 5509617432498411985
+                contentType: Sed voluptas incidunt.
+                etag: Dolorum aut repudiandae veritatis eius.
+                length: 6507098949510570459
         "400":
           description: ""
           content:
@@ -16460,12 +16740,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
         "401":
           description: ""
           content:
@@ -16473,12 +16753,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: true
+                temporary: false
+                timeout: false
         "403":
           description: ""
           content:
@@ -16486,7 +16766,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -16499,7 +16779,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -16518,17 +16798,17 @@ paths:
         required: true
         schema:
           type: string
-          example: Dolor omnis cumque.
-        example: Quas ratione.
+          example: Odit quasi ut enim vel.
+        example: Necessitatibus enim.
       - name: Content-Length
         in: header
         allowEmptyValue: true
         required: true
         schema:
           type: integer
-          example: 8231190346077239365
+          example: 5097225931297942756
           format: int64
-        example: 3453302795858693795
+        example: 3239060453338993428
       responses:
         "204":
           description: ""
@@ -16555,26 +16835,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: false
-        "403":
-          description: ""
-          content:
-            application/vnd.goa.error:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                fault: true
-                id: 123abc
-                message: parameter 'p' must be an integer
-                name: bad_request
-                temporary: true
+                temporary: false
                 timeout: true
-        "404":
+        "403":
           description: ""
           content:
             application/vnd.goa.error:
@@ -16586,6 +16853,19 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
+                timeout: false
+        "404":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: true
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: false
                 timeout: false
       security:
       - jwt_header_Authorization:
@@ -16725,8 +17005,8 @@ paths:
             schema:
               $ref: '#/components/schemas/RecoveryFields'
             example:
-              password: p04
-              token: Deserunt sed.
+              password: yst
+              token: Ut sed distinctio vero.
       responses:
         "204":
           description: ""
@@ -16744,8 +17024,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
         "401":
           description: ""
           content:
@@ -16758,21 +17038,8 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
-        "403":
-          description: ""
-          content:
-            application/vnd.goa.error:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                fault: true
-                id: 123abc
-                message: parameter 'p' must be an integer
-                name: bad_request
-                temporary: false
                 timeout: true
-        "404":
+        "403":
           description: ""
           content:
             application/vnd.goa.error:
@@ -16785,6 +17052,19 @@ paths:
                 name: bad_request
                 temporary: true
                 timeout: false
+        "404":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: true
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: true
+                timeout: true
   /user/recovery/lookup:
     post:
       tags:
@@ -16798,7 +17078,7 @@ paths:
             schema:
               $ref: '#/components/schemas/RemoveUserFields'
             example:
-              email: Qui et.
+              email: Sit est perspiciatis deserunt sed recusandae nulla.
       responses:
         "204":
           description: ""
@@ -16817,7 +17097,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: false
+                timeout: true
         "401":
           description: ""
           content:
@@ -16825,7 +17105,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -16842,7 +17122,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: false
         "404":
           description: ""
@@ -16856,7 +17136,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
   /user/resume:
     post:
       tags:
@@ -16876,7 +17156,7 @@ paths:
               example:
                 token: A dicta.
             example:
-              token: Minus culpa dignissimos.
+              token: Qui quaerat sit corporis.
       responses:
         "204":
           description: ""
@@ -16885,8 +17165,8 @@ paths:
               required: true
               schema:
                 type: string
-                example: Minima repellendus.
-              example: Qui quaerat sit corporis.
+                example: Exercitationem impedit alias distinctio dolor neque harum.
+              example: Molestiae praesentium assumenda aut qui rerum.
           content:
             application/json:
               example: {}
@@ -16897,7 +17177,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -16915,7 +17195,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: true
+                timeout: false
         "403":
           description: ""
           content:
@@ -16927,7 +17207,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: true
         "404":
           description: ""
@@ -16936,7 +17216,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -18390,8 +18670,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: false
+                temporary: true
+                timeout: true
         "401":
           description: ""
           content:
@@ -18399,7 +18679,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -18416,7 +18696,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
         "404":
           description: ""
@@ -18450,8 +18730,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/TransmissionToken'
               example:
-                token: Et architecto quia aliquam ad quam dicta.
-                url: Repellat repudiandae velit molestias voluptatem laboriosam.
+                token: Necessitatibus voluptatem veritatis repudiandae soluta.
+                url: Alias earum.
         "400":
           description: ""
           content:
@@ -18463,8 +18743,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
         "401":
           description: ""
           content:
@@ -18472,11 +18752,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
         "403":
           description: ""
@@ -18489,8 +18769,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: true
+                temporary: false
+                timeout: false
         "404":
           description: ""
           content:
@@ -18498,12 +18778,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: false
+                temporary: true
+                timeout: true
       security:
       - jwt_header_Authorization:
         - api:access
@@ -18537,15 +18817,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
               example:
-                admin: true
-                bio: Eum omnis.
-                email: rgz
-                id: 2064107628
-                name: glg
+                admin: false
+                bio: Modi ducimus eos.
+                email: ojs
+                id: 764592349
+                name: qhh
                 photo:
-                  url: Iste optio omnis quia minima ipsum et.
-                tncDate: 2740574924209324702
-                updatedAt: 8924591717216796875
+                  url: Beatae quia est sunt libero accusamus.
+                tncDate: 6212943205411007043
+                updatedAt: 7442836116102262280
         "400":
           description: ""
           content:
@@ -18553,12 +18833,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
         "401":
           description: ""
           content:
@@ -18579,11 +18859,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
+                temporary: false
                 timeout: false
         "404":
           description: ""
@@ -18592,12 +18872,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: false
+                timeout: true
   /users/{userId}:
     patch:
       tags:
@@ -18610,9 +18890,9 @@ paths:
         required: true
         schema:
           type: integer
-          example: 723210105
+          example: 446640641
           format: int32
-        example: 100137564
+        example: 442703740
       requestBody:
         required: true
         content:
@@ -18648,14 +18928,14 @@ paths:
                 $ref: '#/components/schemas/User'
               example:
                 admin: true
-                bio: Et sit et totam beatae.
-                email: zhh
-                id: 264921024
-                name: 09c
+                bio: Est voluptatibus dolores.
+                email: ktd
+                id: 258993549
+                name: lj8
                 photo:
-                  url: Iste optio omnis quia minima ipsum et.
-                tncDate: 8891140523514796177
-                updatedAt: 892398718154323271
+                  url: Beatae quia est sunt libero accusamus.
+                tncDate: 8716339233129268539
+                updatedAt: 3144149329314149935
         "400":
           description: ""
           content:
@@ -18663,7 +18943,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -18693,7 +18973,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
         "404":
           description: ""
@@ -18702,12 +18982,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: true
+                timeout: false
       security:
       - jwt_header_Authorization:
         - api:access
@@ -18725,9 +19005,9 @@ paths:
         required: true
         schema:
           type: integer
-          example: 2063783596
+          example: 1923558931
           format: int32
-        example: 508052979
+        example: 1768199751
       requestBody:
         required: true
         content:
@@ -18735,7 +19015,7 @@ paths:
             schema:
               $ref: '#/components/schemas/AcceptTncFields'
             example:
-              accept: false
+              accept: true
       responses:
         "200":
           description: ""
@@ -18745,14 +19025,14 @@ paths:
                 $ref: '#/components/schemas/User'
               example:
                 admin: true
-                bio: Occaecati et provident.
-                email: x39
-                id: 828325028
-                name: wle
+                bio: Atque nemo et ratione quia.
+                email: n30
+                id: 2036148746
+                name: pae
                 photo:
-                  url: Iste optio omnis quia minima ipsum et.
-                tncDate: 7128163939962598490
-                updatedAt: 3377762766931640598
+                  url: Beatae quia est sunt libero accusamus.
+                tncDate: 4251712274014378985
+                updatedAt: 2721665007218317546
         "400":
           description: ""
           content:
@@ -18760,11 +19040,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
         "401":
           description: ""
@@ -18777,7 +19057,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
         "403":
           description: ""
@@ -18791,7 +19071,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
         "404":
           description: ""
           content:
@@ -18804,7 +19084,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: true
+                timeout: false
       security:
       - jwt_header_Authorization:
         - api:access
@@ -18822,9 +19102,9 @@ paths:
         required: true
         schema:
           type: integer
-          example: 1822128819
+          example: 1575755739
           format: int32
-        example: 148626423
+        example: 641291545
       requestBody:
         required: true
         content:
@@ -18832,8 +19112,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateUserPasswordFields'
             example:
-              newPassword: 3c7
-              oldPassword: d7x
+              newPassword: 0yz
+              oldPassword: jh6
       responses:
         "200":
           description: ""
@@ -18843,28 +19123,15 @@ paths:
                 $ref: '#/components/schemas/User'
               example:
                 admin: true
-                bio: Dolore sed id sequi qui voluptatem.
-                email: fae
-                id: 257035581
-                name: 0p3
+                bio: Ut ut exercitationem qui.
+                email: gp6
+                id: 241490865
+                name: rac
                 photo:
-                  url: Iste optio omnis quia minima ipsum et.
-                tncDate: 4839327466091732015
-                updatedAt: 7854716569660523927
+                  url: Beatae quia est sunt libero accusamus.
+                tncDate: 3941986357613811813
+                updatedAt: 3859399267888070160
         "400":
-          description: ""
-          content:
-            application/vnd.goa.error:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                fault: true
-                id: 123abc
-                message: parameter 'p' must be an integer
-                name: bad_request
-                temporary: false
-                timeout: false
-        "401":
           description: ""
           content:
             application/vnd.goa.error:
@@ -18877,7 +19144,7 @@ paths:
                 name: bad_request
                 temporary: false
                 timeout: true
-        "403":
+        "401":
           description: ""
           content:
             application/vnd.goa.error:
@@ -18889,6 +19156,19 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
+                timeout: false
+        "403":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: false
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: true
                 timeout: true
         "404":
           description: ""
@@ -18902,7 +19182,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
       security:
       - jwt_header_Authorization:
         - api:access
@@ -18920,9 +19200,9 @@ paths:
         required: true
         schema:
           type: integer
-          example: 2089274433
+          example: 1295498407
           format: int32
-        example: 287457235
+        example: 190308710
       responses:
         "204":
           description: ""
@@ -18936,12 +19216,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+                timeout: true
         "401":
           description: ""
           content:
@@ -18949,11 +19229,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: false
         "403":
           description: ""
@@ -18962,7 +19242,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -18979,7 +19259,7 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
   /users/project/{projectId}:
     get:
@@ -18993,9 +19273,9 @@ paths:
         required: true
         schema:
           type: integer
-          example: 1811318913
+          example: 2086580864
           format: int32
-        example: 1341427444
+        example: 1066309930
       responses:
         "200":
           description: ""
@@ -19057,39 +19337,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
-                id: 123abc
-                message: parameter 'p' must be an integer
-                name: bad_request
-                temporary: true
-                timeout: false
-        "401":
-          description: ""
-          content:
-            application/vnd.goa.error:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
                 timeout: false
-        "403":
-          description: ""
-          content:
-            application/vnd.goa.error:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                fault: true
-                id: 123abc
-                message: parameter 'p' must be an integer
-                name: bad_request
-                temporary: true
-                timeout: false
-        "404":
+        "401":
           description: ""
           content:
             application/vnd.goa.error:
@@ -19101,6 +19355,32 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
+                timeout: false
+        "403":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: false
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: false
+                timeout: true
+        "404":
+          description: ""
+          content:
+            application/vnd.goa.error:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                fault: true
+                id: 123abc
+                message: parameter 'p' must be an integer
+                name: bad_request
+                temporary: false
                 timeout: true
       security:
       - jwt_header_Authorization:
@@ -19120,8 +19400,8 @@ paths:
         required: true
         schema:
           type: string
-          example: Quod dolor soluta ea.
-        example: Cum nulla repellendus reiciendis deleniti.
+          example: Expedita praesentium sit earum aliquam.
+        example: Nihil ut.
       responses:
         "302":
           description: ""
@@ -19130,8 +19410,8 @@ paths:
               required: true
               schema:
                 type: string
-                example: Aut iste expedita.
-              example: Sit earum.
+                example: Velit ratione vel cum non eius.
+              example: Molestiae ex eveniet cum exercitationem.
           content:
             application/json:
               example: {}
@@ -19142,7 +19422,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -19168,12 +19448,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
         "404":
           description: ""
           content:
@@ -19185,8 +19465,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: true
+                temporary: false
+                timeout: false
 components:
   schemas:
     AcceptTncFields:
@@ -20436,20 +20716,20 @@ components:
           items:
             $ref: '#/components/schemas/StationOwner'
           example:
-          - id: 1183568884
-            name: Natus dolorem.
-          - id: 1183568884
-            name: Natus dolorem.
-          - id: 1183568884
-            name: Natus dolorem.
-          - id: 1183568884
-            name: Natus dolorem.
+          - id: 1729058233
+            name: Dolor at.
+          - id: 1729058233
+            name: Dolor at.
+          - id: 1729058233
+            name: Dolor at.
+          - id: 1729058233
+            name: Dolor at.
       example:
         roles:
-        - id: 1183568884
-          name: Natus dolorem.
-        - id: 1183568884
-          name: Natus dolorem.
+        - id: 1729058233
+          name: Dolor at.
+        - id: 1729058233
+          name: Dolor at.
       required:
       - roles
     DeviceDataSummaryResponse:
@@ -22892,12 +23172,12 @@ components:
           items:
             $ref: '#/components/schemas/EssentialStation'
           example:
-          - createdAt: 659828976115940646
-            deviceId: Soluta beatae voluptatem dolores eligendi voluptatem quod.
-            firmwareNumber: 741377152
-            firmwareTime: 3539012563059886564
-            id: 3369766317313738144
-            lastIngestionAt: 6215018029907335113
+          - createdAt: 5387655588755808170
+            deviceId: Dicta quia laboriosam et repellat cum.
+            firmwareNumber: 186084729
+            firmwareTime: 6596063804157784843
+            id: 4592033324369980555
+            lastIngestionAt: 6515241642281454558
             location:
               precise:
               - 0.9523603096922911
@@ -23082,20 +23362,20 @@ components:
                     - 0.23953689284147475
                     - 0.5813385444404998
               url: Soluta placeat deleniti nihil.
-            memoryAvailable: 1069166074
-            memoryUsed: 911211648
-            name: Officiis officiis rerum.
+            memoryAvailable: 2072949638
+            memoryUsed: 1737526125
+            name: Quam reiciendis autem ut voluptatem.
             owner:
               id: 989315217
               name: Voluptas suscipit totam ut.
-            recordingStartedAt: 7512899811816533076
-            updatedAt: 5248056863086295382
-          - createdAt: 659828976115940646
-            deviceId: Soluta beatae voluptatem dolores eligendi voluptatem quod.
-            firmwareNumber: 741377152
-            firmwareTime: 3539012563059886564
-            id: 3369766317313738144
-            lastIngestionAt: 6215018029907335113
+            recordingStartedAt: 6628457166662642729
+            updatedAt: 3131588709258940720
+          - createdAt: 5387655588755808170
+            deviceId: Dicta quia laboriosam et repellat cum.
+            firmwareNumber: 186084729
+            firmwareTime: 6596063804157784843
+            id: 4592033324369980555
+            lastIngestionAt: 6515241642281454558
             location:
               precise:
               - 0.9523603096922911
@@ -23280,20 +23560,20 @@ components:
                     - 0.23953689284147475
                     - 0.5813385444404998
               url: Soluta placeat deleniti nihil.
-            memoryAvailable: 1069166074
-            memoryUsed: 911211648
-            name: Officiis officiis rerum.
+            memoryAvailable: 2072949638
+            memoryUsed: 1737526125
+            name: Quam reiciendis autem ut voluptatem.
             owner:
               id: 989315217
               name: Voluptas suscipit totam ut.
-            recordingStartedAt: 7512899811816533076
-            updatedAt: 5248056863086295382
-          - createdAt: 659828976115940646
-            deviceId: Soluta beatae voluptatem dolores eligendi voluptatem quod.
-            firmwareNumber: 741377152
-            firmwareTime: 3539012563059886564
-            id: 3369766317313738144
-            lastIngestionAt: 6215018029907335113
+            recordingStartedAt: 6628457166662642729
+            updatedAt: 3131588709258940720
+          - createdAt: 5387655588755808170
+            deviceId: Dicta quia laboriosam et repellat cum.
+            firmwareNumber: 186084729
+            firmwareTime: 6596063804157784843
+            id: 4592033324369980555
+            lastIngestionAt: 6515241642281454558
             location:
               precise:
               - 0.9523603096922911
@@ -23478,26 +23758,26 @@ components:
                     - 0.23953689284147475
                     - 0.5813385444404998
               url: Soluta placeat deleniti nihil.
-            memoryAvailable: 1069166074
-            memoryUsed: 911211648
-            name: Officiis officiis rerum.
+            memoryAvailable: 2072949638
+            memoryUsed: 1737526125
+            name: Quam reiciendis autem ut voluptatem.
             owner:
               id: 989315217
               name: Voluptas suscipit totam ut.
-            recordingStartedAt: 7512899811816533076
-            updatedAt: 5248056863086295382
+            recordingStartedAt: 6628457166662642729
+            updatedAt: 3131588709258940720
         total:
           type: integer
           example: 1543144691
           format: int32
       example:
         stations:
-        - createdAt: 659828976115940646
-          deviceId: Soluta beatae voluptatem dolores eligendi voluptatem quod.
-          firmwareNumber: 741377152
-          firmwareTime: 3539012563059886564
-          id: 3369766317313738144
-          lastIngestionAt: 6215018029907335113
+        - createdAt: 5387655588755808170
+          deviceId: Dicta quia laboriosam et repellat cum.
+          firmwareNumber: 186084729
+          firmwareTime: 6596063804157784843
+          id: 4592033324369980555
+          lastIngestionAt: 6515241642281454558
           location:
             precise:
             - 0.9523603096922911
@@ -23682,20 +23962,20 @@ components:
                   - 0.23953689284147475
                   - 0.5813385444404998
             url: Soluta placeat deleniti nihil.
-          memoryAvailable: 1069166074
-          memoryUsed: 911211648
-          name: Officiis officiis rerum.
+          memoryAvailable: 2072949638
+          memoryUsed: 1737526125
+          name: Quam reiciendis autem ut voluptatem.
           owner:
             id: 989315217
             name: Voluptas suscipit totam ut.
-          recordingStartedAt: 7512899811816533076
-          updatedAt: 5248056863086295382
-        - createdAt: 659828976115940646
-          deviceId: Soluta beatae voluptatem dolores eligendi voluptatem quod.
-          firmwareNumber: 741377152
-          firmwareTime: 3539012563059886564
-          id: 3369766317313738144
-          lastIngestionAt: 6215018029907335113
+          recordingStartedAt: 6628457166662642729
+          updatedAt: 3131588709258940720
+        - createdAt: 5387655588755808170
+          deviceId: Dicta quia laboriosam et repellat cum.
+          firmwareNumber: 186084729
+          firmwareTime: 6596063804157784843
+          id: 4592033324369980555
+          lastIngestionAt: 6515241642281454558
           location:
             precise:
             - 0.9523603096922911
@@ -23880,20 +24160,20 @@ components:
                   - 0.23953689284147475
                   - 0.5813385444404998
             url: Soluta placeat deleniti nihil.
-          memoryAvailable: 1069166074
-          memoryUsed: 911211648
-          name: Officiis officiis rerum.
+          memoryAvailable: 2072949638
+          memoryUsed: 1737526125
+          name: Quam reiciendis autem ut voluptatem.
           owner:
             id: 989315217
             name: Voluptas suscipit totam ut.
-          recordingStartedAt: 7512899811816533076
-          updatedAt: 5248056863086295382
-        - createdAt: 659828976115940646
-          deviceId: Soluta beatae voluptatem dolores eligendi voluptatem quod.
-          firmwareNumber: 741377152
-          firmwareTime: 3539012563059886564
-          id: 3369766317313738144
-          lastIngestionAt: 6215018029907335113
+          recordingStartedAt: 6628457166662642729
+          updatedAt: 3131588709258940720
+        - createdAt: 5387655588755808170
+          deviceId: Dicta quia laboriosam et repellat cum.
+          firmwareNumber: 186084729
+          firmwareTime: 6596063804157784843
+          id: 4592033324369980555
+          lastIngestionAt: 6515241642281454558
           location:
             precise:
             - 0.9523603096922911
@@ -24078,14 +24358,14 @@ components:
                   - 0.23953689284147475
                   - 0.5813385444404998
             url: Soluta placeat deleniti nihil.
-          memoryAvailable: 1069166074
-          memoryUsed: 911211648
-          name: Officiis officiis rerum.
+          memoryAvailable: 2072949638
+          memoryUsed: 1737526125
+          name: Quam reiciendis autem ut voluptatem.
           owner:
             id: 989315217
             name: Voluptas suscipit totam ut.
-          recordingStartedAt: 7512899811816533076
-          updatedAt: 5248056863086295382
+          recordingStartedAt: 6628457166662642729
+          updatedAt: 3131588709258940720
         total: 1919688527
       required:
       - stations
@@ -31486,7 +31766,7 @@ components:
         id: 715307853
         name: 3d0
         photo:
-          url: Iste optio omnis quia minima ipsum et.
+          url: Beatae quia est sunt libero accusamus.
         tncDate: 2270866841576477132
         updatedAt: 6307885175197132561
       required:

@@ -27,6 +27,10 @@ type Client struct {
 	// endpoint.
 	TransferDoer goahttp.Doer
 
+	// DefaultPhoto Doer is the HTTP client used to make requests to the default
+	// photo endpoint.
+	DefaultPhotoDoer goahttp.Doer
+
 	// Update Doer is the HTTP client used to make requests to the update endpoint.
 	UpdateDoer goahttp.Doer
 
@@ -87,6 +91,7 @@ func NewClient(
 		AddDoer:             doer,
 		GetDoer:             doer,
 		TransferDoer:        doer,
+		DefaultPhotoDoer:    doer,
 		UpdateDoer:          doer,
 		ListMineDoer:        doer,
 		ListProjectDoer:     doer,
@@ -172,6 +177,30 @@ func (c *Client) Transfer() goa.Endpoint {
 		resp, err := c.TransferDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("station", "transfer", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// DefaultPhoto returns an endpoint that makes HTTP requests to the station
+// service default photo server.
+func (c *Client) DefaultPhoto() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDefaultPhotoRequest(c.encoder)
+		decodeResponse = DecodeDefaultPhotoResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDefaultPhotoRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DefaultPhotoDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "default photo", err)
 		}
 		return decodeResponse(resp)
 	}

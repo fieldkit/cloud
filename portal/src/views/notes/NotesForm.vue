@@ -34,7 +34,10 @@
                 </div>
                 <div class="photo-container" v-for="photo in form.addedPhotos" v-bind:key="photo.key">
                     <img :src="photo.image" />
-                    <ListItemOptions @listItemOptionClick="onPhotoOptionClick($event, photo)" :options="photoOptions"></ListItemOptions>
+                    <ListItemOptions
+                        @listItemOptionClick="onUnsavedPhotoOptionClick($event, photo)"
+                        :options="photoOptions"
+                    ></ListItemOptions>
                 </div>
                 <ImageUploader @change="onImage" :placeholder="placeholder" :allowPreview="false" />
             </div>
@@ -89,10 +92,10 @@ export default Vue.extend({
             form: new Notes(),
             placeholder: NewPhoto,
             photoOptions: [
-                /*{
+                {
                     label: "Use as Station Image",
                     event: "use-as-station-image",
-                },*/
+                },
                 {
                     label: "Delete Image",
                     event: "delete-media",
@@ -135,7 +138,7 @@ export default Vue.extend({
         onChange() {
             this.$emit("change", this.form);
         },
-        async onPhotoOptionClick(event: string, photo: AddedPhoto | PortalNoteMedia) {
+        async onPhotoOptionClick(event: string, photo: PortalNoteMedia) {
             if (event === "delete-media") {
                 await this.$confirm({
                     message: `Are you sure you want to delete this image?`,
@@ -145,11 +148,28 @@ export default Vue.extend({
                     },
                     callback: async (confirm) => {
                         if (confirm) {
-                            if (photo.id) {
-                                await this.$services.api.deleteMedia(photo.id);
-                                this.notes.media = this.notes.media.filter((media) => media.id !== photo.id);
-                                return;
-                            }
+                            await this.$services.api.deleteMedia(photo.id);
+                            this.notes.media = this.notes.media.filter((media) => media.id !== photo.id);
+                            return;
+                        }
+                    },
+                });
+            }
+
+            if (event === "use-as-station-image") {
+                await this.$services.api.setStationImage(this.station.id, photo.id);
+            }
+        },
+        async onUnsavedPhotoOptionClick(event: string, photo: AddedPhoto) {
+            if (event === "delete-media") {
+                await this.$confirm({
+                    message: `Are you sure you want to delete this image?`,
+                    button: {
+                        no: "Cancel",
+                        yes: "Delete",
+                    },
+                    callback: async (confirm) => {
+                        if (confirm) {
                             const photoIndex = this.form.addedPhotos.findIndex((addedPhoto) => addedPhoto.key === photo.key);
                             this.form.addedPhotos.splice(photoIndex, 1);
                             return;
@@ -159,16 +179,22 @@ export default Vue.extend({
             }
 
             if (event === "use-as-station-image") {
-                // TODO: add use as station functionality
+                this.$services.api
+                    .uploadStationMedia(this.station.id, photo.key, photo.file)
+                    .then(async (uploadedPhoto: PortalNoteMedia) => {
+                        await this.$services.api.setStationImage(this.station.id, uploadedPhoto.id);
+                    });
             }
         },
         async deleteMedia(photo: PortalNoteMedia): Promise<void> {
             if (photo.id) {
                 await this.$services.api.deleteMedia(photo.id);
-                this.notes.media = this.notes.media.filter((media) => media.id !== photo.id);
+                this.notes.media = this.notes.media.filter(
+                    (media: { id: number; key: string; url: string; contentType: string }) => media.id !== photo.id
+                );
                 return;
             }
-            const photoIndex = this.form.addedPhotos.findIndex((addedPhoto) => addedPhoto.key === photo.key);
+            const photoIndex = this.form.addedPhotos.findIndex((addedPhoto: NoteMedia) => addedPhoto.key === photo.key);
             this.form.addedPhotos.splice(photoIndex, 1);
             return;
         },

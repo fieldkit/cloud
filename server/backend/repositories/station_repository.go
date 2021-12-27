@@ -100,6 +100,14 @@ func (r *StationRepository) UpdateOwner(ctx context.Context, station *data.Stati
 	return nil
 }
 
+func (r *StationRepository) UpdatePhoto(ctx context.Context, station *data.Station) (err error) {
+    if _, err := r.db.NamedExecContext(ctx, `UPDATE fieldkit.station SET photo_id = :photo_id, updated_at = :updated_at WHERE id = :id`, station); err != nil {
+        return err
+    }
+
+    return nil
+}
+
 func (r *StationRepository) QueryStationByID(ctx context.Context, id int32) (station *data.Station, err error) {
 	station = &data.Station{}
 	if err := r.db.GetContext(ctx, station, `
