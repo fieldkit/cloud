@@ -475,7 +475,7 @@ header {
     }
 
     &-submit {
-        @include position(absolute, 50% 10px null null);
+        @include position(absolute, null 10px 0 null);
         @include flex(center);
         height: 45px;
         padding: 0 10px;
@@ -485,6 +485,14 @@ header {
         .data-view &,
         .reply & {
             right: 0;
+        }
+
+        .data-view & {
+            bottom: -5px;
+        }
+
+        .reply & {
+            bottom: -22px;
         }
     }
 }
