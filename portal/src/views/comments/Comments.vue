@@ -420,7 +420,11 @@ header {
             padding: 18px 23px 17px 15px;
 
             .new-comment-submit {
-                right: 25px;
+                right: 33px;
+
+                @include bp-down($sm) {
+                    right: 25px;
+                }
             }
         }
     }
@@ -452,17 +456,15 @@ header {
     &-input {
         width: 100%;
         display: flex;
+        border-radius: 2px;
+        border: solid 1px $color-border;
 
         ::v-deep textarea {
             margin: 0;
-            padding: 14px 72px 14px 13px;
-            border-radius: 2px;
-            border: solid 1px $color-border;
+            padding: 14px 60px 14px 13px;
             outline: none;
             width: 100%;
             font-weight: 500;
-            resize: none;
-            overflow: hidden;
 
             &::placeholder {
                 color: #cccdcf;
@@ -475,24 +477,30 @@ header {
     }
 
     &-submit {
-        @include position(absolute, null 10px 0 null);
+        @include position(absolute, null 10px 35px null);
         @include flex(center);
-        height: 45px;
         padding: 0 10px;
-        transform: translateY(-50%);
         font-weight: 900;
 
-        .data-view &,
-        .reply & {
-            right: 0;
+        @include bp-down($sm) {
+            bottom: 25px;
         }
 
         .data-view & {
-            bottom: -5px;
+            right: 0;
+            bottom: 30px;
         }
 
         .reply & {
-            bottom: -22px;
+            right: 12px;
+
+            @include bp-down($sm) {
+                right: 7px;
+            }
+        }
+
+        .reply & {
+            bottom: 5px;
         }
     }
 }
@@ -532,6 +540,10 @@ header {
         border: 0;
         margin: 0;
         padding: 7px 45px 0 7px;
+
+        .reply & {
+            padding-right: 60px;
+        }
     }
 }
 
@@ -630,7 +642,8 @@ header {
 }
 
 ::v-deep textarea {
-    overflow-y: hidden;
     resize: none;
+    border: 0 !important;
+    max-height: 75vh;
 }
 </style>
