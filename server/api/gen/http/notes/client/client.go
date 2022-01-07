@@ -32,6 +32,10 @@ type Client struct {
 	// media endpoint.
 	UploadMediaDoer goahttp.Doer
 
+	// DeleteMedia Doer is the HTTP client used to make requests to the delete
+	// media endpoint.
+	DeleteMediaDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -59,6 +63,7 @@ func NewClient(
 		GetDoer:             doer,
 		DownloadMediaDoer:   doer,
 		UploadMediaDoer:     doer,
+		DeleteMediaDoer:     doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -164,6 +169,30 @@ func (c *Client) UploadMedia() goa.Endpoint {
 		resp, err := c.UploadMediaDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("notes", "upload media", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// DeleteMedia returns an endpoint that makes HTTP requests to the notes
+// service delete media server.
+func (c *Client) DeleteMedia() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDeleteMediaRequest(c.encoder)
+		decodeResponse = DecodeDeleteMediaResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDeleteMediaRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DeleteMediaDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("notes", "delete media", err)
 		}
 		return decodeResponse(resp)
 	}

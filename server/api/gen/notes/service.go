@@ -26,6 +26,8 @@ type Service interface {
 	DownloadMedia(context.Context, *DownloadMediaPayload) (res *DownloadMediaResult, body io.ReadCloser, err error)
 	// UploadMedia implements upload media.
 	UploadMedia(context.Context, *UploadMediaPayload, io.ReadCloser) (res *NoteMedia, err error)
+	// DeleteMedia implements delete media.
+	DeleteMedia(context.Context, *DeleteMediaPayload) (err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -42,7 +44,7 @@ const ServiceName = "notes"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"update", "get", "download media", "upload media"}
+var MethodNames = [5]string{"update", "get", "download media", "upload media", "delete media"}
 
 // UpdatePayload is the payload type of the notes service update method.
 type UpdatePayload struct {
@@ -93,6 +95,13 @@ type NoteMedia struct {
 	URL         string
 	Key         string
 	ContentType string
+}
+
+// DeleteMediaPayload is the payload type of the notes service delete media
+// method.
+type DeleteMediaPayload struct {
+	Auth    string
+	MediaID int32
 }
 
 type FieldNoteUpdate struct {

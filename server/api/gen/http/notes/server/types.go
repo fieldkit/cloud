@@ -329,6 +329,78 @@ type UploadMediaBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// DeleteMediaUnauthorizedResponseBody is the type of the "notes" service
+// "delete media" endpoint HTTP response body for the "unauthorized" error.
+type DeleteMediaUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteMediaForbiddenResponseBody is the type of the "notes" service "delete
+// media" endpoint HTTP response body for the "forbidden" error.
+type DeleteMediaForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteMediaNotFoundResponseBody is the type of the "notes" service "delete
+// media" endpoint HTTP response body for the "not-found" error.
+type DeleteMediaNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteMediaBadRequestResponseBody is the type of the "notes" service "delete
+// media" endpoint HTTP response body for the "bad-request" error.
+type DeleteMediaBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // FieldNoteResponseBody is used to define fields on response body types.
 type FieldNoteResponseBody struct {
 	ID        int64                        `form:"id" json:"id" xml:"id"`
@@ -650,6 +722,62 @@ func NewUploadMediaBadRequestResponseBody(res *goa.ServiceError) *UploadMediaBad
 	return body
 }
 
+// NewDeleteMediaUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "delete media" endpoint of the "notes" service.
+func NewDeleteMediaUnauthorizedResponseBody(res *goa.ServiceError) *DeleteMediaUnauthorizedResponseBody {
+	body := &DeleteMediaUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteMediaForbiddenResponseBody builds the HTTP response body from the
+// result of the "delete media" endpoint of the "notes" service.
+func NewDeleteMediaForbiddenResponseBody(res *goa.ServiceError) *DeleteMediaForbiddenResponseBody {
+	body := &DeleteMediaForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteMediaNotFoundResponseBody builds the HTTP response body from the
+// result of the "delete media" endpoint of the "notes" service.
+func NewDeleteMediaNotFoundResponseBody(res *goa.ServiceError) *DeleteMediaNotFoundResponseBody {
+	body := &DeleteMediaNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteMediaBadRequestResponseBody builds the HTTP response body from the
+// result of the "delete media" endpoint of the "notes" service.
+func NewDeleteMediaBadRequestResponseBody(res *goa.ServiceError) *DeleteMediaBadRequestResponseBody {
+	body := &DeleteMediaBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewUpdatePayload builds a notes service update endpoint payload.
 func NewUpdatePayload(body *UpdateRequestBody, stationID int32, auth string) *notes.UpdatePayload {
 	v := &notes.UpdatePayload{}
@@ -686,6 +814,15 @@ func NewUploadMediaPayload(stationID int32, key string, contentType string, cont
 	v.Key = key
 	v.ContentType = contentType
 	v.ContentLength = contentLength
+	v.Auth = auth
+
+	return v
+}
+
+// NewDeleteMediaPayload builds a notes service delete media endpoint payload.
+func NewDeleteMediaPayload(mediaID int32, auth string) *notes.DeleteMediaPayload {
+	v := &notes.DeleteMediaPayload{}
+	v.MediaID = mediaID
 	v.Auth = auth
 
 	return v

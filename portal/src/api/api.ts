@@ -1097,6 +1097,14 @@ class FKApi {
         });
     }
 
+    setStationImage(stationId: number, photoId: number) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/stations/" + stationId + "/photo/" + photoId,
+        });
+    }
+
     public getAllStations(page: number, pageSize: number): Promise<PageOfStations> {
         const qp = new URLSearchParams();
         qp.append("page", page.toString());
@@ -1202,6 +1210,14 @@ class FKApi {
                 reader.onloadend = () => resolve(reader.result as string);
                 reader.readAsDataURL(blob);
             });
+        });
+    }
+
+    deleteMedia(mediaId: number) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/notes/media/" + mediaId,
         });
     }
 
