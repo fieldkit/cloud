@@ -20,7 +20,7 @@ def getStackURL(user, password, branch, stackName) {
 }
 
 timestamps {
-	node () {
+	node ("main") {
 		try {
 			def isDev = params.DeployFrom.indexOf("fkdev.org") >= 0
 			def stackName = params.DeployStack ?: "portal-stack"
