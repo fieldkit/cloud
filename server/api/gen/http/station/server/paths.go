@@ -26,6 +26,11 @@ func TransferStationPath(id int32, ownerID int32) string {
 	return fmt.Sprintf("/stations/%v/transfer/%v", id, ownerID)
 }
 
+// DefaultPhotoStationPath returns the URL path to the station service default photo HTTP endpoint.
+func DefaultPhotoStationPath(id int32, photoID int32) string {
+	return fmt.Sprintf("/stations/%v/photo/%v", id, photoID)
+}
+
 // UpdateStationPath returns the URL path to the station service update HTTP endpoint.
 func UpdateStationPath(id int32) string {
 	return fmt.Sprintf("/stations/%v", id)

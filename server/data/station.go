@@ -81,7 +81,7 @@ type Station struct {
 	FirmwareTime       *int64     `db:"firmware_time"`
 	PlaceOther         *string    `db:"place_other"`
 	PlaceNative        *string    `db:"place_native"`
-	PhotoID            *int64     `db:"photo_id"`
+	PhotoID            int32     `db:"photo_id"`
 }
 
 func (s *Station) ParseHttpReply(raw string) (*pb.HttpReply, error) {

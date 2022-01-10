@@ -21,6 +21,7 @@ type Endpoints struct {
 	Get           goa.Endpoint
 	DownloadMedia goa.Endpoint
 	UploadMedia   goa.Endpoint
+	DeleteMedia   goa.Endpoint
 }
 
 // DownloadMediaResponseData holds both the result and the HTTP response body
@@ -50,6 +51,7 @@ func NewEndpoints(s Service) *Endpoints {
 		Get:           NewGetEndpoint(s, a.JWTAuth),
 		DownloadMedia: NewDownloadMediaEndpoint(s, a.JWTAuth),
 		UploadMedia:   NewUploadMediaEndpoint(s, a.JWTAuth),
+		DeleteMedia:   NewDeleteMediaEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -59,6 +61,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Get = m(e.Get)
 	e.DownloadMedia = m(e.DownloadMedia)
 	e.UploadMedia = m(e.UploadMedia)
+	e.DeleteMedia = m(e.DeleteMedia)
 }
 
 // NewUpdateEndpoint returns an endpoint function that calls the method
@@ -153,5 +156,24 @@ func NewUploadMediaEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpo
 		}
 		vres := NewViewedNoteMedia(res, "default")
 		return vres, nil
+	}
+}
+
+// NewDeleteMediaEndpoint returns an endpoint function that calls the method
+// "delete media" of service "notes".
+func NewDeleteMediaEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*DeleteMediaPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.DeleteMedia(ctx, p)
 	}
 }
