@@ -213,6 +213,7 @@ func (c *StationService) DefaultPhoto(ctx context.Context, payload *station.Defa
     sr := repositories.NewStationRepository(c.options.Database)
 
     updating, err := sr.QueryStationByID(ctx, payload.ID)
+
     if err != nil {
         if err == sql.ErrNoRows {
             return station.MakeNotFound(errors.New("station not found"))
@@ -225,7 +226,7 @@ func (c *StationService) DefaultPhoto(ctx context.Context, payload *station.Defa
         return err
     }
 
-    if err := p.RequireAdmin(); err != nil {
+    if err := p.CanModify(); err != nil {
         return err
     }
 
