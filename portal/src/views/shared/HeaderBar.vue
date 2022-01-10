@@ -9,15 +9,63 @@
             v-on:mouseenter="onAccountHover($event)"
             v-on:mouseleave="onAccountHover($event)"
         >
-            <UserPhoto v-if="user" :user="user" />
+            <div class="header-avatar">
+                <span class="badge">10</span>
+                <UserPhoto v-if="user" :user="user" />
+                <span v-if="isAccountHovered" class="triangle"></span>
+            </div>
             <a v-if="user" class="header-account-name">{{ firstName }}</a>
             <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
                 {{ $t("layout.header.login") }}
             </router-link>
-            <div class="header-account-menu" v-bind:class="{ active: isAccountHovered }">
-                <router-link v-if="user" :to="{ name: 'editUser' }">{{ $t("layout.header.myAccount") }}</router-link>
-                <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">{{ $t("layout.header.admin") }}</router-link>
-                <a class="log-out" v-if="isAuthenticated" v-on:click="logout">{{ $t("layout.header.logout") }}</a>
+            <div class="notifications-container" v-bind:class="{ active: isAccountHovered }">
+                <header class="notifications-header">
+                    <span>{{ $t("notifications.title") }}</span>
+                    <div>
+                        <!--                        <router-link v-if="user" :to="{ name: 'editUser' }">{{ $t("layout.header.myAccount") }}</router-link>
+                        <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">{{ $t("layout.header.admin") }}</router-link>
+                        <a class="log-out" v-if="isAuthenticated" v-on:click="logout">{{ $t("layout.header.logout") }}</a>-->
+                    </div>
+                </header>
+                <ul class="notifications-list">
+                    <li class="notifications-item notifications-item--reply">
+                        <UserPhoto :user="user" />
+                        <span class="notifications-item-icon"></span>
+                        <div>
+                            Harriet Alexandra replied to your data view commment Harriet Alexandra replied to your data view commment
+                            <div class="notifications-timestamp">
+                                1 day ago
+                            </div>
+                        </div>
+                        <i class="icon-ellipsis"></i>
+                    </li>
+                    <li class="notifications-item notifications-item--comment">
+                        <UserPhoto :user="user" />
+                        <span class="notifications-item-icon"></span>
+                        <div>
+                            Harriet Alexandra replied to your data view commment
+                            <div class="notifications-timestamp">
+                                1 day ago
+                            </div>
+                        </div>
+                        <i class="icon-ellipsis"></i>
+                    </li>
+                    <li class="notifications-item notifications-item--mention">
+                        <UserPhoto :user="user" />
+                        <span class="notifications-item-icon"></span>
+                        <div>
+                            Harriet Alexandra replied to your data view commment
+                            <div class="notifications-timestamp">
+                                1 day ago
+                            </div>
+                        </div>
+                        <i class="icon-ellipsis"></i>
+                    </li>
+                </ul>
+                <footer class="notifications-footer">
+                    <button>{{ $t("notifications.viewAllButton") }}</button>
+                    <button>{{ $t("notifications.dismissAllButton") }}</button>
+                </footer>
             </div>
         </div>
     </div>
@@ -37,7 +85,7 @@ export default Vue.extend({
     },
     data(): { isAccountHovered: boolean } {
         return {
-            isAccountHovered: false,
+            isAccountHovered: true,
         };
     },
     computed: {
@@ -108,12 +156,6 @@ export default Vue.extend({
             padding-right: 0;
         }
 
-        * {
-            font-weight: 500;
-            color: #2c3e50;
-            cursor: pointer;
-        }
-
         &-name {
             font-size: 16px;
             font-weight: 500;
@@ -148,40 +190,22 @@ export default Vue.extend({
                 transform: rotate(180deg) translateY(50%);
             }
         }
-
-        &-menu {
-            overflow: hidden;
-            padding: 8px;
-            background: #fff;
-            transition: opacity 0.25s, max-height 0.33s;
-            opacity: 0;
-            visibility: hidden;
-            text-align: left;
-            min-width: 143px;
-            box-sizing: border-box;
-            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-            z-index: -1;
-            @include position(absolute, calc(100% - 5px) 70px null null);
-
-            @include bp-down($lg) {
-                @include position(fixed, 60px 10px null unset);
-            }
-
-            &.active {
-                opacity: 1 !important;
-                visibility: visible;
-                border: solid 1px #e9e9e9;
-                z-index: initial;
-            }
-
-            a {
-                padding: 8px 17px;
-                font-size: 14px;
-                display: block;
-                user-select: none;
-            }
-        }
     }
+
+    &-avatar {
+        position: relative;
+    }
+}
+
+.triangle {
+    @include position(absolute, null null -10px 5px);
+    z-index: $z-index-top;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 15px 12px 15px;
+    border-color: transparent transparent #fff transparent;
+    filter: drop-shadow(0px -2px 1px rgba(0, 0, 0, 0.1));
 }
 
 .log-out,
@@ -215,5 +239,142 @@ export default Vue.extend({
     @include bp-up($md) {
         display: none;
     }
+}
+
+.badge {
+    @include position(absolute, -5px null null -7px);
+    height: 20px;
+    width: 20px;
+    @include flex(center, center);
+    background: #1b80c9;
+    color: #fff;
+    font-size: 11px;
+    font-family: $font-family-bold;
+    border-radius: 50%;
+}
+
+.notifications {
+    &-container {
+        padding: 10px;
+        background: #fff;
+        transition: opacity 0.25s, max-height 0.33s;
+        opacity: 0;
+        visibility: hidden;
+        text-align: left;
+        min-width: 143px;
+        box-sizing: border-box;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+        border: solid 1px #e9e9e9;
+        z-index: -1;
+        width: 320px;
+        @include position(absolute, calc(100% + 1px) 70px null null);
+
+        @include bp-down($lg) {
+            @include position(fixed, 60px 10px null unset);
+        }
+
+        &.active {
+            opacity: 1 !important;
+            visibility: visible;
+            z-index: initial;
+        }
+
+        a {
+            padding: 8px 17px;
+            font-size: 14px;
+            display: block;
+            user-select: none;
+        }
+    }
+
+    &-header {
+        @include flex(center, space-between);
+        height: 50px;
+        border-bottom: solid 1px #d8dce0;
+        margin-bottom: 15px;
+        font-size: 20px;
+        letter-spacing: 0.1px;
+    }
+
+    &-item {
+        @include flex(flex-start);
+        color: #6a6d71;
+        font-size: 14px;
+        font-family: $font-family-light;
+        margin-bottom: 10px;
+        position: relative;
+        line-height: 1.4em;
+
+        img {
+            width: 35px;
+            height: 35px;
+            margin-right: 7px;
+        }
+
+        &-icon {
+            @include position(absolute, 24px 0 null 18px);
+            display: block;
+            border-radius: 50%;
+            width: 17px;
+            height: 17px;
+
+            .notifications-item--reply & {
+                background: url(../../assets/icon-reply.svg) no-repeat center center #ce596b;
+            }
+
+            .notifications-item--mention & {
+                background: url(../../assets/icon-reply.svg) no-repeat center center #52b5e4;
+            }
+
+            .notifications-item--comment & {
+                background: url(../../assets/icon-reply.svg) no-repeat center center #5268cc;
+            }
+        }
+    }
+
+    &-timestamp {
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    &-footer {
+        border-top: solid 1px #d8dce0;
+        @include flex(center, space-between);
+
+        button {
+            padding: 11px 5px 0 5px;
+            font-size: 16px;
+            font-weight: 900;
+            color: #2c3e50;
+        }
+    }
+}
+
+.flex {
+    display: flex;
+}
+
+.icon-ellipsis {
+    display: block;
+    cursor: pointer;
+
+    &:after {
+        @include flex(flex-end);
+        content: "...";
+        color: #2c3e50;
+        height: 17px;
+        font-size: 32px;
+        font-family: $font-family-bold;
+        letter-spacing: -1.5px;
+    }
+}
+
+button {
+    padding: 0;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    cursor: pointer;
+    background: transparent;
 }
 </style>
