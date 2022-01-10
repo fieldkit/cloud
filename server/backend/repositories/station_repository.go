@@ -163,6 +163,19 @@ func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, devic
 	return stations[0], nil
 }
 
+func (r *StationRepository) QueryStationByPhotoID(ctx context.Context, id int32) (station *data.Station, err error) {
+    station = &data.Station{}
+    	if err := r.db.GetContext(ctx, station, `
+    		SELECT
+    			id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
+    			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
+    		FROM fieldkit.station WHERE photo_id = $1
+    		`, id); err != nil {
+    		return nil, err
+    	}
+    	return station, nil
+}
+
 func (r *StationRepository) QueryStationConfigurationByMetaID(ctx context.Context, metaRecordID int64) (*data.StationConfiguration, error) {
 	configurations := []*data.StationConfiguration{}
 	if err := r.db.SelectContext(ctx, &configurations, `SELECT * FROM fieldkit.station_configuration WHERE meta_record_id = $1`, metaRecordID); err != nil {

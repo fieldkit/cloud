@@ -292,8 +292,16 @@ func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMed
 }
 
 func (s *NotesService) DeleteMedia(ctx context.Context, payload *notes.DeleteMediaPayload) error {
-	_, err := NewPermissions(ctx, s.options).Unwrap()
+    sr := repositories.NewStationRepository(s.options.Database)
+
+    station, err := sr.QueryStationByPhotoID(ctx, payload.MediaID)
+
+	p, err := NewPermissions(ctx, s.options).ForStation(station)
     if err != nil {
+        return err
+    }
+
+    if err := p.CanModify(); err != nil {
         return err
     }
 
