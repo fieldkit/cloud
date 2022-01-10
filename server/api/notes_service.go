@@ -200,6 +200,7 @@ func (s *NotesService) DownloadMedia(ctx context.Context, payload *notes.Downloa
 	log := Logger(ctx).Sugar()
 
 	allMedia := &data.FieldNoteMedia{}
+
 	if err := s.options.Database.GetContext(ctx, allMedia, `
 		SELECT * FROM fieldkit.notes_media WHERE id = $1
 		`, payload.MediaID); err != nil {
@@ -288,6 +289,36 @@ func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMed
 		ContentType: media.ContentType,
 		URL:         fmt.Sprintf("/notes/media/%d", media.ID),
 	}, nil
+}
+
+func (s *NotesService) DeleteMedia(ctx context.Context, payload *notes.DeleteMediaPayload) error {
+    sr := repositories.NewStationRepository(s.options.Database)
+
+    station, err := sr.QueryStationByPhotoID(ctx, payload.MediaID)
+
+	p, err := NewPermissions(ctx, s.options).ForStation(station)
+    if err != nil {
+        return err
+    }
+
+    if err := p.CanModify(); err != nil {
+        return err
+    }
+
+    if _, err := s.options.Database.ExecContext(ctx, `
+        UPDATE fieldkit.station SET photo_id = NULL
+                WHERE photo_id = $1
+        `, payload.MediaID); err != nil {
+        return err
+    }
+
+	if _, err := s.options.Database.ExecContext(ctx, `
+		DELETE FROM fieldkit.notes_media WHERE id = $1
+		`, payload.MediaID); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *NotesService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {

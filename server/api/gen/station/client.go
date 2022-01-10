@@ -18,6 +18,7 @@ type Client struct {
 	AddEndpoint            goa.Endpoint
 	GetEndpoint            goa.Endpoint
 	TransferEndpoint       goa.Endpoint
+	DefaultPhotoEndpoint   goa.Endpoint
 	UpdateEndpoint         goa.Endpoint
 	ListMineEndpoint       goa.Endpoint
 	ListProjectEndpoint    goa.Endpoint
@@ -30,11 +31,12 @@ type Client struct {
 }
 
 // NewClient initializes a "station" service client given the endpoints.
-func NewClient(add, get, transfer, update, listMine, listProject, listAssociated, downloadPhoto, listAll, delete_, adminSearch, progress goa.Endpoint) *Client {
+func NewClient(add, get, transfer, defaultPhoto, update, listMine, listProject, listAssociated, downloadPhoto, listAll, delete_, adminSearch, progress goa.Endpoint) *Client {
 	return &Client{
 		AddEndpoint:            add,
 		GetEndpoint:            get,
 		TransferEndpoint:       transfer,
+		DefaultPhotoEndpoint:   defaultPhoto,
 		UpdateEndpoint:         update,
 		ListMineEndpoint:       listMine,
 		ListProjectEndpoint:    listProject,
@@ -70,6 +72,12 @@ func (c *Client) Get(ctx context.Context, p *GetPayload) (res *StationFull, err 
 // Transfer calls the "transfer" endpoint of the "station" service.
 func (c *Client) Transfer(ctx context.Context, p *TransferPayload) (err error) {
 	_, err = c.TransferEndpoint(ctx, p)
+	return
+}
+
+// DefaultPhoto calls the "default photo" endpoint of the "station" service.
+func (c *Client) DefaultPhoto(ctx context.Context, p *DefaultPhotoPayload) (err error) {
+	_, err = c.DefaultPhotoEndpoint(ctx, p)
 	return
 }
 

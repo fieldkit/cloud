@@ -26,6 +26,7 @@ type Server struct {
 	Get           http.Handler
 	DownloadMedia http.Handler
 	UploadMedia   http.Handler
+	DeleteMedia   http.Handler
 	CORS          http.Handler
 }
 
@@ -66,6 +67,7 @@ func New(
 			{"Get", "GET", "/stations/{stationId}/notes"},
 			{"DownloadMedia", "GET", "/notes/media/{mediaId}"},
 			{"UploadMedia", "POST", "/stations/{stationId}/media"},
+			{"DeleteMedia", "DELETE", "/notes/media/{mediaId}"},
 			{"CORS", "OPTIONS", "/stations/{stationId}/notes"},
 			{"CORS", "OPTIONS", "/notes/media/{mediaId}"},
 			{"CORS", "OPTIONS", "/stations/{stationId}/media"},
@@ -74,6 +76,7 @@ func New(
 		Get:           NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
 		DownloadMedia: NewDownloadMediaHandler(e.DownloadMedia, mux, decoder, encoder, errhandler, formatter),
 		UploadMedia:   NewUploadMediaHandler(e.UploadMedia, mux, decoder, encoder, errhandler, formatter),
+		DeleteMedia:   NewDeleteMediaHandler(e.DeleteMedia, mux, decoder, encoder, errhandler, formatter),
 		CORS:          NewCORSHandler(),
 	}
 }
@@ -87,6 +90,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Get = m(s.Get)
 	s.DownloadMedia = m(s.DownloadMedia)
 	s.UploadMedia = m(s.UploadMedia)
+	s.DeleteMedia = m(s.DeleteMedia)
 	s.CORS = m(s.CORS)
 }
 
@@ -96,6 +100,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetHandler(mux, h.Get)
 	MountDownloadMediaHandler(mux, h.DownloadMedia)
 	MountUploadMediaHandler(mux, h.UploadMedia)
+	MountDeleteMediaHandler(mux, h.DeleteMedia)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -300,6 +305,57 @@ func NewUploadMediaHandler(
 		}
 		data := &notes.UploadMediaRequestData{Payload: payload.(*notes.UploadMediaPayload), Body: r.Body}
 		res, err := endpoint(ctx, data)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountDeleteMediaHandler configures the mux to serve the "notes" service
+// "delete media" endpoint.
+func MountDeleteMediaHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleNotesOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("DELETE", "/notes/media/{mediaId}", f)
+}
+
+// NewDeleteMediaHandler creates a HTTP handler which loads the HTTP request
+// and calls the "notes" service "delete media" endpoint.
+func NewDeleteMediaHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDeleteMediaRequest(mux, decoder)
+		encodeResponse = EncodeDeleteMediaResponse(encoder)
+		encodeError    = EncodeDeleteMediaError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "delete media")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "notes")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil {
 				errhandler(ctx, w, err)

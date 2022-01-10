@@ -149,3 +149,27 @@ func BuildUploadMediaPayload(notesUploadMediaStationID string, notesUploadMediaK
 
 	return v, nil
 }
+
+// BuildDeleteMediaPayload builds the payload for the notes delete media
+// endpoint from CLI flags.
+func BuildDeleteMediaPayload(notesDeleteMediaMediaID string, notesDeleteMediaAuth string) (*notes.DeleteMediaPayload, error) {
+	var err error
+	var mediaID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(notesDeleteMediaMediaID, 10, 32)
+		mediaID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for mediaID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = notesDeleteMediaAuth
+	}
+	v := &notes.DeleteMediaPayload{}
+	v.MediaID = mediaID
+	v.Auth = auth
+
+	return v, nil
+}

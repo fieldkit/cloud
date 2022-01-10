@@ -209,6 +209,37 @@ func (c *StationService) Transfer(ctx context.Context, payload *station.Transfer
 	return nil
 }
 
+func (c *StationService) DefaultPhoto(ctx context.Context, payload *station.DefaultPhotoPayload) (err error) {
+    sr := repositories.NewStationRepository(c.options.Database)
+
+    updating, err := sr.QueryStationByID(ctx, payload.ID)
+
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return station.MakeNotFound(errors.New("station not found"))
+        }
+        return err
+    }
+
+    p, err := NewPermissions(ctx, c.options).ForStation(updating)
+    if err != nil {
+        return err
+    }
+
+    if err := p.CanModify(); err != nil {
+        return err
+    }
+
+    updating.UpdatedAt = time.Now()
+    updating.PhotoID = payload.PhotoID
+
+    if err := sr.UpdatePhoto(ctx, updating); err != nil {
+        return err
+    }
+
+    return nil
+}
+
 func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
 	sr := repositories.NewStationRepository(c.options.Database)
 
@@ -451,8 +482,8 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 
 	allMedia := []*data.FieldNoteMedia{}
 	if err := c.options.Database.SelectContext(ctx, &allMedia, `
-		SELECT * FROM fieldkit.notes_media WHERE station_id = $1 ORDER BY created_at DESC
-		`, payload.StationID); err != nil {
+        SELECT * FROM fieldkit.notes_media WHERE id IN (SELECT photo_id FROM fieldkit.station where id = $1) ORDER BY created_at DESC
+        `, payload.StationID); err != nil {
 		return nil, err
 	}
 

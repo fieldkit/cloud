@@ -392,6 +392,78 @@ type TransferBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// DefaultPhotoUnauthorizedResponseBody is the type of the "station" service
+// "default photo" endpoint HTTP response body for the "unauthorized" error.
+type DefaultPhotoUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DefaultPhotoForbiddenResponseBody is the type of the "station" service
+// "default photo" endpoint HTTP response body for the "forbidden" error.
+type DefaultPhotoForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DefaultPhotoNotFoundResponseBody is the type of the "station" service
+// "default photo" endpoint HTTP response body for the "not-found" error.
+type DefaultPhotoNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DefaultPhotoBadRequestResponseBody is the type of the "station" service
+// "default photo" endpoint HTTP response body for the "bad-request" error.
+type DefaultPhotoBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // UpdateUnauthorizedResponseBody is the type of the "station" service "update"
 // endpoint HTTP response body for the "unauthorized" error.
 type UpdateUnauthorizedResponseBody struct {
@@ -1601,6 +1673,62 @@ func NewTransferBadRequestResponseBody(res *goa.ServiceError) *TransferBadReques
 	return body
 }
 
+// NewDefaultPhotoUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "default photo" endpoint of the "station" service.
+func NewDefaultPhotoUnauthorizedResponseBody(res *goa.ServiceError) *DefaultPhotoUnauthorizedResponseBody {
+	body := &DefaultPhotoUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDefaultPhotoForbiddenResponseBody builds the HTTP response body from the
+// result of the "default photo" endpoint of the "station" service.
+func NewDefaultPhotoForbiddenResponseBody(res *goa.ServiceError) *DefaultPhotoForbiddenResponseBody {
+	body := &DefaultPhotoForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDefaultPhotoNotFoundResponseBody builds the HTTP response body from the
+// result of the "default photo" endpoint of the "station" service.
+func NewDefaultPhotoNotFoundResponseBody(res *goa.ServiceError) *DefaultPhotoNotFoundResponseBody {
+	body := &DefaultPhotoNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDefaultPhotoBadRequestResponseBody builds the HTTP response body from the
+// result of the "default photo" endpoint of the "station" service.
+func NewDefaultPhotoBadRequestResponseBody(res *goa.ServiceError) *DefaultPhotoBadRequestResponseBody {
+	body := &DefaultPhotoBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewUpdateUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "update" endpoint of the "station" service.
 func NewUpdateUnauthorizedResponseBody(res *goa.ServiceError) *UpdateUnauthorizedResponseBody {
@@ -2132,6 +2260,17 @@ func NewTransferPayload(id int32, ownerID int32, auth string) *station.TransferP
 	v := &station.TransferPayload{}
 	v.ID = id
 	v.OwnerID = ownerID
+	v.Auth = auth
+
+	return v
+}
+
+// NewDefaultPhotoPayload builds a station service default photo endpoint
+// payload.
+func NewDefaultPhotoPayload(id int32, photoID int32, auth string) *station.DefaultPhotoPayload {
+	v := &station.DefaultPhotoPayload{}
+	v.ID = id
+	v.PhotoID = photoID
 	v.Auth = auth
 
 	return v
