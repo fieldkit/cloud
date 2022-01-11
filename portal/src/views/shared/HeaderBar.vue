@@ -10,7 +10,9 @@
             v-on:mouseleave="onAccountHover($event)"
         >
             <div class="header-avatar">
-                <span class="badge">10</span>
+                <i class="badge">
+                    <span>10</span>
+                </i>
                 <UserPhoto v-if="user" :user="user" />
                 <span v-if="isAccountHovered" class="triangle"></span>
             </div>
@@ -21,13 +23,19 @@
             <div class="notifications-container" v-bind:class="{ active: isAccountHovered }">
                 <header class="notifications-header">
                     <span>{{ $t("notifications.title") }}</span>
-                    <div>
-                        <!--                        <router-link v-if="user" :to="{ name: 'editUser' }">{{ $t("layout.header.myAccount") }}</router-link>
-                        <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">{{ $t("layout.header.admin") }}</router-link>
-                        <a class="log-out" v-if="isAuthenticated" v-on:click="logout">{{ $t("layout.header.logout") }}</a>-->
+                    <div class="flex">
+                        <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">
+                            {{ $t("layout.header.admin") }}
+                        </router-link>
+                        <router-link v-if="user" :to="{ name: 'editUser' }" :title="$t('layout.header.myAccount')">
+                            <img src="@/assets/icon-account.svg" alt="My Account" />
+                        </router-link>
+                        <a class="log-out" v-if="isAuthenticated" v-on:click="logout" :title="$t('layout.header.logout')">
+                            <img src="@/assets/icon-logout.svg" alt="Logout" />
+                        </a>
                     </div>
                 </header>
-                <ul class="notifications-list">
+                <ul>
                     <li class="notifications-item notifications-item--reply">
                         <UserPhoto :user="user" />
                         <span class="notifications-item-icon"></span>
@@ -40,6 +48,105 @@
                         <i class="icon-ellipsis"></i>
                     </li>
                     <li class="notifications-item notifications-item--comment">
+                        <UserPhoto :user="user" />
+                        <span class="notifications-item-icon"></span>
+                        <div>
+                            Harriet Alexandra replied to your data view commment
+                            <div class="notifications-timestamp">
+                                1 day ago
+                            </div>
+                        </div>
+                        <i class="icon-ellipsis"></i>
+                    </li>
+                    <li class="notifications-item notifications-item--mention">
+                        <UserPhoto :user="user" />
+                        <span class="notifications-item-icon"></span>
+                        <div>
+                            Harriet Alexandra replied to your data view commment
+                            <div class="notifications-timestamp">
+                                1 day ago
+                            </div>
+                        </div>
+                        <i class="icon-ellipsis"></i>
+                    </li>
+                    <li class="notifications-item notifications-item--mention">
+                        <UserPhoto :user="user" />
+                        <span class="notifications-item-icon"></span>
+                        <div>
+                            Harriet Alexandra replied to your data view commment
+                            <div class="notifications-timestamp">
+                                1 day ago
+                            </div>
+                        </div>
+                        <i class="icon-ellipsis"></i>
+                    </li>
+                    <li class="notifications-item notifications-item--mention">
+                        <UserPhoto :user="user" />
+                        <span class="notifications-item-icon"></span>
+                        <div>
+                            Harriet Alexandra replied to your data view commment
+                            <div class="notifications-timestamp">
+                                1 day ago
+                            </div>
+                        </div>
+                        <i class="icon-ellipsis"></i>
+                    </li>
+                    <li class="notifications-item notifications-item--mention">
+                        <UserPhoto :user="user" />
+                        <span class="notifications-item-icon"></span>
+                        <div>
+                            Harriet Alexandra replied to your data view commment
+                            <div class="notifications-timestamp">
+                                1 day ago
+                            </div>
+                        </div>
+                        <i class="icon-ellipsis"></i>
+                    </li>
+                    <li class="notifications-item notifications-item--mention">
+                        <UserPhoto :user="user" />
+                        <span class="notifications-item-icon"></span>
+                        <div>
+                            Harriet Alexandra replied to your data view commment
+                            <div class="notifications-timestamp">
+                                1 day ago
+                            </div>
+                        </div>
+                        <i class="icon-ellipsis"></i>
+                    </li>
+                    <li class="notifications-item notifications-item--mention">
+                        <UserPhoto :user="user" />
+                        <span class="notifications-item-icon"></span>
+                        <div>
+                            Harriet Alexandra replied to your data view commment
+                            <div class="notifications-timestamp">
+                                1 day ago
+                            </div>
+                        </div>
+                        <i class="icon-ellipsis"></i>
+                    </li>
+                    <li class="notifications-item notifications-item--mention">
+                        <UserPhoto :user="user" />
+                        <span class="notifications-item-icon"></span>
+                        <div>
+                            Harriet Alexandra replied to your data view commment
+                            <div class="notifications-timestamp">
+                                1 day ago
+                            </div>
+                        </div>
+                        <i class="icon-ellipsis"></i>
+                    </li>
+                    <li class="notifications-item notifications-item--mention">
+                        <UserPhoto :user="user" />
+                        <span class="notifications-item-icon"></span>
+                        <div>
+                            Harriet Alexandra replied to your data view commment
+                            <div class="notifications-timestamp">
+                                1 day ago
+                            </div>
+                        </div>
+                        <i class="icon-ellipsis"></i>
+                    </li>
+                    <li class="notifications-item notifications-item--mention">
                         <UserPhoto :user="user" />
                         <span class="notifications-item-icon"></span>
                         <div>
@@ -85,7 +192,7 @@ export default Vue.extend({
     },
     data(): { isAccountHovered: boolean } {
         return {
-            isAccountHovered: true,
+            isAccountHovered: false,
         };
     },
     computed: {
@@ -194,6 +301,7 @@ export default Vue.extend({
 
     &-avatar {
         position: relative;
+        cursor: pointer;
     }
 }
 
@@ -206,6 +314,11 @@ export default Vue.extend({
     border-width: 0 15px 12px 15px;
     border-color: transparent transparent #fff transparent;
     filter: drop-shadow(0px -2px 1px rgba(0, 0, 0, 0.1));
+
+    @include bp-down($md) {
+        left: 2px;
+        border-width: 0 12px 9px 12px;
+    }
 }
 
 .log-out,
@@ -218,8 +331,8 @@ export default Vue.extend({
     margin: 0 10px 0 0;
 
     @include bp-down($md) {
-        width: 25px;
-        height: 25px;
+        width: 30px;
+        height: 30px;
     }
 
     @include bp-down($sm) {
@@ -245,17 +358,21 @@ export default Vue.extend({
     @include position(absolute, -5px null null -7px);
     height: 20px;
     width: 20px;
-    @include flex(center, center);
     background: #1b80c9;
-    color: #fff;
-    font-size: 11px;
-    font-family: $font-family-bold;
     border-radius: 50%;
+
+    > * {
+        @include position(absolute, 5px null null 50%);
+        transform: translateX(-50%);
+        color: #fff;
+        font-size: 11px;
+        font-style: normal;
+        font-family: $font-family-bold;
+    }
 }
 
 .notifications {
     &-container {
-        padding: 10px;
         background: #fff;
         transition: opacity 0.25s, max-height 0.33s;
         opacity: 0;
@@ -267,10 +384,23 @@ export default Vue.extend({
         border: solid 1px #e9e9e9;
         z-index: -1;
         width: 320px;
+        height: 80vh;
+        @include flex();
+        flex-direction: column;
         @include position(absolute, calc(100% + 1px) 70px null null);
 
         @include bp-down($lg) {
-            @include position(fixed, 60px 10px null unset);
+            top: 100%;
+            right: 30px;
+        }
+
+        @include bp-down($sm) {
+            right: -10px;
+            height: calc(100vh - 55px);
+        }
+
+        @include bp-down($xs) {
+            width: 100vw;
         }
 
         &.active {
@@ -280,10 +410,15 @@ export default Vue.extend({
         }
 
         a {
-            padding: 8px 17px;
+            padding: 8px 12px;
             font-size: 14px;
             display: block;
             user-select: none;
+        }
+
+        > ul {
+            overflow-y: auto;
+            padding: 10px;
         }
     }
 
@@ -294,6 +429,7 @@ export default Vue.extend({
         margin-bottom: 15px;
         font-size: 20px;
         letter-spacing: 0.1px;
+        padding: 0 13px;
     }
 
     &-item {
@@ -311,6 +447,10 @@ export default Vue.extend({
             margin-right: 7px;
         }
 
+        > div {
+            padding-right: 7px;
+        }
+
         &-icon {
             @include position(absolute, 24px 0 null 18px);
             display: block;
@@ -319,15 +459,16 @@ export default Vue.extend({
             height: 17px;
 
             .notifications-item--reply & {
-                background: url(../../assets/icon-reply.svg) no-repeat center center #ce596b;
-            }
-
-            .notifications-item--mention & {
-                background: url(../../assets/icon-reply.svg) no-repeat center center #52b5e4;
+                background: url(../../assets/icon-reply-white.svg) no-repeat center center #ce596b;
+                background-size: 11px;
             }
 
             .notifications-item--comment & {
-                background: url(../../assets/icon-reply.svg) no-repeat center center #5268cc;
+                background: url(../../assets/icon-comment.svg) no-repeat center center #5268cc;
+            }
+
+            .notifications-item--mention & {
+                background: url(../../assets/icon-mention.svg) no-repeat center center #52b5e4;
             }
         }
     }
@@ -339,10 +480,11 @@ export default Vue.extend({
 
     &-footer {
         border-top: solid 1px #d8dce0;
+        margin-top: auto;
         @include flex(center, space-between);
 
         button {
-            padding: 11px 5px 0 5px;
+            padding: 13px 15px 10px 15px;
             font-size: 16px;
             font-weight: 900;
             color: #2c3e50;
@@ -357,6 +499,7 @@ export default Vue.extend({
 .icon-ellipsis {
     display: block;
     cursor: pointer;
+    margin-left: auto;
 
     &:after {
         @include flex(flex-end);
