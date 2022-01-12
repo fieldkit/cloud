@@ -193,7 +193,27 @@ var _ = Service("notes", func() {
 
 			httpAuthentication()
 		})
+
 	})
+
+    Method("delete media", func() {
+        Security(JWTAuth, func() {
+            Scope("api:access")
+        })
+
+        Payload(func() {
+            Token("auth")
+            Required("auth")
+            Attribute("mediaId", Int32)
+            Required("mediaId")
+        })
+
+        HTTP(func() {
+            DELETE("notes/media/{mediaId}")
+
+            httpAuthentication()
+        })
+    })
 
 	commonOptions()
 })

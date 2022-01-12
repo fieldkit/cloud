@@ -20,15 +20,17 @@ type Client struct {
 	GetEndpoint           goa.Endpoint
 	DownloadMediaEndpoint goa.Endpoint
 	UploadMediaEndpoint   goa.Endpoint
+	DeleteMediaEndpoint   goa.Endpoint
 }
 
 // NewClient initializes a "notes" service client given the endpoints.
-func NewClient(update, get, downloadMedia, uploadMedia goa.Endpoint) *Client {
+func NewClient(update, get, downloadMedia, uploadMedia, deleteMedia goa.Endpoint) *Client {
 	return &Client{
 		UpdateEndpoint:        update,
 		GetEndpoint:           get,
 		DownloadMediaEndpoint: downloadMedia,
 		UploadMediaEndpoint:   uploadMedia,
+		DeleteMediaEndpoint:   deleteMedia,
 	}
 }
 
@@ -71,4 +73,10 @@ func (c *Client) UploadMedia(ctx context.Context, p *UploadMediaPayload, req io.
 		return
 	}
 	return ires.(*NoteMedia), nil
+}
+
+// DeleteMedia calls the "delete media" endpoint of the "notes" service.
+func (c *Client) DeleteMedia(ctx context.Context, p *DeleteMediaPayload) (err error) {
+	_, err = c.DeleteMediaEndpoint(ctx, p)
+	return
 }

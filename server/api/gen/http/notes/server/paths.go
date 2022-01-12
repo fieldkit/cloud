@@ -30,3 +30,8 @@ func DownloadMediaNotesPath(mediaID int32) string {
 func UploadMediaNotesPath(stationID int32) string {
 	return fmt.Sprintf("/stations/%v/media", stationID)
 }
+
+// DeleteMediaNotesPath returns the URL path to the notes service delete media HTTP endpoint.
+func DeleteMediaNotesPath(mediaID int32) string {
+	return fmt.Sprintf("/notes/media/%v", mediaID)
+}

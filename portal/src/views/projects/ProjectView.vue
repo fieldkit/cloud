@@ -1,7 +1,7 @@
 <template>
     <StandardLayout :viewingProjects="true" :viewingProject="displayProject" :disableScrolling="activityVisible">
         <div class="container-wrap">
-            <div class="project-view" v-if="displayProject">
+            <template v-if="displayProject">
                 <DoubleHeader
                     :title="isAdministrator ? displayProject.name : null"
                     :subtitle="isAdministrator ? $t('project.dashboard') : null"
@@ -31,7 +31,7 @@
                     :displayProject="displayProject"
                     :userStations="stations"
                 />
-            </div>
+            </template>
         </div>
     </StandardLayout>
 </template>
