@@ -10,36 +10,8 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { initial } from "lodash";
-
-const ResizeAuto = Vue.extend({
-    name: "ResizeAuto",
-    methods: {
-        resize(ev) {
-            ev.target.style.height = "auto";
-            ev.target.style.height = `${ev.target.scrollHeight}px`;
-        },
-    },
-    mounted() {
-        this.$nextTick(() => {
-            // workaround since $el.scrollHeight does not have the correct value without timeout
-            setTimeout(() => {
-                const el: any = this.$el;
-                el.setAttribute("style", "height:" + this.$el.scrollHeight + "px");
-            }, 200);
-        });
-        this.$el.addEventListener("input", this.resize);
-    },
-    beforeDestroy() {
-        this.$el.removeEventListener("input", this.resize);
-    },
-    render(this: any) {
-        return this.$scopedSlots.default({
-            resize: this.resize,
-        });
-    },
-});
+import Vue from "vue";
+import { ResizeAuto } from "./ResizeAuto";
 
 export default Vue.extend({
     name: "TextAreaField",

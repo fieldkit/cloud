@@ -21,19 +21,17 @@
                     <div class="comment-main">
                         <UserPhoto :user="post.author"></UserPhoto>
                         <div class="column-post">
-                            <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
-                            <span class="author">
-                                {{ post.author.name }}
-                                <i
-                                    class="icon-ellipsis options-trigger"
+                            <div class="post-header">
+                                <span class="author">
+                                    {{ post.author.name }}
+                                </span>
+                                <ListItemOptions
                                     v-if="user.id === post.author.id || user.admin"
-                                    @click="showCommentOptions($event)"
-                                ></i>
-                                <div class="options-btns">
-                                    <button @click="startEditing(post)" v-if="user.id == post.author.id">Edit Post</button>
-                                    <button @click="deleteComment(post.id)">Delete Post</button>
-                                </div>
-                            </span>
+                                    @listItemOptionClick="onListItemOptionClick($event, post)"
+                                    :options="getCommentOptions(post)"
+                                />
+                                <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
+                            </div>
                             <Tiptap v-model="post.body" :readonly="post.readonly" saveLabel="Save" @save="saveEdit(post.id, post.body)" />
                         </div>
                     </div>
@@ -43,18 +41,16 @@
                                 <div class="comment-main">
                                     <UserPhoto :user="reply.author"></UserPhoto>
                                     <div class="column-reply">
-                                        <span class="author">
-                                            {{ reply.author.name }}
-                                            <i
-                                                class="icon-ellipsis options-trigger"
+                                        <div class="post-header">
+                                            <span class="author">
+                                                {{ reply.author.name }}
+                                            </span>
+                                            <ListItemOptions
                                                 v-if="user.id === reply.author.id || user.admin"
-                                                @click="showCommentOptions($event)"
-                                            ></i>
-                                            <div class="options-btns">
-                                                <button @click="startEditing(reply)" v-if="user.id == reply.author.id">Edit Post</button>
-                                                <button @click="deleteComment(reply.id)">Delete Post</button>
-                                            </div>
-                                        </span>
+                                                @listItemOptionClick="onListItemOptionClick($event, reply)"
+                                                :options="getCommentOptions(reply)"
+                                            />
+                                        </div>
                                         <Tiptap
                                             v-model="reply.body"
                                             :readonly="reply.readonly"
@@ -98,12 +94,14 @@ import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
+import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
 
 export default Vue.extend({
     name: "Comments",
     components: {
         ...CommonComponents,
+        ListItemOptions,
         Tiptap,
     },
     props: {
@@ -254,26 +252,6 @@ export default Vue.extend({
                 this.$emit("viewDataClicked", JSON.parse(post.bookmark));
             }
         },
-        showCommentOptions(event: MouseEvent) {
-            if (event.target) {
-                const optionsMenu = (event.target as HTMLElement).nextElementSibling;
-
-                if (!(optionsMenu as HTMLElement).classList.contains("visible")) {
-                    (optionsMenu as HTMLElement).classList.add("visible");
-                    setTimeout(function () {
-                        document.addEventListener(
-                            "click",
-                            function () {
-                                (optionsMenu as HTMLElement).classList.remove("visible");
-                            },
-                            {
-                                once: true,
-                            }
-                        );
-                    }, 1);
-                }
-            }
-        },
         deleteComment(commentID: number) {
             this.$services.api
                 .deleteComment(commentID)
@@ -305,6 +283,35 @@ export default Vue.extend({
                     this.errorMessage = CommentsErrorsEnum.editComment;
                 });
         },
+        onListItemOptionClick(event: string, post: Comment): void {
+            if (event === "edit-comment") {
+                this.startEditing(post);
+            }
+            if (event === "delete-comment") {
+                this.deleteComment(post.id);
+            }
+        },
+        getCommentOptions(post: Comment): { label: string; event: string }[] {
+            if (this.user.id === post.author.id) {
+                return [
+                    {
+                        label: "Edit post",
+                        event: "edit-comment",
+                    },
+                    {
+                        label: "Delete post",
+                        event: "delete-comment",
+                    },
+                ];
+            }
+
+            return [
+                {
+                    label: "Delete post",
+                    event: "delete-comment",
+                },
+            ];
+        },
     },
 });
 </script>
@@ -325,13 +332,14 @@ button {
     box-sizing: border-box;
     font-size: 14px;
 }
+
 .hide {
     display: none;
 }
 
 .container {
     margin-top: 20px;
-    padding: 0 25px 30px 20px;
+    padding: 0 20px 30px 20px;
     background: #fff;
     border-radius: 1px;
     border: 1px solid $color-border;
@@ -340,15 +348,19 @@ button {
     &.data-view {
         margin-top: 0;
         padding-top: 45px;
-        padding-bottom: 22px;
         box-shadow: none;
         border: 0;
+    }
+
+    @include bp-down($xs) {
+        margin: 20px -10px 0;
+        padding: 0 10px 30px 10px;
     }
 }
 
 header {
     @include flex(center, space-between);
-    height: 52px;
+    padding: 13px 0;
     border-bottom: 1px solid $color-border;
     font-size: 20px;
     font-weight: 500;
@@ -368,22 +380,30 @@ header {
 
     .data-view & {
         border-top: none;
+        padding: 0;
     }
 }
 
 .list {
-    overflow-y: hidden;
+    overflow: hidden;
 
     .data-view & {
         margin-top: 30px;
-        width: 60%;
+        @include bp-down($xs) {
+            margin-top: 10px;
+        }
     }
 }
 
 .new-comment {
-    @include flex(top);
+    @include flex(center);
     padding: 22px 0;
     position: relative;
+
+    @include bp-down($xs) {
+        margin: 0 -10px;
+        padding: 15px 10px 15px 10px;
+    }
 
     .container.data-view & {
         &:not(.reply) {
@@ -391,19 +411,19 @@ header {
             padding: 18px 23px 17px 15px;
 
             .new-comment-submit {
-                right: 30px;
+                right: 33px;
+
+                @include bp-down($sm) {
+                    right: 25px;
+                }
             }
         }
     }
 
     &.reply {
-        padding: 0;
-        margin-top: 10px;
+        padding: 0 0 0;
+        margin: 10px 0 0 0;
         width: 100%;
-
-        input {
-            height: 35px;
-        }
     }
 
     img {
@@ -416,30 +436,63 @@ header {
         img {
             width: 46px;
             height: 46px;
+
+            @include bp-down($xs) {
+                width: 42px;
+                height: 42px;
+            }
         }
     }
 
-    input {
-        height: 45px;
-        padding: 14px 72px 12px 13px;
+    &-input {
+        width: 100%;
+        display: flex;
         border-radius: 2px;
         border: solid 1px $color-border;
-        outline: none;
-        width: 100%;
-        font-weight: 500;
 
-        &::placeholder {
-            color: #cccdcf;
+        ::v-deep textarea {
+            margin: 0;
+            padding: 14px 60px 14px 13px;
+            outline: none;
+            width: 100%;
+            font-weight: 500;
+
+            &::placeholder {
+                color: #cccdcf;
+            }
+
+            @include bp-down($xs) {
+                padding: 7px 40px 7px 7px;
+            }
         }
     }
 
     &-submit {
-        @include position(absolute, 50% 10px null null);
+        @include position(absolute, null 10px 35px null);
         @include flex(center);
-        height: 45px;
         padding: 0 10px;
-        transform: translateY(-50%);
         font-weight: 900;
+
+        @include bp-down($sm) {
+            bottom: 25px;
+        }
+
+        .data-view & {
+            right: 0;
+            bottom: 30px;
+        }
+
+        .reply & {
+            right: 12px;
+
+            @include bp-down($sm) {
+                right: 7px;
+            }
+        }
+
+        .reply & {
+            bottom: 5px;
+        }
     }
 }
 
@@ -455,41 +508,9 @@ header {
     position: relative;
 }
 
-.options {
-    &-trigger {
-        @include position(absolute, 0 -40px null null);
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.33s;
-    }
-
-    &-btns {
-        @include position(absolute, 0 calc(-100px - 50px) null null);
-        opacity: 0;
-        visibility: hidden;
-        padding: 10px;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-        background: #fff;
-        z-index: $z-index-top;
-        transition: opacity 0.33s;
-        width: 100px;
-
-        &.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        > * {
-            display: block;
-            white-space: nowrap;
-            font-family: $font-family-bold;
-            cursor: pointer;
-
-            &:not(:last-of-type) {
-                margin-bottom: 10px;
-            }
-        }
-    }
+::v-deep .options-trigger {
+    opacity: 0;
+    visibility: hidden;
 }
 
 .body {
@@ -497,7 +518,6 @@ header {
     font-family: $font-family-light;
     outline: none;
     border: solid 1px $color-border;
-    min-height: 35px;
     width: calc(100% - 40px);
     overflow-wrap: break-word;
 
@@ -507,9 +527,14 @@ header {
         min-height: unset;
     }
 
-    + .new-comment-submit {
-        transform: translateY(calc(-50% + 12px));
-        right: -10px;
+    ::v-deep textarea {
+        border: 0;
+        margin: 0;
+        padding: 7px 45px 0 7px;
+
+        .reply & {
+            padding-right: 60px;
+        }
     }
 }
 
@@ -531,10 +556,8 @@ header {
     }
 
     .column {
-        /* padding-top: 1em; */
-
         &:nth-of-type(2) {
-            padding-left: 42px;
+            padding-left: 36px;
         }
     }
 
@@ -556,22 +579,25 @@ header {
 .comment-main {
     display: flex;
     flex: 100%;
+    overflow-wrap: break-word;
 
     @include attention() {
-        .options-trigger {
+        ::v-deep .options-trigger {
             opacity: 1;
             visibility: visible;
         }
     }
 }
 
-.column,
-.column-post,
-.column-reply {
+.column {
     @include flex(flex-start);
     width: 100%;
     flex-direction: column;
     position: relative;
+
+    > * {
+        overflow-wrap: anywhere;
+    }
 }
 
 .actions {
@@ -601,20 +627,26 @@ header {
     transition: opacity 0.25s ease-in-out;
 }
 
-.icon-ellipsis {
-    display: block;
-    cursor: pointer;
-
-    &:after {
-        @include flex(flex-end);
-        content: "...";
-        height: 17px;
-        font-size: 32px;
-        font-family: $font-family-bold;
-    }
-}
 .error {
     color: $color-danger;
     margin-bottom: 10px;
+}
+
+::v-deep textarea {
+    resize: none;
+    border: 0 !important;
+    max-height: 75vh;
+}
+
+.column-reply,
+.column-post {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.post-header {
+    display: flex;
 }
 </style>

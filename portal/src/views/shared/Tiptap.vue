@@ -31,22 +31,21 @@
 
 <script lang="ts">
 import _ from "lodash";
-import Vue, { PropType } from "vue";
+import Vue from "vue";
+import { ResizeAuto } from "./ResizeAuto";
 import { Editor, JSONContent, EditorContent, VueRenderer, Extension } from "@tiptap/vue-2";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
-import StarterKit from "@tiptap/starter-kit";
 import CharacterCount from "@tiptap/extension-character-count";
 import Mention from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
 import MentionList from "../comments/MentionList.vue";
 import tippy from "tippy.js";
 
-import { MentionableUser } from "@/api";
-
 export default Vue.extend({
     components: {
+        // ResizeAuto,
         EditorContent,
     },
     props: {
