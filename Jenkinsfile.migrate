@@ -1,7 +1,7 @@
 @Library('conservify') _
 
 timestamps {
-    node () {
+    node ("main") {
         try {
 			def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
 			def branchName = params.DeployBranch ?: "main"
