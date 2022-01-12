@@ -2,13 +2,12 @@
     <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
-        <form @submit.prevent="save(newComment)" class="new-comment">
+        <div class="new-comment">
             <UserPhoto v-if="user" :user="user"></UserPhoto>
-            <TextAreaField class="new-comment-input" :placeholder="placeholder" v-model="newComment.body" />
-            <button type="submit" class="new-comment-submit" v-if="newComment.body.length > 0">Post</button>
-        </form>
+            <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+        </div>
 
-        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+        <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
 
         <div v-if="posts.length === 0">There are no comments yet.</div>
 
@@ -21,21 +20,19 @@
                 <div class="comment comment-first-level" v-for="post in posts" v-bind:key="post.id">
                     <div class="comment-main">
                         <UserPhoto :user="post.author"></UserPhoto>
-                        <div class="column">
-                            <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
-                            <span class="author">
-                                {{ post.author.name }}
+                        <div class="column-post">
+                            <div class="post-header">
+                                <span class="author">
+                                    {{ post.author.name }}
+                                </span>
                                 <ListItemOptions
                                     v-if="user.id === post.author.id || user.admin"
                                     @listItemOptionClick="onListItemOptionClick($event, post)"
                                     :options="getCommentOptions(post)"
-                                ></ListItemOptions>
-                            </span>
-                            <div class="break-word" v-if="post.readonly">{{ post.body }}</div>
-                            <TextAreaField v-else class="body" v-model="post.body" />
-                            <button type="submit" class="new-comment-submit" v-if="!post.readonly" @click="saveEdit(post.id, post.body)">
-                                Save
-                            </button>
+                                />
+                                <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
+                            </div>
+                            <Tiptap v-model="post.body" :readonly="post.readonly" saveLabel="Save" @save="saveEdit(post.id, post.body)" />
                         </div>
                     </div>
                     <div class="column">
@@ -43,40 +40,33 @@
                             <div class="comment" v-for="reply in post.replies" v-bind:key="reply.id">
                                 <div class="comment-main">
                                     <UserPhoto :user="reply.author"></UserPhoto>
-                                    <div class="column">
-                                        <span class="author">
-                                            {{ reply.author.name }}
+                                    <div class="column-reply">
+                                        <div class="post-header">
+                                            <span class="author">
+                                                {{ reply.author.name }}
+                                            </span>
                                             <ListItemOptions
-                                                v-if="user.id === post.author.id || user.admin"
+                                                v-if="user.id === reply.author.id || user.admin"
                                                 @listItemOptionClick="onListItemOptionClick($event, reply)"
-                                                :options="getCommentOptions(post)"
-                                            ></ListItemOptions>
-                                        </span>
-                                        <div v-if="reply.readonly">{{ reply.body }}</div>
-                                        <TextAreaField v-else class="body" v-model="reply.body" />
-                                        <button
-                                            type="submit"
-                                            class="new-comment-submit"
-                                            v-if="!reply.readonly"
-                                            @click="saveEdit(reply.id, reply.body)"
-                                        >
-                                            Save
-                                        </button>
+                                                :options="getCommentOptions(reply)"
+                                            />
+                                        </div>
+                                        <Tiptap
+                                            v-model="reply.body"
+                                            :readonly="reply.readonly"
+                                            saveLabel="Save"
+                                            @save="saveEdit(reply.id, reply.body)"
+                                        />
                                     </div>
                                 </div>
                             </div>
                         </transition-group>
 
                         <transition name="fade">
-                            <form
-                                @submit.prevent="save(newReply)"
-                                class="new-comment reply"
-                                v-if="newReply && newReply.threadId === post.id"
-                            >
+                            <div class="new-comment reply" v-if="newReply && newReply.threadId === post.id">
                                 <UserPhoto :user="user"></UserPhoto>
-                                <TextAreaField class="body" placeholder="Reply to comment" v-model="newReply.body" />
-                                <button type="submit" class="new-comment-submit" v-if="newReply.body">Post</button>
-                            </form>
+                                <Tiptap v-model="newReply.body" placeholder="Reply to comment" @save="save(newReply)" saveLabel="Post" />
+                            </div>
                         </transition>
 
                         <div class="actions">
@@ -105,12 +95,14 @@ import { Comment } from "@/views/comments/model";
 import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
+import Tiptap from "@/views/shared/Tiptap.vue";
 
 export default Vue.extend({
     name: "Comments",
     components: {
         ...CommonComponents,
         ListItemOptions,
+        Tiptap,
     },
     props: {
         user: {
@@ -166,7 +158,6 @@ export default Vue.extend({
         this.placeholder = this.getNewCommentPlaceholder();
         return this.getComments();
     },
-
     methods: {
         getNewCommentPlaceholder(): string {
             if (this.viewType === "project") {
@@ -278,7 +269,7 @@ export default Vue.extend({
         startEditing(post: Comment) {
             post.readonly = false;
         },
-        saveEdit(commentID: number, body: string) {
+        saveEdit(commentID: number, body: Record<string, unknown>) {
             this.$services.api
                 .editComment(commentID, body)
                 .then((response) => {
@@ -325,7 +316,7 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "../../scss/global";
 
 button {
@@ -645,5 +636,17 @@ header {
     resize: none;
     border: 0 !important;
     max-height: 75vh;
+}
+
+.column-reply,
+.column-post {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.post-header {
+    display: flex;
 }
 </style>

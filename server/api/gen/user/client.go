@@ -38,10 +38,11 @@ type Client struct {
 	AdminTermsAndConditionsEndpoint goa.Endpoint
 	AdminDeleteEndpoint             goa.Endpoint
 	AdminSearchEndpoint             goa.Endpoint
+	MentionablesEndpoint            goa.Endpoint
 }
 
 // NewClient initializes a "user" service client given the endpoints.
-func NewClient(roles, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, resume, logout, refresh, sendValidation, validate, add, update, changePassword, acceptTnc, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminTermsAndConditions, adminDelete, adminSearch goa.Endpoint) *Client {
+func NewClient(roles, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, resume, logout, refresh, sendValidation, validate, add, update, changePassword, acceptTnc, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminTermsAndConditions, adminDelete, adminSearch, mentionables goa.Endpoint) *Client {
 	return &Client{
 		RolesEndpoint:                   roles,
 		UploadPhotoEndpoint:             uploadPhoto,
@@ -65,6 +66,7 @@ func NewClient(roles, uploadPhoto, downloadPhoto, login, recoveryLookup, recover
 		AdminTermsAndConditionsEndpoint: adminTermsAndConditions,
 		AdminDeleteEndpoint:             adminDelete,
 		AdminSearchEndpoint:             adminSearch,
+		MentionablesEndpoint:            mentionables,
 	}
 }
 
@@ -260,4 +262,14 @@ func (c *Client) AdminSearch(ctx context.Context, p *AdminSearchPayload) (res *A
 		return
 	}
 	return ires.(*AdminSearchResult), nil
+}
+
+// Mentionables calls the "mentionables" endpoint of the "user" service.
+func (c *Client) Mentionables(ctx context.Context, p *MentionablesPayload) (res *MentionableOptions, err error) {
+	var ires interface{}
+	ires, err = c.MentionablesEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*MentionableOptions), nil
 }

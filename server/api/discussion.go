@@ -13,6 +13,7 @@ import (
 
 	discService "github.com/fieldkit/cloud/server/api/gen/discussion"
 
+	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
@@ -133,6 +134,10 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 		return nil, err
 	}
 
+	if err := c.notifyMentionsAndReplies(ctx, post); err != nil {
+		return nil, err
+	}
+
 	users := map[int32]*data.User{
 		user.ID: user,
 	}
@@ -176,6 +181,10 @@ func (c *DiscussionService) UpdateMessage(ctx context.Context, payload *discServ
 		return nil, err
 	}
 
+	if err := c.notifyMentionsAndReplies(ctx, post); err != nil {
+		return nil, err
+	}
+
 	users := map[int32]*data.User{
 		user.ID: user,
 	}
@@ -206,11 +215,55 @@ func (c *DiscussionService) DeleteMessage(ctx context.Context, payload *discServ
 		return discService.MakeForbidden(errors.New("unauthorized"))
 	}
 
+	nr := repositories.NewNotificationRepository(c.db)
+	if err := nr.DeleteByPostID(ctx, payload.PostID); err != nil {
+		return err
+	}
+
 	if err := dr.DeletePostByID(ctx, payload.PostID); err != nil {
 		return err
 	}
 
 	_ = post
+
+	return nil
+}
+
+func (c *DiscussionService) notifyMentionsAndReplies(ctx context.Context, post *data.DiscussionPost) error {
+	log := Logger(ctx).Sugar()
+
+	notifications := make([]*data.Notification, 0)
+
+	if post.ThreadID != nil {
+		dr := repositories.NewDiscussionRepository(c.db)
+		replying, err := dr.QueryPostByID(ctx, *post.ThreadID)
+		if err != nil {
+			return err
+		}
+		notifications = append(notifications, data.NewReplyNotification(replying.UserID, post.ID))
+	}
+
+	mentions, err := backend.DiscoverMentions(ctx, post.ID, post.Body)
+	if err != nil {
+		return err
+	}
+	if len(mentions) > 0 {
+		log.Infow("mentions", "mentions", mentions)
+		notifications = append(notifications, backend.NotifyMentions(mentions)...)
+	}
+
+	nr := repositories.NewNotificationRepository(c.db)
+	for _, notif := range notifications {
+		if saved, err := nr.AddNotification(ctx, notif); err != nil {
+			return err
+		} else {
+			message := saved.ToMap()
+			log.Infow("notification", "notification", message)
+			if err := c.options.subscriptions.Publish(ctx, notif.UserID, []map[string]interface{}{message}); err != nil {
+				log.Errorw("notification", "error", err)
+			}
+		}
+	}
 
 	return nil
 }

@@ -11,7 +11,7 @@ export function serializePromiseChain(all, fn) {
     }, Promise.resolve([]));
 }
 
-export function promiseAfter(t, v) {
+export function promiseAfter(t, v = undefined) {
     return new Promise(function(resolve) {
         setTimeout(resolve.bind(null, v), t);
     });

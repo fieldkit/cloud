@@ -75,12 +75,13 @@ button {
 
 .options {
     &-trigger {
-        @include position(absolute, 0 -40px null null);
+        // @include position(absolute, 0 -40px null null);
+        padding-left: 10px;
         transition: opacity 0.33s;
     }
 
     &-btns {
-        @include position(absolute, 0 null null calc(100% + 10px));
+        @include position(absolute, 0 null null null);
         opacity: 0;
         visibility: hidden;
         padding: 10px;

@@ -860,6 +860,37 @@ func (c *UserService) AdminSearch(ctx context.Context, payload *user.AdminSearch
 	}, nil
 }
 
+func (c *UserService) Mentionables(ctx context.Context, payload *user.MentionablesPayload) (*user.MentionableOptions, error) {
+	sr := repositories.NewUserRepository(c.options.Database)
+
+	users, err := sr.QueryMentionables(ctx, payload.Query)
+	if err != nil {
+		return nil, err
+	}
+
+	wms := make([]*user.MentionableUser, 0)
+	for _, dm := range users {
+		wm := &user.MentionableUser{
+			ID:      dm.ID,
+			Mention: strings.ReplaceAll(dm.Name, " ", ""),
+			Name:    dm.Name,
+		}
+
+		if dm.MediaURL != nil {
+			url := fmt.Sprintf("/user/%d/media", dm.ID)
+			wm.Photo = &user.UserPhoto{
+				URL: &url,
+			}
+		}
+
+		wms = append(wms, wm)
+	}
+
+	return &user.MentionableOptions{
+		Users: wms,
+	}, nil
+}
+
 func (s *UserService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
