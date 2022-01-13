@@ -1,7 +1,7 @@
 <template>
     <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible">
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closeExports" />
-        <div class="container-wrap explore-view">
+        <div class="explore-view">
             <div class="explore-header">
                 <DoubleHeader
                     title="Data View"
@@ -208,6 +208,9 @@ export default Vue.extend({
 }
 
 .explore-view {
+    text-align: left;
+    background-color: #fcfcfc;
+    padding: 40px;
     flex-grow: 1;
 }
 .explore-header {
