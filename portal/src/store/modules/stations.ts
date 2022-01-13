@@ -32,37 +32,6 @@ export const PROJECT_LOADED = "PROJECT_LOADED";
 export const PROJECT_UPDATE = "PROJECT_UPDATE";
 export const PROJECT_DELETED = "PROJECT_DELETED";
 
-export class StationsState {
-    stations: { [index: number]: DisplayStation } = {};
-    hasNoStations: boolean;
-    projects: { [index: number]: Project } = {};
-    projectUsers: { [index: number]: ProjectUser[] } = {};
-    projectFollowers: { [index: number]: ProjectFollowers } = {};
-    projectStations: { [index: number]: DisplayStation[] } = {};
-    projectActivities: { [index: number]: Activity[] } = {};
-    user: {
-        stations: { [index: number]: DisplayStation };
-        projects: { [index: number]: Project };
-    } = {
-        stations: {},
-        projects: {},
-    };
-    community: {
-        projects: { [index: number]: Project };
-    } = {
-        projects: {},
-    };
-    mapped: MappedStations | null = null;
-}
-
-export function whenWasStationUpdated(station: Station): Date {
-    const uploads = station.uploads.map((u) => u.time);
-    if (uploads.length > 0) {
-        return new Date(uploads[0]);
-    }
-    return new Date(station.updatedAt);
-}
-
 export class DisplaySensor {
     name: string;
     unitOfMeasure: string;
@@ -124,6 +93,14 @@ export class DisplayStation {
             this.regions = station.location.regions;
         }
     }
+}
+
+export function whenWasStationUpdated(station: Station): Date {
+    const uploads = station.uploads.map((u) => u.time);
+    if (uploads.length > 0) {
+        return new Date(uploads[0]);
+    }
+    return new Date(station.updatedAt);
 }
 
 export class ProjectModule {
@@ -206,6 +183,29 @@ export class MappedStations {
     public static defaultBounds(): BoundingRectangle {
         return new BoundingRectangle().zoomOutOrAround(DefaultLocation, DefaultMargin);
     }
+}
+
+export class StationsState {
+    stations: { [index: number]: DisplayStation } = {};
+    hasNoStations: boolean;
+    projects: { [index: number]: Project } = {};
+    projectUsers: { [index: number]: ProjectUser[] } = {};
+    projectFollowers: { [index: number]: ProjectFollowers } = {};
+    projectStations: { [index: number]: DisplayStation[] } = {};
+    projectActivities: { [index: number]: Activity[] } = {};
+    user: {
+        stations: { [index: number]: DisplayStation };
+        projects: { [index: number]: Project };
+    } = {
+        stations: {},
+        projects: {},
+    };
+    community: {
+        projects: { [index: number]: Project };
+    } = {
+        projects: {},
+    };
+    mapped: MappedStations | null = null;
 }
 
 export class DisplayProject {

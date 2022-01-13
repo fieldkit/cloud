@@ -107,6 +107,27 @@ export class VizInfo {
     ) {}
 }
 
+export enum FastTime {
+    Custom = -1,
+    Day = 1,
+    Week = 7,
+    TwoWeeks = 14,
+    Month = 30,
+    Year = 365,
+    All = 0,
+}
+
+export enum ChartType {
+    TimeSeries,
+    Histogram,
+    Range,
+    Map,
+}
+
+type VizBookmark = [Stations, Sensors, [number, number], [[number, number], [number, number]] | [], ChartType, FastTime] | [];
+
+type GroupBookmark = [VizBookmark[]];
+
 export abstract class Viz {
     protected busyDepth = 0;
     public readonly id = Ids.make();
@@ -144,27 +165,6 @@ export class Scrubbers {
         this.timeRange = TimeRange.mergeArrays(rows.map((s) => s.data.timeRange));
     }
 }
-
-export enum FastTime {
-    Custom = -1,
-    Day = 1,
-    Week = 7,
-    TwoWeeks = 14,
-    Month = 30,
-    Year = 365,
-    All = 0,
-}
-
-export enum ChartType {
-    TimeSeries,
-    Histogram,
-    Range,
-    Map,
-}
-
-type VizBookmark = [Stations, Sensors, [number, number], [[number, number], [number, number]] | [], ChartType, FastTime] | [];
-
-type GroupBookmark = [VizBookmark[]];
 
 export class Bookmark {
     static Version = 1;

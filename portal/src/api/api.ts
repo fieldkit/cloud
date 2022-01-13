@@ -10,6 +10,32 @@ import { Comment } from "@/views/comments/model";
 import { SensorsResponse } from "@/views/viz/api";
 import { promiseAfter } from "@/utilities";
 
+export interface PortalDeployStatus {
+    serverName: string;
+    name: string;
+    tag: string;
+    git: { hash: string };
+}
+
+export interface EssentialStation {
+    id: number;
+    name: string;
+    deviceId: string;
+    owner: { id: number; name: string };
+    uploads: { id: number }[];
+}
+
+export interface PageOfStations {
+    stations: EssentialStation[];
+    total: number;
+}
+
+export interface MentionableUser {
+    id: number;
+    name: string;
+    photo: { url: string };
+}
+
 export class ApiError extends Error {
     constructor(message) {
         super(message);
@@ -1383,32 +1409,6 @@ class FKApi {
         return;
     }
 	*/
-}
-
-export interface PortalDeployStatus {
-    serverName: string;
-    name: string;
-    tag: string;
-    git: { hash: string };
-}
-
-export interface EssentialStation {
-    id: number;
-    name: string;
-    deviceId: string;
-    owner: { id: number; name: string };
-    uploads: { id: number }[];
-}
-
-export interface PageOfStations {
-    stations: EssentialStation[];
-    total: number;
-}
-
-export interface MentionableUser {
-    id: number;
-    name: string;
-    photo: { url: string };
 }
 
 export default FKApi;
