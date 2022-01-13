@@ -1,0 +1,24 @@
+{
+  "axis": {
+    "labelFont": "Avenir Light",
+    "labelFontSize": 12,
+    "labelColor": "#6a6d71",
+    "titleFont": "Avenir Light",
+    "titleFontSize": 14,
+    "titlePadding": 20,
+    "grid": false,
+    "tickSize": 10,
+    "tickOpacity": 0,
+    "domainColor": "#d8dce0"
+  },
+  "axisX": {
+    "title": null
+  },
+  "axisY": {
+    "domain": false
+  },
+  "view": {
+    "fill": "#ffffff",
+    "stroke": "transparent"
+  }
+}
