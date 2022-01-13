@@ -156,9 +156,9 @@ export default Vue.extend({
                         class: "mention",
                     },
                     suggestion: {
-                        items: (query: string): any[] => {
-                            if (query.length > 0) {
-                                return (services.api.mentionables(query).then((mentionables) => {
+                        items: (props: { query: string; editor: Editor }): any[] => {
+                            if (props.query.length > 0) {
+                                return (services.api.mentionables(props.query).then((mentionables) => {
                                     console.log("mentionables", mentionables);
                                     return mentionables.users;
                                 }) as unknown) as any[];
