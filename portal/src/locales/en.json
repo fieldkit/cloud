@@ -315,6 +315,13 @@
     "notifications": {
         "title": "Notifications",
         "viewAllButton": "View All",
-        "dismissAllButton": "Dismiss All"
+        "dismissAllButton": "Dismiss All",
+        "filters": {
+            "all": "All",
+            "unread": "Unread",
+            "comment": "Comment",
+            "reply": "Reply",
+            "mention": "Mention"
+        }
     }
 }

@@ -35,140 +35,9 @@
                         </a>
                     </div>
                 </header>
-                <ul>
-                    <li class="notifications-item notifications-item--reply">
-                        <UserPhoto :user="user" />
-                        <span class="notifications-item-icon"></span>
-                        <div>
-                            Harriet Alexandra replied to your data view commment Harriet Alexandra replied to your data view commment
-                            <div class="notifications-timestamp">
-                                1 day ago
-                            </div>
-                        </div>
-                        <i class="icon-ellipsis"></i>
-                    </li>
-                    <li class="notifications-item notifications-item--comment">
-                        <UserPhoto :user="user" />
-                        <span class="notifications-item-icon"></span>
-                        <div>
-                            Harriet Alexandra replied to your data view commment
-                            <div class="notifications-timestamp">
-                                1 day ago
-                            </div>
-                        </div>
-                        <i class="icon-ellipsis"></i>
-                    </li>
-                    <li class="notifications-item notifications-item--mention">
-                        <UserPhoto :user="user" />
-                        <span class="notifications-item-icon"></span>
-                        <div>
-                            Harriet Alexandra replied to your data view commment
-                            <div class="notifications-timestamp">
-                                1 day ago
-                            </div>
-                        </div>
-                        <i class="icon-ellipsis"></i>
-                    </li>
-                    <li class="notifications-item notifications-item--mention">
-                        <UserPhoto :user="user" />
-                        <span class="notifications-item-icon"></span>
-                        <div>
-                            Harriet Alexandra replied to your data view commment
-                            <div class="notifications-timestamp">
-                                1 day ago
-                            </div>
-                        </div>
-                        <i class="icon-ellipsis"></i>
-                    </li>
-                    <li class="notifications-item notifications-item--mention">
-                        <UserPhoto :user="user" />
-                        <span class="notifications-item-icon"></span>
-                        <div>
-                            Harriet Alexandra replied to your data view commment
-                            <div class="notifications-timestamp">
-                                1 day ago
-                            </div>
-                        </div>
-                        <i class="icon-ellipsis"></i>
-                    </li>
-                    <li class="notifications-item notifications-item--mention">
-                        <UserPhoto :user="user" />
-                        <span class="notifications-item-icon"></span>
-                        <div>
-                            Harriet Alexandra replied to your data view commment
-                            <div class="notifications-timestamp">
-                                1 day ago
-                            </div>
-                        </div>
-                        <i class="icon-ellipsis"></i>
-                    </li>
-                    <li class="notifications-item notifications-item--mention">
-                        <UserPhoto :user="user" />
-                        <span class="notifications-item-icon"></span>
-                        <div>
-                            Harriet Alexandra replied to your data view commment
-                            <div class="notifications-timestamp">
-                                1 day ago
-                            </div>
-                        </div>
-                        <i class="icon-ellipsis"></i>
-                    </li>
-                    <li class="notifications-item notifications-item--mention">
-                        <UserPhoto :user="user" />
-                        <span class="notifications-item-icon"></span>
-                        <div>
-                            Harriet Alexandra replied to your data view commment
-                            <div class="notifications-timestamp">
-                                1 day ago
-                            </div>
-                        </div>
-                        <i class="icon-ellipsis"></i>
-                    </li>
-                    <li class="notifications-item notifications-item--mention">
-                        <UserPhoto :user="user" />
-                        <span class="notifications-item-icon"></span>
-                        <div>
-                            Harriet Alexandra replied to your data view commment
-                            <div class="notifications-timestamp">
-                                1 day ago
-                            </div>
-                        </div>
-                        <i class="icon-ellipsis"></i>
-                    </li>
-                    <li class="notifications-item notifications-item--mention">
-                        <UserPhoto :user="user" />
-                        <span class="notifications-item-icon"></span>
-                        <div>
-                            Harriet Alexandra replied to your data view commment
-                            <div class="notifications-timestamp">
-                                1 day ago
-                            </div>
-                        </div>
-                        <i class="icon-ellipsis"></i>
-                    </li>
-                    <li class="notifications-item notifications-item--mention">
-                        <UserPhoto :user="user" />
-                        <span class="notifications-item-icon"></span>
-                        <div>
-                            Harriet Alexandra replied to your data view commment
-                            <div class="notifications-timestamp">
-                                1 day ago
-                            </div>
-                        </div>
-                        <i class="icon-ellipsis"></i>
-                    </li>
-                    <li class="notifications-item notifications-item--mention">
-                        <UserPhoto :user="user" />
-                        <span class="notifications-item-icon"></span>
-                        <div>
-                            Harriet Alexandra replied to your data view commment
-                            <div class="notifications-timestamp">
-                                1 day ago
-                            </div>
-                        </div>
-                        <i class="icon-ellipsis"></i>
-                    </li>
-                </ul>
+
+                <NotificationsList></NotificationsList>
+
                 <footer class="notifications-footer">
                     <button>{{ $t("notifications.viewAllButton") }}</button>
                     <button>{{ $t("notifications.dismissAllButton") }}</button>
@@ -183,12 +52,14 @@ import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import CommonComponents from "@/views/shared";
+import NotificationsList from "@/views/notifications/NotificationsList.vue";
 import { GlobalState } from "@/store/modules/global";
 
 export default Vue.extend({
     name: "HeaderBar",
     components: {
         ...CommonComponents,
+        NotificationsList,
     },
     data(): { isAccountHovered: boolean } {
         return {
@@ -226,16 +97,17 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import "../../scss/mixins";
+@import "../../scss/notifications";
 
 .header {
     background: #fff;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);
     width: 100%;
-    height: 66px;
     float: left;
     padding: 0 10px;
     box-sizing: border-box;
     z-index: $z-index-header;
+    flex: 0 0 66px;
     @include flex(center, flex-end);
 
     @include bp-down($md) {
@@ -371,145 +243,8 @@ export default Vue.extend({
     }
 }
 
-.notifications {
-    &-container {
-        background: #fff;
-        transition: opacity 0.25s, max-height 0.33s;
-        opacity: 0;
-        visibility: hidden;
-        text-align: left;
-        min-width: 143px;
-        box-sizing: border-box;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-        border: solid 1px #e9e9e9;
-        z-index: -1;
-        width: 320px;
-        height: 80vh;
-        @include flex();
-        flex-direction: column;
-        @include position(absolute, calc(100% + 1px) 70px null null);
-
-        @include bp-down($lg) {
-            top: 100%;
-            right: 30px;
-        }
-
-        @include bp-down($sm) {
-            right: -10px;
-            height: calc(100vh - 55px);
-        }
-
-        @include bp-down($xs) {
-            width: 100vw;
-        }
-
-        &.active {
-            opacity: 1 !important;
-            visibility: visible;
-            z-index: initial;
-        }
-
-        a {
-            padding: 8px 12px;
-            font-size: 14px;
-            display: block;
-            user-select: none;
-        }
-
-        > ul {
-            overflow-y: auto;
-            padding: 10px;
-        }
-    }
-
-    &-header {
-        @include flex(center, space-between);
-        height: 50px;
-        border-bottom: solid 1px #d8dce0;
-        margin-bottom: 15px;
-        font-size: 20px;
-        letter-spacing: 0.1px;
-        padding: 0 13px;
-    }
-
-    &-item {
-        @include flex(flex-start);
-        color: #6a6d71;
-        font-size: 14px;
-        font-family: $font-family-light;
-        margin-bottom: 10px;
-        position: relative;
-        line-height: 1.4em;
-
-        img {
-            width: 35px;
-            height: 35px;
-            margin-right: 7px;
-        }
-
-        > div {
-            padding-right: 7px;
-        }
-
-        &-icon {
-            @include position(absolute, 24px 0 null 18px);
-            display: block;
-            border-radius: 50%;
-            width: 17px;
-            height: 17px;
-
-            .notifications-item--reply & {
-                background: url(../../assets/icon-reply-white.svg) no-repeat center center #ce596b;
-                background-size: 11px;
-            }
-
-            .notifications-item--comment & {
-                background: url(../../assets/icon-comment.svg) no-repeat center center #5268cc;
-            }
-
-            .notifications-item--mention & {
-                background: url(../../assets/icon-mention.svg) no-repeat center center #52b5e4;
-            }
-        }
-    }
-
-    &-timestamp {
-        font-size: 12px;
-        margin-top: 3px;
-    }
-
-    &-footer {
-        border-top: solid 1px #d8dce0;
-        margin-top: auto;
-        @include flex(center, space-between);
-
-        button {
-            padding: 13px 15px 10px 15px;
-            font-size: 16px;
-            font-weight: 900;
-            color: #2c3e50;
-        }
-    }
-}
-
 .flex {
     display: flex;
-}
-
-.icon-ellipsis {
-    display: block;
-    cursor: pointer;
-    margin-left: auto;
-
-    &:after {
-        @include flex(flex-end);
-        content: "...";
-        color: #2c3e50;
-        height: 17px;
-        font-size: 32px;
-        font-family: $font-family-bold;
-        letter-spacing: -1.5px;
-    }
 }
 
 button {
@@ -519,5 +254,54 @@ button {
     box-shadow: none;
     cursor: pointer;
     background: transparent;
+}
+
+.notifications-container {
+    background: #fff;
+    transition: opacity 0.25s, max-height 0.33s;
+    text-align: left;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+    border: solid 1px #e9e9e9;
+    height: 80vh;
+    flex-direction: column;
+    width: 320px;
+    z-index: -1;
+    opacity: 0;
+    visibility: hidden;
+    @include flex();
+    @include position(absolute, calc(100% + 1px) 70px null null);
+
+    @include bp-down($lg) {
+        top: 100%;
+        right: 30px;
+    }
+
+    @include bp-down($sm) {
+        right: -10px;
+        height: calc(100vh - 55px);
+    }
+
+    @include bp-down($xs) {
+        width: 100vw;
+    }
+
+    &.active {
+        opacity: 1 !important;
+        visibility: visible;
+        z-index: initial;
+    }
+
+    a {
+        padding: 8px 12px;
+        font-size: 14px;
+        display: block;
+        user-select: none;
+    }
+
+    > ul {
+        overflow-y: auto;
+        padding: 10px;
+    }
 }
 </style>
