@@ -3,12 +3,12 @@ import Vue from "vue";
 
 import { Workspace, Viz, Group, TimeZoom } from "./viz";
 import { VizGraph } from "./VizGraph";
-import { D3Scrubber } from "./D3Scrubber";
+import { VegaScrubber as Scrubber } from "./VegaScrubber";
 
 export const VizGroup = Vue.extend({
     components: {
         VizGraph,
-        D3Scrubber,
+        Scrubber,
     },
     props: {
         group: {
@@ -81,7 +81,7 @@ export const VizGroup = Vue.extend({
 					</component>
 				</template>
 				<div v-if="group.scrubbers && !group.scrubbers.empty">
-					<D3Scrubber :scrubbers="group.scrubbers" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
+					<Scrubber :scrubbers="group.scrubbers" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
 				</div>
 				<div v-else class="loading-scrubber">
 					Loading Scrubber
