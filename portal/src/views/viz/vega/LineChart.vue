@@ -1,7 +1,7 @@
 <template>
     <div>
-        <button v-on:click="downloadChart('png')">Download chart png</button>
-        <button v-on:click="downloadChart('svg')">Download chart svg</button>
+        <button v-on:click="downloadChart('png')" v-if="false">Download chart png</button>
+        <button v-on:click="downloadChart('svg')" v-if="false">Download chart svg</button>
         <div class="viz linechart"></div>
     </div>
 </template>

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button v-on:click="pickRange([1629956332434, 1630344275971])">
+        <button v-on:click="pickRange([1629956332434, 1630344275971])" v-if="false">
             Pick date range
         </button>
         <div class="viz scrubber"></div>
