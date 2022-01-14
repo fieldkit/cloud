@@ -150,7 +150,6 @@ export const ViewingControls = Vue.extend({
             }
         },
     },
-
     template: `
 		<div class="controls-container">
 			<div class="row row-1">
@@ -166,8 +165,23 @@ export const ViewingControls = Vue.extend({
 					<div class="fast-time" @click="ev => raiseFastTime(ev, 30)" v-bind:class="{ selected: viz.fastTime == 30 }">Month</div>
 					<div class="fast-time" @click="ev => raiseFastTime(ev, 365)" v-bind:class="{ selected: viz.fastTime == 365 }">Year</div>
 					<div class="fast-time" @click="ev => raiseFastTime(ev, 0)" v-bind:class="{ selected: viz.fastTime == 0 }">All</div>
-					<div class="time-picker">
-						<v-date-picker class="vc-calendar" :value="manualRangeValue" @input="raiseManualTime" mode="range" :popover="{ placement: 'bottom left' }" :masks="{ input: 'MM/DD/YY' }" />
+					<div class="date-picker">
+						<v-date-picker :value="manualRangeValue" @input="raiseManualTime" mode="date" :masks="{ input: 'MM/DD/YY' }" is-range>
+                            <template v-slot="{ inputValue, inputEvents }">
+                                <div class="flex justify-center items-center">
+                                    <input
+                                        :value="inputValue.start"
+                                        v-on="inputEvents.start"
+                                        class="border px-2 py-1 w-32 rounded focus:outline-none focus:border-indigo-300"
+                                    />
+                                    <input
+                                        :value="inputValue.end"
+                                        v-on="inputEvents.end"
+                                        class="border px-2 py-1 w-32 rounded focus:outline-none focus:border-indigo-300"
+                                    />
+                                </div>
+                            </template>
+                        </v-date-picker>
 					</div>
 				</div>
 			</div>

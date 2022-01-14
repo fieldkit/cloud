@@ -366,8 +366,15 @@ export default Vue.extend({
     cursor: pointer;
 }
 
-.controls-container .time-picker {
+.controls-container .date-picker {
     margin-left: 20px;
+}
+
+.controls-container .date-picker input {
+    padding: 5px;
+    border: 1px solid rgb(215, 220, 225);
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .controls-container .fast-time.selected {
