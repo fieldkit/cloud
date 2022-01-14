@@ -1365,7 +1365,7 @@ class FKApi {
     private async establish(callback: (message: unknown) => Promise<void>, status: (connected: boolean) => Promise<void>) {
         while (this.listening) {
             if (this.token.authenticated() && !this.socket) {
-                const wsBase = this.baseUrl.replace("https", "ws").replace("http", "ws");
+                const wsBase = this.baseUrl.replace("https", "wss").replace("http", "ws");
                 this.socket = new WebSocket(wsBase + "/notifications");
 
                 this.socket.addEventListener("open", () => {
