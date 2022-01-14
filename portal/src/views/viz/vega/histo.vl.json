@@ -4,21 +4,38 @@
   "width": "container",
   "encoding": {
     "x": {
-      "bin": { "maxbins": 20 },
+      "bin": {
+        "maxbins": 20
+      },
       "field": "value",
       "axis": {},
       "title": "Battery charge (%)"
     },
-    "y": { "aggregate": "count" },
+    "y": {
+      "aggregate": "count"
+    },
     "color": {
-      "bin": { "maxbins": 20 },
+      "bin": {
+        "maxbins": 20
+      },
       "field": "value",
-      "scale": { "scheme": "inferno", "reverse": false },
+      "scale": {
+        "scheme": "inferno",
+        "reverse": false
+      },
       "legend": null
     },
     "tooltip": [
-      { "aggregate": "count" },
-      { "field": "value", "bin": { "maxbins": 20 }, "title": "Range" }
+      {
+        "aggregate": "count"
+      },
+      {
+        "field": "value",
+        "bin": {
+          "maxbins": 20
+        },
+        "title": "Range"
+      }
     ]
   },
   "layer": [

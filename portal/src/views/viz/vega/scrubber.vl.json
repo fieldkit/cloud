@@ -12,30 +12,68 @@
         "format": "%Y-%m-%d"
       }
     },
-    "y": { "field": "value", "type": "quantitative" }
+    "y": {
+      "field": "value",
+      "type": "quantitative"
+    }
   },
   "layer": [
     {
       "params": [
         {
           "name": "brush",
-          "select": { "type": "interval", "encodings": ["x"] }
+          "select": {
+            "type": "interval",
+            "encodings": [
+              "x"
+            ]
+          }
         }
       ],
-      "mark": { "type": "area", "color": "#DCDEDF" }
+      "mark": {
+        "type": "area",
+        "color": "#DCDEDF"
+      }
     },
     {
-      "transform": [{ "filter": { "param": "brush" } }],
-      "mark": { "type": "area", "color": "#52b5e4" }
+      "transform": [
+        {
+          "filter": {
+            "param": "brush"
+          }
+        }
+      ],
+      "mark": {
+        "type": "area",
+        "color": "#52b5e4"
+      }
     },
     {
-      "mark": { "type": "image", "width": 30, "height": 30 },
+      "mark": {
+        "type": "image",
+        "width": 30,
+        "height": 30
+      },
       "encoding": {
-        "x": { "field": "time", "type": "temporal" },
-        "y": { "field": "value", "type": "quantitative" },
-        "url": { "field": "img", "type": "nominal" }
+        "x": {
+          "field": "time",
+          "type": "temporal"
+        },
+        "y": {
+          "field": "value",
+          "type": "quantitative"
+        },
+        "url": {
+          "field": "img",
+          "type": "nominal"
+        }
       }
     }
   ],
-  "resolve": { "axis": { "x": "shared", "y": "shared" } }
+  "resolve": {
+    "axis": {
+      "x": "shared",
+      "y": "shared"
+    }
+  }
 }
