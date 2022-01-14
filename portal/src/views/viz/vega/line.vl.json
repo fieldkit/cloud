@@ -2,37 +2,7 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "description": "Vega-Lite spec for FieldKit time series charts.",
   "width": "container",
-  "params": [
-    {
-      "name": "interpolate",
-      "value": "bundle",
-      "bind": {
-        "input": "select",
-        "options": [
-          "basis",
-          "bundle",
-          "cardinal",
-          "catmull-rom",
-          "linear",
-          "monotone",
-          "natural",
-          "step",
-          "step-after",
-          "step-before"
-        ]
-      }
-    },
-    {
-      "name": "tension",
-      "value": 1,
-      "bind": {
-        "input": "range",
-        "min": 0,
-        "max": 1,
-        "step": 0.05
-      }
-    }
-  ],
+  "params": [],
   "encoding": {
     "x": {
       "field": "time",
@@ -113,12 +83,8 @@
               ]
             },
             "strokeWidth": 2,
-            "interpolate": {
-              "expr": "interpolate"
-            },
-            "tension": {
-              "expr": "tension"
-            }
+            "interpolate": "catmull-rom",
+            "tension": 1
           }
         },
         {
