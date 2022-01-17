@@ -39,6 +39,7 @@ type Endpoints struct {
 	AdminTermsAndConditions goa.Endpoint
 	AdminDelete             goa.Endpoint
 	AdminSearch             goa.Endpoint
+	Mentionables            goa.Endpoint
 }
 
 // UploadPhotoRequestData holds both the payload and the HTTP request body
@@ -77,6 +78,7 @@ func NewEndpoints(s Service) *Endpoints {
 		AdminTermsAndConditions: NewAdminTermsAndConditionsEndpoint(s, a.JWTAuth),
 		AdminDelete:             NewAdminDeleteEndpoint(s, a.JWTAuth),
 		AdminSearch:             NewAdminSearchEndpoint(s, a.JWTAuth),
+		Mentionables:            NewMentionablesEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -104,6 +106,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.AdminTermsAndConditions = m(e.AdminTermsAndConditions)
 	e.AdminDelete = m(e.AdminDelete)
 	e.AdminSearch = m(e.AdminSearch)
+	e.Mentionables = m(e.Mentionables)
 }
 
 // NewRolesEndpoint returns an endpoint function that calls the method "roles"
@@ -470,5 +473,29 @@ func NewAdminSearchEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpo
 			return nil, err
 		}
 		return s.AdminSearch(ctx, p)
+	}
+}
+
+// NewMentionablesEndpoint returns an endpoint function that calls the method
+// "mentionables" of service "user".
+func NewMentionablesEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*MentionablesPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.Mentionables(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedMentionableOptions(res, "default")
+		return vres, nil
 	}
 }

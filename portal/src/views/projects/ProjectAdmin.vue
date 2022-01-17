@@ -74,8 +74,8 @@
             <ProjectStations :project="project" :admin="true" :userStations="userStations" />
         </div>
 
-        <div class="row-section data-readings">
-            <div class="project-data" v-if="false">
+        <div class="row-section data-readings" v-if="false">
+            <div class="project-data">
                 <ProjectDataFiles :projectStations="displayProject.stations" />
             </div>
             <div class="project-readings">

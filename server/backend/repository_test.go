@@ -2,10 +2,12 @@ package backend
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/tests"
 )
 
@@ -151,4 +153,36 @@ func TestIngestionRepositoryQueryByStationID(t *testing.T) {
 
 	assert.NotNil(sf)
 	assert.NotNil(fd)
+}
+
+func TestNotificationRepositoryAdd(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	user, err := e.AddUser()
+	assert.NoError(err)
+	assert.NotNil(user)
+
+	r := repositories.NewNotificationRepository(e.DB)
+	assert.NoError(err)
+
+	sf, err := r.AddNotification(e.Ctx, &data.Notification{
+		UserID:    user.ID,
+		CreatedAt: time.Now(),
+		Kind:      "mention",
+		Seen:      false,
+	})
+	assert.NoError(err)
+	assert.NotNil(sf)
+
+	notifs, err := r.QueryByUserID(e.Ctx, user.ID)
+	assert.NoError(err)
+	assert.Equal(1, len(notifs))
+
+	assert.NoError(r.MarkNotificationSeen(e.Ctx, user.ID, sf.ID))
+
+	notifs, err = r.QueryByUserID(e.Ctx, user.ID)
+	assert.NoError(err)
+	assert.Equal(0, len(notifs))
 }

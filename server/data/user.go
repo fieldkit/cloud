@@ -64,6 +64,7 @@ type User struct {
 	Admin            bool      `db:"admin"`
 	FirmwareTester   bool      `db:"firmware_tester"`
 	FirmwarePattern  *string   `db:"firmware_pattern"`
+	Taggable         bool      `db:"taggable"`
 	CreatedAt        time.Time `db:"created_at"`
 	UpdatedAt        time.Time `db:"updated_at"`
 	TncDate          time.Time `db:"tnc_date"`

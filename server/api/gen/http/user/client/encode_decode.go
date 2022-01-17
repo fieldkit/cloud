@@ -3059,6 +3059,154 @@ func DecodeAdminSearchResponse(decoder func(*http.Response) goahttp.Decoder, res
 	}
 }
 
+// BuildMentionablesRequest instantiates a HTTP request object with method and
+// path set to call the "user" service "mentionables" endpoint
+func (c *Client) BuildMentionablesRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: MentionablesUserPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("user", "mentionables", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeMentionablesRequest returns an encoder for requests sent to the user
+// mentionables server.
+func EncodeMentionablesRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*user.MentionablesPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("user", "mentionables", "*user.MentionablesPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		values := req.URL.Query()
+		if p.ProjectID != nil {
+			values.Add("projectId", fmt.Sprintf("%v", *p.ProjectID))
+		}
+		if p.Bookmark != nil {
+			values.Add("bookmark", *p.Bookmark)
+		}
+		values.Add("query", p.Query)
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeMentionablesResponse returns a decoder for responses returned by the
+// user mentionables endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeMentionablesResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeMentionablesResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body MentionablesResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "mentionables", err)
+			}
+			p := NewMentionablesMentionableOptionsOK(&body)
+			view := "default"
+			vres := &userviews.MentionableOptions{Projected: p, View: view}
+			if err = userviews.ValidateMentionableOptions(vres); err != nil {
+				return nil, goahttp.ErrValidationError("user", "mentionables", err)
+			}
+			res := user.NewMentionableOptions(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body MentionablesUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "mentionables", err)
+			}
+			err = ValidateMentionablesUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "mentionables", err)
+			}
+			return nil, NewMentionablesUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body MentionablesForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "mentionables", err)
+			}
+			err = ValidateMentionablesForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "mentionables", err)
+			}
+			return nil, NewMentionablesForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body MentionablesNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "mentionables", err)
+			}
+			err = ValidateMentionablesNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "mentionables", err)
+			}
+			return nil, NewMentionablesNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body MentionablesBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "mentionables", err)
+			}
+			err = ValidateMentionablesBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "mentionables", err)
+			}
+			return nil, NewMentionablesBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("user", "mentionables", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalAvailableRoleResponseBodyToUserviewsAvailableRoleView builds a
 // value of type *userviews.AvailableRoleView from a value of type
 // *AvailableRoleResponseBody.
@@ -3157,6 +3305,22 @@ func unmarshalUserPhotoResponseBodyToUserUserPhoto(v *UserPhotoResponseBody) *us
 	}
 	res := &user.UserPhoto{
 		URL: v.URL,
+	}
+
+	return res
+}
+
+// unmarshalMentionableUserResponseBodyToUserviewsMentionableUserView builds a
+// value of type *userviews.MentionableUserView from a value of type
+// *MentionableUserResponseBody.
+func unmarshalMentionableUserResponseBodyToUserviewsMentionableUserView(v *MentionableUserResponseBody) *userviews.MentionableUserView {
+	res := &userviews.MentionableUserView{
+		ID:      v.ID,
+		Name:    v.Name,
+		Mention: v.Mention,
+	}
+	if v.Photo != nil {
+		res.Photo = unmarshalUserPhotoResponseBodyToUserviewsUserPhotoView(v.Photo)
 	}
 
 	return res

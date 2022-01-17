@@ -1,103 +1,17 @@
 <template>
     <ul>
-        <li class="notifications-item notifications-item--reply">
+        <li
+            class="notifications-item notifications-item--reply"
+            v-for="notification in notifications"
+            :key="notification.notificationId"
+            v-on:click="onClick(notification)"
+        >
             <div class="notifications-avatar">
                 <UserPhoto :user="user" />
                 <span class="notifications-item-icon"></span>
             </div>
             <div>
-                Harriet Alexandra replied to your data view commment Harriet Alexandra replied to your data view commment
-                <div class="notifications-timestamp">
-                    1 day ago
-                </div>
-            </div>
-            <i class="icon-ellipsis"></i>
-        </li>
-        <li class="notifications-item notifications-item--comment">
-            <div class="notifications-avatar">
-                <UserPhoto :user="user" />
-                <span class="notifications-item-icon"></span>
-            </div>
-            <div>
-                Harriet Alexandra replied to your data view commment
-                <div class="notifications-timestamp">
-                    1 day ago
-                </div>
-            </div>
-            <i class="icon-ellipsis"></i>
-        </li>
-        <li class="notifications-item notifications-item--mention">
-            <div class="notifications-avatar">
-                <UserPhoto :user="user" />
-                <span class="notifications-item-icon"></span>
-            </div>
-            <div>
-                Harriet Alexandra replied to your data view commment
-                <div class="notifications-timestamp">
-                    1 day ago
-                </div>
-            </div>
-            <i class="icon-ellipsis"></i>
-        </li>
-        <li class="notifications-item notifications-item--mention">
-            <div class="notifications-avatar">
-                <UserPhoto :user="user" />
-                <span class="notifications-item-icon"></span>
-            </div>
-            <div>
-                Harriet Alexandra replied to your data view commment
-                <div class="notifications-timestamp">
-                    1 day ago
-                </div>
-            </div>
-            <i class="icon-ellipsis"></i>
-        </li>
-        <li class="notifications-item notifications-item--mention">
-            <div class="notifications-avatar">
-                <UserPhoto :user="user" />
-                <span class="notifications-item-icon"></span>
-            </div>
-            <div>
-                Harriet Alexandra replied to your data view commment
-                <div class="notifications-timestamp">
-                    1 day ago
-                </div>
-            </div>
-            <i class="icon-ellipsis"></i>
-        </li>
-        <li class="notifications-item notifications-item--mention">
-            <div class="notifications-avatar">
-                <UserPhoto :user="user" />
-                <span class="notifications-item-icon"></span>
-            </div>
-            <div>
-                Harriet Alexandra replied to your data view commment
-                <div class="notifications-timestamp">
-                    1 day ago
-                </div>
-            </div>
-            <i class="icon-ellipsis"></i>
-        </li>
-        <li class="notifications-item notifications-item--mention">
-            <div class="notifications-avatar">
-                <UserPhoto :user="user" />
-                <span class="notifications-item-icon"></span>
-            </div>
-            <div>
-                Harriet Alexandra replied to your data view commment
-                <div class="notifications-timestamp">
-                    1 day ago
-                </div>
-            </div>
-            <i class="icon-ellipsis"></i>
-        </li>
-        <li class="notifications-item notifications-item--mention">
-            <div class="notifications-avatar">
-                <UserPhoto :user="user" />
-                <span class="notifications-item-icon"></span>
-            </div>
-            <div>
-                Harriet Alexandra replied to your data view commment
+                {{ display(notification) }}
                 <div class="notifications-timestamp">
                     1 day ago
                 </div>
@@ -109,7 +23,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { GlobalState } from "@/store/modules/global";
 import UserPhoto from "../shared/UserPhoto.vue";
 
@@ -122,9 +36,19 @@ export default Vue.extend({
         return {};
     },
     computed: {
+        ...mapGetters({
+            notifications: "notifications",
+        }),
         ...mapState({ user: (s: GlobalState) => s.user.user }),
     },
-    methods: {},
+    methods: {
+        display(notification: Notification): string {
+            return "Notification";
+        },
+        onClick(notification: Notification): void {
+            this.$emit("notification-click", notification);
+        },
+    },
 });
 </script>
 

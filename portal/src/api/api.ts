@@ -2,12 +2,39 @@ import _ from "lodash";
 import axios from "axios";
 import TokenStorage from "./tokens";
 import Config from "../secrets";
-import { keysToCamel, keysToCamelWithWarnings } from "@/json-tools";
+import { keysToCamel } from "@/json-tools";
 import { ExportParams } from "@/store/typed-actions";
 import { BoundingRectangle } from "@/store/map-types";
 import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { SensorsResponse } from "@/views/viz/api";
+import { promiseAfter } from "@/utilities";
+
+export interface PortalDeployStatus {
+    serverName: string;
+    name: string;
+    tag: string;
+    git: { hash: string };
+}
+
+export interface EssentialStation {
+    id: number;
+    name: string;
+    deviceId: string;
+    owner: { id: number; name: string };
+    uploads: { id: number }[];
+}
+
+export interface PageOfStations {
+    stations: EssentialStation[];
+    total: number;
+}
+
+export interface MentionableUser {
+    id: number;
+    name: string;
+    photo: { url: string };
+}
 
 export class ApiError extends Error {
     constructor(message) {
@@ -85,7 +112,7 @@ export interface ExportStatus {
     statusUrl: string;
     downloadUrl: string | null;
     progress: number;
-    args: any;
+    args: Record<string, unknown>;
 }
 
 export interface UserExports {
@@ -269,7 +296,6 @@ export interface Station {
     owner: Owner;
     deviceId: string;
     uploads: Upload[];
-    images: any[];
     photos: Photos;
     readOnly: boolean;
     configurations: Configurations;
@@ -288,6 +314,8 @@ export interface ProjectsResponse {
 export interface StationsResponse {
     stations: Station[];
 }
+
+export type SendFunction = (message: unknown) => Promise<void>;
 
 // Intentionally keeping this synchronous since it'll get used in
 // VueJS stuff quite often to make URLs that don't require custom
@@ -308,7 +336,7 @@ export interface InvokeParams {
     auth: Auth;
     method: string;
     url: string;
-    data?: any;
+    data?: Record<string, unknown>;
     contentType?: string;
     refreshed?: boolean | null;
     blob?: boolean | null;
@@ -418,7 +446,7 @@ class FKApi {
         })
             .then(
                 (response) => this.handleLogin(response),
-                (error) => this.logout(true).then(() => Promise.reject(new AuthenticationRequiredError()))
+                () => this.logout(true).then(() => Promise.reject(new AuthenticationRequiredError()))
             )
             .finally(() => {
                 this.refreshing = null;
@@ -1116,6 +1144,16 @@ class FKApi {
         });
     }
 
+    public mentionables(query: string): Promise<{ users: MentionableUser[] }> {
+        const qp = new URLSearchParams();
+        qp.append("query", query);
+        return this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + "/mentionables?" + qp.toString(),
+        });
+    }
+
     public adminSearchUsers(query: string): Promise<{ users: SimpleUser[] }> {
         const qp = new URLSearchParams();
         qp.append("query", query);
@@ -1206,7 +1244,7 @@ class FKApi {
             url: getUrl(),
         }).then((blob) => {
             const reader = new FileReader();
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 reader.onloadend = () => resolve(reader.result as string);
                 reader.readAsDataURL(blob);
             });
@@ -1229,7 +1267,25 @@ class FKApi {
         });
     }
 
-    public getComments(projectIDOrBookmark: number | string): Promise<{ posts: Comment[] }> {
+    private parseBody(post: Comment): Comment {
+        try {
+            return _.extend(post, {
+                body: JSON.parse(post.body),
+                replies: this.parseBodies(post.replies),
+            });
+        } catch (error) {
+            console.log("comments-malformed", post);
+            return post;
+        }
+    }
+
+    private parseBodies(posts: Comment[]): Comment[] {
+        return posts.map((c) => {
+            return this.parseBody(c);
+        });
+    }
+
+    public async getComments(projectIDOrBookmark: number | string): Promise<{ posts: Comment[] }> {
         let apiURL;
 
         if (typeof projectIDOrBookmark === "number") {
@@ -1238,58 +1294,121 @@ class FKApi {
             apiURL = this.baseUrl + "/discussion?bookmark=" + JSON.stringify(projectIDOrBookmark);
         }
 
-        return this.invoke({
+        const returned = await this.invoke({
             auth: Auth.Required,
             method: "GET",
             url: apiURL,
         });
+
+        const fixed = this.parseBodies(returned.posts);
+
+        console.log("comments", returned);
+
+        return {
+            posts: fixed,
+        };
     }
 
-    public postComment(comment: NewComment): Promise<{ post: Comment }> {
-        return this.invoke({
+    public async postComment(comment: NewComment): Promise<{ post: Comment }> {
+        console.log("save-comment", comment);
+
+        const returned = await this.invoke({
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/discussion",
-            data: { post: comment },
+            data: {
+                post: _.extend({}, comment, {
+                    body: JSON.stringify(comment.body),
+                }),
+            },
         });
+
+        console.log("comments", returned);
+
+        return {
+            post: this.parseBody(returned.post),
+        };
     }
 
-    public deleteComment(commentID: number): Promise<boolean> {
-        return this.invoke({
+    public async deleteComment(commentID: number): Promise<boolean> {
+        return await this.invoke({
             auth: Auth.Required,
             method: "DELETE",
             url: this.baseUrl + "/discussion/" + commentID,
         });
     }
 
-    public editComment(commentID: number, body: string): Promise<boolean> {
-        return this.invoke({
+    public async editComment(commentID: number, body: Record<string, unknown>): Promise<boolean> {
+        const returned = await this.invoke({
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/discussion/" + commentID,
-            data: { body: body },
+            data: { body: JSON.stringify(body) },
         });
+
+        console.log("edit", returned);
+
+        return returned;
     }
-}
 
-export interface PortalDeployStatus {
-    serverName: string;
-    name: string;
-    tag: string;
-    git: { hash: string };
-}
+    private socket: WebSocket | null = null;
 
-export interface EssentialStation {
-    id: number;
-    name: string;
-    deviceId: string;
-    owner: { id: number; name: string };
-    uploads: { id: number }[];
-}
+    private async send(message: unknown) {
+        if (!this.socket) {
+            throw new Error("disconnected");
+        }
+        // TODO Does this need to queue before open?
+        this.socket.send(JSON.stringify(message));
+        return await Promise.resolve();
+    }
 
-export interface PageOfStations {
-    stations: EssentialStation[];
-    total: number;
+    private async establish(callback: (message: unknown) => Promise<void>, status: (connected: boolean) => Promise<void>) {
+        while (this.listening) {
+            if (this.token.authenticated() && !this.socket) {
+                const wsBase = this.baseUrl.replace("https", "wss").replace("http", "ws");
+                this.socket = new WebSocket(wsBase + "/notifications");
+
+                this.socket.addEventListener("open", () => {
+                    console.log("ws: connected");
+                    if (!this.socket) throw new Error("disconnected");
+                    const token = this.token.getHeader();
+                    this.socket.send(JSON.stringify({ token: token }));
+                });
+
+                this.socket.addEventListener("message", (event) => {
+                    const message = JSON.parse(event.data);
+                    void callback(message);
+                });
+
+                this.socket.addEventListener("close", async () => {
+                    console.log("ws: closed");
+                    void status(false);
+                    this.socket = null;
+                });
+            } else {
+                await promiseAfter(1000);
+            }
+        }
+    }
+
+    private listening = false;
+
+    public async listenForNotifications(
+        callback: (message: unknown) => Promise<void>,
+        status: (connected: boolean) => Promise<void>
+    ): Promise<SendFunction> {
+        if (!this.listening) {
+            this.listening = true;
+            void this.establish(callback, status);
+        }
+        return this.send.bind(this);
+    }
+
+    /*
+    public async markNotificationsRead(ids: number[]): Promise<void> {
+        return;
+    }
+	*/
 }
 
 export default FKApi;
