@@ -91,6 +91,15 @@ type Listener struct {
 	published     chan []map[string]interface{}
 }
 
+type ListenerError struct {
+	Message   string
+	Connected bool
+}
+
+func (e *ListenerError) Error() string {
+	return e.Message
+}
+
 type AfterAuthenticationFunc func(ctx context.Context, userID int32) error
 
 func NewListener(options *ControllerOptions, stream notifications.ListenServerStream, afterAuth AfterAuthenticationFunc) (l *Listener) {
@@ -111,7 +120,10 @@ func (l *Listener) service(ctx context.Context) {
 		dictionary, err := l.stream.Recv()
 		if err != nil {
 			if err != io.EOF {
-				l.errors <- err
+				l.errors <- &ListenerError{
+					Message:   fmt.Sprintf("%v", err),
+					Connected: false,
+				}
 			}
 			close(l.errors)
 			close(l.published)

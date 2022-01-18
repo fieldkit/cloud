@@ -9,8 +9,8 @@ import (
 
 	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
 
-	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common"
 )
 
 type NotificationsService struct {
@@ -58,13 +58,21 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 			}
 
 			log.Errorw("ws:error", "error", err)
-			if err := stream.Send(map[string]interface{}{
-				"error": map[string]interface{}{
-					"code":    401,
-					"message": "unauthenticated",
-				},
-			}); err != nil {
-				log.Warnw("ws:error:send", "error", err)
+
+			connected := true
+			if le, ok := err.(*ListenerError); ok {
+				connected = le.Connected
+			}
+
+			if connected {
+				if err := stream.Send(map[string]interface{}{
+					"error": map[string]interface{}{
+						"code":    401,
+						"message": "unauthenticated",
+					},
+				}); err != nil {
+					log.Warnw("ws:error:send", "error", err)
+				}
 			}
 			done = true
 		case <-ctx.Done():
