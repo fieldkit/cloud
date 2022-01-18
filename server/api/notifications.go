@@ -57,11 +57,12 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 				return nil
 			}
 
-			log.Errorw("ws:error", "error", err)
-
 			connected := true
 			if le, ok := err.(*ListenerError); ok {
 				connected = le.Connected
+				log.Warnw("ws:error", "error", err)
+			} else {
+				log.Errorw("ws:error", "error", err)
 			}
 
 			if connected {
