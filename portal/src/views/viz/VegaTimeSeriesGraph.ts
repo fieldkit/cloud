@@ -32,19 +32,13 @@ export const VegaTimeSeriesGraph = Vue.extend({
             }
             return null;
         },
-    },
-    watch: {
-        data(newValue, oldValue) {
-            this.viz.log("graphing (data)");
-            this.refresh();
+        label(): string {
+            const vizInfo = this.workspace.vizInfo(this.viz);
+            if (vizInfo.unitOfMeasure) {
+                return i18n.tc(vizInfo.firmwareKey) + " (" + _.capitalize(vizInfo.unitOfMeasure) + ")";
+            }
+            return i18n.tc(vizInfo.firmwareKey);
         },
-    },
-    mounted() {
-        this.viz.log("mounted");
-        this.refresh();
-    },
-    updated() {
-        this.viz.log("updated");
     },
     methods: {
         onDouble() {
@@ -53,17 +47,12 @@ export const VegaTimeSeriesGraph = Vue.extend({
         raiseTimeZoomed(newTimes: TimeZoom) {
             return this.$emit("viz-time-zoomed", newTimes);
         },
-        refresh() {
-            if (!this.data) {
-                this.viz.log("refresh: nothing");
-                return;
-            } else {
-                this.viz.log("refresh: data");
-            }
-
-            const vizInfo = this.workspace.vizInfo(this.viz);
-            console.log("viz-info", vizInfo);
-        },
     },
-    template: `<div class="viz time-series-graph"><div class="chart" @dblclick="onDouble"><LineChart /></div></div>`,
+    template: `
+        <div class="viz time-series-graph">
+            <div class="chart" @dblclick="onDouble" v-if="data">
+                <LineChart :data="{ data: data.data }" :label="label" v-bind:key="data.key" />
+            </div>
+        </div>
+    `,
 });

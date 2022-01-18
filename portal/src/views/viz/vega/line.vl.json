@@ -8,6 +8,8 @@
       "field": "time",
       "type": "temporal",
       "axis": {
+        "grid": false,
+        "tickBand": "extent",
         "formatType": "time",
         "format": "%Y-%m-%d"
       }
@@ -19,9 +21,11 @@
         "y": {
           "field": "value",
           "type": "quantitative",
-          "title": "Battery charge (%)",
           "scale": {
             "zero": false
+          },
+          "axis": {
+            "title": "Value"
           }
         }
       },

@@ -8,8 +8,9 @@
         "maxbins": 20
       },
       "field": "value",
-      "axis": {},
-      "title": "Battery charge (%)"
+      "axis": {
+        "title": "Value"
+      }
     },
     "y": {
       "aggregate": "count"

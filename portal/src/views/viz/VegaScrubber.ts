@@ -50,8 +50,12 @@ export const VegaScrubber = Vue.extend({
             return this.$emit("viz-time-zoomed", new TimeZoom(null, newTimes));
         },
         refresh() {
-            console.log("scrubber refresh");
+            console.log("scrubber refresh", this.scrubbers);
         },
     },
-    template: `<div class="viz scrubber"><Scrubber /></div>`,
+    template: `
+        <div class="viz scrubber" v-if="data && data[0].data">
+            <Scrubber :data="{ data: data[0].data }" />
+        </div>
+    `,
 });

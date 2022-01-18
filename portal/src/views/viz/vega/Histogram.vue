@@ -4,22 +4,51 @@
 
 <script>
 import { default as vegaEmbed } from "vega-embed";
-import histoSpec from "./histo.vl.json";
-import fieldkitBatteryData from "./fieldkitBatteryData.json";
+import histogramSpec from "./histo.vl.json";
 import chartConfig from "./chartConfig.json";
-
-histoSpec.config = chartConfig;
-
-histoSpec.data = { values: fieldkitBatteryData.data };
 
 export default {
     name: "Histogram",
+    props: {
+        data: {
+            type: Object,
+            required: true,
+        },
+        label: {
+            type: String,
+            required: true,
+        },
+    },
     mounted: function() {
-        vegaEmbed(".histogram", histoSpec, {
-            renderer: "svg",
-            tooltip: { offsetX: -50, offsetY: 50 },
-            actions: { source: false, editor: false, compiled: false },
-        });
+        console.log("vega-mounted");
+        this.refresh();
+    },
+    watch: {
+        label() {
+            console.log("vega-watch-label");
+            this.refresh();
+        },
+        data() {
+            console.log("vega-watch-data");
+            this.refresh();
+        },
+    },
+    methods: {
+        async refresh() {
+            console.log("vega-updated");
+
+            histogramSpec.config = chartConfig;
+            histogramSpec.data = { name: "table", values: this.data.data };
+            histogramSpec.encoding.x.axis.title = this.label;
+
+            const vegaView = await vegaEmbed(".histogram", histogramSpec, {
+                renderer: "svg",
+                tooltip: { offsetX: -50, offsetY: 50 },
+                actions: { source: false, editor: false, compiled: false },
+            });
+
+            this.vegaView = vegaView;
+        },
     },
 };
 </script>

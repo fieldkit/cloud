@@ -54,13 +54,15 @@
     },
     "y": {
       "field": "minimum",
+      "title": "Minimum",
       "type": "quantitative",
       "scale": {
         "zero": false
       }
     },
     "y2": {
-      "field": "maximum"
+      "field": "maximum",
+      "title": "Maximum"
     },
     "tooltip": [
       {
