@@ -52,6 +52,9 @@ export default Vue.extend({
                 });
             }
         },
+        async disagree(): Promise<void> {
+            await this.$router.push({ name: "login" });
+        },
         goBack(): void {
             if (window.history.length) {
                 this.$router.go(-1);

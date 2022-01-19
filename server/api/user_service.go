@@ -131,7 +131,7 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 
 	tncDate := time.Time{}
 
-	if *payload.User.TncAccept == true {
+	if payload.User.TncAccept != nil && *payload.User.TncAccept {
 		tncDate = time.Now()
 	}
 
@@ -856,6 +856,37 @@ func (c *UserService) AdminSearch(ctx context.Context, payload *user.AdminSearch
 	}
 
 	return &user.AdminSearchResult{
+		Users: wms,
+	}, nil
+}
+
+func (c *UserService) Mentionables(ctx context.Context, payload *user.MentionablesPayload) (*user.MentionableOptions, error) {
+	sr := repositories.NewUserRepository(c.options.Database)
+
+	users, err := sr.QueryMentionables(ctx, payload.Query)
+	if err != nil {
+		return nil, err
+	}
+
+	wms := make([]*user.MentionableUser, 0)
+	for _, dm := range users {
+		wm := &user.MentionableUser{
+			ID:      dm.ID,
+			Mention: strings.ReplaceAll(dm.Name, " ", ""),
+			Name:    dm.Name,
+		}
+
+		if dm.MediaURL != nil {
+			url := fmt.Sprintf("/user/%d/media", dm.ID)
+			wm.Photo = &user.UserPhoto{
+				URL: &url,
+			}
+		}
+
+		wms = append(wms, wm)
+	}
+
+	return &user.MentionableOptions{
 		Users: wms,
 	}, nil
 }

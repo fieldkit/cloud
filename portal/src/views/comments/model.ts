@@ -1,6 +1,6 @@
 export interface Comment {
     id: number;
-    author: object;
+    author: { id: number; name: string; photo: object };
     bookmark?: string;
     body: string;
     replies: Comment[];
@@ -11,7 +11,7 @@ export interface Comment {
 
 export class Comment {
     id: number;
-    author: object;
+    author: { id: number; name: string; photo: object };
     bookmark?: string;
     body: string;
     replies: Comment[];
@@ -21,13 +21,12 @@ export class Comment {
 
     constructor(
         id: number,
-        author: object,
+        author: { id: number; name: string; photo: object },
         bookmark: string | undefined,
         body: string,
         createdAt: number,
-        updatedAt: number,
-    )
-    {
+        updatedAt: number
+    ) {
         this.id = id;
         this.author = author;
         this.bookmark = bookmark;

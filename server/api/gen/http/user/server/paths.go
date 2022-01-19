@@ -120,3 +120,8 @@ func AdminDeleteUserPath() string {
 func AdminSearchUserPath() string {
 	return "/admin/users/search"
 }
+
+// MentionablesUserPath returns the URL path to the user service mentionables HTTP endpoint.
+func MentionablesUserPath() string {
+	return "/mentionables"
+}

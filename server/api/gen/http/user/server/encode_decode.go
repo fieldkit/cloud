@@ -2384,6 +2384,130 @@ func EncodeAdminSearchError(encoder func(context.Context, http.ResponseWriter) g
 	}
 }
 
+// EncodeMentionablesResponse returns an encoder for responses returned by the
+// user mentionables endpoint.
+func EncodeMentionablesResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*userviews.MentionableOptions)
+		enc := encoder(ctx, w)
+		body := NewMentionablesResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeMentionablesRequest returns a decoder for requests sent to the user
+// mentionables endpoint.
+func DecodeMentionablesRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			projectID *int32
+			bookmark  *string
+			query     string
+			auth      string
+			err       error
+		)
+		{
+			projectIDRaw := r.URL.Query().Get("projectId")
+			if projectIDRaw != "" {
+				v, err2 := strconv.ParseInt(projectIDRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("projectID", projectIDRaw, "integer"))
+				}
+				pv := int32(v)
+				projectID = &pv
+			}
+		}
+		bookmarkRaw := r.URL.Query().Get("bookmark")
+		if bookmarkRaw != "" {
+			bookmark = &bookmarkRaw
+		}
+		query = r.URL.Query().Get("query")
+		if query == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("query", "query string"))
+		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewMentionablesPayload(projectID, bookmark, query, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeMentionablesError returns an encoder for errors returned by the
+// mentionables user endpoint.
+func EncodeMentionablesError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewMentionablesUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewMentionablesForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewMentionablesNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewMentionablesBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // marshalUserviewsAvailableRoleViewToAvailableRoleResponseBody builds a value
 // of type *AvailableRoleResponseBody from a value of type
 // *userviews.AvailableRoleView.
@@ -2484,6 +2608,22 @@ func marshalUserUserPhotoToUserPhotoResponseBody(v *user.UserPhoto) *UserPhotoRe
 	}
 	res := &UserPhotoResponseBody{
 		URL: v.URL,
+	}
+
+	return res
+}
+
+// marshalUserviewsMentionableUserViewToMentionableUserResponseBody builds a
+// value of type *MentionableUserResponseBody from a value of type
+// *userviews.MentionableUserView.
+func marshalUserviewsMentionableUserViewToMentionableUserResponseBody(v *userviews.MentionableUserView) *MentionableUserResponseBody {
+	res := &MentionableUserResponseBody{
+		ID:      *v.ID,
+		Name:    *v.Name,
+		Mention: *v.Mention,
+	}
+	if v.Photo != nil {
+		res.Photo = marshalUserviewsUserPhotoViewToUserPhotoResponseBody(v.Photo)
 	}
 
 	return res

@@ -1,7 +1,7 @@
 <template>
     <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible">
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closeExports" />
-        <div class="explore-view">
+        <div class="container-wrap explore-view">
             <div class="explore-header">
                 <DoubleHeader
                     title="Data View"
@@ -189,6 +189,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+@import "../../scss/layout";
+
 .graph .x-axis {
     color: #7f7f7f;
 }
@@ -206,9 +208,6 @@ export default Vue.extend({
 }
 
 .explore-view {
-    text-align: left;
-    background-color: #fcfcfc;
-    padding: 40px;
     flex-grow: 1;
 }
 .explore-header {
@@ -367,8 +366,15 @@ export default Vue.extend({
     cursor: pointer;
 }
 
-.controls-container .time-picker {
+.controls-container .date-picker {
     margin-left: 20px;
+}
+
+.controls-container .date-picker input {
+    padding: 5px;
+    border: 1px solid rgb(215, 220, 225);
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .controls-container .fast-time.selected {

@@ -661,6 +661,140 @@ func BuildUploadMediaStreamPayload(payload interface{}, fpath string) (*notes.Up
 	}, nil
 }
 
+// BuildDeleteMediaRequest instantiates a HTTP request object with method and
+// path set to call the "notes" service "delete media" endpoint
+func (c *Client) BuildDeleteMediaRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		mediaID int32
+	)
+	{
+		p, ok := v.(*notes.DeleteMediaPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("notes", "delete media", "*notes.DeleteMediaPayload", v)
+		}
+		mediaID = p.MediaID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteMediaNotesPath(mediaID)}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("notes", "delete media", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeDeleteMediaRequest returns an encoder for requests sent to the notes
+// delete media server.
+func EncodeDeleteMediaRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*notes.DeleteMediaPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("notes", "delete media", "*notes.DeleteMediaPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeDeleteMediaResponse returns a decoder for responses returned by the
+// notes delete media endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeDeleteMediaResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeDeleteMediaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusNoContent:
+			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body DeleteMediaUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "delete media", err)
+			}
+			err = ValidateDeleteMediaUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "delete media", err)
+			}
+			return nil, NewDeleteMediaUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body DeleteMediaForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "delete media", err)
+			}
+			err = ValidateDeleteMediaForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "delete media", err)
+			}
+			return nil, NewDeleteMediaForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body DeleteMediaNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "delete media", err)
+			}
+			err = ValidateDeleteMediaNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "delete media", err)
+			}
+			return nil, NewDeleteMediaNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body DeleteMediaBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("notes", "delete media", err)
+			}
+			err = ValidateDeleteMediaBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("notes", "delete media", err)
+			}
+			return nil, NewDeleteMediaBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("notes", "delete media", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // marshalNotesFieldNoteUpdateToFieldNoteUpdateRequestBody builds a value of
 // type *FieldNoteUpdateRequestBody from a value of type *notes.FieldNoteUpdate.
 func marshalNotesFieldNoteUpdateToFieldNoteUpdateRequestBody(v *notes.FieldNoteUpdate) *FieldNoteUpdateRequestBody {

@@ -119,8 +119,8 @@ func loadConfiguration() (*Config, *Options, error) {
 	viper.AddConfigPath(".")
 	viper.SetEnvPrefix("FIELDKIT")
 
-	viper.SetDefault("SAML.CERT", "fk-saml.cert")
-	viper.SetDefault("SAML.KEY", "fk-saml.key")
+	viper.SetDefault("SAML.CERT", "")
+	viper.SetDefault("SAML.KEY", "")
 	viper.SetDefault("SAML.SP_URL", "http://127.0.0.1:8080")
 	viper.SetDefault("SAML.LOGIN_URL", "http://127.0.0.1:8081/login/%s")
 	viper.SetDefault("SAML.IPD_META", "http://127.0.0.1:8090/auth/realms/fk/protocol/saml/descriptor")

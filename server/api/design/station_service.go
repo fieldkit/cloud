@@ -319,6 +319,27 @@ var _ = Service("station", func() {
 		})
 	})
 
+	Method("default photo", func() {
+        Security(JWTAuth, func() {
+            Scope("api:access")
+        })
+
+        Payload(func() {
+            Token("auth")
+            Required("auth")
+            Attribute("id", Int32)
+            Required("id")
+            Attribute("photoId", Int32)
+            Required("photoId")
+        })
+
+        HTTP(func() {
+            POST("stations/{id}/photo/{photoId}")
+
+            httpAuthentication()
+        })
+    })
+
 	Method("update", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
