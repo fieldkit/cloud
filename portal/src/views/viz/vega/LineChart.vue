@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import _ from "lodash";
 import { default as vegaEmbed } from "vega-embed";
 import lineSpec from "./line.vl.json";
 import fieldkitBatteryData from "./fieldkitBatteryData.json";

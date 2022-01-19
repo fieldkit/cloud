@@ -94,6 +94,15 @@ export class QueriedData {
     get data() {
         return this.sdr.data;
     }
+
+    public removeDuplicates(): QueriedData {
+        const filtered = {
+            summaries: this.sdr.summaries,
+            aggregate: this.sdr.aggregate,
+            data: _.sortedUniqBy(this.sdr.data, (d) => d.time),
+        };
+        return new QueriedData(this.timeRangeQueried, filtered);
+    }
 }
 
 export class VizInfo {
@@ -490,8 +499,9 @@ export class Querier {
             .sensorData(queryParams)
             .then((sdr: SensorDataResponse) => {
                 const queried = new QueriedData(params.when, sdr);
-                this.data[key] = queried;
-                return queried;
+                const filtered = queried.removeDuplicates();
+                this.data[key] = filtered;
+                return filtered;
             })
             .finally(() => {
                 vq.howBusy(-1);

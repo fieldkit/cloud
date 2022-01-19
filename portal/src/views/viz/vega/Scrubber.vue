@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import _ from "lodash";
 import { default as vegaEmbed } from "vega-embed";
 import scrubberSpec from "./scrubber.vl.json";
 import fieldkitBatteryData from "./fieldkitBatteryData.json";
