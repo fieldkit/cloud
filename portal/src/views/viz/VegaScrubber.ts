@@ -24,8 +24,11 @@ export const VegaScrubber = Vue.extend({
         data(): QueriedData[] {
             return this.scrubbers.rows.map((s) => s.data);
         },
-        visible(): TimeRange {
-            return this.scrubbers.visible;
+        visible(): number[] {
+            if (this.scrubbers.visible.isExtreme()) {
+                return this.scrubbers.timeRange.toArray();
+            }
+            return this.scrubbers.visible.toArray();
         },
     },
     watch: {
@@ -46,8 +49,8 @@ export const VegaScrubber = Vue.extend({
         // console.log("scrubber updated");
     },
     methods: {
-        raiseTimeZoomed(newTimes) {
-            return this.$emit("viz-time-zoomed", new TimeZoom(null, newTimes));
+        raiseTimeZoomed(zoom: TimeZoom) {
+            return this.$emit("viz-time-zoomed", zoom);
         },
         refresh() {
             console.log("scrubber refresh", this.scrubbers);
@@ -55,7 +58,7 @@ export const VegaScrubber = Vue.extend({
     },
     template: `
         <div class="viz scrubber" v-if="data && data[0].data">
-            <Scrubber :data="{ data: data[0].data }" />
+            <Scrubber :data="data[0]" :visible="visible" @time-zoomed="raiseTimeZoomed" />
         </div>
     `,
 });
