@@ -87,7 +87,7 @@
               ]
             },
             "strokeWidth": 2,
-            "interpolate": "catmull-rom",
+            "interpolate": "monotone",
             "tension": 1
           }
         },
