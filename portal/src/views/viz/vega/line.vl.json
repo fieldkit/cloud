@@ -11,7 +11,8 @@
         "grid": false,
         "tickBand": "extent",
         "formatType": "time",
-        "format": "%Y-%m-%d"
+        "format": "%Y-%m-%d",
+        "labelColor": "#7f7f7f"
       }
     }
   },
@@ -25,7 +26,10 @@
             "zero": false
           },
           "axis": {
-            "title": "Value"
+            "title": "Value",
+            "titleFontWeight": 400,
+            "titleColor": "#7f7f7f",
+            "labelColor": "#7f7f7f"
           }
         }
       },
