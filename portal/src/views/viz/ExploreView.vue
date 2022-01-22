@@ -305,10 +305,11 @@ export default Vue.extend({
 }
 
 /* HACK d3 Real talk, no idea how to do this elsewhere. -jlewallen */
+/*
 .brush-container .selection {
     opacity: 0.3;
 }
-
+*/
 .controls-container {
     margin-left: 40px;
     margin-right: 40px;

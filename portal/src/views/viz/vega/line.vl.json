@@ -8,11 +8,22 @@
       "field": "time",
       "type": "temporal",
       "axis": {
+        "domain": true,
         "grid": false,
-        "tickBand": "extent",
+        "tickCount": "month",
+        "tickMinStep": 1,
+        "tickOpacity": 1,
+        "tickSize": 5,
+        "gridOpacity": 0.3,
+        "title": "Time",
+        "titleFontWeight": 400,
+        "titleColor": "#7f7f7f",
         "formatType": "time",
-        "format": "%Y-%m-%d",
-        "labelColor": "#7f7f7f"
+        "format": "%-m/%-d/%Y",
+        "labelColor": "#7f7f7f",
+        "labelOverlap": "parity",
+        "labelFlush": true,
+        "labelBound": true
       }
     }
   },
@@ -26,6 +37,8 @@
             "zero": false
           },
           "axis": {
+            "domain": true,
+            "tickOpacity": 1,
             "title": "Value",
             "titleFontWeight": 400,
             "titleColor": "#7f7f7f",
