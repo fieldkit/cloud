@@ -2,7 +2,7 @@
     <div class="container-side" v-bind:class="{ active: !sidebar.narrow }">
         <div class="sidebar-header">
             <router-link :to="{ name: 'projects' }">
-                <img :alt="$t('layout.logo.alt')" id="header-logo" src="@/assets/logo-fieldkit.svg" />
+                <Logo />
             </router-link>
         </div>
         <a class="sidebar-trigger" v-on:click="toggleSidebar">
@@ -57,9 +57,13 @@
 
 <script lang="ts">
 import Vue from "vue";
+import Logo from "@/views/shared/Logo.vue";
 
 export default Vue.extend({
     name: "SidebarNav",
+    components: {
+        Logo,
+    },
     props: {
         viewingProject: { type: Object, default: null },
         viewingStation: { type: Object, default: null },
@@ -162,13 +166,10 @@ export default Vue.extend({
         padding: 0 20px;
         height: 54px;
     }
-}
-#header-logo {
-    width: 140px;
-    margin: 16px auto;
 
-    @include bp-down($md) {
-        display: none;
+    > a {
+        height: 100%;
+        display: flex;
     }
 }
 

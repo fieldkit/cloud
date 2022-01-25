@@ -1,6 +1,6 @@
 <template>
     <div class="terms">
-        <img class="terms-header-logo" :alt="$t('layout.logo.alt')" src="@/assets/FieldKit_Logo_White.png" />
+        <img class="terms-header-logo" :alt="$t('layout.logo.fieldkit.alt')" src="@/assets/FieldKit_Logo_White.png" />
         <div class="terms-content">
             <img v-if="!tncOutdated" alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="goBack" />
             <div v-html="$t('terms.html')" class="terms-content-html"></div>
