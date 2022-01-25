@@ -12,6 +12,10 @@ import { AuthenticationRequiredError } from "@/api";
 export default Vue.extend({
     async mounted(): Promise<void> {
         try {
+            if (new URL(window.location.href).host === "floodnet.fieldkit.org") {
+                this.$nextTick().then(() => document.body.classList.add("floodnet"));
+            }
+            
             await this.$store.dispatch(ActionTypes.INITIALIZE);
         } catch (err) {
             console.log("initialize error", err, err.stack);
