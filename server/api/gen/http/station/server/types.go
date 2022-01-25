@@ -2267,7 +2267,7 @@ func NewTransferPayload(id int32, ownerID int32, auth string) *station.TransferP
 
 // NewDefaultPhotoPayload builds a station service default photo endpoint
 // payload.
-func NewDefaultPhotoPayload(id int32, photoID int32, auth string) *station.DefaultPhotoPayload {
+func NewDefaultPhotoPayload(id int32, photoID int32, auth *string) *station.DefaultPhotoPayload {
 	v := &station.DefaultPhotoPayload{}
 	v.ID = id
 	v.PhotoID = photoID
@@ -2308,7 +2308,7 @@ func NewListProjectPayload(id int32, auth *string) *station.ListProjectPayload {
 
 // NewListAssociatedPayload builds a station service list associated endpoint
 // payload.
-func NewListAssociatedPayload(id int32, auth string) *station.ListAssociatedPayload {
+func NewListAssociatedPayload(id int32, auth *string) *station.ListAssociatedPayload {
 	v := &station.ListAssociatedPayload{}
 	v.ID = id
 	v.Auth = auth
@@ -2318,7 +2318,7 @@ func NewListAssociatedPayload(id int32, auth string) *station.ListAssociatedPayl
 
 // NewDownloadPhotoPayload builds a station service download photo endpoint
 // payload.
-func NewDownloadPhotoPayload(stationID int32, size *int32, ifNoneMatch *string, auth string) *station.DownloadPhotoPayload {
+func NewDownloadPhotoPayload(stationID int32, size *int32, ifNoneMatch *string, auth *string) *station.DownloadPhotoPayload {
 	v := &station.DownloadPhotoPayload{}
 	v.StationID = stationID
 	v.Size = size

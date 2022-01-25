@@ -22,12 +22,11 @@ var _ = Service("sensor", func() {
 
 	Method("data", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
 			Attribute("start", Int64)
 			Attribute("end", Int64)
 			Attribute("stations", String)

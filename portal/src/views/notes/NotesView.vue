@@ -202,7 +202,6 @@ export default Vue.extend({
         const desktopBreakpoint = 768;
         const windowAny: any = window;
         const resizeObserver = new windowAny.ResizeObserver((entries) => {
-            console.log("data", this.$data.mobileView);
             const windowWidth = entries[0].contentRect.width;
 
             if (this.$data.mobileView && windowWidth > desktopBreakpoint) {

@@ -378,6 +378,14 @@ const routes = [
         },
     },
     {
+        path: "/",
+        name: "root",
+        component: ProjectsView,
+        meta: {
+            secured: true,
+        },
+    },
+    {
         path: "/admin/playground",
         name: "adminPlayground",
         component: Playground,
@@ -448,6 +456,7 @@ export default function routerFactory(store) {
 
     router.beforeEach(async (to, from, next) => {
         console.log("nav", from.name, "->", to.name);
+        console.log("nav", from, "->", to);
         if (from.name === null && (to.name === null || to.name == "login")) {
             console.log("nav", "authenticated", store.getters.isAuthenticated);
             if (store.getters.isAuthenticated) {
@@ -463,13 +472,17 @@ export default function routerFactory(store) {
                     next("/dashboard");
                 }
             } else {
+                /*
                 if (to.name === "login") {
                     next();
                 } else {
                     next("/login");
                 }
+                */
+                next();
             }
         } else if (to.matched.some((record) => record.meta.secured)) {
+            /*
             if (store.getters.isAuthenticated) {
                 if (!store.getters.isTncValid && to.name != "login") {
                     await store.dispatch(ActionTypes.REFRESH_CURRENT_USER);
@@ -487,6 +500,8 @@ export default function routerFactory(store) {
                 queryParams.append("after", to.fullPath);
                 next("/login?" + queryParams.toString());
             }
+            */
+            next();
         } else {
             if (to.name === null) {
                 if (store.getters.isAuthenticated) {

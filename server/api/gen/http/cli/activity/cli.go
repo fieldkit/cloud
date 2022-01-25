@@ -254,11 +254,11 @@ func ParseEndpoint(
 
 		notesGetFlags         = flag.NewFlagSet("get", flag.ExitOnError)
 		notesGetStationIDFlag = notesGetFlags.String("station-id", "REQUIRED", "")
-		notesGetAuthFlag      = notesGetFlags.String("auth", "REQUIRED", "")
+		notesGetAuthFlag      = notesGetFlags.String("auth", "", "")
 
 		notesDownloadMediaFlags       = flag.NewFlagSet("download- media", flag.ExitOnError)
 		notesDownloadMediaMediaIDFlag = notesDownloadMediaFlags.String("media-id", "REQUIRED", "")
-		notesDownloadMediaAuthFlag    = notesDownloadMediaFlags.String("auth", "REQUIRED", "")
+		notesDownloadMediaAuthFlag    = notesDownloadMediaFlags.String("auth", "", "")
 
 		notesUploadMediaFlags             = flag.NewFlagSet("upload- media", flag.ExitOnError)
 		notesUploadMediaStationIDFlag     = notesUploadMediaFlags.String("station-id", "REQUIRED", "")
@@ -428,7 +428,7 @@ func ParseEndpoint(
 		sensorDataAggregateFlag  = sensorDataFlags.String("aggregate", "", "")
 		sensorDataCompleteFlag   = sensorDataFlags.String("complete", "", "")
 		sensorDataTailFlag       = sensorDataFlags.String("tail", "", "")
-		sensorDataAuthFlag       = sensorDataFlags.String("auth", "REQUIRED", "")
+		sensorDataAuthFlag       = sensorDataFlags.String("auth", "", "")
 
 		informationFlags = flag.NewFlagSet("information", flag.ContinueOnError)
 
@@ -457,7 +457,7 @@ func ParseEndpoint(
 		stationDefaultPhotoFlags       = flag.NewFlagSet("default- photo", flag.ExitOnError)
 		stationDefaultPhotoIDFlag      = stationDefaultPhotoFlags.String("id", "REQUIRED", "")
 		stationDefaultPhotoPhotoIDFlag = stationDefaultPhotoFlags.String("photo-id", "REQUIRED", "")
-		stationDefaultPhotoAuthFlag    = stationDefaultPhotoFlags.String("auth", "REQUIRED", "")
+		stationDefaultPhotoAuthFlag    = stationDefaultPhotoFlags.String("auth", "", "")
 
 		stationUpdateFlags    = flag.NewFlagSet("update", flag.ExitOnError)
 		stationUpdateBodyFlag = stationUpdateFlags.String("body", "REQUIRED", "")
@@ -473,13 +473,13 @@ func ParseEndpoint(
 
 		stationListAssociatedFlags    = flag.NewFlagSet("list- associated", flag.ExitOnError)
 		stationListAssociatedIDFlag   = stationListAssociatedFlags.String("id", "REQUIRED", "")
-		stationListAssociatedAuthFlag = stationListAssociatedFlags.String("auth", "REQUIRED", "")
+		stationListAssociatedAuthFlag = stationListAssociatedFlags.String("auth", "", "")
 
 		stationDownloadPhotoFlags           = flag.NewFlagSet("download- photo", flag.ExitOnError)
 		stationDownloadPhotoStationIDFlag   = stationDownloadPhotoFlags.String("station-id", "REQUIRED", "")
 		stationDownloadPhotoSizeFlag        = stationDownloadPhotoFlags.String("size", "", "")
 		stationDownloadPhotoIfNoneMatchFlag = stationDownloadPhotoFlags.String("if-none-match", "", "")
-		stationDownloadPhotoAuthFlag        = stationDownloadPhotoFlags.String("auth", "REQUIRED", "")
+		stationDownloadPhotoAuthFlag        = stationDownloadPhotoFlags.String("auth", "", "")
 
 		stationListAllFlags        = flag.NewFlagSet("list- all", flag.ExitOnError)
 		stationListAllPageFlag     = stationListAllFlags.String("page", "", "")
@@ -588,7 +588,7 @@ func ParseEndpoint(
 
 		userListByProjectFlags         = flag.NewFlagSet("list- by- project", flag.ExitOnError)
 		userListByProjectProjectIDFlag = userListByProjectFlags.String("project-id", "REQUIRED", "")
-		userListByProjectAuthFlag      = userListByProjectFlags.String("auth", "REQUIRED", "")
+		userListByProjectAuthFlag      = userListByProjectFlags.String("auth", "", "")
 
 		userIssueTransmissionTokenFlags    = flag.NewFlagSet("issue- transmission- token", flag.ExitOnError)
 		userIssueTransmissionTokenAuthFlag = userIssueTransmissionTokenFlags.String("auth", "REQUIRED", "")

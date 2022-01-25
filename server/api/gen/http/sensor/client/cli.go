@@ -91,9 +91,11 @@ func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataSt
 			}
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = sensorDataAuth
+		if sensorDataAuth != "" {
+			auth = &sensorDataAuth
+		}
 	}
 	v := &sensor.DataPayload{}
 	v.Start = start
