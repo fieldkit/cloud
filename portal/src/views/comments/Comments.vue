@@ -378,6 +378,10 @@ header {
     border-bottom: 1px solid $color-border;
     padding: 15px 0;
 
+    body.floodnet & {
+        border-bottom: 1px solid $color-floodnet-light;
+    }
+
     .data-view & {
         border-top: none;
         padding: 0;
@@ -547,6 +551,10 @@ header {
 
     &-first-level {
         border-bottom: 1px solid $color-border;
+
+        body.floodnet & {
+            border-bottom: 1px solid $color-floodnet-light;
+        }
     }
 
     &::v-deep .default-user-icon {

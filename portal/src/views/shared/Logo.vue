@@ -8,10 +8,7 @@ import Vue from "vue";
 export default Vue.extend({
     name: "Logo",
     mounted(): void {
-        const appEl = document.getElementById("#app");
-        console.log("radoi", appEl);
-
-        if ((appEl as HTMLElement).classList.contains("floodnet")) {
+        if (document.body.classList.contains("floodnet")) {
             this.altText = this.$tc("layout.logo.floodnet.alt");
         }
     },
