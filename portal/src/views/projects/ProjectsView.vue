@@ -91,7 +91,7 @@ export default Vue.extend({
 }
 
 .container.community {
-    border-top: 1px solid #d8dce0;
+    border-top: 1px solid var(--color-border);
 }
 .container .header {
     display: flex;

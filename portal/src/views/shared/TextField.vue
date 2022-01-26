@@ -95,7 +95,7 @@ export default Vue.extend({
     margin-bottom: 2px;
     border: 0;
     border-radius: 0;
-    border-bottom: 1px solid #d8dce0;
+    border-bottom: 1px solid var(--color-border);
 
     &:-webkit-autofill {
         font-size: 16px!important;

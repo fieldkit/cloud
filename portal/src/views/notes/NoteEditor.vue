@@ -72,7 +72,7 @@ export default Vue.extend({
     margin-top: 1em;
     margin-bottom: 1em;
     padding: 1em;
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
 }
 
@@ -91,7 +91,7 @@ export default Vue.extend({
     flex-wrap: wrap;
     align-items: baseline;
     margin-bottom: 10px;
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     background-color: #fcfcfc;
     padding: 8px;

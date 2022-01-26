@@ -59,8 +59,8 @@ export default Vue.extend({
 }
 .tab {
     padding: 16px 13px;
-    border-right: 1px solid #d8dce0;
-    border-bottom: 1px solid #d8dce0;
+    border-right: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
     border-left: 4px solid white;
     cursor: pointer;
 
@@ -71,7 +71,7 @@ export default Vue.extend({
 
 .vertical {
     margin-top: auto;
-    border-right: 1px solid #d8dce0;
+    border-right: 1px solid var(--color-border);
     height: 100%;
 }
 .name {

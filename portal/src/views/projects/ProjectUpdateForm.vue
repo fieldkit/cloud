@@ -125,7 +125,7 @@ textarea {
     height: 50px;
     font-size: 18px;
     color: white;
-    background-color: #ce596b;
+    background-color: var(--color-secondary);
     border: none;
     border-radius: 5px;
     margin: 50px 0 20px 0;

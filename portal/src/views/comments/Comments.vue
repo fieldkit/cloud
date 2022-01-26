@@ -345,16 +345,16 @@ button {
     border: 1px solid $color-border;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
 
+    @include bp-down($xs) {
+        margin: 20px -10px 0;
+        padding: 0 10px 30px 10px;
+    }
+
     &.data-view {
         margin-top: 0;
         padding-top: 45px;
         box-shadow: none;
         border: 0;
-    }
-
-    @include bp-down($xs) {
-        margin: 20px -10px 0;
-        padding: 0 10px 30px 10px;
     }
 }
 
@@ -369,6 +369,10 @@ header {
         font-size: 18px;
         height: auto;
         border: none;
+    }
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
     }
 }
 
