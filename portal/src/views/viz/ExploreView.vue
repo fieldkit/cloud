@@ -346,17 +346,22 @@ export default Vue.extend({
     padding: 10px;
 }
 
-.controls-container .tree {
-    flex-basis: 50%;
-}
-
-.controls-container .tree div {
-    flex-basis: 50%;
-}
-
 .controls-container .left {
+    align-items: center;
+    display: flex;
+}
+
+.controls-container .left.half {
+    flex-basis: 50%;
+}
+
+.controls-container .tree-pair {
     display: flex;
     align-items: center;
+}
+
+.controls-container .tree-pair div {
+    flex-basis: 50%;
 }
 
 .controls-container .right {

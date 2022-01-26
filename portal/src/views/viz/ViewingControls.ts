@@ -10,13 +10,10 @@ import { TimeRange } from "./common";
 import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType } from "./viz";
 import { vueTickHack } from "@/utilities";
 
-export const SelectionControls = Vue.extend({
-    name: "SensorControls",
+export const SensorSelectionRow = Vue.extend({
+    name: "SensorSelectionRow",
     components: {
         Treeselect,
-    },
-    data(): {} {
-        return {};
     },
     props: {
         viz: {
@@ -27,20 +24,16 @@ export const SelectionControls = Vue.extend({
             type: Object as PropType<Workspace>,
             required: true,
         },
+        stationOptions: {
+            type: Array as PropType<StationTreeOption[]>,
+            required: true,
+        },
+        sensorOptions: {
+            type: Array as PropType<StationTreeOption[]>,
+            required: true,
+        },
     },
     computed: {
-        stationOptions(): StationTreeOption[] {
-            this.viz.log("station-options", { options: this.workspace.stationOptions });
-            return this.workspace.stationOptions;
-        },
-        sensorOptions(): SensorTreeOption[] {
-            this.viz.log("sensor-options", { options: this.workspace.sensorOptions });
-            const stationId = this.viz.chartParams.sensorParams.stations[0]; // this.selectedStation
-            if (stationId == null) {
-                return [];
-            }
-            return this.workspace.sensorOptions(stationId);
-        },
         selectedStation(): number | null {
             return this.viz.chartParams.sensorParams.stations[0];
         },
@@ -70,12 +63,53 @@ export const SelectionControls = Vue.extend({
         },
     },
     template: `
-		<div class="left tree">
+		<div class="tree-pair">
             <treeselect v-if="stationOptions.length" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" />
             <div v-else class="loading-options">Loading Options</div>
             <treeselect v-if="sensorOptions.length" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="1" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
             <div v-else class="loading-options">Loading Options</div>
 		</div>
+    `,
+});
+
+export const SelectionControls = Vue.extend({
+    name: "SensorControls",
+    components: {
+        SensorSelectionRow,
+    },
+    props: {
+        viz: {
+            type: Object as PropType<Graph>,
+            required: true,
+        },
+        workspace: {
+            type: Object as PropType<Workspace>,
+            required: true,
+        },
+    },
+    computed: {
+        stationOptions(): StationTreeOption[] {
+            this.viz.log("station-options", { options: this.workspace.stationOptions });
+            return this.workspace.stationOptions;
+        },
+        sensorOptions(): SensorTreeOption[] {
+            this.viz.log("sensor-options", { options: this.workspace.sensorOptions });
+            const stationId = this.viz.chartParams.sensorParams.stations[0]; // this.selectedStation
+            if (stationId == null) {
+                return [];
+            }
+            return this.workspace.sensorOptions(stationId);
+        },
+    },
+    methods: {
+        raiseChangeSensors(...args: unknown[]): void {
+            this.$emit("viz-change-sensors", ...args);
+        },
+    },
+    template: `
+		<div class="left half">
+            <SensorSelectionRow :viz="viz" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions" @viz-change-sensors="raiseChangeSensors" />
+        </div>
     `,
 });
 
