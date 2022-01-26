@@ -27,16 +27,21 @@ $font_path: '~@/fonts/';
 // floodnet
 @font-face {
     font-family: "Public Sans Bold";
-    src: url($font_path + 'Public_Sans/static/PublicSans-Bold.ttf') format("truetype");
+    src: url($font_path + 'PublicSans/static/PublicSans-Bold.ttf') format("truetype");
 }
 
 @font-face {
     font-family: "Public Sans Extra Light";
-    src: url($font_path + 'Public_Sans/static/PublicSans-ExtraLight.ttf') format("truetype");
+    src: url($font_path + 'PublicSans/static/PublicSans-ExtraLight.ttf') format("truetype");
+}
+
+@font-face {
+    font-family: "Mukta Bold";
+    src: url($font_path + 'Mukta/Mukta-Bold.ttf') format("truetype");
 }
 
 .bold {
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
 }
 
 

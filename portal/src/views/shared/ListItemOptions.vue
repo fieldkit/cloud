@@ -60,7 +60,7 @@ export default Vue.extend({
         content: "...";
         height: 17px;
         font-size: 32px;
-        font-family: $font-family-bold;
+        font-family: var(--font-family-bold);
     }
 }
 
@@ -99,7 +99,7 @@ button {
         > * {
             display: block;
             white-space: nowrap;
-            font-family: $font-family-bold;
+            font-family: var(--font-family-bold);
             cursor: pointer;
             text-align: left;
             width: 100%;

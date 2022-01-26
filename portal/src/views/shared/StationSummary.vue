@@ -154,7 +154,7 @@ export default Vue.extend({
 }
 .station-name {
     font-size: 18px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     margin-bottom: 2px;
 }
 .station-synced {
@@ -173,7 +173,7 @@ export default Vue.extend({
 .module-icon-container {
     float: left;
     margin-right: 10px;
-    box-shadow: 0 2px 4px 0 #d8dce0;
+    box-shadow: 0 2px 4px 0 var(--color-border);
     border-radius: 50%;
     display: flex;
 
@@ -244,16 +244,16 @@ export default Vue.extend({
 }
 .readings-container div.title {
     padding-bottom: 13px;
-    font-family: $font-family-normal;
+    font-family: var(--font-family-medium);
 }
 .explore-button {
     font-size: 18px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     color: #ffffff;
     text-align: center;
     padding: 10px;
     margin: 24px 0 0 0px;
-    background-color: #ce596b;
+    background-color: var(--color-secondary);
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;

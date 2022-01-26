@@ -272,7 +272,7 @@ export default Vue.extend({
 .icons-container .icon {
     background-color: #fcfcfc;
     box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.11);
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     border-radius: 50%;
     cursor: pointer;
 }
@@ -323,10 +323,6 @@ export default Vue.extend({
     margin-bottom: 5px;
     align-items: baseline;
     min-height: 80px;
-
-    body.floodnet & {
-        border-bottom: 1px solid $color-floodnet-light;
-    }
 }
 
 .controls-container .row-2 {
@@ -379,10 +375,6 @@ export default Vue.extend({
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
-
-    body.floodnet & {
-        border: 1px solid $color-floodnet-light;
-    }
 }
 
 .controls-container .fast-time.selected {
@@ -398,10 +390,6 @@ export default Vue.extend({
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
-
-    body.floodnet & {
-        border: 1px solid $color-floodnet-light;
-    }
 }
 
 .debug-panel {
@@ -443,7 +431,7 @@ export default Vue.extend({
     top: 70px;
     bottom: 0;
     background-color: #fcfcfc;
-    border-left: 2px solid #d8dce0;
+    border-left: 2px solid var(--color-border);
     z-index: 10;
     overflow-y: scroll;
     width: 30em;

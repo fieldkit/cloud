@@ -8,17 +8,32 @@ $md: 1040;
 $lg: 1280;
 $xl: 1440;
 
-$color-danger: #c42c44;
-$color-border: #d8dce0;
+// fieldkit
+$color-fieldkit-dark: #2c3e50;
+$color-fieldkit-primary: #1b80c9;
+$color-fieldkit-secondary: #ce596b;
+$color-fieldkit-border: #d8dce0;
+$color-fieldkit-danger: #c42c44;
+
+$font-family-fieldkit-medium: Avenir, Helvetica, sans-serif;
+$font-family-fieldkit-light: Avenir Light, Helvetica, sans-serif;
+$font-family-fieldkit-bold: Avenir Heavy, Helvetica, sans-serif;
 
 // floodnet
 $color-floodnet-dark: #042d36;
-$color-floodnet-mint: #BEF3E7;
-$color-floodnet-light: #E7EEEC;
+$color-floodnet-primary: #bef3e7;
+$color-floodnet-light: #e7eeec;
 
-$font-family-normal: Avenir, Helvetica, sans-serif;
-$font-family-light: Avenir Light, Helvetica, sans-serif;
-$font-family-bold: Avenir Heavy, Helvetica, sans-serif;
-
-$font-family-floodnet-extra-light: Public Sans Extra Light, Helvetica, sans-serif;
+$font-family-floodnet-medium: Public Sans Extra Light, Helvetica, sans-serif;
 $font-family-floodnet-bold: Public Sans Bold, Helvetica, sans-serif;
+$font-family-floodnet-button: Mukta Bold, Helvetica, sans-serif;
+
+
+$color-danger: var(--color-danger);
+$color-border: var(--color-border);
+$color-primary: var(--color-primary);
+$color-dark: var(--color-dark);
+
+$font-family-medium: var(--font-family-medium);
+$font-family-light: var(--font-family-light);
+$font-family-bold: var(--font-family-bold);

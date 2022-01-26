@@ -216,14 +216,14 @@ export default Vue.extend({
 
     @include bp-down($md) {
         padding: 25px 8px;
-        border-bottom: 1px solid #d8dce0;
+        border-bottom: 1px solid var(--color-border);
     }
 }
 
 .header {
     @include flex(center);
     padding-bottom: 11px;
-    border-bottom: 1px solid #d8dce0;
+    border-bottom: 1px solid var(--color-border);
 
     @include bp-down($md) {
         border: 0;
@@ -265,7 +265,7 @@ export default Vue.extend({
     border: solid 1px #cccdcf;
     background-color: #ffffff;
     font-size: 14px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     letter-spacing: 0.08px;
     color: #2c3e50;
     margin-left: 7px;

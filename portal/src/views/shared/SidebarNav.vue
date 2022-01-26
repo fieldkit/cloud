@@ -196,7 +196,7 @@ export default Vue.extend({
 }
 .nav-label {
     @include flex(center);
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     font-size: 16px;
     margin: 12px 0;
     cursor: pointer;
@@ -206,7 +206,7 @@ export default Vue.extend({
     margin: 0 10px 0 5px;
 }
 .selected {
-    border-bottom: 2px solid #1b80c9;
+    border-bottom: 2px solid $color-primary;
     height: 100%;
     display: inline-block;
 
@@ -234,10 +234,6 @@ export default Vue.extend({
 
     &.selected {
         padding-bottom: 2px;
-    }
-
-    body.floodnet & {
-        font-family: $font-family-floodnet-extra-light;
     }
 }
 .sidebar-compass {

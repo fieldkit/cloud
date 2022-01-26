@@ -11,7 +11,6 @@ import { AuthenticationRequiredError } from "@/api";
 
 export default Vue.extend({
     async mounted(): Promise<void> {
-        document.body.classList.add("floodnet");
         try {
             await this.$store.dispatch(ActionTypes.INITIALIZE);
         } catch (err) {
@@ -31,6 +30,7 @@ export default Vue.extend({
 <style lang="scss">
 @import "scss/mixins";
 @import "scss/typography";
+@import "scss/variables";
 
 html {
 }
@@ -42,23 +42,36 @@ body,
     min-height: 100vh;
 }
 body {
+    --color-primary: #{$color-fieldkit-primary};
+    --color-secondary: #{$color-fieldkit-secondary};
+    --color-dark: #{$color-fieldkit-dark};
+    --color-border: #{$color-fieldkit-border};
+    --font-family-medium: #{$font-family-fieldkit-medium};
+    --font-family-light: #{$font-family-fieldkit-light};
+    --font-family-bold: #{$font-family-fieldkit-bold};
+
     text-align: center;
-    color: #2c3e50;
     margin: 0;
     padding: 0;
-
     flex-shrink: 0;
 
     * {
-        font-family: $font-family-normal, Helvetica, Arial, sans-serif;
+        color: var(--color-dark);
+        font-family: var(--font-family-medium), Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
     }
 
     &.floodnet {
-        color: $color-floodnet-dark;
-
         * {
-            font-family: $font-family-floodnet-extra-light, Helvetica, Arial, sans-serif;
+            --color-primary: #{$color-floodnet-primary};
+            --color-secondary: #{$color-floodnet-dark};
+            --color-dark: #{$color-floodnet-dark};
+            --color-border: #{$color-floodnet-light};
+            --font-family-medium: #{$font-family-floodnet-medium};
+            --font-family-light: #{$font-family-floodnet-medium};
+            --font-family-bold: #{$font-family-floodnet-bold};
+            color: var(--color-dark);
+            font-family: var(--font-family-medium), Helvetica, Arial, sans-serif;
         }
     }
 }
@@ -88,6 +101,10 @@ a {
 button {
     cursor: pointer;
     color: inherit;
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-button;
+    }
 }
 .main-panel {
     width: auto;
@@ -100,7 +117,7 @@ button {
 }
 
 h1 {
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
 }
 
 ul {
@@ -120,8 +137,6 @@ li {
 }
 
 .vue-treeselect__control {
-    body.floodnet & {
-        border: 1px solid $color-floodnet-light;
-    }
+    border: 1px solid var(--color-border);
 }
 </style>
