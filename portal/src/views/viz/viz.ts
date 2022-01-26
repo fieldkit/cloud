@@ -70,7 +70,7 @@ export class QueriedData {
     timeRangeData: number[] = [];
     timeRange: number[] = [];
 
-    constructor(public readonly timeRangeQueried: TimeRange, private readonly sdr: SensorDataResponse) {
+    constructor(public readonly key: string, public readonly timeRangeQueried: TimeRange, private readonly sdr: SensorDataResponse) {
         if (this.sdr.data.length > 0) {
             const filtered = this.sdr.data.filter((d) => _.isNumber(d.value));
             const values = filtered.map((d) => d.value);
@@ -93,6 +93,15 @@ export class QueriedData {
 
     get data() {
         return this.sdr.data;
+    }
+
+    public removeDuplicates(): QueriedData {
+        const filtered = {
+            summaries: this.sdr.summaries,
+            aggregate: this.sdr.aggregate,
+            data: _.sortedUniqBy(this.sdr.data, (d) => d.time),
+        };
+        return new QueriedData(this.key, this.timeRangeQueried, filtered);
     }
 }
 
@@ -489,9 +498,10 @@ export class Querier {
         return new FKApi()
             .sensorData(queryParams)
             .then((sdr: SensorDataResponse) => {
-                const queried = new QueriedData(params.when, sdr);
-                this.data[key] = queried;
-                return queried;
+                const queried = new QueriedData(key, params.when, sdr);
+                const filtered = queried.removeDuplicates();
+                this.data[key] = filtered;
+                return filtered;
             })
             .finally(() => {
                 vq.howBusy(-1);

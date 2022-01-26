@@ -3,23 +3,27 @@ import Vue from "vue";
 import { Graph, Workspace, ChartType } from "./viz";
 
 import { ViewingControls } from "./ViewingControls";
-import { D3TimeSeriesGraph } from "./D3TimeSeriesGraph";
-import { D3Histogram } from "./D3Histogram";
-import { D3Range } from "./D3Range";
-import { D3Map } from "./D3Map";
-import { D3Scrubber } from "./D3Scrubber";
 import { DebuggingPanel } from "./DebuggingPanel";
+/*
+import { D3TimeSeriesGraph as TimeSeriesGraph } from "./D3TimeSeriesGraph";
+import { D3Histogram as Histogram } from "./D3Histogram";
+import { D3Range as Range } from "./D3Range";
+*/
+import { VegaTimeSeriesGraph as TimeSeriesGraph } from "./VegaTimeSeriesGraph";
+import { VegaHistogram as Histogram } from "./VegaHistogram";
+import { VegaRange as Range } from "./VegaRange";
+
+import { D3Map as Map } from "./D3Map";
 
 export const VizGraph = Vue.extend({
     name: "VizGraph",
     components: {
         ViewingControls,
         DebuggingPanel,
-        D3TimeSeriesGraph,
-        D3Histogram,
-        D3Range,
-        D3Map,
-        D3Scrubber,
+        TimeSeriesGraph,
+        Histogram,
+        Range,
+        Map,
     },
     data(): {} {
         return {};
@@ -70,16 +74,16 @@ export const VizGraph = Vue.extend({
         uiNameOf(graph: Graph): string {
             switch (graph.chartType) {
                 case ChartType.TimeSeries:
-                    return "D3TimeSeriesGraph";
+                    return "TimeSeriesGraph";
                 case ChartType.Histogram:
-                    return "D3Histogram";
+                    return "Histogram";
                 case ChartType.Range:
-                    return "D3Range";
+                    return "Range";
                 case ChartType.Map:
-                    return "D3Map";
+                    return "Map";
             }
             this.viz.log("unknown chart type");
-            return "D3TimeSeriesGraph";
+            return "TimeSeriesGraph";
         },
     },
     template: `
