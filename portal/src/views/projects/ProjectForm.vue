@@ -555,10 +555,10 @@ form > .outer-input-container {
     height: 45px;
     font-size: 18px;
     color: white;
-    background-color: #ce596b;
+    background-color: var(--color-secondary);
     border: none;
     border-radius: 5px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     letter-spacing: 0.1px;
     margin-bottom: 20px;
 
@@ -598,7 +598,7 @@ form > .outer-input-container {
 
     .ti-input {
         border: 0;
-        border-bottom: 1px solid #d8dce0;
+        border-bottom: 1px solid var(--color-border);
         padding: 0 0 3px 0;
     }
 
@@ -632,7 +632,7 @@ form > .outer-input-container {
     }
 
     .ti-deletion-mark {
-        background: #ce596b !important;
+        background: var(--color-secondary) !important;
         color: white;
 
         .ti-icon-close {
@@ -646,7 +646,7 @@ form > .outer-input-container {
 }
 .map-container {
     box-sizing: border-box;
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     background: white;
     width: 700px;
     max-width: 100%;
@@ -681,7 +681,7 @@ form > .outer-input-container {
 }
 
 .map-stations-buttons-body {
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     border-radius: 100px;
     display: flex;
     background-color: white;

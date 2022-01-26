@@ -275,7 +275,11 @@ export default Vue.extend({
     padding-top: 1em;
     padding-bottom: 1em;
     padding-left: 1em;
-    border-bottom: 1px solid #d8dce0;
+    border-bottom: 1px solid var(--color-border);
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
 }
 .stations-heading {
     display: flex;
@@ -317,16 +321,20 @@ export default Vue.extend({
             margin-right: 15px;
         }
     }
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
 }
 .last-seen {
     font-size: 12px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     color: #6a6d71;
 }
 .stations-container {
     margin: 25px 0 0 0;
     border-radius: 1px;
-    border: solid 1px #d8dce0;
+    border: solid 1px var(--color-border);
     background-color: #ffffff;
     overflow: hidden;
 }
@@ -360,7 +368,7 @@ export default Vue.extend({
     height: 38px;
     margin: 20px auto;
     padding: 1em;
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     transition: opacity 0.25s;
 }
 .project-stations-no-stations {
@@ -380,7 +388,7 @@ export default Vue.extend({
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    border-left: 1px solid #d8dce0;
+    border-left: 1px solid var(--color-border);
     text-align: center;
 }
 

@@ -2,7 +2,7 @@
     <div class="container-side" v-bind:class="{ active: !sidebar.narrow }">
         <div class="sidebar-header">
             <router-link :to="{ name: 'projects' }">
-                <img :alt="$t('layout.logo.alt')" id="header-logo" src="@/assets/logo-fieldkit.svg" />
+                <Logo />
             </router-link>
         </div>
         <a class="sidebar-trigger" v-on:click="toggleSidebar">
@@ -57,9 +57,13 @@
 
 <script lang="ts">
 import Vue from "vue";
+import Logo from "@/views/shared/Logo.vue";
 
 export default Vue.extend({
     name: "SidebarNav",
+    components: {
+        Logo,
+    },
     props: {
         viewingProject: { type: Object, default: null },
         viewingStation: { type: Object, default: null },
@@ -162,13 +166,10 @@ export default Vue.extend({
         padding: 0 20px;
         height: 54px;
     }
-}
-#header-logo {
-    width: 140px;
-    margin: 16px auto;
 
-    @include bp-down($md) {
-        display: none;
+    > a {
+        height: 100%;
+        display: flex;
     }
 }
 
@@ -195,7 +196,7 @@ export default Vue.extend({
 }
 .nav-label {
     @include flex(center);
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     font-size: 16px;
     margin: 12px 0;
     cursor: pointer;
@@ -205,9 +206,13 @@ export default Vue.extend({
     margin: 0 10px 0 5px;
 }
 .selected {
-    border-bottom: 2px solid #1b80c9;
+    border-bottom: 2px solid $color-primary;
     height: 100%;
     display: inline-block;
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
 }
 .unselected {
     display: inline-block;

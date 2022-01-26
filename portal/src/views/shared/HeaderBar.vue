@@ -1,7 +1,7 @@
 <template>
     <div class="header">
         <router-link :to="{ name: 'projects' }">
-            <img :alt="$t('layout.logo.alt')" id="header-logo" src="@/assets/logo-fieldkit.svg" />
+            <Logo />
         </router-link>
         <div
             class="header-account"
@@ -50,11 +50,13 @@ import * as ActionTypes from "@/store/actions";
 import { MarkNotificationsSeen } from "@/store";
 import CommonComponents from "@/views/shared";
 import { GlobalState } from "@/store/modules/global";
+import Logo from "@/views/shared/Logo.vue";
 
 export default Vue.extend({
     name: "HeaderBar",
     components: {
         ...CommonComponents,
+        Logo,
     },
     data(): { isAccountHovered: boolean; hiding: boolean } {
         return {
@@ -136,6 +138,11 @@ export default Vue.extend({
         ::v-deep + * {
             margin-top: 54px;
         }
+    }
+
+    > a {
+        display: flex;
+        align-items: center;
     }
 
     &-account {
@@ -251,20 +258,6 @@ export default Vue.extend({
 
     @include bp-down($sm) {
         margin: 0;
-    }
-}
-
-#header-logo {
-    @include position(fixed, 18px null null 50%);
-    width: 103px;
-    transform: translateX(-50%);
-
-    @include bp-up($sm) {
-        width: 140px;
-    }
-
-    @include bp-up($md) {
-        display: none;
     }
 }
 

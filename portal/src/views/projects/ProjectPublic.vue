@@ -237,13 +237,13 @@ export default Vue.extend({
 }
 .header .project-name {
     font-size: 24px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     margin: 0 15px 0 0;
     display: inline-block;
 }
 .header .project-dashboard {
     font-size: 20px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     margin: 0 15px 0 0;
     display: inline-block;
     margin-top: 10px;
@@ -253,7 +253,7 @@ export default Vue.extend({
 .details {
     display: flex;
     border-radius: 2px;
-    border: solid 1px #d8dce0;
+    border: solid 1px var(--color-border);
     background-color: white;
 
     @include bp-down($sm) {
@@ -304,7 +304,7 @@ export default Vue.extend({
     }
 }
 .details .details-heading {
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     padding-bottom: 10px;
     font-size: 24px;
     color: #2c3e50;
@@ -322,7 +322,7 @@ export default Vue.extend({
     padding-right: 0.2em;
 }
 .details .details-bottom {
-    border-top: 1px solid #d8dce0;
+    border-top: 1px solid var(--color-border);
     padding-top: 20px;
     display: flex;
     flex-direction: row;
@@ -334,7 +334,7 @@ export default Vue.extend({
     margin-top: 4px;
 }
 .details-bottom .title {
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
 }
 
 .module-icon {
@@ -378,7 +378,7 @@ export default Vue.extend({
 .update {
     padding: 26px 29px 23px;
     border-radius: 2px;
-    border: solid 1px #d8dce0;
+    border: solid 1px var(--color-border);
     background-color: #ffffff;
     margin-top: 16px;
     position: relative;
@@ -469,7 +469,7 @@ export default Vue.extend({
 
 .recent-activity {
     border-radius: 2px;
-    border: solid 1px #d8dce0;
+    border: solid 1px var(--color-border);
     background-color: #ffffff;
     padding: 17px 23px;
     flex: 1;
@@ -543,7 +543,7 @@ export default Vue.extend({
     flex-basis: 349px;
     padding: 17px 20px;
     border-radius: 2px;
-    border: solid 1px #d8dce0;
+    border: solid 1px var(--color-border);
     background-color: #ffffff;
     margin-right: 32px;
 

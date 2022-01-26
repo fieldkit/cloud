@@ -1,7 +1,7 @@
 <template>
     <div class="form-container">
         <div class="form-wrap">
-            <img class="form-header-logo" :alt="$t('layout.logo.alt')" src="@/assets/FieldKit_Logo_White.png" />
+            <img class="form-header-logo" :alt="$t('layout.logo.fieldkit.alt')" src="@/assets/FieldKit_Logo_White.png" />
             <form v-if="!created" class="form" @submit.prevent="save">
                 <h1 class="form-title">{{ $t("createAccount.form.title") }}</h1>
                 <div class="form-group">

@@ -365,20 +365,20 @@ export default Vue.extend({
     flex-direction: column;
     flex-basis: 250px;
     flex-shrink: 0;
-    border-top: 1px solid #d8dce0;
-    border-left: 1px solid #d8dce0;
-    border-bottom: 1px solid #d8dce0;
+    border-top: 1px solid var(--color-border);
+    border-left: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
 
     @include bp-down($md) {
         flex-basis: 100%;
     }
 }
 .tab {
-    border-bottom: 1px solid #d8dce0;
+    border-bottom: 1px solid var(--color-border);
     cursor: pointer;
 
     @include bp-down($md) {
-        border-right: 1px solid #d8dce0;
+        border-right: 1px solid var(--color-border);
         border-bottom: 0;
     }
 
@@ -430,14 +430,14 @@ export default Vue.extend({
     &-content {
         width: calc(100% - 250px);
         z-index: $z-index-top;
-        border: 1px solid #d8dce0;
+        border: 1px solid var(--color-border);
 
         @include bp-down($md) {
             padding-top: 1px;
             width: 100%;
             max-height: 0;
             border: 0;
-            border-top: 1px solid #d8dce0;
+            border-top: 1px solid var(--color-border);
             overflow: hidden;
 
             @at-root .tab.active & {
@@ -449,7 +449,7 @@ export default Vue.extend({
 
 .vertical {
     margin-top: auto;
-    border-right: 1px solid #d8dce0;
+    border-right: 1px solid var(--color-border);
     height: 100%;
 }
 .name {

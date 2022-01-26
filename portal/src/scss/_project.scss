@@ -38,7 +38,6 @@
 }
 
 .details {
-
     &-row {
         margin-bottom: 5px;
         font-family: $font-family-light;
@@ -54,8 +53,8 @@
             padding-right: 24px;
 
             &:after {
-                content: '';
-                background: url('../../assets/icon-tooltip.svg') no-repeat center center;
+                content: "";
+                background: url("../../assets/icon-tooltip.svg") no-repeat center center;
                 background-size: contain;
                 width: 14px;
                 height: 14px;
@@ -92,4 +91,3 @@
         max-height: 100%;
     }
 }
-

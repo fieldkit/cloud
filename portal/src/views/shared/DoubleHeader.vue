@@ -71,15 +71,17 @@ export default Vue.extend({
 .back {
     font-size: 14px;
     letter-spacing: 0.06px;
-    color: #2c3e50;
     margin-bottom: 20px;
     cursor: pointer;
 }
 .one {
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     font-size: 24px;
-    color: #2c3e50;
     margin-bottom: 1px;
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
 }
 .two {
     font-weight: 500;

@@ -243,7 +243,7 @@ export default Vue.extend({
     margin-top: 25px;
     display: flex;
     flex-direction: column;
-    border: 1px solid #d8dce0;
+    border: 1px solid $color-border;
     border-radius: 1px;
     background: white;
     padding: 25px 20px;
@@ -261,6 +261,10 @@ export default Vue.extend({
     @include bp-down($xs) {
         margin-bottom: 5px;
     }
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
 }
 .invite-button {
     padding: 0 20px;
@@ -268,9 +272,13 @@ export default Vue.extend({
     border-radius: 3px;
     border: 1px solid #cccdcf;
     font-size: 14px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     background-color: #ffffff;
     cursor: pointer;
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-button;
+    }
 }
 
 .user-row {
@@ -332,12 +340,16 @@ export default Vue.extend({
 
 .cell-heading {
     font-size: 14px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
 
     &:nth-of-type(2) {
         @include bp-down($sm) {
             display: none;
         }
+    }
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
     }
 }
 
@@ -355,7 +367,7 @@ export default Vue.extend({
 
 .invite-status {
     color: #0a67aa;
-    font-family: $font-family-normal !important;
+    font-family: var(--font-family-medium) !important;
 }
 
 .cell .text-input {

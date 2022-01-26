@@ -107,7 +107,7 @@ export default {
     clear: both;
     min-width: 600px;
     margin: 30px 0 0 0;
-    border-bottom: 2px solid #d8dce0;
+    border-bottom: 2px solid var(--color-border);
 }
 .project-name {
     font-size: 22px;
@@ -120,8 +120,8 @@ export default {
     height: 30px;
     color: white;
     font-size: 18px;
-    font-family: $font-family-bold;
-    background-color: #ce596b;
+    font-family: var(--font-family-bold);
+    background-color: var(--color-secondary);
     border: none;
     border-radius: 5px;
     margin: 0 20px 0 20px;

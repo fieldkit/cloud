@@ -235,7 +235,7 @@ export default Vue.extend({
 }
 .footer .button.enabled {
     color: #ffffff;
-    background-color: #ce596b;
+    background-color: var(--color-secondary);
     cursor: pointer;
 }
 input {

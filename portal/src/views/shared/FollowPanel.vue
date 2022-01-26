@@ -43,10 +43,9 @@ export default Vue.extend({
     align-items: center;
     font-size: 18px;
     font-weight: 500;
-    color: #2c3e50;
     padding-top: 24px;
     border-radius: 1px;
-    border-top: solid 1px #d8dce0;
+    border-top: solid 1px var(--color-border);
     margin-top: 10px;
 
     @include bp-down($xs) {

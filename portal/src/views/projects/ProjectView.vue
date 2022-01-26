@@ -171,9 +171,13 @@ export default Vue.extend({
     border: solid 1px #cccdcf;
     background-color: #ffffff;
     cursor: pointer;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     padding: 10px 22px;
     @include flex(center, center);
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-button;
+    }
 
     img {
         margin-right: 14px;
@@ -185,7 +189,7 @@ export default Vue.extend({
     top: 70px;
     bottom: 0;
     background-color: #fcfcfc;
-    border-left: 2px solid #d8dce0;
+    border-left: 2px solid var(--color-border);
     z-index: 10;
     overflow-y: scroll;
     width: 30em;

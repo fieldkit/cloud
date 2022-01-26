@@ -58,7 +58,12 @@
     "random.random_9": "Random 9",
     "layout": {
         "logo": {
-            "alt": "FieldKit Logo",
+            "fieldkit": {
+                "alt": "FieldKit Logo"
+            },
+            "floodnet": {
+                "alt": "Floodnet Logo"
+            },
             "compass": {
                 "alt": "FieldKit Compass Logo"
             }

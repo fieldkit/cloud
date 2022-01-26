@@ -99,7 +99,7 @@ export default {
 
 .project-container {
     flex-basis: 270px;
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     margin: 0 12px 40px;
     padding-bottom: 17px;
     transition: all 0.33s;
@@ -123,7 +123,7 @@ export default {
     }
 }
 .project-name {
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     font-size: 16px;
     margin: 13px 15px 0 15px;
 }
@@ -137,7 +137,7 @@ export default {
 .project-image-container {
     height: 138px;
     text-align: center;
-    border-bottom: 1px solid #d8dce0;
+    border-bottom: 1px solid var(--color-border);
 }
 ::v-deep .project-image {
     height: 100%;
@@ -181,7 +181,7 @@ export default {
     margin-top: auto;
 
     * {
-        font-family: $font-family-bold;
+        font-family: var(--font-family-bold);
     }
 
     img {

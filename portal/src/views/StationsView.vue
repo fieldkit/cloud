@@ -246,7 +246,7 @@ export default Vue.extend({
 
     .heading {
         font-size: 18px;
-        font-family: $font-family-bold;
+        font-family: var(--font-family-bold);
         margin-bottom: 2px;
         margin-top: 0;
     }
