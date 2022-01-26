@@ -209,6 +209,10 @@ export default Vue.extend({
     border-bottom: 2px solid #1b80c9;
     height: 100%;
     display: inline-block;
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
 }
 .unselected {
     display: inline-block;
@@ -230,6 +234,10 @@ export default Vue.extend({
 
     &.selected {
         padding-bottom: 2px;
+    }
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-extra-light;
     }
 }
 .sidebar-compass {
