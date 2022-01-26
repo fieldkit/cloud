@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-            <div class="nav-section">
+            <div class="nav-section" v-if="stations.length > 0">
                 <router-link :to="{ name: 'mapAllStations' }">
                     <div class="nav-label">
                         <img alt="Stations" src="@/assets/icon-stations.svg" />

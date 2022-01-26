@@ -53,9 +53,13 @@ func NewDataEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 		sc := security.JWTScheme{
 			Name:           "jwt",
 			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
+			RequiredScopes: []string{},
 		}
-		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		var token string
+		if p.Auth != nil {
+			token = *p.Auth
+		}
+		ctx, err = authJWTFn(ctx, token, &sc)
 		if err != nil {
 			return nil, err
 		}

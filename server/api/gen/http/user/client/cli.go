@@ -459,9 +459,11 @@ func BuildListByProjectPayload(userListByProjectProjectID string, userListByProj
 			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = userListByProjectAuth
+		if userListByProjectAuth != "" {
+			auth = &userListByProjectAuth
+		}
 	}
 	v := &user.ListByProjectPayload{}
 	v.ProjectID = projectID

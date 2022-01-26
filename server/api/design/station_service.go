@@ -320,25 +320,24 @@ var _ = Service("station", func() {
 	})
 
 	Method("default photo", func() {
-        Security(JWTAuth, func() {
-            Scope("api:access")
-        })
+		Security(JWTAuth, func() {
+			// Optional
+		})
 
-        Payload(func() {
-            Token("auth")
-            Required("auth")
-            Attribute("id", Int32)
-            Required("id")
-            Attribute("photoId", Int32)
-            Required("photoId")
-        })
+		Payload(func() {
+			Token("auth")
+			Attribute("id", Int32)
+			Required("id")
+			Attribute("photoId", Int32)
+			Required("photoId")
+		})
 
-        HTTP(func() {
-            POST("stations/{id}/photo/{photoId}")
+		HTTP(func() {
+			POST("stations/{id}/photo/{photoId}")
 
-            httpAuthentication()
-        })
-    })
+			httpAuthentication()
+		})
+	})
 
 	Method("update", func() {
 		Security(JWTAuth, func() {
@@ -406,12 +405,11 @@ var _ = Service("station", func() {
 
 	Method("list associated", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
 			Attribute("id", Int32)
 			Required("id")
 		})
@@ -427,12 +425,11 @@ var _ = Service("station", func() {
 
 	Method("download photo", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
 			Attribute("stationId", Int32)
 			Required("stationId")
 			Attribute("size", Int32)

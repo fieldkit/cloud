@@ -51,7 +51,7 @@
                     />
                 </div>
                 <div class="right-actions">
-                    <FollowControl :project="project">
+                    <FollowControl :project="project" v-if="isAuthenticated">
                         <template #default="{ following, follow, unfollow }">
                             <button class="button-social" v-on:click="unfollow" v-if="following">
                                 <img src="@/assets/icon-heart-dark-blue.svg" width="16px" alt="Icon" />
@@ -142,6 +142,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import { mapGetters } from "vuex";
 import * as utils from "../../utilities";
 import { ProjectModule, DisplayStation, Project, DisplayProject } from "@/store";
 import ProjectStations from "./ProjectStations.vue";
@@ -183,6 +184,7 @@ export default Vue.extend({
         },
     },
     computed: {
+        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         project(): Project {
             return this.displayProject.project;
         },

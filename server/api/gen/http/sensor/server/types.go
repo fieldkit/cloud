@@ -269,7 +269,7 @@ func NewDataBadRequestResponseBody(res *goa.ServiceError) *DataBadRequestRespons
 }
 
 // NewDataPayload builds a sensor service data endpoint payload.
-func NewDataPayload(start *int64, end *int64, stations *string, sensors *string, resolution *int32, aggregate *string, complete *bool, tail *int32, auth string) *sensor.DataPayload {
+func NewDataPayload(start *int64, end *int64, stations *string, sensors *string, resolution *int32, aggregate *string, complete *bool, tail *int32, auth *string) *sensor.DataPayload {
 	v := &sensor.DataPayload{}
 	v.Start = start
 	v.End = end

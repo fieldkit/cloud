@@ -1,7 +1,7 @@
 <template>
     <StandardLayout :viewingProjects="true">
         <div class="projects-view">
-            <div class="container mine">
+            <div class="container mine" v-if="userProjects.length > 0">
                 <div class="header">
                     <h1 v-if="isAuthenticated">{{ $t("projects.title.mine") }}</h1>
                     <h1 v-if="!isAuthenticated">{{ $t("projects.title.anonymous") }}</h1>
@@ -29,7 +29,6 @@ import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout";
 import ProjectThumbnails from "./ProjectThumbnails";
-import * as ActionTypes from "@/store/actions";
 
 export default Vue.extend({
     name: "ProjectsView",
@@ -50,9 +49,11 @@ export default Vue.extend({
         }),
     },
     mounted() {
-        return this.$services.api.getInvitesByUser().then((invites) => {
-            this.invites = invites;
-        });
+        if (this.isAuthenticated) {
+            return this.$services.api.getInvitesByUser().then((invites) => {
+                this.invites = invites;
+            });
+        }
     },
     methods: {
         goBack() {
