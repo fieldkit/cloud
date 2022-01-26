@@ -30,9 +30,6 @@ export const ViewingControls = Vue.extend({
         },
     },
     computed: {
-        compareIcon() {
-            return this.$loadAsset("icon-compare.svg");
-        },
         chartTypes(): { label: string; id: ChartType }[] {
             const vizInfo = this.workspace.vizInfo(this.viz);
             const allTypes = [
@@ -154,7 +151,10 @@ export const ViewingControls = Vue.extend({
 		<div class="controls-container">
 			<div class="row row-1">
 				<div class="left buttons" v-if="!viz.busy">
-					<div class="button compare" @click="raiseCompare" alt="Compare"> <img :src="compareIcon" /><div>Compare Sensor Graphs</div></div>
+					<div class="button compare" @click="raiseCompare" alt="Compare"> 
+                        <i class="icon icon-compare"> </i> 
+                        <div>Compare Sensor Graphs</div>
+                    </div>
 				</div>
 				<div class="left busy" v-else><Spinner /></div>
 				<div class="right time">

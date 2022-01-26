@@ -60,7 +60,7 @@ export default Vue.extend({
         content: "...";
         height: 17px;
         font-size: 32px;
-        font-family: var(--font-family-bold);
+        font-family: "icomoon";
     }
 }
 
