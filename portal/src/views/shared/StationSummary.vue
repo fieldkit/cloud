@@ -161,7 +161,7 @@ export default Vue.extend({
     font-size: 14px;
 }
 .station-battery {
-    margin: 5px 0 7px;
+    margin: 5px 0 0;
     display: flex;
     line-height: 13px;
 }
@@ -173,6 +173,7 @@ export default Vue.extend({
 .module-icon-container {
     float: left;
     margin-right: 10px;
+    margin-top: 5px;
     box-shadow: 0 2px 4px 0 var(--color-border);
     border-radius: 50%;
     display: flex;
@@ -245,6 +246,10 @@ export default Vue.extend({
 .readings-container div.title {
     padding-bottom: 13px;
     font-family: var(--font-family-medium);
+
+    body.floodnet & {
+        font-family: var(--font-family-bold);
+    }
 }
 .explore-button {
     font-size: 18px;

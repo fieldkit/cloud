@@ -11,6 +11,7 @@ import { AuthenticationRequiredError } from "@/api";
 
 export default Vue.extend({
     async mounted(): Promise<void> {
+        document.body.classList.add("floodnet");
         try {
             await this.$store.dispatch(ActionTypes.INITIALIZE);
         } catch (err) {
