@@ -161,14 +161,14 @@
           {
             "field": "value",
             "type": "quantitative",
-            "formatType": "number",
+            "formatType": "fkHumanReadable",
             "format": ".3"
           },
           {
             "field": "time",
             "type": "temporal",
             "formatType": "time",
-            "format": "%Y-%m-%d %H:%m"
+            "format": "%-m/%-d/%Y %H:%m"
           }
         ]
       },

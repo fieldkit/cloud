@@ -1,4 +1,5 @@
 {
+  "customFormatTypes": true,
   "axis": {
     "labelFont": "Avenir Light",
     "labelFontSize": 12,

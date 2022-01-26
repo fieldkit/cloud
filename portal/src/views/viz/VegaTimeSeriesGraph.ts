@@ -39,6 +39,10 @@ export const VegaTimeSeriesGraph = Vue.extend({
             }
             return i18n.tc(vizInfo.firmwareKey);
         },
+        valueSuffix(): string | null {
+            const vizInfo = this.workspace.vizInfo(this.viz);
+            return vizInfo.unitOfMeasure;
+        },
     },
     methods: {
         onDouble() {
@@ -51,7 +55,7 @@ export const VegaTimeSeriesGraph = Vue.extend({
     template: `
         <div class="viz time-series-graph">
             <div class="chart" @dblclick="onDouble" v-if="data">
-                <LineChart :data="{ data: data.data }" :label="label" v-bind:key="data.key" />
+                <LineChart :data="{ data: data.data }" :label="label" :valueSuffix="valueSuffix" v-bind:key="data.key" />
             </div>
         </div>
     `,

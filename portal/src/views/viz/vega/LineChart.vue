@@ -9,6 +9,7 @@
 <script>
 import _ from "lodash";
 import { default as vegaEmbed } from "vega-embed";
+import { expressionFunction } from "vega";
 import lineSpec from "./line.vl.json";
 import chartConfig from "./chartConfig.json";
 
@@ -20,6 +21,10 @@ export default {
             required: true,
         },
         label: {
+            type: String,
+            required: true,
+        },
+        valueSuffix: {
             type: String,
             required: true,
         },
@@ -45,6 +50,16 @@ export default {
             lineSpec.config = chartConfig;
             lineSpec.data = { name: "table", values: this.data.data };
             lineSpec.layer[0].encoding.y.axis.title = this.label;
+
+            expressionFunction("fkHumanReadable", (datum) => {
+                if (_.isUndefined(datum)) {
+                    return "N/A";
+                }
+                if (this.valueSuffix) {
+                    return `${datum.toFixed(3)} ${this.valueSuffix}`;
+                }
+                return `${datum.toFixed(3)}`;
+            });
 
             await vegaEmbed(".linechart", lineSpec, {
                 renderer: "svg",
