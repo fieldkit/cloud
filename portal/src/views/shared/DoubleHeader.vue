@@ -78,6 +78,10 @@ export default Vue.extend({
     font-family: $font-family-bold;
     font-size: 24px;
     margin-bottom: 1px;
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
 }
 .two {
     font-weight: 500;

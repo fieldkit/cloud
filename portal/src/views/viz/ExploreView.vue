@@ -323,6 +323,10 @@ export default Vue.extend({
     margin-bottom: 5px;
     align-items: baseline;
     min-height: 80px;
+
+    body.floodnet & {
+        border-bottom: 1px solid $color-floodnet-light;
+    }
 }
 
 .controls-container .row-2 {
@@ -375,6 +379,10 @@ export default Vue.extend({
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
+
+    body.floodnet & {
+        border: 1px solid $color-floodnet-light;
+    }
 }
 
 .controls-container .fast-time.selected {
@@ -390,6 +398,10 @@ export default Vue.extend({
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
+
+    body.floodnet & {
+        border: 1px solid $color-floodnet-light;
+    }
 }
 
 .debug-panel {

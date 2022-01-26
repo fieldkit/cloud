@@ -11,7 +11,7 @@ import { AuthenticationRequiredError } from "@/api";
 
 export default Vue.extend({
     async mounted(): Promise<void> {
-        document.body.classList.add('floodnet');
+        document.body.classList.add("floodnet");
         try {
             await this.$store.dispatch(ActionTypes.INITIALIZE);
         } catch (err) {
@@ -50,12 +50,16 @@ body {
     flex-shrink: 0;
 
     * {
-        font-family: "Avenir", Helvetica, Arial, sans-serif;
+        font-family: $font-family-normal, Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
     }
 
     &.floodnet {
-      color: $color-floodnet-dark;
+        color: $color-floodnet-dark;
+
+        * {
+            font-family: $font-family-floodnet-extra-light, Helvetica, Arial, sans-serif;
+        }
     }
 }
 body:not(.disable-scrolling) {
@@ -112,6 +116,12 @@ li {
 }
 
 .date-picker input {
-  color: inherit;
+    color: inherit;
+}
+
+.vue-treeselect__control {
+    body.floodnet & {
+        border: 1px solid $color-floodnet-light;
+    }
 }
 </style>

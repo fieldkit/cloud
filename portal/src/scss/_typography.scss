@@ -24,6 +24,17 @@ $font_path: '~@/fonts/';
     url($font_path + 'Avenir/AvenirLTPro-Heavy.ttf') format("truetype") /* Safari, Android, iOS */
 }
 
+// floodnet
+@font-face {
+    font-family: "Public Sans Bold";
+    src: url($font_path + 'Public_Sans/static/PublicSans-Bold.ttf') format("truetype");
+}
+
+@font-face {
+    font-family: "Public Sans Extra Light";
+    src: url($font_path + 'Public_Sans/static/PublicSans-ExtraLight.ttf') format("truetype");
+}
+
 .bold {
     font-family: $font-family-bold;
 }
