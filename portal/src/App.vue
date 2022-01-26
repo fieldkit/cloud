@@ -30,7 +30,6 @@ export default Vue.extend({
 <style lang="scss">
 @import "scss/mixins";
 @import "scss/typography";
-@import "scss/variables";
 
 html {
 }
