@@ -1,5 +1,13 @@
 @import "mixins";
 
+.flex {
+    display: flex;
+
+    &-al-center {
+        align-items: center;
+    }
+}
+
 .main-panel {
     display: flex;
     flex-direction: column;

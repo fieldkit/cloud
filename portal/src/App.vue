@@ -30,6 +30,7 @@ export default Vue.extend({
 <style lang="scss">
 @import "scss/mixins";
 @import "scss/typography";
+@import "scss/icons";
 @import "icomoon/style.css";
 
 html {
@@ -139,4 +140,5 @@ li {
 .vue-treeselect__control {
     border: 1px solid var(--color-border);
 }
+
 </style>

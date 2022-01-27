@@ -12,7 +12,7 @@
             <div class="nav-section">
                 <router-link :to="{ name: 'projects' }">
                     <div class="nav-label">
-                        <img alt="Projects" src="@/assets/icon-projects.svg" />
+                        <i class="icon icon-projects"></i>
                         <span v-bind:class="{ selected: viewingProjects }">{{ $t("layout.side.projects.title") }}</span>
                     </div>
                 </router-link>
@@ -31,7 +31,7 @@
             <div class="nav-section">
                 <router-link :to="{ name: 'mapAllStations' }">
                     <div class="nav-label">
-                        <img alt="Stations" src="@/assets/icon-stations.svg" />
+                        <i class="icon icon-stations"></i>
                         <span v-bind:class="{ selected: viewingStations }">{{ $t("layout.side.stations.title") }}</span>
                     </div>
                 </router-link>
@@ -201,9 +201,14 @@ export default Vue.extend({
     margin: 12px 0;
     cursor: pointer;
 }
-.nav-label img {
+.nav-label .icon {
     vertical-align: sub;
     margin: 0 10px 0 5px;
+    font-size: 16px;
+
+    &:before {
+        color: var(--color-primary);
+    }
 }
 .selected {
     border-bottom: 2px solid $color-primary;

@@ -6,7 +6,7 @@
                     <h1 v-if="isAuthenticated">{{ $t("projects.title.mine") }}</h1>
                     <h1 v-if="!isAuthenticated">{{ $t("projects.title.anonymous") }}</h1>
                     <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
-                        <img alt="Add project" src="@/assets/icon-plus-round.svg" />
+                        <i class="icon icon-plus-round"> </i>
                         <span>{{ $t("projects.add") }}</span>
                     </div>
                 </div>
@@ -140,13 +140,12 @@ export default Vue.extend({
 #add-project {
     margin-left: auto;
     cursor: pointer;
-    @include flex(flex-end);
+    font-size: 16px;
+    @include flex(center);
 
-    img {
+    i {
         margin-right: 7px;
+        margin-top: -3px;
     }
-}
-#add-project img {
-    vertical-align: bottom;
 }
 </style>
