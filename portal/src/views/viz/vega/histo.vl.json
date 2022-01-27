@@ -9,11 +9,17 @@
       },
       "field": "value",
       "axis": {
-        "title": "Value"
+        "title": "Value",
+        "titleFontWeight": 400,
+        "titleColor": "#7f7f7f"
       }
     },
     "y": {
-      "aggregate": "count"
+      "aggregate": "count",
+      "axis": {
+        "titleFontWeight": 400,
+        "titleColor": "#7f7f7f"
+      }
     },
     "color": {
       "bin": {

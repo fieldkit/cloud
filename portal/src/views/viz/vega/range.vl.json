@@ -43,8 +43,9 @@
       "field": "bin_time",
       "type": "temporal",
       "axis": {
+        "labelColor": "#7f7f7f",
         "formatType": "time",
-        "format": "%Y-%m-%d"
+        "format": "%-m/%-d/%Y"
       },
       "title": null
     },
@@ -58,6 +59,11 @@
       "type": "quantitative",
       "scale": {
         "zero": false
+      },
+      "axis": {
+        "titleFontWeight": 400,
+        "titleColor": "#7f7f7f",
+        "labelColor": "#7f7f7f"
       }
     },
     "y2": {

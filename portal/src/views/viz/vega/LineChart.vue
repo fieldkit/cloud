@@ -64,7 +64,7 @@ export default {
             await vegaEmbed(".linechart", lineSpec, {
                 renderer: "svg",
                 tooltip: { offsetX: -50, offsetY: 50 },
-                actions: false, // { source: false, editor: false, compiled: false },
+                actions: { source: false, editor: false, compiled: false },
             }).then((view) => {
                 this.vegaView = view;
                 view.view.addSignalListener("brush", function(_, value) {
