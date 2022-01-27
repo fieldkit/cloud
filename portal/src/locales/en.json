@@ -318,5 +318,17 @@
         "agreeButton": "Accept",
         "disagreeButton": "Disagree"
     },
-    "selected": "Selected"
+    "selected": "Selected",
+    "notifications": {
+        "title": "Notifications",
+        "viewAllButton": "View All",
+        "dismissAllButton": "Dismiss All",
+        "filters": {
+            "all": "All",
+            "unread": "Unread",
+            "comment": "Comment",
+            "reply": "Reply",
+            "mention": "Mention"
+        }
+    }
 }
