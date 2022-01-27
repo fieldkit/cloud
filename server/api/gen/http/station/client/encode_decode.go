@@ -506,8 +506,8 @@ func EncodeDefaultPhotoRequest(encoder func(*http.Request) goahttp.Encoder) func
 		if !ok {
 			return goahttp.ErrInvalidType("station", "default photo", "*station.DefaultPhotoPayload", v)
 		}
-		{
-			head := p.Auth
+		if p.Auth != nil {
+			head := *p.Auth
 			if !strings.Contains(head, " ") {
 				req.Header.Set("Authorization", "Bearer "+head)
 			} else {
@@ -1081,8 +1081,8 @@ func EncodeListAssociatedRequest(encoder func(*http.Request) goahttp.Encoder) fu
 		if !ok {
 			return goahttp.ErrInvalidType("station", "list associated", "*station.ListAssociatedPayload", v)
 		}
-		{
-			head := p.Auth
+		if p.Auth != nil {
+			head := *p.Auth
 			if !strings.Contains(head, " ") {
 				req.Header.Set("Authorization", "Bearer "+head)
 			} else {
@@ -1234,8 +1234,8 @@ func EncodeDownloadPhotoRequest(encoder func(*http.Request) goahttp.Encoder) fun
 			head := *p.IfNoneMatch
 			req.Header.Set("If-None-Match", head)
 		}
-		{
-			head := p.Auth
+		if p.Auth != nil {
+			head := *p.Auth
 			if !strings.Contains(head, " ") {
 				req.Header.Set("Authorization", "Bearer "+head)
 			} else {

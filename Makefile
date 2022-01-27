@@ -1,6 +1,6 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 2
-VERSION_PATCH = 26
+VERSION_PATCH = 27
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
@@ -167,7 +167,7 @@ aws-image:
 sanitize: sanitizer
 	mkdir -p sanitize-data
 	rsync -zvua schema-production/* sanitize-data
-	docker run --rm --name fksanitize-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password -p "5432:5432" -v `pwd`/sanitize-data:/docker-entrypoint-initdb.d/:ro -d mdillon/postgis
+	docker run --rm --name fksanitize-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password -p "5432:5432" -v `pwd`/sanitize-data:/docker-entrypoint-initdb.d/:ro -d postgis/postgis:12-2.5-alpine
 	$(BUILD)/sanitizer --waiting
 	docker exec fksanitize-pg pg_dump 'postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable' | bzip2 > db-sanitized.sql.bz2
 	docker stop fksanitize-pg

@@ -45,10 +45,12 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 	for done := false; !done; {
 		select {
 		case outgoing := <-listener.published:
-			log.Infow("ws:incoming", "message", outgoing)
-			for _, value := range outgoing {
-				if err := stream.Send(value); err != nil {
-					return err
+			if outgoing != nil && len(outgoing) > 0 {
+				log.Infow("ws:incoming", "message", outgoing)
+				for _, value := range outgoing {
+					if err := stream.Send(value); err != nil {
+						return err
+					}
 				}
 			}
 		case err := <-listener.errors:
@@ -58,10 +60,11 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 			}
 
 			connected := true
+
 			if le, ok := err.(*ListenerError); ok {
 				connected = le.Connected
 				log.Warnw("ws:error", "error", err)
-			} else {
+			} else if err != nil {
 				log.Errorw("ws:error", "error", err)
 			}
 

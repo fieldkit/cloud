@@ -10,8 +10,12 @@ import * as ActionTypes from "@/store/actions";
 import { AuthenticationRequiredError } from "@/api";
 
 export default Vue.extend({
-    async mounted(): Promise<void> {
+    async updated(): Promise<void> {
         try {
+            if (window.location.hostname.indexOf("floodnet.") === 0) {
+                this.$nextTick().then(() => document.body.classList.add("floodnet"));
+            }
+
             await this.$store.dispatch(ActionTypes.INITIALIZE);
         } catch (err) {
             console.log("initialize error", err, err.stack);
@@ -140,5 +144,4 @@ li {
 .vue-treeselect__control {
     border: 1px solid var(--color-border);
 }
-
 </style>

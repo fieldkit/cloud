@@ -73,9 +73,11 @@ func BuildGetPayload(notesGetStationID string, notesGetAuth string) (*notes.GetP
 			return nil, fmt.Errorf("invalid value for stationID, must be INT32")
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = notesGetAuth
+		if notesGetAuth != "" {
+			auth = &notesGetAuth
+		}
 	}
 	v := &notes.GetPayload{}
 	v.StationID = stationID
@@ -97,9 +99,11 @@ func BuildDownloadMediaPayload(notesDownloadMediaMediaID string, notesDownloadMe
 			return nil, fmt.Errorf("invalid value for mediaID, must be INT32")
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = notesDownloadMediaAuth
+		if notesDownloadMediaAuth != "" {
+			auth = &notesDownloadMediaAuth
+		}
 	}
 	v := &notes.DownloadMediaPayload{}
 	v.MediaID = mediaID

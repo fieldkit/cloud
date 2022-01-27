@@ -403,12 +403,12 @@ func main() {
 			return
 		}
 
-		if req.Host == config.PortalDomain {
-			staticFinal.ServeHTTP(w, req)
+		if req.Host == config.ApiDomain {
+			serveApi(w, req)
 			return
 		}
 
-		serveApi(w, req)
+		staticFinal.ServeHTTP(w, req)
 	})
 
 	server := &http.Server{

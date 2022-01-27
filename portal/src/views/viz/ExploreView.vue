@@ -1,7 +1,7 @@
 <template>
     <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible">
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closeExports" />
-        <div class="container-wrap explore-view">
+        <div class="explore-view">
             <div class="explore-header">
                 <DoubleHeader
                     title="Data View"
@@ -208,6 +208,9 @@ export default Vue.extend({
 }
 
 .explore-view {
+    text-align: left;
+    background-color: #fcfcfc;
+    padding: 40px;
     flex-grow: 1;
 }
 .explore-header {
@@ -302,10 +305,11 @@ export default Vue.extend({
 }
 
 /* HACK d3 Real talk, no idea how to do this elsewhere. -jlewallen */
+/*
 .brush-container .selection {
     opacity: 0.3;
 }
-
+*/
 .controls-container {
     margin-left: 40px;
     margin-right: 40px;

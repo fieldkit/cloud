@@ -1646,10 +1646,6 @@ paths:
       tags:
       - notes
       summary: download media notes
-      description: |2-
-
-        **Required security scopes for jwt**:
-          * `api:access`
       operationId: notes#download media
       parameters:
       - name: mediaId
@@ -1660,7 +1656,7 @@ paths:
       - name: Authorization
         in: header
         description: authentication token
-        required: true
+        required: false
         type: string
         pattern: ^Bearer [^ ]+$
       responses:
@@ -3458,10 +3454,6 @@ paths:
       tags:
       - sensor
       summary: data sensor
-      description: |2-
-
-        **Required security scopes for jwt**:
-          * `api:access`
       operationId: sensor#data
       parameters:
       - name: start
@@ -3503,7 +3495,7 @@ paths:
       - name: Authorization
         in: header
         description: authentication token
-        required: true
+        required: false
         type: string
         pattern: ^Bearer [^ ]+$
       responses:
@@ -3733,10 +3725,6 @@ paths:
       tags:
       - station
       summary: list associated station
-      description: |2-
-
-        **Required security scopes for jwt**:
-          * `api:access`
       operationId: station#list associated
       parameters:
       - name: id
@@ -3747,7 +3735,7 @@ paths:
       - name: Authorization
         in: header
         description: authentication token
-        required: true
+        required: false
         type: string
         pattern: ^Bearer [^ ]+$
       responses:
@@ -3780,10 +3768,6 @@ paths:
       tags:
       - station
       summary: default photo station
-      description: |2-
-
-        **Required security scopes for jwt**:
-          * `api:access`
       operationId: station#default photo
       parameters:
       - name: id
@@ -3799,7 +3783,7 @@ paths:
       - name: Authorization
         in: header
         description: authentication token
-        required: true
+        required: false
         type: string
         pattern: ^Bearer [^ ]+$
       responses:
@@ -3940,10 +3924,6 @@ paths:
       tags:
       - notes
       summary: get notes
-      description: |2-
-
-        **Required security scopes for jwt**:
-          * `api:access`
       operationId: notes#get
       parameters:
       - name: stationId
@@ -3954,7 +3934,7 @@ paths:
       - name: Authorization
         in: header
         description: authentication token
-        required: true
+        required: false
         type: string
         pattern: ^Bearer [^ ]+$
       responses:
@@ -4040,10 +4020,6 @@ paths:
       tags:
       - station
       summary: download photo station
-      description: |2-
-
-        **Required security scopes for jwt**:
-          * `api:access`
       operationId: station#download photo
       parameters:
       - name: size
@@ -4063,7 +4039,7 @@ paths:
       - name: Authorization
         in: header
         description: authentication token
-        required: true
+        required: false
         type: string
         pattern: ^Bearer [^ ]+$
       responses:
@@ -4914,10 +4890,6 @@ paths:
       tags:
       - user
       summary: list by project user
-      description: |2-
-
-        **Required security scopes for jwt**:
-          * `api:access`
       operationId: user#list by project
       parameters:
       - name: projectId
@@ -4928,7 +4900,7 @@ paths:
       - name: Authorization
         in: header
         description: authentication token
-        required: true
+        required: false
         type: string
         pattern: ^Bearer [^ ]+$
       responses:

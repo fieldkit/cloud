@@ -398,7 +398,7 @@ func DecodeDefaultPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) go
 		var (
 			id      int32
 			photoID int32
-			auth    string
+			auth    *string
 			err     error
 
 			params = mux.Vars(r)
@@ -419,18 +419,20 @@ func DecodeDefaultPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) go
 			}
 			photoID = int32(v)
 		}
-		auth = r.Header.Get("Authorization")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		authRaw := r.Header.Get("Authorization")
+		if authRaw != "" {
+			auth = &authRaw
 		}
 		if err != nil {
 			return nil, err
 		}
 		payload := NewDefaultPhotoPayload(id, photoID, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
+		if payload.Auth != nil {
+			if strings.Contains(*payload.Auth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
+				payload.Auth = &cred
+			}
 		}
 
 		return payload, nil
@@ -864,7 +866,7 @@ func DecodeListAssociatedRequest(mux goahttp.Muxer, decoder func(*http.Request) 
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			id   int32
-			auth string
+			auth *string
 			err  error
 
 			params = mux.Vars(r)
@@ -877,18 +879,20 @@ func DecodeListAssociatedRequest(mux goahttp.Muxer, decoder func(*http.Request) 
 			}
 			id = int32(v)
 		}
-		auth = r.Header.Get("Authorization")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		authRaw := r.Header.Get("Authorization")
+		if authRaw != "" {
+			auth = &authRaw
 		}
 		if err != nil {
 			return nil, err
 		}
 		payload := NewListAssociatedPayload(id, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
+		if payload.Auth != nil {
+			if strings.Contains(*payload.Auth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
+				payload.Auth = &cred
+			}
 		}
 
 		return payload, nil
@@ -979,7 +983,7 @@ func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) g
 			stationID   int32
 			size        *int32
 			ifNoneMatch *string
-			auth        string
+			auth        *string
 			err         error
 
 			params = mux.Vars(r)
@@ -1007,18 +1011,20 @@ func DecodeDownloadPhotoRequest(mux goahttp.Muxer, decoder func(*http.Request) g
 		if ifNoneMatchRaw != "" {
 			ifNoneMatch = &ifNoneMatchRaw
 		}
-		auth = r.Header.Get("Authorization")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		authRaw := r.Header.Get("Authorization")
+		if authRaw != "" {
+			auth = &authRaw
 		}
 		if err != nil {
 			return nil, err
 		}
 		payload := NewDownloadPhotoPayload(stationID, size, ifNoneMatch, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
+		if payload.Auth != nil {
+			if strings.Contains(*payload.Auth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
+				payload.Auth = &cred
+			}
 		}
 
 		return payload, nil

@@ -123,9 +123,11 @@ func BuildDefaultPhotoPayload(stationDefaultPhotoID string, stationDefaultPhotoP
 			return nil, fmt.Errorf("invalid value for photoID, must be INT32")
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = stationDefaultPhotoAuth
+		if stationDefaultPhotoAuth != "" {
+			auth = &stationDefaultPhotoAuth
+		}
 	}
 	v := &station.DefaultPhotoPayload{}
 	v.ID = id
@@ -222,9 +224,11 @@ func BuildListAssociatedPayload(stationListAssociatedID string, stationListAssoc
 			return nil, fmt.Errorf("invalid value for id, must be INT32")
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = stationListAssociatedAuth
+		if stationListAssociatedAuth != "" {
+			auth = &stationListAssociatedAuth
+		}
 	}
 	v := &station.ListAssociatedPayload{}
 	v.ID = id
@@ -264,9 +268,11 @@ func BuildDownloadPhotoPayload(stationDownloadPhotoStationID string, stationDown
 			ifNoneMatch = &stationDownloadPhotoIfNoneMatch
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = stationDownloadPhotoAuth
+		if stationDownloadPhotoAuth != "" {
+			auth = &stationDownloadPhotoAuth
+		}
 	}
 	v := &station.DownloadPhotoPayload{}
 	v.StationID = stationID

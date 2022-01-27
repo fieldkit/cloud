@@ -4,7 +4,7 @@
         <div class="header">
             <div class="name">{{ station.name }}</div>
             <div class="completed">{{ completed }}% Complete</div>
-            <div class="buttons">
+            <div class="buttons" v-if="isAuthenticated">
                 <button type="submit" class="button" v-on:click="onSave">Save</button>
             </div>
         </div>
@@ -47,16 +47,14 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { mapGetters } from "vuex";
 import CommonComponents from "@/views/shared";
-import NoteEditor from "./NoteEditor.vue";
-
-import NewPhoto from "../../assets/image-placeholder.svg";
-
-import { required } from "vuelidate/lib/validators";
 
 import { Notes, AddedPhoto, NoteMedia, PortalNoteMedia } from "./model";
+import NoteEditor from "./NoteEditor.vue";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
-import * as ActionTypes from "@/store/actions";
+
+import NewPhoto from "../../assets/image-placeholder.svg";
 
 export default Vue.extend({
     name: "NotesForm",
@@ -104,6 +102,7 @@ export default Vue.extend({
         };
     },
     computed: {
+        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         photos(this: any) {
             return NoteMedia.onlyPhotos(this.notes.media);
         },

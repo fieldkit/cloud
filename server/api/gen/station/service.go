@@ -112,7 +112,7 @@ type TransferPayload struct {
 // DefaultPhotoPayload is the payload type of the station service default photo
 // method.
 type DefaultPhotoPayload struct {
-	Auth    string
+	Auth    *string
 	ID      int32
 	PhotoID int32
 }
@@ -146,14 +146,14 @@ type ListProjectPayload struct {
 // ListAssociatedPayload is the payload type of the station service list
 // associated method.
 type ListAssociatedPayload struct {
-	Auth string
+	Auth *string
 	ID   int32
 }
 
 // DownloadPhotoPayload is the payload type of the station service download
 // photo method.
 type DownloadPhotoPayload struct {
-	Auth        string
+	Auth        *string
 	StationID   int32
 	Size        *int32
 	IfNoneMatch *string
