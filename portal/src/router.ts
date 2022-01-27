@@ -20,6 +20,8 @@ import ExploreView from "./views/viz/ExploreView.vue";
 
 import NotesView from "./views/notes/NotesView.vue";
 
+import NotificationsView from "./views/notifications/NotificationsView.vue";
+
 import AdminMain from "./views/admin/AdminMain.vue";
 import AdminUsers from "./views/admin/AdminUsers.vue";
 import AdminStations from "./views/admin/AdminStations.vue";
@@ -381,6 +383,14 @@ const routes = [
         path: "/",
         name: "root",
         component: ProjectsView,
+        meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/notifications",
+        name: "notifications",
+        component: NotificationsView,
         meta: {
             secured: true,
         },
