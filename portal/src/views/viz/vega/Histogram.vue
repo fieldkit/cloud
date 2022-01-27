@@ -35,8 +35,6 @@ export default {
     },
     methods: {
         async refresh() {
-            console.log("vega-updated");
-
             histogramSpec.config = chartConfig;
             histogramSpec.data = { name: "table", values: this.data.data };
             histogramSpec.encoding.x.axis.title = this.label;

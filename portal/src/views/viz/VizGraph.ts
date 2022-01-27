@@ -39,10 +39,10 @@ export const VizGraph = Vue.extend({
         },
     },
     mounted() {
-        this.viz.log("mounted");
+        this.viz.log("mounted", this.viz);
     },
     updated() {
-        this.viz.log("updated");
+        this.viz.log("updated", this.viz);
     },
     computed: {
         debug(): boolean {

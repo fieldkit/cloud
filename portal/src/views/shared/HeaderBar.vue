@@ -95,7 +95,7 @@ export default Vue.extend({
             });
         },
         onAccountHover(event: Event): void {
-            console.log("hover", this.hiding, this.isAccountHovered);
+            // console.log("hover", this.hiding, this.isAccountHovered);
 
             if (this.hiding && this.isAccountHovered) {
                 this.isAccountHovered = false;

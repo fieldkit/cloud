@@ -35,8 +35,6 @@ export default {
     },
     methods: {
         async refresh() {
-            console.log("vega-updated");
-
             rangeSpec.config = chartConfig;
             rangeSpec.data = { name: "table", values: this.data.data };
             // rangeSpec.layer[0].encoding.y.title = this.label;
