@@ -49,7 +49,7 @@
         </div>
         <div class="sidebar-header sidebar-compass">
             <router-link :to="{ name: 'projects' }">
-                <img :alt="$t('layout.logo.compass.alt')" src="@/assets/logo-compass.svg" width="45" height="45" />
+                <i role="img" class="sidebar-compass-logo" :aria-label="narrowSidebarLogoAlt"></i>
             </router-link>
         </div>
     </div>
@@ -104,6 +104,15 @@ export default Vue.extend({
                 narrow: window.screen.availWidth <= 1040,
             },
         };
+    },
+    computed: {
+        narrowSidebarLogoAlt(): string {
+            if (document.body.classList.contains("floodnet")) {
+                return this.$tc("layout.logo.floodnet.alt");
+            }
+
+            return this.$tc("layout.logo.compass.alt");
+        },
     },
     methods: {
         showStation(station: unknown): void {
@@ -261,10 +270,20 @@ export default Vue.extend({
     @include bp-down($md) {
         display: none;
     }
+
+    &-logo {
+        width: 45px;
+        display: block;
+        background: url("../../assets/logo-compass.svg") no-repeat center center;
+        background-size: contain;
+
+        body.floodnet & {
+            background: url("../../assets/logo-floodnet-seal.png") no-repeat center center;
+            background-size: contain;
+        }
+    }
 }
-.sidebar-compass img {
-    align-self: center;
-}
+
 .sidebar-trigger {
     transition: all 0.25s;
     cursor: pointer;

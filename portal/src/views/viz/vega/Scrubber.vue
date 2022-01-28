@@ -41,6 +41,7 @@ export default {
         scrubberSpec.config = JSON.parse(JSON.stringify(chartConfig));
         // Some styling overrides. The height of the scrubber can be set with scrubberSpec.height
         scrubberSpec.config.axisX.tickSize = 20;
+        //  scrubberSpec.config.layer[0].mark.colour = "#000000";
         scrubberSpec.config.view = { fill: "#f4f5f7", stroke: "transparent" };
         scrubberSpec.data = { values: this.data.data };
         scrubberSpec.layer[2].data = { values: [] };
@@ -88,7 +89,16 @@ export default {
 </script>
 
 <style lang="scss">
+@import "src/scss/variables";
 .viz {
     width: 100%;
+}
+
+.role-mark.brush_brush {
+    body.floodnet & {
+        path {
+            //fill: $color-floodnet-light;
+        }
+    }
 }
 </style>

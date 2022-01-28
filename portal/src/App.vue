@@ -10,16 +10,16 @@ import * as ActionTypes from "@/store/actions";
 import { AuthenticationRequiredError } from "@/api";
 
 export default Vue.extend({
-    async updated(): Promise<void> {
+    async mounted(): Promise<void> {
         try {
-            if (window.location.hostname.indexOf("floodnet.") === 0) {
-                this.$nextTick().then(() => document.body.classList.add("floodnet"));
-            }
-
+            this.applyCustomClasses();
             await this.$store.dispatch(ActionTypes.INITIALIZE);
         } catch (err) {
             console.log("initialize error", err, err.stack);
         }
+    },
+    updated() {
+        this.applyCustomClasses();
     },
     errorCaptured(err, vm, info): boolean {
         console.log("vuejs:error-captured", JSON.stringify(err));
@@ -28,6 +28,13 @@ export default Vue.extend({
             return false;
         }
         return true;
+    },
+    methods: {
+        applyCustomClasses(): void {
+            // if (window.location.hostname.indexOf("floodnet.") === 0) {
+            this.$nextTick().then(() => document.body.classList.add("floodnet"));
+            //  }
+        },
     },
 });
 </script>

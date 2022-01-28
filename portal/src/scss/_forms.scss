@@ -1,4 +1,4 @@
-@import './mixins.scss';
+@import "./mixins.scss";
 
 .form {
     width: 460px;
@@ -33,10 +33,13 @@
             padding: 40px 0;
             justify-content: flex-start;
         }
+
+        body.floodnet & {
+            background-color: var(--color-dark);
+        }
     }
 
     &-header {
-
         &-logo {
             width: 211px;
             margin-bottom: 82px;
@@ -138,7 +141,7 @@
         margin: 25px auto 0 auto;
 
         ::v-deep input:-webkit-autofill::first-line {
-            font-size: 16px!important;
+            font-size: 16px !important;
         }
     }
 

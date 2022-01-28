@@ -412,5 +412,9 @@ export default Vue.extend({
     font-size: 20px;
     cursor: pointer;
     margin: auto;
+
+    &:before {
+        color: var(--color-primary);
+    }
 }
 </style>

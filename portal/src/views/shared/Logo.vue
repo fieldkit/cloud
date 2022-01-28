@@ -7,17 +7,16 @@ import Vue from "vue";
 
 export default Vue.extend({
     name: "Logo",
-    mounted(): void {
-        if (document.body.classList.contains("floodnet")) {
-            this.altText = this.$tc("layout.logo.floodnet.alt");
-        }
-    },
-    data(): {
-        altText: string;
-    } {
-        return {
-            altText: this.$tc("layout.logo.fieldkit.alt"),
-        };
+    computed: {
+        altText(): string {
+            if (document.body.classList.contains("floodnet")) {
+                console.log("radoi true");
+
+                return this.$tc("layout.logo.floodnet.alt");
+            }
+            console.log("radoi false");
+            return this.$tc("layout.logo.fieldkit.alt");
+        },
     },
 });
 </script>
