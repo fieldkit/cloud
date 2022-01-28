@@ -62,8 +62,9 @@ export default {
                 return `${datum.toFixed(3)}`;
             });
 
-            await vegaEmbed(".linechart", lineSpec, {
+            await vegaEmbed(this.$el, lineSpec, {
                 renderer: "svg",
+                width: "100%",
                 tooltip: { offsetX: -50, offsetY: 50 },
                 actions: { source: false, editor: false, compiled: false },
             }).then((view) => {

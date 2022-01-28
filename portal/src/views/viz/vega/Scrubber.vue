@@ -47,8 +47,9 @@ export default {
 
         console.log("vega-scrubber", this.data, this.visible);
 
-        await vegaEmbed(".scrubber", scrubberSpec, {
+        await vegaEmbed(this.$el, scrubberSpec, {
             renderer: "svg",
+            width: "100%",
             actions: { source: false, editor: false, compiled: false },
         }).then((view) => {
             this.vegaView = view;

@@ -311,10 +311,13 @@ export default Vue.extend({
 }
 */
 
-.vega-embed summary {
-    margin-right: 1em;
+.vega-embed {
+    width: 100%;
+    summary {
+        margin-left: 0.25em;
+        margin-right: 0.5em;
+    }
 }
-
 .scrubber.vega-embed summary {
     display: none;
 }
