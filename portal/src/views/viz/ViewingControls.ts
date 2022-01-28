@@ -38,13 +38,13 @@ export const SensorSelectionRow = Vue.extend({
             return this.viz.chartParams.sensorParams.stations[0];
         },
         selectedSensor(): string | null {
-            const sensorAndModule = this.viz.chartParams.sensorParams.sensors[0];
+            const sensorAndModule = this.viz.chartParams.sensorParams.sensor;
             return `${sensorAndModule[0]}-${sensorAndModule[1]}`;
         },
     },
     methods: {
         raiseChangeStation(node: StationTreeOption): void {
-            const sensor = this.viz.chartParams.sensorParams.sensors[0];
+            const sensor = this.viz.chartParams.sensorParams.sensor;
             console.log("raising viz-change-sensors", "sensor", sensor);
             vueTickHack(() => {
                 const params = this.workspace.makeParamsForStationChange(Number(node.id), sensor);
@@ -93,12 +93,13 @@ export const SelectionControls = Vue.extend({
             return this.workspace.stationOptions;
         },
         sensorOptions(): SensorTreeOption[] {
-            this.viz.log("sensor-options", { options: this.workspace.sensorOptions });
             const stationId = this.viz.chartParams.sensorParams.stations[0]; // this.selectedStation
             if (stationId == null) {
                 return [];
             }
-            return this.workspace.sensorOptions(stationId);
+            const sensorOptions = this.workspace.sensorOptions(stationId);
+            this.viz.log("sensor-options", { options: sensorOptions });
+            return sensorOptions;
         },
     },
     methods: {
@@ -108,7 +109,12 @@ export const SelectionControls = Vue.extend({
     },
     template: `
 		<div class="left half">
-            <SensorSelectionRow :viz="viz" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions" @viz-change-sensors="raiseChangeSensors" />
+            <div class="row">
+                <SensorSelectionRow :viz="viz" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions" @viz-change-sensors="raiseChangeSensors" />
+                <div class="actions">
+					<div class="button" alt="Add">Add</div>
+                </div>
+            </div>
         </div>
     `,
 });

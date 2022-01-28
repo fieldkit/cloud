@@ -27,10 +27,7 @@ export const VegaTimeSeriesGraph = Vue.extend({
     },
     computed: {
         data(): QueriedData | null {
-            if (this.viz.graphing) {
-                return this.viz.graphing;
-            }
-            return null;
+            return this.viz.graphing;
         },
         label(): string {
             const vizInfo = this.workspace.vizInfo(this.viz);

@@ -38,7 +38,7 @@ import { mapState, mapGetters } from "vuex";
 import { GlobalState } from "@/store/modules/global";
 
 import { SensorsResponse } from "./api";
-import { Workspace, Bookmark } from "./viz";
+import { Workspace, Bookmark, serializeBookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 
 import Comments from "../comments/Comments.vue";
@@ -120,7 +120,9 @@ export default Vue.extend({
             if (Bookmark.sameAs(this.bookmark, bookmark)) {
                 return Promise.resolve(this.workspace);
             }
-            await this.$router.push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bookmark) } }).then(() => this.workspace);
+            await this.$router
+                .push({ name: "exploreBookmark", params: { bookmark: serializeBookmark(bookmark) } })
+                .then(() => this.workspace);
         },
         async openExports(): Promise<void> {
             const encoded = JSON.stringify(this.bookmark);
@@ -174,11 +176,12 @@ export default Vue.extend({
 
                     console.log("quick-sensors", quickSensors);
 
-                    const stations = [stationId];
-                    const sensors = [[quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId]];
+                    const sensors = [
+                        [stationId, [quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId]],
+                    ];
 
                     return workspace
-                        .addStandardGraph(stations, sensors)
+                        .addStandardGraph(sensors)
                         .eventually((ws) => this.onChange(ws.bookmark()))
                         .then((ws) => Promise.all([ws.query(), this.includeAssociatedStations(workspace)]));
                 });
@@ -349,6 +352,21 @@ export default Vue.extend({
 .controls-container .left {
     align-items: center;
     display: flex;
+}
+
+.controls-container .left .row {
+    align-items: center;
+    display: flex;
+
+    .actions {
+        margin-left: 1em;
+        display: flex;
+        align-items: center;
+
+        .button {
+            margin-bottom: 0;
+        }
+    }
 }
 
 .controls-container .left.half {
