@@ -310,6 +310,11 @@ export default Vue.extend({
     opacity: 0.3;
 }
 */
+
+.vega-embed summary {
+    margin-right: 1em;
+}
+
 .controls-container {
     margin-left: 40px;
     margin-right: 40px;

@@ -45,8 +45,6 @@ export default {
     },
     methods: {
         async refresh() {
-            console.log("vega-updated", this.label);
-
             lineSpec.config = chartConfig;
             lineSpec.data = { name: "table", values: this.data.data };
             lineSpec.layer[0].encoding.y.axis.title = this.label;

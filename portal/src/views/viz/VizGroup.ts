@@ -24,8 +24,8 @@ export const VizGroup = Vue.extend({
             required: true,
         },
     },
-    data() {
-        return {};
+    mounted() {
+        this.group.log("mounted", this.group, this.topGroup);
     },
     methods: {
         raiseGroupZoomed(zoom: TimeZoom, ...args) {
