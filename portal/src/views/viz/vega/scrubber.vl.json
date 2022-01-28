@@ -8,19 +8,26 @@
       "field": "time",
       "type": "temporal",
       "axis": {
-        "ticks": false,
-        "labels": false,
         "formatType": "time",
-        "format": "%Y-%m-%d"
+        "format": "%Y-%m-%d",
+        "labelOpacity": 0,
+        "titleOpacity": 0
       }
     },
     "y": {
       "field": "value",
       "type": "quantitative",
+      "scale": {
+        "zero": false
+      },
       "axis": {
-        "title": "",
-        "ticks": false,
-        "labels": false
+        "domain": true,
+        "title": "Value",
+        "titleFontWeight": 400,
+        "titleColor": "#7f7f7f",
+        "labelColor": "#7f7f7f",
+        "labelOpacity": 0,
+        "titleOpacity": 0
       }
     }
   },

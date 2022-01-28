@@ -315,6 +315,10 @@ export default Vue.extend({
     margin-right: 1em;
 }
 
+.scrubber.vega-embed summary {
+    display: none;
+}
+
 .controls-container {
     margin-left: 40px;
     margin-right: 40px;

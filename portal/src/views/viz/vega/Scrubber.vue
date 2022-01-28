@@ -49,7 +49,7 @@ export default {
 
         await vegaEmbed(".scrubber", scrubberSpec, {
             renderer: "svg",
-            actions: false, // { source: false, editor: false, compiled: false },
+            actions: { source: false, editor: false, compiled: false },
         }).then((view) => {
             this.vegaView = view;
             let scrubbed = [];
