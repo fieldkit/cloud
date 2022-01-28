@@ -745,8 +745,6 @@ export class Workspace {
             return -option.age.valueOf();
         });
 
-        console.log("sensor-tree-options", { sorted: sorted });
-
         return sorted;
     }
 
