@@ -55,7 +55,7 @@ export const VegaTimeSeriesGraph = Vue.extend({
     template: `
         <div class="viz time-series-graph">
             <div class="chart" @dblclick="onDouble" v-if="data">
-                <LineChart :data="{ data: data.data }" :label="label" :valueSuffix="valueSuffix" v-bind:key="data.key" />
+                <LineChart :data="{ data: data.data }" :label="label" :valueSuffix="valueSuffix" v-bind:key="data.key" @time-zoomed="raiseTimeZoomed" />
             </div>
         </div>
     `,

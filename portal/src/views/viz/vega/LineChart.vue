@@ -13,6 +13,9 @@ import { expressionFunction } from "vega";
 import lineSpec from "./line.vl.json";
 import chartConfig from "./chartConfig.json";
 
+import { TimeRange } from "../common";
+import { TimeZoom } from "../viz";
+
 export default {
     name: "LineChart",
     props: {
@@ -65,8 +68,15 @@ export default {
                 actions: { source: false, editor: false, compiled: false },
             }).then((view) => {
                 this.vegaView = view;
-                view.view.addSignalListener("brush", function(_, value) {
-                    console.log("vega-line-brush", value.time);
+                let scrubbed = [];
+                view.view.addSignalListener("brush", (_, value) => {
+                    scrubbed = value.time;
+                });
+                this.vegaView.view.addEventListener("mouseup", () => {
+                    console.log("vega-line-brush", scrubbed);
+                    if (scrubbed.length == 2) {
+                        this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
+                    }
                 });
             });
         },

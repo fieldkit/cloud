@@ -52,14 +52,18 @@ export default {
             actions: false, // { source: false, editor: false, compiled: false },
         }).then((view) => {
             this.vegaView = view;
+            let scrubbed = [];
             this.vegaView.view.addSignalListener("brush", (_, value) => {
                 if (value.time) {
-                    console.log("vega-scrubber-brush", value.time);
+                    scrubbed = value.time;
                 } else {
-                    console.log("vega-scrubber-brush:none", this.data);
-                    console.log("vega-scrubber-brush:none", this.data.timeRange);
-                    const range = this.data.timeRange;
-                    this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(range[0], range[1])));
+                    scrubbed = this.data.timeRange;
+                }
+            });
+            this.vegaView.view.addEventListener("mouseup", () => {
+                console.log("vega-scrubber-brush", scrubbed);
+                if (scrubbed.length == 2) {
+                    this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                 }
             });
         });
@@ -68,6 +72,10 @@ export default {
     },
     methods: {
         pickRange(timeRange) {
+            console.log("vega-scrubber:pick", timeRange, this.data.timeRange);
+            if (_.isEqual(timeRange, this.data.timeRange)) {
+                return;
+            }
             this.vegaView.view
                 .signal("brush_x", [this.vegaView.view.scale("x")(timeRange[0]), this.vegaView.view.scale("x")(timeRange[1])])
                 .signal("brush_tuple", {
