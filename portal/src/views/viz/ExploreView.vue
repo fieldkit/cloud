@@ -4,12 +4,22 @@
         <div class="explore-view">
             <div class="explore-header">
                 <DoubleHeader
-                    title="Data View"
                     :backTitle="backRoute === 'viewProject' ? $t('layout.backProjectDashboard') : $t('layout.backToStations')"
                     :backRoute="backRoute"
                     :backRouteParams="backRouteParams"
                 >
-                    <div class="button" @click="openExports">Export</div>
+                    <template v-slot:title>
+                        <div class="one">
+                            Data View
+                            <div class="button compare" alt="Add Chart" @click="addChart">
+                                <img :src="addIcon" />
+                                <div>Add Chart</div>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-slot:default>
+                        <div class="button" @click="openExports">Export</div>
+                    </template>
                 </DoubleHeader>
             </div>
 
@@ -93,6 +103,9 @@ export default Vue.extend({
             stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
         }),
+        addIcon(): unknown {
+            return this.$loadAsset("icon-compare.svg");
+        },
     },
     watch: {
         async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
@@ -116,6 +129,11 @@ export default Vue.extend({
         }
     },
     methods: {
+        async addChart() {
+            console.log("viz-add");
+            if (!this.workspace) throw new Error("viz-add: no workspace");
+            return this.workspace.addChart().query();
+        },
         async onChange(bookmark: Bookmark): Promise<void> {
             if (Bookmark.sameAs(this.bookmark, bookmark)) {
                 return Promise.resolve(this.workspace);
@@ -488,5 +506,10 @@ export default Vue.extend({
     div {
         padding-left: 1em;
     }
+}
+
+.one {
+    display: flex;
+    flex-direction: row;
 }
 </style>

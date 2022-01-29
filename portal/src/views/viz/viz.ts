@@ -812,11 +812,17 @@ export class Workspace {
         return this;
     }
 
-    public compare(viz: Viz): Workspace {
+    public addChart(): Workspace {
         if (this.groups.length > 0) {
-            this.groups.unshift(this.groups[0].cloneForCompare());
+            const adding = this.groups[0].cloneForCompare();
+            console.log("viz-compare", adding);
+            this.groups.unshift(adding);
         }
         return this;
+    }
+
+    public compare(viz: Viz): Workspace {
+        return this.addChart();
     }
 
     public changeChart(viz: Viz, chartType: ChartType): Workspace {

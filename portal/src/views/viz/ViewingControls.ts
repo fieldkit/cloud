@@ -227,7 +227,6 @@ export const ViewingControls = Vue.extend({
 		<div class="controls-container">
 			<div class="row row-1">
 				<div class="left buttons" v-if="!viz.busy">
-					<div class="button compare" @click="raiseCompare" alt="Compare"> <img :src="compareIcon" /><div>Compare Sensor Graphs</div></div>
 				</div>
 				<div class="left busy" v-else><Spinner /></div>
 				<div class="right time">
