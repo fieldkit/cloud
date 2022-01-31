@@ -212,6 +212,7 @@ export default Vue.extend({
 <style lang="scss">
 @import "../../scss/layout";
 
+/*
 .graph .x-axis {
     color: #7f7f7f;
 }
@@ -227,6 +228,7 @@ export default Vue.extend({
 .graph .y-axis text {
     font-size: 7pt;
 }
+*/
 
 .explore-view {
     text-align: left;
@@ -339,7 +341,7 @@ export default Vue.extend({
         margin-right: 0.5em;
     }
 }
-.scrubber.vega-embed summary {
+.scrubber .vega-embed summary {
     display: none;
 }
 
