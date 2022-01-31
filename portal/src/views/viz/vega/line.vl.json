@@ -13,7 +13,6 @@
         "tickCount": "month",
         "tickMinStep": 1,
         "tickOpacity": 1,
-        "tickSize": 5,
         "gridOpacity": 0.3,
         "title": "Time",
         "titleFontWeight": 400,

@@ -43,9 +43,13 @@
       "field": "bin_time",
       "type": "temporal",
       "axis": {
+        "title": "Time",
+        "titleFontWeight": 400,
+        "titleColor": "#7f7f7f",
         "labelColor": "#7f7f7f",
         "formatType": "time",
-        "format": "%-m/%-d/%Y"
+        "format": "%-m/%-d/%Y",
+        "tickOpacity": 0
       },
       "title": null
     },
@@ -61,6 +65,8 @@
         "zero": false
       },
       "axis": {
+        "domain": true,
+        "tickOpacity": 1,
         "titleFontWeight": 400,
         "titleColor": "#7f7f7f",
         "labelColor": "#7f7f7f"

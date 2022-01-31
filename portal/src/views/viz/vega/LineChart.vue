@@ -51,6 +51,8 @@ export default {
             lineSpec.config = chartConfig;
             lineSpec.data = { name: "table", values: this.data.data };
             lineSpec.layer[0].encoding.y.axis.title = this.label;
+            lineSpec.width = "container";
+            lineSpec.height = 300;
 
             expressionFunction("fkHumanReadable", (datum) => {
                 if (_.isUndefined(datum)) {
@@ -64,7 +66,6 @@ export default {
 
             await vegaEmbed(this.$el, lineSpec, {
                 renderer: "svg",
-                width: "100%",
                 tooltip: { offsetX: -50, offsetY: 50 },
                 actions: { source: false, editor: false, compiled: false },
             }).then((view) => {

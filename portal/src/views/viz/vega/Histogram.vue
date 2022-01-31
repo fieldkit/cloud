@@ -38,6 +38,8 @@ export default {
             histogramSpec.config = chartConfig;
             histogramSpec.data = { name: "table", values: this.data.data };
             histogramSpec.encoding.x.axis.title = this.label;
+            histogramSpec.width = "container";
+            histogramSpec.height = 300;
 
             const vegaView = await vegaEmbed(".histogram", histogramSpec, {
                 renderer: "svg",

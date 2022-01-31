@@ -37,7 +37,9 @@ export default {
         async refresh() {
             rangeSpec.config = chartConfig;
             rangeSpec.data = { name: "table", values: this.data.data };
-            // rangeSpec.layer[0].encoding.y.title = this.label;
+            rangeSpec.encoding.y.axis.title = this.label;
+            rangeSpec.width = "container";
+            rangeSpec.height = 300;
 
             const vegaView = await vegaEmbed(".rangechart", rangeSpec, {
                 renderer: "svg",

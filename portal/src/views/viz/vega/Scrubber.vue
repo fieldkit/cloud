@@ -44,12 +44,12 @@ export default {
         scrubberSpec.config.view = { fill: "#f4f5f7", stroke: "transparent" };
         scrubberSpec.data = { values: this.data.data };
         scrubberSpec.layer[2].data = { values: [] };
+        scrubberSpec.width = "container";
 
         console.log("vega-scrubber", this.data, this.visible);
 
         await vegaEmbed(this.$el, scrubberSpec, {
             renderer: "svg",
-            width: "100%",
             actions: { source: false, editor: false, compiled: false },
         }).then((view) => {
             this.vegaView = view;
