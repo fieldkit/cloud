@@ -10,11 +10,8 @@ export default Vue.extend({
     computed: {
         altText(): string {
             if (document.body.classList.contains("floodnet")) {
-                console.log("radoi true");
-
                 return this.$tc("layout.logo.floodnet.alt");
             }
-            console.log("radoi false");
             return this.$tc("layout.logo.fieldkit.alt");
         },
     },
@@ -43,7 +40,7 @@ export default Vue.extend({
 
     @at-root .floodnet & {
         width: 160px;
-        background: url("../../assets/logo-floodnet.png") no-repeat center center;
+        background: url("../../assets/logo-floodnet.svg") no-repeat center center;
         background-size: contain;
 
         @include bp-down($md) {

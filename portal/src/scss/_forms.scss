@@ -35,6 +35,7 @@
         }
 
         body.floodnet & {
+            background-image: unset;
             background-color: var(--color-dark);
         }
     }

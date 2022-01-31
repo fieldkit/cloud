@@ -74,14 +74,18 @@ body {
     }
 
     &.floodnet {
+        --color-primary: #{$color-floodnet-primary};
+        --color-secondary: #{$color-floodnet-dark};
+        --color-dark: #{$color-floodnet-dark};
+        --color-border: #{$color-floodnet-border};
+        --font-family-medium: #{$font-family-floodnet-medium};
+        --font-family-light: #{$font-family-floodnet-medium};
+        --font-family-bold: #{$font-family-floodnet-bold};
+        // v-calendar overwrite
+        --blue-600: #{$color-floodnet-primary};
+        --blue-200: #{lighten($color-floodnet-primary, 11%)};
+
         * {
-            --color-primary: #{$color-floodnet-primary};
-            --color-secondary: #{$color-floodnet-dark};
-            --color-dark: #{$color-floodnet-dark};
-            --color-border: #{$color-floodnet-light};
-            --font-family-medium: #{$font-family-floodnet-medium};
-            --font-family-light: #{$font-family-floodnet-medium};
-            --font-family-bold: #{$font-family-floodnet-bold};
             color: var(--color-dark);
             font-family: var(--font-family-medium), Helvetica, Arial, sans-serif;
         }
@@ -98,6 +102,12 @@ body.blue-background {
 
     @include bp-down($md) {
         background-color: #fff;
+    }
+
+    &.floodnet {
+        @include bp-up($md) {
+            background-color: var(--color-dark);
+        }
     }
 }
 html.map-view {
@@ -150,5 +160,17 @@ li {
 
 .vue-treeselect__control {
     border: 1px solid var(--color-border);
+}
+
+.vc-nav-item {
+    color: #fff !important;
+
+    &.is-active {
+        color: var(--color-dark) !important;
+    }
+}
+
+.vc-nav-header * {
+    color: #fff !important;
 }
 </style>

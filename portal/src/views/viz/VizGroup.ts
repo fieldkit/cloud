@@ -66,7 +66,7 @@ export const VizGroup = Vue.extend({
                     <div style="display: none;">Group:{{group.id}} Viz:{{viz.id}} {{isLinked(index)}} {{index}} {{topGroup}}</div>
 					<div class="icons-container" v-if="!topGroup || index > 0" v-bind:class="{ 'linked': isLinked(index), 'unlinked': !isLinked(index) }">
 						<div class="invisible-spacing-icon"></div>
-						<div class="icon" v-on:click="(ev) => raiseChangeLinkage(viz, !isLinked(index))" v-bind:class="{ 'link-icon': !isLinked(index), 'unlink-icon': isLinked(index) }"></div>
+						<div class="icon" v-on:click="(ev) => raiseChangeLinkage(viz, !isLinked(index))" v-bind:class="{ 'icon-open-link': !isLinked(index), 'icon-link': isLinked(index) }"></div>
 						<div class="icon remove-icon" v-on:click="(ev) => raiseRemove(viz)"></div>
 					</div>
 

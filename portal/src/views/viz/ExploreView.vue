@@ -278,23 +278,14 @@ export default Vue.extend({
     border: 1px solid var(--color-border);
     border-radius: 50%;
     cursor: pointer;
+    font-size: 28px;
+    padding: 5px;
+
+    &:before {
+        color: var(--color-dark);
+    }
 }
-.icons-container .unlink-icon {
-    background-position: center;
-    background-image: url(../../assets/link.png);
-    background-size: 30px;
-    background-repeat: no-repeat;
-    width: 40px;
-    height: 40px;
-}
-.icons-container .link-icon {
-    background-position: center;
-    background-image: url(../../assets/open_link.png);
-    background-size: 30px;
-    background-repeat: no-repeat;
-    width: 40px;
-    height: 40px;
-}
+
 .icons-container .remove-icon {
     background-position: center;
     background-image: url(../../assets/Icon_Close_Circle.png);
@@ -458,5 +449,16 @@ export default Vue.extend({
     div {
         padding-left: 1em;
     }
+}
+
+.brush_brush_bg path {
+    body.floodnet & {
+        fill: var(--color-border);
+        fill-opacity: 1;
+    }
+}
+
+.layer_1_marks path {
+    fill: var(--color-primary);
 }
 </style>

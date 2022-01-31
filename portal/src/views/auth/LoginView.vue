@@ -1,6 +1,9 @@
 <template>
     <div class="form-container" v-if="!sso">
+        <!--
         <img class="form-header-logo" :alt="$t('layout.logo.fieldkit.alt')" src="@/assets/FieldKit_Logo_White.png" />
+-->
+        <Logo class="form-header-logo"></Logo>
         <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="spoofing" :failed="failed" @login="save" />
     </div>
 </template>
@@ -9,6 +12,7 @@
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import LoginForm from "./LoginForm.vue";
+import Logo from "../shared/Logo.vue";
 
 import FKApi, { LoginPayload } from "@/api/api";
 import { ActionTypes } from "@/store";
@@ -18,6 +22,7 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
         LoginForm,
+        Logo,
     },
     props: {
         spoofing: {
@@ -95,4 +100,12 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import "../../scss/forms.scss";
+
+.form-header-logo {
+    height: 60px;
+
+    &:before {
+        color: #fff;
+    }
+}
 </style>

@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?9hdg4b');
-  src:  url('fonts/icomoon.eot?9hdg4b#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?9hdg4b') format('truetype'),
-    url('fonts/icomoon.woff?9hdg4b') format('woff'),
-    url('fonts/icomoon.svg?9hdg4b#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?d1vvg2');
+  src:  url('fonts/icomoon.eot?d1vvg2#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?d1vvg2') format('truetype'),
+    url('fonts/icomoon.woff?d1vvg2') format('woff'),
+    url('fonts/icomoon.svg?d1vvg2#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,59 +25,73 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-close:before {
+.icon-open-link:before {
+  content: "\e913";
+}
+.icon-link:before {
+  content: "\e912";
+}
+.icon-calendar:before {
   content: "\e900";
+  color: #1b80c9;
 }
-.icon-compare:before {
+.icon-heart:before {
   content: "\e901";
-}
-.icon-field-notes:before {
-  content: "\e902";
-  color: #1b80c9;
-}
-.icon-list:before {
-  content: "\e904";
-  color: #d8dce0;
-}
-.icon-location:before {
-  content: "\e905";
-  color: #1b80c9;
-}
-.icon-map:before {
-  content: "\e906";
-  color: #d8dce0;
-}
-.icon-menu:before {
-  content: "\e907";
+  color: #ce596b;
 }
 .icon-minus-round:before {
-  content: "\e908";
-}
-.icon-notification:before {
-  content: "\e909";
-  color: #1b80c9;
+  content: "\e902";
 }
 .icon-plus-round:before {
-  content: "\e90a";
+  content: "\e903";
 }
-.icon-projects:before {
+.icon-close:before {
+  content: "\e904";
+}
+.icon-compare:before {
+  content: "\e905";
+}
+.icon-reply:before {
+  content: "\e906";
+}
+.icon-map:before {
+  content: "\e907";
+  color: #d8dce0;
+}
+.icon-list:before {
+  content: "\e908";
+  color: #d8dce0;
+}
+.icon-view-data:before {
+  content: "\e909";
+}
+.icon-field-notes:before {
+  content: "\e90a";
+  color: #1b80c9;
+}
+.icon-stations:before {
   content: "\e90b";
   color: #1b80c9;
 }
-.icon-reply:before {
+.icon-projects:before {
   content: "\e90c";
+  color: #1b80c9;
 }
-.icon-stations:before {
+.icon-time:before {
   content: "\e90d";
   color: #1b80c9;
 }
-.icon-tick:before {
+.icon-notification:before {
   content: "\e90e";
+  color: #1b80c9;
 }
-.icon-view-data:before {
+.icon-location:before {
   content: "\e90f";
+  color: #1b80c9;
 }
-.icon-heart:before {
-  content: "\e903";
-  color: #ce596b;
+.icon-menu:before {
+  content: "\e910";
+}
+.icon-tick:before {
+  content: "\e911";
 }
