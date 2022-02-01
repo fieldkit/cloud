@@ -1,1 +1,13 @@
-<svg height="33" viewBox="0 0 33 33" width="33" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><image fill="none" height="33" width="33" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACEAAAAhCAYAAABX5MJvAAAABGdBTUEAALGOfPtRkwAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIaADAAQAAAABAAAAIQAAAAAWQIAAAAACt0lEQVRYCcVYO28TQRCe2TNBvAQSEgI7lOHhVAiDRMEfIDwkpER0UESiRxahCbFF5QRRIdGkoEShCoI0UCAoEBBIlQePBgm7QwogEpTIN8x39kaXOxOfE995m92bnfu+7/YxO3tMLZTuOzM9LKuXXJfOMkuGiNMktJ+YfhBJRYTLxtBr4W2T34dPfIkKzc0c+yfEeTM/fY3EvSFE2Wb+tl+B54jNvTPHcw8fD3DV2hvVG4rIFKf7WKqjrZAHSSBG2LlZHsk9C/bZZ2Mb/rogYrqLb0dJqk+3IgCY3vuKAzzg+nlsOzQSR0sLe/4s/3ykL5+zTu2qlWxq1469Vz4NHfvtx1ynDErjEgBSfBjwgyPi+BV95T7M/1W/LYZ2z8yr8s5fL8efW+y16cAixBqwHbHX7Jy3i9WbDmxD7ILYiX0E4AMvTJ4IxAGdhsgxwGIZ5nzKSWWZeNHaotbg8+KPFYFAFPVlv9+Bg+bBt+GT87rkXvjtkdt1XoNQvJlRANGH67kl1LqwvBrtVgp4wW9wFrTyYrt9wW9wGLUbuBU88OvawmnYuQJ+3R16HHe0cNp4+UAnRWg+YmoJSQdVaEKU0j1eUQmHtiTD8H0S+W/IN2wccaVfSC6HeaTCmcK7SRVyMdzZ3LIvu3v77EDvSnNPosOlj2l3ebUc9uUnBjlhuCOaZXFhKd87MdvVzBtHt/u3eqGRH/jZi5jVlc+NHJKwsdN1xCAr1rA7lwRhkAO84K9lVpoVBx0Sea7zeiKQlic9GuADLz7WE4F7AdLyRL6+TgI+ex+pTYd2INViprEkhIDHpnbgWxOBh8Hbp2/pME2hHVcBPnj8+OtEFJhd3AviEgJc4IPHL0Lt4YLgMl58X9Iwmw/3bs6ieejdwZFTQ0EBQGsowtIkdRfdUATEdPxWbkfE1nH9n/gHNV4Z3Jqk7mkAAAAASUVORK5CYII="/></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>Combined Shape Copy</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Projects" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="06_Projects_UI_Desktop" transform="translate(-1085.000000, -325.000000)" fill="#1B80C9">
+            <g id="Group-18-Copy" transform="translate(1085.000000, 321.000000)">
+                <path d="M7,4 C10.8659932,4 14,7.13400675 14,11 C14,14.8659932 10.8659932,18 7,18 C3.13400675,18 0,14.8659932 0,11 C0,7.13400675 3.13400675,4 7,4 Z M5.92307692,7.83653846 L5.92307692,11.5769231 L5.92307692,11.5769231 C5.92307692,11.8530655 6.14693455,12.0769231 6.42307692,12.0769231 L10.7692308,12.0769231 L10.7692308,12.0769231 C11.5769231,12.0769231 11.5769231,11 10.7692308,11 C9.51282051,11 8.25641026,11 7,11 L7,9.30048077 C7,8.77323718 7,8.28525641 7,7.83653846 C7,7.02884615 5.92307692,7.02884615 5.92307692,7.83653846 Z" id="Combined-Shape-Copy"></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -42,11 +42,9 @@
 
     &-header {
         &-logo {
-            width: 211px;
             margin-bottom: 82px;
 
             @include bp-down($xs) {
-                width: 117px;
                 margin-bottom: 30px;
             }
         }

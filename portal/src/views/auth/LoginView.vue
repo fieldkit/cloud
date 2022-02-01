@@ -102,10 +102,17 @@ export default Vue.extend({
 @import "../../scss/forms.scss";
 
 .form-header-logo {
-    height: 60px;
+    font-size: 211px;
+    height: 45px;
+    @include flex(center);
 
     &:before {
         color: #fff;
+    }
+
+    @include bp-down($xs) {
+        font-size: 117px;
+        height: 25px;
     }
 }
 </style>

@@ -21,13 +21,13 @@
                         <div class="project-detail">{{ project.description }}</div>
                     </div>
                     <div class="details-right">
-                        <div class="details-row" v-if="!project.startTime">
+                        <div class="details-row" v-if="project.startTime">
                             <div class="details-icon-container">
                                 <i class="icon icon-calendar"></i>
                             </div>
                             <template>{{ $t("project.started", { started: project.startTime }) }}</template>
                         </div>
-                        <div class="details-row" v-if="!displayProject.duration">
+                        <div class="details-row" v-if="displayProject.duration">
                             <div class="details-icon-container">
                                 <i class="icon icon-time" role="img" aria-label="duration"></i>
                             </div>

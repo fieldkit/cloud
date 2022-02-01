@@ -250,6 +250,16 @@ export default Vue.extend({
         padding-bottom: 2px;
     }
 }
+
+#header-logo {
+    font-size: 140px;
+    @include flex(center);
+
+    @include bp-down($md) {
+        display: none;
+    }
+}
+
 .sidebar-compass {
     display: flex;
     align-items: center;

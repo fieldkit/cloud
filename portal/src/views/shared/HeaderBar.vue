@@ -368,4 +368,20 @@ button {
         }
     }
 }
+
+#header-logo {
+    display: none;
+
+    @include bp-down($md) {
+        @include position(fixed, null null null 50%);
+        @include flex(center);
+        font-size: 130px;
+        height: 50px;
+        transform: translateX(-50%);
+    }
+
+    @include bp-down($xs) {
+        font-size: 110px;
+    }
+}
 </style>

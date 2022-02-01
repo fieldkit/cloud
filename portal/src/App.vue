@@ -10,7 +10,7 @@ import * as ActionTypes from "@/store/actions";
 import { AuthenticationRequiredError } from "@/api";
 
 export default Vue.extend({
-    async mounted(): Promise<void> {
+    async beforeMount(): Promise<void> {
         try {
             this.applyCustomClasses();
             await this.$store.dispatch(ActionTypes.INITIALIZE);
@@ -18,7 +18,7 @@ export default Vue.extend({
             console.log("initialize error", err, err.stack);
         }
     },
-    updated() {
+    beforeUpdate() {
         this.applyCustomClasses();
     },
     errorCaptured(err, vm, info): boolean {
@@ -31,9 +31,9 @@ export default Vue.extend({
     },
     methods: {
         applyCustomClasses(): void {
-            // if (window.location.hostname.indexOf("floodnet.") === 0) {
-            this.$nextTick().then(() => document.body.classList.add("floodnet"));
-            //  }
+            if (window.location.hostname.indexOf("floodnet.") === 0) {
+                document.body.classList.add("floodnet");
+            }
         },
     },
 });
