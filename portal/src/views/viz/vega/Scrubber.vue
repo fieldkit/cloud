@@ -94,11 +94,4 @@ export default {
     width: 100%;
 }
 
-.role-mark.brush_brush {
-    body.floodnet & {
-        path {
-            //fill: $color-floodnet-light;
-        }
-    }
-}
 </style>

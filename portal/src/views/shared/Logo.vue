@@ -9,7 +9,6 @@ export default Vue.extend({
     name: "Logo",
     computed: {
         altText(): string {
-            console.log("dadadada radoi");
             if (document.body.classList.contains("floodnet")) {
                 return this.$tc("layout.logo.floodnet.alt");
             }

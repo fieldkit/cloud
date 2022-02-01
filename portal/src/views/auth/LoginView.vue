@@ -1,8 +1,5 @@
 <template>
     <div class="form-container" v-if="!sso">
-        <!--
-        <img class="form-header-logo" :alt="$t('layout.logo.fieldkit.alt')" src="@/assets/FieldKit_Logo_White.png" />
--->
         <Logo class="form-header-logo"></Logo>
         <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="spoofing" :failed="failed" @login="save" />
     </div>
