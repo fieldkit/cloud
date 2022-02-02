@@ -7,7 +7,7 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import Spinner from "@/views/shared/Spinner.vue";
 
 import { TimeRange, VizSensor } from "./common";
-import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType, DataSetSeries } from "./viz";
+import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType, DataSetSeries, NewParams } from "./viz";
 import { vueTickHack } from "@/utilities";
 
 export const SensorSelectionRow = Vue.extend({
@@ -48,30 +48,26 @@ export const SensorSelectionRow = Vue.extend({
     },
     methods: {
         raiseChangeStation(node: StationTreeOption): void {
-            const sensor = this.ds.vizSensor[1]; // TODO VizSensor
-            console.log("raising viz-change-sensors", "sensor", sensor);
             vueTickHack(() => {
-                const params = this.workspace.makeParamsForStationChange(Number(node.id), sensor);
-                this.$emit("viz-change-sensors", params);
+                const newSeries = this.workspace.makeSeries(Number(node.id), this.ds.sensorAndModule);
+                console.log("raising viz-change-series", newSeries);
+                this.$emit("viz-change-series", newSeries);
             });
         },
         raiseChangeSensor(node: SensorTreeOption): void {
-            const station = this.ds.vizSensor[0]; // TODO VizSensor
-            console.log("raising viz-change-sensors", "station", station);
             vueTickHack(() => {
                 if (!node.moduleId) throw new Error();
                 if (!node.sensorId) throw new Error();
-                const params = this.workspace.makeParamsForSensorChange(station, [node.moduleId, node.sensorId]);
-                this.$emit("viz-change-sensors", params);
+                const newSeries = this.workspace.makeSeries(this.ds.stationId, [node.moduleId, node.sensorId]);
+                console.log("raising viz-change-series", newSeries);
+                this.$emit("viz-change-series", newSeries);
             });
         },
     },
     template: `
 		<div class="tree-pair">
-            <treeselect v-if="stationOptions.length" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" />
-            <div v-else class="loading-options">Loading Options</div>
-            <treeselect v-if="sensorOptions.length" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="1" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
-            <div v-else class="loading-options">Loading Options</div>
+            <treeselect :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" />
+            <treeselect :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="1" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
 		</div>
     `,
 });
@@ -96,6 +92,15 @@ export const SelectionControls = Vue.extend({
             this.viz.log("station-options", { options: this.workspace.stationOptions });
             return this.workspace.stationOptions;
         },
+        showRemove(): boolean {
+            return this.viz.dataSets.length >= 2;
+        },
+        showAdd(): boolean {
+            return this.viz.dataSets.length <= 1;
+        },
+        visible(): boolean {
+            return this.stationOptions.length > 0;
+        },
     },
     methods: {
         sensorOptions(vizSensor: VizSensor): SensorTreeOption[] {
@@ -104,16 +109,30 @@ export const SelectionControls = Vue.extend({
             this.viz.log("sensor-options", { options: sensorOptions });
             return sensorOptions;
         },
-        raiseChangeSensors(...args: unknown[]): void {
-            this.$emit("viz-change-sensors", ...args);
+        raiseChangeSeries(index: number, newSeries: DataSetSeries): void {
+            console.log("BLAH BLAH jacob", newSeries);
+            const newParams = this.viz.modifySeries(index, [newSeries.stationId, newSeries.sensorAndModule]);
+            this.viz.log("raise viz-change-sensors", index, newSeries);
+            this.$emit("viz-change-sensors", newParams);
+        },
+        addSeries() {
+            const newParams = this.viz.addSeries();
+            this.viz.log("raise viz-change-sensors", newParams);
+            this.$emit("viz-change-sensors", newParams);
+        },
+        removeSeries(index: number) {
+            const newParams = this.viz.removeSeries(index);
+            this.viz.log("raise viz-change-sensors", newParams);
+            this.$emit("viz-change-sensors", newParams);
         },
     },
     template: `
-		<div class="left half">
+		<div class="left half" v-if="visible">
             <div class="row" v-for="(ds, index) in viz.dataSets" v-bind:key="index">
-                <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-sensors="raiseChangeSensors" />
-                <div class="actions">
-					<div class="button" alt="Add">Add</div>
+                <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)" />
+                <div class="actions" v-if="showAdd || showRemove">
+                    <div class="button" alt="Add" @click="() => addSeries()" v-if="showAdd">Add</div>
+                    <div class="button" alt="Remove" @click="() => removeSeries(index)" v-if="showRemove">Remove</div>
                 </div>
             </div>
         </div>

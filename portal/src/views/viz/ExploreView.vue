@@ -328,13 +328,6 @@ export default Vue.extend({
     height: 20px;
 }
 
-/* HACK d3 Real talk, no idea how to do this elsewhere. -jlewallen */
-/*
-.brush-container .selection {
-    opacity: 0.3;
-}
-*/
-
 .vega-embed {
     width: 100%;
     summary {
@@ -373,6 +366,7 @@ export default Vue.extend({
 .controls-container .left {
     align-items: center;
     display: flex;
+    flex-direction: column;
 }
 
 .controls-container .left .row {
