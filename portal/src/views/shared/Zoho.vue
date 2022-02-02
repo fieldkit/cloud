@@ -3,6 +3,8 @@
 </template>
 <script>
 import Vue from "@/store/strong-vue";
+import { FKPartnersEnum } from "@/views/shared/PartnerCustomisationHelper";
+import { isCustomisationEnabledFor } from "./PartnerCustomisationHelper";
 
 export default Vue.extend({
     name: "Zoho",
@@ -11,14 +13,18 @@ export default Vue.extend({
             console.log("zoho:disabled");
             return;
         }
+        if (isCustomisationEnabledFor(FKPartnersEnum.floodnet)) {
+            console.log("zoho:disabled");
+            return;
+        }
 
         window.ZohoHCAsap =
             window.ZohoHCAsap ||
-            function (a, b) {
+            function(a, b) {
                 global.ZohoHCAsap[a] = b;
             };
 
-        (function () {
+        (function() {
             const d = document;
             const s = d.createElement("script");
             s.type = "text/javascript";
