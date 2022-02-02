@@ -1,5 +1,13 @@
 @import "mixins";
 
+.flex {
+    display: flex;
+
+    &-al-center {
+        align-items: center;
+    }
+}
+
 .main-panel {
     display: flex;
     flex-direction: column;
@@ -27,7 +35,6 @@
     flex-direction: column;
     height: 100%;
     max-width: 1080px;
-    background-color: #fcfcfc;
     text-align: left;
     padding: 40px 90px;
 

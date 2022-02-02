@@ -12,7 +12,7 @@
             <div class="nav-section">
                 <router-link :to="{ name: 'projects' }">
                     <div class="nav-label">
-                        <img alt="Projects" src="@/assets/icon-projects.svg" />
+                        <i class="icon icon-projects"></i>
                         <span v-bind:class="{ selected: viewingProjects }">{{ $t("layout.side.projects.title") }}</span>
                     </div>
                 </router-link>
@@ -31,7 +31,7 @@
             <div class="nav-section" v-if="stations.length > 0">
                 <router-link :to="{ name: 'mapAllStations' }">
                     <div class="nav-label">
-                        <img alt="Stations" src="@/assets/icon-stations.svg" />
+                        <i class="icon icon-stations"></i>
                         <span v-bind:class="{ selected: viewingStations }">{{ $t("layout.side.stations.title") }}</span>
                     </div>
                 </router-link>
@@ -49,7 +49,7 @@
         </div>
         <div class="sidebar-header sidebar-compass">
             <router-link :to="{ name: 'projects' }">
-                <img :alt="$t('layout.logo.compass.alt')" src="@/assets/logo-compass.svg" width="45" height="45" />
+                <i role="img" class="icon" :class="narrowSidebarLogoIconClass" :aria-label="narrowSidebarLogoAlt"></i>
             </router-link>
         </div>
     </div>
@@ -58,6 +58,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Logo from "@/views/shared/Logo.vue";
+import interpolatePartner from "./PartnerCustomisationHelper";
 
 export default Vue.extend({
     name: "SidebarNav",
@@ -98,11 +99,15 @@ export default Vue.extend({
         sidebar: {
             narrow: boolean;
         };
+        narrowSidebarLogoIconClass: string;
+        narrowSidebarLogoAlt: string;
     } {
         return {
             sidebar: {
                 narrow: window.screen.availWidth <= 1040,
             },
+            narrowSidebarLogoIconClass: interpolatePartner("icon-logo-narrow-"),
+            narrowSidebarLogoAlt: interpolatePartner("layout.logo.") + ".alt",
         };
     },
     methods: {
@@ -201,9 +206,14 @@ export default Vue.extend({
     margin: 12px 0;
     cursor: pointer;
 }
-.nav-label img {
+.nav-label .icon {
     vertical-align: sub;
     margin: 0 10px 0 5px;
+    font-size: 16px;
+
+    &:before {
+        color: var(--color-primary);
+    }
 }
 .selected {
     border-bottom: 2px solid $color-primary;
@@ -236,6 +246,16 @@ export default Vue.extend({
         padding-bottom: 2px;
     }
 }
+
+#header-logo {
+    font-size: 32px;
+    @include flex(center);
+
+    @include bp-down($md) {
+        display: none;
+    }
+}
+
 .sidebar-compass {
     display: flex;
     align-items: center;
@@ -256,10 +276,22 @@ export default Vue.extend({
     @include bp-down($md) {
         display: none;
     }
+
+    i {
+        display: flex;
+        align-items: center;
+        font-size: 50px;
+
+        &:before {
+            color: var(--color-primary);
+
+            body.floodnet & {
+                color: var(--color-dark);
+            }
+        }
+    }
 }
-.sidebar-compass img {
-    align-self: center;
-}
+
 .sidebar-trigger {
     transition: all 0.25s;
     cursor: pointer;

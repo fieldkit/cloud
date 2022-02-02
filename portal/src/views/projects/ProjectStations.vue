@@ -23,11 +23,11 @@
             {{ $t("project.stations.title") }}
             <div class="stations-cta-container" v-if="admin">
                 <div class="stations-cta" v-on:click="showAddStationPicker">
-                    <img src="@/assets/icon-plus-round.svg" />
+                    <i class="icon icon-plus-round"></i>
                     {{ $t("project.stations.add.trigger") }}
                 </div>
                 <div class="stations-cta" v-on:click="showEditStationPicker">
-                    <img src="@/assets/icon-minus-round.svg" />
+                    <i class="icon icon-minus-round"></i>
                     {{ $t("project.stations.edit.trigger") }}
                 </div>
             </div>
@@ -47,7 +47,7 @@
                         @selected="showSummary(station)"
                     >
                         <div class="station-links">
-                            <img class="notes" v-on:click="openNotes(station)" src="@/assets/icon-field-notes.svg" />
+                            <i v-on:click="openNotes(station)" class="icon icon-field-notes"></i>
                         </div>
                     </TinyStation>
                 </div>
@@ -304,11 +304,6 @@ export default Vue.extend({
     font-size: 14px;
     margin-right: 1em;
     @include flex(center);
-
-    img {
-        margin-right: 7px;
-        width: 18px;
-    }
 }
 .stations-cta {
     cursor: pointer;
@@ -324,6 +319,11 @@ export default Vue.extend({
 
     body.floodnet & {
         font-family: $font-family-floodnet-bold;
+    }
+
+    .icon {
+        margin-right: 7px;
+        margin-top: -3px;
     }
 }
 .last-seen {
@@ -397,14 +397,6 @@ export default Vue.extend({
     font-size: 12px;
 }
 
-.station-links .notes {
-    cursor: pointer;
-    font-size: 14px;
-    width: 20px;
-    height: 20px;
-    margin: auto;
-}
-
 .pagination {
     margin-top: auto;
     padding-bottom: 1em;
@@ -414,5 +406,15 @@ export default Vue.extend({
     width: 359px;
     top: 20px;
     left: 122px;
+}
+
+.icon-field-notes {
+    font-size: 20px;
+    cursor: pointer;
+    margin: auto;
+
+    &:before {
+        color: var(--color-primary);
+    }
 }
 </style>

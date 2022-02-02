@@ -71,11 +71,11 @@
 
                         <div class="actions">
                             <button @click="addReply(post)">
-                                <img src="@/assets/icon-reply.svg" />
+                                <i class="icon icon-reply"></i>
                                 Reply
                             </button>
                             <button v-if="viewType === 'data'" @click="viewDataClick(post)">
-                                <img src="@/assets/icon-view-data.svg" />
+                                <i class="icon icon-view-data"></i>
                                 View Data
                             </button>
                         </div>
@@ -615,8 +615,13 @@ header {
         @include flex(flex-start);
     }
 
-    img {
-        width: 14px;
+    .icon {
+        font-size: 11px;
+        margin-right: 5px;
+    }
+
+    .icon-view-data {
+        font-size: 14px;
         margin-right: 6px;
     }
 }

@@ -12,11 +12,11 @@
         </router-link>
         <div class="invited-container" v-if="invited">
             <div class="accept" v-on:click.stop.prevent="onAccept">
-                <img alt="Close" src="@/assets/icon-tick-blue.svg" />
+                <i class="icon icon-tick"></i>
                 <span>{{ $t("project.invite.accept") }}</span>
             </div>
             <div class="reject" v-on:click.stop.prevent="onDecline">
-                <img alt="Close" src="@/assets/icon-close-bold.svg" />
+                <i class="icon icon-close"></i>
                 <span>{{ $t("project.invite.decline") }}</span>
             </div>
         </div>
@@ -24,13 +24,11 @@
             <div class="social follows" v-if="project.following">
                 <FollowControl :project="project">
                     <template #default="{ following, followers, follow, unfollow }">
-                        <span v-if="following" v-on:click="unfollow" class="icon">
-                            <img src="@/assets/icon-heart.svg" class="icon" />
-                        </span>
-                        <span v-if="!following" v-on:click="follow" class="icon">
-                            <img src="@/assets/icon-heart-gray.svg" class="icon" />
-                        </span>
-                        {{ followers }}
+                        <div class="flex al-center">
+                            <i v-if="following" v-on:click="unfollow" class="icon icon-heart"></i>
+                            <i v-if="!following" v-on:click="follow" class="icon icon-heart gray"></i>
+                            {{ followers }}
+                        </div>
                     </template>
                 </FollowControl>
             </div>
@@ -128,7 +126,6 @@ export default {
     margin: 13px 15px 0 15px;
 }
 .project-description {
-    overflow-wrap: break-word;
     font-family: $font-family-light;
     font-size: 14px;
     margin: 2px 15px 15px 15px;
@@ -184,13 +181,16 @@ export default {
         font-family: var(--font-family-bold);
     }
 
-    img {
+    i {
         margin: 0 5px 0 3px;
-        height: 100%;
+    }
+
+    span {
+      margin-bottom: -2px;
     }
 }
 .invited-container .accept {
-    padding: 5px;
+    padding: 6px;
     text-align: center;
     font-size: 14px;
     color: #2c3e50;
@@ -210,6 +210,22 @@ export default {
 
     span {
         padding-top: 2px;
+    }
+}
+
+.icon {
+    &-heart {
+        margin-right: 5px;
+        margin-top: 1px;
+    }
+
+    &-tick {
+        font-size: 12px;
+        color: var(--color-primary);
+    }
+
+    &-close {
+        font-weight: 900;
     }
 }
 </style>

@@ -1,0 +1,18 @@
+.icon {
+    &-heart {
+        font-size: 15px;
+        font-weight: 600;
+
+        &--gray {
+            color: #575757;
+        }
+    }
+
+    &-plus-round {
+        font-size: 18px;
+    }
+
+    &-minus-round {
+        font-size: 18px;
+    }
+}
