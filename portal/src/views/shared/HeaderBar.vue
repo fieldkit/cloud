@@ -375,13 +375,13 @@ button {
     @include bp-down($md) {
         @include position(fixed, null null null 50%);
         @include flex(center);
-        font-size: 130px;
+        font-size: 32px;
         height: 50px;
         transform: translateX(-50%);
     }
 
     @include bp-down($xs) {
-        font-size: 110px;
+        font-size: 26px;
     }
 }
 </style>

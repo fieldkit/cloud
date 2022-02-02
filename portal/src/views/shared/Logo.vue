@@ -4,22 +4,18 @@
 
 <script lang="ts">
 import Vue from "vue";
+import interpolatePartner from "./partnerCustomisationHelper";
 
 export default Vue.extend({
     name: "Logo",
-    computed: {
-        altText(): string {
-            if (document.body.classList.contains("floodnet")) {
-                return this.$tc("layout.logo.floodnet.alt");
-            }
-            return this.$tc("layout.logo.fieldkit.alt");
-        },
-        iconClass(): string {
-            if (document.body.classList.contains("floodnet")) {
-                return "icon-logo-floodnet";
-            }
-            return "icon-logo-fieldkit";
-        },
+    data(): {
+        iconClass: string;
+        altText: string;
+    } {
+        return {
+            iconClass: interpolatePartner("icon-logo-"),
+            altText: interpolatePartner("layout.logo.") + ".alt",
+        };
     },
 });
 </script>
