@@ -58,7 +58,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Logo from "@/views/shared/Logo.vue";
-import interpolatePartner from "./PartnerCustomisationHelper";
+import {interpolatePartner} from "./PartnerCustomisationHelper";
 
 export default Vue.extend({
     name: "SidebarNav",
