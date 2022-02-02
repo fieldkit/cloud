@@ -6,8 +6,8 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 import Spinner from "@/views/shared/Spinner.vue";
 
-import { TimeRange } from "./common";
-import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType } from "./viz";
+import { TimeRange, VizSensor } from "./common";
+import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType, DataSetSeries } from "./viz";
 import { vueTickHack } from "@/utilities";
 
 export const SensorSelectionRow = Vue.extend({
@@ -24,6 +24,10 @@ export const SensorSelectionRow = Vue.extend({
             type: Object as PropType<Workspace>,
             required: true,
         },
+        ds: {
+            type: Object as PropType<DataSetSeries>,
+            required: true,
+        },
         stationOptions: {
             type: Array as PropType<StationTreeOption[]>,
             required: true,
@@ -35,16 +39,16 @@ export const SensorSelectionRow = Vue.extend({
     },
     computed: {
         selectedStation(): number | null {
-            return this.viz.chartParams.sensorParams.stations[0];
+            return this.ds.vizSensor[0]; // TODO VizSensor
         },
         selectedSensor(): string | null {
-            const sensorAndModule = this.viz.chartParams.sensorParams.sensor;
+            const sensorAndModule = this.ds.vizSensor[1]; // TODO VizSensor
             return `${sensorAndModule[0]}-${sensorAndModule[1]}`;
         },
     },
     methods: {
         raiseChangeStation(node: StationTreeOption): void {
-            const sensor = this.viz.chartParams.sensorParams.sensor;
+            const sensor = this.ds.vizSensor[1]; // TODO VizSensor
             console.log("raising viz-change-sensors", "sensor", sensor);
             vueTickHack(() => {
                 const params = this.workspace.makeParamsForStationChange(Number(node.id), sensor);
@@ -52,7 +56,7 @@ export const SensorSelectionRow = Vue.extend({
             });
         },
         raiseChangeSensor(node: SensorTreeOption): void {
-            const station = this.viz.chartParams.sensorParams.stations[0];
+            const station = this.ds.vizSensor[0]; // TODO VizSensor
             console.log("raising viz-change-sensors", "station", station);
             vueTickHack(() => {
                 if (!node.moduleId) throw new Error();
@@ -92,25 +96,22 @@ export const SelectionControls = Vue.extend({
             this.viz.log("station-options", { options: this.workspace.stationOptions });
             return this.workspace.stationOptions;
         },
-        sensorOptions(): SensorTreeOption[] {
-            const stationId = this.viz.chartParams.sensorParams.stations[0]; // this.selectedStation
-            if (stationId == null) {
-                return [];
-            }
+    },
+    methods: {
+        sensorOptions(vizSensor: VizSensor): SensorTreeOption[] {
+            const stationId = vizSensor[0]; // TODO VizSensor
             const sensorOptions = this.workspace.sensorOptions(stationId);
             this.viz.log("sensor-options", { options: sensorOptions });
             return sensorOptions;
         },
-    },
-    methods: {
         raiseChangeSensors(...args: unknown[]): void {
             this.$emit("viz-change-sensors", ...args);
         },
     },
     template: `
 		<div class="left half">
-            <div class="row">
-                <SensorSelectionRow :viz="viz" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions" @viz-change-sensors="raiseChangeSensors" />
+            <div class="row" v-for="(ds, index) in viz.dataSets" v-bind:key="index">
+                <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-sensors="raiseChangeSensors" />
                 <div class="actions">
 					<div class="button" alt="Add">Add</div>
                 </div>

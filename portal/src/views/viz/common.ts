@@ -87,11 +87,6 @@ export class SensorParams {
     }
 
     public get id(): string {
-        /*
-        if (this.stations.length == 0) {
-            return ["Z", this.sensors.join("-"), "S", "ALL"].join("~");
-        }
-        */
         return ["Z", this.sensors.map((s) => _.flatten(s)).join("-"), "S"].join("~");
     }
 }

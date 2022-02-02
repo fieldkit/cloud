@@ -194,12 +194,13 @@ export default Vue.extend({
 
                     console.log("quick-sensors", quickSensors);
 
-                    const sensors = [
-                        [stationId, [quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId]],
+                    const vizSensor = [
+                        stationId,
+                        [quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId],
                     ];
 
                     return workspace
-                        .addStandardGraph(sensors)
+                        .addStandardGraph(vizSensor)
                         .eventually((ws) => this.onChange(ws.bookmark()))
                         .then((ws) => Promise.all([ws.query(), this.includeAssociatedStations(workspace)]));
                 });

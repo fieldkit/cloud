@@ -159,6 +159,28 @@ export abstract class Viz {
     public abstract bookmark(): VizBookmark;
 }
 
+type ResolveData = (qd: QueriedData) => void;
+
+class VizQuery {
+    constructor(public readonly params: DataQueryParams, public readonly vizes: Viz[], private readonly r: ResolveData) {}
+
+    public howBusy(d: number): any {
+        return this.vizes.map((v) => v.howBusy(d));
+    }
+
+    public resolve(qd: QueriedData) {
+        return this.r(qd);
+    }
+}
+
+class InfoQuery {
+    constructor(public readonly params: Stations, public readonly vizes: Viz[]) {}
+
+    public howBusy(d: number): any {
+        return this.vizes.map((v) => v.howBusy(d));
+    }
+}
+
 export class Scrubber {
     constructor(public readonly index: number, public readonly data: QueriedData) {}
 }
@@ -263,28 +285,55 @@ export class TimeZoom {
     constructor(public readonly fast: FastTime | null, public readonly range: TimeRange | null) {}
 }
 
-export class Graph extends Viz {
+export class DataSetSeries {
     public graphing: QueriedData | null = null;
+
+    constructor(public readonly vizSensor: VizSensor) {}
+
+    public bookmark(): VizSensor {
+        return this.vizSensor;
+    }
+
+    public get stationId(): StationID {
+        return this.vizSensor[0];
+    }
+
+    public get sensorAndModule() {
+        return this.vizSensor[1];
+    }
+}
+
+export class Graph extends Viz {
     public all: QueriedData | null = null;
     public visible: TimeRange = TimeRange.eternity;
     public chartType: ChartType = ChartType.TimeSeries;
     public fastTime: FastTime = FastTime.All;
     public geo: GeoZoom | null = null;
 
+    constructor(public readonly when: TimeRange, public dataSets: DataSetSeries[]) {
+        super();
+    }
+
     public get visibleTimeRange(): TimeRange {
-        if (this.graphing) {
-            return new TimeRange(this.graphing.timeRange[0], this.graphing.timeRange[1]);
-        }
         return this.visible;
     }
 
-    constructor(public chartParams: DataQueryParams) {
-        super();
-        if (this.chartParams.sensors.length != 1) throw new Error(`viz: Graph too many sensors`);
+    public get allStationIds(): StationID[] {
+        return this.dataSets.map((ds) => ds.stationId);
+    }
+
+    public allQueries(): VizQuery[] {
+        return this.dataSets.map((ds) => {
+            const params = new DataQueryParams(this.visible, [ds.vizSensor]);
+            return new VizQuery(params, [this], (qd) => {
+                ds.graphing = qd;
+                return;
+            });
+        });
     }
 
     public clone(): Viz {
-        const c = new Graph(this.chartParams);
+        const c = new Graph(this.when, this.dataSets);
         c.all = this.all;
         c.visible = this.visible;
         c.chartType = this.chartType;
@@ -293,7 +342,10 @@ export class Graph extends Viz {
     }
 
     public get scrubberParams(): DataQueryParams {
-        return new DataQueryParams(TimeRange.eternity, this.chartParams.sensors);
+        return new DataQueryParams(
+            TimeRange.eternity,
+            this.dataSets.map((ds) => ds.vizSensor)
+        );
     }
 
     public timeZoomed(zoom: TimeZoom): TimeRange {
@@ -305,7 +357,8 @@ export class Graph extends Viz {
             this.fastTime = zoom.fast;
         }
 
-        this.chartParams = new DataQueryParams(this.visible, this.chartParams.sensors);
+        // this.chartParams = new DataQueryParams(this.visible, this.chartParams.sensors); // TODO
+        throw new Error("NOT IMPLEMENTED");
 
         return this.visible;
     }
@@ -316,7 +369,7 @@ export class Graph extends Viz {
     }
 
     private getFastRange(fastTime: FastTime) {
-        if (!this.all) throw new Error("fast time missing all data");
+        if (!this.all) throw new Error("viz: Fast time missing all data");
 
         const sensorRange = this.all.timeRange;
         if (fastTime === FastTime.All) {
@@ -337,6 +390,9 @@ export class Graph extends Viz {
         const sensorParams = option.sensorParams;
         this.log(`changing-sensors`, option);
 
+        throw new Error("NOT IMPLEMENTED"); // TODO
+
+        /*
         if (_.difference(sensorParams.stations, this.chartParams.stations)) {
             if (this.geo) {
                 this.log(`changing-sensors`, "clearing-geo");
@@ -346,11 +402,12 @@ export class Graph extends Viz {
 
         this.chartParams = new DataQueryParams(this.chartParams.when, sensorParams.sensors);
         this.all = null;
+        */
     }
 
     public bookmark(): VizBookmark {
         return [
-            this.chartParams.sensors,
+            this.dataSets.map((ds) => ds.bookmark()),
             [this.visible.start, this.visible.end],
             this.geo ? this.geo.bounds : [],
             this.chartType,
@@ -360,8 +417,9 @@ export class Graph extends Viz {
 
     public static fromBookmark(bm: VizBookmark): Viz {
         const visible = new TimeRange(bm[1][0], bm[1][1]);
-        const chartParams = new DataQueryParams(visible, bm[0]);
-        const graph = new Graph(chartParams);
+        console.log("viz jacob jacob", bm[0]);
+        const dataSets = bm[0].map((vizSensor) => new DataSetSeries(vizSensor));
+        const graph = new Graph(visible, dataSets);
         graph.geo = bm[2].length ? new GeoZoom(bm[2]) : null;
         graph.chartType = bm[3];
         graph.fastTime = bm[4];
@@ -398,7 +456,7 @@ export class Group {
 
     public unlinkAt(viz: Viz): Group {
         const index = _.indexOf(this.vizes, viz);
-        if (index < 0) throw new Error("unlinking of mismatched group/viz");
+        if (index < 0) throw new Error("viz: Unlinking of mismatched group/viz");
         console.log("unlink-at:index", index);
         const removing = this.vizes.slice(index);
         console.log("unlink-at:removing", removing);
@@ -477,24 +535,6 @@ export class Group {
 
     public static fromBookmark(bm: GroupBookmark): Group {
         return new Group(bm[0].map((vm) => Graph.fromBookmark(vm)));
-    }
-}
-
-type ResolveData = (qd: QueriedData) => void;
-
-class VizQuery {
-    constructor(public readonly params: DataQueryParams, public readonly vizes: Viz[], public readonly resolve: ResolveData) {}
-
-    public howBusy(d: number): any {
-        return this.vizes.map((v) => v.howBusy(d));
-    }
-}
-
-class InfoQuery {
-    constructor(public readonly params: Stations, public readonly vizes: Viz[]) {}
-
-    public howBusy(d: number): any {
-        return this.vizes.map((v) => v.howBusy(d));
     }
 }
 
@@ -600,7 +640,7 @@ export class Workspace {
         // is especially important to do from here because we may have
         // been instantiated from a Bookmark. Right now we just query
         // for information on all the stations involved.
-        const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz.chartParams.stations)).concat(this.stationIds));
+        const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz.allStationIds)).concat(this.stationIds));
         const infoQueries = allStationIds.length ? [new InfoQuery(allStationIds, allGraphs)] : [];
 
         // Second step is to query to fill in any required scrubbers. I
@@ -617,13 +657,7 @@ export class Workspace {
             );
 
         // Now build the queries for the data being viewed.
-        const graphingQueries = allGraphs.map(
-            (viz: Graph) =>
-                new VizQuery(viz.chartParams, [viz], (qd) => {
-                    viz.graphing = qd;
-                    return;
-                })
-        );
+        const graphingQueries = _.flatten(allGraphs.map((viz: Graph) => viz.allQueries()));
 
         // Combine and make them unique to avoid obvious
         // duplicates. Eventually we can also merge stations/sensors
@@ -667,20 +701,23 @@ export class Workspace {
         });
     }
 
-    public vizInfo(viz: Graph): VizInfo {
+    public vizInfo(viz: Graph, ds: DataSetSeries | undefined = undefined): VizInfo {
+        // if (viz.chartParams.stations.length != 1) throw new Error("expected 1 station per graph, for now");
+        // if (viz.chartParams.sensors.length != 1) throw new Error("expected 1 sensor per graph, for now");
+
         const sensorDetailsByKey = _.keyBy(_.flatten(this.meta.modules.map((m) => m.sensors)), (s) => s.fullKey);
         const keysById = _.keyBy(this.meta.sensors, (s) => s.id);
 
-        if (viz.chartParams.stations.length != 1) {
-            throw new Error("expected 1 station per graph, for now");
+        if (!ds) {
+            if (viz.dataSets.length == 0) throw new Error("viz: No DataSets");
+            ds = viz.dataSets[0];
         }
 
-        if (viz.chartParams.sensors.length != 1) {
-            throw new Error("expected 1 sensor per graph, for now");
-        }
+        console.log(`viz`, ds);
 
-        const stationId = viz.chartParams.station;
-        const sensor = viz.chartParams.sensor;
+        const stationId = ds.stationId;
+        const sensor = ds.sensorAndModule;
+        if (!sensor || sensor.length != 2) throw new Error("viz: Malformed SensorAndModule");
         const sensorId = sensor[1];
 
         const station = this.stations[stationId];
@@ -729,11 +766,11 @@ export class Workspace {
     }
 
     private refreshStationIds() {
-        this.stationIds = _.flatten(_.flatten(this.groups.map((g) => g.vizes.map((v) => (v as Graph).chartParams.stations))));
+        this.stationIds = _.flatten(_.flatten(this.groups.map((g) => g.vizes.map((v) => (v as Graph).allStationIds))));
     }
 
-    public addStandardGraph(sensors: VizSensor[]): Workspace {
-        return this.addGraph(new Graph(new DataQueryParams(TimeRange.eternity, sensors)));
+    public addStandardGraph(vizSensor: VizSensor): Workspace {
+        return this.addGraph(new Graph(TimeRange.eternity, [new DataSetSeries(vizSensor)]));
     }
 
     public get stationOptions(): StationTreeOption[] {
