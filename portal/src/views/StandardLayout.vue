@@ -111,6 +111,10 @@ export default Vue.extend({
     background: #fcfcfc;
     position: relative;
     width: 100%;
+
+    body.floodnet & {
+        background: #{lighten($color-floodnet-border, 5%)};
+    }
 }
 .scrolling-disabled {
     overflow-y: hidden;

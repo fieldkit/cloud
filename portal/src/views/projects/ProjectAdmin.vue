@@ -23,25 +23,25 @@
                     <div class="details-right">
                         <div class="details-row" v-if="project.startTime">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" width="14px" height="14px" />
+                                <i class="icon icon-calendar"></i>
                             </div>
                             <template>{{ $t("project.started", { started: project.startTime }) }}</template>
                         </div>
                         <div class="details-row" v-if="displayProject.duration">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-time.svg" class="icon" width="14px" height="14px" />
+                                <i class="icon icon-time" role="img" aria-label="duration"></i>
                             </div>
                             <template>{{ $t("project.duration", { duration: displayProject.duration }) }}</template>
                         </div>
                         <div class="details-row location-name" v-if="project.location" width="12px" height="14px">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                                <i class="icon icon-location" role="img" aria-label="location"></i>
                             </div>
                             <template>{{ $t("project.location", { location: project.location }) }}</template>
                         </div>
                         <div class="details-row location-native" v-if="displayProject.places.native">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="12px" height="14px" />
+                                <i class="icon icon-location"></i>
                             </div>
                             <template>{{ $t("project.nativeLands", { nativeLands: displayProject.places.native }) }}</template>
                         </div>

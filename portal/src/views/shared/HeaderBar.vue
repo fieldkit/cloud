@@ -134,7 +134,7 @@ export default Vue.extend({
     padding: 0 10px;
     box-sizing: border-box;
     z-index: $z-index-header;
-    flex: 0 0 66px;
+    flex: 0 0 65px;
     @include flex(center, flex-end);
 
     @include bp-down($md) {
@@ -366,6 +366,22 @@ button {
             overflow-y: auto;
             padding: 10px;
         }
+    }
+}
+
+#header-logo {
+    display: none;
+
+    @include bp-down($md) {
+        @include position(fixed, null null null 50%);
+        @include flex(center);
+        font-size: 32px;
+        height: 50px;
+        transform: translateX(-50%);
+    }
+
+    @include bp-down($xs) {
+        font-size: 26px;
     }
 }
 </style>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>minus-round</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="minus-round" fill="#2C3E50" fill-rule="nonzero">
+            <path d="M10.5,0 C4.70101013,0 0,4.70101013 0,10.5 C0,16.2989899 4.70101013,21 10.5,21 C16.2989899,21 21,16.2989899 21,10.5 C21,4.70101013 16.2989899,0 10.5,0 Z M10.5,1.5 C15.4705627,1.5 19.5,5.52943725 19.5,10.5 C19.5,15.4705627 15.4705627,19.5 10.5,19.5 C5.52943725,19.5 1.5,15.4705627 1.5,10.5 C1.5,5.52943725 5.52943725,1.5 10.5,1.5 Z" id="rect907"></path>
+            <g id="g913" stroke-linecap="round" transform="translate(6.000000, 10.000000)">
+                <path d="M4.5,-4.75 C4.87969577,-4.75 5.19349096,-4.46784612 5.24315338,-4.10177056 L5.25,-4 L5.25,5 C5.25,5.41421356 4.91421356,5.75 4.5,5.75 C4.12030423,5.75 3.80650904,5.46784612 3.75684662,5.10177056 L3.75,5 L3.75,-4 C3.75,-4.41421356 4.08578644,-4.75 4.5,-4.75 Z" id="path911" transform="translate(4.500000, 0.500000) rotate(90.000000) translate(-4.500000, -0.500000) "></path>
+            </g>
+        </g>
+    </g>
+</svg>
