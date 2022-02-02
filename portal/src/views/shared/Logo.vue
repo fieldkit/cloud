@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import interpolatePartner from "./partnerCustomisationHelper";
+import interpolatePartner from "./PartnerCustomisationHelper";
 
 export default Vue.extend({
     name: "Logo",
