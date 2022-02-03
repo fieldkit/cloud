@@ -348,7 +348,10 @@ export class Graph extends Viz {
     public get scrubberParams(): DataQueryParams {
         return new DataQueryParams(
             TimeRange.eternity,
-            this.dataSets.map((ds) => ds.vizSensor)
+            _.take(
+                this.dataSets.map((ds) => ds.vizSensor),
+                1
+            )
         );
     }
 
@@ -774,7 +777,7 @@ export class Workspace {
     }
 
     private refreshStationIds() {
-        this.stationIds = _.flatten(_.flatten(this.groups.map((g) => g.vizes.map((v) => (v as Graph).allStationIds))));
+        this.stationIds = _.uniq(_.flatten(_.flatten(this.groups.map((g) => g.vizes.map((v) => (v as Graph).allStationIds)))));
     }
 
     public addStandardGraph(vizSensor: VizSensor): Workspace {
@@ -789,10 +792,7 @@ export class Workspace {
 
     public sensorOptions(stationId: number): SensorTreeOption[] {
         const station = this.stations[stationId];
-        if (!station) {
-            console.log(`no-options: no station`);
-            return [];
-        }
+        if (!station) throw new Error("viz: No station");
         const allSensors = station.sensors;
         const allModules = _.groupBy(allSensors, (s) => s.moduleId);
         const keysById = _.fromPairs(allSensors.map((row) => [row.moduleId, row.moduleKey]));
@@ -825,7 +825,7 @@ export class Workspace {
                     })
                 );
                 const moduleAge = _.max(children.map((c) => c.age));
-                if (!moduleAge) throw new Error(`expected module age: no sensors?`);
+                if (!moduleAge) throw new Error(`viz: Expected module age: no sensors?`);
 
                 const label = i18n.tc(moduleKey); //  + ` (${moduleAge.fromNow()})`;
                 return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, moduleAge);
@@ -841,9 +841,9 @@ export class Workspace {
 
     public makeSeries(stationId: number, sensorAndModule: SensorSpec): DataSetSeries {
         const station = this.stations[stationId];
-        if (!station) throw new Error(`no station with id: ${stationId}`);
+        if (!station) throw new Error(`viz: No station with id: ${stationId}`);
         const sensors = station.sensors;
-        if (sensors.length == 0) throw new Error(`no sensors on station with id: ${stationId}`);
+        if (sensors.length == 0) throw new Error(`viz: No sensors on station with id: ${stationId}`);
         const moduleIds = sensors.map((s) => s.moduleId);
         if (moduleIds.includes(sensorAndModule[0])) {
             return new DataSetSeries([stationId, sensorAndModule]);
@@ -890,9 +890,7 @@ export class Workspace {
             console.log("linkage-link", viz.id, group.id, viz, group);
             this.groups.reduce((previous: Group | null, iter: Group): Group => {
                 if (iter == group) {
-                    if (previous == null) {
-                        throw new Error("tried linking first group, nice work");
-                    }
+                    if (previous == null) throw new Error("viz: Tried linking first group, nice work");
                     this.removeGroup(group);
                     previous.addAll(group);
                 }
@@ -935,7 +933,7 @@ export class Workspace {
 
     public static fromBookmark(meta: SensorsResponse, bm: Bookmark): Workspace {
         if (bm.v !== 1) {
-            throw new Error("unexpected bookmark version");
+            throw new Error("viz: Unexpected bookmark version");
         }
         return new Workspace(
             meta,

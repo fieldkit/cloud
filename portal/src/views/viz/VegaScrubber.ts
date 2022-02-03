@@ -11,9 +11,6 @@ export const VegaScrubber = Vue.extend({
     components: {
         Scrubber,
     },
-    data() {
-        return {};
-    },
     props: {
         scrubbers: {
             type: Scrubbers,
@@ -53,7 +50,7 @@ export const VegaScrubber = Vue.extend({
             return this.$emit("viz-time-zoomed", zoom);
         },
         refresh() {
-            console.log("scrubber refresh", this.scrubbers);
+            // console.log("scrubber refresh", this.scrubbers);
         },
     },
     template: `

@@ -166,7 +166,7 @@ export default Vue.extend({
             return this.workspace;
         },
         async includeAssociatedStations(ws: Workspace): Promise<void> {
-            console.log(`include-associated`, ws.allStationIds);
+            // console.log(`include-associated`, ws.allStationIds);
             if (ws.allStationIds.length != 1) {
                 return;
             }
