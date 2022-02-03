@@ -110,7 +110,6 @@ export const SelectionControls = Vue.extend({
             return sensorOptions;
         },
         raiseChangeSeries(index: number, newSeries: DataSetSeries): void {
-            console.log("BLAH BLAH jacob", newSeries);
             const newParams = this.viz.modifySeries(index, [newSeries.stationId, newSeries.sensorAndModule]);
             this.viz.log("raise viz-change-sensors", index, newSeries);
             this.$emit("viz-change-sensors", newParams);

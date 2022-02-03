@@ -2,43 +2,7 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "description": "Vega-Lite spec for FieldKit time series chart with a second y-axis.",
   "width": "container",
-  "params": [
-    {
-      "name": "toggleHighlight",
-      "bind": {
-        "input": "checkbox"
-      }
-    },
-    {
-      "name": "interpolate",
-      "value": "bundle",
-      "bind": {
-        "input": "select",
-        "options": [
-          "basis",
-          "bundle",
-          "cardinal",
-          "catmull-rom",
-          "linear",
-          "monotone",
-          "natural",
-          "step",
-          "step-after",
-          "step-before"
-        ]
-      }
-    },
-    {
-      "name": "tension",
-      "value": 1,
-      "bind": {
-        "input": "range",
-        "min": 0,
-        "max": 1,
-        "step": 0.05
-      }
-    }
-  ],
+  "params": [],
   "encoding": {
     "x": {
       "field": "time",
@@ -62,10 +26,10 @@
           },
           "axis": {
             "titleOpacity": {
-              "expr": "toggleHighlight ? 0.2 : 1"
+              "expr": "1"
             },
             "labelOpacity": {
-              "expr": "toggleHighlight ? 0.2 : 1"
+              "expr": "1"
             }
           }
         }
@@ -74,10 +38,6 @@
         {
           "encoding": {
             "opacity": {
-              "condition": {
-                "param": "toggleHighlight",
-                "value": 0.2
-              },
               "value": 1
             }
           },
@@ -137,12 +97,8 @@
               ]
             },
             "strokeWidth": 2,
-            "interpolate": {
-              "expr": "interpolate"
-            },
-            "tension": {
-              "expr": "tension"
-            }
+            "interpolate": "monotone",
+            "tension": 1
           }
         },
         {
@@ -163,10 +119,6 @@
               "legend": null
             },
             "opacity": {
-              "condition": {
-                "param": "toggleHighlight",
-                "value": 0
-              },
               "value": 1
             }
           }
@@ -226,6 +178,15 @@
                 "on": "mouseover",
                 "clear": "mouseout"
               }
+            },
+            {
+              "name": "brush",
+              "select": {
+                "type": "interval",
+                "encodings": [
+                  "x"
+                ]
+              }
             }
           ]
         }
@@ -243,10 +204,10 @@
           },
           "axis": {
             "titleOpacity": {
-              "expr": "toggleHighlight ? 1 : 0.2"
+              "expr": "0.2"
             },
             "labelOpacity": {
-              "expr": "toggleHighlight ? 1 : 0.2"
+              "expr": "0.2"
             }
           }
         }
@@ -255,10 +216,6 @@
         {
           "encoding": {
             "opacity": {
-              "condition": {
-                "param": "toggleHighlight",
-                "value": 1
-              },
               "value": 0.2
             }
           },
@@ -318,12 +275,8 @@
               ]
             },
             "strokeWidth": 2,
-            "interpolate": {
-              "expr": "interpolate"
-            },
-            "tension": {
-              "expr": "tension"
-            }
+            "interpolate": "monotone",
+            "tension": 1
           }
         },
         {
@@ -343,11 +296,7 @@
               "legend": null
             },
             "opacity": {
-              "condition": {
-                "param": "toggleHighlight",
-                "value": 1
-              },
-              "value": 0
+              "value": 0.2
             }
           }
         },
@@ -405,6 +354,15 @@
                 "nearest": false,
                 "on": "mouseover",
                 "clear": "mouseout"
+              }
+            },
+            {
+              "name": "brush2",
+              "select": {
+                "type": "interval",
+                "encodings": [
+                  "x"
+                ]
               }
             }
           ]
