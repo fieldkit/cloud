@@ -1302,7 +1302,7 @@ class FKApi {
 
         const fixed = this.parseBodies(returned.posts);
 
-        console.log("comments", returned);
+        // console.log("comments", returned);
 
         return {
             posts: fixed,
@@ -1323,7 +1323,7 @@ class FKApi {
             },
         });
 
-        console.log("comments", returned);
+        // console.log("comments", returned);
 
         return {
             post: this.parseBody(returned.post),

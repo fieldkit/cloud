@@ -65,6 +65,7 @@ func (c *DiscussionService) Data(ctx context.Context, payload *discService.DataP
 
 	bookmark, err := data.ParseBookmark(payload.Bookmark)
 	if err != nil {
+		panic(err)
 		return nil, err
 	}
 

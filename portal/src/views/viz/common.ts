@@ -65,20 +65,34 @@ export type SensorID = number;
 export type Stations = StationID[];
 export type SensorSpec = [ModuleID, SensorID];
 export type Sensors = SensorSpec[];
+export type VizSensor = [StationID, SensorSpec];
 
 export class SensorParams {
-    constructor(public readonly stations: Stations, public readonly sensors: Sensors) {}
+    constructor(public readonly sensors: VizSensor[]) {}
+
+    public get stations(): StationID[] {
+        return this.sensors.map((vs) => vs[0]);
+    }
+
+    public get station(): StationID {
+        return this.stations[0];
+    }
+
+    public get sensor(): SensorSpec {
+        return this.sensors.map((vs) => vs[1])[0];
+    }
+
+    public get sensorAndModules(): SensorSpec[] {
+        return this.sensors.map((vs) => vs[1]);
+    }
 
     public get id(): string {
-        if (this.stations.length == 0) {
-            return ["Z", this.sensors.join("-"), "S", "ALL"].join("~");
-        }
-        return ["Z", this.sensors.join("-"), "S", this.stations.join("-")].join("~");
+        return ["Z", this.sensors.map((s) => _.flatten(s)).join("-"), "S"].join("~");
     }
 }
 
 export class DataQueryParams {
-    constructor(public readonly when: TimeRange, public readonly stations: Stations, public readonly sensors: Sensors) {}
+    constructor(public readonly when: TimeRange, public readonly sensors: VizSensor[]) {}
 
     public sameAs(o: DataQueryParams): boolean {
         return _.isEqual(this, o);
@@ -89,14 +103,30 @@ export class DataQueryParams {
         queryParams.append("start", this.when.start.toString());
         queryParams.append("end", this.when.end.toString());
         queryParams.append("stations", this.stations.join(","));
-        queryParams.append("sensors", this.sensors.join(","));
+        queryParams.append("sensors", this.sensorAndModules.join(","));
         queryParams.append("resolution", "1000");
         queryParams.append("complete", "true");
         return queryParams;
     }
 
     public get sensorParams(): SensorParams {
-        return new SensorParams(this.stations, this.sensors);
+        return new SensorParams(this.sensors);
+    }
+
+    public get stations(): StationID[] {
+        return this.sensorParams.stations;
+    }
+
+    public get station(): StationID {
+        return this.sensorParams.station;
+    }
+
+    public get sensor(): SensorSpec {
+        return this.sensorParams.sensor;
+    }
+
+    public get sensorAndModules(): SensorSpec[] {
+        return this.sensorParams.sensorAndModules;
     }
 }
 

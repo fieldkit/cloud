@@ -5,8 +5,12 @@
                 <span class="small-arrow">&lt;</span>
                 {{ backTitle }}
             </div>
-            <div class="one" v-if="title">{{ title }}</div>
-            <div class="two" v-if="subtitle">{{ subtitle }}</div>
+            <slot name="title">
+                <div class="one" v-if="title">{{ title }}</div>
+            </slot>
+            <slot name="subtitle">
+                <div class="two" v-if="subtitle">{{ subtitle }}</div>
+            </slot>
         </div>
         <div class="actions">
             <slot></slot>

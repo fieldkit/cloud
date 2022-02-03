@@ -4,12 +4,22 @@
         <div class="explore-view">
             <div class="explore-header">
                 <DoubleHeader
-                    title="Data View"
                     :backTitle="backRoute === 'viewProject' ? $t('layout.backProjectDashboard') : $t('layout.backToStations')"
                     :backRoute="backRoute"
                     :backRouteParams="backRouteParams"
                 >
-                    <div class="button" @click="openExports">Export</div>
+                    <template v-slot:title>
+                        <div class="one">
+                            Data View
+                            <div class="button compare" alt="Add Chart" @click="addChart">
+                                <img :src="addIcon" />
+                                <div>Add Chart</div>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-slot:default>
+                        <div class="button" @click="openExports">Export</div>
+                    </template>
                 </DoubleHeader>
             </div>
 
@@ -38,7 +48,7 @@ import { mapState, mapGetters } from "vuex";
 import { GlobalState } from "@/store/modules/global";
 
 import { SensorsResponse } from "./api";
-import { Workspace, Bookmark } from "./viz";
+import { Workspace, Bookmark, serializeBookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 
 import Comments from "../comments/Comments.vue";
@@ -93,6 +103,9 @@ export default Vue.extend({
             stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
         }),
+        addIcon(): unknown {
+            return this.$loadAsset("icon-compare.svg");
+        },
     },
     watch: {
         async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
@@ -116,11 +129,18 @@ export default Vue.extend({
         }
     },
     methods: {
+        async addChart() {
+            console.log("viz-add");
+            if (!this.workspace) throw new Error("viz-add: no workspace");
+            return this.workspace.addChart().query();
+        },
         async onChange(bookmark: Bookmark): Promise<void> {
             if (Bookmark.sameAs(this.bookmark, bookmark)) {
                 return Promise.resolve(this.workspace);
             }
-            await this.$router.push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bookmark) } }).then(() => this.workspace);
+            await this.$router
+                .push({ name: "exploreBookmark", params: { bookmark: serializeBookmark(bookmark) } })
+                .then(() => this.workspace);
         },
         async openExports(): Promise<void> {
             const encoded = JSON.stringify(this.bookmark);
@@ -174,11 +194,13 @@ export default Vue.extend({
 
                     console.log("quick-sensors", quickSensors);
 
-                    const stations = [stationId];
-                    const sensors = [[quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId]];
+                    const vizSensor = [
+                        stationId,
+                        [quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId],
+                    ];
 
                     return workspace
-                        .addStandardGraph(stations, sensors)
+                        .addStandardGraph(vizSensor)
                         .eventually((ws) => this.onChange(ws.bookmark()))
                         .then((ws) => Promise.all([ws.query(), this.includeAssociatedStations(workspace)]));
                 });
@@ -191,6 +213,7 @@ export default Vue.extend({
 <style lang="scss">
 @import "../../scss/layout";
 
+/*
 .graph .x-axis {
     color: #7f7f7f;
 }
@@ -206,6 +229,7 @@ export default Vue.extend({
 .graph .y-axis text {
     font-size: 7pt;
 }
+*/
 
 .explore-view {
     text-align: left;
@@ -295,13 +319,6 @@ export default Vue.extend({
     height: 20px;
 }
 
-/* HACK d3 Real talk, no idea how to do this elsewhere. -jlewallen */
-/*
-.brush-container .selection {
-    opacity: 0.3;
-}
-*/
-
 .vega-embed {
     width: 100%;
     summary {
@@ -309,7 +326,7 @@ export default Vue.extend({
         margin-right: 0.5em;
     }
 }
-.scrubber.vega-embed summary {
+.scrubber .vega-embed summary {
     display: none;
 }
 
@@ -337,17 +354,38 @@ export default Vue.extend({
     padding: 10px;
 }
 
-.controls-container .tree {
-    flex-basis: 50%;
-}
-
-.controls-container .tree div {
-    flex-basis: 50%;
-}
-
 .controls-container .left {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.controls-container .left .row {
+    align-items: center;
+    display: flex;
+
+    .actions {
+        margin-left: 1em;
+        display: flex;
+        align-items: center;
+
+        .button {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.controls-container .left.half {
+    flex-basis: 50%;
+}
+
+.controls-container .tree-pair {
     display: flex;
     align-items: center;
+}
+
+.controls-container .tree-pair div {
+    flex-basis: 50%;
 }
 
 .controls-container .right {
@@ -467,5 +505,10 @@ export default Vue.extend({
 
 .layer_1_marks path {
     fill: var(--color-primary);
+}
+
+.one {
+    display: flex;
+    flex-direction: row;
 }
 </style>

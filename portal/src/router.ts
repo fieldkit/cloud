@@ -27,7 +27,7 @@ import AdminUsers from "./views/admin/AdminUsers.vue";
 import AdminStations from "./views/admin/AdminStations.vue";
 import Playground from "./views/admin/Playground.vue";
 
-import { Bookmark } from "./views/viz/viz";
+import { deserializeBookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
 import { ActionTypes } from "@/store";
 
@@ -306,7 +306,7 @@ const routes = [
         component: ExploreView,
         props: (route) => {
             return {
-                bookmark: Object.assign(new Bookmark(1, []), JSON.parse(route.params.bookmark)),
+                bookmark: deserializeBookmark(route.params.bookmark),
             };
         },
         meta: {
@@ -319,7 +319,7 @@ const routes = [
         component: ExploreView,
         props: (route) => {
             return {
-                bookmark: Object.assign(new Bookmark(1, []), JSON.parse(route.params.bookmark)),
+                bookmark: deserializeBookmark(route.params.bookmark),
                 exportsVisible: true,
             };
         },
@@ -466,7 +466,6 @@ export default function routerFactory(store) {
 
     router.beforeEach(async (to, from, next) => {
         console.log("nav", from.name, "->", to.name);
-        console.log("nav", from, "->", to);
         if (from.name === null && (to.name === null || to.name == "login")) {
             console.log("nav", "authenticated", store.getters.isAuthenticated);
             if (store.getters.isAuthenticated) {
