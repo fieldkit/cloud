@@ -46,6 +46,7 @@ export default Vue.extend({
 
 html {
 }
+
 html,
 body,
 #app {
@@ -53,6 +54,7 @@ body,
     flex-direction: column;
     min-height: 100vh;
 }
+
 body {
     --color-primary: #{$color-fieldkit-primary};
     --color-secondary: #{$color-fieldkit-secondary};
@@ -91,12 +93,15 @@ body {
         }
     }
 }
+
 body:not(.disable-scrolling) {
     overflow-y: scroll;
 }
+
 body.disable-scrolling {
     margin-right: 14px; /* We need width of the scrollbars! */
 }
+
 body.blue-background {
     background-color: #1b80c9;
 
@@ -110,16 +115,20 @@ body.blue-background {
         }
     }
 }
+
 html.map-view {
     height: 100%;
 }
+
 body.map-view {
     height: 100%;
 }
+
 a {
     text-decoration: none;
     color: inherit;
 }
+
 button {
     cursor: pointer;
     color: inherit;
@@ -128,11 +137,13 @@ button {
         font-family: $font-family-floodnet-button;
     }
 }
+
 .main-panel {
     width: auto;
     text-align: left;
     color: #2c3e50;
 }
+
 .main-panel h1 {
     font-size: 36px;
     margin-top: 40px;
@@ -146,6 +157,7 @@ ul {
     margin: 0;
     padding: 0;
 }
+
 li {
     list-style-type: none;
 }
