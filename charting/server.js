@@ -125,10 +125,26 @@ const localizedSensors = _(locale.modules)
   .value();
 
 app.get("/", (req, res) => {
-  res.send({ server_name: "", version: "", name: "", git: { hash: "" } });
+  res.send({
+    server_name: "",
+    version: "",
+    name: "",
+    git: { hash: "" },
+    path: "/",
+  });
 });
 
-app.get("/charts/rendered", async (req, res) => {
+app.get("/charting", (req, res) => {
+  res.send({
+    server_name: "",
+    version: "",
+    name: "",
+    git: { hash: "" },
+    path: "/charting",
+  });
+});
+
+app.get("/charting/rendered", async (req, res) => {
   // TODO Authorization header
 
   res.setHeader("Content-Type", "image/png");
@@ -293,6 +309,7 @@ app.get("/charts/rendered", async (req, res) => {
     stream.pipe(res);
   } catch (error) {
     console.log(`charting: ${error.message}`);
+    throw error;
   }
 });
 
