@@ -2,6 +2,7 @@ const _ = require("lodash");
 const express = require("express");
 const vega = require("vega");
 const vegaLite = require("vega-lite");
+
 const axios = require("axios");
 const app = express();
 
@@ -13,6 +14,91 @@ const lineSpec = require("./vega/line.v1.json");
 const histogramSpec = require("./vega/histogram.v1.json");
 const rangeSpec = require("./vega/range.v1.json");
 const doubleLineSpec = require("./vega/doubleLine.v1.json");
+
+vega.expressionFunction("fkHumanReadable", (datum) => {
+  if (_.isUndefined(datum)) {
+    return "N/A";
+  }
+  if (this.valueSuffix) {
+    return `${datum.toFixed(3)} ${this.valueSuffix}`;
+  }
+  return `${datum.toFixed(3)}`;
+});
+
+class Chart {
+  sensor(index, label, units) {
+    throw new Error("charting: NOT IMPLEMENTED");
+  }
+
+  data(index, data) {
+    throw new Error("charting: NOT IMPLEMENTED");
+  }
+}
+
+class TimeSeriesChart extends Chart {
+  constructor(viz) {
+    super();
+    this.double = viz[0].length > 1;
+    if (this.double) {
+      this.spec = _.cloneDeep(doubleLineSpec);
+    } else {
+      this.spec = _.cloneDeep(lineSpec);
+    }
+  }
+
+  sensor(index, label, units) {
+    if (this.double) {
+      this.spec.layer[index].encoding.y.title = label;
+    } else {
+      if (index == 0) {
+        this.spec.layer[0].encoding.y.axis.title = label;
+      }
+    }
+  }
+
+  data(index, data) {
+    if (this.double) {
+      this.spec.layer[index].data = {
+        name: `table_${index}`,
+        values: data.data,
+      };
+    } else {
+      this.spec.data = { name: `table`, values: data.data };
+    }
+  }
+}
+
+class RangeChart extends Chart {
+  constructor(viz) {
+    super();
+    this.spec = _.cloneDeep(rangeSpec);
+  }
+
+  sensor(index, label, units) {
+    this.spec.encoding.y.axis.title = label;
+  }
+
+  data(index, data) {
+    this.spec.data = { name: "table", values: data.data };
+  }
+}
+
+class HistogramChart extends Chart {
+  constructor(viz) {
+    super();
+    this.spec = _.cloneDeep(histogramSpec);
+  }
+
+  sensor(index, label, units) {
+    this.spec.encoding.x.axis.title = label;
+  }
+
+  data(index, data) {
+    this.spec.data = { name: "table", values: data.data };
+  }
+}
+
+const charts = [TimeSeriesChart, HistogramChart, RangeChart, TimeSeriesChart];
 
 const locale = require("./en.json");
 const localizedSensors = _(locale.modules)
@@ -52,17 +138,33 @@ app.get("/charts/rendered", async (req, res) => {
 
     if (!req.query.bookmark) throw new Error("charting: Bookmark is required");
 
-    const spec = _.cloneDeep(doubleLineSpec);
     const bookmark = JSON.parse(req.query.bookmark);
     const w = req.query.w || 800;
     const h = req.query.h || 300;
 
     console.log(`charting:bookmark`, bookmark);
 
+    const specs = [];
+
     const allQueries = _.flattenDeep(
       bookmark.g.map((g1) => {
         return g1.map((g2) => {
           return g2.map((viz) => {
+            console.log(`charting:viz`, viz);
+
+            const chartTypeBookmark = viz[3];
+
+            const chartCtor = charts[chartTypeBookmark];
+            if (!chartCtor) throw new Error("charting: Unknown chart type");
+
+            const chart = new chartCtor(viz);
+
+            const spec = chart.spec;
+            spec.config = chartConfig;
+            spec.width = w;
+            spec.height = h;
+            specs.push(spec);
+
             return viz[0].map((vizSensor, index) => {
               const when = viz[1];
 
@@ -117,7 +219,7 @@ app.get("/charts/rendered", async (req, res) => {
                       return `${name}`;
                     };
 
-                    spec.layer[index].encoding.y.title = make();
+                    chart.sensor(index, make(), sensor.unit_of_measure);
                   },
                 },
                 /*
@@ -144,10 +246,7 @@ app.get("/charts/rendered", async (req, res) => {
                   url: `${baseUrl}/sensors/data?${dataParams.toString()}`,
                   handle: (key, data) => {
                     console.log(`charting:handle-data(${key})`);
-                    spec.layer[index].data = {
-                      name: `table_${index}`,
-                      values: data.data,
-                    };
+                    chart.data(index, data);
                   },
                 },
               ];
@@ -181,15 +280,7 @@ app.get("/charts/rendered", async (req, res) => {
 
     console.log(`charting:data-queries-done`, responses);
 
-    // spec.layer[0].data = { name: "table0", values: dataLeft.data };
-    // spec.layer[0].encoding.y.title = "Left";
-    // spec.layer[1].data = { name: "table1", values: dataRight.data };
-    // spec.layer[1].encoding.y.title = "Right";
-    spec.config = chartConfig;
-    spec.width = w;
-    spec.height = h;
-
-    const vegaSpec = vegaLite.compile(spec);
+    const vegaSpec = vegaLite.compile(specs[0]);
     const parsedSpec = vega.parse(vegaSpec.spec);
     const view = new vega.View(parsedSpec, {
       logger: vega.logger(vega.Debug, "error"),
