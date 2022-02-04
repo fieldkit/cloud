@@ -4,7 +4,7 @@
 
 <script>
 import { default as vegaEmbed } from "vega-embed";
-import rangeSpec from "./range.vl.json";
+import rangeSpec from "./range.v1.json";
 import chartConfig from "./chartConfig.json";
 
 export default {

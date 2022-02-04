@@ -10,7 +10,7 @@
 <script>
 import _ from "lodash";
 import { default as vegaEmbed } from "vega-embed";
-import scrubberSpec from "./scrubber.vl.json";
+import scrubberSpec from "./scrubber.v1.json";
 import chartConfig from "./chartConfig.json";
 
 import { TimeRange } from "../common";
@@ -102,5 +102,4 @@ export default {
 .viz {
     width: 100%;
 }
-
 </style>

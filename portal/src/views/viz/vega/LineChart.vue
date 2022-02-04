@@ -10,7 +10,7 @@
 import _ from "lodash";
 import { default as vegaEmbed } from "vega-embed";
 import { expressionFunction } from "vega";
-import lineSpec from "./line.vl.json";
+import lineSpec from "./line.v1.json";
 import chartConfig from "./chartConfig.json";
 
 import { TimeRange } from "../common";

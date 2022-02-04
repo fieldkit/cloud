@@ -4,7 +4,7 @@
 
 <script>
 import { default as vegaEmbed } from "vega-embed";
-import histogramSpec from "./histo.vl.json";
+import histogramSpec from "./histogram.v1.json";
 import chartConfig from "./chartConfig.json";
 
 export default {
