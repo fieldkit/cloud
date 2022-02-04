@@ -78,3 +78,7 @@ EXPOSE 80
 ENTRYPOINT ["/server"]' > build/Dockerfile
 
 docker build -t conservify/fk-cloud:$DOCKER_TAG build
+
+cp build/static.env charting
+
+docker build -t conservify/fk-charting:$DOCKER_TAG charting

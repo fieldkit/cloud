@@ -6,14 +6,14 @@ const vegaLite = require("vega-lite");
 const axios = require("axios");
 const app = express();
 
-const port = 8081;
-const baseUrl = `http://127.0.0.1:8080`;
-
 const chartConfig = require("./vega/chartConfig.json");
 const lineSpec = require("./vega/line.v1.json");
 const histogramSpec = require("./vega/histogram.v1.json");
 const rangeSpec = require("./vega/range.v1.json");
 const doubleLineSpec = require("./vega/doubleLine.v1.json");
+
+const port = Number(process.env.FIELDKIT_PORT || 8081);
+const baseUrl = process.env.FIELDKT_BASE_URL || `http://127.0.0.1:8080`;
 
 vega.expressionFunction("fkHumanReadable", (datum) => {
   if (_.isUndefined(datum)) {
@@ -297,5 +297,5 @@ app.get("/charts/rendered", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`charting: listening on port ${port}`);
+  console.log(`charting: listening port=${port} base=${baseUrl}`);
 });
