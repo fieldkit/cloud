@@ -2,7 +2,7 @@ const _ = require("lodash");
 const express = require("express");
 const vega = require("vega");
 const vegaLite = require("vega-lite");
-
+const os = require("os");
 const axios = require("axios");
 const app = express();
 
@@ -124,25 +124,19 @@ const localizedSensors = _(locale.modules)
   .fromPairs()
   .value();
 
-app.get("/", (req, res) => {
+const statusHandler = (req, res) => {
   res.send({
-    server_name: "",
-    version: "",
-    name: "",
-    git: { hash: "" },
-    path: "/",
+    server_name: process.env.FIELDKIT_SERVER_NAME,
+    version: process.env.FIELDKIT_VERSION,
+    name: process.env.HOSTNAME,
+    tag: process.env.TAG,
+    git: { hash: process.env.GIT_HASH },
   });
-});
+};
 
-app.get("/charting", (req, res) => {
-  res.send({
-    server_name: "",
-    version: "",
-    name: "",
-    git: { hash: "" },
-    path: "/charting",
-  });
-});
+app.get("/", statusHandler);
+
+app.get("/charting", statusHandler);
 
 app.get("/charting/rendered", async (req, res) => {
   // TODO Authorization header
