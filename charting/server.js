@@ -138,7 +138,7 @@ app.get("/", statusHandler);
 
 app.get("/charting", statusHandler);
 
-app.get("/charting/rendered", async (req, res) => {
+app.get("/charting/rendered", async (req, res, next) => {
   // TODO Authorization header
 
   res.setHeader("Content-Type", "image/png");
@@ -302,8 +302,8 @@ app.get("/charting/rendered", async (req, res) => {
 
     stream.pipe(res);
   } catch (error) {
-    console.log(`charting: ${error.message}`);
-    throw error;
+    console.log(`charting:error`, error.message);
+    next(error);
   }
 });
 
