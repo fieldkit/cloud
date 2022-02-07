@@ -113,15 +113,36 @@ func (tw *TwitterContext) SharedProject(w http.ResponseWriter, req *http.Request
 	}
 }
 
-func (tw *TwitterContext) Handler(continueServing http.Handler) http.Handler {
-	r := mux.NewRouter()
+func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	log := Logger(ctx).Sugar()
+	vars := mux.Vars(req)
 
+	bookmark := vars["bookmark"]
+
+	log.Infow("twitter-workspace-card", "bookmark", bookmark)
+
+	// NOTE TODO We're casually assuming https everywhere.
+	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v", tw.baseApiUrl, bookmark)
+
+	meta := make(map[string]string)
+	meta["twitter:card"] = "summary_large_image"
+	meta["twitter:site"] = "@FieldKitOrg"
+	meta["twitter:title"] = "Name"
+	meta["twitter:description"] = "Description"
+	meta["twitter:image"] = photoUrl
+	meta["twitter:image:alt"] = "Description"
+
+	if err := tw.serveMeta(w, req, meta); err != nil {
+		log.Errorw("error-internal", "error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+}
+
+func (tw *TwitterContext) Register(r *mux.Router) {
 	s := r.NewRoute().HeadersRegexp("User-Agent", ".*Twitterbot.*").Subrouter()
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}", tw.SharedProject)
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", tw.SharedProject)
-	r.NotFoundHandler = continueServing
-
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		r.ServeHTTP(w, req)
-	})
+	s.HandleFunc("/dashboard/explore/{bookmark}", tw.SharedWorkspace)
 }

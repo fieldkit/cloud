@@ -17,6 +17,8 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
+	"github.com/gorilla/mux"
+
 	"github.com/O-C-R/singlepage"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -372,48 +374,33 @@ func main() {
 		log.Infow("portal spa disabled")
 	}
 
-	statusHandler := health.StatusHandler(ctx)
-
 	_, err = api.AuthorizationHeaderMiddleware(config.SessionKey)
 	if err != nil {
 		panic(err)
 	}
 
+	statusHandler := health.StatusHandler(ctx)
 	services := theApi.services
 	statusFinal := logging.Monitoring("status", services.Metrics)(statusHandler)
 	ingesterFinal := logging.Monitoring("ingester", services.Metrics)(ingester.Handler)
 	apiFinal := logging.Monitoring("api", services.Metrics)(theApi.handler)
+	staticFinal := logging.Monitoring("static", services.Metrics)(portalServer)
 
-	tw := social.NewTwitterContext(services.Database, config.ApiHost)
-	socialFinal := tw.Handler(portalServer)
+	rootRouter := mux.NewRouter()
+	rootRouter.Handle("/status", statusFinal)
 
-	staticFinal := logging.Monitoring("static", services.Metrics)(socialFinal)
+	twitterHandlerFactory := social.NewTwitterContext(services.Database, config.ApiHost)
+	twitterHandlerFactory.Register(rootRouter)
 
-	serveApi := func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/ingestion" {
-			ingesterFinal.ServeHTTP(w, req)
-		} else {
-			apiFinal.ServeHTTP(w, req)
-		}
-	}
+	apiOnly := rootRouter.Host(config.ApiDomain).Subrouter()
+	apiOnly.Handle("/ingestion", ingesterFinal)
+	apiOnly.NotFoundHandler = apiFinal
 
-	finalHandler := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path == "/status" {
-			statusFinal.ServeHTTP(w, req)
-			return
-		}
-
-		if req.Host == config.ApiDomain {
-			serveApi(w, req)
-			return
-		}
-
-		staticFinal.ServeHTTP(w, req)
-	})
+	rootRouter.NotFoundHandler = staticFinal
 
 	server := &http.Server{
 		Addr:    config.Addr,
-		Handler: finalHandler,
+		Handler: rootRouter,
 	}
 
 	if err := server.ListenAndServe(); err != nil {
