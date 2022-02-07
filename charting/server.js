@@ -146,7 +146,10 @@ app.get("/charting/rendered", async (req, res, next) => {
   try {
     console.log(`charting:query`, req.query);
 
-    if (!req.query.bookmark) throw new Error("charting: Bookmark is required");
+    if (!req.query.bookmark) {
+      res.status(400).send("bad request");
+      return;
+    }
 
     const bookmark = JSON.parse(req.query.bookmark);
     const w = req.query.w || 800;
