@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -123,7 +124,7 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 	log.Infow("twitter-workspace-card", "bookmark", bookmark)
 
 	// NOTE TODO We're casually assuming https everywhere.
-	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v", tw.baseApiUrl, bookmark)
+	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v", tw.baseApiUrl, url.QueryEscape(bookmark))
 
 	meta := make(map[string]string)
 	meta["twitter:card"] = "summary_large_image"
