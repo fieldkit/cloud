@@ -355,8 +355,8 @@ export default Vue.extend({
 }
 
 .controls-container .left {
-    align-items: center;
     display: flex;
+    align-items: center;
     flex-direction: column;
 }
 
@@ -375,13 +375,14 @@ export default Vue.extend({
     }
 }
 
-.controls-container .left.half {
+.controls-container .half {
     flex-basis: 50%;
 }
 
 .controls-container .tree-pair {
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
 .controls-container .tree-pair div {
@@ -390,12 +391,12 @@ export default Vue.extend({
 
 .controls-container .right {
     display: flex;
-    justify-content: center;
-    align-items: baseline;
+    justify-content: flex-end;
+    align-items: center;
 }
 
-.controls-container .row-2 .right {
-    flex-basis: 10%;
+.controls-container .right .chart-type {
+    flex-basis: 25%;
 }
 
 .controls-container .right {

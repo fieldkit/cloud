@@ -276,8 +276,10 @@ export const ViewingControls = Vue.extend({
 			<div class="row row-2">
                 <SelectionControls :viz="viz" :workspace="workspace" @viz-change-sensors="raiseChangeSensors" />
 
-				<div class="right chart-type" v-if="chartTypes.length > 1">
-					<treeselect :options="chartTypes" :value="viz.chartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
+				<div class="right half" v-if="chartTypes.length > 1">
+                    <div class="chart-type">
+                        <treeselect :options="chartTypes" :value="viz.chartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
+                    </div>
 				</div>
 			</div>
 		</div>
