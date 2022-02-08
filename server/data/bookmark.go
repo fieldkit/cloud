@@ -3,6 +3,7 @@ package data
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 )
 
 type VizBookmark = []interface{} // [Stations, Sensors, [number, number], [[number, number], [number, number]] | [], ChartType, FastTime] | [];
@@ -13,6 +14,19 @@ type Bookmark struct {
 	Version  int32           `json:"v"`
 	Groups   []GroupBookmark `json:"g"`
 	Stations []int32         `json:"s"`
+}
+
+type BookmarkSensor struct {
+	StationID int32  `json:"station_id"`
+	ModuleID  string `json:"module_id"`
+	SensorID  int64  `json:"sensor_id"`
+}
+
+type BookmarkViz struct {
+	Start       time.Time         `json:"start"`
+	End         time.Time         `json:"end"`
+	ExtremeTime bool              `json:"extreme_time"`
+	Sensors     []*BookmarkSensor `json:"sensors"`
 }
 
 func ParseBookmark(s string) (*Bookmark, error) {
@@ -47,6 +61,51 @@ func ParseBookmark(s string) (*Bookmark, error) {
 		}
 	}
 	return &b, nil
+}
+
+func (b *Bookmark) Vizes() []*BookmarkViz {
+	vizes := make([]*BookmarkViz, 0)
+
+	MaxTime := int64(8640000000000000)
+	MinTime := -MaxTime
+
+	for _, g1 := range b.Groups {
+		for _, g2 := range g1 {
+			for _, viz := range g2 {
+				if len(viz) == 5 {
+					timeRange := viz[1].([]interface{})
+
+					startRaw := int64(timeRange[0].(float64))
+					endRaw := int64(timeRange[1].(float64))
+
+					bookmarkViz := &BookmarkViz{
+						Start:       time.Unix(0, startRaw*int64(time.Millisecond)),
+						End:         time.Unix(0, endRaw*int64(time.Millisecond)),
+						ExtremeTime: startRaw == MinTime || endRaw == MaxTime,
+						Sensors:     make([]*BookmarkSensor, 0),
+					}
+
+					for _, s := range viz[0].([]interface{}) {
+						values := s.([]interface{})
+						stationID := int32(values[0].(float64))
+						sensorAndModule := values[1].([]interface{})
+						moduleID := sensorAndModule[0].(string)
+						sensorID := int64(sensorAndModule[1].(float64))
+
+						bookmarkViz.Sensors = append(bookmarkViz.Sensors, &BookmarkSensor{
+							StationID: stationID,
+							ModuleID:  moduleID,
+							SensorID:  sensorID,
+						})
+					}
+
+					vizes = append(vizes, bookmarkViz)
+				}
+			}
+		}
+	}
+
+	return vizes
 }
 
 func (b *Bookmark) StationIDs() []int32 {

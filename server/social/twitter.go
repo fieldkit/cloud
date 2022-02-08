@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 
@@ -123,16 +124,68 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 
 	log.Infow("twitter-workspace-card", "bookmark", bookmark)
 
-	// NOTE TODO We're casually assuming https everywhere.
-	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v", tw.baseApiUrl, url.QueryEscape(bookmark))
+	parsed, err := data.ParseBookmark(bookmark)
+	if err != nil {
+		log.Errorw("error-internal", "error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	sensorRows := []*data.Sensor{}
+	if err := tw.db.SelectContext(ctx, &sensorRows, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
+		log.Errorw("error-internal", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	sensorIdToKey := make(map[int64]string)
+	for _, row := range sensorRows {
+		sensorIdToKey[row.ID] = row.Key
+	}
+
+	sr := repositories.NewStationRepository(tw.db)
+
+	sensorKeys := make([]string, 0)
+	stationNames := make([]string, 0)
+	ranges := make([]string, 0)
 
 	meta := make(map[string]string)
+
+	for _, v := range parsed.Vizes() {
+		log.Infow("viz:parsed", "v", v)
+
+		for _, s := range v.Sensors {
+			station, err := sr.QueryStationByID(ctx, s.StationID)
+			if err != nil {
+				log.Errorw("error-internal", "error", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			stationNames = append(stationNames, station.Name)
+			sensorKeys = append(sensorKeys, sensorIdToKey[s.SensorID])
+		}
+
+		start := v.Start.Format(time.RFC1123)
+		end := v.End.Format(time.RFC1123)
+		ranges = append(ranges, fmt.Sprintf("%s to %s", start, end))
+
+		meta["twitter:title"] = fmt.Sprintf("%s: %s", stationNames[0], sensorKeys[0])
+
+		if !v.ExtremeTime {
+			meta["twitter:description"] = ranges[0]
+		}
+
+		break // NOTE Single out first Viz.
+	}
+
+	log.Infow("viz", "sensors", sensorKeys)
+
+	// NOTE TODO We're casually assuming https everywhere.
+	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v", tw.baseApiUrl, url.QueryEscape(bookmark))
 	meta["twitter:card"] = "summary_large_image"
 	meta["twitter:site"] = "@FieldKitOrg"
-	meta["twitter:title"] = "Name"
-	meta["twitter:description"] = "Description"
 	meta["twitter:image"] = photoUrl
-	meta["twitter:image:alt"] = "Description"
+	meta["twitter:image:alt"] = meta["twitter:description"]
 
 	if err := tw.serveMeta(w, req, meta); err != nil {
 		log.Errorw("error-internal", "error", err)
