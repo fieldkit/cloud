@@ -392,6 +392,9 @@ func main() {
 	twitterHandlerFactory := social.NewTwitterContext(services.Database, config.ApiHost)
 	twitterHandlerFactory.Register(rootRouter)
 
+	localApiOnly := rootRouter.Host("fk-service:8000").Subrouter()
+	localApiOnly.NotFoundHandler = apiFinal
+
 	apiOnly := rootRouter.Host(config.ApiDomain).Subrouter()
 	apiOnly.Handle("/ingestion", ingesterFinal)
 	apiOnly.NotFoundHandler = apiFinal
