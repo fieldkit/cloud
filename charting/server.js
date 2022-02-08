@@ -144,7 +144,7 @@ app.get("/charting/rendered", async (req, res, next) => {
   res.setHeader("Content-Type", "image/png");
 
   try {
-    console.log(`charting:query`, req.query);
+    console.log(`charting:query`);
 
     if (!req.query.bookmark) {
       res.status(400).send("bad request");
@@ -155,7 +155,7 @@ app.get("/charting/rendered", async (req, res, next) => {
     const w = req.query.w || 800;
     const h = req.query.h || 300;
 
-    console.log(`charting:bookmark`, bookmark);
+    console.log(`charting:bookmark`, JSON.stringify(bookmark));
 
     const specs = [];
 
@@ -163,7 +163,7 @@ app.get("/charting/rendered", async (req, res, next) => {
       bookmark.g.map((g1) => {
         return g1.map((g2) => {
           return g2.map((viz) => {
-            console.log(`charting:viz`, viz);
+            console.log(`charting:viz`, JSON.stringify(viz));
 
             const chartTypeBookmark = viz[3];
 
@@ -204,8 +204,14 @@ app.get("/charting/rendered", async (req, res, next) => {
                       .groupBy((r) => r.id)
                       .value();
 
-                    if (!sensorKeysById[String(sensorId)])
-                      throw new Error("charting: Missing sensor");
+                    if (!sensorKeysById[String(sensorId)]) {
+                      console.log(
+                        `charting: sensors: ${JSON.stringify(
+                          _.keys(sensorKeysById)
+                        )}`
+                      );
+                      throw new Error(`charting: Missing sensor: ${sensorId}`);
+                    }
 
                     const sensorKey = sensorKeysById[String(sensorId)][0].key;
                     const sensors = _(data.modules)
@@ -215,8 +221,11 @@ app.get("/charting/rendered", async (req, res, next) => {
                       .value();
 
                     const byKey = sensors[sensorKey];
-                    if (byKey.length == 0)
-                      throw new Error("charting: Missing sensor meta");
+                    if (byKey.length == 0) {
+                      throw new Error(
+                        `charting: Missing sensor meta: ${sensorKey}`
+                      );
+                    }
                     const sensor = byKey[0];
 
                     const name = localizedSensors[sensorKey];
@@ -274,7 +283,7 @@ app.get("/charting/rendered", async (req, res, next) => {
       .value();
 
     const uniqueQueries = _.uniqBy(allQueries, (q) => q.key);
-    console.log(`charting:data-queries`, uniqueQueries);
+    console.log(`charting:data-queries`, uniqueQueries.length);
 
     const responses = await Promise.all(
       uniqueQueries.map((axiosQuery) =>
