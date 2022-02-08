@@ -153,7 +153,7 @@ app.get("/charting/rendered", async (req, res, next) => {
 
     const bookmark = JSON.parse(req.query.bookmark);
     const w = req.query.w || 800;
-    const h = req.query.h || 300;
+    const h = req.query.h || 418;
 
     console.log(`charting:bookmark`, JSON.stringify(bookmark));
 
