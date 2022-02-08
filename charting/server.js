@@ -13,7 +13,7 @@ const rangeSpec = require("./vega/range.v1.json");
 const doubleLineSpec = require("./vega/doubleLine.v1.json");
 
 const port = Number(process.env.FIELDKIT_PORT || 8081);
-const baseUrl = process.env.FIELDKT_BASE_URL || `http://127.0.0.1:8080`;
+const baseUrl = process.env.FIELDKIT_BASE_URL || `http://127.0.0.1:8080`;
 
 vega.expressionFunction("fkHumanReadable", (datum) => {
   if (_.isUndefined(datum)) {
