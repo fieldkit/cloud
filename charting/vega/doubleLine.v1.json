@@ -9,7 +9,18 @@
       "type": "temporal",
       "axis": {
         "formatType": "time",
-        "format": "%Y-%m-%d"
+        "format": "%Y-%m-%d",
+        "tickCount": 8,
+        "labelPadding": -24,
+        "tickSize": 30,
+        "gridDash": [
+          2,
+          2
+        ],
+        "tickDash": [
+          2,
+          2
+        ]
       }
     }
   },
@@ -30,7 +41,15 @@
             },
             "labelOpacity": {
               "expr": "1"
-            }
+            },
+            "gridOpacity": {
+              "expr": "1"
+            },
+            "grid": true,
+            "gridDash": [
+              2,
+              2
+            ]
           }
         }
       },
@@ -208,7 +227,15 @@
             },
             "labelOpacity": {
               "expr": "0.2"
-            }
+            },
+            "gridOpacity": {
+              "expr": "0.2"
+            },
+            "grid": true,
+            "gridDash": [
+              2,
+              2
+            ]
           }
         }
       },

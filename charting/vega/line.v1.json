@@ -9,11 +9,8 @@
       "type": "temporal",
       "axis": {
         "domain": true,
-        "grid": false,
-        "tickCount": "month",
         "tickMinStep": 1,
-        "tickOpacity": 1,
-        "gridOpacity": 0.3,
+        "tickOpacity": 0,
         "title": "Time",
         "titleFontWeight": 400,
         "titleColor": "#7f7f7f",
@@ -22,7 +19,16 @@
         "labelColor": "#7f7f7f",
         "labelOverlap": "parity",
         "labelFlush": true,
-        "labelBound": true
+        "labelBound": true,
+        "tickCount": 8,
+        "gridDash": [
+          2,
+          2
+        ],
+        "tickDash": [
+          2,
+          2
+        ]
       }
     }
   },
@@ -37,7 +43,15 @@
           },
           "axis": {
             "domain": true,
-            "tickOpacity": 1,
+            "gridDash": [
+              2,
+              2
+            ],
+            "tickDash": [
+              2,
+              2
+            ],
+            "tickOpacity": 0,
             "title": "Value",
             "titleFontWeight": 400,
             "titleColor": "#7f7f7f",
