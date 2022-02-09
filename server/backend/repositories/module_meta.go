@@ -37,6 +37,69 @@ type HeaderFields struct {
 type ModuleMetaRepository struct {
 }
 
+// TODO This needs to move with all the other meta data to the database.
+var (
+	EnUs = map[string]string{
+		"fk.water.ec.ec": "Conductivity", "fk.water.ec.tds": "TDS",
+		"fk.water.ec.salinity": "Salinity",
+		"fk.water.ph.ph":       "pH",
+		"fk.water.do.do":       "DO", "fk.water.do.temperature": "Temperature",
+		"fk.water.do.pressure": "Pressure", "fk.water.dox.dox": "DO",
+		"fk.water.temp.temp":        "Temperature",
+		"fk.water.orp.orp":          "ORP",
+		"fk.weather.humidity":       "Humidity",
+		"fk.weather.temperature1":   "Temperature 1",
+		"fk.weather.pressure":       "Pressure",
+		"fk.weather.temperature2":   "Temperature 2",
+		"fk.weather.rain":           "Rain",
+		"fk.weather.wind":           "Wind",
+		"fk.weather.windMv":         "Wind Raw ADC",
+		"fk.weather.windSpeed":      "Wind Speed",
+		"fk.weather.windDir":        "Wind Direction",
+		"fk.weather.windDirMv":      "Wind Direction Raw ADC",
+		"fk.weather.windHrMaxSpeed": "Wind Max Speed (1 hour)", "fk.weather.windHrMaxDir": "Wind Max Direction (1 hour)",
+		"fk.weather.wind10mMaxSpeed": "Wind Max Speed (10 min)",
+		"fk.weather.wind10mMaxDir":   "Wind Max Direction (10 min)",
+		"fk.weather.wind2mAvgSpeed":  "Wind Average Speed (2 min)",
+		"fk.weather.wind2mAvgDir":    "Wind Average Direction (2 min)",
+		"fk.weather.rainThisHour":    "Rain This Hour", "fk.weather.rainPrevHour": "Rain Previous Hour",
+		"fk.distance.distance":          "Distance",
+		"fk.distance.distance0":         "Distance 0",
+		"fk.distance.distance1":         "Distance 1",
+		"fk.distance.distance2":         "Distance 2",
+		"fk.distance.calibration":       "Calibration",
+		"fk.diagnostics.batteryCharge":  "Battery Charge",
+		"fk.diagnostics.batteryVoltage": "Battery Voltage",
+		"fk.diagnostics.batteryVbus":    "Battery Bus Voltage",
+		"fk.diagnostics.batteryVs":      "Battery Shunt Voltage",
+		"fk.diagnostics.batteryMa":      "Battery Current",
+		"fk.diagnostics.batteryPower":   "Battery Power",
+		"fk.diagnostics.freeMemory":     "Free Memory",
+		"fk.diagnostics.uptime":         "Uptime",
+		"fk.diagnostics.temperature":    "Temperature",
+		"fk.random.random0":             "Random 0",
+		"fk.random.random1":             "Random 1",
+		"fk.random.random2":             "Random 2",
+		"fk.random.random3":             "Random 3",
+		"fk.random.random4":             "Random 4",
+		"fk.random.random5":             "Random 5", "fk.random.random6": "Random 6",
+		"fk.random.random7": "Random 7", "fk.random.random8": "Random 8",
+		"fk.random.random9":           "Random 9",
+		"fk.testing.sin":              "Sin(x)",
+		"fk.testing.saw.weekly":       "Saw(x)",
+		"wh.floodnet.battery":         "Battery",
+		"wh.floodnet.distance":        "Distance",
+		"wh.floodnet.depth":           "Depth",
+		"wh.floodnet.depthUnfiltered": "Depth (Unfiltered)",
+		"wh.floodnet.tideFeet":        "Tide Level",
+		"wh.floodnet.altitude":        "Altitude",
+		"wh.floodnet.temperature":     "Temperature",
+		"wh.floodnet.pressure":        "Pressure",
+		"wh.floodnet.sdError":         "SD Error",
+		"wh.floodnet.humidity":        "Humidity",
+	}
+)
+
 var (
 	moduleMeta []*ModuleMeta
 )
@@ -1035,6 +1098,12 @@ func init() {
 		for sensorIndex, s := range m.Sensors {
 			s.Order = sensorIndex
 			s.FullKey = m.Key + "." + s.Key
+			s.Strings = make(map[string]map[string]string)
+			s.Strings["en-us"] = make(map[string]string)
+
+			if label, ok := EnUs[s.FullKey]; ok {
+				s.Strings["en-us"]["label"] = label
+			}
 		}
 	}
 }

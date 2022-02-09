@@ -17,14 +17,15 @@ type VizConfig struct {
 }
 
 type SensorMeta struct {
-	Key           string         `json:"key"`
-	FullKey       string         `json:"full_key"`
-	FirmwareKey   string         `json:"firmware_key"`
-	UnitOfMeasure string         `json:"unit_of_measure"`
-	Order         int            `json:"order"`
-	Ranges        []SensorRanges `json:"ranges"`
-	Internal      bool           `json:"internal"`
-	VizConfigs    []VizConfig    `json:"viz"`
+	Key           string                       `json:"key"`
+	FullKey       string                       `json:"full_key"`
+	FirmwareKey   string                       `json:"firmware_key"`
+	UnitOfMeasure string                       `json:"unit_of_measure"`
+	Order         int                          `json:"order"`
+	Ranges        []SensorRanges               `json:"ranges"`
+	Internal      bool                         `json:"internal"`
+	VizConfigs    []VizConfig                  `json:"viz"`
+	Strings       map[string]map[string]string `json:"strings"`
 }
 
 type ModuleMeta struct {
