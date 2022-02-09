@@ -100,30 +100,6 @@ class HistogramChart extends Chart {
 
 const charts = [TimeSeriesChart, HistogramChart, RangeChart, TimeSeriesChart];
 
-const locale = require("./en.json");
-const localizedSensors = _(locale.modules)
-  .map((m, moduleKey) => {
-    return _(m.sensors)
-      .map((sensorName, sensorKey) => {
-        const normalizedKey = sensorKey
-          .split(".")
-          .map((p) => _.camelCase(p).replace("10M", "10m").replace("2M", "2m"))
-          .join(".");
-
-        if (moduleKey.indexOf("wh.") == 0) {
-          const fullKey = [moduleKey, normalizedKey].join(".");
-          return [fullKey, sensorName];
-        }
-
-        const fullKey = ["fk", moduleKey, normalizedKey].join(".");
-        return [fullKey, sensorName];
-      })
-      .value();
-  })
-  .flatten()
-  .fromPairs()
-  .value();
-
 const statusHandler = (req, res) => {
   res.send({
     server_name: process.env.FIELDKIT_SERVER_NAME,
@@ -228,7 +204,7 @@ app.get("/charting/rendered", async (req, res, next) => {
                     }
                     const sensor = byKey[0];
 
-                    const name = localizedSensors[sensorKey];
+                    const name = sensor.strings["en-us"]["label"] || "Unknown";
 
                     console.log(
                       `charting:handle-meta(${key}) sensor-id=${sensorId} sensor-key=${sensorKey} uom='${sensor.unit_of_measure}'`
