@@ -1,6 +1,12 @@
 <template>
     <div id="app">
         <router-view />
+        <i
+            v-if="isFloodnetCustomisationEnabled()"
+            role="img"
+            :aria-label="$tc('layout.logo.fieldkit')"
+            class="icon icon-logo-fieldkit app-logo"
+        ></i>
     </div>
 </template>
 
@@ -8,6 +14,8 @@
 import Vue from "vue";
 import * as ActionTypes from "@/store/actions";
 import { AuthenticationRequiredError } from "@/api";
+import { FKPartnersEnum } from "@/views/shared/PartnerCustomisationHelper";
+import { isCustomisationEnabledFor } from "@/views/shared/PartnerCustomisationHelper";
 
 export default Vue.extend({
     async beforeMount(): Promise<void> {
@@ -35,6 +43,9 @@ export default Vue.extend({
                 document.body.classList.add("floodnet");
             }
         },
+        isFloodnetCustomisationEnabled(): boolean {
+            return isCustomisationEnabledFor(FKPartnersEnum.floodnet);
+        },
     },
 });
 </script>
@@ -46,6 +57,7 @@ export default Vue.extend({
 
 html {
 }
+
 html,
 body,
 #app {
@@ -53,6 +65,7 @@ body,
     flex-direction: column;
     min-height: 100vh;
 }
+
 body {
     --color-primary: #{$color-fieldkit-primary};
     --color-secondary: #{$color-fieldkit-secondary};
@@ -91,12 +104,15 @@ body {
         }
     }
 }
+
 body:not(.disable-scrolling) {
     overflow-y: scroll;
 }
+
 body.disable-scrolling {
     margin-right: 14px; /* We need width of the scrollbars! */
 }
+
 body.blue-background {
     background-color: #1b80c9;
 
@@ -110,16 +126,20 @@ body.blue-background {
         }
     }
 }
+
 html.map-view {
     height: 100%;
 }
+
 body.map-view {
     height: 100%;
 }
+
 a {
     text-decoration: none;
     color: inherit;
 }
+
 button {
     cursor: pointer;
     color: inherit;
@@ -128,11 +148,13 @@ button {
         font-family: $font-family-floodnet-button;
     }
 }
+
 .main-panel {
     width: auto;
     text-align: left;
     color: #2c3e50;
 }
+
 .main-panel h1 {
     font-size: 36px;
     margin-top: 40px;
@@ -146,6 +168,7 @@ ul {
     margin: 0;
     padding: 0;
 }
+
 li {
     list-style-type: none;
 }
@@ -172,5 +195,16 @@ li {
 
 .vc-nav-header * {
     color: #fff !important;
+}
+
+.app-logo {
+    @include position(fixed, null null 15px 15px);
+    z-index: $z-index-app-logo;
+    font-size: 28px;
+    text-shadow: 0 5px 7px rgba(0, 0, 0, 0.2);
+
+    &:before {
+        color: var(--color-dark);
+    }
 }
 </style>
