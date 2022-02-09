@@ -476,6 +476,7 @@ header {
         @include flex(center);
         padding: 0 10px;
         font-weight: 900;
+        flex-shrink: 0;
 
         @include bp-down($sm) {
             bottom: 25px;
@@ -627,8 +628,11 @@ header {
 }
 
 .timestamp {
-    @include position(absolute, 0 0 null null);
     font-family: $font-family-light;
+    flex-shrink: 0;
+    margin-left: auto;
+    line-height: 1.5;
+    padding-left: 10px;
 }
 
 .fade-enter-active,
