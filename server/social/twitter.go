@@ -138,6 +138,8 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 		return
 	}
 
+	mmr := repositories.NewModuleMetaRepository()
+
 	sensorIdToKey := make(map[int64]string)
 	for _, row := range sensorRows {
 		sensorIdToKey[row.ID] = row.Key
@@ -146,6 +148,7 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 	sr := repositories.NewStationRepository(tw.db)
 
 	sensorKeys := make([]string, 0)
+	sensorLabels := make([]string, 0)
 	stationNames := make([]string, 0)
 	ranges := make([]string, 0)
 
@@ -161,15 +164,27 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
+
+			sensorKey := sensorIdToKey[s.SensorID]
+
+			sensorMeta, err := mmr.FindByFullKey(sensorKey)
+			if err != nil {
+				log.Errorw("error-internal", "error", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			label := sensorMeta.Sensor.Strings["en-us"]["label"]
 			stationNames = append(stationNames, station.Name)
-			sensorKeys = append(sensorKeys, sensorIdToKey[s.SensorID])
+			sensorKeys = append(sensorKeys, sensorKey)
+			sensorLabels = append(sensorLabels, label)
 		}
 
 		start := v.Start.Format(time.RFC1123)
 		end := v.End.Format(time.RFC1123)
 		ranges = append(ranges, fmt.Sprintf("%s to %s", start, end))
 
-		meta["twitter:title"] = fmt.Sprintf("%s: %s", stationNames[0], sensorKeys[0])
+		meta["twitter:title"] = fmt.Sprintf("%s: %s", stationNames[0], sensorLabels[0])
 
 		if !v.ExtremeTime {
 			meta["twitter:description"] = ranges[0]
