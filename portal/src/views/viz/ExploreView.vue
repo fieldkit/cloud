@@ -403,12 +403,16 @@ export default Vue.extend({
     font-size: 12px;
 }
 
+.controls-container .right.half {
+    align-items: flex-start;
+}
+
 .controls-container .view-by {
-    margin: 35px 10px 0 10px;
+    margin: 0px 10px 0 10px;
 }
 
 .controls-container .fast-time {
-    margin: 35px 10px 0 10px;
+    margin: 0px 10px 0 10px;
     cursor: pointer;
 }
 
